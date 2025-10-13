@@ -1,0 +1,17 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 2%
+    patch:
+      default:
+        target: 80%
+        threshold: 2%
+
+ignore:
+  - "tests/**/*"
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+  - "vite.config.ts"
+  - "jest.config.cjs"
