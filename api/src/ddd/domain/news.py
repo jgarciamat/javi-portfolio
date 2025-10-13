@@ -6,7 +6,7 @@ class NewsItem:
         self.url = url
         self.summary = summary
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "title": self.title,
             "url": self.url,

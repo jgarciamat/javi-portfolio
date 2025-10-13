@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit && cd api && mypy ."
   },
   "dependencies": {
     "react": "^19.1.1",
