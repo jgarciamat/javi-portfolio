@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1760371459046" clover="3.2.0">
+  <project timestamp="1760371459046" name="All files">
+    <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2" elements="11" coveredelements="11" complexity="0" loc="7" ncloc="7" packages="2" files="2" classes="2"/>
+    <package name="application">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="fetchNews.ts" path="/Users/javi/proyectos/src/ddd/application/fetchNews.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="infrastructure">
+      <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="newsApi.ts" path="/Users/javi/proyectos/src/ddd/infrastructure/newsApi.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="8" type="stmt"/>
+        <line num="5" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="3" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

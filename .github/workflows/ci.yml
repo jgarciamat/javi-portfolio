@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   frontend:
@@ -25,11 +25,22 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Lint
+      run: npm run lint
+      
     - name: Type check
       run: npx tsc --noEmit
       
-    - name: Run tests
-      run: npm test
+    - name: Run tests and coverage
+      run: npm run test:coverage
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true
+        flags: frontend
+        verbose: true
       
     - name: Build
       run: npm run build

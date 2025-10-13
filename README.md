@@ -1,8 +1,52 @@
-# React + TypeScript + Vite
+# Javi Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![CI/CD](https://github.com/jgarciamat/javi-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/jgarciamat/javi-portfolio/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jgarciamat/javi-portfolio/branch/master/graph/badge.svg)](https://codecov.io/gh/jgarciamat/javi-portfolio)
 
-Currently, two official plugins are available:
+Portfolio web application con React y FastAPI, siguiendo arquitectura DDD.
+
+## Tecnologías
+- Frontend:
+  - React 19
+  - TypeScript
+  - Sass
+  - Jest + Testing Library
+- Backend:
+  - Python FastAPI
+  - MyPy para type checking
+
+## Scripts Disponibles
+
+### Frontend
+```bash
+npm run dev            # Inicia el servidor de desarrollo
+npm run build         # Construye la aplicación
+npm test             # Ejecuta los tests
+npm run test:coverage # Ejecuta los tests con cobertura
+npm run lint         # Ejecuta el linter
+```
+
+### Backend
+```bash
+pip install -r requirements.txt  # Instala dependencias
+uvicorn api.main:app --reload   # Inicia el servidor de desarrollo
+pytest                          # Ejecuta los tests
+mypy .                          # Verifica tipos
+```
+
+## CI/CD
+El proyecto utiliza GitHub Actions para:
+- Verificación de tipos
+- Linting
+- Tests y cobertura de código
+- Build
+- Integración con Codecov
+
+Los requisitos de cobertura son:
+- Cobertura general del proyecto: 90%
+- Cobertura de cambios nuevos: 95%
+
+## Plugins de Vite
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
