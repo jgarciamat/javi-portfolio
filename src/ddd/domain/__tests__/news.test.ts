@@ -28,7 +28,7 @@ describe('filterNews', () => {
     it('debe filtrar noticias que contienen el texto en el título', () => {
         const result = filterNews(testNews, { titleContains: 'React' });
         expect(result).toHaveLength(2);
-        expect(result.every(news => 
+        expect(result.every(news =>
             news.title.toLowerCase().includes('react')
         )).toBe(true);
     });
