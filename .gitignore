@@ -36,6 +36,7 @@ venv.bak/
 # Coverage
 .coverage
 coverage.xml
+coverage/
 htmlcov/
 
 # Editor directories and files
