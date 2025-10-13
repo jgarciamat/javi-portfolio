@@ -17,6 +17,6 @@ app.add_middleware(
 
 
 @app.get("/news", response_model=List[dict])
-def get_news():
+def get_news() -> List[dict]:
     news_items = get_relevant_news()
     return [item.to_dict() for item in news_items]

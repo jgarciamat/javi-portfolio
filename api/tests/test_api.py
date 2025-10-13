@@ -4,12 +4,12 @@ from api.main import app
 
 client = TestClient(app)
 
-def test_get_empty_news():
+def test_get_empty_news() -> None:
     response = client.get("/news")
     assert response.status_code == 200
     assert response.json() == []
 
-def test_add_and_get_news():
+def test_add_and_get_news() -> None:
     test_news = {
         "title": "Test News",
         "url": "https://test.com",
