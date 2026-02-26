@@ -142,7 +142,7 @@ describe('UpdateAvatar', () => {
     it('throws when image is too large', async () => {
         const repo = makeRepo(makeUser());
         const uc = new UpdateAvatar(repo);
-        const bigDataUrl = 'data:image/png;base64,' + 'A'.repeat(270_001);
+        const bigDataUrl = 'data:image/png;base64,' + 'A'.repeat(810_001);
 
         await expect(
             uc.execute({ userId: 'user-1', avatarDataUrl: bigDataUrl })

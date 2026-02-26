@@ -2,6 +2,7 @@ import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
+import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
 
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear } = useAnnualChart(initialYear); const { data, loading, error } = useAnnualSummary(year);
@@ -17,13 +18,19 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
         { income: 0, expenses: 0, saving: 0 }
     );
 
+    // Next-year button: disabled if the entire next year is beyond the 7-day rule.
+    // Use January of the next year as the probe: if January of next year is not yet accessible,
+    // navigating to that year is not allowed either.
+    const now = new Date();
+    const nextYearDisabled = isNextButtonDisabled(year + 1, 1, now);
+
     return (
         <div className="annual-view">
             {/* Year picker */}
             <div className="annual-header">
                 <button className="btn-nav" onClick={prevYear}>‹ {year - 1}</button>
                 <h2 className="annual-title">Balance anual {year}</h2>
-                <button className="btn-nav" onClick={nextYear} disabled={year >= initialYear}>
+                <button className="btn-nav" onClick={nextYear} disabled={nextYearDisabled}>
                     {year + 1} ›
                 </button>
             </div>
@@ -75,7 +82,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                         </div>
                                     </div>
                                     <div className="annual-month-label">
-                                        {onMonthClick ? (
+                                        {onMonthClick && !isNextButtonDisabled(year, month, now) ? (
                                             <button
                                                 type="button"
                                                 className="annual-month-btn"
@@ -145,8 +152,8 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                             <tbody>
                                 {months.map(({ month, income, expenses, saving, balance }) => (
                                     <tr key={month}>
-                                    <td className="annual-td-month">
-                                            {onMonthClick ? (
+                                        <td className="annual-td-month">
+                                            {onMonthClick && !isNextButtonDisabled(year, month, now) ? (
                                                 <button
                                                     type="button"
                                                     className="annual-month-btn"

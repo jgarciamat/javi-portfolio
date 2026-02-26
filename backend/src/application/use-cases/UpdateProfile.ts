@@ -65,9 +65,9 @@ export class UpdateAvatar {
         if (!avatarDataUrl.startsWith('data:image/')) {
             throw new Error('Formato de imagen no válido');
         }
-        // Limit size to ~200 KB (base64 ratio ~1.33)
-        if (avatarDataUrl.length > 270_000) {
-            throw new Error('La imagen es demasiado grande (máx. 200 KB)');
+        // Limit size to ~600 KB (base64 ratio ~1.33)
+        if (avatarDataUrl.length > 810_000) {
+            throw new Error('La imagen es demasiado grande (máx. 600 KB)');
         }
 
         const updated = user.withAvatar(avatarDataUrl);

@@ -1,8 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AnnualChart } from '@modules/finances/ui/components/AnnualChart';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 const mockGetAnnual = jest.fn().mockResolvedValue({
-    year: 2025,
+    year: CURRENT_YEAR,
     months: {
         1: { income: 1000, expenses: 400, saving: 100, balance: 500 },
         2: { income: 0, expenses: 200, saving: 0, balance: -200 },
@@ -23,7 +25,7 @@ describe('AnnualChart', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockGetAnnual.mockResolvedValue({
-            year: 2025,
+            year: CURRENT_YEAR,
             months: {
                 1: { income: 1000, expenses: 400, saving: 100, balance: 500 },
             },
@@ -31,22 +33,22 @@ describe('AnnualChart', () => {
     });
 
     test('renders annual chart with title', async () => {
-        render(<AnnualChart initialYear={2025} />);
-        await waitFor(() => expect(screen.getByText(/Balance anual 2025/i)).toBeInTheDocument());
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
     });
 
     test('shows loading state initially', () => {
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         expect(screen.getByText(/Cargando/i)).toBeInTheDocument();
     });
 
     test('renders month labels after data loads', async () => {
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getAllByText('Ene').length).toBeGreaterThan(0));
     });
 
     test('shows annual totals section', async () => {
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText('Total ingresos')).toBeInTheDocument());
         expect(screen.getByText('Total gastos')).toBeInTheDocument();
         expect(screen.getByText('Total ahorrado')).toBeInTheDocument();
@@ -54,27 +56,27 @@ describe('AnnualChart', () => {
     });
 
     test('prevYear button navigates to previous year', async () => {
-        render(<AnnualChart initialYear={2025} />);
-        await waitFor(() => expect(screen.getByText(/Balance anual 2025/i)).toBeInTheDocument());
-        fireEvent.click(screen.getByText(/‹ 2024/));
-        await waitFor(() => expect(screen.getByText(/Balance anual 2024/i)).toBeInTheDocument());
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
+        fireEvent.click(screen.getByText(new RegExp(`‹ ${CURRENT_YEAR - 1}`)));
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR - 1}`, 'i'))).toBeInTheDocument());
     });
 
-    test('nextYear button is disabled when at initialYear', async () => {
-        render(<AnnualChart initialYear={2025} />);
-        await waitFor(() => expect(screen.getByText(/Balance anual 2025/i)).toBeInTheDocument());
-        const nextBtn = screen.getByText(/2026/);
+    test('nextYear button is disabled when at current year', async () => {
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
+        const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 1}`));
         expect(nextBtn).toBeDisabled();
     });
 
     test('shows error state when API fails', async () => {
         mockGetAnnual.mockRejectedValueOnce(new Error('Annual error'));
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText(/Annual error/i)).toBeInTheDocument());
     });
 
     test('shows legend items', async () => {
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText('Ingresos')).toBeInTheDocument());
         expect(screen.getByText('Gastos')).toBeInTheDocument();
         expect(screen.getByText('Ahorro')).toBeInTheDocument();
@@ -83,27 +85,27 @@ describe('AnnualChart', () => {
     test('shows — for zero values in monthly table', async () => {
         mockGetAnnual.mockReset();
         mockGetAnnual.mockResolvedValue({
-            year: 2025,
+            year: CURRENT_YEAR,
             months: { 1: { income: 0, expenses: 0, saving: 0, balance: 0 } },
         });
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getAllByText('—').length).toBeGreaterThan(0));
     });
 
     test('shows negative balance colors when expenses exceed income', async () => {
         mockGetAnnual.mockReset();
         mockGetAnnual.mockResolvedValue({
-            year: 2025,
+            year: CURRENT_YEAR,
             months: { 1: { income: 100, expenses: 800, saving: 0, balance: -700 } },
         });
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText('Balance anual')).toBeInTheDocument());
         // Negative balance means ef4444 color applied — component renders without error
         expect(screen.getByText('Balance anual')).toBeInTheDocument();
     });
 
     test('triggers mouse events on chart bars', async () => {
-        render(<AnnualChart initialYear={2025} />);
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getAllByText('Ene').length).toBeGreaterThan(0));
         const incomeBars = document.querySelectorAll('.annual-bar-income');
         if (incomeBars.length > 0) {

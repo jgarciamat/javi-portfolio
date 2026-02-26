@@ -78,8 +78,8 @@ export function ProfilePage({ onClose }: Props) {
             setAvatarMsg({ ok: false, text: 'El archivo debe ser una imagen' });
             return;
         }
-        if (file.size > 200_000) {
-            setAvatarMsg({ ok: false, text: 'La imagen no puede superar 200 KB' });
+        if (file.size > 600_000) {
+            setAvatarMsg({ ok: false, text: 'La imagen no puede superar 600 KB' });
             return;
         }
         const reader = new FileReader();

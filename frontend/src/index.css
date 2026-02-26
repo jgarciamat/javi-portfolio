@@ -1538,9 +1538,14 @@ textarea {
 /* ─── Transaction form: action buttons row ─────── */
 .tx-form-actions {
     display: flex;
+    flex-direction: row;
     gap: 0.75rem;
     margin-top: 0.25rem;
-    flex-wrap: wrap;
+}
+
+.tx-form-actions>button {
+    flex: 1;
+    min-width: 0;
 }
 
 /* ─── Annual chart: clickable month labels ─────── */
@@ -1619,8 +1624,15 @@ textarea {
 }
 
 @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to   { transform: translateX(0);    opacity: 1; }
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .profile-header {
@@ -1648,7 +1660,9 @@ textarea {
     transition: color 0.15s;
 }
 
-.profile-close:hover { color: #f1f5f9; }
+.profile-close:hover {
+    color: #f1f5f9;
+}
 
 .profile-section {
     display: flex;
