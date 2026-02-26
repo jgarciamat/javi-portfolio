@@ -61,7 +61,7 @@ export function useTransactionForm({
             return;
         }
         const parsedAmount = parseFloat(amount);
-        if ((type === 'EXPENSE' || type === 'SAVING') && parsedAmount > availableBalance) {
+        if (type === 'SAVING' && parsedAmount > availableBalance) {
             const fmt = (n: number) =>
                 new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(n);
             setError(`Saldo insuficiente. Saldo disponible: ${fmt(availableBalance)}`);
