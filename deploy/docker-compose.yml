@@ -1,0 +1,48 @@
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - web_dist:/usr/share/nginx/html:ro
+      - ./nginx-web.conf:/etc/nginx/conf.d/default.conf:ro
+
+  api:
+    image: node:20-alpine
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: /data/db.sqlite
+      JWT_SECRET: "${JWT_SECRET}"
+      RESEND_API_KEY: "${RESEND_API_KEY}"
+      RESEND_FROM_EMAIL: "${RESEND_FROM_EMAIL}"
+      SMTP_FROM_NAME: "${SMTP_FROM_NAME}"
+      APP_URL: "${APP_URL}"
+      NPM_CONFIG_PRODUCTION: "false"
+      TS_NODE_PROJECT: /app/tsconfig.json
+      TS_CONFIG_PATHS_BASEURL: /app/src
+    volumes:
+      - ../backend:/app
+      - api_data:/data
+    command: sh -lc "npm install --include=dev && npm run build && node -r tsconfig-paths/register dist/infrastructure/express/server.js"
+
+volumes:
+  web_dist:
+  api_data:
+  caddy_data:
+  caddy_config:

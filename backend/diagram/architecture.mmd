@@ -1,0 +1,12 @@
+graph TB
+    H["HTTP Request"]
+    M["Auth Middleware"]
+    C["Controller"]
+    U["Use Case"]
+    P["Ports / Interfaces"]
+    R["Repository"]
+    D["Domain (Entities / VOs)"]
+    DB[(SQLite DB)]
+
+    H --> M --> C --> U --> P --> R --> DB
+    U --> D

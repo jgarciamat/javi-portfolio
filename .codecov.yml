@@ -1,0 +1,37 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 1%
+        informational: false
+    patch:
+      default:
+        target: 95%
+        threshold: 1%
+        informational: false
+  
+  notify:
+    slack:
+      default:
+        url: "${{ secrets.SLACK_WEBHOOK }}"
+        threshold: 1%
+        only_pulls: false
+        branches: ["master"]
+        
+  flags:
+    frontend:
+      paths:
+        - src/
+      carryforward: true
+
+ignore:
+  - "tests/**/*"
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+  - "**/__mocks__/**"
+  - "src/setupTests.ts"
+  - "vite.config.ts"
+  - "jest.config.cjs"
+  - "**/*.config.js"
+  - "**/*.config.ts"
