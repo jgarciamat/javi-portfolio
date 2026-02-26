@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { MonthlyBudget } from '@domain/entities/MonthlyBudget';
 import { IMonthlyBudgetRepository } from '@domain/repositories/IMonthlyBudgetRepository';
+import { MonthlyBudgetRow } from './row-types';
 
 export class SqliteMonthlyBudgetRepository implements IMonthlyBudgetRepository {
     constructor(private readonly db: Database.Database) { }
@@ -28,18 +29,18 @@ export class SqliteMonthlyBudgetRepository implements IMonthlyBudgetRepository {
     async findByUserAndMonth(userId: string, year: number, month: number): Promise<MonthlyBudget | null> {
         const row = this.db
             .prepare('SELECT * FROM monthly_budgets WHERE user_id = ? AND year = ? AND month = ?')
-            .get(userId, year, month) as any;
+            .get(userId, year, month) as MonthlyBudgetRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findAllByUser(userId: string): Promise<MonthlyBudget[]> {
         const rows = this.db
             .prepare('SELECT * FROM monthly_budgets WHERE user_id = ? ORDER BY year DESC, month DESC')
-            .all(userId) as any[];
+            .all(userId) as MonthlyBudgetRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
-    private toEntity(row: any): MonthlyBudget {
+    private toEntity(row: MonthlyBudgetRow): MonthlyBudget {
         return MonthlyBudget.create({
             id: row.id,
             userId: row.user_id,

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export interface CategoryProps {
     id: string;
     name: string;
@@ -22,7 +24,6 @@ export class Category {
         if (!props.name || props.name.trim() === '') {
             throw new Error('Category name cannot be empty');
         }
-        const { v4: uuidv4 } = require('uuid');
         return new Category({
             id: uuidv4(),
             name: props.name.trim(),
@@ -51,7 +52,7 @@ export class Category {
         return this._icon;
     }
 
-    toJSON() {
+    toJSON(): CategoryProps {
         return {
             id: this._id,
             name: this._name,

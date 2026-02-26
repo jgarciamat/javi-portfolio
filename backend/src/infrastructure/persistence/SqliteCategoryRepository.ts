@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { Category } from '@domain/entities/Category';
 import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
+import { CategoryRow } from './row-types';
 
 const DEFAULT_CATEGORIES = [
     { name: 'Ahorro', color: '#a78bfa', icon: '🐷' },
@@ -46,24 +47,24 @@ export class SqliteCategoryRepository implements ICategoryRepository {
     }
 
     async findById(id: string): Promise<Category | null> {
-        const row = this.db.prepare('SELECT * FROM categories WHERE id = ?').get(id) as any;
+        const row = this.db.prepare('SELECT * FROM categories WHERE id = ?').get(id) as CategoryRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findByName(name: string): Promise<Category | null> {
-        const row = this.db.prepare('SELECT * FROM categories WHERE lower(name) = lower(?)').get(name) as any;
+        const row = this.db.prepare('SELECT * FROM categories WHERE lower(name) = lower(?)').get(name) as CategoryRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findAll(): Promise<Category[]> {
-        const rows = this.db.prepare('SELECT * FROM categories ORDER BY name').all() as any[];
+        const rows = this.db.prepare('SELECT * FROM categories ORDER BY name').all() as CategoryRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
     async findAllByUser(userId: string): Promise<Category[]> {
         const rows = this.db
             .prepare('SELECT * FROM categories WHERE user_id = ? ORDER BY name')
-            .all(userId) as any[];
+            .all(userId) as CategoryRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
@@ -71,7 +72,7 @@ export class SqliteCategoryRepository implements ICategoryRepository {
         this.db.prepare('DELETE FROM categories WHERE id = ?').run(id);
     }
 
-    private toEntity(row: any): Category {
+    private toEntity(row: CategoryRow): Category {
         return Category.reconstitute({ id: row.id, name: row.name, color: row.color, icon: row.icon });
     }
 }

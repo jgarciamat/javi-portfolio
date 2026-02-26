@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -16,7 +16,7 @@ import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
 import { CategoryController } from '@infrastructure/controllers/CategoryController';
 import { BudgetController } from '@infrastructure/controllers/BudgetController';
-import { authMiddleware } from '@infrastructure/express/authMiddleware';
+import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
 
 dotenv.config();
@@ -35,7 +35,7 @@ const categoryRepo = new SqliteCategoryRepository(db);
 const budgetRepo = new SqliteMonthlyBudgetRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
-async function seedAdmin() {
+async function seedAdmin(): Promise<void> {
     const ADMIN_ID = 'admin-fixed-id-0000-0000-000000000001';
     const ADMIN_EMAIL = 'admin@admin.com';
     const ADMIN_PASS = 'admin';
@@ -47,17 +47,12 @@ async function seedAdmin() {
             INSERT OR IGNORE INTO users (id, email, name, password_hash, created_at, email_verified, verification_token)
             VALUES (?, ?, 'Admin', ?, ?, 1, NULL)
         `).run(ADMIN_ID, ADMIN_EMAIL, passwordHash, new Date().toISOString());
-        console.log('✅ Admin user created: admin@admin.com / admin');
     }
 
-    // Always ensure admin has categories (seed if missing — INSERT OR IGNORE is idempotent)
+    // Always ensure admin has categories (INSERT OR IGNORE is idempotent)
     categoryRepo.seedForUser(ADMIN_ID);
-    const catCount = (db.prepare('SELECT COUNT(*) as n FROM categories WHERE user_id = ?').get(ADMIN_ID) as any).n;
-    if (catCount > 0) {
-        console.log(`✅ Admin categories ready (${catCount})`);
-    }
 }
-seedAdmin().catch(console.error);
+seedAdmin().catch((err: unknown) => console.error('Seed error:', err));
 
 // --- Services ---
 const emailService = new EmailService();
@@ -79,34 +74,34 @@ const budgetController = new BudgetController(setMonthlyBudget, getMonthlyBudget
 const router = express.Router();
 
 // Public
-router.post('/auth/register', (req, res) => authController.register(req, res));
-router.post('/auth/login', (req, res) => authController.login(req, res));
-router.get('/auth/verify-email', (req, res) => authController.verify(req, res));
-router.get('/health', (_req, res) => res.json({ status: 'ok', app: 'money-manager-api' }));
+router.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
+router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
+router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
+router.get('/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'money-manager-api' }));
 
 // Protected
-router.use(authMiddleware as any);
+router.use(authMiddleware);
 
 // IMPORTANT: specific routes before parameterized ones
-router.get('/transactions/summary', (req, res) => transactionController.summary(req as any, res));
-router.get('/transactions/annual/:year', (req, res) => transactionController.annual(req as any, res));
-router.get('/transactions', (req, res) => transactionController.getAll(req as any, res));
-router.post('/transactions', (req, res) => transactionController.create(req as any, res));
-router.delete('/transactions/:id', (req, res) => transactionController.delete(req as any, res));
+router.get('/transactions/summary', (req: Request, res: Response) => transactionController.summary(req as AuthRequest, res));
+router.get('/transactions/annual/:year', (req: Request, res: Response) => transactionController.annual(req as AuthRequest, res));
+router.get('/transactions', (req: Request, res: Response) => transactionController.getAll(req as AuthRequest, res));
+router.post('/transactions', (req: Request, res: Response) => transactionController.create(req as AuthRequest, res));
+router.delete('/transactions/:id', (req: Request, res: Response) => transactionController.delete(req as AuthRequest, res));
 
-router.get('/categories', (req, res) => categoryController.getAll(req as any, res));
-router.post('/categories', (req, res) => categoryController.create(req as any, res));
-router.delete('/categories/:id', (req, res) => categoryController.delete(req as any, res));
+router.get('/categories', (req: Request, res: Response) => categoryController.getAll(req as AuthRequest, res));
+router.post('/categories', (req: Request, res: Response) => categoryController.create(req as AuthRequest, res));
+router.delete('/categories/:id', (req: Request, res: Response) => categoryController.delete(req as AuthRequest, res));
 
-router.get('/budget/history', (req, res) => budgetController.history(req as any, res));
-router.get('/budget/carryover/:year/:month', (req, res) => budgetController.carryover(req as any, res));
-router.get('/budget/:year/:month', (req, res) => budgetController.get(req as any, res));
-router.put('/budget/:year/:month', (req, res) => budgetController.set(req as any, res));
+router.get('/budget/history', (req: Request, res: Response) => budgetController.history(req as AuthRequest, res));
+router.get('/budget/carryover/:year/:month', (req: Request, res: Response) => budgetController.carryover(req as AuthRequest, res));
+router.get('/budget/:year/:month', (req: Request, res: Response) => budgetController.get(req as AuthRequest, res));
+router.put('/budget/:year/:month', (req: Request, res: Response) => budgetController.set(req as AuthRequest, res));
 
 app.use('/api', router);
 
 app.listen(PORT, () => {
-    console.log(`💰 Money Manager API running on http://localhost:${PORT}`);
+    console.info(`💰 Money Manager API running on http://localhost:${PORT}`);
 });
 
 export default app;

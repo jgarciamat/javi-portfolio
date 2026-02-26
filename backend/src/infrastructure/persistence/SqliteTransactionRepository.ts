@@ -4,6 +4,7 @@ import { ITransactionRepository } from '@domain/repositories/ITransactionReposit
 import { TransactionId } from '@domain/value-objects/TransactionId';
 import { Amount } from '@domain/value-objects/Amount';
 import { TransactionType } from '@domain/value-objects/TransactionType';
+import { TransactionRow, BalanceRow } from './row-types';
 
 export class SqliteTransactionRepository implements ITransactionRepository {
     constructor(private readonly db: Database.Database) { }
@@ -19,7 +20,7 @@ export class SqliteTransactionRepository implements ITransactionRepository {
       `)
             .run({
                 id: j.id,
-                userId: (transaction as any)._userId ?? '',
+                userId: '',
                 year: d.getFullYear(),
                 month: d.getMonth() + 1,
                 description: j.description,
@@ -55,28 +56,28 @@ export class SqliteTransactionRepository implements ITransactionRepository {
     }
 
     async findById(id: string): Promise<Transaction | null> {
-        const row = this.db.prepare('SELECT * FROM transactions WHERE id = ?').get(id) as any;
+        const row = this.db.prepare('SELECT * FROM transactions WHERE id = ?').get(id) as TransactionRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findAll(): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions ORDER BY date DESC')
-            .all() as any[];
+            .all() as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
     async findByUserAndMonth(userId: string, year: number, month: number): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions WHERE user_id = ? AND year = ? AND month = ? ORDER BY date DESC')
-            .all(userId, year, month) as any[];
+            .all(userId, year, month) as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
     async findByUserAndYear(userId: string, year: number): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions WHERE user_id = ? AND year = ? ORDER BY month ASC, date ASC')
-            .all(userId, year) as any[];
+            .all(userId, year) as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
@@ -90,28 +91,28 @@ export class SqliteTransactionRepository implements ITransactionRepository {
             FROM transactions
             WHERE user_id = ?
               AND (year < ? OR (year = ? AND month < ?))
-        `).get(userId, year, year, month) as { balance: number };
-        return Math.round((row?.balance ?? 0) * 100) / 100;
+        `).get(userId, year, year, month) as BalanceRow | undefined;
+        return Math.round(((row?.balance ?? 0) * 100)) / 100;
     }
 
     async findByType(type: string): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions WHERE type = ? ORDER BY date DESC')
-            .all(type.toUpperCase()) as any[];
+            .all(type.toUpperCase()) as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
     async findByCategory(category: string): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions WHERE lower(category) = lower(?) ORDER BY date DESC')
-            .all(category) as any[];
+            .all(category) as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
     async findByDateRange(from: Date, to: Date): Promise<Transaction[]> {
         const rows = this.db
             .prepare('SELECT * FROM transactions WHERE date >= ? AND date <= ? ORDER BY date DESC')
-            .all(from.toISOString(), to.toISOString()) as any[];
+            .all(from.toISOString(), to.toISOString()) as TransactionRow[];
         return rows.map((r) => this.toEntity(r));
     }
 
@@ -119,7 +120,7 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         this.db.prepare('DELETE FROM transactions WHERE id = ?').run(id);
     }
 
-    private toEntity(row: any): Transaction {
+    private toEntity(row: TransactionRow): Transaction {
         return Transaction.reconstitute({
             id: TransactionId.create(row.id),
             description: row.description,

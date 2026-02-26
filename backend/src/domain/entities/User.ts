@@ -30,7 +30,7 @@ export class User {
         return User.create({ ...this.props, emailVerified: true, verificationToken: null });
     }
 
-    toJSON() {
+    toJSON(): { id: string; email: string; name: string } {
         return { id: this.props.id, email: this.props.email, name: this.props.name };
     }
 }

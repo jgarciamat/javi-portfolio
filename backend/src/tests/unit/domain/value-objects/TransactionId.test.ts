@@ -21,10 +21,12 @@ describe('TransactionId', () => {
         });
 
         it('should throw error for null id', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             expect(() => TransactionId.create(null as any)).toThrow('TransactionId cannot be empty');
         });
 
         it('should throw error for undefined id', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             expect(() => TransactionId.create(undefined as any)).toThrow('TransactionId cannot be empty');
         });
     });

@@ -35,7 +35,7 @@ export class MonthlyBudget {
         return `${this.props.year}-${String(this.props.month).padStart(2, '0')}`;
     }
 
-    toJSON() {
+    toJSON(): { id: string; userId: string; year: number; month: number; initialAmount: number; label: string } {
         return {
             id: this.props.id,
             userId: this.props.userId,

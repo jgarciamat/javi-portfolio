@@ -66,8 +66,15 @@ gh_actions_deploy_javi_portfolio.pub
 # Vite cache
 .vite/
 
+# TypeScript build info
+*.tsbuildinfo
+
+# Jest cache
+.jest-cache/
+
 # Backup / temp files
 *.bak
+*.tmp
 
 # Root-level package files (not a monorepo root)
 /package.json

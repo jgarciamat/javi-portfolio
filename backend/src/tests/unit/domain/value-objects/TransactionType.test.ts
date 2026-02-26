@@ -22,6 +22,7 @@ describe('TransactionType', () => {
         });
 
         it('should throw for invalid type', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             expect(() => TransactionType.create('TRANSFER' as any)).toThrow(
                 'Invalid transaction type: TRANSFER'
             );

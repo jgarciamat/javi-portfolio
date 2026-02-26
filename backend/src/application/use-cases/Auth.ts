@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '@domain/entities/User';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
-import { SqliteCategoryRepository } from '@infrastructure/persistence/SqliteCategoryRepository';
+import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
 import { EmailService } from '@infrastructure/email/EmailService';
 
 const JWT_SECRET = process.env.JWT_SECRET ?? 'money-manager-secret-change-in-prod';
@@ -17,7 +17,7 @@ export interface RegisterResult { message: string; }
 export class RegisterUser {
     constructor(
         private readonly userRepo: IUserRepository,
-        private readonly categoryRepo: SqliteCategoryRepository,
+        private readonly categoryRepo: ICategoryRepository,
         private readonly emailService: EmailService,
     ) { }
 

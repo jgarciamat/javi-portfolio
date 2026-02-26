@@ -88,7 +88,7 @@ export class Transaction {
         return this._createdAt;
     }
 
-    toJSON() {
+    toJSON(): { id: string; description: string; amount: number; type: string; category: string; date: string; createdAt: string } {
         return {
             id: this._id.value,
             description: this._description,

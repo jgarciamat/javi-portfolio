@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { SqlMasterRow } from './row-types';
 
 let db: Database.Database;
 
@@ -71,7 +72,7 @@ function initSchema(db: Database.Database): void {
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as any;
+  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
   if (!info || info.sql.includes('SAVING')) return; // Already migrated or table doesn't exist
 
   db.pragma('foreign_keys = OFF');
@@ -98,7 +99,7 @@ function migrateTransactionsTable(db: Database.Database): void {
 }
 
 function migrateUsersEmailVerification(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as any;
+  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('email_verified')) {
     db.exec(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`);

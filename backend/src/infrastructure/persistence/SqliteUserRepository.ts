@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { User } from '@domain/entities/User';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
+import { UserRow } from './row-types';
 
 export class SqliteUserRepository implements IUserRepository {
     constructor(private readonly db: Database.Database) { }
@@ -29,21 +30,21 @@ export class SqliteUserRepository implements IUserRepository {
     }
 
     async findById(id: string): Promise<User | null> {
-        const row = this.db.prepare('SELECT * FROM users WHERE id = ?').get(id) as any;
+        const row = this.db.prepare('SELECT * FROM users WHERE id = ?').get(id) as UserRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const row = this.db.prepare('SELECT * FROM users WHERE email = ?').get(email) as any;
+        const row = this.db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
     async findByVerificationToken(token: string): Promise<User | null> {
-        const row = this.db.prepare('SELECT * FROM users WHERE verification_token = ?').get(token) as any;
+        const row = this.db.prepare('SELECT * FROM users WHERE verification_token = ?').get(token) as UserRow | undefined;
         return row ? this.toEntity(row) : null;
     }
 
-    private toEntity(row: any): User {
+    private toEntity(row: UserRow): User {
         return User.create({
             id: row.id,
             email: row.email,
