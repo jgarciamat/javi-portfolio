@@ -54,7 +54,16 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
         );
     }
 
+    async findAllByUser(_userId: string): Promise<Category[]> {
+        // In-memory repo is not user-scoped; return all categories
+        return this.findAll();
+    }
+
     async delete(id: string): Promise<void> {
         this.categories.delete(id);
+    }
+
+    seedForUser(_userId: string): void {
+        // In-memory repo seeds defaults in constructor; no-op per user
     }
 }

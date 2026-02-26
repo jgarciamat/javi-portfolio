@@ -5,7 +5,7 @@ export function TransactionTable({ transactions, onDelete }: TransactionTablePro
     if (transactions.length === 0) {
         return (
             <div style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
-                <div style={{ fontSize: '2.5rem' }}>📭</div>
+                <div style={{ fontSize: '2.5rem' }}>{'\uD83D\uDCB8'}</div>
                 <p style={{ margin: '0.5rem 0 0' }}>No hay transacciones aún. ¡Añade una!</p>
             </div>
         );
