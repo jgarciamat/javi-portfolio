@@ -33,6 +33,7 @@ interface FinancesState {
 interface FinancesActions {
     goToPrev: () => void;
     goToNext: () => void;
+    navigateTo: (year: number, month: number) => void;
     addTransaction: (dto: CreateTransactionDTO) => Promise<Transaction>;
     removeTransaction: (id: string) => Promise<void>;
     addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
@@ -74,6 +75,11 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         setYear((y) => (month === 12 ? y + 1 : y));
         setMonth((m) => (m === 12 ? 1 : m + 1));
     }, [month]);
+
+    const navigateTo = useCallback((targetYear: number, targetMonth: number) => {
+        setYear(targetYear);
+        setMonth(targetMonth);
+    }, []);
 
     // ── Transactions state ────────────────────────────────────────────────────
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -194,6 +200,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         error,
         goToPrev,
         goToNext,
+        navigateTo,
         addTransaction,
         removeTransaction,
         addCategory,

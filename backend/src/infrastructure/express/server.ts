@@ -11,11 +11,13 @@ import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/Sqlit
 
 import { RegisterUser, LoginUser, VerifyEmail } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
+import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
 import { CategoryController } from '@infrastructure/controllers/CategoryController';
 import { BudgetController } from '@infrastructure/controllers/BudgetController';
+import { ProfileController } from '@infrastructure/controllers/ProfileController';
 import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
 
@@ -69,6 +71,11 @@ const authController = new AuthController(registerUser, loginUser, verifyEmail);
 const transactionController = new TransactionController(transactionRepo);
 const categoryController = new CategoryController(categoryRepo);
 const budgetController = new BudgetController(setMonthlyBudget, getMonthlyBudget, transactionRepo);
+const profileController = new ProfileController(
+    new UpdateName(userRepo),
+    new UpdatePassword(userRepo),
+    new UpdateAvatar(userRepo),
+);
 
 // --- Routes ---
 const router = express.Router();
@@ -97,6 +104,11 @@ router.get('/budget/history', (req: Request, res: Response) => budgetController.
 router.get('/budget/carryover/:year/:month', (req: Request, res: Response) => budgetController.carryover(req as AuthRequest, res));
 router.get('/budget/:year/:month', (req: Request, res: Response) => budgetController.get(req as AuthRequest, res));
 router.put('/budget/:year/:month', (req: Request, res: Response) => budgetController.set(req as AuthRequest, res));
+
+// Profile
+router.patch('/profile/name', (req: Request, res: Response) => profileController.patchName(req as AuthRequest, res));
+router.patch('/profile/password', (req: Request, res: Response) => profileController.patchPassword(req as AuthRequest, res));
+router.patch('/profile/avatar', (req: Request, res: Response) => profileController.patchAvatar(req as AuthRequest, res));
 
 app.use('/api', router);
 

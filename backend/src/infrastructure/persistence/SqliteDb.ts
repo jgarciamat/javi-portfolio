@@ -107,4 +107,7 @@ function migrateUsersEmailVerification(db: Database.Database): void {
   if (!info.sql.includes('verification_token')) {
     db.exec(`ALTER TABLE users ADD COLUMN verification_token TEXT`);
   }
+  if (!info.sql.includes('avatar_url')) {
+    db.exec(`ALTER TABLE users ADD COLUMN avatar_url TEXT`);
+  }
 }

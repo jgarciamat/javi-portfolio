@@ -1489,3 +1489,226 @@ textarea {
 .collapsible-body-inner {
     padding: 0 1.25rem 1.25rem;
 }
+
+/* ─── Auth: Remember-me checkbox ──────────────── */
+.auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    cursor: pointer;
+    width: 100%;
+}
+
+.auth-remember input[type='checkbox'] {
+    accent-color: #6366f1;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+}
+
+/* ─── Auth: Password strength hints ───────────── */
+.auth-password-hints {
+    list-style: none;
+    margin: -2px 0 4px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.auth-hint-error {
+    font-size: 0.78rem;
+    color: #f87171;
+    margin: 0;
+}
+
+.auth-hint-ok {
+    font-size: 0.78rem;
+    color: #4ade80;
+    margin: -2px 0 4px;
+}
+
+.auth-input-error {
+    border-color: #f87171 !important;
+}
+
+/* ─── Transaction form: action buttons row ─────── */
+.tx-form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+}
+
+/* ─── Annual chart: clickable month labels ─────── */
+.annual-month-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.annual-month-btn:hover {
+    color: #6366f1;
+    background: #1e293b;
+}
+
+/* ─── Header: avatar / profile button ─────────── */
+.header-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.header-user-btn:hover {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+.header-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #334155;
+}
+
+.header-avatar-placeholder {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* ─── Profile page overlay ─────────────────────── */
+.profile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: stretch;
+}
+
+.profile-panel {
+    background: #0f172a;
+    border-left: 1px solid #1e293b;
+    width: 100%;
+    max-width: 420px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: slideInRight 0.25s ease;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.profile-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.profile-close {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.15s;
+}
+
+.profile-close:hover { color: #f1f5f9; }
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 0;
+}
+
+.profile-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profile-divider {
+    border: none;
+    border-top: 1px solid #1e293b;
+    margin: 0;
+}
+
+.profile-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-avatar-preview {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.profile-avatar-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.profile-msg-ok {
+    font-size: 0.82rem;
+    color: #4ade80;
+    margin: 0;
+}

@@ -6,6 +6,7 @@ export interface UserProps {
     createdAt: Date;
     emailVerified: boolean;
     verificationToken: string | null;
+    avatarUrl?: string | null;
 }
 
 export class User {
@@ -25,12 +26,25 @@ export class User {
     get createdAt(): Date { return this.props.createdAt; }
     get emailVerified(): boolean { return this.props.emailVerified; }
     get verificationToken(): string | null { return this.props.verificationToken; }
+    get avatarUrl(): string | null { return this.props.avatarUrl ?? null; }
 
     verify(): User {
         return User.create({ ...this.props, emailVerified: true, verificationToken: null });
     }
 
-    toJSON(): { id: string; email: string; name: string } {
-        return { id: this.props.id, email: this.props.email, name: this.props.name };
+    withName(name: string): User {
+        return User.create({ ...this.props, name });
+    }
+
+    withPasswordHash(passwordHash: string): User {
+        return User.create({ ...this.props, passwordHash });
+    }
+
+    withAvatar(avatarUrl: string | null): User {
+        return User.create({ ...this.props, avatarUrl });
+    }
+
+    toJSON(): { id: string; email: string; name: string; avatarUrl: string | null } {
+        return { id: this.props.id, email: this.props.email, name: this.props.name, avatarUrl: this.props.avatarUrl ?? null };
     }
 }

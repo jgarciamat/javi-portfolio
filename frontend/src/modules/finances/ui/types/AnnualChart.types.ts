@@ -1,5 +1,7 @@
 export interface AnnualChartProps {
     initialYear: number;
+    /** Called when the user clicks a month label — navigates to that month's view */
+    onMonthClick?: (year: number, month: number) => void;
 }
 
 /** Internal state for the floating tooltip */

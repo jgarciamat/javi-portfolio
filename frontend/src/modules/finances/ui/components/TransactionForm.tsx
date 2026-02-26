@@ -11,6 +11,7 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
         setDate,
         handleCategoryChange,
         handleSubmit,
+        reset,
         loading,
         error,
     } = useTransactionForm({ viewYear, viewMonth, availableBalance, onSubmit });
@@ -46,9 +47,14 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
 
                 {error && <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0.4rem 0' }}>{error}</p>}
 
-                <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Guardando...' : 'Guardar transacción'}
-                </button>
+                <div className="tx-form-actions">
+                    <button type="submit" className="btn-primary" disabled={loading}>
+                        {loading ? 'Guardando...' : 'Guardar transacción'}
+                    </button>
+                    <button type="button" className="btn-cancel" onClick={reset} disabled={loading}>
+                        Cancelar
+                    </button>
+                </div>
             </form>
         </CollapsiblePanel>
     );

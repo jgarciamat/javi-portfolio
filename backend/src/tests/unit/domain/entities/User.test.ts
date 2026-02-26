@@ -51,7 +51,7 @@ describe('User entity', () => {
         it('should return public fields only', () => {
             const user = User.create(baseProps);
             const json = user.toJSON();
-            expect(json).toEqual({ id: 'user-id-001', email: 'test@example.com', name: 'Test User' });
+            expect(json).toEqual({ id: 'user-id-001', email: 'test@example.com', name: 'Test User', avatarUrl: null });
             expect(Object.keys(json)).not.toContain('passwordHash');
         });
     });

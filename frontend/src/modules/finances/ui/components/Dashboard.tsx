@@ -9,23 +9,29 @@ import { TransactionForm } from './TransactionForm';
 import { CategoryChart } from './CategoryChart';
 import { AnnualChart } from './AnnualChart';
 import { CategoryManager } from './CategoryManager';
+import { ProfilePage } from '@modules/auth/ui/ProfilePage';
+import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
 
 export function Dashboard() {
     const now = new Date();
     const [tab, setTab] = useState<'monthly' | 'annual'>('monthly');
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     const { user, logout } = useAuth();
     const {
         year, month,
         transactions, summary, carryover,
         categories, loading, error,
-        goToPrev, goToNext,
+        goToPrev, goToNext, navigateTo,
         addTransaction, removeTransaction,
         addCategory, removeCategory,
     } = useFinances();
 
     const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+
+    // Enable next month 7 days before the 1st of the following month
+    const isNextDisabled = isNextButtonDisabled(year, month, now);
 
     return (
         <div className="dashboard">
@@ -39,7 +45,18 @@ export function Dashboard() {
                     </div>
                 </div>
                 <div className="header-actions">
-                    <span className="header-user">👤 {user?.name}</span>
+                    <button
+                        className="header-user header-user-btn"
+                        onClick={() => setShowProfile(true)}
+                        aria-label="Abrir perfil"
+                        title="Ver perfil"
+                    >
+                        {user?.avatarUrl
+                            ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
+                            : <span className="header-avatar-placeholder">👤</span>
+                        }
+                        <span>{user?.name}</span>
+                    </button>
                     <button onClick={logout} className="btn-logout">Salir</button>
                 </div>
             </header>
@@ -57,7 +74,10 @@ export function Dashboard() {
 
                 {tab === 'annual' ? (
                     <div className="card">
-                        <AnnualChart initialYear={now.getFullYear()} />
+                        <AnnualChart
+                            initialYear={now.getFullYear()}
+                            onMonthClick={(y, m) => { navigateTo(y, m); setTab('monthly'); }}
+                        />
                     </div>
                 ) : (
                     <>
@@ -69,7 +89,7 @@ export function Dashboard() {
                                     <div className="month-nav-title">{MONTH_NAMES[month - 1]} {year}</div>
                                     {isCurrentMonth && <div className="month-nav-badge">Mes actual</div>}
                                 </div>
-                                <button onClick={goToNext} disabled={isCurrentMonth} className="btn-nav">Siguiente ›</button>
+                                <button onClick={goToNext} disabled={isNextDisabled} className="btn-nav">Siguiente ›</button>
                             </div>
                         </div>
 
@@ -107,7 +127,7 @@ export function Dashboard() {
                                 <TransactionTable transactions={transactions} onDelete={removeTransaction} />
                             </CollapsiblePanel>
 
-                            {summary && (
+                            {summary && transactions.length > 0 && (
                                 <CollapsiblePanel
                                     title="📊 Resumen por categoría"
                                     style={{ marginTop: '1.25rem', marginBottom: 0 }}
@@ -128,6 +148,9 @@ export function Dashboard() {
                 onAdd={addCategory}
                 onDelete={removeCategory}
             />
+
+            {/* Profile panel */}
+            {showProfile && <ProfilePage onClose={() => setShowProfile(false)} />}
         </div>
     );
 }

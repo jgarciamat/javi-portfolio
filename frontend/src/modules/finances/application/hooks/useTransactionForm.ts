@@ -97,6 +97,14 @@ export function useTransactionForm({
         setDate,
         handleCategoryChange,
         handleSubmit,
+        reset: () => {
+            setDescription('');
+            setAmount('');
+            setType('EXPENSE');
+            setCategory('');
+            setDate(getDefaultDate(viewYear, viewMonth));
+            setError(null);
+        },
         loading,
         error,
     };

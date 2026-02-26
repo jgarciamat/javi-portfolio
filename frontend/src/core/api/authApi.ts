@@ -53,6 +53,15 @@ export const authApi = {
     verifyEmail(token: string) {
         return publicRequest<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`);
     },
+    updateName(name: string) {
+        return request<{ name: string }>('/profile/name', { method: 'PATCH', body: JSON.stringify({ name }) });
+    },
+    updatePassword(currentPassword: string, newPassword: string) {
+        return request<{ message: string }>('/profile/password', { method: 'PATCH', body: JSON.stringify({ currentPassword, newPassword }) });
+    },
+    updateAvatar(avatarDataUrl: string) {
+        return request<{ avatarUrl: string }>('/profile/avatar', { method: 'PATCH', body: JSON.stringify({ avatarDataUrl }) });
+    },
 };
 
 export const budgetApi = {

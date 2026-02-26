@@ -9,6 +9,9 @@ interface AuthContextValue {
     register: (email: string, password: string, name: string) => Promise<string>;
     logout: () => void;
     isAuthenticated: boolean;
+    updateName: (name: string) => Promise<void>;
+    updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+    updateAvatar: (avatarDataUrl: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -48,8 +51,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     }, []);
 
+    const updateName = useCallback(async (name: string) => {
+        const result = await authApi.updateName(name);
+        setUser((u) => u ? { ...u, name: result.name } : u);
+        const stored = localStorage.getItem('mm_user');
+        if (stored) {
+            const parsed = JSON.parse(stored) as AuthUser;
+            localStorage.setItem('mm_user', JSON.stringify({ ...parsed, name: result.name }));
+        }
+    }, []);
+
+    const updatePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+        await authApi.updatePassword(currentPassword, newPassword);
+    }, []);
+
+    const updateAvatar = useCallback(async (avatarDataUrl: string) => {
+        const result = await authApi.updateAvatar(avatarDataUrl);
+        setUser((u) => u ? { ...u, avatarUrl: result.avatarUrl } : u);
+        const stored = localStorage.getItem('mm_user');
+        if (stored) {
+            const parsed = JSON.parse(stored) as AuthUser;
+            localStorage.setItem('mm_user', JSON.stringify({ ...parsed, avatarUrl: result.avatarUrl }));
+        }
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token, updateName, updatePassword, updateAvatar }}>
             {children}
         </AuthContext.Provider>
     );

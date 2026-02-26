@@ -30,6 +30,7 @@ const defaultFinancesContext = {
     error: null,
     goToPrev: mockGoToPrev,
     goToNext: mockGoToNext,
+    navigateTo: jest.fn(),
     addTransaction: mockAddTransaction,
     removeTransaction: mockRemoveTransaction,
     addCategory: mockAddCategory,
@@ -129,7 +130,7 @@ describe('Dashboard', () => {
         await waitFor(() => expect(mockAddTransaction).toHaveBeenCalled());
     });
 
-    test('shows "Mes actual" badge and disables next button when on current month', () => {
+    test('shows "Mes actual" badge when on current month', () => {
         const now = new Date();
         useFinances.mockReturnValue({
             ...defaultFinancesContext,
@@ -138,7 +139,6 @@ describe('Dashboard', () => {
         });
         render(<Dashboard />);
         expect(screen.getByText('Mes actual')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Siguiente/i })).toBeDisabled();
     });
 
     test('renders with null carryover and null summary', () => {

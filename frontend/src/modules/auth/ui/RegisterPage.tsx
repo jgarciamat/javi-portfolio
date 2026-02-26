@@ -1,30 +1,20 @@
-import { useState } from 'react';
-import { useAuth } from '@shared/hooks/useAuth';
+import { useRegisterForm } from '../application/useRegisterForm';
 
 interface Props { onSwitch: () => void; }
 
 export function RegisterPage({ onSwitch }: Props) {
-    const { register } = useAuth();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPass, setShowPass] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [registered, setRegistered] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true); setError(null);
-        try {
-            await register(email, password, name);
-            setRegistered(true);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const {
+        name, setName,
+        email, setEmail,
+        password, setPassword,
+        confirmPassword, setConfirmPassword,
+        showPass, setShowPass,
+        showConfirm, setShowConfirm,
+        error, loading, registered,
+        passwordValidation,
+        passwordsMatch, confirmTouched,
+        handleSubmit,
+    } = useRegisterForm();
 
     if (registered) {
         return (
@@ -60,18 +50,52 @@ export function RegisterPage({ onSwitch }: Props) {
                 <input className="auth-input" type="email" placeholder="Email" value={email}
                     onChange={(e) => setEmail(e.target.value)} required />
 
+                {/* Password */}
                 <div className="auth-pass-wrap">
-                    <input className="auth-input auth-pass-input"
+                    <input
+                        className="auth-input auth-pass-input"
                         type={showPass ? 'text' : 'password'}
                         placeholder="Contraseña"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required />
+                        required
+                    />
                     <button type="button" className="auth-eye" onClick={() => setShowPass(v => !v)}
                         aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
                         {showPass ? '🙈' : '👁️'}
                     </button>
                 </div>
+
+                {/* Password strength hints */}
+                {password.length > 0 && !passwordValidation.valid && (
+                    <ul className="auth-password-hints" aria-label="Requisitos de contraseña">
+                        {passwordValidation.errors.map((e) => (
+                            <li key={e} className="auth-hint-error">✗ {e}</li>
+                        ))}
+                    </ul>
+                )}
+                {password.length > 0 && passwordValidation.valid && (
+                    <p className="auth-hint-ok">✓ Contraseña segura</p>
+                )}
+
+                {/* Confirm password */}
+                <div className="auth-pass-wrap">
+                    <input
+                        className={`auth-input auth-pass-input${confirmTouched && !passwordsMatch ? ' auth-input-error' : ''}`}
+                        type={showConfirm ? 'text' : 'password'}
+                        placeholder="Repetir contraseña"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                    />
+                    <button type="button" className="auth-eye" onClick={() => setShowConfirm(v => !v)}
+                        aria-label={showConfirm ? 'Ocultar confirmación' : 'Mostrar confirmación'}>
+                        {showConfirm ? '🙈' : '👁️'}
+                    </button>
+                </div>
+                {confirmTouched && !passwordsMatch && (
+                    <p className="auth-hint-error" style={{ marginTop: '-4px' }}>✗ Las contraseñas no coinciden</p>
+                )}
 
                 {error && <p className="auth-error">{error}</p>}
 

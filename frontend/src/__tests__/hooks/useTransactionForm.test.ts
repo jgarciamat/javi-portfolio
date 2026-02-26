@@ -134,4 +134,18 @@ describe('useTransactionForm', () => {
         const todayStr = now.toISOString().split('T')[0];
         expect(result.current.fields.date).toBe(todayStr);
     });
+
+    test('reset clears all fields', async () => {
+        const { result } = renderHook(() => useTransactionForm(defaultOpts));
+        act(() => {
+            result.current.setDescription('Groceries');
+            result.current.setAmount('50');
+            result.current.setCategory('Food');
+        });
+        act(() => result.current.reset());
+        expect(result.current.fields.description).toBe('');
+        expect(result.current.fields.amount).toBe('');
+        expect(result.current.fields.category).toBe('');
+        expect(result.current.error).toBeNull();
+    });
 });

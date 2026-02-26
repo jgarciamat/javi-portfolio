@@ -8,6 +8,7 @@ export interface UserRow {
     created_at: string;
     email_verified: number;
     verification_token: string | null;
+    avatar_url: string | null;
 }
 
 export interface TransactionRow {

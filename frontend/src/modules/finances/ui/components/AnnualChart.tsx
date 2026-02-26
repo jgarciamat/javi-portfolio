@@ -3,7 +3,7 @@ import { useAnnualChart } from '../../application/hooks/useAnnualChart';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
 
-export function AnnualChart({ initialYear }: AnnualChartProps) {
+export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear } = useAnnualChart(initialYear); const { data, loading, error } = useAnnualSummary(year);
 
     const months = data ? Object.entries(data.months).map(([k, v]) => ({ month: Number(k), ...v })) : [];
@@ -74,7 +74,20 @@ export function AnnualChart({ initialYear }: AnnualChartProps) {
                                             />
                                         </div>
                                     </div>
-                                    <div className="annual-month-label">{MONTH_SHORT[month - 1]}</div>
+                                    <div className="annual-month-label">
+                                        {onMonthClick ? (
+                                            <button
+                                                type="button"
+                                                className="annual-month-btn"
+                                                onClick={() => onMonthClick(year, month)}
+                                                title={`Ver ${MONTH_SHORT[month - 1]} ${year}`}
+                                            >
+                                                {MONTH_SHORT[month - 1]}
+                                            </button>
+                                        ) : (
+                                            MONTH_SHORT[month - 1]
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -132,7 +145,20 @@ export function AnnualChart({ initialYear }: AnnualChartProps) {
                             <tbody>
                                 {months.map(({ month, income, expenses, saving, balance }) => (
                                     <tr key={month}>
-                                        <td className="annual-td-month">{MONTH_SHORT[month - 1]}</td>
+                                    <td className="annual-td-month">
+                                            {onMonthClick ? (
+                                                <button
+                                                    type="button"
+                                                    className="annual-month-btn"
+                                                    onClick={() => onMonthClick(year, month)}
+                                                    title={`Ver ${MONTH_SHORT[month - 1]} ${year}`}
+                                                >
+                                                    {MONTH_SHORT[month - 1]}
+                                                </button>
+                                            ) : (
+                                                MONTH_SHORT[month - 1]
+                                            )}
+                                        </td>
                                         <td style={{ color: '#4ade80' }}>{income > 0 ? fmtCurrency(income) : '—'}</td>
                                         <td style={{ color: '#f87171' }}>{expenses > 0 ? fmtCurrency(expenses) : '—'}</td>
                                         <td style={{ color: '#a78bfa' }}>{saving > 0 ? fmtCurrency(saving) : '—'}</td>

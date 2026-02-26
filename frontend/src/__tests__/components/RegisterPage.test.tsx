@@ -8,6 +8,16 @@ jest.mock('@shared/hooks/useAuth', () => ({
     useAuth: () => ({ register: mockRegister }),
 }));
 
+const VALID_PASS = 'Secure1!Pass';
+
+/** Fill out the register form with a valid password that passes all rules */
+function fillForm(name = 'John', email = 'j@test.com', pass = VALID_PASS) {
+    fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: name } });
+    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: email } });
+    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: pass } });
+    fireEvent.change(screen.getByPlaceholderText('Repetir contraseña'), { target: { value: pass } });
+}
+
 describe('RegisterPage', () => {
     const mockOnSwitch = jest.fn();
 
@@ -18,23 +28,20 @@ describe('RegisterPage', () => {
         expect(screen.getByPlaceholderText('Nombre')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Repetir contraseña')).toBeInTheDocument();
         expect(screen.getByText('Crear cuenta')).toBeInTheDocument();
     });
 
     test('calls register with correct args on submit', async () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'John' } });
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'j@test.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'secret' } });
+        fillForm();
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
-        await waitFor(() => expect(mockRegister).toHaveBeenCalledWith('j@test.com', 'secret', 'John'));
+        await waitFor(() => expect(mockRegister).toHaveBeenCalledWith('j@test.com', VALID_PASS, 'John'));
     });
 
     test('shows email confirmation screen after successful registration', async () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'John' } });
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'j@test.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'secret' } });
+        fillForm();
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('¡Revisa tu email!')).toBeInTheDocument());
         expect(screen.getByText('j@test.com')).toBeInTheDocument();
@@ -42,21 +49,34 @@ describe('RegisterPage', () => {
 
     test('confirmation screen "Ir a iniciar sesión" calls onSwitch', async () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'John' } });
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'j@test.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'secret' } });
+        fillForm();
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('Ir a iniciar sesión')).toBeInTheDocument());
         fireEvent.click(screen.getByText('Ir a iniciar sesión'));
         expect(mockOnSwitch).toHaveBeenCalled();
     });
 
-    test('shows error when register fails', async () => {
-        mockRegister.mockRejectedValueOnce(new Error('Email already exists'));
+    test('shows validation error when password is too weak', async () => {
+        render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        fillForm('X', 'x@x.com', 'weakpass');
+        fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
+        await waitFor(() => expect(mockRegister).not.toHaveBeenCalled());
+    });
+
+    test('shows error when passwords do not match', async () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
         fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'X' } });
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'x@x.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pw' } });
+        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: VALID_PASS } });
+        fireEvent.change(screen.getByPlaceholderText('Repetir contraseña'), { target: { value: 'DifferentPass1!' } });
+        fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
+        await waitFor(() => expect(mockRegister).not.toHaveBeenCalled());
+    });
+
+    test('shows error when register fails', async () => {
+        mockRegister.mockRejectedValueOnce(new Error('Email already exists'));
+        render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        fillForm('X', 'x@x.com');
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('Email already exists')).toBeInTheDocument());
     });
@@ -64,9 +84,7 @@ describe('RegisterPage', () => {
     test('shows generic error for non-Error rejection', async () => {
         mockRegister.mockRejectedValueOnce('boom');
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'X' } });
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'x@x.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pw' } });
+        fillForm('X', 'x@x.com');
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('Error al crear la cuenta')).toBeInTheDocument());
     });
@@ -75,7 +93,9 @@ describe('RegisterPage', () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
         const passInput = screen.getByPlaceholderText('Contraseña');
         expect(passInput).toHaveAttribute('type', 'password');
-        fireEvent.click(screen.getByLabelText('Mostrar contraseña'));
+        // The first eye button belongs to the password field
+        const eyeButtons = screen.getAllByLabelText('Mostrar contraseña');
+        fireEvent.click(eyeButtons[0]);
         expect(passInput).toHaveAttribute('type', 'text');
     });
 
@@ -85,3 +105,4 @@ describe('RegisterPage', () => {
         expect(mockOnSwitch).toHaveBeenCalled();
     });
 });
+

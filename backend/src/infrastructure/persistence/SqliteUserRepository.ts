@@ -9,14 +9,15 @@ export class SqliteUserRepository implements IUserRepository {
     async save(user: User): Promise<void> {
         this.db
             .prepare(`
-        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token)
-        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken)
+        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token, avatar_url)
+        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken, @avatarUrl)
         ON CONFLICT(id) DO UPDATE SET
           email              = excluded.email,
           name               = excluded.name,
           password_hash      = excluded.password_hash,
           email_verified     = excluded.email_verified,
-          verification_token = excluded.verification_token
+          verification_token = excluded.verification_token,
+          avatar_url         = excluded.avatar_url
       `)
             .run({
                 id: user.id,
@@ -26,6 +27,7 @@ export class SqliteUserRepository implements IUserRepository {
                 createdAt: user.createdAt.toISOString(),
                 emailVerified: user.emailVerified ? 1 : 0,
                 verificationToken: user.verificationToken,
+                avatarUrl: user.avatarUrl,
             });
     }
 
@@ -53,6 +55,7 @@ export class SqliteUserRepository implements IUserRepository {
             createdAt: new Date(row.created_at),
             emailVerified: row.email_verified === 1,
             verificationToken: row.verification_token ?? null,
+            avatarUrl: row.avatar_url ?? null,
         });
     }
 }
