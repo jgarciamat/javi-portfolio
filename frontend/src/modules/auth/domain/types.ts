@@ -8,12 +8,17 @@ export interface AuthUser {
 }
 
 export interface AuthResult {
-    token: string;
+    accessToken: string;
+    refreshToken: string;
     user: AuthUser;
 }
 
 export interface RegisterResult {
     message: string;
+}
+
+export interface RefreshResult {
+    accessToken: string;
 }
 
 export interface LoginDTO {

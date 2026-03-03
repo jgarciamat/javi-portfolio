@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
-import { RegisterUser, LoginUser, VerifyEmail } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
 
 export class AuthController {
     constructor(
         private readonly registerUser: RegisterUser,
         private readonly loginUser: LoginUser,
         private readonly verifyEmail: VerifyEmail,
+        private readonly logoutUser: LogoutUser,
+        private readonly refreshAccessToken: RefreshAccessToken,
     ) { }
 
     async register(req: Request, res: Response): Promise<void> {
@@ -23,6 +25,32 @@ export class AuthController {
             res.status(200).json(result);
         } catch (e) {
             res.status(401).json({ error: e instanceof Error ? e.message : 'Error al iniciar sesión' });
+        }
+    }
+
+    async logout(req: Request, res: Response): Promise<void> {
+        try {
+            const { refreshToken } = req.body as { refreshToken?: string };
+            if (refreshToken) {
+                await this.logoutUser.execute(refreshToken);
+            }
+            res.status(204).end();
+        } catch (e) {
+            res.status(400).json({ error: e instanceof Error ? e.message : 'Error al cerrar sesión' });
+        }
+    }
+
+    async refresh(req: Request, res: Response): Promise<void> {
+        try {
+            const { refreshToken } = req.body as { refreshToken?: string };
+            if (!refreshToken) {
+                res.status(400).json({ error: 'refreshToken requerido' });
+                return;
+            }
+            const result = await this.refreshAccessToken.execute(refreshToken);
+            res.status(200).json(result);
+        } catch (e) {
+            res.status(401).json({ error: e instanceof Error ? e.message : 'Error al refrescar sesión' });
         }
     }
 

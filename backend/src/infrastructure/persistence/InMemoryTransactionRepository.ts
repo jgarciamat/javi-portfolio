@@ -36,6 +36,13 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
         );
     }
 
+    async patchTransaction(id: string, changes: { done?: boolean; notes?: string | null }): Promise<Transaction | null> {
+        const tx = this.transactions.get(id);
+        if (!tx) return null;
+        tx.patch(changes);
+        return tx;
+    }
+
     async delete(id: string): Promise<void> {
         this.transactions.delete(id);
     }

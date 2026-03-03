@@ -4,15 +4,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '@domain/entities/User';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
 import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
+import { IRefreshTokenRepository } from '@domain/repositories/IRefreshTokenRepository';
 import { EmailService } from '@infrastructure/email/EmailService';
 
 const JWT_SECRET = process.env.JWT_SECRET ?? 'money-manager-secret-change-in-prod';
-const JWT_EXPIRES = '30d';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'money-manager-refresh-secret-change-in-prod';
+const JWT_ACCESS_EXPIRES = '15m';
+const JWT_REFRESH_EXPIRES = '7d';
+const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 
 export interface RegisterDTO { email: string; password: string; name: string; }
 export interface LoginDTO { email: string; password: string; }
-export interface AuthResult { token: string; user: { id: string; email: string; name: string }; }
+export interface AuthResult { accessToken: string; refreshToken: string; user: { id: string; email: string; name: string }; }
 export interface RegisterResult { message: string; }
+export interface RefreshResult { accessToken: string; }
 
 export class RegisterUser {
     constructor(
@@ -50,7 +55,10 @@ export class RegisterUser {
 }
 
 export class LoginUser {
-    constructor(private readonly userRepo: IUserRepository) { }
+    constructor(
+        private readonly userRepo: IUserRepository,
+        private readonly refreshTokenRepo: IRefreshTokenRepository,
+    ) { }
 
     async execute(dto: LoginDTO): Promise<AuthResult> {
         const user = await this.userRepo.findByEmail(dto.email.toLowerCase());
@@ -63,8 +71,54 @@ export class LoginUser {
             throw new Error('Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.');
         }
 
-        const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
-        return { token, user: user.toJSON() };
+        const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRES });
+        const refreshToken = jwt.sign({ userId: user.id }, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES });
+
+        // Persist refresh token
+        await this.refreshTokenRepo.save({
+            id: uuidv4(),
+            userId: user.id,
+            token: refreshToken,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
+            createdAt: new Date(),
+        });
+
+        return { accessToken, refreshToken, user: user.toJSON() };
+    }
+}
+
+export class LogoutUser {
+    constructor(private readonly refreshTokenRepo: IRefreshTokenRepository) { }
+
+    async execute(refreshToken: string): Promise<void> {
+        await this.refreshTokenRepo.deleteByToken(refreshToken);
+    }
+}
+
+export class RefreshAccessToken {
+    constructor(private readonly refreshTokenRepo: IRefreshTokenRepository) { }
+
+    async execute(refreshToken: string): Promise<RefreshResult> {
+        // Verify signature & expiry
+        let payload: { userId: string };
+        try {
+            payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { userId: string };
+        } catch {
+            throw new Error('Refresh token inválido o expirado');
+        }
+
+        // Verify it's still in DB (not revoked)
+        const record = await this.refreshTokenRepo.findByToken(refreshToken);
+        if (!record) throw new Error('Refresh token revocado');
+
+        // Check DB-level expiry
+        if (record.expiresAt < new Date()) {
+            await this.refreshTokenRepo.deleteByToken(refreshToken);
+            throw new Error('Refresh token expirado');
+        }
+
+        const accessToken = jwt.sign({ userId: payload.userId }, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRES });
+        return { accessToken };
     }
 }
 

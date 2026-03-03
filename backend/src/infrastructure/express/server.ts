@@ -9,7 +9,9 @@ import { SqliteTransactionRepository } from '@infrastructure/persistence/SqliteT
 import { SqliteCategoryRepository } from '@infrastructure/persistence/SqliteCategoryRepository';
 import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/SqliteMonthlyBudgetRepository';
 
-import { RegisterUser, LoginUser, VerifyEmail } from '@application/use-cases/Auth';
+import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/SqliteRefreshTokenRepository';
+
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 
@@ -35,6 +37,7 @@ const userRepo = new SqliteUserRepository(db);
 const transactionRepo = new SqliteTransactionRepository(db);
 const categoryRepo = new SqliteCategoryRepository(db);
 const budgetRepo = new SqliteMonthlyBudgetRepository(db);
+const refreshTokenRepo = new SqliteRefreshTokenRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
 async function seedAdmin(): Promise<void> {
@@ -61,13 +64,15 @@ const emailService = new EmailService();
 
 // --- Use cases ---
 const registerUser = new RegisterUser(userRepo, categoryRepo, emailService);
-const loginUser = new LoginUser(userRepo);
+const loginUser = new LoginUser(userRepo, refreshTokenRepo);
 const verifyEmail = new VerifyEmail(userRepo);
+const logoutUser = new LogoutUser(refreshTokenRepo);
+const refreshAccessToken = new RefreshAccessToken(refreshTokenRepo);
 const setMonthlyBudget = new SetMonthlyBudget(budgetRepo);
 const getMonthlyBudget = new GetMonthlyBudget(budgetRepo);
 
 // --- Controllers ---
-const authController = new AuthController(registerUser, loginUser, verifyEmail);
+const authController = new AuthController(registerUser, loginUser, verifyEmail, logoutUser, refreshAccessToken);
 const transactionController = new TransactionController(transactionRepo);
 const categoryController = new CategoryController(categoryRepo);
 const budgetController = new BudgetController(setMonthlyBudget, getMonthlyBudget, transactionRepo);
@@ -83,11 +88,14 @@ const router = express.Router();
 // Public
 router.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
 router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
+router.post('/auth/refresh', (req: Request, res: Response) => authController.refresh(req, res));
 router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
 router.get('/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'money-manager-api' }));
 
 // Protected
 router.use(authMiddleware);
+
+router.post('/auth/logout', (req: Request, res: Response) => authController.logout(req, res));
 
 // IMPORTANT: specific routes before parameterized ones
 router.get('/transactions/summary', (req: Request, res: Response) => transactionController.summary(req as AuthRequest, res));

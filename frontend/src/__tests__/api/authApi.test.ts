@@ -4,10 +4,14 @@
  * api.config is stubbed via moduleNameMapper in jest.config.cjs → src/__mocks__/api.config.ts
  */
 
-import { authApi, budgetApi } from '@core/api/authApi';
+import { authApi, budgetApi, registerUnauthorizedHandler } from '@core/api/authApi';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
+
+// A valid-looking fake JWT with exp far in the future
+const FAKE_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6OTk5OTk5OTk5OX0.sig';
+const FAKE_REFRESH_TOKEN = 'refresh-abc-xyz';
 
 function makeResponse(body: unknown, status = 200) {
     return {
@@ -34,8 +38,12 @@ describe('authApi', () => {
         );
     });
 
-    test('login sends POST and returns AuthResult', async () => {
-        const expected = { token: 'tok2', user: { id: 'u2', name: 'Login', email: 'l@b' } };
+    test('login sends POST and returns AuthResult with accessToken + refreshToken', async () => {
+        const expected = {
+            accessToken: FAKE_ACCESS_TOKEN,
+            refreshToken: FAKE_REFRESH_TOKEN,
+            user: { id: 'u2', name: 'Login', email: 'l@b' },
+        };
         mockFetch.mockResolvedValueOnce(makeResponse(expected));
         const result = await authApi.login({ email: 'l@b', password: 'pw' });
         expect(result).toEqual(expected);
@@ -76,8 +84,8 @@ describe('authApi', () => {
     });
 
     test('does NOT send Authorization header on login even when token is in localStorage', async () => {
-        localStorage.setItem('mm_token', 'tok-auth');
-        mockFetch.mockResolvedValueOnce(makeResponse({ token: 't', user: {} }));
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN, refreshToken: FAKE_REFRESH_TOKEN, user: {} }));
         await authApi.login({ email: 'a@b', password: 'pw' });
         const calledHeaders = mockFetch.mock.calls[0][1].headers;
         expect(calledHeaders['Authorization']).toBeUndefined();
@@ -85,7 +93,7 @@ describe('authApi', () => {
 
     test('does not send Authorization header when no token in localStorage', async () => {
         localStorage.removeItem('mm_token');
-        mockFetch.mockResolvedValueOnce(makeResponse({ token: 't', user: {} }));
+        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN, refreshToken: FAKE_REFRESH_TOKEN, user: {} }));
         await authApi.login({ email: 'a@b', password: 'pw' });
         const calledHeaders = mockFetch.mock.calls[0][1].headers;
         expect(calledHeaders['Authorization']).toBeUndefined();
@@ -100,6 +108,65 @@ describe('authApi', () => {
             'http://localhost:3000/api/auth/verify-email?token=test-token-123',
             expect.any(Object)
         );
+    });
+
+    test('logout sends POST /auth/logout with refreshToken', async () => {
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+        await authApi.logout(FAKE_REFRESH_TOKEN);
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/auth/logout',
+            expect.objectContaining({ method: 'POST' })
+        );
+    });
+
+    test('401 handler: retries with refreshed token on 401 response', async () => {
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
+
+        // First call → 401
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
+        // tryRefresh call → 200 with new accessToken
+        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN }));
+        // Retry of original request → 200 with data
+        mockFetch.mockResolvedValueOnce(makeResponse({ name: 'Updated' }));
+
+        const result = await authApi.updateName('Updated');
+        expect(result).toEqual({ name: 'Updated' });
+        expect(mockFetch).toHaveBeenCalledTimes(3);
+    });
+
+    test('401 handler: calls onUnauthorized when refresh also fails', async () => {
+        const handler = jest.fn();
+        registerUnauthorizedHandler(handler);
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
+
+        // First call → 401
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
+        // tryRefresh → 401 (refresh also expired)
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'invalid' }, 401));
+
+        await expect(authApi.updateName('Fail')).rejects.toThrow('Sesión expirada');
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    test('401 handler: calls onUnauthorized when no refresh token stored', async () => {
+        const handler = jest.fn();
+        registerUnauthorizedHandler(handler);
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        localStorage.removeItem('mm_refresh_token');
+
+        // First call → 401
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
+
+        await expect(authApi.updateName('Fail')).rejects.toThrow('Sesión expirada');
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    test('registerUnauthorizedHandler registers a callback', () => {
+        const handler = jest.fn();
+        expect(() => registerUnauthorizedHandler(handler)).not.toThrow();
     });
 });
 

@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import type { AuthUser } from '@shared/types/auth.types';
-import { authApi } from '@core/api/authApi';
+import { authApi, registerUnauthorizedHandler } from '@core/api/authApi';
 
 interface AuthContextValue {
     user: AuthUser | null;
@@ -16,6 +16,14 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Decode the exp claim from a JWT without verifying signature (client-side only). */
+function isTokenExpired(token: string): boolean {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return typeof payload.exp === 'number' && payload.exp * 1000 < Date.now();
+    } catch { return true; }
+}
+
 function loadUser(): AuthUser | null {
     try {
         const raw = localStorage.getItem('mm_user');
@@ -23,14 +31,22 @@ function loadUser(): AuthUser | null {
     } catch { return null; }
 }
 
+/** Load access token from storage, returning null if it is already expired. */
+function loadToken(): string | null {
+    const t = localStorage.getItem('mm_token');
+    if (!t || isTokenExpired(t)) return null;
+    return t;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(loadUser);
-    const [token, setToken] = useState<string | null>(() => localStorage.getItem('mm_token'));
+    const [token, setToken] = useState<string | null>(loadToken);
 
-    const persist = (result: { token: string; user: AuthUser }) => {
-        localStorage.setItem('mm_token', result.token);
+    const persist = (result: { accessToken: string; refreshToken: string; user: AuthUser }) => {
+        localStorage.setItem('mm_token', result.accessToken);
+        localStorage.setItem('mm_refresh_token', result.refreshToken);
         localStorage.setItem('mm_user', JSON.stringify(result.user));
-        setToken(result.token);
+        setToken(result.accessToken);
         setUser(result.user);
     };
 
@@ -45,11 +61,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const logout = useCallback(() => {
+        // Best-effort: tell backend to revoke the refresh token
+        const refreshToken = localStorage.getItem('mm_refresh_token');
+        if (refreshToken) {
+            authApi.logout(refreshToken).catch(() => { /* ignore network errors on logout */ });
+        }
         localStorage.removeItem('mm_token');
+        localStorage.removeItem('mm_refresh_token');
         localStorage.removeItem('mm_user');
         setToken(null);
         setUser(null);
     }, []);
+
+    // Register the unauthorized handler so the API layer can trigger logout when
+    // both the access token and refresh token are invalid / expired.
+    useEffect(() => {
+        registerUnauthorizedHandler(logout);
+    }, [logout]);
 
     const updateName = useCallback(async (name: string) => {
         const result = await authApi.updateName(name);
