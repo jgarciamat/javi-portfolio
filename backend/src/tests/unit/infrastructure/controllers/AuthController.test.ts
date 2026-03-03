@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
 
-function makeRes() {
+function makeRes(): Partial<Response> & { end: jest.Mock } {
     const res: Partial<Response> & { end: jest.Mock } = { end: jest.fn() };
     res.status = jest.fn().mockReturnValue(res);
     res.json = jest.fn().mockReturnValue(res);

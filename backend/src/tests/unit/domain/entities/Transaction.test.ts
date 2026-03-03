@@ -1,4 +1,7 @@
 import { Transaction } from '@domain/entities/Transaction';
+import { TransactionId } from '@domain/value-objects/TransactionId';
+import { Amount } from '@domain/value-objects/Amount';
+import { TransactionType } from '@domain/value-objects/TransactionType';
 
 describe('Transaction entity', () => {
     test('create with valid data', () => {
@@ -124,10 +127,6 @@ describe('Transaction entity', () => {
             notes: 'Paid on time',
         });
         const json = original.toJSON();
-
-        const { TransactionId } = require('@domain/value-objects/TransactionId');
-        const { Amount } = require('@domain/value-objects/Amount');
-        const { TransactionType } = require('@domain/value-objects/TransactionType');
 
         const restored = Transaction.reconstitute({
             id: TransactionId.create(json.id),

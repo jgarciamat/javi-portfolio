@@ -11,6 +11,12 @@ echo "==> Fetch & reset to origin/$BRANCH"
 git fetch origin "$BRANCH"
 git reset --hard "origin/$BRANCH"
 
+echo "==> Build backend (TypeScript) -> backend/dist"
+docker run --rm -t \
+  -v "$REPO_DIR/backend:/app" \
+  -w /app \
+  node:20-alpine sh -lc "npm ci && npm run build"
+
 echo "==> Build frontend (Vite) -> frontend/dist"
 docker run --rm -t \
   -v "$REPO_DIR/frontend:/app" \

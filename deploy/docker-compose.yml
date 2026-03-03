@@ -39,7 +39,7 @@ services:
     volumes:
       - ../backend:/app
       - api_data:/data
-    command: sh -lc "npm install --include=dev && npm run build && node -r tsconfig-paths/register dist/infrastructure/express/server.js"
+    command: sh -lc "npm ci --include=dev && node -r tsconfig-paths/register dist/infrastructure/express/server.js"
 
 volumes:
   web_dist:
