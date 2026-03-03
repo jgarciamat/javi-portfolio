@@ -10,6 +10,8 @@ export interface Transaction {
     category: string;
     date: string;
     createdAt: string;
+    done: boolean;
+    notes: string | null;
 }
 
 export interface CreateTransactionDTO {
@@ -18,6 +20,8 @@ export interface CreateTransactionDTO {
     type: TransactionType;
     category: string;
     date?: string;
+    done?: boolean;
+    notes?: string | null;
 }
 
 export interface Category {

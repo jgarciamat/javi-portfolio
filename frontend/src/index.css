@@ -688,7 +688,95 @@ textarea {
     color: #f87171;
 }
 
-/* ─── Category chart ─────────────────────────── */
+/* ─── Transaction done / notes ───────────────── */
+.tx-done-checkbox {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #6366f1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tx-row-done td {
+    opacity: 0.5;
+}
+
+.tx-row-done td:first-child {
+    opacity: 1;
+}
+
+.tx-card-done {
+    opacity: 0.55;
+}
+
+.tx-card-done .tx-card-check {
+    opacity: 1;
+}
+
+.tx-card-check {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.tx-notes-cell {
+    max-width: 180px;
+    min-width: 80px;
+}
+
+.tx-notes-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    cursor: pointer;
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tx-notes-text:hover {
+    color: #c7d2fe;
+}
+
+.tx-notes-placeholder {
+    color: #475569;
+    font-style: italic;
+    font-size: 0.78rem;
+}
+
+.tx-notes-edit-input {
+    background: #1e293b;
+    border: 1px solid #6366f1;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    color: #f1f5f9;
+    font-size: 0.8rem;
+    width: 100%;
+    min-width: 100px;
+}
+
+.tx-notes-edit-input:focus {
+    outline: none;
+}
+
+.tx-notes-input {
+    resize: vertical;
+    min-height: 2.5rem;
+}
+
+.tx-done-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin: 0.4rem 0 0.6rem;
+    cursor: pointer;
+}
+
+
 .chart-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

@@ -94,6 +94,7 @@ router.get('/transactions/summary', (req: Request, res: Response) => transaction
 router.get('/transactions/annual/:year', (req: Request, res: Response) => transactionController.annual(req as AuthRequest, res));
 router.get('/transactions', (req: Request, res: Response) => transactionController.getAll(req as AuthRequest, res));
 router.post('/transactions', (req: Request, res: Response) => transactionController.create(req as AuthRequest, res));
+router.patch('/transactions/:id', (req: Request, res: Response) => transactionController.patch(req as AuthRequest, res));
 router.delete('/transactions/:id', (req: Request, res: Response) => transactionController.delete(req as AuthRequest, res));
 
 router.get('/categories', (req: Request, res: Response) => categoryController.getAll(req as AuthRequest, res));

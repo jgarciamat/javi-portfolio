@@ -22,6 +22,8 @@ export interface TransactionRow {
     category: string;
     date: string;
     created_at: string;
+    done: number;        // SQLite stores booleans as 0/1
+    notes: string | null;
 }
 
 export interface CategoryRow {

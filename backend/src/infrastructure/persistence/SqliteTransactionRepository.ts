@@ -14,8 +14,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         const d = new Date(j.date);
         this.db
             .prepare(`
-        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at)
-        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt)
+        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, done, notes)
+        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt, @done, @notes)
         ON CONFLICT(id) DO NOTHING
       `)
             .run({
@@ -29,6 +29,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
                 category: j.category,
                 date: j.date,
                 createdAt: j.createdAt,
+                done: j.done ? 1 : 0,
+                notes: j.notes ?? null,
             });
     }
 
@@ -37,8 +39,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         const d = new Date(j.date);
         this.db
             .prepare(`
-        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at)
-        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt)
+        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, done, notes)
+        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt, @done, @notes)
         ON CONFLICT(id) DO NOTHING
       `)
             .run({
@@ -52,6 +54,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
                 category: j.category,
                 date: j.date,
                 createdAt: j.createdAt,
+                done: j.done ? 1 : 0,
+                notes: j.notes ?? null,
             });
     }
 
@@ -120,6 +124,20 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         this.db.prepare('DELETE FROM transactions WHERE id = ?').run(id);
     }
 
+    async patchTransaction(id: string, changes: { done?: boolean; notes?: string | null }): Promise<Transaction | null> {
+        const tx = await this.findById(id);
+        if (!tx) return null;
+        tx.patch(changes);
+        const sets: string[] = [];
+        const params: Record<string, unknown> = { id };
+        if (changes.done !== undefined) { sets.push('done = @done'); params.done = changes.done ? 1 : 0; }
+        if ('notes' in changes) { sets.push('notes = @notes'); params.notes = changes.notes ?? null; }
+        if (sets.length > 0) {
+            this.db.prepare(`UPDATE transactions SET ${sets.join(', ')} WHERE id = @id`).run(params);
+        }
+        return tx;
+    }
+
     private toEntity(row: TransactionRow): Transaction {
         return Transaction.reconstitute({
             id: TransactionId.create(row.id),
@@ -129,6 +147,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
             category: row.category,
             date: new Date(row.date),
             createdAt: new Date(row.created_at),
+            done: row.done === 1,
+            notes: row.notes ?? null,
         });
     }
 }

@@ -28,6 +28,8 @@ export function useTransactionForm({
     const [type, setType] = useState<TransactionType>('EXPENSE');
     const [category, setCategory] = useState('');
     const [date, setDate] = useState(defaultDate);
+    const [done, setDone] = useState(false);
+    const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -38,13 +40,15 @@ export function useTransactionForm({
         setType('EXPENSE');
         setCategory('');
         setDate(getDefaultDate(viewYear, viewMonth));
+        setDone(false);
+        setNotes('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewYear, viewMonth]);
 
     // Clear error whenever any field changes
     useEffect(() => {
         setError(null);
-    }, [description, amount, type, category, date, viewYear, viewMonth]);
+    }, [description, amount, type, category, date, notes, viewYear, viewMonth]);
 
     const handleCategoryChange = (value: string, onManageCategories: () => void) => {
         if (value === '__manage__') {
@@ -76,11 +80,15 @@ export function useTransactionForm({
                 type,
                 category,
                 date: new Date(date).toISOString(),
+                done,
+                notes: notes.trim() || null,
             });
             setDescription('');
             setAmount('');
             setCategory('');
             setDate(getDefaultDate(viewYear, viewMonth));
+            setDone(false);
+            setNotes('');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al crear la transacción');
         } finally {
@@ -89,12 +97,14 @@ export function useTransactionForm({
     };
 
     return {
-        fields: { description, amount, type, category, date },
+        fields: { description, amount, type, category, date, done, notes },
         setDescription,
         setAmount,
         setType,
         setCategory,
         setDate,
+        setDone,
+        setNotes,
         handleCategoryChange,
         handleSubmit,
         reset: () => {
@@ -103,6 +113,8 @@ export function useTransactionForm({
             setType('EXPENSE');
             setCategory('');
             setDate(getDefaultDate(viewYear, viewMonth));
+            setDone(false);
+            setNotes('');
             setError(null);
         },
         loading,

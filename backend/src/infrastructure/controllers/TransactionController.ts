@@ -13,15 +13,11 @@ export class TransactionController {
             const userId = req.userId!;
             const transaction = Transaction.create(req.body);
 
-            // Validate available balance for EXPENSE and SAVING types
-            if (transaction.type.isExpense() || transaction.type.isSaving()) {
+            // Validate available balance only for SAVING type
+            if (transaction.type.isSaving()) {
                 const txYear = transaction.date.getFullYear();
                 const txMonth = transaction.date.getMonth() + 1;
-
-                // Sum of all months before this one
                 const carryover = this.transactionRepo.computeCarryover(userId, txYear, txMonth);
-
-                // Current month's balance (before this new transaction)
                 const monthTxs = await this.transactionRepo.findByUserAndMonth(userId, txYear, txMonth);
                 let monthIncome = 0, monthExpenses = 0, monthSaving = 0;
                 for (const tx of monthTxs) {
@@ -31,7 +27,6 @@ export class TransactionController {
                 }
                 const monthBalance = monthIncome - monthExpenses - monthSaving;
                 const available = Math.round((carryover + monthBalance) * 100) / 100;
-
                 if (transaction.amount.value > available) {
                     res.status(400).json({
                         error: `Saldo insuficiente. Saldo disponible: ${available.toFixed(2)} €`,
@@ -44,6 +39,21 @@ export class TransactionController {
             res.status(201).json(transaction.toJSON());
         } catch (e) {
             res.status(400).json({ error: e instanceof Error ? e.message : 'Error' });
+        }
+    }
+
+    async patch(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const { done, notes } = req.body as { done?: boolean; notes?: string | null };
+            const changes: { done?: boolean; notes?: string | null } = {};
+            if (done !== undefined) changes.done = done;
+            if ('notes' in req.body) changes.notes = notes;
+            const updated = await this.transactionRepo.patchTransaction(id, changes);
+            if (!updated) { res.status(404).json({ error: 'No encontrado' }); return; }
+            res.json(updated.toJSON());
+        } catch (e) {
+            res.status(500).json({ error: e instanceof Error ? e.message : 'Error' });
         }
     }
 

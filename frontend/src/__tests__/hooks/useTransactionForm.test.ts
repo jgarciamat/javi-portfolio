@@ -36,6 +36,7 @@ describe('useTransactionForm', () => {
             result.current.setDescription('Test');
             result.current.setAmount('100');
             result.current.setCategory('Food');
+            result.current.setType('SAVING');
         });
         const fakeEvent = { preventDefault: jest.fn() } as unknown as React.FormEvent;
         await act(async () => { result.current.handleSubmit(fakeEvent); });

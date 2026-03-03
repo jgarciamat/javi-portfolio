@@ -48,6 +48,13 @@ export const transactionApi = {
         return request<void>(`/transactions/${id}`, { method: 'DELETE' });
     },
 
+    patch(id: string, changes: { done?: boolean; notes?: string | null }) {
+        return request<Transaction>(`/transactions/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(changes),
+        });
+    },
+
     getSummary(params?: { year?: number; month?: number }) {
         const query = new URLSearchParams(
             Object.entries(params ?? {})

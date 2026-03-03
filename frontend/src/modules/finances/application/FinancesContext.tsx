@@ -36,6 +36,7 @@ interface FinancesActions {
     navigateTo: (year: number, month: number) => void;
     addTransaction: (dto: CreateTransactionDTO) => Promise<Transaction>;
     removeTransaction: (id: string) => Promise<void>;
+    patchTransaction: (id: string, changes: { done?: boolean; notes?: string | null }) => Promise<void>;
     addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
     removeCategory: (id: string) => Promise<void>;
     refresh: () => Promise<void>;
@@ -152,6 +153,20 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         [year, month, transactionApi, fetchMonth]
     );
 
+    const patchTransaction = useCallback(
+        async (id: string, changes: { done?: boolean; notes?: string | null }) => {
+            const updated = await transactionApi.patch(id, changes);
+            const key = `${year}-${month}`;
+            const cached = cache.current.get(key);
+            if (cached) {
+                const newTxs = cached.transactions.map((t) => (t.id === id ? updated : t));
+                cache.current.set(key, { ...cached, transactions: newTxs });
+                setTransactions(newTxs);
+            }
+        },
+        [year, month, transactionApi]
+    );
+
     // ── Categories state ──────────────────────────────────────────────────────
     const [categories, setCategories] = useState<Category[]>([]);
 
@@ -203,6 +218,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         navigateTo,
         addTransaction,
         removeTransaction,
+        patchTransaction,
         addCategory,
         removeCategory,
         refresh: fetchMonth,

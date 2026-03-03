@@ -10,6 +10,7 @@ const mockGetSummary = jest.fn();
 const mockGetCarryover = jest.fn();
 const mockCreateTx = jest.fn();
 const mockDeleteTx = jest.fn();
+const mockPatchTx = jest.fn();
 const mockGetAllCats = jest.fn();
 const mockCreateCat = jest.fn();
 const mockDeleteCat = jest.fn();
@@ -37,6 +38,8 @@ function Consumer() {
             <div data-testid="year">{ctx.year}</div>
             <div data-testid="month">{ctx.month}</div>
             <div data-testid="tx-count">{ctx.transactions.length}</div>
+            <div data-testid="tx-done">{String(ctx.transactions[0]?.done ?? '')}</div>
+            <div data-testid="tx-notes">{ctx.transactions[0]?.notes ?? 'null'}</div>
             <div data-testid="cat-count">{ctx.categories.length}</div>
             <div data-testid="loading">{String(ctx.loading)}</div>
             <div data-testid="error">{ctx.error ?? ''}</div>
@@ -46,6 +49,8 @@ function Consumer() {
             <button onClick={ctx.goToNext}>next</button>
             <button onClick={() => ctx.addTransaction({ description: 'New', amount: 50, type: 'INCOME', category: 'Salary' })}>add-tx</button>
             <button onClick={() => ctx.removeTransaction('t1')}>del-tx</button>
+            <button onClick={() => ctx.patchTransaction('t1', { done: true })}>patch-done</button>
+            <button onClick={() => ctx.patchTransaction('t1', { notes: 'Patched note' })}>patch-notes</button>
             <button onClick={() => ctx.addCategory({ name: 'Food', icon: '🍔' })}>add-cat</button>
             <button onClick={() => ctx.removeCategory('c1')}>del-cat</button>
             <button onClick={ctx.refresh}>refresh</button>
@@ -65,18 +70,19 @@ function Wrapper() {
 
 describe('FinancesContext / FinancesProvider', () => {
     // Stable API object references — same instance across all renders in a test
-    const stableTransactionApi = { getAll: mockGetAll, getSummary: mockGetSummary, create: mockCreateTx, delete: mockDeleteTx };
+    const stableTransactionApi = { getAll: mockGetAll, getSummary: mockGetSummary, create: mockCreateTx, delete: mockDeleteTx, patch: mockPatchTx };
     const stableCategoryApi = { getAll: mockGetAllCats, create: mockCreateCat, delete: mockDeleteCat };
     const stableBudgetApi = { getCarryover: mockGetCarryover };
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockGetAll.mockResolvedValue([{ id: 't1', description: 'Bus', amount: 10, type: 'EXPENSE', category: 'Transport', date: '2025-01-05', createdAt: '2025-01-05' }]);
+        mockGetAll.mockResolvedValue([{ id: 't1', description: 'Bus', amount: 10, type: 'EXPENSE', category: 'Transport', date: '2025-01-05', createdAt: '2025-01-05', done: false, notes: null }]);
         mockGetSummary.mockResolvedValue({ totalIncome: 500, totalExpenses: 10, totalSaving: 0, balance: 490, expensesByCategory: {}, incomeByCategory: {}, savingByCategory: {}, transactionCount: 1 });
         mockGetCarryover.mockResolvedValue({ carryover: 100, year: 2025, month: 1 });
         mockGetAllCats.mockResolvedValue([{ id: 'c1', name: 'Transport', color: '#ff0000', icon: '🚗' }]);
-        mockCreateTx.mockResolvedValue({ id: 't2', description: 'New', amount: 50, type: 'INCOME', category: 'Salary', date: '2025-01-10', createdAt: '2025-01-10' });
+        mockCreateTx.mockResolvedValue({ id: 't2', description: 'New', amount: 50, type: 'INCOME', category: 'Salary', date: '2025-01-10', createdAt: '2025-01-10', done: false, notes: null });
         mockDeleteTx.mockResolvedValue(undefined);
+        mockPatchTx.mockResolvedValue({ id: 't1', description: 'Bus', amount: 10, type: 'EXPENSE', category: 'Transport', date: '2025-01-05', createdAt: '2025-01-05', done: true, notes: 'Patched note' });
         mockCreateCat.mockResolvedValue({ id: 'c2', name: 'Food', color: '#00ff00', icon: '🍔' });
         mockDeleteCat.mockResolvedValue(undefined);
 
@@ -255,5 +261,38 @@ describe('FinancesContext / FinancesProvider', () => {
         await waitFor(() => expect(mockGetAll).toHaveBeenCalledTimes(3));
         // Transactions are still visible (applied from cache before re-fetch)
         expect(screen.getByTestId('tx-count').textContent).toBe('1');
+    });
+
+    // ── patchTransaction ──────────────────────────────────────────────────────
+
+    test('patchTransaction calls API and updates transaction in state', async () => {
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
+        expect(screen.getByTestId('tx-done').textContent).toBe('false');
+
+        fireEvent.click(screen.getByText('patch-done'));
+        await waitFor(() => expect(mockPatchTx).toHaveBeenCalledWith('t1', { done: true }));
+        await waitFor(() => expect(screen.getByTestId('tx-done').textContent).toBe('true'));
+    });
+
+    test('patchTransaction updates notes in state', async () => {
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
+
+        fireEvent.click(screen.getByText('patch-notes'));
+        await waitFor(() => expect(mockPatchTx).toHaveBeenCalledWith('t1', { notes: 'Patched note' }));
+        await waitFor(() => expect(screen.getByTestId('tx-notes').textContent).toBe('Patched note'));
+    });
+
+    test('patchTransaction does not re-fetch from API (uses optimistic cache update)', async () => {
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
+        const getAllCallsBefore = mockGetAll.mock.calls.length;
+
+        fireEvent.click(screen.getByText('patch-done'));
+        await waitFor(() => expect(mockPatchTx).toHaveBeenCalledTimes(1));
+
+        // getAll should NOT have been called again
+        expect(mockGetAll.mock.calls.length).toBe(getAllCallsBefore);
     });
 });

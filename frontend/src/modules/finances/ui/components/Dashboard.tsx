@@ -24,7 +24,7 @@ export function Dashboard() {
         transactions, summary, carryover,
         categories, loading, error,
         goToPrev, goToNext, navigateTo,
-        addTransaction, removeTransaction,
+        addTransaction, removeTransaction, patchTransaction,
         addCategory, removeCategory,
     } = useFinances();
 
@@ -124,7 +124,7 @@ export function Dashboard() {
                                 title={<>📋 Transacciones ({transactions.length})</>}
                                 style={{ marginBottom: '0' }}
                             >
-                                <TransactionTable transactions={transactions} onDelete={removeTransaction} />
+                                <TransactionTable transactions={transactions} onDelete={removeTransaction} onPatch={patchTransaction} />
                             </CollapsiblePanel>
 
                             {summary && transactions.length > 0 && (

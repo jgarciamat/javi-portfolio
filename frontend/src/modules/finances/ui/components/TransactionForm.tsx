@@ -9,6 +9,8 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
         setAmount,
         setType,
         setDate,
+        setDone,
+        setNotes,
         handleCategoryChange,
         handleSubmit,
         reset,
@@ -43,7 +45,24 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
                         ))}
                     </select>
                     <input className="tx-input" type="date" value={fields.date} onChange={(e) => setDate(e.target.value)} />
+                    <textarea
+                        className="tx-input tx-notes-input"
+                        placeholder="Notas (opcional)"
+                        value={fields.notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        rows={2}
+                    />
                 </div>
+
+                <label className="tx-done-label">
+                    <input
+                        type="checkbox"
+                        className="tx-done-checkbox"
+                        checked={fields.done}
+                        onChange={(e) => setDone(e.target.checked)}
+                    />
+                    Marcar como realizada
+                </label>
 
                 {error && <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0.4rem 0' }}>{error}</p>}
 

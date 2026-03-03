@@ -1,7 +1,40 @@
+import { useState } from 'react';
 import type { TransactionTableProps } from '../types';
+import type { TransactionType } from '@modules/finances/domain/types';
 import { formatCurrency, formatDate } from '../types/TransactionTable.types';
 
-export function TransactionTable({ transactions, onDelete }: TransactionTableProps) {
+function txBadgeClass(type: TransactionType): string {
+    if (type === 'INCOME') return 'tx-badge tx-badge-income';
+    if (type === 'SAVING') return 'tx-badge tx-badge-saving';
+    return 'tx-badge tx-badge-expense';
+}
+
+function txLabel(type: TransactionType): string {
+    if (type === 'INCOME') return '↑ Ingreso';
+    if (type === 'SAVING') return '↑ Ahorro';
+    return '↓ Gasto';
+}
+
+function txAmountColor(type: TransactionType): string {
+    if (type === 'INCOME') return '#4ade80';
+    if (type === 'SAVING') return '#a78bfa';
+    return '#f87171';
+}
+
+export function TransactionTable({ transactions, onDelete, onPatch }: TransactionTableProps) {
+    const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
+    const [notesValue, setNotesValue] = useState('');
+
+    const startEditNotes = (id: string, current: string | null) => {
+        setEditingNotesId(id);
+        setNotesValue(current ?? '');
+    };
+
+    const commitNotes = (id: string) => {
+        onPatch(id, { notes: notesValue.trim() || null });
+        setEditingNotesId(null);
+    };
+
     if (transactions.length === 0) {
         return (
             <div style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
@@ -18,23 +51,54 @@ export function TransactionTable({ transactions, onDelete }: TransactionTablePro
                 <table className="tx-table">
                     <thead>
                         <tr>
-                            {['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Importe', ''].map((h) => (
+                            <th>✓</th>
+                            {['Fecha', 'Descripción', 'Notas', 'Categoría', 'Tipo', 'Importe', ''].map((h) => (
                                 <th key={h}>{h}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         {transactions.map((tx) => (
-                            <tr key={tx.id}>
+                            <tr key={tx.id} className={tx.done ? 'tx-row-done' : ''}>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        className="tx-done-checkbox"
+                                        checked={tx.done}
+                                        onChange={(e) => onPatch(tx.id, { done: e.target.checked })}
+                                        title="Marcar como realizada"
+                                    />
+                                </td>
                                 <td style={{ color: '#94a3b8' }}>{formatDate(tx.date)}</td>
                                 <td style={{ color: '#f1f5f9', fontWeight: 500 }}>{tx.description}</td>
+                                <td className="tx-notes-cell">
+                                    {editingNotesId === tx.id ? (
+                                        <input
+                                            className="tx-notes-edit-input"
+                                            autoFocus
+                                            value={notesValue}
+                                            onChange={(e) => setNotesValue(e.target.value)}
+                                            onBlur={() => commitNotes(tx.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') commitNotes(tx.id);
+                                                if (e.key === 'Escape') setEditingNotesId(null);
+                                            }}
+                                        />
+                                    ) : (
+                                        <span
+                                            className="tx-notes-text"
+                                            onClick={() => startEditNotes(tx.id, tx.notes)}
+                                            title="Clic para editar notas"
+                                        >
+                                            {tx.notes ?? <span className="tx-notes-placeholder">+ añadir nota</span>}
+                                        </span>
+                                    )}
+                                </td>
                                 <td><span className="tx-cat-badge">{tx.category}</span></td>
                                 <td>
-                                    <span className={`tx-badge ${tx.type === 'INCOME' ? 'tx-badge-income' : tx.type === 'SAVING' ? 'tx-badge-saving' : 'tx-badge-expense'}`}>
-                                        {tx.type === 'INCOME' ? '↑ Ingreso' : tx.type === 'SAVING' ? ' Ahorro' : '↓ Gasto'}
-                                    </span>
+                                    <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
                                 </td>
-                                <td style={{ fontWeight: 700, color: tx.type === 'INCOME' ? '#4ade80' : tx.type === 'SAVING' ? '#a78bfa' : '#f87171' }}>
+                                <td style={{ fontWeight: 700, color: txAmountColor(tx.type) }}>
                                     {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
                                 </td>
                                 <td>
@@ -49,18 +113,43 @@ export function TransactionTable({ transactions, onDelete }: TransactionTablePro
             {/* Mobile card list */}
             <div className="tx-card-list">
                 {transactions.map((tx) => (
-                    <div key={tx.id} className="tx-card">
+                    <div key={tx.id} className={`tx-card${tx.done ? ' tx-card-done' : ''}`}>
+                        <div className="tx-card-check">
+                            <input
+                                type="checkbox"
+                                className="tx-done-checkbox"
+                                checked={tx.done}
+                                onChange={(e) => onPatch(tx.id, { done: e.target.checked })}
+                            />
+                        </div>
                         <div className="tx-card-left">
                             <div className="tx-card-desc">{tx.description}</div>
                             <div className="tx-card-meta">{formatDate(tx.date)} · {tx.category}</div>
+                            {editingNotesId === tx.id ? (
+                                <input
+                                    className="tx-notes-edit-input"
+                                    value={notesValue}
+                                    onChange={(e) => setNotesValue(e.target.value)}
+                                    onBlur={() => commitNotes(tx.id)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') commitNotes(tx.id);
+                                        if (e.key === 'Escape') setEditingNotesId(null);
+                                    }}
+                                />
+                            ) : (
+                                <span
+                                    className="tx-notes-text"
+                                    onClick={() => startEditNotes(tx.id, tx.notes)}
+                                >
+                                    {tx.notes ?? <span className="tx-notes-placeholder">+ añadir nota</span>}
+                                </span>
+                            )}
                         </div>
                         <div className="tx-card-right">
-                            <span className="tx-card-amount" style={{ color: tx.type === 'INCOME' ? '#4ade80' : tx.type === 'SAVING' ? '#a78bfa' : '#f87171' }}>
+                            <span className="tx-card-amount" style={{ color: txAmountColor(tx.type) }}>
                                 {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
                             </span>
-                            <span className={`tx-badge ${tx.type === 'INCOME' ? 'tx-badge-income' : tx.type === 'SAVING' ? 'tx-badge-saving' : 'tx-badge-expense'}`}>
-                                {tx.type === 'INCOME' ? '↑ Ingreso' : tx.type === 'SAVING' ? '↑ Ahorro' : '↓ Gasto'}
-                            </span>
+                            <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
                             <button className="btn-delete" onClick={() => onDelete(tx.id)} aria-label="Eliminar">🗑️</button>
                         </div>
                     </div>
@@ -69,4 +158,3 @@ export function TransactionTable({ transactions, onDelete }: TransactionTablePro
         </>
     );
 }
-
