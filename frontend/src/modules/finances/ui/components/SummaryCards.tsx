@@ -1,4 +1,5 @@
 import type { SummaryCardsProps } from '../types';
+import '../css/SummaryCards.css';
 import { formatCurrency } from '../types/SummaryCards.types';
 
 export function SummaryCards({ summary, carryover }: SummaryCardsProps) {

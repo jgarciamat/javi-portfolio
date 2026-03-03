@@ -1,4 +1,5 @@
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
+import '../css/TransactionForm.css';
 import type { TransactionFormProps } from '../types';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 

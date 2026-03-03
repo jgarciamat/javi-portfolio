@@ -1,4 +1,5 @@
 import type { CategoryChartProps, BarChartProps } from '../types';
+import '../css/CategoryChart.css';
 import { formatCurrency } from '../types/CategoryChart.types';
 
 function BarChart({ data, title, color, total }: BarChartProps) {

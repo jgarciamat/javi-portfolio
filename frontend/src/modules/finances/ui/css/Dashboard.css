@@ -1,0 +1,488 @@
+/* ─── Dashboard layout ───────────────────────── */
+.dashboard {
+    min-height: 100vh;
+    background: #020617;
+    color: #f1f5f9;
+}
+
+/* Header */
+.header {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-logo {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.header-sub {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.header-user {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #94a3b8;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-logout:hover {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+/* Main content area */
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+/* ─── Month navigator ────────────────────────── */
+.month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.month-nav-center {
+    text-align: center;
+}
+
+.month-nav-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.month-nav-badge {
+    font-size: 0.72rem;
+    color: #6366f1;
+    margin-top: 2px;
+}
+
+.btn-nav {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #94a3b8;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.btn-nav:hover:not(:disabled) {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+.btn-nav:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+/* ─── Budget row ─────────────────────────────── */
+.budget-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.budget-label {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    flex: 1;
+    min-width: 160px;
+}
+
+.budget-amount {
+    color: #6366f1;
+    font-weight: 700;
+}
+
+.budget-undefined {
+    color: #475569;
+}
+
+.budget-form {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.budget-input {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    color: #f1f5f9;
+    width: 120px;
+    min-width: 80px;
+}
+
+.budget-input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.btn-save {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.btn-save:hover {
+    background: #4f46e5;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #94a3b8;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-edit {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #94a3b8;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.btn-edit:hover {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* ─── Month content wrapper + loading overlay ── */
+.month-content {
+    position: relative;
+}
+
+.month-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(10, 15, 28, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.month-spinner {
+    width: 48px;
+    height: 48px;
+    animation: month-spin 0.9s linear infinite;
+}
+
+.month-spinner circle {
+    stroke: #6366f1;
+    stroke-linecap: round;
+    stroke-dasharray: 80, 200;
+    stroke-dashoffset: 0;
+    animation: month-dash 1.5s ease-in-out infinite;
+}
+
+@keyframes month-spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes month-dash {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+    }
+
+    100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124px;
+    }
+}
+
+/* ─── Tabs ───────────────────────────────────── */
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: #cbd5e1;
+}
+
+.tab-btn.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+}
+
+/* ─── Header: avatar / profile button ─────────── */
+.header-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.header-user-btn:hover {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+.header-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #334155;
+}
+
+.header-avatar-placeholder {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+/* ─── Profile page overlay ─────────────────────── */
+.profile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: stretch;
+}
+
+.profile-panel {
+    background: #0f172a;
+    border-left: 1px solid #1e293b;
+    width: 100%;
+    max-width: 420px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: slideInRight 0.25s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.profile-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.profile-close {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.15s;
+}
+
+.profile-close:hover {
+    color: #f1f5f9;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 0;
+}
+
+.profile-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profile-divider {
+    border: none;
+    border-top: 1px solid #1e293b;
+    margin: 0;
+}
+
+.profile-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-avatar-preview {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.profile-avatar-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.profile-msg-ok {
+    font-size: 0.82rem;
+    color: #4ade80;
+    margin: 0;
+}
+
+/* ─── Dashboard responsive ───────────────────── */
+@media (max-width: 600px) {
+    .header-user {
+        display: none;
+    }
+
+    .header-title {
+        font-size: 1rem;
+    }
+
+    .main {
+        padding: 1rem 0.75rem;
+    }
+
+    .month-nav-title {
+        font-size: 1rem;
+    }
+
+    .btn-nav {
+        padding: 0.4rem 0.65rem;
+        font-size: 0.82rem;
+    }
+}

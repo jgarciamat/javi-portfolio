@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import '../css/TransactionTable.css';
 import type { TransactionTableProps } from '../types';
 import type { TransactionType } from '@modules/finances/domain/types';
 import { formatCurrency, formatDate } from '../types/TransactionTable.types';

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import '../css/Dashboard.css';
 import { useFinances } from '../../application/FinancesContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';

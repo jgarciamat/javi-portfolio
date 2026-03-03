@@ -1,4 +1,5 @@
 import type { CategoryManagerProps } from '../types';
+import '../css/CategoryManager.css';
 import { EMOJI_GROUPS, CATEGORY_COLORS } from '../types';
 import { useCategoryManager } from '../../application/hooks/useCategoryManager';
 

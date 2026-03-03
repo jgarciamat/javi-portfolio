@@ -1,5 +1,6 @@
 import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
+import '../css/AnnualChart.css';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
 import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';

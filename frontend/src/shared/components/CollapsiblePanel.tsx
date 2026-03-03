@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react';
+import './css/CollapsiblePanel.css';
 
 interface CollapsiblePanelProps {
     title: ReactNode;

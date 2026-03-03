@@ -1,0 +1,238 @@
+/* ─── Annual view ────────────────────────────── */
+.annual-view {
+    padding: 0;
+}
+
+.annual-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.annual-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    text-align: center;
+}
+
+.annual-legend {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+}
+
+.annual-empty {
+    text-align: center;
+    color: #64748b;
+    padding: 3rem 0;
+}
+
+.annual-chart-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+/* Tooltip */
+.annual-tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: #0f172a;
+    border: 1px solid;
+    border-radius: 7px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transform: translate(-50%, calc(-100% - 10px));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+}
+
+.annual-chart {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+    height: 220px;
+    min-width: 600px;
+}
+
+.annual-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.annual-bars {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 0;
+}
+
+.annual-bar-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    width: 100%;
+    justify-content: center;
+    height: 100%;
+}
+
+.annual-bar {
+    flex: 1;
+    max-width: 14px;
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    transition: height 0.3s ease, filter 0.15s;
+    cursor: pointer;
+}
+
+.annual-bar:hover {
+    filter: brightness(1.25);
+}
+
+.annual-bar-income {
+    background: #4ade80;
+}
+
+.annual-bar-expense {
+    background: #f87171;
+}
+
+.annual-bar-saving {
+    background: #a78bfa;
+}
+
+.annual-month-label {
+    flex-shrink: 0;
+    margin-top: 6px;
+    font-size: 0.7rem;
+    color: #64748b;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ─── Clickable month labels ─────────────────── */
+.annual-month-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.annual-month-btn:hover {
+    color: #6366f1;
+    background: #1e293b;
+}
+
+/* Totals row */
+.annual-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.annual-total-card {
+    background: #1e293b;
+    border-radius: 10px;
+    border-left: 3px solid;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.annual-total-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.annual-total-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+/* Monthly detail table */
+.annual-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.annual-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.annual-table th {
+    padding: 0.55rem 0.75rem;
+    text-align: right;
+    color: #64748b;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #334155;
+}
+
+.annual-table th:first-child {
+    text-align: left;
+}
+
+.annual-table td {
+    padding: 0.55rem 0.75rem;
+    text-align: right;
+    border-bottom: 1px solid #1e293b;
+}
+
+.annual-td-month {
+    text-align: left !important;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.annual-table tr:hover td {
+    background: #1e293b;
+}
+
+/* ─── AnnualChart responsive ─────────────────── */
+@media (max-width: 600px) {
+    .annual-chart {
+        min-width: 480px;
+    }
+
+    .annual-title {
+        font-size: 1rem;
+    }
+
+    .annual-totals {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

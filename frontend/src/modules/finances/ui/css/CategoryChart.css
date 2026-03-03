@@ -1,0 +1,55 @@
+/* ─── Category chart (bar chart) ─────────────── */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+    margin-top: 1.25rem;
+}
+
+.chart-title {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.85rem;
+}
+
+.bar-row {
+    margin-bottom: 0.55rem;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.bar-label-name {
+    color: #cbd5e1;
+}
+
+.bar-label-value {
+    color: #94a3b8;
+}
+
+.bar-track {
+    background: #1e293b;
+    border-radius: 999px;
+    height: 7px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+/* ─── CategoryChart responsive ───────────────── */
+@media (max-width: 600px) {
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}

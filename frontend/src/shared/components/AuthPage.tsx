@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './css/AuthPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
 import { LoginPage } from '@modules/auth/ui/LoginPage';
