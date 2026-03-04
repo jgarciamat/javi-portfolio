@@ -188,13 +188,18 @@
 }
 
 .btn-cancel {
-    background: transparent;
-    border: 1px solid #334155;
+    background: #7f1d1d;
+    border: 1px solid #991b1b;
     border-radius: 6px;
-    color: #94a3b8;
+    color: #fca5a5;
     padding: 0.4rem 0.8rem;
     cursor: pointer;
     font-size: 0.85rem;
+    transition: background 0.15s;
+}
+
+.btn-cancel:hover {
+    background: #991b1b;
 }
 
 .btn-edit {

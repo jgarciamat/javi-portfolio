@@ -56,18 +56,18 @@ export function useTransactionForm({
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
         e.preventDefault();
         if (!description || !amount || !category) {
             setError('Rellena todos los campos');
-            return;
+            return false;
         }
         const parsedAmount = parseFloat(amount);
         if (type === 'SAVING' && parsedAmount > availableBalance) {
             const fmt = (n: number) =>
                 new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(n);
             setError(`Saldo insuficiente. Saldo disponible: ${fmt(availableBalance)}`);
-            return;
+            return false;
         }
         setLoading(true);
         setError(null);
@@ -85,8 +85,10 @@ export function useTransactionForm({
             setCategory('');
             setDate(getDefaultDate(viewYear, viewMonth));
             setNotes('');
+            return true;
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al crear la transacción');
+            return false;
         } finally {
             setLoading(false);
         }

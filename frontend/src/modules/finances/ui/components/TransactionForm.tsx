@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import '../css/TransactionForm.css';
 import type { TransactionFormProps } from '../types';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 
 export function TransactionForm({ categories, onSubmit, onManageCategories, viewYear, viewMonth, availableBalance }: TransactionFormProps) {
+    const [open, setOpen] = useState(false);
+
     const {
         fields,
         setDescription,
@@ -18,9 +21,18 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
         error,
     } = useTransactionForm({ viewYear, viewMonth, availableBalance, onSubmit });
 
+    const handleCancel = () => {
+        reset();
+        setOpen(false);
+    };
+
     return (
-        <CollapsiblePanel title="➕ Nueva transacción" defaultOpen={false}>
-            <form onSubmit={handleSubmit} className="tx-form">
+        <CollapsiblePanel
+            title="➕ Nueva transacción"
+            open={open}
+            onToggle={() => setOpen((v) => !v)}
+        >
+            <form onSubmit={async (e) => { const ok = await handleSubmit(e); if (ok) setOpen(false); }} className="tx-form">
                 <div className="tx-form-grid">
                     <input className="tx-input" placeholder="Descripción" value={fields.description}
                         onChange={(e) => setDescription(e.target.value)} required />
@@ -58,7 +70,7 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
                     <button type="submit" className="btn-primary" disabled={loading}>
                         {loading ? 'Guardando...' : 'Guardar transacción'}
                     </button>
-                    <button type="button" className="btn-cancel" onClick={reset} disabled={loading}>
+                    <button type="button" className="btn-cancel" onClick={handleCancel} disabled={loading}>
                         Cancelar
                     </button>
                 </div>

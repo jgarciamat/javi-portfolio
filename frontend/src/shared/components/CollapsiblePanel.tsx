@@ -4,6 +4,10 @@ import './css/CollapsiblePanel.css';
 interface CollapsiblePanelProps {
     title: ReactNode;
     defaultOpen?: boolean;
+    /** Controlled open state — if provided, the panel becomes controlled */
+    open?: boolean;
+    /** Called when the header toggle is clicked in controlled mode */
+    onToggle?: () => void;
     children: ReactNode;
     /** Extra class applied to the outer .card wrapper */
     className?: string;
@@ -14,11 +18,14 @@ interface CollapsiblePanelProps {
 export function CollapsiblePanel({
     title,
     defaultOpen = true,
+    open: openProp,
+    onToggle,
     children,
     className,
     style,
 }: CollapsiblePanelProps) {
-    const [open, setOpen] = useState(defaultOpen);
+    const [openInternal, setOpenInternal] = useState(defaultOpen);
+    const open = openProp !== undefined ? openProp : openInternal;
     const bodyRef = useRef<HTMLDivElement>(null);
 
     // Animate max-height for smooth expand/collapse
@@ -45,7 +52,7 @@ export function CollapsiblePanel({
         <div className={`card collapsible-panel${className ? ` ${className}` : ''}`} style={style}>
             <button
                 className={`collapsible-header${open ? ' collapsible-header--open' : ''}`}
-                onClick={() => setOpen((v) => !v)}
+                onClick={() => onToggle ? onToggle() : setOpenInternal((v) => !v)}
                 aria-expanded={open}
             >
                 <span className="collapsible-title">{title}</span>
