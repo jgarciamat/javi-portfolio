@@ -10,7 +10,7 @@ export function AIAdvisor({ year, month }: Props) {
     const { advice, loading, error, analyze, clear } = useAIAdvisor();
 
     return (
-        <div className="ai-advisor">
+        <div className="card ai-advisor">
             <div className="ai-advisor-header">
                 <span className="ai-advisor-title">🤖 Asesor financiero IA</span>
                 <div className="ai-advisor-actions">

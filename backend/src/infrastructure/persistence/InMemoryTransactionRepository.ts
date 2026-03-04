@@ -46,4 +46,16 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
     async delete(id: string): Promise<void> {
         this.transactions.delete(id);
     }
+
+    async findByUserAndMonth(_userId: string, year: number, month: number): Promise<Transaction[]> {
+        return (await this.findAll()).filter((tx) => {
+            const d = tx.date;
+            return d.getFullYear() === year && d.getMonth() + 1 === month;
+        });
+    }
+
+    computeCarryover(_userId: string, _year: number, _month: number): number {
+        // For in-memory (tests), carryover is always 0
+        return 0;
+    }
 }

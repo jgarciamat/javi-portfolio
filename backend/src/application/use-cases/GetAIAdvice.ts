@@ -27,7 +27,7 @@ export interface AIAdvice {
 
 export class GetAIAdvice {
     async execute(context: FinancialContext): Promise<AIAdvice> {
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
             // Fallback: rule-based advice when no API key is configured
@@ -37,37 +37,30 @@ export class GetAIAdvice {
         const prompt = this.buildPrompt(context);
 
         try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${apiKey}`,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'gpt-4o-mini',
-                    messages: [
-                        {
-                            role: 'system',
-                            content:
-                                'Eres un asesor financiero personal experto. Analiza los datos financieros del usuario y proporciona consejos personalizados, concisos y accionables en español. Responde SOLO con JSON válido.',
-                        },
-                        { role: 'user', content: prompt },
-                    ],
-                    max_tokens: 600,
-                    temperature: 0.7,
-                    response_format: { type: 'json_object' },
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 600,
+                        responseMimeType: 'application/json',
+                    },
                 }),
             });
 
             if (!response.ok) {
-                throw new Error(`OpenAI API error: ${response.status}`);
+                throw new Error(`Gemini API error: ${response.status}`);
             }
 
             const data = (await response.json()) as {
-                choices: { message: { content: string } }[];
+                candidates: { content: { parts: { text: string }[] } }[];
             };
-            const content = data.choices[0]?.message?.content ?? '{}';
-            return JSON.parse(content) as AIAdvice;
+            const text = data.candidates[0]?.content?.parts[0]?.text ?? '{}';
+            return JSON.parse(text) as AIAdvice;
         } catch {
             // Graceful degradation
             return this.generateRuleBasedAdvice(context);
@@ -81,21 +74,22 @@ export class GetAIAdvice {
             .map(([cat, amt]) => `${cat}: ${amt.toFixed(2)}€`)
             .join(', ');
 
-        return `Analiza la siguiente situación financiera del mes ${ctx.month}/${ctx.year}:
+        return `Eres un asesor financiero personal experto. Analiza los siguientes datos financieros reales del usuario para el mes ${ctx.month}/${ctx.year} y proporciona consejos personalizados, concisos y accionables en español.
+
+DATOS FINANCIEROS:
 - Ingresos totales: ${ctx.totalIncome.toFixed(2)}€
 - Gastos totales: ${ctx.totalExpenses.toFixed(2)}€
-- Balance: ${ctx.balance.toFixed(2)}€
+- Balance del mes: ${ctx.balance.toFixed(2)}€
 - Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}%
-- Presupuesto mensual: ${ctx.budgetAmount > 0 ? ctx.budgetAmount.toFixed(2) + '€' : 'no definido'}
-- Principales categorías de gasto: ${topCategories || 'ninguno'}
+- Principales categorías de gasto: ${topCategories || 'sin gastos registrados'}
 - Número de transacciones: ${ctx.transactions.length}
 
-Responde con un JSON con esta estructura exacta:
+Responde ÚNICAMENTE con un JSON válido con esta estructura exacta (sin texto adicional, sin markdown):
 {
-  "summary": "resumen breve de la situación financiera en 1-2 frases",
-  "tips": ["consejo accionable 1", "consejo accionable 2", "consejo accionable 3"],
-  "positives": ["punto positivo 1", "punto positivo 2"],
-  "warnings": ["advertencia 1 si aplica"]
+  "summary": "resumen honesto de la situación financiera del mes en 1-2 frases",
+  "positives": ["punto positivo concreto 1", "punto positivo concreto 2"],
+  "warnings": ["advertencia concreta 1 si aplica"],
+  "tips": ["consejo accionable y específico 1", "consejo accionable y específico 2", "consejo accionable y específico 3"]
 }`;
     }
 
