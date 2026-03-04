@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAIAdvisor } from '../../application/hooks/useAIAdvisor';
+import { useI18n } from '@core/i18n/I18nContext';
 import '../css/AIAdvisor.css';
 
 interface Props {
@@ -9,9 +10,15 @@ interface Props {
 
 export function AIAdvisor({ year, month }: Props) {
     const { advice, loading, error, analyzed, daysUntilNextAnalysis, justAnalyzed, analyze } = useAIAdvisor({ year, month });
+    const { t } = useI18n();
     const [open, setOpen] = useState(false);
     const bodyRef = useRef<HTMLDivElement>(null);
     const isFirstRender = useRef(true);
+
+    const cooldownText = (key: string) =>
+        t(key)
+            .replace('{days}', String(daysUntilNextAnalysis))
+            .replace('{plural}', daysUntilNextAnalysis !== 1 ? 's' : '');
 
     // Animate max-height
     useEffect(() => {
@@ -48,22 +55,22 @@ export function AIAdvisor({ year, month }: Props) {
                 tabIndex={0}
                 onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(v => !v)}
             >
-                <span className="ai-advisor-title">🤖 Asesor financiero IA</span>
+                <span className="ai-advisor-title">{t('app.ai.title')}</span>
                 <div className="ai-advisor-actions" onClick={e => e.stopPropagation()}>
                     <button
                         className={`ai-btn ai-btn--primary${loading ? ' ai-btn--loading' : ''}`}
                         onClick={() => analyze(year, month)}
                         disabled={loading || analyzed}
-                        title={analyzed ? `Podrás repetir el análisis en ${daysUntilNextAnalysis} día${daysUntilNextAnalysis !== 1 ? 's' : ''}` : undefined}
+                        title={analyzed ? cooldownText('app.ai.cooldown.title') : undefined}
                     >
                         {loading ? (
                             <span className="ai-spinner" />
                         ) : analyzed ? (
-                            '✅ Analizado'
+                            t('app.ai.btn.analyzed')
                         ) : advice ? (
-                            '🔄 Reanalizar'
+                            t('app.ai.btn.reanalyze')
                         ) : (
-                            '✨ Analizar mes'
+                            t('app.ai.btn.analyze')
                         )}
                     </button>
                 </div>
@@ -71,9 +78,7 @@ export function AIAdvisor({ year, month }: Props) {
             </div>
 
             {analyzed && (
-                <p className="ai-cooldown">
-                    🕐 Podrás repetir el análisis en {daysUntilNextAnalysis} día{daysUntilNextAnalysis !== 1 ? 's' : ''}
-                </p>
+                <p className="ai-cooldown">{cooldownText('app.ai.cooldown')}</p>
             )}
 
             <div className="ai-advisor-body" ref={bodyRef}>
@@ -88,7 +93,7 @@ export function AIAdvisor({ year, month }: Props) {
 
                             {advice.positives.length > 0 && (
                                 <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--green">✅ Puntos positivos</h4>
+                                    <h4 className="ai-section-title ai-section-title--green">{t('app.ai.section.positives')}</h4>
                                     <ul className="ai-list">
                                         {advice.positives.map((p, i) => (
                                             <li key={i} className="ai-list-item ai-list-item--green">{p}</li>
@@ -99,7 +104,7 @@ export function AIAdvisor({ year, month }: Props) {
 
                             {advice.warnings.length > 0 && (
                                 <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--red">⚠️ Advertencias</h4>
+                                    <h4 className="ai-section-title ai-section-title--red">{t('app.ai.section.warnings')}</h4>
                                     <ul className="ai-list">
                                         {advice.warnings.map((w, i) => (
                                             <li key={i} className="ai-list-item ai-list-item--red">{w}</li>
@@ -110,7 +115,7 @@ export function AIAdvisor({ year, month }: Props) {
 
                             {advice.tips.length > 0 && (
                                 <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--blue">💡 Consejos</h4>
+                                    <h4 className="ai-section-title ai-section-title--blue">{t('app.ai.section.tips')}</h4>
                                     <ul className="ai-list">
                                         {advice.tips.map((t, i) => (
                                             <li key={i} className="ai-list-item ai-list-item--blue">{t}</li>
@@ -122,7 +127,7 @@ export function AIAdvisor({ year, month }: Props) {
                     )}
 
                     {!advice && !error && (
-                        <p className="ai-placeholder">Pulsa "✨ Analizar mes" para obtener consejos personalizados sobre tus finanzas.</p>
+                        <p className="ai-placeholder">{t('app.ai.placeholder')}</p>
                     )}
                 </div>
             </div>

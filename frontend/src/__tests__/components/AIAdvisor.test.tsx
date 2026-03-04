@@ -1,6 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AIAdvisor } from '@modules/finances/ui/components/AIAdvisor';
 import type { AIAdvice } from '@core/api/premiumApi';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string) => translations[key] ?? key;
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // ── Mutable state object that each mock call reads from ─────────────────────
 const mockAnalyze = jest.fn();
