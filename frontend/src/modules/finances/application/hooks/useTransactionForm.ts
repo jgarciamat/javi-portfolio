@@ -11,8 +11,22 @@ interface UseTransactionFormOptions {
 function getDefaultDate(viewYear: number, viewMonth: number): string {
     const now = new Date();
     const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth() + 1;
-    if (isCurrentMonth) return now.toISOString().split('T')[0];
+    if (isCurrentMonth) {
+        // Local date YYYY-MM-DD to avoid UTC offset shifting the day
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
     return `${viewYear}-${String(viewMonth).padStart(2, '0')}-01`;
+}
+
+/** Convert a local date string "YYYY-MM-DD" to an ISO string at local noon,
+ *  so UTC offset never shifts it to a different calendar day. */
+function localDateToISO(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day, 12, 0, 0);
+    return d.toISOString();
 }
 
 export function useTransactionForm({
@@ -77,7 +91,7 @@ export function useTransactionForm({
                 amount: parsedAmount,
                 type,
                 category,
-                date: new Date(date).toISOString(),
+                date: localDateToISO(date),
                 notes: notes.trim() || null,
             });
             setDescription('');

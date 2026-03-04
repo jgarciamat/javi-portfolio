@@ -15,8 +15,10 @@ export class TransactionController {
 
             // Validate available balance only for SAVING type
             if (transaction.type.isSaving()) {
-                const txYear = transaction.date.getFullYear();
-                const txMonth = transaction.date.getMonth() + 1;
+                // Extract year/month from ISO date string to avoid timezone shifts
+                const [yearStr, monthStr] = transaction.toJSON().date.split('-');
+                const txYear = parseInt(yearStr, 10);
+                const txMonth = parseInt(monthStr, 10);
                 const carryover = this.transactionRepo.computeCarryover(userId, txYear, txMonth);
                 const monthTxs = await this.transactionRepo.findByUserAndMonth(userId, txYear, txMonth);
                 let monthIncome = 0, monthExpenses = 0, monthSaving = 0;

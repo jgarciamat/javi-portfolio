@@ -11,7 +11,11 @@ export class SqliteTransactionRepository implements ITransactionRepository {
 
     async save(transaction: Transaction): Promise<void> {
         const j = transaction.toJSON();
-        const d = new Date(j.date);
+        // Extract year/month from the date string directly (YYYY-MM-...) to avoid
+        // timezone shifts from Date.getFullYear() / getMonth()
+        const [yearStr, monthStr] = j.date.split('-');
+        const year = parseInt(yearStr, 10);
+        const month = parseInt(monthStr, 10);
         this.db
             .prepare(`
         INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, notes)
@@ -21,8 +25,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
             .run({
                 id: j.id,
                 userId: '',
-                year: d.getFullYear(),
-                month: d.getMonth() + 1,
+                year,
+                month,
                 description: j.description,
                 amount: j.amount,
                 type: j.type,
@@ -35,7 +39,9 @@ export class SqliteTransactionRepository implements ITransactionRepository {
 
     async saveForUser(transaction: Transaction, userId: string): Promise<void> {
         const j = transaction.toJSON();
-        const d = new Date(j.date);
+        const [yearStr, monthStr] = j.date.split('-');
+        const year = parseInt(yearStr, 10);
+        const month = parseInt(monthStr, 10);
         this.db
             .prepare(`
         INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, notes)
@@ -45,8 +51,8 @@ export class SqliteTransactionRepository implements ITransactionRepository {
             .run({
                 id: j.id,
                 userId,
-                year: d.getFullYear(),
-                month: d.getMonth() + 1,
+                year,
+                month,
                 description: j.description,
                 amount: j.amount,
                 type: j.type,
