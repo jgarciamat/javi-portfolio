@@ -1,4 +1,4 @@
-import { isNextMonthAllowed, isNextButtonDisabled } from '../../../modules/finances/domain/nextMonthLogic';
+import { isNextMonthAllowed, isNextButtonDisabled, isMonthInFuture } from '../../../modules/finances/domain/nextMonthLogic';
 
 function makeDate(year: number, month: number, day: number): Date {
     return new Date(year, month - 1, day);
@@ -58,5 +58,27 @@ describe('isNextButtonDisabled', () => {
     it('handles December → January year transition correctly (next not yet allowed)', () => {
         // Dec 10 2026 — next month not allowed. Viewing Dec 2026 → disabled
         expect(isNextButtonDisabled(2026, 12, makeDate(2026, 12, 10))).toBe(true);
+    });
+});
+
+describe('isMonthInFuture', () => {
+    it('returns false for the current month', () => {
+        expect(isMonthInFuture(2026, 3, makeDate(2026, 3, 4))).toBe(false);
+    });
+
+    it('returns false for a past month in the same year', () => {
+        expect(isMonthInFuture(2026, 1, makeDate(2026, 3, 4))).toBe(false);
+    });
+
+    it('returns false for a month in a past year', () => {
+        expect(isMonthInFuture(2025, 12, makeDate(2026, 3, 4))).toBe(false);
+    });
+
+    it('returns true for next month', () => {
+        expect(isMonthInFuture(2026, 4, makeDate(2026, 3, 4))).toBe(true);
+    });
+
+    it('returns true for a month in a future year', () => {
+        expect(isMonthInFuture(2027, 1, makeDate(2026, 3, 4))).toBe(true);
     });
 });

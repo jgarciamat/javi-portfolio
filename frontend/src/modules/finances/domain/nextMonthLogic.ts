@@ -10,6 +10,18 @@ export function isNextMonthAllowed(today: Date): boolean {
 }
 
 /**
+ * Returns true when a given year/month is strictly in the future (after the current month).
+ * Used in the annual chart to decide if a month label should be a clickable link.
+ */
+export function isMonthInFuture(viewYear: number, viewMonth: number, today: Date = new Date()): boolean {
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    if (viewYear > currentYear) return true;
+    if (viewYear === currentYear && viewMonth > currentMonth) return true;
+    return false;
+}
+
+/**
  * Returns true when the "Siguiente" button should be disabled.
  * @param viewYear  - the year currently displayed
  * @param viewMonth - the month currently displayed (1–12)

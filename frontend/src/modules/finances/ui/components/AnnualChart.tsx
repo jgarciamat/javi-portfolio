@@ -3,7 +3,7 @@ import { useAnnualChart } from '../../application/hooks/useAnnualChart';
 import '../css/AnnualChart.css';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
-import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
+import { isNextButtonDisabled, isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
 
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear } = useAnnualChart(initialYear); const { data, loading, error } = useAnnualSummary(year);
@@ -83,7 +83,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                         </div>
                                     </div>
                                     <div className="annual-month-label">
-                                        {onMonthClick && !isNextButtonDisabled(year, month, now) ? (
+                                        {onMonthClick && !isMonthInFuture(year, month, now) ? (
                                             <button
                                                 type="button"
                                                 className="annual-month-btn"
@@ -154,7 +154,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                 {months.map(({ month, income, expenses, saving, balance }) => (
                                     <tr key={month}>
                                         <td className="annual-td-month">
-                                            {onMonthClick && !isNextButtonDisabled(year, month, now) ? (
+                                            {onMonthClick && !isMonthInFuture(year, month, now) ? (
                                                 <button
                                                     type="button"
                                                     className="annual-month-btn"
