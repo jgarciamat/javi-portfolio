@@ -23,9 +23,9 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
     const [notesValue, setNotesValue] = useState('');
 
     const txLabel = (type: TransactionType): string => {
-        if (type === 'INCOME') return `↑ ${t('app.transaction.form.type.income')}`;
-        if (type === 'SAVING') return `↑ ${t('app.transaction.form.type.saving')}`;
-        return `↓ ${t('app.transaction.form.type.expense')}`;
+        if (type === 'INCOME') return t('app.transaction.form.type.income');
+        if (type === 'SAVING') return t('app.transaction.form.type.saving');
+        return t('app.transaction.form.type.expense');
     };
 
     const startEditNotes = (id: string, current: string | null) => {

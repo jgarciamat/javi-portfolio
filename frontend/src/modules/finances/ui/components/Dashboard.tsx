@@ -15,6 +15,8 @@ import { CategoryChart } from './CategoryChart';
 import { AnnualChart } from './AnnualChart';
 import { CategoryManager } from './CategoryManager';
 import { ProfilePage } from '@modules/auth/ui/ProfilePage';
+import { BudgetAlerts } from './BudgetAlerts';
+import { AIAdvisor } from './AIAdvisor';
 import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
 
 export function Dashboard() {
@@ -131,6 +133,9 @@ export function Dashboard() {
                                 </div>
                             )}
 
+                            {/* Smart budget alerts */}
+                            <BudgetAlerts summary={summary} carryover={carryover} />
+
                             {summary && <SummaryCards summary={summary} carryover={carryover} />}
 
                             <TransactionForm
@@ -141,6 +146,9 @@ export function Dashboard() {
                                 viewMonth={month}
                                 availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}
                             />
+
+                            {/* AI Financial Advisor */}
+                            <AIAdvisor year={year} month={month} />
 
                             <CollapsiblePanel
                                 title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}

@@ -20,8 +20,12 @@ import { TransactionController } from '@infrastructure/controllers/TransactionCo
 import { CategoryController } from '@infrastructure/controllers/CategoryController';
 import { BudgetController } from '@infrastructure/controllers/BudgetController';
 import { ProfileController } from '@infrastructure/controllers/ProfileController';
+import { AlertController } from '@infrastructure/controllers/AlertController';
+import { AIController } from '@infrastructure/controllers/AIController';
 import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
+import { CheckBudgetAlerts } from '@application/use-cases/CheckBudgetAlerts';
+import { GetAIAdvice } from '@application/use-cases/GetAIAdvice';
 
 dotenv.config();
 
@@ -71,6 +75,10 @@ const refreshAccessToken = new RefreshAccessToken(refreshTokenRepo);
 const setMonthlyBudget = new SetMonthlyBudget(budgetRepo);
 const getMonthlyBudget = new GetMonthlyBudget(budgetRepo);
 
+// --- New feature use-cases & services ---
+const checkBudgetAlerts = new CheckBudgetAlerts(transactionRepo);
+const getAIAdvice = new GetAIAdvice();
+
 // --- Controllers ---
 const authController = new AuthController(registerUser, loginUser, verifyEmail, logoutUser, refreshAccessToken);
 const transactionController = new TransactionController(transactionRepo);
@@ -81,6 +89,8 @@ const profileController = new ProfileController(
     new UpdatePassword(userRepo),
     new UpdateAvatar(userRepo),
 );
+const alertController = new AlertController(checkBudgetAlerts);
+const aiController = new AIController(getAIAdvice, transactionRepo, budgetRepo);
 
 // --- Routes ---
 const router = express.Router();
@@ -118,6 +128,12 @@ router.put('/budget/:year/:month', (req: Request, res: Response) => budgetContro
 router.patch('/profile/name', (req: Request, res: Response) => profileController.patchName(req as AuthRequest, res));
 router.patch('/profile/password', (req: Request, res: Response) => profileController.patchPassword(req as AuthRequest, res));
 router.patch('/profile/avatar', (req: Request, res: Response) => profileController.patchAvatar(req as AuthRequest, res));
+
+// Alerts
+router.get('/alerts/budget/:year/:month', (req: Request, res: Response) => alertController.budgetAlerts(req as AuthRequest, res));
+
+// AI Advisor
+router.post('/ai/advice', (req: Request, res: Response) => aiController.getAdvice(req as AuthRequest, res));
 
 app.use('/api', router);
 
