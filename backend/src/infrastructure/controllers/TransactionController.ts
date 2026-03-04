@@ -45,9 +45,8 @@ export class TransactionController {
     async patch(req: AuthRequest, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const { done, notes } = req.body as { done?: boolean; notes?: string | null };
-            const changes: { done?: boolean; notes?: string | null } = {};
-            if (done !== undefined) changes.done = done;
+            const { notes } = req.body as { notes?: string | null };
+            const changes: { notes?: string | null } = {};
             if ('notes' in req.body) changes.notes = notes;
             const updated = await this.transactionRepo.patchTransaction(id, changes);
             if (!updated) { res.status(404).json({ error: 'No encontrado' }); return; }

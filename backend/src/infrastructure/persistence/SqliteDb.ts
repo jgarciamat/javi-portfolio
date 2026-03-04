@@ -80,8 +80,8 @@ function initSchema(db: Database.Database): void {
   migrateTransactionsTable(db);
   // Migration: add email verification columns if missing
   migrateUsersEmailVerification(db);
-  // Migration: add done + notes columns to transactions if missing
-  migrateTransactionsDoneNotes(db);
+  // Migration: add notes column to transactions if missing
+  migrateTransactionsNotes(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -125,12 +125,9 @@ function migrateUsersEmailVerification(db: Database.Database): void {
   }
 }
 
-function migrateTransactionsDoneNotes(db: Database.Database): void {
+function migrateTransactionsNotes(db: Database.Database): void {
   const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
   if (!info) return;
-  if (!info.sql.includes('done')) {
-    db.exec(`ALTER TABLE transactions ADD COLUMN done INTEGER NOT NULL DEFAULT 0`);
-  }
   if (!info.sql.includes('notes')) {
     db.exec(`ALTER TABLE transactions ADD COLUMN notes TEXT`);
   }

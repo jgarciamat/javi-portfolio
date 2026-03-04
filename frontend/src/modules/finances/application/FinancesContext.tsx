@@ -36,7 +36,7 @@ interface FinancesActions {
     navigateTo: (year: number, month: number) => void;
     addTransaction: (dto: CreateTransactionDTO) => Promise<Transaction>;
     removeTransaction: (id: string) => Promise<void>;
-    patchTransaction: (id: string, changes: { done?: boolean; notes?: string | null }) => Promise<void>;
+    patchTransaction: (id: string, changes: { notes?: string | null }) => Promise<void>;
     addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
     removeCategory: (id: string) => Promise<void>;
     refresh: () => Promise<void>;
@@ -154,7 +154,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     );
 
     const patchTransaction = useCallback(
-        async (id: string, changes: { done?: boolean; notes?: string | null }) => {
+        async (id: string, changes: { notes?: string | null }) => {
             const updated = await transactionApi.patch(id, changes);
             const key = `${year}-${month}`;
             const cached = cache.current.get(key);

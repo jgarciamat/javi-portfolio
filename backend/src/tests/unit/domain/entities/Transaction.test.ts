@@ -49,53 +49,40 @@ describe('Transaction entity', () => {
         expect(json).toHaveProperty('date');
     });
 
-    // ── done / notes ──────────────────────────────────────────────────────────
+    // ── notes ─────────────────────────────────────────────────────────────────
 
-    test('create defaults done=false and notes=null', () => {
+    test('create defaults notes=null', () => {
         const tx = Transaction.create({ description: 'Test', amount: 5, type: 'expense', category: 'misc' });
-        expect(tx.done).toBe(false);
         expect(tx.notes).toBeNull();
     });
 
-    test('create with done=true and notes sets them', () => {
+    test('create with notes sets it', () => {
         const tx = Transaction.create({
             description: 'Paid bill',
             amount: 50,
             type: 'expense',
             category: 'bills',
-            done: true,
             notes: 'Paid via bank transfer',
         });
-        expect(tx.done).toBe(true);
         expect(tx.notes).toBe('Paid via bank transfer');
     });
 
-    test('toJSON includes done and notes', () => {
+    test('toJSON includes notes', () => {
         const tx = Transaction.create({
             description: 'Salary',
             amount: 1000,
             type: 'income',
             category: 'work',
-            done: true,
             notes: 'Monthly salary',
         });
         const json = tx.toJSON();
-        expect(json.done).toBe(true);
         expect(json.notes).toBe('Monthly salary');
     });
 
-    test('toJSON done=false notes=null by default', () => {
+    test('toJSON notes=null by default', () => {
         const tx = Transaction.create({ description: 'Bus', amount: 2, type: 'expense', category: 'transport' });
         const json = tx.toJSON();
-        expect(json.done).toBe(false);
         expect(json.notes).toBeNull();
-    });
-
-    test('patch updates done', () => {
-        const tx = Transaction.create({ description: 'Test', amount: 10, type: 'expense', category: 'misc' });
-        expect(tx.done).toBe(false);
-        tx.patch({ done: true });
-        expect(tx.done).toBe(true);
     });
 
     test('patch updates notes', () => {
@@ -110,20 +97,18 @@ describe('Transaction entity', () => {
         expect(tx.notes).toBeNull();
     });
 
-    test('patch with no changes leaves values unchanged', () => {
-        const tx = Transaction.create({ description: 'Test', amount: 10, type: 'expense', category: 'misc', done: true, notes: 'note' });
+    test('patch with no changes leaves notes unchanged', () => {
+        const tx = Transaction.create({ description: 'Test', amount: 10, type: 'expense', category: 'misc', notes: 'note' });
         tx.patch({});
-        expect(tx.done).toBe(true);
         expect(tx.notes).toBe('note');
     });
 
-    test('reconstitute preserves done and notes', () => {
+    test('reconstitute preserves notes', () => {
         const original = Transaction.create({
             description: 'Rent',
             amount: 800,
             type: 'expense',
             category: 'housing',
-            done: true,
             notes: 'Paid on time',
         });
         const json = original.toJSON();
@@ -136,11 +121,9 @@ describe('Transaction entity', () => {
             category: json.category,
             date: new Date(json.date),
             createdAt: new Date(json.createdAt),
-            done: json.done,
             notes: json.notes,
         });
 
-        expect(restored.done).toBe(true);
         expect(restored.notes).toBe('Paid on time');
     });
 });

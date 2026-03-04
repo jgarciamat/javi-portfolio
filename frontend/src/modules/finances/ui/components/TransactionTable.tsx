@@ -52,7 +52,6 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
                 <table className="tx-table">
                     <thead>
                         <tr>
-                            <th>✓</th>
                             {['Fecha', 'Descripción', 'Notas', 'Categoría', 'Tipo', 'Importe', ''].map((h) => (
                                 <th key={h}>{h}</th>
                             ))}
@@ -60,16 +59,7 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
                     </thead>
                     <tbody>
                         {transactions.map((tx) => (
-                            <tr key={tx.id} className={tx.done ? 'tx-row-done' : ''}>
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        className="tx-done-checkbox"
-                                        checked={tx.done}
-                                        onChange={(e) => onPatch(tx.id, { done: e.target.checked })}
-                                        title="Marcar como realizada"
-                                    />
-                                </td>
+                            <tr key={tx.id}>
                                 <td style={{ color: '#94a3b8' }}>{formatDate(tx.date)}</td>
                                 <td style={{ color: '#f1f5f9', fontWeight: 500 }}>{tx.description}</td>
                                 <td className="tx-notes-cell">
@@ -114,15 +104,7 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
             {/* Mobile card list */}
             <div className="tx-card-list">
                 {transactions.map((tx) => (
-                    <div key={tx.id} className={`tx-card${tx.done ? ' tx-card-done' : ''}`}>
-                        <div className="tx-card-check">
-                            <input
-                                type="checkbox"
-                                className="tx-done-checkbox"
-                                checked={tx.done}
-                                onChange={(e) => onPatch(tx.id, { done: e.target.checked })}
-                            />
-                        </div>
+                    <div key={tx.id} className="tx-card">
                         <div className="tx-card-left">
                             <div className="tx-card-desc">{tx.description}</div>
                             <div className="tx-card-meta">{formatDate(tx.date)} · {tx.category}</div>

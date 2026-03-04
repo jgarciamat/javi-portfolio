@@ -68,22 +68,22 @@ describe('TransactionController.patch()', () => {
     });
 
     test('returns 200 with patched transaction on success', async () => {
-        const tx = makeTx({ done: true, notes: 'Done note' });
+        const tx = makeTx({ notes: 'Done note' });
         repo.patchTransaction.mockResolvedValue(tx);
 
-        const req = makeReq({ params: { id: tx.id.value }, body: { done: true, notes: 'Done note' } });
+        const req = makeReq({ params: { id: tx.id.value }, body: { notes: 'Done note' } });
         const res = makeRes();
 
         await controller.patch(req, res as Response);
 
-        expect(repo.patchTransaction).toHaveBeenCalledWith(tx.id.value, { done: true, notes: 'Done note' });
-        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ done: true, notes: 'Done note' }));
+        expect(repo.patchTransaction).toHaveBeenCalledWith(tx.id.value, { notes: 'Done note' });
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ notes: 'Done note' }));
     });
 
     test('returns 404 when transaction not found', async () => {
         repo.patchTransaction.mockResolvedValue(null);
 
-        const req = makeReq({ params: { id: 'missing-id' }, body: { done: true } });
+        const req = makeReq({ params: { id: 'missing-id' }, body: { notes: 'some note' } });
         const res = makeRes();
 
         await controller.patch(req, res as Response);
@@ -95,7 +95,7 @@ describe('TransactionController.patch()', () => {
     test('returns 500 when repo throws', async () => {
         repo.patchTransaction.mockRejectedValue(new Error('DB error'));
 
-        const req = makeReq({ params: { id: 'any-id' }, body: { done: false } });
+        const req = makeReq({ params: { id: 'any-id' }, body: { notes: null } });
         const res = makeRes();
 
         await controller.patch(req, res as Response);
@@ -116,19 +116,7 @@ describe('TransactionController.patch()', () => {
         expect(res.json).toHaveBeenCalledWith({ error: 'Error' });
     });
 
-    test('sends only done when notes is absent from body', async () => {
-        const tx = makeTx({ done: true });
-        repo.patchTransaction.mockResolvedValue(tx);
-
-        const req = makeReq({ params: { id: tx.id.value }, body: { done: true } });
-        const res = makeRes();
-
-        await controller.patch(req, res as Response);
-
-        expect(repo.patchTransaction).toHaveBeenCalledWith(tx.id.value, { done: true });
-    });
-
-    test('sends only notes when done is absent from body', async () => {
+    test('sends only notes when notes is present in body', async () => {
         const tx = makeTx({ notes: 'Just a note' });
         repo.patchTransaction.mockResolvedValue(tx);
 

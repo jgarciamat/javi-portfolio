@@ -3,7 +3,7 @@ import type { Transaction } from '@modules/finances/domain/types';
 export interface TransactionTableProps {
     transactions: Transaction[];
     onDelete: (id: string) => void;
-    onPatch: (id: string, changes: { done?: boolean; notes?: string | null }) => void;
+    onPatch: (id: string, changes: { notes?: string | null }) => void;
 }
 
 export function formatCurrency(amount: number): string {

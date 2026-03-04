@@ -48,7 +48,7 @@ export const transactionApi = {
         return request<void>(`/transactions/${id}`, { method: 'DELETE' });
     },
 
-    patch(id: string, changes: { done?: boolean; notes?: string | null }) {
+    patch(id: string, changes: { notes?: string | null }) {
         return request<Transaction>(`/transactions/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(changes),

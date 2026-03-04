@@ -10,7 +10,6 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
         setAmount,
         setType,
         setDate,
-        setDone,
         setNotes,
         handleCategoryChange,
         handleSubmit,
@@ -55,19 +54,7 @@ export function TransactionForm({ categories, onSubmit, onManageCategories, view
                     />
                 </div>
 
-                <label className="tx-done-label">
-                    <input
-                        type="checkbox"
-                        className="tx-done-checkbox"
-                        checked={fields.done}
-                        onChange={(e) => setDone(e.target.checked)}
-                    />
-                    Marcar como realizada
-                </label>
-
-                {error && <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0.4rem 0' }}>{error}</p>}
-
-                <div className="tx-form-actions">
+                {error && <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0.4rem 0' }}>{error}</p>}                <div className="tx-form-actions">
                     <button type="submit" className="btn-primary" disabled={loading}>
                         {loading ? 'Guardando...' : 'Guardar transacción'}
                     </button>

@@ -80,37 +80,6 @@ describe('TransactionForm', () => {
         expect(dateInput.value).toBe('2025-06-15');
     });
 
-    // ── done checkbox ─────────────────────────────────────────────────────────
-
-    test('renders "Marcar como realizada" checkbox unchecked by default', () => {
-        render(<TransactionForm {...defaultProps} />);
-        fireEvent.click(screen.getByRole('button', { expanded: false }));
-        const checkbox = screen.getByRole('checkbox');
-        expect(checkbox).toBeInTheDocument();
-        expect(checkbox).not.toBeChecked();
-    });
-
-    test('checking done checkbox marks it as checked', () => {
-        render(<TransactionForm {...defaultProps} />);
-        fireEvent.click(screen.getByRole('button', { expanded: false }));
-        const checkbox = screen.getByRole('checkbox');
-        fireEvent.click(checkbox);
-        expect(checkbox).toBeChecked();
-    });
-
-    test('submitting with done=true passes done in DTO', async () => {
-        render(<TransactionForm {...defaultProps} />);
-        fireEvent.click(screen.getByRole('button', { expanded: false }));
-        fireEvent.change(screen.getByPlaceholderText('Descripción'), { target: { value: 'Paid' } });
-        fireEvent.change(screen.getByPlaceholderText(/Importe/i), { target: { value: '30' } });
-        fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: 'Food' } });
-        fireEvent.click(screen.getByRole('checkbox'));
-        fireEvent.click(screen.getByText('Guardar transacción'));
-        await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
-            expect.objectContaining({ done: true })
-        ));
-    });
-
     // ── notes textarea ────────────────────────────────────────────────────────
 
     test('renders notes textarea with placeholder', () => {
@@ -153,13 +122,11 @@ describe('TransactionForm', () => {
         ));
     });
 
-    test('reset button clears done checkbox and notes', async () => {
+    test('reset button clears notes', async () => {
         render(<TransactionForm {...defaultProps} />);
         fireEvent.click(screen.getByRole('button', { expanded: false }));
-        fireEvent.click(screen.getByRole('checkbox'));
         fireEvent.change(screen.getByPlaceholderText('Notas (opcional)'), { target: { value: 'Some note' } });
         fireEvent.click(screen.getByText('Cancelar'));
-        expect(screen.getByRole('checkbox')).not.toBeChecked();
         expect((screen.getByPlaceholderText('Notas (opcional)') as HTMLTextAreaElement).value).toBe('');
     });
 });

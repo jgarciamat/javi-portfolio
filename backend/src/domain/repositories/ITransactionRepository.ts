@@ -8,5 +8,5 @@ export interface ITransactionRepository {
     findByCategory(category: string): Promise<Transaction[]>;
     findByDateRange(from: Date, to: Date): Promise<Transaction[]>;
     delete(id: string): Promise<void>;
-    patchTransaction(id: string, changes: { done?: boolean; notes?: string | null }): Promise<Transaction | null>;
+    patchTransaction(id: string, changes: { notes?: string | null }): Promise<Transaction | null>;
 }

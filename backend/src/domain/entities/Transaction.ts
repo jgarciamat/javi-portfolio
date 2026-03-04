@@ -10,7 +10,6 @@ export interface TransactionProps {
     category: string;
     date: Date;
     createdAt: Date;
-    done: boolean;
     notes: string | null;
 }
 
@@ -22,7 +21,6 @@ export class Transaction {
     private _category: string;
     private _date: Date;
     private readonly _createdAt: Date;
-    private _done: boolean;
     private _notes: string | null;
 
     private constructor(props: TransactionProps) {
@@ -33,7 +31,6 @@ export class Transaction {
         this._category = props.category;
         this._date = props.date;
         this._createdAt = props.createdAt;
-        this._done = props.done ?? false;
         this._notes = props.notes ?? null;
     }
 
@@ -43,7 +40,6 @@ export class Transaction {
         type: string;
         category: string;
         date?: Date | string;
-        done?: boolean;
         notes?: string | null;
     }): Transaction {
         if (!props.description || props.description.trim() === '') {
@@ -61,7 +57,6 @@ export class Transaction {
             category: props.category.trim(),
             date,
             createdAt: new Date(),
-            done: props.done ?? false,
             notes: props.notes ?? null,
         });
     }
@@ -77,17 +72,15 @@ export class Transaction {
     get category(): string { return this._category; }
     get date(): Date { return this._date; }
     get createdAt(): Date { return this._createdAt; }
-    get done(): boolean { return this._done; }
     get notes(): string | null { return this._notes; }
 
-    patch(changes: { done?: boolean; notes?: string | null }): void {
-        if (changes.done !== undefined) this._done = changes.done;
+    patch(changes: { notes?: string | null }): void {
         if ('notes' in changes) this._notes = changes.notes ?? null;
     }
 
     toJSON(): {
         id: string; description: string; amount: number; type: string;
-        category: string; date: string; createdAt: string; done: boolean; notes: string | null;
+        category: string; date: string; createdAt: string; notes: string | null;
     } {
         return {
             id: this._id.value,
@@ -97,7 +90,6 @@ export class Transaction {
             category: this._category,
             date: this._date.toISOString(),
             createdAt: this._createdAt.toISOString(),
-            done: this._done,
             notes: this._notes,
         };
     }

@@ -19,7 +19,6 @@ function makeDb(): Database.Database {
             category    TEXT NOT NULL,
             date        TEXT NOT NULL,
             created_at  TEXT NOT NULL,
-            done        INTEGER NOT NULL DEFAULT 0,
             notes       TEXT
         );
     `);
@@ -52,21 +51,12 @@ describe('SqliteTransactionRepository', () => {
 
     // ── saveForUser ───────────────────────────────────────────────────────────
 
-    test('saveForUser stores done=false and notes=null by default', async () => {
+    test('saveForUser stores notes=null by default', async () => {
         const tx = makeTx();
         await repo.saveForUser(tx, 'user1');
 
-        const row = db.prepare('SELECT done, notes FROM transactions WHERE id = ?').get(tx.id.value) as { done: number; notes: string | null };
-        expect(row.done).toBe(0);
+        const row = db.prepare('SELECT notes FROM transactions WHERE id = ?').get(tx.id.value) as { notes: string | null };
         expect(row.notes).toBeNull();
-    });
-
-    test('saveForUser stores done=true', async () => {
-        const tx = makeTx({ done: true });
-        await repo.saveForUser(tx, 'user1');
-
-        const row = db.prepare('SELECT done FROM transactions WHERE id = ?').get(tx.id.value) as { done: number };
-        expect(row.done).toBe(1);
     });
 
     test('saveForUser stores notes string', async () => {
@@ -78,23 +68,6 @@ describe('SqliteTransactionRepository', () => {
     });
 
     // ── toEntity (via findById) ───────────────────────────────────────────────
-
-    test('findById returns done=false when stored as 0', async () => {
-        const tx = makeTx({ done: false });
-        await repo.saveForUser(tx, 'user1');
-
-        const found = await repo.findById(tx.id.value);
-        expect(found).not.toBeNull();
-        expect(found!.done).toBe(false);
-    });
-
-    test('findById returns done=true when stored as 1', async () => {
-        const tx = makeTx({ done: true });
-        await repo.saveForUser(tx, 'user1');
-
-        const found = await repo.findById(tx.id.value);
-        expect(found!.done).toBe(true);
-    });
 
     test('findById returns notes correctly', async () => {
         const tx = makeTx({ notes: 'A note' });
@@ -120,21 +93,8 @@ describe('SqliteTransactionRepository', () => {
     // ── patchTransaction ──────────────────────────────────────────────────────
 
     test('patchTransaction returns null for unknown id', async () => {
-        const result = await repo.patchTransaction('nonexistent', { done: true });
+        const result = await repo.patchTransaction('nonexistent', {});
         expect(result).toBeNull();
-    });
-
-    test('patchTransaction updates done from false to true', async () => {
-        const tx = makeTx({ done: false });
-        await repo.saveForUser(tx, 'user1');
-
-        const patched = await repo.patchTransaction(tx.id.value, { done: true });
-        expect(patched).not.toBeNull();
-        expect(patched!.done).toBe(true);
-
-        // Verify it was actually persisted
-        const row = db.prepare('SELECT done FROM transactions WHERE id = ?').get(tx.id.value) as { done: number };
-        expect(row.done).toBe(1);
     });
 
     test('patchTransaction updates notes', async () => {
@@ -156,33 +116,22 @@ describe('SqliteTransactionRepository', () => {
         expect(patched!.notes).toBeNull();
     });
 
-    test('patchTransaction updates both done and notes at once', async () => {
-        const tx = makeTx();
-        await repo.saveForUser(tx, 'user1');
-
-        const patched = await repo.patchTransaction(tx.id.value, { done: true, notes: 'Both fields' });
-        expect(patched!.done).toBe(true);
-        expect(patched!.notes).toBe('Both fields');
-    });
-
     test('patchTransaction with empty changes returns entity unchanged', async () => {
-        const tx = makeTx({ done: true, notes: 'Keep me' });
+        const tx = makeTx({ notes: 'Keep me' });
         await repo.saveForUser(tx, 'user1');
 
         const patched = await repo.patchTransaction(tx.id.value, {});
-        expect(patched!.done).toBe(true);
         expect(patched!.notes).toBe('Keep me');
     });
 
     // ── save (generic, no userId) ─────────────────────────────────────────────
 
     test('save stores transaction with empty user_id', async () => {
-        const tx = makeTx({ done: true, notes: 'Generic save' });
+        const tx = makeTx({ notes: 'Generic save' });
         await repo.save(tx);
 
-        const row = db.prepare('SELECT user_id, done, notes FROM transactions WHERE id = ?').get(tx.id.value) as { user_id: string; done: number; notes: string };
+        const row = db.prepare('SELECT user_id, notes FROM transactions WHERE id = ?').get(tx.id.value) as { user_id: string; notes: string };
         expect(row.user_id).toBe('');
-        expect(row.done).toBe(1);
         expect(row.notes).toBe('Generic save');
     });
 
