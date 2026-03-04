@@ -45,8 +45,12 @@
     border-radius: 8px;
     padding: 0.75rem 1rem;
     color: #f1f5f9;
-    font-size: 0.9rem;
+    font-size: 1rem;
     width: 100%;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .auth-input:focus {
@@ -91,6 +95,9 @@
     cursor: pointer;
     font-size: 0.95rem;
     transition: background 0.15s;
+    touch-action: manipulation;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-btn:hover:not(:disabled) {

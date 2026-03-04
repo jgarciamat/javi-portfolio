@@ -26,7 +26,8 @@ export function LoginPage({ onSwitch }: Props) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoFocus
+                    autoComplete="email"
+                    inputMode="email"
                 />
 
                 <div className="auth-pass-wrap">
