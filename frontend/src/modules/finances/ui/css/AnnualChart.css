@@ -12,6 +12,9 @@
 }
 
 .annual-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     margin: 0;
     font-size: 1.15rem;
     font-weight: 700;

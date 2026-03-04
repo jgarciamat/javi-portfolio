@@ -1,5 +1,7 @@
 import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
+import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import '../css/AnnualChart.css';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
@@ -10,6 +12,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear } = useAnnualChart(initialYear);
     const { data, loading, error } = useAnnualSummary(year);
     const { t } = useI18n();
+    const { exportAnnualCSV } = useExportCSV();
 
     const months = data ? Object.entries(data.months).map(([k, v]) => ({ month: Number(k), ...v })) : [];
 
@@ -33,7 +36,21 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
             {/* Year picker */}
             <div className="annual-header">
                 <button className="btn-nav" onClick={prevYear}>‹ {year - 1}</button>
-                <h2 className="annual-title">{t('app.annual.title')} {year}</h2>
+                <h2 className="annual-title">
+                    {t('app.annual.title')} {year}
+                    {months.length > 0 && (
+                        <OptionsDropdown
+                            ariaLabel={t('app.export.options')}
+                            options={[
+                                {
+                                    icon: '📥',
+                                    label: t('app.export.annual'),
+                                    onClick: () => exportAnnualCSV(months, year),
+                                },
+                            ]}
+                        />
+                    )}
+                </h2>
                 <button className="btn-nav" onClick={nextYear} disabled={nextYearDisabled}>
                     {year + 1} ›
                 </button>

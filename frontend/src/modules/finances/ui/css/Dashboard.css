@@ -93,6 +93,9 @@
 }
 
 .month-nav-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 1.2rem;
     font-weight: 700;
     color: #f1f5f9;

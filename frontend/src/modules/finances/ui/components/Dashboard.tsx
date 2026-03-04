@@ -3,8 +3,10 @@ import '../css/Dashboard.css';
 import { useFinances } from '../../application/FinancesContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useExportCSV } from '../../application/hooks/useExportCSV';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
+import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import { MONTH_NAMES } from '../types';
 import { SummaryCards } from './SummaryCards';
 import { TransactionTable } from './TransactionTable';
@@ -22,7 +24,8 @@ export function Dashboard() {
     const [showProfile, setShowProfile] = useState(false);
 
     const { user, logout } = useAuth();
-    const { t } = useI18n();
+    const { t, tCategory } = useI18n();
+    const { exportMonthCSV } = useExportCSV();
     const {
         year, month,
         transactions, summary, carryover,
@@ -91,7 +94,21 @@ export function Dashboard() {
                             <div className="month-nav">
                                 <button onClick={goToPrev} className="btn-nav">‹ {t('app.nav.prev')}</button>
                                 <div className="month-nav-center">
-                                    <div className="month-nav-title">{MONTH_NAMES[month - 1]} {year}</div>
+                                    <div className="month-nav-title">
+                                        {MONTH_NAMES[month - 1]} {year}
+                                        {transactions.length > 0 && (
+                                            <OptionsDropdown
+                                                ariaLabel={t('app.export.options')}
+                                                options={[
+                                                    {
+                                                        icon: '📥',
+                                                        label: t('app.export.month'),
+                                                        onClick: () => exportMonthCSV(transactions, summary, year, month, tCategory),
+                                                    },
+                                                ]}
+                                            />
+                                        )}
+                                    </div>
                                     {isCurrentMonth && <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>}
                                 </div>
                                 <button onClick={goToNext} disabled={isNextDisabled} className="btn-nav">{t('app.nav.next')} ›</button>
