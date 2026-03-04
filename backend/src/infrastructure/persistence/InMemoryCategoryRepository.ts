@@ -2,11 +2,14 @@ import { Category } from '@domain/entities/Category';
 import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
 
 const DEFAULT_CATEGORIES = [
+    { name: 'Agua', color: '#38bdf8', icon: '💧' },
     { name: 'Alimentación', color: '#f97316', icon: '🍔' },
     { name: 'Transporte', color: '#3b82f6', icon: '🚗' },
     { name: 'Vivienda', color: '#8b5cf6', icon: '🏠' },
     { name: 'Salud', color: '#22c55e', icon: '💊' },
+    { name: 'Gas', color: '#fb923c', icon: '🔥' },
     { name: 'Gastos casa', color: '#f43f5e', icon: '💸' },
+    { name: 'Luz', color: '#facc15', icon: '💡' },
     { name: 'Niño', color: '#a78bfa', icon: '🧒' },
     { name: 'Ocio', color: '#ec4899', icon: '🎉' },
     { name: 'Ropa', color: '#f59e0b', icon: '👕' },

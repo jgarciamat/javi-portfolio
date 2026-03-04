@@ -4,12 +4,15 @@ import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
 import { CategoryRow } from './row-types';
 
 const DEFAULT_CATEGORIES = [
+    { name: 'Agua', color: '#38bdf8', icon: '💧' },
     { name: 'Ahorro', color: '#a78bfa', icon: '🐷' },
     { name: 'Alimentación', color: '#f97316', icon: '🍔' },
     { name: 'Educación', color: '#84cc16', icon: '📚' },
     { name: 'Freelance', color: '#6366f1', icon: '🖥️' },
+    { name: 'Gas', color: '#fb923c', icon: '🔥' },
     { name: 'Gastos', color: '#f43f5e', icon: '💸' },
     { name: 'Inversiones', color: '#eab308', icon: '📈' },
+    { name: 'Luz', color: '#facc15', icon: '💡' },
     { name: 'Niño', color: '#a78bfa', icon: '🧒' },
     { name: 'Ocio', color: '#ec4899', icon: '🎉' },
     { name: 'Otros', color: '#94a3b8', icon: '📦' },
