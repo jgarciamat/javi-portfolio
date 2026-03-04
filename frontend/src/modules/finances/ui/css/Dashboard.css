@@ -388,6 +388,24 @@
     font-weight: 700;
     color: #f1f5f9;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.profile-title-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #334155;
+    flex-shrink: 0;
+}
+
+.profile-title-avatar-placeholder {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .profile-close {
@@ -462,6 +480,45 @@
     flex-wrap: wrap;
 }
 
+/* ─── Avatar presets grid ──────────────────────── */
+.avatar-presets {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+}
+
+.avatar-preset-btn {
+    background: #1e293b;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-preset-btn:hover {
+    background: #334155;
+    border-color: #475569;
+}
+
+.avatar-preset-btn.selected {
+    border-color: #6366f1;
+    background: #1e1b4b;
+}
+
+.avatar-presets-hint {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0.4rem 0 0;
+}
+
 .profile-msg-ok {
     font-size: 0.82rem;
     color: #4ade80;
@@ -497,5 +554,9 @@
 
     .profile-panel {
         max-width: 100%;
+    }
+
+    .avatar-presets {
+        grid-template-columns: repeat(6, 1fr);
     }
 }

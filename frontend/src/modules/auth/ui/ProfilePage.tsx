@@ -71,6 +71,25 @@ export function ProfilePage({ onClose }: Props) {
     const [avatarLoading, setAvatarLoading] = useState(false);
     const [avatarMsg, setAvatarMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
+    // Keep preview in sync with the saved avatar (e.g. after a successful save)
+    useEffect(() => {
+        setAvatarPreview(user?.avatarUrl ?? null);
+    }, [user?.avatarUrl]);
+
+    const PRESET_AVATARS = [
+        '🧑', '👩', '👨', '🧔', '👩‍🦰', '👩‍🦱', '👩‍🦳', '👩‍🦲',
+        '🧑‍💼', '👩‍💼', '🧑‍🎨', '👩‍🎨', '🧑‍🚀', '🦊', '🐼', '🐨',
+        '🦁', '🐯', '🐸', '🦄', '🐙', '🤖', '👾', '🎃',
+    ];
+
+    const handlePresetSelect = useCallback((emoji: string) => {
+        // Build a small SVG data URL wrapping the emoji so it works as an img src
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="50" x="8" font-size="48">${emoji}</text></svg>`;
+        const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        setAvatarPreview(dataUrl);
+        setAvatarMsg(null);
+    }, []);
+
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -78,14 +97,15 @@ export function ProfilePage({ onClose }: Props) {
             setAvatarMsg({ ok: false, text: 'El archivo debe ser una imagen' });
             return;
         }
-        if (file.size > 600_000) {
-            setAvatarMsg({ ok: false, text: 'La imagen no puede superar 600 KB' });
+        if (file.size > 2_000_000) {
+            setAvatarMsg({ ok: false, text: 'La imagen no puede superar 2 MB' });
             return;
         }
         const reader = new FileReader();
         reader.onload = (ev) => {
             const dataUrl = ev.target?.result as string;
             setAvatarPreview(dataUrl);
+            setAvatarMsg(null);
         };
         reader.readAsDataURL(file);
     }, []);
@@ -121,7 +141,13 @@ export function ProfilePage({ onClose }: Props) {
         >
             <div className="profile-panel" onClick={(e) => e.stopPropagation()}>
                 <div className="profile-header">
-                    <h2 className="profile-title">👤 Mi perfil</h2>
+                    <h2 className="profile-title">
+                        {user?.avatarUrl
+                            ? <img src={user.avatarUrl} alt="Avatar" className="profile-title-avatar" />
+                            : <span className="profile-title-avatar-placeholder">👤</span>
+                        }
+                        Mi perfil
+                    </h2>
                     <button className="profile-close" onClick={onClose} aria-label="Cerrar perfil">✕</button>
                 </div>
 
@@ -149,7 +175,7 @@ export function ProfilePage({ onClose }: Props) {
                                 className="btn-secondary"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                Elegir imagen
+                                📁 Subir imagen
                             </button>
                             <input
                                 ref={fileInputRef}
@@ -170,6 +196,26 @@ export function ProfilePage({ onClose }: Props) {
                             )}
                         </div>
                     </div>
+                    {/* Preset avatar grid */}
+                    <div className="avatar-presets">
+                        {PRESET_AVATARS.map((emoji) => {
+                            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="50" x="8" font-size="48">${emoji}</text></svg>`;
+                            const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+                            return (
+                                <button
+                                    key={emoji}
+                                    type="button"
+                                    className={`avatar-preset-btn${avatarPreview === dataUrl ? ' selected' : ''}`}
+                                    onClick={() => handlePresetSelect(emoji)}
+                                    title={emoji}
+                                    aria-label={`Usar avatar ${emoji}`}
+                                >
+                                    {emoji}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <p className="avatar-presets-hint">Elige un avatar predefinido o sube tu propia imagen (máx. 2 MB)</p>
                     {avatarMsg && (
                         <p className={avatarMsg.ok ? 'profile-msg-ok' : 'auth-error'}>{avatarMsg.text}</p>
                     )}
