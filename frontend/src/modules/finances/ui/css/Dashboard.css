@@ -466,6 +466,10 @@
 /* ─── Dashboard responsive ───────────────────── */
 @media (max-width: 600px) {
     .header-user {
+        display: flex;
+    }
+
+    .header-user-name {
         display: none;
     }
 
@@ -484,5 +488,9 @@
     .btn-nav {
         padding: 0.4rem 0.65rem;
         font-size: 0.82rem;
+    }
+
+    .profile-panel {
+        max-width: 100%;
     }
 }

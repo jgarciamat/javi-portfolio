@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
 import { validatePassword } from '@modules/auth/domain/passwordValidation';
 
@@ -104,9 +104,22 @@ export function ProfilePage({ onClose }: Props) {
         }
     };
 
+    // Close on Escape key
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [onClose]);
+
     return (
-        <div className="profile-overlay" role="dialog" aria-modal="true" aria-label="Perfil de usuario">
-            <div className="profile-panel">
+        <div
+            className="profile-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Perfil de usuario"
+            onClick={onClose}
+        >
+            <div className="profile-panel" onClick={(e) => e.stopPropagation()}>
                 <div className="profile-header">
                     <h2 className="profile-title">👤 Mi perfil</h2>
                     <button className="profile-close" onClick={onClose} aria-label="Cerrar perfil">✕</button>

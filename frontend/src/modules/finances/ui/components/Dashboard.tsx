@@ -56,7 +56,7 @@ export function Dashboard() {
                             ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
                             : <span className="header-avatar-placeholder">👤</span>
                         }
-                        <span>{user?.name}</span>
+                        <span className="header-user-name">{user?.name}</span>
                     </button>
                     <button onClick={logout} className="btn-logout">Salir</button>
                 </div>
