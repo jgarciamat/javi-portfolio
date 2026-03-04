@@ -6,27 +6,30 @@ import { ApiProvider } from '@core/context/ApiContext';
 import { FinancesProvider } from './modules/finances/application/FinancesContext';
 import { Dashboard } from './modules/finances/ui/components/Dashboard';
 import { VerifyEmailPage } from './modules/auth/ui/VerifyEmailPage';
+import { I18nProvider } from '@core/i18n/I18nContext';
 
 export default function App() {
     return (
-        <AuthProvider>
-            <ApiProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/login" element={<AuthPage />} />
-                        <Route path="/verify-email" element={<VerifyEmailPage />} />
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="/" element={
-                                <FinancesProvider>
-                                    <Dashboard />
-                                </FinancesProvider>
-                            } />
-                        </Route>
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                </BrowserRouter>
-            </ApiProvider>
-        </AuthProvider>
+        <I18nProvider>
+            <AuthProvider>
+                <ApiProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/login" element={<AuthPage />} />
+                            <Route path="/verify-email" element={<VerifyEmailPage />} />
+                            <Route element={<ProtectedRoute />}>
+                                <Route path="/" element={
+                                    <FinancesProvider>
+                                        <Dashboard />
+                                    </FinancesProvider>
+                                } />
+                            </Route>
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                    </BrowserRouter>
+                </ApiProvider>
+            </AuthProvider>
+        </I18nProvider>
     );
 }
 

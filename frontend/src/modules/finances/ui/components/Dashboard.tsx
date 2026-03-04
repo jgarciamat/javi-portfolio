@@ -2,7 +2,9 @@ import { useState } from 'react';
 import '../css/Dashboard.css';
 import { useFinances } from '../../application/FinancesContext';
 import { useAuth } from '@shared/hooks/useAuth';
+import { useI18n } from '@core/i18n/I18nContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
+import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { MONTH_NAMES } from '../types';
 import { SummaryCards } from './SummaryCards';
 import { TransactionTable } from './TransactionTable';
@@ -20,6 +22,7 @@ export function Dashboard() {
     const [showProfile, setShowProfile] = useState(false);
 
     const { user, logout } = useAuth();
+    const { t } = useI18n();
     const {
         year, month,
         transactions, summary, carryover,
@@ -41,16 +44,16 @@ export function Dashboard() {
                 <div className="header-brand">
                     <span className="header-logo">💰</span>
                     <div>
-                        <h1 className="header-title">Money Manager</h1>
-                        <p className="header-sub">Control de gastos y ahorros</p>
+                        <h1 className="header-title">{t('app.header.title')}</h1>
+                        <p className="header-sub">{t('app.header.subtitle')}</p>
                     </div>
                 </div>
                 <div className="header-actions">
                     <button
                         className="header-user header-user-btn"
                         onClick={() => setShowProfile(true)}
-                        aria-label="Abrir perfil"
-                        title="Ver perfil"
+                        aria-label={t('app.header.openProfile')}
+                        title={t('app.header.openProfile')}
                     >
                         {user?.avatarUrl
                             ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
@@ -58,7 +61,8 @@ export function Dashboard() {
                         }
                         <span className="header-user-name">{user?.name}</span>
                     </button>
-                    <button onClick={logout} className="btn-logout">Salir</button>
+                    <LanguageSwitcher />
+                    <button onClick={logout} className="btn-logout">{t('app.header.logout')}</button>
                 </div>
             </header>
 
@@ -66,10 +70,10 @@ export function Dashboard() {
                 {/* Tabs */}
                 <div className="tabs">
                     <button className={`tab-btn${tab === 'monthly' ? ' active' : ''}`} onClick={() => setTab('monthly')}>
-                        📅 Resumen mensual
+                        📅 {t('app.tabs.monthly')}
                     </button>
                     <button className={`tab-btn${tab === 'annual' ? ' active' : ''}`} onClick={() => setTab('annual')}>
-                        📊 Balance anual
+                        📊 {t('app.tabs.annual')}
                     </button>
                 </div>
 
@@ -85,25 +89,25 @@ export function Dashboard() {
                         {/* Month navigator */}
                         <div className="card">
                             <div className="month-nav">
-                                <button onClick={goToPrev} className="btn-nav">‹ Anterior</button>
+                                <button onClick={goToPrev} className="btn-nav">‹ {t('app.nav.prev')}</button>
                                 <div className="month-nav-center">
                                     <div className="month-nav-title">{MONTH_NAMES[month - 1]} {year}</div>
-                                    {isCurrentMonth && <div className="month-nav-badge">Mes actual</div>}
+                                    {isCurrentMonth && <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>}
                                 </div>
-                                <button onClick={goToNext} disabled={isNextDisabled} className="btn-nav">Siguiente ›</button>
+                                <button onClick={goToNext} disabled={isNextDisabled} className="btn-nav">{t('app.nav.next')} ›</button>
                             </div>
                         </div>
 
                         {error && (
                             <div style={{ background: '#4c0519', border: '1px solid #be123c', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem', color: '#fca5a5' }}>
-                                ⚠️ Error: {error} — ¿Está el servidor backend corriendo?
+                                ⚠️ {t('app.error.backendDown', { error })}
                             </div>
                         )}
 
                         {/* Contenido mensual con overlay de carga */}
                         <div className="month-content">
                             {loading && (
-                                <div className="month-loading-overlay" aria-label="Cargando…">
+                                <div className="month-loading-overlay" aria-label={t('app.loading')}>
                                     <svg className="month-spinner" viewBox="0 0 50 50" aria-hidden="true">
                                         <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
                                     </svg>
@@ -122,7 +126,7 @@ export function Dashboard() {
                             />
 
                             <CollapsiblePanel
-                                title={<>📋 Transacciones ({transactions.length})</>}
+                                title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}
                                 style={{ marginBottom: '0' }}
                             >
                                 <TransactionTable transactions={transactions} onDelete={removeTransaction} onPatch={patchTransaction} />
@@ -130,7 +134,7 @@ export function Dashboard() {
 
                             {summary && transactions.length > 0 && (
                                 <CollapsiblePanel
-                                    title="📊 Resumen por categoría"
+                                    title={`📊 ${t('app.categoryChart.title')}`}
                                     style={{ marginTop: '1.25rem', marginBottom: 0 }}
                                 >
                                     <CategoryChart summary={summary} />

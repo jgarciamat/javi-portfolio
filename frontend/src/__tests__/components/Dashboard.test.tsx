@@ -1,5 +1,18 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string, vars?: Record<string, string>) => {
+    let v = translations[key] ?? key;
+    if (vars) Object.entries(vars).forEach(([k, val]) => { v = v.replace(`{${k}}`, val); });
+    return v;
+};
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // Mock all hooks and context deps
 const mockLogout = jest.fn();
@@ -117,7 +130,7 @@ describe('Dashboard', () => {
     test('submits transaction form and calls addTransaction', async () => {
         render(<Dashboard />);
         // Open the TransactionForm collapsible
-        const toggleBtn = screen.getByRole('button', { expanded: false });
+        const toggleBtn = screen.getByRole('button', { name: /Nueva transacción/i, expanded: false });
         fireEvent.click(toggleBtn);
         // Fill in required fields
         fireEvent.change(screen.getByPlaceholderText('Descripción'), { target: { value: 'Test tx' } });
@@ -189,7 +202,7 @@ describe('Dashboard - category modal', () => {
     test('opens category modal from TransactionForm manage categories button', () => {
         render(<Dashboard />);
         // Open the TransactionForm collapsible
-        const toggleBtn = screen.getByRole('button', { expanded: false });
+        const toggleBtn = screen.getByRole('button', { name: /Nueva transacción/i, expanded: false });
         fireEvent.click(toggleBtn);
         // Select __manage__ in the category select
         const categorySelect = screen.getAllByRole('combobox')[1];

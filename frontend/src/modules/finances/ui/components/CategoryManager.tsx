@@ -2,8 +2,10 @@ import type { CategoryManagerProps } from '../types';
 import '../css/CategoryManager.css';
 import { EMOJI_GROUPS, CATEGORY_COLORS } from '../types';
 import { useCategoryManager } from '../../application/hooks/useCategoryManager';
+import { useI18n } from '@core/i18n/I18nContext';
 
 export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: CategoryManagerProps) {
+    const { t, tCategory } = useI18n();
     const {
         fields,
         setName,
@@ -29,11 +31,11 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
 
     return (
         <div className="cat-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-            <div className="cat-modal" role="dialog" aria-modal="true" aria-label="Gestionar categorías">
+            <div className="cat-modal" role="dialog" aria-modal="true" aria-label={t('app.category.manager.title')}>
                 {/* Header */}
                 <div className="cat-modal-header">
-                    <span className="cat-modal-title">🗂️ Gestionar categorías</span>
-                    <button className="cat-modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
+                    <span className="cat-modal-title">🗂️ {t('app.category.manager.title')}</span>
+                    <button className="cat-modal-close" onClick={onClose} aria-label={t('app.category.manager.close')}>✕</button>
                 </div>
 
                 {/* Body */}
@@ -41,7 +43,7 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                     <div className="cat-manager">
                         {/* Create form */}
                         <div className="cat-create-card">
-                            <h3 className="cat-section-title">➕ Nueva categoría</h3>
+                            <h3 className="cat-section-title">➕ {t('app.category.manager.new')}</h3>
                             <div className="cat-form">
                                 {/* Emoji + Name row */}
                                 <div className="cat-emoji-row">
@@ -55,7 +57,7 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                                     </button>
                                     <input
                                         className="cat-input"
-                                        placeholder="Nombre de la categoría"
+                                        placeholder={t('app.category.manager.name.placeholder')}
                                         value={fields.name}
                                         onChange={(e) => setName(e.target.value)}
                                         maxLength={30}
@@ -81,7 +83,7 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                                     <div className="cat-emoji-panel">
                                         <input
                                             className="cat-emoji-search"
-                                            placeholder="Buscar emoji..."
+                                            placeholder={t('app.category.manager.emoji.search')}
                                             value={fields.search}
                                             onChange={(e) => setSearch(e.target.value)}
                                             autoFocus
@@ -116,9 +118,9 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
 
                         {/* Category list */}
                         <div className="cat-list-section">
-                            <h3 className="cat-section-title">Tus categorías ({categories.length})</h3>
+                            <h3 className="cat-section-title">{t('app.category.manager.list.title')} ({categories.length})</h3>
                             {categories.length === 0 ? (
-                                <p className="cat-empty">Sin categorías aún.</p>
+                                <p className="cat-empty">{t('app.category.manager.list.empty')}</p>
                             ) : (
                                 <div className="cat-list">
                                     {categories.map((cat) => (
@@ -129,13 +131,13 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                                             >
                                                 {cat.icon}
                                             </span>
-                                            <span className="cat-item-name">{cat.name}</span>
+                                            <span className="cat-item-name">{tCategory(cat.name)}</span>
                                             <button
                                                 className="cat-del-btn"
                                                 onClick={() => handleDelete(cat.id)}
                                                 disabled={deletingId === cat.id}
-                                                title="Eliminar categoría"
-                                                aria-label={`Eliminar ${cat.name}`}
+                                                title={t('app.category.manager.delete.title')}
+                                                aria-label={`${t('app.category.manager.delete.title')} ${tCategory(cat.name)}`}
                                             >
                                                 {deletingId === cat.id ? '⏳' : '🗑️'}
                                             </button>
@@ -149,13 +151,13 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
 
                 {/* Footer */}
                 <div className="cat-modal-footer">
-                    <button className="btn-secondary" onClick={onClose}>Cerrar</button>
+                    <button className="btn-secondary" onClick={onClose}>{t('app.category.manager.close')}</button>
                     <button
                         className="btn-primary"
                         disabled={!canCreate || saving}
                         onClick={handleCreate}
                     >
-                        {saving ? 'Creando...' : '✓ Crear categoría'}
+                        {saving ? t('app.category.manager.creating') : t('app.category.manager.create')}
                     </button>
                 </div>
             </div>

@@ -30,6 +30,9 @@
       ],
       "@core/*": [
         "src/core/*"
+      ],
+      "@locales/*": [
+        "src/locales/*"
       ]
     }
   },

@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
 import { validatePassword } from '@modules/auth/domain/passwordValidation';
+import { useI18n } from '@core/i18n/I18nContext';
 
 interface Props {
     onClose: () => void;
@@ -8,6 +9,7 @@ interface Props {
 
 export function ProfilePage({ onClose }: Props) {
     const { user, updateName, updatePassword, updateAvatar } = useAuth();
+    const { t } = useI18n();
 
     // ── Name ─────────────────────────────────────────────────────────────────
     const [name, setName] = useState(user?.name ?? '');
@@ -20,9 +22,9 @@ export function ProfilePage({ onClose }: Props) {
         setNameMsg(null);
         try {
             await updateName(name);
-            setNameMsg({ ok: true, text: 'Nombre actualizado correctamente' });
+            setNameMsg({ ok: true, text: t('app.profile.name.saved') });
         } catch (err) {
-            setNameMsg({ ok: false, text: err instanceof Error ? err.message : 'Error al actualizar nombre' });
+            setNameMsg({ ok: false, text: err instanceof Error ? err.message : t('app.profile.name.saved') });
         } finally {
             setNameLoading(false);
         }
@@ -48,18 +50,18 @@ export function ProfilePage({ onClose }: Props) {
             return;
         }
         if (!newPassMatch) {
-            setPassMsg({ ok: false, text: 'Las contraseñas nuevas no coinciden' });
+            setPassMsg({ ok: false, text: t('app.profile.password.mismatch') });
             return;
         }
         setPassLoading(true);
         try {
             await updatePassword(currentPassword, newPassword);
-            setPassMsg({ ok: true, text: 'Contraseña cambiada correctamente' });
+            setPassMsg({ ok: true, text: t('app.profile.password.saved') });
             setCurrentPassword('');
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (err) {
-            setPassMsg({ ok: false, text: err instanceof Error ? err.message : 'Error al cambiar contraseña' });
+            setPassMsg({ ok: false, text: err instanceof Error ? err.message : t('app.profile.password.saved') });
         } finally {
             setPassLoading(false);
         }
@@ -94,11 +96,11 @@ export function ProfilePage({ onClose }: Props) {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
-            setAvatarMsg({ ok: false, text: 'El archivo debe ser una imagen' });
+            setAvatarMsg({ ok: false, text: t('app.profile.avatar.errorType') });
             return;
         }
         if (file.size > 2_000_000) {
-            setAvatarMsg({ ok: false, text: 'La imagen no puede superar 2 MB' });
+            setAvatarMsg({ ok: false, text: t('app.profile.avatar.errorSize') });
             return;
         }
         const reader = new FileReader();
@@ -108,7 +110,7 @@ export function ProfilePage({ onClose }: Props) {
             setAvatarMsg(null);
         };
         reader.readAsDataURL(file);
-    }, []);
+    }, [t]);
 
     const handleAvatarSave = async () => {
         if (!avatarPreview || avatarPreview === user?.avatarUrl) return;
@@ -116,9 +118,9 @@ export function ProfilePage({ onClose }: Props) {
         setAvatarMsg(null);
         try {
             await updateAvatar(avatarPreview);
-            setAvatarMsg({ ok: true, text: 'Foto de perfil actualizada' });
+            setAvatarMsg({ ok: true, text: t('app.profile.avatar.saved') });
         } catch (err) {
-            setAvatarMsg({ ok: false, text: err instanceof Error ? err.message : 'Error al guardar foto' });
+            setAvatarMsg({ ok: false, text: err instanceof Error ? err.message : t('app.profile.avatar.saved') });
         } finally {
             setAvatarLoading(false);
         }
@@ -136,7 +138,7 @@ export function ProfilePage({ onClose }: Props) {
             className="profile-overlay"
             role="dialog"
             aria-modal="true"
-            aria-label="Perfil de usuario"
+            aria-label={t('app.profile.title')}
             onClick={onClose}
         >
             <div className="profile-panel" onClick={(e) => e.stopPropagation()}>
@@ -146,14 +148,14 @@ export function ProfilePage({ onClose }: Props) {
                             ? <img src={user.avatarUrl} alt="Avatar" className="profile-title-avatar" />
                             : <span className="profile-title-avatar-placeholder">👤</span>
                         }
-                        Mi perfil
+                        {t('app.profile.title')}
                     </h2>
-                    <button className="profile-close" onClick={onClose} aria-label="Cerrar perfil">✕</button>
+                    <button className="profile-close" onClick={onClose} aria-label={t('app.profile.title')}>✕</button>
                 </div>
 
                 {/* Read-only email */}
                 <div className="profile-section">
-                    <label className="profile-label">Email (no modificable)</label>
+                    <label className="profile-label">{t('app.profile.email.label')}</label>
                     <input className="auth-input" type="email" value={user?.email ?? ''} disabled />
                 </div>
 
@@ -161,7 +163,7 @@ export function ProfilePage({ onClose }: Props) {
 
                 {/* Avatar */}
                 <div className="profile-section">
-                    <label className="profile-label">Foto de perfil</label>
+                    <label className="profile-label">{t('app.profile.avatar.label')}</label>
                     <div className="profile-avatar-row">
                         <div className="profile-avatar-preview">
                             {avatarPreview
@@ -175,7 +177,7 @@ export function ProfilePage({ onClose }: Props) {
                                 className="btn-secondary"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                📁 Subir imagen
+                                📁 {t('app.profile.avatar.upload')}
                             </button>
                             <input
                                 ref={fileInputRef}
@@ -191,7 +193,7 @@ export function ProfilePage({ onClose }: Props) {
                                     onClick={handleAvatarSave}
                                     disabled={avatarLoading}
                                 >
-                                    {avatarLoading ? 'Guardando...' : 'Guardar foto'}
+                                    {avatarLoading ? t('app.profile.avatar.saving') : t('app.profile.avatar.save')}
                                 </button>
                             )}
                         </div>
@@ -215,7 +217,7 @@ export function ProfilePage({ onClose }: Props) {
                             );
                         })}
                     </div>
-                    <p className="avatar-presets-hint">Elige un avatar predefinido o sube tu propia imagen (máx. 2 MB)</p>
+                    <p className="avatar-presets-hint">{t('app.profile.avatar.hint')}</p>
                     {avatarMsg && (
                         <p className={avatarMsg.ok ? 'profile-msg-ok' : 'auth-error'}>{avatarMsg.text}</p>
                     )}
@@ -225,7 +227,7 @@ export function ProfilePage({ onClose }: Props) {
 
                 {/* Change name */}
                 <form className="profile-section" onSubmit={handleNameSubmit}>
-                    <label className="profile-label">Nombre</label>
+                    <label className="profile-label">{t('app.profile.name.label')}</label>
                     <input
                         className="auth-input"
                         type="text"
@@ -238,7 +240,7 @@ export function ProfilePage({ onClose }: Props) {
                         <p className={nameMsg.ok ? 'profile-msg-ok' : 'auth-error'}>{nameMsg.text}</p>
                     )}
                     <button type="submit" className="btn-primary" disabled={nameLoading || name === user?.name}>
-                        {nameLoading ? 'Guardando...' : 'Cambiar nombre'}
+                        {nameLoading ? t('app.profile.name.saving') : t('app.profile.name.save')}
                     </button>
                 </form>
 
@@ -246,19 +248,19 @@ export function ProfilePage({ onClose }: Props) {
 
                 {/* Change password */}
                 <form className="profile-section" onSubmit={handlePasswordSubmit}>
-                    <label className="profile-label">Cambiar contraseña</label>
+                    <label className="profile-label">{t('app.profile.password.label')}</label>
 
                     <div className="auth-pass-wrap">
                         <input
                             className="auth-input auth-pass-input"
                             type={showCurrent ? 'text' : 'password'}
-                            placeholder="Contraseña actual"
+                            placeholder={t('app.profile.password.current')}
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             required
                         />
                         <button type="button" className="auth-eye" onClick={() => setShowCurrent(v => !v)}
-                            aria-label={showCurrent ? 'Ocultar' : 'Mostrar'}>
+                            aria-label={showCurrent ? t('app.auth.login.hidePassword') : t('app.auth.login.showPassword')}>
                             {showCurrent ? '🙈' : '👁️'}
                         </button>
                     </div>
@@ -267,13 +269,13 @@ export function ProfilePage({ onClose }: Props) {
                         <input
                             className="auth-input auth-pass-input"
                             type={showNew ? 'text' : 'password'}
-                            placeholder="Nueva contraseña"
+                            placeholder={t('app.profile.password.new')}
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                         />
                         <button type="button" className="auth-eye" onClick={() => setShowNew(v => !v)}
-                            aria-label={showNew ? 'Ocultar' : 'Mostrar'}>
+                            aria-label={showNew ? t('app.auth.login.hidePassword') : t('app.auth.login.showPassword')}>
                             {showNew ? '🙈' : '👁️'}
                         </button>
                     </div>
@@ -289,14 +291,14 @@ export function ProfilePage({ onClose }: Props) {
                     <input
                         className={`auth-input${confirmNewPassword.length > 0 && !newPassMatch ? ' auth-input-error' : ''}`}
                         type="password"
-                        placeholder="Repetir nueva contraseña"
+                        placeholder={t('app.profile.password.confirm')}
                         value={confirmNewPassword}
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
                         required
                         style={{ marginTop: '0.5rem' }}
                     />
                     {confirmNewPassword.length > 0 && !newPassMatch && (
-                        <p className="auth-hint-error">✗ Las contraseñas no coinciden</p>
+                        <p className="auth-hint-error">{t('app.profile.password.noMatch')}</p>
                     )}
 
                     {passMsg && (
@@ -304,7 +306,7 @@ export function ProfilePage({ onClose }: Props) {
                     )}
 
                     <button type="submit" className="btn-primary" disabled={passLoading}>
-                        {passLoading ? 'Cambiando...' : 'Cambiar contraseña'}
+                        {passLoading ? t('app.profile.password.saving') : t('app.profile.password.save')}
                     </button>
                 </form>
             </div>

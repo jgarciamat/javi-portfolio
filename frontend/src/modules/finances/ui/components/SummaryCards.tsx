@@ -1,8 +1,10 @@
 import type { SummaryCardsProps } from '../types';
 import '../css/SummaryCards.css';
 import { formatCurrency } from '../types/SummaryCards.types';
+import { useI18n } from '@core/i18n/I18nContext';
 
 export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
+    const { t } = useI18n();
     const carryoverAmount = carryover ?? 0;
     const saldoTotal = carryoverAmount + summary.balance;
 
@@ -11,41 +13,41 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
 
     const cards = [
         {
-            title: 'Balance del mes',
+            title: t('app.summary.monthBalance'),
             value: formatCurrency(summary.balance),
             accent: summary.balance >= 0 ? '#22c55e' : '#ef4444',
             icon: '💰',
-            sub: `${summary.transactionCount} transacciones`,
+            sub: t('app.summary.monthBalance.sub', { count: String(summary.transactionCount) }),
         },
         {
-            title: 'Ingresos',
+            title: t('app.summary.income'),
             value: formatCurrency(summary.totalIncome),
             accent: '#22c55e',
             icon: '📈',
-            sub: 'Total ingresos',
+            sub: t('app.summary.income.sub'),
         },
         {
-            title: 'Gastos',
+            title: t('app.summary.expenses'),
             value: formatCurrency(summary.totalExpenses),
             accent: '#ef4444',
             icon: '📉',
-            sub: 'Total gastos',
+            sub: t('app.summary.expenses.sub'),
         },
         {
-            title: 'Ahorrado',
+            title: t('app.summary.saving'),
             value: formatCurrency(summary.totalSaving),
             accent: '#a78bfa',
             icon: '🐷',
-            sub: 'Total ahorrado',
+            sub: t('app.summary.saving.sub'),
         },
         {
-            title: 'Tasa de ahorro',
+            title: t('app.summary.savingsRate'),
             value: `${savingsRate.toFixed(1)}%`,
             accent: savingsRateColor,
             icon: '📊',
             sub: summary.totalIncome > 0
-                ? `Sobre ${formatCurrency(summary.totalIncome)} ingresado`
-                : 'Sin ingresos registrados',
+                ? t('app.summary.savingsRate.sub', { amount: formatCurrency(summary.totalIncome) })
+                : t('app.summary.savingsRate.noIncome'),
         },
     ];
 
@@ -57,11 +59,11 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
                 style={{ '--accent': saldoTotal >= 0 ? '#6366f1' : '#ef4444' } as React.CSSProperties}
             >
                 <div className="summary-card-header">
-                    <span className="summary-card-title">Saldo disponible 🏦</span>
+                    <span className="summary-card-title">{t('app.summary.availableBalance')} 🏦</span>
                 </div>
                 <div className="summary-card-value">{formatCurrency(saldoTotal)}</div>
                 <div className="summary-card-sub">
-                    Acumulado meses anteriores: {formatCurrency(carryoverAmount)}
+                    {t('app.summary.carryover')}: {formatCurrency(carryoverAmount)}
                 </div>
             </div>
 

@@ -1,6 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AuthPage } from '@shared/components/AuthPage';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string) => translations[key] ?? key;
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({

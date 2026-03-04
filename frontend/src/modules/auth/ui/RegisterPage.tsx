@@ -1,8 +1,10 @@
 import { useRegisterForm } from '../application/useRegisterForm';
+import { useI18n } from '@core/i18n/I18nContext';
 
 interface Props { onSwitch: () => void; }
 
 export function RegisterPage({ onSwitch }: Props) {
+    const { t } = useI18n();
     const {
         name, setName,
         email, setEmail,
@@ -21,17 +23,16 @@ export function RegisterPage({ onSwitch }: Props) {
             <div className="auth-page">
                 <div className="auth-card">
                     <div className="auth-logo">📧</div>
-                    <h1 className="auth-title">¡Revisa tu email!</h1>
+                    <h1 className="auth-title">{t('app.auth.register.verify.title')}</h1>
                     <p className="auth-sub" style={{ textAlign: 'center', lineHeight: 1.6 }}>
-                        Hemos enviado un enlace de verificación a<br />
+                        {t('app.auth.register.verify.sub')}<br />
                         <strong>{email}</strong>
                     </p>
                     <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', margin: '12px 0 20px' }}>
-                        Haz clic en el enlace del email para activar tu cuenta.
-                        Luego podrás iniciar sesión.
+                        {t('app.auth.register.verify.instructions')}
                     </p>
                     <button className="auth-btn" onClick={onSwitch}>
-                        Ir a iniciar sesión
+                        {t('app.auth.register.verify.goLogin')}
                     </button>
                 </div>
             </div>
@@ -43,11 +44,11 @@ export function RegisterPage({ onSwitch }: Props) {
             <form onSubmit={handleSubmit} className="auth-card">
                 <div className="auth-logo">💰</div>
                 <h1 className="auth-title">Money Manager</h1>
-                <p className="auth-sub">Crea tu cuenta gratuita</p>
+                <p className="auth-sub">{t('app.auth.register.title')}</p>
 
-                <input className="auth-input" type="text" placeholder="Nombre" value={name}
+                <input className="auth-input" type="text" placeholder={t('app.auth.register.name')} value={name}
                     onChange={(e) => setName(e.target.value)} required autoFocus />
-                <input className="auth-input" type="email" placeholder="Email" value={email}
+                <input className="auth-input" type="email" placeholder={t('app.auth.register.email')} value={email}
                     onChange={(e) => setEmail(e.target.value)} required />
 
                 {/* Password */}
@@ -55,13 +56,13 @@ export function RegisterPage({ onSwitch }: Props) {
                     <input
                         className="auth-input auth-pass-input"
                         type={showPass ? 'text' : 'password'}
-                        placeholder="Contraseña"
+                        placeholder={t('app.auth.register.password')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
                     <button type="button" className="auth-eye" onClick={() => setShowPass(v => !v)}
-                        aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+                        aria-label={showPass ? t('app.auth.register.hidePassword') : t('app.auth.register.showPassword')}>
                         {showPass ? '🙈' : '👁️'}
                     </button>
                 </div>
@@ -75,7 +76,7 @@ export function RegisterPage({ onSwitch }: Props) {
                     </ul>
                 )}
                 {password.length > 0 && passwordValidation.valid && (
-                    <p className="auth-hint-ok">✓ Contraseña segura</p>
+                    <p className="auth-hint-ok">{t('app.auth.register.passwordOk')}</p>
                 )}
 
                 {/* Confirm password */}
@@ -83,28 +84,28 @@ export function RegisterPage({ onSwitch }: Props) {
                     <input
                         className={`auth-input auth-pass-input${confirmTouched && !passwordsMatch ? ' auth-input-error' : ''}`}
                         type={showConfirm ? 'text' : 'password'}
-                        placeholder="Repetir contraseña"
+                        placeholder={t('app.auth.register.confirmPassword')}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                     />
                     <button type="button" className="auth-eye" onClick={() => setShowConfirm(v => !v)}
-                        aria-label={showConfirm ? 'Ocultar confirmación' : 'Mostrar confirmación'}>
+                        aria-label={showConfirm ? t('app.auth.register.hideConfirm') : t('app.auth.register.showConfirm')}>
                         {showConfirm ? '🙈' : '👁️'}
                     </button>
                 </div>
                 {confirmTouched && !passwordsMatch && (
-                    <p className="auth-hint-error" style={{ marginTop: '-4px' }}>✗ Las contraseñas no coinciden</p>
+                    <p className="auth-hint-error" style={{ marginTop: '-4px' }}>✗ {t('app.profile.password.noMatch').replace('✗ ', '')}</p>
                 )}
 
                 {error && <p className="auth-error">{error}</p>}
 
                 <button type="submit" className="auth-btn" disabled={loading}>
-                    {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+                    {loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
                 </button>
                 <p className="auth-switch">
-                    ¿Ya tienes cuenta?{' '}
-                    <span className="auth-link" onClick={onSwitch}>Inicia sesión</span>
+                    {t('app.auth.register.switch')}{' '}
+                    <span className="auth-link" onClick={onSwitch}>{t('app.auth.register.switchLink')}</span>
                 </p>
             </form>
         </div>

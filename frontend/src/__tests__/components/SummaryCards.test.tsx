@@ -1,6 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import { SummaryCards } from '@modules/finances/ui/components/SummaryCards';
 import type { FinancialSummary } from '@modules/finances/domain/types';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string, vars?: Record<string, string>) => {
+    let v = translations[key] ?? key;
+    if (vars) Object.entries(vars).forEach(([k, val]) => { v = v.replace(`{${k}}`, val); });
+    return v;
+};
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 const baseSummary: FinancialSummary = {
     balance: 100,

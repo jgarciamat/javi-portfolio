@@ -9,6 +9,7 @@ export default defineConfig({
       '@modules': path.resolve(__dirname, './src/modules'),
       '@shared': path.resolve(__dirname, './src/shared'),
       '@core': path.resolve(__dirname, './src/core'),
+      '@locales': path.resolve(__dirname, './src/locales'),
     },
   },
   server: {

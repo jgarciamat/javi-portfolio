@@ -1,6 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CategoryManager } from '@modules/finances/ui/components/CategoryManager';
 import type { Category } from '@modules/finances/domain/types';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string) => translations[key] ?? key;
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({
+        locale: 'es', setLocale: jest.fn(),
+        t,
+        tCategory: (n: string) => n,
+    }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 const mockOnClose = jest.fn();
 const mockOnAdd = jest.fn().mockResolvedValue(undefined);
@@ -55,7 +68,7 @@ describe('CategoryManager', () => {
 
     test('calls onDelete when delete button is clicked', () => {
         render(<CategoryManager {...defaultProps} />);
-        fireEvent.click(screen.getByLabelText('Eliminar Food'));
+        fireEvent.click(screen.getByLabelText('Eliminar categoría Food'));
         expect(mockOnDelete).toHaveBeenCalledWith('c1');
     });
 
@@ -124,7 +137,7 @@ describe('CategoryManager', () => {
         let resolveDelete!: () => void;
         const slowDelete = jest.fn(() => new Promise<void>((res) => { resolveDelete = res; }));
         render(<CategoryManager {...defaultProps} onDelete={slowDelete} />);
-        fireEvent.click(screen.getByLabelText('Eliminar Food'));
+        fireEvent.click(screen.getByLabelText('Eliminar categoría Food'));
         // While delete is pending, spinner should show
         expect(await screen.findByText('⏳')).toBeInTheDocument();
         // Resolve and clean up

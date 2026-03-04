@@ -2,6 +2,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TransactionTable } from '@modules/finances/ui/components/TransactionTable';
 import type { Transaction } from '@modules/finances/domain/types';
+import esJson from '@locales/es.json';
+
+const translations = esJson as Record<string, string>;
+const t = (key: string) => translations[key] ?? key;
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({
+        locale: 'es', setLocale: jest.fn(),
+        t,
+        tCategory: (n: string) => n,
+    }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 const mockOnDelete = jest.fn();
 const mockOnPatch = jest.fn();

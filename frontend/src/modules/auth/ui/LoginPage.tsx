@@ -1,8 +1,10 @@
 import { useLoginForm } from '../application/useLoginForm';
+import { useI18n } from '@core/i18n/I18nContext';
 
 interface Props { onSwitch: () => void; }
 
 export function LoginPage({ onSwitch }: Props) {
+    const { t } = useI18n();
     const {
         email, setEmail,
         password, setPassword,
@@ -17,12 +19,12 @@ export function LoginPage({ onSwitch }: Props) {
             <form onSubmit={handleSubmit} className="auth-card">
                 <div className="auth-logo">💰</div>
                 <h1 className="auth-title">Money Manager</h1>
-                <p className="auth-sub">Inicia sesión en tu cuenta</p>
+                <p className="auth-sub">{t('app.auth.login.title')}</p>
 
                 <input
                     className="auth-input"
                     type="email"
-                    placeholder="Email"
+                    placeholder={t('app.auth.login.email')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -34,7 +36,7 @@ export function LoginPage({ onSwitch }: Props) {
                     <input
                         className="auth-input auth-pass-input"
                         type={showPass ? 'text' : 'password'}
-                        placeholder="Contraseña"
+                        placeholder={t('app.auth.login.password')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -43,7 +45,7 @@ export function LoginPage({ onSwitch }: Props) {
                         type="button"
                         className="auth-eye"
                         onClick={() => setShowPass(v => !v)}
-                        aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        aria-label={showPass ? t('app.auth.login.hidePassword') : t('app.auth.login.showPassword')}
                     >
                         {showPass ? '🙈' : '👁️'}
                     </button>
@@ -55,17 +57,17 @@ export function LoginPage({ onSwitch }: Props) {
                         checked={remember}
                         onChange={(e) => setRemember(e.target.checked)}
                     />
-                    <span>Recordarme</span>
+                    <span>{t('app.auth.login.remember')}</span>
                 </label>
 
                 {error && <p className="auth-error">{error}</p>}
 
                 <button type="submit" className="auth-btn" disabled={loading}>
-                    {loading ? 'Entrando...' : 'Iniciar sesión'}
+                    {loading ? t('app.auth.login.loading') : t('app.auth.login.submit')}
                 </button>
                 <p className="auth-switch">
-                    ¿No tienes cuenta?{' '}
-                    <span className="auth-link" onClick={onSwitch}>Regístrate</span>
+                    {t('app.auth.login.switch')}{' '}
+                    <span className="auth-link" onClick={onSwitch}>{t('app.auth.login.switchLink')}</span>
                 </p>
             </form>
         </div>
