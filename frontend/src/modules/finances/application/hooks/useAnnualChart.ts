@@ -21,8 +21,9 @@ export function useAnnualChart(initialYear: number) {
         hideTooltip();
     };
 
-    const prevYear = () => setYear((y) => y - 1);
+    const prevYear = () => setYear((y) => (y <= 2026 ? y : y - 1));
     const nextYear = () => setYear((y) => y + 1);
+    const prevYearDisabled = year <= 2026;
 
     return {
         year,
@@ -33,5 +34,6 @@ export function useAnnualChart(initialYear: number) {
         leaveBar,
         prevYear,
         nextYear,
+        prevYearDisabled,
     };
 }

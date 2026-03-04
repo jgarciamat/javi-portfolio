@@ -64,11 +64,17 @@ describe('AnnualChart', () => {
         expect(screen.getByText('Balance anual')).toBeInTheDocument();
     });
 
-    test('prevYear button navigates to previous year', async () => {
+    test('prevYear button is disabled at 2026 (app minimum year)', async () => {
         render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
-        fireEvent.click(screen.getByText(new RegExp(`‹ ${CURRENT_YEAR - 1}`)));
-        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR - 1}`, 'i'))).toBeInTheDocument());
+        // The prev-year button shows the previous year label
+        const prevBtn = screen.getByText(new RegExp(`‹ ${CURRENT_YEAR - 1}`));
+        if (CURRENT_YEAR === 2026) {
+            expect(prevBtn).toBeDisabled();
+        } else {
+            // If somehow testing in a later year, the button should be enabled
+            expect(prevBtn).not.toBeDisabled();
+        }
     });
 
     test('nextYear button is disabled when at current year', async () => {

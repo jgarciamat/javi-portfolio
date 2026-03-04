@@ -181,12 +181,13 @@ describe('FinancesContext / FinancesProvider', () => {
         await waitFor(() => expect(mockGetAll).toHaveBeenCalledTimes(2));
     });
 
-    test('goToPrev wraps year when month is January', async () => {
+    test('goToPrev wraps year when month is January (and not at Jan 2026 boundary)', async () => {
         // Navigate to January by going prev until month=1, then verify year wraps
         render(<Wrapper />);
         await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
         // Click prev until we reach month 1
         let currentMonth = parseInt(screen.getByTestId('month').textContent ?? '6', 10);
+        const currentYear = parseInt(screen.getByTestId('year').textContent ?? '2026', 10);
         // Navigate backwards until month === 1
         while (currentMonth > 1) {
             fireEvent.click(screen.getByText('prev'));
@@ -194,17 +195,45 @@ describe('FinancesContext / FinancesProvider', () => {
                 currentMonth = parseInt(screen.getByTestId('month').textContent ?? '1', 10);
             });
         }
-        // Now we're at month=1, one more prev should go to December of previous year
-        const yearBeforeWrap = parseInt(screen.getByTestId('year').textContent ?? '2025', 10);
+        // If we are at Jan 2026 (the app's minimum), prev should be blocked
+        if (currentYear === 2026) {
+            const yearAtBoundary = parseInt(screen.getByTestId('year').textContent ?? '0', 10);
+            fireEvent.click(screen.getByText('prev'));
+            await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('1'));
+            expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearAtBoundary);
+        } else {
+            // Now we're at month=1 above the minimum, one more prev should go to December of previous year
+            const yearBeforeWrap = parseInt(screen.getByTestId('year').textContent ?? '2025', 10);
+            fireEvent.click(screen.getByText('prev'));
+            await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('12'));
+            expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearBeforeWrap - 1);
+        }
+    });
+
+    test('goToPrev is blocked at January 2026 (app minimum)', async () => {
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
+        // Navigate backwards all the way to Jan 2026
+        let currentYear = parseInt(screen.getByTestId('year').textContent ?? '2026', 10);
+        let currentMonth = parseInt(screen.getByTestId('month').textContent ?? '1', 10);
+        while (currentYear > 2026 || currentMonth > 1) {
+            fireEvent.click(screen.getByText('prev'));
+            await waitFor(() => {
+                currentYear = parseInt(screen.getByTestId('year').textContent ?? '2026', 10);
+                currentMonth = parseInt(screen.getByTestId('month').textContent ?? '1', 10);
+            });
+        }
+        // Now at Jan 2026 — one more click must not move
+        expect(screen.getByTestId('year').textContent).toBe('2026');
+        expect(screen.getByTestId('month').textContent).toBe('1');
         fireEvent.click(screen.getByText('prev'));
-        await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('12'));
-        expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearBeforeWrap - 1);
+        await waitFor(() => expect(screen.getByTestId('year').textContent).toBe('2026'));
+        expect(screen.getByTestId('month').textContent).toBe('1');
     });
 
     test('goToNext wraps year when month is December', async () => {
         render(<Wrapper />);
         await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
-        // Navigate forward to December
         let currentMonth = parseInt(screen.getByTestId('month').textContent ?? '6', 10);
         while (currentMonth < 12) {
             fireEvent.click(screen.getByText('next'));

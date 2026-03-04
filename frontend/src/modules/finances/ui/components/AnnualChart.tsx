@@ -9,7 +9,7 @@ import { isNextButtonDisabled, isMonthInFuture } from '@modules/finances/domain/
 import { useI18n } from '@core/i18n/I18nContext';
 
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
-    const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear } = useAnnualChart(initialYear);
+    const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear, prevYearDisabled } = useAnnualChart(initialYear);
     const { data, loading, error } = useAnnualSummary(year);
     const { t } = useI18n();
     const { exportAnnualCSV } = useExportCSV();
@@ -35,7 +35,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
         <div className="annual-view">
             {/* Year picker */}
             <div className="annual-header">
-                <button className="btn-nav" onClick={prevYear}>‹ {year - 1}</button>
+                <button className="btn-nav" onClick={prevYear} disabled={prevYearDisabled}>‹ {year - 1}</button>
                 <h2 className="annual-title">
                     {t('app.annual.title')} {year}
                     {months.length > 0 && (

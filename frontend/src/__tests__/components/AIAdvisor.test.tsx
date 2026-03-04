@@ -4,22 +4,25 @@ import type { AIAdvice } from '@core/api/premiumApi';
 
 // ── Mutable state object that each mock call reads from ─────────────────────
 const mockAnalyze = jest.fn();
-const mockClear = jest.fn();
 
 interface HookState {
     advice: AIAdvice | null;
     loading: boolean;
     error: string | null;
+    analyzed: boolean;
+    daysUntilNextAnalysis: number;
+    justAnalyzed: boolean;
     analyze: jest.Mock;
-    clear: jest.Mock;
 }
 
 let hookState: HookState = {
     advice: null,
     loading: false,
     error: null,
+    analyzed: false,
+    daysUntilNextAnalysis: 0,
+    justAnalyzed: false,
     analyze: mockAnalyze,
-    clear: mockClear,
 };
 
 jest.mock('@modules/finances/application/hooks/useAIAdvisor', () => ({
@@ -36,8 +39,7 @@ const sampleAdvice: AIAdvice = {
 describe('AIAdvisor', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        // Reset to default (no advice, not loading, no error)
-        hookState = { advice: null, loading: false, error: null, analyze: mockAnalyze, clear: mockClear };
+        hookState = { advice: null, loading: false, error: null, analyzed: false, daysUntilNextAnalysis: 0, justAnalyzed: false, analyze: mockAnalyze };
     });
 
     test('renders the panel with title', () => {
@@ -46,22 +48,23 @@ describe('AIAdvisor', () => {
     });
 
     test('renders "Analizar mes" button when no advice', () => {
-        render(<AIAdvisor year={2025} month={1} />);
-        expect(screen.getByRole('button', { name: /Analizar mes/i })).toBeInTheDocument();
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLElement;
+        expect(btn).toHaveTextContent(/Analizar mes/i);
     });
 
     test('clicking "Analizar mes" calls analyze with year and month', () => {
-        render(<AIAdvisor year={2025} month={3} />);
-        fireEvent.click(screen.getByRole('button', { name: /Analizar mes/i }));
+        const { container } = render(<AIAdvisor year={2025} month={3} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLElement;
+        fireEvent.click(btn);
         expect(mockAnalyze).toHaveBeenCalledTimes(1);
         expect(mockAnalyze).toHaveBeenCalledWith(2025, 3);
     });
 
     test('button is disabled while loading', () => {
         hookState = { ...hookState, loading: true };
-        render(<AIAdvisor year={2025} month={1} />);
-        // While loading the button shows a spinner and no text — query by role
-        const btn = screen.getByRole('button', { name: '' });
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLButtonElement;
         expect(btn).toBeDisabled();
     });
 
@@ -106,23 +109,17 @@ describe('AIAdvisor', () => {
         expect(screen.getByText('Configura un fondo de emergencia')).toBeInTheDocument();
     });
 
-    test('shows "Reanalizar" button when advice is already loaded', () => {
-        hookState = { ...hookState, advice: sampleAdvice };
-        render(<AIAdvisor year={2025} month={1} />);
-        expect(screen.getByRole('button', { name: /Reanalizar/i })).toBeInTheDocument();
+    test('shows "Reanalizar" button when advice is loaded but not on cooldown', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: false, daysUntilNextAnalysis: 0 };
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLElement;
+        expect(btn).toHaveTextContent(/Reanalizar/i);
     });
 
-    test('shows "Cerrar" button when advice is present', () => {
+    test('does not render "Cerrar" button', () => {
         hookState = { ...hookState, advice: sampleAdvice };
-        render(<AIAdvisor year={2025} month={1} />);
-        expect(screen.getByRole('button', { name: /Cerrar/i })).toBeInTheDocument();
-    });
-
-    test('"Cerrar" button calls clear', () => {
-        hookState = { ...hookState, advice: sampleAdvice };
-        render(<AIAdvisor year={2025} month={1} />);
-        fireEvent.click(screen.getByRole('button', { name: /Cerrar/i }));
-        expect(mockClear).toHaveBeenCalledTimes(1);
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        expect(container.querySelector('.ai-btn--ghost')).toBeNull();
     });
 
     test('does not render positives section when list is empty', () => {
@@ -141,5 +138,63 @@ describe('AIAdvisor', () => {
         hookState = { ...hookState, advice: { ...sampleAdvice, tips: [] } };
         render(<AIAdvisor year={2025} month={1} />);
         expect(screen.queryByText(/Consejos/i)).toBeNull();
+    });
+
+    test('button shows "✅ Analizado" and is disabled when on cooldown', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5 };
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLButtonElement;
+        expect(btn).toHaveTextContent(/Analizado/i);
+        expect(btn).toBeDisabled();
+    });
+
+    test('shows cooldown message with days remaining', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5 };
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.getByText(/Podrás repetir el análisis en 5 días/i)).toBeInTheDocument();
+    });
+
+    test('shows singular "día" when 1 day remaining', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 1 };
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.getByText(/en 1 día$/i)).toBeInTheDocument();
+    });
+
+    test('does not show cooldown message when not on cooldown', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: false, daysUntilNextAnalysis: 0 };
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.queryByText(/Podrás repetir/i)).toBeNull();
+    });
+
+    test('button shows "✨ Analizar mes" when not analyzed and no advice', () => {
+        hookState = { ...hookState, analyzed: false };
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const btn = container.querySelector('.ai-btn--primary') as HTMLElement;
+        expect(btn).toHaveTextContent(/Analizar mes/i);
+    });
+
+    test('shows placeholder text when no advice and no error', () => {
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.getByText(/Pulsa.*Analizar mes/i)).toBeInTheDocument();
+    });
+
+    test('placeholder is not shown when advice is present', () => {
+        hookState = { ...hookState, advice: sampleAdvice };
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.queryByText(/Pulsa.*Analizar mes/i)).toBeNull();
+    });
+
+    test('panel starts closed on page load even when advice exists (re-hydrated)', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5, justAnalyzed: false };
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const header = container.querySelector('.ai-advisor-header') as HTMLElement;
+        expect(header).not.toHaveClass('ai-advisor-header--open');
+    });
+
+    test('panel opens when a fresh analysis just completed (justAnalyzed: true)', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 7, justAnalyzed: true };
+        const { container } = render(<AIAdvisor year={2025} month={1} />);
+        const header = container.querySelector('.ai-advisor-header') as HTMLElement;
+        expect(header).toHaveClass('ai-advisor-header--open');
     });
 });

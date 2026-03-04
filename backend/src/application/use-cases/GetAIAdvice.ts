@@ -37,7 +37,7 @@ export class GetAIAdvice {
         const prompt = this.buildPrompt(context);
 
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -46,22 +46,25 @@ export class GetAIAdvice {
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
                         temperature: 0.7,
-                        maxOutputTokens: 600,
-                        responseMimeType: 'application/json',
+                        maxOutputTokens: 2048,
                     },
                 }),
             });
 
             if (!response.ok) {
-                throw new Error(`Gemini API error: ${response.status}`);
+                const errBody = await response.text();
+                throw new Error(`Gemini API error ${response.status}: ${errBody}`);
             }
 
             const data = (await response.json()) as {
                 candidates: { content: { parts: { text: string }[] } }[];
             };
-            const text = data.candidates[0]?.content?.parts[0]?.text ?? '{}';
+            let text = data.candidates[0]?.content?.parts[0]?.text ?? '{}';
+            // Strip markdown code fences if present (```json ... ```)
+            text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
             return JSON.parse(text) as AIAdvice;
-        } catch {
+        } catch (err) {
+            console.error('[GetAIAdvice] Gemini call failed, using rule-based fallback:', err);
             // Graceful degradation
             return this.generateRuleBasedAdvice(context);
         }
@@ -74,23 +77,15 @@ export class GetAIAdvice {
             .map(([cat, amt]) => `${cat}: ${amt.toFixed(2)}€`)
             .join(', ');
 
-        return `Eres un asesor financiero personal experto. Analiza los siguientes datos financieros reales del usuario para el mes ${ctx.month}/${ctx.year} y proporciona consejos personalizados, concisos y accionables en español.
+        return `Eres un asesor financiero personal. Analiza los datos del mes ${ctx.month}/${ctx.year} y responde ÚNICAMENTE con JSON válido (sin markdown, sin texto adicional).
 
-DATOS FINANCIEROS:
-- Ingresos totales: ${ctx.totalIncome.toFixed(2)}€
-- Gastos totales: ${ctx.totalExpenses.toFixed(2)}€
-- Balance del mes: ${ctx.balance.toFixed(2)}€
-- Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}%
-- Principales categorías de gasto: ${topCategories || 'sin gastos registrados'}
-- Número de transacciones: ${ctx.transactions.length}
+DATOS:
+- Ingresos: ${ctx.totalIncome.toFixed(2)}€ | Gastos: ${ctx.totalExpenses.toFixed(2)}€ | Balance: ${ctx.balance.toFixed(2)}€
+- Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}% | Transacciones: ${ctx.transactions.length}
+- Top gastos por categoría: ${topCategories || 'ninguno'}
 
-Responde ÚNICAMENTE con un JSON válido con esta estructura exacta (sin texto adicional, sin markdown):
-{
-  "summary": "resumen honesto de la situación financiera del mes en 1-2 frases",
-  "positives": ["punto positivo concreto 1", "punto positivo concreto 2"],
-  "warnings": ["advertencia concreta 1 si aplica"],
-  "tips": ["consejo accionable y específico 1", "consejo accionable y específico 2", "consejo accionable y específico 3"]
-}`;
+JSON de respuesta (máximo 2 items por array, frases cortas):
+{"summary":"...","positives":["..."],"warnings":["..."],"tips":["...","..."]}`;
     }
 
     private generateRuleBasedAdvice(ctx: FinancialContext): AIAdvice {

@@ -31,6 +31,7 @@ interface FinancesState {
 }
 
 interface FinancesActions {
+    isPrevDisabled: boolean;
     goToPrev: () => void;
     goToNext: () => void;
     navigateTo: (year: number, month: number) => void;
@@ -67,10 +68,16 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     const [year, setYear] = useState(now.getFullYear());
     const [month, setMonth] = useState(now.getMonth() + 1);
 
+    const MIN_YEAR = 2026;
+    const MIN_MONTH = 1;
+
+    const isPrevDisabled = year === MIN_YEAR && month === MIN_MONTH;
+
     const goToPrev = useCallback(() => {
+        if (year === MIN_YEAR && month === MIN_MONTH) return;
         setYear((y) => (month === 1 ? y - 1 : y));
         setMonth((m) => (m === 1 ? 12 : m - 1));
-    }, [month]);
+    }, [month, year]);
 
     const goToNext = useCallback(() => {
         setYear((y) => (month === 12 ? y + 1 : y));
@@ -78,6 +85,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     }, [month]);
 
     const navigateTo = useCallback((targetYear: number, targetMonth: number) => {
+        if (targetYear < MIN_YEAR || (targetYear === MIN_YEAR && targetMonth < MIN_MONTH)) return;
         setYear(targetYear);
         setMonth(targetMonth);
     }, []);
@@ -213,6 +221,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         categories,
         loading,
         error,
+        isPrevDisabled,
         goToPrev,
         goToNext,
         navigateTo,

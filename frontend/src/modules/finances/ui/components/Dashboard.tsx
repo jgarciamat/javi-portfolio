@@ -32,7 +32,7 @@ export function Dashboard() {
         year, month,
         transactions, summary, carryover,
         categories, loading, error,
-        goToPrev, goToNext, navigateTo,
+        isPrevDisabled, goToPrev, goToNext, navigateTo,
         addTransaction, removeTransaction, patchTransaction,
         addCategory, removeCategory,
     } = useFinances();
@@ -94,7 +94,7 @@ export function Dashboard() {
                         {/* Month navigator */}
                         <div className="card">
                             <div className="month-nav">
-                                <button onClick={goToPrev} className="btn-nav">‹ {t('app.nav.prev')}</button>
+                                <button onClick={goToPrev} disabled={isPrevDisabled} className="btn-nav">‹ {t('app.nav.prev')}</button>
                                 <div className="month-nav-center">
                                     <div className="month-nav-title">
                                         {MONTH_NAMES[month - 1]} {year}

@@ -8,10 +8,26 @@ describe('useAnnualChart', () => {
         expect(result.current.tooltip).toBeNull();
     });
 
-    test('prevYear decrements year', () => {
-        const { result } = renderHook(() => useAnnualChart(2025));
+    test('prevYear decrements year when above minimum (2026)', () => {
+        const { result } = renderHook(() => useAnnualChart(2027));
         act(() => result.current.prevYear());
-        expect(result.current.year).toBe(2024);
+        expect(result.current.year).toBe(2026);
+    });
+
+    test('prevYear is blocked at 2026 (app minimum year)', () => {
+        const { result } = renderHook(() => useAnnualChart(2026));
+        act(() => result.current.prevYear());
+        expect(result.current.year).toBe(2026);
+    });
+
+    test('prevYearDisabled is true at 2026', () => {
+        const { result } = renderHook(() => useAnnualChart(2026));
+        expect(result.current.prevYearDisabled).toBe(true);
+    });
+
+    test('prevYearDisabled is false above 2026', () => {
+        const { result } = renderHook(() => useAnnualChart(2027));
+        expect(result.current.prevYearDisabled).toBe(false);
     });
 
     test('nextYear increments year', () => {
