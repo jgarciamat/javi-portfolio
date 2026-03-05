@@ -145,14 +145,12 @@ export class RequestPasswordReset {
     async execute(dto: { email: string }): Promise<void> {
         const user = await this.userRepo.findByEmail(dto.email.toLowerCase());
         if (!user) {
-            const err = new Error('El email no está registrado.');
-            (err as any).code = 'EMAIL_NOT_FOUND';
+            const err = Object.assign(new Error('El email no está registrado.'), { code: 'EMAIL_NOT_FOUND' as const });
             throw err;
         }
 
         if (user.resetEmailSent) {
-            const err = new Error('Ya se ha enviado un enlace de recuperación a este email. Cambia tu contraseña o espera a que expire.');
-            (err as any).code = 'RESET_EMAIL_ALREADY_SENT';
+            const err = Object.assign(new Error('Ya se ha enviado un enlace de recuperación a este email. Cambia tu contraseña o espera a que expire.'), { code: 'RESET_EMAIL_ALREADY_SENT' as const });
             throw err;
         }
 

@@ -30,12 +30,11 @@ export function ForgotPasswordPage({ onBack }: Props) {
                     setError(err.message);
                 }
             } else if (err instanceof Error) {
-                // Fallback: check code property for tests/mocks
-                const code = (err as any).code as string | undefined;
-                const status = (err as any).status as number | undefined;
-                if (status === 404 || code === 'EMAIL_NOT_FOUND') {
+                // Fallback: check code/status properties for test mocks
+                const coded = err as Error & { code?: string; status?: number };
+                if (coded.status === 404 || coded.code === 'EMAIL_NOT_FOUND') {
                     setError(t('app.auth.forgot.error.notFound'));
-                } else if (status === 409 || code === 'RESET_EMAIL_ALREADY_SENT') {
+                } else if (coded.status === 409 || coded.code === 'RESET_EMAIL_ALREADY_SENT') {
                     setAlreadySent(true);
                     setError(t('app.auth.forgot.error.alreadySent'));
                 } else {

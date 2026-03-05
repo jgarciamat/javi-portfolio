@@ -264,7 +264,7 @@ describe('RequestPasswordReset', () => {
 
         const err = await useCase.execute({ email: 'nobody@example.com' }).catch(e => e);
         expect(err).toBeInstanceOf(Error);
-        expect((err as any).code).toBe('EMAIL_NOT_FOUND');
+        expect((err as Error & { code?: string }).code).toBe('EMAIL_NOT_FOUND');
         expect(userRepo.save).not.toHaveBeenCalled();
         expect(emailSvc.sendPasswordResetEmail).not.toHaveBeenCalled();
     });
@@ -282,7 +282,7 @@ describe('RequestPasswordReset', () => {
 
         const err = await useCase.execute({ email: 'exists@example.com' }).catch(e => e);
         expect(err).toBeInstanceOf(Error);
-        expect((err as any).code).toBe('RESET_EMAIL_ALREADY_SENT');
+        expect((err as Error & { code?: string }).code).toBe('RESET_EMAIL_ALREADY_SENT');
         expect(userRepo.save).not.toHaveBeenCalled();
         expect(emailSvc.sendPasswordResetEmail).not.toHaveBeenCalled();
     });

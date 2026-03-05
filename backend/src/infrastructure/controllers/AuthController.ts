@@ -81,7 +81,7 @@ export class AuthController {
             res.status(200).json({ message: 'Enlace de recuperación enviado.' });
         } catch (e) {
             if (e instanceof Error) {
-                const code = (e as any).code as string | undefined;
+                const code = (e as Error & { code?: string }).code;
                 if (code === 'EMAIL_NOT_FOUND') {
                     res.status(404).json({ error: e.message, code });
                     return;
