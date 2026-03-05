@@ -9,8 +9,8 @@ interface Props {
 }
 
 export function AIAdvisor({ year, month }: Props) {
-    const { advice, loading, error, analyzed, daysUntilNextAnalysis, justAnalyzed, analyze } = useAIAdvisor({ year, month });
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
+    const { advice, loading, error, analyzed, daysUntilNextAnalysis, justAnalyzed, analyze } = useAIAdvisor({ year, month, locale });
     const [open, setOpen] = useState(false);
     const bodyRef = useRef<HTMLDivElement>(null);
     const isFirstRender = useRef(true);

@@ -54,10 +54,10 @@ export interface AIAdvice {
 }
 
 export const aiApi = {
-    getAdvice(year: number, month: number): Promise<AIAdvice> {
+    getAdvice(year: number, month: number, locale: string): Promise<AIAdvice> {
         return request<AIAdvice>('/ai/advice', {
             method: 'POST',
-            body: JSON.stringify({ year, month }),
+            body: JSON.stringify({ year, month, locale }),
         });
     },
 };

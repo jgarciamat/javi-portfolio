@@ -13,7 +13,7 @@ export class AIController {
 
     async getAdvice(req: AuthRequest, res: Response): Promise<void> {
         try {
-            const { year, month } = req.body as { year: number; month: number };
+            const { year, month, locale } = req.body as { year: number; month: number; locale?: string };
 
             if (!year || !month || month < 1 || month > 12) {
                 res.status(400).json({ error: 'year y month son requeridos' });
@@ -30,9 +30,7 @@ export class AIController {
             const transactions: { description: string; amount: number; type: 'income' | 'expense'; category: string; date: string }[] = [];
 
             if (this.transactionRepo) {
-                const from = new Date(year, month - 1, 1);
-                const to = new Date(year, month, 0, 23, 59, 59);
-                const txs = await this.transactionRepo.findByDateRange(from, to);
+                const txs = await this.transactionRepo.findByUserAndMonth(req.userId!, year, month);
 
                 for (const tx of txs) {
                     const isIncome = tx.type.isIncome();
@@ -63,6 +61,7 @@ export class AIController {
             const advice = await this.getAIAdvice.execute({
                 year,
                 month,
+                locale: locale ?? 'es',
                 totalIncome: Math.round(totalIncome * 100) / 100,
                 totalExpenses: Math.round(totalExpenses * 100) / 100,
                 balance: Math.round(balance * 100) / 100,

@@ -61,9 +61,10 @@ interface UseAIAdvisorResult {
 interface Options {
     year: number;
     month: number;
+    locale: string;
 }
 
-export function useAIAdvisor({ year, month }: Options): UseAIAdvisorResult {
+export function useAIAdvisor({ year, month, locale }: Options): UseAIAdvisorResult {
     const userId = getCurrentUserId();
     const persisted = loadFromStorage(userId, year, month);
 
@@ -73,6 +74,10 @@ export function useAIAdvisor({ year, month }: Options): UseAIAdvisorResult {
     const [error, setError] = useState<string | null>(null);
     // Tracks whether the last state change was a fresh analysis (vs re-hydration)
     const [justAnalyzed, setJustAnalyzed] = useState(false);
+
+    // Keep locale always up-to-date inside the analyze callback without re-creating it
+    const localeRef = useRef(locale);
+    localeRef.current = locale;
 
     // Re-hydrate when year/month change — this is NOT a fresh analysis
     const isFirstRender = useRef(true);
@@ -94,7 +99,7 @@ export function useAIAdvisor({ year, month }: Options): UseAIAdvisorResult {
         setError(null);
         setJustAnalyzed(false);
         try {
-            const result = await aiApi.getAdvice(y, m);
+            const result = await aiApi.getAdvice(y, m, localeRef.current);
             setAdvice(result);
             const now = new Date().toISOString();
             setAnalyzedAt(now);
