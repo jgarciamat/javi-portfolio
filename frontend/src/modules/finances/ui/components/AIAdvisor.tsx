@@ -10,15 +10,32 @@ interface Props {
 
 export function AIAdvisor({ year, month }: Props) {
     const { t, locale } = useI18n();
-    const { advice, loading, error, analyzed, daysUntilNextAnalysis, justAnalyzed, analyze } = useAIAdvisor({ year, month, locale });
+    const { advice, loading, error, analyzed, daysUntilNextAnalysis, hoursUntilNextAnalysis, justAnalyzed, analyze } = useAIAdvisor({ year, month, locale });
     const [open, setOpen] = useState(false);
     const bodyRef = useRef<HTMLDivElement>(null);
     const isFirstRender = useRef(true);
 
-    const cooldownText = (key: string) =>
-        t(key)
-            .replace('{days}', String(daysUntilNextAnalysis))
-            .replace('{plural}', daysUntilNextAnalysis !== 1 ? 's' : '');
+    const cooldownText = (key: string) => {
+        const d = daysUntilNextAnalysis;
+        const h = hoursUntilNextAnalysis;
+        let timeStr: string;
+        if (d > 0 && h > 0) {
+            timeStr = t('app.ai.cooldown.daysHours')
+                .replace('{days}', String(d))
+                .replace('{dayPlural}', d !== 1 ? 's' : '')
+                .replace('{hours}', String(h))
+                .replace('{hourPlural}', h !== 1 ? 's' : '');
+        } else if (d > 0) {
+            timeStr = t('app.ai.cooldown.daysOnly')
+                .replace('{days}', String(d))
+                .replace('{dayPlural}', d !== 1 ? 's' : '');
+        } else {
+            timeStr = t('app.ai.cooldown.hoursOnly')
+                .replace('{hours}', String(h))
+                .replace('{hourPlural}', h !== 1 ? 's' : '');
+        }
+        return t(key).replace('{time}', timeStr);
+    };
 
     // Animate max-height
     useEffect(() => {

@@ -38,11 +38,15 @@ function saveToStorage(userId: string, year: number, month: number, advice: AIAd
     localStorage.setItem(storageKey(userId, year, month), JSON.stringify(data));
 }
 
-/** Returns full days remaining until the cooldown expires (0 = can analyse now). */
-function daysRemaining(analyzedAt: string): number {
+/** Returns { days, hours } remaining until the cooldown expires. Both 0 = can analyse now. */
+function timeRemaining(analyzedAt: string): { days: number; hours: number } {
     const elapsed = Date.now() - new Date(analyzedAt).getTime();
-    const remaining = COOLDOWN_MS - elapsed;
-    return remaining > 0 ? Math.ceil(remaining / (24 * 60 * 60 * 1000)) : 0;
+    const remainingMs = COOLDOWN_MS - elapsed;
+    if (remainingMs <= 0) return { days: 0, hours: 0 };
+    const totalHours = Math.ceil(remainingMs / (60 * 60 * 1000));
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours % 24;
+    return { days, hours };
 }
 
 interface UseAIAdvisorResult {
@@ -53,6 +57,8 @@ interface UseAIAdvisorResult {
     analyzed: boolean;
     /** Days left in the cooldown; 0 means analysis is available. */
     daysUntilNextAnalysis: number;
+    /** Hours left beyond the days; 0–23. */
+    hoursUntilNextAnalysis: number;
     /** True only for the render cycle immediately after a fresh analysis completes. */
     justAnalyzed: boolean;
     analyze: (year: number, month: number) => Promise<void>;
@@ -90,8 +96,8 @@ export function useAIAdvisor({ year, month, locale }: Options): UseAIAdvisorResu
         setJustAnalyzed(false);
     }, [year, month, userId]);
 
-    const days = analyzedAt ? daysRemaining(analyzedAt) : 0;
-    const analyzed = days > 0;
+    const { days, hours } = analyzedAt ? timeRemaining(analyzedAt) : { days: 0, hours: 0 };
+    const analyzed = days > 0 || hours > 0;
 
     const analyze = useCallback(async (y: number, m: number) => {
         const uid = getCurrentUserId();
@@ -112,5 +118,5 @@ export function useAIAdvisor({ year, month, locale }: Options): UseAIAdvisorResu
         }
     }, []);
 
-    return { advice, loading, error, analyzed, daysUntilNextAnalysis: days, justAnalyzed, analyze };
+    return { advice, loading, error, analyzed, daysUntilNextAnalysis: days, hoursUntilNextAnalysis: hours, justAnalyzed, analyze };
 }

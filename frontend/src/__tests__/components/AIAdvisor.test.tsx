@@ -20,6 +20,7 @@ interface HookState {
     error: string | null;
     analyzed: boolean;
     daysUntilNextAnalysis: number;
+    hoursUntilNextAnalysis: number;
     justAnalyzed: boolean;
     analyze: jest.Mock;
 }
@@ -30,6 +31,7 @@ let hookState: HookState = {
     error: null,
     analyzed: false,
     daysUntilNextAnalysis: 0,
+    hoursUntilNextAnalysis: 0,
     justAnalyzed: false,
     analyze: mockAnalyze,
 };
@@ -48,7 +50,7 @@ const sampleAdvice: AIAdvice = {
 describe('AIAdvisor', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        hookState = { advice: null, loading: false, error: null, analyzed: false, daysUntilNextAnalysis: 0, justAnalyzed: false, analyze: mockAnalyze };
+        hookState = { advice: null, loading: false, error: null, analyzed: false, daysUntilNextAnalysis: 0, hoursUntilNextAnalysis: 0, justAnalyzed: false, analyze: mockAnalyze };
     });
 
     test('renders the panel with title', () => {
@@ -150,27 +152,33 @@ describe('AIAdvisor', () => {
     });
 
     test('button shows "✅ Analizado" and is disabled when on cooldown', () => {
-        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5 };
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5, hoursUntilNextAnalysis: 3 };
         const { container } = render(<AIAdvisor year={2025} month={1} />);
         const btn = container.querySelector('.ai-btn--primary') as HTMLButtonElement;
         expect(btn).toHaveTextContent(/Analizado/i);
         expect(btn).toBeDisabled();
     });
 
-    test('shows cooldown message with days remaining', () => {
-        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5 };
+    test('shows cooldown message with days and hours remaining', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 5, hoursUntilNextAnalysis: 3 };
         render(<AIAdvisor year={2025} month={1} />);
-        expect(screen.getByText(/Podrás repetir el análisis en 5 días/i)).toBeInTheDocument();
+        expect(screen.getByText(/5 días y 3 horas/i)).toBeInTheDocument();
     });
 
-    test('shows singular "día" when 1 day remaining', () => {
-        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 1 };
+    test('shows only hours when less than 1 day remaining', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 0, hoursUntilNextAnalysis: 8 };
         render(<AIAdvisor year={2025} month={1} />);
-        expect(screen.getByText(/en 1 día$/i)).toBeInTheDocument();
+        expect(screen.getByText(/8 horas/i)).toBeInTheDocument();
+    });
+
+    test('shows singular "día" and no hours when exactly 1 day remaining', () => {
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: true, daysUntilNextAnalysis: 1, hoursUntilNextAnalysis: 0 };
+        render(<AIAdvisor year={2025} month={1} />);
+        expect(screen.getByText(/en 1 día/i)).toBeInTheDocument();
     });
 
     test('does not show cooldown message when not on cooldown', () => {
-        hookState = { ...hookState, advice: sampleAdvice, analyzed: false, daysUntilNextAnalysis: 0 };
+        hookState = { ...hookState, advice: sampleAdvice, analyzed: false, daysUntilNextAnalysis: 0, hoursUntilNextAnalysis: 0 };
         render(<AIAdvisor year={2025} month={1} />);
         expect(screen.queryByText(/Podrás repetir/i)).toBeNull();
     });
