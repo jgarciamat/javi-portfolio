@@ -10,12 +10,14 @@
 
 /* Auth page when PublicHeader is present (56px fixed) */
 .auth-page-with-header {
-    min-height: 100vh;
+    height: 100vh;
     background: #020617;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: calc(56px + 1.5rem) 1rem 1.5rem;
+    padding-top: 56px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .auth-card {

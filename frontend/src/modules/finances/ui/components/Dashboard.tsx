@@ -97,7 +97,10 @@ export function Dashboard() {
                                 <button onClick={goToPrev} disabled={isPrevDisabled} className="btn-nav">‹ {t('app.nav.prev')}</button>
                                 <div className="month-nav-center">
                                     <div className="month-nav-title">
-                                        {MONTH_NAMES[month - 1]} {year}
+                                        <span className="month-nav-title-text">
+                                            {MONTH_NAMES[month - 1]} {year}
+                                            {isCurrentMonth && <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>}
+                                        </span>
                                         {transactions.length > 0 && (
                                             <OptionsDropdown
                                                 ariaLabel={t('app.export.options')}
@@ -111,7 +114,6 @@ export function Dashboard() {
                                             />
                                         )}
                                     </div>
-                                    {isCurrentMonth && <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>}
                                 </div>
                                 <button onClick={goToNext} disabled={isNextDisabled} className="btn-nav">{t('app.nav.next')} ›</button>
                             </div>
