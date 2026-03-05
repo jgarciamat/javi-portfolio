@@ -6,6 +6,7 @@ import { ApiProvider } from '@core/context/ApiContext';
 import { FinancesProvider } from './modules/finances/application/FinancesContext';
 import { Dashboard } from './modules/finances/ui/components/Dashboard';
 import { VerifyEmailPage } from './modules/auth/ui/VerifyEmailPage';
+import { ResetPasswordPage } from './modules/auth/ui/ResetPasswordPage';
 import { I18nProvider } from '@core/i18n/I18nContext';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
                         <Routes>
                             <Route path="/login" element={<AuthPage />} />
                             <Route path="/verify-email" element={<VerifyEmailPage />} />
+                            <Route path="/reset-password" element={<ResetPasswordPage />} />
                             <Route element={<ProtectedRoute />}>
                                 <Route path="/" element={
                                     <FinancesProvider>

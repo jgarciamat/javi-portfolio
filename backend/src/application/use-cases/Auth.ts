@@ -134,6 +134,52 @@ export class VerifyEmail {
     }
 }
 
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+export class RequestPasswordReset {
+    constructor(
+        private readonly userRepo: IUserRepository,
+        private readonly emailService: EmailService,
+    ) { }
+
+    async execute(dto: { email: string }): Promise<void> {
+        const user = await this.userRepo.findByEmail(dto.email.toLowerCase());
+        if (!user) {
+            const err = new Error('El email no está registrado.');
+            (err as any).code = 'EMAIL_NOT_FOUND';
+            throw err;
+        }
+
+        if (user.resetEmailSent) {
+            const err = new Error('Ya se ha enviado un enlace de recuperación a este email. Cambia tu contraseña o espera a que expire.');
+            (err as any).code = 'RESET_EMAIL_ALREADY_SENT';
+            throw err;
+        }
+
+        const token = uuidv4();
+        const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+        const updated = user.withResetToken(token, expiresAt).withResetEmailSent(true);
+        await this.userRepo.save(updated);
+
+        this.emailService.sendPasswordResetEmail(user.email, user.name, token)
+            .catch((err) => console.error('Reset email error:', err));
+    }
+}
+
+export class ResetPassword {
+    constructor(private readonly userRepo: IUserRepository) { }
+
+    async execute(dto: { token: string; newPassword: string }): Promise<void> {
+        const user = await this.userRepo.findByResetToken(dto.token);
+        if (!user || !user.resetTokenExpiresAt) throw new Error('El enlace no es válido o ya fue usado.');
+        if (user.resetTokenExpiresAt < new Date()) throw new Error('El enlace ha expirado. Solicita uno nuevo.');
+
+        const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+        const updated = user.withPasswordHash(passwordHash).withResetToken(null, null).withResetEmailSent(false);
+        await this.userRepo.save(updated);
+    }
+}
+
 export function verifyToken(token: string): { userId: string } {
     return jwt.verify(token, JWT_SECRET) as { userId: string };
 }

@@ -21,6 +21,12 @@ jest.mock('@shared/hooks/useAuth', () => ({
     useAuth: jest.fn(),
 }));
 
+jest.mock('@core/api/authApi', () => ({
+    authApi: {
+        requestPasswordReset: jest.fn().mockResolvedValue({ message: 'ok' }),
+    },
+}));
+
 import { useAuth } from '@shared/hooks/useAuth';
 const mockUseAuth = useAuth as jest.Mock;
 
@@ -37,7 +43,6 @@ describe('AuthPage', () => {
 
     test('switches to RegisterPage when onSwitch is called', () => {
         render(<MemoryRouter><AuthPage /></MemoryRouter>);
-        // Click "Regístrate" link
         fireEvent.click(screen.getByText('Regístrate'));
         expect(screen.getByText(/Crea tu cuenta gratuita/i)).toBeInTheDocument();
     });
@@ -46,6 +51,20 @@ describe('AuthPage', () => {
         render(<MemoryRouter><AuthPage /></MemoryRouter>);
         fireEvent.click(screen.getByText('Regístrate'));
         fireEvent.click(screen.getByText('Inicia sesión'));
+        expect(screen.getByText(/Inicia sesión en tu cuenta/i)).toBeInTheDocument();
+    });
+
+    test('switches to ForgotPasswordPage when forgot link is clicked', () => {
+        render(<MemoryRouter><AuthPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText(t('app.auth.forgot.link')));
+        expect(screen.getByText(t('app.auth.forgot.title'))).toBeInTheDocument();
+    });
+
+    test('switches back to LoginPage from ForgotPasswordPage', () => {
+        render(<MemoryRouter><AuthPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText(t('app.auth.forgot.link')));
+        expect(screen.getByText(t('app.auth.forgot.title'))).toBeInTheDocument();
+        fireEvent.click(screen.getByText(t('app.auth.forgot.backToLogin')));
         expect(screen.getByText(/Inicia sesión en tu cuenta/i)).toBeInTheDocument();
     });
 

@@ -11,7 +11,7 @@ import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/Sqlit
 
 import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/SqliteRefreshTokenRepository';
 
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 
@@ -78,9 +78,11 @@ const getMonthlyBudget = new GetMonthlyBudget(budgetRepo);
 // --- New feature use-cases & services ---
 const checkBudgetAlerts = new CheckBudgetAlerts(transactionRepo);
 const getAIAdvice = new GetAIAdvice();
+const requestPasswordReset = new RequestPasswordReset(userRepo, emailService);
+const resetPassword = new ResetPassword(userRepo);
 
 // --- Controllers ---
-const authController = new AuthController(registerUser, loginUser, verifyEmail, logoutUser, refreshAccessToken);
+const authController = new AuthController(registerUser, loginUser, verifyEmail, logoutUser, refreshAccessToken, requestPasswordReset, resetPassword);
 const transactionController = new TransactionController(transactionRepo);
 const categoryController = new CategoryController(categoryRepo);
 const budgetController = new BudgetController(setMonthlyBudget, getMonthlyBudget, transactionRepo);
@@ -100,6 +102,8 @@ router.post('/auth/register', (req: Request, res: Response) => authController.re
 router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
 router.post('/auth/refresh', (req: Request, res: Response) => authController.refresh(req, res));
 router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
+router.post('/auth/forgot-password', (req: Request, res: Response) => authController.requestPasswordReset(req, res));
+router.post('/auth/reset-password', (req: Request, res: Response) => authController.resetPassword(req, res));
 router.get('/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'money-manager-api' }));
 
 // Protected

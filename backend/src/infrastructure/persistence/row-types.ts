@@ -9,6 +9,9 @@ export interface UserRow {
     email_verified: number;
     verification_token: string | null;
     avatar_url: string | null;
+    reset_token: string | null;
+    reset_token_expires_at: string | null;
+    reset_email_sent: number;
 }
 
 export interface TransactionRow {

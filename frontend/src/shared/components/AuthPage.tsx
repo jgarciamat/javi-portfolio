@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
 import { LoginPage } from '@modules/auth/ui/LoginPage';
 import { RegisterPage } from '@modules/auth/ui/RegisterPage';
+import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
 
 export function AuthPage() {
-    const [mode, setMode] = useState<'login' | 'register'>('login');
+    const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ export function AuthPage() {
         if (isAuthenticated) navigate('/', { replace: true });
     }, [isAuthenticated, navigate]);
 
-    return mode === 'login'
-        ? <LoginPage onSwitch={() => setMode('register')} />
-        : <RegisterPage onSwitch={() => setMode('login')} />;
+    if (mode === 'forgot') return <ForgotPasswordPage onBack={() => setMode('login')} />;
+    if (mode === 'register') return <RegisterPage onSwitch={() => setMode('login')} />;
+    return <LoginPage onSwitch={() => setMode('register')} onForgot={() => setMode('forgot')} />;
 }

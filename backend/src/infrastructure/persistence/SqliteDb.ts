@@ -82,6 +82,10 @@ function initSchema(db: Database.Database): void {
   migrateUsersEmailVerification(db);
   // Migration: add notes column to transactions if missing
   migrateTransactionsNotes(db);
+  // Migration: add password reset token columns if missing
+  migrateUsersPasswordReset(db);
+  // Migration: add reset_email_sent column if missing
+  migrateUsersResetEmailSent(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -130,5 +134,24 @@ function migrateTransactionsNotes(db: Database.Database): void {
   if (!info) return;
   if (!info.sql.includes('notes')) {
     db.exec(`ALTER TABLE transactions ADD COLUMN notes TEXT`);
+  }
+}
+
+function migrateUsersPasswordReset(db: Database.Database): void {
+  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
+  if (!info) return;
+  if (!info.sql.includes('reset_token')) {
+    db.exec(`ALTER TABLE users ADD COLUMN reset_token TEXT`);
+  }
+  if (!info.sql.includes('reset_token_expires_at')) {
+    db.exec(`ALTER TABLE users ADD COLUMN reset_token_expires_at TEXT`);
+  }
+}
+
+function migrateUsersResetEmailSent(db: Database.Database): void {
+  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
+  if (!info) return;
+  if (!info.sql.includes('reset_email_sent')) {
+    db.exec(`ALTER TABLE users ADD COLUMN reset_email_sent INTEGER NOT NULL DEFAULT 0`);
   }
 }

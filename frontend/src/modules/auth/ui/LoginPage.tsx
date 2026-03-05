@@ -1,9 +1,9 @@
 import { useLoginForm } from '../application/useLoginForm';
 import { useI18n } from '@core/i18n/I18nContext';
 
-interface Props { onSwitch: () => void; }
+interface Props { onSwitch: () => void; onForgot: () => void; }
 
-export function LoginPage({ onSwitch }: Props) {
+export function LoginPage({ onSwitch, onForgot }: Props) {
     const { t } = useI18n();
     const {
         email, setEmail,
@@ -59,6 +59,11 @@ export function LoginPage({ onSwitch }: Props) {
                     />
                     <span>{t('app.auth.login.remember')}</span>
                 </label>
+                <p style={{ textAlign: 'right', margin: '-4px 0 4px' }}>
+                    <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onForgot}>
+                        {t('app.auth.forgot.link')}
+                    </span>
+                </p>
 
                 {error && <p className="auth-error">{error}</p>}
 

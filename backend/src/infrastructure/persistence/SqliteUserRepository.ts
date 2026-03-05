@@ -9,15 +9,18 @@ export class SqliteUserRepository implements IUserRepository {
     async save(user: User): Promise<void> {
         this.db
             .prepare(`
-        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token, avatar_url)
-        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken, @avatarUrl)
+        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token, avatar_url, reset_token, reset_token_expires_at, reset_email_sent)
+        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken, @avatarUrl, @resetToken, @resetTokenExpiresAt, @resetEmailSent)
         ON CONFLICT(id) DO UPDATE SET
-          email              = excluded.email,
-          name               = excluded.name,
-          password_hash      = excluded.password_hash,
-          email_verified     = excluded.email_verified,
-          verification_token = excluded.verification_token,
-          avatar_url         = excluded.avatar_url
+          email                  = excluded.email,
+          name                   = excluded.name,
+          password_hash          = excluded.password_hash,
+          email_verified         = excluded.email_verified,
+          verification_token     = excluded.verification_token,
+          avatar_url             = excluded.avatar_url,
+          reset_token            = excluded.reset_token,
+          reset_token_expires_at = excluded.reset_token_expires_at,
+          reset_email_sent       = excluded.reset_email_sent
       `)
             .run({
                 id: user.id,
@@ -28,6 +31,9 @@ export class SqliteUserRepository implements IUserRepository {
                 emailVerified: user.emailVerified ? 1 : 0,
                 verificationToken: user.verificationToken,
                 avatarUrl: user.avatarUrl,
+                resetToken: user.resetToken,
+                resetTokenExpiresAt: user.resetTokenExpiresAt?.toISOString() ?? null,
+                resetEmailSent: user.resetEmailSent ? 1 : 0,
             });
     }
 
@@ -46,6 +52,11 @@ export class SqliteUserRepository implements IUserRepository {
         return row ? this.toEntity(row) : null;
     }
 
+    async findByResetToken(token: string): Promise<User | null> {
+        const row = this.db.prepare('SELECT * FROM users WHERE reset_token = ?').get(token) as UserRow | undefined;
+        return row ? this.toEntity(row) : null;
+    }
+
     private toEntity(row: UserRow): User {
         return User.create({
             id: row.id,
@@ -56,6 +67,9 @@ export class SqliteUserRepository implements IUserRepository {
             emailVerified: row.email_verified === 1,
             verificationToken: row.verification_token ?? null,
             avatarUrl: row.avatar_url ?? null,
+            resetToken: row.reset_token ?? null,
+            resetTokenExpiresAt: row.reset_token_expires_at ? new Date(row.reset_token_expires_at) : null,
+            resetEmailSent: row.reset_email_sent === 1,
         });
     }
 }

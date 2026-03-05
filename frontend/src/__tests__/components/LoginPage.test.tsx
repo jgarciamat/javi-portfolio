@@ -19,18 +19,30 @@ jest.mock('@shared/hooks/useAuth', () => ({
 
 describe('LoginPage', () => {
     const mockOnSwitch = jest.fn();
+    const mockOnForgot = jest.fn();
 
     beforeEach(() => jest.clearAllMocks());
 
     test('renders email, password inputs and submit button', () => {
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
         expect(screen.getByText('Iniciar sesión')).toBeInTheDocument();
     });
 
+    test('renders forgot password link', () => {
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
+        expect(screen.getByText(t('app.auth.forgot.link'))).toBeInTheDocument();
+    });
+
+    test('calls onForgot when forgot password link is clicked', () => {
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
+        fireEvent.click(screen.getByText(t('app.auth.forgot.link')));
+        expect(mockOnForgot).toHaveBeenCalled();
+    });
+
     test('calls login with email and password on submit', async () => {
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@test.com' } });
         fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pass123' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
@@ -39,7 +51,7 @@ describe('LoginPage', () => {
 
     test('shows error message when login fails', async () => {
         mockLogin.mockRejectedValueOnce(new Error('Credenciales inválidas'));
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'bad@test.com' } });
         fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'wrong' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
@@ -48,7 +60,7 @@ describe('LoginPage', () => {
 
     test('shows generic error for non-Error rejection', async () => {
         mockLogin.mockRejectedValueOnce('boom');
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'a@b.com' } });
         fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pw' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
@@ -56,7 +68,7 @@ describe('LoginPage', () => {
     });
 
     test('toggles password visibility', () => {
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         const passInput = screen.getByPlaceholderText('Contraseña');
         expect(passInput).toHaveAttribute('type', 'password');
         fireEvent.click(screen.getByLabelText('Mostrar contraseña'));
@@ -66,7 +78,7 @@ describe('LoginPage', () => {
     });
 
     test('calls onSwitch when register link is clicked', () => {
-        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} /></MemoryRouter>);
+        render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
         fireEvent.click(screen.getByText('Regístrate'));
         expect(mockOnSwitch).toHaveBeenCalled();
     });

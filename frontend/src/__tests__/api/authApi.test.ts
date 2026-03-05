@@ -110,6 +110,55 @@ describe('authApi', () => {
         );
     });
 
+    test('requestPasswordReset sends POST /auth/forgot-password with email', async () => {
+        const expected = { message: 'Si existe una cuenta con ese email, recibirás un enlace.' };
+        mockFetch.mockResolvedValueOnce(makeResponse(expected));
+        const result = await authApi.requestPasswordReset('user@example.com');
+        expect(result).toEqual(expected);
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/auth/forgot-password',
+            expect.objectContaining({
+                method: 'POST',
+                body: JSON.stringify({ email: 'user@example.com' }),
+            })
+        );
+    });
+
+    test('requestPasswordReset does not send Authorization header', async () => {
+        localStorage.setItem('mm_token', 'some-token');
+        mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }));
+        await authApi.requestPasswordReset('u@e.com');
+        const calledHeaders = mockFetch.mock.calls[0][1].headers;
+        expect(calledHeaders['Authorization']).toBeUndefined();
+    });
+
+    test('resetPassword sends POST /auth/reset-password with token and newPassword', async () => {
+        const expected = { message: 'Contraseña restablecida correctamente.' };
+        mockFetch.mockResolvedValueOnce(makeResponse(expected));
+        const result = await authApi.resetPassword('my-reset-token', 'newpassword123');
+        expect(result).toEqual(expected);
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/auth/reset-password',
+            expect.objectContaining({
+                method: 'POST',
+                body: JSON.stringify({ token: 'my-reset-token', newPassword: 'newpassword123' }),
+            })
+        );
+    });
+
+    test('resetPassword does not send Authorization header', async () => {
+        localStorage.setItem('mm_token', 'some-token');
+        mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }));
+        await authApi.resetPassword('tok', 'pw');
+        const calledHeaders = mockFetch.mock.calls[0][1].headers;
+        expect(calledHeaders['Authorization']).toBeUndefined();
+    });
+
+    test('resetPassword throws on server error', async () => {
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'El enlace ha expirado.' }, 400));
+        await expect(authApi.resetPassword('expired-token', 'pw')).rejects.toThrow('El enlace ha expirado.');
+    });
+
     test('logout sends POST /auth/logout with refreshToken', async () => {
         localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
         mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });

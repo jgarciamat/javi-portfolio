@@ -24,6 +24,7 @@ function makeRepo(user: User | null = null): IUserRepository {
         findById: jest.fn().mockResolvedValue(user),
         findByEmail: jest.fn().mockResolvedValue(null),
         findByVerificationToken: jest.fn().mockResolvedValue(null),
+        findByResetToken: jest.fn().mockResolvedValue(null),
     };
 }
 

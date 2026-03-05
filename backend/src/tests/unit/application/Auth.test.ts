@@ -1,4 +1,4 @@
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
 import { ICategoryRepository } from '@domain/repositories/ICategoryRepository';
 import { IRefreshTokenRepository } from '@domain/repositories/IRefreshTokenRepository';
@@ -12,6 +12,7 @@ function makeUserRepo(overrides: Partial<IUserRepository> = {}): IUserRepository
         findById: jest.fn().mockResolvedValue(null),
         findByEmail: jest.fn().mockResolvedValue(null),
         findByVerificationToken: jest.fn().mockResolvedValue(null),
+        findByResetToken: jest.fn().mockResolvedValue(null),
         ...overrides,
     };
 }
@@ -249,5 +250,167 @@ describe('RefreshAccessToken', () => {
 
         expect(result.accessToken).toBeDefined();
         expect(result.accessToken.length).toBeGreaterThan(10);
+    });
+});
+
+// ── RequestPasswordReset ──────────────────────────────────────────────────────
+
+describe('RequestPasswordReset', () => {
+    it('should throw EMAIL_NOT_FOUND when email is not found', async () => {
+        const userRepo = makeUserRepo({ findByEmail: jest.fn().mockResolvedValue(null) });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const emailSvc = { sendPasswordResetEmail: jest.fn() } as any;
+        const useCase = new RequestPasswordReset(userRepo, emailSvc);
+
+        const err = await useCase.execute({ email: 'nobody@example.com' }).catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect((err as any).code).toBe('EMAIL_NOT_FOUND');
+        expect(userRepo.save).not.toHaveBeenCalled();
+        expect(emailSvc.sendPasswordResetEmail).not.toHaveBeenCalled();
+    });
+
+    it('should throw RESET_EMAIL_ALREADY_SENT when resetEmailSent is true', async () => {
+        const user = User.create({
+            id: 'u-reset-already', email: 'exists@example.com', passwordHash: 'h',
+            name: 'Reset', createdAt: new Date(), emailVerified: true, verificationToken: null,
+            resetEmailSent: true,
+        });
+        const userRepo = makeUserRepo({ findByEmail: jest.fn().mockResolvedValue(user) });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const emailSvc = { sendPasswordResetEmail: jest.fn() } as any;
+        const useCase = new RequestPasswordReset(userRepo, emailSvc);
+
+        const err = await useCase.execute({ email: 'exists@example.com' }).catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect((err as any).code).toBe('RESET_EMAIL_ALREADY_SENT');
+        expect(userRepo.save).not.toHaveBeenCalled();
+        expect(emailSvc.sendPasswordResetEmail).not.toHaveBeenCalled();
+    });
+
+    it('should generate a reset token, set resetEmailSent=true, save the user, and send the email', async () => {
+        const user = User.create({
+            id: 'u-reset-1', email: 'exists@example.com', passwordHash: 'h',
+            name: 'Reset', createdAt: new Date(), emailVerified: true, verificationToken: null,
+        });
+        const userRepo = makeUserRepo({ findByEmail: jest.fn().mockResolvedValue(user) });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const emailSvc = { sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined) } as any;
+        const useCase = new RequestPasswordReset(userRepo, emailSvc);
+
+        await useCase.execute({ email: 'exists@example.com' });
+
+        expect(userRepo.save).toHaveBeenCalledTimes(1);
+        const savedUser = (userRepo.save as jest.Mock).mock.calls[0][0] as User;
+        expect(savedUser.resetToken).toBeTruthy();
+        expect(savedUser.resetTokenExpiresAt).toBeInstanceOf(Date);
+        expect(savedUser.resetTokenExpiresAt!.getTime()).toBeGreaterThan(Date.now());
+        expect(savedUser.resetEmailSent).toBe(true);
+
+        // Email is sent non-blocking — wait for the microtask
+        await Promise.resolve();
+        expect(emailSvc.sendPasswordResetEmail).toHaveBeenCalledWith(
+            'exists@example.com', 'Reset', savedUser.resetToken
+        );
+    });
+
+    it('should normalize email to lowercase before lookup', async () => {
+        const user = User.create({
+            id: 'u-reset-2', email: 'upper@example.com', passwordHash: 'h',
+            name: 'Upper', createdAt: new Date(), emailVerified: true, verificationToken: null,
+        });
+        const findByEmail = jest.fn().mockResolvedValue(user);
+        const userRepo = makeUserRepo({ findByEmail });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const emailSvc = { sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined) } as any;
+        const useCase = new RequestPasswordReset(userRepo, emailSvc);
+
+        await useCase.execute({ email: 'UPPER@EXAMPLE.COM' });
+
+        expect(findByEmail).toHaveBeenCalledWith('upper@example.com');
+    });
+
+    it('should log error but not throw when email send fails', async () => {
+        const user = User.create({
+            id: 'u-reset-3', email: 'err@example.com', passwordHash: 'h',
+            name: 'ErrUser', createdAt: new Date(), emailVerified: true, verificationToken: null,
+        });
+        const userRepo = makeUserRepo({ findByEmail: jest.fn().mockResolvedValue(user) });
+        const emailSvc = { sendPasswordResetEmail: jest.fn().mockRejectedValue(new Error('SMTP down')) } as unknown as never;
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+        const useCase = new RequestPasswordReset(userRepo, emailSvc);
+
+        await expect(useCase.execute({ email: 'err@example.com' })).resolves.toBeUndefined();
+        // Wait for the .catch() microtask to run
+        await new Promise(r => setTimeout(r, 0));
+        expect(consoleSpy).toHaveBeenCalledWith('Reset email error:', expect.any(Error));
+        consoleSpy.mockRestore();
+    });
+});
+
+// ── ResetPassword ─────────────────────────────────────────────────────────────
+
+describe('ResetPassword', () => {
+    it('should throw when token is not found', async () => {
+        const userRepo = makeUserRepo({ findByResetToken: jest.fn().mockResolvedValue(null) });
+        const useCase = new ResetPassword(userRepo);
+
+        await expect(useCase.execute({ token: 'bad-token', newPassword: 'newpass' }))
+            .rejects.toThrow('El enlace no es válido o ya fue usado.');
+    });
+
+    it('should throw when user has no resetTokenExpiresAt', async () => {
+        // User found but expiry is null (token already cleared)
+        const user = User.create({
+            id: 'u-rp-1', email: 'rp@example.com', passwordHash: 'h',
+            name: 'RP', createdAt: new Date(), emailVerified: true, verificationToken: null,
+            resetToken: 'some-token', resetTokenExpiresAt: null,
+        });
+        const userRepo = makeUserRepo({ findByResetToken: jest.fn().mockResolvedValue(user) });
+        const useCase = new ResetPassword(userRepo);
+
+        await expect(useCase.execute({ token: 'some-token', newPassword: 'newpass' }))
+            .rejects.toThrow('El enlace no es válido o ya fue usado.');
+    });
+
+    it('should throw when reset token is expired', async () => {
+        const expiredUser = User.create({
+            id: 'u-rp-2', email: 'rp2@example.com', passwordHash: 'h',
+            name: 'RP2', createdAt: new Date(), emailVerified: true, verificationToken: null,
+            resetToken: 'expired-token', resetTokenExpiresAt: new Date(Date.now() - 1000),
+        });
+        const userRepo = makeUserRepo({ findByResetToken: jest.fn().mockResolvedValue(expiredUser) });
+        const useCase = new ResetPassword(userRepo);
+
+        await expect(useCase.execute({ token: 'expired-token', newPassword: 'newpass' }))
+            .rejects.toThrow('El enlace ha expirado. Solicita uno nuevo.');
+    });
+
+    it('should hash the new password, clear the reset token, clear resetEmailSent, and save the user', async () => {
+        const bcrypt = await import('bcryptjs');
+        const futureDate = new Date(Date.now() + 60 * 60 * 1000);
+        const user = User.create({
+            id: 'u-rp-3', email: 'rp3@example.com', passwordHash: 'old-hash',
+            name: 'RP3', createdAt: new Date(), emailVerified: true, verificationToken: null,
+            resetToken: 'valid-token', resetTokenExpiresAt: futureDate, resetEmailSent: true,
+        });
+        const userRepo = makeUserRepo({ findByResetToken: jest.fn().mockResolvedValue(user) });
+        const useCase = new ResetPassword(userRepo);
+
+        await useCase.execute({ token: 'valid-token', newPassword: 'brandnewpass' });
+
+        expect(userRepo.save).toHaveBeenCalledTimes(1);
+        const savedUser = (userRepo.save as jest.Mock).mock.calls[0][0] as User;
+
+        // Password was hashed
+        expect(savedUser.passwordHash).not.toBe('old-hash');
+        const isValid = await bcrypt.compare('brandnewpass', savedUser.passwordHash);
+        expect(isValid).toBe(true);
+
+        // Reset token was cleared
+        expect(savedUser.resetToken).toBeNull();
+        expect(savedUser.resetTokenExpiresAt).toBeNull();
+
+        // resetEmailSent was cleared
+        expect(savedUser.resetEmailSent).toBe(false);
     });
 });

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthController } from '@infrastructure/controllers/AuthController';
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 
 function makeRes(): Partial<Response> & { end: jest.Mock } {
     const res: Partial<Response> & { end: jest.Mock } = { end: jest.fn() };
@@ -19,6 +19,8 @@ describe('AuthController', () => {
     let verifyUseCase: jest.Mocked<VerifyEmail>;
     let logoutUseCase: jest.Mocked<LogoutUser>;
     let refreshUseCase: jest.Mocked<RefreshAccessToken>;
+    let requestPasswordResetUseCase: jest.Mocked<RequestPasswordReset>;
+    let resetPasswordUseCase: jest.Mocked<ResetPassword>;
     let controller: AuthController;
 
     beforeEach(() => {
@@ -32,7 +34,11 @@ describe('AuthController', () => {
         logoutUseCase = { execute: jest.fn() } as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         refreshUseCase = { execute: jest.fn() } as any;
-        controller = new AuthController(registerUseCase, loginUseCase, verifyUseCase, logoutUseCase, refreshUseCase);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        requestPasswordResetUseCase = { execute: jest.fn() } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resetPasswordUseCase = { execute: jest.fn() } as any;
+        controller = new AuthController(registerUseCase, loginUseCase, verifyUseCase, logoutUseCase, refreshUseCase, requestPasswordResetUseCase, resetPasswordUseCase);
     });
 
     describe('register', () => {
@@ -179,6 +185,134 @@ describe('AuthController', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ error: 'El enlace de verificación no es válido o ya fue usado.' });
+        });
+    });
+
+    describe('requestPasswordReset', () => {
+        it('should return 200 with message on success', async () => {
+            requestPasswordResetUseCase.execute.mockResolvedValue(undefined);
+            const req = makeReq({ email: 'user@example.com' });
+            const res = makeRes();
+
+            await controller.requestPasswordReset(req as Request, res as Response);
+
+            expect(requestPasswordResetUseCase.execute).toHaveBeenCalledWith({ email: 'user@example.com' });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.any(String) }));
+        });
+
+        it('should return 400 when email is missing from body', async () => {
+            const res = makeRes();
+
+            await controller.requestPasswordReset(makeReq({}) as Request, res as Response);
+
+            expect(requestPasswordResetUseCase.execute).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Email requerido' });
+        });
+
+        it('should return 404 when use case throws EMAIL_NOT_FOUND', async () => {
+            const err = Object.assign(new Error('El email no está registrado.'), { code: 'EMAIL_NOT_FOUND' });
+            requestPasswordResetUseCase.execute.mockRejectedValue(err);
+            const req = makeReq({ email: 'nobody@example.com' });
+            const res = makeRes();
+
+            await controller.requestPasswordReset(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ error: 'El email no está registrado.', code: 'EMAIL_NOT_FOUND' });
+        });
+
+        it('should return 409 when use case throws RESET_EMAIL_ALREADY_SENT', async () => {
+            const err = Object.assign(new Error('Ya se ha enviado un enlace.'), { code: 'RESET_EMAIL_ALREADY_SENT' });
+            requestPasswordResetUseCase.execute.mockRejectedValue(err);
+            const req = makeReq({ email: 'u@e.com' });
+            const res = makeRes();
+
+            await controller.requestPasswordReset(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(409);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Ya se ha enviado un enlace.', code: 'RESET_EMAIL_ALREADY_SENT' });
+        });
+
+        it('should return 400 when use case throws a generic error', async () => {
+            requestPasswordResetUseCase.execute.mockRejectedValue(new Error('Unexpected error'));
+            const req = makeReq({ email: 'u@e.com' });
+            const res = makeRes();
+
+            await controller.requestPasswordReset(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Unexpected error' });
+        });
+
+        it('should return 400 with generic message when non-Error is thrown', async () => {
+            requestPasswordResetUseCase.execute.mockRejectedValue('boom');
+            const req = makeReq({ email: 'u@e.com' });
+            const res = makeRes();
+
+            await controller.requestPasswordReset(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Error al procesar la solicitud' });
+        });
+    });
+
+    describe('resetPassword', () => {
+        it('should return 200 with success message on valid token + password', async () => {
+            resetPasswordUseCase.execute.mockResolvedValue(undefined);
+            const req = makeReq({ token: 'valid-token', newPassword: 'newpass123' });
+            const res = makeRes();
+
+            await controller.resetPassword(req as Request, res as Response);
+
+            expect(resetPasswordUseCase.execute).toHaveBeenCalledWith({ token: 'valid-token', newPassword: 'newpass123' });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.any(String) }));
+        });
+
+        it('should return 400 when token is missing', async () => {
+            const req = makeReq({ newPassword: 'newpass123' });
+            const res = makeRes();
+
+            await controller.resetPassword(req as Request, res as Response);
+
+            expect(resetPasswordUseCase.execute).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Token y nueva contraseña requeridos' });
+        });
+
+        it('should return 400 when newPassword is missing', async () => {
+            const req = makeReq({ token: 'some-token' });
+            const res = makeRes();
+
+            await controller.resetPassword(req as Request, res as Response);
+
+            expect(resetPasswordUseCase.execute).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Token y nueva contraseña requeridos' });
+        });
+
+        it('should return 400 when use case throws (invalid/expired token)', async () => {
+            resetPasswordUseCase.execute.mockRejectedValue(new Error('El enlace ha expirado. Solicita uno nuevo.'));
+            const req = makeReq({ token: 'expired-token', newPassword: 'newpass123' });
+            const res = makeRes();
+
+            await controller.resetPassword(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'El enlace ha expirado. Solicita uno nuevo.' });
+        });
+
+        it('should return 400 with generic message when non-Error is thrown', async () => {
+            resetPasswordUseCase.execute.mockRejectedValue('boom');
+            const req = makeReq({ token: 't', newPassword: 'p' });
+            const res = makeRes();
+
+            await controller.resetPassword(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Error al restablecer contraseña' });
         });
     });
 });

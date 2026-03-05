@@ -7,6 +7,9 @@ export interface UserProps {
     emailVerified: boolean;
     verificationToken: string | null;
     avatarUrl?: string | null;
+    resetToken?: string | null;
+    resetTokenExpiresAt?: Date | null;
+    resetEmailSent?: boolean;
 }
 
 export class User {
@@ -27,6 +30,9 @@ export class User {
     get emailVerified(): boolean { return this.props.emailVerified; }
     get verificationToken(): string | null { return this.props.verificationToken; }
     get avatarUrl(): string | null { return this.props.avatarUrl ?? null; }
+    get resetToken(): string | null { return this.props.resetToken ?? null; }
+    get resetTokenExpiresAt(): Date | null { return this.props.resetTokenExpiresAt ?? null; }
+    get resetEmailSent(): boolean { return this.props.resetEmailSent ?? false; }
 
     verify(): User {
         return User.create({ ...this.props, emailVerified: true, verificationToken: null });
@@ -42,6 +48,14 @@ export class User {
 
     withAvatar(avatarUrl: string | null): User {
         return User.create({ ...this.props, avatarUrl });
+    }
+
+    withResetToken(token: string | null, expiresAt: Date | null): User {
+        return User.create({ ...this.props, resetToken: token, resetTokenExpiresAt: expiresAt });
+    }
+
+    withResetEmailSent(sent: boolean): User {
+        return User.create({ ...this.props, resetEmailSent: sent });
     }
 
     toJSON(): { id: string; email: string; name: string; avatarUrl: string | null } {

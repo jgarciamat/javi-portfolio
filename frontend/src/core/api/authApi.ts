@@ -2,6 +2,13 @@ import { API_BASE_URL } from '@core/config/api.config';
 import type { AuthResult, MonthlyBudget } from '@shared/types/auth.types';
 import type { RegisterResult, RefreshResult } from '@modules/auth/domain/types';
 
+export class ApiError extends Error {
+    constructor(message: string, public readonly status: number, public readonly code?: string) {
+        super(message);
+        this.name = 'ApiError';
+    }
+}
+
 function getToken(): string | null {
     return localStorage.getItem('mm_token');
 }
@@ -90,7 +97,7 @@ async function publicRequest<T>(path: string, options?: RequestInit): Promise<T>
     });
     if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error ?? `HTTP ${res.status}`);
+        throw new ApiError(body?.error ?? `HTTP ${res.status}`, res.status, body?.code);
     }
     if (res.status === 204) return undefined as T;
     return res.json();
@@ -108,6 +115,12 @@ export const authApi = {
     },
     verifyEmail(token: string) {
         return publicRequest<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`);
+    },
+    requestPasswordReset(email: string) {
+        return publicRequest<{ message: string }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+    },
+    resetPassword(token: string, newPassword: string) {
+        return publicRequest<{ message: string }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) });
     },
     updateName(name: string) {
         return request<{ name: string }>('/profile/name', { method: 'PATCH', body: JSON.stringify({ name }) });
