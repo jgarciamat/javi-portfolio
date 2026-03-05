@@ -51,19 +51,19 @@ export function LoginPage({ onSwitch, onForgot }: Props) {
                     </button>
                 </div>
 
-                <label className="auth-remember">
-                    <input
-                        type="checkbox"
-                        checked={remember}
-                        onChange={(e) => setRemember(e.target.checked)}
-                    />
-                    <span>{t('app.auth.login.remember')}</span>
-                </label>
-                <p style={{ textAlign: 'right', margin: '-4px 0 4px' }}>
-                    <span className="auth-link" style={{ fontSize: '0.8rem' }} onClick={onForgot}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '-8px 0 4px' }}>
+                    <label className="auth-remember">
+                        <input
+                            type="checkbox"
+                            checked={remember}
+                            onChange={(e) => setRemember(e.target.checked)}
+                        />
+                        <span>{t('app.auth.login.remember')}</span>
+                    </label>
+                    <span className="auth-link" style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }} onClick={onForgot}>
                         {t('app.auth.forgot.link')}
                     </span>
-                </p>
+                </div>
 
                 {error && <p className="auth-error">{error}</p>}
 

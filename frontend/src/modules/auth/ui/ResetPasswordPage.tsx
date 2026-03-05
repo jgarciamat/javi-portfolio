@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { authApi } from '@core/api/authApi';
 import { useI18n } from '@core/i18n/I18nContext';
 import { validatePassword } from '../domain/passwordValidation';
+import { PublicHeader } from '@shared/components/PublicHeader';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -46,95 +47,100 @@ export function ResetPasswordPage() {
 
     if (status === 'success') {
         return (
-            <div className="auth-page">
-                <div className="auth-card">
-                    <div className="auth-logo">✅</div>
-                    <h1 className="auth-title">{t('app.auth.reset.success.title')}</h1>
-                    <p className="auth-sub" style={{ textAlign: 'center', lineHeight: 1.6 }}>
-                        {t('app.auth.reset.success.sub')}
-                    </p>
-                    <button className="auth-btn" style={{ marginTop: '24px' }} onClick={() => navigate('/auth', { replace: true })}>
-                        {t('app.auth.reset.goLogin')}
-                    </button>
+            <>
+                <PublicHeader />
+                <div className="auth-page-with-header">
+                    <div className="auth-card">
+                        <div className="auth-logo">✅</div>
+                        <h1 className="auth-title">{t('app.auth.reset.success.title')}</h1>
+                        <p className="auth-sub" style={{ textAlign: 'center', lineHeight: 1.6 }}>
+                            {t('app.auth.reset.success.sub')}
+                        </p>
+                        <button className="auth-btn" style={{ marginTop: '24px' }} onClick={() => navigate('/auth', { replace: true })}>
+                            {t('app.auth.reset.goLogin')}
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </>
         );
     }
 
     return (
-        <div className="auth-page">
-            <form onSubmit={handleSubmit} className="auth-card">
-                <div className="auth-logo">🔐</div>
-                <h1 className="auth-title">Money Manager</h1>
-                <p className="auth-sub">{t('app.auth.reset.title')}</p>
-                <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', margin: '-8px 0 12px' }}>
-                    {t('app.auth.reset.sub')}
-                </p>
+        <>
+            <PublicHeader />
+            <div className="auth-page-with-header">
+                <form onSubmit={handleSubmit} className="auth-card">
+                    <div className="auth-logo">🔐</div>
+                    <h1 className="auth-title">{t('app.auth.reset.title')}</h1>
+                    <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', margin: '-8px 0 12px' }}>
+                        {t('app.auth.reset.sub')}
+                    </p>
 
-                <div className="auth-pass-wrap">
-                    <input
-                        className="auth-input auth-pass-input"
-                        type={showPass ? 'text' : 'password'}
-                        placeholder={t('app.auth.reset.password')}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        autoFocus
-                    />
-                    <button
-                        type="button"
-                        className="auth-eye"
-                        onClick={() => setShowPass(v => !v)}
-                        aria-label={showPass ? t('app.auth.reset.hidePassword') : t('app.auth.reset.showPassword')}
-                    >
-                        {showPass ? '🙈' : '👁️'}
+                    <div className="auth-pass-wrap">
+                        <input
+                            className="auth-input auth-pass-input"
+                            type={showPass ? 'text' : 'password'}
+                            placeholder={t('app.auth.reset.password')}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            autoFocus
+                        />
+                        <button
+                            type="button"
+                            className="auth-eye"
+                            onClick={() => setShowPass(v => !v)}
+                            aria-label={showPass ? t('app.auth.reset.hidePassword') : t('app.auth.reset.showPassword')}
+                        >
+                            {showPass ? '🙈' : '👁️'}
+                        </button>
+                    </div>
+
+                    {/* Password strength hints */}
+                    {password.length > 0 && !passwordValidation.valid && (
+                        <ul className="auth-password-hints" aria-label="Requisitos de contraseña">
+                            {passwordValidation.errors.map((e) => (
+                                <li key={e} className="auth-hint-error">✗ {e}</li>
+                            ))}
+                        </ul>
+                    )}
+                    {password.length > 0 && passwordValidation.valid && (
+                        <p className="auth-hint-ok">{t('app.auth.reset.passwordOk')}</p>
+                    )}
+
+                    <div className="auth-pass-wrap">
+                        <input
+                            className={`auth-input auth-pass-input${mismatch ? ' auth-input--error' : ''}`}
+                            type={showConfirm ? 'text' : 'password'}
+                            placeholder={t('app.auth.reset.confirm')}
+                            value={confirm}
+                            onChange={(e) => setConfirm(e.target.value)}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="auth-eye"
+                            onClick={() => setShowConfirm(v => !v)}
+                            aria-label={showConfirm ? t('app.auth.reset.hideConfirm') : t('app.auth.reset.showConfirm')}
+                        >
+                            {showConfirm ? '🙈' : '👁️'}
+                        </button>
+                    </div>
+                    {mismatch && <p className="auth-error">{t('app.auth.reset.mismatch')}</p>}
+
+                    {error && status === 'error' && <p className="auth-error">{error}</p>}
+
+                    <button type="submit" className="auth-btn" disabled={submitDisabled}>
+                        {status === 'loading' ? t('app.auth.reset.loading') : t('app.auth.reset.submit')}
                     </button>
-                </div>
 
-                {/* Password strength hints */}
-                {password.length > 0 && !passwordValidation.valid && (
-                    <ul className="auth-password-hints" aria-label="Requisitos de contraseña">
-                        {passwordValidation.errors.map((e) => (
-                            <li key={e} className="auth-hint-error">✗ {e}</li>
-                        ))}
-                    </ul>
-                )}
-                {password.length > 0 && passwordValidation.valid && (
-                    <p className="auth-hint-ok">{t('app.auth.reset.passwordOk')}</p>
-                )}
-
-                <div className="auth-pass-wrap">
-                    <input
-                        className={`auth-input auth-pass-input${mismatch ? ' auth-input--error' : ''}`}
-                        type={showConfirm ? 'text' : 'password'}
-                        placeholder={t('app.auth.reset.confirm')}
-                        value={confirm}
-                        onChange={(e) => setConfirm(e.target.value)}
-                        required
-                    />
-                    <button
-                        type="button"
-                        className="auth-eye"
-                        onClick={() => setShowConfirm(v => !v)}
-                        aria-label={showConfirm ? t('app.auth.reset.hideConfirm') : t('app.auth.reset.showConfirm')}
-                    >
-                        {showConfirm ? '🙈' : '👁️'}
-                    </button>
-                </div>
-                {mismatch && <p className="auth-error">{t('app.auth.reset.mismatch')}</p>}
-
-                {error && status === 'error' && <p className="auth-error">{error}</p>}
-
-                <button type="submit" className="auth-btn" disabled={submitDisabled}>
-                    {status === 'loading' ? t('app.auth.reset.loading') : t('app.auth.reset.submit')}
-                </button>
-
-                <p className="auth-switch">
-                    <span className="auth-link" onClick={() => navigate('/auth', { replace: true })}>
-                        {t('app.auth.reset.goLogin')}
-                    </span>
-                </p>
-            </form>
-        </div>
+                    <p className="auth-switch">
+                        <span className="auth-link" onClick={() => navigate('/auth', { replace: true })}>
+                            {t('app.auth.reset.goLogin')}
+                        </span>
+                    </p>
+                </form>
+            </div>
+        </>
     );
 }
