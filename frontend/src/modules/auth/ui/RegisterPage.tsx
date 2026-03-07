@@ -1,7 +1,22 @@
 import { useRegisterForm } from '../application/useRegisterForm';
 import { useI18n } from '@core/i18n/I18nContext';
+import { AuthPasswordInput } from './AuthPasswordInput';
 
 interface Props { onSwitch: () => void; }
+
+interface PasswordHintsProps { password: string; errors: string[]; valid: boolean; okText: string; }
+
+function PasswordHints({ password, errors, valid, okText }: PasswordHintsProps) {
+    if (password.length === 0) return null;
+    if (!valid) {
+        return (
+            <ul className="auth-password-hints" aria-label="Requisitos de contraseña">
+                {errors.map((e) => <li key={e} className="auth-hint-error">✗ {e}</li>)}
+            </ul>
+        );
+    }
+    return <p className="auth-hint-ok">{okText}</p>;
+}
 
 export function RegisterPage({ onSwitch }: Props) {
     const { t } = useI18n();
@@ -52,48 +67,37 @@ export function RegisterPage({ onSwitch }: Props) {
                     onChange={(e) => setEmail(e.target.value)} required />
 
                 {/* Password */}
-                <div className="auth-pass-wrap">
-                    <input
-                        className="auth-input auth-pass-input"
-                        type={showPass ? 'text' : 'password'}
-                        placeholder={t('app.auth.register.password')}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <button type="button" className="auth-eye" onClick={() => setShowPass(v => !v)}
-                        aria-label={showPass ? t('app.auth.register.hidePassword') : t('app.auth.register.showPassword')}>
-                        {showPass ? '🙈' : '👁️'}
-                    </button>
-                </div>
+                <AuthPasswordInput
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    show={showPass}
+                    onToggle={() => setShowPass(v => !v)}
+                    placeholder={t('app.auth.register.password')}
+                    showLabel={t('app.auth.register.showPassword')}
+                    hideLabel={t('app.auth.register.hidePassword')}
+                    required
+                />
 
                 {/* Password strength hints */}
-                {password.length > 0 && !passwordValidation.valid && (
-                    <ul className="auth-password-hints" aria-label="Requisitos de contraseña">
-                        {passwordValidation.errors.map((e) => (
-                            <li key={e} className="auth-hint-error">✗ {e}</li>
-                        ))}
-                    </ul>
-                )}
-                {password.length > 0 && passwordValidation.valid && (
-                    <p className="auth-hint-ok">{t('app.auth.register.passwordOk')}</p>
-                )}
+                <PasswordHints
+                    password={password}
+                    errors={passwordValidation.errors}
+                    valid={passwordValidation.valid}
+                    okText={t('app.auth.register.passwordOk')}
+                />
 
                 {/* Confirm password */}
-                <div className="auth-pass-wrap">
-                    <input
-                        className={`auth-input auth-pass-input${confirmTouched && !passwordsMatch ? ' auth-input-error' : ''}`}
-                        type={showConfirm ? 'text' : 'password'}
-                        placeholder={t('app.auth.register.confirmPassword')}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                    <button type="button" className="auth-eye" onClick={() => setShowConfirm(v => !v)}
-                        aria-label={showConfirm ? t('app.auth.register.hideConfirm') : t('app.auth.register.showConfirm')}>
-                        {showConfirm ? '🙈' : '👁️'}
-                    </button>
-                </div>
+                <AuthPasswordInput
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    show={showConfirm}
+                    onToggle={() => setShowConfirm(v => !v)}
+                    placeholder={t('app.auth.register.confirmPassword')}
+                    showLabel={t('app.auth.register.showConfirm')}
+                    hideLabel={t('app.auth.register.hideConfirm')}
+                    errorClass={confirmTouched && !passwordsMatch ? 'auth-input-error' : undefined}
+                    required
+                />
                 {confirmTouched && !passwordsMatch && (
                     <p className="auth-hint-error" style={{ marginTop: '-4px' }}>✗ {t('app.profile.password.noMatch').replace('✗ ', '')}</p>
                 )}

@@ -17,6 +17,7 @@ import type {
     CreateCategoryDTO,
     FinancialSummary,
 } from '@modules/finances/domain/types';
+import { useCategoryActions } from './hooks/useCategoryActions';
 
 // ─── State & Actions ──────────────────────────────────────────────────────────
 
@@ -188,41 +189,8 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         [year, month, transactionApi, fetchMonth]
     );
 
-    // ── Categories state ──────────────────────────────────────────────────────
-    const [categories, setCategories] = useState<Category[]>([]);
-
-    const fetchCategories = useCallback(async () => {
-        if (!token) return;
-        categoryApi
-            .getAll()
-            .then((cats) =>
-                setCategories([...cats].sort((a, b) => a.name.localeCompare(b.name)))
-            )
-            .catch(() => setCategories([]));
-    }, [token, categoryApi]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
-
-    const addCategory = useCallback(
-        async (dto: CreateCategoryDTO) => {
-            const cat = await categoryApi.create(dto);
-            setCategories((prev) =>
-                [...prev, cat].sort((a, b) => a.name.localeCompare(b.name))
-            );
-            return cat;
-        },
-        [categoryApi]
-    );
-
-    const removeCategory = useCallback(
-        async (id: string) => {
-            await categoryApi.delete(id);
-            setCategories((prev) => prev.filter((c) => c.id !== id));
-        },
-        [categoryApi]
-    );
+    // ── Categories ────────────────────────────────────────────────────────────
+    const { categories, addCategory, removeCategory } = useCategoryActions(categoryApi);
 
     // ── Value ─────────────────────────────────────────────────────────────────
     const value: FinancesContextValue = {

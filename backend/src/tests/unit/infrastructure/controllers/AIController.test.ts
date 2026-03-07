@@ -59,11 +59,11 @@ describe('AIController', () => {
 
     it('passes transaction and budget data when repos are provided', async () => {
         const tx = {
-            type: { isIncome: () => true },
+            type: { isIncome: (): boolean => true },
             amount: { value: 500 },
             category: 'Salario',
             description: 'Salario',
-            date: { toISOString: () => '2025-03-01T00:00:00.000Z' },
+            date: { toISOString: (): string => '2025-03-01T00:00:00.000Z' },
         };
         const txRepo = {
             findByUserAndMonth: jest.fn().mockResolvedValue([tx]),
@@ -83,11 +83,11 @@ describe('AIController', () => {
 
     it('handles expense transactions correctly', async () => {
         const tx = {
-            type: { isIncome: () => false },
+            type: { isIncome: (): boolean => false },
             amount: { value: 200 },
             category: 'Ocio',
             description: 'Cine',
-            date: { toISOString: () => '2025-03-05T00:00:00.000Z' },
+            date: { toISOString: (): string => '2025-03-05T00:00:00.000Z' },
         };
         const txRepo = { findByUserAndMonth: jest.fn().mockResolvedValue([tx]) };
         const budgetRepo = { findByUserAndMonth: jest.fn().mockResolvedValue(null) };

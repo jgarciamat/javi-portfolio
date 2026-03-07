@@ -7,6 +7,39 @@ import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
 import { isNextButtonDisabled, isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
 import { useI18n } from '@core/i18n/I18nContext';
+import { AnnualMonthTable } from './AnnualMonthTable';
+
+interface TotalsProps {
+    totals: { income: number; expenses: number; saving: number };
+    t: (k: string) => string;
+}
+
+function AnnualTotals({ totals, t }: TotalsProps) {
+    const balance = totals.income - totals.expenses - totals.saving;
+    const balanceColor = balance >= 0 ? '#6366f1' : '#ef4444';
+    return (
+        <div className="annual-totals">
+            <div className="annual-total-card" style={{ borderColor: '#4ade80' }}>
+                <span className="annual-total-label">{t('app.annual.totalIncome')}</span>
+                <span className="annual-total-value" style={{ color: '#4ade80' }}>{fmtCurrency(totals.income)}</span>
+            </div>
+            <div className="annual-total-card" style={{ borderColor: '#f87171' }}>
+                <span className="annual-total-label">{t('app.annual.totalExpenses')}</span>
+                <span className="annual-total-value" style={{ color: '#f87171' }}>{fmtCurrency(totals.expenses)}</span>
+            </div>
+            <div className="annual-total-card" style={{ borderColor: '#a78bfa' }}>
+                <span className="annual-total-label">{t('app.annual.totalSaving')}</span>
+                <span className="annual-total-value" style={{ color: '#a78bfa' }}>{fmtCurrency(totals.saving)}</span>
+            </div>
+            <div className="annual-total-card" style={{ borderColor: balanceColor }}>
+                <span className="annual-total-label">{t('app.annual.annualBalance')}</span>
+                <span className="annual-total-value" style={{ color: balanceColor }}>
+                    {fmtCurrency(balance)}
+                </span>
+            </div>
+        </div>
+    );
+}
 
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear, prevYearDisabled } = useAnnualChart(initialYear);
@@ -137,67 +170,10 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                     )}
 
                     {/* Annual totals */}
-                    <div className="annual-totals">
-                        <div className="annual-total-card" style={{ borderColor: '#4ade80' }}>
-                            <span className="annual-total-label">{t('app.annual.totalIncome')}</span>
-                            <span className="annual-total-value" style={{ color: '#4ade80' }}>{fmtCurrency(totals.income)}</span>
-                        </div>
-                        <div className="annual-total-card" style={{ borderColor: '#f87171' }}>
-                            <span className="annual-total-label">{t('app.annual.totalExpenses')}</span>
-                            <span className="annual-total-value" style={{ color: '#f87171' }}>{fmtCurrency(totals.expenses)}</span>
-                        </div>
-                        <div className="annual-total-card" style={{ borderColor: '#a78bfa' }}>
-                            <span className="annual-total-label">{t('app.annual.totalSaving')}</span>
-                            <span className="annual-total-value" style={{ color: '#a78bfa' }}>{fmtCurrency(totals.saving)}</span>
-                        </div>
-                        <div className="annual-total-card" style={{ borderColor: totals.income - totals.expenses - totals.saving >= 0 ? '#6366f1' : '#ef4444' }}>
-                            <span className="annual-total-label">{t('app.annual.annualBalance')}</span>
-                            <span className="annual-total-value" style={{ color: totals.income - totals.expenses - totals.saving >= 0 ? '#6366f1' : '#ef4444' }}>
-                                {fmtCurrency(totals.income - totals.expenses - totals.saving)}
-                            </span>
-                        </div>
-                    </div>
+                    <AnnualTotals totals={totals} t={t} />
 
                     {/* Monthly detail table */}
-                    <div className="annual-table-wrap">
-                        <table className="annual-table">
-                            <thead>
-                                <tr>
-                                    <th>{t('app.annual.table.month')}</th>
-                                    <th style={{ color: '#4ade80' }}>{t('app.annual.table.income')}</th>
-                                    <th style={{ color: '#f87171' }}>{t('app.annual.table.expenses')}</th>
-                                    <th style={{ color: '#a78bfa' }}>{t('app.annual.table.saving')}</th>
-                                    <th>{t('app.annual.table.balance')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {months.map(({ month, income, expenses, saving, balance }) => (
-                                    <tr key={month}>
-                                        <td className="annual-td-month">
-                                            {onMonthClick && !isMonthInFuture(year, month, now) ? (
-                                                <button
-                                                    type="button"
-                                                    className="annual-month-btn"
-                                                    onClick={() => onMonthClick(year, month)}
-                                                    title={`Ver ${MONTH_SHORT[month - 1]} ${year}`}
-                                                >
-                                                    {MONTH_SHORT[month - 1]}
-                                                </button>
-                                            ) : (
-                                                MONTH_SHORT[month - 1]
-                                            )}
-                                        </td>
-                                        <td style={{ color: '#4ade80' }}>{income > 0 ? fmtCurrency(income) : '—'}</td>
-                                        <td style={{ color: '#f87171' }}>{expenses > 0 ? fmtCurrency(expenses) : '—'}</td>
-                                        <td style={{ color: '#a78bfa' }}>{saving > 0 ? fmtCurrency(saving) : '—'}</td>
-                                        <td style={{ color: balance >= 0 ? '#6366f1' : '#ef4444', fontWeight: 700 }}>
-                                            {fmtCurrency(balance)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <AnnualMonthTable months={months} year={year} now={now} onMonthClick={onMonthClick} />
                 </>
             )}
         </div>

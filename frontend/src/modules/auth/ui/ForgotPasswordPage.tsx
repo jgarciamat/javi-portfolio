@@ -4,6 +4,21 @@ import { useI18n } from '@core/i18n/I18nContext';
 
 interface Props { onBack: () => void; }
 
+function resolveError(err: unknown, t: (key: string) => string): { message: string; alreadySent: boolean } {
+    const isNotFound = (e: { code?: string; status?: number }) =>
+        e.status === 404 || e.code === 'EMAIL_NOT_FOUND';
+    const isAlreadySent = (e: { code?: string; status?: number }) =>
+        e.status === 409 || e.code === 'RESET_EMAIL_ALREADY_SENT';
+
+    if (err instanceof ApiError || err instanceof Error) {
+        const coded = err as Error & { code?: string; status?: number };
+        if (isNotFound(coded)) return { message: t('app.auth.forgot.error.notFound'), alreadySent: false };
+        if (isAlreadySent(coded)) return { message: t('app.auth.forgot.error.alreadySent'), alreadySent: true };
+        return { message: (err as Error).message, alreadySent: false };
+    }
+    return { message: 'Error', alreadySent: false };
+}
+
 export function ForgotPasswordPage({ onBack }: Props) {
     const { t } = useI18n();
     const [email, setEmail] = useState('');
@@ -20,29 +35,9 @@ export function ForgotPasswordPage({ onBack }: Props) {
             await authApi.requestPasswordReset(email);
             setSent(true);
         } catch (err) {
-            if (err instanceof ApiError) {
-                if (err.status === 404 || err.code === 'EMAIL_NOT_FOUND') {
-                    setError(t('app.auth.forgot.error.notFound'));
-                } else if (err.status === 409 || err.code === 'RESET_EMAIL_ALREADY_SENT') {
-                    setAlreadySent(true);
-                    setError(t('app.auth.forgot.error.alreadySent'));
-                } else {
-                    setError(err.message);
-                }
-            } else if (err instanceof Error) {
-                // Fallback: check code/status properties for test mocks
-                const coded = err as Error & { code?: string; status?: number };
-                if (coded.status === 404 || coded.code === 'EMAIL_NOT_FOUND') {
-                    setError(t('app.auth.forgot.error.notFound'));
-                } else if (coded.status === 409 || coded.code === 'RESET_EMAIL_ALREADY_SENT') {
-                    setAlreadySent(true);
-                    setError(t('app.auth.forgot.error.alreadySent'));
-                } else {
-                    setError(err.message);
-                }
-            } else {
-                setError('Error');
-            }
+            const { message, alreadySent } = resolveError(err, t);
+            setError(message);
+            if (alreadySent) setAlreadySent(true);
         } finally {
             setLoading(false);
         }

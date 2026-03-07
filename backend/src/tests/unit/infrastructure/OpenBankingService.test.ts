@@ -100,15 +100,15 @@ describe('OpenBankingService — live mode (mocked fetch)', () => {
         delete process.env.GOCARDLESS_SECRET_KEY;
     });
 
-    function mockFetch(responses: Array<{ ok: boolean; json?: unknown; text?: string }>) {
+    function mockFetch(responses: Array<{ ok: boolean; json?: unknown; text?: string }>): void {
         let call = 0;
         global.fetch = jest.fn().mockImplementation(async () => {
             const r = responses[call++] ?? { ok: true, json: {} };
             return {
                 ok: r.ok,
                 status: 400,
-                json: async () => r.json,
-                text: async () => r.text ?? '',
+                json: async (): Promise<unknown> => r.json,
+                text: async (): Promise<string> => r.text ?? '',
             };
         });
     }

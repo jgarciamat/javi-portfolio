@@ -2,10 +2,90 @@ import { useState, useEffect, useRef } from 'react';
 import { useAIAdvisor } from '../../application/hooks/useAIAdvisor';
 import { useI18n } from '@core/i18n/I18nContext';
 import '../css/AIAdvisor.css';
+import type { AIAdvice } from '@core/api/premiumApi';
 
 interface Props {
     year: number;
     month: number;
+}
+
+interface AIAdviceContentProps {
+    advice: AIAdvice | null;
+    error: string | null;
+    t: (k: string) => string;
+}
+
+function AIAdviceContent({ advice, error, t }: AIAdviceContentProps) {
+    return (
+        <>
+            {error && <div className="ai-error">⚠️ {error}</div>}
+            {advice && (
+                <div className="ai-content">
+                    <p className="ai-summary">{advice.summary}</p>
+                    {advice.positives.length > 0 && (
+                        <div className="ai-section">
+                            <h4 className="ai-section-title ai-section-title--green">{t('app.ai.section.positives')}</h4>
+                            <ul className="ai-list">
+                                {advice.positives.map((p, i) => (
+                                    <li key={i} className="ai-list-item ai-list-item--green">{p}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {advice.warnings.length > 0 && (
+                        <div className="ai-section">
+                            <h4 className="ai-section-title ai-section-title--red">{t('app.ai.section.warnings')}</h4>
+                            <ul className="ai-list">
+                                {advice.warnings.map((w, i) => (
+                                    <li key={i} className="ai-list-item ai-list-item--red">{w}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {advice.tips.length > 0 && (
+                        <div className="ai-section">
+                            <h4 className="ai-section-title ai-section-title--blue">{t('app.ai.section.tips')}</h4>
+                            <ul className="ai-list">
+                                {advice.tips.map((tip, i) => (
+                                    <li key={i} className="ai-list-item ai-list-item--blue">{tip}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
+            {!advice && !error && (
+                <p className="ai-placeholder">{t('app.ai.placeholder')}</p>
+            )}
+        </>
+    );
+}
+
+function buildCooldownText(
+    key: string,
+    daysUntilNextAnalysis: number,
+    hoursUntilNextAnalysis: number,
+    t: (k: string) => string
+): string {
+    const d = daysUntilNextAnalysis;
+    const h = hoursUntilNextAnalysis;
+    let timeStr: string;
+    if (d > 0 && h > 0) {
+        timeStr = t('app.ai.cooldown.daysHours')
+            .replace('{days}', String(d))
+            .replace('{dayPlural}', d !== 1 ? 's' : '')
+            .replace('{hours}', String(h))
+            .replace('{hourPlural}', h !== 1 ? 's' : '');
+    } else if (d > 0) {
+        timeStr = t('app.ai.cooldown.daysOnly')
+            .replace('{days}', String(d))
+            .replace('{dayPlural}', d !== 1 ? 's' : '');
+    } else {
+        timeStr = t('app.ai.cooldown.hoursOnly')
+            .replace('{hours}', String(h))
+            .replace('{hourPlural}', h !== 1 ? 's' : '');
+    }
+    return t(key).replace('{time}', timeStr);
 }
 
 export function AIAdvisor({ year, month }: Props) {
@@ -15,27 +95,8 @@ export function AIAdvisor({ year, month }: Props) {
     const bodyRef = useRef<HTMLDivElement>(null);
     const isFirstRender = useRef(true);
 
-    const cooldownText = (key: string) => {
-        const d = daysUntilNextAnalysis;
-        const h = hoursUntilNextAnalysis;
-        let timeStr: string;
-        if (d > 0 && h > 0) {
-            timeStr = t('app.ai.cooldown.daysHours')
-                .replace('{days}', String(d))
-                .replace('{dayPlural}', d !== 1 ? 's' : '')
-                .replace('{hours}', String(h))
-                .replace('{hourPlural}', h !== 1 ? 's' : '');
-        } else if (d > 0) {
-            timeStr = t('app.ai.cooldown.daysOnly')
-                .replace('{days}', String(d))
-                .replace('{dayPlural}', d !== 1 ? 's' : '');
-        } else {
-            timeStr = t('app.ai.cooldown.hoursOnly')
-                .replace('{hours}', String(h))
-                .replace('{hourPlural}', h !== 1 ? 's' : '');
-        }
-        return t(key).replace('{time}', timeStr);
-    };
+    const cooldownText = (key: string) =>
+        buildCooldownText(key, daysUntilNextAnalysis, hoursUntilNextAnalysis, t);
 
     // Animate max-height
     useEffect(() => {
@@ -100,52 +161,7 @@ export function AIAdvisor({ year, month }: Props) {
 
             <div className="ai-advisor-body" ref={bodyRef}>
                 <div className="ai-advisor-body-inner">
-                    {error && (
-                        <div className="ai-error">⚠️ {error}</div>
-                    )}
-
-                    {advice && (
-                        <div className="ai-content">
-                            <p className="ai-summary">{advice.summary}</p>
-
-                            {advice.positives.length > 0 && (
-                                <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--green">{t('app.ai.section.positives')}</h4>
-                                    <ul className="ai-list">
-                                        {advice.positives.map((p, i) => (
-                                            <li key={i} className="ai-list-item ai-list-item--green">{p}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {advice.warnings.length > 0 && (
-                                <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--red">{t('app.ai.section.warnings')}</h4>
-                                    <ul className="ai-list">
-                                        {advice.warnings.map((w, i) => (
-                                            <li key={i} className="ai-list-item ai-list-item--red">{w}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {advice.tips.length > 0 && (
-                                <div className="ai-section">
-                                    <h4 className="ai-section-title ai-section-title--blue">{t('app.ai.section.tips')}</h4>
-                                    <ul className="ai-list">
-                                        {advice.tips.map((t, i) => (
-                                            <li key={i} className="ai-list-item ai-list-item--blue">{t}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {!advice && !error && (
-                        <p className="ai-placeholder">{t('app.ai.placeholder')}</p>
-                    )}
+                    <AIAdviceContent advice={advice} error={error} t={t} />
                 </div>
             </div>
         </div>
