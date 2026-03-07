@@ -104,15 +104,17 @@ describe('LoginUser', () => {
     });
 
     it('should throw if email is not verified', async () => {
+        const bcrypt = await import('bcryptjs');
+        const hash = await bcrypt.hash('correctpass', 10);
         const unverified = User.create({
-            id: 'u2', email: 'u@e.com', passwordHash: 'h', name: 'U',
+            id: 'u2', email: 'u@e.com', passwordHash: hash, name: 'U',
             createdAt: new Date(), emailVerified: false, verificationToken: 'tok',
         });
         const userRepo = makeUserRepo({ findByEmail: jest.fn().mockResolvedValue(unverified) });
         const useCase = new LoginUser(userRepo, makeRefreshTokenRepo());
 
-        await expect(useCase.execute({ email: 'u@e.com', password: 'any' }))
-            .rejects.toThrow('Credenciales incorrectas');
+        await expect(useCase.execute({ email: 'u@e.com', password: 'correctpass' }))
+            .rejects.toThrow('Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.');
     });
 
     it('should throw if password is wrong', async () => {
@@ -412,5 +414,23 @@ describe('ResetPassword', () => {
 
         // resetEmailSent was cleared
         expect(savedUser.resetEmailSent).toBe(false);
+    });
+});
+
+// ── verifyToken ───────────────────────────────────────────────────────────────
+
+import { verifyToken } from '@application/use-cases/Auth';
+
+describe('verifyToken', () => {
+    it('decodes a valid access token and returns the userId', async () => {
+        const jwt = await import('jsonwebtoken');
+        const secret = process.env.JWT_SECRET ?? 'money-manager-secret-change-in-prod';
+        const token = jwt.sign({ userId: 'user-abc' }, secret, { expiresIn: '15m' });
+        const payload = verifyToken(token);
+        expect(payload.userId).toBe('user-abc');
+    });
+
+    it('throws when token is invalid', () => {
+        expect(() => verifyToken('not.a.valid.token')).toThrow();
     });
 });

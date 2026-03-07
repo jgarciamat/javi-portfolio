@@ -45,6 +45,17 @@ describe('TransactionType', () => {
             const t = TransactionType.expense();
             expect(t.isExpense()).toBe(true);
         });
+
+        it('should create saving via static method', () => {
+            const t = TransactionType.saving();
+            expect(t.isSaving()).toBe(true);
+            expect(t.value).toBe('SAVING');
+        });
+
+        it('should create SAVING via create()', () => {
+            const t = TransactionType.create('saving');
+            expect(t.isSaving()).toBe(true);
+        });
     });
 
     describe('equality', () => {

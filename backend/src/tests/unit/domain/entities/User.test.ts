@@ -55,4 +55,31 @@ describe('User entity', () => {
             expect(Object.keys(json)).not.toContain('passwordHash');
         });
     });
+
+    describe('getters defaults', () => {
+        it('avatarUrl returns null when not set', () => {
+            const user = User.create(baseProps);
+            expect(user.avatarUrl).toBeNull();
+        });
+
+        it('resetToken returns null when not set', () => {
+            const user = User.create(baseProps);
+            expect(user.resetToken).toBeNull();
+        });
+
+        it('resetTokenExpiresAt returns null when not set', () => {
+            const user = User.create(baseProps);
+            expect(user.resetTokenExpiresAt).toBeNull();
+        });
+
+        it('resetEmailSent defaults to false when not set', () => {
+            const user = User.create(baseProps);
+            expect(user.resetEmailSent).toBe(false);
+        });
+
+        it('resetEmailSent returns true when explicitly set', () => {
+            const user = User.create({ ...baseProps, resetEmailSent: true });
+            expect(user.resetEmailSent).toBe(true);
+        });
+    });
 });

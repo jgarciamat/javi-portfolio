@@ -24,6 +24,11 @@ describe('Amount', () => {
         it('should throw for NaN', () => {
             expect(() => Amount.create(NaN)).toThrow('Amount must be a valid number');
         });
+
+        it('should throw for null', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            expect(() => Amount.create(null as any)).toThrow('Amount cannot be null or undefined');
+        });
     });
 
     describe('operations', () => {
