@@ -8,6 +8,7 @@ import { Dashboard } from './modules/finances/ui/components/Dashboard';
 import { VerifyEmailPage } from './modules/auth/ui/VerifyEmailPage';
 import { ResetPasswordPage } from './modules/auth/ui/ResetPasswordPage';
 import { I18nProvider } from '@core/i18n/I18nContext';
+import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 
 export default function App() {
     return (
@@ -29,6 +30,7 @@ export default function App() {
                             <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                     </BrowserRouter>
+                    <UpdatePrompt />
                 </ApiProvider>
             </AuthProvider>
         </I18nProvider>

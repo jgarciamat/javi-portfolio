@@ -7,10 +7,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       // El manifest ya está en public/site.webmanifest — no lo regeneramos
       manifest: false,
       workbox: {
+        // Activa el nuevo SW inmediatamente cuando el usuario confirma la actualización
+        skipWaiting: true,
+        clientsClaim: true,
         // Precachea todos los assets del build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // Estrategia network-first para las llamadas API
