@@ -141,6 +141,31 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         return tx;
     }
 
+    async updateTransaction(id: string, changes: {
+        description?: string;
+        amount?: number;
+        type?: string;
+        category?: string;
+        date?: string;
+        notes?: string | null;
+    }): Promise<Transaction | null> {
+        const tx = await this.findById(id);
+        if (!tx) return null;
+        tx.update(changes);
+        const sets: string[] = [];
+        const params: Record<string, unknown> = { id };
+        if (changes.description !== undefined) { sets.push('description = @description'); params.description = tx.description; }
+        if (changes.amount !== undefined) { sets.push('amount = @amount'); params.amount = tx.amount.value; }
+        if (changes.type !== undefined) { sets.push('type = @type'); params.type = tx.type.value; }
+        if (changes.category !== undefined) { sets.push('category = @category'); params.category = tx.category; }
+        if (changes.date !== undefined) { sets.push('date = @date'); params.date = tx.date.toISOString(); }
+        if ('notes' in changes) { sets.push('notes = @notes'); params.notes = changes.notes ?? null; }
+        if (sets.length > 0) {
+            this.db.prepare(`UPDATE transactions SET ${sets.join(', ')} WHERE id = @id`).run(params);
+        }
+        return tx;
+    }
+
     private toEntity(row: TransactionRow): Transaction {
         return Transaction.reconstitute({
             id: TransactionId.create(row.id),

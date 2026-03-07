@@ -22,6 +22,15 @@ export interface CreateTransactionDTO {
     notes?: string | null;
 }
 
+export interface UpdateTransactionDTO {
+    description?: string;
+    amount?: number;
+    type?: TransactionType;
+    category?: string;
+    date?: string;
+    notes?: string | null;
+}
+
 export interface Category {
     id: string;
     name: string;

@@ -18,6 +18,7 @@ jest.mock('@core/i18n/I18nContext', () => ({
 
 const mockOnDelete = jest.fn();
 const mockOnPatch = jest.fn();
+const mockOnEdit = jest.fn();
 
 const txExpense: Transaction = {
     id: 't1', description: 'Bus ticket', amount: 10, type: 'EXPENSE',
@@ -44,37 +45,37 @@ describe('TransactionTable', () => {
     beforeEach(() => jest.clearAllMocks());
 
     test('shows empty state when no transactions', () => {
-        render(<TransactionTable transactions={[]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getByText(/No hay transacciones aún/i)).toBeInTheDocument();
     });
 
     test('renders EXPENSE transaction with correct badge and amount', () => {
-        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText('Bus ticket').length).toBeGreaterThan(0);
         expect(screen.getAllByText(/↓ Gasto/i).length).toBeGreaterThan(0);
     });
 
     test('renders INCOME transaction with correct badge', () => {
-        render(<TransactionTable transactions={[txIncome]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txIncome]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText('Salary').length).toBeGreaterThan(0);
         expect(screen.getAllByText(/↑ Ingreso/i).length).toBeGreaterThan(0);
     });
 
     test('renders SAVING transaction with correct badge', () => {
-        render(<TransactionTable transactions={[txSaving]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txSaving]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText('Savings pot').length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Ahorro/i).length).toBeGreaterThan(0);
     });
 
     test('calls onDelete with correct id when delete button is clicked', () => {
-        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         const deleteBtns = screen.getAllByLabelText('Eliminar');
         fireEvent.click(deleteBtns[0]);
         expect(mockOnDelete).toHaveBeenCalledWith('t1');
     });
 
     test('calls onDelete from mobile card delete button', () => {
-        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         const deleteBtns = screen.getAllByLabelText('Eliminar');
         expect(deleteBtns.length).toBe(2);
         fireEvent.click(deleteBtns[1]);
@@ -82,7 +83,7 @@ describe('TransactionTable', () => {
     });
 
     test('renders multiple transactions', () => {
-        render(<TransactionTable transactions={[txExpense, txIncome, txSaving]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txExpense, txIncome, txSaving]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText('Bus ticket').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Salary').length).toBeGreaterThan(0);
     });
@@ -90,18 +91,18 @@ describe('TransactionTable', () => {
     // ── notes inline edit ─────────────────────────────────────────────────────
 
     test('shows "+" placeholder when notes is null', () => {
-        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText(/\+ añadir nota/i).length).toBeGreaterThan(0);
     });
 
     test('shows existing notes text', () => {
-        render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         expect(screen.getAllByText('Paid via bank').length).toBeGreaterThan(0);
     });
 
     test('clicking notes text shows edit input', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         const noteTexts = screen.getAllByText('Paid via bank');
         await user.click(noteTexts[0]);
         const inputs = container.querySelectorAll('.tx-notes-edit-input');
@@ -110,7 +111,7 @@ describe('TransactionTable', () => {
 
     test('pressing Enter on notes input commits the note', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[0]);
         const input = container.querySelector('.tx-notes-edit-input') as HTMLInputElement;
         await user.clear(input);
@@ -121,7 +122,7 @@ describe('TransactionTable', () => {
 
     test('pressing Escape on notes input cancels edit without calling onPatch', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[0]);
         const input = container.querySelector('.tx-notes-edit-input') as HTMLInputElement;
         await user.clear(input);
@@ -132,7 +133,7 @@ describe('TransactionTable', () => {
 
     test('blur on notes input commits the note', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[0]);
         const input = container.querySelector('.tx-notes-edit-input') as HTMLInputElement;
         await user.clear(input);
@@ -143,7 +144,7 @@ describe('TransactionTable', () => {
 
     test('committing empty notes calls onPatch with null', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[0]);
         const input = container.querySelector('.tx-notes-edit-input') as HTMLInputElement;
         await user.clear(input);
@@ -154,7 +155,7 @@ describe('TransactionTable', () => {
 
     test('clicking placeholder note opens edit with empty input', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         const placeholders = screen.getAllByText(/\+ añadir nota/i);
         await user.click(placeholders[0]);
         const input = container.querySelector('.tx-notes-edit-input') as HTMLInputElement;
@@ -166,7 +167,7 @@ describe('TransactionTable', () => {
 
     test('clicking notes text in mobile card shows edit input', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         // index 1 is the mobile card span (index 0 is desktop)
         const noteTexts = screen.getAllByText('Paid via bank');
         await user.click(noteTexts[1]);
@@ -176,7 +177,7 @@ describe('TransactionTable', () => {
 
     test('pressing Enter on mobile notes input commits the note', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[1]);
         const inputs = container.querySelectorAll('.tx-notes-edit-input');
         const mobileInput = inputs[inputs.length - 1] as HTMLInputElement;
@@ -187,7 +188,7 @@ describe('TransactionTable', () => {
 
     test('pressing Escape on mobile notes input cancels edit', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[1]);
         expect(container.querySelectorAll('.tx-notes-edit-input').length).toBeGreaterThan(0);
         const inputs = container.querySelectorAll('.tx-notes-edit-input');
@@ -198,12 +199,29 @@ describe('TransactionTable', () => {
 
     test('blur on mobile notes input commits the note', async () => {
         const user = userEvent.setup();
-        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} />);
+        const { container } = render(<TransactionTable transactions={[txWithNotes]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
         await user.click(screen.getAllByText('Paid via bank')[1]);
         const inputs = container.querySelectorAll('.tx-notes-edit-input');
         const mobileInput = inputs[inputs.length - 1] as HTMLInputElement;
         fireEvent.change(mobileInput, { target: { value: 'Mobile blur' } });
         fireEvent.blur(mobileInput);
         expect(mockOnPatch).toHaveBeenCalledWith('t4', { notes: 'Mobile blur' });
+    });
+
+    // ── edit button ───────────────────────────────────────────────────────────
+
+    test('calls onEdit with the correct transaction when edit button is clicked (desktop)', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        const editBtns = screen.getAllByLabelText('Editar');
+        fireEvent.click(editBtns[0]);
+        expect(mockOnEdit).toHaveBeenCalledWith(txExpense);
+    });
+
+    test('calls onEdit with the correct transaction when edit button is clicked (mobile card)', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        const editBtns = screen.getAllByLabelText('Editar');
+        expect(editBtns.length).toBe(2); // desktop + mobile
+        fireEvent.click(editBtns[1]);
+        expect(mockOnEdit).toHaveBeenCalledWith(txExpense);
     });
 });

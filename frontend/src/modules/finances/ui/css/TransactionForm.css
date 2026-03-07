@@ -62,12 +62,6 @@
 /* ─── TransactionForm responsive ─────────────── */
 @media (max-width: 600px) {
     .tx-form-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 380px) {
-    .tx-form-grid {
         grid-template-columns: 1fr;
     }
 }

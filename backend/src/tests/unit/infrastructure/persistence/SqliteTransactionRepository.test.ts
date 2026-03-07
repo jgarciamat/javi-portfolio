@@ -263,4 +263,83 @@ describe('SqliteTransactionRepository', () => {
         expect(results.length).toBe(1);
         expect(results[0].description).toBe('Coffee');
     });
+
+    // ── updateTransaction ─────────────────────────────────────────────────────
+
+    test('updateTransaction returns null for unknown id', async () => {
+        const result = await repo.updateTransaction('nonexistent', { description: 'test' });
+        expect(result).toBeNull();
+    });
+
+    test('updateTransaction updates description', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { description: 'Tea' });
+        expect(updated!.description).toBe('Tea');
+
+        const row = db.prepare('SELECT description FROM transactions WHERE id = ?').get(tx.id.value) as { description: string };
+        expect(row.description).toBe('Tea');
+    });
+
+    test('updateTransaction updates amount', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { amount: 9.99 });
+        expect(updated!.amount.value).toBe(9.99);
+    });
+
+    test('updateTransaction updates type', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { type: 'income' });
+        expect(updated!.type.value).toBe('INCOME');
+    });
+
+    test('updateTransaction updates category', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { category: 'Transport' });
+        expect(updated!.category).toBe('Transport');
+    });
+
+    test('updateTransaction updates date', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { date: '2025-06-15T12:00:00.000Z' });
+        expect(updated!.date.getMonth() + 1).toBe(6);
+        expect(updated!.date.getDate()).toBe(15);
+    });
+
+    test('updateTransaction updates notes', async () => {
+        const tx = makeTx();
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { notes: 'New note' });
+        expect(updated!.notes).toBe('New note');
+
+        const row = db.prepare('SELECT notes FROM transactions WHERE id = ?').get(tx.id.value) as { notes: string };
+        expect(row.notes).toBe('New note');
+    });
+
+    test('updateTransaction sets notes to null', async () => {
+        const tx = makeTx({ notes: 'Old note' });
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, { notes: null });
+        expect(updated!.notes).toBeNull();
+    });
+
+    test('updateTransaction with no changes returns entity unchanged', async () => {
+        const tx = makeTx({ notes: 'Stay' });
+        await repo.saveForUser(tx, 'user1');
+
+        const updated = await repo.updateTransaction(tx.id.value, {});
+        expect(updated!.notes).toBe('Stay');
+        expect(updated!.description).toBe('Coffee');
+    });
 });

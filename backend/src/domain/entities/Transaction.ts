@@ -78,6 +78,22 @@ export class Transaction {
         if ('notes' in changes) this._notes = changes.notes ?? null;
     }
 
+    update(changes: {
+        description?: string;
+        amount?: number;
+        type?: string;
+        category?: string;
+        date?: string | Date;
+        notes?: string | null;
+    }): void {
+        if (changes.description !== undefined) this._description = changes.description.trim();
+        if (changes.amount !== undefined) this._amount = Amount.create(changes.amount);
+        if (changes.type !== undefined) this._type = TransactionType.create(changes.type);
+        if (changes.category !== undefined) this._category = changes.category.trim();
+        if (changes.date !== undefined) this._date = new Date(changes.date);
+        if ('notes' in changes) this._notes = changes.notes ?? null;
+    }
+
     toJSON(): {
         id: string; description: string; amount: number; type: string;
         category: string; date: string; createdAt: string; notes: string | null;

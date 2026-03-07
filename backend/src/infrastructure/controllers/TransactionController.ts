@@ -58,6 +58,32 @@ export class TransactionController {
         }
     }
 
+    async update(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const { description, amount, type, category, date, notes } = req.body as {
+                description?: string;
+                amount?: number;
+                type?: string;
+                category?: string;
+                date?: string;
+                notes?: string | null;
+            };
+            const changes: Record<string, unknown> = {};
+            if (description !== undefined) changes.description = description;
+            if (amount !== undefined) changes.amount = amount;
+            if (type !== undefined) changes.type = type;
+            if (category !== undefined) changes.category = category;
+            if (date !== undefined) changes.date = date;
+            if ('notes' in req.body) changes.notes = notes;
+            const updated = await this.transactionRepo.updateTransaction(id, changes);
+            if (!updated) { res.status(404).json({ error: 'No encontrado' }); return; }
+            res.json(updated.toJSON());
+        } catch (e) {
+            res.status(400).json({ error: e instanceof Error ? e.message : 'Error' });
+        }
+    }
+
     async getAll(req: AuthRequest, res: Response): Promise<void> {
         try {
             const userId = req.userId!;

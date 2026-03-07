@@ -12,6 +12,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 import type {
     Transaction,
     CreateTransactionDTO,
+    UpdateTransactionDTO,
     Category,
     CreateCategoryDTO,
     FinancialSummary,
@@ -38,6 +39,7 @@ interface FinancesActions {
     addTransaction: (dto: CreateTransactionDTO) => Promise<Transaction>;
     removeTransaction: (id: string) => Promise<void>;
     patchTransaction: (id: string, changes: { notes?: string | null }) => Promise<void>;
+    updateTransaction: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
     addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
     removeCategory: (id: string) => Promise<void>;
     refresh: () => Promise<void>;
@@ -175,6 +177,17 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         [year, month, transactionApi]
     );
 
+    const updateTransaction = useCallback(
+        async (id: string, dto: UpdateTransactionDTO) => {
+            const updated = await transactionApi.update(id, dto);
+            cache.current.delete(`${year}-${month}`);
+            await fetchMonth({ silent: true });
+            // Optimistically update state too
+            setTransactions((prev) => prev.map((t) => (t.id === id ? updated : t)));
+        },
+        [year, month, transactionApi, fetchMonth]
+    );
+
     // ── Categories state ──────────────────────────────────────────────────────
     const [categories, setCategories] = useState<Category[]>([]);
 
@@ -228,6 +241,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         addTransaction,
         removeTransaction,
         patchTransaction,
+        updateTransaction,
         addCategory,
         removeCategory,
         refresh: fetchMonth,

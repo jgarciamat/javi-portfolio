@@ -17,7 +17,7 @@ function txAmountColor(type: TransactionType): string {
     return '#f87171';
 }
 
-export function TransactionTable({ transactions, onDelete, onPatch }: TransactionTableProps) {
+export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: TransactionTableProps) {
     const { t, tCategory } = useI18n();
     const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
     const [notesValue, setNotesValue] = useState('');
@@ -103,6 +103,7 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
                                     {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
                                 </td>
                                 <td>
+                                    <button className="btn-edit" onClick={() => onEdit(tx)} title={t('app.transaction.table.edit')} aria-label={t('app.transaction.table.edit')}>✏️</button>
                                     <button className="btn-delete" onClick={() => onDelete(tx.id)} title={t('app.transaction.table.delete')} aria-label={t('app.transaction.table.delete')}>🗑️</button>
                                 </td>
                             </tr>
@@ -143,7 +144,10 @@ export function TransactionTable({ transactions, onDelete, onPatch }: Transactio
                                 {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
                             </span>
                             <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
-                            <button className="btn-delete" onClick={() => onDelete(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                <button className="btn-edit" onClick={() => onEdit(tx)} aria-label={t('app.transaction.table.edit')}>✏️</button>
+                                <button className="btn-delete" onClick={() => onDelete(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                            </div>
                         </div>
                     </div>
                 ))}

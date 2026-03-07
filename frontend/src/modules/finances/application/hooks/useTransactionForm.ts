@@ -6,6 +6,14 @@ interface UseTransactionFormOptions {
     viewMonth: number;
     availableBalance: number;
     onSubmit: (dto: CreateTransactionDTO) => Promise<void>;
+    initialValues?: {
+        description?: string;
+        amount?: string;
+        type?: TransactionType;
+        category?: string;
+        date?: string;
+        notes?: string;
+    };
 }
 
 function getDefaultDate(viewYear: number, viewMonth: number): string {
@@ -34,20 +42,22 @@ export function useTransactionForm({
     viewMonth,
     availableBalance,
     onSubmit,
+    initialValues,
 }: UseTransactionFormOptions) {
     const defaultDate = getDefaultDate(viewYear, viewMonth);
 
-    const [description, setDescription] = useState('');
-    const [amount, setAmount] = useState('');
-    const [type, setType] = useState<TransactionType>('EXPENSE');
-    const [category, setCategory] = useState('');
-    const [date, setDate] = useState(defaultDate);
-    const [notes, setNotes] = useState('');
+    const [description, setDescription] = useState(initialValues?.description ?? '');
+    const [amount, setAmount] = useState(initialValues?.amount ?? '');
+    const [type, setType] = useState<TransactionType>(initialValues?.type ?? 'EXPENSE');
+    const [category, setCategory] = useState(initialValues?.category ?? '');
+    const [date, setDate] = useState(initialValues?.date ?? defaultDate);
+    const [notes, setNotes] = useState(initialValues?.notes ?? '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Reset all fields when the viewed month changes
+    // Reset all fields when the viewed month changes (only when no initialValues)
     useEffect(() => {
+        if (initialValues) return;
         setDescription('');
         setAmount('');
         setType('EXPENSE');

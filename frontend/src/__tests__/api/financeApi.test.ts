@@ -108,6 +108,28 @@ describe('transactionApi', () => {
         const headers = mockFetch.mock.calls[0][1].headers;
         expect(headers['Authorization']).toBeUndefined();
     });
+
+    test('patch sends PATCH to /transactions/:id', async () => {
+        const tx = { id: 't1', description: 'Bus', amount: 10, type: 'EXPENSE', category: 'Transport', date: '2025-01-05', createdAt: '2025-01-05', notes: 'Paid' };
+        mockFetch.mockResolvedValueOnce(makeResponse(tx));
+        const result = await transactionApi.patch('t1', { notes: 'Paid' });
+        expect(result).toEqual(tx);
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/transactions/t1',
+            expect.objectContaining({ method: 'PATCH' }),
+        );
+    });
+
+    test('update sends PUT to /transactions/:id', async () => {
+        const tx = { id: 't1', description: 'Lunch', amount: 12, type: 'EXPENSE', category: 'Food', date: '2025-01-05', createdAt: '2025-01-05', notes: null };
+        mockFetch.mockResolvedValueOnce(makeResponse(tx));
+        const result = await transactionApi.update('t1', { description: 'Lunch', amount: 12 });
+        expect(result).toEqual(tx);
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/transactions/t1',
+            expect.objectContaining({ method: 'PUT' }),
+        );
+    });
 });
 
 describe('categoryApi', () => {

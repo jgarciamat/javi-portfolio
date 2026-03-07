@@ -4,6 +4,7 @@ export interface TransactionTableProps {
     transactions: Transaction[];
     onDelete: (id: string) => void;
     onPatch: (id: string, changes: { notes?: string | null }) => void;
+    onEdit: (tx: Transaction) => void;
 }
 
 export function formatCurrency(amount: number): string {

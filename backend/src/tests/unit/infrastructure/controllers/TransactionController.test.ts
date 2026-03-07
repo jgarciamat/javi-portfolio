@@ -53,6 +53,7 @@ function makeRepo(): jest.Mocked<SqliteTransactionRepository> {
         computeCarryover: jest.fn(),
         delete: jest.fn(),
         patchTransaction: jest.fn(),
+        updateTransaction: jest.fn(),
     } as unknown as jest.Mocked<SqliteTransactionRepository>;
 }
 
@@ -435,5 +436,119 @@ describe('TransactionController.annual()', () => {
         await controller.annual(req, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+// ── update() ─────────────────────────────────────────────────────────────────
+
+describe('TransactionController.update()', () => {
+    let repo: jest.Mocked<SqliteTransactionRepository>;
+    let controller: TransactionController;
+
+    beforeEach(() => {
+        repo = makeRepo();
+        controller = new TransactionController(repo);
+    });
+
+    test('returns 200 with updated transaction on success', async () => {
+        const tx = makeTx({ description: 'Updated coffee', amount: 4.5 });
+        repo.updateTransaction.mockResolvedValue(tx);
+
+        const req = makeReq({
+            params: { id: tx.id.value },
+            body: { description: 'Updated coffee', amount: 4.5 },
+        });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(repo.updateTransaction).toHaveBeenCalledWith(
+            tx.id.value,
+            expect.objectContaining({ description: 'Updated coffee', amount: 4.5 }),
+        );
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ description: 'Updated coffee' }));
+    });
+
+    test('returns 404 when transaction not found', async () => {
+        repo.updateTransaction.mockResolvedValue(null);
+
+        const req = makeReq({ params: { id: 'missing-id' }, body: { description: 'test' } });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ error: 'No encontrado' });
+    });
+
+    test('returns 400 when repo throws validation error', async () => {
+        repo.updateTransaction.mockRejectedValue(new Error('Invalid amount'));
+
+        const req = makeReq({ params: { id: 'any-id' }, body: { amount: -1 } });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Invalid amount' });
+    });
+
+    test('returns 400 with generic message when non-Error thrown', async () => {
+        repo.updateTransaction.mockRejectedValue('unexpected');
+
+        const req = makeReq({ params: { id: 'any-id' }, body: {} });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Error' });
+    });
+
+    test('passes all fields to updateTransaction when provided', async () => {
+        const tx = makeTx();
+        repo.updateTransaction.mockResolvedValue(tx);
+
+        const req = makeReq({
+            params: { id: tx.id.value },
+            body: {
+                description: 'Lunch',
+                amount: 12,
+                type: 'expense',
+                category: 'Food',
+                date: '2025-03-10T12:00:00.000Z',
+                notes: 'With colleagues',
+            },
+        });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(repo.updateTransaction).toHaveBeenCalledWith(
+            tx.id.value,
+            expect.objectContaining({
+                description: 'Lunch',
+                amount: 12,
+                type: 'expense',
+                category: 'Food',
+                date: '2025-03-10T12:00:00.000Z',
+                notes: 'With colleagues',
+            }),
+        );
+    });
+
+    test('passes notes: null correctly when notes is null in body', async () => {
+        const tx = makeTx({ notes: null });
+        repo.updateTransaction.mockResolvedValue(tx);
+
+        const req = makeReq({ params: { id: tx.id.value }, body: { notes: null } });
+        const res = makeRes();
+
+        await controller.update(req, res as Response);
+
+        expect(repo.updateTransaction).toHaveBeenCalledWith(
+            tx.id.value,
+            expect.objectContaining({ notes: null }),
+        );
     });
 });

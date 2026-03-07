@@ -1,0 +1,81 @@
+/* ─── Edit Transaction Modal ─────────────────── */
+.edit-tx-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.edit-tx-modal {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+    animation: editModalIn 0.18s ease;
+}
+
+@keyframes editModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.edit-tx-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.edit-tx-modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.edit-tx-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0.25rem;
+    transition: color 0.15s;
+}
+
+.edit-tx-modal-close:hover {
+    color: #f1f5f9;
+}
+
+.edit-tx-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.edit-tx-modal-actions>button {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .edit-tx-modal {
+        padding: 1.1rem;
+        border-radius: 10px;
+    }
+}

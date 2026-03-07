@@ -11,6 +11,7 @@ import { MONTH_NAMES } from '../types';
 import { SummaryCards } from './SummaryCards';
 import { TransactionTable } from './TransactionTable';
 import { TransactionForm } from './TransactionForm';
+import { EditTransactionModal } from './EditTransactionModal';
 import { CategoryChart } from './CategoryChart';
 import { AnnualChart } from './AnnualChart';
 import { CategoryManager } from './CategoryManager';
@@ -18,12 +19,14 @@ import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { BudgetAlerts } from './BudgetAlerts';
 import { AIAdvisor } from './AIAdvisor';
 import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
+import type { Transaction } from '@modules/finances/domain/types';
 
 export function Dashboard() {
     const now = new Date();
     const [tab, setTab] = useState<'monthly' | 'annual'>('monthly');
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
     const { user, logout } = useAuth();
     const { t, tCategory } = useI18n();
@@ -33,7 +36,7 @@ export function Dashboard() {
         transactions, summary, carryover,
         categories, loading, error,
         isPrevDisabled, goToPrev, goToNext, navigateTo,
-        addTransaction, removeTransaction, patchTransaction,
+        addTransaction, removeTransaction, patchTransaction, updateTransaction,
         addCategory, removeCategory,
     } = useFinances();
 
@@ -156,7 +159,12 @@ export function Dashboard() {
                                 title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}
                                 style={{ marginBottom: '0' }}
                             >
-                                <TransactionTable transactions={transactions} onDelete={removeTransaction} onPatch={patchTransaction} />
+                                <TransactionTable
+                                    transactions={transactions}
+                                    onDelete={removeTransaction}
+                                    onPatch={patchTransaction}
+                                    onEdit={setEditingTransaction}
+                                />
                             </CollapsiblePanel>
 
                             {summary && transactions.length > 0 && (
@@ -183,6 +191,23 @@ export function Dashboard() {
 
             {/* Profile panel */}
             {showProfile && <ProfilePage onClose={() => setShowProfile(false)} />}
+
+            {/* Edit transaction modal */}
+            {editingTransaction && (
+                <EditTransactionModal
+                    transaction={editingTransaction}
+                    categories={categories}
+                    onSave={async (id, dto) => {
+                        await updateTransaction(id, dto);
+                        setEditingTransaction(null);
+                    }}
+                    onClose={() => setEditingTransaction(null)}
+                    onManageCategories={() => { setEditingTransaction(null); setShowCategoryModal(true); }}
+                    viewYear={year}
+                    viewMonth={month}
+                    availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}
+                />
+            )}
         </div>
     );
 }

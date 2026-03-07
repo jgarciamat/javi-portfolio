@@ -55,6 +55,13 @@ export const transactionApi = {
         });
     },
 
+    update(id: string, dto: Partial<CreateTransactionDTO>) {
+        return request<Transaction>(`/transactions/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(dto),
+        });
+    },
+
     getSummary(params?: { year?: number; month?: number }) {
         const query = new URLSearchParams(
             Object.entries(params ?? {})
