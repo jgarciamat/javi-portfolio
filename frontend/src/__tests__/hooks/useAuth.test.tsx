@@ -93,6 +93,37 @@ describe('useAuth / AuthProvider', () => {
         expect(screen.getByTestId('auth').textContent).toBe('false');
     });
 
+    test('expired token on mount results in user being null', () => {
+        const expired = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6MX0.sig';
+        localStorage.setItem('mm_token', expired);
+        localStorage.setItem('mm_refresh_token', 'some-refresh');
+        localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'OldUser', email: 'o@b' }));
+        render(<AuthProvider><TestComponent /></AuthProvider>);
+        expect(screen.getByTestId('user').textContent).toBe('no-user');
+        expect(screen.getByTestId('auth').textContent).toBe('false');
+    });
+
+    test('loadToken clears all stale localStorage entries when token is expired', () => {
+        const expired = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6MX0.sig';
+        localStorage.setItem('mm_token', expired);
+        localStorage.setItem('mm_refresh_token', 'stale-refresh');
+        localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'OldUser', email: 'o@b' }));
+        render(<AuthProvider><TestComponent /></AuthProvider>);
+        expect(localStorage.getItem('mm_token')).toBeNull();
+        expect(localStorage.getItem('mm_refresh_token')).toBeNull();
+        expect(localStorage.getItem('mm_user')).toBeNull();
+    });
+
+    test('loadToken clears stale storage when no token is present', () => {
+        // No token in storage but user and refresh still there (e.g. from logout gone wrong)
+        localStorage.setItem('mm_refresh_token', 'leftover-refresh');
+        localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'Ghost', email: 'g@b' }));
+        render(<AuthProvider><TestComponent /></AuthProvider>);
+        expect(localStorage.getItem('mm_refresh_token')).toBeNull();
+        expect(localStorage.getItem('mm_user')).toBeNull();
+        expect(screen.getByTestId('auth').textContent).toBe('false');
+    });
+
     test('handles corrupt localStorage gracefully (loadUser error branch)', () => {
         localStorage.setItem('mm_user', 'not-valid-json{{{');
         render(<AuthProvider><TestComponent /></AuthProvider>);

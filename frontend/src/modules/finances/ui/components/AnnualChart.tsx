@@ -5,7 +5,7 @@ import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import '../css/AnnualChart.css';
 import type { AnnualChartProps } from '../types';
 import { MONTH_SHORT, fmtCurrency } from '../types';
-import { isNextButtonDisabled, isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
+import { isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
 import { useI18n } from '@core/i18n/I18nContext';
 import { AnnualMonthTable } from './AnnualMonthTable';
 
@@ -58,11 +58,9 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
         { income: 0, expenses: 0, saving: 0 }
     );
 
-    // Next-year button: disabled if the entire next year is beyond the 7-day rule.
-    // Use January of the next year as the probe: if January of next year is not yet accessible,
-    // navigating to that year is not allowed either.
     const now = new Date();
-    const nextYearDisabled = isNextButtonDisabled(year + 1, 1, now);
+    // Allow navigating up to 1 year ahead of the current year
+    const nextYearDisabled = year >= now.getFullYear() + 1;
 
     return (
         <div className="annual-view">

@@ -1,63 +1,48 @@
-import { isNextMonthAllowed, isNextButtonDisabled, isMonthInFuture } from '../../../modules/finances/domain/nextMonthLogic';
+import { isNextButtonDisabled, isMonthInFuture } from '../../../modules/finances/domain/nextMonthLogic';
 
 function makeDate(year: number, month: number, day: number): Date {
     return new Date(year, month - 1, day);
 }
 
-describe('isNextMonthAllowed', () => {
-    it('returns false when many days remain in the month (e.g. 15th of a 31-day month)', () => {
-        // Feb 15 → 28 days total, 13 days until next month
-        expect(isNextMonthAllowed(makeDate(2026, 2, 15))).toBe(false);
-    });
-
-    it('returns false when exactly 7 days remain (i.e. daysUntilNext = 7)', () => {
-        // Jan has 31 days; Jan 24 → daysUntilNext = 7 → NOT yet allowed
-        expect(isNextMonthAllowed(makeDate(2026, 1, 24))).toBe(false);
-    });
-
-    it('returns true when 6 days remain (i.e. the 25th of a 31-day month)', () => {
-        // Jan 25 → daysUntilNext = 6 → allowed
-        expect(isNextMonthAllowed(makeDate(2026, 1, 25))).toBe(true);
-    });
-
-    it('returns true on the last day of the month', () => {
-        expect(isNextMonthAllowed(makeDate(2026, 1, 31))).toBe(true);
-    });
-
-    it('returns true in February near end (short month)', () => {
-        // Feb 2026 has 28 days; Feb 22 → daysUntilNext = 6 → allowed
-        expect(isNextMonthAllowed(makeDate(2026, 2, 22))).toBe(true);
-    });
-});
-
 describe('isNextButtonDisabled', () => {
-    it('disables when currently viewing current month and next is not yet allowed', () => {
-        // Jan 15 2026 — next month not yet allowed, viewing Jan 2026
-        expect(isNextButtonDisabled(2026, 1, makeDate(2026, 1, 15))).toBe(true);
+    it('disables when viewing the next month (current + 1)', () => {
+        // Today is March 7 2026 — April 2026 is current+1 → button should be disabled when already on April
+        expect(isNextButtonDisabled(2026, 4, makeDate(2026, 3, 7))).toBe(true);
     });
 
-    it('disables when viewing the next month even if it is allowed', () => {
-        // Jan 25 2026 — next month (Feb) is allowed but user is already on Feb 2026
-        expect(isNextButtonDisabled(2026, 2, makeDate(2026, 1, 25))).toBe(true);
+    it('enables when viewing the current month (can navigate to current + 1)', () => {
+        // Today is March 7 2026 — viewing March → can go to April → enabled
+        expect(isNextButtonDisabled(2026, 3, makeDate(2026, 3, 7))).toBe(false);
     });
 
-    it('enables when on current month and next month is allowed (within 7 days)', () => {
-        // Jan 25 2026 — next month allowed, viewing Jan 2026 → "Siguiente" should be ENABLED
-        expect(isNextButtonDisabled(2026, 1, makeDate(2026, 1, 25))).toBe(false);
+    it('enables even at the start of the month (no 7-day restriction)', () => {
+        // Today is Jan 1 2026 — viewing Jan → can go to Feb → enabled
+        expect(isNextButtonDisabled(2026, 1, makeDate(2026, 1, 1))).toBe(false);
     });
 
-    it('disables when viewing a future year', () => {
-        expect(isNextButtonDisabled(2027, 1, makeDate(2026, 1, 25))).toBe(true);
+    it('disables when viewing a month 2+ months ahead', () => {
+        // Today is March 7 2026 — viewing May 2026 (2 months ahead) → disabled
+        expect(isNextButtonDisabled(2026, 5, makeDate(2026, 3, 7))).toBe(true);
     });
 
-    it('handles December → January year transition correctly (next allowed)', () => {
-        // Dec 25 2026 — next month is Jan 2027. Viewing Dec 2026 → enabled
-        expect(isNextButtonDisabled(2026, 12, makeDate(2026, 12, 25))).toBe(false);
+    it('disables when viewing a future year beyond current+1', () => {
+        // Today is March 7 2026 — viewing 2028 → disabled
+        expect(isNextButtonDisabled(2028, 1, makeDate(2026, 3, 7))).toBe(true);
     });
 
-    it('handles December → January year transition correctly (next not yet allowed)', () => {
-        // Dec 10 2026 — next month not allowed. Viewing Dec 2026 → disabled
-        expect(isNextButtonDisabled(2026, 12, makeDate(2026, 12, 10))).toBe(true);
+    it('handles December → January wrap correctly (enables when on December)', () => {
+        // Today is Dec 7 2026 — viewing Dec 2026 → can go to Jan 2027 → enabled
+        expect(isNextButtonDisabled(2026, 12, makeDate(2026, 12, 7))).toBe(false);
+    });
+
+    it('handles December → January wrap correctly (disables when on January of next year)', () => {
+        // Today is Dec 7 2026 — viewing Jan 2027 (= current+1) → disabled
+        expect(isNextButtonDisabled(2027, 1, makeDate(2026, 12, 7))).toBe(true);
+    });
+
+    it('disables when viewing February of next year (2 months ahead of December)', () => {
+        // Today is Dec 2026 — viewing Feb 2027 → disabled
+        expect(isNextButtonDisabled(2027, 2, makeDate(2026, 12, 7))).toBe(true);
     });
 });
 
@@ -74,7 +59,7 @@ describe('isMonthInFuture', () => {
         expect(isMonthInFuture(2025, 12, makeDate(2026, 3, 4))).toBe(false);
     });
 
-    it('returns true for next month', () => {
+    it('returns true for next month (current + 1)', () => {
         expect(isMonthInFuture(2026, 4, makeDate(2026, 3, 4))).toBe(true);
     });
 

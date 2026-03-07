@@ -9,7 +9,6 @@ import { CategoryManager } from './CategoryManager';
 import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView } from './MonthlyView';
-import { isNextButtonDisabled } from '@modules/finances/domain/nextMonthLogic';
 import type { Transaction } from '@modules/finances/domain/types';
 
 export function Dashboard() {
@@ -25,13 +24,12 @@ export function Dashboard() {
         year, month,
         transactions, summary, carryover,
         categories, loading, error,
-        isPrevDisabled, goToPrev, goToNext, navigateTo,
+        isPrevDisabled, isNextDisabled, goToPrev, goToNext, navigateTo,
         addTransaction, removeTransaction, patchTransaction, updateTransaction,
         addCategory, removeCategory,
     } = useFinances();
 
     const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
-    const isNextDisabled = isNextButtonDisabled(year, month, now);
 
     return (
         <div className="dashboard">

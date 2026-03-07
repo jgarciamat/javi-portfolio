@@ -77,10 +77,17 @@ describe('AnnualChart', () => {
         }
     });
 
-    test('nextYear button is disabled when at current year', async () => {
+    test('nextYear button is enabled when viewing current year (can navigate 1 year ahead)', async () => {
         render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
         const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 1}`));
+        expect(nextBtn).not.toBeDisabled();
+    });
+
+    test('nextYear button is disabled when already at current year + 1', async () => {
+        render(<AnnualChart initialYear={CURRENT_YEAR + 1} />);
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR + 1}`, 'i'))).toBeInTheDocument());
+        const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 2}`));
         expect(nextBtn).toBeDisabled();
     });
 

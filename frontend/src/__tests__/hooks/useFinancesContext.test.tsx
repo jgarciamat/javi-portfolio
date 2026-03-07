@@ -46,6 +46,7 @@ function Consumer() {
             <div data-testid="balance">{ctx.summary?.balance ?? 'null'}</div>
             <button onClick={ctx.goToPrev}>prev</button>
             <button onClick={ctx.goToNext}>next</button>
+            <button onClick={() => ctx.navigateTo(2026, 12)}>goto-dec</button>
             <button onClick={() => ctx.addTransaction({ description: 'New', amount: 50, type: 'INCOME', category: 'Salary' })}>add-tx</button>
             <button onClick={() => ctx.removeTransaction('t1')}>del-tx</button>
             <button onClick={() => ctx.patchTransaction('t1', { notes: 'Patched note' })}>patch-notes</button>
@@ -90,7 +91,7 @@ describe('FinancesContext / FinancesProvider', () => {
             budgetApi: stableBudgetApi,
         });
 
-        useAuth.mockReturnValue({ token: 'tok-test', user: { name: 'Tester' } });
+        useAuth.mockReturnValue({ token: 'tok-test', user: { name: 'Tester' }, logout: jest.fn() });
     });
 
     test('loads transactions, summary and categories on mount', async () => {
@@ -232,20 +233,23 @@ describe('FinancesContext / FinancesProvider', () => {
     });
 
     test('goToNext wraps year when month is December', async () => {
-        render(<Wrapper />);
-        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
-        let currentMonth = parseInt(screen.getByTestId('month').textContent ?? '6', 10);
-        while (currentMonth < 12) {
+        // Simulate being in December so the max allowed month is January (next year),
+        // which means navigateTo(2026, 12) is within bounds and next→Jan 2027 is allowed
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 11, 15)); // Dec 15 2026
+        try {
+            render(<Wrapper />);
+            // Initial month should be December (current month from fake timer)
+            await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('12'));
+            const yearBeforeWrap = parseInt(screen.getByTestId('year').textContent ?? '2026', 10);
+
+            // One more next should go to January of next year (Jan 2027 = Dec+1)
             fireEvent.click(screen.getByText('next'));
-            await waitFor(() => {
-                currentMonth = parseInt(screen.getByTestId('month').textContent ?? '12', 10);
-            });
+            await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('1'));
+            expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearBeforeWrap + 1);
+        } finally {
+            jest.useRealTimers();
         }
-        // Now at month=12, one more next should go to January of next year
-        const yearBeforeWrap = parseInt(screen.getByTestId('year').textContent ?? '2025', 10);
-        fireEvent.click(screen.getByText('next'));
-        await waitFor(() => expect(screen.getByTestId('month').textContent).toBe('1'));
-        expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearBeforeWrap + 1);
     });
 
     test('useFinances throws when used outside FinancesProvider', () => {
@@ -256,7 +260,7 @@ describe('FinancesContext / FinancesProvider', () => {
     });
 
     test('fetchCategories does not fetch when token is null', async () => {
-        useAuth.mockReturnValue({ token: null, user: null });
+        useAuth.mockReturnValue({ token: null, user: null, logout: jest.fn() });
         render(<Wrapper />);
         await new Promise((r) => setTimeout(r, 50));
         expect(mockGetAllCats).not.toHaveBeenCalled();
@@ -311,5 +315,71 @@ describe('FinancesContext / FinancesProvider', () => {
 
         // getAll should NOT have been called again
         expect(mockGetAll.mock.calls.length).toBe(getAllCallsBefore);
+    });
+
+    // ── Session expiry ────────────────────────────────────────────────────────
+
+    test('calls logout instead of setError when fetchMonth throws "Sesión expirada"', async () => {
+        const mockLogout = jest.fn();
+        useAuth.mockReturnValue({ token: 'tok-test', user: { name: 'Tester' }, logout: mockLogout });
+        mockGetAll.mockRejectedValueOnce(new Error('Sesión expirada. Por favor inicia sesión de nuevo.'));
+
+        render(<Wrapper />);
+        await waitFor(() => expect(mockLogout).toHaveBeenCalledTimes(1));
+        // Error should NOT be shown in the UI
+        expect(screen.getByTestId('error').textContent).toBe('');
+    });
+
+    test('does NOT call logout for regular errors (only sets error state)', async () => {
+        const mockLogout = jest.fn();
+        useAuth.mockReturnValue({ token: 'tok-test', user: { name: 'Tester' }, logout: mockLogout });
+        mockGetAll.mockRejectedValueOnce(new Error('Network error'));
+
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('error').textContent).toBe('Network error'));
+        expect(mockLogout).not.toHaveBeenCalled();
+    });
+
+    // ── isNextDisabled ────────────────────────────────────────────────────────
+
+    test('isNextDisabled is exposed in context value', async () => {
+        function IsNextConsumer() {
+            const { isNextDisabled } = useFinances();
+            return <div data-testid="is-next-disabled">{String(isNextDisabled)}</div>;
+        }
+        render(<FinancesProvider><IsNextConsumer /></FinancesProvider>);
+        await waitFor(() => expect(screen.getByTestId('is-next-disabled')).toBeInTheDocument());
+        // Value is a boolean — either true or false depending on current date
+        const val = screen.getByTestId('is-next-disabled').textContent;
+        expect(val === 'true' || val === 'false').toBe(true);
+    });
+
+    test('goToNext is blocked when already at the maximum allowed month', async () => {
+        // Navigate forward until isNextDisabled is true, then verify next click does nothing
+        render(<Wrapper />);
+        await waitFor(() => expect(screen.getByTestId('tx-count').textContent).toBe('1'));
+
+        const now = new Date();
+        const maxYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+        const maxMonth = now.getMonth() === 11 ? 1 : now.getMonth() + 2;
+
+        // Navigate forward until we reach the max month
+        let yr = parseInt(screen.getByTestId('year').textContent ?? '0', 10);
+        let mo = parseInt(screen.getByTestId('month').textContent ?? '0', 10);
+        while (yr < maxYear || (yr === maxYear && mo < maxMonth)) {
+            fireEvent.click(screen.getByText('next'));
+            await waitFor(() => {
+                yr = parseInt(screen.getByTestId('year').textContent ?? '0', 10);
+                mo = parseInt(screen.getByTestId('month').textContent ?? '0', 10);
+            });
+        }
+
+        // We should now be at maxMonth — one more click must not move forward
+        const yearBefore = parseInt(screen.getByTestId('year').textContent ?? '0', 10);
+        const monthBefore = parseInt(screen.getByTestId('month').textContent ?? '0', 10);
+        fireEvent.click(screen.getByText('next'));
+        await new Promise((r) => setTimeout(r, 50));
+        expect(parseInt(screen.getByTestId('year').textContent ?? '0', 10)).toBe(yearBefore);
+        expect(parseInt(screen.getByTestId('month').textContent ?? '0', 10)).toBe(monthBefore);
     });
 });

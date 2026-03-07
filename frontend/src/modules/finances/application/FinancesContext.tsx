@@ -6,8 +6,7 @@ import {
     useRef,
     useEffect,
     type ReactNode,
-} from 'react';
-import { useApi } from '@core/context/ApiContext';
+} from 'react'; import { useApi } from '@core/context/ApiContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import type {
     Transaction,
@@ -34,6 +33,7 @@ interface FinancesState {
 
 interface FinancesActions {
     isPrevDisabled: boolean;
+    isNextDisabled: boolean;
     goToPrev: () => void;
     goToNext: () => void;
     navigateTo: (year: number, month: number) => void;
@@ -67,12 +67,18 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     const { token, logout } = useAuth();
 
     // ── Navigation ────────────────────────────────────────────────────────────
-    const now = new Date();
+    // Capture 'now' once on mount — used only for initial state and navigation bounds
+    const nowRef = useRef(new Date());
+    const now = nowRef.current;
     const [year, setYear] = useState(now.getFullYear());
     const [month, setMonth] = useState(now.getMonth() + 1);
 
     const MIN_YEAR = 2026;
     const MIN_MONTH = 1;
+
+    // Maximum allowed: 1 month ahead of today (fixed at mount time)
+    const maxYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+    const maxMonth = now.getMonth() === 11 ? 1 : now.getMonth() + 2;
 
     const isPrevDisabled = year === MIN_YEAR && month === MIN_MONTH;
 
@@ -83,15 +89,19 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     }, [month, year]);
 
     const goToNext = useCallback(() => {
+        // Block if already at the max allowed month (current + 1)
+        if (year > maxYear || (year === maxYear && month >= maxMonth)) return;
         setYear((y) => (month === 12 ? y + 1 : y));
         setMonth((m) => (m === 12 ? 1 : m + 1));
-    }, [month]);
+    }, [month, year, maxYear, maxMonth]);
 
     const navigateTo = useCallback((targetYear: number, targetMonth: number) => {
         if (targetYear < MIN_YEAR || (targetYear === MIN_YEAR && targetMonth < MIN_MONTH)) return;
+        // Also block navigation beyond max allowed month
+        if (targetYear > maxYear || (targetYear === maxYear && targetMonth > maxMonth)) return;
         setYear(targetYear);
         setMonth(targetMonth);
-    }, []);
+    }, [maxYear, maxMonth]);
 
     // ── Transactions state ────────────────────────────────────────────────────
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -207,6 +217,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
         loading,
         error,
         isPrevDisabled,
+        isNextDisabled: year > maxYear || (year === maxYear && month >= maxMonth),
         goToPrev,
         goToNext,
         navigateTo,
