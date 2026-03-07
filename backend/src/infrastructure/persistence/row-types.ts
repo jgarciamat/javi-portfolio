@@ -57,3 +57,19 @@ export interface BalanceRow {
 export interface SqlMasterRow {
     sql: string;
 }
+
+export interface RecurringRuleRow {
+    id: string;
+    user_id: string;
+    description: string;
+    amount: number;
+    type: string;
+    category: string;
+    start_year: number;
+    start_month: number;
+    end_year: number | null;
+    end_month: number | null;
+    frequency: string;
+    active: number;
+    created_at: string;
+}

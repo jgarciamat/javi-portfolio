@@ -86,6 +86,8 @@ function initSchema(db: Database.Database): void {
   migrateUsersPasswordReset(db);
   // Migration: add reset_email_sent column if missing
   migrateUsersResetEmailSent(db);
+  // Migration: add recurring_rules table if missing
+  migrateRecurringRules(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -154,4 +156,26 @@ function migrateUsersResetEmailSent(db: Database.Database): void {
   if (!info.sql.includes('reset_email_sent')) {
     db.exec(`ALTER TABLE users ADD COLUMN reset_email_sent INTEGER NOT NULL DEFAULT 0`);
   }
+}
+
+function migrateRecurringRules(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS recurring_rules (
+      id          TEXT PRIMARY KEY,
+      user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      description TEXT NOT NULL,
+      amount      REAL NOT NULL,
+      type        TEXT NOT NULL CHECK(type IN ('INCOME','EXPENSE','SAVING')),
+      category    TEXT NOT NULL,
+      start_year  INTEGER NOT NULL,
+      start_month INTEGER NOT NULL,
+      end_year    INTEGER,
+      end_month   INTEGER,
+      frequency   TEXT NOT NULL DEFAULT 'monthly' CHECK(frequency IN ('monthly','bimonthly')),
+      active      INTEGER NOT NULL DEFAULT 1,
+      created_at  TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_recurring_rules_user_id ON recurring_rules(user_id);
+  `);
 }

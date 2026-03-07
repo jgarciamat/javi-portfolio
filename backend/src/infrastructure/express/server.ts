@@ -10,10 +10,12 @@ import { SqliteCategoryRepository } from '@infrastructure/persistence/SqliteCate
 import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/SqliteMonthlyBudgetRepository';
 
 import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/SqliteRefreshTokenRepository';
+import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/SqliteRecurringRuleRepository';
 
 import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
+import { CreateRecurringRule, GetRecurringRules, UpdateRecurringRule, DeleteRecurringRule } from '@application/use-cases/RecurringRules';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
@@ -22,6 +24,7 @@ import { BudgetController } from '@infrastructure/controllers/BudgetController';
 import { ProfileController } from '@infrastructure/controllers/ProfileController';
 import { AlertController } from '@infrastructure/controllers/AlertController';
 import { AIController } from '@infrastructure/controllers/AIController';
+import { RecurringRuleController } from '@infrastructure/controllers/RecurringRuleController';
 import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
 import { CheckBudgetAlerts } from '@application/use-cases/CheckBudgetAlerts';
@@ -42,6 +45,7 @@ const transactionRepo = new SqliteTransactionRepository(db);
 const categoryRepo = new SqliteCategoryRepository(db);
 const budgetRepo = new SqliteMonthlyBudgetRepository(db);
 const refreshTokenRepo = new SqliteRefreshTokenRepository(db);
+const recurringRuleRepo = new SqliteRecurringRuleRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
 async function seedAdmin(): Promise<void> {
@@ -93,6 +97,12 @@ const profileController = new ProfileController(
 );
 const alertController = new AlertController(checkBudgetAlerts);
 const aiController = new AIController(getAIAdvice, transactionRepo, budgetRepo);
+const recurringRuleController = new RecurringRuleController(
+    new CreateRecurringRule(recurringRuleRepo),
+    new GetRecurringRules(recurringRuleRepo),
+    new UpdateRecurringRule(recurringRuleRepo),
+    new DeleteRecurringRule(recurringRuleRepo),
+);
 
 // --- Routes ---
 const router = express.Router();
@@ -139,6 +149,12 @@ router.get('/alerts/budget/:year/:month', (req: Request, res: Response) => alert
 
 // AI Advisor
 router.post('/ai/advice', (req: Request, res: Response) => aiController.getAdvice(req as AuthRequest, res));
+
+// Recurring rules
+router.get('/recurring-rules', (req: Request, res: Response) => recurringRuleController.getAll(req as AuthRequest, res));
+router.post('/recurring-rules', (req: Request, res: Response) => recurringRuleController.create(req as AuthRequest, res));
+router.patch('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.update(req as AuthRequest, res));
+router.delete('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.delete(req as AuthRequest, res));
 
 app.use('/api', router);
 

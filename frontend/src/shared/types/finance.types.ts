@@ -11,4 +11,8 @@ export type {
     MonthData,
     AnnualSummary,
     CarryoverData,
+    RecurringFrequency,
+    RecurringRule,
+    CreateRecurringRuleDTO,
+    UpdateRecurringRuleDTO,
 } from '@modules/finances/domain/types';

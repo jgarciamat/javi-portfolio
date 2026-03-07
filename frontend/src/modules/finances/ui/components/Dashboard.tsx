@@ -9,11 +9,12 @@ import { CategoryManager } from './CategoryManager';
 import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView } from './MonthlyView';
+import { RecurringRulesTab } from './RecurringRulesTab';
 import type { Transaction } from '@modules/finances/domain/types';
 
 export function Dashboard() {
     const now = new Date();
-    const [tab, setTab] = useState<'monthly' | 'annual'>('monthly');
+    const [tab, setTab] = useState<'monthly' | 'annual' | 'automations'>('monthly');
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -30,6 +31,48 @@ export function Dashboard() {
     } = useFinances();
 
     const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+
+    const handleSaveEdit = async (id: string, dto: Parameters<typeof updateTransaction>[1]) => {
+        await updateTransaction(id, dto);
+        setEditingTransaction(null);
+    };
+
+    const handleMonthClick = (y: number, m: number) => { navigateTo(y, m); setTab('monthly'); };
+
+    function renderTabContent() {
+        if (tab === 'annual') {
+            return (
+                <div className="card">
+                    <AnnualChart initialYear={now.getFullYear()} onMonthClick={handleMonthClick} />
+                </div>
+            );
+        }
+        if (tab === 'automations') {
+            return <RecurringRulesTab categories={categories} />;
+        }
+        return (
+            <MonthlyView
+                year={year}
+                month={month}
+                isCurrentMonth={isCurrentMonth}
+                isPrevDisabled={isPrevDisabled}
+                isNextDisabled={isNextDisabled}
+                transactions={transactions}
+                summary={summary}
+                carryover={carryover}
+                categories={categories}
+                loading={loading}
+                error={error}
+                onPrev={goToPrev}
+                onNext={goToNext}
+                onAddTransaction={addTransaction}
+                onDeleteTransaction={removeTransaction}
+                onPatchTransaction={patchTransaction}
+                onEditTransaction={setEditingTransaction}
+                onManageCategories={() => setShowCategoryModal(true)}
+            />
+        );
+    }
 
     return (
         <div className="dashboard">
@@ -67,37 +110,12 @@ export function Dashboard() {
                     <button className={`tab-btn${tab === 'annual' ? ' active' : ''}`} onClick={() => setTab('annual')}>
                         📊 {t('app.tabs.annual')}
                     </button>
+                    <button className={`tab-btn${tab === 'automations' ? ' active' : ''}`} onClick={() => setTab('automations')}>
+                        ⚙️ {t('app.tabs.automations')}
+                    </button>
                 </div>
 
-                {tab === 'annual' ? (
-                    <div className="card">
-                        <AnnualChart
-                            initialYear={now.getFullYear()}
-                            onMonthClick={(y, m) => { navigateTo(y, m); setTab('monthly'); }}
-                        />
-                    </div>
-                ) : (
-                    <MonthlyView
-                        year={year}
-                        month={month}
-                        isCurrentMonth={isCurrentMonth}
-                        isPrevDisabled={isPrevDisabled}
-                        isNextDisabled={isNextDisabled}
-                        transactions={transactions}
-                        summary={summary}
-                        carryover={carryover}
-                        categories={categories}
-                        loading={loading}
-                        error={error}
-                        onPrev={goToPrev}
-                        onNext={goToNext}
-                        onAddTransaction={addTransaction}
-                        onDeleteTransaction={removeTransaction}
-                        onPatchTransaction={patchTransaction}
-                        onEditTransaction={setEditingTransaction}
-                        onManageCategories={() => setShowCategoryModal(true)}
-                    />
-                )}
+                {renderTabContent()}
             </main>
 
             <CategoryManager
@@ -114,10 +132,7 @@ export function Dashboard() {
                 <EditTransactionModal
                     transaction={editingTransaction}
                     categories={categories}
-                    onSave={async (id, dto) => {
-                        await updateTransaction(id, dto);
-                        setEditingTransaction(null);
-                    }}
+                    onSave={handleSaveEdit}
                     onClose={() => setEditingTransaction(null)}
                     onManageCategories={() => { setEditingTransaction(null); setShowCategoryModal(true); }}
                     viewYear={year}

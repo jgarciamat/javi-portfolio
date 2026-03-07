@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import { transactionApi, categoryApi } from '@core/api/financeApi';
+import { transactionApi, categoryApi, recurringApi } from '@core/api/financeApi';
 import { authApi, budgetApi } from '@core/api/authApi';
 
 // ─── API shape types ─────────────────────────────────────────────────────────
@@ -10,13 +10,14 @@ export interface IApiContext {
     categoryApi: typeof categoryApi;
     authApi: typeof authApi;
     budgetApi: typeof budgetApi;
+    recurringApi: typeof recurringApi;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 const ApiContext = createContext<IApiContext | null>(null);
 
-const defaultValue: IApiContext = { transactionApi, categoryApi, authApi, budgetApi };
+const defaultValue: IApiContext = { transactionApi, categoryApi, authApi, budgetApi, recurringApi };
 
 export function ApiProvider({ children }: { children: ReactNode }) {
     return (

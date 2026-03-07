@@ -72,3 +72,46 @@ export interface CarryoverData {
     year: number;
     month: number;
 }
+
+// ─── Recurring rules ──────────────────────────────────────────────────────────
+
+export type RecurringFrequency = 'monthly' | 'bimonthly';
+
+export interface RecurringRule {
+    id: string;
+    userId: string;
+    description: string;
+    amount: number;
+    type: TransactionType;
+    category: string;
+    startYear: number;
+    startMonth: number;
+    endYear: number | null;
+    endMonth: number | null;
+    frequency: RecurringFrequency;
+    active: boolean;
+    createdAt: string;
+}
+
+export interface CreateRecurringRuleDTO {
+    description: string;
+    amount: number;
+    type: TransactionType;
+    category: string;
+    startYear: number;
+    startMonth: number;
+    endYear?: number | null;
+    endMonth?: number | null;
+    frequency?: RecurringFrequency;
+}
+
+export interface UpdateRecurringRuleDTO {
+    description?: string;
+    amount?: number;
+    type?: TransactionType;
+    category?: string;
+    endYear?: number | null;
+    endMonth?: number | null;
+    frequency?: RecurringFrequency;
+    active?: boolean;
+}

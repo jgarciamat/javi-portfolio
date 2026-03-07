@@ -5,6 +5,9 @@ import type {
     Category,
     FinancialSummary,
     AnnualSummary,
+    RecurringRule,
+    CreateRecurringRuleDTO,
+    UpdateRecurringRuleDTO,
 } from '@shared/types/finance.types';
 
 function authHeaders(): Record<string, string> {
@@ -88,5 +91,26 @@ export const categoryApi = {
     },
     delete(id: string) {
         return request<void>(`/categories/${id}`, { method: 'DELETE' });
+    },
+};
+
+export const recurringApi = {
+    getAll() {
+        return request<RecurringRule[]>('/recurring-rules');
+    },
+    create(dto: CreateRecurringRuleDTO) {
+        return request<RecurringRule>('/recurring-rules', {
+            method: 'POST',
+            body: JSON.stringify(dto),
+        });
+    },
+    update(id: string, dto: UpdateRecurringRuleDTO) {
+        return request<RecurringRule>(`/recurring-rules/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(dto),
+        });
+    },
+    delete(id: string) {
+        return request<void>(`/recurring-rules/${id}`, { method: 'DELETE' });
     },
 };
