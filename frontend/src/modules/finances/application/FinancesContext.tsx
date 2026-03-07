@@ -64,7 +64,7 @@ interface MonthCache {
 
 export function FinancesProvider({ children }: { children: ReactNode }) {
     const { transactionApi, categoryApi, budgetApi } = useApi();
-    const { token } = useAuth();
+    const { token, logout } = useAuth();
 
     // ── Navigation ────────────────────────────────────────────────────────────
     const now = new Date();
@@ -133,12 +133,16 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
                 cache.current.set(key, fresh);
                 applyMonthData(fresh);
             } catch (e) {
+                if (e instanceof Error && e.message.toLowerCase().includes('sesión expirada')) {
+                    logout();
+                    return;
+                }
                 setError(e instanceof Error ? e.message : 'Error al cargar datos');
             } finally {
                 setLoading(false);
             }
         },
-        [year, month, token, transactionApi, budgetApi, applyMonthData]
+        [year, month, token, logout, transactionApi, budgetApi, applyMonthData]
     );
 
     useEffect(() => {

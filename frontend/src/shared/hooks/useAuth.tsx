@@ -31,16 +31,23 @@ function loadUser(): AuthUser | null {
     } catch { return null; }
 }
 
-/** Load access token from storage, returning null if it is already expired. */
+/** Load access token from storage, returning null if it is already expired.
+ *  If the access token is expired, also clear stale auth data from localStorage. */
 function loadToken(): string | null {
     const t = localStorage.getItem('mm_token');
-    if (!t || isTokenExpired(t)) return null;
+    if (!t || isTokenExpired(t)) {
+        // Clear stale data so the app starts with a clean unauthenticated state
+        localStorage.removeItem('mm_token');
+        localStorage.removeItem('mm_refresh_token');
+        localStorage.removeItem('mm_user');
+        return null;
+    }
     return t;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<AuthUser | null>(loadUser);
     const [token, setToken] = useState<string | null>(loadToken);
+    const [user, setUser] = useState<AuthUser | null>(token ? loadUser : null);
 
     const persist = (result: { accessToken: string; refreshToken: string; user: AuthUser }) => {
         localStorage.setItem('mm_token', result.accessToken);
