@@ -123,7 +123,10 @@ jobs:
             const pr = context.payload.pull_request;
             const version = process.env.NEXT_VERSION;
 
-            // Commits in develop not yet in master
+            // Fetch latest refs so git log sees the bump commit if it was just pushed
+            execSync('git fetch origin');
+
+            // Commits in develop not yet in master (exclude auto bump commits)
             const log = execSync(
               'git log origin/master..origin/develop --pretty=format:"%H|%s|%an" --no-merges'
             ).toString().trim();
@@ -149,6 +152,8 @@ jobs:
 
             for (const line of log.split('\n')) {
               const [sha, subject, author] = line.split('|');
+              // Skip auto-generated bump commits
+              if (/^chore\(release\): bump version/.test(subject)) continue;
               const match = subject.match(/^(\w+)(\(.*?\))?!?:/);
               const type  = match ? match[1] : 'other';
               const key   = LABELS[type] ?? '📦 Other';
@@ -185,13 +190,20 @@ jobs:
             });
 
             // Also update the PR title to include the version (if not already there)
-            const currentTitle = pr.title;
-            if (!currentTitle.includes(`v${version}`)) {
-              const cleanTitle = currentTitle.replace(/\s*v\d+\.\d+\.\d+\s*$/, '').trim();
+            // Fetch the *current* PR title from the API (not the stale payload)
+            const { data: freshPr } = await github.rest.pulls.get({
+              owner, repo,
+              pull_number: pr.number,
+            });
+            const currentTitle = freshPr.title;
+            // Strip any existing version suffix (anywhere in the title, not just at end)
+            const cleanTitle = currentTitle.replace(/\s*v\d+\.\d+\.\d+/g, '').trim();
+            const newTitle = `${cleanTitle} v${version}`;
+            if (currentTitle !== newTitle) {
               await github.rest.pulls.update({
                 owner, repo,
                 pull_number: pr.number,
-                title: `${cleanTitle} v${version}`,
+                title: newTitle,
               });
             }
 
