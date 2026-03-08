@@ -232,3 +232,39 @@ npm test
 - Mantener los controladores delgados: recibir request -> validar -> llamar al caso de uso -> mapear respuesta.
 
 ---
+
+## 🚀 Release a producción (develop → master)
+
+El proceso de release está **automatizado** mediante GitHub Actions.
+
+### Pasos
+
+```bash
+# 1. Estar en develop con todo commiteado y pusheado
+git checkout develop && git pull origin develop
+
+# 2. Abrir la PR
+gh pr create --base master --head develop --title "Release develop"
+
+# 3. El workflow automático hace:
+#    ✅ Añade la label "release"
+#    ✅ Calcula el bump semver (major/minor/patch) según los commits
+#    ✅ Actualiza "version" en frontend/package.json y commitea a develop
+#    ✅ Pone el número de versión en el título de la PR
+#    ✅ Genera el changelog agrupado por tipo de commit en el body de la PR
+
+# 4. Revisar y mergear
+gh pr merge --merge
+```
+
+### Convención de commits → bump de versión
+
+| Prefijo | Bump |
+|---|---|
+| `feat!:` o `BREAKING CHANGE` | major `1.0.0 → 2.0.0` |
+| `feat:` | minor `1.0.0 → 1.1.0` |
+| `fix:`, `chore:`, `refactor:`… | patch `1.0.0 → 1.0.1` |
+
+> Documentación completa: [`.agent/workflows/release-to-master.md`](.agent/workflows/release-to-master.md)
+
+---

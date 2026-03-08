@@ -1,4 +1,4 @@
-name: Release PR — label + changelog
+name: Release PR — version bump, label + changelog
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 permissions:
   pull-requests: write
-  contents: read
+  contents: write   # needed to push the version-bump commit
 
 jobs:
   label_and_changelog:
@@ -44,13 +44,76 @@ jobs:
               labels: ['release'],
             });
 
-      # ── 2. Checkout to read git log ─────────────────────────────────────────
+      # ── 2. Checkout develop branch (full history) ───────────────────────────
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # full history needed for git log
+          ref: develop
+          fetch-depth: 0   # full history needed for git log + push
 
-      # ── 3. Build changelog from commits not yet in master ───────────────────
+      # ── 3. Bump version in package.json (only on open/reopen) ───────────────
+      - name: Bump version and commit to develop
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            // ── Determine bump type from commit subjects ──────────────────────
+            const log = execSync(
+              'git log origin/master..origin/develop --pretty=format:"%s" --no-merges'
+            ).toString().trim();
+
+            const lines = log ? log.split('\n') : [];
+            let bump = 'patch';
+            for (const subject of lines) {
+              if (/^(\w+)(\(.*?\))?!:/.test(subject) || /BREAKING CHANGE/.test(subject)) {
+                bump = 'major';
+                break;
+              }
+              if (/^feat(\(.*?\))?:/.test(subject) && bump !== 'major') {
+                bump = 'minor';
+              }
+            }
+            console.log(`Bump type: ${bump}`);
+
+            // ── Read current version ──────────────────────────────────────────
+            const pkgPath = path.join(process.env.GITHUB_WORKSPACE, 'frontend/package.json');
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            const [major, minor, patch] = pkg.version.split('.').map(Number);
+
+            let nextVersion;
+            if (bump === 'major') nextVersion = `${major + 1}.0.0`;
+            else if (bump === 'minor') nextVersion = `${major}.${minor + 1}.0`;
+            else nextVersion = `${major}.${minor}.${patch + 1}`;
+
+            console.log(`Version: ${pkg.version} → ${nextVersion}`);
+
+            // ── Write new version ─────────────────────────────────────────────
+            pkg.version = nextVersion;
+            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+
+            // ── Commit and push to develop ────────────────────────────────────
+            execSync('git config user.name  "github-actions[bot]"');
+            execSync('git config user.email "github-actions[bot]@users.noreply.github.com"');
+            execSync(`git add frontend/package.json`);
+            execSync(`git commit -m "chore(release): bump version to ${nextVersion} [skip ci]"`);
+            execSync('git push origin develop');
+
+            // ── Expose version for subsequent steps ───────────────────────────
+            const core = require('@actions/core');
+            core.exportVariable('NEXT_VERSION', nextVersion);
+
+      # ── 4. Read current version (on synchronize/edited) ─────────────────────
+      - name: Read current version
+        if: github.event.action != 'opened' && github.event.action != 'reopened'
+        run: |
+          VERSION=$(node -p "require('./frontend/package.json').version")
+          echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
+
+      # ── 5. Build changelog and update PR description ────────────────────────
       - name: Generate changelog and update PR body
         uses: actions/github-script@v7
         with:
@@ -58,8 +121,9 @@ jobs:
             const { execSync } = require('child_process');
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
+            const version = process.env.NEXT_VERSION;
 
-            // Commits in develop that are NOT in master
+            // Commits in develop not yet in master
             const log = execSync(
               'git log origin/master..origin/develop --pretty=format:"%H|%s|%an" --no-merges'
             ).toString().trim();
@@ -69,7 +133,7 @@ jobs:
               return;
             }
 
-            // Group by conventional-commit prefix (feat, fix, chore, etc.)
+            // Group by conventional-commit prefix
             const groups = {};
             const LABELS = {
               feat:     '✨ Features',
@@ -93,7 +157,8 @@ jobs:
             }
 
             // Build markdown body
-            let body = `## 📋 Changelog\n\n`;
+            let body = `## 🚀 Release \`v${version}\`\n\n`;
+            body += `## 📋 Changelog\n\n`;
             body += `> Auto-generated from commits in \`develop\` not yet merged into \`master\`.\n\n`;
 
             for (const [section, commits] of Object.entries(groups)) {
@@ -104,7 +169,7 @@ jobs:
               body += '\n';
             }
 
-            // Preserve any manually written content below a separator (if present)
+            // Preserve any manually written content below the separator
             const existing = pr.body ?? '';
             const SEPARATOR = '<!-- changelog:end -->';
             const manualSection = existing.includes(SEPARATOR)
@@ -118,3 +183,15 @@ jobs:
               pull_number: pr.number,
               body: newBody,
             });
+
+            // Also update the PR title to include the version (if not already there)
+            const currentTitle = pr.title;
+            if (!currentTitle.includes(`v${version}`)) {
+              const cleanTitle = currentTitle.replace(/\s*v\d+\.\d+\.\d+\s*$/, '').trim();
+              await github.rest.pulls.update({
+                owner, repo,
+                pull_number: pr.number,
+                title: `${cleanTitle} v${version}`,
+              });
+            }
+
