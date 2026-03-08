@@ -51,15 +51,31 @@ jobs:
           ref: develop
           fetch-depth: 0   # full history needed for git log + push
 
-      # ── 3. Bump version in package.json (only on open/reopen) ───────────────
+      # ── 3. Bump version in package.json ─────────────────────────────────────
+      # Runs on opened, reopened and synchronize.
+      # The script itself guards against re-running when HEAD is already a bump commit.
       - name: Bump version and commit to develop
-        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        if: |
+          github.event.action == 'opened' ||
+          github.event.action == 'reopened' ||
+          github.event.action == 'synchronize'
         uses: actions/github-script@v7
         with:
           script: |
             const { execSync } = require('child_process');
             const fs = require('fs');
             const path = require('path');
+
+            // Guard: if the HEAD commit on develop is already a bump, skip
+            const headMsg = execSync('git log -1 --pretty=format:"%s" origin/develop').toString().trim();
+            if (/^chore\(release\): bump version/.test(headMsg)) {
+              console.log('HEAD is already a bump commit — skipping.');
+              // Still expose the current version for the changelog step
+              const pkgPath = path.join(process.env.GITHUB_WORKSPACE, 'frontend/package.json');
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              core.exportVariable('NEXT_VERSION', pkg.version);
+              return;
+            }
 
             // ── Determine bump type from commit subjects ──────────────────────
             const log = execSync(
@@ -106,9 +122,9 @@ jobs:
             // `core` is already injected as a global by actions/github-script
             core.exportVariable('NEXT_VERSION', nextVersion);
 
-      # ── 4. Read current version (on synchronize/edited) ─────────────────────
+      # ── 4. Read current version (fallback for edited event) ─────────────────
       - name: Read current version
-        if: github.event.action != 'opened' && github.event.action != 'reopened'
+        if: github.event.action == 'edited'
         run: |
           VERSION=$(node -p "require('./frontend/package.json').version")
           echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
