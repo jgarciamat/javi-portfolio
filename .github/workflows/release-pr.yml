@@ -1,0 +1,120 @@
+name: Release PR — label + changelog
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+    branches:
+      - master
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  label_and_changelog:
+    runs-on: ubuntu-latest
+    # Only run for develop -> master PRs
+    if: github.head_ref == 'develop' && github.base_ref == 'master'
+
+    steps:
+      # ── 1. Ensure the "release" label exists and add it ─────────────────────
+      - name: Add release label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+
+            // Create label if it doesn't exist yet (idempotent)
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo,
+                name: 'release',
+                color: '0075ca',
+                description: 'Release to production',
+              });
+            } catch (e) {
+              // 422 = already exists — ignore
+              if (e.status !== 422) throw e;
+            }
+
+            await github.rest.issues.addLabels({
+              owner, repo,
+              issue_number: pr.number,
+              labels: ['release'],
+            });
+
+      # ── 2. Checkout to read git log ─────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history needed for git log
+
+      # ── 3. Build changelog from commits not yet in master ───────────────────
+      - name: Generate changelog and update PR body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+
+            // Commits in develop that are NOT in master
+            const log = execSync(
+              'git log origin/master..origin/develop --pretty=format:"%H|%s|%an" --no-merges'
+            ).toString().trim();
+
+            if (!log) {
+              console.log('No new commits found.');
+              return;
+            }
+
+            // Group by conventional-commit prefix (feat, fix, chore, etc.)
+            const groups = {};
+            const LABELS = {
+              feat:     '✨ Features',
+              fix:      '🐛 Bug fixes',
+              perf:     '⚡ Performance',
+              refactor: '♻️  Refactor',
+              test:     '🧪 Tests',
+              docs:     '📝 Docs',
+              chore:    '🔧 Chore',
+              ci:       '👷 CI',
+              style:    '💄 Style',
+            };
+
+            for (const line of log.split('\n')) {
+              const [sha, subject, author] = line.split('|');
+              const match = subject.match(/^(\w+)(\(.*?\))?!?:/);
+              const type  = match ? match[1] : 'other';
+              const key   = LABELS[type] ?? '📦 Other';
+              if (!groups[key]) groups[key] = [];
+              groups[key].push({ sha: sha.slice(0, 7), subject, author });
+            }
+
+            // Build markdown body
+            let body = `## 📋 Changelog\n\n`;
+            body += `> Auto-generated from commits in \`develop\` not yet merged into \`master\`.\n\n`;
+
+            for (const [section, commits] of Object.entries(groups)) {
+              body += `### ${section}\n`;
+              for (const { sha, subject, author } of commits) {
+                body += `- [\`${sha}\`](../../commit/${sha}) ${subject} — _${author}_\n`;
+              }
+              body += '\n';
+            }
+
+            // Preserve any manually written content below a separator (if present)
+            const existing = pr.body ?? '';
+            const SEPARATOR = '<!-- changelog:end -->';
+            const manualSection = existing.includes(SEPARATOR)
+              ? existing.slice(existing.indexOf(SEPARATOR) + SEPARATOR.length)
+              : '';
+
+            const newBody = body + SEPARATOR + manualSection;
+
+            await github.rest.pulls.update({
+              owner, repo,
+              pull_number: pr.number,
+              body: newBody,
+            });
