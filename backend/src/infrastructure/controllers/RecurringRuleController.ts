@@ -52,8 +52,14 @@ export class RecurringRuleController {
         try {
             const userId = req.userId!;
             const { id } = req.params;
-            this.deleteUseCase.execute(id, userId);
-            res.status(204).send();
+            const scope = (req.query.scope as string) || 'none';
+            this.deleteUseCase.execute(id, userId, scope as import('@application/use-cases/RecurringRules').DeleteScope)
+                .then(() => res.status(204).send())
+                .catch((e) => {
+                    const msg = e instanceof Error ? e.message : 'Error';
+                    const status = msg === 'Forbidden' ? 403 : msg.includes('not found') ? 404 : 400;
+                    res.status(status).json({ error: msg });
+                });
         } catch (e) {
             const msg = e instanceof Error ? e.message : 'Error';
             const status = msg === 'Forbidden' ? 403 : msg.includes('not found') ? 404 : 400;

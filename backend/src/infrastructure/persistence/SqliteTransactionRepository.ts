@@ -168,6 +168,26 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         return tx;
     }
 
+    /** Delete transactions created by a recurring rule.
+     *  If fromYear/fromMonth are given, only deletes transactions in that month or later.
+     *  Otherwise deletes all transactions linked to the rule.
+     */
+    async deleteByRecurringRule(recurringRuleId: string, userId: string, fromYear?: number, fromMonth?: number): Promise<void> {
+        if (fromYear !== undefined && fromMonth !== undefined) {
+            this.db.prepare(`
+                DELETE FROM transactions
+                WHERE recurring_rule_id = ?
+                  AND user_id = ?
+                  AND (year > ? OR (year = ? AND month >= ?))
+            `).run(recurringRuleId, userId, fromYear, fromYear, fromMonth);
+        } else {
+            this.db.prepare(`
+                DELETE FROM transactions
+                WHERE recurring_rule_id = ? AND user_id = ?
+            `).run(recurringRuleId, userId);
+        }
+    }
+
     private toEntity(row: TransactionRow): Transaction {
         return Transaction.reconstitute({
             id: TransactionId.create(row.id),

@@ -193,4 +193,49 @@ describe('useRecurringRules', () => {
         expect(result.current.rules).toHaveLength(2);
         expect(mockRecurringApi.getAll).toHaveBeenCalledTimes(2);
     });
+
+    test('deleteRule passes scope="none" by default to recurringApi.delete', async () => {
+        setupMocks('tok');
+        mockRecurringApi.getAll.mockResolvedValue([ruleA]);
+        mockRecurringApi.delete.mockResolvedValue(undefined);
+
+        const { result } = renderHook(() => useRecurringRules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        await act(async () => {
+            await result.current.deleteRule('r1');
+        });
+
+        expect(mockRecurringApi.delete).toHaveBeenCalledWith('r1', 'none');
+    });
+
+    test('deleteRule passes scope="all" to recurringApi.delete', async () => {
+        setupMocks('tok');
+        mockRecurringApi.getAll.mockResolvedValue([ruleA]);
+        mockRecurringApi.delete.mockResolvedValue(undefined);
+
+        const { result } = renderHook(() => useRecurringRules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        await act(async () => {
+            await result.current.deleteRule('r1', 'all');
+        });
+
+        expect(mockRecurringApi.delete).toHaveBeenCalledWith('r1', 'all');
+    });
+
+    test('deleteRule passes scope="from_current" to recurringApi.delete', async () => {
+        setupMocks('tok');
+        mockRecurringApi.getAll.mockResolvedValue([ruleA]);
+        mockRecurringApi.delete.mockResolvedValue(undefined);
+
+        const { result } = renderHook(() => useRecurringRules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        await act(async () => {
+            await result.current.deleteRule('r1', 'from_current');
+        });
+
+        expect(mockRecurringApi.delete).toHaveBeenCalledWith('r1', 'from_current');
+    });
 });

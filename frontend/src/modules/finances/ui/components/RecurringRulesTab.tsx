@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
+import { useFinances } from '../../application/FinancesContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { DeleteRuleModal } from './DeleteRuleModal';
+import type { DeleteScope } from './DeleteRuleModal';
 import '../css/RecurringRulesTab.css';
 import type { RecurringRule, CreateRecurringRuleDTO, UpdateRecurringRuleDTO, RecurringFrequency, TransactionType, Category } from '@modules/finances/domain/types';
 
@@ -19,8 +22,8 @@ interface FormState {
     startYear: string;
     startMonth: string;
     hasEnd: boolean;
-    endYear: string;
-    endMonth: string;
+    /** ISO date string YYYY-MM-DD used by the native date picker */
+    endDate: string;
 }
 
 const now = new Date();
@@ -33,13 +36,17 @@ const EMPTY_FORM: FormState = {
     startYear: String(now.getFullYear()),
     startMonth: String(now.getMonth() + 1),
     hasEnd: false,
-    endYear: '',
-    endMonth: '',
+    endDate: '',
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function ruleToForm(rule: RecurringRule): FormState {
+    // Build ISO date string for the date picker from stored year/month (day=1)
+    const endDate =
+        rule.endYear !== null && rule.endMonth !== null
+            ? `${rule.endYear}-${String(rule.endMonth).padStart(2, '0')}-01`
+            : '';
     return {
         description: rule.description,
         amount: String(rule.amount),
@@ -49,8 +56,7 @@ function ruleToForm(rule: RecurringRule): FormState {
         startYear: String(rule.startYear),
         startMonth: String(rule.startMonth),
         hasEnd: rule.endYear !== null,
-        endYear: rule.endYear !== null ? String(rule.endYear) : '',
-        endMonth: rule.endMonth !== null ? String(rule.endMonth) : '',
+        endDate,
     };
 }
 
@@ -62,6 +68,13 @@ function validateForm(form: FormState, amount: number): string | null {
 }
 
 function buildDto(form: FormState, amount: number): CreateRecurringRuleDTO {
+    let endYear: number | null = null;
+    let endMonth: number | null = null;
+    if (form.hasEnd && form.endDate) {
+        const [y, m] = form.endDate.split('-').map(Number);
+        endYear = y;
+        endMonth = m;
+    }
     return {
         description: form.description.trim(),
         amount,
@@ -70,8 +83,8 @@ function buildDto(form: FormState, amount: number): CreateRecurringRuleDTO {
         frequency: form.frequency,
         startYear: parseInt(form.startYear, 10),
         startMonth: parseInt(form.startMonth, 10),
-        endYear: form.hasEnd && form.endYear ? parseInt(form.endYear, 10) : null,
-        endMonth: form.hasEnd && form.endMonth ? parseInt(form.endMonth, 10) : null,
+        endYear,
+        endMonth,
     };
 }
 
@@ -182,32 +195,39 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                     </div>
                 </div>
 
-                {/* End toggle + date */}
+                {/* End — radio buttons + native date picker */}
                 <div className="recurring-form-field recurring-form-field--wide">
                     <label className="recurring-label">{t('app.recurring.form.end')}</label>
-                    <label className="tx-done-label recurring-end-toggle">
-                        <input type="checkbox" checked={form.hasEnd} onChange={(e) => set('hasEnd', e.target.checked)} />
-                        {form.hasEnd ? t('app.recurring.card.to') : t('app.recurring.form.end.forever')}
-                    </label>
-                    {form.hasEnd && (
-                        <div className="recurring-date-row">
-                            <select className="tx-input" value={form.endMonth} onChange={(e) => set('endMonth', e.target.value)}>
-                                <option value="">—</option>
-                                {Array.from({ length: 12 }, (_, i) => (
-                                    <option key={i + 1} value={i + 1}>{t(`app.recurring.months.${i + 1}`)}</option>
-                                ))}
-                            </select>
+                    <div className="recurring-end-radios">
+                        <label className="recurring-radio-label">
                             <input
-                                className="tx-input recurring-year-input"
-                                type="number"
-                                min="2020"
-                                max="2099"
-                                value={form.endYear}
-                                onChange={(e) => set('endYear', e.target.value)}
+                                type="radio"
+                                name="hasEnd"
+                                value="noend"
+                                checked={!form.hasEnd}
+                                onChange={() => set('hasEnd', false)}
                             />
-                        </div>
+                            {t('app.recurring.form.end.noend')}
+                        </label>
+                        <label className="recurring-radio-label">
+                            <input
+                                type="radio"
+                                name="hasEnd"
+                                value="withend"
+                                checked={form.hasEnd}
+                                onChange={() => set('hasEnd', true)}
+                            />
+                            {t('app.recurring.form.end.withend')}
+                        </label>
+                    </div>
+                    {form.hasEnd && (
+                        <input
+                            className="tx-input"
+                            type="date"
+                            value={form.endDate}
+                            onChange={(e) => set('endDate', e.target.value)}
+                        />
                     )}
-                    {!form.hasEnd && <p className="recurring-hint">{t('app.recurring.form.end.hint')}</p>}
                 </div>
             </div>
 
@@ -279,7 +299,7 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
                 </button>
                 <button
                     className="btn-danger recurring-btn-sm"
-                    onClick={() => { if (window.confirm(t('app.recurring.delete.confirm'))) onDelete(rule.id); }}
+                    onClick={() => onDelete(rule.id)}
                 >
                     🗑 {t('app.recurring.card.delete')}
                 </button>
@@ -293,12 +313,31 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
 export function RecurringRulesTab({ categories }: RecurringRulesTabProps) {
     const { t } = useI18n();
     const { rules, loading, error, createRule, updateRule, deleteRule, toggleActive } = useRecurringRules();
+    const { refresh } = useFinances();
 
     const [showForm, setShowForm] = useState(false);
     const [editingRule, setEditingRule] = useState<RecurringRule | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
     const [formError, setFormError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
+
+    // ── Delete modal state ──────────────────────────────────────────────────
+    const [deletingRule, setDeletingRule] = useState<RecurringRule | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDeleteConfirm = async (scope: DeleteScope) => {
+        if (!deletingRule) return;
+        setDeleting(true);
+        try {
+            await deleteRule(deletingRule.id, scope);
+            await refresh({ invalidate: true });
+            setDeletingRule(null);
+        } catch {
+            setDeletingRule(null);
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     const openCreate = () => {
         setEditingRule(null);
@@ -334,6 +373,8 @@ export function RecurringRulesTab({ categories }: RecurringRulesTabProps) {
             } else {
                 await createRule(dto);
             }
+            // Refresh transactions so the backfilled months appear immediately
+            await refresh({ invalidate: true });
             closeForm();
         } catch (e) {
             setFormError(e instanceof Error ? e.message : 'Error al guardar');
@@ -389,11 +430,20 @@ export function RecurringRulesTab({ categories }: RecurringRulesTabProps) {
                             key={rule.id}
                             rule={rule}
                             onEdit={openEdit}
-                            onDelete={deleteRule}
+                            onDelete={(id) => setDeletingRule(rules.find((r) => r.id === id) ?? null)}
                             onToggle={toggleActive}
                         />
                     ))}
                 </div>
+            )}
+
+            {deletingRule && (
+                <DeleteRuleModal
+                    ruleName={deletingRule.description}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setDeletingRule(null)}
+                    loading={deleting}
+                />
             )}
         </div>
     );

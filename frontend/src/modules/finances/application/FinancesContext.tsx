@@ -43,7 +43,7 @@ interface FinancesActions {
     updateTransaction: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
     addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
     removeCategory: (id: string) => Promise<void>;
-    refresh: () => Promise<void>;
+    refresh: (opts?: { invalidate?: boolean }) => Promise<void>;
 }
 
 type FinancesContextValue = FinancesState & FinancesActions;
@@ -118,9 +118,14 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const fetchMonth = useCallback(
-        async (opts?: { silent?: boolean }) => {
+        async (opts?: { silent?: boolean; invalidate?: boolean }) => {
             if (!token) return;
             const key = `${year}-${month}`;
+
+            if (opts?.invalidate) {
+                cache.current.delete(key);
+            }
+
             const cached = cache.current.get(key);
 
             if (cached && !opts?.silent) {

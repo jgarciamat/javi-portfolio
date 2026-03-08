@@ -52,7 +52,7 @@ function Consumer() {
             <button onClick={() => ctx.patchTransaction('t1', { notes: 'Patched note' })}>patch-notes</button>
             <button onClick={() => ctx.addCategory({ name: 'Food', icon: '🍔' })}>add-cat</button>
             <button onClick={() => ctx.removeCategory('c1')}>del-cat</button>
-            <button onClick={ctx.refresh}>refresh</button>
+            <button onClick={() => ctx.refresh()}>refresh</button>
         </div>
     );
 }

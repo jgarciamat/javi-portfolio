@@ -101,7 +101,7 @@ const recurringRuleController = new RecurringRuleController(
     new CreateRecurringRule(recurringRuleRepo, transactionRepo),
     new GetRecurringRules(recurringRuleRepo, transactionRepo),
     new UpdateRecurringRule(recurringRuleRepo, transactionRepo),
-    new DeleteRecurringRule(recurringRuleRepo),
+    new DeleteRecurringRule(recurringRuleRepo, transactionRepo),
 );
 
 // --- Routes ---

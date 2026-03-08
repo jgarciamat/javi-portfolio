@@ -26,6 +26,7 @@ function makeTxRepo(): jest.Mocked<ITransactionRepository> {
         computeCarryover: jest.fn(),
         delete: jest.fn(),
         patchTransaction: jest.fn(),
+        deleteByRecurringRule: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<ITransactionRepository>;
 }
 
@@ -226,23 +227,61 @@ describe('UpdateRecurringRule', () => {
 });
 
 describe('DeleteRecurringRule', () => {
-    it('deletes the rule', () => {
+    it('deletes the rule with default scope=none (no transactions removed)', async () => {
         const repo = makeRepo();
+        const txRepo = makeTxRepo();
         const rule = makeRule();
         repo.findById.mockReturnValue(rule);
-        new DeleteRecurringRule(repo).execute(rule.id, 'u1');
+        await new DeleteRecurringRule(repo, txRepo).execute(rule.id, 'u1');
+        expect(repo.delete).toHaveBeenCalledWith(rule.id);
+        expect(txRepo.deleteByRecurringRule).not.toHaveBeenCalled();
+    });
+
+    it('scope=none: keeps all transactions', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const rule = makeRule();
+        repo.findById.mockReturnValue(rule);
+        await new DeleteRecurringRule(repo, txRepo).execute(rule.id, 'u1', 'none');
+        expect(txRepo.deleteByRecurringRule).not.toHaveBeenCalled();
         expect(repo.delete).toHaveBeenCalledWith(rule.id);
     });
 
-    it('throws when rule not found', () => {
+    it('scope=all: deletes all transactions for the rule', async () => {
         const repo = makeRepo();
-        repo.findById.mockReturnValue(null);
-        expect(() => new DeleteRecurringRule(repo).execute('missing', 'u1')).toThrow('not found');
+        const txRepo = makeTxRepo();
+        const rule = makeRule();
+        repo.findById.mockReturnValue(rule);
+        await new DeleteRecurringRule(repo, txRepo).execute(rule.id, 'u1', 'all');
+        expect(txRepo.deleteByRecurringRule).toHaveBeenCalledWith(rule.id, 'u1');
+        expect(repo.delete).toHaveBeenCalledWith(rule.id);
     });
 
-    it('throws Forbidden when userId does not match', () => {
+    it('scope=from_current: deletes transactions from next month onward (keeps current month)', async () => {
         const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const rule = makeRule();
+        repo.findById.mockReturnValue(rule);
+        const now = new Date();
+        let nextMonth = now.getMonth() + 2; // +1 for 1-based, +1 for next month
+        let nextYear = now.getFullYear();
+        if (nextMonth > 12) { nextMonth = 1; nextYear++; }
+        await new DeleteRecurringRule(repo, txRepo).execute(rule.id, 'u1', 'from_current');
+        expect(txRepo.deleteByRecurringRule).toHaveBeenCalledWith(rule.id, 'u1', nextYear, nextMonth);
+        expect(repo.delete).toHaveBeenCalledWith(rule.id);
+    });
+
+    it('throws when rule not found', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        repo.findById.mockReturnValue(null);
+        await expect(new DeleteRecurringRule(repo, txRepo).execute('missing', 'u1')).rejects.toThrow('not found');
+    });
+
+    it('throws Forbidden when userId does not match', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
         repo.findById.mockReturnValue(makeRule());
-        expect(() => new DeleteRecurringRule(repo).execute('id', 'otherUser')).toThrow('Forbidden');
+        await expect(new DeleteRecurringRule(repo, txRepo).execute('id', 'otherUser')).rejects.toThrow('Forbidden');
     });
 });

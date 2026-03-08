@@ -41,8 +41,8 @@ export function useRecurringRules() {
         return updated;
     }, [recurringApi]);
 
-    const deleteRule = useCallback(async (id: string): Promise<void> => {
-        await recurringApi.delete(id);
+    const deleteRule = useCallback(async (id: string, scope: 'none' | 'from_current' | 'all' = 'none'): Promise<void> => {
+        await recurringApi.delete(id, scope);
         setRules((prev) => prev.filter((r) => r.id !== id));
     }, [recurringApi]);
 

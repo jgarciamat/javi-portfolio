@@ -62,4 +62,8 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
         // For in-memory (tests), carryover is always 0
         return 0;
     }
+
+    async deleteByRecurringRule(_recurringRuleId: string, _userId: string, _fromYear?: number, _fromMonth?: number): Promise<void> {
+        // No-op for in-memory (tests mock this)
+    }
 }

@@ -71,12 +71,21 @@ describe('recurringApi', () => {
         );
     });
 
-    test('delete calls DELETE /recurring-rules/:id and returns undefined', async () => {
+    test('delete calls DELETE /recurring-rules/:id?scope=none by default and returns undefined', async () => {
         mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
         const result = await recurringApi.delete('r1');
         expect(result).toBeUndefined();
         expect(mockFetch).toHaveBeenCalledWith(
-            `${BASE}/recurring-rules/r1`,
+            `${BASE}/recurring-rules/r1?scope=none`,
+            expect.objectContaining({ method: 'DELETE' }),
+        );
+    });
+
+    test('delete passes scope param to DELETE /recurring-rules/:id', async () => {
+        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+        await recurringApi.delete('r1', 'all');
+        expect(mockFetch).toHaveBeenCalledWith(
+            `${BASE}/recurring-rules/r1?scope=all`,
             expect.objectContaining({ method: 'DELETE' }),
         );
     });

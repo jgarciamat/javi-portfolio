@@ -158,13 +158,31 @@ export class UpdateRecurringRule {
     }
 }
 
-export class DeleteRecurringRule {
-    constructor(private readonly repo: IRecurringRuleRepository) { }
+export type DeleteScope = 'none' | 'from_current' | 'all';
 
-    execute(id: string, userId: string): void {
+export class DeleteRecurringRule {
+    constructor(
+        private readonly repo: IRecurringRuleRepository,
+        private readonly transactionRepo: ITransactionRepository,
+    ) { }
+
+    async execute(id: string, userId: string, scope: DeleteScope = 'none'): Promise<void> {
         const existing = this.repo.findById(id);
         if (!existing) throw new Error('Recurring rule not found');
         if (existing.userId !== userId) throw new Error('Forbidden');
+
+        if (scope === 'all') {
+            await this.transactionRepo.deleteByRecurringRule(id, userId);
+        } else if (scope === 'from_current') {
+            // "from_current" keeps the current month's transaction and removes from next month onward
+            const now = new Date();
+            let nextYear = now.getFullYear();
+            let nextMonth = now.getMonth() + 2; // +1 for 1-based, +1 for next month
+            if (nextMonth > 12) { nextMonth = 1; nextYear++; }
+            await this.transactionRepo.deleteByRecurringRule(id, userId, nextYear, nextMonth);
+        }
+        // scope === 'none': keep all transactions
+
         this.repo.delete(id);
     }
 }

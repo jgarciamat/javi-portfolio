@@ -15,6 +15,7 @@ function makeRepo(overrides: Partial<ITransactionRepository> = {}): jest.Mocked<
         computeCarryover: jest.fn(),
         delete: jest.fn(),
         patchTransaction: jest.fn(),
+        deleteByRecurringRule: jest.fn(),
         ...overrides,
     } as jest.Mocked<ITransactionRepository>;
 }

@@ -110,7 +110,7 @@ export const recurringApi = {
             body: JSON.stringify(dto),
         });
     },
-    delete(id: string) {
-        return request<void>(`/recurring-rules/${id}`, { method: 'DELETE' });
+    delete(id: string, scope: 'none' | 'from_current' | 'all' = 'none') {
+        return request<void>(`/recurring-rules/${id}?scope=${scope}`, { method: 'DELETE' });
     },
 };
