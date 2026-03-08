@@ -15,4 +15,5 @@ export type {
     RecurringRule,
     CreateRecurringRuleDTO,
     UpdateRecurringRuleDTO,
+    MonthlyBudget,
 } from '@modules/finances/domain/types';

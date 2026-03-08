@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@core/config/api.config';
-import type { AuthResult, MonthlyBudget } from '@shared/types/auth.types';
+import type { AuthResult } from '@modules/auth/domain/types';
+import type { MonthlyBudget } from '@modules/finances/domain/types';
 import type { RegisterResult, RefreshResult } from '@modules/auth/domain/types';
 
 export class ApiError extends Error {
