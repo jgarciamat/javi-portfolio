@@ -66,6 +66,8 @@ export class SqliteRecurringRuleRepository implements IRecurringRuleRepository {
         amount: number;
         type: string;
         category: string;
+        startYear: number;
+        startMonth: number;
         endYear: number | null;
         endMonth: number | null;
         frequency: string;
@@ -81,6 +83,8 @@ export class SqliteRecurringRuleRepository implements IRecurringRuleRepository {
         if (changes.amount !== undefined) { sets.push('amount = ?'); values.push(changes.amount); }
         if (changes.type !== undefined) { sets.push('type = ?'); values.push(changes.type.toUpperCase()); }
         if (changes.category !== undefined) { sets.push('category = ?'); values.push(changes.category); }
+        if (changes.startYear !== undefined) { sets.push('start_year = ?'); values.push(changes.startYear); }
+        if (changes.startMonth !== undefined) { sets.push('start_month = ?'); values.push(changes.startMonth); }
         if ('endYear' in changes) { sets.push('end_year = ?'); values.push(changes.endYear ?? null); }
         if ('endMonth' in changes) { sets.push('end_month = ?'); values.push(changes.endMonth ?? null); }
         if (changes.frequency !== undefined) { sets.push('frequency = ?'); values.push(changes.frequency); }

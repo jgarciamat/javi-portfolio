@@ -88,6 +88,8 @@ function initSchema(db: Database.Database): void {
   migrateUsersResetEmailSent(db);
   // Migration: add recurring_rules table if missing
   migrateRecurringRules(db);
+  // Migration: add recurring_rule_id column to transactions if missing
+  migrateTransactionsRecurringRuleId(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -155,6 +157,19 @@ function migrateUsersResetEmailSent(db: Database.Database): void {
   if (!info) return;
   if (!info.sql.includes('reset_email_sent')) {
     db.exec(`ALTER TABLE users ADD COLUMN reset_email_sent INTEGER NOT NULL DEFAULT 0`);
+  }
+}
+
+function migrateTransactionsRecurringRuleId(db: Database.Database): void {
+  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
+  if (!info) return;
+  if (!info.sql.includes('recurring_rule_id')) {
+    db.exec(`ALTER TABLE transactions ADD COLUMN recurring_rule_id TEXT`);
+  }
+  // Unique constraint to prevent duplicate backfill entries for the same rule+month
+  const idxInfo = db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_transactions_recurring_unique'").get();
+  if (!idxInfo) {
+    db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_recurring_unique ON transactions(user_id, recurring_rule_id, year, month) WHERE recurring_rule_id IS NOT NULL`);
   }
 }
 

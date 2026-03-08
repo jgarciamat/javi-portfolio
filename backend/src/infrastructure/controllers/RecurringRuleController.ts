@@ -15,10 +15,10 @@ export class RecurringRuleController {
         private readonly deleteUseCase: DeleteRecurringRule,
     ) { }
 
-    getAll(req: AuthRequest, res: Response): void {
+    async getAll(req: AuthRequest, res: Response): Promise<void> {
         try {
             const userId = req.userId!;
-            const rules = this.getUseCase.execute(userId);
+            const rules = await this.getUseCase.execute(userId);
             res.json(rules.map((r) => r.toJSON()));
         } catch (e) {
             res.status(500).json({ error: e instanceof Error ? e.message : 'Error' });
@@ -35,11 +35,11 @@ export class RecurringRuleController {
         }
     }
 
-    update(req: AuthRequest, res: Response): void {
+    async update(req: AuthRequest, res: Response): Promise<void> {
         try {
             const userId = req.userId!;
             const { id } = req.params;
-            const rule = this.updateUseCase.execute(id, userId, req.body);
+            const rule = await this.updateUseCase.execute(id, userId, req.body);
             res.json(rule.toJSON());
         } catch (e) {
             const msg = e instanceof Error ? e.message : 'Error';

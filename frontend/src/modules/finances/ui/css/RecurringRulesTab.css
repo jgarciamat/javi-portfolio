@@ -246,16 +246,68 @@
 
 /* ─── Responsive ─────────────────────────────── */
 @media (max-width: 600px) {
-    .recurring-cards-grid {
-        grid-template-columns: 1fr;
+    .recurring-header-card {
+        padding: 1rem;
     }
 
     .recurring-tab-header {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .recurring-tab-header .btn-primary {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .recurring-cards-grid {
+        grid-template-columns: 1fr;
     }
 
     .recurring-form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .recurring-form-field--wide {
+        grid-column: 1;
+    }
+
+    .recurring-date-row {
+        flex-direction: row;
+        gap: 0.4rem;
+    }
+
+    .recurring-year-input {
+        max-width: none;
+        flex: 1;
+    }
+
+    .recurring-card-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .recurring-btn-sm {
+        flex: 1;
+        min-width: calc(50% - 0.2rem);
+        text-align: center;
+        justify-content: center;
+    }
+
+    .recurring-card-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+
+    .recurring-card-amount {
+        font-size: 1.1rem;
+    }
+
+    .recurring-card-description {
+        white-space: normal;
     }
 }

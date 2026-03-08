@@ -110,6 +110,8 @@ export interface UpdateRecurringRuleDTO {
     amount?: number;
     type?: TransactionType;
     category?: string;
+    startYear?: number;
+    startMonth?: number;
     endYear?: number | null;
     endMonth?: number | null;
     frequency?: RecurringFrequency;

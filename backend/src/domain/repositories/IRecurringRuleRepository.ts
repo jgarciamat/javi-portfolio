@@ -9,6 +9,8 @@ export interface IRecurringRuleRepository {
         amount: number;
         type: string;
         category: string;
+        startYear: number;
+        startMonth: number;
         endYear: number | null;
         endMonth: number | null;
         frequency: string;

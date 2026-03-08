@@ -37,16 +37,17 @@ export class SqliteTransactionRepository implements ITransactionRepository {
             });
     }
 
-    async saveForUser(transaction: Transaction, userId: string): Promise<void> {
+    async saveForUser(transaction: Transaction, userId: string, recurringRuleId?: string): Promise<void> {
         const j = transaction.toJSON();
         const [yearStr, monthStr] = j.date.split('-');
         const year = parseInt(yearStr, 10);
         const month = parseInt(monthStr, 10);
         this.db
             .prepare(`
-        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, notes)
-        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt, @notes)
+        INSERT INTO transactions (id, user_id, year, month, description, amount, type, category, date, created_at, notes, recurring_rule_id)
+        VALUES (@id, @userId, @year, @month, @description, @amount, @type, @category, @date, @createdAt, @notes, @recurringRuleId)
         ON CONFLICT(id) DO NOTHING
+        ON CONFLICT(user_id, recurring_rule_id, year, month) WHERE recurring_rule_id IS NOT NULL DO NOTHING
       `)
             .run({
                 id: j.id,
@@ -60,6 +61,7 @@ export class SqliteTransactionRepository implements ITransactionRepository {
                 date: j.date,
                 createdAt: j.createdAt,
                 notes: j.notes ?? null,
+                recurringRuleId: recurringRuleId ?? null,
             });
     }
 

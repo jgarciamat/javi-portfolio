@@ -40,7 +40,8 @@ export class CreateRecurringRule {
 
             if (!rule.appliesTo(year, month)) continue;
 
-            const date = new Date(year, month - 1, 1);
+            // Use UTC date to avoid timezone shifts when serialising to ISO string
+            const date = new Date(Date.UTC(year, month - 1, 1));
             const tx = Transaction.create({
                 description: dto.description,
                 amount: dto.amount,
@@ -48,7 +49,7 @@ export class CreateRecurringRule {
                 category: dto.category,
                 date,
             });
-            await this.transactionRepo.saveForUser(tx, dto.userId);
+            await this.transactionRepo.saveForUser(tx, dto.userId, rule.id);
         }
 
         return rule;
@@ -56,31 +57,103 @@ export class CreateRecurringRule {
 }
 
 export class GetRecurringRules {
-    constructor(private readonly repo: IRecurringRuleRepository) { }
+    constructor(
+        private readonly repo: IRecurringRuleRepository,
+        private readonly transactionRepo: ITransactionRepository,
+    ) { }
 
-    execute(userId: string): RecurringRule[] {
-        return this.repo.findByUserId(userId);
+    async execute(userId: string): Promise<RecurringRule[]> {
+        const rules = this.repo.findByUserId(userId);
+
+        // Backfill any active rules that are missing transactions for past/current months
+        const now = new Date();
+        const currentOrd = now.getFullYear() * 12 + (now.getMonth() + 1);
+
+        for (const rule of rules) {
+            if (!rule.active) continue;
+
+            const startOrd = rule.startYear * 12 + rule.startMonth;
+            const endOrd = rule.endYear !== null && rule.endMonth !== null
+                ? Math.min(rule.endYear * 12 + rule.endMonth, currentOrd)
+                : currentOrd;
+
+            for (let ord = startOrd; ord <= endOrd; ord++) {
+                const year = Math.floor((ord - 1) / 12);
+                const month = ((ord - 1) % 12) + 1;
+
+                if (!rule.appliesTo(year, month)) continue;
+
+                // Use UTC date to avoid timezone shifts when serialising to ISO string
+                const date = new Date(Date.UTC(year, month - 1, 1));
+                const tx = Transaction.create({
+                    description: rule.description,
+                    amount: rule.amount,
+                    type: rule.type,
+                    category: rule.category,
+                    date,
+                });
+                // ON CONFLICT(user_id, recurring_rule_id, year, month) DO NOTHING ensures idempotency
+                await this.transactionRepo.saveForUser(tx, userId, rule.id);
+            }
+        }
+
+        return rules;
     }
 }
 
 export class UpdateRecurringRule {
-    constructor(private readonly repo: IRecurringRuleRepository) { }
+    constructor(
+        private readonly repo: IRecurringRuleRepository,
+        private readonly transactionRepo: ITransactionRepository,
+    ) { }
 
-    execute(id: string, userId: string, changes: Partial<{
+    async execute(id: string, userId: string, changes: Partial<{
         description: string;
         amount: number;
         type: string;
         category: string;
+        startYear: number;
+        startMonth: number;
         endYear: number | null;
         endMonth: number | null;
         frequency: string;
         active: boolean;
-    }>): RecurringRule {
+    }>): Promise<RecurringRule> {
         const existing = this.repo.findById(id);
         if (!existing) throw new Error('Recurring rule not found');
         if (existing.userId !== userId) throw new Error('Forbidden');
+
         const updated = this.repo.update(id, changes);
         if (!updated) throw new Error('Recurring rule not found');
+
+        // Backfill any newly covered past months when startYear/startMonth moves earlier
+        const prevStartOrd = existing.startYear * 12 + existing.startMonth;
+        const newStartOrd = updated.startYear * 12 + updated.startMonth;
+
+        if (newStartOrd < prevStartOrd && updated.active) {
+            const now = new Date();
+            const currentOrd = now.getFullYear() * 12 + (now.getMonth() + 1);
+            // Only fill newly uncovered range: from new start up to (but not including) old start
+            const fillUpTo = Math.min(prevStartOrd - 1, currentOrd);
+
+            for (let ord = newStartOrd; ord <= fillUpTo; ord++) {
+                const year = Math.floor((ord - 1) / 12);
+                const month = ((ord - 1) % 12) + 1;
+
+                if (!updated.appliesTo(year, month)) continue;
+
+                const date = new Date(Date.UTC(year, month - 1, 1)); // Use UTC date to avoid timezone shifts when serialising to ISO string
+                const tx = Transaction.create({
+                    description: updated.description,
+                    amount: updated.amount,
+                    type: updated.type,
+                    category: updated.category,
+                    date,
+                });
+                await this.transactionRepo.saveForUser(tx, userId, updated.id);
+            }
+        }
+
         return updated;
     }
 }

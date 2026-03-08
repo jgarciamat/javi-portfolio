@@ -9,18 +9,22 @@ function makeDb(): Database.Database {
     db.pragma('foreign_keys = OFF'); // no users table in memory
     db.exec(`
         CREATE TABLE transactions (
-            id          TEXT PRIMARY KEY,
-            user_id     TEXT NOT NULL DEFAULT '',
-            year        INTEGER NOT NULL,
-            month       INTEGER NOT NULL,
-            description TEXT NOT NULL,
-            amount      REAL NOT NULL,
-            type        TEXT NOT NULL,
-            category    TEXT NOT NULL,
-            date        TEXT NOT NULL,
-            created_at  TEXT NOT NULL,
-            notes       TEXT
+            id                TEXT PRIMARY KEY,
+            user_id           TEXT NOT NULL DEFAULT '',
+            year              INTEGER NOT NULL,
+            month             INTEGER NOT NULL,
+            description       TEXT NOT NULL,
+            amount            REAL NOT NULL,
+            type              TEXT NOT NULL,
+            category          TEXT NOT NULL,
+            date              TEXT NOT NULL,
+            created_at        TEXT NOT NULL,
+            notes             TEXT,
+            recurring_rule_id TEXT
         );
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_recurring_unique
+            ON transactions(user_id, recurring_rule_id, year, month)
+            WHERE recurring_rule_id IS NOT NULL;
     `);
     return db;
 }
@@ -341,5 +345,29 @@ describe('SqliteTransactionRepository', () => {
         const updated = await repo.updateTransaction(tx.id.value, {});
         expect(updated!.notes).toBe('Stay');
         expect(updated!.description).toBe('Coffee');
+    });
+
+    // ── saveForUser idempotency via recurring_rule_id ─────────────────────────
+
+    test('saveForUser with same recurringRuleId+year+month is idempotent', async () => {
+        const tx1 = makeTx({ date: new Date('2026-01-01T00:00:00.000Z') });
+        const tx2 = makeTx({ date: new Date('2026-01-01T00:00:00.000Z') });
+
+        await repo.saveForUser(tx1, 'user1', 'rule-abc');
+        await repo.saveForUser(tx2, 'user1', 'rule-abc'); // same rule+user+year+month → ignored
+
+        const rows = db.prepare('SELECT COUNT(*) as cnt FROM transactions WHERE user_id = ?').get('user1') as { cnt: number };
+        expect(rows.cnt).toBe(1);
+    });
+
+    test('saveForUser with different recurringRuleIds inserts both', async () => {
+        const tx1 = makeTx({ date: new Date('2026-01-01T00:00:00.000Z') });
+        const tx2 = makeTx({ date: new Date('2026-01-01T00:00:00.000Z') });
+
+        await repo.saveForUser(tx1, 'user1', 'rule-aaa');
+        await repo.saveForUser(tx2, 'user1', 'rule-bbb');
+
+        const rows = db.prepare('SELECT COUNT(*) as cnt FROM transactions WHERE user_id = ?').get('user1') as { cnt: number };
+        expect(rows.cnt).toBe(2);
     });
 });

@@ -118,37 +118,110 @@ describe('CreateRecurringRule', () => {
 });
 
 describe('GetRecurringRules', () => {
-    it('returns all rules for user', () => {
+    it('returns all rules for user', async () => {
         const repo = makeRepo();
-        const rule = makeRule();
+        const txRepo = makeTxRepo();
+        const rule = makeRule({ startYear: 2099, startMonth: 1 }); // future start → no backfill
         repo.findByUserId.mockReturnValue([rule]);
-        const result = new GetRecurringRules(repo).execute('u1');
+        const result = await new GetRecurringRules(repo, txRepo).execute('u1');
         expect(result).toHaveLength(1);
         expect(repo.findByUserId).toHaveBeenCalledWith('u1');
+    });
+
+    it('backfills missing months for active rules on get', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        let startYear = currentYear;
+        let startMonth = currentMonth - 1;
+        if (startMonth <= 0) { startMonth += 12; startYear -= 1; }
+
+        const rule = makeRule({ startYear, startMonth });
+        repo.findByUserId.mockReturnValue([rule]);
+        await new GetRecurringRules(repo, txRepo).execute('u1');
+        // Should attempt to backfill 2 months (startMonth and currentMonth)
+        expect(txRepo.saveForUser).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not backfill inactive rules', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const now = new Date();
+        const rule = makeRule({ startYear: now.getFullYear(), startMonth: now.getMonth() + 1, active: false });
+        repo.findByUserId.mockReturnValue([rule]);
+        await new GetRecurringRules(repo, txRepo).execute('u1');
+        expect(txRepo.saveForUser).not.toHaveBeenCalled();
     });
 });
 
 describe('UpdateRecurringRule', () => {
-    it('updates and returns the rule', () => {
+    it('updates and returns the rule', async () => {
         const repo = makeRepo();
+        const txRepo = makeTxRepo();
         const rule = makeRule();
         const updated = makeRule({ description: 'Salario actualizado' });
         repo.findById.mockReturnValue(rule);
         repo.update.mockReturnValue(updated);
-        const result = new UpdateRecurringRule(repo).execute(rule.id, 'u1', { description: 'Salario actualizado' });
+        const result = await new UpdateRecurringRule(repo, txRepo).execute(rule.id, 'u1', { description: 'Salario actualizado' });
         expect(result.description).toBe('Salario actualizado');
     });
 
-    it('throws when rule not found', () => {
+    it('throws when rule not found', async () => {
         const repo = makeRepo();
+        const txRepo = makeTxRepo();
         repo.findById.mockReturnValue(null);
-        expect(() => new UpdateRecurringRule(repo).execute('missing', 'u1', {})).toThrow('not found');
+        await expect(new UpdateRecurringRule(repo, txRepo).execute('missing', 'u1', {})).rejects.toThrow('not found');
     });
 
-    it('throws Forbidden when userId does not match', () => {
+    it('throws Forbidden when userId does not match', async () => {
         const repo = makeRepo();
+        const txRepo = makeTxRepo();
         repo.findById.mockReturnValue(makeRule());
-        expect(() => new UpdateRecurringRule(repo).execute('id', 'otherUser', {})).toThrow('Forbidden');
+        await expect(new UpdateRecurringRule(repo, txRepo).execute('id', 'otherUser', {})).rejects.toThrow('Forbidden');
+    });
+
+    it('backfills transactions when startMonth moves earlier', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        // Original rule starts this month
+        const original = makeRule({ startYear: currentYear, startMonth: currentMonth });
+        // Updated rule starts 2 months earlier
+        let newStartYear = currentYear;
+        let newStartMonth = currentMonth - 2;
+        if (newStartMonth <= 0) { newStartMonth += 12; newStartYear -= 1; }
+
+        const updatedRule = makeRule({ startYear: newStartYear, startMonth: newStartMonth });
+        repo.findById.mockReturnValue(original);
+        repo.update.mockReturnValue(updatedRule);
+
+        await new UpdateRecurringRule(repo, txRepo).execute(original.id, 'u1', { startYear: newStartYear, startMonth: newStartMonth });
+
+        // Should backfill 2 months (the 2 months before the original start)
+        expect(txRepo.saveForUser).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not backfill when startMonth moves later', async () => {
+        const repo = makeRepo();
+        const txRepo = makeTxRepo();
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        const original = makeRule({ startYear: currentYear, startMonth: currentMonth - 1 <= 0 ? 1 : currentMonth - 1 });
+        const updatedRule = makeRule({ startYear: currentYear, startMonth: currentMonth });
+        repo.findById.mockReturnValue(original);
+        repo.update.mockReturnValue(updatedRule);
+
+        await new UpdateRecurringRule(repo, txRepo).execute(original.id, 'u1', { startMonth: currentMonth });
+
+        expect(txRepo.saveForUser).not.toHaveBeenCalled();
     });
 });
 

@@ -8,7 +8,7 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
         this.transactions.set(transaction.id.value, transaction);
     }
 
-    async saveForUser(transaction: Transaction, _userId: string): Promise<void> {
+    async saveForUser(transaction: Transaction, _userId: string, _recurringRuleId?: string): Promise<void> {
         this.transactions.set(transaction.id.value, transaction);
     }
 
