@@ -103,7 +103,7 @@ jobs:
             execSync('git push origin develop');
 
             // ── Expose version for subsequent steps ───────────────────────────
-            const core = require('@actions/core');
+            // `core` is already injected as a global by actions/github-script
             core.exportVariable('NEXT_VERSION', nextVersion);
 
       # ── 4. Read current version (on synchronize/edited) ─────────────────────
