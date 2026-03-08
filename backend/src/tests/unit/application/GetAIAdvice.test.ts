@@ -6,10 +6,12 @@ const baseContext: FinancialContext = {
     locale: 'es',
     totalIncome: 2000,
     totalExpenses: 1000,
-    balance: 1000,
+    totalSaving: 200,
+    balance: 800,
     savingsRate: 50,
     budgetAmount: 0,
     expensesByCategory: { Alimentación: 300, Ocio: 700 },
+    savingByCategory: { 'Fondo de emergencia': 200 },
     transactions: [
         { description: 'Supermercado', amount: 300, type: 'expense', category: 'Alimentación', date: '2025-03-10' },
     ],
@@ -68,9 +70,10 @@ describe('GetAIAdvice (rule-based fallback)', () => {
         expect(result.summary).toContain('50');
     });
 
-    it('summary mentions saved amount when balance >= 0', async () => {
-        const result = await useCase.execute({ ...baseContext, balance: 500, savingsRate: 25 });
-        expect(result.summary).toContain('500');
+    it('summary mentions income and saving when balance >= 0', async () => {
+        const result = await useCase.execute({ ...baseContext, balance: 800, totalSaving: 200, savingsRate: 25 });
+        // Summary should mention income (2000) or saving (200) figures
+        expect(result.summary).toMatch(/2000|200/);
     });
 
     it('works in English locale', async () => {

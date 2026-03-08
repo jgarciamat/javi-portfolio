@@ -1,7 +1,7 @@
 export interface TransactionContext {
     description: string;
     amount: number;
-    type: 'income' | 'expense';
+    type: 'income' | 'expense' | 'saving';
     category: string;
     date: string;
 }
@@ -12,10 +12,12 @@ export interface FinancialContext {
     locale: string;
     totalIncome: number;
     totalExpenses: number;
+    totalSaving: number;
     balance: number;
     savingsRate: number;
     budgetAmount: number;
     expensesByCategory: Record<string, number>;
+    savingByCategory: Record<string, number>;
     transactions: TransactionContext[];
 }
 
@@ -72,9 +74,15 @@ export class GetAIAdvice {
     }
 
     private buildPrompt(ctx: FinancialContext): string {
-        const topCategories = Object.entries(ctx.expensesByCategory)
+        const topExpenses = Object.entries(ctx.expensesByCategory)
             .sort(([, a], [, b]) => b - a)
             .slice(0, 5)
+            .map(([cat, amt]) => `${cat}: ${amt.toFixed(2)}€`)
+            .join(', ');
+
+        const topSavings = Object.entries(ctx.savingByCategory)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3)
             .map(([cat, amt]) => `${cat}: ${amt.toFixed(2)}€`)
             .join(', ');
 
@@ -84,9 +92,10 @@ export class GetAIAdvice {
             return `You are a personal financial advisor. Analyse the data for month ${ctx.month}/${ctx.year} and respond ONLY with valid JSON (no markdown, no extra text).
 
 DATA:
-- Income: ${ctx.totalIncome.toFixed(2)}€ | Expenses: ${ctx.totalExpenses.toFixed(2)}€ | Balance: ${ctx.balance.toFixed(2)}€
-- Savings rate: ${ctx.savingsRate.toFixed(1)}% | Transactions: ${ctx.transactions.length}
-- Top expense categories: ${topCategories || 'none'}
+- Income: ${ctx.totalIncome.toFixed(2)}€ | Expenses: ${ctx.totalExpenses.toFixed(2)}€ | Saving: ${ctx.totalSaving.toFixed(2)}€ | Net balance: ${ctx.balance.toFixed(2)}€
+- Savings rate: ${ctx.savingsRate.toFixed(1)}% | Total transactions: ${ctx.transactions.length}
+- Top expense categories: ${topExpenses || 'none'}
+- Saving categories: ${topSavings || 'none'}
 
 Response JSON (max 2 items per array, short sentences):
 {"summary":"...","positives":["..."],"warnings":["..."],"tips":["...","..."]}`;
@@ -95,9 +104,10 @@ Response JSON (max 2 items per array, short sentences):
         return `Eres un asesor financiero personal. Analiza los datos del mes ${ctx.month}/${ctx.year} y responde ÚNICAMENTE con JSON válido (sin markdown, sin texto adicional).
 
 DATOS:
-- Ingresos: ${ctx.totalIncome.toFixed(2)}€ | Gastos: ${ctx.totalExpenses.toFixed(2)}€ | Balance: ${ctx.balance.toFixed(2)}€
-- Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}% | Transacciones: ${ctx.transactions.length}
-- Top gastos por categoría: ${topCategories || 'ninguno'}
+- Ingresos: ${ctx.totalIncome.toFixed(2)}€ | Gastos: ${ctx.totalExpenses.toFixed(2)}€ | Ahorro: ${ctx.totalSaving.toFixed(2)}€ | Balance neto: ${ctx.balance.toFixed(2)}€
+- Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}% | Total transacciones: ${ctx.transactions.length}
+- Top gastos por categoría: ${topExpenses || 'ninguno'}
+- Categorías de ahorro: ${topSavings || 'ninguno'}
 
 JSON de respuesta (máximo 2 items por array, frases cortas):
 {"summary":"...","positives":["..."],"warnings":["..."],"tips":["...","..."]}`;
@@ -143,6 +153,14 @@ JSON de respuesta (máximo 2 items por array, frases cortas):
             }
         }
 
+        if (ctx.totalSaving > 0) {
+            positives.push(
+                isEn
+                    ? `You have allocated ${ctx.totalSaving.toFixed(2)}€ to savings this month.`
+                    : `Has destinado ${ctx.totalSaving.toFixed(2)}€ al ahorro este mes.`
+            );
+        }
+
         if (ctx.budgetAmount > 0 && ctx.totalExpenses > ctx.budgetAmount) {
             warnings.push(
                 isEn
@@ -171,14 +189,16 @@ JSON de respuesta (máximo 2 items por array, frases cortas):
                 : 'Revisa tus suscripciones periódicamente para eliminar las que no uses.'
         );
 
+        const totalSavedOrBalanced = ctx.totalSaving + Math.max(0, ctx.balance);
         const summary = ctx.balance >= 0
             ? (isEn
-                ? `This month you saved ${ctx.balance.toFixed(2)}€ with a savings rate of ${ctx.savingsRate.toFixed(1)}%.`
-                : `Este mes has ahorrado ${ctx.balance.toFixed(2)}€ con una tasa de ahorro del ${ctx.savingsRate.toFixed(1)}%.`)
+                ? `This month: income ${ctx.totalIncome.toFixed(2)}€, expenses ${ctx.totalExpenses.toFixed(2)}€, saving ${ctx.totalSaving.toFixed(2)}€. Savings rate: ${ctx.savingsRate.toFixed(1)}%.`
+                : `Este mes: ingresos ${ctx.totalIncome.toFixed(2)}€, gastos ${ctx.totalExpenses.toFixed(2)}€, ahorro ${ctx.totalSaving.toFixed(2)}€. Tasa de ahorro: ${ctx.savingsRate.toFixed(1)}%.`)
             : (isEn
                 ? `This month your expenses exceed your income by ${Math.abs(ctx.balance).toFixed(2)}€.`
                 : `Este mes tus gastos superan tus ingresos en ${Math.abs(ctx.balance).toFixed(2)}€.`);
 
+        void totalSavedOrBalanced; // used for future reference
         return { summary, tips, positives, warnings };
     }
 }

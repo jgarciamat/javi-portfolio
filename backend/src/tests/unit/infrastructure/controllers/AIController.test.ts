@@ -59,7 +59,7 @@ describe('AIController', () => {
 
     it('passes transaction and budget data when repos are provided', async () => {
         const tx = {
-            type: { isIncome: (): boolean => true },
+            type: { isSaving: (): boolean => false, isIncome: (): boolean => true },
             amount: { value: 500 },
             category: 'Salario',
             description: 'Salario',
@@ -78,12 +78,14 @@ describe('AIController', () => {
         await controller.getAdvice(makeReq({ year: 2025, month: 3 }), res as Response);
 
         expect(res.json).toHaveBeenCalledWith(sampleAdvice);
-        expect(getAIAdvice.execute).toHaveBeenCalledWith(expect.objectContaining({ totalIncome: 500, budgetAmount: 1000 }));
+        expect(getAIAdvice.execute).toHaveBeenCalledWith(
+            expect.objectContaining({ totalIncome: 500, budgetAmount: 1000, totalSaving: 0 })
+        );
     });
 
     it('handles expense transactions correctly', async () => {
         const tx = {
-            type: { isIncome: (): boolean => false },
+            type: { isSaving: (): boolean => false, isIncome: (): boolean => false },
             amount: { value: 200 },
             category: 'Ocio',
             description: 'Cine',
@@ -97,6 +99,41 @@ describe('AIController', () => {
 
         await controller.getAdvice(makeReq({ year: 2025, month: 3 }), res as Response);
 
-        expect(getAIAdvice.execute).toHaveBeenCalledWith(expect.objectContaining({ totalExpenses: 200, budgetAmount: 0 }));
+        expect(getAIAdvice.execute).toHaveBeenCalledWith(
+            expect.objectContaining({ totalExpenses: 200, budgetAmount: 0, totalSaving: 0 })
+        );
+    });
+
+    it('handles saving transactions correctly', async () => {
+        const incomeTx = {
+            type: { isSaving: (): boolean => false, isIncome: (): boolean => true },
+            amount: { value: 2000 },
+            category: 'Salario',
+            description: 'Salario',
+            date: { toISOString: (): string => '2025-03-01T00:00:00.000Z' },
+        };
+        const savingTx = {
+            type: { isSaving: (): boolean => true, isIncome: (): boolean => false },
+            amount: { value: 500 },
+            category: 'Fondo de emergencia',
+            description: 'Ahorro mensual',
+            date: { toISOString: (): string => '2025-03-02T00:00:00.000Z' },
+        };
+        const txRepo = { findByUserAndMonth: jest.fn().mockResolvedValue([incomeTx, savingTx]) };
+        const budgetRepo = { findByUserAndMonth: jest.fn().mockResolvedValue(null) };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        controller = new AIController(getAIAdvice, txRepo as any, budgetRepo as any);
+        const res = makeRes();
+
+        await controller.getAdvice(makeReq({ year: 2025, month: 3 }), res as Response);
+
+        expect(getAIAdvice.execute).toHaveBeenCalledWith(
+            expect.objectContaining({
+                totalIncome: 2000,
+                totalExpenses: 0,
+                totalSaving: 500,
+                savingByCategory: { 'Fondo de emergencia': 500 },
+            })
+        );
     });
 });

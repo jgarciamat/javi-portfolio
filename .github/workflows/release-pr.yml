@@ -51,15 +51,31 @@ jobs:
           ref: develop
           fetch-depth: 0   # full history needed for git log + push
 
-      # ── 3. Bump version in package.json (only on open/reopen) ───────────────
+      # ── 3. Bump version in package.json ─────────────────────────────────────
+      # Runs on opened, reopened and synchronize.
+      # The script itself guards against re-running when HEAD is already a bump commit.
       - name: Bump version and commit to develop
-        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        if: |
+          github.event.action == 'opened' ||
+          github.event.action == 'reopened' ||
+          github.event.action == 'synchronize'
         uses: actions/github-script@v7
         with:
           script: |
             const { execSync } = require('child_process');
             const fs = require('fs');
             const path = require('path');
+
+            // Guard: if the HEAD commit on develop is already a bump, skip
+            const headMsg = execSync('git log -1 --pretty=format:"%s" origin/develop').toString().trim();
+            if (/^chore\(release\): bump version/.test(headMsg)) {
+              console.log('HEAD is already a bump commit — skipping.');
+              // Still expose the current version for the changelog step
+              const pkgPath = path.join(process.env.GITHUB_WORKSPACE, 'frontend/package.json');
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              core.exportVariable('NEXT_VERSION', pkg.version);
+              return;
+            }
 
             // ── Determine bump type from commit subjects ──────────────────────
             const log = execSync(
@@ -103,12 +119,12 @@ jobs:
             execSync('git push origin develop');
 
             // ── Expose version for subsequent steps ───────────────────────────
-            const core = require('@actions/core');
+            // `core` is already injected as a global by actions/github-script
             core.exportVariable('NEXT_VERSION', nextVersion);
 
-      # ── 4. Read current version (on synchronize/edited) ─────────────────────
+      # ── 4. Read current version (fallback for edited event) ─────────────────
       - name: Read current version
-        if: github.event.action != 'opened' && github.event.action != 'reopened'
+        if: github.event.action == 'edited'
         run: |
           VERSION=$(node -p "require('./frontend/package.json').version")
           echo "NEXT_VERSION=$VERSION" >> $GITHUB_ENV
@@ -123,7 +139,10 @@ jobs:
             const pr = context.payload.pull_request;
             const version = process.env.NEXT_VERSION;
 
-            // Commits in develop not yet in master
+            // Fetch latest refs so git log sees the bump commit if it was just pushed
+            execSync('git fetch origin');
+
+            // Commits in develop not yet in master (exclude auto bump commits)
             const log = execSync(
               'git log origin/master..origin/develop --pretty=format:"%H|%s|%an" --no-merges'
             ).toString().trim();
@@ -149,6 +168,8 @@ jobs:
 
             for (const line of log.split('\n')) {
               const [sha, subject, author] = line.split('|');
+              // Skip auto-generated bump commits
+              if (/^chore\(release\): bump version/.test(subject)) continue;
               const match = subject.match(/^(\w+)(\(.*?\))?!?:/);
               const type  = match ? match[1] : 'other';
               const key   = LABELS[type] ?? '📦 Other';
@@ -185,13 +206,20 @@ jobs:
             });
 
             // Also update the PR title to include the version (if not already there)
-            const currentTitle = pr.title;
-            if (!currentTitle.includes(`v${version}`)) {
-              const cleanTitle = currentTitle.replace(/\s*v\d+\.\d+\.\d+\s*$/, '').trim();
+            // Fetch the *current* PR title from the API (not the stale payload)
+            const { data: freshPr } = await github.rest.pulls.get({
+              owner, repo,
+              pull_number: pr.number,
+            });
+            const currentTitle = freshPr.title;
+            // Strip any existing version suffix (anywhere in the title, not just at end)
+            const cleanTitle = currentTitle.replace(/\s*v\d+\.\d+\.\d+/g, '').trim();
+            const newTitle = `${cleanTitle} v${version}`;
+            if (currentTitle !== newTitle) {
               await github.rest.pulls.update({
                 owner, repo,
                 pull_number: pr.number,
-                title: `${cleanTitle} v${version}`,
+                title: newTitle,
               });
             }
 
