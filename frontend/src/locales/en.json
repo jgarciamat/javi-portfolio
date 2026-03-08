@@ -241,5 +241,9 @@
     "app.categories.Salud": "Health",
     "app.categories.Tecnología": "Technology",
     "app.categories.Transporte": "Transport",
-    "app.categories.Vivienda": "Housing"
+    "app.categories.Vivienda": "Housing",
+    "app.confirm.delete.title": "Delete transaction",
+    "app.confirm.delete.message": "Are you sure you want to delete this transaction? This action cannot be undone.",
+    "app.confirm.delete.cancel": "No, cancel",
+    "app.confirm.delete.confirm": "Yes, delete"
 }

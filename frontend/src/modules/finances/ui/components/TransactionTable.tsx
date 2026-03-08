@@ -4,6 +4,7 @@ import type { TransactionTableProps } from '../types';
 import type { TransactionType } from '@modules/finances/domain/types';
 import { formatCurrency, formatDate } from '../types/TransactionTable.types';
 import { useI18n } from '@core/i18n/I18nContext';
+import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
 
 function txBadgeClass(type: TransactionType): string {
     if (type === 'INCOME') return 'tx-badge tx-badge-income';
@@ -21,6 +22,7 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
     const { t, tCategory } = useI18n();
     const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
     const [notesValue, setNotesValue] = useState('');
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
     const txLabel = (type: TransactionType): string => {
         if (type === 'INCOME') return t('app.transaction.form.type.income');
@@ -104,7 +106,7 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
                                 </td>
                                 <td>
                                     <button className="btn-edit" onClick={() => onEdit(tx)} title={t('app.transaction.table.edit')} aria-label={t('app.transaction.table.edit')}>✏️</button>
-                                    <button className="btn-delete" onClick={() => onDelete(tx.id)} title={t('app.transaction.table.delete')} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                                    <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} title={t('app.transaction.table.delete')} aria-label={t('app.transaction.table.delete')}>🗑️</button>
                                 </td>
                             </tr>
                         ))}
@@ -146,12 +148,22 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
                             <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
                             <div style={{ display: 'flex', gap: '0.25rem' }}>
                                 <button className="btn-edit" onClick={() => onEdit(tx)} aria-label={t('app.transaction.table.edit')}>✏️</button>
-                                <button className="btn-delete" onClick={() => onDelete(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                                <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {pendingDeleteId !== null && (
+                <ConfirmDeleteModal
+                    onConfirm={() => {
+                        onDelete(pendingDeleteId);
+                        setPendingDeleteId(null);
+                    }}
+                    onCancel={() => setPendingDeleteId(null)}
+                />
+            )}
         </>
     );
 }

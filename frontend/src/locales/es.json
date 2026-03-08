@@ -241,5 +241,9 @@
     "app.categories.Salud": "Salud",
     "app.categories.Tecnología": "Tecnología",
     "app.categories.Transporte": "Transporte",
-    "app.categories.Vivienda": "Vivienda"
+    "app.categories.Vivienda": "Vivienda",
+    "app.confirm.delete.title": "Eliminar transacción",
+    "app.confirm.delete.message": "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+    "app.confirm.delete.cancel": "No, cancelar",
+    "app.confirm.delete.confirm": "Sí, eliminar"
 }

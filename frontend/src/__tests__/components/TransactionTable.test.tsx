@@ -67,18 +67,70 @@ describe('TransactionTable', () => {
         expect(screen.getAllByText(/Ahorro/i).length).toBeGreaterThan(0);
     });
 
-    test('calls onDelete with correct id when delete button is clicked', () => {
+    // ── delete confirmation modal ─────────────────────────────────────────────
+
+    test('clicking delete button opens confirmation modal, not calling onDelete yet', () => {
         render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
-        const deleteBtns = screen.getAllByLabelText('Eliminar');
+        const deleteBtns = screen.getAllByLabelText(t('app.transaction.table.delete'));
         fireEvent.click(deleteBtns[0]);
-        expect(mockOnDelete).toHaveBeenCalledWith('t1');
+        // Modal should be visible
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByText(t('app.confirm.delete.title'))).toBeInTheDocument();
+        expect(screen.getByText(t('app.confirm.delete.message'))).toBeInTheDocument();
+        // onDelete must NOT have been called yet
+        expect(mockOnDelete).not.toHaveBeenCalled();
     });
 
-    test('calls onDelete from mobile card delete button', () => {
+    test('confirming delete calls onDelete with correct id and closes modal', () => {
         render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
-        const deleteBtns = screen.getAllByLabelText('Eliminar');
-        expect(deleteBtns.length).toBe(2);
+        fireEvent.click(screen.getAllByLabelText(t('app.transaction.table.delete'))[0]);
+        // Click the red confirm button
+        fireEvent.click(screen.getByText(t('app.confirm.delete.confirm')));
+        expect(mockOnDelete).toHaveBeenCalledWith('t1');
+        expect(mockOnDelete).toHaveBeenCalledTimes(1);
+        // Modal should be gone
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    test('cancelling delete closes modal without calling onDelete', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        fireEvent.click(screen.getAllByLabelText(t('app.transaction.table.delete'))[0]);
+        fireEvent.click(screen.getByText(t('app.confirm.delete.cancel')));
+        expect(mockOnDelete).not.toHaveBeenCalled();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    test('pressing Escape closes confirmation modal without calling onDelete', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        fireEvent.click(screen.getAllByLabelText(t('app.transaction.table.delete'))[0]);
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        fireEvent.keyDown(document, { key: 'Escape' });
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(mockOnDelete).not.toHaveBeenCalled();
+    });
+
+    test('clicking overlay closes confirmation modal without calling onDelete', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        fireEvent.click(screen.getAllByLabelText(t('app.transaction.table.delete'))[0]);
+        const overlay = screen.getByRole('dialog');
+        fireEvent.click(overlay);
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(mockOnDelete).not.toHaveBeenCalled();
+    });
+
+    test('mobile card delete button also opens confirmation modal', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        const deleteBtns = screen.getAllByLabelText(t('app.transaction.table.delete'));
+        expect(deleteBtns.length).toBe(2); // desktop + mobile
         fireEvent.click(deleteBtns[1]);
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(mockOnDelete).not.toHaveBeenCalled();
+    });
+
+    test('mobile card confirm delete calls onDelete with correct id', () => {
+        render(<TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />);
+        fireEvent.click(screen.getAllByLabelText(t('app.transaction.table.delete'))[1]);
+        fireEvent.click(screen.getByText(t('app.confirm.delete.confirm')));
         expect(mockOnDelete).toHaveBeenCalledWith('t1');
     });
 
