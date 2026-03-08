@@ -19,8 +19,8 @@ interface FormState {
     type: TransactionType;
     category: string;
     frequency: RecurringFrequency;
-    startYear: string;
-    startMonth: string;
+    /** ISO date string YYYY-MM-DD used by the native date picker */
+    startDate: string;
     hasEnd: boolean;
     /** ISO date string YYYY-MM-DD used by the native date picker */
     endDate: string;
@@ -33,8 +33,7 @@ const EMPTY_FORM: FormState = {
     type: 'EXPENSE',
     category: '',
     frequency: 'monthly',
-    startYear: String(now.getFullYear()),
-    startMonth: String(now.getMonth() + 1),
+    startDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`,
     hasEnd: false,
     endDate: '',
 };
@@ -47,14 +46,14 @@ function ruleToForm(rule: RecurringRule): FormState {
         rule.endYear !== null && rule.endMonth !== null
             ? `${rule.endYear}-${String(rule.endMonth).padStart(2, '0')}-01`
             : '';
+    const startDate = `${rule.startYear}-${String(rule.startMonth).padStart(2, '0')}-01`;
     return {
         description: rule.description,
         amount: String(rule.amount),
         type: rule.type,
         category: rule.category,
         frequency: rule.frequency,
-        startYear: String(rule.startYear),
-        startMonth: String(rule.startMonth),
+        startDate,
         hasEnd: rule.endYear !== null,
         endDate,
     };
@@ -75,14 +74,15 @@ function buildDto(form: FormState, amount: number): CreateRecurringRuleDTO {
         endYear = y;
         endMonth = m;
     }
+    const [sy, sm] = form.startDate ? form.startDate.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
     return {
         description: form.description.trim(),
         amount,
         type: form.type,
         category: form.category,
         frequency: form.frequency,
-        startYear: parseInt(form.startYear, 10),
-        startMonth: parseInt(form.startMonth, 10),
+        startYear: sy,
+        startMonth: sm,
         endYear,
         endMonth,
     };
@@ -175,24 +175,16 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                     </select>
                 </div>
 
-                {/* Start */}
+                {/* Start — native date picker */}
                 <div className="recurring-form-field">
                     <label className="recurring-label">{t('app.recurring.form.start')}</label>
-                    <div className="recurring-date-row">
-                        <select className="tx-input" value={form.startMonth} onChange={(e) => set('startMonth', e.target.value)}>
-                            {Array.from({ length: 12 }, (_, i) => (
-                                <option key={i + 1} value={i + 1}>{t(`app.recurring.months.${i + 1}`)}</option>
-                            ))}
-                        </select>
-                        <input
-                            className="tx-input recurring-year-input"
-                            type="number"
-                            min="2020"
-                            max="2099"
-                            value={form.startYear}
-                            onChange={(e) => set('startYear', e.target.value)}
-                        />
-                    </div>
+                    <input
+                        className="tx-input recurring-date-input"
+                        type="date"
+                        value={form.startDate}
+                        onChange={(e) => set('startDate', e.target.value)}
+                        onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+                    />
                 </div>
 
                 {/* End — radio buttons + native date picker */}
@@ -222,10 +214,11 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                     </div>
                     {form.hasEnd && (
                         <input
-                            className="tx-input"
+                            className="tx-input recurring-date-input"
                             type="date"
                             value={form.endDate}
                             onChange={(e) => set('endDate', e.target.value)}
+                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
                         />
                     )}
                 </div>

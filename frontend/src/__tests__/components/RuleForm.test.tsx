@@ -120,9 +120,21 @@ function getNoEndRadio() {
     return screen.getByRole('radio', { name: t('app.recurring.form.end.noend') });
 }
 
-/** Get the native date input (only present when "Con fecha de fin" is selected) */
+/** Get all date inputs (start is always present in the form, end only when hasEnd=true) */
+function getDateInputs() {
+    return Array.from(document.querySelectorAll('input[type="date"]')) as HTMLInputElement[];
+}
+
+/** Get the start date input (always the first date input in the form) */
+function getStartDateInput() {
+    return getDateInputs()[0];
+}
+
+/** Get the native date input for end (only present when "Con fecha de fin" is selected) */
 function getEndDateInput() {
-    return document.querySelector('input[type="date"]') as HTMLInputElement;
+    const inputs = getDateInputs();
+    // After clicking "Con fecha de fin" there will be 2 date inputs: [start, end]
+    return inputs.length >= 2 ? inputs[1] : null;
 }
 
 /** Fill the minimum required fields */
@@ -205,6 +217,12 @@ describe('RuleForm — end-date radio buttons', () => {
         openCreateForm();
         expect(screen.queryByText(/Deja en blanco/)).toBeNull();
     });
+
+    test('"Inicio" date input is shown by default', () => {
+        renderTab();
+        openCreateForm();
+        expect(getStartDateInput()).toBeInTheDocument();
+    });
 });
 
 // ── buildDto — payload sent to API ────────────────────────────────────────────
@@ -236,7 +254,7 @@ describe('RuleForm — buildDto (via form submission)', () => {
         fillRequiredFields('Gym', '40', 'Hogar');
 
         fireEvent.click(getWithEndRadio());
-        fireEvent.change(getEndDateInput(), { target: { value: '2027-07-01' } });
+        fireEvent.change(getEndDateInput()!, { target: { value: '2027-07-01' } });
 
         fireEvent.click(screen.getByText(t('app.recurring.form.save')));
 
@@ -289,15 +307,8 @@ describe('RuleForm — buildDto (via form submission)', () => {
         )!;
         fireEvent.change(freqSelect, { target: { value: 'bimonthly' } });
 
-        const startMonthSelect = screen.getAllByRole('combobox').find((s) =>
-            Array.from(s.querySelectorAll('option')).some((o) => (o as HTMLOptionElement).value === '6'),
-        )!;
-        fireEvent.change(startMonthSelect, { target: { value: '6' } });
-
-        const yearInputs = screen
-            .getAllByRole('spinbutton')
-            .filter((el) => (el as HTMLInputElement).min === '2020');
-        fireEvent.change(yearInputs[0], { target: { value: '2026' } });
+        // Set start date via native date input
+        fireEvent.change(getStartDateInput(), { target: { value: '2026-06-01' } });
 
         fireEvent.click(screen.getByText(t('app.recurring.form.save')));
 
@@ -411,6 +422,8 @@ describe('RuleForm — ruleToForm (edit mode pre-population)', () => {
             (screen.getByPlaceholderText(t('app.recurring.form.description')) as HTMLInputElement).value,
         ).toBe('Netflix');
         expect((screen.getByPlaceholderText('0.00') as HTMLInputElement).value).toBe('12.99');
+        // ruleNoEnd: startYear=2026, startMonth=3
+        expect(getStartDateInput().value).toBe('2026-03-01');
         expect(getNoEndRadio()).toBeChecked();
         expect(getEndDateInput()).toBeNull();
     });
@@ -420,11 +433,13 @@ describe('RuleForm — ruleToForm (edit mode pre-population)', () => {
         renderTab();
         fireEvent.click(screen.getByRole('button', { name: new RegExp(t('app.recurring.card.edit')) }));
 
+        // ruleWithEnd: startYear=2026, startMonth=1
+        expect(getStartDateInput().value).toBe('2026-01-01');
         expect(getWithEndRadio()).toBeChecked();
-        const dateInput = getEndDateInput();
-        expect(dateInput).toBeInTheDocument();
+        const dateInputs = getDateInputs();
+        expect(dateInputs).toHaveLength(2);
         // ruleWithEnd has endYear=2026, endMonth=7 → formatted as 2026-07-01
-        expect(dateInput!.value).toBe('2026-07-01');
+        expect(dateInputs[1].value).toBe('2026-07-01');
     });
 
     test('edit form shows correct title', () => {
@@ -495,18 +510,16 @@ describe('RuleForm — additional coverage', () => {
         currentRules = [];
     });
 
-    test('changing start year updates the dto startYear', async () => {
+    test('changing start date updates the dto startYear and startMonth', async () => {
         mockCreateRule.mockResolvedValue({ ...ruleNoEnd, id: 'new' });
         renderTab();
         openCreateForm();
         fillRequiredFields();
-        const yearInputs = screen
-            .getAllByRole('spinbutton')
-            .filter((el) => (el as HTMLInputElement).min === '2020');
-        fireEvent.change(yearInputs[0], { target: { value: '2025' } });
+        fireEvent.change(getStartDateInput(), { target: { value: '2025-04-01' } });
         fireEvent.click(screen.getByText(t('app.recurring.form.save')));
         await waitFor(() => expect(mockCreateRule).toHaveBeenCalled());
         expect(mockCreateRule.mock.calls[0][0].startYear).toBe(2025);
+        expect(mockCreateRule.mock.calls[0][0].startMonth).toBe(4);
     });
 
     test('RuleCard shows "Activar" button when rule is inactive', () => {

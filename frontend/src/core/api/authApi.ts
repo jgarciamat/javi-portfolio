@@ -57,7 +57,12 @@ export function registerUnauthorizedHandler(handler: () => void): void {
     onUnauthorized = handler;
 }
 
-async function request<T>(path: string, options?: RequestInit, isRetry = false): Promise<T> {
+/**
+ * Authenticated request with automatic 401 handling:
+ * tries to refresh the access token once, then calls onUnauthorized (logout) if refresh also fails.
+ * Exported so financeApi and premiumApi can share the same auth/refresh/logout logic.
+ */
+export async function apiRequest<T>(path: string, options?: RequestInit, isRetry = false): Promise<T> {
     const res = await fetch(`${API_BASE_URL}${path}`, {
         headers: authHeaders(),
         ...options,
@@ -111,7 +116,7 @@ export const authApi = {
         return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: JSON.stringify(dto) });
     },
     logout(refreshToken: string) {
-        return request<void>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) });
+        return apiRequest<void>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) });
     },
     verifyEmail(token: string) {
         return publicRequest<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`);
@@ -123,31 +128,31 @@ export const authApi = {
         return publicRequest<{ message: string }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) });
     },
     updateName(name: string) {
-        return request<{ name: string }>('/profile/name', { method: 'PATCH', body: JSON.stringify({ name }) });
+        return apiRequest<{ name: string }>('/profile/name', { method: 'PATCH', body: JSON.stringify({ name }) });
     },
     updatePassword(currentPassword: string, newPassword: string) {
-        return request<{ message: string }>('/profile/password', { method: 'PATCH', body: JSON.stringify({ currentPassword, newPassword }) });
+        return apiRequest<{ message: string }>('/profile/password', { method: 'PATCH', body: JSON.stringify({ currentPassword, newPassword }) });
     },
     updateAvatar(avatarDataUrl: string) {
-        return request<{ avatarUrl: string }>('/profile/avatar', { method: 'PATCH', body: JSON.stringify({ avatarDataUrl }) });
+        return apiRequest<{ avatarUrl: string }>('/profile/avatar', { method: 'PATCH', body: JSON.stringify({ avatarDataUrl }) });
     },
 };
 
 export const budgetApi = {
     get(year: number, month: number) {
-        return request<MonthlyBudget>(`/budget/${year}/${month}`);
+        return apiRequest<MonthlyBudget>(`/budget/${year}/${month}`);
     },
     set(year: number, month: number, initialAmount: number) {
-        return request<MonthlyBudget>(`/budget/${year}/${month}`, {
+        return apiRequest<MonthlyBudget>(`/budget/${year}/${month}`, {
             method: 'PUT',
             body: JSON.stringify({ initialAmount }),
         });
     },
     history() {
-        return request<MonthlyBudget[]>('/budget/history');
+        return apiRequest<MonthlyBudget[]>('/budget/history');
     },
     getCarryover(year: number, month: number) {
-        return request<{ carryover: number; year: number; month: number }>(
+        return apiRequest<{ carryover: number; year: number; month: number }>(
             `/budget/carryover/${year}/${month}`
         );
     },

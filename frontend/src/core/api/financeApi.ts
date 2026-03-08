@@ -1,4 +1,5 @@
-import { API_BASE_URL } from '@core/config/api.config';
+
+import { apiRequest } from '@core/api/authApi';
 import type {
     Transaction,
     CreateTransactionDTO,
@@ -10,26 +11,6 @@ import type {
     UpdateRecurringRuleDTO,
 } from '@shared/types/finance.types';
 
-function authHeaders(): Record<string, string> {
-    const token = localStorage.getItem('mm_token');
-    return token
-        ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-        : { 'Content-Type': 'application/json' };
-}
-
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-        headers: authHeaders(),
-        ...options,
-    });
-    if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error ?? `HTTP error ${res.status}`);
-    }
-    if (res.status === 204) return undefined as T;
-    return res.json();
-}
-
 export const transactionApi = {
     getAll(params?: { year?: number; month?: number }) {
         const query = new URLSearchParams(
@@ -37,29 +18,29 @@ export const transactionApi = {
                 .filter(([, v]) => v !== undefined)
                 .map(([k, v]) => [k, String(v)])
         ).toString();
-        return request<Transaction[]>(`/transactions${query ? `?${query}` : ''}`);
+        return apiRequest<Transaction[]>(`/transactions${query ? `?${query}` : ''}`);
     },
 
     create(dto: CreateTransactionDTO) {
-        return request<Transaction>('/transactions', {
+        return apiRequest<Transaction>('/transactions', {
             method: 'POST',
             body: JSON.stringify(dto),
         });
     },
 
     delete(id: string) {
-        return request<void>(`/transactions/${id}`, { method: 'DELETE' });
+        return apiRequest<void>(`/transactions/${id}`, { method: 'DELETE' });
     },
 
     patch(id: string, changes: { notes?: string | null }) {
-        return request<Transaction>(`/transactions/${id}`, {
+        return apiRequest<Transaction>(`/transactions/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(changes),
         });
     },
 
     update(id: string, dto: Partial<CreateTransactionDTO>) {
-        return request<Transaction>(`/transactions/${id}`, {
+        return apiRequest<Transaction>(`/transactions/${id}`, {
             method: 'PUT',
             body: JSON.stringify(dto),
         });
@@ -71,46 +52,46 @@ export const transactionApi = {
                 .filter(([, v]) => v !== undefined)
                 .map(([k, v]) => [k, String(v)])
         ).toString();
-        return request<FinancialSummary>(`/transactions/summary${query ? `?${query}` : ''}`);
+        return apiRequest<FinancialSummary>(`/transactions/summary${query ? `?${query}` : ''}`);
     },
 
     getAnnual(year: number) {
-        return request<AnnualSummary>(`/transactions/annual/${year}`);
+        return apiRequest<AnnualSummary>(`/transactions/annual/${year}`);
     },
 };
 
 export const categoryApi = {
     getAll() {
-        return request<Category[]>('/categories');
+        return apiRequest<Category[]>('/categories');
     },
     create(dto: { name: string; color?: string; icon?: string }) {
-        return request<Category>('/categories', {
+        return apiRequest<Category>('/categories', {
             method: 'POST',
             body: JSON.stringify(dto),
         });
     },
     delete(id: string) {
-        return request<void>(`/categories/${id}`, { method: 'DELETE' });
+        return apiRequest<void>(`/categories/${id}`, { method: 'DELETE' });
     },
 };
 
 export const recurringApi = {
     getAll() {
-        return request<RecurringRule[]>('/recurring-rules');
+        return apiRequest<RecurringRule[]>('/recurring-rules');
     },
     create(dto: CreateRecurringRuleDTO) {
-        return request<RecurringRule>('/recurring-rules', {
+        return apiRequest<RecurringRule>('/recurring-rules', {
             method: 'POST',
             body: JSON.stringify(dto),
         });
     },
     update(id: string, dto: UpdateRecurringRuleDTO) {
-        return request<RecurringRule>(`/recurring-rules/${id}`, {
+        return apiRequest<RecurringRule>(`/recurring-rules/${id}`, {
             method: 'PATCH',
             body: JSON.stringify(dto),
         });
     },
     delete(id: string, scope: 'none' | 'from_current' | 'all' = 'none') {
-        return request<void>(`/recurring-rules/${id}?scope=${scope}`, { method: 'DELETE' });
+        return apiRequest<void>(`/recurring-rules/${id}?scope=${scope}`, { method: 'DELETE' });
     },
 };

@@ -82,7 +82,7 @@ describe('transactionApi', () => {
 
     test('throws HTTP error status when body has no error field', async () => {
         mockFetch.mockResolvedValueOnce(makeResponse({}, 500));
-        await expect(transactionApi.getAll()).rejects.toThrow('HTTP error 500');
+        await expect(transactionApi.getAll()).rejects.toThrow('HTTP 500');
     });
 
     test('falls back to HTTP status when error response body is not JSON', async () => {
@@ -91,7 +91,7 @@ describe('transactionApi', () => {
             status: 502,
             json: jest.fn().mockRejectedValue(new Error('not json')),
         });
-        await expect(transactionApi.getAll()).rejects.toThrow('HTTP error 502');
+        await expect(transactionApi.getAll()).rejects.toThrow('HTTP 502');
     });
 
     test('sends Authorization header when token exists', async () => {

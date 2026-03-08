@@ -1,23 +1,4 @@
-import { API_BASE_URL } from '@core/config/api.config';
-
-function authHeaders(): Record<string, string> {
-    const token = localStorage.getItem('mm_token');
-    return token
-        ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
-        : { 'Content-Type': 'application/json' };
-}
-
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-        headers: authHeaders(),
-        ...options,
-    });
-    if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error ?? `HTTP error ${res.status}`);
-    }
-    return res.json();
-}
+import { apiRequest } from '@core/api/authApi';
 
 // ─── Alerts ──────────────────────────────────────────────────────────────────
 
@@ -40,7 +21,7 @@ export interface AlertsResponse {
 
 export const alertApi = {
     getBudgetAlerts(year: number, month: number): Promise<AlertsResponse> {
-        return request<AlertsResponse>(`/alerts/budget/${year}/${month}`);
+        return apiRequest<AlertsResponse>(`/alerts/budget/${year}/${month}`);
     },
 };
 
@@ -55,7 +36,7 @@ export interface AIAdvice {
 
 export const aiApi = {
     getAdvice(year: number, month: number, locale: string): Promise<AIAdvice> {
-        return request<AIAdvice>('/ai/advice', {
+        return apiRequest<AIAdvice>('/ai/advice', {
             method: 'POST',
             body: JSON.stringify({ year, month, locale }),
         });
@@ -87,28 +68,28 @@ export interface SyncResult {
 
 export const openBankingApi = {
     listInstitutions(country = 'ES'): Promise<{ institutions: BankInstitution[] }> {
-        return request<{ institutions: BankInstitution[] }>(`/open-banking/institutions?country=${country}`);
+        return apiRequest<{ institutions: BankInstitution[] }>(`/open-banking/institutions?country=${country}`);
     },
 
     linkAccount(institutionId: string, redirectUrl: string): Promise<{ link: string; requisitionId: string }> {
-        return request<{ link: string; requisitionId: string }>('/open-banking/link', {
+        return apiRequest<{ link: string; requisitionId: string }>('/open-banking/link', {
             method: 'POST',
             body: JSON.stringify({ institutionId, redirectUrl }),
         });
     },
 
     getLinkedAccounts(requisitionId: string): Promise<{ accounts: LinkedAccount[] }> {
-        return request<{ accounts: LinkedAccount[] }>(`/open-banking/accounts?requisitionId=${requisitionId}`);
+        return apiRequest<{ accounts: LinkedAccount[] }>(`/open-banking/accounts?requisitionId=${requisitionId}`);
     },
 
     syncTransactions(accountId: string, dateFrom?: string, dateTo?: string): Promise<SyncResult> {
-        return request<SyncResult>('/open-banking/sync', {
+        return apiRequest<SyncResult>('/open-banking/sync', {
             method: 'POST',
             body: JSON.stringify({ accountId, dateFrom, dateTo }),
         });
     },
 
     unlinkAccount(accountId: string): Promise<{ message: string }> {
-        return request<{ message: string }>(`/open-banking/accounts/${accountId}`, { method: 'DELETE' });
+        return apiRequest<{ message: string }>(`/open-banking/accounts/${accountId}`, { method: 'DELETE' });
     },
 };

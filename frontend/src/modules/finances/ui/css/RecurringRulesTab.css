@@ -66,13 +66,9 @@
     letter-spacing: 0.02em;
 }
 
-.recurring-date-row {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.recurring-year-input {
-    max-width: 90px;
+.recurring-date-input {
+    width: 160px;
+    cursor: pointer;
 }
 
 .recurring-end-radios {
