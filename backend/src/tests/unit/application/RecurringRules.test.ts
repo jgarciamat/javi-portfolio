@@ -62,13 +62,13 @@ describe('CreateRecurringRule', () => {
         expect(txRepo.saveForUser).not.toHaveBeenCalled();
     });
 
-    it('creates backfill transactions for past months up to today', async () => {
+    it('creates backfill transactions for past months up to today+1 (next visible month)', async () => {
         const repo = makeRepo();
         const txRepo = makeTxRepo();
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
-        // Start exactly 2 months ago (monthly) → expect 3 transactions (start, start+1, current)
+        // Start exactly 2 months ago (monthly) → expect 4 transactions (start, start+1, current, current+1)
         let startYear = currentYear;
         let startMonth = currentMonth - 2;
         if (startMonth <= 0) { startMonth += 12; startYear -= 1; }
@@ -83,7 +83,7 @@ describe('CreateRecurringRule', () => {
             startMonth,
         });
 
-        expect(txRepo.saveForUser).toHaveBeenCalledTimes(3);
+        expect(txRepo.saveForUser).toHaveBeenCalledTimes(4);
     });
 
     it('only backfills months within end date range', async () => {
@@ -143,8 +143,8 @@ describe('GetRecurringRules', () => {
         const rule = makeRule({ startYear, startMonth });
         repo.findByUserId.mockReturnValue([rule]);
         await new GetRecurringRules(repo, txRepo).execute('u1');
-        // Should attempt to backfill 2 months (startMonth and currentMonth)
-        expect(txRepo.saveForUser).toHaveBeenCalledTimes(2);
+        // Should attempt to backfill 3 months (startMonth, currentMonth, currentMonth+1)
+        expect(txRepo.saveForUser).toHaveBeenCalledTimes(3);
     });
 
     it('does not backfill inactive rules', async () => {

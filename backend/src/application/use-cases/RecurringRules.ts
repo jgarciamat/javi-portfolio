@@ -26,13 +26,17 @@ export class CreateRecurringRule {
         const rule = RecurringRule.create(dto);
         this.repo.save(rule);
 
-        // Backfill: create transactions for every past/current month the rule applies to
+        // Backfill: create transactions for every past/current/next-visible month the rule applies to.
+        // The app allows viewing up to 1 month ahead of today, so we fill up to currentMonth+1.
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
+        // maxVisibleOrd = currentMonth + 1 (wrapping December → January of next year)
+        const maxVisibleYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        const maxVisibleMonth = currentMonth === 12 ? 1 : currentMonth + 1;
 
         const startOrdinal = dto.startYear * 12 + dto.startMonth;
-        const endOrdinal = currentYear * 12 + currentMonth;
+        const endOrdinal = maxVisibleYear * 12 + maxVisibleMonth;
 
         for (let ord = startOrdinal; ord <= endOrdinal; ord++) {
             const year = Math.floor((ord - 1) / 12);
@@ -65,17 +69,22 @@ export class GetRecurringRules {
     async execute(userId: string): Promise<RecurringRule[]> {
         const rules = this.repo.findByUserId(userId);
 
-        // Backfill any active rules that are missing transactions for past/current months
+        // Backfill any active rules that are missing transactions for past/current/next-visible months.
+        // The app allows viewing up to 1 month ahead of today, so we fill up to currentMonth+1.
         const now = new Date();
-        const currentOrd = now.getFullYear() * 12 + (now.getMonth() + 1);
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+        const maxVisibleYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        const maxVisibleMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        const maxVisibleOrd = maxVisibleYear * 12 + maxVisibleMonth;
 
         for (const rule of rules) {
             if (!rule.active) continue;
 
             const startOrd = rule.startYear * 12 + rule.startMonth;
             const endOrd = rule.endYear !== null && rule.endMonth !== null
-                ? Math.min(rule.endYear * 12 + rule.endMonth, currentOrd)
-                : currentOrd;
+                ? Math.min(rule.endYear * 12 + rule.endMonth, maxVisibleOrd)
+                : maxVisibleOrd;
 
             for (let ord = startOrd; ord <= endOrd; ord++) {
                 const year = Math.floor((ord - 1) / 12);
