@@ -107,11 +107,11 @@ export function Dashboard() {
                     <button className={`tab-btn${tab === 'monthly' ? ' active' : ''}`} onClick={() => setTab('monthly')}>
                         📅 {t('app.tabs.monthly')}
                     </button>
-                    <button className={`tab-btn${tab === 'annual' ? ' active' : ''}`} onClick={() => setTab('annual')}>
-                        📊 {t('app.tabs.annual')}
-                    </button>
                     <button className={`tab-btn${tab === 'automations' ? ' active' : ''}`} onClick={() => setTab('automations')}>
                         ⚙️ {t('app.tabs.automations')}
+                    </button>
+                    <button className={`tab-btn${tab === 'annual' ? ' active' : ''}`} onClick={() => setTab('annual')}>
+                        📊 {t('app.tabs.annual')}
                     </button>
                 </div>
 

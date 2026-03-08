@@ -24,6 +24,13 @@ textarea {
     font-size: inherit;
 }
 
+/* Prevent date pickers from overflowing their container on mobile */
+input[type="date"] {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
 /* ─── Card base ──────────────────────────────── */
 .card {
     background: #0f172a;
