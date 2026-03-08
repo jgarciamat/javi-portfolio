@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
-import './LanguageSwitcher.css';
+import './css/LanguageSwitcher.css';
 
 const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
     { locale: 'es', flag: '🇪🇸', label: 'Español' },

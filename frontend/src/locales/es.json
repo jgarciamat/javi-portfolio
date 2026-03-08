@@ -250,5 +250,9 @@
     "app.confirm.delete.title": "Eliminar transacción",
     "app.confirm.delete.message": "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
     "app.confirm.delete.cancel": "No, cancelar",
-    "app.confirm.delete.confirm": "Sí, eliminar"
+    "app.confirm.delete.confirm": "Sí, eliminar",
+    "app.alert.dismiss": "Cerrar alerta",
+    "app.alert.spent": "Gastado:",
+    "app.alert.remaining": "Te quedan:",
+    "app.alert.overBudget": "Te pasas:"
 }

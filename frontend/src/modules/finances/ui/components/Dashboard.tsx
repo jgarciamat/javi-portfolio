@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import '../css/Dashboard.css';
 import { useFinances } from '../../application/FinancesContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useDashboard } from '../../application/hooks/useDashboard';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { AnnualChart } from './AnnualChart';
 import { CategoryManager } from './CategoryManager';
@@ -10,15 +10,9 @@ import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView } from './MonthlyView';
 import { RecurringRulesTab } from './RecurringRulesTab';
-import type { Transaction } from '@modules/finances/domain/types';
 
 export function Dashboard() {
     const now = new Date();
-    const [tab, setTab] = useState<'monthly' | 'annual' | 'automations'>('monthly');
-    const [showCategoryModal, setShowCategoryModal] = useState(false);
-    const [showProfile, setShowProfile] = useState(false);
-    const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-
     const { user, logout } = useAuth();
     const { t } = useI18n();
     const {
@@ -30,14 +24,13 @@ export function Dashboard() {
         addCategory, removeCategory,
     } = useFinances();
 
-    const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
-
-    const handleSaveEdit = async (id: string, dto: Parameters<typeof updateTransaction>[1]) => {
-        await updateTransaction(id, dto);
-        setEditingTransaction(null);
-    };
-
-    const handleMonthClick = (y: number, m: number) => { navigateTo(y, m); setTab('monthly'); };
+    const {
+        tab, setTab,
+        showCategoryModal, openCategoryModal, closeCategoryModal,
+        showProfile, openProfile, closeProfile,
+        editingTransaction, setEditingTransaction,
+        isCurrentMonth, handleSaveEdit, handleMonthClick,
+    } = useDashboard({ year, month, navigateTo, updateTransaction });
 
     function renderTabContent() {
         if (tab === 'annual') {
@@ -69,7 +62,7 @@ export function Dashboard() {
                 onDeleteTransaction={removeTransaction}
                 onPatchTransaction={patchTransaction}
                 onEditTransaction={setEditingTransaction}
-                onManageCategories={() => setShowCategoryModal(true)}
+                onManageCategories={openCategoryModal}
             />
         );
     }
@@ -87,7 +80,7 @@ export function Dashboard() {
                 <div className="header-actions">
                     <button
                         className="header-user header-user-btn"
-                        onClick={() => setShowProfile(true)}
+                        onClick={openProfile}
                         aria-label={t('app.header.openProfile')}
                         title={t('app.header.openProfile')}
                     >
@@ -120,13 +113,13 @@ export function Dashboard() {
 
             <CategoryManager
                 open={showCategoryModal}
-                onClose={() => setShowCategoryModal(false)}
+                onClose={closeCategoryModal}
                 categories={categories}
                 onAdd={addCategory}
                 onDelete={removeCategory}
             />
 
-            {showProfile && <ProfilePage onClose={() => setShowProfile(false)} />}
+            {showProfile && <ProfilePage onClose={closeProfile} />}
 
             {editingTransaction && (
                 <EditTransactionModal
@@ -134,7 +127,7 @@ export function Dashboard() {
                     categories={categories}
                     onSave={handleSaveEdit}
                     onClose={() => setEditingTransaction(null)}
-                    onManageCategories={() => { setEditingTransaction(null); setShowCategoryModal(true); }}
+                    onManageCategories={() => { setEditingTransaction(null); openCategoryModal(); }}
                     viewYear={year}
                     viewMonth={month}
                     availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}

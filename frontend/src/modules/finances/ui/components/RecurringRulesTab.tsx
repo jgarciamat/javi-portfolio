@@ -1,98 +1,18 @@
 import { useState } from 'react';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
+import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleForm';
 import { useFinances } from '../../application/FinancesContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { DeleteRuleModal } from './DeleteRuleModal';
 import type { DeleteScope } from './DeleteRuleModal';
 import '../css/RecurringRulesTab.css';
-import type { RecurringRule, CreateRecurringRuleDTO, UpdateRecurringRuleDTO, RecurringFrequency, TransactionType, Category } from '@modules/finances/domain/types';
+import type { RecurringRule, Category } from '@modules/finances/domain/types';
+import { TYPE_CLASS } from '../types/RecurringRulesTab.types';
+import type { FormState } from '../types/RecurringRulesTab.types';
 
 interface RecurringRulesTabProps {
     categories: Category[];
 }
-
-// ─── Form state ───────────────────────────────────────────────────────────────
-
-interface FormState {
-    description: string;
-    amount: string;
-    type: TransactionType;
-    category: string;
-    frequency: RecurringFrequency;
-    /** ISO date string YYYY-MM-DD used by the native date picker */
-    startDate: string;
-    hasEnd: boolean;
-    /** ISO date string YYYY-MM-DD used by the native date picker */
-    endDate: string;
-}
-
-const now = new Date();
-const EMPTY_FORM: FormState = {
-    description: '',
-    amount: '',
-    type: 'EXPENSE',
-    category: '',
-    frequency: 'monthly',
-    startDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`,
-    hasEnd: false,
-    endDate: '',
-};
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function ruleToForm(rule: RecurringRule): FormState {
-    // Build ISO date string for the date picker from stored year/month (day=1)
-    const endDate =
-        rule.endYear !== null && rule.endMonth !== null
-            ? `${rule.endYear}-${String(rule.endMonth).padStart(2, '0')}-01`
-            : '';
-    const startDate = `${rule.startYear}-${String(rule.startMonth).padStart(2, '0')}-01`;
-    return {
-        description: rule.description,
-        amount: String(rule.amount),
-        type: rule.type,
-        category: rule.category,
-        frequency: rule.frequency,
-        startDate,
-        hasEnd: rule.endYear !== null,
-        endDate,
-    };
-}
-
-function validateForm(form: FormState, amount: number): string | null {
-    if (!form.description.trim()) return 'La descripción es obligatoria';
-    if (isNaN(amount) || amount <= 0) return 'El importe debe ser un número positivo';
-    if (!form.category) return 'Selecciona una categoría';
-    return null;
-}
-
-function buildDto(form: FormState, amount: number): CreateRecurringRuleDTO {
-    let endYear: number | null = null;
-    let endMonth: number | null = null;
-    if (form.hasEnd && form.endDate) {
-        const [y, m] = form.endDate.split('-').map(Number);
-        endYear = y;
-        endMonth = m;
-    }
-    const [sy, sm] = form.startDate ? form.startDate.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
-    return {
-        description: form.description.trim(),
-        amount,
-        type: form.type,
-        category: form.category,
-        frequency: form.frequency,
-        startYear: sy,
-        startMonth: sm,
-        endYear,
-        endMonth,
-    };
-}
-
-const TYPE_CLASS: Record<TransactionType, string> = {
-    INCOME: 'recurring-type--income',
-    EXPENSE: 'recurring-type--expense',
-    SAVING: 'recurring-type--saving',
-};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -308,11 +228,12 @@ export function RecurringRulesTab({ categories }: RecurringRulesTabProps) {
     const { rules, loading, error, createRule, updateRule, deleteRule, toggleActive } = useRecurringRules();
     const { refresh } = useFinances();
 
-    const [showForm, setShowForm] = useState(false);
-    const [editingRule, setEditingRule] = useState<RecurringRule | null>(null);
-    const [form, setForm] = useState<FormState>(EMPTY_FORM);
-    const [formError, setFormError] = useState<string | null>(null);
-    const [saving, setSaving] = useState(false);
+    const { showForm, editingRule, form, formError, saving, setForm, openCreate, openEdit, closeForm, handleSubmit } =
+        useRecurringRuleForm({
+            onCreateRule: createRule,
+            onUpdateRule: updateRule,
+            onAfterSave: () => refresh({ invalidate: true }),
+        });
 
     // ── Delete modal state ──────────────────────────────────────────────────
     const [deletingRule, setDeletingRule] = useState<RecurringRule | null>(null);
@@ -329,50 +250,6 @@ export function RecurringRulesTab({ categories }: RecurringRulesTabProps) {
             setDeletingRule(null);
         } finally {
             setDeleting(false);
-        }
-    };
-
-    const openCreate = () => {
-        setEditingRule(null);
-        setForm(EMPTY_FORM);
-        setFormError(null);
-        setShowForm(true);
-    };
-
-    const openEdit = (rule: RecurringRule) => {
-        setEditingRule(rule);
-        setForm(ruleToForm(rule));
-        setFormError(null);
-        setShowForm(true);
-    };
-
-    const closeForm = () => {
-        setShowForm(false);
-        setEditingRule(null);
-    };
-
-    const handleSubmit = async () => {
-        const amount = parseFloat(form.amount);
-        const validationError = validateForm(form, amount);
-        if (validationError) { setFormError(validationError); return; }
-
-        const dto = buildDto(form, amount);
-
-        setSaving(true);
-        setFormError(null);
-        try {
-            if (editingRule) {
-                await updateRule(editingRule.id, dto as UpdateRecurringRuleDTO);
-            } else {
-                await createRule(dto);
-            }
-            // Refresh transactions so the backfilled months appear immediately
-            await refresh({ invalidate: true });
-            closeForm();
-        } catch (e) {
-            setFormError(e instanceof Error ? e.message : 'Error al guardar');
-        } finally {
-            setSaving(false);
         }
     };
 

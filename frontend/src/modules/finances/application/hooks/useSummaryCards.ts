@@ -1,0 +1,78 @@
+import { formatCurrency } from '../../ui/types/SummaryCards.types';
+import type { FinancialSummary } from '@modules/finances/domain/types';
+
+export interface SummaryCard {
+    title: string;
+    value: string;
+    accent: string;
+    icon: string;
+    sub: string;
+}
+
+export interface UseSummaryCardsReturn {
+    saldoTotal: number;
+    carryoverAmount: number;
+    savingsRate: number;
+    savingsRateColor: string;
+    cards: SummaryCard[];
+}
+
+export function useSummaryCards(
+    summary: FinancialSummary,
+    carryover: number | null,
+    t: (key: string, params?: Record<string, string>) => string,
+): UseSummaryCardsReturn {
+    const carryoverAmount = carryover ?? 0;
+    const saldoTotal = carryoverAmount + summary.balance;
+
+    const savingsRate = summary.totalIncome > 0
+        ? (summary.totalSaving / summary.totalIncome) * 100
+        : 0;
+
+    const savingsRateColor =
+        savingsRate >= 20 ? '#22c55e' :
+            savingsRate >= 10 ? '#f59e0b' :
+                '#ef4444';
+
+    const cards: SummaryCard[] = [
+        {
+            title: t('app.summary.monthBalance'),
+            value: formatCurrency(summary.balance),
+            accent: summary.balance >= 0 ? '#22c55e' : '#ef4444',
+            icon: '💰',
+            sub: t('app.summary.monthBalance.sub', { count: String(summary.transactionCount) }),
+        },
+        {
+            title: t('app.summary.income'),
+            value: formatCurrency(summary.totalIncome),
+            accent: '#22c55e',
+            icon: '📈',
+            sub: t('app.summary.income.sub'),
+        },
+        {
+            title: t('app.summary.expenses'),
+            value: formatCurrency(summary.totalExpenses),
+            accent: '#ef4444',
+            icon: '📉',
+            sub: t('app.summary.expenses.sub'),
+        },
+        {
+            title: t('app.summary.saving'),
+            value: formatCurrency(summary.totalSaving),
+            accent: '#a78bfa',
+            icon: '🐷',
+            sub: t('app.summary.saving.sub'),
+        },
+        {
+            title: t('app.summary.savingsRate'),
+            value: `${savingsRate.toFixed(1)}%`,
+            accent: savingsRateColor,
+            icon: '📊',
+            sub: summary.totalIncome > 0
+                ? t('app.summary.savingsRate.sub', { amount: formatCurrency(summary.totalIncome) })
+                : t('app.summary.savingsRate.noIncome'),
+        },
+    ];
+
+    return { saldoTotal, carryoverAmount, savingsRate, savingsRateColor, cards };
+}

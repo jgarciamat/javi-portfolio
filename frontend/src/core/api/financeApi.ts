@@ -9,7 +9,7 @@ import type {
     RecurringRule,
     CreateRecurringRuleDTO,
     UpdateRecurringRuleDTO,
-} from '@shared/types/finance.types';
+} from '@modules/finances/domain/types';
 
 export const transactionApi = {
     getAll(params?: { year?: number; month?: number }) {

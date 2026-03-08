@@ -79,3 +79,6 @@ gh_actions_deploy_javi_portfolio.pub
 # Root-level package files (not a monorepo root)
 /package.json
 /package-lock.json
+
+# Agent rules & workflows (local only)
+.agent/

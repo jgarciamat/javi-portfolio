@@ -117,3 +117,14 @@ export interface UpdateRecurringRuleDTO {
     frequency?: RecurringFrequency;
     active?: boolean;
 }
+
+// ─── Budget ───────────────────────────────────────────────────────────────────
+
+export interface MonthlyBudget {
+    id?: string;
+    userId?: string;
+    year: number;
+    month: number;
+    initialAmount: number;
+    label?: string;
+}

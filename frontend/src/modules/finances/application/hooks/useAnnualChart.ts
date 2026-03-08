@@ -24,6 +24,7 @@ export function useAnnualChart(initialYear: number) {
     const prevYear = () => setYear((y) => (y <= 2026 ? y : y - 1));
     const nextYear = () => setYear((y) => (y >= new Date().getFullYear() + 1 ? y : y + 1));
     const prevYearDisabled = year <= 2026;
+    const nextYearDisabled = year >= new Date().getFullYear() + 1;
 
     return {
         year,
@@ -35,5 +36,6 @@ export function useAnnualChart(initialYear: number) {
         prevYear,
         nextYear,
         prevYearDisabled,
+        nextYearDisabled,
     };
 }

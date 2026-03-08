@@ -1,57 +1,22 @@
-import { useState } from 'react';
 import { useBankSync } from '../../application/hooks/useBankSync';
 import '../css/BankSync.css';
 import { BankSyncBody } from './BankSyncBody';
+import type { BankSyncProps } from '../types/BankSync.types';
 
-interface Props {
-    onSyncComplete?: () => void;
-}
-
-type Step = 'idle' | 'selecting' | 'linking' | 'syncing' | 'done';
-
-export function BankSync({ onSyncComplete }: Props) {
-    const [open, setOpen] = useState(false);
-    const [step, setStep] = useState<Step>('idle');
-
+export function BankSync({ onSyncComplete }: BankSyncProps) {
     const {
         institutions,
         loadingInstitutions,
         syncResult,
         error,
-        fetchInstitutions,
-        linkAccount,
-        syncTransactions,
         linkUrl,
-        requisitionId,
-        clearResult,
-    } = useBankSync();
-
-    const handleOpen = async () => {
-        setOpen(true);
-        setStep('selecting');
-        await fetchInstitutions();
-    };
-
-    const handleSelectInstitution = async (institutionId: string) => {
-        setStep('linking');
-        await linkAccount(institutionId);
-    };
-
-    const handleSync = async () => {
-        setStep('syncing');
-        // In demo mode, use the demo account ID; in real mode the accountId comes
-        // from the OAuth callback. For the demo flow we use a known demo account.
-        const accountId = requisitionId?.startsWith('demo') ? 'demo-account-001' : 'demo-account-001';
-        await syncTransactions(accountId);
-        setStep('done');
-        onSyncComplete?.();
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-        setStep('idle');
-        clearResult();
-    };
+        open,
+        step,
+        handleOpen,
+        handleSelectInstitution,
+        handleSync,
+        handleClose,
+    } = useBankSync(onSyncComplete);
 
     return (
         <>

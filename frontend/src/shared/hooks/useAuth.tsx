@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import type { AuthUser } from '@shared/types/auth.types';
+import type { AuthUser } from '@modules/auth/domain/types';
 import { authApi, registerUnauthorizedHandler } from '@core/api/authApi';
 
 interface AuthContextValue {

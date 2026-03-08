@@ -4,3 +4,7 @@ export { useAnnualSummary } from './useAnnualSummary';
 export { useTransactionForm } from './useTransactionForm';
 export { useAnnualChart } from './useAnnualChart';
 export { useCategoryManager } from './useCategoryManager';
+export { useTransactionTable } from './useTransactionTable';
+export { useSummaryCards } from './useSummaryCards';
+export { useRecurringRuleForm } from './useRecurringRuleForm';
+export { useDashboard } from './useDashboard';

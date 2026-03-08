@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { useBudgetAlerts } from '../../application/hooks/useAlerts';
 import type { BudgetAlert } from '../../application/hooks/useAlerts';
-import type { FinancialSummary } from '@modules/finances/domain/types';
+import { useI18n } from '@core/i18n/I18nContext';
 import '../css/BudgetAlerts.css';
-
-interface Props {
-    summary: FinancialSummary | null;
-    carryover: number | null;
-}
+import type { BudgetAlertsProps } from '../types/BudgetAlerts.types';
 
 function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => void }) {
+    const { t } = useI18n();
     const icon = alert.level === 'danger' ? '🔴' : '🟡';
     const progressWidth = Math.min(alert.percentage, 100);
 
@@ -21,7 +18,7 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
                 <button
                     className="alert-card-dismiss"
                     onClick={onDismiss}
-                    aria-label="Cerrar alerta"
+                    aria-label={t('app.alert.dismiss')}
                 >✕</button>
             </div>
             <div className="alert-progress-bar">
@@ -31,12 +28,12 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
                 />
             </div>
             <div className="alert-card-amounts">
-                <span>Gastado: <strong>{alert.spentAmount.toFixed(2)}€</strong></span>
+                <span>{t('app.alert.spent')} <strong>{alert.spentAmount.toFixed(2)}€</strong></span>
                 {alert.remainingAmount !== null && (
                     <span>
                         {alert.remainingAmount >= 0
-                            ? <>Te quedan: <strong>{alert.remainingAmount.toFixed(2)}€</strong></>
-                            : <>Te pasas: <strong>{Math.abs(alert.remainingAmount).toFixed(2)}€</strong></>
+                            ? <>{t('app.alert.remaining')} <strong>{alert.remainingAmount.toFixed(2)}€</strong></>
+                            : <>{t('app.alert.overBudget')} <strong>{Math.abs(alert.remainingAmount).toFixed(2)}€</strong></>
                         }
                     </span>
                 )}
@@ -45,7 +42,7 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
     );
 }
 
-export function BudgetAlerts({ summary, carryover }: Props) {
+export function BudgetAlerts({ summary, carryover }: BudgetAlertsProps) {
     const alerts = useBudgetAlerts({ summary, carryover });
     const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 

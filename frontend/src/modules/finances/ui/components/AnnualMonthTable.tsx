@@ -1,21 +1,7 @@
 import { MONTH_SHORT, fmtCurrency } from '../types';
+import type { AnnualMonthTableProps } from '../types/AnnualChart.types';
 import { isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
 import { useI18n } from '@core/i18n/I18nContext';
-
-interface MonthData {
-    month: number;
-    income: number;
-    expenses: number;
-    saving: number;
-    balance: number;
-}
-
-interface AnnualMonthTableProps {
-    months: MonthData[];
-    year: number;
-    now: Date;
-    onMonthClick?: (year: number, month: number) => void;
-}
 
 export function AnnualMonthTable({ months, year, now, onMonthClick }: AnnualMonthTableProps) {
     const { t } = useI18n();
