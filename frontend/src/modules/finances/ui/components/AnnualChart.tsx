@@ -4,7 +4,7 @@ import { useExportCSV } from '../../application/hooks/useExportCSV';
 import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import '../css/AnnualChart.css';
 import type { AnnualChartProps } from '../types';
-import { MONTH_SHORT, fmtCurrency } from '../types';
+import { MONTH_SHORT, fmtCurrency, buildAnnualChartData } from '../types/AnnualChart.types';
 import { isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
 import { useI18n } from '@core/i18n/I18nContext';
 import { AnnualMonthTable } from './AnnualMonthTable';
@@ -42,25 +42,13 @@ function AnnualTotals({ totals, t }: TotalsProps) {
 }
 
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
-    const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear, prevYearDisabled } = useAnnualChart(initialYear);
+    const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear, prevYearDisabled, nextYearDisabled } = useAnnualChart(initialYear);
     const { data, loading, error } = useAnnualSummary(year);
+    const { months, maxVal, totals } = buildAnnualChartData(data);
     const { t } = useI18n();
     const { exportAnnualCSV } = useExportCSV();
 
-    const months = data ? Object.entries(data.months).map(([k, v]) => ({ month: Number(k), ...v })) : [];
-
-    const maxVal = months.length
-        ? Math.max(...months.flatMap((m) => [m.income, m.expenses, m.saving]), 1)
-        : 1;
-
-    const totals = months.reduce(
-        (acc, m) => ({ income: acc.income + m.income, expenses: acc.expenses + m.expenses, saving: acc.saving + m.saving }),
-        { income: 0, expenses: 0, saving: 0 }
-    );
-
     const now = new Date();
-    // Allow navigating up to 1 year ahead of the current year
-    const nextYearDisabled = year >= now.getFullYear() + 1;
 
     return (
         <div className="annual-view">

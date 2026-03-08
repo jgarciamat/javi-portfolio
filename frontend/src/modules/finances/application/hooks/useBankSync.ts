@@ -1,21 +1,31 @@
 import { useState, useCallback } from 'react';
 import { openBankingApi, BankInstitution, SyncResult } from '@core/api/premiumApi';
 
+export type BankSyncStep = 'idle' | 'selecting' | 'linking' | 'syncing' | 'done';
+
 interface UseBankSyncResult {
+    // API state
     institutions: BankInstitution[];
     loadingInstitutions: boolean;
     syncing: boolean;
     syncResult: SyncResult | null;
     error: string | null;
+    requisitionId: string | null;
+    linkUrl: string | null;
     fetchInstitutions: () => Promise<void>;
     linkAccount: (institutionId: string) => Promise<void>;
     syncTransactions: (accountId: string) => Promise<void>;
-    requisitionId: string | null;
-    linkUrl: string | null;
     clearResult: () => void;
+    // Modal/step UI state
+    open: boolean;
+    step: BankSyncStep;
+    handleOpen: () => Promise<void>;
+    handleSelectInstitution: (institutionId: string) => Promise<void>;
+    handleSync: () => Promise<void>;
+    handleClose: () => void;
 }
 
-export function useBankSync(): UseBankSyncResult {
+export function useBankSync(onSyncComplete?: () => void): UseBankSyncResult {
     const [institutions, setInstitutions] = useState<BankInstitution[]>([]);
     const [loadingInstitutions, setLoadingInstitutions] = useState(false);
     const [syncing, setSyncing] = useState(false);
@@ -23,6 +33,10 @@ export function useBankSync(): UseBankSyncResult {
     const [error, setError] = useState<string | null>(null);
     const [requisitionId, setRequisitionId] = useState<string | null>(null);
     const [linkUrl, setLinkUrl] = useState<string | null>(null);
+
+    // ── Modal / step state ────────────────────────────────────────────────────
+    const [open, setOpen] = useState(false);
+    const [step, setStep] = useState<BankSyncStep>('idle');
 
     const fetchInstitutions = useCallback(async () => {
         setLoadingInstitutions(true);
@@ -74,6 +88,34 @@ export function useBankSync(): UseBankSyncResult {
         setRequisitionId(null);
     }, []);
 
+    // ── Modal step handlers ───────────────────────────────────────────────────
+
+    const handleOpen = useCallback(async () => {
+        setOpen(true);
+        setStep('selecting');
+        await fetchInstitutions();
+    }, [fetchInstitutions]);
+
+    const handleSelectInstitution = useCallback(async (institutionId: string) => {
+        setStep('linking');
+        await linkAccount(institutionId);
+    }, [linkAccount]);
+
+    const handleSync = useCallback(async () => {
+        setStep('syncing');
+        // In demo mode, use the demo account ID
+        const accountId = requisitionId?.startsWith('demo') ? 'demo-account-001' : 'demo-account-001';
+        await syncTransactions(accountId);
+        setStep('done');
+        onSyncComplete?.();
+    }, [requisitionId, syncTransactions, onSyncComplete]);
+
+    const handleClose = useCallback(() => {
+        setOpen(false);
+        setStep('idle');
+        clearResult();
+    }, [clearResult]);
+
     return {
         institutions,
         loadingInstitutions,
@@ -86,5 +128,11 @@ export function useBankSync(): UseBankSyncResult {
         requisitionId,
         linkUrl,
         clearResult,
+        open,
+        step,
+        handleOpen,
+        handleSelectInstitution,
+        handleSync,
+        handleClose,
     };
 }

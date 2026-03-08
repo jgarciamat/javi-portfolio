@@ -1,4 +1,5 @@
 import type { Category, CreateTransactionDTO } from '@modules/finances/domain/types';
+import type { UseTransactionFormReturn } from '../../application/hooks/useTransactionForm';
 
 export interface TransactionFormProps {
     categories: Category[];
@@ -9,4 +10,10 @@ export interface TransactionFormProps {
     viewMonth: number;
     /** Current available balance (carryover + month balance). Used to block overspending. */
     availableBalance: number;
+}
+
+export interface TransactionFormFieldsProps {
+    form: UseTransactionFormReturn;
+    categories: Category[];
+    onManageCategories: () => void;
 }

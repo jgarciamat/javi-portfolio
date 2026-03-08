@@ -2,29 +2,11 @@ import { useEffect } from 'react';
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import '../css/TransactionForm.css';
 import '../css/EditTransactionModal.css';
-import type { Category, Transaction, UpdateTransactionDTO } from '@modules/finances/domain/types';
+import type { UpdateTransactionDTO } from '@modules/finances/domain/types';
 import { TransactionFormFields } from './TransactionFormFields';
 import { useI18n } from '@core/i18n/I18nContext';
-
-interface EditTransactionModalProps {
-    transaction: Transaction;
-    categories: Category[];
-    onSave: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
-    onClose: () => void;
-    onManageCategories: () => void;
-    viewYear: number;
-    viewMonth: number;
-    availableBalance: number;
-}
-
-/** Convert an ISO date string to YYYY-MM-DD (local timezone) */
-function isoToDateInput(iso: string): string {
-    const d = new Date(iso);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-}
+import { isoToDateInput } from '../types/TransactionTable.types';
+import type { EditTransactionModalProps } from '../types/EditTransactionModal.types';
 
 export function EditTransactionModal({
     transaction,

@@ -1,21 +1,4 @@
-import type { SyncResult } from '@core/api/premiumApi';
-
-interface Institution {
-    id: string;
-    name: string;
-    bic: string;
-}
-
-interface BankSyncBodyProps {
-    step: 'selecting' | 'linking' | 'syncing' | 'done';
-    institutions: Institution[];
-    loadingInstitutions: boolean;
-    linkUrl: string | null;
-    syncResult: SyncResult | null;
-    onSelectInstitution: (id: string) => void;
-    onSync: () => void;
-    onClose: () => void;
-}
+import type { BankSyncBodyProps } from '../types/BankSync.types';
 
 export function BankSyncBody({ step, institutions, loadingInstitutions, linkUrl, syncResult, onSelectInstitution, onSync, onClose }: BankSyncBodyProps) {
     if (step === 'selecting') {

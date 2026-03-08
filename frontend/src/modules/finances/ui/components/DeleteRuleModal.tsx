@@ -1,17 +1,9 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import '../css/DeleteRuleModal.css';
+import type { VisibleScope, DeleteRuleModalProps } from '../types/DeleteRuleModal.types';
 
-export type DeleteScope = 'none' | 'from_current' | 'all';
-
-type VisibleScope = 'from_current' | 'all';
-
-interface DeleteRuleModalProps {
-    ruleName: string;
-    onConfirm: (scope: DeleteScope) => void;
-    onCancel: () => void;
-    loading?: boolean;
-}
+export type { DeleteScope } from '../types/DeleteRuleModal.types';
 
 export function DeleteRuleModal({ ruleName, onConfirm, onCancel, loading = false }: DeleteRuleModalProps) {
     const { t } = useI18n();

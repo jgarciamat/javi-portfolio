@@ -1,8 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BudgetAlerts } from '@modules/finances/ui/components/BudgetAlerts';
 import type { FinancialSummary } from '@modules/finances/domain/types';
+import esJson from '@locales/es.json';
 
-// BudgetAlerts does NOT use i18n directly — no need to mock useI18n
+const translations = esJson as Record<string, string>;
+const t = (key: string) => translations[key] ?? key;
+const tCategory = (name: string) => translations['app.categories.' + name.replace(/\s+/g, '')] ?? name;
+
+jest.mock('@core/i18n/I18nContext', () => ({
+    useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory }),
+    I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 const baseSummary: FinancialSummary = {
     balance: 20,

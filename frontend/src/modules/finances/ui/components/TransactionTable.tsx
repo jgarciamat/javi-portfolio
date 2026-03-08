@@ -1,72 +1,26 @@
-import { useState } from 'react';
 import '../css/TransactionTable.css';
 import type { TransactionTableProps } from '../types';
-import type { TransactionType, Transaction } from '@modules/finances/domain/types';
-import { formatCurrency, formatDate } from '../types/TransactionTable.types';
+import { txBadgeClass, txAmountColor, formatCurrency, formatDate } from '../types/TransactionTable.types';
 import { useI18n } from '@core/i18n/I18nContext';
 import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
-
-function txBadgeClass(type: TransactionType): string {
-    if (type === 'INCOME') return 'tx-badge tx-badge-income';
-    if (type === 'SAVING') return 'tx-badge tx-badge-saving';
-    return 'tx-badge tx-badge-expense';
-}
-
-function txAmountColor(type: TransactionType): string {
-    if (type === 'INCOME') return '#4ade80';
-    if (type === 'SAVING') return '#a78bfa';
-    return '#f87171';
-}
-
-/** Returns "YYYY-MM-DD" (Madrid timezone) for grouping by day */
-function txDayKey(dateStr: string): string {
-    return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(dateStr));
-}
-
-/** Returns "lun. 6 mar." / "Mon, Jan 6" style label depending on locale */
-function formatDayLabel(dateStr: string, locale: string): string {
-    return new Intl.DateTimeFormat(locale, {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        timeZone: 'Europe/Madrid',
-    }).format(new Date(dateStr));
-}
-
-/** Groups transactions into ordered day buckets preserving original sort order */
-function groupByDay(transactions: Transaction[], locale: string): { dayKey: string; label: string; items: Transaction[] }[] {
-    const map = new Map<string, { label: string; items: Transaction[] }>();
-    for (const tx of transactions) {
-        const key = txDayKey(tx.date);
-        if (!map.has(key)) {
-            map.set(key, { label: formatDayLabel(tx.date, locale), items: [] });
-        }
-        map.get(key)!.items.push(tx);
-    }
-    return Array.from(map.entries()).map(([dayKey, v]) => ({ dayKey, ...v }));
-}
+import { useTransactionTable } from '../../application/hooks/useTransactionTable';
 
 export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: TransactionTableProps) {
     const { t, tCategory, locale } = useI18n();
-    const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
-    const [notesValue, setNotesValue] = useState('');
-    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-
-    const txLabel = (type: TransactionType): string => {
-        if (type === 'INCOME') return t('app.transaction.form.type.income');
-        if (type === 'SAVING') return t('app.transaction.form.type.saving');
-        return t('app.transaction.form.type.expense');
-    };
-
-    const startEditNotes = (id: string, current: string | null) => {
-        setEditingNotesId(id);
-        setNotesValue(current ?? '');
-    };
-
-    const commitNotes = (id: string) => {
-        onPatch(id, { notes: notesValue.trim() || null });
-        setEditingNotesId(null);
-    };
+    const {
+        groups,
+        editingNotesId,
+        notesValue,
+        pendingDeleteId,
+        txLabel,
+        startEditNotes,
+        commitNotes,
+        cancelEditNotes,
+        setNotesValue,
+        setPendingDeleteId,
+        confirmDelete,
+        cancelDelete,
+    } = useTransactionTable({ transactions, locale, t, onPatch, onDelete });
 
     if (transactions.length === 0) {
         return (
@@ -76,8 +30,6 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
             </div>
         );
     }
-
-    const groups = groupByDay(transactions, locale);
 
     return (
         <>
@@ -121,7 +73,7 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
                                                     onBlur={() => commitNotes(tx.id)}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') commitNotes(tx.id);
-                                                        if (e.key === 'Escape') setEditingNotesId(null);
+                                                        if (e.key === 'Escape') cancelEditNotes();
                                                     }}
                                                 />
                                             ) : (
@@ -171,7 +123,7 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
                                             onBlur={() => commitNotes(tx.id)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') commitNotes(tx.id);
-                                                if (e.key === 'Escape') setEditingNotesId(null);
+                                                if (e.key === 'Escape') cancelEditNotes();
                                             }}
                                         />
                                     ) : (
@@ -201,11 +153,8 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
 
             {pendingDeleteId !== null && (
                 <ConfirmDeleteModal
-                    onConfirm={() => {
-                        onDelete(pendingDeleteId);
-                        setPendingDeleteId(null);
-                    }}
-                    onCancel={() => setPendingDeleteId(null)}
+                    onConfirm={confirmDelete}
+                    onCancel={cancelDelete}
                 />
             )}
         </>

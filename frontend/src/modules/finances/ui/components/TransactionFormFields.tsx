@@ -1,12 +1,6 @@
-import type { Category, TransactionType } from '@modules/finances/domain/types';
-import type { UseTransactionFormReturn } from '../../application/hooks/useTransactionForm';
+import type { TransactionType } from '@modules/finances/domain/types';
+import type { TransactionFormFieldsProps } from '../types/TransactionForm.types';
 import { useI18n } from '@core/i18n/I18nContext';
-
-interface TransactionFormFieldsProps {
-    form: UseTransactionFormReturn;
-    categories: Category[];
-    onManageCategories: () => void;
-}
 
 export function TransactionFormFields({ form, categories, onManageCategories }: TransactionFormFieldsProps) {
     const { t, tCategory } = useI18n();
