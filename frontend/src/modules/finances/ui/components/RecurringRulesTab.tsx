@@ -75,12 +75,6 @@ function buildDto(form: FormState, amount: number): CreateRecurringRuleDTO {
     };
 }
 
-const TYPE_ICON: Record<TransactionType, string> = {
-    INCOME: '↑',
-    EXPENSE: '↓',
-    SAVING: '↑',
-};
-
 const TYPE_CLASS: Record<TransactionType, string> = {
     INCOME: 'recurring-type--income',
     EXPENSE: 'recurring-type--expense',
@@ -245,7 +239,7 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
         <div className={`recurring-card${rule.active ? '' : ' recurring-card--inactive'}`}>
             <div className="recurring-card-header">
                 <span className={`recurring-type-badge ${TYPE_CLASS[rule.type]}`}>
-                    {TYPE_ICON[rule.type]} {t(`app.recurring.form.type.${rule.type.toLowerCase() as 'income' | 'expense' | 'saving'}`)}
+                    {t(`app.recurring.form.type.${rule.type.toLowerCase() as 'income' | 'expense' | 'saving'}`)}
                 </span>
                 <span className={`recurring-status-badge ${rule.active ? 'recurring-status--active' : 'recurring-status--inactive'}`}>
                     {rule.active ? t('app.recurring.card.active') : t('app.recurring.card.inactive')}

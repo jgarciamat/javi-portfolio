@@ -25,10 +25,10 @@ export class RecurringRuleController {
         }
     }
 
-    create(req: AuthRequest, res: Response): void {
+    async create(req: AuthRequest, res: Response): Promise<void> {
         try {
             const userId = req.userId!;
-            const rule = this.createUseCase.execute({ ...req.body, userId });
+            const rule = await this.createUseCase.execute({ ...req.body, userId });
             res.status(201).json(rule.toJSON());
         } catch (e) {
             res.status(400).json({ error: e instanceof Error ? e.message : 'Error' });

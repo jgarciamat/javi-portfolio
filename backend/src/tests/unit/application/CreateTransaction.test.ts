@@ -5,6 +5,7 @@ import { Transaction } from '@domain/entities/Transaction';
 function makeRepo(): jest.Mocked<ITransactionRepository> {
     return {
         save: jest.fn(),
+        saveForUser: jest.fn(),
         findById: jest.fn(),
         findAll: jest.fn(),
         findByType: jest.fn(),

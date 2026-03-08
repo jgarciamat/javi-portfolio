@@ -2,6 +2,7 @@ import { Transaction } from '@domain/entities/Transaction';
 
 export interface ITransactionRepository {
     save(transaction: Transaction): Promise<void>;
+    saveForUser(transaction: Transaction, userId: string): Promise<void>;
     findById(id: string): Promise<Transaction | null>;
     findAll(): Promise<Transaction[]>;
     findByType(type: string): Promise<Transaction[]>;

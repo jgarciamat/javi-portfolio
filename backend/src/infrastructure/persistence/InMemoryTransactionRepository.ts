@@ -8,6 +8,10 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
         this.transactions.set(transaction.id.value, transaction);
     }
 
+    async saveForUser(transaction: Transaction, _userId: string): Promise<void> {
+        this.transactions.set(transaction.id.value, transaction);
+    }
+
     async findById(id: string): Promise<Transaction | null> {
         return this.transactions.get(id) ?? null;
     }

@@ -98,7 +98,7 @@ const profileController = new ProfileController(
 const alertController = new AlertController(checkBudgetAlerts);
 const aiController = new AIController(getAIAdvice, transactionRepo, budgetRepo);
 const recurringRuleController = new RecurringRuleController(
-    new CreateRecurringRule(recurringRuleRepo),
+    new CreateRecurringRule(recurringRuleRepo, transactionRepo),
     new GetRecurringRules(recurringRuleRepo),
     new UpdateRecurringRule(recurringRuleRepo),
     new DeleteRecurringRule(recurringRuleRepo),

@@ -1,5 +1,7 @@
 import { RecurringRule } from '@domain/entities/RecurringRule';
 import { IRecurringRuleRepository } from '@domain/repositories/IRecurringRuleRepository';
+import { ITransactionRepository } from '@domain/repositories/ITransactionRepository';
+import { Transaction } from '@domain/entities/Transaction';
 
 export interface CreateRecurringRuleDTO {
     userId: string;
@@ -15,11 +17,40 @@ export interface CreateRecurringRuleDTO {
 }
 
 export class CreateRecurringRule {
-    constructor(private readonly repo: IRecurringRuleRepository) { }
+    constructor(
+        private readonly repo: IRecurringRuleRepository,
+        private readonly transactionRepo: ITransactionRepository,
+    ) { }
 
-    execute(dto: CreateRecurringRuleDTO): RecurringRule {
+    async execute(dto: CreateRecurringRuleDTO): Promise<RecurringRule> {
         const rule = RecurringRule.create(dto);
         this.repo.save(rule);
+
+        // Backfill: create transactions for every past/current month the rule applies to
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        const startOrdinal = dto.startYear * 12 + dto.startMonth;
+        const endOrdinal = currentYear * 12 + currentMonth;
+
+        for (let ord = startOrdinal; ord <= endOrdinal; ord++) {
+            const year = Math.floor((ord - 1) / 12);
+            const month = ((ord - 1) % 12) + 1;
+
+            if (!rule.appliesTo(year, month)) continue;
+
+            const date = new Date(year, month - 1, 1);
+            const tx = Transaction.create({
+                description: dto.description,
+                amount: dto.amount,
+                type: dto.type,
+                category: dto.category,
+                date,
+            });
+            await this.transactionRepo.saveForUser(tx, dto.userId);
+        }
+
         return rule;
     }
 }
