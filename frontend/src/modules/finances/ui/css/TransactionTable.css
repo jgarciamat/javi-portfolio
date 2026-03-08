@@ -82,6 +82,44 @@
     font-size: 0.95rem;
 }
 
+/* ─── Day separator row (desktop) ───────────── */
+.tx-day-separator td {
+    padding: 0.55rem 0.85rem 0.3rem;
+    border-bottom: none;
+    background: transparent;
+}
+
+.tx-day-separator:not(:first-child) td {
+    padding-top: 1rem;
+    border-top: 1px solid #1e293b;
+}
+
+.tx-day-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #475569;
+}
+
+/* ─── Day header (mobile cards) ─────────────── */
+.tx-day-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #475569;
+    padding: 0.9rem 0 0.35rem;
+    border-top: 1px solid #1e293b;
+}
+
+/* Remove top border from the very first day header */
+.tx-card-list>div:first-child .tx-day-header {
+    border-top: none;
+    padding-top: 0;
+}
+
 /* ─── Badges ─────────────────────────────────── */
 .tx-badge {
     border-radius: 999px;

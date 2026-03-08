@@ -276,4 +276,58 @@ describe('TransactionTable', () => {
         fireEvent.click(editBtns[1]);
         expect(mockOnEdit).toHaveBeenCalledWith(txExpense);
     });
+
+    // ── day separators ────────────────────────────────────────────────────────
+
+    test('renders one day separator when all transactions are on the same day', () => {
+        const sameDayTxs: Transaction[] = [
+            { ...txExpense, id: 'a', date: '2025-01-05T08:00:00.000Z' },
+            { ...txIncome, id: 'b', date: '2025-01-05T14:00:00.000Z' },
+        ];
+        const { container } = render(
+            <TransactionTable transactions={sameDayTxs} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        // Desktop: exactly 1 separator row
+        expect(container.querySelectorAll('.tx-day-separator').length).toBe(1);
+        // Mobile: exactly 1 day header
+        expect(container.querySelectorAll('.tx-day-header').length).toBe(1);
+    });
+
+    test('renders two day separators for transactions on two different days', () => {
+        const twoDayTxs: Transaction[] = [
+            { ...txExpense, id: 'a', date: '2025-01-05T08:00:00.000Z' },
+            { ...txIncome, id: 'b', date: '2025-01-06T10:00:00.000Z' },
+        ];
+        const { container } = render(
+            <TransactionTable transactions={twoDayTxs} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        expect(container.querySelectorAll('.tx-day-separator').length).toBe(2);
+        expect(container.querySelectorAll('.tx-day-header').length).toBe(2);
+    });
+
+    test('day separator label contains the day of the week and date', () => {
+        const { container } = render(
+            <TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        // The label is rendered both in .tx-day-label (desktop) and .tx-day-header (mobile)
+        const labelEl = container.querySelector('.tx-day-label');
+        expect(labelEl).not.toBeNull();
+        expect(labelEl!.textContent!.trim().length).toBeGreaterThan(0);
+        // Should contain a digit (the day number)
+        expect(labelEl!.textContent).toMatch(/\d/);
+    });
+
+    test('transactions on the same day are grouped together (no extra separators)', () => {
+        const threeSameDayTxs: Transaction[] = [
+            { ...txExpense, id: 'x1', date: '2025-03-10T09:00:00.000Z' },
+            { ...txIncome, id: 'x2', date: '2025-03-10T11:00:00.000Z' },
+            { ...txSaving, id: 'x3', date: '2025-03-10T15:00:00.000Z' },
+        ];
+        const { container } = render(
+            <TransactionTable transactions={threeSameDayTxs} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        expect(container.querySelectorAll('.tx-day-separator').length).toBe(1);
+        // All 3 transactions rendered (desktop + mobile = 6 descriptions)
+        expect(screen.getAllByText('Bus ticket').length).toBe(2); // desktop + mobile
+    });
 });
