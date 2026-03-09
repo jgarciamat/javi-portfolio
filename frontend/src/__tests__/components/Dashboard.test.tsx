@@ -59,8 +59,7 @@ jest.mock('@modules/finances/application/FinancesContext', () => ({
     useFinances: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useFinances } = require('@modules/finances/application/FinancesContext') as { useFinances: jest.Mock };
+const { useFinances } = jest.requireMock('@modules/finances/application/FinancesContext') as { useFinances: jest.Mock };
 
 jest.mock('@core/context/ApiContext', () => ({
     useApi: () => ({

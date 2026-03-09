@@ -3,7 +3,7 @@
  * We mock fs to control the data directory path, and use an in-memory
  * Database so no real .db file is created on disk.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports */
 import path from 'path';
 
 // Mock fs so we don't create real directories
