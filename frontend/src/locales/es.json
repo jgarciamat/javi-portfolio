@@ -255,5 +255,8 @@
     "app.alert.dismiss": "Cerrar alerta",
     "app.alert.spent": "Gastado:",
     "app.alert.remaining": "Te quedan:",
-    "app.alert.overBudget": "Te pasas:"
+    "app.alert.overBudget": "Te pasas:",
+    "app.alert.globalDanger": "Has gastado más de lo que tienes disponible este mes ({pct}%)",
+    "app.alert.globalWarning": "Llevas el {pct}% de tu dinero disponible gastado",
+    "app.alert.categoryAlert": "\"{category}\" supera el {pct}% de tu dinero disponible"
 }

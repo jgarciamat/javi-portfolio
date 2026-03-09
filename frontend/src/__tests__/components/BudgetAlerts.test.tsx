@@ -4,7 +4,11 @@ import type { FinancialSummary } from '@modules/finances/domain/types';
 import esJson from '@locales/es.json';
 
 const translations = esJson as Record<string, string>;
-const t = (key: string) => translations[key] ?? key;
+const t = (key: string, vars?: Record<string, string>) => {
+    let v = translations[key] ?? key;
+    if (vars) Object.entries(vars).forEach(([k, val]) => { v = v.replace(`{${k}}`, val); });
+    return v;
+};
 const tCategory = (name: string) => translations['app.categories.' + name.replace(/\s+/g, '')] ?? name;
 
 jest.mock('@core/i18n/I18nContext', () => ({

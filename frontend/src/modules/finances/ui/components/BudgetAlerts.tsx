@@ -43,7 +43,8 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
 }
 
 export function BudgetAlerts({ summary, carryover }: BudgetAlertsProps) {
-    const alerts = useBudgetAlerts({ summary, carryover });
+    const { t } = useI18n();
+    const alerts = useBudgetAlerts({ summary, carryover, t });
     const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 
     const visible = alerts.filter((_, i) => !dismissed.has(i));
