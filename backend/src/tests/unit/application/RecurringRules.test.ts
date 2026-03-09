@@ -30,7 +30,7 @@ function makeTxRepo(): jest.Mocked<ITransactionRepository> {
     } as unknown as jest.Mocked<ITransactionRepository>;
 }
 
-function makeRule(overrides: Partial<Parameters<typeof RecurringRule.create>[0]> = {}) {
+function makeRule(overrides: Partial<Parameters<typeof RecurringRule.create>[0]> = {}): RecurringRule {
     return RecurringRule.create({
         userId: 'u1',
         description: 'Salario',

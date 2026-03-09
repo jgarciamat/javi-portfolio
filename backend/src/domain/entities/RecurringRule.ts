@@ -106,7 +106,7 @@ export class RecurringRule {
         return true;
     }
 
-    toJSON() {
+    toJSON(): Omit<RecurringRuleProps, 'createdAt'> & { createdAt: string } {
         return {
             id: this.props.id,
             userId: this.props.userId,
@@ -124,17 +124,17 @@ export class RecurringRule {
         };
     }
 
-    get id() { return this.props.id; }
-    get userId() { return this.props.userId; }
-    get description() { return this.props.description; }
-    get amount() { return this.props.amount; }
-    get type() { return this.props.type; }
-    get category() { return this.props.category; }
-    get startYear() { return this.props.startYear; }
-    get startMonth() { return this.props.startMonth; }
-    get endYear() { return this.props.endYear; }
-    get endMonth() { return this.props.endMonth; }
-    get frequency() { return this.props.frequency; }
-    get active() { return this.props.active; }
-    get createdAt() { return this.props.createdAt; }
+    get id(): string { return this.props.id; }
+    get userId(): string { return this.props.userId; }
+    get description(): string { return this.props.description; }
+    get amount(): number { return this.props.amount; }
+    get type(): RecurringType { return this.props.type; }
+    get category(): string { return this.props.category; }
+    get startYear(): number { return this.props.startYear; }
+    get startMonth(): number { return this.props.startMonth; }
+    get endYear(): number | null { return this.props.endYear; }
+    get endMonth(): number | null { return this.props.endMonth; }
+    get frequency(): RecurringFrequency { return this.props.frequency; }
+    get active(): boolean { return this.props.active; }
+    get createdAt(): Date { return this.props.createdAt; }
 }
