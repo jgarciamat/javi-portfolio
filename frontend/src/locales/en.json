@@ -264,5 +264,8 @@
     "app.alert.dismiss": "Dismiss alert",
     "app.alert.spent": "Spent:",
     "app.alert.remaining": "Remaining:",
-    "app.alert.overBudget": "Over budget:"
+    "app.alert.overBudget": "Over budget:",
+    "app.alert.globalDanger": "You have spent more than your available budget this month ({pct}%)",
+    "app.alert.globalWarning": "You have spent {pct}% of your available budget",
+    "app.alert.categoryAlert": "\"{category}\" accounts for {pct}% of your available budget"
 }
