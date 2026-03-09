@@ -13,6 +13,7 @@ export { };
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Cypress {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Chainable {
       // Add custom commands here
       // Example: login(email: string, password: string): Chainable<void>
