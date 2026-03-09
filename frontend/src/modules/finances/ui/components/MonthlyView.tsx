@@ -14,7 +14,7 @@ import type { MonthlyViewProps } from '../types/MonthlyView.types';
 export function MonthlyView({
     year, month, isCurrentMonth, isPrevDisabled, isNextDisabled,
     transactions, summary, carryover, categories, loading, error,
-    onPrev, onNext, onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
+    onPrev, onNext, onGoToCurrentMonth, onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
 }: MonthlyViewProps) {
     const { t, tCategory } = useI18n();
     const { exportMonthCSV } = useExportCSV();
@@ -28,7 +28,10 @@ export function MonthlyView({
                         <div className="month-nav-title">
                             <span className="month-nav-title-text">
                                 {MONTH_NAMES[month - 1]} {year}
-                                {isCurrentMonth && <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>}
+                                {isCurrentMonth
+                                    ? <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>
+                                    : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth}>{t('app.nav.goToCurrentMonth')}</button>
+                                }
                             </span>
                             {transactions.length > 0 && (
                                 <OptionsDropdown

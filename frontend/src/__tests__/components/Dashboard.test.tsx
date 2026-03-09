@@ -154,6 +154,31 @@ describe('Dashboard', () => {
         expect(screen.getByText('Mes actual')).toBeInTheDocument();
     });
 
+    test('shows "↩ Ir al mes actual" button when not on current month', () => {
+        useFinances.mockReturnValue({
+            ...defaultFinancesContext,
+            year: 2025,
+            month: 1,
+        });
+        render(<Dashboard />);
+        const btn = screen.getByRole('button', { name: '↩ Ir al mes actual' });
+        expect(btn).toBeInTheDocument();
+    });
+
+    test('clicking "↩ Ir al mes actual" navigates to current month', () => {
+        const mockNavigateTo = jest.fn();
+        useFinances.mockReturnValue({
+            ...defaultFinancesContext,
+            year: 2025,
+            month: 1,
+            navigateTo: mockNavigateTo,
+        });
+        render(<Dashboard />);
+        fireEvent.click(screen.getByRole('button', { name: '↩ Ir al mes actual' }));
+        const now = new Date();
+        expect(mockNavigateTo).toHaveBeenCalledWith(now.getFullYear(), now.getMonth() + 1);
+    });
+
     test('renders with null carryover and null summary', () => {
         useFinances.mockReturnValue({
             ...defaultFinancesContext,

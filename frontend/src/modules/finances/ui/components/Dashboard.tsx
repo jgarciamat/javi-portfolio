@@ -32,6 +32,8 @@ export function Dashboard() {
         isCurrentMonth, handleSaveEdit, handleMonthClick,
     } = useDashboard({ year, month, navigateTo, updateTransaction });
 
+    const goToCurrentMonth = () => navigateTo(now.getFullYear(), now.getMonth() + 1);
+
     function renderTabContent() {
         if (tab === 'annual') {
             return (
@@ -58,6 +60,7 @@ export function Dashboard() {
                 error={error}
                 onPrev={goToPrev}
                 onNext={goToNext}
+                onGoToCurrentMonth={goToCurrentMonth}
                 onAddTransaction={addTransaction}
                 onDeleteTransaction={removeTransaction}
                 onPatchTransaction={patchTransaction}

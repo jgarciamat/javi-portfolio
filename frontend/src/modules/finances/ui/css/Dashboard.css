@@ -118,6 +118,18 @@
     font-weight: 400;
 }
 
+.month-nav-badge--btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+}
+
+.month-nav-badge--btn:hover {
+    color: #818cf8;
+}
+
 .btn-nav {
     background: #1e293b;
     border: 1px solid #334155;

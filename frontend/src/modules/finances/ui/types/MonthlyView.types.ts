@@ -14,6 +14,7 @@ export interface MonthlyViewProps {
     error: string | null;
     onPrev: () => void;
     onNext: () => void;
+    onGoToCurrentMonth: () => void;
     onAddTransaction: (dto: CreateTransactionDTO) => Promise<Transaction>;
     onDeleteTransaction: (id: string) => Promise<void>;
     onPatchTransaction: (id: string, changes: { notes?: string | null }) => Promise<void>;

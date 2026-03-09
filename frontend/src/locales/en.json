@@ -9,6 +9,7 @@
     "app.nav.prev": "Previous",
     "app.nav.next": "Next",
     "app.nav.currentMonth": "Current month",
+    "app.nav.goToCurrentMonth": "↩ Go to current month",
     "app.error.backendDown": "Error: {error} — Is the backend server running?",
     "app.loading": "Loading…",
     "app.transactions.title": "Transactions ({count})",
