@@ -9,6 +9,8 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
     const { t, tCategory, locale } = useI18n();
     const {
         groups,
+        collapsedDays,
+        toggleDay,
         editingNotesId,
         notesValue,
         pendingDeleteId,
@@ -52,103 +54,126 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
                         </tr>
                     </thead>
                     <tbody>
-                        {groups.map(({ dayKey, label, items }) => (
-                            <>
-                                <tr key={`sep-${dayKey}`} className="tx-day-separator">
-                                    <td colSpan={7}>
-                                        <span className="tx-day-label">{label}</span>
-                                    </td>
-                                </tr>
-                                {items.map((tx) => (
-                                    <tr key={tx.id}>
-                                        <td style={{ color: '#94a3b8' }}>{formatDate(tx.date)}</td>
-                                        <td style={{ color: '#f1f5f9', fontWeight: 500 }}>{tx.description}</td>
-                                        <td className="tx-notes-cell">
-                                            {editingNotesId === tx.id ? (
-                                                <input
-                                                    className="tx-notes-edit-input"
-                                                    autoFocus
-                                                    value={notesValue}
-                                                    onChange={(e) => setNotesValue(e.target.value)}
-                                                    onBlur={() => commitNotes(tx.id)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') commitNotes(tx.id);
-                                                        if (e.key === 'Escape') cancelEditNotes();
-                                                    }}
-                                                />
-                                            ) : (
-                                                <span
-                                                    className="tx-notes-text"
-                                                    onClick={() => startEditNotes(tx.id, tx.notes)}
-                                                    title={t('app.transaction.table.notes.placeholder')}
-                                                >
-                                                    {tx.notes ?? <span className="tx-notes-placeholder">{t('app.transaction.table.notes.placeholder')}</span>}
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td><span className="tx-cat-badge">{tCategory(tx.category)}</span></td>
-                                        <td>
-                                            <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
-                                        </td>
-                                        <td style={{ fontWeight: 700, color: txAmountColor(tx.type) }}>
-                                            {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
-                                        </td>
-                                        <td>
-                                            <button className="btn-edit" onClick={() => onEdit(tx)} title={t('app.transaction.table.edit')} aria-label={t('app.transaction.table.edit')}>✏️</button>
-                                            <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} title={t('app.transaction.table.delete')} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                        {groups.map(({ dayKey, label, items }) => {
+                            const isCollapsed = collapsedDays.has(dayKey);
+                            return (
+                                <>
+                                    <tr
+                                        key={`sep-${dayKey}`}
+                                        className="tx-day-separator tx-day-separator--clickable"
+                                        onClick={() => toggleDay(dayKey)}
+                                        aria-expanded={!isCollapsed}
+                                    >
+                                        <td colSpan={7}>
+                                            <span className="tx-day-label">
+                                                <span className={`tx-day-chevron${isCollapsed ? ' tx-day-chevron--collapsed' : ''}`}>▾</span>
+                                                {label}
+                                                <span className="tx-day-count">({items.length})</span>
+                                            </span>
                                         </td>
                                     </tr>
-                                ))}
-                            </>
-                        ))}
+                                    {!isCollapsed && items.map((tx) => (
+                                        <tr key={tx.id}>
+                                            <td style={{ color: '#94a3b8' }}>{formatDate(tx.date)}</td>
+                                            <td style={{ color: '#f1f5f9', fontWeight: 500 }}>{tx.description}</td>
+                                            <td className="tx-notes-cell">
+                                                {editingNotesId === tx.id ? (
+                                                    <input
+                                                        className="tx-notes-edit-input"
+                                                        autoFocus
+                                                        value={notesValue}
+                                                        onChange={(e) => setNotesValue(e.target.value)}
+                                                        onBlur={() => commitNotes(tx.id)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') commitNotes(tx.id);
+                                                            if (e.key === 'Escape') cancelEditNotes();
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <span
+                                                        className="tx-notes-text"
+                                                        onClick={() => startEditNotes(tx.id, tx.notes)}
+                                                        title={t('app.transaction.table.notes.placeholder')}
+                                                    >
+                                                        {tx.notes ?? <span className="tx-notes-placeholder">{t('app.transaction.table.notes.placeholder')}</span>}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td><span className="tx-cat-badge">{tCategory(tx.category)}</span></td>
+                                            <td>
+                                                <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
+                                            </td>
+                                            <td style={{ fontWeight: 700, color: txAmountColor(tx.type) }}>
+                                                {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
+                                            </td>
+                                            <td>
+                                                <button className="btn-edit" onClick={() => onEdit(tx)} title={t('app.transaction.table.edit')} aria-label={t('app.transaction.table.edit')}>✏️</button>
+                                                <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} title={t('app.transaction.table.delete')} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
 
             {/* Mobile card list */}
             <div className="tx-card-list">
-                {groups.map(({ dayKey, label, items }) => (
-                    <div key={`group-${dayKey}`}>
-                        <div className="tx-day-header">{label}</div>
-                        {items.map((tx) => (
-                            <div key={tx.id} className="tx-card">
-                                <div className="tx-card-left">
-                                    <div className="tx-card-desc">{tx.description}</div>
-                                    <div className="tx-card-meta">{formatDate(tx.date)} · {tCategory(tx.category)}</div>
-                                    {editingNotesId === tx.id ? (
-                                        <input
-                                            className="tx-notes-edit-input"
-                                            value={notesValue}
-                                            onChange={(e) => setNotesValue(e.target.value)}
-                                            onBlur={() => commitNotes(tx.id)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') commitNotes(tx.id);
-                                                if (e.key === 'Escape') cancelEditNotes();
-                                            }}
-                                        />
-                                    ) : (
-                                        <span
-                                            className="tx-notes-text"
-                                            onClick={() => startEditNotes(tx.id, tx.notes)}
-                                        >
-                                            {tx.notes ?? <span className="tx-notes-placeholder">{t('app.transaction.table.notes.placeholder')}</span>}
+                {groups.map(({ dayKey, label, items }) => {
+                    const isCollapsed = collapsedDays.has(dayKey);
+                    return (
+                        <div key={`group-${dayKey}`}>
+                            <div
+                                className="tx-day-header tx-day-header--clickable"
+                                onClick={() => toggleDay(dayKey)}
+                                aria-expanded={!isCollapsed}
+                            >
+                                <span className={`tx-day-chevron${isCollapsed ? ' tx-day-chevron--collapsed' : ''}`}>▾</span>
+                                {label}
+                                <span className="tx-day-count">({items.length})</span>
+                            </div>
+                            {!isCollapsed && items.map((tx) => (
+                                <div key={tx.id} className="tx-card">
+                                    <div className="tx-card-left">
+                                        <div className="tx-card-desc">{tx.description}</div>
+                                        <div className="tx-card-meta">{formatDate(tx.date)} · {tCategory(tx.category)}</div>
+                                        {editingNotesId === tx.id ? (
+                                            <input
+                                                className="tx-notes-edit-input"
+                                                value={notesValue}
+                                                onChange={(e) => setNotesValue(e.target.value)}
+                                                onBlur={() => commitNotes(tx.id)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') commitNotes(tx.id);
+                                                    if (e.key === 'Escape') cancelEditNotes();
+                                                }}
+                                            />
+                                        ) : (
+                                            <span
+                                                className="tx-notes-text"
+                                                onClick={() => startEditNotes(tx.id, tx.notes)}
+                                            >
+                                                {tx.notes ?? <span className="tx-notes-placeholder">{t('app.transaction.table.notes.placeholder')}</span>}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="tx-card-right">
+                                        <span className="tx-card-amount" style={{ color: txAmountColor(tx.type) }}>
+                                            {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
                                         </span>
-                                    )}
-                                </div>
-                                <div className="tx-card-right">
-                                    <span className="tx-card-amount" style={{ color: txAmountColor(tx.type) }}>
-                                        {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
-                                    </span>
-                                    <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
-                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
-                                        <button className="btn-edit" onClick={() => onEdit(tx)} aria-label={t('app.transaction.table.edit')}>✏️</button>
-                                        <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                                        <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
+                                        <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                            <button className="btn-edit" onClick={() => onEdit(tx)} aria-label={t('app.transaction.table.edit')}>✏️</button>
+                                            <button className="btn-delete" onClick={() => setPendingDeleteId(tx.id)} aria-label={t('app.transaction.table.delete')}>🗑️</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ))}
+                            ))}
+                        </div>
+                    );
+                })}
             </div>
 
             {pendingDeleteId !== null && (

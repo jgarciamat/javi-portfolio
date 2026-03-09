@@ -330,4 +330,77 @@ describe('TransactionTable', () => {
         // All 3 transactions rendered (desktop + mobile = 6 descriptions)
         expect(screen.getAllByText('Bus ticket').length).toBe(2); // desktop + mobile
     });
+
+    // ── collapsible day groups ─────────────────────────────────────────────────
+
+    test('clicking the day separator collapses the group (transactions disappear)', () => {
+        const { container } = render(
+            <TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        // Initially visible
+        expect(screen.getAllByText('Bus ticket').length).toBe(2); // desktop + mobile
+
+        // Click the desktop separator row to collapse
+        const separator = container.querySelector('.tx-day-separator--clickable')!;
+        fireEvent.click(separator);
+
+        // After collapse, transactions are hidden
+        expect(screen.queryAllByText('Bus ticket').length).toBe(0);
+    });
+
+    test('clicking the day separator twice expands the group again', () => {
+        const { container } = render(
+            <TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        const separator = container.querySelector('.tx-day-separator--clickable')!;
+
+        fireEvent.click(separator); // collapse
+        expect(screen.queryAllByText('Bus ticket').length).toBe(0);
+
+        fireEvent.click(separator); // expand
+        expect(screen.getAllByText('Bus ticket').length).toBe(2);
+    });
+
+    test('chevron rotates when group is collapsed', () => {
+        const { container } = render(
+            <TransactionTable transactions={[txExpense]} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        const separator = container.querySelector('.tx-day-separator--clickable')!;
+        const chevron = separator.querySelector('.tx-day-chevron')!;
+
+        expect(chevron.classList.contains('tx-day-chevron--collapsed')).toBe(false);
+        fireEvent.click(separator);
+        expect(chevron.classList.contains('tx-day-chevron--collapsed')).toBe(true);
+    });
+
+    test('collapsing one day does not affect other days', () => {
+        const twoDayTxs: Transaction[] = [
+            { ...txExpense, id: 'a', date: '2025-01-05T08:00:00.000Z' },
+            { ...txIncome, id: 'b', date: '2025-01-06T10:00:00.000Z' },
+        ];
+        const { container } = render(
+            <TransactionTable transactions={twoDayTxs} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        const separators = container.querySelectorAll('.tx-day-separator--clickable');
+        expect(separators.length).toBe(2);
+
+        // Collapse only the first day
+        fireEvent.click(separators[0]);
+
+        // Bus ticket (day 1) hidden, Salary (day 2) still visible
+        expect(screen.queryAllByText('Bus ticket').length).toBe(0);
+        expect(screen.getAllByText('Salary').length).toBe(2); // desktop + mobile
+    });
+
+    test('day count badge shows number of transactions in the group', () => {
+        const sameDayTxs: Transaction[] = [
+            { ...txExpense, id: 'a', date: '2025-01-05T08:00:00.000Z' },
+            { ...txIncome, id: 'b', date: '2025-01-05T14:00:00.000Z' },
+        ];
+        const { container } = render(
+            <TransactionTable transactions={sameDayTxs} onDelete={mockOnDelete} onPatch={mockOnPatch} onEdit={mockOnEdit} />
+        );
+        const countBadge = container.querySelector('.tx-day-separator .tx-day-count');
+        expect(countBadge?.textContent).toBe('(2)');
+    });
 });

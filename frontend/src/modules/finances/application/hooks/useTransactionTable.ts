@@ -13,6 +13,8 @@ interface UseTransactionTableOptions {
 
 export interface UseTransactionTableReturn {
     groups: DayGroup[];
+    collapsedDays: Set<string>;
+    toggleDay: (dayKey: string) => void;
     editingNotesId: string | null;
     notesValue: string;
     pendingDeleteId: string | null;
@@ -36,8 +38,18 @@ export function useTransactionTable({
     const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
     const [notesValue, setNotesValue] = useState('');
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+    const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
 
     const groups = groupByDay(transactions, locale);
+
+    const toggleDay = (dayKey: string) => {
+        setCollapsedDays((prev) => {
+            const next = new Set(prev);
+            if (next.has(dayKey)) next.delete(dayKey);
+            else next.add(dayKey);
+            return next;
+        });
+    };
 
     const txLabel = (type: TransactionType): string => {
         if (type === 'INCOME') return t('app.transaction.form.type.income');
@@ -68,6 +80,8 @@ export function useTransactionTable({
 
     return {
         groups,
+        collapsedDays,
+        toggleDay,
         editingNotesId,
         notesValue,
         pendingDeleteId,

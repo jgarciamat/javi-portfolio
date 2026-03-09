@@ -94,8 +94,19 @@
     border-top: 1px solid #1e293b;
 }
 
+.tx-day-separator--clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.tx-day-separator--clickable:hover td {
+    background: #0f172a;
+}
+
 .tx-day-label {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -103,8 +114,32 @@
     color: #475569;
 }
 
+.tx-day-chevron {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #475569;
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
+    line-height: 1;
+}
+
+.tx-day-chevron--collapsed {
+    transform: rotate(-90deg);
+}
+
+.tx-day-count {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #334155;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
 /* ─── Day header (mobile cards) ─────────────── */
 .tx-day-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -112,6 +147,15 @@
     color: #475569;
     padding: 0.9rem 0 0.35rem;
     border-top: 1px solid #1e293b;
+}
+
+.tx-day-header--clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.tx-day-header--clickable:hover {
+    color: #64748b;
 }
 
 /* Remove top border from the very first day header */
