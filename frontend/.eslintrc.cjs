@@ -56,6 +56,7 @@ module.exports = {
         'src/__mocks__/**/*.js',
         'cypress/**/*.ts',
         'cypress.config.ts',
+        'capacitor.config.ts',
         'vite.config.ts',
         'setupTests.ts',
         'core/**/*.ts',
