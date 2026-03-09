@@ -17,11 +17,8 @@ jest.mock('@core/context/ApiContext', () => ({
     useApi: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useApi } = require('@core/context/ApiContext') as { useApi: jest.Mock };
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useAuth } = require('@shared/hooks/useAuth') as { useAuth: jest.Mock };
-
+const { useApi } = jest.requireMock('@core/context/ApiContext') as { useApi: jest.Mock };
+const { useAuth } = jest.requireMock('@shared/hooks/useAuth') as { useAuth: jest.Mock };
 function TestComponent({ year = 2025, month = 1 }: { year?: number; month?: number }) {
     const { transactions, summary, carryover, loading, error, addTransaction, removeTransaction } =
         useTransactions({ year, month });

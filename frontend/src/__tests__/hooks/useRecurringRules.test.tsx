@@ -7,10 +7,8 @@ import type { RecurringRule } from '../../modules/finances/domain/types';
 jest.mock('@core/context/ApiContext', () => ({ useApi: jest.fn() }));
 jest.mock('@shared/hooks/useAuth', () => ({ useAuth: jest.fn() }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useApi } = require('@core/context/ApiContext') as { useApi: jest.Mock };
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useAuth } = require('@shared/hooks/useAuth') as { useAuth: jest.Mock };
+const { useApi } = jest.requireMock('@core/context/ApiContext') as { useApi: jest.Mock };
+const { useAuth } = jest.requireMock('@shared/hooks/useAuth') as { useAuth: jest.Mock };
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 

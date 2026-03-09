@@ -12,8 +12,7 @@ jest.mock('@core/context/ApiContext', () => ({
     useApi: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { useApi } = require('@core/context/ApiContext') as { useApi: jest.Mock };
+const { useApi } = jest.requireMock('@core/context/ApiContext') as { useApi: jest.Mock };
 
 function TestComponent({ year = 2025 }: { year?: number }) {
     const { data, loading, error, refresh } = useAnnualSummary(year);
