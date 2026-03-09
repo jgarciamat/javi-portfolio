@@ -13,14 +13,22 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "lint": "eslint . --ext ts,tsx",
-    "lint:fix": "eslint . --ext ts,tsx --fix"
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "build:android": "npm run build && npx cap sync android && npx cap open android",
+    "build:ios": "npm run build && npx cap sync ios && npx cap open ios",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:copy": "npx cap copy"
   },
   "dependencies": {
+    "@capacitor/core": "^8.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.21.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/ios": "^8.2.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",

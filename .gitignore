@@ -66,6 +66,13 @@ gh_actions_deploy_javi_portfolio.pub
 # Vite cache
 .vite/
 
+# Vite PWA dev assets (generated at runtime, not needed in repo)
+frontend/dev-dist/
+
+# Capacitor — keystore files (NEVER commit these)
+*.jks
+*.keystore
+
 # TypeScript build info
 *.tsbuildinfo
 

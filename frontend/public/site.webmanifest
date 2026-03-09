@@ -1,11 +1,19 @@
 {
+    "id": "com.jgarciamat.moneymanager",
     "name": "Money Manager",
     "short_name": "Money Manager",
     "description": "Control de gastos y ahorros personales",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
+    "orientation": "portrait",
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
+    "lang": "es",
+    "categories": [
+        "finance",
+        "productivity"
+    ],
     "icons": [
         {
             "src": "/icon-192.png",
@@ -22,6 +30,22 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/mobile-dashboard.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Dashboard principal"
+        },
+        {
+            "src": "/screenshots/mobile-transactions.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Listado de transacciones"
         }
     ]
 }
