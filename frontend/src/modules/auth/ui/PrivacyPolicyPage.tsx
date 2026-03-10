@@ -116,6 +116,20 @@ export function PrivacyPolicyPage() {
                     <p>{t('app.privacy.s10.p1')}</p>
                 </section>
 
+                {/* Section 11 – Account Deletion */}
+                <section className="privacy-section">
+                    <h2 className="privacy-section-title">{t('app.privacy.s11.title')}</h2>
+                    <p>{t('app.privacy.s11.p1')}</p>
+                    <p><strong>{t('app.privacy.s11.steps')}</strong></p>
+                    <ol>
+                        <li>{t('app.privacy.s11.step1')}</li>
+                        <li>{t('app.privacy.s11.step2')}</li>
+                        <li>{t('app.privacy.s11.step3')}</li>
+                        <li>{t('app.privacy.s11.step4')}</li>
+                    </ol>
+                    <p>{t('app.privacy.s11.p2')}</p>
+                </section>
+
                 {/* Contact */}
                 <div className="privacy-contact">
                     <h2 className="privacy-section-title">{t('app.privacy.contact.title')}</h2>
