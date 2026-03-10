@@ -15,7 +15,7 @@ export default function App() {
         <I18nProvider>
             <AuthProvider>
                 <ApiProvider>
-                    <BrowserRouter>
+                    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                         <Routes>
                             <Route path="/login" element={<AuthPage />} />
                             <Route path="/verify-email" element={<VerifyEmailPage />} />
