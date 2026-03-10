@@ -20,9 +20,10 @@ interface DatePickerFieldProps {
     value: string;
     onChange: (v: string) => void;
     label?: string;
+    locale?: string;
 }
 
-function DatePickerField({ value, onChange, label }: DatePickerFieldProps) {
+function DatePickerField({ value, onChange, label, locale = 'es-ES' }: DatePickerFieldProps) {
     const ref = useRef<HTMLInputElement>(null);
 
     const formatDisplay = (v: string): string => {
@@ -30,7 +31,7 @@ function DatePickerField({ value, onChange, label }: DatePickerFieldProps) {
         const [y, m, d] = v.split('-');
         if (!y || !m || !d) return v;
         const date = new Date(Number(y), Number(m) - 1, Number(d));
-        return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+        return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
     };
 
     return (
@@ -71,7 +72,7 @@ interface RuleFormProps {
 }
 
 function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categories, isEdit }: RuleFormProps) {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
 
     const set = (key: keyof FormState, value: string | boolean) =>
         onChange({ ...form, [key]: value });
@@ -145,6 +146,7 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                         value={form.startDate}
                         onChange={(v) => set('startDate', v)}
                         label={t('app.recurring.form.start')}
+                        locale={locale}
                     />
                 </div>
 
@@ -178,6 +180,7 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                             value={form.endDate}
                             onChange={(v) => set('endDate', v)}
                             label={t('app.recurring.form.end')}
+                            locale={locale}
                         />
                     )}
                 </div>

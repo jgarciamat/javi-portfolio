@@ -68,12 +68,12 @@ export function isoToDateInput(iso: string): string {
 
 // ─── Formatting ───────────────────────────────────────────────────────────────
 
-export function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
+export function formatCurrency(amount: number, locale = 'es-ES'): string {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
-export function formatDate(dateStr: string): string {
-    return new Intl.DateTimeFormat('es-ES', {
+export function formatDate(dateStr: string, locale = 'es-ES'): string {
+    return new Intl.DateTimeFormat(locale, {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
