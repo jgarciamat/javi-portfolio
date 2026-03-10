@@ -51,7 +51,8 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                                         type="button"
                                         className="cat-emoji-btn"
                                         onClick={() => setShowEmojiPicker((v) => !v)}
-                                        title="Elegir emoji"
+                                        title={t('app.category.manager.emoji.choose')}
+                                        aria-label={t('app.category.manager.emoji.choose')}
                                     >
                                         {fields.icon}
                                     </button>
@@ -74,6 +75,7 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
                                             style={{ background: c }}
                                             onClick={() => setColor(c)}
                                             title={c}
+                                            aria-label={c}
                                         />
                                     ))}
                                 </div>

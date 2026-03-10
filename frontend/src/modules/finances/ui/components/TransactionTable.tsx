@@ -1,3 +1,4 @@
+import React from 'react';
 import '../css/TransactionTable.css';
 import type { TransactionTableProps } from '../types';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
@@ -36,6 +37,7 @@ function DesktopTable({
     return (
         <div className="tx-table-wrap">
             <table className="tx-table">
+                <caption className="sr-only">{t('app.transaction.table.caption')}</caption>
                 <thead>
                     <tr>
                         {[
@@ -46,19 +48,19 @@ function DesktopTable({
                             t('app.transaction.table.type'),
                             t('app.transaction.table.amount'),
                             '',
-                        ].map((h) => <th key={h}>{h}</th>)}
+                        ].map((h, i) => <th key={h || `col-${i}`} scope="col">{h}</th>)}
                     </tr>
                 </thead>
                 <tbody>
                     {groups.map(({ dayKey, label, items }) => {
                         const isCollapsed = collapsedDays.has(dayKey);
                         return (
-                            <>
+                            <React.Fragment key={dayKey}>
                                 <tr
-                                    key={`sep-${dayKey}`}
                                     className="tx-day-separator tx-day-separator--clickable"
                                     onClick={() => toggleDay(dayKey)}
                                     aria-expanded={!isCollapsed}
+                                    aria-label={`${label} (${items.length})`}
                                 >
                                     <td colSpan={7}>
                                         <span className="tx-day-label">
@@ -106,7 +108,7 @@ function DesktopTable({
                                         </td>
                                     </tr>
                                 ))}
-                            </>
+                            </React.Fragment>
                         );
                     })}
                 </tbody>
@@ -131,6 +133,10 @@ function MobileCardList({
                             className="tx-day-header tx-day-header--clickable"
                             onClick={() => toggleDay(dayKey)}
                             aria-expanded={!isCollapsed}
+                            aria-label={`${label} (${items.length})`}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleDay(dayKey); }}
                         >
                             <span className={`tx-day-chevron${isCollapsed ? ' tx-day-chevron--collapsed' : ''}`}>▾</span>
                             {label}
