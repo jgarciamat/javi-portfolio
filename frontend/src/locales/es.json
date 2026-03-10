@@ -106,6 +106,7 @@
     "app.profile.password.saved": "Contraseña cambiada correctamente",
     "app.profile.password.mismatch": "Las contraseñas nuevas no coinciden",
     "app.profile.password.noMatch": "✗ Las contraseñas no coinciden",
+    "app.profile.settings.title": "Ajustes",
     "app.profile.deleteAccount.button": "Eliminar cuenta",
     "app.profile.deleteAccount.modal.title": "Eliminar cuenta permanentemente",
     "app.profile.deleteAccount.modal.warning": "⚠️ Esta acción no se puede deshacer.",

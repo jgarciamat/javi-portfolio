@@ -106,6 +106,7 @@
     "app.profile.password.saved": "Password changed successfully",
     "app.profile.password.mismatch": "New passwords do not match",
     "app.profile.password.noMatch": "✗ Passwords do not match",
+    "app.profile.settings.title": "Settings",
     "app.profile.deleteAccount.button": "Delete account",
     "app.profile.deleteAccount.modal.title": "Delete account permanently",
     "app.profile.deleteAccount.modal.warning": "⚠️ This action cannot be undone.",

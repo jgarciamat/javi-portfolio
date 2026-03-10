@@ -7,13 +7,14 @@ module.exports = {
         '^.+\\.tsx?$': 'ts-jest',
     },
     moduleNameMapper: {
+        // CSS/asset files — must come before alias rules so aliased CSS paths are also mocked
+        '\\.(css|less|scss|sass|png|jpg|jpeg|gif|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
         // Specific override first — prevents import.meta in api.config.ts
         '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
         '^@modules/(.*)$': '<rootDir>/src/modules/$1',
         '^@shared/(.*)$': '<rootDir>/src/shared/$1',
         '^@core/(.*)$': '<rootDir>/src/core/$1',
         '^@locales/(.*)$': '<rootDir>/src/locales/$1',
-        '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/fileMock.js',
     },
     setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
     collectCoverageFrom: [
