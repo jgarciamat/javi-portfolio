@@ -38,6 +38,7 @@
     "app.transaction.form.category.placeholder": "Category...",
     "app.transaction.form.category.manage": "Create / Delete category",
     "app.transaction.form.notes": "Notes (optional)",
+    "app.transaction.form.date": "Date",
     "app.transaction.form.save": "Save transaction",
     "app.transaction.form.saving": "Saving...",
     "app.transaction.form.cancel": "Cancel",
