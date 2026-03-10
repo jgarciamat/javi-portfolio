@@ -18,6 +18,7 @@ interface Params {
     summary: FinancialSummary | null;
     carryover: number | null;
     t?: (key: string, vars?: Record<string, string>) => string;
+    tCategory?: (name: string) => string;
 }
 
 function defaultT(key: string, vars?: Record<string, string>): string {
@@ -31,7 +32,7 @@ function defaultT(key: string, vars?: Record<string, string>): string {
     return msg;
 }
 
-export function useBudgetAlerts({ summary, carryover, t = defaultT }: Params): BudgetAlert[] {
+export function useBudgetAlerts({ summary, carryover, t = defaultT, tCategory = (n) => n }: Params): BudgetAlert[] {
     return useMemo(() => {
         if (!summary) return [];
 
@@ -73,11 +74,11 @@ export function useBudgetAlerts({ summary, carryover, t = defaultT }: Params): B
                     spentAmount: Math.round(spent * 100) / 100,
                     remainingAmount: null,
                     percentage: Math.round(catPct * 10) / 10,
-                    message: t('app.alert.categoryAlert', { category, pct: String(Math.round(catPct)) }),
+                    message: t('app.alert.categoryAlert', { category: tCategory(category), pct: String(Math.round(catPct)) }),
                 });
             }
         }
 
         return alerts;
-    }, [summary, carryover, t]);
+    }, [summary, carryover, t, tCategory]);
 }

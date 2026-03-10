@@ -3,49 +3,82 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0f172a" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Canonical -->
+    <link rel="canonical" href="https://money.jgarciamat.com/" />
     <!-- SEO -->
+    <title>Money Manager — Control de gastos y ahorros</title>
     <meta name="description"
         content="Money Manager — Controla tus gastos, ingresos y ahorros personales. Visualiza tu situación financiera mensual y anual con gráficos claros." />
     <meta name="keywords"
-        content="control de gastos, finanzas personales, ahorro, gestor de gastos, presupuesto personal" />
+        content="control de gastos, finanzas personales, ahorro, gestor de gastos, presupuesto personal, app finanzas" />
     <meta name="author" content="Javi García" />
     <meta name="robots" content="noindex, nofollow" />
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Money Manager" />
+    <meta property="og:url" content="https://money.jgarciamat.com/" />
     <meta property="og:title" content="Money Manager — Control de gastos y ahorros" />
     <meta property="og:description"
         content="Controla tus gastos, ingresos y ahorros personales de forma sencilla y visual." />
-    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:image" content="https://money.jgarciamat.com/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="Money Manager logo" />
     <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_GB" />
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Money Manager — Control de gastos y ahorros" />
     <meta name="twitter:description"
         content="Controla tus gastos, ingresos y ahorros personales de forma sencilla y visual." />
-    <meta name="twitter:image" content="/icon-512.png" />
+    <meta name="twitter:image" content="https://money.jgarciamat.com/icon-512.png" />
+    <meta name="twitter:image:alt" content="Money Manager logo" />
     <!-- PWA: iOS Safari -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Money Manager" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <title>Money Manager — Control de gastos y ahorros</title>
+    <!-- Preconnect to API -->
+    <link rel="preconnect" href="https://money.jgarciamat.com" />
     <!-- Structured data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "Money Manager",
+        "url": "https://money.jgarciamat.com/",
         "description": "Controla tus gastos, ingresos y ahorros personales de forma sencilla y visual.",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web, Android, iOS",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+        "inLanguage": ["es", "en"],
+        "author": {
+            "@type": "Person",
+            "name": "Javi García",
+            "url": "https://jgarciamat.com"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        },
+        "featureList": [
+            "Control de gastos e ingresos mensuales",
+            "Gráficos de balance anual",
+            "Alertas de presupuesto por categoría",
+            "Reglas de transacciones recurrentes",
+            "Exportación a CSV",
+            "Soporte multiidioma (ES / EN)",
+            "Progressive Web App instalable"
+        ]
     }
     </script>
 </head>
