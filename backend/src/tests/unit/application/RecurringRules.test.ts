@@ -10,6 +10,7 @@ function makeRepo(): jest.Mocked<IRecurringRuleRepository> {
         findByUserId: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
+        deleteAllByUser: jest.fn(),
     };
 }
 
@@ -27,6 +28,7 @@ function makeTxRepo(): jest.Mocked<ITransactionRepository> {
         delete: jest.fn(),
         patchTransaction: jest.fn(),
         deleteByRecurringRule: jest.fn().mockResolvedValue(undefined),
+        deleteAllByUser: jest.fn(),
     } as unknown as jest.Mocked<ITransactionRepository>;
 }
 

@@ -75,6 +75,10 @@ export class SqliteCategoryRepository implements ICategoryRepository {
         this.db.prepare('DELETE FROM categories WHERE id = ?').run(id);
     }
 
+    async deleteAllByUser(userId: string): Promise<void> {
+        this.db.prepare('DELETE FROM categories WHERE user_id = ?').run(userId);
+    }
+
     private toEntity(row: CategoryRow): Category {
         return Category.reconstitute({ id: row.id, name: row.name, color: row.color, icon: row.icon });
     }

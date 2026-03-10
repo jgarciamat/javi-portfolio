@@ -1,12 +1,14 @@
 import { Response } from 'express';
 import { AuthRequest } from '@infrastructure/express/authMiddleware';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
+import { DeleteAccount } from '@application/use-cases/DeleteAccount';
 
 export class ProfileController {
     constructor(
         private readonly updateName: UpdateName,
         private readonly updatePassword: UpdatePassword,
         private readonly updateAvatar: UpdateAvatar,
+        private readonly deleteAccountUC: DeleteAccount,
     ) { }
 
     async patchName(req: AuthRequest, res: Response): Promise<void> {
@@ -45,5 +47,15 @@ export class ProfileController {
 
     async getProfile(req: AuthRequest, res: Response): Promise<void> {
         res.status(200).json({ userId: req.userId });
+    }
+
+    async deleteAccount(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const userId = req.userId!;
+            await this.deleteAccountUC.execute({ userId });
+            res.status(204).end();
+        } catch (e) {
+            res.status(400).json({ error: e instanceof Error ? e.message : 'Error al eliminar cuenta' });
+        }
     }
 }

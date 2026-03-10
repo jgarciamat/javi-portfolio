@@ -16,6 +16,7 @@ function makeTxRepo(overrides: Partial<ITransactionRepository> = {}): jest.Mocke
         delete: jest.fn(),
         patchTransaction: jest.fn(),
         deleteByRecurringRule: jest.fn(),
+        deleteAllByUser: jest.fn(),
         ...overrides,
     } as jest.Mocked<ITransactionRepository>;
 }

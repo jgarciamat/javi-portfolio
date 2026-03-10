@@ -15,6 +15,7 @@ import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/Sqlit
 import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
+import { DeleteAccount } from '@application/use-cases/DeleteAccount';
 import { CreateRecurringRule, GetRecurringRules, UpdateRecurringRule, DeleteRecurringRule } from '@application/use-cases/RecurringRules';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
@@ -94,6 +95,7 @@ const profileController = new ProfileController(
     new UpdateName(userRepo),
     new UpdatePassword(userRepo),
     new UpdateAvatar(userRepo),
+    new DeleteAccount(userRepo, transactionRepo, categoryRepo, recurringRuleRepo, refreshTokenRepo),
 );
 const alertController = new AlertController(checkBudgetAlerts);
 const aiController = new AIController(getAIAdvice, transactionRepo, budgetRepo);
@@ -143,6 +145,7 @@ router.put('/budget/:year/:month', (req: Request, res: Response) => budgetContro
 router.patch('/profile/name', (req: Request, res: Response) => profileController.patchName(req as AuthRequest, res));
 router.patch('/profile/password', (req: Request, res: Response) => profileController.patchPassword(req as AuthRequest, res));
 router.patch('/profile/avatar', (req: Request, res: Response) => profileController.patchAvatar(req as AuthRequest, res));
+router.delete('/profile/account', (req: Request, res: Response) => profileController.deleteAccount(req as AuthRequest, res));
 
 // Alerts
 router.get('/alerts/budget/:year/:month', (req: Request, res: Response) => alertController.budgetAlerts(req as AuthRequest, res));

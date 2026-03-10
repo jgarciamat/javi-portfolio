@@ -130,6 +130,10 @@ export class SqliteTransactionRepository implements ITransactionRepository {
         this.db.prepare('DELETE FROM transactions WHERE id = ?').run(id);
     }
 
+    async deleteAllByUser(userId: string): Promise<void> {
+        this.db.prepare('DELETE FROM transactions WHERE user_id = ?').run(userId);
+    }
+
     async patchTransaction(id: string, changes: { notes?: string | null }): Promise<Transaction | null> {
         const tx = await this.findById(id);
         if (!tx) return null;

@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useNameSection, usePasswordSection, useAvatarSection } from '../application/useProfileSections';
 import { AvatarSection } from './ProfileAvatarSection';
 import { NameSection } from './ProfileNameSection';
 import { PasswordSection } from './ProfilePasswordSection';
+import { DeleteAccountModal } from './DeleteAccountModal';
+import { useDeleteAccount } from '../application/useDeleteAccount';
 
 interface Props {
     onClose: () => void;
@@ -16,12 +18,14 @@ export function ProfilePage({ onClose }: Props) {
     const nameSection = useNameSection();
     const passwordSection = usePasswordSection();
     const avatarSection = useAvatarSection();
+    const { loading: deleteLoading, error: deleteError, handleDelete } = useDeleteAccount();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     useEffect(() => {
-        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !showDeleteModal) onClose(); };
         document.addEventListener('keydown', handleKey);
         return () => document.removeEventListener('keydown', handleKey);
-    }, [onClose]);
+    }, [onClose, showDeleteModal]);
 
     return (
         <div
@@ -56,7 +60,27 @@ export function ProfilePage({ onClose }: Props) {
 
                 <hr className="profile-divider" />
                 <PasswordSection {...passwordSection} />
+
+                <hr className="profile-divider" />
+                <div className="profile-section profile-delete-section">
+                    <button
+                        className="btn-delete-account"
+                        onClick={() => setShowDeleteModal(true)}
+                        aria-label={t('app.profile.deleteAccount.button')}
+                    >
+                        🗑️ {t('app.profile.deleteAccount.button')}
+                    </button>
+                </div>
             </div>
+
+            {showDeleteModal && (
+                <DeleteAccountModal
+                    loading={deleteLoading}
+                    error={deleteError}
+                    onConfirm={handleDelete}
+                    onCancel={() => setShowDeleteModal(false)}
+                />
+            )}
         </div>
     );
 }

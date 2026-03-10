@@ -16,6 +16,7 @@ function makeRepo(): jest.Mocked<ITransactionRepository> {
         delete: jest.fn(),
         patchTransaction: jest.fn(),
         deleteByRecurringRule: jest.fn(),
+        deleteAllByUser: jest.fn(),
     } as jest.Mocked<ITransactionRepository>;
 }
 

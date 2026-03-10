@@ -10,6 +10,7 @@ function makeRepo(overrides: Partial<ICategoryRepository> = {}): jest.Mocked<ICa
         findAll: jest.fn().mockResolvedValue([]),
         findAllByUser: jest.fn(),
         delete: jest.fn(),
+        deleteAllByUser: jest.fn(),
         seedForUser: jest.fn(),
         ...overrides,
     } as jest.Mocked<ICategoryRepository>;

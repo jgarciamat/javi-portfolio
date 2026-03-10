@@ -17,4 +17,5 @@ export interface IRecurringRuleRepository {
         active: boolean;
     }>): RecurringRule | null;
     delete(id: string): void;
+    deleteAllByUser(userId: string): void;
 }

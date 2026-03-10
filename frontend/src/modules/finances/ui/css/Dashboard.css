@@ -631,3 +631,36 @@
         min-width: 0;
     }
 }
+
+/* ── Delete account button ────────────────────────────────────────────────── */
+.profile-delete-section {
+    padding-top: 0.25rem;
+    padding-bottom: 0.5rem;
+}
+
+.btn-delete-account {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-delete-account:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.btn-delete-account:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}

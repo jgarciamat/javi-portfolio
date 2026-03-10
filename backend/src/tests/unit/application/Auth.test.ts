@@ -13,6 +13,7 @@ function makeUserRepo(overrides: Partial<IUserRepository> = {}): IUserRepository
         findByEmail: jest.fn().mockResolvedValue(null),
         findByVerificationToken: jest.fn().mockResolvedValue(null),
         findByResetToken: jest.fn().mockResolvedValue(null),
+        delete: jest.fn().mockResolvedValue(undefined),
         ...overrides,
     };
 }
@@ -25,6 +26,7 @@ function makeCategoryRepo(overrides: Partial<ICategoryRepository> = {}): ICatego
         findAll: jest.fn().mockResolvedValue([]),
         findAllByUser: jest.fn().mockResolvedValue([]),
         delete: jest.fn().mockResolvedValue(undefined),
+        deleteAllByUser: jest.fn().mockResolvedValue(undefined),
         seedForUser: jest.fn(),
         ...overrides,
     };

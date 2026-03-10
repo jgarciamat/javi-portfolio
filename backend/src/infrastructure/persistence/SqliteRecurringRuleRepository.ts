@@ -100,4 +100,8 @@ export class SqliteRecurringRuleRepository implements IRecurringRuleRepository {
     delete(id: string): void {
         this.db.prepare('DELETE FROM recurring_rules WHERE id = ?').run(id);
     }
+
+    deleteAllByUser(userId: string): void {
+        this.db.prepare('DELETE FROM recurring_rules WHERE user_id = ?').run(userId);
+    }
 }

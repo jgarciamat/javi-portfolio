@@ -217,6 +217,30 @@ describe('authApi', () => {
         const handler = jest.fn();
         expect(() => registerUnauthorizedHandler(handler)).not.toThrow();
     });
+
+    test('deleteAccount sends DELETE /profile/account', async () => {
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+        await authApi.deleteAccount();
+        expect(mockFetch).toHaveBeenCalledWith(
+            'http://localhost:3000/api/profile/account',
+            expect.objectContaining({ method: 'DELETE' })
+        );
+    });
+
+    test('deleteAccount sends Authorization header when token is stored', async () => {
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+        await authApi.deleteAccount();
+        const calledHeaders = mockFetch.mock.calls[0][1].headers;
+        expect(calledHeaders['Authorization']).toBe(`Bearer ${FAKE_ACCESS_TOKEN}`);
+    });
+
+    test('deleteAccount throws on server error', async () => {
+        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'Usuario no encontrado' }, 400));
+        await expect(authApi.deleteAccount()).rejects.toThrow('Usuario no encontrado');
+    });
 });
 
 describe('budgetApi', () => {

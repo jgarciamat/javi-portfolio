@@ -57,6 +57,10 @@ export class SqliteUserRepository implements IUserRepository {
         return row ? this.toEntity(row) : null;
     }
 
+    async delete(id: string): Promise<void> {
+        this.db.prepare('DELETE FROM users WHERE id = ?').run(id);
+    }
+
     private toEntity(row: UserRow): User {
         return User.create({
             id: row.id,

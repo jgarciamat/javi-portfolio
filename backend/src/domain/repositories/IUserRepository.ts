@@ -6,4 +6,5 @@ export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>;
     findByVerificationToken(token: string): Promise<User | null>;
     findByResetToken(token: string): Promise<User | null>;
+    delete(id: string): Promise<void>;
 }

@@ -51,6 +51,12 @@ export class InMemoryTransactionRepository implements ITransactionRepository {
         this.transactions.delete(id);
     }
 
+    async deleteAllByUser(userId: string): Promise<void> {
+        for (const [key, tx] of this.transactions.entries()) {
+            if ((tx as { userId?: string }).userId === userId) this.transactions.delete(key);
+        }
+    }
+
     async findByUserAndMonth(_userId: string, year: number, month: number): Promise<Transaction[]> {
         return (await this.findAll()).filter((tx) => {
             const d = tx.date;

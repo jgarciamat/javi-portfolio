@@ -1,12 +1,14 @@
 import { Response } from 'express';
 import { ProfileController } from '@infrastructure/controllers/ProfileController';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
+import { DeleteAccount } from '@application/use-cases/DeleteAccount';
 import { AuthRequest } from '@infrastructure/express/authMiddleware';
 
 function makeRes(): Partial<Response> {
     const res: Partial<Response> = {};
     res.status = jest.fn().mockReturnValue(res);
     res.json = jest.fn().mockReturnValue(res);
+    res.end = jest.fn().mockReturnValue(res);
     return res;
 }
 
@@ -18,6 +20,7 @@ describe('ProfileController', () => {
     let updateName: jest.Mocked<UpdateName>;
     let updatePassword: jest.Mocked<UpdatePassword>;
     let updateAvatar: jest.Mocked<UpdateAvatar>;
+    let deleteAccount: jest.Mocked<DeleteAccount>;
     let controller: ProfileController;
 
     beforeEach(() => {
@@ -27,7 +30,9 @@ describe('ProfileController', () => {
         updatePassword = { execute: jest.fn() } as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         updateAvatar = { execute: jest.fn() } as any;
-        controller = new ProfileController(updateName, updatePassword, updateAvatar);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        deleteAccount = { execute: jest.fn() } as any;
+        controller = new ProfileController(updateName, updatePassword, updateAvatar, deleteAccount);
     });
 
     describe('patchName', () => {
@@ -100,6 +105,33 @@ describe('ProfileController', () => {
             await controller.getProfile(makeReq({}, 'user-42'), res as Response);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({ userId: 'user-42' });
+        });
+    });
+
+    describe('deleteAccount', () => {
+        it('returns 204 on success', async () => {
+            deleteAccount.execute.mockResolvedValue(undefined);
+            const res = makeRes();
+            await controller.deleteAccount(makeReq({}, 'user-1'), res as Response);
+            expect(deleteAccount.execute).toHaveBeenCalledWith({ userId: 'user-1' });
+            expect(res.status).toHaveBeenCalledWith(204);
+            expect(res.end).toHaveBeenCalled();
+        });
+
+        it('returns 400 with error message on failure', async () => {
+            deleteAccount.execute.mockRejectedValue(new Error('Usuario no encontrado'));
+            const res = makeRes();
+            await controller.deleteAccount(makeReq({}, 'bad-user'), res as Response);
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Usuario no encontrado' });
+        });
+
+        it('returns generic error message when error is not an Error instance', async () => {
+            deleteAccount.execute.mockRejectedValue('unexpected');
+            const res = makeRes();
+            await controller.deleteAccount(makeReq({}), res as Response);
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ error: 'Error al eliminar cuenta' });
         });
     });
 });

@@ -137,6 +137,9 @@ export const authApi = {
     updateAvatar(avatarDataUrl: string) {
         return apiRequest<{ avatarUrl: string }>('/profile/avatar', { method: 'PATCH', body: JSON.stringify({ avatarDataUrl }) });
     },
+    deleteAccount() {
+        return apiRequest<void>('/profile/account', { method: 'DELETE' });
+    },
 };
 
 export const budgetApi = {

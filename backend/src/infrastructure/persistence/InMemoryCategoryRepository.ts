@@ -66,6 +66,12 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
         this.categories.delete(id);
     }
 
+    async deleteAllByUser(userId: string): Promise<void> {
+        for (const [key, cat] of this.categories.entries()) {
+            if ((cat as { userId?: string }).userId === userId) this.categories.delete(key);
+        }
+    }
+
     seedForUser(_userId: string): void {
         // In-memory repo seeds defaults in constructor; no-op per user
     }

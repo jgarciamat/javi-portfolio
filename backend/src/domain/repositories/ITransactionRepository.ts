@@ -12,5 +12,6 @@ export interface ITransactionRepository {
     findByUserAndMonth(userId: string, year: number, month: number): Promise<Transaction[]>;
     computeCarryover(userId: string, year: number, month: number): number;
     delete(id: string): Promise<void>;
+    deleteAllByUser(userId: string): Promise<void>;
     patchTransaction(id: string, changes: { notes?: string | null }): Promise<Transaction | null>;
 }

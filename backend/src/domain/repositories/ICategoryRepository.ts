@@ -7,5 +7,6 @@ export interface ICategoryRepository {
     findAll(): Promise<Category[]>;
     findAllByUser(userId: string): Promise<Category[]>;
     delete(id: string): Promise<void>;
+    deleteAllByUser(userId: string): Promise<void>;
     seedForUser(userId: string): void;
 }
