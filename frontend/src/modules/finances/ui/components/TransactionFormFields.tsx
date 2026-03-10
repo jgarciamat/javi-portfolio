@@ -4,7 +4,7 @@ import type { TransactionFormFieldsProps } from '../types/TransactionForm.types'
 import { useI18n } from '@core/i18n/I18nContext';
 
 export function TransactionFormFields({ form, categories, onManageCategories }: TransactionFormFieldsProps) {
-    const { t, tCategory } = useI18n();
+    const { t, tCategory, locale } = useI18n();
     const { fields, setDescription, setAmount, setType, setDate, setNotes, handleCategoryChange } = form;
     const dateInputRef = useRef<HTMLInputElement>(null);
 
@@ -14,7 +14,7 @@ export function TransactionFormFields({ form, categories, onManageCategories }: 
         const [y, m, d] = value.split('-');
         if (!y || !m || !d) return value;
         const date = new Date(Number(y), Number(m) - 1, Number(d));
-        return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+        return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
     };
 
     return (
