@@ -7,6 +7,7 @@ import { FinancesProvider } from './modules/finances/application/FinancesContext
 import { Dashboard } from './modules/finances/ui/components/Dashboard';
 import { VerifyEmailPage } from './modules/auth/ui/VerifyEmailPage';
 import { ResetPasswordPage } from './modules/auth/ui/ResetPasswordPage';
+import { PrivacyPolicyPage } from './modules/auth/ui/PrivacyPolicyPage';
 import { I18nProvider } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 
@@ -20,6 +21,7 @@ export default function App() {
                             <Route path="/login" element={<AuthPage />} />
                             <Route path="/verify-email" element={<VerifyEmailPage />} />
                             <Route path="/reset-password" element={<ResetPasswordPage />} />
+                            <Route path="/privacy" element={<PrivacyPolicyPage />} />
                             <Route element={<ProtectedRoute />}>
                                 <Route path="/" element={
                                     <FinancesProvider>
