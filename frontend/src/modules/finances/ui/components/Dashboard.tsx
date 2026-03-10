@@ -94,24 +94,51 @@ export function Dashboard() {
                         <span className="header-user-name">{user?.name}</span>
                     </button>
                     <LanguageSwitcher />
-                    <button onClick={logout} className="btn-logout">{t('app.header.logout')}</button>
+                    <button onClick={logout} className="btn-logout" title={t('app.header.logout')} aria-label={t('app.header.logout')}>{t('app.header.logout')}</button>
                 </div>
             </header>
 
             <main className="main">
-                <div className="tabs">
-                    <button className={`tab-btn${tab === 'monthly' ? ' active' : ''}`} onClick={() => setTab('monthly')}>
+                <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
+                    <button
+                        className={`tab-btn${tab === 'monthly' ? ' active' : ''}`}
+                        onClick={() => setTab('monthly')}
+                        role="tab"
+                        aria-selected={tab === 'monthly'}
+                        aria-controls="tabpanel-monthly"
+                        id="tab-monthly"
+                    >
                         📅 {t('app.tabs.monthly')}
                     </button>
-                    <button className={`tab-btn${tab === 'automations' ? ' active' : ''}`} onClick={() => setTab('automations')}>
+                    <button
+                        className={`tab-btn${tab === 'automations' ? ' active' : ''}`}
+                        onClick={() => setTab('automations')}
+                        role="tab"
+                        aria-selected={tab === 'automations'}
+                        aria-controls="tabpanel-automations"
+                        id="tab-automations"
+                    >
                         ⚙️ {t('app.tabs.automations')}
                     </button>
-                    <button className={`tab-btn${tab === 'annual' ? ' active' : ''}`} onClick={() => setTab('annual')}>
+                    <button
+                        className={`tab-btn${tab === 'annual' ? ' active' : ''}`}
+                        onClick={() => setTab('annual')}
+                        role="tab"
+                        aria-selected={tab === 'annual'}
+                        aria-controls="tabpanel-annual"
+                        id="tab-annual"
+                    >
                         📊 {t('app.tabs.annual')}
                     </button>
-                </div>
+                </nav>
 
-                {renderTabContent()}
+                <div
+                    role="tabpanel"
+                    id={`tabpanel-${tab}`}
+                    aria-labelledby={`tab-${tab}`}
+                >
+                    {renderTabContent()}
+                </div>
             </main>
 
             <CategoryManager

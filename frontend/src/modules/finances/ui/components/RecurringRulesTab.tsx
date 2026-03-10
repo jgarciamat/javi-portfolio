@@ -240,18 +240,23 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
             </div>
 
             <div className="recurring-card-actions">
-                <button className="btn-secondary recurring-btn-sm" onClick={() => onEdit(rule)}>
+                <button className="btn-secondary recurring-btn-sm" onClick={() => onEdit(rule)}
+                    title={t('app.recurring.card.edit')} aria-label={`${t('app.recurring.card.edit')}: ${rule.description}`}>
                     ✏️ {t('app.recurring.card.edit')}
                 </button>
                 <button
                     className="btn-secondary recurring-btn-sm"
                     onClick={() => onToggle(rule.id, !rule.active)}
+                    title={rule.active ? t('app.recurring.card.pause') : t('app.recurring.card.activate')}
+                    aria-label={`${rule.active ? t('app.recurring.card.pause') : t('app.recurring.card.activate')}: ${rule.description}`}
                 >
                     {rule.active ? `⏸ ${t('app.recurring.card.pause')}` : `▶ ${t('app.recurring.card.activate')}`}
                 </button>
                 <button
                     className="btn-danger recurring-btn-sm"
                     onClick={() => onDelete(rule.id)}
+                    title={t('app.recurring.card.delete')}
+                    aria-label={`${t('app.recurring.card.delete')}: ${rule.description}`}
                 >
                     🗑 {t('app.recurring.card.delete')}
                 </button>

@@ -22,15 +22,15 @@ export function MonthlyView({
     return (
         <>
             <div className="card">
-                <div className="month-nav">
-                    <button onClick={onPrev} disabled={isPrevDisabled} className="btn-nav">‹ {t('app.nav.prev')}</button>
+                <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
+                    <button onClick={onPrev} disabled={isPrevDisabled} className="btn-nav" title={t('app.nav.prev')}>‹ {t('app.nav.prev')}</button>
                     <div className="month-nav-center">
                         <div className="month-nav-title">
                             <span className="month-nav-title-text">
                                 {MONTH_NAMES[month - 1]} {year}
                                 {isCurrentMonth
                                     ? <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>
-                                    : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth}>{t('app.nav.goToCurrentMonth')}</button>
+                                    : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth} title={t('app.nav.goToCurrentMonth')}>{t('app.nav.goToCurrentMonth')}</button>
                                 }
                             </span>
                             {transactions.length > 0 && (
@@ -45,12 +45,12 @@ export function MonthlyView({
                             )}
                         </div>
                     </div>
-                    <button onClick={onNext} disabled={isNextDisabled} className="btn-nav">{t('app.nav.next')} ›</button>
-                </div>
+                    <button onClick={onNext} disabled={isNextDisabled} className="btn-nav" title={t('app.nav.next')}>{t('app.nav.next')} ›</button>
+                </nav>
             </div>
 
             {error && (
-                <div style={{ background: '#4c0519', border: '1px solid #be123c', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem', color: '#fca5a5' }}>
+                <div role="alert" style={{ background: '#4c0519', border: '1px solid #be123c', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem', color: '#fca5a5' }}>
                     ⚠️ {t('app.error.backendDown', { error })}
                 </div>
             )}

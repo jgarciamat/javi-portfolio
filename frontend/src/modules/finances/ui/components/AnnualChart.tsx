@@ -53,8 +53,8 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
     return (
         <div className="annual-view">
             {/* Year picker */}
-            <div className="annual-header">
-                <button className="btn-nav" onClick={prevYear} disabled={prevYearDisabled}>‹ {year - 1}</button>
+            <nav className="annual-header" aria-label={t('app.nav.yearNav')}>
+                <button className="btn-nav" onClick={prevYear} disabled={prevYearDisabled} title={String(year - 1)} aria-label={String(year - 1)}>‹ {year - 1}</button>
                 <h2 className="annual-title">
                     {t('app.annual.title')} {year}
                     {months.length > 0 && (
@@ -70,10 +70,10 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                         />
                     )}
                 </h2>
-                <button className="btn-nav" onClick={nextYear} disabled={nextYearDisabled}>
+                <button className="btn-nav" onClick={nextYear} disabled={nextYearDisabled} title={String(year + 1)} aria-label={String(year + 1)}>
                     {year + 1} ›
                 </button>
-            </div>
+            </nav>
 
             {/* Legend */}
             <div className="annual-legend">
@@ -101,6 +101,8 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                             <div
                                                 className="annual-bar annual-bar-income"
                                                 style={{ height: `${(income / maxVal) * 100}%` }}
+                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.income')}: ${fmtCurrency(income)}`}
+                                                role="img"
                                                 onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.income')}: ${fmtCurrency(income)}`, '#4ade80')}
                                                 onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.income')}: ${fmtCurrency(income)}`, '#4ade80')}
                                                 onMouseLeave={leaveBar}
@@ -108,6 +110,8 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                             <div
                                                 className="annual-bar annual-bar-expense"
                                                 style={{ height: `${(expenses / maxVal) * 100}%` }}
+                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`}
+                                                role="img"
                                                 onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`, '#f87171')}
                                                 onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`, '#f87171')}
                                                 onMouseLeave={leaveBar}
@@ -115,6 +119,8 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                                             <div
                                                 className="annual-bar annual-bar-saving"
                                                 style={{ height: `${(saving / maxVal) * 100}%` }}
+                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`}
+                                                role="img"
                                                 onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`, '#a78bfa')}
                                                 onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`, '#a78bfa')}
                                                 onMouseLeave={leaveBar}
