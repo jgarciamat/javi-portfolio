@@ -9,7 +9,7 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
     const { saldoTotal, carryoverAmount, cards } = useSummaryCards(summary, carryover, t);
 
     return (
-        <>
+        <section aria-label={t('app.summary.ariaLabel')}>
             {/* Saldo disponible */}
             <div
                 className="summary-card summary-card-carryover"
@@ -29,13 +29,13 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
                     <div key={card.title} className="summary-card" style={{ '--accent': card.accent } as React.CSSProperties}>
                         <div className="summary-card-header">
                             <span className="summary-card-title">{card.title}</span>
-                            <span className="summary-card-icon">{card.icon}</span>
+                            <span className="summary-card-icon" aria-hidden="true">{card.icon}</span>
                         </div>
                         <div className="summary-card-value">{card.value}</div>
                         <div className="summary-card-sub">{card.sub}</div>
                     </div>
                 ))}
             </div>
-        </>
+        </section>
     );
 }

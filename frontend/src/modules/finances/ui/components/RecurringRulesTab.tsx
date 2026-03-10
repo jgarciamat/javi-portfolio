@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
 import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleForm';
 import { useFinances } from '../../application/FinancesContext';
@@ -12,6 +12,50 @@ import type { FormState } from '../types/RecurringRulesTab.types';
 
 interface RecurringRulesTabProps {
     categories: Category[];
+}
+
+// ─── Date picker helper ───────────────────────────────────────────────────────
+
+interface DatePickerFieldProps {
+    value: string;
+    onChange: (v: string) => void;
+    label?: string;
+    locale?: string;
+}
+
+function DatePickerField({ value, onChange, label, locale = 'es-ES' }: DatePickerFieldProps) {
+    const ref = useRef<HTMLInputElement>(null);
+
+    const formatDisplay = (v: string): string => {
+        if (!v) return '';
+        const [y, m, d] = v.split('-');
+        if (!y || !m || !d) return v;
+        const date = new Date(Number(y), Number(m) - 1, Number(d));
+        return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+    };
+
+    return (
+        <div
+            className="tx-input tx-date-display recurring-date-display"
+            onClick={() => ref.current?.showPicker?.()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') ref.current?.showPicker?.(); }}
+            aria-label={label}
+        >
+            <span className="tx-date-icon">📅</span>
+            <span>{formatDisplay(value)}</span>
+            <input
+                ref={ref}
+                type="date"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="tx-date-hidden-input"
+                tabIndex={-1}
+                aria-hidden="true"
+            />
+        </div>
+    );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -28,7 +72,7 @@ interface RuleFormProps {
 }
 
 function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categories, isEdit }: RuleFormProps) {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
 
     const set = (key: keyof FormState, value: string | boolean) =>
         onChange({ ...form, [key]: value });
@@ -95,15 +139,14 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                     </select>
                 </div>
 
-                {/* Start — native date picker */}
+                {/* Start — styled date picker */}
                 <div className="recurring-form-field">
                     <label className="recurring-label">{t('app.recurring.form.start')}</label>
-                    <input
-                        className="tx-input recurring-date-input"
-                        type="date"
+                    <DatePickerField
                         value={form.startDate}
-                        onChange={(e) => set('startDate', e.target.value)}
-                        onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+                        onChange={(v) => set('startDate', v)}
+                        label={t('app.recurring.form.start')}
+                        locale={locale}
                     />
                 </div>
 
@@ -133,12 +176,11 @@ function RuleForm({ form, onChange, onSubmit, onCancel, loading, error, categori
                         </label>
                     </div>
                     {form.hasEnd && (
-                        <input
-                            className="tx-input recurring-date-input"
-                            type="date"
+                        <DatePickerField
                             value={form.endDate}
-                            onChange={(e) => set('endDate', e.target.value)}
-                            onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+                            onChange={(v) => set('endDate', v)}
+                            label={t('app.recurring.form.end')}
+                            locale={locale}
                         />
                     )}
                 </div>
@@ -201,18 +243,23 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
             </div>
 
             <div className="recurring-card-actions">
-                <button className="btn-secondary recurring-btn-sm" onClick={() => onEdit(rule)}>
+                <button className="btn-secondary recurring-btn-sm" onClick={() => onEdit(rule)}
+                    title={t('app.recurring.card.edit')} aria-label={`${t('app.recurring.card.edit')}: ${rule.description}`}>
                     ✏️ {t('app.recurring.card.edit')}
                 </button>
                 <button
                     className="btn-secondary recurring-btn-sm"
                     onClick={() => onToggle(rule.id, !rule.active)}
+                    title={rule.active ? t('app.recurring.card.pause') : t('app.recurring.card.activate')}
+                    aria-label={`${rule.active ? t('app.recurring.card.pause') : t('app.recurring.card.activate')}: ${rule.description}`}
                 >
                     {rule.active ? `⏸ ${t('app.recurring.card.pause')}` : `▶ ${t('app.recurring.card.activate')}`}
                 </button>
                 <button
                     className="btn-danger recurring-btn-sm"
                     onClick={() => onDelete(rule.id)}
+                    title={t('app.recurring.card.delete')}
+                    aria-label={`${t('app.recurring.card.delete')}: ${rule.description}`}
                 >
                     🗑 {t('app.recurring.card.delete')}
                 </button>

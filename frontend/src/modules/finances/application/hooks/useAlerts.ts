@@ -17,9 +17,22 @@ export interface BudgetAlert {
 interface Params {
     summary: FinancialSummary | null;
     carryover: number | null;
+    t?: (key: string, vars?: Record<string, string>) => string;
+    tCategory?: (name: string) => string;
 }
 
-export function useBudgetAlerts({ summary, carryover }: Params): BudgetAlert[] {
+function defaultT(key: string, vars?: Record<string, string>): string {
+    const templates: Record<string, string> = {
+        'app.alert.globalDanger': 'Has gastado más de lo que tienes disponible este mes ({pct}%)',
+        'app.alert.globalWarning': 'Llevas el {pct}% de tu dinero disponible gastado',
+        'app.alert.categoryAlert': '"{category}" supera el {pct}% de tu dinero disponible',
+    };
+    let msg = templates[key] ?? key;
+    if (vars) Object.entries(vars).forEach(([k, v]) => { msg = msg.replace(`{${k}}`, v); });
+    return msg;
+}
+
+export function useBudgetAlerts({ summary, carryover, t = defaultT, tCategory = (n) => n }: Params): BudgetAlert[] {
     return useMemo(() => {
         if (!summary) return [];
 
@@ -38,7 +51,7 @@ export function useBudgetAlerts({ summary, carryover }: Params): BudgetAlert[] {
                 spentAmount: Math.round(summary.totalExpenses * 100) / 100,
                 remainingAmount: remaining,
                 percentage: Math.round(globalPct * 10) / 10,
-                message: `Has gastado más de lo que tienes disponible este mes (${Math.round(globalPct)}%)`,
+                message: t('app.alert.globalDanger', { pct: String(Math.round(globalPct)) }),
             });
         } else if (globalPct >= 80) {
             alerts.push({
@@ -47,7 +60,7 @@ export function useBudgetAlerts({ summary, carryover }: Params): BudgetAlert[] {
                 spentAmount: Math.round(summary.totalExpenses * 100) / 100,
                 remainingAmount: remaining,
                 percentage: Math.round(globalPct * 10) / 10,
-                message: `Llevas el ${Math.round(globalPct)}% de tu dinero disponible gastado`,
+                message: t('app.alert.globalWarning', { pct: String(Math.round(globalPct)) }),
             });
         }
 
@@ -59,13 +72,13 @@ export function useBudgetAlerts({ summary, carryover }: Params): BudgetAlert[] {
                     level: catPct >= 40 ? 'danger' : 'warning',
                     category,
                     spentAmount: Math.round(spent * 100) / 100,
-                    remainingAmount: null,   // no aplica para categorías
+                    remainingAmount: null,
                     percentage: Math.round(catPct * 10) / 10,
-                    message: `"${category}" supera el ${Math.round(catPct)}% de tu dinero disponible`,
+                    message: t('app.alert.categoryAlert', { category: tCategory(category), pct: String(Math.round(catPct)) }),
                 });
             }
         }
 
         return alerts;
-    }, [summary, carryover]);
+    }, [summary, carryover, t, tCategory]);
 }

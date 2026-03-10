@@ -66,10 +66,9 @@
     letter-spacing: 0.02em;
 }
 
-.recurring-date-input {
-    width: 160px;
+.recurring-date-display {
+    width: 200px;
     max-width: 100%;
-    cursor: pointer;
 }
 
 .recurring-end-radios {
@@ -281,6 +280,10 @@
 
     .recurring-form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .recurring-date-display {
+        width: 100%;
     }
 
     .recurring-form-field--wide {

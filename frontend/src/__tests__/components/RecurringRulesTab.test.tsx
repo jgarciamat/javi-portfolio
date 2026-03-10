@@ -227,5 +227,210 @@ describe('RecurringRulesTab', () => {
             expect(screen.queryByRole('dialog')).toBeNull();
             expect(mockDeleteRule).not.toHaveBeenCalled();
         });
+
+        test('closes modal even when deleteRule throws', async () => {
+            currentRules = [ruleA];
+            mockDeleteRule.mockRejectedValue(new Error('network error'));
+            renderTab();
+
+            fireEvent.click(screen.getByRole('button', { name: new RegExp(t('app.recurring.card.delete')) }));
+            fireEvent.click(screen.getByText(t('app.recurring.delete.confirm')));
+
+            await waitFor(() => expect(mockDeleteRule).toHaveBeenCalled());
+            // Modal should be closed even after error
+            await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        });
+    });
+
+    // ── DatePickerField — start date ──────────────────────────────────────────
+    describe('DatePickerField (start date)', () => {
+        test('shows formatted start date in the styled div', () => {
+            renderTab();
+            openCreateForm();
+            // The start date field renders as a role="button" with aria-label=Inicio
+            const startBtn = screen.getByRole('button', { name: t('app.recurring.form.start') });
+            expect(startBtn).toBeInTheDocument();
+            // Contains some digit (formatted date)
+            expect(startBtn.textContent).toMatch(/\d/);
+        });
+
+        test('clicking start date div calls showPicker on hidden input', () => {
+            renderTab();
+            openCreateForm();
+            const hiddenInputs = document.querySelectorAll('input[type="date"]');
+            const startInput = hiddenInputs[0] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            startInput.showPicker = showPickerMock;
+            fireEvent.click(screen.getByRole('button', { name: t('app.recurring.form.start') }));
+            expect(showPickerMock).toHaveBeenCalled();
+        });
+
+        test('pressing Enter on start date div calls showPicker', () => {
+            renderTab();
+            openCreateForm();
+            const startInput = document.querySelectorAll('input[type="date"]')[0] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            startInput.showPicker = showPickerMock;
+            fireEvent.keyDown(screen.getByRole('button', { name: t('app.recurring.form.start') }), { key: 'Enter' });
+            expect(showPickerMock).toHaveBeenCalled();
+        });
+
+        test('pressing Space on start date div calls showPicker', () => {
+            renderTab();
+            openCreateForm();
+            const startInput = document.querySelectorAll('input[type="date"]')[0] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            startInput.showPicker = showPickerMock;
+            fireEvent.keyDown(screen.getByRole('button', { name: t('app.recurring.form.start') }), { key: ' ' });
+            expect(showPickerMock).toHaveBeenCalled();
+        });
+
+        test('pressing other key on start date div does NOT call showPicker', () => {
+            renderTab();
+            openCreateForm();
+            const startInput = document.querySelectorAll('input[type="date"]')[0] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            startInput.showPicker = showPickerMock;
+            fireEvent.keyDown(screen.getByRole('button', { name: t('app.recurring.form.start') }), { key: 'Tab' });
+            expect(showPickerMock).not.toHaveBeenCalled();
+        });
+
+        test('changing hidden start date input updates displayed value', () => {
+            renderTab();
+            openCreateForm();
+            const startInput = document.querySelectorAll('input[type="date"]')[0] as HTMLInputElement;
+            fireEvent.change(startInput, { target: { value: '2026-06-01' } });
+            expect(screen.getByRole('button', { name: t('app.recurring.form.start') }).textContent).toMatch(/1|jun/i);
+        });
+
+        test('start date field shows empty string when value is empty', () => {
+            // Renders with empty value — formatDisplay('') returns ''
+            renderTab();
+            openCreateForm();
+            const startInput = document.querySelectorAll('input[type="date"]')[0] as HTMLInputElement;
+            fireEvent.change(startInput, { target: { value: '' } });
+            const startBtn = screen.getByRole('button', { name: t('app.recurring.form.start') });
+            // Only the emoji remains visible, no date text
+            expect(startBtn.textContent).toBe('📅');
+        });
+    });
+
+    // ── DatePickerField — end date (hasEnd = true) ────────────────────────────
+    describe('DatePickerField (end date)', () => {
+        test('end date picker appears when "Con fecha de fin" is selected', () => {
+            renderTab();
+            openCreateForm();
+            expect(screen.queryByRole('button', { name: t('app.recurring.form.end') })).toBeNull();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.withend')));
+            expect(screen.getByRole('button', { name: t('app.recurring.form.end') })).toBeInTheDocument();
+        });
+
+        test('clicking end date div calls showPicker', () => {
+            renderTab();
+            openCreateForm();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.withend')));
+            const endInput = document.querySelectorAll('input[type="date"]')[1] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            endInput.showPicker = showPickerMock;
+            fireEvent.click(screen.getByRole('button', { name: t('app.recurring.form.end') }));
+            expect(showPickerMock).toHaveBeenCalled();
+        });
+
+        test('pressing Enter on end date div calls showPicker', () => {
+            renderTab();
+            openCreateForm();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.withend')));
+            const endInput = document.querySelectorAll('input[type="date"]')[1] as HTMLInputElement;
+            const showPickerMock = jest.fn();
+            endInput.showPicker = showPickerMock;
+            fireEvent.keyDown(screen.getByRole('button', { name: t('app.recurring.form.end') }), { key: 'Enter' });
+            expect(showPickerMock).toHaveBeenCalled();
+        });
+
+        test('changing hidden end date input updates displayed value', () => {
+            renderTab();
+            openCreateForm();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.withend')));
+            const endInput = document.querySelectorAll('input[type="date"]')[1] as HTMLInputElement;
+            fireEvent.change(endInput, { target: { value: '2026-12-31' } });
+            expect(screen.getByRole('button', { name: t('app.recurring.form.end') }).textContent).toMatch(/31/);
+        });
+
+        test('switching back to "Sin fecha de fin" hides end date picker', () => {
+            renderTab();
+            openCreateForm();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.withend')));
+            expect(screen.getByRole('button', { name: t('app.recurring.form.end') })).toBeInTheDocument();
+            fireEvent.click(screen.getByLabelText(t('app.recurring.form.end.noend')));
+            expect(screen.queryByRole('button', { name: t('app.recurring.form.end') })).toBeNull();
+        });
+    });
+
+    // ── Cancel create form ────────────────────────────────────────────────────
+    describe('cancel create form', () => {
+        test('clicking cancel in create form closes the form', () => {
+            renderTab();
+            openCreateForm();
+            expect(screen.getByText(t('app.recurring.form.title.create'))).toBeInTheDocument();
+            fireEvent.click(screen.getByText(t('app.recurring.form.cancel')));
+            expect(screen.queryByText(t('app.recurring.form.title.create'))).toBeNull();
+        });
+    });
+
+    // ── Type and frequency selects ────────────────────────────────────────────
+    describe('form type and frequency selects', () => {
+        test('changing type select updates the form', () => {
+            renderTab();
+            openCreateForm();
+            const selects = screen.getAllByRole('combobox');
+            // Type select is the one containing INCOME/EXPENSE options
+            const typeSelect = selects.find((s) =>
+                Array.from(s.querySelectorAll('option')).some((o) => (o as HTMLOptionElement).value === 'INCOME')
+            ) as HTMLSelectElement;
+            fireEvent.change(typeSelect, { target: { value: 'INCOME' } });
+            expect(typeSelect.value).toBe('INCOME');
+        });
+
+        test('changing frequency select updates the form', () => {
+            renderTab();
+            openCreateForm();
+            const selects = screen.getAllByRole('combobox');
+            const freqSelect = selects.find((s) =>
+                Array.from(s.querySelectorAll('option')).some((o) => (o as HTMLOptionElement).value === 'bimonthly')
+            ) as HTMLSelectElement;
+            fireEvent.change(freqSelect, { target: { value: 'bimonthly' } });
+            expect(freqSelect.value).toBe('bimonthly');
+        });
+    });
+    describe('toggle active', () => {
+        test('clicking pause calls toggleActive with false', async () => {
+            currentRules = [ruleA]; // ruleA is active
+            mockToggleActive.mockResolvedValue(undefined);
+            renderTab();
+            fireEvent.click(screen.getByRole('button', { name: new RegExp(t('app.recurring.card.pause')) }));
+            await waitFor(() => expect(mockToggleActive).toHaveBeenCalledWith('r1', false));
+        });
+
+        test('clicking activate calls toggleActive with true', async () => {
+            currentRules = [{ ...ruleA, active: false }];
+            mockToggleActive.mockResolvedValue(undefined);
+            renderTab();
+            fireEvent.click(screen.getByRole('button', { name: new RegExp(t('app.recurring.card.activate')) }));
+            await waitFor(() => expect(mockToggleActive).toHaveBeenCalledWith('r1', true));
+        });
+    });
+
+    // ── Cancel edit ───────────────────────────────────────────────────────────
+    describe('cancel edit form', () => {
+        test('clicking cancel in edit form closes the form', () => {
+            currentRules = [ruleA];
+            renderTab();
+            // Open edit form
+            fireEvent.click(screen.getByRole('button', { name: new RegExp(t('app.recurring.card.edit')) }));
+            expect(screen.getByText(t('app.recurring.form.title.edit'))).toBeInTheDocument();
+            // Cancel
+            fireEvent.click(screen.getByText(t('app.recurring.form.cancel')));
+            expect(screen.queryByText(t('app.recurring.form.title.edit'))).toBeNull();
+        });
     });
 });

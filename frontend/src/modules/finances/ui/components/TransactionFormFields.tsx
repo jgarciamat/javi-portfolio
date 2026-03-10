@@ -1,10 +1,21 @@
+import { useRef } from 'react';
 import type { TransactionType } from '@modules/finances/domain/types';
 import type { TransactionFormFieldsProps } from '../types/TransactionForm.types';
 import { useI18n } from '@core/i18n/I18nContext';
 
 export function TransactionFormFields({ form, categories, onManageCategories }: TransactionFormFieldsProps) {
-    const { t, tCategory } = useI18n();
+    const { t, tCategory, locale } = useI18n();
     const { fields, setDescription, setAmount, setType, setDate, setNotes, handleCategoryChange } = form;
+    const dateInputRef = useRef<HTMLInputElement>(null);
+
+    /** Format YYYY-MM-DD → locale-friendly display string */
+    const formatDisplayDate = (value: string): string => {
+        if (!value) return '';
+        const [y, m, d] = value.split('-');
+        if (!y || !m || !d) return value;
+        const date = new Date(Number(y), Number(m) - 1, Number(d));
+        return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+    };
 
     return (
         <div className="tx-form-grid">
@@ -47,12 +58,26 @@ export function TransactionFormFields({ form, categories, onManageCategories }: 
                     <option key={c.id} value={c.name}>{c.icon} {tCategory(c.name)}</option>
                 ))}
             </select>
-            <input
-                className="tx-input"
-                type="date"
-                value={fields.date}
-                onChange={(e) => setDate(e.target.value)}
-            />
+            <div
+                className="tx-input tx-date-display"
+                onClick={() => dateInputRef.current?.showPicker?.()}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') dateInputRef.current?.showPicker?.(); }}
+                aria-label={t('app.transaction.form.date')}
+            >
+                <span className="tx-date-icon">📅</span>
+                <span>{formatDisplayDate(fields.date)}</span>
+                <input
+                    ref={dateInputRef}
+                    type="date"
+                    value={fields.date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="tx-date-hidden-input"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                />
+            </div>
             <textarea
                 className="tx-input tx-notes-input"
                 placeholder={t('app.transaction.form.notes')}

@@ -109,14 +109,14 @@ describe('Dashboard', () => {
 
     test('switches to annual tab', () => {
         render(<Dashboard />);
-        fireEvent.click(screen.getByRole('button', { name: /Balance anual/i }));
+        fireEvent.click(screen.getByRole('tab', { name: /Balance anual/i }));
         expect(screen.getByRole('heading', { name: /Balance anual/i })).toBeInTheDocument();
     });
 
     test('switches back to monthly tab from annual', () => {
         render(<Dashboard />);
-        fireEvent.click(screen.getByRole('button', { name: /Balance anual/i }));
-        fireEvent.click(screen.getByRole('button', { name: /Resumen mensual/i }));
+        fireEvent.click(screen.getByRole('tab', { name: /Balance anual/i }));
+        fireEvent.click(screen.getByRole('tab', { name: /Resumen mensual/i }));
         expect(screen.getByText('Enero 2025')).toBeInTheDocument();
     });
 

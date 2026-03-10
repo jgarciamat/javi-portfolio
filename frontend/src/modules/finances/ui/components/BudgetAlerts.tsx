@@ -21,7 +21,7 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
                     aria-label={t('app.alert.dismiss')}
                 >✕</button>
             </div>
-            <div className="alert-progress-bar">
+            <div className="alert-progress-bar" role="progressbar" aria-valuenow={progressWidth} aria-valuemin={0} aria-valuemax={100} aria-label={`${progressWidth}%`}>
                 <div
                     className={`alert-progress-fill alert-progress-fill--${alert.level}`}
                     style={{ width: `${progressWidth}%` }}
@@ -43,7 +43,8 @@ function AlertCard({ alert, onDismiss }: { alert: BudgetAlert; onDismiss: () => 
 }
 
 export function BudgetAlerts({ summary, carryover }: BudgetAlertsProps) {
-    const alerts = useBudgetAlerts({ summary, carryover });
+    const { t, tCategory } = useI18n();
+    const alerts = useBudgetAlerts({ summary, carryover, t, tCategory });
     const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 
     const visible = alerts.filter((_, i) => !dismissed.has(i));
@@ -51,7 +52,7 @@ export function BudgetAlerts({ summary, carryover }: BudgetAlertsProps) {
     if (visible.length === 0) return null;
 
     return (
-        <div className="budget-alerts">
+        <section className="budget-alerts" aria-label={t('app.alert.sectionLabel')} aria-live="polite">
             {visible.map((alert) => {
                 const originalIdx = alerts.indexOf(alert);
                 return (
@@ -62,6 +63,6 @@ export function BudgetAlerts({ summary, carryover }: BudgetAlertsProps) {
                     />
                 );
             })}
-        </div>
+        </section>
     );
 }

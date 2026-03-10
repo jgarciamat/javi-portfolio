@@ -54,6 +54,7 @@ export function CollapsiblePanel({
                 className={`collapsible-header${open ? ' collapsible-header--open' : ''}`}
                 onClick={() => onToggle ? onToggle() : setOpenInternal((v) => !v)}
                 aria-expanded={open}
+                title={open ? 'Contraer' : 'Expandir'}
             >
                 <span className="collapsible-title">{title}</span>
                 <span className="collapsible-chevron" aria-hidden="true">›</span>

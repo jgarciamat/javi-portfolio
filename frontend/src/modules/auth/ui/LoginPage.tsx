@@ -1,5 +1,6 @@
 import { useLoginForm } from '../application/useLoginForm';
 import { useI18n } from '@core/i18n/I18nContext';
+import { Link } from 'react-router-dom';
 
 interface Props { onSwitch: () => void; onForgot: () => void; }
 
@@ -73,6 +74,11 @@ export function LoginPage({ onSwitch, onForgot }: Props) {
                 <p className="auth-switch">
                     {t('app.auth.login.switch')}{' '}
                     <span className="auth-link" onClick={onSwitch}>{t('app.auth.login.switchLink')}</span>
+                </p>
+                <p style={{ marginTop: '1rem', fontSize: '0.75rem', textAlign: 'center', color: '#64748b' }}>
+                    <Link to="/privacy" style={{ color: '#6366f1', textDecoration: 'none' }}>
+                        {t('app.privacy.link')}
+                    </Link>
                 </p>
             </form>
         </div>

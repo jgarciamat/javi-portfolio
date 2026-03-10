@@ -1,3 +1,4 @@
+import React from 'react';
 import '../css/TransactionTable.css';
 import type { TransactionTableProps } from '../types';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
@@ -25,17 +26,19 @@ interface TableHookState {
     onEdit: (tx: Transaction) => void;
     t: (key: string) => string;
     tCategory: (name: string) => string;
+    locale: string;
 }
 
 // ── Desktop table ─────────────────────────────────────────────────────────────
 
 function DesktopTable({
     groups, collapsedDays, toggleDay, editingNotesId, notesValue, txLabel,
-    startEditNotes, commitNotes, cancelEditNotes, setNotesValue, setPendingDeleteId, onEdit, t, tCategory,
+    startEditNotes, commitNotes, cancelEditNotes, setNotesValue, setPendingDeleteId, onEdit, t, tCategory, locale,
 }: TableHookState): React.ReactElement {
     return (
         <div className="tx-table-wrap">
             <table className="tx-table">
+                <caption className="sr-only">{t('app.transaction.table.caption')}</caption>
                 <thead>
                     <tr>
                         {[
@@ -46,19 +49,19 @@ function DesktopTable({
                             t('app.transaction.table.type'),
                             t('app.transaction.table.amount'),
                             '',
-                        ].map((h) => <th key={h}>{h}</th>)}
+                        ].map((h, i) => <th key={h || `col-${i}`} scope="col">{h}</th>)}
                     </tr>
                 </thead>
                 <tbody>
                     {groups.map(({ dayKey, label, items }) => {
                         const isCollapsed = collapsedDays.has(dayKey);
                         return (
-                            <>
+                            <React.Fragment key={dayKey}>
                                 <tr
-                                    key={`sep-${dayKey}`}
                                     className="tx-day-separator tx-day-separator--clickable"
                                     onClick={() => toggleDay(dayKey)}
                                     aria-expanded={!isCollapsed}
+                                    aria-label={`${label} (${items.length})`}
                                 >
                                     <td colSpan={7}>
                                         <span className="tx-day-label">
@@ -70,7 +73,7 @@ function DesktopTable({
                                 </tr>
                                 {!isCollapsed && items.map((tx) => (
                                     <tr key={tx.id}>
-                                        <td style={{ color: '#94a3b8' }}>{formatDate(tx.date)}</td>
+                                        <td style={{ color: '#94a3b8' }}>{formatDate(tx.date, locale)}</td>
                                         <td style={{ color: '#f1f5f9', fontWeight: 500 }}>{tx.description}</td>
                                         <td className="tx-notes-cell">
                                             {editingNotesId === tx.id ? (
@@ -98,7 +101,7 @@ function DesktopTable({
                                         <td><span className="tx-cat-badge">{tCategory(tx.category)}</span></td>
                                         <td><span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span></td>
                                         <td style={{ fontWeight: 700, color: txAmountColor(tx.type) }}>
-                                            {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
+                                            {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount, locale)}
                                         </td>
                                         <td>
                                             <button className="btn-edit" onClick={() => onEdit(tx)} title={t('app.transaction.table.edit')} aria-label={t('app.transaction.table.edit')}>✏️</button>
@@ -106,7 +109,7 @@ function DesktopTable({
                                         </td>
                                     </tr>
                                 ))}
-                            </>
+                            </React.Fragment>
                         );
                     })}
                 </tbody>
@@ -119,7 +122,7 @@ function DesktopTable({
 
 function MobileCardList({
     groups, collapsedDays, toggleDay, editingNotesId, notesValue, txLabel,
-    startEditNotes, commitNotes, cancelEditNotes, setNotesValue, setPendingDeleteId, onEdit, t, tCategory,
+    startEditNotes, commitNotes, cancelEditNotes, setNotesValue, setPendingDeleteId, onEdit, t, tCategory, locale,
 }: TableHookState): React.ReactElement {
     return (
         <div className="tx-card-list">
@@ -131,6 +134,10 @@ function MobileCardList({
                             className="tx-day-header tx-day-header--clickable"
                             onClick={() => toggleDay(dayKey)}
                             aria-expanded={!isCollapsed}
+                            aria-label={`${label} (${items.length})`}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleDay(dayKey); }}
                         >
                             <span className={`tx-day-chevron${isCollapsed ? ' tx-day-chevron--collapsed' : ''}`}>▾</span>
                             {label}
@@ -140,7 +147,7 @@ function MobileCardList({
                             <div key={tx.id} className="tx-card">
                                 <div className="tx-card-left">
                                     <div className="tx-card-desc">{tx.description}</div>
-                                    <div className="tx-card-meta">{formatDate(tx.date)} · {tCategory(tx.category)}</div>
+                                    <div className="tx-card-meta">{formatDate(tx.date, locale)} · {tCategory(tx.category)}</div>
                                     {editingNotesId === tx.id ? (
                                         <input
                                             className="tx-notes-edit-input"
@@ -163,7 +170,7 @@ function MobileCardList({
                                 </div>
                                 <div className="tx-card-right">
                                     <span className="tx-card-amount" style={{ color: txAmountColor(tx.type) }}>
-                                        {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount)}
+                                        {tx.type === 'EXPENSE' ? '−' : '+'}{formatCurrency(tx.amount, locale)}
                                     </span>
                                     <span className={txBadgeClass(tx.type)}>{txLabel(tx.type)}</span>
                                     <div style={{ display: 'flex', gap: '0.25rem' }}>
@@ -214,7 +221,7 @@ export function TransactionTable({ transactions, onDelete, onPatch, onEdit }: Tr
         groups, collapsedDays, toggleDay,
         editingNotesId, notesValue, txLabel,
         startEditNotes, commitNotes, cancelEditNotes,
-        setNotesValue, setPendingDeleteId, onEdit, t, tCategory,
+        setNotesValue, setPendingDeleteId, onEdit, t, tCategory, locale,
     };
 
     return (

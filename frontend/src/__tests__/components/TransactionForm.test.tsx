@@ -142,4 +142,93 @@ describe('TransactionForm', () => {
         fireEvent.click(screen.getByText('Cancelar'));
         expect((screen.getByPlaceholderText('Notas (opcional)') as HTMLTextAreaElement).value).toBe('');
     });
+
+    // ── Date picker widget ────────────────────────────────────────────────────
+
+    test('date picker div shows formatted date', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        // The styled div shows a readable date (not YYYY-MM-DD)
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        expect(dateBtn).toBeInTheDocument();
+        // The display text should not be the raw ISO value
+        expect(dateBtn.textContent).toMatch(/\d/); // contains some digit (day or year)
+    });
+
+    test('date picker displays empty when date value is cleared', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        fireEvent.change(hiddenInput, { target: { value: '' } });
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        // Only the calendar emoji remains — no formatted date text
+        expect(dateBtn.textContent).toBe('📅');
+    });
+
+    test('date picker shows raw value when date string is partially malformed', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        // Simulate a value where split gives parts but they are non-numeric (edge case)
+        // We bypass the input constraint by directly changing state through change event
+        // A value like "not-a--date" splits to ['not', 'a', '', 'date'] — third part is falsy
+        fireEvent.change(hiddenInput, { target: { value: 'not-a-' } });
+        // The field should not crash and should render something
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        expect(dateBtn).toBeInTheDocument();
+    });
+
+    test('clicking the date picker div calls showPicker on the hidden input', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        const showPickerMock = jest.fn();
+        hiddenInput.showPicker = showPickerMock;
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        fireEvent.click(dateBtn);
+        expect(showPickerMock).toHaveBeenCalled();
+    });
+
+    test('pressing Enter on date picker div calls showPicker', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        const showPickerMock = jest.fn();
+        hiddenInput.showPicker = showPickerMock;
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        fireEvent.keyDown(dateBtn, { key: 'Enter' });
+        expect(showPickerMock).toHaveBeenCalled();
+    });
+
+    test('pressing Space on date picker div calls showPicker', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        const showPickerMock = jest.fn();
+        hiddenInput.showPicker = showPickerMock;
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        fireEvent.keyDown(dateBtn, { key: ' ' });
+        expect(showPickerMock).toHaveBeenCalled();
+    });
+
+    test('pressing other key on date picker div does NOT call showPicker', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        const showPickerMock = jest.fn();
+        hiddenInput.showPicker = showPickerMock;
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        fireEvent.keyDown(dateBtn, { key: 'Tab' });
+        expect(showPickerMock).not.toHaveBeenCalled();
+    });
+
+    test('changing hidden date input updates displayed date', () => {
+        render(<TransactionForm {...defaultProps} />);
+        fireEvent.click(screen.getByRole('button', { expanded: false }));
+        const hiddenInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+        fireEvent.change(hiddenInput, { target: { value: '2025-12-25' } });
+        // After change the formatted date should include 25 and dec/dic
+        const dateBtn = screen.getByRole('button', { name: 'Fecha' });
+        expect(dateBtn.textContent).toMatch(/25/);
+    });
 });

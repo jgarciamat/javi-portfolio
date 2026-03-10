@@ -69,6 +69,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function useI18n(): I18nContextValue {
     const ctx = useContext(I18nContext);
-    if (!ctx) throw new Error('useI18n must be used inside I18nProvider');
+    if (!ctx) {
+        if (import.meta.env.DEV) {
+            // During HMR, providers may temporarily be unavailable — return a no-op fallback
+            // so the app doesn't crash. The real context will be restored on next render.
+            return {
+                locale: 'es',
+                setLocale: () => undefined,
+                t: (key: string) => key,
+                tCategory: (name: string) => name,
+            };
+        }
+        throw new Error('useI18n must be used inside I18nProvider');
+    }
     return ctx;
 }
