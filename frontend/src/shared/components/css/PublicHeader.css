@@ -1,19 +1,14 @@
 /* ─── Public Header (auth pages) ─────────────────────────── */
 .public-header {
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
     z-index: 100;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 0.75rem 1.5rem;
-    /* Safe area: empuja la cabecera por debajo de la status bar en Android/iOS */
-    padding-top: calc(0.75rem + env(safe-area-inset-top));
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
-    height: calc(56px + env(safe-area-inset-top));
     box-sizing: border-box;
 }
 
@@ -21,11 +16,20 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    /* Limita el ancho para que el título rompa en 2 líneas igual que en el Dashboard */
+    max-width: 60%;
 }
 
 .public-header-logo {
     font-size: 1.4rem;
     line-height: 1;
+    flex-shrink: 0;
+}
+
+.public-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .public-header-title {
@@ -33,4 +37,13 @@
     font-weight: 700;
     color: #f1f5f9;
     letter-spacing: 0.01em;
+    line-height: 1.2;
+    /* Fuerza wrapping igual que en el Dashboard */
+    word-break: break-word;
+}
+
+.public-header-sub {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.2;
 }

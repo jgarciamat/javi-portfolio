@@ -17,13 +17,13 @@ export function AuthPage() {
     }, [isAuthenticated, navigate]);
 
     return (
-        <>
+        <div className="auth-page-root">
             <PublicHeader />
             <div className="auth-page-with-header">
                 {mode === 'forgot' && <ForgotPasswordPage onBack={() => setMode('login')} />}
                 {mode === 'register' && <RegisterPage onSwitch={() => setMode('login')} />}
                 {mode === 'login' && <LoginPage onSwitch={() => setMode('register')} onForgot={() => setMode('forgot')} />}
             </div>
-        </>
+        </div>
     );
 }

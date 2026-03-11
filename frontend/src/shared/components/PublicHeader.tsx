@@ -9,7 +9,10 @@ export function PublicHeader() {
         <header className="public-header">
             <div className="public-header-brand">
                 <span className="public-header-logo">💰</span>
-                <span className="public-header-title">{t('app.header.title')}</span>
+                <div className="public-header-text">
+                    <span className="public-header-title">{t('app.header.title')}</span>
+                    <span className="public-header-sub">{t('app.header.subtitle')}</span>
+                </div>
             </div>
             <LanguageSwitcher />
         </header>
