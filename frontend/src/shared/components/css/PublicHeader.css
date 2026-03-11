@@ -9,9 +9,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1.5rem;
+    /* Safe area: empuja la cabecera por debajo de la status bar en Android/iOS */
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
-    height: 56px;
+    height: calc(56px + env(safe-area-inset-top));
     box-sizing: border-box;
 }
 
