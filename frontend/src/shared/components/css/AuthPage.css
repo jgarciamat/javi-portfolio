@@ -8,14 +8,14 @@
     padding: 1rem;
 }
 
-/* Auth page when PublicHeader is present (56px fixed) */
+/* Auth page when PublicHeader is present (56px fixed + safe area) */
 .auth-page-with-header {
     height: 100vh;
     background: #020617;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 56px;
+    padding-top: calc(56px + env(safe-area-inset-top));
     box-sizing: border-box;
     overflow: hidden;
 }
