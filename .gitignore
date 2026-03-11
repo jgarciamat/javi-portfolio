@@ -72,6 +72,7 @@ frontend/dev-dist/
 # Capacitor — keystore files (NEVER commit these)
 *.jks
 *.keystore
+/frontend/android/app/build.gradle
 
 # TypeScript build info
 *.tsbuildinfo
