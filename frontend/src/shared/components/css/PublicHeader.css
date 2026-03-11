@@ -10,6 +10,7 @@
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
     box-sizing: border-box;
+    padding-top: 2rem;
 }
 
 .public-header-brand {
