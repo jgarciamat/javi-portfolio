@@ -94,7 +94,7 @@ function makeUseCase(
     categoryRepo?: Partial<ICategoryRepository>,
     recurringRuleRepo?: Partial<IRecurringRuleRepository>,
     refreshTokenRepo?: Partial<IRefreshTokenRepository>,
-) {
+): DeleteAccount {
     return new DeleteAccount(
         makeUserRepo(userRepo),
         makeTransactionRepo(transactionRepo),
