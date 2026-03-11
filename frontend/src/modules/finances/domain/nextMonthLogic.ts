@@ -31,3 +31,33 @@ export function isNextButtonDisabled(viewYear: number, viewMonth: number, today:
     if (viewYear === maxYear && viewMonth >= maxMonth) return true;
     return false;
 }
+
+/**
+ * Returns true when the "next year" button in the annual chart should be disabled.
+ *
+ * Rule: navigating to the next year is only allowed if we are in December of
+ * the current year (because January of next year is the only future month
+ * accessible at that point). At any other time of the year, the next year
+ * has no accessible months yet.
+ *
+ * Examples:
+ *   - Today = March 2026,    viewing 2026 → disabled (only Jan 2026 is allowed ahead, same year)
+ *   - Today = December 2026, viewing 2026 → enabled  (Jan 2027 is the +1 month)
+ *   - Today = December 2026, viewing 2027 → disabled (already on next year)
+ *   - Today = any month,     viewing year > currentYear + 1 → disabled
+ *
+ * @param viewYear - the year currently displayed in the annual chart
+ * @param today    - reference date (defaults to now)
+ */
+export function isNextYearDisabled(viewYear: number, today: Date = new Date()): boolean {
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // 1–12
+
+    // Already past or at the next year
+    if (viewYear >= currentYear + 1) return true;
+
+    // Can only go to next year if we are in December
+    if (currentMonth !== 12) return true;
+
+    return false;
+}

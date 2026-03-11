@@ -2,6 +2,10 @@ import { renderHook, act } from '@testing-library/react';
 import { useAnnualChart } from '../../modules/finances/application/hooks/useAnnualChart';
 
 describe('useAnnualChart', () => {
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     test('initialises year from prop', () => {
         const { result } = renderHook(() => useAnnualChart(2025));
         expect(result.current.year).toBe(2025);
@@ -30,11 +34,54 @@ describe('useAnnualChart', () => {
         expect(result.current.prevYearDisabled).toBe(false);
     });
 
-    test('nextYear increments year', () => {
-        const { result } = renderHook(() => useAnnualChart(2025));
-        act(() => result.current.nextYear());
-        expect(result.current.year).toBe(2026);
+    // ── nextYear / nextYearDisabled ────────────────────────────────────────────
+
+    test('nextYearDisabled is true outside December — cannot navigate to next year', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 2, 10)); // March 10 2026
+        const { result } = renderHook(() => useAnnualChart(2026));
+        expect(result.current.nextYearDisabled).toBe(true);
     });
+
+    test('nextYearDisabled is false in December — next year is accessible', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 11, 1)); // Dec 1 2026
+        const { result } = renderHook(() => useAnnualChart(2026));
+        expect(result.current.nextYearDisabled).toBe(false);
+    });
+
+    test('nextYearDisabled is true when already viewing next year even in December', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 11, 15)); // Dec 15 2026
+        const { result } = renderHook(() => useAnnualChart(2027));
+        expect(result.current.nextYearDisabled).toBe(true);
+    });
+
+    test('nextYear is blocked outside December', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 2, 10)); // March 10 2026
+        const { result } = renderHook(() => useAnnualChart(2026));
+        act(() => result.current.nextYear());
+        expect(result.current.year).toBe(2026); // unchanged
+    });
+
+    test('nextYear increments year when in December', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 11, 1)); // Dec 1 2026
+        const { result } = renderHook(() => useAnnualChart(2026));
+        act(() => result.current.nextYear());
+        expect(result.current.year).toBe(2027);
+    });
+
+    test('nextYear is blocked when already at next year even in December', () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(2026, 11, 15)); // Dec 15 2026
+        const { result } = renderHook(() => useAnnualChart(2027));
+        act(() => result.current.nextYear());
+        expect(result.current.year).toBe(2027); // unchanged
+    });
+
+    // ── Tooltip ───────────────────────────────────────────────────────────────
 
     test('showTooltip sets tooltip state', () => {
         const { result } = renderHook(() => useAnnualChart(2025));

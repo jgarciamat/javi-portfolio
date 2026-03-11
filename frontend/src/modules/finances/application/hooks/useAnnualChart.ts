@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { TooltipState } from '@modules/finances/ui/types';
+import { isNextYearDisabled } from '@modules/finances/domain/nextMonthLogic';
 
 export function useAnnualChart(initialYear: number) {
     const [year, setYear] = useState(initialYear);
@@ -22,9 +23,11 @@ export function useAnnualChart(initialYear: number) {
     };
 
     const prevYear = () => setYear((y) => (y <= 2026 ? y : y - 1));
-    const nextYear = () => setYear((y) => (y >= new Date().getFullYear() + 1 ? y : y + 1));
+    const nextYear = () => {
+        if (!isNextYearDisabled(year)) setYear((y) => y + 1);
+    };
     const prevYearDisabled = year <= 2026;
-    const nextYearDisabled = year >= new Date().getFullYear() + 1;
+    const nextYearDisabled = isNextYearDisabled(year);
 
     return {
         year,

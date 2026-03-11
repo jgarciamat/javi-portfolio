@@ -1,4 +1,4 @@
-import { isNextButtonDisabled, isMonthInFuture } from '../../../modules/finances/domain/nextMonthLogic';
+import { isNextButtonDisabled, isMonthInFuture, isNextYearDisabled } from '../../../modules/finances/domain/nextMonthLogic';
 
 function makeDate(year: number, month: number, day: number): Date {
     return new Date(year, month - 1, day);
@@ -65,5 +65,40 @@ describe('isMonthInFuture', () => {
 
     it('returns true for a month in a future year', () => {
         expect(isMonthInFuture(2027, 1, makeDate(2026, 3, 4))).toBe(true);
+    });
+});
+
+describe('isNextYearDisabled', () => {
+    it('disabled in March — cannot navigate to next year', () => {
+        // Today is March 10 2026 — viewing 2026 → disabled (not December)
+        expect(isNextYearDisabled(2026, makeDate(2026, 3, 10))).toBe(true);
+    });
+
+    it('disabled in November — still not December', () => {
+        // Today is Nov 30 2026 — viewing 2026 → disabled
+        expect(isNextYearDisabled(2026, makeDate(2026, 11, 30))).toBe(true);
+    });
+
+    it('enabled in December — can navigate to next year', () => {
+        // Today is Dec 1 2026 — viewing 2026 → enabled (Jan 2027 is accessible)
+        expect(isNextYearDisabled(2026, makeDate(2026, 12, 1))).toBe(false);
+    });
+
+    it('enabled on Dec 31 — still December', () => {
+        expect(isNextYearDisabled(2026, makeDate(2026, 12, 31))).toBe(false);
+    });
+
+    it('disabled when already viewing next year', () => {
+        // Today is Dec 2026 — already viewing 2027 → disabled (already there)
+        expect(isNextYearDisabled(2027, makeDate(2026, 12, 15))).toBe(true);
+    });
+
+    it('disabled when viewing two years ahead', () => {
+        expect(isNextYearDisabled(2028, makeDate(2026, 12, 15))).toBe(true);
+    });
+
+    it('disabled in January of a new year — cannot yet go to the year after', () => {
+        // Today is Jan 15 2027 — viewing 2027 → disabled (not December)
+        expect(isNextYearDisabled(2027, makeDate(2027, 1, 15))).toBe(true);
     });
 });
