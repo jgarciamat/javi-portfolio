@@ -15,6 +15,7 @@
     "lint": "eslint . --ext ts,tsx",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "build:android": "npm run build && npx cap sync android && npx cap open android",
+    "build:android:prod": "tsc && vite build --mode android && npx cap sync android",
     "build:ios": "npm run build && npx cap sync ios && npx cap open ios",
     "cap:sync": "npm run build && npx cap sync",
     "cap:copy": "npx cap copy"
