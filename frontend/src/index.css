@@ -14,6 +14,11 @@ body {
     background: #020617;
     color: #f1f5f9;
     -webkit-text-size-adjust: 100%;
+    /* Safe area para notch/status bar en Android e iOS (Capacitor) */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 input,

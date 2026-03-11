@@ -77,18 +77,34 @@ describe('AnnualChart', () => {
         }
     });
 
-    test('nextYear button is enabled when viewing current year (can navigate 1 year ahead)', async () => {
+    test('nextYear button is disabled outside December — cannot navigate to next year', async () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(CURRENT_YEAR, 2, 11)); // March 11
+        render(<AnnualChart initialYear={CURRENT_YEAR} />);
+        await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
+        const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 1}`));
+        expect(nextBtn).toBeDisabled();
+        jest.useRealTimers();
+    });
+
+    test('nextYear button is enabled in December — can navigate to next year', async () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(CURRENT_YEAR, 11, 1)); // Dec 1
         render(<AnnualChart initialYear={CURRENT_YEAR} />);
         await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR}`, 'i'))).toBeInTheDocument());
         const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 1}`));
         expect(nextBtn).not.toBeDisabled();
+        jest.useRealTimers();
     });
 
     test('nextYear button is disabled when already at current year + 1', async () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date(CURRENT_YEAR, 11, 1)); // Dec — can reach year+1
         render(<AnnualChart initialYear={CURRENT_YEAR + 1} />);
         await waitFor(() => expect(screen.getByText(new RegExp(`Balance anual ${CURRENT_YEAR + 1}`, 'i'))).toBeInTheDocument());
         const nextBtn = screen.getByText(new RegExp(`${CURRENT_YEAR + 2}`));
         expect(nextBtn).toBeDisabled();
+        jest.useRealTimers();
     });
 
     test('shows error state when API fails', async () => {

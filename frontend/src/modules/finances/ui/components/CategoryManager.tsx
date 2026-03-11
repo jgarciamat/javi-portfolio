@@ -1,10 +1,57 @@
+import React from 'react';
 import type { CategoryManagerProps } from '../types';
 import '../css/CategoryManager.css';
 import { EMOJI_GROUPS, CATEGORY_COLORS } from '../types';
 import { useCategoryManager } from '../../application/hooks/useCategoryManager';
 import { useI18n } from '@core/i18n/I18nContext';
 
-export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: CategoryManagerProps) {
+interface EmojiPickerPanelProps {
+    search: string;
+    selectedIcon: string;
+    onSearch: (v: string) => void;
+    onSelect: (e: string) => void;
+    searchPlaceholder: string;
+}
+
+function EmojiPickerPanel({ search, selectedIcon, onSearch, onSelect, searchPlaceholder }: EmojiPickerPanelProps): React.JSX.Element {
+    const filteredGroups = search.trim()
+        ? [{ label: 'Resultados', emojis: EMOJI_GROUPS.flatMap(g => g.emojis).filter(e => e.includes(search)) }]
+        : EMOJI_GROUPS;
+    return (
+        <div className="cat-emoji-panel">
+            <input
+                className="cat-emoji-search"
+                placeholder={searchPlaceholder}
+                value={search}
+                onChange={(e) => onSearch(e.target.value)}
+                autoFocus
+            />
+            <div className="cat-emoji-scroll">
+                {filteredGroups.map((group) => (
+                    group.emojis.length > 0 && (
+                        <div key={group.label}>
+                            <div className="cat-emoji-group-label">{group.label}</div>
+                            <div className="cat-emoji-grid">
+                                {group.emojis.map((e) => (
+                                    <button
+                                        key={e}
+                                        type="button"
+                                        className={`cat-emoji-item${selectedIcon === e ? ' selected' : ''}`}
+                                        onClick={() => onSelect(e)}
+                                    >
+                                        {e}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: CategoryManagerProps): React.JSX.Element | null {
     const { t, tCategory } = useI18n();
     const {
         fields,
@@ -21,11 +68,6 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
         handleCreate,
         handleDelete,
     } = useCategoryManager({ open, onClose, onAdd, onDelete });
-
-    // Filter all emojis by search
-    const filteredGroups = fields.search.trim()
-        ? [{ label: 'Resultados', emojis: EMOJI_GROUPS.flatMap(g => g.emojis).filter(e => e.includes(fields.search)) }]
-        : EMOJI_GROUPS;
 
     if (!open) return null;
 
@@ -82,36 +124,13 @@ export function CategoryManager({ open, onClose, categories, onAdd, onDelete }: 
 
                                 {/* Emoji picker panel */}
                                 {showEmojiPicker && (
-                                    <div className="cat-emoji-panel">
-                                        <input
-                                            className="cat-emoji-search"
-                                            placeholder={t('app.category.manager.emoji.search')}
-                                            value={fields.search}
-                                            onChange={(e) => setSearch(e.target.value)}
-                                            autoFocus
-                                        />
-                                        <div className="cat-emoji-scroll">
-                                            {filteredGroups.map((group) => (
-                                                group.emojis.length > 0 && (
-                                                    <div key={group.label}>
-                                                        <div className="cat-emoji-group-label">{group.label}</div>
-                                                        <div className="cat-emoji-grid">
-                                                            {group.emojis.map((e) => (
-                                                                <button
-                                                                    key={e}
-                                                                    type="button"
-                                                                    className={`cat-emoji-item${fields.icon === e ? ' selected' : ''}`}
-                                                                    onClick={() => selectEmoji(e)}
-                                                                >
-                                                                    {e}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )
-                                            ))}
-                                        </div>
-                                    </div>
+                                    <EmojiPickerPanel
+                                        search={fields.search}
+                                        selectedIcon={fields.icon}
+                                        onSearch={setSearch}
+                                        onSelect={selectEmoji}
+                                        searchPlaceholder={t('app.category.manager.emoji.search')}
+                                    />
                                 )}
 
                                 {error && <p className="cat-error">{error}</p>}
