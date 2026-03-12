@@ -1,0 +1,52 @@
+/* ─── Transaction view selector ──────────────── */
+.tx-view-selector {
+    display: flex;
+    gap: 0.35rem;
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 0.25rem;
+    width: fit-content;
+}
+
+.tx-view-selector__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.tx-view-selector__btn:hover {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+.tx-view-selector__btn--active {
+    background: #1e293b;
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.tx-view-selector__icon {
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+/* ─── Mobile: icon-only ──────────────────────── */
+@media (max-width: 480px) {
+    .tx-view-selector__label {
+        display: none;
+    }
+
+    .tx-view-selector__btn {
+        padding: 0.4rem 0.6rem;
+    }
+}

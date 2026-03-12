@@ -1,23 +1,100 @@
 import { MONTH_NAMES } from '../types';
+import '../css/TransactionViews.css';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { useTransactionView } from '../../application/hooks/useTransactionView';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import { SummaryCards } from './SummaryCards';
 import { TransactionTable } from './TransactionTable';
+import { TransactionWeekView } from './TransactionWeekView';
+import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
 import { CategoryChart } from './CategoryChart';
 import { BudgetAlerts } from './BudgetAlerts';
 import { AIAdvisor } from './AIAdvisor';
 import type { MonthlyViewProps } from '../types/MonthlyView.types';
+import type { WeekGroup } from '@modules/finances/domain/transactionGrouping';
+import type { CalendarCell } from '@modules/finances/domain/transactionGrouping';
+import type { TransactionViewMode } from '../../application/hooks/useTransactionView';
+import type { Transaction } from '@modules/finances/domain/types';
+
+// ─── Sub-component: transaction tabs + collapsible panel ─────────────────────
+
+const TX_VIEW_MODES = [
+    { value: 'day' as const, icon: '☀️', labelKey: 'app.transactions.view.day' as const },
+    { value: 'week' as const, icon: '📅', labelKey: 'app.transactions.view.week' as const },
+    { value: 'calendar' as const, icon: '🗓️', labelKey: 'app.transactions.view.calendar' as const },
+];
+
+interface TxPanelProps {
+    mode: TransactionViewMode;
+    setMode: (m: TransactionViewMode) => void;
+    transactions: Transaction[];
+    weekGroups: WeekGroup[];
+    calendarRows: CalendarCell[][];
+    year: number;
+    month: number;
+    onDeleteTransaction: MonthlyViewProps['onDeleteTransaction'];
+    onPatchTransaction: MonthlyViewProps['onPatchTransaction'];
+    onEditTransaction: MonthlyViewProps['onEditTransaction'];
+    t: (key: string, params?: Record<string, string>) => string;
+}
+
+function TransactionPanel({ mode, setMode, transactions, weekGroups, calendarRows, year, month, onDeleteTransaction, onPatchTransaction, onEditTransaction, t }: TxPanelProps) {
+    return (
+        <>
+            {transactions.length > 0 && (
+                <nav className="tx-tabs" role="tablist" aria-label={t('app.transactions.title', { count: '' }).trim()}>
+                    {TX_VIEW_MODES.map(({ value, icon, labelKey }) => (
+                        <button
+                            key={value}
+                            role="tab"
+                            aria-selected={mode === value}
+                            className={`tab-btn${mode === value ? ' active' : ''}`}
+                            onClick={() => setMode(value)}
+                        >
+                            {icon} {t(labelKey)}
+                        </button>
+                    ))}
+                </nav>
+            )}
+            <CollapsiblePanel
+                title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}
+                style={{ marginBottom: '0' }}
+            >
+                {mode === 'day' && (
+                    <TransactionTable
+                        transactions={transactions}
+                        onDelete={onDeleteTransaction}
+                        onPatch={onPatchTransaction}
+                        onEdit={onEditTransaction}
+                    />
+                )}
+                {mode === 'week' && <TransactionWeekView weekGroups={weekGroups} />}
+                {mode === 'calendar' && (
+                    <TransactionCalendarView calendarRows={calendarRows} year={year} month={month} />
+                )}
+            </CollapsiblePanel>
+        </>
+    );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export function MonthlyView({
     year, month, isCurrentMonth, isPrevDisabled, isNextDisabled,
     transactions, summary, carryover, categories, loading, error,
     onPrev, onNext, onGoToCurrentMonth, onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
 }: MonthlyViewProps) {
-    const { t, tCategory } = useI18n();
+    const { t, tCategory, locale } = useI18n();
     const { exportMonthCSV } = useExportCSV();
+    const { mode, setMode, weekGroups, calendarRows } = useTransactionView({
+        transactions,
+        locale,
+        year,
+        month,
+    });
 
     return (
         <>
@@ -78,17 +155,20 @@ export function MonthlyView({
 
                 <AIAdvisor year={year} month={month} />
 
-                <CollapsiblePanel
-                    title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}
-                    style={{ marginBottom: '0' }}
-                >
-                    <TransactionTable
-                        transactions={transactions}
-                        onDelete={onDeleteTransaction}
-                        onPatch={onPatchTransaction}
-                        onEdit={onEditTransaction}
-                    />
-                </CollapsiblePanel>
+                {/* ── Transaction tabs + panel ───────────────────────────── */}
+                <TransactionPanel
+                    mode={mode}
+                    setMode={setMode}
+                    transactions={transactions}
+                    weekGroups={weekGroups}
+                    calendarRows={calendarRows}
+                    year={year}
+                    month={month}
+                    onDeleteTransaction={onDeleteTransaction}
+                    onPatchTransaction={onPatchTransaction}
+                    onEditTransaction={onEditTransaction}
+                    t={t}
+                />
 
                 {summary && transactions.length > 0 && (
                     <CollapsiblePanel
