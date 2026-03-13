@@ -11,6 +11,7 @@
     border-bottom: 1px solid #1e293b;
     box-sizing: border-box;
     padding-top: 2rem;
+    flex-shrink: 0;
 }
 
 .public-header-brand {
@@ -47,4 +48,10 @@
     font-size: 0.75rem;
     color: #64748b;
     line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+    .public-header {
+        padding: 0.75rem 1rem;
+    }
 }
