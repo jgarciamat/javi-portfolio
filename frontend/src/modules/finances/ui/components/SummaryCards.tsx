@@ -10,21 +10,22 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
 
     return (
         <section aria-label={t('app.summary.ariaLabel')}>
-            {/* Saldo disponible */}
-            <div
-                className="summary-card summary-card-carryover"
-                style={{ '--accent': saldoTotal >= 0 ? '#6366f1' : '#ef4444' } as React.CSSProperties}
-            >
-                <div className="summary-card-header">
-                    <span className="summary-card-title">{t('app.summary.availableBalance')} 🏦</span>
-                </div>
-                <div className="summary-card-value">{formatCurrency(saldoTotal)}</div>
-                <div className="summary-card-sub">
-                    {t('app.summary.carryover')}: {formatCurrency(carryoverAmount)}
-                </div>
-            </div>
-
             <div className="summary-grid">
+                {/* Saldo disponible */}
+                <div
+                    className="summary-card summary-card-carryover"
+                    style={{ '--accent': saldoTotal >= 0 ? '#6366f1' : '#ef4444' } as React.CSSProperties}
+                >
+                    <div className="summary-card-header">
+                        <span className="summary-card-title">{t('app.summary.availableBalance')}</span>
+                        <span className="summary-card-icon" aria-hidden="true">🏦</span>
+                    </div>
+                    <div className="summary-card-value">{formatCurrency(saldoTotal)}</div>
+                    <div className="summary-card-sub">
+                        {t('app.summary.carryover')}: {formatCurrency(carryoverAmount)}
+                    </div>
+                </div>
+
                 {cards.map((card) => (
                     <div key={card.title} className="summary-card" style={{ '--accent': card.accent } as React.CSSProperties}>
                         <div className="summary-card-header">

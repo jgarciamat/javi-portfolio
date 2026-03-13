@@ -158,13 +158,11 @@
     color: #64748b;
 }
 
-/* Remove top border from the very first day header */
 .tx-card-list>div:first-child .tx-day-header {
     border-top: none;
     padding-top: 0;
 }
 
-/* In week view, day headers never have a top border */
 .tx-week-day .tx-day-header {
     border-top: none;
     padding-top: 0.35rem;
