@@ -8,13 +8,42 @@ import { AnnualChart } from './AnnualChart';
 import { CategoryManager } from './CategoryManager';
 import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { EditTransactionModal } from './EditTransactionModal';
-import { MonthlyView } from './MonthlyView';
+import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { RecurringRulesTab } from './RecurringRulesTab';
+import type { DashboardTab } from '../../application/hooks/useDashboard';
+
+// ─── Sub-component: tab bar ───────────────────────────────────────────────────
+
+const TABS: { id: DashboardTab; icon: string; labelKey: string }[] = [
+    { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly' },
+    { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations' },
+    { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual' },
+];
+
+function DashboardTabs({ tab, setTab, t }: { tab: DashboardTab; setTab: (t: DashboardTab) => void; t: (k: string) => string }) {
+    return (
+        <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
+            {TABS.map(({ id, icon, labelKey }) => (
+                <button
+                    key={id}
+                    className={`tab-btn${tab === id ? ' active' : ''}`}
+                    onClick={() => setTab(id)}
+                    role="tab"
+                    aria-selected={tab === id}
+                    aria-controls={`tabpanel-${id}`}
+                    id={`tab-${id}`}
+                >
+                    {icon} {t(labelKey)}
+                </button>
+            ))}
+        </nav>
+    );
+}
 
 export function Dashboard() {
     const now = new Date();
     const { user, logout } = useAuth();
-    const { t } = useI18n();
+    const { t, tCategory } = useI18n();
     const {
         year, month,
         transactions, summary, carryover,
@@ -72,66 +101,58 @@ export function Dashboard() {
 
     return (
         <div className="dashboard">
-            <header className="header">
-                <div className="header-brand">
-                    <span className="header-logo">💰</span>
-                    <div>
-                        <h1 className="header-title">{t('app.header.title')}</h1>
-                        <p className="header-sub">{t('app.header.subtitle')}</p>
+            <div className="dashboard-sticky">
+                <header className="header">
+                    <div className="header-brand">
+                        <span className="header-logo">💰</span>
+                        <div>
+                            <h1 className="header-title">{t('app.header.title')}</h1>
+                            <p className="header-sub">{t('app.header.subtitle')}</p>
+                        </div>
+                    </div>
+                    <div className="header-actions">
+                        <button
+                            className="header-user header-user-btn"
+                            onClick={openProfile}
+                            aria-label={t('app.header.openProfile')}
+                            title={t('app.header.openProfile')}
+                        >
+                            {user?.avatarUrl
+                                ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
+                                : <span className="header-avatar-placeholder">👤</span>
+                            }
+                            <span className="header-user-name">{user?.name}</span>
+                        </button>
+                        <LanguageSwitcher />
+                        <button onClick={logout} className="btn-logout" title={t('app.header.logout')} aria-label={t('app.header.logout')}>{t('app.header.logout')}</button>
+                    </div>
+                </header>
+
+                {/* ── Sub-header: tabs + month nav ─────────────────────── */}
+                <div className="sticky-nav">
+                    <div className="sticky-nav-inner">
+                        <DashboardTabs tab={tab} setTab={setTab} t={t} />
+
+                        {tab === 'monthly' && (
+                            <MonthNavCard
+                                year={year}
+                                month={month}
+                                isCurrentMonth={isCurrentMonth}
+                                isPrevDisabled={isPrevDisabled}
+                                isNextDisabled={isNextDisabled}
+                                transactions={transactions}
+                                summary={summary}
+                                onPrev={goToPrev}
+                                onNext={goToNext}
+                                onGoToCurrentMonth={goToCurrentMonth}
+                                tCategory={tCategory}
+                            />
+                        )}
                     </div>
                 </div>
-                <div className="header-actions">
-                    <button
-                        className="header-user header-user-btn"
-                        onClick={openProfile}
-                        aria-label={t('app.header.openProfile')}
-                        title={t('app.header.openProfile')}
-                    >
-                        {user?.avatarUrl
-                            ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
-                            : <span className="header-avatar-placeholder">👤</span>
-                        }
-                        <span className="header-user-name">{user?.name}</span>
-                    </button>
-                    <LanguageSwitcher />
-                    <button onClick={logout} className="btn-logout" title={t('app.header.logout')} aria-label={t('app.header.logout')}>{t('app.header.logout')}</button>
-                </div>
-            </header>
+            </div>
 
             <main className="main">
-                <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
-                    <button
-                        className={`tab-btn${tab === 'monthly' ? ' active' : ''}`}
-                        onClick={() => setTab('monthly')}
-                        role="tab"
-                        aria-selected={tab === 'monthly'}
-                        aria-controls="tabpanel-monthly"
-                        id="tab-monthly"
-                    >
-                        📅 {t('app.tabs.monthly')}
-                    </button>
-                    <button
-                        className={`tab-btn${tab === 'automations' ? ' active' : ''}`}
-                        onClick={() => setTab('automations')}
-                        role="tab"
-                        aria-selected={tab === 'automations'}
-                        aria-controls="tabpanel-automations"
-                        id="tab-automations"
-                    >
-                        ⚙️ {t('app.tabs.automations')}
-                    </button>
-                    <button
-                        className={`tab-btn${tab === 'annual' ? ' active' : ''}`}
-                        onClick={() => setTab('annual')}
-                        role="tab"
-                        aria-selected={tab === 'annual'}
-                        aria-controls="tabpanel-annual"
-                        id="tab-annual"
-                    >
-                        📊 {t('app.tabs.annual')}
-                    </button>
-                </nav>
-
                 <div
                     role="tabpanel"
                     id={`tabpanel-${tab}`}

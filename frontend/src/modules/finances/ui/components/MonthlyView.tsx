@@ -19,6 +19,56 @@ import type { CalendarCell } from '@modules/finances/domain/transactionGrouping'
 import type { TransactionViewMode } from '../../application/hooks/useTransactionView';
 import type { Transaction } from '@modules/finances/domain/types';
 
+// ─── Exported: month navigator card (used in Dashboard sticky bar) ────────────
+
+export interface MonthNavProps {
+    year: number;
+    month: number;
+    isCurrentMonth: boolean;
+    isPrevDisabled: boolean;
+    isNextDisabled: boolean;
+    transactions: Transaction[];
+    summary: MonthlyViewProps['summary'];
+    onPrev: () => void;
+    onNext: () => void;
+    onGoToCurrentMonth: () => void;
+    tCategory: (key: string) => string;
+}
+
+export function MonthNavCard({ year, month, isCurrentMonth, isPrevDisabled, isNextDisabled, transactions, summary, onPrev, onNext, onGoToCurrentMonth, tCategory }: MonthNavProps) {
+    const { t } = useI18n();
+    const { exportMonthCSV } = useExportCSV();
+    return (
+        <div className="card">
+            <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
+                <button onClick={onPrev} disabled={isPrevDisabled} className="btn-nav" title={t('app.nav.prev')}>‹ {t('app.nav.prev')}</button>
+                <div className="month-nav-center">
+                    <div className="month-nav-title">
+                        <span className="month-nav-title-text">
+                            {MONTH_NAMES[month - 1]} {year}
+                            {isCurrentMonth
+                                ? <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>
+                                : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth} title={t('app.nav.goToCurrentMonth')}>{t('app.nav.goToCurrentMonth')}</button>
+                            }
+                        </span>
+                        {transactions.length > 0 && (
+                            <OptionsDropdown
+                                ariaLabel={t('app.export.options')}
+                                options={[{
+                                    icon: '📥',
+                                    label: t('app.export.month'),
+                                    onClick: () => exportMonthCSV(transactions, summary, year, month, tCategory),
+                                }]}
+                            />
+                        )}
+                    </div>
+                </div>
+                <button onClick={onNext} disabled={isNextDisabled} className="btn-nav" title={t('app.nav.next')}>{t('app.nav.next')} ›</button>
+            </nav>
+        </div>
+    );
+}
+
 // ─── Sub-component: transaction tabs + collapsible panel ─────────────────────
 
 const TX_VIEW_MODES = [
@@ -83,12 +133,11 @@ function TransactionPanel({ mode, setMode, transactions, weekGroups, calendarRow
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function MonthlyView({
-    year, month, isCurrentMonth, isPrevDisabled, isNextDisabled,
+    year, month,
     transactions, summary, carryover, categories, loading, error,
-    onPrev, onNext, onGoToCurrentMonth, onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
+    onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
 }: MonthlyViewProps) {
-    const { t, tCategory, locale } = useI18n();
-    const { exportMonthCSV } = useExportCSV();
+    const { t, locale } = useI18n();
     const { mode, setMode, weekGroups, calendarRows } = useTransactionView({
         transactions,
         locale,
@@ -98,34 +147,6 @@ export function MonthlyView({
 
     return (
         <>
-            <div className="card">
-                <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
-                    <button onClick={onPrev} disabled={isPrevDisabled} className="btn-nav" title={t('app.nav.prev')}>‹ {t('app.nav.prev')}</button>
-                    <div className="month-nav-center">
-                        <div className="month-nav-title">
-                            <span className="month-nav-title-text">
-                                {MONTH_NAMES[month - 1]} {year}
-                                {isCurrentMonth
-                                    ? <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>
-                                    : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth} title={t('app.nav.goToCurrentMonth')}>{t('app.nav.goToCurrentMonth')}</button>
-                                }
-                            </span>
-                            {transactions.length > 0 && (
-                                <OptionsDropdown
-                                    ariaLabel={t('app.export.options')}
-                                    options={[{
-                                        icon: '📥',
-                                        label: t('app.export.month'),
-                                        onClick: () => exportMonthCSV(transactions, summary, year, month, tCategory),
-                                    }]}
-                                />
-                            )}
-                        </div>
-                    </div>
-                    <button onClick={onNext} disabled={isNextDisabled} className="btn-nav" title={t('app.nav.next')}>{t('app.nav.next')} ›</button>
-                </nav>
-            </div>
-
             {error && (
                 <div role="alert" style={{ background: '#4c0519', border: '1px solid #be123c', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem', color: '#fca5a5' }}>
                     ⚠️ {t('app.error.backendDown', { error })}

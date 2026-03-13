@@ -5,6 +5,14 @@
     color: #f1f5f9;
 }
 
+/* ─── Sticky wrapper: header + sub-nav ──────── */
+.dashboard-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #020617;
+}
+
 /* Header */
 .header {
     background: #0f172a;
@@ -14,9 +22,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
 }
 
 .header-brand {
@@ -78,6 +83,33 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem 1rem;
+}
+
+/* ─── Sticky sub-header: tabs + month nav ──────── */
+.sticky-nav {
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
+}
+
+.sticky-nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.sticky-nav-inner .tabs {
+    padding-top: 0.6rem;
+}
+
+/* card inside sticky-nav loses its own margin */
+.sticky-nav-inner .card {
+    margin-bottom: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    background: transparent;
 }
 
 /* ─── Month navigator ────────────────────────── */
@@ -306,8 +338,8 @@
 .tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1.25rem;
-    border-bottom: 1px solid #1e293b;
+    margin-bottom: 0;
+    border-bottom: none;
     padding-bottom: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -647,6 +679,10 @@
 
     .main {
         padding: 1rem 0.75rem;
+    }
+
+    .sticky-nav-inner {
+        padding: 0 0.75rem;
     }
 
     /* Tabs: solo la pestaña activa se muestra completa;
