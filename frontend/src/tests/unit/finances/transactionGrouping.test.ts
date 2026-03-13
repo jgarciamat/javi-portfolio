@@ -12,12 +12,9 @@ import type { Transaction } from '@modules/finances/domain/types';
 function makeTx(overrides: Partial<Transaction> & { id: string; date: string; amount: number; type: Transaction['type'] }): Transaction {
     return {
         description: 'Test',
-        categoryId: null,
-        categoryName: null,
-        categoryColor: null,
-        categoryIcon: null,
+        category: '',
+        createdAt: overrides.date ?? '',
         notes: null,
-        userId: 'u1',
         ...overrides,
     };
 }

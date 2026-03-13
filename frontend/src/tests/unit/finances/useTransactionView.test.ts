@@ -14,12 +14,9 @@ function makeTx(id: string, date: string, amount: number, type: Transaction['typ
         amount,
         type,
         description: 'Test',
-        categoryId: null,
-        categoryName: null,
-        categoryColor: null,
-        categoryIcon: null,
+        category: '',
+        createdAt: date,
         notes: null,
-        userId: 'u1',
     };
 }
 
