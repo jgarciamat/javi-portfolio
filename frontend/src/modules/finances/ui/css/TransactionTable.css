@@ -164,6 +164,12 @@
     padding-top: 0;
 }
 
+/* In week view, day headers never have a top border */
+.tx-week-day .tx-day-header {
+    border-top: none;
+    padding-top: 0.35rem;
+}
+
 /* ─── Badges ─────────────────────────────────── */
 .tx-badge {
     border-radius: 999px;

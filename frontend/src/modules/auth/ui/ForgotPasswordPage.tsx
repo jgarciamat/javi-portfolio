@@ -45,53 +45,49 @@ export function ForgotPasswordPage({ onBack }: Props) {
 
     if (sent) {
         return (
-            <div className="auth-page">
-                <div className="auth-card">
-                    <div className="auth-logo">📬</div>
-                    <h1 className="auth-title">{t('app.auth.forgot.success.title')}</h1>
-                    <p className="auth-sub" style={{ textAlign: 'center', lineHeight: 1.6 }}>
-                        {t('app.auth.forgot.success.sub')}
-                    </p>
-                    <button className="auth-btn" onClick={onBack}>
-                        {t('app.auth.forgot.backToLogin')}
-                    </button>
-                </div>
+            <div className="auth-card">
+                <div className="auth-logo">📬</div>
+                <h1 className="auth-title">{t('app.auth.forgot.success.title')}</h1>
+                <p className="auth-sub" style={{ textAlign: 'center', lineHeight: 1.6 }}>
+                    {t('app.auth.forgot.success.sub')}
+                </p>
+                <button className="auth-btn" onClick={onBack}>
+                    {t('app.auth.forgot.backToLogin')}
+                </button>
             </div>
         );
     }
 
     return (
-        <div className="auth-page">
-            <form onSubmit={handleSubmit} className="auth-card">
-                <div className="auth-logo">🔑</div>
-                <h1 className="auth-title">Money Manager</h1>
-                <p className="auth-sub">{t('app.auth.forgot.title')}</p>
-                <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', margin: '-8px 0 12px' }}>
-                    {t('app.auth.forgot.sub')}
-                </p>
+        <form onSubmit={handleSubmit} className="auth-card">
+            <div className="auth-logo">🔑</div>
+            <h1 className="auth-title">Money Manager</h1>
+            <p className="auth-sub">{t('app.auth.forgot.title')}</p>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', margin: '-8px 0 12px' }}>
+                {t('app.auth.forgot.sub')}
+            </p>
 
-                <input
-                    className="auth-input"
-                    type="email"
-                    placeholder={t('app.auth.forgot.email')}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                    inputMode="email"
-                    autoFocus
-                />
+            <input
+                className="auth-input"
+                type="email"
+                placeholder={t('app.auth.forgot.email')}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                inputMode="email"
+                autoFocus
+            />
 
-                {error && <p className="auth-error">{error}</p>}
+            {error && <p className="auth-error">{error}</p>}
 
-                <button type="submit" className="auth-btn" disabled={loading || alreadySent}>
-                    {loading ? t('app.auth.forgot.loading') : t('app.auth.forgot.submit')}
-                </button>
+            <button type="submit" className="auth-btn" disabled={loading || alreadySent}>
+                {loading ? t('app.auth.forgot.loading') : t('app.auth.forgot.submit')}
+            </button>
 
-                <p className="auth-switch">
-                    <span className="auth-link" onClick={onBack}>{t('app.auth.forgot.backToLogin')}</span>
-                </p>
-            </form>
-        </div>
+            <p className="auth-switch">
+                <span className="auth-link" onClick={onBack}>{t('app.auth.forgot.backToLogin')}</span>
+            </p>
+        </form>
     );
 }
