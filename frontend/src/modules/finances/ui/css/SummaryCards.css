@@ -45,7 +45,6 @@
 
 /* ─── Carryover (saldo disponible) card ─────── */
 .summary-card-carryover {
-    margin-bottom: 1rem;
     border-left-width: 4px;
     border-left-style: solid;
     border-left-color: var(--accent);
