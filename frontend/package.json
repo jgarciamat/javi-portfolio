@@ -1,6 +1,6 @@
 {
   "name": "logistics-frontend",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Frontend para app de logística con React 19 y DDD",
   "type": "module",
   "scripts": {
