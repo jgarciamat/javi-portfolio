@@ -1,7 +1,7 @@
 {
-  "name": "logistics-backend",
+  "name": "portfolio-backend",
   "version": "1.0.0",
-  "description": "Backend para app de logística con arquitectura hexagonal",
+  "description": "Backend para portfolio con arquitectura hexagonal",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/infrastructure/express/server.ts",

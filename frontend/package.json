@@ -1,7 +1,7 @@
 {
-  "name": "logistics-frontend",
+  "name": "portfolio-frontend",
   "version": "1.7.0",
-  "description": "Frontend para app de logística con React 19 y DDD",
+  "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
     "dev": "vite",
