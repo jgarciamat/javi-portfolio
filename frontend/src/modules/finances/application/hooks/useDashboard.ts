@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Transaction, UpdateTransactionDTO } from '@modules/finances/domain/types';
 
-export type DashboardTab = 'monthly' | 'annual' | 'automations';
+export type DashboardTab = 'monthly' | 'annual' | 'automations' | 'custom-alerts';
 
 interface UseDashboardOptions {
     year: number;

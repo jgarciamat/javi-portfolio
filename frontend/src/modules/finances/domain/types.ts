@@ -128,3 +128,46 @@ export interface MonthlyBudget {
     initialAmount: number;
     label?: string;
 }
+
+// ─── Custom Alerts ────────────────────────────────────────────────────────────
+
+export type CustomAlertMetric =
+    | 'expenses_pct'
+    | 'income_pct'
+    | 'saving_pct'
+    | 'balance_pct'
+    | 'balance_amount'
+    | 'category_pct'
+    | 'category_amount';
+
+export type CustomAlertOperator = 'gte' | 'lte';
+
+export interface CustomAlert {
+    id: string;
+    userId: string;
+    name: string;
+    metric: CustomAlertMetric;
+    operator: CustomAlertOperator;
+    threshold: number;
+    category: string | null;
+    active: boolean;
+    createdAt: string;
+}
+
+export interface CreateCustomAlertDTO {
+    name: string;
+    metric: CustomAlertMetric;
+    operator: CustomAlertOperator;
+    threshold: number;
+    category?: string | null;
+    active?: boolean;
+}
+
+export interface UpdateCustomAlertDTO {
+    name?: string;
+    metric?: CustomAlertMetric;
+    operator?: CustomAlertOperator;
+    threshold?: number;
+    category?: string | null;
+    active?: boolean;
+}

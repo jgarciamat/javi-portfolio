@@ -10,6 +10,7 @@ import { ProfilePage } from '@modules/auth/ui/ProfilePage';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { RecurringRulesTab } from './RecurringRulesTab';
+import { CustomAlertsTab } from './CustomAlertsTab';
 import type { DashboardTab } from '../../application/hooks/useDashboard';
 
 // ─── Sub-component: tab bar ───────────────────────────────────────────────────
@@ -17,6 +18,7 @@ import type { DashboardTab } from '../../application/hooks/useDashboard';
 const TABS: { id: DashboardTab; icon: string; labelKey: string }[] = [
     { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly' },
     { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations' },
+    { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts' },
     { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual' },
 ];
 
@@ -73,6 +75,9 @@ export function Dashboard() {
         }
         if (tab === 'automations') {
             return <RecurringRulesTab categories={categories} />;
+        }
+        if (tab === 'custom-alerts') {
+            return <CustomAlertsTab categories={categories} />;
         }
         return (
             <MonthlyView

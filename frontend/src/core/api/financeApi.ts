@@ -9,6 +9,9 @@ import type {
     RecurringRule,
     CreateRecurringRuleDTO,
     UpdateRecurringRuleDTO,
+    CustomAlert,
+    CreateCustomAlertDTO,
+    UpdateCustomAlertDTO,
 } from '@modules/finances/domain/types';
 
 export const transactionApi = {
@@ -93,5 +96,26 @@ export const recurringApi = {
     },
     delete(id: string, scope: 'none' | 'from_current' | 'all' = 'none') {
         return apiRequest<void>(`/recurring-rules/${id}?scope=${scope}`, { method: 'DELETE' });
+    },
+};
+
+export const customAlertApi = {
+    getAll() {
+        return apiRequest<CustomAlert[]>('/custom-alerts');
+    },
+    create(dto: CreateCustomAlertDTO) {
+        return apiRequest<CustomAlert>('/custom-alerts', {
+            method: 'POST',
+            body: JSON.stringify(dto),
+        });
+    },
+    update(id: string, dto: UpdateCustomAlertDTO) {
+        return apiRequest<CustomAlert>(`/custom-alerts/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(dto),
+        });
+    },
+    delete(id: string) {
+        return apiRequest<void>(`/custom-alerts/${id}`, { method: 'DELETE' });
     },
 };

@@ -73,3 +73,15 @@ export interface RecurringRuleRow {
     active: number;
     created_at: string;
 }
+
+export interface CustomAlertRow {
+    id: string;
+    user_id: string;
+    name: string;
+    metric: string;
+    operator: string;
+    threshold: number;
+    category: string | null;
+    active: number;
+    created_at: string;
+}

@@ -11,12 +11,14 @@ import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/Sqlit
 
 import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/SqliteRefreshTokenRepository';
 import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/SqliteRecurringRuleRepository';
+import { SqliteCustomAlertRepository } from '@infrastructure/persistence/SqliteCustomAlertRepository';
 
 import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 import { DeleteAccount } from '@application/use-cases/DeleteAccount';
 import { CreateRecurringRule, GetRecurringRules, UpdateRecurringRule, DeleteRecurringRule } from '@application/use-cases/RecurringRules';
+import { CreateCustomAlert, GetCustomAlerts, UpdateCustomAlert, DeleteCustomAlert } from '@application/use-cases/CustomAlerts';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
@@ -26,6 +28,7 @@ import { ProfileController } from '@infrastructure/controllers/ProfileController
 import { AlertController } from '@infrastructure/controllers/AlertController';
 import { AIController } from '@infrastructure/controllers/AIController';
 import { RecurringRuleController } from '@infrastructure/controllers/RecurringRuleController';
+import { CustomAlertController } from '@infrastructure/controllers/CustomAlertController';
 import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
 import { CheckBudgetAlerts } from '@application/use-cases/CheckBudgetAlerts';
@@ -47,6 +50,7 @@ const categoryRepo = new SqliteCategoryRepository(db);
 const budgetRepo = new SqliteMonthlyBudgetRepository(db);
 const refreshTokenRepo = new SqliteRefreshTokenRepository(db);
 const recurringRuleRepo = new SqliteRecurringRuleRepository(db);
+const customAlertRepo = new SqliteCustomAlertRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
 async function seedAdmin(): Promise<void> {
@@ -105,6 +109,12 @@ const recurringRuleController = new RecurringRuleController(
     new UpdateRecurringRule(recurringRuleRepo, transactionRepo),
     new DeleteRecurringRule(recurringRuleRepo, transactionRepo),
 );
+const customAlertController = new CustomAlertController(
+    new CreateCustomAlert(customAlertRepo),
+    new GetCustomAlerts(customAlertRepo),
+    new UpdateCustomAlert(customAlertRepo),
+    new DeleteCustomAlert(customAlertRepo),
+);
 
 // --- Routes ---
 const router = express.Router();
@@ -158,6 +168,12 @@ router.get('/recurring-rules', (req: Request, res: Response) => recurringRuleCon
 router.post('/recurring-rules', (req: Request, res: Response) => recurringRuleController.create(req as AuthRequest, res));
 router.patch('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.update(req as AuthRequest, res));
 router.delete('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.delete(req as AuthRequest, res));
+
+// Custom alerts
+router.get('/custom-alerts', (req: Request, res: Response) => customAlertController.getAll(req as AuthRequest, res));
+router.post('/custom-alerts', (req: Request, res: Response) => customAlertController.create(req as AuthRequest, res));
+router.patch('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.update(req as AuthRequest, res));
+router.delete('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.delete(req as AuthRequest, res));
 
 app.use('/api', router);
 

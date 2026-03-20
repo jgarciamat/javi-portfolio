@@ -90,6 +90,8 @@ function initSchema(db: Database.Database): void {
   migrateRecurringRules(db);
   // Migration: add recurring_rule_id column to transactions if missing
   migrateTransactionsRecurringRuleId(db);
+  // Migration: add custom_alerts table if missing
+  migrateCustomAlerts(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -192,5 +194,23 @@ function migrateRecurringRules(db: Database.Database): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_recurring_rules_user_id ON recurring_rules(user_id);
+  `);
+}
+
+function migrateCustomAlerts(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS custom_alerts (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name       TEXT NOT NULL,
+      metric     TEXT NOT NULL,
+      operator   TEXT NOT NULL CHECK(operator IN ('gte','lte')),
+      threshold  REAL NOT NULL,
+      category   TEXT,
+      active     INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_custom_alerts_user_id ON custom_alerts(user_id);
   `);
 }
