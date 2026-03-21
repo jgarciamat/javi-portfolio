@@ -15,7 +15,8 @@ function createSchema(db: Database.Database): void {
             avatar_url              TEXT,
             reset_token             TEXT,
             reset_token_expires_at  TEXT,
-            reset_email_sent        INTEGER NOT NULL DEFAULT 0
+            reset_email_sent        INTEGER NOT NULL DEFAULT 0,
+            google_id               TEXT
         );
     `);
 }
