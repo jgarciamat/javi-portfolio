@@ -1,7 +1,6 @@
 /* ─── CollapsiblePanel ───────────────────────── */
 .collapsible-panel {
     padding: 0;
-    overflow: hidden;
 }
 
 .collapsible-header {
@@ -45,6 +44,11 @@
 .collapsible-body {
     overflow: hidden;
     transition: max-height 0.3s ease;
+}
+
+/* Una vez abierto, permitir que el contenido dinámico crezca sin recortes */
+.collapsible-header--open~.collapsible-body {
+    overflow: visible;
 }
 
 .collapsible-body-inner {

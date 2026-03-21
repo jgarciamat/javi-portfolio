@@ -34,19 +34,18 @@ export function CollapsiblePanel({
         /* istanbul ignore next */
         if (!el) return;
         if (open) {
+            // Animate to full height, then remove the cap so dynamic content can grow
             el.style.maxHeight = el.scrollHeight + 'px';
+            const onEnd = () => { el.style.maxHeight = 'none'; };
+            el.addEventListener('transitionend', onEnd, { once: true });
         } else {
-            el.style.maxHeight = '0px';
+            // Snap back to a fixed height before animating to 0
+            el.style.maxHeight = el.scrollHeight + 'px';
+            requestAnimationFrame(() => { el.style.maxHeight = '0px'; });
         }
     }, [open]);
 
-    // Recalculate after children change (e.g. new transactions added)
-    useEffect(() => {
-        const el = bodyRef.current;
-        /* istanbul ignore next */
-        if (!el || !open) return;
-        el.style.maxHeight = el.scrollHeight + 'px';
-    });
+    // Remove the second useEffect that was overriding maxHeight on every render
 
     return (
         <div className={`card collapsible-panel${className ? ` ${className}` : ''}`} style={style}>
