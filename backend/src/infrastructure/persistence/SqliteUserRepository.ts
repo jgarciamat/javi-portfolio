@@ -9,8 +9,8 @@ export class SqliteUserRepository implements IUserRepository {
     async save(user: User): Promise<void> {
         this.db
             .prepare(`
-        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token, avatar_url, reset_token, reset_token_expires_at, reset_email_sent)
-        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken, @avatarUrl, @resetToken, @resetTokenExpiresAt, @resetEmailSent)
+        INSERT INTO users (id, email, name, password_hash, created_at, email_verified, verification_token, avatar_url, reset_token, reset_token_expires_at, reset_email_sent, google_id)
+        VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationToken, @avatarUrl, @resetToken, @resetTokenExpiresAt, @resetEmailSent, @googleId)
         ON CONFLICT(id) DO UPDATE SET
           email                  = excluded.email,
           name                   = excluded.name,
@@ -20,7 +20,8 @@ export class SqliteUserRepository implements IUserRepository {
           avatar_url             = excluded.avatar_url,
           reset_token            = excluded.reset_token,
           reset_token_expires_at = excluded.reset_token_expires_at,
-          reset_email_sent       = excluded.reset_email_sent
+          reset_email_sent       = excluded.reset_email_sent,
+          google_id              = excluded.google_id
       `)
             .run({
                 id: user.id,
@@ -34,6 +35,7 @@ export class SqliteUserRepository implements IUserRepository {
                 resetToken: user.resetToken,
                 resetTokenExpiresAt: user.resetTokenExpiresAt?.toISOString() ?? null,
                 resetEmailSent: user.resetEmailSent ? 1 : 0,
+                googleId: user.googleId,
             });
     }
 
@@ -74,6 +76,7 @@ export class SqliteUserRepository implements IUserRepository {
             resetToken: row.reset_token ?? null,
             resetTokenExpiresAt: row.reset_token_expires_at ? new Date(row.reset_token_expires_at) : null,
             resetEmailSent: row.reset_email_sent === 1,
+            googleId: row.google_id ?? null,
         });
     }
 }

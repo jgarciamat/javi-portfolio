@@ -116,6 +116,9 @@ export const authApi = {
     login(dto: { email: string; password: string }) {
         return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: JSON.stringify(dto) });
     },
+    googleLogin(idToken: string) {
+        return publicRequest<AuthResult>('/auth/google', { method: 'POST', body: JSON.stringify({ idToken }) });
+    },
     logout(refreshToken: string) {
         return apiRequest<void>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) });
     },

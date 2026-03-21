@@ -6,6 +6,7 @@ interface AuthContextValue {
     user: AuthUser | null;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
+    loginWithGoogle: (idToken: string) => Promise<void>;
     register: (email: string, password: string, name: string) => Promise<string>;
     logout: () => void;
     isAuthenticated: boolean;
@@ -62,6 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         persist(result);
     }, []);
 
+    const loginWithGoogle = useCallback(async (idToken: string) => {
+        const result = await authApi.googleLogin(idToken);
+        persist(result);
+    }, []);
+
     const register = useCallback(async (email: string, password: string, name: string): Promise<string> => {
         const result = await authApi.register({ email, password, name });
         return result.message;
@@ -111,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token, updateName, updatePassword, updateAvatar }}>
+        <AuthContext.Provider value={{ user, token, login, loginWithGoogle, register, logout, isAuthenticated: !!token, updateName, updatePassword, updateAvatar }}>
             {children}
         </AuthContext.Provider>
     );

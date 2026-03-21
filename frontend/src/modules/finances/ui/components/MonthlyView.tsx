@@ -12,6 +12,7 @@ import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
 import { CategoryChart } from './CategoryChart';
 import { BudgetAlerts } from './BudgetAlerts';
+import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { AIAdvisor } from './AIAdvisor';
 import type { MonthlyViewProps } from '../types/MonthlyView.types';
 import type { WeekGroup } from '@modules/finances/domain/transactionGrouping';
@@ -163,6 +164,7 @@ export function MonthlyView({
                 )}
 
                 <BudgetAlerts summary={summary} carryover={carryover} />
+                <CustomAlertsBanner summary={summary} carryover={carryover} />
                 {summary && <SummaryCards summary={summary} carryover={carryover} />}
 
                 <TransactionForm

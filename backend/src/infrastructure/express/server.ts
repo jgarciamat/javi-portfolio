@@ -11,12 +11,14 @@ import { SqliteMonthlyBudgetRepository } from '@infrastructure/persistence/Sqlit
 
 import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/SqliteRefreshTokenRepository';
 import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/SqliteRecurringRuleRepository';
+import { SqliteCustomAlertRepository } from '@infrastructure/persistence/SqliteCustomAlertRepository';
 
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword, GoogleLogin } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 import { DeleteAccount } from '@application/use-cases/DeleteAccount';
 import { CreateRecurringRule, GetRecurringRules, UpdateRecurringRule, DeleteRecurringRule } from '@application/use-cases/RecurringRules';
+import { CreateCustomAlert, GetCustomAlerts, UpdateCustomAlert, DeleteCustomAlert } from '@application/use-cases/CustomAlerts';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
@@ -26,6 +28,7 @@ import { ProfileController } from '@infrastructure/controllers/ProfileController
 import { AlertController } from '@infrastructure/controllers/AlertController';
 import { AIController } from '@infrastructure/controllers/AIController';
 import { RecurringRuleController } from '@infrastructure/controllers/RecurringRuleController';
+import { CustomAlertController } from '@infrastructure/controllers/CustomAlertController';
 import { authMiddleware, AuthRequest } from '@infrastructure/express/authMiddleware';
 import { EmailService } from '@infrastructure/email/EmailService';
 import { CheckBudgetAlerts } from '@application/use-cases/CheckBudgetAlerts';
@@ -37,7 +40,7 @@ const app = express();
 const PORT = process.env.PORT ?? 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '4mb' }));
 
 // --- DB & Repositories ---
 const db = getDb();
@@ -47,6 +50,7 @@ const categoryRepo = new SqliteCategoryRepository(db);
 const budgetRepo = new SqliteMonthlyBudgetRepository(db);
 const refreshTokenRepo = new SqliteRefreshTokenRepository(db);
 const recurringRuleRepo = new SqliteRecurringRuleRepository(db);
+const customAlertRepo = new SqliteCustomAlertRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
 async function seedAdmin(): Promise<void> {
@@ -77,6 +81,7 @@ const loginUser = new LoginUser(userRepo, refreshTokenRepo);
 const verifyEmail = new VerifyEmail(userRepo);
 const logoutUser = new LogoutUser(refreshTokenRepo);
 const refreshAccessToken = new RefreshAccessToken(refreshTokenRepo);
+const googleLogin = new GoogleLogin(userRepo, categoryRepo, refreshTokenRepo);
 const setMonthlyBudget = new SetMonthlyBudget(budgetRepo);
 const getMonthlyBudget = new GetMonthlyBudget(budgetRepo);
 
@@ -105,6 +110,12 @@ const recurringRuleController = new RecurringRuleController(
     new UpdateRecurringRule(recurringRuleRepo, transactionRepo),
     new DeleteRecurringRule(recurringRuleRepo, transactionRepo),
 );
+const customAlertController = new CustomAlertController(
+    new CreateCustomAlert(customAlertRepo),
+    new GetCustomAlerts(customAlertRepo),
+    new UpdateCustomAlert(customAlertRepo),
+    new DeleteCustomAlert(customAlertRepo),
+);
 
 // --- Routes ---
 const router = express.Router();
@@ -112,6 +123,16 @@ const router = express.Router();
 // Public
 router.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
 router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
+router.post('/auth/google', async (req: Request, res: Response) => {
+    try {
+        const { idToken } = req.body as { idToken?: string };
+        if (!idToken) { res.status(400).json({ error: 'idToken requerido' }); return; }
+        const result = await googleLogin.execute(idToken);
+        res.status(200).json(result);
+    } catch (e) {
+        res.status(401).json({ error: e instanceof Error ? e.message : 'Error con Google' });
+    }
+});
 router.post('/auth/refresh', (req: Request, res: Response) => authController.refresh(req, res));
 router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
 router.post('/auth/forgot-password', (req: Request, res: Response) => authController.requestPasswordReset(req, res));
@@ -158,6 +179,12 @@ router.get('/recurring-rules', (req: Request, res: Response) => recurringRuleCon
 router.post('/recurring-rules', (req: Request, res: Response) => recurringRuleController.create(req as AuthRequest, res));
 router.patch('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.update(req as AuthRequest, res));
 router.delete('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.delete(req as AuthRequest, res));
+
+// Custom alerts
+router.get('/custom-alerts', (req: Request, res: Response) => customAlertController.getAll(req as AuthRequest, res));
+router.post('/custom-alerts', (req: Request, res: Response) => customAlertController.create(req as AuthRequest, res));
+router.patch('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.update(req as AuthRequest, res));
+router.delete('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.delete(req as AuthRequest, res));
 
 app.use('/api', router);
 

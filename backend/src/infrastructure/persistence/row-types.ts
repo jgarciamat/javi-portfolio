@@ -12,6 +12,7 @@ export interface UserRow {
     reset_token: string | null;
     reset_token_expires_at: string | null;
     reset_email_sent: number;
+    google_id: string | null;
 }
 
 export interface TransactionRow {
@@ -70,6 +71,19 @@ export interface RecurringRuleRow {
     end_year: number | null;
     end_month: number | null;
     frequency: string;
+    active: number;
+    created_at: string;
+}
+
+export interface CustomAlertRow {
+    id: string;
+    user_id: string;
+    name: string;
+    metric: string;
+    operator: string;
+    threshold: number;
+    category: string | null;
+    color: string;
     active: number;
     created_at: string;
 }

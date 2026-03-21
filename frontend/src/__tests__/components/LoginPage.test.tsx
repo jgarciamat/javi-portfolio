@@ -12,9 +12,10 @@ jest.mock('@core/i18n/I18nContext', () => ({
 }));
 
 const mockLogin = jest.fn().mockResolvedValue(undefined);
+const mockLoginWithGoogle = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@shared/hooks/useAuth', () => ({
-    useAuth: () => ({ login: mockLogin }),
+    useAuth: () => ({ login: mockLogin, loginWithGoogle: mockLoginWithGoogle }),
 }));
 
 describe('LoginPage', () => {
@@ -25,8 +26,8 @@ describe('LoginPage', () => {
 
     test('renders email, password inputs and submit button', () => {
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(t('app.auth.login.email'))).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(t('app.auth.login.password'))).toBeInTheDocument();
         expect(screen.getByText('Iniciar sesión')).toBeInTheDocument();
     });
 
@@ -43,8 +44,8 @@ describe('LoginPage', () => {
 
     test('calls login with email and password on submit', async () => {
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@test.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pass123' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.email')), { target: { value: 'user@test.com' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.password')), { target: { value: 'pass123' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
         await waitFor(() => expect(mockLogin).toHaveBeenCalledWith('user@test.com', 'pass123'));
     });
@@ -52,8 +53,8 @@ describe('LoginPage', () => {
     test('shows error message when login fails', async () => {
         mockLogin.mockRejectedValueOnce(new Error('Credenciales inválidas'));
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'bad@test.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'wrong' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.email')), { target: { value: 'bad@test.com' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.password')), { target: { value: 'wrong' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('Credenciales inválidas')).toBeInTheDocument());
     });
@@ -61,15 +62,15 @@ describe('LoginPage', () => {
     test('shows generic error for non-Error rejection', async () => {
         mockLogin.mockRejectedValueOnce('boom');
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'a@b.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: 'pw' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.email')), { target: { value: 'a@b.com' } });
+        fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.password')), { target: { value: 'pw' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
         await waitFor(() => expect(screen.getByText('Error al iniciar sesión')).toBeInTheDocument());
     });
 
     test('toggles password visibility', () => {
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        const passInput = screen.getByPlaceholderText('Contraseña');
+        const passInput = screen.getByPlaceholderText(t('app.auth.login.password'));
         expect(passInput).toHaveAttribute('type', 'password');
         fireEvent.click(screen.getByLabelText('Mostrar contraseña'));
         expect(passInput).toHaveAttribute('type', 'text');
@@ -79,7 +80,7 @@ describe('LoginPage', () => {
 
     test('calls onSwitch when register link is clicked', () => {
         render(<MemoryRouter><LoginPage onSwitch={mockOnSwitch} onForgot={mockOnForgot} /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Regístrate'));
+        fireEvent.click(screen.getByText(t('app.auth.login.switchLink')));
         expect(mockOnSwitch).toHaveBeenCalled();
     });
 });

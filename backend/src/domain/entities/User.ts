@@ -10,6 +10,7 @@ export interface UserProps {
     resetToken?: string | null;
     resetTokenExpiresAt?: Date | null;
     resetEmailSent?: boolean;
+    googleId?: string | null;
 }
 
 export class User {
@@ -33,6 +34,7 @@ export class User {
     get resetToken(): string | null { return this.props.resetToken ?? null; }
     get resetTokenExpiresAt(): Date | null { return this.props.resetTokenExpiresAt ?? null; }
     get resetEmailSent(): boolean { return this.props.resetEmailSent ?? false; }
+    get googleId(): string | null { return this.props.googleId ?? null; }
 
     verify(): User {
         return User.create({ ...this.props, emailVerified: true, verificationToken: null });
