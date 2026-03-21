@@ -38,20 +38,20 @@ describe('AuthPage', () => {
 
     test('renders LoginPage by default', () => {
         render(<MemoryRouter><AuthPage /></MemoryRouter>);
-        expect(screen.getByText(/Inicia sesión en tu cuenta/i)).toBeInTheDocument();
+        expect(screen.getByText(t('app.auth.login.title'))).toBeInTheDocument();
     });
 
     test('switches to RegisterPage when onSwitch is called', () => {
         render(<MemoryRouter><AuthPage /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Regístrate'));
-        expect(screen.getByText(/Crea tu cuenta gratuita/i)).toBeInTheDocument();
+        fireEvent.click(screen.getByText(t('app.auth.login.switchLink')));
+        expect(screen.getByText(t('app.auth.register.title'))).toBeInTheDocument();
     });
 
     test('switches back to LoginPage from RegisterPage', () => {
         render(<MemoryRouter><AuthPage /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Regístrate'));
-        fireEvent.click(screen.getByText('Inicia sesión'));
-        expect(screen.getByText(/Inicia sesión en tu cuenta/i)).toBeInTheDocument();
+        fireEvent.click(screen.getByText(t('app.auth.login.switchLink')));
+        fireEvent.click(screen.getByText(t('app.auth.register.subtitleLink')));
+        expect(screen.getByText(t('app.auth.login.title'))).toBeInTheDocument();
     });
 
     test('switches to ForgotPasswordPage when forgot link is clicked', () => {
@@ -65,7 +65,7 @@ describe('AuthPage', () => {
         fireEvent.click(screen.getByText(t('app.auth.forgot.link')));
         expect(screen.getByText(t('app.auth.forgot.title'))).toBeInTheDocument();
         fireEvent.click(screen.getByText(t('app.auth.forgot.backToLogin')));
-        expect(screen.getByText(/Inicia sesión en tu cuenta/i)).toBeInTheDocument();
+        expect(screen.getByText(t('app.auth.login.title'))).toBeInTheDocument();
     });
 
     test('navigates to / when already authenticated', () => {

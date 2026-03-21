@@ -110,7 +110,7 @@ describe('RegisterPage', () => {
 
     test('calls onSwitch when login link is clicked', () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
-        fireEvent.click(screen.getByText('Inicia sesión'));
+        fireEvent.click(screen.getByText(t('app.auth.register.subtitleLink')));
         expect(mockOnSwitch).toHaveBeenCalled();
     });
 });
