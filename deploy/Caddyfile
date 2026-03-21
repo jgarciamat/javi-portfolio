@@ -6,6 +6,9 @@ www.winjgm.com {
   encode zstd gzip
 
   handle /api/* {
+    request_body {
+      max_size 4MB
+    }
     reverse_proxy api:3000
   }
 
