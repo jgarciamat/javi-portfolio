@@ -150,6 +150,7 @@ export interface CustomAlert {
     operator: CustomAlertOperator;
     threshold: number;
     category: string | null;
+    color: string;
     active: boolean;
     createdAt: string;
 }
@@ -160,6 +161,7 @@ export interface CreateCustomAlertDTO {
     operator: CustomAlertOperator;
     threshold: number;
     category?: string | null;
+    color?: string;
     active?: boolean;
 }
 
@@ -169,5 +171,6 @@ export interface UpdateCustomAlertDTO {
     operator?: CustomAlertOperator;
     threshold?: number;
     category?: string | null;
+    color?: string;
     active?: boolean;
 }

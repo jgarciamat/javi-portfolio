@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useCustomAlerts, evaluateAlerts } from '../../application/hooks/useCustomAlerts';
 import type { AlertEvalInput, TriggeredAlert } from '../../application/hooks/useCustomAlerts';
 import { useI18n } from '@core/i18n/I18nContext';
@@ -69,6 +69,7 @@ function BannerCard({ ta, onDismiss }: BannerCardProps) {
     const { t } = useI18n();
     const { alert, currentValue } = ta;
     const isPct = isPercentMetric(alert.metric);
+    const color = alert.color ?? '#6366f1';
 
     // Para métricas de porcentaje mostramos la barra relativa al threshold
     const progressWidth = isPct
@@ -77,8 +78,14 @@ function BannerCard({ ta, onDismiss }: BannerCardProps) {
 
     const message = buildMessage(ta, t);
 
+    // Derive a semi-transparent bg from the alert color
+    const cardStyle: React.CSSProperties = {
+        background: `${color}22`,
+        borderColor: `${color}88`,
+    };
+
     return (
-        <div className="alert-card alert-card--danger" role="alert">
+        <div className="alert-card" role="alert" style={cardStyle}>
             <div className="alert-card-header">
                 <span className="alert-card-icon">🔔</span>
                 <span className="alert-card-message">{message}</span>
@@ -99,8 +106,8 @@ function BannerCard({ ta, onDismiss }: BannerCardProps) {
                     aria-label={`${progressWidth.toFixed(0)}%`}
                 >
                     <div
-                        className="alert-progress-fill alert-progress-fill--danger"
-                        style={{ width: `${progressWidth}%` }}
+                        className="alert-progress-fill"
+                        style={{ width: `${progressWidth}%`, background: color }}
                     />
                 </div>
             )}

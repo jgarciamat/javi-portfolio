@@ -20,7 +20,8 @@ export interface CustomAlertProps {
     metric: CustomAlertMetric;
     operator: CustomAlertOperator;
     threshold: number;        // % or €
-    category: string | null;  // only for category_pct
+    category: string | null;  // only for category_pct / category_amount
+    color: string;            // hex color for the notification banner
     active: boolean;
     createdAt: Date;
 }
@@ -51,6 +52,7 @@ export class CustomAlert {
         operator: string;
         threshold: number;
         category?: string | null;
+        color?: string;
         active?: boolean;
     }): CustomAlert {
         if (!raw.name || raw.name.trim() === '') {
@@ -73,6 +75,11 @@ export class CustomAlert {
             throw new Error(`CustomAlert category is required for ${raw.metric} metric`);
         }
 
+        const color = raw.color?.trim() ?? '#6366f1';
+        if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
+            throw new Error('CustomAlert color must be a valid hex color (e.g. #6366f1)');
+        }
+
         return new CustomAlert({
             id: uuidv4(),
             userId: raw.userId,
@@ -81,6 +88,7 @@ export class CustomAlert {
             operator: raw.operator as CustomAlertOperator,
             threshold: raw.threshold,
             category: needsCategory ? (raw.category ?? '').trim() : null,
+            color,
             active: raw.active ?? true,
             createdAt: new Date(),
         });
@@ -99,6 +107,7 @@ export class CustomAlert {
     get operator(): CustomAlertOperator { return this.props.operator; }
     get threshold(): number { return this.props.threshold; }
     get category(): string | null { return this.props.category; }
+    get color(): string { return this.props.color; }
     get active(): boolean { return this.props.active; }
     get createdAt(): Date { return this.props.createdAt; }
 
@@ -108,7 +117,7 @@ export class CustomAlert {
         return new CustomAlert({ ...this.props, active });
     }
 
-    withProps(changes: Partial<Pick<CustomAlertProps, 'name' | 'metric' | 'operator' | 'threshold' | 'category' | 'active'>>): CustomAlert {
+    withProps(changes: Partial<Pick<CustomAlertProps, 'name' | 'metric' | 'operator' | 'threshold' | 'category' | 'color' | 'active'>>): CustomAlert {
         return new CustomAlert({ ...this.props, ...changes });
     }
 

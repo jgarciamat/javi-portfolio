@@ -19,6 +19,7 @@ export class SqliteCustomAlertRepository implements ICustomAlertRepository {
             operator: row.operator as CustomAlertOperator,
             threshold: row.threshold,
             category: row.category,
+            color: row.color ?? '#6366f1',
             active: row.active === 1,
             createdAt: new Date(row.created_at),
         });
@@ -27,8 +28,8 @@ export class SqliteCustomAlertRepository implements ICustomAlertRepository {
     save(alert: CustomAlert): void {
         this.db.prepare(`
             INSERT INTO custom_alerts
-                (id, user_id, name, metric, operator, threshold, category, active, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, user_id, name, metric, operator, threshold, category, color, active, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             alert.id,
             alert.userId,
@@ -37,6 +38,7 @@ export class SqliteCustomAlertRepository implements ICustomAlertRepository {
             alert.operator,
             alert.threshold,
             alert.category,
+            alert.color,
             alert.active ? 1 : 0,
             alert.createdAt.toISOString(),
         );
@@ -62,6 +64,7 @@ export class SqliteCustomAlertRepository implements ICustomAlertRepository {
         operator: string;
         threshold: number;
         category: string | null;
+        color: string;
         active: boolean;
     }>): CustomAlert | null {
         const existing = this.findById(id);
@@ -75,6 +78,7 @@ export class SqliteCustomAlertRepository implements ICustomAlertRepository {
         if (changes.operator !== undefined) { sets.push('operator = ?'); values.push(changes.operator); }
         if (changes.threshold !== undefined) { sets.push('threshold = ?'); values.push(changes.threshold); }
         if ('category' in changes) { sets.push('category = ?'); values.push(changes.category ?? null); }
+        if (changes.color !== undefined) { sets.push('color = ?'); values.push(changes.color); }
         if (changes.active !== undefined) { sets.push('active = ?'); values.push(changes.active ? 1 : 0); }
 
         if (sets.length === 0) return existing;

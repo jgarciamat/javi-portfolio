@@ -207,10 +207,17 @@ function migrateCustomAlerts(db: Database.Database): void {
       operator   TEXT NOT NULL CHECK(operator IN ('gte','lte')),
       threshold  REAL NOT NULL,
       category   TEXT,
+      color      TEXT NOT NULL DEFAULT '#6366f1',
       active     INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_custom_alerts_user_id ON custom_alerts(user_id);
   `);
+
+  // Add color column to existing databases that don't have it yet
+  const cols = db.prepare("PRAGMA table_info(custom_alerts)").all() as { name: string }[];
+  if (cols.length > 0 && !cols.some((c) => c.name === 'color')) {
+    db.exec("ALTER TABLE custom_alerts ADD COLUMN color TEXT NOT NULL DEFAULT '#6366f1'");
+  }
 }

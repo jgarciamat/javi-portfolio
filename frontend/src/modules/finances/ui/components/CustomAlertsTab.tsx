@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useCustomAlerts, evaluateAlerts } from '../../application/hooks/useCustomAlerts';
 import type { AlertEvalInput } from '../../application/hooks/useCustomAlerts';
 import { useFinances } from '../../application/FinancesContext';
@@ -10,6 +10,7 @@ import type { CustomAlert, CreateCustomAlertDTO, UpdateCustomAlertDTO, CustomAle
 
 interface AlertFormState {
     name: string;
+    color: string;                 // hex color for the notification banner
     isCategoryAlert: boolean;      // checkbox: alerta sobre categoría
     category: string;              // only used when isCategoryAlert = true
     metric: CustomAlertMetric;
@@ -19,6 +20,7 @@ interface AlertFormState {
 
 const DEFAULT_FORM: AlertFormState = {
     name: '',
+    color: '#6366f1',
     isCategoryAlert: false,
     category: '',
     metric: 'expenses_pct',
@@ -84,14 +86,14 @@ function AlertForm({ form, onChange, onSubmit, onCancel, loading, error, categor
     const unit = unitFor(form.metric);
 
     return (
-        <div className="ca-form-panel">
+        <div className="ca-form-content">
             <h3 className="ca-form-title">
                 {isEdit ? t('app.customAlerts.form.title.edit') : t('app.customAlerts.form.title.create')}
             </h3>
 
             <div className="ca-form-grid">
                 {/* Nombre */}
-                <div className="ca-form-field ca-form-field--wide">
+                <div className="ca-form-field ca-field-name">
                     <label className="ca-label">{t('app.customAlerts.form.name')}</label>
                     <input
                         className="tx-input"
@@ -101,8 +103,20 @@ function AlertForm({ form, onChange, onSubmit, onCancel, loading, error, categor
                     />
                 </div>
 
+                {/* Color picker */}
+                <div className="ca-field-color">
+                    <label className="ca-label">{t('app.customAlerts.form.color')}</label>
+                    <input
+                        type="color"
+                        className="ca-color-input"
+                        value={form.color}
+                        onChange={(e) => set('color', e.target.value)}
+                        title={t('app.customAlerts.form.color')}
+                    />
+                </div>
+
                 {/* Checkbox categoría + dropdown */}
-                <div className="ca-form-field ca-form-field--wide">
+                <div className="ca-form-field ca-field-check">
                     <label className="ca-checkbox-row">
                         <input
                             type="checkbox"
@@ -112,8 +126,10 @@ function AlertForm({ form, onChange, onSubmit, onCancel, loading, error, categor
                         />
                         <span className="ca-checkbox-label">{t('app.customAlerts.form.byCategory')}</span>
                     </label>
+                </div>
 
-                    {form.isCategoryAlert && (
+                {form.isCategoryAlert && (
+                    <div className="ca-form-field ca-field-cat">
                         <select
                             className="tx-input ca-category-select"
                             value={form.category}
@@ -124,38 +140,39 @@ function AlertForm({ form, onChange, onSubmit, onCancel, loading, error, categor
                                 <option key={c.id} value={c.name}>{c.icon} {c.name}</option>
                             ))}
                         </select>
-                    )}
-                </div>
+                    </div>
+                )}
 
-                {/* Métrica */}
-                <div className="ca-form-field">
-                    <label className="ca-label">{t('app.customAlerts.form.metric')}</label>
-                    <select
-                        className="tx-input"
-                        value={form.metric}
-                        onChange={(e) => set('metric', e.target.value)}
-                    >
-                        {availableMetrics.map((m) => (
-                            <option key={m.value} value={m.value}>{t(m.labelKey)}</option>
-                        ))}
-                    </select>
-                </div>
+                {/* Métrica + Condición en la misma fila */}
+                <div className="ca-field-metric-op">
+                    <div className="ca-form-field">
+                        <label className="ca-label">{t('app.customAlerts.form.metric')}</label>
+                        <select
+                            className="tx-input"
+                            value={form.metric}
+                            onChange={(e) => set('metric', e.target.value)}
+                        >
+                            {availableMetrics.map((m) => (
+                                <option key={m.value} value={m.value}>{t(m.labelKey)}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                {/* Condición */}
-                <div className="ca-form-field">
-                    <label className="ca-label">{t('app.customAlerts.form.operator')}</label>
-                    <select
-                        className="tx-input"
-                        value={form.operator}
-                        onChange={(e) => set('operator', e.target.value)}
-                    >
-                        <option value="gte">{t('app.customAlerts.operator.gte')}</option>
-                        <option value="lte">{t('app.customAlerts.operator.lte')}</option>
-                    </select>
+                    <div className="ca-form-field">
+                        <label className="ca-label">{t('app.customAlerts.form.operator')}</label>
+                        <select
+                            className="tx-input"
+                            value={form.operator}
+                            onChange={(e) => set('operator', e.target.value)}
+                        >
+                            <option value="gte">{t('app.customAlerts.operator.gte')}</option>
+                            <option value="lte">{t('app.customAlerts.operator.lte')}</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Umbral */}
-                <div className="ca-form-field ca-form-field--wide">
+                <div className="ca-form-field ca-field-thr">
                     <label className="ca-label">
                         {t('app.customAlerts.form.threshold')} ({unit})
                     </label>
@@ -196,80 +213,72 @@ interface AlertCardProps {
     onToggle: (id: string, active: boolean) => Promise<void>;
 }
 
+// ─── Alert card helpers ───────────────────────────────────────────────────────
+
+function formatAlertValue(value: number, unit: string): string {
+    if (unit === '%') return `${value.toFixed(1)}%`;
+    return `${value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+}
+
+function buildCardStyle(triggered: boolean, color: string): React.CSSProperties | undefined {
+    if (!triggered) return undefined;
+    return { borderColor: `${color}88`, boxShadow: `0 0 0 2px ${color}22` };
+}
+
 function AlertCard({ alert, triggered, currentValue, onEdit, onDelete, onToggle }: AlertCardProps) {
     const { t } = useI18n();
     const meta = metaFor(alert.metric);
-    const unit = meta.unitKey;
-
-    const formatValue = (v: number) =>
-        unit === '%' ? `${v.toFixed(1)}%` : `${v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+    const color = alert.color ?? '#6366f1';
+    const cardStyle = buildCardStyle(triggered, color);
+    const statusClass = alert.active ? ' ca-card-status--active' : ' ca-card-status--inactive';
+    const cardClass = `ca-card${triggered ? ' ca-card--triggered' : ''}${!alert.active ? ' ca-card--inactive' : ''}`;
+    const metricLabel = t(meta.labelKey);
+    const descLabel = alert.category ? `${metricLabel} · ${alert.category}` : metricLabel;
 
     return (
-        <div className={`ca-card${triggered ? ' ca-card--triggered' : ''}${!alert.active ? ' ca-card--inactive' : ''}`}>
+        <div className={cardClass} style={cardStyle}>
+            {/* Header: dot de color + nombre + estado */}
             <div className="ca-card-header">
-                <span className="ca-card-icon">{triggered ? '🔔' : '🔕'}</span>
-                <div className="ca-card-info">
-                    <span className="ca-card-name">{alert.name}</span>
-                    <span className="ca-card-desc">
-                        {t(meta.labelKey)}
-                        {alert.category ? ` · ${alert.category}` : ''}
-                        {' '}
-                        {t(`app.customAlerts.operator.${alert.operator}`).toLowerCase()}
-                        {' '}{formatValue(alert.threshold)}
-                    </span>
-                </div>
-                <label className="ca-toggle" title={t('app.customAlerts.toggle')}>
-                    <input
-                        type="checkbox"
-                        checked={alert.active}
-                        onChange={() => onToggle(alert.id, !alert.active)}
-                    />
-                    <span className="ca-toggle-slider" />
-                </label>
+                <span className="ca-card-color-dot" style={{ background: color }} />
+                <span className="ca-card-name" title={alert.name}>{alert.name}</span>
+                <span className={`ca-card-status${statusClass}`}>
+                    {alert.active ? t('app.customAlerts.card.active') : t('app.customAlerts.card.inactive')}
+                </span>
             </div>
 
+            {/* Cuerpo: indicador + umbral */}
+            <div className="ca-card-body">
+                <p className="ca-card-desc" title={descLabel}>
+                    {descLabel}
+                </p>
+                <p className="ca-card-threshold">
+                    {t(`app.customAlerts.operator.${alert.operator}`).toLowerCase()} {formatAlertValue(alert.threshold, meta.unitKey)}
+                </p>
+            </div>
+
+            {/* Triggered */}
             {triggered && currentValue !== null && (
-                <div className="ca-card-triggered-bar">
-                    <span className="ca-triggered-label">
-                        {t('app.customAlerts.triggered')} · {t('app.customAlerts.currentValue')}: {formatValue(currentValue)}
+                <div className="ca-card-triggered-bar" style={{ background: `${color}18` }}>
+                    <span className="ca-triggered-label" style={{ color }}>
+                        {t('app.customAlerts.triggered')} · {t(meta.labelKey)}: {formatAlertValue(currentValue, meta.unitKey)}
                     </span>
                 </div>
             )}
 
+            {/* Acciones */}
             <div className="ca-card-actions">
-                <button className="ca-btn-icon" onClick={() => onEdit(alert)} title={t('app.customAlerts.edit')}>✏️</button>
-                <button className="ca-btn-icon ca-btn-delete" onClick={() => onDelete(alert.id)} title={t('app.customAlerts.delete')}>🗑️</button>
-            </div>
-        </div>
-    );
-}
-
-// ─── Tab header ───────────────────────────────────────────────────────────────
-
-function TabHeader({ showForm, onNew, t }: { showForm: boolean; onNew: () => void; t: (k: string) => string }) {
-    return (
-        <div className="ca-header">
-            <div>
-                <h2 className="ca-title">{t('app.customAlerts.title')}</h2>
-                <p className="ca-subtitle">{t('app.customAlerts.subtitle')}</p>
-            </div>
-            {!showForm && (
-                <button className="btn btn-primary ca-btn-new" onClick={onNew}>
-                    {t('app.customAlerts.new')}
+                <button className="btn-secondary ca-btn-sm" onClick={() => onEdit(alert)}>
+                    ✏️ {t('app.customAlerts.edit')}
                 </button>
-            )}
+                <button className="btn-secondary ca-btn-sm" onClick={() => onToggle(alert.id, !alert.active)}>
+                    {alert.active ? `⏸ ${t('app.customAlerts.pause')}` : `▶ ${t('app.customAlerts.activate')}`}
+                </button>
+                <button className="btn-danger ca-btn-sm" onClick={() => onDelete(alert.id)}>
+                    🗑 {t('app.customAlerts.delete')}
+                </button>
+            </div>
         </div>
     );
-}
-
-// ─── Triggered banner ─────────────────────────────────────────────────────────
-
-function TriggeredBanner({ count, showForm, t }: { count: number; showForm: boolean; t: (k: string) => string }) {
-    if (count === 0 || showForm) return null;
-    const msg = count === 1
-        ? t('app.customAlerts.banner.one')
-        : t('app.customAlerts.banner.many').replace('{n}', String(count));
-    return <div className="ca-triggered-banner">🔔 {msg}</div>;
 }
 
 // ─── Alert list section ───────────────────────────────────────────────────────
@@ -292,7 +301,7 @@ function AlertListSection({
 }: AlertListSectionProps) {
     if (alerts.length === 0 && !showForm) {
         return (
-            <div className="ca-empty">
+            <div className="card ca-empty">
                 <span className="ca-empty-icon">🔕</span>
                 <p className="ca-empty-text">{t('app.customAlerts.empty')}</p>
                 <p className="ca-empty-hint">{t('app.customAlerts.empty.hint')}</p>
@@ -300,7 +309,7 @@ function AlertListSection({
         );
     }
     return (
-        <div className="ca-list">
+        <div className="ca-cards-grid">
             {alerts.map((alert) => (
                 <AlertCard
                     key={alert.id}
@@ -340,6 +349,7 @@ function useAlertFormState(
         setEditingAlert(alert);
         setForm({
             name: alert.name,
+            color: alert.color ?? '#6366f1',
             isCategoryAlert: alert.metric === 'category_pct' || alert.metric === 'category_amount',
             metric: alert.metric,
             operator: alert.operator,
@@ -369,6 +379,7 @@ function useAlertFormState(
             operator: form.operator,
             threshold,
             category: form.isCategoryAlert ? form.category : null,
+            color: form.color,
         };
 
         setFormLoading(true);
@@ -433,7 +444,6 @@ function AlertFormSection({ showForm, editingAlert, form, setForm, formLoading, 
         />
     );
 }
-
 interface AlertBodySectionProps {
     alerts: CustomAlert[];
     loading: boolean;
@@ -485,19 +495,36 @@ export function CustomAlertsTab({ categories }: CustomAlertsTabProps) {
 
     return (
         <div className="ca-tab">
-            <TabHeader showForm={showForm} onNew={openCreate} t={t} />
-            <TriggeredBanner count={triggered.length} showForm={showForm} t={t} />
-            <AlertFormSection
-                showForm={showForm}
-                editingAlert={editingAlert}
-                form={form}
-                setForm={setForm}
-                formLoading={formLoading}
-                formError={formError}
-                handleSubmit={handleSubmit}
-                handleCancel={handleCancel}
-                categories={categories}
-            />
+            {/* Header en tarjeta */}
+            <div className="card ca-header-card">
+                <div className="ca-tab-header">
+                    <div>
+                        <h2 className="ca-tab-title">🔔 {t('app.customAlerts.title')}</h2>
+                        <p className="ca-tab-subtitle">{t('app.customAlerts.subtitle')}</p>
+                    </div>
+                    <button className="btn-primary" onClick={openCreate}>
+                        {t('app.customAlerts.new')}
+                    </button>
+                </div>
+            </div>
+            {/* Formulario en tarjeta */}
+            {showForm && (
+                <div className="card">
+                    <AlertFormSection
+                        showForm={showForm}
+                        editingAlert={editingAlert}
+                        form={form}
+                        setForm={setForm}
+                        formLoading={formLoading}
+                        formError={formError}
+                        handleSubmit={handleSubmit}
+                        handleCancel={handleCancel}
+                        categories={categories}
+                    />
+                </div>
+            )}
+
+            {/* Lista de alertas */}
             <AlertBodySection
                 alerts={alerts}
                 loading={loading}

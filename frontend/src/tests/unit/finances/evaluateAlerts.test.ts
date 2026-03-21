@@ -14,6 +14,7 @@ function makeAlert(overrides: Partial<CustomAlert>): CustomAlert {
         operator: 'gte',
         threshold: 80,
         category: null,
+        color: '#6366f1',
         active: true,
         createdAt: '2026-01-01T00:00:00.000Z',
         ...overrides,

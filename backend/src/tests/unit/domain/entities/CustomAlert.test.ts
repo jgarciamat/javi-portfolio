@@ -18,6 +18,7 @@ describe('CustomAlert entity', () => {
         expect(alert.operator).toBe('gte');
         expect(alert.threshold).toBe(80);
         expect(alert.category).toBeNull();
+        expect(alert.color).toBe('#6366f1');  // default color
         expect(alert.active).toBe(true);
         expect(alert.id).toBeTruthy();
         expect(alert.createdAt).toBeInstanceOf(Date);
@@ -106,6 +107,29 @@ describe('CustomAlert entity', () => {
             .toThrow('category is required for category_amount');
     });
 
+    // ── color ─────────────────────────────────────────────────────────────────
+
+    it('defaults color to #6366f1 when not provided', () => {
+        const alert = CustomAlert.create(base);
+        expect(alert.color).toBe('#6366f1');
+    });
+
+    it('stores a custom color', () => {
+        const alert = CustomAlert.create({ ...base, color: '#ef4444' });
+        expect(alert.color).toBe('#ef4444');
+    });
+
+    it('trims whitespace from color', () => {
+        const alert = CustomAlert.create({ ...base, color: ' #ef4444 ' });
+        expect(alert.color).toBe('#ef4444');
+    });
+
+    it('throws for invalid color format', () => {
+        expect(() => CustomAlert.create({ ...base, color: 'red' })).toThrow('valid hex color');
+        expect(() => CustomAlert.create({ ...base, color: '#gg0000' })).toThrow('valid hex color');
+        expect(() => CustomAlert.create({ ...base, color: '#12345' })).toThrow('valid hex color');
+    });
+
     // ── reconstitute() ────────────────────────────────────────────────────────
 
     it('reconstitutes an alert from persisted props', () => {
@@ -117,6 +141,7 @@ describe('CustomAlert entity', () => {
             operator: 'lte' as const,
             threshold: 200,
             category: null,
+            color: '#10b981',
             active: false,
             createdAt: new Date('2025-01-01'),
         };
@@ -124,6 +149,7 @@ describe('CustomAlert entity', () => {
         expect(alert.id).toBe('fixed-id');
         expect(alert.active).toBe(false);
         expect(alert.threshold).toBe(200);
+        expect(alert.color).toBe('#10b981');
         expect(alert.createdAt).toEqual(new Date('2025-01-01'));
     });
 
@@ -145,6 +171,13 @@ describe('CustomAlert entity', () => {
         expect(alert.threshold).toBe(80); // original unchanged
     });
 
+    it('withProps can update color', () => {
+        const alert = CustomAlert.create(base);
+        const updated = alert.withProps({ color: '#10b981' });
+        expect(updated.color).toBe('#10b981');
+        expect(alert.color).toBe('#6366f1'); // original unchanged
+    });
+
     // ── toJSON() ─────────────────────────────────────────────────────────────
 
     it('serialises createdAt as ISO string in toJSON()', () => {
@@ -164,6 +197,7 @@ describe('CustomAlert entity', () => {
             operator: 'gte',
             threshold: 50,
             category: null,
+            color: '#6366f1',
             active: true,
         });
     });

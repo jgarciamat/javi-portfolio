@@ -82,6 +82,7 @@ export interface CustomAlertRow {
     operator: string;
     threshold: number;
     category: string | null;
+    color: string;
     active: number;
     created_at: string;
 }
