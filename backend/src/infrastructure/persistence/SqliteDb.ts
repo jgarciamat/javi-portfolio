@@ -92,6 +92,8 @@ function initSchema(db: Database.Database): void {
   migrateTransactionsRecurringRuleId(db);
   // Migration: add custom_alerts table if missing
   migrateCustomAlerts(db);
+  // Migration: add google_id column to users if missing
+  migrateUsersGoogleId(db);
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
@@ -219,5 +221,12 @@ function migrateCustomAlerts(db: Database.Database): void {
   const cols = db.prepare("PRAGMA table_info(custom_alerts)").all() as { name: string }[];
   if (cols.length > 0 && !cols.some((c) => c.name === 'color')) {
     db.exec("ALTER TABLE custom_alerts ADD COLUMN color TEXT NOT NULL DEFAULT '#6366f1'");
+  }
+}
+
+function migrateUsersGoogleId(db: Database.Database): void {
+  const cols = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  if (!cols.some((c) => c.name === 'google_id')) {
+    db.exec('ALTER TABLE users ADD COLUMN google_id TEXT');
   }
 }

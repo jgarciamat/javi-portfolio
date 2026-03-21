@@ -181,3 +181,54 @@ export class ResetPassword {
 export function verifyToken(token: string): { userId: string } {
     return jwt.verify(token, JWT_SECRET) as { userId: string };
 }
+
+export class GoogleLogin {
+    constructor(
+        private readonly userRepo: IUserRepository,
+        private readonly categoryRepo: ICategoryRepository,
+        private readonly refreshTokenRepo: IRefreshTokenRepository,
+    ) { }
+
+    async execute(accessToken: string): Promise<AuthResult> {
+        // Verify the access_token with Google's tokeninfo endpoint
+        const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (!res.ok) throw new Error('Token de Google inválido');
+
+        const info = await res.json() as { sub: string; email?: string; name?: string; email_verified?: boolean };
+        if (!info.email) throw new Error('No se pudo obtener el email de Google');
+
+        const { email, name, sub: googleId } = info;
+
+        // Find existing user or create a new one (email-verified by Google)
+        let user = await this.userRepo.findByEmail(email.toLowerCase());
+        if (!user) {
+            user = User.create({
+                id: uuidv4(),
+                email: email.toLowerCase(),
+                name: name ?? email,
+                passwordHash: '',      // no local password
+                createdAt: new Date(),
+                emailVerified: true,   // Google already verified the email
+                verificationToken: null,
+                googleId,
+            });
+            await this.userRepo.save(user);
+            this.categoryRepo.seedForUser(user.id);
+        }
+
+        const appAccessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRES });
+        const refreshToken = jwt.sign({ userId: user.id }, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES });
+
+        await this.refreshTokenRepo.save({
+            id: uuidv4(),
+            userId: user.id,
+            token: refreshToken,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
+            createdAt: new Date(),
+        });
+
+        return { accessToken: appAccessToken, refreshToken, user: user.toJSON() };
+    }
+}

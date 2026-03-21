@@ -13,7 +13,7 @@ import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/Sqlite
 import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/SqliteRecurringRuleRepository';
 import { SqliteCustomAlertRepository } from '@infrastructure/persistence/SqliteCustomAlertRepository';
 
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
+import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword, GoogleLogin } from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 import { DeleteAccount } from '@application/use-cases/DeleteAccount';
@@ -81,6 +81,7 @@ const loginUser = new LoginUser(userRepo, refreshTokenRepo);
 const verifyEmail = new VerifyEmail(userRepo);
 const logoutUser = new LogoutUser(refreshTokenRepo);
 const refreshAccessToken = new RefreshAccessToken(refreshTokenRepo);
+const googleLogin = new GoogleLogin(userRepo, categoryRepo, refreshTokenRepo);
 const setMonthlyBudget = new SetMonthlyBudget(budgetRepo);
 const getMonthlyBudget = new GetMonthlyBudget(budgetRepo);
 
@@ -122,6 +123,16 @@ const router = express.Router();
 // Public
 router.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
 router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
+router.post('/auth/google', async (req: Request, res: Response) => {
+    try {
+        const { idToken } = req.body as { idToken?: string };
+        if (!idToken) { res.status(400).json({ error: 'idToken requerido' }); return; }
+        const result = await googleLogin.execute(idToken);
+        res.status(200).json(result);
+    } catch (e) {
+        res.status(401).json({ error: e instanceof Error ? e.message : 'Error con Google' });
+    }
+});
 router.post('/auth/refresh', (req: Request, res: Response) => authController.refresh(req, res));
 router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
 router.post('/auth/forgot-password', (req: Request, res: Response) => authController.requestPasswordReset(req, res));

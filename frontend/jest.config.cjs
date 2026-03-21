@@ -11,6 +11,8 @@ module.exports = {
         '\\.(css|less|scss|sass|png|jpg|jpeg|gif|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
         // Specific override first — prevents import.meta in api.config.ts
         '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
+        // Mock Google OAuth library in tests
+        '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
         '^@modules/(.*)$': '<rootDir>/src/modules/$1',
         '^@shared/(.*)$': '<rootDir>/src/shared/$1',
         '^@core/(.*)$': '<rootDir>/src/core/$1',

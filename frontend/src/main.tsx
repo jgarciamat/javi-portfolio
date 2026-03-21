@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import './index.css';
 import App from './App';
 
@@ -8,6 +9,8 @@ if (!rootEl) throw new Error('Root element not found');
 
 createRoot(rootEl).render(
     <StrictMode>
-        <App />
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID as string}>
+            <App />
+        </GoogleOAuthProvider>
     </StrictMode>
 );

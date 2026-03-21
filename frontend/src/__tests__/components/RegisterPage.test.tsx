@@ -12,9 +12,10 @@ jest.mock('@core/i18n/I18nContext', () => ({
 }));
 
 const mockRegister = jest.fn().mockResolvedValue('Registro exitoso. Revisa tu email para verificar tu cuenta.');
+const mockLoginWithGoogle = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@shared/hooks/useAuth', () => ({
-    useAuth: () => ({ register: mockRegister }),
+    useAuth: () => ({ register: mockRegister, loginWithGoogle: mockLoginWithGoogle }),
 }));
 
 const VALID_PASS = 'Secure1!Pass';

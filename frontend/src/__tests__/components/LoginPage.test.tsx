@@ -12,9 +12,10 @@ jest.mock('@core/i18n/I18nContext', () => ({
 }));
 
 const mockLogin = jest.fn().mockResolvedValue(undefined);
+const mockLoginWithGoogle = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@shared/hooks/useAuth', () => ({
-    useAuth: () => ({ login: mockLogin }),
+    useAuth: () => ({ login: mockLogin, loginWithGoogle: mockLoginWithGoogle }),
 }));
 
 describe('LoginPage', () => {
