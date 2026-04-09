@@ -79,6 +79,16 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: TURNSTILE_SECRET_KEY
           script: |
             set -euo pipefail
+            # Inject / update TURNSTILE_SECRET_KEY in .env
+            ENV_FILE="${{ secrets.DEPLOY_PATH }}/deploy/.env"
+            if grep -q '^TURNSTILE_SECRET_KEY=' "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^TURNSTILE_SECRET_KEY=.*|TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}|" "$ENV_FILE"
+            else
+              echo "TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}" >> "$ENV_FILE"
+            fi
             "${{ secrets.DEPLOY_PATH }}/deploy/scripts/deploy.sh" "${{ secrets.DEPLOY_PATH }}" master
+        env:
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}

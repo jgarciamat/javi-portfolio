@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword } from '@application/use-cases/Auth';
+import { verifyTurnstile } from '@infrastructure/security/verifyTurnstile';
 
 export class AuthController {
     constructor(
@@ -14,6 +15,7 @@ export class AuthController {
 
     async register(req: Request, res: Response): Promise<void> {
         try {
+            await verifyTurnstile(req.body.turnstileToken);
             const result = await this.registerUser.execute(req.body);
             res.status(201).json(result);
         } catch (e) {
@@ -23,6 +25,7 @@ export class AuthController {
 
     async login(req: Request, res: Response): Promise<void> {
         try {
+            await verifyTurnstile(req.body.turnstileToken);
             const result = await this.loginUser.execute(req.body);
             res.status(200).json(result);
         } catch (e) {

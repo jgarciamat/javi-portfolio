@@ -3,7 +3,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 
 const REMEMBER_EMAIL_KEY = 'mm_remember_email';
 
-export function useLoginForm(onSuccess?: () => void) {
+export function useLoginForm(onSuccess?: () => void, onTurnstileReset?: () => void) {
     const { login } = useAuth();
 
     // Pre-fill remembered email if any
@@ -23,15 +23,16 @@ export function useLoginForm(onSuccess?: () => void) {
         }
     }, [remember, email]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent, turnstileToken?: string | null) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         try {
-            await login(email, password);
+            await login(email, password, turnstileToken ?? undefined);
             onSuccess?.();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+            onTurnstileReset?.(); // invalidate widget on failure so user re-challenges
         } finally {
             setLoading(false);
         }

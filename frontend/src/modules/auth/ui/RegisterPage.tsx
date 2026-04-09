@@ -1,8 +1,10 @@
 import { useRegisterForm } from '../application/useRegisterForm';
+import { useTurnstile } from '../application/useTurnstile';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 import { AuthPasswordInput } from './AuthPasswordInput';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface Props { onSwitch: () => void; }
 
@@ -34,6 +36,7 @@ function GoogleIcon() {
 export function RegisterPage({ onSwitch }: Props) {
     const { t } = useI18n();
     const { loginWithGoogle } = useAuth();
+    const { token: turnstileToken, onSuccess: onTurnstileSuccess, onExpire, onError, reset: resetTurnstile } = useTurnstile();
 
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
@@ -58,7 +61,7 @@ export function RegisterPage({ onSwitch }: Props) {
         passwordValidation,
         passwordsMatch, confirmTouched,
         handleSubmit,
-    } = useRegisterForm();
+    } = useRegisterForm(resetTurnstile);
 
     if (registered) {
         return (
@@ -80,7 +83,7 @@ export function RegisterPage({ onSwitch }: Props) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="auth-card">
+        <form onSubmit={(e) => handleSubmit(e, turnstileToken)} className="auth-card">
             <h1 className="auth-title">{t('app.auth.register.title')}</h1>
             <p className="auth-sub">
                 {t('app.auth.register.subtitle')}{' '}
@@ -139,7 +142,15 @@ export function RegisterPage({ onSwitch }: Props) {
 
             {error && <p className="auth-error">{error}</p>}
 
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <Turnstile
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''}
+                onSuccess={onTurnstileSuccess}
+                onExpire={onExpire}
+                onError={onError}
+                options={{ theme: 'dark', language: 'auto' }}
+            />
+
+            <button type="submit" className="auth-btn" disabled={loading || !turnstileToken}>
                 {loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
             </button>
         </form>
