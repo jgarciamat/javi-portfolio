@@ -1,6 +1,6 @@
 {
   "name": "portfolio-frontend",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
