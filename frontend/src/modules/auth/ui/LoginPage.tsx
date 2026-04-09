@@ -1,8 +1,11 @@
 import { useLoginForm } from '../application/useLoginForm';
+import { useTurnstile } from '../application/useTurnstile';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { TURNSTILE_SITE_KEY } from '@core/config/api.config';
 
 interface Props { onSwitch: () => void; onForgot: () => void; onSuccess?: () => void; }
 
@@ -20,6 +23,7 @@ function GoogleIcon() {
 export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
     const { t } = useI18n();
     const { loginWithGoogle } = useAuth();
+    const { token: turnstileToken, onSuccess: onTurnstileSuccess, onExpire, onError, reset: resetTurnstile } = useTurnstile();
     const {
         email, setEmail,
         password, setPassword,
@@ -27,7 +31,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
         remember, setRemember,
         error, loading,
         handleSubmit,
-    } = useLoginForm(onSuccess);
+    } = useLoginForm(onSuccess, resetTurnstile);
 
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
@@ -42,7 +46,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
     });
 
     return (
-        <form onSubmit={handleSubmit} className="auth-card">
+        <form onSubmit={(e) => handleSubmit(e, turnstileToken)} className="auth-card">
             <h1 className="auth-title">{t('app.auth.login.title')}</h1>
             <p className="auth-sub">
                 {t('app.auth.login.switch')}{' '}
@@ -110,7 +114,15 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
 
             {error && <p className="auth-error">{error}</p>}
 
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={onTurnstileSuccess}
+                onExpire={onExpire}
+                onError={onError}
+                options={{ theme: 'dark', language: 'auto' }}
+            />
+
+            <button type="submit" className="auth-btn" disabled={loading || !turnstileToken}>
                 {loading ? t('app.auth.login.loading') : t('app.auth.login.submit')}
             </button>
 

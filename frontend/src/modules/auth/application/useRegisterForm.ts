@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
 import { validatePassword } from '../domain/passwordValidation';
 
-export function useRegisterForm() {
+export function useRegisterForm(onTurnstileReset?: () => void) {
     const { register } = useAuth();
 
     const [name, setName] = useState('');
@@ -20,7 +20,7 @@ export function useRegisterForm() {
     const passwordsMatch = password === confirmPassword;
     const confirmTouched = confirmPassword.length > 0;
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent, turnstileToken?: string | null) => {
         e.preventDefault();
         setError(null);
 
@@ -35,10 +35,11 @@ export function useRegisterForm() {
 
         setLoading(true);
         try {
-            await register(email, password, name);
+            await register(email, password, name, turnstileToken ?? undefined);
             setRegistered(true);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
+            onTurnstileReset?.();
         } finally {
             setLoading(false);
         }
