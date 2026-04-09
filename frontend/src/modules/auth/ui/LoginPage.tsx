@@ -5,6 +5,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { TURNSTILE_SITE_KEY } from '@core/config/api.config';
 
 interface Props { onSwitch: () => void; onForgot: () => void; onSuccess?: () => void; }
 
@@ -114,7 +115,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
             {error && <p className="auth-error">{error}</p>}
 
             <Turnstile
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''}
+                siteKey={TURNSTILE_SITE_KEY}
                 onSuccess={onTurnstileSuccess}
                 onExpire={onExpire}
                 onError={onError}

@@ -13,12 +13,22 @@ module.exports = {
         '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
         // Mock Google OAuth library in tests
         '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
+        // Mock Turnstile widget — avoids import.meta inside the package
+        '^@marsidev/react-turnstile$': '<rootDir>/src/__mocks__/@marsidev/react-turnstile.tsx',
         '^@modules/(.*)$': '<rootDir>/src/modules/$1',
         '^@shared/(.*)$': '<rootDir>/src/shared/$1',
         '^@core/(.*)$': '<rootDir>/src/core/$1',
         '^@locales/(.*)$': '<rootDir>/src/locales/$1',
     },
     setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+    globals: {
+        'import.meta': {
+            env: {
+                VITE_API_URL: 'http://localhost:3000/api',
+                VITE_TURNSTILE_SITE_KEY: 'test-site-key',
+            },
+        },
+    },
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',
         // Entry points & boilerplate
