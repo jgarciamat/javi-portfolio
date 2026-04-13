@@ -31,7 +31,7 @@ docker run --rm \
   alpine:3.20 sh -lc 'rm -rf /target/* && cp -a /source/. /target/'
 
 echo "==> Deploy stack (recreate to pick changes)"
-docker compose up -d --force-recreate
+docker compose up -d --force-recreate --remove-orphans
 
 echo "==> Status"
 docker compose ps
