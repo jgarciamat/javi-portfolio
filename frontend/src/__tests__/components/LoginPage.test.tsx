@@ -47,7 +47,7 @@ describe('LoginPage', () => {
         fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.email')), { target: { value: 'user@test.com' } });
         fireEvent.change(screen.getByPlaceholderText(t('app.auth.login.password')), { target: { value: 'pass123' } });
         fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
-        await waitFor(() => expect(mockLogin).toHaveBeenCalledWith('user@test.com', 'pass123', 'mock-turnstile-token'));
+        await waitFor(() => expect(mockLogin).toHaveBeenCalledWith('user@test.com', 'pass123'));
     });
 
     test('shows error message when login fails', async () => {

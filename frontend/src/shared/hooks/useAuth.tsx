@@ -5,9 +5,9 @@ import { authApi, registerUnauthorizedHandler } from '@core/api/authApi';
 interface AuthContextValue {
     user: AuthUser | null;
     token: string | null;
-    login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
     loginWithGoogle: (idToken: string) => Promise<void>;
-    register: (email: string, password: string, name: string, turnstileToken?: string) => Promise<string>;
+    register: (email: string, password: string, name: string) => Promise<string>;
     logout: () => void;
     isAuthenticated: boolean;
     updateName: (name: string) => Promise<void>;
@@ -58,8 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(result.user);
     };
 
-    const login = useCallback(async (email: string, password: string, turnstileToken?: string) => {
-        const result = await authApi.login({ email, password, turnstileToken });
+    const login = useCallback(async (email: string, password: string) => {
+        const result = await authApi.login({ email, password });
         persist(result);
     }, []);
 
@@ -68,8 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         persist(result);
     }, []);
 
-    const register = useCallback(async (email: string, password: string, name: string, turnstileToken?: string): Promise<string> => {
-        const result = await authApi.register({ email, password, name, turnstileToken });
+    const register = useCallback(async (email: string, password: string, name: string): Promise<string> => {
+        const result = await authApi.register({ email, password, name });
         return result.message;
     }, []);
 

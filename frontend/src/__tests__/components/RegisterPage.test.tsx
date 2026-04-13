@@ -46,7 +46,7 @@ describe('RegisterPage', () => {
         render(<MemoryRouter><RegisterPage onSwitch={mockOnSwitch} /></MemoryRouter>);
         fillForm();
         fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
-        await waitFor(() => expect(mockRegister).toHaveBeenCalledWith('j@test.com', VALID_PASS, 'John', 'mock-turnstile-token'));
+        await waitFor(() => expect(mockRegister).toHaveBeenCalledWith('j@test.com', VALID_PASS, 'John'));
     });
 
     test('shows email confirmation screen after successful registration', async () => {
