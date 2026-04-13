@@ -110,10 +110,10 @@ async function publicRequest<T>(path: string, options?: RequestInit): Promise<T>
 }
 
 export const authApi = {
-    register(dto: { email: string; password: string; name: string; turnstileToken?: string }) {
+    register(dto: { email: string; password: string; name: string }) {
         return publicRequest<RegisterResult>('/auth/register', { method: 'POST', body: JSON.stringify(dto) });
     },
-    login(dto: { email: string; password: string; turnstileToken?: string }) {
+    login(dto: { email: string; password: string }) {
         return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: JSON.stringify(dto) });
     },
     googleLogin(idToken: string) {
