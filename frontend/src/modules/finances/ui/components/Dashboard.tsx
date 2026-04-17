@@ -11,36 +11,8 @@ import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { RecurringRulesTab } from './RecurringRulesTab';
 import { CustomAlertsTab } from './CustomAlertsTab';
-import type { DashboardTab } from '../../application/hooks/useDashboard';
-
-// ─── Sub-component: tab bar ───────────────────────────────────────────────────
-
-const TABS: { id: DashboardTab; icon: string; labelKey: string }[] = [
-    { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly' },
-    { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations' },
-    { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts' },
-    { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual' },
-];
-
-function DashboardTabs({ tab, setTab, t }: { tab: DashboardTab; setTab: (t: DashboardTab) => void; t: (k: string) => string }) {
-    return (
-        <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
-            {TABS.map(({ id, icon, labelKey }) => (
-                <button
-                    key={id}
-                    className={`tab-btn${tab === id ? ' active' : ''}`}
-                    onClick={() => setTab(id)}
-                    role="tab"
-                    aria-selected={tab === id}
-                    aria-controls={`tabpanel-${id}`}
-                    id={`tab-${id}`}
-                >
-                    {icon} {t(labelKey)}
-                </button>
-            ))}
-        </nav>
-    );
-}
+import { BurgerMenu } from './BurgerMenu';
+import { useState } from 'react';
 
 export function Dashboard() {
     const now = new Date();
@@ -63,6 +35,7 @@ export function Dashboard() {
         isCurrentMonth, handleSaveEdit, handleMonthClick,
     } = useDashboard({ year, month, navigateTo, updateTransaction });
 
+    const [menuOpen, setMenuOpen] = useState(false);
     const goToCurrentMonth = () => navigateTo(now.getFullYear(), now.getMonth() + 1);
 
     function renderTabContent() {
@@ -109,10 +82,20 @@ export function Dashboard() {
             <div className="dashboard-sticky">
                 <header className="header">
                     <div className="header-brand">
-                        <span className="header-logo">💰</span>
+                        <button
+                            className="burger-btn"
+                            onClick={() => setMenuOpen(true)}
+                            aria-label={t('app.menu.open')}
+                            aria-expanded={menuOpen}
+                        >
+                            <span className="burger-btn-logo">💰</span>
+                            <span className="burger-btn-lines" aria-hidden="true">
+                                <span /><span /><span />
+                            </span>
+                        </button>
                         <div>
                             <h1 className="header-title">{t('app.header.title')}</h1>
-                            <p className="header-sub">{t('app.header.subtitle')}</p>
+                            <p className="header-sub">{t(`app.tabs.${tab === 'monthly' ? 'monthly' : tab === 'annual' ? 'annual' : tab === 'automations' ? 'automations' : 'customAlerts'}`)}</p>
                         </div>
                     </div>
                     <div className="header-actions">
@@ -133,12 +116,10 @@ export function Dashboard() {
                     </div>
                 </header>
 
-                {/* ── Sub-header: tabs + month nav ─────────────────────── */}
-                <div className="sticky-nav">
-                    <div className="sticky-nav-inner">
-                        <DashboardTabs tab={tab} setTab={setTab} t={t} />
-
-                        {tab === 'monthly' && (
+                {/* ── Sub-header: month nav only ───────────────────────── */}
+                {tab === 'monthly' && (
+                    <div className="sticky-nav">
+                        <div className="sticky-nav-inner">
                             <MonthNavCard
                                 year={year}
                                 month={month}
@@ -152,9 +133,9 @@ export function Dashboard() {
                                 onGoToCurrentMonth={goToCurrentMonth}
                                 tCategory={tCategory}
                             />
-                        )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             <main className="main">
@@ -176,6 +157,13 @@ export function Dashboard() {
             />
 
             {showProfile && <ProfilePage onClose={closeProfile} />}
+
+            <BurgerMenu
+                open={menuOpen}
+                tab={tab}
+                onSelectTab={setTab}
+                onClose={() => setMenuOpen(false)}
+            />
 
             {editingTransaction && (
                 <EditTransactionModal
