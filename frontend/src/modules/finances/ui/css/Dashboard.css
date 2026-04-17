@@ -725,6 +725,7 @@
 
     .profile-panel {
         max-width: 100%;
+        padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
     }
 
     .avatar-presets {
