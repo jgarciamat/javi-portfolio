@@ -6,30 +6,33 @@ import { authApi, budgetApi } from '@core/api/authApi';
 // ─── API shape types ─────────────────────────────────────────────────────────
 
 export interface IApiContext {
-    transactionApi: typeof transactionApi;
-    categoryApi: typeof categoryApi;
-    authApi: typeof authApi;
-    budgetApi: typeof budgetApi;
-    recurringApi: typeof recurringApi;
-    customAlertApi: typeof customAlertApi;
+  transactionApi: typeof transactionApi;
+  categoryApi: typeof categoryApi;
+  authApi: typeof authApi;
+  budgetApi: typeof budgetApi;
+  recurringApi: typeof recurringApi;
+  customAlertApi: typeof customAlertApi;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 const ApiContext = createContext<IApiContext | null>(null);
 
-const defaultValue: IApiContext = { transactionApi, categoryApi, authApi, budgetApi, recurringApi, customAlertApi };
+const defaultValue: IApiContext = {
+  transactionApi,
+  categoryApi,
+  authApi,
+  budgetApi,
+  recurringApi,
+  customAlertApi,
+};
 
 export function ApiProvider({ children }: { children: ReactNode }) {
-    return (
-        <ApiContext.Provider value={defaultValue}>
-            {children}
-        </ApiContext.Provider>
-    );
+  return <ApiContext.Provider value={defaultValue}>{children}</ApiContext.Provider>;
 }
 
 export function useApi(): IApiContext {
-    const ctx = useContext(ApiContext);
-    if (!ctx) throw new Error('useApi must be used inside ApiProvider');
-    return ctx;
+  const ctx = useContext(ApiContext);
+  if (!ctx) throw new Error('useApi must be used inside ApiProvider');
+  return ctx;
 }

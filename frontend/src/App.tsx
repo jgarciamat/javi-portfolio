@@ -12,30 +12,32 @@ import { I18nProvider } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 
 export default function App() {
-    return (
-        <I18nProvider>
-            <AuthProvider>
-                <ApiProvider>
-                    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                        <Routes>
-                            <Route path="/login" element={<AuthPage />} />
-                            <Route path="/verify-email" element={<VerifyEmailPage />} />
-                            <Route path="/reset-password" element={<ResetPasswordPage />} />
-                            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                            <Route element={<ProtectedRoute />}>
-                                <Route path="/" element={
-                                    <FinancesProvider>
-                                        <Dashboard />
-                                    </FinancesProvider>
-                                } />
-                            </Route>
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </BrowserRouter>
-                    <UpdatePrompt />
-                </ApiProvider>
-            </AuthProvider>
-        </I18nProvider>
-    );
+  return (
+    <I18nProvider>
+      <AuthProvider>
+        <ApiProvider>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="/"
+                  element={
+                    <FinancesProvider>
+                      <Dashboard />
+                    </FinancesProvider>
+                  }
+                />
+              </Route>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+          <UpdatePrompt />
+        </ApiProvider>
+      </AuthProvider>
+    </I18nProvider>
+  );
 }
-

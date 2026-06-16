@@ -13,7 +13,7 @@ export class TransportType {
     }
 
     const upperValue = value.toUpperCase();
-    
+
     if (!this.isValidTransportType(upperValue)) {
       throw new Error(`Invalid transport type: ${value}`);
     }

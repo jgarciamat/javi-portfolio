@@ -1,33 +1,33 @@
 // ─── Auth domain types ────────────────────────────────────────────────────────
 
 export interface AuthUser {
-    id: string;
-    email: string;
-    name: string;
-    avatarUrl?: string | null;
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string | null;
 }
 
 export interface AuthResult {
-    accessToken: string;
-    refreshToken: string;
-    user: AuthUser;
+  accessToken: string;
+  refreshToken: string;
+  user: AuthUser;
 }
 
 export interface RegisterResult {
-    message: string;
+  message: string;
 }
 
 export interface RefreshResult {
-    accessToken: string;
+  accessToken: string;
 }
 
 export interface LoginDTO {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterDTO {
-    email: string;
-    password: string;
-    name: string;
+  email: string;
+  password: string;
+  name: string;
 }

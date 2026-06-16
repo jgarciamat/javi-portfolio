@@ -5,28 +5,26 @@ import '@testing-library/jest-dom';
 // but intermediate setState calls during async operations still trigger this warning.
 const originalError = console.error.bind(console);
 beforeAll(() => {
-    console.error = (...args: Parameters<typeof console.error>) => {
-        const msg = typeof args[0] === 'string' ? args[0] : '';
-        if (
-            msg.includes('not wrapped in act(') ||
-            msg.includes('React Router Future Flag Warning')
-        ) return;
-        originalError(...args);
-    };
+  console.error = (...args: Parameters<typeof console.error>) => {
+    const msg = typeof args[0] === 'string' ? args[0] : '';
+    if (msg.includes('not wrapped in act(') || msg.includes('React Router Future Flag Warning'))
+      return;
+    originalError(...args);
+  };
 });
 afterAll(() => {
-    console.error = originalError;
+  console.error = originalError;
 });
 
 // Suppress React Router v6 future flag deprecation warnings in tests.
 const originalWarn = console.warn.bind(console);
 beforeAll(() => {
-    console.warn = (...args: Parameters<typeof console.warn>) => {
-        const msg = typeof args[0] === 'string' ? args[0] : '';
-        if (msg.includes('React Router Future Flag Warning')) return;
-        originalWarn(...args);
-    };
+  console.warn = (...args: Parameters<typeof console.warn>) => {
+    const msg = typeof args[0] === 'string' ? args[0] : '';
+    if (msg.includes('React Router Future Flag Warning')) return;
+    originalWarn(...args);
+  };
 });
 afterAll(() => {
-    console.warn = originalWarn;
+  console.warn = originalWarn;
 });

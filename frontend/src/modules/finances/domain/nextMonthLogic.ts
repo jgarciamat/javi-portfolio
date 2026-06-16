@@ -2,12 +2,16 @@
  * Returns true when a given year/month is strictly in the future (after the current month).
  * Used in the annual chart to decide if a month label should be a clickable link.
  */
-export function isMonthInFuture(viewYear: number, viewMonth: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-    if (viewYear > currentYear) return true;
-    if (viewYear === currentYear && viewMonth > currentMonth) return true;
-    return false;
+export function isMonthInFuture(
+  viewYear: number,
+  viewMonth: number,
+  today: Date = new Date()
+): boolean {
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  if (viewYear > currentYear) return true;
+  if (viewYear === currentYear && viewMonth > currentMonth) return true;
+  return false;
 }
 
 /**
@@ -19,17 +23,21 @@ export function isMonthInFuture(viewYear: number, viewMonth: number, today: Date
  * @param viewMonth - the month currently displayed (1–12)
  * @param today     - reference date (defaults to now)
  */
-export function isNextButtonDisabled(viewYear: number, viewMonth: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
+export function isNextButtonDisabled(
+  viewYear: number,
+  viewMonth: number,
+  today: Date = new Date()
+): boolean {
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
 
-    // Compute the maximum allowed month (current + 1)
-    const maxYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-    const maxMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+  // Compute the maximum allowed month (current + 1)
+  const maxYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+  const maxMonth = currentMonth === 12 ? 1 : currentMonth + 1;
 
-    if (viewYear > maxYear) return true;
-    if (viewYear === maxYear && viewMonth >= maxMonth) return true;
-    return false;
+  if (viewYear > maxYear) return true;
+  if (viewYear === maxYear && viewMonth >= maxMonth) return true;
+  return false;
 }
 
 /**
@@ -50,14 +58,14 @@ export function isNextButtonDisabled(viewYear: number, viewMonth: number, today:
  * @param today    - reference date (defaults to now)
  */
 export function isNextYearDisabled(viewYear: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1–12
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1; // 1–12
 
-    // Already past or at the next year
-    if (viewYear >= currentYear + 1) return true;
+  // Already past or at the next year
+  if (viewYear >= currentYear + 1) return true;
 
-    // Can only go to next year if we are in December
-    if (currentMonth !== 12) return true;
+  // Can only go to next year if we are in December
+  if (currentMonth !== 12) return true;
 
-    return false;
+  return false;
 }

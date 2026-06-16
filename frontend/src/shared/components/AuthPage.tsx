@@ -8,22 +8,24 @@ import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
 import { PublicHeader } from './PublicHeader';
 
 export function AuthPage() {
-    const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
-    const { isAuthenticated } = useAuth();
-    const navigate = useNavigate();
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (isAuthenticated) navigate('/', { replace: true });
-    }, [isAuthenticated, navigate]);
+  useEffect(() => {
+    if (isAuthenticated) navigate('/', { replace: true });
+  }, [isAuthenticated, navigate]);
 
-    return (
-        <div className="auth-page-root">
-            <PublicHeader />
-            <div className="auth-page-with-header">
-                {mode === 'forgot' && <ForgotPasswordPage onBack={() => setMode('login')} />}
-                {mode === 'register' && <RegisterPage onSwitch={() => setMode('login')} />}
-                {mode === 'login' && <LoginPage onSwitch={() => setMode('register')} onForgot={() => setMode('forgot')} />}
-            </div>
-        </div>
-    );
+  return (
+    <div className="auth-page-root">
+      <PublicHeader />
+      <div className="auth-page-with-header">
+        {mode === 'forgot' && <ForgotPasswordPage onBack={() => setMode('login')} />}
+        {mode === 'register' && <RegisterPage onSwitch={() => setMode('login')} />}
+        {mode === 'login' && (
+          <LoginPage onSwitch={() => setMode('register')} onForgot={() => setMode('forgot')} />
+        )}
+      </div>
+    </div>
+  );
 }

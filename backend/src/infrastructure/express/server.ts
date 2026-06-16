@@ -13,12 +13,31 @@ import { SqliteRefreshTokenRepository } from '@infrastructure/persistence/Sqlite
 import { SqliteRecurringRuleRepository } from '@infrastructure/persistence/SqliteRecurringRuleRepository';
 import { SqliteCustomAlertRepository } from '@infrastructure/persistence/SqliteCustomAlertRepository';
 
-import { RegisterUser, LoginUser, VerifyEmail, LogoutUser, RefreshAccessToken, RequestPasswordReset, ResetPassword, GoogleLogin } from '@application/use-cases/Auth';
+import {
+  RegisterUser,
+  LoginUser,
+  VerifyEmail,
+  LogoutUser,
+  RefreshAccessToken,
+  RequestPasswordReset,
+  ResetPassword,
+  GoogleLogin,
+} from '@application/use-cases/Auth';
 import { SetMonthlyBudget, GetMonthlyBudget } from '@application/use-cases/Budget';
 import { UpdateName, UpdatePassword, UpdateAvatar } from '@application/use-cases/UpdateProfile';
 import { DeleteAccount } from '@application/use-cases/DeleteAccount';
-import { CreateRecurringRule, GetRecurringRules, UpdateRecurringRule, DeleteRecurringRule } from '@application/use-cases/RecurringRules';
-import { CreateCustomAlert, GetCustomAlerts, UpdateCustomAlert, DeleteCustomAlert } from '@application/use-cases/CustomAlerts';
+import {
+  CreateRecurringRule,
+  GetRecurringRules,
+  UpdateRecurringRule,
+  DeleteRecurringRule,
+} from '@application/use-cases/RecurringRules';
+import {
+  CreateCustomAlert,
+  GetCustomAlerts,
+  UpdateCustomAlert,
+  DeleteCustomAlert,
+} from '@application/use-cases/CustomAlerts';
 
 import { AuthController } from '@infrastructure/controllers/AuthController';
 import { TransactionController } from '@infrastructure/controllers/TransactionController';
@@ -54,21 +73,23 @@ const customAlertRepo = new SqliteCustomAlertRepository(db);
 
 // --- Seed admin user (always exists, always has categories) ---
 async function seedAdmin(): Promise<void> {
-    const ADMIN_ID = 'admin-fixed-id-0000-0000-000000000001';
-    const ADMIN_EMAIL = 'admin@admin.com';
-    const ADMIN_PASS = 'admin';
+  const ADMIN_ID = 'admin-fixed-id-0000-0000-000000000001';
+  const ADMIN_EMAIL = 'admin@admin.com';
+  const ADMIN_PASS = 'admin';
 
-    const existing = await userRepo.findById(ADMIN_ID);
-    if (!existing) {
-        const passwordHash = await bcrypt.hash(ADMIN_PASS, 10);
-        db.prepare(`
+  const existing = await userRepo.findById(ADMIN_ID);
+  if (!existing) {
+    const passwordHash = await bcrypt.hash(ADMIN_PASS, 10);
+    db.prepare(
+      `
             INSERT OR IGNORE INTO users (id, email, name, password_hash, created_at, email_verified, verification_token)
             VALUES (?, ?, 'Admin', ?, ?, 1, NULL)
-        `).run(ADMIN_ID, ADMIN_EMAIL, passwordHash, new Date().toISOString());
-    }
+        `
+    ).run(ADMIN_ID, ADMIN_EMAIL, passwordHash, new Date().toISOString());
+  }
 
-    // Always ensure admin has categories (INSERT OR IGNORE is idempotent)
-    categoryRepo.seedForUser(ADMIN_ID);
+  // Always ensure admin has categories (INSERT OR IGNORE is idempotent)
+  categoryRepo.seedForUser(ADMIN_ID);
 }
 seedAdmin().catch((err: unknown) => console.error('Seed error:', err));
 
@@ -92,29 +113,37 @@ const requestPasswordReset = new RequestPasswordReset(userRepo, emailService);
 const resetPassword = new ResetPassword(userRepo);
 
 // --- Controllers ---
-const authController = new AuthController(registerUser, loginUser, verifyEmail, logoutUser, refreshAccessToken, requestPasswordReset, resetPassword);
+const authController = new AuthController(
+  registerUser,
+  loginUser,
+  verifyEmail,
+  logoutUser,
+  refreshAccessToken,
+  requestPasswordReset,
+  resetPassword
+);
 const transactionController = new TransactionController(transactionRepo);
 const categoryController = new CategoryController(categoryRepo);
 const budgetController = new BudgetController(setMonthlyBudget, getMonthlyBudget, transactionRepo);
 const profileController = new ProfileController(
-    new UpdateName(userRepo),
-    new UpdatePassword(userRepo),
-    new UpdateAvatar(userRepo),
-    new DeleteAccount(userRepo, transactionRepo, categoryRepo, recurringRuleRepo, refreshTokenRepo),
+  new UpdateName(userRepo),
+  new UpdatePassword(userRepo),
+  new UpdateAvatar(userRepo),
+  new DeleteAccount(userRepo, transactionRepo, categoryRepo, recurringRuleRepo, refreshTokenRepo)
 );
 const alertController = new AlertController(checkBudgetAlerts);
 const aiController = new AIController(getAIAdvice, transactionRepo, budgetRepo);
 const recurringRuleController = new RecurringRuleController(
-    new CreateRecurringRule(recurringRuleRepo, transactionRepo),
-    new GetRecurringRules(recurringRuleRepo, transactionRepo),
-    new UpdateRecurringRule(recurringRuleRepo, transactionRepo),
-    new DeleteRecurringRule(recurringRuleRepo, transactionRepo),
+  new CreateRecurringRule(recurringRuleRepo, transactionRepo),
+  new GetRecurringRules(recurringRuleRepo, transactionRepo),
+  new UpdateRecurringRule(recurringRuleRepo, transactionRepo),
+  new DeleteRecurringRule(recurringRuleRepo, transactionRepo)
 );
 const customAlertController = new CustomAlertController(
-    new CreateCustomAlert(customAlertRepo),
-    new GetCustomAlerts(customAlertRepo),
-    new UpdateCustomAlert(customAlertRepo),
-    new DeleteCustomAlert(customAlertRepo),
+  new CreateCustomAlert(customAlertRepo),
+  new GetCustomAlerts(customAlertRepo),
+  new UpdateCustomAlert(customAlertRepo),
+  new DeleteCustomAlert(customAlertRepo)
 );
 
 // --- Routes ---
@@ -124,20 +153,29 @@ const router = express.Router();
 router.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
 router.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
 router.post('/auth/google', async (req: Request, res: Response) => {
-    try {
-        const { idToken } = req.body as { idToken?: string };
-        if (!idToken) { res.status(400).json({ error: 'idToken requerido' }); return; }
-        const result = await googleLogin.execute(idToken);
-        res.status(200).json(result);
-    } catch (e) {
-        res.status(401).json({ error: e instanceof Error ? e.message : 'Error con Google' });
+  try {
+    const { idToken } = req.body as { idToken?: string };
+    if (!idToken) {
+      res.status(400).json({ error: 'idToken requerido' });
+      return;
     }
+    const result = await googleLogin.execute(idToken);
+    res.status(200).json(result);
+  } catch (e) {
+    res.status(401).json({ error: e instanceof Error ? e.message : 'Error con Google' });
+  }
 });
 router.post('/auth/refresh', (req: Request, res: Response) => authController.refresh(req, res));
 router.get('/auth/verify-email', (req: Request, res: Response) => authController.verify(req, res));
-router.post('/auth/forgot-password', (req: Request, res: Response) => authController.requestPasswordReset(req, res));
-router.post('/auth/reset-password', (req: Request, res: Response) => authController.resetPassword(req, res));
-router.get('/health', (_req: Request, res: Response) => res.json({ status: 'ok', app: 'money-manager-api' }));
+router.post('/auth/forgot-password', (req: Request, res: Response) =>
+  authController.requestPasswordReset(req, res)
+);
+router.post('/auth/reset-password', (req: Request, res: Response) =>
+  authController.resetPassword(req, res)
+);
+router.get('/health', (_req: Request, res: Response) =>
+  res.json({ status: 'ok', app: 'money-manager-api' })
+);
 
 // Protected
 router.use(authMiddleware);
@@ -145,52 +183,107 @@ router.use(authMiddleware);
 router.post('/auth/logout', (req: Request, res: Response) => authController.logout(req, res));
 
 // IMPORTANT: specific routes before parameterized ones
-router.get('/transactions/summary', (req: Request, res: Response) => transactionController.summary(req as AuthRequest, res));
-router.get('/transactions/annual/:year', (req: Request, res: Response) => transactionController.annual(req as AuthRequest, res));
-router.get('/transactions', (req: Request, res: Response) => transactionController.getAll(req as AuthRequest, res));
-router.post('/transactions', (req: Request, res: Response) => transactionController.create(req as AuthRequest, res));
-router.patch('/transactions/:id', (req: Request, res: Response) => transactionController.patch(req as AuthRequest, res));
-router.put('/transactions/:id', (req: Request, res: Response) => transactionController.update(req as AuthRequest, res));
-router.delete('/transactions/:id', (req: Request, res: Response) => transactionController.delete(req as AuthRequest, res));
+router.get('/transactions/summary', (req: Request, res: Response) =>
+  transactionController.summary(req as AuthRequest, res)
+);
+router.get('/transactions/annual/:year', (req: Request, res: Response) =>
+  transactionController.annual(req as AuthRequest, res)
+);
+router.get('/transactions', (req: Request, res: Response) =>
+  transactionController.getAll(req as AuthRequest, res)
+);
+router.post('/transactions', (req: Request, res: Response) =>
+  transactionController.create(req as AuthRequest, res)
+);
+router.patch('/transactions/:id', (req: Request, res: Response) =>
+  transactionController.patch(req as AuthRequest, res)
+);
+router.put('/transactions/:id', (req: Request, res: Response) =>
+  transactionController.update(req as AuthRequest, res)
+);
+router.delete('/transactions/:id', (req: Request, res: Response) =>
+  transactionController.delete(req as AuthRequest, res)
+);
 
-router.get('/categories', (req: Request, res: Response) => categoryController.getAll(req as AuthRequest, res));
-router.post('/categories', (req: Request, res: Response) => categoryController.create(req as AuthRequest, res));
-router.delete('/categories/:id', (req: Request, res: Response) => categoryController.delete(req as AuthRequest, res));
+router.get('/categories', (req: Request, res: Response) =>
+  categoryController.getAll(req as AuthRequest, res)
+);
+router.post('/categories', (req: Request, res: Response) =>
+  categoryController.create(req as AuthRequest, res)
+);
+router.delete('/categories/:id', (req: Request, res: Response) =>
+  categoryController.delete(req as AuthRequest, res)
+);
 
-router.get('/budget/history', (req: Request, res: Response) => budgetController.history(req as AuthRequest, res));
-router.get('/budget/carryover/:year/:month', (req: Request, res: Response) => budgetController.carryover(req as AuthRequest, res));
-router.get('/budget/:year/:month', (req: Request, res: Response) => budgetController.get(req as AuthRequest, res));
-router.put('/budget/:year/:month', (req: Request, res: Response) => budgetController.set(req as AuthRequest, res));
+router.get('/budget/history', (req: Request, res: Response) =>
+  budgetController.history(req as AuthRequest, res)
+);
+router.get('/budget/carryover/:year/:month', (req: Request, res: Response) =>
+  budgetController.carryover(req as AuthRequest, res)
+);
+router.get('/budget/:year/:month', (req: Request, res: Response) =>
+  budgetController.get(req as AuthRequest, res)
+);
+router.put('/budget/:year/:month', (req: Request, res: Response) =>
+  budgetController.set(req as AuthRequest, res)
+);
 
 // Profile
-router.patch('/profile/name', (req: Request, res: Response) => profileController.patchName(req as AuthRequest, res));
-router.patch('/profile/password', (req: Request, res: Response) => profileController.patchPassword(req as AuthRequest, res));
-router.patch('/profile/avatar', (req: Request, res: Response) => profileController.patchAvatar(req as AuthRequest, res));
-router.delete('/profile/account', (req: Request, res: Response) => profileController.deleteAccount(req as AuthRequest, res));
+router.patch('/profile/name', (req: Request, res: Response) =>
+  profileController.patchName(req as AuthRequest, res)
+);
+router.patch('/profile/password', (req: Request, res: Response) =>
+  profileController.patchPassword(req as AuthRequest, res)
+);
+router.patch('/profile/avatar', (req: Request, res: Response) =>
+  profileController.patchAvatar(req as AuthRequest, res)
+);
+router.delete('/profile/account', (req: Request, res: Response) =>
+  profileController.deleteAccount(req as AuthRequest, res)
+);
 
 // Alerts
-router.get('/alerts/budget/:year/:month', (req: Request, res: Response) => alertController.budgetAlerts(req as AuthRequest, res));
+router.get('/alerts/budget/:year/:month', (req: Request, res: Response) =>
+  alertController.budgetAlerts(req as AuthRequest, res)
+);
 
 // AI Advisor
-router.post('/ai/advice', (req: Request, res: Response) => aiController.getAdvice(req as AuthRequest, res));
+router.post('/ai/advice', (req: Request, res: Response) =>
+  aiController.getAdvice(req as AuthRequest, res)
+);
 
 // Recurring rules
-router.get('/recurring-rules', (req: Request, res: Response) => recurringRuleController.getAll(req as AuthRequest, res));
-router.post('/recurring-rules', (req: Request, res: Response) => recurringRuleController.create(req as AuthRequest, res));
-router.patch('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.update(req as AuthRequest, res));
-router.delete('/recurring-rules/:id', (req: Request, res: Response) => recurringRuleController.delete(req as AuthRequest, res));
+router.get('/recurring-rules', (req: Request, res: Response) =>
+  recurringRuleController.getAll(req as AuthRequest, res)
+);
+router.post('/recurring-rules', (req: Request, res: Response) =>
+  recurringRuleController.create(req as AuthRequest, res)
+);
+router.patch('/recurring-rules/:id', (req: Request, res: Response) =>
+  recurringRuleController.update(req as AuthRequest, res)
+);
+router.delete('/recurring-rules/:id', (req: Request, res: Response) =>
+  recurringRuleController.delete(req as AuthRequest, res)
+);
 
 // Custom alerts
-router.get('/custom-alerts', (req: Request, res: Response) => customAlertController.getAll(req as AuthRequest, res));
-router.post('/custom-alerts', (req: Request, res: Response) => customAlertController.create(req as AuthRequest, res));
-router.patch('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.update(req as AuthRequest, res));
-router.delete('/custom-alerts/:id', (req: Request, res: Response) => customAlertController.delete(req as AuthRequest, res));
+router.get('/custom-alerts', (req: Request, res: Response) =>
+  customAlertController.getAll(req as AuthRequest, res)
+);
+router.post('/custom-alerts', (req: Request, res: Response) =>
+  customAlertController.create(req as AuthRequest, res)
+);
+router.patch('/custom-alerts/:id', (req: Request, res: Response) =>
+  customAlertController.update(req as AuthRequest, res)
+);
+router.delete('/custom-alerts/:id', (req: Request, res: Response) =>
+  customAlertController.delete(req as AuthRequest, res)
+);
 
 app.use('/api', router);
 
 app.listen(PORT, () => {
-    console.info(`💰 Money Manager API running on http://localhost:${PORT}`);
+  console.info(`💰 Money Manager API running on http://localhost:${PORT}`);
 });
 
 export default app;
-

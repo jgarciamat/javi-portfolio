@@ -4,81 +4,92 @@ import type { FinancialSummary } from '@modules/finances/domain/types';
 export type AlertLevel = 'warning' | 'danger';
 
 export interface BudgetAlert {
-    level: AlertLevel;
-    category: string | null;
-    /** Amount spent (global or in category) */
-    spentAmount: number;
-    /** Remaining money: available - totalExpenses (global); null for category alerts */
-    remainingAmount: number | null;
-    percentage: number;
-    message: string;
+  level: AlertLevel;
+  category: string | null;
+  /** Amount spent (global or in category) */
+  spentAmount: number;
+  /** Remaining money: available - totalExpenses (global); null for category alerts */
+  remainingAmount: number | null;
+  percentage: number;
+  message: string;
 }
 
 interface Params {
-    summary: FinancialSummary | null;
-    carryover: number | null;
-    t?: (key: string, vars?: Record<string, string>) => string;
-    tCategory?: (name: string) => string;
+  summary: FinancialSummary | null;
+  carryover: number | null;
+  t?: (key: string, vars?: Record<string, string>) => string;
+  tCategory?: (name: string) => string;
 }
 
 function defaultT(key: string, vars?: Record<string, string>): string {
-    const templates: Record<string, string> = {
-        'app.alert.globalDanger': 'Has gastado más de lo que tienes disponible este mes ({pct}%)',
-        'app.alert.globalWarning': 'Llevas el {pct}% de tu dinero disponible gastado',
-        'app.alert.categoryAlert': '"{category}" supera el {pct}% de tu dinero disponible',
-    };
-    let msg = templates[key] ?? key;
-    if (vars) Object.entries(vars).forEach(([k, v]) => { msg = msg.replace(`{${k}}`, v); });
-    return msg;
+  const templates: Record<string, string> = {
+    'app.alert.globalDanger': 'Has gastado más de lo que tienes disponible este mes ({pct}%)',
+    'app.alert.globalWarning': 'Llevas el {pct}% de tu dinero disponible gastado',
+    'app.alert.categoryAlert': '"{category}" supera el {pct}% de tu dinero disponible',
+  };
+  let msg = templates[key] ?? key;
+  if (vars)
+    Object.entries(vars).forEach(([k, v]) => {
+      msg = msg.replace(`{${k}}`, v);
+    });
+  return msg;
 }
 
-export function useBudgetAlerts({ summary, carryover, t = defaultT, tCategory = (n) => n }: Params): BudgetAlert[] {
-    return useMemo(() => {
-        if (!summary) return [];
+export function useBudgetAlerts({
+  summary,
+  carryover,
+  t = defaultT,
+  tCategory = (n) => n,
+}: Params): BudgetAlert[] {
+  return useMemo(() => {
+    if (!summary) return [];
 
-        const available = (carryover ?? 0) + summary.totalIncome;
-        if (available <= 0) return [];
+    const available = (carryover ?? 0) + summary.totalIncome;
+    if (available <= 0) return [];
 
-        const alerts: BudgetAlert[] = [];
-        const globalPct = (summary.totalExpenses / available) * 100;
-        const remaining = Math.round((available - summary.totalExpenses) * 100) / 100;
+    const alerts: BudgetAlert[] = [];
+    const globalPct = (summary.totalExpenses / available) * 100;
+    const remaining = Math.round((available - summary.totalExpenses) * 100) / 100;
 
-        // ── Global alert ──────────────────────────────────────────────────
-        if (globalPct >= 100) {
-            alerts.push({
-                level: 'danger',
-                category: null,
-                spentAmount: Math.round(summary.totalExpenses * 100) / 100,
-                remainingAmount: remaining,
-                percentage: Math.round(globalPct * 10) / 10,
-                message: t('app.alert.globalDanger', { pct: String(Math.round(globalPct)) }),
-            });
-        } else if (globalPct >= 80) {
-            alerts.push({
-                level: 'warning',
-                category: null,
-                spentAmount: Math.round(summary.totalExpenses * 100) / 100,
-                remainingAmount: remaining,
-                percentage: Math.round(globalPct * 10) / 10,
-                message: t('app.alert.globalWarning', { pct: String(Math.round(globalPct)) }),
-            });
-        }
+    // ── Global alert ──────────────────────────────────────────────────
+    if (globalPct >= 100) {
+      alerts.push({
+        level: 'danger',
+        category: null,
+        spentAmount: Math.round(summary.totalExpenses * 100) / 100,
+        remainingAmount: remaining,
+        percentage: Math.round(globalPct * 10) / 10,
+        message: t('app.alert.globalDanger', { pct: String(Math.round(globalPct)) }),
+      });
+    } else if (globalPct >= 80) {
+      alerts.push({
+        level: 'warning',
+        category: null,
+        spentAmount: Math.round(summary.totalExpenses * 100) / 100,
+        remainingAmount: remaining,
+        percentage: Math.round(globalPct * 10) / 10,
+        message: t('app.alert.globalWarning', { pct: String(Math.round(globalPct)) }),
+      });
+    }
 
-        // ── Per-category alerts (> 30 % of available) ─────────────────────
-        for (const [category, spent] of Object.entries(summary.expensesByCategory)) {
-            const catPct = (spent / available) * 100;
-            if (catPct >= 30) {
-                alerts.push({
-                    level: catPct >= 40 ? 'danger' : 'warning',
-                    category,
-                    spentAmount: Math.round(spent * 100) / 100,
-                    remainingAmount: null,
-                    percentage: Math.round(catPct * 10) / 10,
-                    message: t('app.alert.categoryAlert', { category: tCategory(category), pct: String(Math.round(catPct)) }),
-                });
-            }
-        }
+    // ── Per-category alerts (> 30 % of available) ─────────────────────
+    for (const [category, spent] of Object.entries(summary.expensesByCategory)) {
+      const catPct = (spent / available) * 100;
+      if (catPct >= 30) {
+        alerts.push({
+          level: catPct >= 40 ? 'danger' : 'warning',
+          category,
+          spentAmount: Math.round(spent * 100) / 100,
+          remainingAmount: null,
+          percentage: Math.round(catPct * 10) / 10,
+          message: t('app.alert.categoryAlert', {
+            category: tCategory(category),
+            pct: String(Math.round(catPct)),
+          }),
+        });
+      }
+    }
 
-        return alerts;
-    }, [summary, carryover, t, tCategory]);
+    return alerts;
+  }, [summary, carryover, t, tCategory]);
 }

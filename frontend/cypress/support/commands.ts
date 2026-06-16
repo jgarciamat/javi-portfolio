@@ -8,7 +8,7 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
-export { };
+export {};
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {

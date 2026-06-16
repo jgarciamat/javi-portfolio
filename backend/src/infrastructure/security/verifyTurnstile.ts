@@ -4,6 +4,6 @@
  * and uncommenting the verification logic.
  */
 export async function verifyTurnstile(_token: string | undefined): Promise<void> {
-    // Disabled — no-op
-    return;
+  // Disabled — no-op
+  return;
 }

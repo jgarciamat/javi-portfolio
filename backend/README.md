@@ -111,7 +111,6 @@ Puedes encontrar el diagrama en formato mermaid en `backend/diagram/architecture
 npx @mermaid-js/mermaid-cli -i backend/diagram/architecture.mmd -o backend/diagram/architecture.svg
 ```
 
-
 ## Testing y coverage
 
 - Tests unitarios: `npm test` desde `backend/` (usa Jest + ts-jest).

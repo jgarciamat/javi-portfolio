@@ -19,14 +19,14 @@ para generar builds nativos de Android e iOS desde el mismo código React/Vite.
 
 ## Requisitos previos
 
-| Herramienta | Versión mínima | Notas |
-|---|---|---|
-| Node.js | 18+ | |
-| Android Studio | Ladybug (2024.2) | Para build Android |
-| Xcode | 15+ | Solo macOS, para build iOS |
-| Java JDK | 17+ | Requerido por Gradle |
-| Cuenta Google Play | — | 25 USD pago único |
-| Cuenta Apple Developer | — | 99 USD/año |
+| Herramienta            | Versión mínima   | Notas                      |
+| ---------------------- | ---------------- | -------------------------- |
+| Node.js                | 18+              |                            |
+| Android Studio         | Ladybug (2024.2) | Para build Android         |
+| Xcode                  | 15+              | Solo macOS, para build iOS |
+| Java JDK               | 17+              | Requerido por Gradle       |
+| Cuenta Google Play     | —                | 25 USD pago único          |
+| Cuenta Apple Developer | —                | 99 USD/año                 |
 
 ---
 
@@ -96,6 +96,7 @@ npm run build:android
 ```
 
 En Android Studio:
+
 1. **Build → Generate Signed Bundle / APK**
 2. Selecciona **Android App Bundle (.aab)** ← preferido por Google
 3. Crea o selecciona un **keystore** (guárdalo en lugar seguro, sin subir a git)
@@ -149,6 +150,7 @@ npm run build:ios
 ```
 
 En Xcode:
+
 1. Selecciona el target **App**
 2. En **Signing & Capabilities**:
    - Marca **Automatically manage signing**
@@ -214,6 +216,7 @@ La Microsoft Store acepta PWAs directamente sin Capacitor, mediante el
 ### 3. Requisitos del webmanifest para Microsoft Store
 
 El `site.webmanifest` ya incluye todos los campos necesarios:
+
 - `id` ✅
 - `name` + `short_name` ✅
 - `description` ✅
@@ -227,11 +230,11 @@ El `site.webmanifest` ya incluye todos los campos necesarios:
 
 ### Iconos (ya disponibles en `public/`)
 
-| Archivo | Tamaño | Uso |
-|---|---|---|
-| `icon-192.png` | 192×192 | PWA / Android |
-| `icon-512.png` | 512×512 | PWA / Google Play / Microsoft Store |
-| `apple-touch-icon.png` | 180×180 | iOS home screen |
+| Archivo                | Tamaño  | Uso                                 |
+| ---------------------- | ------- | ----------------------------------- |
+| `icon-192.png`         | 192×192 | PWA / Android                       |
+| `icon-512.png`         | 512×512 | PWA / Google Play / Microsoft Store |
+| `apple-touch-icon.png` | 180×180 | iOS home screen                     |
 
 Para **Google Play** necesitarás además un icono de **512×512** sin transparencia (fondo sólido).
 Para **App Store** los iconos van dentro del proyecto Xcode en `Assets.xcassets`.
@@ -240,19 +243,20 @@ Para **App Store** los iconos van dentro del proyecto Xcode en `Assets.xcassets`
 
 Crea la carpeta `frontend/public/screenshots/` y añade:
 
-| Archivo | Tamaño | Tienda |
-|---|---|---|
-| `mobile-dashboard.png` | 390×844 | PWA (referenciado en webmanifest) |
-| `mobile-transactions.png` | 390×844 | PWA |
-| `play-phone-1.png` | mín. 320×568, máx. 3840×2160 | Google Play |
-| `play-phone-2.png` | igual | Google Play (mín. 2) |
-| `appstore-65inch.png` | 1290×2796 | App Store (iPhone 6,5") obligatorio |
+| Archivo                   | Tamaño                       | Tienda                              |
+| ------------------------- | ---------------------------- | ----------------------------------- |
+| `mobile-dashboard.png`    | 390×844                      | PWA (referenciado en webmanifest)   |
+| `mobile-transactions.png` | 390×844                      | PWA                                 |
+| `play-phone-1.png`        | mín. 320×568, máx. 3840×2160 | Google Play                         |
+| `play-phone-2.png`        | igual                        | Google Play (mín. 2)                |
+| `appstore-65inch.png`     | 1290×2796                    | App Store (iPhone 6,5") obligatorio |
 
 ---
 
 ## Checklist antes de publicar
 
 ### General
+
 - [ ] URL de **política de privacidad** publicada y accesible
 - [ ] El `appId` en `capacitor.config.ts` es único y tuyo (`com.tudominio.moneymanager`)
 - [ ] Bloque `server` **eliminado** de `capacitor.config.ts` (solo dev)
@@ -260,18 +264,21 @@ Crea la carpeta `frontend/public/screenshots/` y añade:
 - [ ] No hay `console.log` sensibles en producción
 
 ### Android
+
 - [ ] `versionCode` incrementado respecto a la versión anterior
 - [ ] Keystore guardado en lugar seguro (fuera del repo)
 - [ ] Build generado en modo `release`, no `debug`
 - [ ] Probado en dispositivo físico o emulador
 
 ### iOS
+
 - [ ] Bundle ID coincide con el registrado en App Store Connect
 - [ ] Build number incrementado
 - [ ] Probado en dispositivo físico (los simuladores no pueden subirse)
 - [ ] Configurado **App Privacy** en App Store Connect
 
 ### Microsoft Store
+
 - [ ] PWA desplegada en HTTPS con dominio propio
 - [ ] Service Worker registrado y funcional en producción
 - [ ] `site.webmanifest` accesible en la raíz del dominio

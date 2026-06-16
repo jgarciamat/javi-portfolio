@@ -2,144 +2,144 @@ import { useState, useEffect } from 'react';
 import type { CreateTransactionDTO, TransactionType } from '@modules/finances/domain/types';
 
 interface UseTransactionFormOptions {
-    viewYear: number;
-    viewMonth: number;
-    availableBalance: number;
-    onSubmit: (dto: CreateTransactionDTO) => Promise<void>;
-    initialValues?: {
-        description?: string;
-        amount?: string;
-        type?: TransactionType;
-        category?: string;
-        date?: string;
-        notes?: string;
-    };
+  viewYear: number;
+  viewMonth: number;
+  availableBalance: number;
+  onSubmit: (dto: CreateTransactionDTO) => Promise<void>;
+  initialValues?: {
+    description?: string;
+    amount?: string;
+    type?: TransactionType;
+    category?: string;
+    date?: string;
+    notes?: string;
+  };
 }
 
 function getDefaultDate(viewYear: number, viewMonth: number): string {
-    const now = new Date();
-    const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth() + 1;
-    if (isCurrentMonth) {
-        // Local date YYYY-MM-DD to avoid UTC offset shifting the day
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    }
-    return `${viewYear}-${String(viewMonth).padStart(2, '0')}-01`;
+  const now = new Date();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth() + 1;
+  if (isCurrentMonth) {
+    // Local date YYYY-MM-DD to avoid UTC offset shifting the day
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  return `${viewYear}-${String(viewMonth).padStart(2, '0')}-01`;
 }
 
 /** Convert a local date string "YYYY-MM-DD" to an ISO string at local noon,
  *  so UTC offset never shifts it to a different calendar day. */
 function localDateToISO(dateStr: string): string {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const d = new Date(year, month - 1, day, 12, 0, 0);
-    return d.toISOString();
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(year, month - 1, day, 12, 0, 0);
+  return d.toISOString();
 }
 
 export function useTransactionForm({
-    viewYear,
-    viewMonth,
-    availableBalance,
-    onSubmit,
-    initialValues,
+  viewYear,
+  viewMonth,
+  availableBalance,
+  onSubmit,
+  initialValues,
 }: UseTransactionFormOptions) {
-    const defaultDate = getDefaultDate(viewYear, viewMonth);
+  const defaultDate = getDefaultDate(viewYear, viewMonth);
 
-    const [description, setDescription] = useState(initialValues?.description ?? '');
-    const [amount, setAmount] = useState(initialValues?.amount ?? '');
-    const [type, setType] = useState<TransactionType>(initialValues?.type ?? 'EXPENSE');
-    const [category, setCategory] = useState(initialValues?.category ?? '');
-    const [date, setDate] = useState(initialValues?.date ?? defaultDate);
-    const [notes, setNotes] = useState(initialValues?.notes ?? '');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [description, setDescription] = useState(initialValues?.description ?? '');
+  const [amount, setAmount] = useState(initialValues?.amount ?? '');
+  const [type, setType] = useState<TransactionType>(initialValues?.type ?? 'EXPENSE');
+  const [category, setCategory] = useState(initialValues?.category ?? '');
+  const [date, setDate] = useState(initialValues?.date ?? defaultDate);
+  const [notes, setNotes] = useState(initialValues?.notes ?? '');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    // Reset all fields when the viewed month changes (only when no initialValues)
-    useEffect(() => {
-        if (initialValues) return;
-        setDescription('');
-        setAmount('');
-        setType('EXPENSE');
-        setCategory('');
-        setDate(getDefaultDate(viewYear, viewMonth));
-        setNotes('');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [viewYear, viewMonth]);
+  // Reset all fields when the viewed month changes (only when no initialValues)
+  useEffect(() => {
+    if (initialValues) return;
+    setDescription('');
+    setAmount('');
+    setType('EXPENSE');
+    setCategory('');
+    setDate(getDefaultDate(viewYear, viewMonth));
+    setNotes('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewYear, viewMonth]);
 
-    // Clear error whenever any field changes
-    useEffect(() => {
-        setError(null);
-    }, [description, amount, type, category, date, notes, viewYear, viewMonth]);
+  // Clear error whenever any field changes
+  useEffect(() => {
+    setError(null);
+  }, [description, amount, type, category, date, notes, viewYear, viewMonth]);
 
-    const handleCategoryChange = (value: string, onManageCategories: () => void) => {
-        if (value === '__manage__') {
-            onManageCategories();
-        } else {
-            setCategory(value);
-        }
-    };
+  const handleCategoryChange = (value: string, onManageCategories: () => void) => {
+    if (value === '__manage__') {
+      onManageCategories();
+    } else {
+      setCategory(value);
+    }
+  };
 
-    const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
-        e.preventDefault();
-        if (!description || !amount || !category) {
-            setError('Rellena todos los campos');
-            return false;
-        }
-        const parsedAmount = parseFloat(amount);
-        if (type === 'SAVING' && parsedAmount > availableBalance) {
-            const fmt = (n: number) =>
-                new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(n);
-            setError(`Saldo insuficiente. Saldo disponible: ${fmt(availableBalance)}`);
-            return false;
-        }
-        setLoading(true);
-        setError(null);
-        try {
-            await onSubmit({
-                description,
-                amount: parsedAmount,
-                type,
-                category,
-                date: localDateToISO(date),
-                notes: notes.trim() || null,
-            });
-            setDescription('');
-            setAmount('');
-            setCategory('');
-            setDate(getDefaultDate(viewYear, viewMonth));
-            setNotes('');
-            return true;
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al crear la transacción');
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
+    e.preventDefault();
+    if (!description || !amount || !category) {
+      setError('Rellena todos los campos');
+      return false;
+    }
+    const parsedAmount = parseFloat(amount);
+    if (type === 'SAVING' && parsedAmount > availableBalance) {
+      const fmt = (n: number) =>
+        new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(n);
+      setError(`Saldo insuficiente. Saldo disponible: ${fmt(availableBalance)}`);
+      return false;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await onSubmit({
+        description,
+        amount: parsedAmount,
+        type,
+        category,
+        date: localDateToISO(date),
+        notes: notes.trim() || null,
+      });
+      setDescription('');
+      setAmount('');
+      setCategory('');
+      setDate(getDefaultDate(viewYear, viewMonth));
+      setNotes('');
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al crear la transacción');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return {
-        fields: { description, amount, type, category, date, notes },
-        setDescription,
-        setAmount,
-        setType,
-        setCategory,
-        setDate,
-        setNotes,
-        handleCategoryChange,
-        handleSubmit,
-        reset: () => {
-            setDescription('');
-            setAmount('');
-            setType('EXPENSE');
-            setCategory('');
-            setDate(getDefaultDate(viewYear, viewMonth));
-            setNotes('');
-            setError(null);
-        },
-        loading,
-        error,
-    };
+  return {
+    fields: { description, amount, type, category, date, notes },
+    setDescription,
+    setAmount,
+    setType,
+    setCategory,
+    setDate,
+    setNotes,
+    handleCategoryChange,
+    handleSubmit,
+    reset: () => {
+      setDescription('');
+      setAmount('');
+      setType('EXPENSE');
+      setCategory('');
+      setDate(getDefaultDate(viewYear, viewMonth));
+      setNotes('');
+      setError(null);
+    },
+    loading,
+    error,
+  };
 }
 
 export type UseTransactionFormReturn = ReturnType<typeof useTransactionForm>;

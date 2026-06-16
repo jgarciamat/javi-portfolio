@@ -97,7 +97,9 @@ function initSchema(db: Database.Database): void {
 }
 
 function migrateTransactionsTable(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'")
+    .get() as SqlMasterRow | undefined;
   if (!info || info.sql.includes('SAVING')) return; // Already migrated or table doesn't exist
 
   db.pragma('foreign_keys = OFF');
@@ -124,7 +126,9 @@ function migrateTransactionsTable(db: Database.Database): void {
 }
 
 function migrateUsersEmailVerification(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'")
+    .get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('email_verified')) {
     db.exec(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`);
@@ -138,7 +142,9 @@ function migrateUsersEmailVerification(db: Database.Database): void {
 }
 
 function migrateTransactionsNotes(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'")
+    .get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('notes')) {
     db.exec(`ALTER TABLE transactions ADD COLUMN notes TEXT`);
@@ -146,7 +152,9 @@ function migrateTransactionsNotes(db: Database.Database): void {
 }
 
 function migrateUsersPasswordReset(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'")
+    .get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('reset_token')) {
     db.exec(`ALTER TABLE users ADD COLUMN reset_token TEXT`);
@@ -157,7 +165,9 @@ function migrateUsersPasswordReset(db: Database.Database): void {
 }
 
 function migrateUsersResetEmailSent(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'")
+    .get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('reset_email_sent')) {
     db.exec(`ALTER TABLE users ADD COLUMN reset_email_sent INTEGER NOT NULL DEFAULT 0`);
@@ -165,15 +175,23 @@ function migrateUsersResetEmailSent(db: Database.Database): void {
 }
 
 function migrateTransactionsRecurringRuleId(db: Database.Database): void {
-  const info = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'").get() as SqlMasterRow | undefined;
+  const info = db
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='transactions'")
+    .get() as SqlMasterRow | undefined;
   if (!info) return;
   if (!info.sql.includes('recurring_rule_id')) {
     db.exec(`ALTER TABLE transactions ADD COLUMN recurring_rule_id TEXT`);
   }
   // Unique constraint to prevent duplicate backfill entries for the same rule+month
-  const idxInfo = db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_transactions_recurring_unique'").get();
+  const idxInfo = db
+    .prepare(
+      "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_transactions_recurring_unique'"
+    )
+    .get();
   if (!idxInfo) {
-    db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_recurring_unique ON transactions(user_id, recurring_rule_id, year, month) WHERE recurring_rule_id IS NOT NULL`);
+    db.exec(
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_recurring_unique ON transactions(user_id, recurring_rule_id, year, month) WHERE recurring_rule_id IS NOT NULL`
+    );
   }
 }
 
@@ -218,14 +236,14 @@ function migrateCustomAlerts(db: Database.Database): void {
   `);
 
   // Add color column to existing databases that don't have it yet
-  const cols = db.prepare("PRAGMA table_info(custom_alerts)").all() as { name: string }[];
+  const cols = db.prepare('PRAGMA table_info(custom_alerts)').all() as { name: string }[];
   if (cols.length > 0 && !cols.some((c) => c.name === 'color')) {
     db.exec("ALTER TABLE custom_alerts ADD COLUMN color TEXT NOT NULL DEFAULT '#6366f1'");
   }
 }
 
 function migrateUsersGoogleId(db: Database.Database): void {
-  const cols = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  const cols = db.prepare('PRAGMA table_info(users)').all() as { name: string }[];
   if (!cols.some((c) => c.name === 'google_id')) {
     db.exec('ALTER TABLE users ADD COLUMN google_id TEXT');
   }

@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Running lint and typecheck before push..."
+
+echo "Frontend: lint & typecheck"
+cd frontend || exit 1
+npm run lint --silent || { echo "Frontend lint failed. Aborting push."; exit 1; }
+npx tsc --noEmit || { echo "Frontend typecheck failed. Aborting push."; exit 1; }
+
+echo "Backend: lint & typecheck"
+cd ../backend || exit 1
+npm run lint --silent || { echo "Backend lint failed. Aborting push."; exit 1; }
+npx -y tsc --noEmit || { echo "Backend typecheck failed. Aborting push."; exit 1; }

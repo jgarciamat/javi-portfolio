@@ -7,32 +7,30 @@ import './css/UpdatePrompt.css';
  * ignorar el aviso.
  */
 export function UpdatePrompt() {
-    const {
-        needRefresh: [needRefresh, setNeedRefresh],
-        updateServiceWorker,
-    } = useRegisterSW();
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW();
 
-    if (!needRefresh) return null;
+  if (!needRefresh) return null;
 
-    return (
-        <div className="update-prompt" role="status" aria-live="polite">
-            <span className="update-prompt__text">
-                🆕 Nueva versión disponible
-            </span>
-            <div className="update-prompt__actions">
-                <button
-                    className="update-prompt__btn update-prompt__btn--update"
-                    onClick={() => updateServiceWorker(true)}
-                >
-                    Actualizar
-                </button>
-                <button
-                    className="update-prompt__btn update-prompt__btn--dismiss"
-                    onClick={() => setNeedRefresh(false)}
-                >
-                    Ahora no
-                </button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="update-prompt" role="status" aria-live="polite">
+      <span className="update-prompt__text">🆕 Nueva versión disponible</span>
+      <div className="update-prompt__actions">
+        <button
+          className="update-prompt__btn update-prompt__btn--update"
+          onClick={() => updateServiceWorker(true)}
+        >
+          Actualizar
+        </button>
+        <button
+          className="update-prompt__btn update-prompt__btn--dismiss"
+          onClick={() => setNeedRefresh(false)}
+        >
+          Ahora no
+        </button>
+      </div>
+    </div>
+  );
 }

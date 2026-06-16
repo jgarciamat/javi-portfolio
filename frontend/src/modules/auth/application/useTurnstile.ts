@@ -9,12 +9,12 @@ import { useState, useCallback } from 'react';
  * - reset: call this after a failed submission so the widget re-challenges
  */
 export function useTurnstile() {
-    const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
-    const onSuccess = useCallback((t: string) => setToken(t), []);
-    const onExpire = useCallback(() => setToken(null), []);
-    const onError = useCallback(() => setToken(null), []);
-    const reset = useCallback(() => setToken(null), []);
+  const onSuccess = useCallback((t: string) => setToken(t), []);
+  const onExpire = useCallback(() => setToken(null), []);
+  const onError = useCallback(() => setToken(null), []);
+  const reset = useCallback(() => setToken(null), []);
 
-    return { token, onSuccess, onExpire, onError, reset };
+  return { token, onSuccess, onExpire, onError, reset };
 }

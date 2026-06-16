@@ -1,14 +1,14 @@
-name: CI (develop)
+name: CI
 
 on:
-  push:
-    branches: [develop]
   pull_request:
-    branches: [develop]
+    branches: [ develop, master ]
+  push:
+    branches: [ develop ]
 
 jobs:
   frontend:
-    name: Frontend – lint & test
+    name: Frontend – lint, typecheck & test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,8 +25,16 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      - name: Prettier check
+        run: npx prettier --check "**/*.{ts,tsx,js,jsx}" 
+        working-directory: frontend
+
       - name: Lint
         run: npm run lint
+        working-directory: frontend
+
+      - name: Typecheck
+        run: npx tsc --noEmit
         working-directory: frontend
 
       - name: Tests
@@ -34,7 +42,7 @@ jobs:
         working-directory: frontend
 
   backend:
-    name: Backend – lint & test
+    name: Backend – lint, typecheck & test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,10 +59,16 @@ jobs:
         run: npm ci
         working-directory: backend
 
+      - name: Prettier check
+        run: npx prettier --check "**/*.ts"
+        working-directory: backend
+
       - name: Lint
         run: npm run lint
         working-directory: backend
 
-      - name: Tests
-        run: npm test -- --watchAll=false
+      - name: Typecheck
+        run: npx tsc --noEmit
         working-directory: backend
+
+

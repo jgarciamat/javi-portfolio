@@ -1,5 +1,13 @@
 // ── Types ────────────────────────────────────────────────────────────────────
-export type { AnnualChartProps, TooltipState, AnnualMonthEntry, AnnualChartTotals, AnnualChartData, MonthData, AnnualMonthTableProps } from './AnnualChart.types';
+export type {
+  AnnualChartProps,
+  TooltipState,
+  AnnualMonthEntry,
+  AnnualChartTotals,
+  AnnualChartData,
+  MonthData,
+  AnnualMonthTableProps,
+} from './AnnualChart.types';
 export type { AIAdvisorProps, AIAdviceContentProps } from './AIAdvisor.types';
 export type { BankSyncProps, BankSyncBodyProps } from './BankSync.types';
 export type { BudgetAlertsProps } from './BudgetAlerts.types';
@@ -18,7 +26,22 @@ export { MONTH_SHORT, fmtCurrency, buildAnnualChartData } from './AnnualChart.ty
 export { buildCooldownText } from './AIAdvisor.types';
 export { EMOJI_GROUPS, CATEGORY_COLORS } from './CategoryManager.types';
 export { formatCurrency as formatCurrencyChart } from './CategoryChart.types';
-export { formatCurrency, formatDate, txBadgeClass, txAmountColor, txDayKey, formatDayLabel, groupByDay, isoToDateInput } from './TransactionTable.types';
+export {
+  formatCurrency,
+  formatDate,
+  txBadgeClass,
+  txAmountColor,
+  txDayKey,
+  formatDayLabel,
+  groupByDay,
+  isoToDateInput,
+} from './TransactionTable.types';
 export { formatCurrency as formatCurrencyCards } from './SummaryCards.types';
 export { MONTH_NAMES } from './Dashboard.types';
-export { TYPE_CLASS, EMPTY_FORM, ruleToForm, validateRecurringForm, buildRecurringDto } from './RecurringRulesTab.types';
+export {
+  TYPE_CLASS,
+  EMPTY_FORM,
+  ruleToForm,
+  validateRecurringForm,
+  buildRecurringDto,
+} from './RecurringRulesTab.types';

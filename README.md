@@ -90,18 +90,22 @@ money-app/
 ### Backend - Arquitectura Hexagonal
 
 **Dominio (Centro)**
+
 - Contiene la lógica de negocio pura
 - Sin dependencias de frameworks
 - Entidades y Value Objects
 
 **Aplicación (Casos de Uso)**
+
 - Orquesta la lógica de dominio
 - Define interfaces (puertos)
 - Casos de uso específicos
 
 **Infraestructura (Adaptadores)**
+
 - Implementa los puertos
 - API REST con Express
+
 ## Money Manager — Estructura y arquitectura (DDD)
 
 Este repositorio contiene una aplicación para gestionar finanzas personales (gastos, ingresos, categorías y presupuestos). Está organizada siguiendo principios de DDD/arquitectura hexagonal para mantener la lógica de negocio aislada y testable.
@@ -125,15 +129,15 @@ Ruta principal: `backend/src`
 Estructura dentro de `backend/src` (conceptual):
 
 - `domain/` — Entidades, Value Objects y contratos (interfaces) de repositorio.
-    - ejemplos en el repo: `entities/Category.ts`, `entities/Transaction.ts`, `entities/User.ts` y value-objects (`Amount.ts`, `TransactionId.ts`, `TransactionType.ts`).
+  - ejemplos en el repo: `entities/Category.ts`, `entities/Transaction.ts`, `entities/User.ts` y value-objects (`Amount.ts`, `TransactionId.ts`, `TransactionType.ts`).
 
 - `application/` — Casos de uso (orquestación de la lógica de dominio) y puertos (interfaces que los adaptadores deben implementar).
-    - Ejemplos: `use-cases/CreateTransaction.ts`, `use-cases/GetTransactions.ts`, `use-cases/GetFinancialSummary.ts`, `use-cases/Auth.ts`, `use-cases/Budget.ts`.
+  - Ejemplos: `use-cases/CreateTransaction.ts`, `use-cases/GetTransactions.ts`, `use-cases/GetFinancialSummary.ts`, `use-cases/Auth.ts`, `use-cases/Budget.ts`.
 
 - `infrastructure/` — Adaptadores: controladores HTTP, servidores, persistencia e implementaciones concretas de repositorios.
-    - Controladores REST: `infrastructure/controllers/*Controller.ts` (p.ej. `TransactionController.ts`, `CategoryController.ts`, `AuthController.ts`).
-    - Express server: `infrastructure/express/server.ts`.
-    - Persistencia: implementaciones concretas (`persistence/`) como `InMemoryTransactionRepository.ts`, `SqliteTransactionRepository.ts`, `SqliteDb.ts`, `SqliteUserRepository.ts`, `SqliteMonthlyBudgetRepository.ts`.
+  - Controladores REST: `infrastructure/controllers/*Controller.ts` (p.ej. `TransactionController.ts`, `CategoryController.ts`, `AuthController.ts`).
+  - Express server: `infrastructure/express/server.ts`.
+  - Persistencia: implementaciones concretas (`persistence/`) como `InMemoryTransactionRepository.ts`, `SqliteTransactionRepository.ts`, `SqliteDb.ts`, `SqliteUserRepository.ts`, `SqliteMonthlyBudgetRepository.ts`.
 
 - `shared/` — utilidades, tipos y helpers compartidos por las capas.
 
@@ -259,10 +263,10 @@ gh pr merge --merge
 
 ### Convención de commits → bump de versión
 
-| Prefijo | Bump |
-|---|---|
-| `feat!:` o `BREAKING CHANGE` | major `1.0.0 → 2.0.0` |
-| `feat:` | minor `1.0.0 → 1.1.0` |
+| Prefijo                        | Bump                  |
+| ------------------------------ | --------------------- |
+| `feat!:` o `BREAKING CHANGE`   | major `1.0.0 → 2.0.0` |
+| `feat:`                        | minor `1.0.0 → 1.1.0` |
 | `fix:`, `chore:`, `refactor:`… | patch `1.0.0 → 1.0.1` |
 
 > Documentación completa: [`.agent/workflows/release-to-master.md`](.agent/workflows/release-to-master.md)

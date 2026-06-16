@@ -8,9 +8,9 @@ const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('Root element not found');
 
 createRoot(rootEl).render(
-    <StrictMode>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID as string}>
-            <App />
-        </GoogleOAuthProvider>
-    </StrictMode>
+  <StrictMode>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID as string}>
+      <App />
+    </GoogleOAuthProvider>
+  </StrictMode>
 );

@@ -1,329 +1,329 @@
 /* ─── Recurring rules tab ────────────────────── */
 .recurring-tab {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .recurring-header-card {
-    padding: 1.25rem 1.5rem;
+  padding: 1.25rem 1.5rem;
 }
 
 .recurring-tab-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .recurring-tab-title {
-    margin: 0 0 0.25rem;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #f1f5f9;
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
 }
 
 .recurring-tab-subtitle {
-    margin: 0;
-    font-size: 0.82rem;
-    color: #64748b;
+  margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
 }
 
 /* ─── Form panel ─────────────────────────────── */
 .recurring-form-panel {
-    padding: 0.25rem 0;
+  padding: 0.25rem 0;
 }
 
 .recurring-form-title {
-    margin: 0 0 1.25rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f1f5f9;
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f1f5f9;
 }
 
 .recurring-form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 .recurring-form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .recurring-form-field--wide {
-    grid-column: 1 / -1;
+  grid-column: 1 / -1;
 }
 
 .recurring-label {
-    font-size: 0.78rem;
-    color: #94a3b8;
-    font-weight: 500;
-    letter-spacing: 0.02em;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .recurring-date-display {
-    width: 200px;
-    max-width: 100%;
+  width: 200px;
+  max-width: 100%;
 }
 
 .recurring-end-radios {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 0.4rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
 }
 
 .recurring-radio-label {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.875rem;
-    color: #f1f5f9;
-    cursor: pointer;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  color: #f1f5f9;
+  cursor: pointer;
+  user-select: none;
 }
 
-.recurring-radio-label input[type="radio"] {
-    accent-color: var(--color-primary, #7c6af5);
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    cursor: pointer;
+.recurring-radio-label input[type='radio'] {
+  accent-color: var(--color-primary, #7c6af5);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .recurring-form-actions {
-    margin-top: 0.75rem;
+  margin-top: 0.75rem;
 }
 
 .recurring-error {
-    color: #f87171;
-    font-size: 0.85rem;
-    margin: 0.4rem 0;
+  color: #f87171;
+  font-size: 0.85rem;
+  margin: 0.4rem 0;
 }
 
 /* ─── Cards grid ─────────────────────────────── */
 .recurring-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
 }
 
 /* ─── Rule card ──────────────────────────────── */
 .recurring-card {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    transition: border-color 0.15s;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.15s;
 }
 
 .recurring-card:hover {
-    border-color: #334155;
+  border-color: #334155;
 }
 
 .recurring-card--inactive {
-    opacity: 0.6;
+  opacity: 0.6;
 }
 
 .recurring-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .recurring-type-badge {
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 0.2rem 0.55rem;
-    border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
 }
 
 .recurring-type--income {
-    background: rgba(34, 197, 94, 0.15);
-    color: #4ade80;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
 }
 
 .recurring-type--expense {
-    background: rgba(248, 113, 113, 0.15);
-    color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
 }
 
 .recurring-type--saving {
-    background: rgba(99, 102, 241, 0.15);
-    color: #818cf8;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
 }
 
 .recurring-status-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 0.18rem 0.5rem;
-    border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.18rem 0.5rem;
+  border-radius: 20px;
 }
 
 .recurring-status--active {
-    background: rgba(34, 197, 94, 0.12);
-    color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
 }
 
 .recurring-status--inactive {
-    background: rgba(148, 163, 184, 0.12);
-    color: #64748b;
+  background: rgba(148, 163, 184, 0.12);
+  color: #64748b;
 }
 
 .recurring-card-body {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .recurring-card-description {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #f1f5f9;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .recurring-card-amount {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #f1f5f9;
-    flex-shrink: 0;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  flex-shrink: 0;
 }
 
 .recurring-card-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .recurring-meta-item {
-    font-size: 0.78rem;
-    color: #64748b;
+  font-size: 0.78rem;
+  color: #64748b;
 }
 
 .recurring-card-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    padding-top: 0.25rem;
-    border-top: 1px solid #1e293b;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid #1e293b;
 }
 
 .recurring-btn-sm {
-    font-size: 0.78rem !important;
-    padding: 0.3rem 0.6rem !important;
+  font-size: 0.78rem !important;
+  padding: 0.3rem 0.6rem !important;
 }
 
 /* ─── Empty state ────────────────────────────── */
 .recurring-empty {
-    padding: 2.5rem 1.5rem;
-    text-align: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
 }
 
 .recurring-empty-title {
-    margin: 0 0 0.5rem;
-    font-size: 1rem;
-    color: #94a3b8;
-    font-weight: 500;
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .recurring-empty-hint {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #475569;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
 }
 
 .recurring-loading {
-    color: #64748b;
-    font-size: 0.9rem;
-    padding: 1rem 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 1rem 0;
 }
 
 /* ─── Responsive ─────────────────────────────── */
 @media (max-width: 600px) {
-    .recurring-header-card {
-        padding: 1rem;
-    }
+  .recurring-header-card {
+    padding: 1rem;
+  }
 
-    .recurring-tab-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
+  .recurring-tab-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
 
-    .recurring-tab-header .btn-primary {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+  .recurring-tab-header .btn-primary {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
 
-    .recurring-cards-grid {
-        grid-template-columns: 1fr;
-    }
+  .recurring-cards-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .recurring-form-grid {
-        grid-template-columns: 1fr;
-    }
+  .recurring-form-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .recurring-date-display {
-        width: 100%;
-    }
+  .recurring-date-display {
+    width: 100%;
+  }
 
-    .recurring-form-field--wide {
-        grid-column: 1;
-    }
+  .recurring-form-field--wide {
+    grid-column: 1;
+  }
 
-    .recurring-date-row {
-        flex-direction: row;
-        gap: 0.4rem;
-    }
+  .recurring-date-row {
+    flex-direction: row;
+    gap: 0.4rem;
+  }
 
-    .recurring-year-input {
-        max-width: none;
-        flex: 1;
-    }
+  .recurring-year-input {
+    max-width: none;
+    flex: 1;
+  }
 
-    .recurring-card-actions {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-    }
+  .recurring-card-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
 
-    .recurring-btn-sm {
-        flex: 1;
-        min-width: calc(50% - 0.2rem);
-        text-align: center;
-        justify-content: center;
-    }
+  .recurring-btn-sm {
+    flex: 1;
+    min-width: calc(50% - 0.2rem);
+    text-align: center;
+    justify-content: center;
+  }
 
-    .recurring-card-body {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.2rem;
-    }
+  .recurring-card-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
 
-    .recurring-card-amount {
-        font-size: 1.1rem;
-    }
+  .recurring-card-amount {
+    font-size: 1.1rem;
+  }
 
-    .recurring-card-description {
-        white-space: normal;
-    }
+  .recurring-card-description {
+    white-space: normal;
+  }
 }
