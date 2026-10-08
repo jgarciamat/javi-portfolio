@@ -20,8 +20,8 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: 'npm'
@@ -34,7 +34,7 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm run test:coverage -- --ci
       - run: npm run build
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -50,8 +50,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: 'npm'
@@ -64,7 +64,7 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm run test:coverage -- --ci
       - run: npm run build
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -77,8 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: 'npm'
@@ -96,7 +96,7 @@ jobs:
       # Starts its own API (fresh database, demo user) and Vite; uses the runner's Chrome.
       - run: npm run e2e
         working-directory: frontend
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: playwright-report
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t money-manager-api:ci backend
       - run: docker build -t money-manager-web:ci frontend
       - name: API container starts and is healthy
