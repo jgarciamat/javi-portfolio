@@ -1,16 +1,16 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '@shared/hooks/useGoBack';
 import './css/PrivacyPolicy.css';
 
 export function PrivacyPolicyPage() {
   const { t } = useI18n();
-  const navigate = useNavigate();
+  const goBack = useGoBack();
 
   return (
     <div className="privacy-page">
       <div className="privacy-container">
         <header className="privacy-header">
-          <button className="privacy-back-btn" onClick={() => navigate(-1)} type="button">
+          <button className="privacy-back-btn" onClick={goBack} type="button">
             {t('app.privacy.back')}
           </button>
           <div className="privacy-header-text">

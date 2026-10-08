@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useGoBack } from '@shared/hooks/useGoBack';
 import '@modules/auth/ui/css/PrivacyPolicy.css';
 
 const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
@@ -7,13 +7,13 @@ const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
 /** Terms of sale. The seller's legal details are filled in from the locale files. */
 export function TermsPage() {
   const { t } = useI18n();
-  const navigate = useNavigate();
+  const goBack = useGoBack();
 
   return (
     <div className="privacy-page">
       <div className="privacy-container">
         <header className="privacy-header">
-          <button className="privacy-back-btn" onClick={() => navigate(-1)} type="button">
+          <button className="privacy-back-btn" onClick={goBack} type="button">
             {t('app.privacy.back')}
           </button>
           <div className="privacy-header-text">
