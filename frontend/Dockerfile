@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ── Build the PWA (uses .env.production) ───────────────────────────────────────
-FROM node:24-bookworm-slim AS build
+FROM node:25-bookworm-slim AS build
 WORKDIR /app
 ENV HUSKY=0
 COPY package.json package-lock.json ./
