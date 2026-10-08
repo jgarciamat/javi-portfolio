@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ── Build: compile TypeScript and keep only production dependencies ───────────
-FROM node:24-bookworm-slim AS build
+FROM node:25-bookworm-slim AS build
 WORKDIR /app
 # Toolchain in case better-sqlite3 has no prebuilt binary for this platform.
 RUN apt-get update \
@@ -16,7 +16,7 @@ COPY src ./src
 RUN npm run build && npm prune --omit=dev
 
 # ── Runtime: no compilers, no dev dependencies, non-root user ─────────────────
-FROM node:24-bookworm-slim
+FROM node:25-bookworm-slim
 ENV NODE_ENV=production \
     PORT=3000 \
     DATABASE_PATH=/data/money-manager.db \
