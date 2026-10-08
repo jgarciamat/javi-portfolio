@@ -1,7 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
-import { GoogleButton } from './GoogleButton';
+import { GoogleSignIn } from './GoogleButton';
 import { PasswordHints } from './PasswordHints';
 
 interface Props {
@@ -41,15 +41,11 @@ export function RegisterPage({ onSwitch }: Props) {
         </button>
       </p>
 
-      <GoogleButton
+      <GoogleSignIn
         label={t('app.auth.register.google')}
         onToken={form.handleGoogleToken}
         onError={form.reportGoogleError}
       />
-
-      <div className="auth-divider">
-        <span>{t('app.auth.login.orDivider')}</span>
-      </div>
 
       <input
         className="auth-input"

@@ -1,4 +1,6 @@
 import { useGoogleLogin } from '@react-oauth/google';
+import { GOOGLE_CLIENT_ID } from '@core/config/api.config';
+import { useI18n } from '@core/i18n/I18nContext';
 
 function GoogleIcon() {
   return (
@@ -31,7 +33,7 @@ interface GoogleButtonProps {
 }
 
 /** "Continue with Google" (implicit flow, custom button). */
-export function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
+function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
   const login = useGoogleLogin({
     onSuccess: (response) => onToken(response.access_token),
     onError,
@@ -42,5 +44,22 @@ export function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
       <GoogleIcon />
       {label}
     </button>
+  );
+}
+
+/**
+ * Google sign-in and the "or" divider below it. Hidden when no client id is
+ * configured: Google's library throws without one, which would break the page.
+ */
+export function GoogleSignIn(props: GoogleButtonProps) {
+  const { t } = useI18n();
+  if (!GOOGLE_CLIENT_ID) return null;
+  return (
+    <>
+      <GoogleButton {...props} />
+      <div className="auth-divider">
+        <span>{t('app.auth.login.orDivider')}</span>
+      </div>
+    </>
   );
 }

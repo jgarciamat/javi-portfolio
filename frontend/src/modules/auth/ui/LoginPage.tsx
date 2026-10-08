@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useLoginForm } from '../application/useLoginForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
-import { GoogleButton } from './GoogleButton';
+import { GoogleSignIn } from './GoogleButton';
 import { isNativeApp } from '@shared/utils/platform';
 
 interface Props {
@@ -25,15 +25,11 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
         </button>
       </p>
 
-      <GoogleButton
+      <GoogleSignIn
         label={t('app.auth.login.google')}
         onToken={form.handleGoogleToken}
         onError={form.reportGoogleError}
       />
-
-      <div className="auth-divider">
-        <span>{t('app.auth.login.orDivider')}</span>
-      </div>
 
       <div className="auth-field">
         <label className="auth-field-label" htmlFor="login-email">
