@@ -1,58 +1,35 @@
 import { useState } from 'react';
-import {
-  EMPTY_FORM,
-  ruleToForm,
-  validateRecurringForm,
-  buildRecurringDto,
-} from '../../ui/types/RecurringRulesTab.types';
-import type { FormState } from '../../ui/types/RecurringRulesTab.types';
+import { useAction } from '@shared/hooks/useAction';
 import type {
-  RecurringRule,
   CreateRecurringRuleDTO,
+  RecurringRule,
   UpdateRecurringRuleDTO,
 } from '@modules/finances/domain/types';
+import {
+  emptyRuleForm,
+  ruleToForm,
+  validateRuleForm,
+  type RuleFormState,
+} from '@modules/finances/domain/recurringForm';
 
-interface UseRecurringRuleFormOptions {
+interface Options {
   onCreateRule: (dto: CreateRecurringRuleDTO) => Promise<RecurringRule>;
   onUpdateRule: (id: string, dto: UpdateRecurringRuleDTO) => Promise<RecurringRule>;
+  /** Runs after a successful save (e.g. reload the month, which may have new movements). */
   onAfterSave?: () => Promise<void>;
 }
 
-export interface UseRecurringRuleFormReturn {
-  showForm: boolean;
-  editingRule: RecurringRule | null;
-  form: FormState;
-  formError: string | null;
-  saving: boolean;
-  setForm: (f: FormState) => void;
-  openCreate: () => void;
-  openEdit: (rule: RecurringRule) => void;
-  closeForm: () => void;
-  handleSubmit: () => Promise<void>;
-}
-
-export function useRecurringRuleForm({
-  onCreateRule,
-  onUpdateRule,
-  onAfterSave,
-}: UseRecurringRuleFormOptions): UseRecurringRuleFormReturn {
+/** Create / edit form of a recurring rule. `formError` is an i18n key or an API message. */
+export function useRecurringRuleForm({ onCreateRule, onUpdateRule, onAfterSave }: Options) {
   const [showForm, setShowForm] = useState(false);
   const [editingRule, setEditingRule] = useState<RecurringRule | null>(null);
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<RuleFormState>(emptyRuleForm);
+  const action = useAction('Error al guardar');
 
-  const openCreate = () => {
-    setEditingRule(null);
-    setForm(EMPTY_FORM);
-    setFormError(null);
-    setShowForm(true);
-  };
-
-  const openEdit = (rule: RecurringRule) => {
+  const open = (rule: RecurringRule | null) => {
     setEditingRule(rule);
-    setForm(ruleToForm(rule));
-    setFormError(null);
+    setForm(rule ? ruleToForm(rule) : emptyRuleForm());
+    action.setError(null);
     setShowForm(true);
   };
 
@@ -62,41 +39,28 @@ export function useRecurringRuleForm({
   };
 
   const handleSubmit = async () => {
-    const amount = parseFloat(form.amount);
-    const validationError = validateRecurringForm(form, amount);
-    if (validationError) {
-      setFormError(validationError);
+    const result = validateRuleForm(form);
+    if ('error' in result) {
+      action.setError(result.error);
       return;
     }
-
-    const dto = buildRecurringDto(form, amount);
-
-    setSaving(true);
-    setFormError(null);
-    try {
-      if (editingRule) {
-        await onUpdateRule(editingRule.id, dto as UpdateRecurringRuleDTO);
-      } else {
-        await onCreateRule(dto);
-      }
+    const saved = await action.run(async () => {
+      if (editingRule) await onUpdateRule(editingRule.id, result.dto);
+      else await onCreateRule(result.dto);
       await onAfterSave?.();
-      closeForm();
-    } catch (e) {
-      setFormError(e instanceof Error ? e.message : 'Error al guardar');
-    } finally {
-      setSaving(false);
-    }
+    });
+    if (saved) closeForm();
   };
 
   return {
     showForm,
     editingRule,
     form,
-    formError,
-    saving,
+    formError: action.error,
+    saving: action.pending,
     setForm,
-    openCreate,
-    openEdit,
+    openCreate: () => open(null),
+    openEdit: (rule: RecurringRule) => open(rule),
     closeForm,
     handleSubmit,
   };

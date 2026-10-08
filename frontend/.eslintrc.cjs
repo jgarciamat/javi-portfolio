@@ -60,8 +60,6 @@ module.exports = {
         'capacitor.config.ts',
         'vite.config.ts',
         'setupTests.ts',
-        'core/**/*.ts',
-        'shared/**/*.ts',
       ],
       parserOptions: {
         project: null,

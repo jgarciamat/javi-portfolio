@@ -10,32 +10,42 @@ import { ResetPasswordPage } from './modules/auth/ui/ResetPasswordPage';
 import { PrivacyPolicyPage } from './modules/auth/ui/PrivacyPolicyPage';
 import { I18nProvider } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
+import { SettingsProvider } from '@core/settings/SettingsContext';
+import { PlanProvider } from './modules/billing/application/PlanContext';
+import { PricingPage } from './modules/billing/ui/PricingPage';
+import { TermsPage } from './modules/billing/ui/TermsPage';
 
 export default function App() {
   return (
     <I18nProvider>
       <AuthProvider>
         <ApiProvider>
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Routes>
-              <Route path="/login" element={<AuthPage />} />
-              <Route path="/verify-email" element={<VerifyEmailPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/privacy" element={<PrivacyPolicyPage />} />
-              <Route element={<ProtectedRoute />}>
-                <Route
-                  path="/"
-                  element={
-                    <FinancesProvider>
-                      <Dashboard />
-                    </FinancesProvider>
-                  }
-                />
-              </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-          <UpdatePrompt />
+          <SettingsProvider>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <Routes>
+                <Route path="/login" element={<AuthPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route
+                    path="/"
+                    element={
+                      <PlanProvider>
+                        <FinancesProvider>
+                          <Dashboard />
+                        </FinancesProvider>
+                      </PlanProvider>
+                    }
+                  />
+                </Route>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </BrowserRouter>
+            <UpdatePrompt />
+          </SettingsProvider>
         </ApiProvider>
       </AuthProvider>
     </I18nProvider>

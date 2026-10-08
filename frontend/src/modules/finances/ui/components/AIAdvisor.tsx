@@ -1,150 +1,131 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useAIAdvisor } from '../../application/hooks/useAIAdvisor';
 import { useI18n } from '@core/i18n/I18nContext';
 import '../css/AIAdvisor.css';
-import type { AIAdvisorProps, AIAdviceContentProps } from '../types/AIAdvisor.types';
-import { buildCooldownText } from '../types/AIAdvisor.types';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import '@modules/billing/ui/css/Billing.css';
+import type { AIAdvice } from '@modules/finances/domain/types';
+
+interface AIAdviceContentProps {
+  advice: AIAdvice | null;
+  error: string | null;
+  t: (k: string, vars?: Record<string, string | number>) => string;
+}
+
+/** Message shown when the automatic (rule-based) analysis replaced the AI one. */
+const FALLBACK_KEYS: Record<NonNullable<AIAdvice['reason']>, string | null> = {
+  premium_required: 'app.ai.fallback.premium',
+  quota: 'app.ai.fallback.quota',
+  budget: 'app.ai.fallback.budget',
+  error: 'app.ai.fallback.error',
+  unavailable: null,
+  no_data: null,
+};
+
+const SECTIONS = [
+  { key: 'positives', titleKey: 'app.ai.section.positives', tone: 'green' },
+  { key: 'warnings', titleKey: 'app.ai.section.warnings', tone: 'red' },
+  { key: 'tips', titleKey: 'app.ai.section.tips', tone: 'blue' },
+] as const;
+
+function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'>) {
+  const plan = useOptionalPlan();
+  const fallbackKey =
+    advice?.source === 'rules' && advice.reason ? FALLBACK_KEYS[advice.reason] : null;
+  if (!fallbackKey) return null;
+  return (
+    <div className="ai-fallback">
+      <span>{t(fallbackKey)}</span>
+      {advice?.reason === 'premium_required' && plan && (
+        <button
+          className="ai-btn ai-btn--primary"
+          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'aiAdvisor' })}
+        >
+          ⭐ {t('billing.seePlans')}
+        </button>
+      )}
+    </div>
+  );
+}
 
 function AIAdviceContent({ advice, error, t }: AIAdviceContentProps) {
   return (
     <>
       {error && <div className="ai-error">⚠️ {error}</div>}
+      <FallbackNotice advice={advice} t={t} />
       {advice && (
         <div className="ai-content">
           <p className="ai-summary">{advice.summary}</p>
-          {advice.positives.length > 0 && (
-            <div className="ai-section">
-              <h4 className="ai-section-title ai-section-title--green">
-                {t('app.ai.section.positives')}
-              </h4>
+          {SECTIONS.filter(({ key }) => advice[key].length > 0).map(({ key, titleKey, tone }) => (
+            <div key={key} className="ai-section">
+              <h4 className={`ai-section-title ai-section-title--${tone}`}>{t(titleKey)}</h4>
               <ul className="ai-list">
-                {advice.positives.map((p, i) => (
-                  <li key={i} className="ai-list-item ai-list-item--green">
-                    {p}
+                {advice[key].map((item, i) => (
+                  <li key={i} className={`ai-list-item ai-list-item--${tone}`}>
+                    {item}
                   </li>
                 ))}
               </ul>
             </div>
-          )}
-          {advice.warnings.length > 0 && (
-            <div className="ai-section">
-              <h4 className="ai-section-title ai-section-title--red">
-                {t('app.ai.section.warnings')}
-              </h4>
-              <ul className="ai-list">
-                {advice.warnings.map((w, i) => (
-                  <li key={i} className="ai-list-item ai-list-item--red">
-                    {w}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {advice.tips.length > 0 && (
-            <div className="ai-section">
-              <h4 className="ai-section-title ai-section-title--blue">
-                {t('app.ai.section.tips')}
-              </h4>
-              <ul className="ai-list">
-                {advice.tips.map((tip, i) => (
-                  <li key={i} className="ai-list-item ai-list-item--blue">
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          ))}
         </div>
+      )}
+      {advice?.source === 'ai' && advice.ai && (
+        <p className="ai-quota">
+          {t('app.ai.quota', { used: advice.ai.used, quota: advice.ai.quota })}
+        </p>
       )}
       {!advice && !error && <p className="ai-placeholder">{t('app.ai.placeholder')}</p>}
     </>
   );
 }
 
-export function AIAdvisor({ year, month }: AIAdvisorProps) {
+export function AIAdvisor({ year, month }: { year: number; month: number }) {
   const { t, locale } = useI18n();
-  const {
-    advice,
-    loading,
-    error,
-    analyzed,
-    daysUntilNextAnalysis,
-    hoursUntilNextAnalysis,
-    justAnalyzed,
-    analyze,
-  } = useAIAdvisor({ year, month, locale });
+  const { advice, loading, error, justAnalyzed, analyze } = useAIAdvisor({ year, month, locale });
+  const plan = useOptionalPlan();
   const [open, setOpen] = useState(false);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
+  const bodyId = useId();
 
-  const cooldownText = (key: string) =>
-    buildCooldownText(key, daysUntilNextAnalysis, hoursUntilNextAnalysis, t);
-
-  // Animate max-height
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!el) return;
-    el.style.maxHeight = open ? el.scrollHeight + 'px' : '0px';
-  }, [open]);
-
-  // Recalculate after content changes
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!el || !open) return;
-    el.style.maxHeight = el.scrollHeight + 'px';
-  });
-
-  // Only open when a fresh analysis just completed (not on page load / month change)
+  // A fresh analysis opens the panel; another month closes it.
   useEffect(() => {
     if (justAnalyzed) setOpen(true);
   }, [justAnalyzed]);
-
-  // Close panel when navigating to a different month (skip first render)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setOpen(false);
-  }, [year, month]);
+  useEffect(() => setOpen(false), [year, month]);
 
   return (
     <div className="card ai-advisor">
-      <div
-        className={`ai-advisor-header${open ? ' ai-advisor-header--open' : ''}`}
-        onClick={() => setOpen((v) => !v)}
-        role="button"
-        aria-expanded={open}
-        tabIndex={0}
-        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setOpen((v) => !v)}
-      >
-        <span className="ai-advisor-title">{t('app.ai.title')}</span>
-        <div className="ai-advisor-actions" onClick={(e) => e.stopPropagation()}>
-          <button
-            className={`ai-btn ai-btn--primary${loading ? ' ai-btn--loading' : ''}`}
-            onClick={() => analyze(year, month)}
-            disabled={loading || analyzed}
-            title={analyzed ? cooldownText('app.ai.cooldown.title') : undefined}
-          >
-            {loading ? (
-              <span className="ai-spinner" />
-            ) : analyzed ? (
-              t('app.ai.btn.analyzed')
-            ) : advice ? (
-              t('app.ai.btn.reanalyze')
-            ) : (
-              t('app.ai.btn.analyze')
-            )}
-          </button>
-        </div>
-        <span className="ai-advisor-chevron" aria-hidden="true">
-          ›
-        </span>
+      <div className={`ai-advisor-header${open ? ' ai-advisor-header--open' : ''}`}>
+        <button
+          type="button"
+          className="ai-advisor-toggle"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls={bodyId}
+        >
+          <span className="ai-advisor-title">
+            {t('app.ai.title')}
+            {plan && <span className="premium-chip">Premium</span>}
+          </span>
+          <span className="ai-advisor-chevron" aria-hidden="true">
+            ›
+          </span>
+        </button>
+        <button
+          className={`ai-btn ai-btn--primary${loading ? ' ai-btn--loading' : ''}`}
+          onClick={() => analyze(year, month)}
+          disabled={loading}
+          aria-busy={loading}
+        >
+          {loading ? (
+            <span className="ai-spinner" aria-label={t('app.common.loading')} />
+          ) : (
+            t(advice ? 'app.ai.btn.reanalyze' : 'app.ai.btn.analyze')
+          )}
+        </button>
       </div>
 
-      {analyzed && <p className="ai-cooldown">{cooldownText('app.ai.cooldown')}</p>}
-
-      <div className="ai-advisor-body" ref={bodyRef}>
+      <div id={bodyId} className={`ai-advisor-body${open ? ' ai-advisor-body--open' : ''}`}>
         <div className="ai-advisor-body-inner">
           <AIAdviceContent advice={advice} error={error} t={t} />
         </div>

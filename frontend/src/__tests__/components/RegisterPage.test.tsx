@@ -57,7 +57,7 @@ describe('RegisterPage', () => {
     fillForm();
     fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
     await waitFor(() =>
-      expect(mockRegister).toHaveBeenCalledWith('j@test.com', VALID_PASS, 'John')
+      expect(mockRegister).toHaveBeenCalledWith('j@test.com', VALID_PASS, 'John', 'es')
     );
   });
 

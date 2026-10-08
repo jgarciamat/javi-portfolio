@@ -1,230 +1,224 @@
-import '../css/Dashboard.css';
-import { useFinances } from '../../application/FinancesContext';
-import { useAuth } from '@shared/hooks/useAuth';
+import type { ReactElement } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useDashboard } from '../../application/hooks/useDashboard';
+import { useOptionalSettings } from '@core/settings/SettingsContext';
+import { useAuth } from '@shared/hooks/useAuth';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
-import { AnnualChart } from './AnnualChart';
-import { CategoryManager } from './CategoryManager';
 import { ProfilePage } from '@modules/auth/ui/ProfilePage';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { OffersView } from '@modules/billing/ui/OffersView';
+import { PlanBanner } from '@modules/billing/ui/PlanBanner';
+import { PlanView } from '@modules/billing/ui/PlanView';
+import { useFinances } from '../../application/FinancesContext';
+import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
+import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
+import { AccountsView } from '../views/AccountsView';
+import { AnalysisView } from '../views/AnalysisView';
+import { BudgetsView } from '../views/BudgetsView';
+import { GoalsView } from '../views/GoalsView';
+import { SearchView } from '../views/SearchView';
+import { SettingsView } from '../views/SettingsView';
+import { SECTION_BY_ID, type DashboardTab } from '../navigation';
+import { AnnualChart } from './AnnualChart';
+import { BurgerMenu } from './BurgerMenu';
+import { CategoryManager } from './CategoryManager';
+import { CustomAlertsTab } from './CustomAlertsTab';
 import { EditTransactionModal } from './EditTransactionModal';
+import { ImportModal } from './ImportModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { RecurringRulesTab } from './RecurringRulesTab';
-import { CustomAlertsTab } from './CustomAlertsTab';
-import type { DashboardTab } from '../../application/hooks/useDashboard';
+import { monthAlertMessage } from './monthAlertMessage';
+import '../css/Dashboard.css';
+import '../css/Sections.css';
 
-// ─── Sub-component: tab bar ───────────────────────────────────────────────────
+/** Sections that need nothing from the dashboard. */
+const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
+  analysis: () => <AnalysisView />,
+  accounts: () => <AccountsView />,
+  budgets: () => <BudgetsView />,
+  goals: () => <GoalsView />,
+  plan: () => <PlanView />,
+  offers: () => <OffersView />,
+};
 
-const TABS: { id: DashboardTab; icon: string; labelKey: string }[] = [
-  { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly' },
-  { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations' },
-  { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts' },
-  { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual' },
-];
+function TabContent({ dash }: { dash: UseDashboardReturn }) {
+  const { year, categories } = useFinances();
+  const simple = SIMPLE_VIEWS[dash.tab];
+  if (simple) return simple();
+  switch (dash.tab) {
+    case 'annual':
+      return (
+        <div className="card">
+          <AnnualChart initialYear={year} onMonthClick={dash.handleMonthClick} />
+        </div>
+      );
+    case 'search':
+      return <SearchView onEdit={dash.setEditingTransaction} refreshKey={dash.editVersion} />;
+    case 'automations':
+      return <RecurringRulesTab categories={categories} />;
+    case 'custom-alerts':
+      return <CustomAlertsTab categories={categories} />;
+    case 'settings':
+      return <SettingsView onOpenProfile={dash.openProfile} />;
+    default:
+      return (
+        <MonthlyView
+          onEditTransaction={dash.setEditingTransaction}
+          onManageCategories={dash.openCategoryModal}
+          onManageBudgets={() => dash.setTab('budgets')}
+        />
+      );
+  }
+}
 
-function DashboardTabs({
-  tab,
-  setTab,
-  t,
-}: {
-  tab: DashboardTab;
-  setTab: (t: DashboardTab) => void;
-  t: (k: string) => string;
-}) {
+function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: string }) {
+  const { t } = useI18n();
+  const { user, logout } = useAuth();
   return (
-    <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
-      {TABS.map(({ id, icon, labelKey }) => (
+    <header className="header">
+      <div className="header-brand">
         <button
-          key={id}
-          className={`tab-btn${tab === id ? ' active' : ''}`}
-          onClick={() => setTab(id)}
-          role="tab"
-          aria-selected={tab === id}
-          aria-controls={`tabpanel-${id}`}
-          id={`tab-${id}`}
+          className="burger-btn"
+          onClick={() => dash.setMenuOpen(true)}
+          aria-label={t('app.menu.open')}
+          aria-expanded={dash.menuOpen}
         >
-          {icon} {t(labelKey)}
+          <span className="burger-btn-logo">💰</span>
+          <span className="burger-btn-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
-      ))}
-    </nav>
+        <div>
+          <h1 className="header-title">{t('app.header.title')}</h1>
+          <p className="header-sub">{sectionLabel}</p>
+        </div>
+      </div>
+      <div className="header-actions">
+        <button
+          className="header-user header-user-btn"
+          onClick={dash.openProfile}
+          aria-label={t('app.header.openProfile')}
+          title={t('app.header.openProfile')}
+        >
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className="header-avatar" />
+          ) : (
+            <span className="header-avatar-placeholder" aria-hidden="true">
+              👤
+            </span>
+          )}
+          <span className="header-user-name">{user?.name}</span>
+        </button>
+        <LanguageSwitcher />
+        <button onClick={logout} className="btn-logout">
+          {t('app.header.logout')}
+        </button>
+      </div>
+    </header>
   );
 }
 
-export function Dashboard() {
-  const now = new Date();
-  const { user, logout } = useAuth();
+/** Dialogs opened from anywhere in the dashboard. */
+function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
+  const finances = useFinances();
+  return (
+    <>
+      {dash.showCategoryModal && (
+        <CategoryManager
+          onClose={dash.closeCategoryModal}
+          categories={finances.categories}
+          onAdd={finances.addCategory}
+          onUpdate={finances.updateCategory}
+          onDelete={finances.removeCategory}
+        />
+      )}
+      {dash.showProfile && <ProfilePage onClose={dash.closeProfile} />}
+      {dash.showImport && (
+        <ImportModal
+          accounts={finances.accounts}
+          onClose={dash.closeImport}
+          onImported={() => finances.refresh({ invalidate: true })}
+        />
+      )}
+      {dash.editingTransaction && (
+        <EditTransactionModal
+          transaction={dash.editingTransaction}
+          categories={finances.categories}
+          accounts={finances.accounts}
+          onSave={dash.handleSaveEdit}
+          onClose={() => dash.setEditingTransaction(null)}
+          onManageCategories={() => {
+            dash.setEditingTransaction(null);
+            dash.openCategoryModal();
+          }}
+          availableBalance={finances.available}
+        />
+      )}
+    </>
+  );
+}
+
+/** Notifies new budget alerts of the current period (when enabled in Settings). */
+function useBudgetAlertNotifications() {
   const { t, tCategory } = useI18n();
-  const {
+  const settings = useOptionalSettings()?.settings ?? null;
+  const { isCurrentPeriod, year, month, alerts } = useFinances();
+  useAlertNotifications({
+    enabled: !!settings?.notificationsEnabled,
+    isCurrentPeriod,
     year,
     month,
-    transactions,
-    summary,
-    carryover,
-    categories,
-    loading,
-    error,
-    isPrevDisabled,
-    isNextDisabled,
-    goToPrev,
-    goToNext,
-    navigateTo,
-    addTransaction,
-    removeTransaction,
-    patchTransaction,
-    updateTransaction,
-    addCategory,
-    removeCategory,
-  } = useFinances();
+    alerts,
+    title: t('app.header.title'),
+    message: (alert) => monthAlertMessage(alert, t, tCategory),
+  });
+}
 
-  const {
-    tab,
-    setTab,
-    showCategoryModal,
-    openCategoryModal,
-    closeCategoryModal,
-    showProfile,
-    openProfile,
-    closeProfile,
-    editingTransaction,
-    setEditingTransaction,
-    isCurrentMonth,
-    handleSaveEdit,
-    handleMonthClick,
-  } = useDashboard({ year, month, navigateTo, updateTransaction });
+export function Dashboard() {
+  const { t } = useI18n();
+  const finances = useFinances();
+  const plan = useOptionalPlan();
+  const dash = useDashboard({
+    navigateTo: finances.navigateTo,
+    updateTransaction: finances.updateTransaction,
+  });
+  const section = SECTION_BY_ID[dash.tab];
+  useBudgetAlertNotifications();
 
-  const goToCurrentMonth = () => navigateTo(now.getFullYear(), now.getMonth() + 1);
-
-  function renderTabContent() {
-    if (tab === 'annual') {
-      return (
-        <div className="card">
-          <AnnualChart initialYear={now.getFullYear()} onMonthClick={handleMonthClick} />
-        </div>
-      );
-    }
-    if (tab === 'automations') {
-      return <RecurringRulesTab categories={categories} />;
-    }
-    if (tab === 'custom-alerts') {
-      return <CustomAlertsTab categories={categories} />;
-    }
-    return (
-      <MonthlyView
-        year={year}
-        month={month}
-        isCurrentMonth={isCurrentMonth}
-        isPrevDisabled={isPrevDisabled}
-        isNextDisabled={isNextDisabled}
-        transactions={transactions}
-        summary={summary}
-        carryover={carryover}
-        categories={categories}
-        loading={loading}
-        error={error}
-        onPrev={goToPrev}
-        onNext={goToNext}
-        onGoToCurrentMonth={goToCurrentMonth}
-        onAddTransaction={addTransaction}
-        onDeleteTransaction={removeTransaction}
-        onPatchTransaction={patchTransaction}
-        onEditTransaction={setEditingTransaction}
-        onManageCategories={openCategoryModal}
-      />
-    );
-  }
+  // Free plan: the import button opens the paywall instead of the importer.
+  const openImport =
+    plan && !plan.isPremium
+      ? () => plan.openUpgrade({ kind: 'feature', feature: 'import' })
+      : dash.openImport;
 
   return (
     <div className="dashboard">
       <div className="dashboard-sticky">
-        <header className="header">
-          <div className="header-brand">
-            <span className="header-logo">💰</span>
-            <div>
-              <h1 className="header-title">{t('app.header.title')}</h1>
-              <p className="header-sub">{t('app.header.subtitle')}</p>
+        <Header dash={dash} sectionLabel={`${section.icon} ${t(section.labelKey)}`} />
+        {dash.tab === 'monthly' && (
+          <div className="sticky-nav">
+            <div className="sticky-nav-inner">
+              <MonthNavCard onImport={openImport} />
             </div>
           </div>
-          <div className="header-actions">
-            <button
-              className="header-user header-user-btn"
-              onClick={openProfile}
-              aria-label={t('app.header.openProfile')}
-              title={t('app.header.openProfile')}
-            >
-              {user?.avatarUrl ? (
-                <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
-              ) : (
-                <span className="header-avatar-placeholder">👤</span>
-              )}
-              <span className="header-user-name">{user?.name}</span>
-            </button>
-            <LanguageSwitcher />
-            <button
-              onClick={logout}
-              className="btn-logout"
-              title={t('app.header.logout')}
-              aria-label={t('app.header.logout')}
-            >
-              {t('app.header.logout')}
-            </button>
-          </div>
-        </header>
-
-        {/* ── Sub-header: tabs + month nav ─────────────────────── */}
-        <div className="sticky-nav">
-          <div className="sticky-nav-inner">
-            <DashboardTabs tab={tab} setTab={setTab} t={t} />
-
-            {tab === 'monthly' && (
-              <MonthNavCard
-                year={year}
-                month={month}
-                isCurrentMonth={isCurrentMonth}
-                isPrevDisabled={isPrevDisabled}
-                isNextDisabled={isNextDisabled}
-                transactions={transactions}
-                summary={summary}
-                onPrev={goToPrev}
-                onNext={goToNext}
-                onGoToCurrentMonth={goToCurrentMonth}
-                tCategory={tCategory}
-              />
-            )}
-          </div>
-        </div>
+        )}
       </div>
 
       <main className="main">
-        <div role="tabpanel" id={`tabpanel-${tab}`} aria-labelledby={`tab-${tab}`}>
-          {renderTabContent()}
+        <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
+        <div role="region" aria-label={t(section.labelKey)}>
+          <TabContent dash={dash} />
         </div>
       </main>
 
-      <CategoryManager
-        open={showCategoryModal}
-        onClose={closeCategoryModal}
-        categories={categories}
-        onAdd={addCategory}
-        onDelete={removeCategory}
+      <BurgerMenu
+        open={dash.menuOpen}
+        tab={dash.tab}
+        onSelectTab={dash.setTab}
+        onClose={() => dash.setMenuOpen(false)}
       />
-
-      {showProfile && <ProfilePage onClose={closeProfile} />}
-
-      {editingTransaction && (
-        <EditTransactionModal
-          transaction={editingTransaction}
-          categories={categories}
-          onSave={handleSaveEdit}
-          onClose={() => setEditingTransaction(null)}
-          onManageCategories={() => {
-            setEditingTransaction(null);
-            openCategoryModal();
-          }}
-          viewYear={year}
-          viewMonth={month}
-          availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}
-        />
-      )}
+      <DashboardModals dash={dash} />
     </div>
   );
 }

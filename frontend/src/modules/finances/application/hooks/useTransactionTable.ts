@@ -1,97 +1,66 @@
-import { useState } from 'react';
-import { groupByDay } from '../../ui/types/TransactionTable.types';
-import type { DayGroup } from '../../ui/types/TransactionTable.types';
-import type { TransactionType } from '@modules/finances/domain/types';
+import { useMemo, useRef, useState } from 'react';
+import { useAction } from '@shared/hooks/useAction';
+import { useToggleSet } from '@shared/hooks/useToggleSet';
+import { groupByDay } from '@modules/finances/domain/transactionGrouping';
+import type { Transaction } from '@modules/finances/domain/types';
 
-interface UseTransactionTableOptions {
-  transactions: Parameters<typeof groupByDay>[0];
+interface Options {
+  transactions: Transaction[];
   locale: string;
-  t: (key: string) => string;
-  onPatch: (id: string, changes: { notes?: string | null }) => void;
-  onDelete: (id: string) => void;
+  onPatch: (id: string, changes: { notes: string | null }) => Promise<unknown> | void;
+  onDelete: (id: string) => Promise<unknown> | void;
 }
 
-export interface UseTransactionTableReturn {
-  groups: DayGroup[];
-  collapsedDays: Set<string>;
-  toggleDay: (dayKey: string) => void;
-  editingNotesId: string | null;
-  notesValue: string;
-  pendingDeleteId: string | null;
-  txLabel: (type: TransactionType) => string;
-  startEditNotes: (id: string, current: string | null) => void;
-  commitNotes: (id: string) => void;
-  cancelEditNotes: () => void;
-  setNotesValue: (value: string) => void;
-  setPendingDeleteId: (id: string | null) => void;
-  confirmDelete: () => void;
-  cancelDelete: () => void;
-}
-
-export function useTransactionTable({
-  transactions,
-  locale,
-  t,
-  onPatch,
-  onDelete,
-}: UseTransactionTableOptions): UseTransactionTableReturn {
+/** Day groups, collapsed days, inline notes editing and delete confirmation. */
+export function useTransactionTable({ transactions, locale, onPatch, onDelete }: Options) {
+  const groups = useMemo(() => groupByDay(transactions, locale), [transactions, locale]);
+  const collapsed = useToggleSet();
   const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
   const [notesValue, setNotesValue] = useState('');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
+  const action = useAction();
+  // Blur fires after Enter / Escape already closed the editor: only the open editor may save.
+  const editing = useRef<{ id: string; original: string | null } | null>(null);
 
-  const groups = groupByDay(transactions, locale);
-
-  const toggleDay = (dayKey: string) => {
-    setCollapsedDays((prev) => {
-      const next = new Set(prev);
-      if (next.has(dayKey)) next.delete(dayKey);
-      else next.add(dayKey);
-      return next;
-    });
+  const startEditNotes = (tx: Transaction) => {
+    editing.current = { id: tx.id, original: tx.notes };
+    setEditingNotesId(tx.id);
+    setNotesValue(tx.notes ?? '');
   };
 
-  const txLabel = (type: TransactionType): string => {
-    if (type === 'INCOME') return t('app.transaction.form.type.income');
-    if (type === 'SAVING') return t('app.transaction.form.type.saving');
-    return t('app.transaction.form.type.expense');
-  };
-
-  const startEditNotes = (id: string, current: string | null) => {
-    setEditingNotesId(id);
-    setNotesValue(current ?? '');
-  };
-
-  const commitNotes = (id: string) => {
-    onPatch(id, { notes: notesValue.trim() || null });
+  const cancelEditNotes = () => {
+    editing.current = null;
     setEditingNotesId(null);
   };
 
-  const cancelEditNotes = () => setEditingNotesId(null);
-
-  const confirmDelete = () => {
-    if (pendingDeleteId !== null) {
-      onDelete(pendingDeleteId);
-      setPendingDeleteId(null);
-    }
+  const commitNotes = () => {
+    const current = editing.current;
+    if (!current) return;
+    cancelEditNotes();
+    const notes = notesValue.trim() || null;
+    if (notes !== current.original) void action.run(async () => onPatch(current.id, { notes }));
   };
 
-  const cancelDelete = () => setPendingDeleteId(null);
+  const confirmDelete = () => {
+    const id = pendingDeleteId;
+    setPendingDeleteId(null);
+    if (id) void action.run(async () => onDelete(id));
+  };
 
   return {
     groups,
-    collapsedDays,
-    toggleDay,
+    isCollapsed: collapsed.has,
+    toggleDay: collapsed.toggle,
     editingNotesId,
     notesValue,
-    pendingDeleteId,
-    txLabel,
+    setNotesValue,
     startEditNotes,
     commitNotes,
     cancelEditNotes,
-    setNotesValue,
-    setPendingDeleteId,
+    pendingDeleteId,
+    askDelete: setPendingDeleteId,
     confirmDelete,
-    cancelDelete,
+    cancelDelete: () => setPendingDeleteId(null),
+    error: action.error,
   };
 }

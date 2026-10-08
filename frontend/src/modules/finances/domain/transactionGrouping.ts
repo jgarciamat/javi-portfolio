@@ -1,3 +1,4 @@
+import { parseDateOnly, toDateOnly } from '@shared/utils/format';
 import type { Transaction } from './types';
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
@@ -30,21 +31,21 @@ export interface CalendarCell {
 
 // ─── Internal date helpers ────────────────────────────────────────────────────
 
-const TZ = 'Europe/Madrid';
+const localDate = parseDateOnly;
+const dayKeyOf = toDateOnly;
 
-/** Returns "YYYY-MM-DD" in Madrid timezone */
+/** Calendar day "YYYY-MM-DD" of a movement (the API sends calendar dates). */
 export function txDayKey(dateStr: string): string {
-  return new Intl.DateTimeFormat('sv-SE', { timeZone: TZ }).format(new Date(dateStr));
+  return dateStr.slice(0, 10);
 }
 
-/** "lun. 6 mar." / "Mon, Jan 6" label */
+/** "lun. 6 mar." / "Mon, 6 Mar" label */
 export function formatDayLabel(dateStr: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-    timeZone: TZ,
-  }).format(new Date(dateStr));
+  }).format(localDate(txDayKey(dateStr)));
 }
 
 /**
@@ -71,7 +72,7 @@ function formatWeekLabel(dayKey: string, locale: string): string {
   monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
-  const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: TZ });
+  const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
   return `${fmt.format(monday)} – ${fmt.format(sunday)}`;
 }
 
@@ -123,53 +124,40 @@ export function groupByWeek(transactions: Transaction[], locale: string): WeekGr
 }
 
 /**
- * Builds a 6×7 calendar grid for a given year/month.
- * Cells outside the month have dayKey=null and items=[].
- * Week starts on Monday (ISO).
+ * Builds the calendar grid of a period (weeks start on Monday). With the default
+ * month start day the period is the calendar month; with a custom start day it
+ * runs from `range.start` to `range.end` (e.g. 25 Mar – 24 Apr).
+ * Cells outside the period have dayKey=null and items=[].
  */
 export function buildCalendarMonth(
   year: number,
   month: number, // 1-12
-  transactions: Transaction[]
+  transactions: Transaction[],
+  range?: { start: string; end: string }
 ): CalendarCell[][] {
-  // Map dayKey → transactions for fast lookup
+  const byDay = indexByDay(transactions);
+  const first = range ? localDate(range.start) : new Date(year, month - 1, 1, 12);
+  const last = range ? localDate(range.end) : new Date(year, month, 0, 12);
+
+  const empty = (): CalendarCell => ({ dayKey: null, dayNumber: null, items: [] });
+  const startOffset = (first.getDay() + 6) % 7; // ISO weekday of the first day (0=Mon)
+  const cells: CalendarCell[] = Array.from({ length: startOffset }, empty);
+  for (const d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+    const key = dayKeyOf(d);
+    cells.push({ dayKey: key, dayNumber: d.getDate(), items: byDay.get(key) ?? [] });
+  }
+  while (cells.length % 7 !== 0 || cells.length < 35) cells.push(empty());
+
+  const rows: CalendarCell[][] = [];
+  for (let r = 0; r < cells.length / 7; r++) rows.push(cells.slice(r * 7, r * 7 + 7));
+  return rows;
+}
+
+function indexByDay(transactions: Transaction[]): Map<string, Transaction[]> {
   const byDay = new Map<string, Transaction[]>();
   for (const tx of transactions) {
     const key = txDayKey(tx.date);
-    if (!byDay.has(key)) byDay.set(key, []);
-    byDay.get(key)!.push(tx);
+    byDay.set(key, [...(byDay.get(key) ?? []), tx]);
   }
-
-  const firstDay = new Date(year, month - 1, 1);
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  // ISO weekday of the 1st (0=Mon … 6=Sun)
-  const startOffset = (firstDay.getDay() + 6) % 7;
-
-  const cells: CalendarCell[] = [];
-
-  // Padding before month start
-  for (let i = 0; i < startOffset; i++) {
-    cells.push({ dayKey: null, dayNumber: null, items: [] });
-  }
-
-  // Actual days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const mm = String(month).padStart(2, '0');
-    const dd = String(d).padStart(2, '0');
-    const key = `${year}-${mm}-${dd}`;
-    cells.push({ dayKey: key, dayNumber: d, items: byDay.get(key) ?? [] });
-  }
-
-  // Padding after month end to fill 6 rows × 7 cols = 42 cells
-  while (cells.length < 42) {
-    cells.push({ dayKey: null, dayNumber: null, items: [] });
-  }
-
-  // Split into rows of 7
-  const rows: CalendarCell[][] = [];
-  for (let r = 0; r < 6; r++) {
-    rows.push(cells.slice(r * 7, r * 7 + 7));
-  }
-  return rows;
+  return byDay;
 }

@@ -1,56 +1,40 @@
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'jsdom',
-    roots: ['<rootDir>/src'],
-    testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
-    transform: {
-        '^.+\\.tsx?$': 'ts-jest',
-    },
-    moduleNameMapper: {
-        // CSS/asset files — must come before alias rules so aliased CSS paths are also mocked
-        '\\.(css|less|scss|sass|png|jpg|jpeg|gif|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
-        // Specific override first — prevents import.meta in api.config.ts
-        '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
-        // Mock Google OAuth library in tests
-        '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
-        // Mock Turnstile widget — avoids import.meta inside the package
-        '^@marsidev/react-turnstile$': '<rootDir>/src/__mocks__/@marsidev/react-turnstile.tsx',
-        '^@modules/(.*)$': '<rootDir>/src/modules/$1',
-        '^@shared/(.*)$': '<rootDir>/src/shared/$1',
-        '^@core/(.*)$': '<rootDir>/src/core/$1',
-        '^@locales/(.*)$': '<rootDir>/src/locales/$1',
-    },
-    setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-    globals: {
-        'import.meta': {
-            env: {
-                VITE_API_URL: 'http://localhost:3000/api',
-                VITE_TURNSTILE_SITE_KEY: 'test-site-key',
-            },
-        },
-    },
-    collectCoverageFrom: [
-        'src/**/*.{ts,tsx}',
-        // Entry points & boilerplate
-        '!src/main.tsx',
-        '!src/vite-env.d.ts',
-        '!src/App.tsx',
-        '!src/index.css',
-        // Type-only files (no executable branches)
-        '!src/**/*.d.ts',
-        '!src/**/*.types.ts',
-        '!src/**/types.ts',
-        '!src/**/types/index.ts',
-        // Barrel re-export indexes
-        '!src/**/index.ts',
-        // Setup file
-        '!src/setupTests.ts',
-        // Config file replaced by mock — import.meta not transpilable
-        '!src/core/config/api.config.ts',
-        // Mock files are not production code
-        '!src/__mocks__/**',
-    ],
-    coverageDirectory: 'coverage',
-    coverageReporters: ['text', 'lcov', 'html'],
-    verbose: true,
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.test.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  moduleNameMapper: {
+    // CSS/asset files — must come before alias rules so aliased CSS paths are also mocked
+    '\\.(css|less|scss|sass|png|jpg|jpeg|gif|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
+    // import.meta is not available in Jest: the API base URL comes from a mock
+    '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
+    '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
+    '^virtual:pwa-register/react$': '<rootDir>/src/__mocks__/pwaRegister.ts',
+    '^@modules/(.*)$': '<rootDir>/src/modules/$1',
+    '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+    '^@core/(.*)$': '<rootDir>/src/core/$1',
+    '^@locales/(.*)$': '<rootDir>/src/locales/$1',
+    '^@test-utils/(.*)$': '<rootDir>/src/test-utils/$1',
+  },
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    // Bootstrapping only: renders <App /> into #root with the Google client id.
+    '!src/main.tsx',
+    // Reads import.meta.env (Vite only); replaced by a mock in tests.
+    '!src/core/config/api.config.ts',
+    '!src/**/*.d.ts',
+    '!src/setupTests.ts',
+    '!src/__mocks__/**',
+    '!src/test-utils/**',
+  ],
+  coverageThreshold: {
+    global: { statements: 100, branches: 100, functions: 100, lines: 100 },
+  },
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  verbose: true,
 };

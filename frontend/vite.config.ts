@@ -16,22 +16,13 @@ export default defineConfig({
         clientsClaim: true,
         // Precachea todos los assets del build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // Estrategia network-first para las llamadas API
-        runtimeCaching: [
-          {
-            urlPattern: /^\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 10,
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 },
-            },
-          },
-        ],
+        // Las respuestas de /api nunca se cachean: son datos privados de cada usuario.
+        navigateFallbackDenylist: [/^\/api\//],
       },
       devOptions: {
-        // Activa el SW también en modo desarrollo para poder probarlo
-        enabled: true,
+        // Desactivado: generaba frontend/dev-dist en cada `npm run dev`.
+        // Actívalo temporalmente si necesitas depurar el service worker.
+        enabled: false,
       },
     }),
   ],
@@ -44,7 +35,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 5176,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

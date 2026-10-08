@@ -1,274 +1,147 @@
-# 📁 Estructura del Proyecto - Money App
+# Money Manager
 
-## 🎯 Estructura Completa
+Gestor de finanzas personales: web (PWA) + app Android/iOS (Capacitor) + API.
+Producción: <https://www.winjgm.com>
 
-```
-money-app/
-│
-├── 📄 package.json              # Workspace raíz con scripts para todo el proyecto
-├── 📄 README.md                 # Documentación principal
-├── 📄 .gitignore                # Archivos a ignorar en git
-│
-├── 📂 backend/                  # Backend con Node.js + Express
-│   ├── 📄 package.json          # Dependencias del backend
-│   ├── 📄 tsconfig.json         # Configuración TypeScript
-│   ├── 📄 jest.config.js        # Configuración Jest
-│   ├── 📄 .eslintrc.js          # Configuración ESLint
-│   ├── 📄 .env.example          # Variables de entorno ejemplo
-│   │
-│   ├── 📂 src/                  # Código fuente (Arquitectura Hexagonal)
-│   │   │
-│   │   ├── 📂 domain/           # ⭕ CAPA DE DOMINIO
-│   │   │   ├── entities/        # Entidades del dominio (Shipment, Product, etc)
-│   │   │   ├── value-objects/   # Value Objects (ShipmentId, TransportType, etc)
-│   │   │   └── repositories/    # Interfaces de repositorios (puertos)
-│   │   │
-│   │   ├── 📂 application/      # ⭕ CAPA DE APLICACIÓN
-│   │   │   ├── use-cases/       # Casos de uso (CreateShipment, GetShipment, etc)
-│   │   │   └── ports/           # Puertos (interfaces para infraestructura)
-│   │   │
-│   │   ├── 📂 infrastructure/   # ⭕ CAPA DE INFRAESTRUCTURA
-│   │   │   ├── controllers/     # Controladores REST
-│   │   │   ├── persistence/     # Implementación de repositorios
-│   │   │   └── express/         # Configuración de Express (server.ts, routes)
-│   │   │
-│   │   └── 📂 shared/           # ⭕ CÓDIGO COMPARTIDO
-│   │       ├── utils/           # Utilidades
-│   │       └── types/           # Tipos compartidos
-│   │
-│   └── 📂 tests/                # Tests
-│       ├── unit/                # Tests unitarios
-│       └── integration/         # Tests de integración
-│
-│
-└── 📂 frontend/                 # Frontend con React 19
-    ├── 📄 package.json          # Dependencias del frontend
-    ├── 📄 tsconfig.json         # Configuración TypeScript
-    ├── 📄 tsconfig.node.json    # Configuración TS para Vite
-    ├── 📄 vite.config.ts        # Configuración Vite
-    ├── 📄 jest.config.js        # Configuración Jest
-    ├── 📄 cypress.config.ts     # Configuración Cypress
-    ├── 📄 .eslintrc.js          # Configuración ESLint (con reglas SOLID)
-    ├── 📄 index.html            # HTML principal
-    │
-    ├── 📂 public/               # Assets estáticos
-    │
-    ├── 📂 src/                  # Código fuente (DDD)
-    │   │
-    │   ├── 📄 main.tsx          # Punto de entrada React
-    │   ├── 📄 App.tsx           # Componente principal
-    │   ├── 📄 setupTests.ts     # Setup para Jest
-    │   ├── 📄 vite-env.d.ts     # Tipos de Vite
-    │   │
-    │   ├── 📂 modules/          # 🎯 MÓDULOS POR DOMINIO
-    │   │   └── shipments/       # Módulo de envíos
-    │   │       ├── domain/      # Entidades y lógica de dominio
-    │   │       ├── application/ # Casos de uso y hooks
-    │   │       ├── infrastructure/ # Servicios y adaptadores API
-    │   │       └── ui/          # Componentes React (presentación)
-    │   │
-    │   ├── 📂 shared/           # 🎯 CÓDIGO COMPARTIDO
-    │   │   ├── components/      # Componentes reutilizables
-    │   │   ├── hooks/           # Hooks personalizados
-    │   │   ├── utils/           # Utilidades
-    │   │   └── types/           # Tipos compartidos
-    │   │
-    │   └── 📂 core/             # 🎯 CONFIGURACIÓN CORE
-    │       ├── config/          # Configuración de la app
-    │       └── api/             # Cliente HTTP base
-    │
-    └── 📂 cypress/              # Tests E2E
-        ├── e2e/                 # Specs de tests e2e
-        ├── fixtures/            # Datos de prueba
-        └── support/             # Comandos y configuración
-            ├── e2e.ts
-            └── commands.ts
-```
+| Parte | Tecnología |
+|---|---|
+| `frontend/` | React 19, Vite, TypeScript, PWA (Workbox), Capacitor 8 |
+| `backend/` | Node 24, Express 4, TypeScript, SQLite (better-sqlite3), zod |
+| `deploy/` | Docker Compose, Caddy (HTTPS), nginx |
 
-## 🎨 Principios Aplicados
+## Funcionalidades
 
-### Backend - Arquitectura Hexagonal
+- **Movimientos** de ingreso, gasto y ahorro, con notas, cuenta y categoría.
+- **Vista mensual** en una sola petición: resumen, saldo arrastrado, alertas y progreso de presupuestos.
+  Vistas por día, semana y calendario.
+- **Mes personalizable**: el mes puede empezar cualquier día del 1 al 28 (p. ej. el día de cobro).
+- **Cuentas** (corriente, efectivo, tarjeta…) con saldo inicial y **transferencias** entre ellas.
+- **Presupuestos por categoría** con avisos al 80 % y al 100 %.
+- **Metas de ahorro** con progreso y ahorro mensual necesario.
+- **Reglas recurrentes** (mensual, bimestral, trimestral, anual). Los cambios se aplican desde el mes actual
+  y los movimientos generados que borras no se vuelven a crear.
+- **Importación de extractos** CSV (cualquier separador y formato numérico) y Norma 43, con detección de
+  duplicados y categorización automática a partir de tu historial, palabras clave y, en Premium, IA.
+- **Búsqueda y filtros** por texto, tipo, categoría, cuenta, fechas e importes.
+- **Análisis**: tendencias por categoría (frente al mes anterior y a la media de 3 meses) y evolución del patrimonio.
+- **Asesor IA** (Cloudflare Workers AI) con respaldo por reglas. Solo se envían cifras agregadas, nunca descripciones.
+- **Alertas personalizadas**, exportación CSV y **exportación completa de datos** en JSON (portabilidad RGPD).
+- **Ajustes** de moneda, idioma (es/en, guardado en la cuenta) y notificaciones locales.
+- Cuentas con email y contraseña (verificación por email) o con Google.
+- **Planes Gratis y Premium** (prueba de 14 días), pagos con Stripe y sección de **ofertas de partners**.
 
-**Dominio (Centro)**
+## Planes y monetización
 
-- Contiene la lógica de negocio pura
-- Sin dependencias de frameworks
-- Entidades y Value Objects
+| | Gratis | Premium |
+|---|---|---|
+| Cuentas / presupuestos / metas / recurrentes / alertas | 1 / 3 / 1 / 3 / 3 | ilimitado |
+| Importar extractos, análisis (tendencias y patrimonio) | — | ✓ |
+| Asesor IA | análisis por reglas | 30 análisis IA al mes |
 
-**Aplicación (Casos de Uso)**
+- Precios (IVA incluido): **2,99 €/mes**, **24,99 €/año** y plan **fundador de 49 €** (pago único, plazas
+  limitadas por `FOUNDER_LIMIT`). Todos los usuarios nuevos tienen **14 días de Premium** sin tarjeta; si
+  pagan durante la prueba, Stripe no cobra hasta que termine.
+- La regla de "¿es Premium?" está en un solo sitio (`domain/model/Subscription.ts → planOf`) y los
+  límites en `domain/services/plans.ts`. Las acciones bloqueadas responden **402** con `PLAN_LIMIT` o
+  `PREMIUM_REQUIRED`; el frontend abre el diálogo de mejora automáticamente. Al bajar a Gratis no se
+  borra nada: solo se impide crear más.
+- **Pagos (Stripe)**: Checkout para suscribirse, Customer Portal para cambiar de plan, tarjeta o cancelar,
+  y un webhook (`POST /api/billing/webhook`) idempotente que relee el estado real de la suscripción.
+  Sin claves de Stripe la app funciona y el botón de pago aparece deshabilitado. En las apps nativas no
+  se ofrece el pago (normas de las tiendas): se remite a la web. Prueba local:
+  `stripe listen --forward-to localhost:3000/api/billing/webhook`.
+- **IA sin coste**: Cloudflare Workers AI dentro de su asignación gratuita diaria (10.000 neuronas).
+  La API suma las neuronas de cada llamada y deja de llamar al llegar a `AI_DAILY_NEURON_BUDGET`
+  (9.000 por defecto); además hay cuota mensual por usuario y caché persistente (repetir el análisis con
+  las mismas cifras no gasta). Si algo se agota, se devuelve el análisis por reglas indicando el motivo.
+  Gemini solo con `AI_PROVIDER=gemini` y clave **de pago** (su capa gratuita no puede usarse para
+  usuarios del EEE).
+- **Afiliación**: las ofertas se leen de `AFFILIATES_FILE` (en producción `deploy/config/affiliates.json`;
+  ejemplo en `backend/config/affiliates.example.json`). Se muestran en su propia sección marcadas como
+  patrocinadas, el usuario puede ocultarlas en Ajustes, se cuentan los clics y la IA nunca recomienda
+  productos concretos.
+- Páginas públicas: `/pricing` (planes) y `/terms` (condiciones, **borrador**: completar los datos del
+  titular y revisar el desistimiento antes de cobrar).
 
-- Orquesta la lógica de dominio
-- Define interfaces (puertos)
-- Casos de uso específicos
-
-**Infraestructura (Adaptadores)**
-
-- Implementa los puertos
-- API REST con Express
-
-## Money Manager — Estructura y arquitectura (DDD)
-
-Este repositorio contiene una aplicación para gestionar finanzas personales (gastos, ingresos, categorías y presupuestos). Está organizada siguiendo principios de DDD/arquitectura hexagonal para mantener la lógica de negocio aislada y testable.
-
-## Visión rápida
-
-- Monorepo con dos workspaces: `backend` y `frontend`.
-- Backend en TypeScript con arquitectura por capas (Domain / Application / Infrastructure / Shared).
-- Frontend en React + Vite siguiendo una estructura por módulos (DDD aplicada en UI).
-
-## Estructura relevante (resumen)
-
-- `package.json` (raíz): scripts para arrancar ambos workspaces y tareas comunes.
-- `backend/`: código del backend (TypeScript + Express). Aquí está la arquitectura DDD/hexagonal.
-- `frontend/`: UI en React (Vite) organizada por módulos/dominios.
-
-## Backend — ubicación y responsabilidades
-
-Ruta principal: `backend/src`
-
-Estructura dentro de `backend/src` (conceptual):
-
-- `domain/` — Entidades, Value Objects y contratos (interfaces) de repositorio.
-  - ejemplos en el repo: `entities/Category.ts`, `entities/Transaction.ts`, `entities/User.ts` y value-objects (`Amount.ts`, `TransactionId.ts`, `TransactionType.ts`).
-
-- `application/` — Casos de uso (orquestación de la lógica de dominio) y puertos (interfaces que los adaptadores deben implementar).
-  - Ejemplos: `use-cases/CreateTransaction.ts`, `use-cases/GetTransactions.ts`, `use-cases/GetFinancialSummary.ts`, `use-cases/Auth.ts`, `use-cases/Budget.ts`.
-
-- `infrastructure/` — Adaptadores: controladores HTTP, servidores, persistencia e implementaciones concretas de repositorios.
-  - Controladores REST: `infrastructure/controllers/*Controller.ts` (p.ej. `TransactionController.ts`, `CategoryController.ts`, `AuthController.ts`).
-  - Express server: `infrastructure/express/server.ts`.
-  - Persistencia: implementaciones concretas (`persistence/`) como `InMemoryTransactionRepository.ts`, `SqliteTransactionRepository.ts`, `SqliteDb.ts`, `SqliteUserRepository.ts`, `SqliteMonthlyBudgetRepository.ts`.
-
-- `shared/` — utilidades, tipos y helpers compartidos por las capas.
-
-### Contratos / Puertos
-
-Los puertos (interfaces) están en `domain/repositories` y definen las operaciones que la capa de aplicación necesita sin acoplarse a la tecnología de persistencia. Implementaciones concretas están en `infrastructure/persistence`.
-
-## Principios aplicados
-
-- Separación clara: la lógica de dominio (entidades y reglas) no conoce Express, la DB ni detalles de infra.
-- Dependencia en abstracciones: la capa de aplicación depende de interfaces; la infraestructura implementa esas interfaces.
-- Repositorios y VO: identificadores y tipos del dominio encapsulados en Value Objects (p. ej. `TransactionId`, `Amount`).
-- Tests: la organización facilita tests unitarios de dominio y tests de integración/infrastuctura.
-
-## API y puntos clave del backend
-
-- Entrypoint del servidor: `backend/src/infrastructure/express/server.ts` — configuración de rutas, middlewares y arranque.
-- Controladores: `backend/src/infrastructure/controllers/*Controller.ts` — exponen endpoints que usan casos de uso de `application/use-cases`.
-- Repositorios en memoria para tests: `backend/src/infrastructure/persistence/InMemory*.ts`.
-- Repositorios SQLite para persistencia real: `backend/src/infrastructure/persistence/Sqlite*.ts` y `SqliteDb.ts`.
-- Autenticación: `infrastructure/controllers/AuthController.ts` y `express/authMiddleware.ts`.
-
-### Documentación relacionada
-
-- `backend/README.md` — resumen y comandos del backend (variables de entorno, testing).
-- `backend/ONBOARDING.md` — checklist de onboarding para desarrolladores que quieran levantar el backend en local.
-
-## Comandos — cómo ejecutar (desde la raíz del monorepo)
-
-- Instalar todo:
+## Arquitectura
 
 ```
-npm run install:all
+backend/src
+├── config/            Variables de entorno validadas (falla al arrancar si faltan secretos en producción)
+├── domain/            Modelo puro: entidades, reglas, errores tipados, periodos, dinero en céntimos
+│   ├── model/         Transaction, Category, Account, RecurringRule, Goal, CategoryBudget, User…
+│   ├── services/      Resumen, presupuestos, tendencias, categorizador, asesor por reglas
+│   └── ports/         Interfaces de repositorios y servicios externos
+├── application/       Casos de uso agrupados por funcionalidad (servicios de aplicación)
+├── infrastructure/
+│   ├── sqlite/        Conexión, migraciones versionadas (PRAGMA user_version) y repositorios
+│   ├── http/          Express: rutas, validación zod, presentadores, errores, rate limiting
+│   ├── auth/ mail/ ai/ billing/ offers/ backup/   Adaptadores (JWT, Google, Resend, Workers AI,
+│   │                  Gemini, Stripe, catálogo de ofertas, copias de seguridad)
+│   └── container.ts   Composition root
+└── main.ts            Arranque: migraciones, backups, servidor, parada ordenada
 ```
 
-- Ejecutar backend y frontend en dev (concurrente):
+- Todos los repositorios reciben el `userId`: ninguna consulta puede leer ni modificar datos de otro usuario.
+- Los importes se guardan como **enteros en céntimos**. La API habla en decimales (`12.34`).
+- Las fechas son fechas de calendario `YYYY-MM-DD` (sin zona horaria).
+- Las transacciones referencian la categoría **por id**: renombrar es seguro y borrar exige reasignar.
 
-```
-npm run dev
-```
+El frontend sigue la misma idea por módulos (`modules/<feature>/{domain,application,ui}`), con
+`core/` (API, i18n, ajustes, notificaciones) y `shared/` (componentes y utilidades de formato).
 
-- Ejecutar solo backend (desde la raíz):
-
-```
-npm run dev:backend
-```
-
-- Ejecutar solo frontend (desde la raíz):
-
-```
-npm run dev:frontend
-```
-
-Alternativamente, dentro del directorio `backend`:
-
-```
-cd backend
-npm install
-npm run dev        # arranca con ts-node-dev: src/infrastructure/express/server.ts
-```
-
-Y para producción/compilar:
-
-```
-cd backend
-npm run build      # compila con tsc -> genera dist/
-npm start          # ejecuta dist/infrastructure/express/server.js
-```
-
-## Tests
-
-- Backend: `backend` usa Jest. Desde la raíz:
-
-```
-npm run test:backend
-```
-
-O directamente:
-
-```
-cd backend
-npm test
-```
-
-## Archivos y módulos a revisar primero (para entender el dominio)
-
-- Casos de uso principales: `backend/src/application/use-cases/*` (CreateTransaction, GetTransactions, GetFinancialSummary, CreateCategory, DeleteTransaction, Auth, Budget).
-- Entidades del dominio: `backend/src/domain/entities/*` (Transaction, Category, MonthlyBudget, User).
-- Value objects: `backend/src/domain/value-objects/*` (Amount, TransactionId, TransactionType, ShipmentId si aplica).
-- Repositorios (interfaces): `backend/src/domain/repositories/*`.
-
-## Buenas prácticas y recomendaciones internas
-
-- Añadir nuevas reglas de negocio en `domain` y exponer operaciones mediante un caso de uso en `application`.
-- Implementar adaptadores concretos en `infrastructure` (p. ej. nuevos repositorios) que cumplan los puertos.
-- Mantener los controladores delgados: recibir request -> validar -> llamar al caso de uso -> mapear respuesta.
-
----
-
-## 🚀 Release a producción (develop → master)
-
-El proceso de release está **automatizado** mediante GitHub Actions.
-
-### Pasos
+## Desarrollo local
 
 ```bash
-# 1. Estar en develop con todo commiteado y pusheado
-git checkout develop && git pull origin develop
-
-# 2. Abrir la PR
-gh pr create --base master --head develop --title "Release develop"
-
-# 3. El workflow automático hace:
-#    ✅ Añade la label "release"
-#    ✅ Calcula el bump semver (major/minor/patch) según los commits
-#    ✅ Actualiza "version" en frontend/package.json y commitea a develop
-#    ✅ Pone el número de versión en el título de la PR
-#    ✅ Genera el changelog agrupado por tipo de commit en el body de la PR
-
-# 4. Revisar y mergear
-gh pr merge --merge
+npm run install:all        # una vez: dependencias de backend y frontend
+cp backend/.env.example backend/.env
+npm run dev                # API en :3000 y app en http://localhost:5176 (se abre sola)
 ```
 
-### Convención de commits → bump de versión
+`npm run dev` (raíz) arranca la API, espera a que responda y lanza Vite en el puerto 5176; `Ctrl+C`
+para los dos. También puedes arrancarlos por separado con `npm run dev` dentro de `backend/` y `frontend/`.
+Sin `RESEND_API_KEY` los enlaces de verificación y recuperación se imprimen en la consola de la API.
+Para el login con Google en local, añade `http://localhost:5176` como origen autorizado en Google Cloud.
 
-| Prefijo                        | Bump                  |
-| ------------------------------ | --------------------- |
-| `feat!:` o `BREAKING CHANGE`   | major `1.0.0 → 2.0.0` |
-| `feat:`                        | minor `1.0.0 → 1.1.0` |
-| `fix:`, `chore:`, `refactor:`… | patch `1.0.0 → 1.0.1` |
+La base de datos SQLite se crea y migra sola al arrancar (`DATABASE_PATH`, por defecto `backend/data/money-manager.db`).
+Para un usuario de prueba en local: `SEED_DEMO_USER=true` y `SEED_DEMO_PASSWORD=...` en `backend/.env`.
 
-> Documentación completa: [`.agent/workflows/release-to-master.md`](.agent/workflows/release-to-master.md)
+| Comando | Qué hace |
+|---|---|
+| `npm test` / `npm run test:coverage` | Tests (backend: unitarios + integración HTTP con SQLite en memoria) |
+| `npm run lint`, `npx tsc --noEmit` | Lint y tipos |
+| `npm run db:migrate` (backend) | Aplica migraciones pendientes (también se hace al arrancar) |
+| `npm run db:backup` (backend) | Copia consistente de la BD en `BACKUP_DIR` |
+| `npm run build:android:prod` (frontend) | Build web para la app Android y `cap sync` |
 
----
+## Producción
+
+`.github/workflows/ci-deploy.yml` ejecuta el CI completo y, en `master`, llama por SSH a
+`deploy/scripts/deploy.sh`, que:
+
+1. actualiza el checkout,
+2. construye las imágenes `money-manager-api` y `money-manager-web` **sin parar el servicio**,
+3. la primera vez, copia la base de datos antigua (`backend/data/money-manager.db`, que vivía dentro del checkout) al volumen `api_db`,
+4. recrea solo los contenedores que cambian y espera al healthcheck de la API.
+
+Configuración en `deploy/.env` (plantilla en `deploy/.env.example`). Obligatorio: `JWT_SECRET`
+(la API no arranca sin él o con un valor publicado). Para el login con Google, `GOOGLE_CLIENT_ID`.
+Para cobrar: `STRIPE_*` (y el webhook en el panel de Stripe apuntando a `/api/billing/webhook`);
+para la IA: `CLOUDFLARE_ACCOUNT_ID` y `CLOUDFLARE_AI_TOKEN`.
+
+### Datos y copias de seguridad
+
+- La BD vive en el volumen Docker `api_db` (`/data/money-manager.db`), fuera del repositorio.
+- La API hace una copia diaria consistente en el volumen `api_backups` y conserva `BACKUP_RETENTION_DAYS` días.
+- Antes de aplicar migraciones guarda además `pre-migration-v<N>-<fecha>.db` junto a la BD.
+- **Copia `api_backups` fuera del servidor** (rclone, restic…): un volumen en la misma máquina no protege de perder la máquina.
+
+## Seguridad
+
+- Contraseñas con bcrypt y política común (8+ caracteres, mayúscula, número y símbolo) en registro, reset y cambio.
+- Access token JWT de 15 min con versión de sesión: cambiar o restablecer la contraseña y "cerrar sesión
+  en todos los dispositivos" invalidan al momento todos los tokens. Los refresh tokens son aleatorios,
+  se guardan hasheados y caducan a los 30 días sin uso.
+- El login con Google verifica que el token se emitió para nuestro `GOOGLE_CLIENT_ID`.
+- Límites de intentos (login, registro, emails, IA), helmet, CORS con lista blanca, sin enumeración de
+  cuentas en la recuperación de contraseña, nombres escapados en los emails.

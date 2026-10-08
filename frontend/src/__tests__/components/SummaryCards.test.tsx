@@ -65,13 +65,13 @@ describe('SummaryCards', () => {
   test('savings rate >= 20 shows green accent', () => {
     const highSavings = { ...baseSummary, totalIncome: 1000, totalSaving: 200 };
     render(<SummaryCards summary={highSavings} carryover={0} />);
-    expect(screen.getByText('20.0%')).toBeInTheDocument();
+    expect(screen.getByText('20,0%')).toBeInTheDocument();
   });
 
   test('savings rate 10-20 shows amber accent', () => {
     const midSavings = { ...baseSummary, totalIncome: 1000, totalSaving: 150 };
     render(<SummaryCards summary={midSavings} carryover={0} />);
-    expect(screen.getByText('15.0%')).toBeInTheDocument();
+    expect(screen.getByText('15,0%')).toBeInTheDocument();
   });
 
   test('negative balance shows red accent on Saldo disponible', () => {

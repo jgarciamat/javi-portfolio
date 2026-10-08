@@ -1,44 +1,28 @@
 import { useState } from 'react';
-import type { TooltipState } from '@modules/finances/ui/types';
-import { isNextYearDisabled } from '@modules/finances/domain/nextMonthLogic';
+import { MIN_YEAR, maxPeriod, type YearMonth } from '@modules/finances/domain/nextMonthLogic';
 
-export function useAnnualChart(initialYear: number) {
+export interface TooltipState {
+  text: string;
+  color: string;
+  x: number;
+  y: number;
+}
+
+/** Year shown in the annual view (MIN_YEAR … year of the planning horizon) and its tooltip. */
+export function useAnnualChart(initialYear: number, current: YearMonth) {
+  const lastYear = maxPeriod(current).year;
   const [year, setYear] = useState(initialYear);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-
-  const showTooltip = (e: React.MouseEvent, text: string, color: string) => {
-    setTooltip({ text, color, x: e.clientX, y: e.clientY });
-  };
-
-  const moveTooltip = (e: React.MouseEvent, text: string, color: string) => {
-    setTooltip({ text, color, x: e.clientX, y: e.clientY });
-  };
-
-  const hideTooltip = () => setTooltip(null);
-
-  const leaveBar = (e: React.MouseEvent) => {
-    const related = e.relatedTarget as HTMLElement | null;
-    if (related && related.classList?.contains('annual-bar')) return;
-    hideTooltip();
-  };
-
-  const prevYear = () => setYear((y) => (y <= 2026 ? y : y - 1));
-  const nextYear = () => {
-    if (!isNextYearDisabled(year)) setYear((y) => y + 1);
-  };
-  const prevYearDisabled = year <= 2026;
-  const nextYearDisabled = isNextYearDisabled(year);
 
   return {
     year,
     tooltip,
-    showTooltip,
-    moveTooltip,
-    hideTooltip,
-    leaveBar,
-    prevYear,
-    nextYear,
-    prevYearDisabled,
-    nextYearDisabled,
+    showTooltip: (e: { clientX: number; clientY: number }, text: string, color: string) =>
+      setTooltip({ text, color, x: e.clientX, y: e.clientY }),
+    hideTooltip: () => setTooltip(null),
+    prevYear: () => setYear((y) => Math.max(MIN_YEAR, y - 1)),
+    nextYear: () => setYear((y) => Math.min(lastYear, y + 1)),
+    prevYearDisabled: year <= MIN_YEAR,
+    nextYearDisabled: year >= lastYear,
   };
 }

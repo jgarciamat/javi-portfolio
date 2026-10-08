@@ -1,0 +1,240 @@
+import request from 'supertest';
+import { FinancialAdvisor } from '@domain/ports/services';
+import {
+  TestContext,
+  TestUser,
+  addTransaction,
+  createTestApp,
+  createUser,
+} from '../helpers/testApp';
+
+describe('Import', () => {
+  let ctx: TestContext;
+  let user: TestUser;
+
+  beforeEach(async () => {
+    ctx = createTestApp();
+    user = await createUser(ctx);
+  });
+
+  const rows = [
+    { date: '2026-03-01', description: 'NOMINA EMPRESA SL', amount: 1800 },
+    { date: '2026-03-02', description: 'MERCADONA VALENCIA', amount: -54.3 },
+    { date: '2026-03-03', description: 'Bar Pepe', amount: -3.2 },
+    { date: '2026-03-03', description: 'Bar Pepe', amount: -3.2 },
+    { date: '2026-03-04', description: 'Regalo tía', amount: -20, category: 'Regalos' },
+    { date: 'not a date', description: 'roto', amount: -1 },
+  ];
+
+  it('previews categories without writing anything (dry run)', async () => {
+    await addTransaction(ctx, user, {
+      description: 'Bar Pepe',
+      category: 'Ocio',
+      date: '2026-02-01',
+    });
+    const res = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows, dryRun: true })
+      .expect(200);
+    expect(res.body).toMatchObject({ dryRun: true, imported: 5, invalid: 1, duplicates: 0 });
+    const byIndex = (i: number) => res.body.rows.find((r: { index: number }) => r.index === i);
+    expect(byIndex(0)).toMatchObject({
+      type: 'INCOME',
+      categoryName: 'Salario',
+      categorySource: 'keywords',
+      amount: 1800,
+    });
+    expect(byIndex(1)).toMatchObject({
+      type: 'EXPENSE',
+      categoryName: 'Alimentación',
+      amount: 54.3,
+    });
+    expect(byIndex(2)).toMatchObject({ categoryName: 'Ocio', categorySource: 'history' });
+    expect(byIndex(4)).toMatchObject({ categoryName: 'Regalos', categorySource: 'file' });
+    expect(byIndex(5)).toMatchObject({ status: 'invalid' });
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    expect(month.transactions).toHaveLength(0);
+  });
+
+  it('imports and skips duplicates when the same file is imported again', async () => {
+    const first = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows })
+      .expect(201);
+    expect(first.body).toMatchObject({ imported: 5, duplicates: 0, invalid: 1 });
+    const again = await request(ctx.app)
+      .post('/api/transactions/import')
+      .set(user.auth)
+      .send({ rows })
+      .expect(201);
+    expect(again.body).toMatchObject({ imported: 0, duplicates: 5 });
+    const month = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    expect(month.transactions).toHaveLength(5);
+    expect(month.summary.totalExpenses).toBe(80.7);
+  });
+});
+
+describe('Export', () => {
+  it('returns every piece of user data as a JSON attachment', async () => {
+    const ctx = createTestApp();
+    const user = await createUser(ctx);
+    await addTransaction(ctx, user, { amount: 9.99, description: 'Netflix' });
+    await request(ctx.app).post('/api/goals').set(user.auth).send({ name: 'Moto', target: 2000 });
+    const res = await request(ctx.app).get('/api/export').set(user.auth).expect(200);
+    expect(res.headers['content-disposition']).toMatch(
+      /attachment; filename="money-manager-2026-03-15.json"/
+    );
+    expect(res.body).toMatchObject({ format: 'money-manager-export', version: 2 });
+    expect(res.body.profile.email).toBe(user.email);
+    expect(res.body.transactions).toEqual([
+      expect.objectContaining({
+        description: 'Netflix',
+        amount: 9.99,
+        category: 'Ocio',
+        account: 'Principal',
+      }),
+    ]);
+    expect(res.body.goals[0]).toMatchObject({ name: 'Moto', target: 2000 });
+    expect(res.body.categories.length).toBeGreaterThan(10);
+    expect(JSON.stringify(res.body)).not.toMatch(/passwordHash|password_hash|tokenHash/);
+  });
+});
+
+describe('Settings', () => {
+  it('a custom month start day moves movements to the right period', async () => {
+    const ctx = createTestApp({ now: '2026-03-27T12:00:00Z' });
+    const user = await createUser(ctx);
+    await addTransaction(ctx, user, { date: '2026-03-24', amount: 10 });
+    await addTransaction(ctx, user, { date: '2026-03-26', amount: 20 });
+
+    const updated = await request(ctx.app)
+      .patch('/api/settings')
+      .set(user.auth)
+      .send({ monthStartDay: 25, currency: 'usd', locale: 'en' })
+      .expect(200);
+    expect(updated.body).toMatchObject({ monthStartDay: 25, currency: 'USD', locale: 'en' });
+    expect(updated.body.currentPeriod).toEqual({
+      year: 2026,
+      month: 4,
+      start: '2026-03-25',
+      end: '2026-04-24',
+    });
+
+    const april = (await request(ctx.app).get('/api/months/2026/4').set(user.auth)).body;
+    expect(april).toMatchObject({ start: '2026-03-25', end: '2026-04-24', isCurrent: true });
+    expect(april.transactions.map((t: { amount: number }) => t.amount)).toEqual([20]);
+    const march = (await request(ctx.app).get('/api/months/2026/3').set(user.auth)).body;
+    expect(march.transactions.map((t: { amount: number }) => t.amount)).toEqual([10]);
+
+    await request(ctx.app)
+      .patch('/api/settings')
+      .set(user.auth)
+      .send({ monthStartDay: 31 })
+      .expect(400);
+    await request(ctx.app)
+      .patch('/api/settings')
+      .set(user.auth)
+      .send({ currency: 'XXX' })
+      .expect(400);
+  });
+});
+
+describe('Stats', () => {
+  let ctx: TestContext;
+  let user: TestUser;
+
+  beforeEach(async () => {
+    ctx = createTestApp({ now: '2026-04-10T12:00:00Z' });
+    user = await createUser(ctx);
+  });
+
+  it('compares each category with the previous month and the 3-month average', async () => {
+    await addTransaction(ctx, user, { category: 'Ocio', amount: 30, date: '2026-01-10' });
+    await addTransaction(ctx, user, { category: 'Ocio', amount: 60, date: '2026-02-10' });
+    await addTransaction(ctx, user, { category: 'Ocio', amount: 90, date: '2026-03-10' });
+    await addTransaction(ctx, user, { category: 'Ocio', amount: 120, date: '2026-04-05' });
+    const res = await request(ctx.app).get('/api/stats/trends/2026/4').set(user.auth).expect(200);
+    expect(res.body.categories).toEqual([
+      {
+        categoryName: 'Ocio',
+        current: 120,
+        previous: 90,
+        average3: 60,
+        changeVsPreviousPct: 33.3,
+        changeVsAveragePct: 100,
+      },
+    ]);
+  });
+
+  it('builds the net worth evolution (available + saved)', async () => {
+    await addTransaction(ctx, user, {
+      type: 'INCOME',
+      category: 'Salario',
+      amount: 1000,
+      date: '2026-02-01',
+    });
+    await addTransaction(ctx, user, {
+      type: 'SAVING',
+      category: 'Ahorro',
+      amount: 200,
+      date: '2026-03-01',
+    });
+    await addTransaction(ctx, user, { amount: 100, date: '2026-04-01' });
+    const res = await request(ctx.app)
+      .get('/api/stats/net-worth?months=3')
+      .set(user.auth)
+      .expect(200);
+    expect(res.body).toEqual([
+      { year: 2026, month: 2, available: 1000, saved: 0, netWorth: 1000 },
+      { year: 2026, month: 3, available: 800, saved: 200, netWorth: 1000 },
+      { year: 2026, month: 4, available: 700, saved: 200, netWorth: 900 },
+    ]);
+  });
+});
+
+describe('AI advice', () => {
+  it('uses the AI provider and falls back to rules when it fails', async () => {
+    const advisor: FinancialAdvisor = {
+      name: 'fake',
+      getAdvice: jest
+        .fn()
+        .mockResolvedValueOnce({
+          advice: { summary: 'IA', tips: [], positives: [], warnings: [] },
+          usage: { neurons: 20 },
+        })
+        .mockRejectedValue(new Error('provider down')),
+    };
+    const errorLog = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const ctx = createTestApp({ advisor });
+    const user = await createUser(ctx);
+    await addTransaction(ctx, user, { type: 'INCOME', category: 'Salario', amount: 1000 });
+
+    const ai = await request(ctx.app)
+      .post('/api/ai/advice')
+      .set(user.auth)
+      .send({ year: 2026, month: 3 })
+      .expect(200);
+    expect(ai.body).toMatchObject({ summary: 'IA', source: 'ai', ai: { used: 1, quota: 30 } });
+    const cached = await request(ctx.app)
+      .post('/api/ai/advice')
+      .set(user.auth)
+      .send({ year: 2026, month: 3 });
+    expect(cached.body).toMatchObject({ source: 'ai', ai: { used: 1 } }); // cache hits are free
+    expect(advisor.getAdvice).toHaveBeenCalledTimes(1);
+    const context = (advisor.getAdvice as jest.Mock).mock.calls[0][0];
+    expect(context).toMatchObject({ totalIncome: 1000, currency: 'EUR', transactionCount: 1 });
+    expect(JSON.stringify(context)).not.toMatch(/Movimiento/); // descriptions are never sent
+
+    await addTransaction(ctx, user, { amount: 10 });
+    const fallback = await request(ctx.app)
+      .post('/api/ai/advice')
+      .set(user.auth)
+      .send({ year: 2026, month: 3, locale: 'en' });
+    expect(fallback.body).toMatchObject({ source: 'rules', reason: 'error' });
+    expect(fallback.body.summary).toMatch(/income/);
+    expect(errorLog).toHaveBeenCalled();
+    errorLog.mockRestore();
+  });
+});

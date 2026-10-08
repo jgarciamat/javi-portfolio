@@ -1,4 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useState } from 'react';
+import { useClickOutside } from '@shared/hooks/useClickOutside';
+import { useEscapeKey } from '@shared/hooks/useEscapeKey';
 import './css/OptionsDropdown.css';
 
 export interface DropdownOption {
@@ -9,35 +11,17 @@ export interface DropdownOption {
 
 interface OptionsDropdownProps {
   options: DropdownOption[];
-  /** aria-label for the toggle button */
-  ariaLabel?: string;
+  /** Accessible name of the toggle button. */
+  ariaLabel: string;
 }
 
-export function OptionsDropdown({ options, ariaLabel = 'Opciones' }: OptionsDropdownProps) {
+/** Small menu of actions; closes on choice, outside click or Escape. */
+export function OptionsDropdown({ options, ariaLabel }: OptionsDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open]);
-
-  // Close on Escape
-  useEffect(() => {
-    if (!open) return;
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  }, [open]);
+  const close = () => setOpen(false);
+  useClickOutside(ref, close, open);
+  useEscapeKey(close, open);
 
   return (
     <div className="options-dropdown" ref={ref}>
@@ -64,18 +48,17 @@ export function OptionsDropdown({ options, ariaLabel = 'Opciones' }: OptionsDrop
           />
         </svg>
       </button>
-
       {open && (
         <ul className="options-dropdown-menu" role="menu">
-          {options.map((opt, i) => (
-            <li key={i} role="none">
+          {options.map((opt) => (
+            <li key={opt.label} role="none">
               <button
                 type="button"
                 role="menuitem"
                 className="options-dropdown-item"
                 onClick={() => {
+                  close();
                   opt.onClick();
-                  setOpen(false);
                 }}
               >
                 {opt.icon && <span className="options-dropdown-item-icon">{opt.icon}</span>}

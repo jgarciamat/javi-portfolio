@@ -28,3 +28,9 @@ beforeAll(() => {
 afterAll(() => {
   console.warn = originalWarn;
 });
+
+// jsdom lacks TextEncoder/TextDecoder (used to read bank statements in the import modal).
+import { TextDecoder as NodeTextDecoder, TextEncoder as NodeTextEncoder } from 'util';
+if (typeof globalThis.TextDecoder === 'undefined') {
+  Object.assign(globalThis, { TextDecoder: NodeTextDecoder, TextEncoder: NodeTextEncoder });
+}

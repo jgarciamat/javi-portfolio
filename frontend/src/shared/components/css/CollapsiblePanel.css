@@ -61,3 +61,12 @@
 .collapsible-body--open .collapsible-body-inner {
   padding: 0.75rem 1.25rem 1.25rem;
 }
+
+.collapsible-panel--flush {
+  margin-bottom: 0;
+}
+
+.collapsible-panel--spaced {
+  margin-top: 1.25rem;
+  margin-bottom: 0;
+}

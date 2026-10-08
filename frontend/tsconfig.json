@@ -21,7 +21,8 @@
       "@modules/*": ["src/modules/*"],
       "@shared/*": ["src/shared/*"],
       "@core/*": ["src/core/*"],
-      "@locales/*": ["src/locales/*"]
+      "@locales/*": ["src/locales/*"],
+      "@test-utils/*": ["src/test-utils/*"]
     }
   },
   "include": ["src", "vite-env.d.ts"],

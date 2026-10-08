@@ -262,9 +262,7 @@
   gap: 0.15rem;
   background: #0f172a;
   border: 1px solid transparent;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .tx-calendar-cell--empty {
@@ -462,10 +460,15 @@
 }
 
 .cal-modal-title {
+  display: inline-block;
   font-size: 0.95rem;
   font-weight: 700;
   color: #f1f5f9;
-  text-transform: capitalize;
+}
+
+/* "jueves, 8 de octubre" → "Jueves, 8 de octubre" (not every word). */
+.cal-modal-title::first-letter {
+  text-transform: uppercase;
 }
 
 .cal-modal-close {
@@ -477,9 +480,7 @@
   padding: 0.2rem 0.4rem;
   border-radius: 6px;
   line-height: 1;
-  transition:
-    background 0.12s,
-    color 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
 
 .cal-modal-close:hover {
@@ -629,4 +630,26 @@
     align-items: center;
     padding: 1rem;
   }
+}
+
+/* Week headers and calendar days are buttons (keyboard accessible). */
+button.tx-week-header,
+button.tx-calendar-cell {
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+button.tx-week-header {
+  border: none;
+  border-bottom: 1px solid #1e293b;
+}
+
+button.tx-calendar-cell:focus-visible {
+  outline: 2px solid #6366f1;
+}
+
+.tx-week-items {
+  display: block;
 }

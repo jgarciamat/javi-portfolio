@@ -1,48 +1,66 @@
-import type { SummaryCardsProps } from '../types';
-import '../css/SummaryCards.css';
-import { formatCurrency } from '../types/SummaryCards.types';
+import type { CSSProperties } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useSummaryCards } from '../../application/hooks/useSummaryCards';
+import { useFormat } from '@core/settings/SettingsContext';
+import type { FinancialSummary } from '@modules/finances/domain/types';
+import { buildSummaryCards } from '@modules/finances/domain/summaryCards';
+import '../css/SummaryCards.css';
+
+interface SummaryCardsProps {
+  summary: FinancialSummary;
+  carryover: number | null;
+}
+
+function Card({
+  title,
+  icon,
+  value,
+  sub,
+  accent,
+  className = '',
+}: {
+  title: string;
+  icon: string;
+  value: string;
+  sub: string;
+  accent: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`summary-card ${className}`.trim()}
+      style={{ '--accent': accent } as CSSProperties}
+    >
+      <div className="summary-card-header">
+        <span className="summary-card-title">{title}</span>
+        <span className="summary-card-icon" aria-hidden="true">
+          {icon}
+        </span>
+      </div>
+      <div className="summary-card-value">{value}</div>
+      <div className="summary-card-sub">{sub}</div>
+    </div>
+  );
+}
 
 export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
   const { t } = useI18n();
-  const { saldoTotal, carryoverAmount, cards } = useSummaryCards(summary, carryover, t);
+  const { money, percent } = useFormat();
+  const carried = carryover ?? 0;
+  const available = carried + summary.balance;
 
   return (
     <section aria-label={t('app.summary.ariaLabel')}>
       <div className="summary-grid">
-        {/* Saldo disponible */}
-        <div
-          className="summary-card summary-card-carryover"
-          style={{ '--accent': saldoTotal >= 0 ? '#6366f1' : '#ef4444' } as React.CSSProperties}
-        >
-          <div className="summary-card-header">
-            <span className="summary-card-title">{t('app.summary.availableBalance')}</span>
-            <span className="summary-card-icon" aria-hidden="true">
-              🏦
-            </span>
-          </div>
-          <div className="summary-card-value">{formatCurrency(saldoTotal)}</div>
-          <div className="summary-card-sub">
-            {t('app.summary.carryover')}: {formatCurrency(carryoverAmount)}
-          </div>
-        </div>
-
-        {cards.map((card) => (
-          <div
-            key={card.title}
-            className="summary-card"
-            style={{ '--accent': card.accent } as React.CSSProperties}
-          >
-            <div className="summary-card-header">
-              <span className="summary-card-title">{card.title}</span>
-              <span className="summary-card-icon" aria-hidden="true">
-                {card.icon}
-              </span>
-            </div>
-            <div className="summary-card-value">{card.value}</div>
-            <div className="summary-card-sub">{card.sub}</div>
-          </div>
+        <Card
+          className="summary-card-carryover"
+          title={t('app.summary.availableBalance')}
+          icon="🏦"
+          value={money(available)}
+          sub={`${t('app.summary.carryover')}: ${money(carried)}`}
+          accent={available >= 0 ? '#6366f1' : '#ef4444'}
+        />
+        {buildSummaryCards(summary, t, money, (n) => percent(n)).map(({ key, ...card }) => (
+          <Card key={key} {...card} />
         ))}
       </div>
     </section>

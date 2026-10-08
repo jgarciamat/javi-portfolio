@@ -14,10 +14,7 @@
   font-size: 0.82rem;
   padding: 0.35rem 0.6rem;
   cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
 }
 
@@ -79,9 +76,7 @@
   cursor: pointer;
   color: #94a3b8;
   font-size: 0.85rem;
-  transition:
-    background 0.12s,
-    color 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
 
 .lang-option:hover {
@@ -93,4 +88,13 @@
   color: #f1f5f9;
   background: #334155;
   font-weight: 600;
+}
+
+button.lang-option {
+  width: 100%;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
 }

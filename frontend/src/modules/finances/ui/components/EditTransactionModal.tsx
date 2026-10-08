@@ -1,12 +1,28 @@
-import { useEffect } from 'react';
+import { useI18n } from '@core/i18n/I18nContext';
+import { useFormat } from '@core/settings/SettingsContext';
+import { Modal } from '@shared/components/Modal';
+import type {
+  Account,
+  Category,
+  Transaction,
+  UpdateTransactionDTO,
+} from '@modules/finances/domain/types';
+import { txDayKey } from '@modules/finances/domain/transactionGrouping';
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
+import { TransactionFormFields } from './TransactionFormFields';
 import '../css/TransactionForm.css';
 import '../css/EditTransactionModal.css';
-import type { UpdateTransactionDTO } from '@modules/finances/domain/types';
-import { TransactionFormFields } from './TransactionFormFields';
-import { useI18n } from '@core/i18n/I18nContext';
-import { isoToDateInput } from '../types/TransactionTable.types';
-import type { EditTransactionModalProps } from '../types/EditTransactionModal.types';
+
+export interface EditTransactionModalProps {
+  transaction: Transaction;
+  categories: Category[];
+  /** Saves and closes the dialog (the caller unmounts it). */
+  onSave: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
+  onClose: () => void;
+  onManageCategories: () => void;
+  availableBalance: number;
+  accounts: Account[];
+}
 
 export function EditTransactionModal({
   transaction,
@@ -14,99 +30,69 @@ export function EditTransactionModal({
   onSave,
   onClose,
   onManageCategories,
-  viewYear,
-  viewMonth,
   availableBalance,
+  accounts,
 }: EditTransactionModalProps) {
   const { t } = useI18n();
-
+  const { money } = useFormat();
   const form = useTransactionForm({
-    viewYear,
-    viewMonth,
-    availableBalance,
-    onSubmit: async (dto) => {
-      const updateDto: UpdateTransactionDTO = {
-        description: dto.description,
-        amount: dto.amount,
-        type: dto.type,
-        category: dto.category,
-        date: dto.date,
-        notes: dto.notes,
-      };
-      await onSave(transaction.id, updateDto);
-    },
+    // Editing a saving: its own amount is already counted in the available balance.
+    availableBalance:
+      transaction.type === 'SAVING' ? availableBalance + transaction.amount : availableBalance,
+    formatMoney: money,
+    t,
+    defaultDate: txDayKey(transaction.date),
+    onSubmit: (dto) => onSave(transaction.id, dto),
     initialValues: {
       description: transaction.description,
       amount: String(transaction.amount),
       type: transaction.type,
       category: transaction.category,
-      date: isoToDateInput(transaction.date),
+      date: txDayKey(transaction.date),
       notes: transaction.notes ?? '',
+      accountId: transaction.accountId ?? null,
     },
   });
 
-  const { handleSubmit, loading, error } = form;
-
-  // Close on Escape key
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   return (
-    <div
-      className="edit-tx-overlay"
-      onClick={handleOverlayClick}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('app.transaction.edit.title')}
+    <Modal
+      label={t('app.transaction.edit.title')}
+      onClose={onClose}
+      dismissible={!form.loading}
+      overlayClassName="edit-tx-overlay"
+      className="edit-tx-modal"
     >
-      <div className="edit-tx-modal">
-        <div className="edit-tx-modal-header">
-          <h2 className="edit-tx-modal-title">✏️ {t('app.transaction.edit.title')}</h2>
-          <button
-            className="edit-tx-modal-close"
-            onClick={onClose}
-            aria-label={t('app.transaction.form.cancel')}
-          >
-            ✕
+      <div className="edit-tx-modal-header">
+        <h2 className="edit-tx-modal-title">✏️ {t('app.transaction.edit.title')}</h2>
+        <button
+          className="edit-tx-modal-close"
+          onClick={onClose}
+          aria-label={t('app.transaction.form.cancel')}
+        >
+          ✕
+        </button>
+      </div>
+      <form onSubmit={form.handleSubmit} className="tx-form" noValidate>
+        <TransactionFormFields
+          form={form}
+          categories={categories}
+          onManageCategories={onManageCategories}
+          accounts={accounts}
+        />
+        {form.error && (
+          <p className="inline-error" role="alert">
+            {form.error}
+          </p>
+        )}
+        <div className="edit-tx-modal-actions">
+          <button type="submit" className="btn-primary" disabled={form.loading}>
+            {form.loading ? t('app.transaction.form.saving') : t('app.transaction.edit.save')}
+          </button>
+          <button type="button" className="btn-cancel" onClick={onClose} disabled={form.loading}>
+            {t('app.transaction.form.cancel')}
           </button>
         </div>
-
-        <form
-          onSubmit={async (e) => {
-            const ok = await handleSubmit(e);
-            if (ok) onClose();
-          }}
-          className="tx-form"
-        >
-          <TransactionFormFields
-            form={form}
-            categories={categories}
-            onManageCategories={onManageCategories}
-          />
-
-          {error && (
-            <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0.4rem 0' }}>{error}</p>
-          )}
-
-          <div className="edit-tx-modal-actions">
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? t('app.transaction.form.saving') : t('app.transaction.edit.save')}
-            </button>
-            <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>
-              {t('app.transaction.form.cancel')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

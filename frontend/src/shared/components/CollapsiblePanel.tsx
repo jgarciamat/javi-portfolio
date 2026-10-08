@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import './css/CollapsiblePanel.css';
 
 interface CollapsiblePanelProps {
@@ -12,7 +12,7 @@ interface CollapsiblePanelProps {
   /** Extra class applied to the outer .card wrapper */
   className?: string;
   /** Inline style applied to the outer .card wrapper */
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export function CollapsiblePanel({
@@ -25,7 +25,8 @@ export function CollapsiblePanel({
   style,
 }: CollapsiblePanelProps) {
   const [openInternal, setOpenInternal] = useState(defaultOpen);
-  const open = openProp !== undefined ? openProp : openInternal;
+  const open = openProp ?? openInternal;
+  const bodyId = useId();
 
   return (
     <div className={`card collapsible-panel${className ? ` ${className}` : ''}`} style={style}>
@@ -33,14 +34,14 @@ export function CollapsiblePanel({
         className={`collapsible-header${open ? ' collapsible-header--open' : ''}`}
         onClick={() => (onToggle ? onToggle() : setOpenInternal((v) => !v))}
         aria-expanded={open}
-        title={open ? 'Contraer' : 'Expandir'}
+        aria-controls={bodyId}
       >
         <span className="collapsible-title">{title}</span>
         <span className="collapsible-chevron" aria-hidden="true">
           ›
         </span>
       </button>
-      <div className={`collapsible-body${open ? ' collapsible-body--open' : ''}`}>
+      <div id={bodyId} className={`collapsible-body${open ? ' collapsible-body--open' : ''}`}>
         <div className="collapsible-body-inner">{children}</div>
       </div>
     </div>

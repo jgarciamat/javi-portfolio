@@ -1,28 +1,47 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import esMessages from '@locales/es.json';
 import enMessages from '@locales/en.json';
+import { storage } from '@shared/utils/storage';
 
 export type Locale = 'es' | 'en';
 
 type Messages = Record<string, string>;
+type Vars = Record<string, string | number>;
 
-const MESSAGES: Record<Locale, Messages> = {
-  es: esMessages,
-  en: enMessages,
-};
-
+const MESSAGES: Record<Locale, Messages> = { es: esMessages, en: enMessages };
 const STORAGE_KEY = 'mm_locale';
 
+const isLocale = (value: unknown): value is Locale => value === 'es' || value === 'en';
+
 function loadLocale(): Locale {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored === 'en' || stored === 'es' ? stored : 'es';
+  const stored = storage.get(STORAGE_KEY);
+  return isLocale(stored) ? stored : 'es';
 }
 
-interface I18nContextValue {
+/** Replaces every `{name}` in `text` with `vars.name`. */
+export function interpolate(text: string, vars?: Vars): string {
+  if (!vars) return text;
+  return Object.entries(vars).reduce(
+    (acc, [key, value]) => acc.split(`{${key}}`).join(String(value)),
+    text
+  );
+}
+
+/** Translation of `key` (Spanish when the key is missing in `locale`, the key itself as last resort). */
+export function translate(locale: Locale, key: string, vars?: Vars): string {
+  return interpolate(MESSAGES[locale][key] ?? MESSAGES.es[key] ?? key, vars);
+}
+
+/** Category names are stored in Spanish; the default ones have a translation. */
+export function translateCategory(locale: Locale, name: string): string {
+  return MESSAGES[locale][`app.categories.${name.replace(/\s+/g, '')}`] ?? name;
+}
+
+export interface I18nContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string, vars?: Record<string, string | number>) => string;
-  /** Returns the translated display name for a canonical (Spanish) category name */
+  t: (key: string, vars?: Vars) => string;
+  /** Display name of a category in the active language. */
   tCategory: (name: string) => string;
 }
 
@@ -31,62 +50,26 @@ const I18nContext = createContext<I18nContextValue | null>(null);
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(loadLocale);
 
-  const setLocale = useCallback((newLocale: Locale) => {
-    localStorage.setItem(STORAGE_KEY, newLocale);
-    setLocaleState(newLocale);
+  const setLocale = useCallback((next: Locale) => {
+    storage.set(STORAGE_KEY, next);
+    setLocaleState(next);
   }, []);
 
-  /** Translate a key with optional variable interpolation: t('key', { count: 5 }) */
-  const t = useCallback(
-    (key: string, vars?: Record<string, string | number>): string => {
-      const messages = MESSAGES[locale];
-      let text = messages[key] ?? MESSAGES['es'][key] ?? key;
-      if (vars) {
-        Object.entries(vars).forEach(([k, v]) => {
-          text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
-        });
-      }
-      return text;
-    },
-    [locale]
+  const value = useMemo<I18nContextValue>(
+    () => ({
+      locale,
+      setLocale,
+      t: (key, vars) => translate(locale, key, vars),
+      tCategory: (name) => translateCategory(locale, name),
+    }),
+    [locale, setLocale]
   );
 
-  /**
-   * Translate a category name stored in the DB (always Spanish canonical form)
-   * to the currently active locale.
-   * Key format: app.categories.<NameWithoutSpaces>
-   */
-  const tCategory = useCallback(
-    (name: string): string => {
-      // Normalise key: strip spaces and special chars to match JSON key format
-      const key = `app.categories.${name.replace(/\s+/g, '')}`;
-      const messages = MESSAGES[locale];
-      return messages[key] ?? name;
-    },
-    [locale]
-  );
-
-  return (
-    <I18nContext.Provider value={{ locale, setLocale, t, tCategory }}>
-      {children}
-    </I18nContext.Provider>
-  );
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n(): I18nContextValue {
   const ctx = useContext(I18nContext);
-  if (!ctx) {
-    if (import.meta.env.DEV) {
-      // During HMR, providers may temporarily be unavailable — return a no-op fallback
-      // so the app doesn't crash. The real context will be restored on next render.
-      return {
-        locale: 'es',
-        setLocale: () => undefined,
-        t: (key: string) => key,
-        tCategory: (name: string) => name,
-      };
-    }
-    throw new Error('useI18n must be used inside I18nProvider');
-  }
+  if (!ctx) throw new Error('useI18n must be used inside I18nProvider');
   return ctx;
 }

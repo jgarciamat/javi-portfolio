@@ -1,69 +1,68 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Transaction, UpdateTransactionDTO } from '@modules/finances/domain/types';
+import { storage } from '@shared/utils/storage';
+import { isDashboardTab, type DashboardTab } from '../../ui/navigation';
 
-export type DashboardTab = 'monthly' | 'annual' | 'automations' | 'custom-alerts';
+const TAB_KEY = 'mm_last_tab';
 
-interface UseDashboardOptions {
-  year: number;
-  month: number;
+const loadTab = (): DashboardTab => {
+  const stored = storage.get(TAB_KEY);
+  return isDashboardTab(stored) ? stored : 'monthly';
+};
+
+interface Options {
   navigateTo: (year: number, month: number) => void;
   updateTransaction: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
 }
 
-export interface UseDashboardReturn {
-  tab: DashboardTab;
-  setTab: (tab: DashboardTab) => void;
-  showCategoryModal: boolean;
-  openCategoryModal: () => void;
-  closeCategoryModal: () => void;
-  showProfile: boolean;
-  openProfile: () => void;
-  closeProfile: () => void;
-  editingTransaction: Transaction | null;
-  setEditingTransaction: (tx: Transaction | null) => void;
-  isCurrentMonth: boolean;
-  handleSaveEdit: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
-  handleMonthClick: (y: number, m: number) => void;
-}
-
-export function useDashboard({
-  year,
-  month,
-  navigateTo,
-  updateTransaction,
-}: UseDashboardOptions): UseDashboardReturn {
-  const now = new Date();
-
-  const [tab, setTab] = useState<DashboardTab>('monthly');
+/** Which section, menu and dialogs of the dashboard are open. */
+export function useDashboard({ navigateTo, updateTransaction }: Options) {
+  const [tab, setTabState] = useState<DashboardTab>(loadTab);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editVersion, setEditVersion] = useState(0);
 
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  /** The last section is remembered on this device. */
+  const setTab = useCallback((next: DashboardTab) => {
+    setTabState(next);
+    storage.set(TAB_KEY, next);
+  }, []);
 
   const handleSaveEdit = async (id: string, dto: UpdateTransactionDTO) => {
     await updateTransaction(id, dto);
     setEditingTransaction(null);
+    setEditVersion((v) => v + 1);
   };
 
-  const handleMonthClick = (y: number, m: number) => {
-    navigateTo(y, m);
+  const handleMonthClick = (year: number, month: number) => {
+    navigateTo(year, month);
     setTab('monthly');
   };
 
   return {
     tab,
     setTab,
+    menuOpen,
+    setMenuOpen,
     showCategoryModal,
     openCategoryModal: () => setShowCategoryModal(true),
     closeCategoryModal: () => setShowCategoryModal(false),
     showProfile,
     openProfile: () => setShowProfile(true),
     closeProfile: () => setShowProfile(false),
+    showImport,
+    openImport: () => setShowImport(true),
+    closeImport: () => setShowImport(false),
     editingTransaction,
     setEditingTransaction,
-    isCurrentMonth,
+    /** Incremented after an edit so lists outside the month view can reload. */
+    editVersion,
     handleSaveEdit,
     handleMonthClick,
   };
 }
+
+export type UseDashboardReturn = ReturnType<typeof useDashboard>;

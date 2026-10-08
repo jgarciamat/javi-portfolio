@@ -30,9 +30,7 @@
   padding: 0.4rem 0.9rem;
   cursor: pointer;
   font-size: 0.85rem;
-  transition:
-    border-color 0.15s,
-    color 0.15s;
+  transition: border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
