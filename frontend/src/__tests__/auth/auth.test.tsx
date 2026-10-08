@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { authApi } from '@core/api/authApi';
 import { ApiError } from '@core/api/http';
 import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
@@ -340,14 +340,36 @@ describe('VerifyEmailPage', () => {
 // ─── Static pages and auth page ──────────────────────────────────────────────
 
 describe('static pages', () => {
-  it('render the privacy policy and the terms, with a back button', () => {
-    const { unmount } = publicRender(<PrivacyPolicyPage />);
-    expect(screen.getByText(tr('app.privacy.title'))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr('app.privacy.back') }));
-    unmount();
-    publicRender(<TermsPage />);
+  /** The legal pages inside a small app, starting at `route`. */
+  const legalApp = (route: string) =>
+    publicRender(
+      <Routes>
+        <Route path="/" element={<p>inicio</p>} />
+        <Route path="/pricing" element={<Link to="/terms">ver condiciones</Link>} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      </Routes>,
+      route
+    );
+  const back = () => fireEvent.click(screen.getByRole('button', { name: tr('app.privacy.back') }));
+
+  it('go back to the previous screen of the app', () => {
+    legalApp('/pricing');
+    fireEvent.click(screen.getByRole('link', { name: 'ver condiciones' }));
     expect(screen.getByText(tr('terms.s5.title'))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr('app.privacy.back') }));
+    back();
+    expect(screen.getByRole('link', { name: 'ver condiciones' })).toBeInTheDocument();
+  });
+
+  it('go home when they were opened directly (new tab or external link)', () => {
+    const { unmount } = legalApp('/terms');
+    back();
+    expect(screen.getByText('inicio')).toBeInTheDocument();
+    unmount();
+    legalApp('/privacy');
+    expect(screen.getByText(tr('app.privacy.title'))).toBeInTheDocument();
+    back();
+    expect(screen.getByText('inicio')).toBeInTheDocument();
   });
 
   it('opens the register form from the pricing link', () => {
