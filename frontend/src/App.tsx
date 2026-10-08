@@ -1,41 +1,67 @@
+import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@shared/hooks/useAuth';
 import { ProtectedRoute } from '@shared/components/ProtectedRoute';
-import { AuthPage } from '@shared/components/AuthPage';
+import { AppSplash } from '@shared/components/AppSplash';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
+import { OfflineBanner } from '@shared/components/OfflineBanner';
 import { ApiProvider } from '@core/context/ApiContext';
-import { FinancesProvider } from './modules/finances/application/FinancesContext';
-import { Dashboard } from './modules/finances/ui/components/Dashboard';
-import { VerifyEmailPage } from './modules/auth/ui/VerifyEmailPage';
-import { ResetPasswordPage } from './modules/auth/ui/ResetPasswordPage';
-import { PrivacyPolicyPage } from './modules/auth/ui/PrivacyPolicyPage';
 import { I18nProvider } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
+import { SettingsProvider } from '@core/settings/SettingsContext';
+import { lazyNamed } from '@shared/utils/lazyNamed';
+
+// Every page is its own chunk: the login screen does not download the dashboard and vice versa.
+const AuthPage = lazyNamed(() => import('@shared/components/AuthPage'), 'AuthPage');
+const DashboardPage = lazyNamed(
+  () => import('./modules/finances/ui/components/DashboardPage'),
+  'DashboardPage'
+);
+const VerifyEmailPage = lazyNamed(
+  () => import('./modules/auth/ui/VerifyEmailPage'),
+  'VerifyEmailPage'
+);
+const ResetPasswordPage = lazyNamed(
+  () => import('./modules/auth/ui/ResetPasswordPage'),
+  'ResetPasswordPage'
+);
+const PrivacyPolicyPage = lazyNamed(
+  () => import('./modules/auth/ui/PrivacyPolicyPage'),
+  'PrivacyPolicyPage'
+);
+const PricingPage = lazyNamed(() => import('./modules/billing/ui/PricingPage'), 'PricingPage');
+const TermsPage = lazyNamed(() => import('./modules/billing/ui/TermsPage'), 'TermsPage');
 
 export default function App() {
-    return (
-        <I18nProvider>
-            <AuthProvider>
-                <ApiProvider>
-                    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                        <Routes>
-                            <Route path="/login" element={<AuthPage />} />
-                            <Route path="/verify-email" element={<VerifyEmailPage />} />
-                            <Route path="/reset-password" element={<ResetPasswordPage />} />
-                            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                            <Route element={<ProtectedRoute />}>
-                                <Route path="/" element={
-                                    <FinancesProvider>
-                                        <Dashboard />
-                                    </FinancesProvider>
-                                } />
-                            </Route>
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </BrowserRouter>
-                    <UpdatePrompt />
-                </ApiProvider>
-            </AuthProvider>
-        </I18nProvider>
-    );
+  return (
+    <I18nProvider>
+      <ErrorBoundary fullPage>
+        <AuthProvider>
+          <ApiProvider>
+            <SettingsProvider>
+              <BrowserRouter>
+                <Suspense fallback={<AppSplash />}>
+                  <Routes>
+                    <Route path="/login" element={<AuthPage />} />
+                    <Route path="/verify-email" element={<VerifyEmailPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                    <Route path="/pricing" element={<PricingPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route element={<ProtectedRoute />}>
+                      <Route path="/" element={<DashboardPage />} />
+                    </Route>
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </SettingsProvider>
+          </ApiProvider>
+        </AuthProvider>
+      </ErrorBoundary>
+      {/* Outside the boundary: a new version may be the fix for a crash. */}
+      <UpdatePrompt />
+      <OfflineBanner />
+    </I18nProvider>
+  );
 }
-

@@ -1,67 +1,79 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { Modal } from '@shared/components/Modal';
 import '../css/DeleteRuleModal.css';
-import type { VisibleScope, DeleteRuleModalProps } from '../types/DeleteRuleModal.types';
 
-export type { DeleteScope } from '../types/DeleteRuleModal.types';
+export type DeleteScope = 'none' | 'from_current' | 'all';
 
-export function DeleteRuleModal({ ruleName, onConfirm, onCancel, loading = false }: DeleteRuleModalProps) {
-    const { t } = useI18n();
-    const [scope, setScope] = useState<VisibleScope>('from_current');
+const SCOPES = [
+  { value: 'from_current', icon: '✂️' },
+  { value: 'all', icon: '🗑️' },
+] as const;
 
-    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) onCancel();
-    };
+interface DeleteRuleModalProps {
+  ruleName: string;
+  onConfirm: (scope: DeleteScope) => void;
+  onCancel: () => void;
+  loading: boolean;
+  error: string | null;
+}
 
-    return (
-        <div className="delete-rule-overlay" role="dialog" aria-modal="true" onMouseDown={handleOverlayClick}>
-            <div className="delete-rule-modal">
-                <h3 className="delete-rule-title">{t('app.recurring.delete.modal.title')}</h3>
-                <p className="delete-rule-subtitle">
-                    <strong>{ruleName}</strong> — {t('app.recurring.delete.modal.subtitle')}
-                </p>
+/** Deleting a rule asks what to do with the movements it already generated. */
+export function DeleteRuleModal({
+  ruleName,
+  onConfirm,
+  onCancel,
+  loading,
+  error,
+}: DeleteRuleModalProps) {
+  const { t } = useI18n();
+  const [scope, setScope] = useState<DeleteScope>('from_current');
 
-                <div className="delete-rule-options">
-                    {(['from_current', 'all'] as VisibleScope[]).map((s) => (
-                        <label
-                            key={s}
-                            className={`delete-rule-option${scope === s ? ' delete-rule-option--selected' : ''}`}
-                            aria-label={t(`app.recurring.delete.scope.${s}`)}
-                        >
-                            <input
-                                type="radio"
-                                name="delete-scope"
-                                value={s}
-                                checked={scope === s}
-                                onChange={() => setScope(s)}
-                            />
-                            <span className="delete-rule-option-icon">
-                                {s === 'from_current' ? '✂️' : '🗑️'}
-                            </span>
-                            <span className="delete-rule-option-text">
-                                {t(`app.recurring.delete.scope.${s}`)}
-                            </span>
-                        </label>
-                    ))}
-                </div>
-
-                <div className="delete-rule-actions">
-                    <button
-                        className="btn-danger"
-                        onClick={() => onConfirm(scope)}
-                        disabled={loading}
-                    >
-                        {t('app.recurring.delete.confirm')}
-                    </button>
-                    <button
-                        className="btn-cancel"
-                        onClick={onCancel}
-                        disabled={loading}
-                    >
-                        {t('app.recurring.delete.cancel')}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <Modal
+      label={t('app.recurring.delete.modal.title')}
+      onClose={onCancel}
+      dismissible={!loading}
+      overlayClassName="delete-rule-overlay"
+      className="delete-rule-modal"
+    >
+      <h3 className="delete-rule-title">{t('app.recurring.delete.modal.title')}</h3>
+      <p className="delete-rule-subtitle">
+        <strong>{ruleName}</strong> — {t('app.recurring.delete.modal.subtitle')}
+      </p>
+      <div className="delete-rule-options" role="radiogroup">
+        {SCOPES.map(({ value, icon }) => (
+          <label
+            key={value}
+            className={`delete-rule-option${
+              scope === value ? ' delete-rule-option--selected' : ''
+            }`}
+          >
+            <input
+              type="radio"
+              name="delete-scope"
+              value={value}
+              checked={scope === value}
+              onChange={() => setScope(value)}
+            />
+            <span className="delete-rule-option-icon" aria-hidden="true">
+              {icon}
+            </span>
+            <span className="delete-rule-option-text">
+              {t(`app.recurring.delete.scope.${value}`)}
+            </span>
+          </label>
+        ))}
+      </div>
+      {error && <p className="recurring-error">{error}</p>}
+      <div className="delete-rule-actions">
+        <button className="btn-danger" onClick={() => onConfirm(scope)} disabled={loading}>
+          {t('app.recurring.delete.confirm')}
+        </button>
+        <button className="btn-cancel" onClick={onCancel} disabled={loading}>
+          {t('app.recurring.delete.cancel')}
+        </button>
+      </div>
+    </Modal>
+  );
 }

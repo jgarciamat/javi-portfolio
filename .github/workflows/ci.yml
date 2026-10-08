@@ -1,60 +1,125 @@
-name: CI (develop)
+name: CI
 
 on:
+  pull_request:
+    branches: [develop, master]
   push:
     branches: [develop]
-  pull_request:
-    branches: [develop]
+  workflow_call:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  frontend:
-    name: Frontend – lint & test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: frontend
-
-      - name: Lint
-        run: npm run lint
-        working-directory: frontend
-
-      - name: Tests
-        run: npm test -- --watchAll=false
-        working-directory: frontend
-
   backend:
-    name: Backend – lint & test
+    name: Backend – format, lint, typecheck, test, build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        env:
+          HUSKY: '0'
+      - run: npx prettier --check "src/**/*.ts"
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:coverage -- --ci
+      - run: npm run build
+      - uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/coverage/lcov.info
+          flags: backend
+          fail_ci_if_error: false
 
-      - name: Install dependencies
-        run: npm ci
-        working-directory: backend
+  frontend:
+    name: Frontend – format, lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        env:
+          HUSKY: '0'
+      - run: npx prettier --check "src/**/*.{ts,tsx}"
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:coverage -- --ci
+      - run: npm run build
+      - uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: frontend/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
 
-      - name: Lint
-        run: npm run lint
+  e2e:
+    name: E2E – Playwright smoke (Chrome)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - run: npm ci
         working-directory: backend
+        env:
+          HUSKY: '0'
+      - run: npm ci
+        working-directory: frontend
+        env:
+          HUSKY: '0'
+      # Starts its own API (fresh database, demo user) and Vite; uses the runner's Chrome.
+      - run: npm run e2e
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
 
-      - name: Tests
-        run: npm test -- --watchAll=false
-        working-directory: backend
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t money-manager-api:ci backend
+      - run: docker build -t money-manager-web:ci frontend
+      - name: API container starts and is healthy
+        run: |
+          docker run -d --name api -e JWT_SECRET="$(openssl rand -base64 48)" money-manager-api:ci
+          for i in $(seq 1 30); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' api)
+            [ "$status" = healthy ] && exit 0
+            sleep 2
+          done
+          docker logs api
+          exit 1

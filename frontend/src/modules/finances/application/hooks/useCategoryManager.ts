@@ -1,89 +1,110 @@
-import { useState, useEffect } from 'react';
-import type { CreateCategoryDTO } from '@modules/finances/domain/types';
+import { useState } from 'react';
+import { ApiError } from '@core/api/http';
+import { useAction } from '@shared/hooks/useAction';
+import { errorMessage } from '@shared/utils/errors';
+import type { Category, CategoryUsage, CreateCategoryDTO } from '@modules/finances/domain/types';
+import {
+  DEFAULT_CATEGORY_COLOR,
+  DEFAULT_CATEGORY_ICON,
+} from '@modules/finances/domain/categoryPresets';
 
-interface UseCategoryManagerOptions {
-    open: boolean;
-    onClose: () => void;
-    onAdd: (dto: CreateCategoryDTO) => Promise<unknown>;
-    onDelete: (id: string) => Promise<void>;
+interface Options {
+  onAdd: (dto: CreateCategoryDTO) => Promise<unknown>;
+  onUpdate: (id: string, dto: Partial<CreateCategoryDTO>) => Promise<unknown>;
+  /** Rejects with ApiError CATEGORY_IN_USE when the category has data and no `reassignTo`. */
+  onDelete: (id: string, reassignTo?: string) => Promise<void>;
 }
 
-export function useCategoryManager({ open, onClose, onAdd, onDelete }: UseCategoryManagerOptions) {
-    const [name, setName] = useState('');
-    const [icon, setIcon] = useState('💰');
-    const [color, setColor] = useState('#6366f1');
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [search, setSearch] = useState('');
+/** A category in use: its data must move to another one before deleting it. */
+export interface PendingDelete {
+  category: Category;
+  usage: CategoryUsage | null;
+}
 
-    // Close on Escape key
-    useEffect(() => {
-        if (!open) return;
-        const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-        document.addEventListener('keydown', handler);
-        return () => document.removeEventListener('keydown', handler);
-    }, [open, onClose]);
+/** State of the category manager: new category form, rename and delete with reassignment. */
+export function useCategoryManager({ onAdd, onUpdate, onDelete }: Options) {
+  const [name, setName] = useState('');
+  const [icon, setIcon] = useState(DEFAULT_CATEGORY_ICON);
+  const [color, setColor] = useState(DEFAULT_CATEGORY_COLOR);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  const [reassignTo, setReassignTo] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const action = useAction();
 
-    // Reset form when modal closes
-    useEffect(() => {
-        if (!open) {
-            setName('');
-            setIcon('💰');
-            setColor('#6366f1');
-            setShowEmojiPicker(false);
-            setSearch('');
-            setError(null);
-        }
-    }, [open]);
+  const handleCreate = async () => {
+    if (!name.trim()) return;
+    const created = await action.run(() => onAdd({ name: name.trim(), icon, color }));
+    if (created) {
+      setName('');
+      setIcon(DEFAULT_CATEGORY_ICON);
+      setColor(DEFAULT_CATEGORY_COLOR);
+    }
+  };
 
-    const handleCreate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!name.trim()) { setError('El nombre es obligatorio'); return; }
-        setSaving(true);
-        setError(null);
-        try {
-            await onAdd({ name: name.trim(), icon, color });
-            setName('');
-            setIcon('💰');
-            setColor('#6366f1');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al crear la categoría');
-        } finally {
-            setSaving(false);
-        }
-    };
+  const handleDelete = async (category: Category, target?: string) => {
+    setDeletingId(category.id);
+    action.setError(null);
+    try {
+      await onDelete(category.id, target);
+      setPendingDelete(null);
+    } catch (err) {
+      if (err instanceof ApiError && err.code === 'CATEGORY_IN_USE') {
+        // Ask where its movements, rules, budgets… should go instead of failing.
+        setPendingDelete({ category, usage: (err.details?.usage as CategoryUsage) ?? null });
+        setReassignTo('');
+      } else {
+        action.setError(errorMessage(err, 'Error'));
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
-    const handleDelete = async (id: string) => {
-        setDeletingId(id);
-        try { await onDelete(id); }
-        catch { /* silent */ }
-        finally { setDeletingId(null); }
-    };
+  const startEdit = (id: string, currentName: string) => {
+    setEditingId(id);
+    setEditName(currentName);
+    action.setError(null);
+  };
 
-    const selectEmoji = (emoji: string) => {
-        setIcon(emoji);
-        setShowEmojiPicker(false);
-        setSearch('');
-    };
+  const saveEdit = async () => {
+    const id = editingId;
+    if (!id || !editName.trim()) return;
+    if (await action.run(() => onUpdate(id, { name: editName.trim() }))) setEditingId(null);
+  };
 
-    const canCreate = name.trim().length > 0;
-
-    return {
-        fields: { name, icon, color, search },
-        setName,
-        setIcon,
-        setColor,
-        setSearch,
-        showEmojiPicker,
-        setShowEmojiPicker,
-        selectEmoji,
-        saving,
-        error,
-        deletingId,
-        canCreate,
-        handleCreate,
-        handleDelete,
-    };
+  return {
+    fields: { name, icon, color, search },
+    setName,
+    setColor,
+    setSearch,
+    showEmojiPicker,
+    toggleEmojiPicker: () => setShowEmojiPicker((v) => !v),
+    selectEmoji: (emoji: string) => {
+      setIcon(emoji);
+      setShowEmojiPicker(false);
+      setSearch('');
+    },
+    saving: action.pending,
+    error: action.error,
+    canCreate: name.trim().length > 0,
+    handleCreate,
+    deletingId,
+    handleDelete,
+    pendingDelete,
+    reassignTo,
+    setReassignTo,
+    cancelDelete: () => setPendingDelete(null),
+    /** Deletes the pending category moving its data to `reassignTo`. */
+    confirmReassign: (pending: PendingDelete) => handleDelete(pending.category, reassignTo),
+    editingId,
+    editName,
+    setEditName,
+    startEdit,
+    cancelEdit: () => setEditingId(null),
+    saveEdit,
+  };
 }

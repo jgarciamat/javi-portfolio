@@ -1,207 +1,221 @@
-import { MONTH_NAMES } from '../types';
-import '../css/TransactionViews.css';
+import { useMemo } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useExportCSV } from '../../application/hooks/useExportCSV';
-import { useTransactionView } from '../../application/hooks/useTransactionView';
+import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
-import { OptionsDropdown } from '@shared/components/OptionsDropdown';
+import { OptionsDropdown, type DropdownOption } from '@shared/components/OptionsDropdown';
+import { todayDateOnly } from '@shared/utils/format';
+import type { Transaction } from '@modules/finances/domain/types';
+import { useFinances } from '../../application/FinancesContext';
+import { useExportCSV } from '../../application/hooks/useExportCSV';
+import {
+  useTransactionView,
+  type TransactionViewMode,
+} from '../../application/hooks/useTransactionView';
+import { AIAdvisor } from './AIAdvisor';
+import { BudgetProgress } from './BudgetProgress';
+import { CategoryChart } from './CategoryChart';
+import { CustomAlertsBanner } from './CustomAlertsBanner';
+import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
-import { TransactionTable } from './TransactionTable';
-import { TransactionWeekView } from './TransactionWeekView';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
-import { CategoryChart } from './CategoryChart';
-import { BudgetAlerts } from './BudgetAlerts';
-import { CustomAlertsBanner } from './CustomAlertsBanner';
-import { AIAdvisor } from './AIAdvisor';
-import type { MonthlyViewProps } from '../types/MonthlyView.types';
-import type { WeekGroup } from '@modules/finances/domain/transactionGrouping';
-import type { CalendarCell } from '@modules/finances/domain/transactionGrouping';
-import type { TransactionViewMode } from '../../application/hooks/useTransactionView';
-import type { Transaction } from '@modules/finances/domain/types';
+import { TransactionTable } from './TransactionTable';
+import { TransactionWeekView } from './TransactionWeekView';
+import '../css/TransactionViews.css';
 
-// ─── Exported: month navigator card (used in Dashboard sticky bar) ────────────
-
-export interface MonthNavProps {
-    year: number;
-    month: number;
-    isCurrentMonth: boolean;
-    isPrevDisabled: boolean;
-    isNextDisabled: boolean;
-    transactions: Transaction[];
-    summary: MonthlyViewProps['summary'];
-    onPrev: () => void;
-    onNext: () => void;
-    onGoToCurrentMonth: () => void;
-    tCategory: (key: string) => string;
+/** The period differs from the calendar month (custom month start day). */
+export function periodRange(
+  year: number,
+  month: number,
+  start: string | null,
+  end: string | null
+): { start: string; end: string } | null {
+  const calendarStart = `${year}-${String(month).padStart(2, '0')}-01`;
+  return start && end && start !== calendarStart ? { start, end } : null;
 }
 
-export function MonthNavCard({ year, month, isCurrentMonth, isPrevDisabled, isNextDisabled, transactions, summary, onPrev, onNext, onGoToCurrentMonth, tCategory }: MonthNavProps) {
-    const { t } = useI18n();
-    const { exportMonthCSV } = useExportCSV();
-    return (
-        <div className="card">
-            <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
-                <button onClick={onPrev} disabled={isPrevDisabled} className="btn-nav" title={t('app.nav.prev')}>‹ {t('app.nav.prev')}</button>
-                <div className="month-nav-center">
-                    <div className="month-nav-title">
-                        <span className="month-nav-title-text">
-                            {MONTH_NAMES[month - 1]} {year}
-                            {isCurrentMonth
-                                ? <div className="month-nav-badge">{t('app.nav.currentMonth')}</div>
-                                : <button className="month-nav-badge month-nav-badge--btn" onClick={onGoToCurrentMonth} title={t('app.nav.goToCurrentMonth')}>{t('app.nav.goToCurrentMonth')}</button>
-                            }
-                        </span>
-                        {transactions.length > 0 && (
-                            <OptionsDropdown
-                                ariaLabel={t('app.export.options')}
-                                options={[{
-                                    icon: '📥',
-                                    label: t('app.export.month'),
-                                    onClick: () => exportMonthCSV(transactions, summary, year, month, tCategory),
-                                }]}
-                            />
-                        )}
-                    </div>
-                </div>
-                <button onClick={onNext} disabled={isNextDisabled} className="btn-nav" title={t('app.nav.next')}>{t('app.nav.next')} ›</button>
-            </nav>
+// ─── Month navigator (sticky bar of the dashboard) ───────────────────────────
+
+export function MonthNavCard({ onImport }: { onImport?: () => void }) {
+  const { t } = useI18n();
+  const format = useFormat();
+  const { exportMonthCSV } = useExportCSV();
+  const f = useFinances();
+  const range = periodRange(f.year, f.month, f.periodStart, f.periodEnd);
+  const options: DropdownOption[] = [];
+  if (f.transactions.length > 0) {
+    options.push({
+      icon: '📥',
+      label: t('app.export.month'),
+      onClick: () => exportMonthCSV(f.transactions, f.summary, f.year, f.month),
+    });
+  }
+  if (onImport) options.push({ icon: '📤', label: t('app.import.open'), onClick: onImport });
+
+  return (
+    <div className="card" data-tour="month-nav">
+      <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
+        <button onClick={f.goToPrev} disabled={f.isPrevDisabled} className="btn-nav">
+          ‹ {t('app.nav.prev')}
+        </button>
+        <div className="month-nav-center">
+          <div className="month-nav-title">
+            <span className="month-nav-title-text">
+              {format.monthLabel(f.year, f.month)}
+              {f.isCurrentPeriod ? (
+                <span className="month-nav-badge">{t('app.nav.currentMonth')}</span>
+              ) : (
+                <button className="month-nav-badge month-nav-badge--btn" onClick={f.goToCurrent}>
+                  {t('app.nav.goToCurrentMonth')}
+                </button>
+              )}
+            </span>
+            {options.length > 0 && (
+              <OptionsDropdown ariaLabel={t('app.export.options')} options={options} />
+            )}
+          </div>
+          {range && <div className="month-nav-range">{format.range(range.start, range.end)}</div>}
         </div>
-    );
+        <button onClick={f.goToNext} disabled={f.isNextDisabled} className="btn-nav">
+          {t('app.nav.next')} ›
+        </button>
+      </nav>
+    </div>
+  );
 }
 
-// ─── Sub-component: transaction tabs + collapsible panel ─────────────────────
+// ─── Movements panel ──────────────────────────────────────────────────────────
 
-const TX_VIEW_MODES = [
-    { value: 'day' as const, icon: '☀️', labelKey: 'app.transactions.view.day' as const },
-    { value: 'week' as const, icon: '📅', labelKey: 'app.transactions.view.week' as const },
-    { value: 'calendar' as const, icon: '🗓️', labelKey: 'app.transactions.view.calendar' as const },
+const VIEW_MODES: { value: TransactionViewMode; icon: string; labelKey: string }[] = [
+  { value: 'day', icon: '☀️', labelKey: 'app.transactions.view.day' },
+  { value: 'week', icon: '📅', labelKey: 'app.transactions.view.week' },
+  { value: 'calendar', icon: '🗓️', labelKey: 'app.transactions.view.calendar' },
 ];
 
-interface TxPanelProps {
-    mode: TransactionViewMode;
-    setMode: (m: TransactionViewMode) => void;
-    transactions: Transaction[];
-    weekGroups: WeekGroup[];
-    calendarRows: CalendarCell[][];
-    year: number;
-    month: number;
-    onDeleteTransaction: MonthlyViewProps['onDeleteTransaction'];
-    onPatchTransaction: MonthlyViewProps['onPatchTransaction'];
-    onEditTransaction: MonthlyViewProps['onEditTransaction'];
-    t: (key: string, params?: Record<string, string>) => string;
-}
+function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
+  const { t, locale } = useI18n();
+  const f = useFinances();
+  const range = useMemo(
+    () => periodRange(f.year, f.month, f.periodStart, f.periodEnd),
+    [f.year, f.month, f.periodStart, f.periodEnd]
+  );
+  const view = useTransactionView({
+    transactions: f.transactions,
+    locale,
+    year: f.year,
+    month: f.month,
+    range,
+  });
 
-function TransactionPanel({ mode, setMode, transactions, weekGroups, calendarRows, year, month, onDeleteTransaction, onPatchTransaction, onEditTransaction, t }: TxPanelProps) {
-    return (
-        <>
-            {transactions.length > 0 && (
-                <nav className="tx-tabs" role="tablist" aria-label={t('app.transactions.title', { count: '' }).trim()}>
-                    {TX_VIEW_MODES.map(({ value, icon, labelKey }) => (
-                        <button
-                            key={value}
-                            role="tab"
-                            aria-selected={mode === value}
-                            className={`tab-btn${mode === value ? ' active' : ''}`}
-                            onClick={() => setMode(value)}
-                        >
-                            {icon} {t(labelKey)}
-                        </button>
-                    ))}
-                </nav>
-            )}
-            <CollapsiblePanel
-                title={<>📋 {t('app.transactions.title', { count: String(transactions.length) })}</>}
-                style={{ marginBottom: '0' }}
+  return (
+    <>
+      {f.transactions.length > 0 && (
+        <div className="tx-tabs" role="tablist" aria-label={t('app.transactions.viewMode')}>
+          {VIEW_MODES.map(({ value, icon, labelKey }) => (
+            <button
+              key={value}
+              role="tab"
+              aria-selected={view.mode === value}
+              className={`tab-btn${view.mode === value ? ' active' : ''}`}
+              onClick={() => view.setMode(value)}
             >
-                {mode === 'day' && (
-                    <TransactionTable
-                        transactions={transactions}
-                        onDelete={onDeleteTransaction}
-                        onPatch={onPatchTransaction}
-                        onEdit={onEditTransaction}
-                    />
-                )}
-                {mode === 'week' && <TransactionWeekView weekGroups={weekGroups} />}
-                {mode === 'calendar' && (
-                    <TransactionCalendarView calendarRows={calendarRows} year={year} month={month} />
-                )}
-            </CollapsiblePanel>
-        </>
-    );
+              {icon} {t(labelKey)}
+            </button>
+          ))}
+        </div>
+      )}
+      <CollapsiblePanel
+        title={<>📋 {t('app.transactions.title', { count: f.transactions.length })}</>}
+        className="collapsible-panel--flush"
+        tourId="movements"
+      >
+        {view.mode === 'day' && (
+          <TransactionTable
+            transactions={f.transactions}
+            onDelete={f.removeTransaction}
+            onPatch={f.patchTransaction}
+            onEdit={onEdit}
+          />
+        )}
+        {view.mode === 'week' && <TransactionWeekView weekGroups={view.weekGroups} />}
+        {view.mode === 'calendar' && (
+          <TransactionCalendarView
+            calendarRows={view.calendarRows}
+            year={f.year}
+            month={f.month}
+            range={range}
+          />
+        )}
+      </CollapsiblePanel>
+    </>
+  );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Month view ───────────────────────────────────────────────────────────────
+
+interface MonthlyViewProps {
+  onEditTransaction: (tx: Transaction) => void;
+  onManageCategories: () => void;
+  onManageBudgets: () => void;
+}
 
 export function MonthlyView({
-    year, month,
-    transactions, summary, carryover, categories, loading, error,
-    onAddTransaction, onDeleteTransaction, onPatchTransaction, onEditTransaction, onManageCategories,
+  onEditTransaction,
+  onManageCategories,
+  onManageBudgets,
 }: MonthlyViewProps) {
-    const { t, locale } = useI18n();
-    const { mode, setMode, weekGroups, calendarRows } = useTransactionView({
-        transactions,
-        locale,
-        year,
-        month,
-    });
+  const { t } = useI18n();
+  const f = useFinances();
+  // Until the month arrives its first day is a good guess for the period start.
+  const defaultDate = f.isCurrentPeriod
+    ? todayDateOnly()
+    : f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`;
 
-    return (
-        <>
-            {error && (
-                <div role="alert" style={{ background: '#4c0519', border: '1px solid #be123c', borderRadius: '8px', padding: '1rem', marginBottom: '1.25rem', color: '#fca5a5' }}>
-                    ⚠️ {t('app.error.backendDown', { error })}
-                </div>
-            )}
+  return (
+    <>
+      {f.error && (
+        <div role="alert" className="error-banner">
+          ⚠️ {t('app.error.backendDown', { error: f.error })}
+        </div>
+      )}
 
-            <div className="month-content">
-                {loading && (
-                    <div className="month-loading-overlay" aria-label={t('app.loading')}>
-                        <svg className="month-spinner" viewBox="0 0 50 50" aria-hidden="true">
-                            <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
-                        </svg>
-                    </div>
-                )}
+      <div className="month-content">
+        {f.loading && (
+          <div className="month-loading-overlay" role="status" aria-label={t('app.loading')}>
+            <svg className="month-spinner" viewBox="0 0 50 50" aria-hidden="true">
+              <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
+            </svg>
+          </div>
+        )}
 
-                <BudgetAlerts summary={summary} carryover={carryover} />
-                <CustomAlertsBanner summary={summary} carryover={carryover} />
-                {summary && <SummaryCards summary={summary} carryover={carryover} />}
+        <MonthAlerts alerts={f.alerts} />
+        <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
+        {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
 
-                <TransactionForm
-                    categories={categories}
-                    onSubmit={(dto) => onAddTransaction(dto).then(() => { })}
-                    onManageCategories={onManageCategories}
-                    viewYear={year}
-                    viewMonth={month}
-                    availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}
-                />
+        <TransactionForm
+          categories={f.categories}
+          accounts={f.accounts}
+          onSubmit={async (dto) => {
+            await f.addTransaction(dto);
+          }}
+          onManageCategories={onManageCategories}
+          defaultDate={defaultDate}
+          availableBalance={f.available}
+        />
 
-                <AIAdvisor year={year} month={month} />
+        <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
+        <AIAdvisor year={f.year} month={f.month} />
+        <MovementsPanel onEdit={onEditTransaction} />
 
-                {/* ── Transaction tabs + panel ───────────────────────────── */}
-                <TransactionPanel
-                    mode={mode}
-                    setMode={setMode}
-                    transactions={transactions}
-                    weekGroups={weekGroups}
-                    calendarRows={calendarRows}
-                    year={year}
-                    month={month}
-                    onDeleteTransaction={onDeleteTransaction}
-                    onPatchTransaction={onPatchTransaction}
-                    onEditTransaction={onEditTransaction}
-                    t={t}
-                />
-
-                {summary && transactions.length > 0 && (
-                    <CollapsiblePanel
-                        title={`📊 ${t('app.categoryChart.title')}`}
-                        style={{ marginTop: '1.25rem', marginBottom: 0 }}
-                    >
-                        <CategoryChart summary={summary} />
-                    </CollapsiblePanel>
-                )}
-            </div>
-        </>
-    );
+        {f.summary && f.transactions.length > 0 && (
+          <CollapsiblePanel
+            title={`📊 ${t('app.categoryChart.title')}`}
+            className="collapsible-panel--spaced"
+          >
+            <CategoryChart summary={f.summary} />
+          </CollapsiblePanel>
+        )}
+      </div>
+    </>
+  );
 }

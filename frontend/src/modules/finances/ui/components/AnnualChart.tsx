@@ -1,173 +1,245 @@
-import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
-import { useAnnualChart } from '../../application/hooks/useAnnualChart';
-import { useExportCSV } from '../../application/hooks/useExportCSV';
-import { OptionsDropdown } from '@shared/components/OptionsDropdown';
-import '../css/AnnualChart.css';
-import type { AnnualChartProps } from '../types';
-import { MONTH_SHORT, fmtCurrency, buildAnnualChartData } from '../types/AnnualChart.types';
-import { isMonthInFuture } from '@modules/finances/domain/nextMonthLogic';
+import { useMemo } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { AnnualMonthTable } from './AnnualMonthTable';
+import { useFormat } from '@core/settings/SettingsContext';
+import { OptionsDropdown } from '@shared/components/OptionsDropdown';
+import { buildAnnualChartData, type AnnualMonthEntry } from '@modules/finances/domain/annual';
+import { isBeyondHorizon } from '@modules/finances/domain/nextMonthLogic';
+import { useFinances } from '../../application/FinancesContext';
+import { useAnnualChart } from '../../application/hooks/useAnnualChart';
+import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
+import { useExportCSV } from '../../application/hooks/useExportCSV';
+import '../css/AnnualChart.css';
 
-interface TotalsProps {
-    totals: { income: number; expenses: number; saving: number };
-    t: (k: string) => string;
+interface AnnualChartProps {
+  initialYear: number;
+  /** Opens the month view of the clicked month. */
+  onMonthClick?: (year: number, month: number) => void;
 }
 
-function AnnualTotals({ totals, t }: TotalsProps) {
-    const balance = totals.income - totals.expenses - totals.saving;
-    const balanceColor = balance >= 0 ? '#6366f1' : '#ef4444';
-    return (
-        <div className="annual-totals">
-            <div className="annual-total-card" style={{ borderColor: '#4ade80' }}>
-                <span className="annual-total-label">{t('app.annual.totalIncome')}</span>
-                <span className="annual-total-value" style={{ color: '#4ade80' }}>{fmtCurrency(totals.income)}</span>
-            </div>
-            <div className="annual-total-card" style={{ borderColor: '#f87171' }}>
-                <span className="annual-total-label">{t('app.annual.totalExpenses')}</span>
-                <span className="annual-total-value" style={{ color: '#f87171' }}>{fmtCurrency(totals.expenses)}</span>
-            </div>
-            <div className="annual-total-card" style={{ borderColor: '#a78bfa' }}>
-                <span className="annual-total-label">{t('app.annual.totalSaving')}</span>
-                <span className="annual-total-value" style={{ color: '#a78bfa' }}>{fmtCurrency(totals.saving)}</span>
-            </div>
-            <div className="annual-total-card" style={{ borderColor: balanceColor }}>
-                <span className="annual-total-label">{t('app.annual.annualBalance')}</span>
-                <span className="annual-total-value" style={{ color: balanceColor }}>
-                    {fmtCurrency(balance)}
-                </span>
-            </div>
+const SERIES = [
+  { key: 'income', color: '#4ade80', className: 'annual-bar-income' },
+  { key: 'expenses', color: '#f87171', className: 'annual-bar-expense' },
+  { key: 'saving', color: '#a78bfa', className: 'annual-bar-saving' },
+] as const;
+
+const BALANCE_COLOR = (balance: number) => (balance >= 0 ? '#6366f1' : '#ef4444');
+
+function MonthLabel({
+  year,
+  month,
+  onMonthClick,
+}: {
+  year: number;
+  month: number;
+  onMonthClick?: AnnualChartProps['onMonthClick'];
+}) {
+  const format = useFormat();
+  const { currentPeriod } = useFinances();
+  const short = format.monthName(month, 'short');
+  // Months beyond the planning horizon cannot be opened.
+  if (!onMonthClick || isBeyondHorizon(year, month, currentPeriod)) return <>{short}</>;
+  return (
+    <button
+      type="button"
+      className="annual-month-btn"
+      onClick={() => onMonthClick(year, month)}
+      title={format.monthLabel(year, month)}
+    >
+      {short}
+    </button>
+  );
+}
+
+function Totals({ totals }: { totals: ReturnType<typeof buildAnnualChartData>['totals'] }) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const cards = [
+    { label: 'app.annual.totalIncome', value: totals.income, color: SERIES[0].color },
+    { label: 'app.annual.totalExpenses', value: totals.expenses, color: SERIES[1].color },
+    { label: 'app.annual.totalSaving', value: totals.saving, color: SERIES[2].color },
+    {
+      label: 'app.annual.annualBalance',
+      value: totals.balance,
+      color: BALANCE_COLOR(totals.balance),
+    },
+  ];
+  return (
+    <div className="annual-totals">
+      {cards.map(({ label, value, color }) => (
+        <div key={label} className="annual-total-card" style={{ borderColor: color }}>
+          <span className="annual-total-label">{t(label)}</span>
+          <span className="annual-total-value" style={{ color }}>
+            {money(value, { decimals: false })}
+          </span>
         </div>
-    );
+      ))}
+    </div>
+  );
 }
 
+function MonthTable({
+  months,
+  year,
+  onMonthClick,
+}: {
+  months: AnnualMonthEntry[];
+  year: number;
+  onMonthClick?: AnnualChartProps['onMonthClick'];
+}) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const cell = (n: number) => (n > 0 ? money(n, { decimals: false }) : '—');
+  return (
+    <div className="annual-table-wrap">
+      <table className="annual-table">
+        <thead>
+          <tr>
+            <th>{t('app.annual.table.month')}</th>
+            {SERIES.map((s) => (
+              <th key={s.key} style={{ color: s.color }}>
+                {t(`app.annual.table.${s.key}`)}
+              </th>
+            ))}
+            <th>{t('app.annual.table.balance')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {months.map((m) => (
+            <tr key={m.month}>
+              <td className="annual-td-month">
+                <MonthLabel year={year} month={m.month} onMonthClick={onMonthClick} />
+              </td>
+              {SERIES.map((s) => (
+                <td key={s.key} style={{ color: s.color }}>
+                  {cell(m[s.key])}
+                </td>
+              ))}
+              <td style={{ color: BALANCE_COLOR(m.balance), fontWeight: 700 }}>
+                {money(m.balance, { decimals: false })}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Income, expenses and saving of every month of a year. */
 export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
-    const { year, tooltip, showTooltip, moveTooltip, hideTooltip, leaveBar, prevYear, nextYear, prevYearDisabled, nextYearDisabled } = useAnnualChart(initialYear);
-    const { data, loading, error } = useAnnualSummary(year);
-    const { months, maxVal, totals } = buildAnnualChartData(data);
-    const { t } = useI18n();
-    const { exportAnnualCSV } = useExportCSV();
+  const chart = useAnnualChart(initialYear, useFinances().currentPeriod);
+  const { year } = chart;
+  const { data, loading, error } = useAnnualSummary(year);
+  const { months, maxVal, totals } = useMemo(() => buildAnnualChartData(data), [data]);
+  const { t } = useI18n();
+  const format = useFormat();
+  const { exportAnnualCSV } = useExportCSV();
 
-    const now = new Date();
+  return (
+    <div className="annual-view">
+      <nav className="annual-header" aria-label={t('app.nav.yearNav')}>
+        <button
+          className="btn-nav"
+          onClick={chart.prevYear}
+          disabled={chart.prevYearDisabled}
+          aria-label={String(year - 1)}
+        >
+          ‹ {year - 1}
+        </button>
+        <h2 className="annual-title">
+          {t('app.annual.title')} {year}
+          {months.length > 0 && (
+            <OptionsDropdown
+              ariaLabel={t('app.export.options')}
+              options={[
+                {
+                  icon: '📥',
+                  label: t('app.export.annual'),
+                  onClick: () => exportAnnualCSV(months, year),
+                },
+              ]}
+            />
+          )}
+        </h2>
+        <button
+          className="btn-nav"
+          onClick={chart.nextYear}
+          disabled={chart.nextYearDisabled}
+          aria-label={String(year + 1)}
+        >
+          {year + 1} ›
+        </button>
+      </nav>
 
-    return (
-        <div className="annual-view">
-            {/* Year picker */}
-            <nav className="annual-header" aria-label={t('app.nav.yearNav')}>
-                <button className="btn-nav" onClick={prevYear} disabled={prevYearDisabled} title={String(year - 1)} aria-label={String(year - 1)}>‹ {year - 1}</button>
-                <h2 className="annual-title">
-                    {t('app.annual.title')} {year}
-                    {months.length > 0 && (
-                        <OptionsDropdown
-                            ariaLabel={t('app.export.options')}
-                            options={[
-                                {
-                                    icon: '📥',
-                                    label: t('app.export.annual'),
-                                    onClick: () => exportAnnualCSV(months, year),
-                                },
-                            ]}
-                        />
-                    )}
-                </h2>
-                <button className="btn-nav" onClick={nextYear} disabled={nextYearDisabled} title={String(year + 1)} aria-label={String(year + 1)}>
-                    {year + 1} ›
-                </button>
-            </nav>
+      <div className="annual-legend">
+        {SERIES.map((s) => (
+          <span key={s.key}>
+            <span className="legend-dot" style={{ background: s.color }} />{' '}
+            {t(`app.annual.legend.${s.key}`)}
+          </span>
+        ))}
+      </div>
 
-            {/* Legend */}
-            <div className="annual-legend">
-                <span className="legend-dot" style={{ background: '#4ade80' }} /> {t('app.annual.legend.income')}
-                <span className="legend-dot" style={{ background: '#f87171' }} /> {t('app.annual.legend.expenses')}
-                <span className="legend-dot" style={{ background: '#a78bfa' }} /> {t('app.annual.legend.saving')}
-            </div>
-
-            {loading && (
-                <div className="annual-empty">⏳ {t('app.annual.loading')}</div>
-            )}
-            {error && (
-                <div className="annual-empty" style={{ color: '#f87171' }}>⚠️ {error}</div>
-            )}
-
-            {!loading && !error && (
-                <>
-                    {/* Chart */}
-                    <div className="annual-chart-wrap" onMouseLeave={hideTooltip}>
-                        <div className="annual-chart">
-                            {months.map(({ month, income, expenses, saving }) => (
-                                <div key={month} className="annual-col">
-                                    <div className="annual-bars">
-                                        <div className="annual-bar-group">
-                                            <div
-                                                className="annual-bar annual-bar-income"
-                                                style={{ height: `${(income / maxVal) * 100}%` }}
-                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.income')}: ${fmtCurrency(income)}`}
-                                                role="img"
-                                                onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.income')}: ${fmtCurrency(income)}`, '#4ade80')}
-                                                onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.income')}: ${fmtCurrency(income)}`, '#4ade80')}
-                                                onMouseLeave={leaveBar}
-                                            />
-                                            <div
-                                                className="annual-bar annual-bar-expense"
-                                                style={{ height: `${(expenses / maxVal) * 100}%` }}
-                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`}
-                                                role="img"
-                                                onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`, '#f87171')}
-                                                onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.expenses')}: ${fmtCurrency(expenses)}`, '#f87171')}
-                                                onMouseLeave={leaveBar}
-                                            />
-                                            <div
-                                                className="annual-bar annual-bar-saving"
-                                                style={{ height: `${(saving / maxVal) * 100}%` }}
-                                                aria-label={`${MONTH_SHORT[month - 1]} ${year} — ${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`}
-                                                role="img"
-                                                onMouseEnter={/* istanbul ignore next */(e) => showTooltip(e, `${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`, '#a78bfa')}
-                                                onMouseMove={/* istanbul ignore next */(e) => moveTooltip(e, `${t('app.annual.legend.saving')}: ${fmtCurrency(saving)}`, '#a78bfa')}
-                                                onMouseLeave={leaveBar}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="annual-month-label">
-                                        {onMonthClick && !isMonthInFuture(year, month, now) ? (
-                                            <button
-                                                type="button"
-                                                className="annual-month-btn"
-                                                onClick={() => onMonthClick(year, month)}
-                                                title={`Ver ${MONTH_SHORT[month - 1]} ${year}`}
-                                            >
-                                                {MONTH_SHORT[month - 1]}
-                                            </button>
-                                        ) : (
-                                            MONTH_SHORT[month - 1]
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Tooltip — fixed so it's never clipped by overflow:auto */}
-                    {tooltip && (
-                        <div
-                            className="annual-tooltip"
-                            style={{
-                                left: tooltip.x,
-                                top: tooltip.y,
-                                borderColor: tooltip.color,
-                                color: tooltip.color,
-                            }}
-                        >
-                            {tooltip.text}
-                        </div>
-                    )}
-
-                    {/* Annual totals */}
-                    <AnnualTotals totals={totals} t={t} />
-
-                    {/* Monthly detail table */}
-                    <AnnualMonthTable months={months} year={year} now={now} onMonthClick={onMonthClick} />
-                </>
-            )}
+      {loading && <div className="annual-empty">⏳ {t('app.annual.loading')}</div>}
+      {error && (
+        <div className="annual-empty annual-error" role="alert">
+          ⚠️ {error}
         </div>
-    );
+      )}
+
+      {!loading && !error && (
+        <>
+          <div className="annual-chart-wrap">
+            <div className="annual-chart">
+              {months.map((m) => (
+                <div key={m.month} className="annual-col">
+                  <div className="annual-bars">
+                    <div className="annual-bar-group">
+                      {SERIES.map((s) => {
+                        const text = `${t(`app.annual.legend.${s.key}`)}: ${format.money(m[s.key], {
+                          decimals: false,
+                        })}`;
+                        return (
+                          <div
+                            key={s.key}
+                            className={`annual-bar ${s.className}`}
+                            style={{ height: `${(m[s.key] / maxVal) * 100}%` }}
+                            role="img"
+                            aria-label={`${format.monthName(m.month, 'short')} ${year} — ${text}`}
+                            onMouseEnter={(e) => chart.showTooltip(e, text, s.color)}
+                            onMouseMove={(e) => chart.showTooltip(e, text, s.color)}
+                            onMouseLeave={chart.hideTooltip}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="annual-month-label">
+                    <MonthLabel year={year} month={m.month} onMonthClick={onMonthClick} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {chart.tooltip && (
+            <div
+              className="annual-tooltip"
+              style={{
+                left: chart.tooltip.x,
+                top: chart.tooltip.y,
+                borderColor: chart.tooltip.color,
+                color: chart.tooltip.color,
+              }}
+            >
+              {chart.tooltip.text}
+            </div>
+          )}
+
+          <Totals totals={totals} />
+          <MonthTable months={months} year={year} onMonthClick={onMonthClick} />
+        </>
+      )}
+    </div>
+  );
 }

@@ -1,124 +1,57 @@
-# Backend — resumen rápido
+# Backend — Money Manager API
 
-Este directorio contiene el backend de la aplicación (TypeScript + Express) organizado siguiendo DDD / arquitectura hexagonal: capas Domain, Application y Infrastructure.
+Express + SQLite con arquitectura hexagonal. Visión general del proyecto en el [README raíz](../README.md).
 
-Ubicación principal del código: `backend/src`
+## Capas
 
-## Qué contiene
+| Capa | Carpeta | Depende de |
+|---|---|---|
+| Dominio | `src/domain` (`model`, `services`, `shared`, `ports`, `errors.ts`) | nada |
+| Aplicación | `src/application/<feature>` | dominio (vía puertos) |
+| Infraestructura | `src/infrastructure` (`sqlite`, `http`, `auth`, `mail`, `ai`, `backup`) | dominio y aplicación |
+| Composición | `src/infrastructure/container.ts`, `src/main.ts` | todo |
 
-- `domain/` — entidades, value objects y contratos (interfaces de repositorio).
-- `application/` — casos de uso (orquestación de lógica de negocio) y puertos.
-- `infrastructure/` — adaptadores: controladores HTTP, persistencia (InMemory/SQLite), servidor Express y middlewares.
-- `tests/` — tests unitarios e integración (Jest).
+Reglas:
 
-## Variables de entorno (ejemplo)
+- El dominio no importa nada de Express, SQLite ni librerías de red.
+- Los repositorios son síncronos (SQLite va en el mismo proceso) y reciben siempre el `userId`.
+  Las operaciones de varios pasos usan `UnitOfWork.run()` (una transacción SQLite).
+- Los errores de negocio son clases de `domain/errors.ts` con un `code` estable; `http/middleware.ts`
+  los traduce a HTTP (`400/401/403/404/409`) y el frontend reacciona al `code`, no al texto.
+- Toda entrada HTTP se valida con zod (`http/schemas.ts`) y los importes se convierten a céntimos ahí.
 
-Crea un fichero `.env` a partir de `.env.example` (si existe) o exporta las variables en tu entorno. Valores típicos:
+## Migraciones
 
-- PORT=4000
-- NODE_ENV=development
-- DATABASE_URL=./data/db.sqlite
-- JWT_SECRET=tu_secreto_jwt
+`src/infrastructure/sqlite/migrations/NNN-*.ts`, aplicadas en orden por `migrator.ts` según
+`PRAGMA user_version`. Cada una corre en su transacción, con comprobación de claves foráneas antes del
+commit y copia de seguridad previa (`VACUUM INTO`) si la BD ya tenía datos.
 
-## Comandos útiles
+**Nunca edites una migración ya aplicada en producción: crea una nueva.**
 
-Desde la raíz del monorepo:
+- `001` reproduce el esquema de la v1.x (cualquier BD antigua queda en un punto conocido).
+- `002` modelo v2: céntimos, categorías por id, cuentas, ajustes, presupuestos, metas y tokens hasheados.
+- `003` desactiva el usuario `admin@admin.com` sembrado por la v1 si aún tenía la contraseña `admin`.
+- `004` periodos omitidos de las reglas recurrentes.
 
-```
-npm run dev:backend     # arranca el backend en modo dev (ts-node-dev)
-npm run test:backend    # ejecuta tests en backend (jest)
-npm run build:backend   # compila TypeScript -> dist/
-```
+## Tests
 
-Directamente dentro de `backend/`:
+- `src/tests/domain`: reglas puras (periodos, dinero, entidades, servicios).
+- `src/tests/integration`: la API real por HTTP (supertest) con SQLite en memoria, reloj fijo y
+  adaptadores falsos (email, Google, IA). Incluye aislamiento entre usuarios y migración de una BD v1.
+- `src/tests/infrastructure`: adaptadores (config, JWT, Google, Gemini, plantillas de email, backups).
 
-```
-npm install
-npm run dev
-npm test
-npm run test:coverage
-npm run build
-```
+## Endpoints principales
 
-## Estructura de ejemplo (dentro de `src`)
-
-- `domain/entities` — `Transaction.ts`, `Category.ts`, `User.ts`, `MonthlyBudget.ts`.
-- `domain/value-objects` — `Amount.ts`, `TransactionId.ts`, `TransactionType.ts`.
-- `application/use-cases` — `CreateTransaction.ts`, `GetTransactions.ts`, `GetFinancialSummary.ts`, etc.
-- `infrastructure/controllers` — `TransactionController.ts`, `CategoryController.ts`, `AuthController.ts`.
-- `infrastructure/persistence` — `InMemory*` y `Sqlite*` repositories.
-- `infrastructure/express/server.ts` — entrypoint HTTP.
-
-## Diagrama (mermaid)
-
-> Diagrama fuente disponible en `backend/diagram/architecture.mmd` — puedes renderizarlo localmente con `mmdc` (mermaid-cli) o verlo en GitHub si tu integrador lo soporta.
-
-```mermaid
-flowchart TB
-    %% High level flow: HTTP -> Controller -> UseCase -> Domain -> Repository -> DB
-    subgraph HTTP
-        H[HTTP Request / Express Router]
-        M[Auth Middleware]
-    end
-
-    subgraph Infra [Infrastructure]
-        C[Controller (REST)]
-        R[Repository (Sqlite / InMemory)]
-        S[Express Server]
-        DB[(SQLite / DB)]
-    end
-
-    subgraph App [Application]
-        U[Use Case (orchestration)]
-        P[Ports (repository interfaces)]
-    end
-
-    subgraph Dom [Domain]
-        E[Entities]
-        V[Value Objects]
-        Rules[Domain Rules]
-    end
-
-    H --> M --> C
-    C --> U
-    U --> P
-    P --> R
-    R --> DB
-    U --> E
-    E --> V
-    E --> Rules
-
-    classDef infra fill:#fff7ed,stroke:#92400e;
-    classDef app fill:#eef2ff,stroke:#3730a3;
-    classDef dom fill:#f8fafc,stroke:#111827;
-    class HTTP fill:#f0f9ff,stroke:#0ea5e9;
-
-    class C,R,S infra;
-    class U,P app;
-    class E,V,Rules dom;
-    class H,M HTTP;
-
-    %% notes
-    click C "./src/infrastructure/controllers" "Controllers folder"
-    click U "./src/application/use-cases" "Use-cases folder"
-    click R "./src/infrastructure/persistence" "Persistence implementations"
-
-```
-
-Puedes encontrar el diagrama en formato mermaid en `backend/diagram/architecture.mmd` y una versión renderizada SVG en `backend/diagram/architecture.svg` (si la generas). Para renderizar localmente:
-
-```
-npx @mermaid-js/mermaid-cli -i backend/diagram/architecture.mmd -o backend/diagram/architecture.svg
-```
-
-
-## Testing y coverage
-
-- Tests unitarios: `npm test` desde `backend/` (usa Jest + ts-jest).
-- Coverage: `npm run test:coverage` (genera `backend/coverage/` con `lcov` y HTML).
-
-## Buenas prácticas al desarrollar
-
-- Mantener la lógica de negocio en `domain` y `application`. Los controladores deben ser delgados.
-- Añadir tests unitarios por cada Value Object, entidad y caso de uso.
-- Para persistencia, implementar repositorios que cumplan los contratos definidos en `domain/repositories`.
+| Método y ruta | Descripción |
+|---|---|
+| `POST /api/auth/register · login · google · refresh · logout · logout-all` | Sesión |
+| `GET/POST /api/auth/verify-email · resend-verification · forgot-password · reset-password` | Emails |
+| `GET /api/months/:year/:month` | Mes completo: movimientos, resumen, saldo arrastrado, presupuestos y alertas |
+| `GET·POST /api/transactions` · `PUT·PATCH·DELETE /api/transactions/:id` | Movimientos |
+| `GET /api/transactions/search` · `GET /api/transactions/annual/:year` · `POST /api/transactions/import` | Búsqueda, anual, importación |
+| `/api/categories` (`PATCH` renombra, `DELETE ?reassignTo=`) | Categorías |
+| `/api/accounts`, `/api/transfers` | Cuentas y transferencias |
+| `/api/budgets`, `/api/goals`, `/api/recurring-rules`, `/api/custom-alerts` | Planificación |
+| `/api/settings`, `/api/profile/*`, `GET /api/export` | Ajustes, perfil y exportación |
+| `GET /api/stats/trends/:year/:month`, `GET /api/stats/net-worth`, `POST /api/ai/advice` | Análisis |
+| `GET /api/health` | Healthcheck (comprueba la BD) |

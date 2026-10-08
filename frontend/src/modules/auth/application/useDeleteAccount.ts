@@ -1,31 +1,28 @@
-import { useState, useCallback } from 'react';
-import { useAuth } from '@shared/hooks/useAuth';
-import { authApi } from '@core/api/authApi';
+import { useCallback, useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useAuth } from '@shared/hooks/useAuth';
+import { errorMessage } from '@shared/utils/errors';
 
-export interface UseDeleteAccountReturn {
-    loading: boolean;
-    error: string | null;
-    handleDelete: () => Promise<void>;
-}
+/** Deletes the account and ends the session (the tokens no longer exist in the API). */
+export function useDeleteAccount() {
+  const { authApi } = useApi();
+  const { endSession } = useAuth();
+  const { t } = useI18n();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export function useDeleteAccount(): UseDeleteAccountReturn {
-    const { logout } = useAuth();
-    const { t } = useI18n();
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const handleDelete = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await authApi.deleteAccount();
+      endSession();
+    } catch (err) {
+      setError(errorMessage(err, t('app.profile.deleteAccount.error')));
+      setLoading(false);
+    }
+  }, [authApi, endSession, t]);
 
-    const handleDelete = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            await authApi.deleteAccount();
-            logout();
-        } catch (err) {
-            setError(err instanceof Error ? err.message : t('app.profile.deleteAccount.error'));
-            setLoading(false);
-        }
-    }, [logout, t]);
-
-    return { loading, error, handleDelete };
+  return { loading, error, handleDelete };
 }

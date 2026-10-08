@@ -1,130 +1,230 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import type { AuthUser } from '@modules/auth/domain/types';
-import { authApi, registerUnauthorizedHandler } from '@core/api/authApi';
+import { authApi } from '@core/api/authApi';
+import {
+  isAccessTokenExpired,
+  refreshAccessToken,
+  registerSessionExpiredHandler,
+  tokenStore,
+} from '@core/api/http';
+import type { Locale } from '@core/i18n/I18nContext';
+import { storage } from '@shared/utils/storage';
+
+/** 'loading' while a stored session is being restored with the refresh token. */
+export type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
 
 interface AuthContextValue {
-    user: AuthUser | null;
-    token: string | null;
-    login: (email: string, password: string) => Promise<void>;
-    loginWithGoogle: (idToken: string) => Promise<void>;
-    register: (email: string, password: string, name: string) => Promise<string>;
-    logout: () => void;
-    isAuthenticated: boolean;
-    updateName: (name: string) => Promise<void>;
-    updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
-    updateAvatar: (avatarDataUrl: string) => Promise<void>;
+  user: AuthUser | null;
+  token: string | null;
+  status: AuthStatus;
+  isAuthenticated: boolean;
+  /** True right after signing in with a password or Google (not when a session is restored). */
+  freshSignIn: boolean;
+  /** Marks the fresh sign-in as handled (the welcome tour asks once per sign-in). */
+  acknowledgeSignIn: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (token: string, locale?: Locale) => Promise<void>;
+  register: (email: string, password: string, name: string, locale?: Locale) => Promise<string>;
+  logout: () => void;
+  /** Forgets the session locally without calling the API (e.g. after deleting the account). */
+  endSession: () => void;
+  logoutEverywhere: () => Promise<void>;
+  updateName: (name: string) => Promise<void>;
+  updatePassword: (currentPassword: string | undefined, newPassword: string) => Promise<void>;
+  updateAvatar: (avatarDataUrl: string | null) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const USER_KEY = 'mm_user';
 
-/** Decode the exp claim from a JWT without verifying signature (client-side only). */
-function isTokenExpired(token: string): boolean {
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return typeof payload.exp === 'number' && payload.exp * 1000 < Date.now();
-    } catch { return true; }
+const loadUser = (): AuthUser | null => storage.getJSON<AuthUser | null>(USER_KEY, null);
+
+function saveUser(user: AuthUser | null): void {
+  if (user) storage.setJSON(USER_KEY, user);
+  else storage.set(USER_KEY, null);
 }
 
-function loadUser(): AuthUser | null {
-    try {
-        const raw = localStorage.getItem('mm_user');
-        return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+/** Initial state: a valid access token means signed in; a refresh token means "restore it". */
+function initialStatus(): AuthStatus {
+  if (!isAccessTokenExpired(tokenStore.getAccess())) return 'authenticated';
+  return tokenStore.getRefresh() ? 'loading' : 'anonymous';
 }
 
-/** Load access token from storage, returning null if it is already expired.
- *  If the access token is expired, also clear stale auth data from localStorage. */
-function loadToken(): string | null {
-    const t = localStorage.getItem('mm_token');
-    if (!t || isTokenExpired(t)) {
-        // Clear stale data so the app starts with a clean unauthenticated state
-        localStorage.removeItem('mm_token');
-        localStorage.removeItem('mm_refresh_token');
-        localStorage.removeItem('mm_user');
-        return null;
-    }
-    return t;
+function initialState(): { status: AuthStatus; token: string | null; user: AuthUser | null } {
+  const status = initialStatus();
+  return {
+    status,
+    token: status === 'authenticated' ? tokenStore.getAccess() : null,
+    user: status === 'anonymous' ? null : loadUser(),
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [token, setToken] = useState<string | null>(loadToken);
-    const [user, setUser] = useState<AuthUser | null>(token ? loadUser : null);
+  const [initial] = useState(initialState);
+  const [status, setStatus] = useState<AuthStatus>(initial.status);
+  const [token, setToken] = useState<string | null>(initial.token);
+  const [user, setUser] = useState<AuthUser | null>(initial.user);
+  const [freshSignIn, setFreshSignIn] = useState(false);
 
-    const persist = (result: { accessToken: string; refreshToken: string; user: AuthUser }) => {
-        localStorage.setItem('mm_token', result.accessToken);
-        localStorage.setItem('mm_refresh_token', result.refreshToken);
-        localStorage.setItem('mm_user', JSON.stringify(result.user));
-        setToken(result.accessToken);
-        setUser(result.user);
+  const clearSession = useCallback(() => {
+    tokenStore.clear();
+    saveUser(null);
+    setToken(null);
+    setUser(null);
+    setStatus('anonymous');
+  }, []);
+
+  // Restore an expired session once at start-up (the old code logged the user out here).
+  useEffect(() => {
+    if (status !== 'loading') return;
+    let cancelled = false;
+    refreshAccessToken().then((fresh) => {
+      if (cancelled) return;
+      if (fresh) {
+        setToken(fresh);
+        setStatus('authenticated');
+      } else if (!tokenStore.getRefresh()) {
+        clearSession();
+      } else {
+        // Offline or server error: keep the session and let the next request retry.
+        setToken(tokenStore.getAccess());
+        setStatus('authenticated');
+      }
+    });
+    return () => {
+      cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const login = useCallback(async (email: string, password: string) => {
-        const result = await authApi.login({ email, password });
-        persist(result);
-    }, []);
+  useEffect(() => {
+    registerSessionExpiredHandler(clearSession);
+    return () => registerSessionExpiredHandler(null);
+  }, [clearSession]);
 
-    const loginWithGoogle = useCallback(async (idToken: string) => {
-        const result = await authApi.googleLogin(idToken);
-        persist(result);
-    }, []);
+  const persist = useCallback(
+    (result: { accessToken: string; refreshToken: string; user: AuthUser }) => {
+      tokenStore.setSession(result.accessToken, result.refreshToken);
+      saveUser(result.user);
+      setToken(result.accessToken);
+      setUser(result.user);
+      setStatus('authenticated');
+      setFreshSignIn(true);
+    },
+    []
+  );
 
-    const register = useCallback(async (email: string, password: string, name: string): Promise<string> => {
-        const result = await authApi.register({ email, password, name });
-        return result.message;
-    }, []);
+  const acknowledgeSignIn = useCallback(() => setFreshSignIn(false), []);
 
-    const logout = useCallback(() => {
-        // Best-effort: tell backend to revoke the refresh token
-        const refreshToken = localStorage.getItem('mm_refresh_token');
-        if (refreshToken) {
-            authApi.logout(refreshToken).catch(() => { /* ignore network errors on logout */ });
-        }
-        localStorage.removeItem('mm_token');
-        localStorage.removeItem('mm_refresh_token');
-        localStorage.removeItem('mm_user');
-        setToken(null);
-        setUser(null);
-    }, []);
+  const login = useCallback(
+    async (email: string, password: string) => persist(await authApi.login({ email, password })),
+    [persist]
+  );
 
-    // Register the unauthorized handler so the API layer can trigger logout when
-    // both the access token and refresh token are invalid / expired.
-    useEffect(() => {
-        registerUnauthorizedHandler(logout);
-    }, [logout]);
+  const loginWithGoogle = useCallback(
+    async (googleToken: string, locale?: Locale) =>
+      persist(await authApi.googleLogin(googleToken, locale)),
+    [persist]
+  );
 
-    const updateName = useCallback(async (name: string) => {
-        const result = await authApi.updateName(name);
-        setUser((u) => u ? { ...u, name: result.name } : u);
-        const stored = localStorage.getItem('mm_user');
-        if (stored) {
-            const parsed = JSON.parse(stored) as AuthUser;
-            localStorage.setItem('mm_user', JSON.stringify({ ...parsed, name: result.name }));
-        }
-    }, []);
+  const register = useCallback(
+    async (email: string, password: string, name: string, locale?: Locale): Promise<string> => {
+      const result = await authApi.register({ email, password, name, locale });
+      return result.message;
+    },
+    []
+  );
 
-    const updatePassword = useCallback(async (currentPassword: string, newPassword: string) => {
-        await authApi.updatePassword(currentPassword, newPassword);
-    }, []);
+  const logout = useCallback(() => {
+    const refreshToken = tokenStore.getRefresh();
+    if (refreshToken) authApi.logout(refreshToken).catch(() => undefined);
+    clearSession();
+  }, [clearSession]);
 
-    const updateAvatar = useCallback(async (avatarDataUrl: string) => {
-        const result = await authApi.updateAvatar(avatarDataUrl);
-        setUser((u) => u ? { ...u, avatarUrl: result.avatarUrl } : u);
-        const stored = localStorage.getItem('mm_user');
-        if (stored) {
-            const parsed = JSON.parse(stored) as AuthUser;
-            localStorage.setItem('mm_user', JSON.stringify({ ...parsed, avatarUrl: result.avatarUrl }));
-        }
-    }, []);
+  const logoutEverywhere = useCallback(async () => {
+    await authApi.logoutEverywhere();
+    clearSession();
+  }, [clearSession]);
 
-    return (
-        <AuthContext.Provider value={{ user, token, login, loginWithGoogle, register, logout, isAuthenticated: !!token, updateName, updatePassword, updateAvatar }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  const updateUser = useCallback((changes: Partial<AuthUser>) => {
+    setUser((u) => {
+      const next = u ? { ...u, ...changes } : u;
+      saveUser(next);
+      return next;
+    });
+  }, []);
+
+  const updateName = useCallback(
+    async (name: string) => updateUser({ name: (await authApi.updateName(name)).name }),
+    [updateUser]
+  );
+
+  const updatePassword = useCallback(
+    async (currentPassword: string | undefined, newPassword: string) => {
+      const result = await authApi.updatePassword(currentPassword, newPassword);
+      // Every other session was closed by the API; this device gets new tokens.
+      tokenStore.setSession(result.accessToken, result.refreshToken);
+      setToken(result.accessToken);
+      updateUser({ hasPassword: true });
+    },
+    [updateUser]
+  );
+
+  const updateAvatar = useCallback(
+    async (avatarDataUrl: string | null) =>
+      updateUser({ avatarUrl: (await authApi.updateAvatar(avatarDataUrl)).avatarUrl }),
+    [updateUser]
+  );
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      token,
+      status,
+      isAuthenticated: status === 'authenticated',
+      freshSignIn,
+      acknowledgeSignIn,
+      login,
+      loginWithGoogle,
+      register,
+      logout,
+      endSession: clearSession,
+      logoutEverywhere,
+      updateName,
+      updatePassword,
+      updateAvatar,
+    }),
+    [
+      user,
+      token,
+      status,
+      freshSignIn,
+      acknowledgeSignIn,
+      login,
+      loginWithGoogle,
+      register,
+      logout,
+      clearSession,
+      logoutEverywhere,
+      updateName,
+      updatePassword,
+      updateAvatar,
+    ]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-    return ctx;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
 }

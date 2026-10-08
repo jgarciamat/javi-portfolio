@@ -1,283 +1,265 @@
 /**
- * Tests for authApi and budgetApi in core/api/authApi.ts
- * We mock global fetch to test the request helper branches.
- * api.config is stubbed via moduleNameMapper in jest.config.cjs → src/__mocks__/api.config.ts
+ * Tests for core/api/http.ts (request helpers, token refresh) and authApi.
+ * fetch is mocked; api.config is stubbed via moduleNameMapper → src/__mocks__/api.config.ts
  */
 
-import { authApi, budgetApi, registerUnauthorizedHandler } from '@core/api/authApi';
+import { authApi } from '@core/api/authApi';
+import {
+  ApiError,
+  apiRequest,
+  errorCode,
+  isAccessTokenExpired,
+  refreshAccessToken,
+  registerSessionExpiredHandler,
+  publicRequest,
+  tokenStore,
+} from '@core/api/http';
+import { translate } from '@core/i18n/I18nContext';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-// A valid-looking fake JWT with exp far in the future
-const FAKE_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6OTk5OTk5OTk5OX0.sig';
-const FAKE_REFRESH_TOKEN = 'refresh-abc-xyz';
+const API = 'http://localhost:3000/api';
 
-function makeResponse(body: unknown, status = 200) {
-    return {
-        ok: status >= 200 && status < 300,
-        status,
-        json: jest.fn().mockResolvedValue(body),
-    };
+function jwt(expSecondsFromNow: number): string {
+  const payload = btoa(
+    JSON.stringify({ sub: 'u1', exp: Math.floor(Date.now() / 1000) + expSecondsFromNow })
+  );
+  return `eyJhbGciOiJIUzI1NiJ9.${payload}.sig`;
 }
 
-describe('authApi', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        localStorage.clear();
-    });
+const VALID = jwt(3600);
+const EXPIRED = jwt(-60);
 
-    test('register sends POST and returns RegisterResult', async () => {
-        const expected = { message: 'Registro exitoso. Revisa tu email para verificar tu cuenta.' };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await authApi.register({ email: 'a@b', password: 'pw', name: 'Test' });
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/register',
-            expect.objectContaining({ method: 'POST' })
-        );
-    });
+function makeResponse(body: unknown, status = 200) {
+  return { ok: status >= 200 && status < 300, status, json: jest.fn().mockResolvedValue(body) };
+}
 
-    test('login sends POST and returns AuthResult with accessToken + refreshToken', async () => {
-        const expected = {
-            accessToken: FAKE_ACCESS_TOKEN,
-            refreshToken: FAKE_REFRESH_TOKEN,
-            user: { id: 'u2', name: 'Login', email: 'l@b' },
-        };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await authApi.login({ email: 'l@b', password: 'pw' });
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/login',
-            expect.objectContaining({ method: 'POST' })
-        );
-    });
+function headersOf(call: number): Record<string, string> {
+  return (mockFetch.mock.calls[call][1] as RequestInit).headers as Record<string, string>;
+}
 
-    test('throws with server error message on non-ok response', async () => {
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'Invalid credentials' }, 401));
-        await expect(authApi.login({ email: 'bad@b', password: 'wrong' }))
-            .rejects.toThrow('Invalid credentials');
-    });
-
-    test('throws HTTP status message when body has no error field', async () => {
-        mockFetch.mockResolvedValueOnce(makeResponse({}, 500));
-        await expect(authApi.login({ email: 'a@b', password: 'pw' }))
-            .rejects.toThrow('HTTP 500');
-    });
-
-    test('falls back to HTTP status when error response body is not JSON', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: false,
-            status: 503,
-            json: jest.fn().mockRejectedValue(new Error('not json')),
-        });
-        await expect(authApi.login({ email: 'a@b', password: 'pw' }))
-            .rejects.toThrow('HTTP 503');
-    });
-
-    test('returns undefined for 204 No Content', async () => {
-        const resp = { ok: true, status: 204, json: jest.fn() };
-        mockFetch.mockResolvedValueOnce(resp);
-        // Just needs to not throw
-        const result = await authApi.login({ email: 'a@b', password: 'pw' } as never);
-        expect(result).toBeUndefined();
-    });
-
-    test('does NOT send Authorization header on login even when token is in localStorage', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN, refreshToken: FAKE_REFRESH_TOKEN, user: {} }));
-        await authApi.login({ email: 'a@b', password: 'pw' });
-        const calledHeaders = mockFetch.mock.calls[0][1].headers;
-        expect(calledHeaders['Authorization']).toBeUndefined();
-    });
-
-    test('does not send Authorization header when no token in localStorage', async () => {
-        localStorage.removeItem('mm_token');
-        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN, refreshToken: FAKE_REFRESH_TOKEN, user: {} }));
-        await authApi.login({ email: 'a@b', password: 'pw' });
-        const calledHeaders = mockFetch.mock.calls[0][1].headers;
-        expect(calledHeaders['Authorization']).toBeUndefined();
-    });
-
-    test('verifyEmail sends GET with token query param', async () => {
-        const expected = { message: 'Email verificado correctamente. Ya puedes iniciar sesión.' };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await authApi.verifyEmail('test-token-123');
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/verify-email?token=test-token-123',
-            expect.any(Object)
-        );
-    });
-
-    test('requestPasswordReset sends POST /auth/forgot-password with email', async () => {
-        const expected = { message: 'Si existe una cuenta con ese email, recibirás un enlace.' };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await authApi.requestPasswordReset('user@example.com');
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/forgot-password',
-            expect.objectContaining({
-                method: 'POST',
-                body: JSON.stringify({ email: 'user@example.com' }),
-            })
-        );
-    });
-
-    test('requestPasswordReset does not send Authorization header', async () => {
-        localStorage.setItem('mm_token', 'some-token');
-        mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }));
-        await authApi.requestPasswordReset('u@e.com');
-        const calledHeaders = mockFetch.mock.calls[0][1].headers;
-        expect(calledHeaders['Authorization']).toBeUndefined();
-    });
-
-    test('resetPassword sends POST /auth/reset-password with token and newPassword', async () => {
-        const expected = { message: 'Contraseña restablecida correctamente.' };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await authApi.resetPassword('my-reset-token', 'newpassword123');
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/reset-password',
-            expect.objectContaining({
-                method: 'POST',
-                body: JSON.stringify({ token: 'my-reset-token', newPassword: 'newpassword123' }),
-            })
-        );
-    });
-
-    test('resetPassword does not send Authorization header', async () => {
-        localStorage.setItem('mm_token', 'some-token');
-        mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }));
-        await authApi.resetPassword('tok', 'pw');
-        const calledHeaders = mockFetch.mock.calls[0][1].headers;
-        expect(calledHeaders['Authorization']).toBeUndefined();
-    });
-
-    test('resetPassword throws on server error', async () => {
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'El enlace ha expirado.' }, 400));
-        await expect(authApi.resetPassword('expired-token', 'pw')).rejects.toThrow('El enlace ha expirado.');
-    });
-
-    test('logout sends POST /auth/logout with refreshToken', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
-        await authApi.logout(FAKE_REFRESH_TOKEN);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/auth/logout',
-            expect.objectContaining({ method: 'POST' })
-        );
-    });
-
-    test('401 handler: retries with refreshed token on 401 response', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
-
-        // First call → 401
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
-        // tryRefresh call → 200 with new accessToken
-        mockFetch.mockResolvedValueOnce(makeResponse({ accessToken: FAKE_ACCESS_TOKEN }));
-        // Retry of original request → 200 with data
-        mockFetch.mockResolvedValueOnce(makeResponse({ name: 'Updated' }));
-
-        const result = await authApi.updateName('Updated');
-        expect(result).toEqual({ name: 'Updated' });
-        expect(mockFetch).toHaveBeenCalledTimes(3);
-    });
-
-    test('401 handler: calls onUnauthorized when refresh also fails', async () => {
-        const handler = jest.fn();
-        registerUnauthorizedHandler(handler);
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
-
-        // First call → 401
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
-        // tryRefresh → 401 (refresh also expired)
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'invalid' }, 401));
-
-        await expect(authApi.updateName('Fail')).rejects.toThrow('Sesión expirada');
-        expect(handler).toHaveBeenCalledTimes(1);
-    });
-
-    test('401 handler: calls onUnauthorized when no refresh token stored', async () => {
-        const handler = jest.fn();
-        registerUnauthorizedHandler(handler);
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        localStorage.removeItem('mm_refresh_token');
-
-        // First call → 401
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401));
-
-        await expect(authApi.updateName('Fail')).rejects.toThrow('Sesión expirada');
-        expect(handler).toHaveBeenCalledTimes(1);
-    });
-
-    test('registerUnauthorizedHandler registers a callback', () => {
-        const handler = jest.fn();
-        expect(() => registerUnauthorizedHandler(handler)).not.toThrow();
-    });
-
-    test('deleteAccount sends DELETE /profile/account', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
-        await authApi.deleteAccount();
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/profile/account',
-            expect.objectContaining({ method: 'DELETE' })
-        );
-    });
-
-    test('deleteAccount sends Authorization header when token is stored', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
-        await authApi.deleteAccount();
-        const calledHeaders = mockFetch.mock.calls[0][1].headers;
-        expect(calledHeaders['Authorization']).toBe(`Bearer ${FAKE_ACCESS_TOKEN}`);
-    });
-
-    test('deleteAccount throws on server error', async () => {
-        localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
-        mockFetch.mockResolvedValueOnce(makeResponse({ error: 'Usuario no encontrado' }, 400));
-        await expect(authApi.deleteAccount()).rejects.toThrow('Usuario no encontrado');
-    });
+beforeEach(() => {
+  jest.clearAllMocks();
+  localStorage.clear();
+  registerSessionExpiredHandler(null);
 });
 
-describe('budgetApi', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        localStorage.clear();
+describe('public auth endpoints', () => {
+  test('register sends the locale and never an Authorization header', async () => {
+    tokenStore.setSession(VALID, 'r');
+    mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }, 201));
+    await authApi.register({ email: 'a@b.co', password: 'pw', name: 'A', locale: 'en' });
+    expect(mockFetch).toHaveBeenCalledWith(
+      `${API}/auth/register`,
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+      email: 'a@b.co',
+      password: 'pw',
+      name: 'A',
+      locale: 'en',
     });
+    expect(headersOf(0).Authorization).toBeUndefined();
+  });
 
-    test('get fetches budget for year/month', async () => {
-        const expected = { id: 'b1', year: 2025, month: 1, initialAmount: 1000 };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await budgetApi.get(2025, 1);
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith('http://localhost:3000/api/budget/2025/1', expect.any(Object));
-    });
+  test('login returns the tokens', async () => {
+    const result = {
+      accessToken: VALID,
+      refreshToken: 'r',
+      user: { id: 'u1', email: 'a@b', name: 'A' },
+    };
+    mockFetch.mockResolvedValueOnce(makeResponse(result));
+    await expect(authApi.login({ email: 'a@b', password: 'pw' })).resolves.toEqual(result);
+  });
 
-    test('set sends PUT with initialAmount', async () => {
-        const expected = { id: 'b2', year: 2025, month: 2, initialAmount: 500 };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await budgetApi.set(2025, 2, 500);
-        expect(result).toEqual(expected);
-        expect(mockFetch).toHaveBeenCalledWith(
-            'http://localhost:3000/api/budget/2025/2',
-            expect.objectContaining({ method: 'PUT' })
-        );
-    });
+  test('errors carry status, code and details', async () => {
+    mockFetch.mockResolvedValueOnce(
+      makeResponse(
+        { error: 'Debes verificar tu email', code: 'EMAIL_NOT_VERIFIED', details: { x: 1 } },
+        403
+      )
+    );
+    const error = await authApi.login({ email: 'a@b', password: 'pw' }).catch((e) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 403, code: 'EMAIL_NOT_VERIFIED', details: { x: 1 } });
+    expect(errorCode(error)).toBe('EMAIL_NOT_VERIFIED');
+    expect(errorCode(new Error('x'))).toBeUndefined();
+  });
 
-    test('history returns array', async () => {
-        mockFetch.mockResolvedValueOnce(makeResponse([{ year: 2025, month: 1, initialAmount: 0 }]));
-        const result = await budgetApi.history();
-        expect(Array.isArray(result)).toBe(true);
+  test('shows a generic message when the error body is not JSON', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 502,
+      json: jest.fn().mockRejectedValue(new Error()),
     });
+    await expect(authApi.requestPasswordReset('a@b')).rejects.toThrow(
+      translate('es', 'app.apiError.generic')
+    );
+  });
 
-    test('getCarryover returns carryover data', async () => {
-        const expected = { carryover: 250, year: 2025, month: 3 };
-        mockFetch.mockResolvedValueOnce(makeResponse(expected));
-        const result = await budgetApi.getCarryover(2025, 3);
-        expect(result).toEqual(expected);
+  test('turns a network failure into a translated ApiError', async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    const error = await publicRequest('/x').catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({
+      status: 0,
+      code: 'NETWORK_ERROR',
+      message: translate('es', 'app.apiError.NETWORK_ERROR'),
     });
+  });
+
+  test.each([
+    ['verifyEmail', () => authApi.verifyEmail('t k'), `${API}/auth/verify-email?token=t%20k`],
+    [
+      'resendVerification',
+      () => authApi.resendVerification('a@b', 'es'),
+      `${API}/auth/resend-verification`,
+    ],
+    [
+      'requestPasswordReset',
+      () => authApi.requestPasswordReset('a@b', 'en'),
+      `${API}/auth/forgot-password`,
+    ],
+    [
+      'resetPassword',
+      () => authApi.resetPassword('tok', 'New-pass1!'),
+      `${API}/auth/reset-password`,
+    ],
+    ['googleLogin', () => authApi.googleLogin('google-token', 'es'), `${API}/auth/google`],
+    ['logout', () => authApi.logout('refresh'), `${API}/auth/logout`],
+  ])('%s calls the right endpoint', async (_name, call, url) => {
+    mockFetch.mockResolvedValueOnce(makeResponse({ message: 'ok' }));
+    await call();
+    expect(mockFetch.mock.calls[0][0]).toBe(url);
+  });
+
+  test('returns undefined for 204 No Content', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+    await expect(authApi.logout('r')).resolves.toBeUndefined();
+  });
+});
+
+describe('apiRequest', () => {
+  test('sends the stored access token', async () => {
+    tokenStore.setSession(VALID, 'r');
+    mockFetch.mockResolvedValueOnce(makeResponse({ ok: true }));
+    await apiRequest('/categories');
+    expect(headersOf(0).Authorization).toBe(`Bearer ${VALID}`);
+  });
+
+  test('refreshes an expired access token before the request', async () => {
+    tokenStore.setSession(EXPIRED, 'refresh-1');
+    mockFetch
+      .mockResolvedValueOnce(makeResponse({ accessToken: VALID }))
+      .mockResolvedValueOnce(makeResponse([]));
+    await apiRequest('/categories');
+    expect(mockFetch.mock.calls[0][0]).toBe(`${API}/auth/refresh`);
+    expect(headersOf(1).Authorization).toBe(`Bearer ${VALID}`);
+    expect(tokenStore.getAccess()).toBe(VALID);
+  });
+
+  test('retries once with a refreshed token after a 401', async () => {
+    tokenStore.setSession(VALID, 'refresh-1');
+    const fresh = jwt(7200);
+    mockFetch
+      .mockResolvedValueOnce(makeResponse({ error: 'expired' }, 401))
+      .mockResolvedValueOnce(makeResponse({ accessToken: fresh }))
+      .mockResolvedValueOnce(makeResponse({ data: 1 }));
+    await expect(apiRequest('/x')).resolves.toEqual({ data: 1 });
+    expect(headersOf(2).Authorization).toBe(`Bearer ${fresh}`);
+  });
+
+  test('ends the session only when the refresh token is rejected', async () => {
+    const onExpired = jest.fn();
+    registerSessionExpiredHandler(onExpired);
+    tokenStore.setSession(VALID, 'refresh-1');
+    mockFetch
+      .mockResolvedValueOnce(makeResponse({}, 401))
+      .mockResolvedValueOnce(makeResponse({ code: 'SESSION_EXPIRED' }, 401));
+    const error = await apiRequest('/x').catch((e) => e);
+    expect(error).toMatchObject({ status: 401, code: 'SESSION_EXPIRED' });
+    expect(onExpired).toHaveBeenCalledTimes(1);
+    expect(tokenStore.getRefresh()).toBeNull();
+  });
+
+  test('does NOT log the user out when the retried request fails with another error (old bug)', async () => {
+    const onExpired = jest.fn();
+    registerSessionExpiredHandler(onExpired);
+    tokenStore.setSession(VALID, 'refresh-1');
+    mockFetch
+      .mockResolvedValueOnce(makeResponse({}, 401))
+      .mockResolvedValueOnce(makeResponse({ accessToken: jwt(7200) }))
+      .mockResolvedValueOnce(
+        makeResponse({ error: 'Saldo insuficiente', code: 'INSUFFICIENT_BALANCE' }, 400)
+      );
+    await expect(apiRequest('/transactions', { method: 'POST' })).rejects.toMatchObject({
+      code: 'INSUFFICIENT_BALANCE',
+    });
+    expect(onExpired).not.toHaveBeenCalled();
+    expect(tokenStore.getRefresh()).toBe('refresh-1');
+  });
+
+  test('keeps the session when refreshing fails because of the network', async () => {
+    tokenStore.setSession(EXPIRED, 'refresh-1');
+    mockFetch.mockRejectedValueOnce(new Error('offline'));
+    await expect(refreshAccessToken()).resolves.toBeNull();
+    expect(tokenStore.getRefresh()).toBe('refresh-1');
+  });
+
+  test('parallel requests share a single refresh call', async () => {
+    tokenStore.setSession(EXPIRED, 'refresh-1');
+    let resolveRefresh: (v: unknown) => void = () => undefined;
+    mockFetch.mockImplementation((url: string) => {
+      if (url.endsWith('/auth/refresh')) {
+        return new Promise((r) => {
+          resolveRefresh = () => r(makeResponse({ accessToken: VALID }));
+        });
+      }
+      return Promise.resolve(makeResponse({}));
+    });
+    const calls = [apiRequest('/a'), apiRequest('/b'), apiRequest('/c')];
+    await Promise.resolve();
+    resolveRefresh(undefined);
+    await Promise.all(calls);
+    expect(
+      mockFetch.mock.calls.filter(([url]) => String(url).endsWith('/auth/refresh'))
+    ).toHaveLength(1);
+  });
+});
+
+describe('authenticated profile endpoints', () => {
+  beforeEach(() => tokenStore.setSession(VALID, 'r'));
+
+  test('updatePassword returns the new tokens', async () => {
+    mockFetch.mockResolvedValueOnce(
+      makeResponse({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' })
+    );
+    await expect(authApi.updatePassword(undefined, 'New-pass1!')).resolves.toMatchObject({
+      refreshToken: 'r2',
+    });
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ newPassword: 'New-pass1!' });
+  });
+
+  test.each([
+    ['deleteAccount', () => authApi.deleteAccount(), `${API}/profile/account`, 'DELETE'],
+    ['logoutEverywhere', () => authApi.logoutEverywhere(), `${API}/auth/logout-all`, 'POST'],
+    ['updateName', () => authApi.updateName('Ana'), `${API}/profile/name`, 'PATCH'],
+    ['updateAvatar', () => authApi.updateAvatar(null), `${API}/profile/avatar`, 'PATCH'],
+  ])('%s', async (_name, call, url, method) => {
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: jest.fn() });
+    await call();
+    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({ method }));
+    expect(headersOf(0).Authorization).toBe(`Bearer ${VALID}`);
+  });
+});
+
+describe('isAccessTokenExpired', () => {
+  test('reads the exp claim with a safety margin', () => {
+    expect(isAccessTokenExpired(VALID)).toBe(false);
+    expect(isAccessTokenExpired(EXPIRED)).toBe(true);
+    expect(isAccessTokenExpired(jwt(10))).toBe(true);
+    expect(isAccessTokenExpired('garbage')).toBe(true);
+    expect(isAccessTokenExpired(null)).toBe(true);
+  });
 });

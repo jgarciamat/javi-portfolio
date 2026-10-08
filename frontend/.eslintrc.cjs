@@ -13,6 +13,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
+    'prettier'
   ],
   plugins: ['@typescript-eslint', 'react', 'react-hooks'],
   env: {
@@ -54,13 +55,10 @@ module.exports = {
         'src/__tests__/**/*.ts',
         'src/__tests__/**/*.tsx',
         'src/__mocks__/**/*.js',
-        'cypress/**/*.ts',
-        'cypress.config.ts',
+        'e2e/**/*.ts',
+        'playwright.config.ts',
         'capacitor.config.ts',
         'vite.config.ts',
-        'setupTests.ts',
-        'core/**/*.ts',
-        'shared/**/*.ts',
       ],
       parserOptions: {
         project: null,

@@ -1,38 +1,62 @@
 #!/usr/bin/env bash
+# Deploys the current origin/<branch> on the server.
+#   usage: deploy.sh [repo_dir] [branch]
+# Images are built before anything is stopped, and containers are only recreated
+# when their image or configuration changed, so the site stays up during the build.
 set -euo pipefail
 
 REPO_DIR="${1:-/opt/winjgm/javi-portfolio}"
 BRANCH="${2:-master}"
+DEPLOY_DIR="$REPO_DIR/deploy"
+LEGACY_DB_DIR="$REPO_DIR/backend/data"
 
 echo "==> Using repo: $REPO_DIR, branch: $BRANCH"
 cd "$REPO_DIR"
-
-echo "==> Fetch & reset to origin/$BRANCH"
 git fetch origin "$BRANCH"
 git reset --hard "origin/$BRANCH"
 
-echo "==> Build backend (TypeScript) -> backend/dist"
-docker run --rm -t \
-  -v "$REPO_DIR/backend:/app" \
-  -w /app \
-  node:20-alpine sh -lc "npm ci && npm run build"
+cd "$DEPLOY_DIR"
+if [ ! -f .env ]; then
+  echo "!! $DEPLOY_DIR/.env is missing (copy .env.example and fill it in)" >&2
+  exit 1
+fi
 
-echo "==> Build frontend (Vite) -> frontend/dist"
-docker run --rm -t \
-  -v "$REPO_DIR/frontend:/app" \
-  -w /app \
-  node:20-alpine sh -lc "npm ci && npm run build"
+echo "==> Building images"
+docker compose build --pull
 
-echo "==> Copy dist -> docker volume deploy_web_dist"
-cd "$REPO_DIR/deploy"
-docker run --rm \
-  -v deploy_web_dist:/target \
-  -v "$REPO_DIR/frontend/dist:/source:ro" \
-  alpine:3.20 sh -lc 'rm -rf /target/* && cp -a /source/. /target/'
+# Versions <= 1.10 kept the SQLite file inside the git checkout (backend/data).
+# Copy it once into the api_db volume; the original files are left untouched.
+if [ -f "$LEGACY_DB_DIR/money-manager.db" ]; then
+  echo "==> Checking legacy database in $LEGACY_DB_DIR"
+  docker compose stop api >/dev/null 2>&1 || true
+  docker compose run --rm --no-deps --user root --entrypoint sh \
+    -v "$LEGACY_DB_DIR:/legacy:ro" api -c '
+      if [ -f /data/money-manager.db ]; then
+        echo "   volume already has a database, legacy copy skipped"
+      else
+        cp -a /legacy/money-manager.db* /data/ && chown node:node /data/money-manager.db*
+        echo "   legacy database copied into the api_db volume"
+      fi'
+fi
 
-echo "==> Deploy stack (recreate to pick changes)"
-docker compose down --remove-orphans
+echo "==> Starting services"
 docker compose up -d --remove-orphans
 
-echo "==> Status"
+echo "==> Waiting for the API to be healthy"
+API_CONTAINER="$(docker compose ps -q api)"
+for _ in $(seq 1 30); do
+  STATUS="$(docker inspect --format '{{.State.Health.Status}}' "$API_CONTAINER" 2>/dev/null || echo starting)"
+  if [ "$STATUS" = "healthy" ]; then
+    echo "   API healthy"
+    break
+  fi
+  sleep 2
+done
+if [ "${STATUS:-}" != "healthy" ]; then
+  echo "!! API did not become healthy; last logs:" >&2
+  docker compose logs --tail=80 api >&2
+  exit 1
+fi
+
+docker image prune -f >/dev/null
 docker compose ps

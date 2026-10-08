@@ -1,63 +1,43 @@
 /**
- * Returns true when a given year/month is strictly in the future (after the current month).
- * Used in the annual chart to decide if a month label should be a clickable link.
+ * Navigation limits for the month and annual views. Past months are unlimited
+ * (down to MIN_YEAR, to allow importing old bank statements) and the future is
+ * limited to MAX_MONTHS_AHEAD so recurring movements can be planned.
+ * `current` is the user's current period (it depends on the month start day).
  */
-export function isMonthInFuture(viewYear: number, viewMonth: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
-    if (viewYear > currentYear) return true;
-    if (viewYear === currentYear && viewMonth > currentMonth) return true;
-    return false;
+export const MIN_YEAR = 2000;
+export const MAX_MONTHS_AHEAD = 12;
+
+export interface YearMonth {
+  year: number;
+  month: number;
 }
 
-/**
- * Returns true when the "Siguiente" button should be disabled.
- * Rule: navigation is allowed up to 1 month ahead of the current month.
- * E.g. on March 2026, April 2026 is accessible but May 2026 is not.
- *
- * @param viewYear  - the year currently displayed
- * @param viewMonth - the month currently displayed (1–12)
- * @param today     - reference date (defaults to now)
- */
-export function isNextButtonDisabled(viewYear: number, viewMonth: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1;
+const ordinal = (p: YearMonth) => p.year * 12 + (p.month - 1);
+const fromOrdinal = (o: number): YearMonth => ({ year: Math.floor(o / 12), month: (o % 12) + 1 });
 
-    // Compute the maximum allowed month (current + 1)
-    const maxYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-    const maxMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-
-    if (viewYear > maxYear) return true;
-    if (viewYear === maxYear && viewMonth >= maxMonth) return true;
-    return false;
+export function addMonths(p: YearMonth, n: number): YearMonth {
+  return fromOrdinal(ordinal(p) + n);
 }
 
-/**
- * Returns true when the "next year" button in the annual chart should be disabled.
- *
- * Rule: navigating to the next year is only allowed if we are in December of
- * the current year (because January of next year is the only future month
- * accessible at that point). At any other time of the year, the next year
- * has no accessible months yet.
- *
- * Examples:
- *   - Today = March 2026,    viewing 2026 → disabled (only Jan 2026 is allowed ahead, same year)
- *   - Today = December 2026, viewing 2026 → enabled  (Jan 2027 is the +1 month)
- *   - Today = December 2026, viewing 2027 → disabled (already on next year)
- *   - Today = any month,     viewing year > currentYear + 1 → disabled
- *
- * @param viewYear - the year currently displayed in the annual chart
- * @param today    - reference date (defaults to now)
- */
-export function isNextYearDisabled(viewYear: number, today: Date = new Date()): boolean {
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth() + 1; // 1–12
+export function comparePeriods(a: YearMonth, b: YearMonth): number {
+  return ordinal(a) - ordinal(b);
+}
 
-    // Already past or at the next year
-    if (viewYear >= currentYear + 1) return true;
+/** Latest month the user can open. */
+export function maxPeriod(current: YearMonth): YearMonth {
+  return addMonths(current, MAX_MONTHS_AHEAD);
+}
 
-    // Can only go to next year if we are in December
-    if (currentMonth !== 12) return true;
+/** True when a month is further ahead than the planning horizon (cannot be opened). */
+export function isBeyondHorizon(year: number, month: number, current: YearMonth): boolean {
+  return comparePeriods({ year, month }, maxPeriod(current)) > 0;
+}
 
-    return false;
+/** "Next" is disabled once the view reaches the planning horizon. */
+export function isNextButtonDisabled(year: number, month: number, current: YearMonth): boolean {
+  return comparePeriods({ year, month }, maxPeriod(current)) >= 0;
+}
+
+export function isPrevButtonDisabled(year: number, month: number): boolean {
+  return comparePeriods({ year, month }, { year: MIN_YEAR, month: 1 }) <= 0;
 }

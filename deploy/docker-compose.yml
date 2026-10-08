@@ -10,40 +10,45 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - web
-      - api
+      web:
+        condition: service_started
+      api:
+        condition: service_healthy
 
   web:
-    image: nginx:alpine
+    build:
+      context: ../frontend
+    image: money-manager-web:latest
     restart: unless-stopped
     volumes:
-      - web_dist:/usr/share/nginx/html:ro
       - ./nginx-web.conf:/etc/nginx/conf.d/default.conf:ro
 
   api:
-    image: node:20-alpine
+    build:
+      context: ../backend
+    image: money-manager-api:latest
     restart: unless-stopped
-    working_dir: /app
+    # Secrets and settings live in deploy/.env (see .env.example). The variables
+    # below are fixed by the container layout and override the file.
+    env_file: .env
     environment:
       NODE_ENV: production
       PORT: "3000"
-      DATABASE_URL: /data/db.sqlite
-      JWT_SECRET: "${JWT_SECRET}"
-      RESEND_API_KEY: "${RESEND_API_KEY}"
-      RESEND_FROM_EMAIL: "${RESEND_FROM_EMAIL}"
-      SMTP_FROM_NAME: "${SMTP_FROM_NAME}"
-      APP_URL: "${APP_URL}"
-      TURNSTILE_SECRET_KEY: "${TURNSTILE_SECRET_KEY}"
-      NPM_CONFIG_PRODUCTION: "false"
-      TS_NODE_PROJECT: /app/tsconfig.json
-      TS_CONFIG_PATHS_BASEURL: /app/src
+      DATABASE_PATH: /data/money-manager.db
+      AFFILIATES_FILE: /config/affiliates.json
+      BACKUP_DIR: /backups
     volumes:
-      - ../backend:/app
-      - api_data:/data
-    command: sh -lc "npm ci --include=dev && node -r tsconfig-paths/register dist/infrastructure/express/server.js"
+      - api_db:/data
+      - api_backups:/backups
+      # Partner offers: edit deploy/config/affiliates.json in the repo and deploy.
+      - ./config/affiliates.json:/config/affiliates.json:ro
+    stop_grace_period: 15s
 
 volumes:
-  web_dist:
-  api_data:
+  # SQLite database (WAL files included). Never stored inside the git checkout.
+  api_db:
+  # Daily online backups written by the API (retention: BACKUP_RETENTION_DAYS).
+  # Copy this volume off the server regularly, e.g. with rclone or restic.
+  api_backups:
   caddy_data:
   caddy_config:

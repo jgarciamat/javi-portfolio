@@ -1,123 +1,230 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 body {
-    margin: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #020617;
-    color: #f1f5f9;
-    -webkit-text-size-adjust: 100%;
-    /* Safe area para notch/status bar en Android e iOS (Capacitor) */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #020617;
+  color: #f1f5f9;
+  -webkit-text-size-adjust: 100%;
+  /* Safe area para notch/status bar en Android e iOS (Capacitor) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 input,
 select,
 button,
 textarea {
-    font-family: inherit;
-    font-size: inherit;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* Prevent date pickers from overflowing their container on mobile */
-input[type="date"] {
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
+input[type='date'] {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ─── Card base ──────────────────────────────── */
 .card {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 /* ─── Shared buttons ─────────────────────────── */
 .btn-primary {
-    background: #6366f1;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.65rem 1.5rem;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.15s;
-    width: 100%;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  width: 100%;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #4f46e5;
+  background: #4f46e5;
 }
 
 .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
-    background: #1e293b;
-    color: #cbd5e1;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 0.55rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
 .btn-secondary:hover {
-    background: #334155;
-    color: #f1f5f9;
+  background: #334155;
+  color: #f1f5f9;
 }
 
 .btn-danger {
-    background: rgba(239, 68, 68, 0.12);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.25);
-    border-radius: 8px;
-    padding: 0.55rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
 .btn-danger:hover {
-    background: rgba(239, 68, 68, 0.22);
-    color: #fca5a5;
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
 }
 
 /* ─── Accessibility helpers ─────────────────── */
 /* Visually hidden but readable by screen readers */
 .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Focus ring visible for keyboard navigation */
 :focus-visible {
-    outline: 2px solid #6366f1;
-    outline-offset: 2px;
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* ─── Empty state ────────────────────────────── */
+.empty-block {
+  text-align: center;
+  padding: 2.5rem;
+  color: #64748b;
+}
+
+.empty-block-icon {
+  font-size: 2.5rem;
+}
+
+.empty-block-text {
+  margin: 0.5rem 0 0;
+}
+
+/* ─── Shared inline error ─────────────────────── */
+.inline-error {
+  color: #f87171;
+  font-size: 0.85rem;
+  margin: 0.4rem 0;
+}
+
+/* ─── App splash (session or page chunk loading) ─────────────────────────────────── */
+
+.app-splash {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-splash-logo {
+  font-size: 3rem;
+  animation: splash-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes splash-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ─── Error screen (ErrorBoundary) ────────────── */
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.error-screen--page {
+  min-height: 80vh;
+  justify-content: center;
+}
+
+.error-screen-icon {
+  font-size: 2.5rem;
+}
+
+.error-screen-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.error-screen-text {
+  margin: 0;
+  max-width: 28rem;
+  color: #94a3b8;
+}
+
+.error-screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.error-screen-actions .btn-primary {
+  width: auto;
+}
+
+/* ─── Offline banner ──────────────────────────── */
+.offline-banner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 1100;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  background: #78350f;
+  border: 1px solid #b45309;
+  color: #fef3c7;
+  font-size: 0.875rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Dialogs take focus on open (to announce them); no ring around the whole panel. */
+[role='dialog']:focus {
+  outline: none;
 }

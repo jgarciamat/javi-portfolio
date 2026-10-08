@@ -1,12 +1,19 @@
 graph TB
-    H["HTTP Request"]
-    M["Auth Middleware"]
-    C["Controller"]
-    U["Use Case"]
-    P["Ports / Interfaces"]
-    R["Repository"]
-    D["Domain (Entities / VOs)"]
-    DB[(SQLite DB)]
+    H["HTTP request"]
+    MW["http/middleware<br/>helmet · CORS · rate limit · auth (session version)"]
+    RT["http/routes<br/>zod schemas · presenters"]
+    APP["application/*Service<br/>use cases"]
+    PORTS["domain/ports<br/>repositories · services"]
+    DOM["domain/model + domain/services<br/>entities · rules · cents · periods"]
+    SQL["infrastructure/sqlite<br/>repositories · migrations"]
+    EXT["infrastructure/auth · mail · ai · backup<br/>JWT · Google · Resend · Gemini"]
+    DB[(SQLite<br/>/data/money-manager.db)]
+    ERR["http/middleware errorHandler<br/>DomainError → HTTP status + code"]
 
-    H --> M --> C --> U --> P --> R --> DB
-    U --> D
+    H --> MW --> RT --> APP
+    APP --> DOM
+    APP --> PORTS
+    SQL -. implements .-> PORTS
+    EXT -. implements .-> PORTS
+    SQL --> DB
+    APP -. throws .-> ERR

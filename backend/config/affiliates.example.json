@@ -1,0 +1,30 @@
+[
+  {
+    "id": "example-bank",
+    "category": "banking",
+    "name": "Banco de ejemplo",
+    "icon": "🏦",
+    "title": { "es": "Cuenta sin comisiones", "en": "No-fee current account" },
+    "description": {
+      "es": "Sustituye este texto por la descripción del partner y sus condiciones reales.",
+      "en": "Replace this text with the partner's description and real terms."
+    },
+    "highlight": { "es": "Ejemplo de ventaja", "en": "Example perk" },
+    "url": "https://example.com/replace-with-your-affiliate-link",
+    "active": false
+  },
+  {
+    "id": "example-savings",
+    "category": "savings",
+    "name": "Cuenta remunerada de ejemplo",
+    "icon": "💶",
+    "title": { "es": "Cuenta remunerada", "en": "Interest-bearing account" },
+    "description": {
+      "es": "Las ofertas con \"active\": false no se muestran.",
+      "en": "Offers with \"active\": false are not shown."
+    },
+    "highlight": null,
+    "url": "https://example.com/replace-with-your-affiliate-link-2",
+    "active": false
+  }
+]

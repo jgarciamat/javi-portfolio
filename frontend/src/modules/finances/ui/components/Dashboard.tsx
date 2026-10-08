@@ -1,194 +1,255 @@
-import '../css/Dashboard.css';
-import { useFinances } from '../../application/FinancesContext';
-import { useAuth } from '@shared/hooks/useAuth';
+import { Suspense, type ReactElement } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useDashboard } from '../../application/hooks/useDashboard';
+import { useOptionalSettings } from '@core/settings/SettingsContext';
+import { useAuth } from '@shared/hooks/useAuth';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
-import { AnnualChart } from './AnnualChart';
-import { CategoryManager } from './CategoryManager';
-import { ProfilePage } from '@modules/auth/ui/ProfilePage';
+import { lazyNamed } from '@shared/utils/lazyNamed';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { PlanBanner } from '@modules/billing/ui/PlanBanner';
+import { useFinances } from '../../application/FinancesContext';
+import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
+import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
+import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
+import { SECTION_BY_ID, type DashboardTab } from '../navigation';
+import { GuidedTour } from '../tour/GuidedTour';
+import { BurgerMenu } from './BurgerMenu';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
-import { RecurringRulesTab } from './RecurringRulesTab';
-import { CustomAlertsTab } from './CustomAlertsTab';
-import type { DashboardTab } from '../../application/hooks/useDashboard';
+import { monthAlertMessage } from './monthAlertMessage';
+import '../css/Dashboard.css';
+import '../css/Sections.css';
 
-// ─── Sub-component: tab bar ───────────────────────────────────────────────────
+// The monthly view is the landing tab; every other section and dialog is its own chunk.
+const AnalysisView = lazyNamed(() => import('../views/AnalysisView'), 'AnalysisView');
+const AccountsView = lazyNamed(() => import('../views/AccountsView'), 'AccountsView');
+const BudgetsView = lazyNamed(() => import('../views/BudgetsView'), 'BudgetsView');
+const GoalsView = lazyNamed(() => import('../views/GoalsView'), 'GoalsView');
+const SearchView = lazyNamed(() => import('../views/SearchView'), 'SearchView');
+const SettingsView = lazyNamed(() => import('../views/SettingsView'), 'SettingsView');
+const PlanView = lazyNamed(() => import('@modules/billing/ui/PlanView'), 'PlanView');
+const OffersView = lazyNamed(() => import('@modules/billing/ui/OffersView'), 'OffersView');
+const AnnualChart = lazyNamed(() => import('./AnnualChart'), 'AnnualChart');
+const RecurringRulesTab = lazyNamed(() => import('./RecurringRulesTab'), 'RecurringRulesTab');
+const CustomAlertsTab = lazyNamed(() => import('./CustomAlertsTab'), 'CustomAlertsTab');
+const CategoryManager = lazyNamed(() => import('./CategoryManager'), 'CategoryManager');
+const ImportModal = lazyNamed(() => import('./ImportModal'), 'ImportModal');
+const ProfilePage = lazyNamed(() => import('@modules/auth/ui/ProfilePage'), 'ProfilePage');
 
-const TABS: { id: DashboardTab; icon: string; labelKey: string }[] = [
-    { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly' },
-    { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations' },
-    { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts' },
-    { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual' },
-];
+/** Sections that need nothing from the dashboard. */
+const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
+  analysis: () => <AnalysisView />,
+  accounts: () => <AccountsView />,
+  budgets: () => <BudgetsView />,
+  goals: () => <GoalsView />,
+  plan: () => <PlanView />,
+  offers: () => <OffersView />,
+};
 
-function DashboardTabs({ tab, setTab, t }: { tab: DashboardTab; setTab: (t: DashboardTab) => void; t: (k: string) => string }) {
-    return (
-        <nav className="tabs" role="tablist" aria-label={t('app.tabs.ariaLabel')}>
-            {TABS.map(({ id, icon, labelKey }) => (
-                <button
-                    key={id}
-                    className={`tab-btn${tab === id ? ' active' : ''}`}
-                    onClick={() => setTab(id)}
-                    role="tab"
-                    aria-selected={tab === id}
-                    aria-controls={`tabpanel-${id}`}
-                    id={`tab-${id}`}
-                >
-                    {icon} {t(labelKey)}
-                </button>
-            ))}
-        </nav>
-    );
+function SectionLoading() {
+  const { t } = useI18n();
+  return (
+    <p className="empty-block" role="status">
+      {t('app.common.loading')}
+    </p>
+  );
+}
+
+function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTour: () => void }) {
+  const { year, categories } = useFinances();
+  const simple = SIMPLE_VIEWS[dash.tab];
+  if (simple) return simple();
+  switch (dash.tab) {
+    case 'annual':
+      return (
+        <div className="card">
+          <AnnualChart initialYear={year} onMonthClick={dash.handleMonthClick} />
+        </div>
+      );
+    case 'search':
+      return <SearchView onEdit={dash.setEditingTransaction} refreshKey={dash.editVersion} />;
+    case 'automations':
+      return <RecurringRulesTab categories={categories} />;
+    case 'custom-alerts':
+      return <CustomAlertsTab categories={categories} />;
+    case 'settings':
+      return <SettingsView onOpenProfile={dash.openProfile} onStartTour={onStartTour} />;
+    default:
+      return (
+        <MonthlyView
+          onEditTransaction={dash.setEditingTransaction}
+          onManageCategories={dash.openCategoryModal}
+          onManageBudgets={() => dash.setTab('budgets')}
+        />
+      );
+  }
+}
+
+function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: string }) {
+  const { t } = useI18n();
+  const { user, logout } = useAuth();
+  return (
+    <header className="header">
+      <div className="header-brand">
+        <button
+          className="burger-btn"
+          onClick={() => dash.setMenuOpen(true)}
+          aria-label={t('app.menu.open')}
+          aria-expanded={dash.menuOpen}
+        >
+          <span className="burger-btn-logo">💰</span>
+          <span className="burger-btn-lines" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+        <div>
+          <h1 className="header-title">{t('app.header.title')}</h1>
+          <p className="header-sub">{sectionLabel}</p>
+        </div>
+      </div>
+      <div className="header-actions">
+        <button
+          className="header-user header-user-btn"
+          onClick={dash.openProfile}
+          aria-label={t('app.header.openProfile')}
+          title={t('app.header.openProfile')}
+        >
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className="header-avatar" />
+          ) : (
+            <span className="header-avatar-placeholder" aria-hidden="true">
+              👤
+            </span>
+          )}
+          <span className="header-user-name">{user?.name}</span>
+        </button>
+        <LanguageSwitcher />
+        <button onClick={logout} className="btn-logout">
+          {t('app.header.logout')}
+        </button>
+      </div>
+    </header>
+  );
+}
+
+/** Dialogs opened from anywhere in the dashboard. */
+function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
+  const finances = useFinances();
+  return (
+    <>
+      {dash.showCategoryModal && (
+        <CategoryManager
+          onClose={dash.closeCategoryModal}
+          categories={finances.categories}
+          onAdd={finances.addCategory}
+          onUpdate={finances.updateCategory}
+          onDelete={finances.removeCategory}
+        />
+      )}
+      {dash.showProfile && <ProfilePage onClose={dash.closeProfile} />}
+      {dash.showImport && (
+        <ImportModal
+          accounts={finances.accounts}
+          onClose={dash.closeImport}
+          onImported={() => finances.refresh({ invalidate: true })}
+        />
+      )}
+      {dash.editingTransaction && (
+        <EditTransactionModal
+          transaction={dash.editingTransaction}
+          categories={finances.categories}
+          accounts={finances.accounts}
+          onSave={dash.handleSaveEdit}
+          onClose={() => dash.setEditingTransaction(null)}
+          onManageCategories={() => {
+            dash.setEditingTransaction(null);
+            dash.openCategoryModal();
+          }}
+          availableBalance={finances.available}
+        />
+      )}
+    </>
+  );
+}
+
+/** Notifies new budget alerts of the current period (when enabled in Settings). */
+function useBudgetAlertNotifications() {
+  const { t, tCategory } = useI18n();
+  const settings = useOptionalSettings()?.settings ?? null;
+  const { isCurrentPeriod, year, month, alerts } = useFinances();
+  useAlertNotifications({
+    enabled: !!settings?.notificationsEnabled,
+    isCurrentPeriod,
+    year,
+    month,
+    alerts,
+    title: t('app.header.title'),
+    message: (alert) => monthAlertMessage(alert, t, tCategory),
+  });
 }
 
 export function Dashboard() {
-    const now = new Date();
-    const { user, logout } = useAuth();
-    const { t, tCategory } = useI18n();
-    const {
-        year, month,
-        transactions, summary, carryover,
-        categories, loading, error,
-        isPrevDisabled, isNextDisabled, goToPrev, goToNext, navigateTo,
-        addTransaction, removeTransaction, patchTransaction, updateTransaction,
-        addCategory, removeCategory,
-    } = useFinances();
+  const { t } = useI18n();
+  const finances = useFinances();
+  const plan = useOptionalPlan();
+  const dash = useDashboard({
+    navigateTo: finances.navigateTo,
+    updateTransaction: finances.updateTransaction,
+  });
+  const section = SECTION_BY_ID[dash.tab];
+  const tour = useWelcomeTour(dash.tab, dash.setTab);
+  useBudgetAlertNotifications();
 
-    const {
-        tab, setTab,
-        showCategoryModal, openCategoryModal, closeCategoryModal,
-        showProfile, openProfile, closeProfile,
-        editingTransaction, setEditingTransaction,
-        isCurrentMonth, handleSaveEdit, handleMonthClick,
-    } = useDashboard({ year, month, navigateTo, updateTransaction });
+  // Free plan: the import button opens the paywall instead of the importer.
+  const openImport =
+    plan && !plan.isPremium
+      ? () => plan.openUpgrade({ kind: 'feature', feature: 'import' })
+      : dash.openImport;
 
-    const goToCurrentMonth = () => navigateTo(now.getFullYear(), now.getMonth() + 1);
-
-    function renderTabContent() {
-        if (tab === 'annual') {
-            return (
-                <div className="card">
-                    <AnnualChart initialYear={now.getFullYear()} onMonthClick={handleMonthClick} />
-                </div>
-            );
-        }
-        if (tab === 'automations') {
-            return <RecurringRulesTab categories={categories} />;
-        }
-        if (tab === 'custom-alerts') {
-            return <CustomAlertsTab categories={categories} />;
-        }
-        return (
-            <MonthlyView
-                year={year}
-                month={month}
-                isCurrentMonth={isCurrentMonth}
-                isPrevDisabled={isPrevDisabled}
-                isNextDisabled={isNextDisabled}
-                transactions={transactions}
-                summary={summary}
-                carryover={carryover}
-                categories={categories}
-                loading={loading}
-                error={error}
-                onPrev={goToPrev}
-                onNext={goToNext}
-                onGoToCurrentMonth={goToCurrentMonth}
-                onAddTransaction={addTransaction}
-                onDeleteTransaction={removeTransaction}
-                onPatchTransaction={patchTransaction}
-                onEditTransaction={setEditingTransaction}
-                onManageCategories={openCategoryModal}
-            />
-        );
-    }
-
-    return (
-        <div className="dashboard">
-            <div className="dashboard-sticky">
-                <header className="header">
-                    <div className="header-brand">
-                        <span className="header-logo">💰</span>
-                        <div>
-                            <h1 className="header-title">{t('app.header.title')}</h1>
-                            <p className="header-sub">{t('app.header.subtitle')}</p>
-                        </div>
-                    </div>
-                    <div className="header-actions">
-                        <button
-                            className="header-user header-user-btn"
-                            onClick={openProfile}
-                            aria-label={t('app.header.openProfile')}
-                            title={t('app.header.openProfile')}
-                        >
-                            {user?.avatarUrl
-                                ? <img src={user.avatarUrl} alt="Avatar" className="header-avatar" />
-                                : <span className="header-avatar-placeholder">👤</span>
-                            }
-                            <span className="header-user-name">{user?.name}</span>
-                        </button>
-                        <LanguageSwitcher />
-                        <button onClick={logout} className="btn-logout" title={t('app.header.logout')} aria-label={t('app.header.logout')}>{t('app.header.logout')}</button>
-                    </div>
-                </header>
-
-                {/* ── Sub-header: tabs + month nav ─────────────────────── */}
-                <div className="sticky-nav">
-                    <div className="sticky-nav-inner">
-                        <DashboardTabs tab={tab} setTab={setTab} t={t} />
-
-                        {tab === 'monthly' && (
-                            <MonthNavCard
-                                year={year}
-                                month={month}
-                                isCurrentMonth={isCurrentMonth}
-                                isPrevDisabled={isPrevDisabled}
-                                isNextDisabled={isNextDisabled}
-                                transactions={transactions}
-                                summary={summary}
-                                onPrev={goToPrev}
-                                onNext={goToNext}
-                                onGoToCurrentMonth={goToCurrentMonth}
-                                tCategory={tCategory}
-                            />
-                        )}
-                    </div>
-                </div>
+  return (
+    <div className="dashboard">
+      <div className="dashboard-sticky">
+        <Header dash={dash} sectionLabel={`${section.icon} ${t(section.labelKey)}`} />
+        {dash.tab === 'monthly' && (
+          <div className="sticky-nav">
+            <div className="sticky-nav-inner">
+              <MonthNavCard onImport={openImport} />
             </div>
+          </div>
+        )}
+      </div>
 
-            <main className="main">
-                <div
-                    role="tabpanel"
-                    id={`tabpanel-${tab}`}
-                    aria-labelledby={`tab-${tab}`}
-                >
-                    {renderTabContent()}
-                </div>
-            </main>
-
-            <CategoryManager
-                open={showCategoryModal}
-                onClose={closeCategoryModal}
-                categories={categories}
-                onAdd={addCategory}
-                onDelete={removeCategory}
-            />
-
-            {showProfile && <ProfilePage onClose={closeProfile} />}
-
-            {editingTransaction && (
-                <EditTransactionModal
-                    transaction={editingTransaction}
-                    categories={categories}
-                    onSave={handleSaveEdit}
-                    onClose={() => setEditingTransaction(null)}
-                    onManageCategories={() => { setEditingTransaction(null); openCategoryModal(); }}
-                    viewYear={year}
-                    viewMonth={month}
-                    availableBalance={(carryover ?? 0) + (summary?.balance ?? 0)}
-                />
-            )}
+      <main className="main">
+        <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
+        <div role="region" aria-label={t(section.labelKey)} data-tour="section">
+          {/* A failing section does not take the menu down; changing section clears the error. */}
+          <ErrorBoundary key={dash.tab}>
+            <Suspense fallback={<SectionLoading />}>
+              <TabContent dash={dash} onStartTour={tour.start} />
+            </Suspense>
+          </ErrorBoundary>
         </div>
-    );
+      </main>
+
+      <BurgerMenu
+        open={dash.menuOpen}
+        tab={dash.tab}
+        onSelectTab={dash.setTab}
+        onClose={() => dash.setMenuOpen(false)}
+      />
+      <Suspense fallback={null}>
+        <DashboardModals dash={dash} />
+      </Suspense>
+      {tour.open && (
+        <GuidedTour
+          steps={tour.steps}
+          onShowTab={dash.setTab}
+          onClose={tour.close}
+          initialDontShowAgain={tour.dontShowAgain}
+        />
+      )}
+    </div>
+  );
 }

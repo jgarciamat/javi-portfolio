@@ -1,0 +1,13 @@
+{
+  "name": "javi-portfolio-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "install:all": "(cd backend && npm ci) && (cd frontend && npm ci)",
+    "test": "(cd backend && npm test) && (cd frontend && npm test)",
+    "prepare:all": "(cd backend && npm run prepare) && (cd frontend && npm run prepare)"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

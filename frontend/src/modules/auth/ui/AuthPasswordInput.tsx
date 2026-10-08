@@ -1,31 +1,51 @@
+import { useState } from 'react';
+import { useI18n } from '@core/i18n/I18nContext';
+
 interface AuthPasswordInputProps {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    show: boolean;
-    onToggle: () => void;
-    placeholder: string;
-    showLabel: string;
-    hideLabel: string;
-    errorClass?: string;
-    required?: boolean;
-    autoFocus?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  /** Marks the field as wrong (e.g. confirmation that does not match). */
+  invalid?: boolean;
+  required?: boolean;
+  autoFocus?: boolean;
+  autoComplete?: 'current-password' | 'new-password';
 }
 
-export function AuthPasswordInput({ value, onChange, show, onToggle, placeholder, showLabel, hideLabel, errorClass, required, autoFocus }: AuthPasswordInputProps) {
-    return (
-        <div className="auth-pass-wrap">
-            <input
-                className={`auth-input auth-pass-input${errorClass ? ` ${errorClass}` : ''}`}
-                type={show ? 'text' : 'password'}
-                placeholder={placeholder}
-                value={value}
-                onChange={onChange}
-                required={required}
-                autoFocus={autoFocus}
-            />
-            <button type="button" className="auth-eye" onClick={onToggle} aria-label={show ? hideLabel : showLabel}>
-                {show ? '🙈' : '👁️'}
-            </button>
-        </div>
-    );
+/** Password field with a button to show / hide what was typed. */
+export function AuthPasswordInput({
+  value,
+  onChange,
+  placeholder,
+  invalid = false,
+  required = true,
+  autoFocus,
+  autoComplete = 'new-password',
+}: AuthPasswordInputProps) {
+  const { t } = useI18n();
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="auth-pass-wrap">
+      <input
+        className={`auth-input auth-pass-input${invalid ? ' auth-input-error' : ''}`}
+        type={visible ? 'text' : 'password'}
+        placeholder={placeholder}
+        aria-label={placeholder}
+        aria-invalid={invalid || undefined}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        autoFocus={autoFocus}
+        autoComplete={autoComplete}
+      />
+      <button
+        type="button"
+        className="auth-eye"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={t(visible ? 'app.auth.login.hidePassword' : 'app.auth.login.showPassword')}
+      >
+        {visible ? '🙈' : '👁️'}
+      </button>
+    </div>
+  );
 }
