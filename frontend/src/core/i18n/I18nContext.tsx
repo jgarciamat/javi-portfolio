@@ -6,14 +6,15 @@ import { storage } from '@shared/utils/storage';
 export type Locale = 'es' | 'en';
 
 type Messages = Record<string, string>;
-type Vars = Record<string, string | number>;
+export type Vars = Record<string, string | number>;
 
 const MESSAGES: Record<Locale, Messages> = { es: esMessages, en: enMessages };
 const STORAGE_KEY = 'mm_locale';
 
 const isLocale = (value: unknown): value is Locale => value === 'es' || value === 'en';
 
-function loadLocale(): Locale {
+/** The language last chosen on this device (Spanish by default). */
+export function storedLocale(): Locale {
   const stored = storage.get(STORAGE_KEY);
   return isLocale(stored) ? stored : 'es';
 }
@@ -32,6 +33,10 @@ export function translate(locale: Locale, key: string, vars?: Vars): string {
   return interpolate(MESSAGES[locale][key] ?? MESSAGES.es[key] ?? key, vars);
 }
 
+export function hasMessage(locale: Locale, key: string): boolean {
+  return key in MESSAGES[locale];
+}
+
 /** Category names are stored in Spanish; the default ones have a translation. */
 export function translateCategory(locale: Locale, name: string): string {
   return MESSAGES[locale][`app.categories.${name.replace(/\s+/g, '')}`] ?? name;
@@ -48,7 +53,7 @@ export interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(loadLocale);
+  const [locale, setLocaleState] = useState<Locale>(storedLocale);
 
   const setLocale = useCallback((next: Locale) => {
     storage.set(STORAGE_KEY, next);

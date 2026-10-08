@@ -89,3 +89,7 @@ frontend/dev-dist/
 
 # Agent rules & workflows (local only)
 .agent/
+
+# Playwright
+frontend/test-results/
+frontend/playwright-report/

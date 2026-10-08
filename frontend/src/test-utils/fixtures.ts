@@ -120,6 +120,7 @@ export const settings = (over: Partial<UserSettings> = {}): UserSettings => ({
   defaultAccountId: 'a1',
   notificationsEnabled: false,
   showOffers: true,
+  showTour: true,
   currentPeriod: { year: 2026, month: 3, start: '2026-03-01', end: '2026-03-31' },
   ...over,
 });

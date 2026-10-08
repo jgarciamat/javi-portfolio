@@ -68,7 +68,6 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
     <Modal
       label={t('app.profile.title')}
       onClose={onClose}
-      dismissible={!showDelete}
       overlayClassName="profile-overlay"
       className="profile-panel"
     >

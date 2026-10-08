@@ -81,6 +81,28 @@
   gap: 0.6rem;
 }
 
+/* "I accept the terms of sale": the plan buttons stay disabled until it is ticked. */
+.plan-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.plan-terms input {
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0.1rem 0 0;
+  accent-color: #6366f1;
+}
+
+.plan-terms a {
+  color: #a5b4fc;
+}
+
 .plan-option {
   position: relative;
   display: grid;

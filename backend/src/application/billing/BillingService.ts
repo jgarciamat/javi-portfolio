@@ -1,7 +1,8 @@
-import { BusinessRuleError, ConflictError, NotFoundError } from '@domain/errors';
+import { BusinessRuleError, ConflictError, NotFoundError, ValidationError } from '@domain/errors';
 import {
   PlanId,
   SubscriptionProps,
+  TERMS_VERSION,
   TRIAL_DAYS,
   emptySubscription,
   isTrialActive,
@@ -12,13 +13,36 @@ import {
   UnitOfWork,
   UserRepository,
 } from '@domain/ports/repositories';
-import { BillingEvent, CheckoutKind, Clock, PaymentGateway } from '@domain/ports/services';
+import {
+  BillingEvent,
+  CheckoutKind,
+  Clock,
+  EmailLocale,
+  EmailSender,
+  PaymentGateway,
+} from '@domain/ports/services';
 import { LimitedResource, PLAN_LIMITS, serializableLimits } from '@domain/services/plans';
 import { AiAllowance, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from './EntitlementService';
 
 /** How many of each limited resource a user has (active ones). */
 export type ResourceCounter = (userId: string) => Record<LimitedResource, number>;
+
+/** What the buyer agrees to before paying (both are required). */
+export interface CheckoutConsent {
+  /** Accepts the terms of sale. */
+  acceptTerms: boolean;
+  /** Asks Premium to start at once and acknowledges losing the 14-day withdrawal right. */
+  waiveWithdrawal: boolean;
+}
+
+/** Work to do after a webhook is stored: provider calls and e-mails run outside the transaction. */
+interface FollowUp {
+  /** Subscription that must stop renewing (replaced by the founder plan). */
+  stopSubscription?: string;
+  /** User who just bought and gets the purchase confirmation. */
+  confirmPurchase?: string;
+}
 
 export interface BillingOptions {
   appUrl: string;
@@ -68,7 +92,9 @@ export class BillingService {
     private readonly entitlements: EntitlementService,
     private readonly allowance: AiAllowance,
     private readonly gateway: PaymentGateway,
+    private readonly email: EmailSender,
     private readonly countResources: ResourceCounter,
+    private readonly localeOf: (userId: string) => EmailLocale,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
     private readonly options: BillingOptions,
@@ -115,7 +141,21 @@ export class BillingService {
     };
   }
 
-  async checkout(userId: string, kind: CheckoutKind): Promise<{ url: string }> {
+  /**
+   * Starts the payment page. The buyer must accept the terms and ask Premium to
+   * start at once (so the purchase cannot be withdrawn and refunded afterwards).
+   */
+  async checkout(
+    userId: string,
+    kind: CheckoutKind,
+    consent: CheckoutConsent
+  ): Promise<{ url: string }> {
+    if (!consent.acceptTerms || !consent.waiveWithdrawal) {
+      throw new ValidationError(
+        'Acepta las condiciones de contratación y el inicio inmediato para continuar',
+        'TERMS_REQUIRED'
+      );
+    }
     const user = this.users.findById(userId);
     if (!user) throw new NotFoundError('Usuario no encontrado', 'USER_NOT_FOUND');
     const now = this.clock.now();
@@ -141,14 +181,16 @@ export class BillingService {
       successUrl: `${this.options.appUrl}/?billing=success`,
       cancelUrl: `${this.options.appUrl}/?billing=cancel`,
     });
-    if (customerId && customerId !== sub.stripeCustomerId) {
-      const fresh = this.subscriptions.get(userId) ?? sub;
-      this.subscriptions.save({
-        ...fresh,
-        stripeCustomerId: customerId,
-        updatedAt: now.toISOString(),
-      });
-    }
+    // Proof of what was accepted, and the customer for the coming webhooks.
+    const fresh = this.subscriptions.get(userId) ?? sub;
+    this.subscriptions.save({
+      ...fresh,
+      stripeCustomerId: customerId ?? fresh.stripeCustomerId,
+      termsAcceptedAt: now.toISOString(),
+      termsVersion: TERMS_VERSION,
+      withdrawalWaivedAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    });
     return { url };
   }
 
@@ -183,16 +225,24 @@ export class BillingService {
       this.events.markProcessed(event.id, event.type, this.clock.now());
       return result;
     });
-    if (followUp) {
+    if (followUp.stopSubscription) {
       // A lifetime purchase replaces the recurring plan: stop its renewals.
       await this.gateway
-        .cancelSubscription(followUp, true)
+        .cancelSubscription(followUp.stopSubscription, true)
         .catch((e) => this.logger.error('[billing] could not stop the old subscription', e));
     }
+    if (followUp.confirmPurchase) this.confirmPurchase(followUp.confirmPurchase);
   }
 
-  /** Returns the id of a subscription that must stop renewing, if any. */
-  private apply(event: Exclude<BillingEvent, { type: 'ignored' }>): string | null {
+  /** Durable confirmation of the purchase and of the immediate start (no withdrawal). */
+  private confirmPurchase(userId: string): void {
+    const user = this.users.findById(userId)!;
+    this.email
+      .sendPurchaseConfirmation(user.email, user.name, this.localeOf(userId))
+      .catch((e) => this.logger.error('[email] purchase confirmation failed', e));
+  }
+
+  private apply(event: Exclude<BillingEvent, { type: 'ignored' }>): FollowUp {
     const now = this.clock.now();
     const stamp = now.toISOString();
     const find = (userId: string | null, customerId: string | null): SubscriptionProps | null => {
@@ -205,16 +255,29 @@ export class BillingService {
     switch (event.type) {
       case 'checkout_completed': {
         const sub = find(event.userId, event.customerId);
-        if (sub && event.customerId && !sub.stripeCustomerId) {
+        if (!sub) return {};
+        if (event.customerId && !sub.stripeCustomerId) {
           this.subscriptions.save({ ...sub, stripeCustomerId: event.customerId, updatedAt: stamp });
         }
-        return null;
+        return { confirmPurchase: sub.userId };
+      }
+      case 'lifetime_refunded': {
+        const sub = find(event.userId, event.customerId);
+        if (sub?.lifetime) {
+          this.subscriptions.save({
+            ...sub,
+            lifetime: false,
+            status: 'canceled',
+            updatedAt: stamp,
+          });
+        }
+        return {};
       }
       case 'lifetime_purchased': {
         const sub = find(event.userId, event.customerId);
         if (!sub) {
           this.logger.warn(`[billing] lifetime purchase ${event.id} without a known user`);
-          return null;
+          return {};
         }
         this.subscriptions.save({
           ...sub,
@@ -225,9 +288,12 @@ export class BillingService {
           stripeCustomerId: sub.stripeCustomerId ?? event.customerId,
           updatedAt: stamp,
         });
-        return sub.stripeSubscriptionId && LIVE_STATUSES.has(sub.status) && !sub.cancelAtPeriodEnd
-          ? sub.stripeSubscriptionId
-          : null;
+        const live =
+          sub.stripeSubscriptionId && LIVE_STATUSES.has(sub.status) && !sub.cancelAtPeriodEnd;
+        return {
+          stopSubscription: live ? sub.stripeSubscriptionId! : undefined,
+          confirmPurchase: sub.userId,
+        };
       }
       case 'subscription_changed': {
         const sub =
@@ -235,13 +301,13 @@ export class BillingService {
           find(event.userId, event.customerId);
         if (!sub) {
           this.logger.warn(`[billing] subscription ${event.subscriptionId} without a known user`);
-          return null;
+          return {};
         }
         const replacesAnother =
           sub.stripeSubscriptionId && sub.stripeSubscriptionId !== event.subscriptionId;
         // A late event about an old, cancelled subscription must not override the current one.
         if (replacesAnother && event.status === 'canceled' && LIVE_STATUSES.has(sub.status)) {
-          return null;
+          return {};
         }
         this.subscriptions.save({
           ...sub,
@@ -254,9 +320,8 @@ export class BillingService {
           updatedAt: stamp,
         });
         // Someone with lifetime access who still had a live subscription.
-        return sub.lifetime && event.status !== 'canceled' && !event.cancelAtPeriodEnd
-          ? event.subscriptionId
-          : null;
+        const stop = sub.lifetime && event.status !== 'canceled' && !event.cancelAtPeriodEnd;
+        return { stopSubscription: stop ? event.subscriptionId : undefined };
       }
     }
   }

@@ -62,7 +62,7 @@ export class ProfileService {
   updateAvatar(userId: string, dataUrl: string | null): { avatarUrl: string | null } {
     const user = this.requireUser(userId);
     if (dataUrl !== null) {
-      const match = DATA_URL.exec(dataUrl ?? '');
+      const match = DATA_URL.exec(dataUrl);
       if (!match || !AVATAR_TYPES.includes(match[1])) {
         throw new ValidationError(
           'Formato de imagen no válido (PNG, JPEG, WebP o GIF)',

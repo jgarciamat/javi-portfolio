@@ -25,6 +25,8 @@ export interface UserSettingsProps {
   notificationsEnabled: boolean;
   /** Show the (clearly labelled) affiliate offers section. */
   showOffers: boolean;
+  /** Open the guided tour after signing in (until the user asks not to). */
+  showTour: boolean;
 }
 
 export type SettingsChanges = Partial<Omit<UserSettingsProps, 'userId'>>;
@@ -38,6 +40,7 @@ export function defaultSettings(userId: string, locale: string = 'es'): UserSett
     defaultAccountId: null,
     notificationsEnabled: false,
     showOffers: true,
+    showTour: true,
   };
 }
 

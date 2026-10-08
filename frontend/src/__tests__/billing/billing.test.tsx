@@ -26,6 +26,18 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
+const CONSENT = { acceptTerms: true, waiveWithdrawal: true };
+const termsBox = () =>
+  screen.findByRole('checkbox', { name: new RegExp(tr('billing.acceptTerms')) });
+const immediateStartBox = () =>
+  screen.findByRole('checkbox', { name: literal(tr('billing.immediateStart')) });
+
+/** Gives both consents (the plan buttons stay disabled until then). */
+const acceptTerms = async () => {
+  fireEvent.click(await termsBox());
+  fireEvent.click(await immediateStartBox());
+};
+
 const withPlan = (ui: React.ReactElement, overview = f.billing(), api = createFakeApi()) => {
   api.billingApi.get.mockResolvedValue(overview);
   return renderWithProviders(ui, { api, plan: true, finances: false });
@@ -41,7 +53,7 @@ describe('billing API', () => {
   it('calls the billing and offers endpoints', async () => {
     await billingApi.get();
     await billingApi.plans();
-    await billingApi.checkout('yearly');
+    await billingApi.checkout('yearly', { acceptTerms: true, waiveWithdrawal: true });
     await billingApi.portal();
     await offersApi.list();
     await offersApi.click('bank a');
@@ -254,6 +266,7 @@ describe('PlanView', () => {
     expect(await screen.findByText('Portal caído')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('billing.manage')) }));
     await waitFor(() => expect(redirectTo).toHaveBeenCalledWith('https://portal'));
+    await acceptTerms();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('billing.monthly')) }));
     await waitFor(() => expect(redirectTo).toHaveBeenCalledWith('https://checkout.test'));
   });
@@ -266,6 +279,37 @@ describe('PlanView', () => {
     expect(screen.getByText(tr('app.common.loading'))).toBeInTheDocument();
     await act(async () => fail(new Error('down')));
     expect(screen.getByText(tr('billing.loadError'))).toBeInTheDocument();
+  });
+});
+
+describe('Cancelling', () => {
+  const paying = f.billing({
+    trialDaysLeft: 0,
+    subscription: {
+      ...f.billing().subscription,
+      source: 'stripe',
+      status: 'active',
+      currentPeriodEnd: '2026-04-15T00:00:00Z',
+      canManage: true,
+    },
+  });
+
+  it('only offers to cancel the renewal, keeping Premium until the end of the period', async () => {
+    withPlan(<PlanView />, paying);
+    expect(await screen.findByText(tr('billing.cancelHint'))).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: new RegExp(tr('billing.manage')) })
+    ).toBeInTheDocument();
+  });
+
+  it('hides the payment portal inside the store apps', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    withPlan(<PlanView />, paying);
+    expect(
+      await screen.findByText(tr('billing.status.renewsOn', { date: '15 abr 2026' }))
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: new RegExp(tr('billing.manage')) })).toBeNull();
+    expect(screen.queryByText(tr('billing.cancelHint'))).toBeNull();
   });
 });
 
@@ -282,6 +326,16 @@ describe('PlanOptions', () => {
     );
     const yearly = await screen.findByRole('button', { name: new RegExp(tr('billing.yearly')) });
     expect(screen.queryByRole('button', { name: literal(tr('billing.lifetime')) })).toBeNull();
+    expect(yearly).toBeDisabled();
+    expect(screen.getByText(tr('billing.acceptTermsFirst'))).toBeInTheDocument();
+    // One box is not enough: both consents are needed.
+    fireEvent.click(await termsBox());
+    expect(yearly).toBeDisabled();
+    fireEvent.click(await termsBox());
+    fireEvent.click(await immediateStartBox());
+    expect(yearly).toBeDisabled();
+    fireEvent.click(await termsBox());
+    expect(screen.queryByText(tr('billing.acceptTermsFirst'))).toBeNull();
     fireEvent.click(yearly);
     expect(await screen.findByText('Pago no disponible')).toBeInTheDocument();
     fireEvent.click(yearly);
@@ -291,8 +345,9 @@ describe('PlanOptions', () => {
   it('buys the founder plan', async () => {
     const api = createFakeApi();
     withPlan(<PlanView />, f.billing(), api);
+    await acceptTerms();
     fireEvent.click(await screen.findByRole('button', { name: literal(tr('billing.lifetime')) }));
-    await waitFor(() => expect(api.billingApi.checkout).toHaveBeenCalledWith('lifetime'));
+    await waitFor(() => expect(api.billingApi.checkout).toHaveBeenCalledWith('lifetime', CONSENT));
     expect(screen.getByText(tr('billing.redirecting'))).toBeInTheDocument();
   });
 
@@ -300,6 +355,8 @@ describe('PlanOptions', () => {
     jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     const { unmount } = withPlan(<PlanView />);
     expect(await screen.findByText(tr('billing.nativeNote'))).toBeInTheDocument();
+    // Nothing in the app talks about buying: not even the trial reminder.
+    expect(screen.queryByText(literal(tr('billing.trialKeeps', { days: 10 })))).toBeNull();
     unmount();
     jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(false);
     withPlan(<PlanView />, f.billing({ catalog: f.catalog({ paymentsEnabled: false }) }));

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /api/
+Disallow: /verify-email
+Disallow: /reset-password
+
+Sitemap: https://www.winjgm.com/sitemap.xml

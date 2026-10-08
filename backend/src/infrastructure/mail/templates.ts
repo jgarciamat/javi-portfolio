@@ -80,16 +80,9 @@ const COPY: Record<'verify' | 'reset', Record<EmailLocale, Copy>> = {
   },
 };
 
-function render(
-  kind: 'verify' | 'reset',
-  locale: EmailLocale,
-  name: string,
-  url: string
-): EmailContent {
-  const c = COPY[kind][locale] ?? COPY[kind].es;
-  const htmlName = safeName(name);
-  const htmlUrl = escapeHtml(url);
-  const html = `<!DOCTYPE html>
+/** Shared HTML frame of every e-mail. */
+function layout(locale: EmailLocale, body: string): string {
+  return `<!DOCTYPE html>
 <html lang="${locale}">
 <head>
   <meta charset="UTF-8" />
@@ -109,23 +102,105 @@ function render(
   <div class="wrapper">
     <div class="header"><h1>Money Manager</h1></div>
     <div class="body">
-      <p>${c.greeting(`<strong>${htmlName}</strong>`)}</p>
-      <p>${c.intro}</p>
-      <p style="text-align:center"><a class="btn" href="${htmlUrl}">${c.button}</a></p>
-      <p>${c.copyLink}</p>
-      <p class="url">${htmlUrl}</p>
-      <p>${c.expires}</p>
-      <p>${c.ignore}</p>
+${body}
     </div>
     <div class="footer">© ${new Date().getFullYear()} Money Manager</div>
   </div>
 </body>
 </html>`;
-  const plainName = name
+}
+
+/** The name as plain text (for the text part of the e-mail). */
+const plainName = (name: string): string =>
+  name
     .replace(/https?:\/\/\S+/gi, '')
     .slice(0, 80)
     .trim();
-  const text = `${c.greeting(plainName)}\n\n${c.intro}\n${url}\n\n${c.expires}\n${c.ignore}`;
+
+function render(
+  kind: 'verify' | 'reset',
+  locale: EmailLocale,
+  name: string,
+  url: string
+): EmailContent {
+  const c = COPY[kind][locale];
+  const htmlUrl = escapeHtml(url);
+  const html = layout(
+    locale,
+    `      <p>${c.greeting(`<strong>${safeName(name)}</strong>`)}</p>
+      <p>${c.intro}</p>
+      <p style="text-align:center"><a class="btn" href="${htmlUrl}">${c.button}</a></p>
+      <p>${c.copyLink}</p>
+      <p class="url">${htmlUrl}</p>
+      <p>${c.expires}</p>
+      <p>${c.ignore}</p>`
+  );
+  const text = `${c.greeting(plainName(name))}\n\n${c.intro}\n${url}\n\n${c.expires}\n${c.ignore}`;
+  return { subject: c.subject, html, text };
+}
+
+const PURCHASE_COPY: Record<
+  EmailLocale,
+  {
+    subject: string;
+    greeting: (name: string) => string;
+    thanks: (date: string) => string;
+    immediateStart: string;
+    cancel: string;
+    terms: string;
+    contact: string;
+  }
+> = {
+  es: {
+    subject: 'Confirmación de tu compra de Money Manager Premium',
+    greeting: (n) => `Hola ${n},`,
+    thanks: (date) => `Gracias por pasarte a Premium. Confirmamos tu compra del ${date}.`,
+    immediateStart:
+      'Al comprar pediste que Premium empezara de inmediato y aceptaste que, por ello, pierdes el derecho de desistimiento de 14 días.',
+    cancel:
+      'Si tu plan es mensual o anual, puedes cancelar la renovación cuando quieras desde «Tu plan → Gestionar suscripción» en la web: no se te vuelve a cobrar y conservas Premium hasta el final del periodo ya pagado.',
+    terms: 'Condiciones de contratación:',
+    contact: 'Si tienes cualquier duda, responde a este email o escribe a moneymanager@outlook.es.',
+  },
+  en: {
+    subject: 'Your Money Manager Premium purchase',
+    greeting: (n) => `Hi ${n},`,
+    thanks: (date) => `Thanks for upgrading to Premium. We confirm your purchase of ${date}.`,
+    immediateStart:
+      'When buying, you asked Premium to start straight away and accepted that you therefore lose the 14-day right of withdrawal.',
+    cancel:
+      'If your plan is monthly or yearly, you can cancel the renewal at any time from "Your plan → Manage subscription" on the web: you are not charged again and you keep Premium until the end of the period already paid.',
+    terms: 'Terms of sale:',
+    contact: 'If you have any questions, reply to this e-mail or write to moneymanager@outlook.es.',
+  },
+};
+
+/** Durable confirmation of a purchase, including the immediate start (no withdrawal). */
+export function purchaseEmail(
+  locale: EmailLocale,
+  name: string,
+  termsUrl: string,
+  at: Date
+): EmailContent {
+  const c = PURCHASE_COPY[locale];
+  const tag = locale === 'es' ? 'es-ES' : 'en-GB';
+  const date = at.toLocaleDateString(tag, { day: 'numeric', month: 'long', year: 'numeric' });
+  const lines = [c.thanks(date), c.immediateStart, c.cancel];
+  const htmlUrl = escapeHtml(termsUrl);
+  const paragraphs = [
+    c.greeting(`<strong>${safeName(name)}</strong>`),
+    ...lines.map(escapeHtml),
+    `${c.terms} <a class="url" href="${htmlUrl}">${htmlUrl}</a>`,
+    escapeHtml(c.contact),
+  ].map((p) => `      <p>${p}</p>`);
+  const html = layout(locale, paragraphs.join('\n'));
+  const text = [
+    c.greeting(plainName(name)),
+    '',
+    ...lines,
+    `${c.terms} ${termsUrl}`,
+    c.contact,
+  ].join('\n');
   return { subject: c.subject, html, text };
 }
 

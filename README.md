@@ -108,7 +108,8 @@ Para un usuario de prueba en local: `SEED_DEMO_USER=true` y `SEED_DEMO_PASSWORD=
 
 | Comando | Qué hace |
 |---|---|
-| `npm test` / `npm run test:coverage` | Tests (backend: unitarios + integración HTTP con SQLite en memoria) |
+| `npm test` / `npm run test:coverage` | Tests (backend: unitarios + integración HTTP con SQLite en memoria; frontend: 100 % de cobertura obligatoria) |
+| `npm run e2e` (frontend) | Pruebas end-to-end con Playwright y el Chrome instalado: arranca su propia API (puerto 3100, BD temporal, usuario demo) y Vite (5186) |
 | `npm run lint`, `npx tsc --noEmit` | Lint y tipos |
 | `npm run db:migrate` (backend) | Aplica migraciones pendientes (también se hace al arrancar) |
 | `npm run db:backup` (backend) | Copia consistente de la BD en `BACKUP_DIR` |

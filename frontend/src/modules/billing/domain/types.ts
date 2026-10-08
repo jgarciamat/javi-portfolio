@@ -1,5 +1,12 @@
 export type PlanId = 'free' | 'premium';
 export type CheckoutKind = 'monthly' | 'yearly' | 'lifetime';
+
+/** What the buyer agrees to before paying (the API requires both). */
+export interface CheckoutConsent {
+  acceptTerms: boolean;
+  /** Premium starts at once, so the 14-day right of withdrawal is lost. */
+  waiveWithdrawal: boolean;
+}
 export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor';
 

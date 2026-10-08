@@ -39,6 +39,11 @@ export type EmailLocale = 'es' | 'en';
 export interface EmailSender {
   sendVerification(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
   sendPasswordReset(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
+  /**
+   * Confirms a purchase on a durable medium, including the request to start at
+   * once and the loss of the right of withdrawal (required for that loss to apply).
+   */
+  sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void>;
 }
 
 export interface GoogleIdentity {
@@ -98,8 +103,14 @@ export type BillingEvent =
       currentPeriodEnd: Date | null;
       cancelAtPeriodEnd: boolean;
     }
-  | { id: string; type: 'lifetime_purchased'; userId: string | null; customerId: string | null }
-  | { id: string; type: 'checkout_completed'; userId: string | null; customerId: string | null }
+  | {
+      id: string;
+      type: 'lifetime_purchased' | 'checkout_completed';
+      userId: string | null;
+      customerId: string | null;
+    }
+  /** The founder payment was refunded in full (from the payment provider's dashboard). */
+  | { id: string; type: 'lifetime_refunded'; userId: string | null; customerId: string | null }
   | { id: string; type: 'ignored' };
 
 export interface PaymentGateway {

@@ -411,6 +411,8 @@ export interface UserSettings {
   notificationsEnabled: boolean;
   /** Partner offers section (affiliate links) visible. */
   showOffers: boolean;
+  /** Open the guided tour after signing in. */
+  showTour: boolean;
   currentPeriod: { year: number; month: number; start: string; end: string };
 }
 
@@ -423,5 +425,6 @@ export type SettingsChanges = Partial<
     | 'defaultAccountId'
     | 'notificationsEnabled'
     | 'showOffers'
+    | 'showTour'
   >
 >;

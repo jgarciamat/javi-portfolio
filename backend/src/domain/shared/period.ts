@@ -67,7 +67,7 @@ export function formatDate(year: number, month: number, day: number): string {
  * Throws when the value is not a real date (e.g. 2026-02-30).
  */
 export function toDateOnly(value: string): string {
-  const match = DATE_ONLY.exec(value ?? '');
+  const match = DATE_ONLY.exec(value);
   if (!match) throw new ValidationError('Fecha inválida (formato YYYY-MM-DD)', 'INVALID_DATE');
   const [, y, m, d] = match;
   const year = Number(y);

@@ -26,6 +26,20 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Libraries change less often than the app: their own chunk survives deploys in the cache.
+        manualChunks(id) {
+          if (
+            /node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)
+          ) {
+            return 'react';
+          }
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@modules': path.resolve(__dirname, './src/modules'),

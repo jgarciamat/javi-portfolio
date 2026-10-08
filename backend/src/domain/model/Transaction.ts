@@ -47,7 +47,7 @@ export type TransactionChanges = Partial<
 >;
 
 function cleanDescription(value: string): string {
-  const trimmed = (value ?? '').trim();
+  const trimmed = value.trim();
   if (!trimmed)
     throw new ValidationError('La descripción no puede estar vacía', 'INVALID_DESCRIPTION');
   if (trimmed.length > DESCRIPTION_MAX) {
@@ -121,15 +121,6 @@ export class Transaction {
   get id(): string {
     return this.props.id;
   }
-  get userId(): string {
-    return this.props.userId;
-  }
-  get accountId(): string {
-    return this.props.accountId;
-  }
-  get categoryId(): string {
-    return this.props.categoryId;
-  }
   get description(): string {
     return this.props.description;
   }
@@ -143,9 +134,6 @@ export class Transaction {
   get type(): TransactionType {
     return this.props.type;
   }
-  get date(): string {
-    return this.props.date;
-  }
   get period(): Period {
     return this.props.period;
   }
@@ -154,12 +142,6 @@ export class Transaction {
   }
   get recurringRuleId(): string | null {
     return this.props.recurringRuleId;
-  }
-  get importHash(): string | null {
-    return this.props.importHash;
-  }
-  get createdAt(): string {
-    return this.props.createdAt;
   }
 
   toPrimitives(): TransactionProps {

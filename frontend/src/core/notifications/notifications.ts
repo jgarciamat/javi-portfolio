@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { isNativeApp } from '@shared/utils/platform';
 
 /**
  * Local notifications: native (Android/iOS via @capacitor/local-notifications)
@@ -8,19 +8,17 @@ import { Capacitor } from '@capacitor/core';
 
 const MONTHLY_REMINDER_ID = 1001;
 
-const isNative = (): boolean => Capacitor.isNativePlatform();
-
 async function plugin() {
   const { LocalNotifications } = await import('@capacitor/local-notifications');
   return LocalNotifications;
 }
 
 export function notificationsSupported(): boolean {
-  return isNative() || (typeof window !== 'undefined' && 'Notification' in window);
+  return isNativeApp() || (typeof window !== 'undefined' && 'Notification' in window);
 }
 
 export async function requestNotificationPermission(): Promise<boolean> {
-  if (isNative()) {
+  if (isNativeApp()) {
     const p = await plugin();
     const status = await p.requestPermissions();
     return status.display === 'granted';
@@ -31,7 +29,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
 }
 
 export async function hasNotificationPermission(): Promise<boolean> {
-  if (isNative()) {
+  if (isNativeApp()) {
     const p = await plugin();
     return (await p.checkPermissions()).display === 'granted';
   }
@@ -39,7 +37,7 @@ export async function hasNotificationPermission(): Promise<boolean> {
 }
 
 export async function showNotification(id: number, title: string, body: string): Promise<void> {
-  if (isNative()) {
+  if (isNativeApp()) {
     const p = await plugin();
     await p.schedule({ notifications: [{ id, title, body }] });
     return;
@@ -57,7 +55,7 @@ export async function scheduleMonthlyReminder(
   title: string,
   body: string
 ): Promise<void> {
-  if (!isNative()) return;
+  if (!isNativeApp()) return;
   const p = await plugin();
   await p.cancel({ notifications: [{ id: MONTHLY_REMINDER_ID }] });
   await p.schedule({
@@ -73,7 +71,7 @@ export async function scheduleMonthlyReminder(
 }
 
 export async function cancelMonthlyReminder(): Promise<void> {
-  if (!isNative()) return;
+  if (!isNativeApp()) return;
   const p = await plugin();
   await p.cancel({ notifications: [{ id: MONTHLY_REMINDER_ID }] });
 }

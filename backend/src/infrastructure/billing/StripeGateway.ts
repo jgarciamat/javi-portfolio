@@ -124,10 +124,30 @@ export class StripeGateway implements PaymentGateway {
         const session = event.data.object;
         const userId = session.client_reference_id ?? session.metadata?.userId ?? null;
         const customerId = idOf(session.customer);
-        if (session.metadata?.kind === 'lifetime' && session.payment_status === 'paid') {
-          return { id: event.id, type: 'lifetime_purchased', userId, customerId };
+        // One purchase, one event: the founder plan once it is paid (cards at once,
+        // bank debits later), subscriptions when the payment page completes.
+        if (session.metadata?.kind === 'lifetime') {
+          return session.payment_status === 'paid'
+            ? { id: event.id, type: 'lifetime_purchased', userId, customerId }
+            : { id: event.id, type: 'ignored' };
         }
-        return { id: event.id, type: 'checkout_completed', userId, customerId };
+        return event.type === 'checkout.session.completed'
+          ? { id: event.id, type: 'checkout_completed', userId, customerId }
+          : { id: event.id, type: 'ignored' };
+      }
+      case 'charge.refunded': {
+        const charge = event.data.object;
+        const paymentIntentId = idOf(charge.payment_intent);
+        // Partial refunds keep the purchase; only the founder payment matters here.
+        if (!charge.refunded || !paymentIntentId) return { id: event.id, type: 'ignored' };
+        const { metadata } = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+        if (metadata?.kind !== 'lifetime') return { id: event.id, type: 'ignored' };
+        return {
+          id: event.id,
+          type: 'lifetime_refunded',
+          userId: metadata.userId ?? null,
+          customerId: idOf(charge.customer),
+        };
       }
       case 'customer.subscription.created':
       case 'customer.subscription.updated':

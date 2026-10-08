@@ -8,6 +8,8 @@
 export const TRIAL_DAYS = 14;
 /** Days a failed renewal keeps Premium while the payment provider retries. */
 export const PAST_DUE_GRACE_DAYS = 3;
+/** Version (date) of the terms of sale the user accepts before paying. */
+export const TERMS_VERSION = '2026-10-08';
 
 export type PlanId = 'free' | 'premium';
 export type SubscriptionStatus = 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';
@@ -23,6 +25,10 @@ export interface SubscriptionProps {
   lifetime: boolean;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
+  termsAcceptedAt: string | null;
+  termsVersion: string | null;
+  /** When the user asked Premium to start at once, giving up the 14-day withdrawal. */
+  withdrawalWaivedAt: string | null;
   updatedAt: string;
 }
 
@@ -39,6 +45,9 @@ export function newTrial(userId: string, now: Date): SubscriptionProps {
     lifetime: false,
     stripeCustomerId: null,
     stripeSubscriptionId: null,
+    termsAcceptedAt: null,
+    termsVersion: null,
+    withdrawalWaivedAt: null,
     updatedAt: now.toISOString(),
   };
 }

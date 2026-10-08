@@ -206,7 +206,7 @@ describe('Payments', () => {
     const res = await request(ctx.app)
       .post('/api/billing/checkout')
       .set(user.auth)
-      .send({ kind: 'yearly' })
+      .send({ kind: 'yearly', acceptTerms: true, waiveWithdrawal: true })
       .expect(200);
     expect(res.body.url).toBe('https://checkout.test/yearly');
     const [checkout] = ctx.payments.checkouts;
@@ -214,7 +214,10 @@ describe('Payments', () => {
     expect(checkout.trialEnd?.toISOString()).toBe('2026-03-29T12:00:00.000Z');
     expect(checkout.successUrl).toBe('http://localhost:5173/?billing=success');
 
-    await request(ctx.app).post('/api/billing/checkout').set(user.auth).send({ kind: 'monthly' });
+    await request(ctx.app)
+      .post('/api/billing/checkout')
+      .set(user.auth)
+      .send({ kind: 'monthly', acceptTerms: true, waiveWithdrawal: true });
     expect(ctx.payments.checkouts[1].customerId).toBe('cus_1');
     expect((await plan()).subscription.canManage).toBe(true);
   });
@@ -243,7 +246,7 @@ describe('Payments', () => {
     const again = await request(ctx.app)
       .post('/api/billing/checkout')
       .set(user.auth)
-      .send({ kind: 'monthly' })
+      .send({ kind: 'monthly', acceptTerms: true, waiveWithdrawal: true })
       .expect(409);
     expect(again.body.code).toBe('ALREADY_SUBSCRIBED');
 
@@ -278,7 +281,7 @@ describe('Payments', () => {
     await request(ctx.app)
       .post('/api/billing/checkout')
       .set(user.auth)
-      .send({ kind: 'lifetime' })
+      .send({ kind: 'lifetime', acceptTerms: true, waiveWithdrawal: true })
       .expect(200);
     await webhook(ctx, {
       id: 'evt_lifetime',
@@ -297,7 +300,7 @@ describe('Payments', () => {
     const again = await request(ctx.app)
       .post('/api/billing/checkout')
       .set(user.auth)
-      .send({ kind: 'monthly' })
+      .send({ kind: 'monthly', acceptTerms: true, waiveWithdrawal: true })
       .expect(409);
     expect(again.body.code).toBe('ALREADY_PREMIUM');
   });
@@ -308,7 +311,7 @@ describe('Payments', () => {
     const res = await request(soldOut.app)
       .post('/api/billing/checkout')
       .set(buyer.auth)
-      .send({ kind: 'lifetime' })
+      .send({ kind: 'lifetime', acceptTerms: true, waiveWithdrawal: true })
       .expect(400);
     expect(res.body.code).toBe('FOUNDER_SOLD_OUT');
   });
@@ -317,6 +320,84 @@ describe('Payments', () => {
     await webhook(ctx, subscriptionEvent(user)).expect(200);
     await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
     expect(ctx.payments.cancelled).toEqual([{ subscriptionId: 'sub_1', atPeriodEnd: false }]);
+  });
+
+  it('keeps the account when the subscription cannot be cancelled', async () => {
+    await webhook(ctx, subscriptionEvent(user)).expect(200);
+    const logged = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    jest.spyOn(ctx.payments, 'cancelSubscription').mockRejectedValue(new Error('Stripe down'));
+    const res = await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(400);
+    expect(res.body.code).toBe('BILLING_UNAVAILABLE');
+    await request(ctx.app).get('/api/profile').set(user.auth).expect(200);
+    logged.mockRestore();
+  });
+
+  it('applies a lifetime purchase even if the old plan cannot be stopped', async () => {
+    await webhook(ctx, subscriptionEvent(user)).expect(200);
+    const logged = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    jest.spyOn(ctx.payments, 'cancelSubscription').mockRejectedValue(new Error('Stripe down'));
+    await webhook(ctx, {
+      id: 'evt_life_2',
+      type: 'lifetime_purchased',
+      userId: user.id,
+      customerId: 'cus_1',
+    }).expect(200);
+    expect(logged).toHaveBeenCalledWith(
+      '[billing] could not stop the old subscription',
+      expect.any(Error)
+    );
+    expect(await plan()).toMatchObject({ subscription: { lifetime: true } });
+    logged.mockRestore();
+  });
+
+  it('ignores payments it cannot link to a user', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await webhook(ctx, {
+      id: 'evt_orphan_checkout',
+      type: 'checkout_completed',
+      userId: null,
+      customerId: null,
+    }).expect(200);
+    await webhook(ctx, {
+      id: 'evt_orphan_life',
+      type: 'lifetime_purchased',
+      userId: 'nobody',
+      customerId: 'cus_unknown',
+    }).expect(200);
+    await webhook(
+      ctx,
+      subscriptionEvent(
+        { ...user, id: 'nobody' },
+        {
+          id: 'evt_orphan_sub',
+          customerId: 'cus_unknown',
+          subscriptionId: 'sub_unknown',
+        }
+      )
+    ).expect(200);
+    expect(warn.mock.calls.map((c) => c[0])).toEqual([
+      '[billing] lifetime purchase evt_orphan_life without a known user',
+      '[billing] subscription sub_unknown without a known user',
+    ]);
+    expect(await plan()).toMatchObject({ subscription: { lifetime: false } });
+    warn.mockRestore();
+  });
+
+  it('remembers the customer of a first checkout only once', async () => {
+    await webhook(ctx, {
+      id: 'evt_first',
+      type: 'checkout_completed',
+      userId: user.id,
+      customerId: 'cus_first',
+    }).expect(200);
+    await webhook(ctx, {
+      id: 'evt_second',
+      type: 'checkout_completed',
+      userId: user.id,
+      customerId: 'cus_second',
+    }).expect(200);
+    const res = await request(ctx.app).post('/api/billing/portal').set(user.auth).expect(200);
+    expect(res.body.url).toBe('https://portal.test/cus_first');
   });
 });
 

@@ -203,10 +203,10 @@ const cases: Case[] = [
   ['plans', () => billingApi.plans(), 'GET', '/billing/plans'],
   [
     'checkout',
-    () => billingApi.checkout('monthly'),
+    () => billingApi.checkout('monthly', { acceptTerms: true, waiveWithdrawal: true }),
     'POST',
     '/billing/checkout',
-    { kind: 'monthly' },
+    { kind: 'monthly', acceptTerms: true, waiveWithdrawal: true },
   ],
   ['portal', () => billingApi.portal(), 'POST', '/billing/portal'],
   ['offers', () => offersApi.list(), 'GET', '/offers'],

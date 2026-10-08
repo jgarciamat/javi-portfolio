@@ -1,12 +1,12 @@
-import type { ReactNode } from 'react';
-import { useEscapeKey } from '@shared/hooks/useEscapeKey';
+import { useRef, type ReactNode } from 'react';
+import { useDialog } from '@shared/hooks/useDialog';
 
 interface ModalProps {
   /** Accessible name of the dialog. */
   label: string;
   onClose: () => void;
   children: ReactNode;
-  /** Escape and a click on the backdrop close it (off while saving, or under a nested modal). */
+  /** Escape and a click on the backdrop close it (off while saving). */
   dismissible?: boolean;
   overlayClassName?: string;
   className?: string;
@@ -14,7 +14,8 @@ interface ModalProps {
 
 /**
  * Dialog with a backdrop. The backdrop reacts to mouse *down* so that selecting
- * text inside the dialog and releasing outside does not close it.
+ * text inside the dialog and releasing outside does not close it. Focus and
+ * keyboard handling (also for nested dialogs) live in `useDialog`.
  */
 export function Modal({
   label,
@@ -24,7 +25,8 @@ export function Modal({
   overlayClassName = 'modal-overlay',
   className = 'modal-panel',
 }: ModalProps) {
-  useEscapeKey(onClose, dismissible);
+  const panel = useRef<HTMLDivElement>(null);
+  useDialog(panel, onClose, dismissible);
 
   return (
     <div
@@ -33,7 +35,14 @@ export function Modal({
         if (dismissible && e.target === e.currentTarget) onClose();
       }}
     >
-      <div className={className} role="dialog" aria-modal="true" aria-label={label}>
+      <div
+        ref={panel}
+        className={className}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        tabIndex={-1}
+      >
         {children}
       </div>
     </div>

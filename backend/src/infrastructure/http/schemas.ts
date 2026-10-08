@@ -73,6 +73,7 @@ export const settingsBody = z
     defaultAccountId: id,
     notificationsEnabled: z.boolean(),
     showOffers: z.boolean(),
+    showTour: z.boolean(),
   })
   .partial()
   .strict();
@@ -247,5 +248,17 @@ export const netWorthQuery = z.object({
 
 // ─── Billing & offers ────────────────────────────────────────────────────────
 
-export const checkoutBody = z.object({ kind: z.enum(['monthly', 'yearly', 'lifetime']) });
+export const checkoutBody = z.object({
+  kind: z.enum(['monthly', 'yearly', 'lifetime']),
+  acceptTerms: z.boolean().default(false),
+  waiveWithdrawal: z.boolean().default(false),
+});
 export const offerParams = z.object({ id: z.string().regex(/^[a-z0-9-]{2,40}$/) });
+
+// ---------- Client error reports ----------
+export const clientErrorBody = z.object({
+  kind: z.enum(['render', 'error', 'unhandledrejection']),
+  message: z.string().trim().min(1).max(500),
+  stack: z.string().max(4000).optional(),
+  path: z.string().max(300).optional(),
+});

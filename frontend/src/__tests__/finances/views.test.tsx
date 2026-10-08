@@ -531,7 +531,10 @@ describe('SettingsView', () => {
       total: 0,
     });
     const onOpenProfile = jest.fn();
-    const view = renderWithProviders(<SettingsView onOpenProfile={onOpenProfile} />, { api });
+    const view = renderWithProviders(
+      <SettingsView onOpenProfile={onOpenProfile} onStartTour={jest.fn()} />,
+      { api }
+    );
     return { ...view, onOpenProfile };
   }
 
@@ -661,7 +664,9 @@ describe('SettingsView', () => {
     let resolve!: (v: ReturnType<typeof f.settings>) => void;
     api.settingsApi.get.mockReturnValue(new Promise((r) => (resolve = r)));
     api.accountApi.getAll.mockResolvedValue({ accounts: [f.account()], total: 0 });
-    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} />, { api });
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
     expect(screen.getByText(tr('app.common.loading'))).toBeInTheDocument();
     await act(async () => resolve(f.settings()));
     expect(

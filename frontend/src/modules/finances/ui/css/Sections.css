@@ -601,26 +601,6 @@
   margin-top: 0.15rem;
 }
 
-/* ─── App splash (session being restored) ─────────────────────────────────── */
-
-.app-splash {
-  min-height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.app-splash-logo {
-  font-size: 3rem;
-  animation: splash-pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes splash-pulse {
-  50% {
-    opacity: 0.4;
-  }
-}
-
 /* ─── Burger menu ─────────────────────────────────────────────────────────── */
 
 .burger-btn {

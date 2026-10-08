@@ -53,7 +53,7 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
   if (onImport) options.push({ icon: '📤', label: t('app.import.open'), onClick: onImport });
 
   return (
-    <div className="card">
+    <div className="card" data-tour="month-nav">
       <nav className="month-nav" aria-label={t('app.nav.ariaLabel')}>
         <button onClick={f.goToPrev} disabled={f.isPrevDisabled} className="btn-nav">
           ‹ {t('app.nav.prev')}
@@ -127,6 +127,7 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
       <CollapsiblePanel
         title={<>📋 {t('app.transactions.title', { count: f.transactions.length })}</>}
         className="collapsible-panel--flush"
+        tourId="movements"
       >
         {view.mode === 'day' && (
           <TransactionTable

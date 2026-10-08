@@ -22,9 +22,3 @@ export function assertPositiveCents(cents: Cents, field = 'importe'): void {
     throw new ValidationError(`El ${field} debe ser mayor que 0`, 'INVALID_AMOUNT');
   }
 }
-
-export function assertNonNegativeCents(cents: Cents, field = 'importe'): void {
-  if (!Number.isInteger(cents) || cents < 0) {
-    throw new ValidationError(`El ${field} no puede ser negativo`, 'INVALID_AMOUNT');
-  }
-}

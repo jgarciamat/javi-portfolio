@@ -67,6 +67,7 @@ export class FakePaymentGateway implements PaymentGateway {
     const event = JSON.parse(rawBody.toString('utf8')) as BillingEvent & {
       currentPeriodEnd?: string | null;
     };
+    // Dates travel as ISO strings in the test payloads.
     return 'currentPeriodEnd' in event && typeof event.currentPeriodEnd === 'string'
       ? ({ ...event, currentPeriodEnd: new Date(event.currentPeriodEnd) } as BillingEvent)
       : event;

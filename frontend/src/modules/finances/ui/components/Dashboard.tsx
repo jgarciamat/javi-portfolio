@@ -1,34 +1,40 @@
-import type { ReactElement } from 'react';
+import { Suspense, type ReactElement } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
-import { ProfilePage } from '@modules/auth/ui/ProfilePage';
+import { lazyNamed } from '@shared/utils/lazyNamed';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
-import { OffersView } from '@modules/billing/ui/OffersView';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
-import { PlanView } from '@modules/billing/ui/PlanView';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
-import { AccountsView } from '../views/AccountsView';
-import { AnalysisView } from '../views/AnalysisView';
-import { BudgetsView } from '../views/BudgetsView';
-import { GoalsView } from '../views/GoalsView';
-import { SearchView } from '../views/SearchView';
-import { SettingsView } from '../views/SettingsView';
+import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
-import { AnnualChart } from './AnnualChart';
+import { GuidedTour } from '../tour/GuidedTour';
 import { BurgerMenu } from './BurgerMenu';
-import { CategoryManager } from './CategoryManager';
-import { CustomAlertsTab } from './CustomAlertsTab';
 import { EditTransactionModal } from './EditTransactionModal';
-import { ImportModal } from './ImportModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
-import { RecurringRulesTab } from './RecurringRulesTab';
 import { monthAlertMessage } from './monthAlertMessage';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
+
+// The monthly view is the landing tab; every other section and dialog is its own chunk.
+const AnalysisView = lazyNamed(() => import('../views/AnalysisView'), 'AnalysisView');
+const AccountsView = lazyNamed(() => import('../views/AccountsView'), 'AccountsView');
+const BudgetsView = lazyNamed(() => import('../views/BudgetsView'), 'BudgetsView');
+const GoalsView = lazyNamed(() => import('../views/GoalsView'), 'GoalsView');
+const SearchView = lazyNamed(() => import('../views/SearchView'), 'SearchView');
+const SettingsView = lazyNamed(() => import('../views/SettingsView'), 'SettingsView');
+const PlanView = lazyNamed(() => import('@modules/billing/ui/PlanView'), 'PlanView');
+const OffersView = lazyNamed(() => import('@modules/billing/ui/OffersView'), 'OffersView');
+const AnnualChart = lazyNamed(() => import('./AnnualChart'), 'AnnualChart');
+const RecurringRulesTab = lazyNamed(() => import('./RecurringRulesTab'), 'RecurringRulesTab');
+const CustomAlertsTab = lazyNamed(() => import('./CustomAlertsTab'), 'CustomAlertsTab');
+const CategoryManager = lazyNamed(() => import('./CategoryManager'), 'CategoryManager');
+const ImportModal = lazyNamed(() => import('./ImportModal'), 'ImportModal');
+const ProfilePage = lazyNamed(() => import('@modules/auth/ui/ProfilePage'), 'ProfilePage');
 
 /** Sections that need nothing from the dashboard. */
 const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
@@ -40,7 +46,16 @@ const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
   offers: () => <OffersView />,
 };
 
-function TabContent({ dash }: { dash: UseDashboardReturn }) {
+function SectionLoading() {
+  const { t } = useI18n();
+  return (
+    <p className="empty-block" role="status">
+      {t('app.common.loading')}
+    </p>
+  );
+}
+
+function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTour: () => void }) {
   const { year, categories } = useFinances();
   const simple = SIMPLE_VIEWS[dash.tab];
   if (simple) return simple();
@@ -58,7 +73,7 @@ function TabContent({ dash }: { dash: UseDashboardReturn }) {
     case 'custom-alerts':
       return <CustomAlertsTab categories={categories} />;
     case 'settings':
-      return <SettingsView onOpenProfile={dash.openProfile} />;
+      return <SettingsView onOpenProfile={dash.openProfile} onStartTour={onStartTour} />;
     default:
       return (
         <MonthlyView
@@ -184,6 +199,7 @@ export function Dashboard() {
     updateTransaction: finances.updateTransaction,
   });
   const section = SECTION_BY_ID[dash.tab];
+  const tour = useWelcomeTour(dash.tab, dash.setTab);
   useBudgetAlertNotifications();
 
   // Free plan: the import button opens the paywall instead of the importer.
@@ -207,8 +223,13 @@ export function Dashboard() {
 
       <main className="main">
         <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
-        <div role="region" aria-label={t(section.labelKey)}>
-          <TabContent dash={dash} />
+        <div role="region" aria-label={t(section.labelKey)} data-tour="section">
+          {/* A failing section does not take the menu down; changing section clears the error. */}
+          <ErrorBoundary key={dash.tab}>
+            <Suspense fallback={<SectionLoading />}>
+              <TabContent dash={dash} onStartTour={tour.start} />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
 
@@ -218,7 +239,17 @@ export function Dashboard() {
         onSelectTab={dash.setTab}
         onClose={() => dash.setMenuOpen(false)}
       />
-      <DashboardModals dash={dash} />
+      <Suspense fallback={null}>
+        <DashboardModals dash={dash} />
+      </Suspense>
+      {tour.open && (
+        <GuidedTour
+          steps={tour.steps}
+          onShowTab={dash.setTab}
+          onClose={tour.close}
+          initialDontShowAgain={tour.dontShowAgain}
+        />
+      )}
     </div>
   );
 }

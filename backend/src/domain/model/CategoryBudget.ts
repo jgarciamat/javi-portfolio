@@ -41,12 +41,6 @@ export class CategoryBudget {
   get id(): string {
     return this.props.id;
   }
-  get categoryId(): string {
-    return this.props.categoryId;
-  }
-  get amountCents(): Cents {
-    return this.props.amountCents;
-  }
 
   toPrimitives(): CategoryBudgetProps {
     return { ...this.props };

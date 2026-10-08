@@ -329,6 +329,7 @@ interface SettingsRow {
   default_account_id: string | null;
   notifications_enabled: number;
   show_offers: number;
+  show_tour: number;
 }
 
 export class SqliteSettingsRepository implements SettingsRepository {
@@ -347,6 +348,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
       defaultAccountId: row.default_account_id,
       notificationsEnabled: row.notifications_enabled === 1,
       showOffers: row.show_offers !== 0,
+      showTour: row.show_tour !== 0,
     };
   }
 
@@ -354,17 +356,19 @@ export class SqliteSettingsRepository implements SettingsRepository {
     this.db
       .prepare(
         `INSERT INTO user_settings (user_id, currency, locale, month_start_day, default_account_id,
-           notifications_enabled, show_offers)
+           notifications_enabled, show_offers, show_tour)
          VALUES (@userId, @currency, @locale, @monthStartDay, @defaultAccountId, @notificationsEnabled,
-           @showOffers)
+           @showOffers, @showTour)
          ON CONFLICT(user_id) DO UPDATE SET currency = excluded.currency, locale = excluded.locale,
            month_start_day = excluded.month_start_day, default_account_id = excluded.default_account_id,
-           notifications_enabled = excluded.notifications_enabled, show_offers = excluded.show_offers`
+           notifications_enabled = excluded.notifications_enabled, show_offers = excluded.show_offers,
+           show_tour = excluded.show_tour`
       )
       .run({
         ...s,
         notificationsEnabled: s.notificationsEnabled ? 1 : 0,
         showOffers: s.showOffers ? 1 : 0,
+        showTour: s.showTour ? 1 : 0,
       });
   }
 }

@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useLoginForm } from '../application/useLoginForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleButton } from './GoogleButton';
+import { isNativeApp } from '@shared/utils/platform';
 
 interface Props {
   onSwitch: () => void;
@@ -94,8 +95,13 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
       </button>
 
       <p className="auth-footer-links">
-        <Link to="/pricing">{t('pricing.link')}</Link>
-        {' · '}
+        {/* The store apps do not advertise web prices (Google Play payments policy). */}
+        {!isNativeApp() && (
+          <>
+            <Link to="/pricing">{t('pricing.link')}</Link>
+            {' · '}
+          </>
+        )}
         <Link to="/privacy">{t('app.privacy.link')}</Link>
       </p>
     </form>

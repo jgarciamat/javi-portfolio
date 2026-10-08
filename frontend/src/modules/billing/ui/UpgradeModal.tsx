@@ -57,12 +57,12 @@ export function UpgradeModal({ reason }: { reason: UpgradeReason }) {
         ))}
       </ul>
       {overview ? (
-        <>
-          <PlanOptions catalog={overview.catalog} onChoose={checkout} disabled={subscribed} />
-          {overview.trialDaysLeft > 0 && (
-            <p className="plan-note">{t('billing.trialKeeps', { days: overview.trialDaysLeft })}</p>
-          )}
-        </>
+        <PlanOptions
+          catalog={overview.catalog}
+          onChoose={checkout}
+          disabled={subscribed}
+          trialDaysLeft={overview.trialDaysLeft}
+        />
       ) : (
         <p className="plan-note">{t('app.common.loading')}</p>
       )}

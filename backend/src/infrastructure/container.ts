@@ -264,6 +264,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       entitlements,
       allowance,
       payments,
+      email,
       (userId) => ({
         accounts: repos.accounts.listByUser(userId).filter((a) => !a.archived).length,
         budgets: repos.budgets.listByUser(userId).length,
@@ -271,6 +272,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
       }),
+      (userId) => repos.settings.get(userId).locale,
       uow,
       clock,
       {

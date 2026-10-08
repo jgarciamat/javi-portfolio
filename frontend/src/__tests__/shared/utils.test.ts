@@ -1,7 +1,7 @@
 import { storage } from '@shared/utils/storage';
 import { errorMessage } from '@shared/utils/errors';
 import { isPositiveAmount, parseDecimal } from '@shared/utils/numbers';
-import { redirectTo } from '@shared/utils/navigation';
+import { redirectTo, reloadPage } from '@shared/utils/navigation';
 
 describe('storage', () => {
   beforeEach(() => localStorage.clear());
@@ -63,5 +63,12 @@ describe('redirectTo', () => {
     // jsdom only implements hash navigation, enough to see that location changed.
     redirectTo('#paid');
     expect(window.location.hash).toBe('#paid');
+  });
+
+  it('reloads the page', () => {
+    // jsdom does not implement reloads: it only reports "not implemented".
+    const error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    reloadPage();
+    expect(error).toHaveBeenCalledWith(expect.objectContaining({ type: 'not implemented' }));
   });
 });

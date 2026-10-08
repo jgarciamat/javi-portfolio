@@ -24,11 +24,11 @@ export interface UserProps {
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function normalizeEmail(email: string): string {
-  return (email ?? '').trim().toLowerCase();
+  return email.trim().toLowerCase();
 }
 
 function cleanName(name: string): string {
-  const trimmed = (name ?? '').trim();
+  const trimmed = name.trim();
   if (!trimmed) throw new ValidationError('El nombre no puede estar vacío');
   if (trimmed.length > 80) throw new ValidationError('El nombre no puede superar 80 caracteres');
   return trimmed;
@@ -160,14 +160,8 @@ export class User {
   get resetTokenExpiresAt(): string | null {
     return this.props.resetTokenExpiresAt;
   }
-  get googleId(): string | null {
-    return this.props.googleId;
-  }
   get sessionVersion(): number {
     return this.props.sessionVersion;
-  }
-  get avatarUrl(): string | null {
-    return this.props.avatarUrl;
   }
 
   toPublic(): {

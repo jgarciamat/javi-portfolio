@@ -2,3 +2,8 @@
 export function redirectTo(url: string): void {
   window.location.assign(url);
 }
+
+/** Reloads the app (after an error it cannot recover from in place). */
+export function reloadPage(): void {
+  window.location.reload();
+}

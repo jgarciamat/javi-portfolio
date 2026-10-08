@@ -32,7 +32,7 @@ export interface GoalInput {
 }
 
 function validate(props: GoalProps): GoalProps {
-  const name = (props.name ?? '').trim();
+  const name = props.name.trim();
   if (!name) throw new ValidationError('El nombre de la meta no puede estar vacío');
   if (name.length > 80) throw new ValidationError('Nombre demasiado largo');
   assertPositiveCents(props.targetCents, 'objetivo');
@@ -79,13 +79,6 @@ export class Goal {
     if (changes.color !== undefined) next.color = changes.color;
     if (changes.archived !== undefined) next.archived = changes.archived;
     return new Goal(validate(next));
-  }
-
-  get id(): string {
-    return this.props.id;
-  }
-  get categoryId(): string {
-    return this.props.categoryId;
   }
 
   toPrimitives(): GoalProps {

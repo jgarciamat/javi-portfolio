@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { errorMessage } from '@shared/utils/errors';
+import { isNativeApp } from '@shared/utils/platform';
 import { usePlan } from '../application/PlanContext';
 import type { BillingOverview, LimitedResource } from '../domain/types';
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
-import { errorMessage } from '@shared/utils/errors';
 
 const RESOURCES: LimitedResource[] = [
   'accounts',
@@ -71,61 +72,79 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
-/** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
-export function PlanView() {
+/** Plan, status and the subscription portal (where it can be cancelled). */
+function PlanCard({ overview }: { overview: BillingOverview }) {
   const { t } = useI18n();
-  const { overview, loading, checkout, openPortal } = usePlan();
+  const { openPortal } = usePlan();
   const [error, setError] = useState<string | null>(null);
-
-  if (loading && !overview) return <div className="card">{t('app.common.loading')}</div>;
-  if (!overview) return <div className="card form-error">{t('billing.loadError')}</div>;
-
   const isPremium = overview.plan === 'premium';
-  const paying = isPremium && overview.subscription.source !== 'trial';
-
   const portal = () => openPortal().catch((e: unknown) => setError(errorMessage(e, 'Error')));
 
   return (
-    <div className="section-view">
-      <div className="card plan-card">
-        <div className="plan-card-head">
-          <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
-          <span className={`plan-badge plan-badge--${overview.plan}`}>
-            {isPremium ? t('billing.premium') : t('billing.free')}
-          </span>
-        </div>
-        <StatusLine overview={overview} />
-        {error && <p className="form-error">{error}</p>}
-        {overview.subscription.canManage && (
+    <div className="card plan-card">
+      <div className="plan-card-head">
+        <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
+        <span className={`plan-badge plan-badge--${overview.plan}`}>
+          {isPremium ? t('billing.premium') : t('billing.free')}
+        </span>
+      </div>
+      <StatusLine overview={overview} />
+      {error && <p className="form-error">{error}</p>}
+      {/* The provider's portal also sells plans: not inside the store apps. */}
+      {overview.subscription.canManage && !isNativeApp() && (
+        <>
           <div className="button-row">
             <button className="btn-secondary" onClick={portal}>
               ⚙️ {t('billing.manage')}
             </button>
           </div>
-        )}
-      </div>
-
-      <UsageCard overview={overview} />
-
-      {!paying && (
-        <div className="card">
-          <h2 className="section-title">🚀 {t('billing.upgradeTitle')}</h2>
-          <ul className="upgrade-benefits">
-            {PREMIUM_BENEFITS.map((key) => (
-              <li key={key}>{t(key)}</li>
-            ))}
-          </ul>
-          <PlanOptions catalog={overview.catalog} onChoose={checkout} />
-          {overview.trialDaysLeft > 0 && (
-            <p className="plan-note">{t('billing.trialKeeps', { days: overview.trialDaysLeft })}</p>
-          )}
-          <p className="plan-note">
-            <a href="/terms" target="_blank" rel="noopener">
-              {t('billing.terms')}
-            </a>
-          </p>
-        </div>
+          <p className="plan-note">{t('billing.cancelHint')}</p>
+        </>
       )}
+    </div>
+  );
+}
+
+function UpgradeCard({ overview }: { overview: BillingOverview }) {
+  const { t } = useI18n();
+  const { checkout } = usePlan();
+  return (
+    <div className="card">
+      <h2 className="section-title">🚀 {t('billing.upgradeTitle')}</h2>
+      <ul className="upgrade-benefits">
+        {PREMIUM_BENEFITS.map((key) => (
+          <li key={key}>{t(key)}</li>
+        ))}
+      </ul>
+      <PlanOptions
+        catalog={overview.catalog}
+        onChoose={checkout}
+        trialDaysLeft={overview.trialDaysLeft}
+      />
+      <p className="plan-note">
+        <a href="/terms" target="_blank" rel="noopener">
+          {t('billing.terms')}
+        </a>
+      </p>
+    </div>
+  );
+}
+
+/** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
+export function PlanView() {
+  const { t } = useI18n();
+  const { overview, loading } = usePlan();
+
+  if (loading && !overview) return <div className="card">{t('app.common.loading')}</div>;
+  if (!overview) return <div className="card form-error">{t('billing.loadError')}</div>;
+
+  const paying = overview.plan === 'premium' && overview.subscription.source !== 'trial';
+
+  return (
+    <div className="section-view">
+      <PlanCard overview={overview} />
+      <UsageCard overview={overview} />
+      {!paying && <UpgradeCard overview={overview} />}
     </div>
   );
 }

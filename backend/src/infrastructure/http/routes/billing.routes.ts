@@ -45,7 +45,8 @@ export function billingRoutes(c: Container, limiter: RateLimiterFactory): Router
     '/billing/checkout',
     paymentsLimiter,
     authed(async (req, res) => {
-      res.json(await c.billing.checkout(req.userId, checkoutBody.parse(req.body).kind));
+      const { kind, ...consent } = checkoutBody.parse(req.body);
+      res.json(await c.billing.checkout(req.userId, kind, consent));
     })
   );
   router.post(

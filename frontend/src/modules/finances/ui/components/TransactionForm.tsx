@@ -43,6 +43,7 @@ export function TransactionForm({
   return (
     <CollapsiblePanel
       title={<>➕ {t('app.transaction.form.title')}</>}
+      tourId="new-transaction"
       open={open}
       onToggle={() => setOpen((v) => !v)}
     >

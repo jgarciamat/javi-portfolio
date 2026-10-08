@@ -17,7 +17,7 @@ export interface CategoryProps {
 }
 
 function cleanName(name: string): string {
-  const trimmed = (name ?? '').trim();
+  const trimmed = name.trim();
   if (!trimmed) throw new ValidationError('El nombre de la categoría no puede estar vacío');
   if (trimmed.length > CATEGORY_NAME_MAX) {
     throw new ValidationError(`El nombre no puede superar ${CATEGORY_NAME_MAX} caracteres`);
@@ -69,17 +69,8 @@ export class Category {
   get id(): string {
     return this.props.id;
   }
-  get userId(): string {
-    return this.props.userId;
-  }
   get name(): string {
     return this.props.name;
-  }
-  get color(): string {
-    return this.props.color;
-  }
-  get icon(): string {
-    return this.props.icon;
   }
 
   toPrimitives(): CategoryProps {

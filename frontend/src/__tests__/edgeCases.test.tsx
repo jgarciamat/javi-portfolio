@@ -468,7 +468,7 @@ describe('dashboard edge cases', () => {
       screen.getByRole('combobox', { name: tr('app.transaction.form.category.placeholder') }),
       { target: { value: '__manage__' } }
     );
-    const manager = screen.getByRole('dialog', { name: tr('app.category.manager.title') });
+    const manager = await screen.findByRole('dialog', { name: tr('app.category.manager.title') });
     fireEvent.change(
       within(manager).getByRole('textbox', { name: tr('app.category.manager.name.placeholder') }),
       { target: { value: 'Viajes' } }
@@ -621,7 +621,9 @@ describe('more edge cases', () => {
       accounts: [f.account({ id: 'a1' }), f.account({ id: 'a2' })],
       total: 0,
     });
-    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} />, { api });
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
     // No default account yet: the select has no matching option.
     expect(
       await screen.findByRole('combobox', { name: new RegExp(tr('app.settings.defaultAccount')) })
@@ -839,6 +841,7 @@ describe('more edge cases', () => {
     await screen.findByText('Cena');
     fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('menuitem', { name: literal(tr('app.import.open')) }));
+    await screen.findByRole('dialog', { name: tr('app.import.title') });
     const bytes = new TextEncoder().encode('Fecha;Concepto;Importe\n01/03/2026;Pan;-1\n');
     const file = Object.assign(new File([bytes as BlobPart], 'x.csv'), {
       arrayBuffer: async () => bytes.buffer,

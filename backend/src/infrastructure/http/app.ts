@@ -5,6 +5,7 @@ import { Container } from '../container';
 import { errorHandler, notFoundHandler, rateLimiterFactory, requireAuth } from './middleware';
 import { authRoutes } from './routes/auth.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
+import { clientErrorRoutes } from './routes/client.routes';
 import { financeRoutes } from './routes/finance.routes';
 import { planningRoutes } from './routes/planning.routes';
 import { userRoutes } from './routes/user.routes';
@@ -47,6 +48,7 @@ export function createApp(c: Container): Express {
   api.use(limiter({ windowMs: 60 * 1000, limit: 300 }));
   api.use('/auth', authRoutes(c, limiter));
   api.use(publicBillingRoutes(c));
+  api.use(clientErrorRoutes(limiter));
   api.use(requireAuth(c.auth));
   api.use(billingRoutes(c, limiter));
   api.use(financeRoutes(c, limiter));

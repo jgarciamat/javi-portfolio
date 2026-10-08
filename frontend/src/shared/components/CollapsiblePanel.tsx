@@ -13,6 +13,8 @@ interface CollapsiblePanelProps {
   className?: string;
   /** Inline style applied to the outer .card wrapper */
   style?: CSSProperties;
+  /** Anchor for the guided tour (`data-tour`). */
+  tourId?: string;
 }
 
 export function CollapsiblePanel({
@@ -23,13 +25,18 @@ export function CollapsiblePanel({
   children,
   className,
   style,
+  tourId,
 }: CollapsiblePanelProps) {
   const [openInternal, setOpenInternal] = useState(defaultOpen);
   const open = openProp ?? openInternal;
   const bodyId = useId();
 
   return (
-    <div className={`card collapsible-panel${className ? ` ${className}` : ''}`} style={style}>
+    <div
+      className={`card collapsible-panel${className ? ` ${className}` : ''}`}
+      style={style}
+      data-tour={tourId}
+    >
       <button
         className={`collapsible-header${open ? ' collapsible-header--open' : ''}`}
         onClick={() => (onToggle ? onToggle() : setOpenInternal((v) => !v))}

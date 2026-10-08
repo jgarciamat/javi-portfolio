@@ -11,12 +11,12 @@ import {
   parseAdvice,
   parseCategorization,
 } from '@infrastructure/ai/prompts';
-import { StripeGateway } from '@infrastructure/billing/StripeGateway';
+import { DisabledPaymentGateway, StripeGateway } from '@infrastructure/billing/StripeGateway';
 import { JsonOfferCatalog } from '@infrastructure/offers/JsonOfferCatalog';
 import { JwtTokenService } from '@infrastructure/auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from '@infrastructure/auth/GoogleIdentityVerifier';
 import { BackupService } from '@infrastructure/backup/BackupService';
-import { escapeHtml, verificationEmail } from '@infrastructure/mail/templates';
+import { escapeHtml, purchaseEmail, verificationEmail } from '@infrastructure/mail/templates';
 import { openDatabase } from '@infrastructure/sqlite/database';
 import { AdviceContext } from '@domain/services/rule-based-advisor';
 
@@ -96,6 +96,22 @@ describe('e-mail templates', () => {
   it('is localised', () => {
     expect(verificationEmail('en', 'Ann', 'u').subject).toMatch(/Verify/);
     expect(verificationEmail('es', 'Ana', 'u').subject).toMatch(/Verifica/);
+  });
+});
+
+describe('purchase e-mail', () => {
+  it('confirms the purchase, the immediate start and how to cancel, in the user language', () => {
+    const at = new Date('2026-03-20T10:00:00Z');
+    const es = purchaseEmail('es', '<b>Ana</b>', 'https://app.test/terms', at);
+    expect(es.subject).toMatch(/Confirmación/);
+    expect(es.text).toContain('20 de marzo de 2026');
+    expect(es.text).toContain('pierdes el derecho de desistimiento');
+    expect(es.text).toContain('Condiciones de contratación: https://app.test/terms');
+    expect(es.html).toContain('&lt;b&gt;Ana&lt;/b&gt;');
+    expect(es.html).toContain('href="https://app.test/terms"');
+    const en = purchaseEmail('en', 'Ana', 'https://app.test/terms', at);
+    expect(en.text).toContain('20 March 2026');
+    expect(en.text).toContain('lose the 14-day right of withdrawal');
   });
 });
 
@@ -387,6 +403,234 @@ describe('StripeGateway', () => {
     await expect(gateway.parseWebhook(other.body, 't=1,v1=bad')).rejects.toMatchObject({
       code: 'INVALID_SIGNATURE',
     });
+  });
+
+  it('checks out the yearly plan without a trial and fails without a checkout URL', async () => {
+    const { client, create } = fakeClient();
+    const gateway = new StripeGateway(config, client);
+    const request = {
+      userId: 'u1',
+      email: 'a@b.c',
+      kind: 'yearly' as const,
+      customerId: 'cus_1',
+      trialEnd: null,
+      successUrl: 's',
+      cancelUrl: 'c',
+    };
+    await gateway.createCheckout(request);
+    expect(create.mock.calls[0][0]).toMatchObject({
+      line_items: [{ price: 'price_y', quantity: 1 }],
+      subscription_data: { trial_end: undefined },
+    });
+    create.mockResolvedValueOnce({ url: null });
+    await expect(gateway.createCheckout(request)).rejects.toThrow('checkout URL');
+  });
+
+  it('refuses the lifetime plan when it has no price', async () => {
+    const { client } = fakeClient();
+    const gateway = new StripeGateway(
+      { ...config, prices: { ...config.prices, lifetime: null } },
+      client
+    );
+    await expect(
+      gateway.createCheckout({
+        userId: 'u1',
+        email: 'a@b.c',
+        kind: 'lifetime',
+        customerId: 'cus_1',
+        trialEnd: null,
+        successUrl: 's',
+        cancelUrl: 'c',
+      })
+    ).rejects.toMatchObject({ code: 'PLAN_UNAVAILABLE' });
+  });
+
+  it('opens the customer portal and cancels now or at the end of the period', async () => {
+    const portal = jest.fn().mockResolvedValue({ url: 'https://billing.stripe.test/p' });
+    const update = jest.fn().mockResolvedValue({});
+    const cancel = jest.fn().mockResolvedValue({});
+    const client = {
+      billingPortal: { sessions: { create: portal } },
+      subscriptions: { update, cancel },
+    } as unknown as Stripe;
+    const gateway = new StripeGateway(config, client);
+    await expect(gateway.createPortal('cus_1', 'https://app')).resolves.toEqual({
+      url: 'https://billing.stripe.test/p',
+    });
+    expect(portal).toHaveBeenCalledWith({ customer: 'cus_1', return_url: 'https://app' });
+    await gateway.cancelSubscription('sub_1', true);
+    expect(update).toHaveBeenCalledWith('sub_1', { cancel_at_period_end: true });
+    await gateway.cancelSubscription('sub_1', false);
+    expect(cancel).toHaveBeenCalledWith('sub_1');
+  });
+
+  it('normalises checkouts, deleted subscriptions and missing data', async () => {
+    const { stripe, client } = fakeClient();
+    const gateway = new StripeGateway(config, client);
+    const parse = (event: object, signature?: string) => {
+      const { body, signature: valid } = signed(stripe, event);
+      return gateway.parseWebhook(body, signature ?? valid);
+    };
+
+    await expect(
+      parse({
+        id: 'evt_c',
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            client_reference_id: null,
+            customer: { id: 'cus_9' },
+            metadata: { userId: 'u9' },
+          },
+        },
+      })
+    ).resolves.toEqual({
+      id: 'evt_c',
+      type: 'checkout_completed',
+      userId: 'u9',
+      customerId: 'cus_9',
+    });
+    // One event per purchase: a subscription's late bank debit and an unpaid
+    // founder session say nothing new.
+    await expect(
+      parse({
+        id: 'evt_c2',
+        type: 'checkout.session.async_payment_succeeded',
+        data: { object: { customer: 'cus_9', metadata: { userId: 'u9' } } },
+      })
+    ).resolves.toEqual({ id: 'evt_c2', type: 'ignored' });
+    await expect(
+      parse({
+        id: 'evt_c3',
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            customer: 'cus_9',
+            metadata: { userId: 'u9', kind: 'lifetime' },
+            payment_status: 'unpaid',
+          },
+        },
+      })
+    ).resolves.toEqual({ id: 'evt_c3', type: 'ignored' });
+    await expect(
+      parse({
+        id: 'evt_d',
+        type: 'checkout.session.completed',
+        data: { object: { customer: null } },
+      })
+    ).resolves.toEqual({
+      id: 'evt_d',
+      type: 'checkout_completed',
+      userId: null,
+      customerId: null,
+    });
+
+    // Deleted: the payload is the final state (no extra request). Old API field for the period.
+    await expect(
+      parse({
+        id: 'evt_e',
+        type: 'customer.subscription.deleted',
+        data: {
+          object: {
+            id: 'sub_2',
+            status: 'incomplete_expired',
+            customer: { id: 'cus_2' },
+            cancel_at_period_end: false,
+            cancel_at: 1_780_000_000,
+            current_period_end: 1_770_000_000,
+            items: { data: [] },
+          },
+        },
+      })
+    ).resolves.toEqual({
+      id: 'evt_e',
+      type: 'subscription_changed',
+      userId: null,
+      customerId: 'cus_2',
+      subscriptionId: 'sub_2',
+      status: 'canceled',
+      currentPeriodEnd: new Date(1_770_000_000 * 1000),
+      cancelAtPeriodEnd: true,
+    });
+    await expect(
+      parse({
+        id: 'evt_f',
+        type: 'customer.subscription.deleted',
+        data: {
+          object: {
+            id: 'sub_3',
+            status: 'trialing',
+            customer: 'cus_3',
+            metadata: {},
+            cancel_at_period_end: true,
+            items: { data: [] },
+          },
+        },
+      })
+    ).resolves.toMatchObject({
+      status: 'trialing',
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: true,
+    });
+
+    const { body } = signed(stripe, { id: 'evt_g', type: 'invoice.paid', data: { object: {} } });
+    await expect(gateway.parseWebhook(body, undefined)).rejects.toMatchObject({
+      code: 'INVALID_SIGNATURE',
+    });
+  });
+
+  it('reports full refunds of the founder payment and ignores the rest', async () => {
+    const stripe = new Stripe('sk_test_x');
+    const retrieve = jest
+      .fn()
+      .mockResolvedValueOnce({ metadata: { kind: 'lifetime', userId: 'u1' } })
+      .mockResolvedValueOnce({ metadata: {} })
+      .mockResolvedValueOnce({ metadata: { kind: 'lifetime' } });
+    const client = { webhooks: stripe.webhooks, paymentIntents: { retrieve } } as unknown as Stripe;
+    const gateway = new StripeGateway(config, client);
+    const refund = (id: string, charge: object) => {
+      const { body, signature } = signed(stripe, {
+        id,
+        type: 'charge.refunded',
+        data: { object: { customer: 'cus_1', refunded: true, payment_intent: 'pi_1', ...charge } },
+      });
+      return gateway.parseWebhook(body, signature);
+    };
+    await expect(refund('evt_r1', {})).resolves.toEqual({
+      id: 'evt_r1',
+      type: 'lifetime_refunded',
+      userId: 'u1',
+      customerId: 'cus_1',
+    });
+    await expect(refund('evt_r2', {})).resolves.toEqual({ id: 'evt_r2', type: 'ignored' });
+    await expect(refund('evt_r3', { payment_intent: { id: 'pi_2' } })).resolves.toMatchObject({
+      type: 'lifetime_refunded',
+      userId: null,
+    });
+    await expect(refund('evt_r4', { refunded: false })).resolves.toEqual({
+      id: 'evt_r4',
+      type: 'ignored',
+    });
+    await expect(refund('evt_r5', { payment_intent: null })).resolves.toEqual({
+      id: 'evt_r5',
+      type: 'ignored',
+    });
+    expect(retrieve).toHaveBeenCalledTimes(3);
+  });
+
+  it('builds its own Stripe client from the secret key', () => {
+    expect(new StripeGateway(config).enabled).toBe(true);
+  });
+});
+
+describe('DisabledPaymentGateway', () => {
+  it('refuses payments but lets accounts be deleted', async () => {
+    const gateway = new DisabledPaymentGateway();
+    expect(gateway.enabled).toBe(false);
+    await expect(gateway.createCheckout()).rejects.toMatchObject({ code: 'PAYMENTS_DISABLED' });
+    await expect(gateway.createPortal()).rejects.toMatchObject({ code: 'PAYMENTS_DISABLED' });
+    await expect(gateway.parseWebhook()).rejects.toMatchObject({ code: 'PAYMENTS_DISABLED' });
+    await expect(gateway.cancelSubscription()).resolves.toBeUndefined();
   });
 });
 

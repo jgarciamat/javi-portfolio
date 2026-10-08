@@ -49,10 +49,6 @@ export class Transfer {
     return new Transfer({ ...props });
   }
 
-  get id(): string {
-    return this.props.id;
-  }
-
   toPrimitives(): TransferProps {
     return { ...this.props };
   }

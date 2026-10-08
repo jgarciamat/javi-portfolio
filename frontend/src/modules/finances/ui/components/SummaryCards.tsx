@@ -49,7 +49,7 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
   const available = carried + summary.balance;
 
   return (
-    <section aria-label={t('app.summary.ariaLabel')}>
+    <section aria-label={t('app.summary.ariaLabel')} data-tour="summary">
       <div className="summary-grid">
         <Card
           className="summary-card-carryover"

@@ -4,7 +4,9 @@ dev-dist
 coverage
 android
 ios
-cypress/videos
-cypress/screenshots
+e2e
+playwright.config.ts
+test-results
+playwright-report
 .env
 .env.local

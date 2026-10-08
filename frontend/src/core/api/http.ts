@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@core/config/api.config';
 import { storage } from '@shared/utils/storage';
+import { apiErrorMessage } from './errorMessages';
 
 /** Error returned by the API: carries the HTTP status and the stable error `code`. */
 export class ApiError extends Error {
@@ -114,7 +115,17 @@ async function toApiError(res: Response): Promise<ApiError> {
     code?: string;
     details?: Record<string, unknown>;
   };
-  return new ApiError(body.error ?? `HTTP ${res.status}`, res.status, body.code, body.details);
+  const message = apiErrorMessage(body.code, body.error, body.details);
+  return new ApiError(message, res.status, body.code, body.details);
+}
+
+/** `fetch` to the API; a network failure becomes an ApiError like any other. */
+async function send(path: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(`${API_BASE_URL}${path}`, init);
+  } catch {
+    throw new ApiError(apiErrorMessage('NETWORK_ERROR'), 0, 'NETWORK_ERROR');
+  }
 }
 
 async function parse<T>(res: Response): Promise<T> {
@@ -139,14 +150,14 @@ export async function apiRequest<T>(path: string, options?: RequestInit): Promis
   if (isAccessTokenExpired(token) && tokenStore.getRefresh()) {
     token = (await refreshAccessToken()) ?? token;
   }
-  let res = await fetch(`${API_BASE_URL}${path}`, buildInit(options, token));
+  let res = await send(path, buildInit(options, token));
   if (res.status === 401) {
     const renewed = await refreshAccessToken();
-    if (renewed) res = await fetch(`${API_BASE_URL}${path}`, buildInit(options, renewed));
+    if (renewed) res = await send(path, buildInit(options, renewed));
     if (res.status === 401) {
       tokenStore.clear();
       onSessionExpired?.();
-      throw new ApiError('Sesión caducada. Inicia sesión de nuevo.', 401, 'SESSION_EXPIRED');
+      throw new ApiError(apiErrorMessage('SESSION_EXPIRED'), 401, 'SESSION_EXPIRED');
     }
   }
   if (!res.ok) {
@@ -159,7 +170,7 @@ export async function apiRequest<T>(path: string, options?: RequestInit): Promis
 
 /** Request to a public endpoint (no token, no refresh). */
 export async function publicRequest<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, buildInit(options, null));
+  const res = await send(path, buildInit(options, null));
   if (!res.ok) throw await toApiError(res);
   return parse<T>(res);
 }

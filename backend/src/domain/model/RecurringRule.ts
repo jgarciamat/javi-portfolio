@@ -48,7 +48,7 @@ export interface RecurringRuleInput {
 }
 
 function validate(props: RecurringRuleProps): RecurringRuleProps {
-  const description = (props.description ?? '').trim();
+  const description = props.description.trim();
   if (!description) throw new ValidationError('La descripción no puede estar vacía');
   if (description.length > 200) throw new ValidationError('Descripción demasiado larga');
   assertPositiveCents(props.amountCents);

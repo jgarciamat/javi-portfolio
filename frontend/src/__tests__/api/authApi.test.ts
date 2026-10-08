@@ -11,8 +11,10 @@ import {
   isAccessTokenExpired,
   refreshAccessToken,
   registerSessionExpiredHandler,
+  publicRequest,
   tokenStore,
 } from '@core/api/http';
+import { translate } from '@core/i18n/I18nContext';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -85,13 +87,26 @@ describe('public auth endpoints', () => {
     expect(errorCode(new Error('x'))).toBeUndefined();
   });
 
-  test('falls back to the HTTP status when the error body is not JSON', async () => {
+  test('shows a generic message when the error body is not JSON', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 502,
       json: jest.fn().mockRejectedValue(new Error()),
     });
-    await expect(authApi.requestPasswordReset('a@b')).rejects.toThrow('HTTP 502');
+    await expect(authApi.requestPasswordReset('a@b')).rejects.toThrow(
+      translate('es', 'app.apiError.generic')
+    );
+  });
+
+  test('turns a network failure into a translated ApiError', async () => {
+    mockFetch.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    const error = await publicRequest('/x').catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({
+      status: 0,
+      code: 'NETWORK_ERROR',
+      message: translate('es', 'app.apiError.NETWORK_ERROR'),
+    });
   });
 
   test.each([

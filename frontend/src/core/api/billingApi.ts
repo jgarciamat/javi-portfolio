@@ -1,5 +1,6 @@
 import type {
   BillingOverview,
+  CheckoutConsent,
   CheckoutKind,
   OffersResponse,
   PlanCatalog,
@@ -15,11 +16,11 @@ export const billingApi = {
   plans() {
     return publicRequest<PlanCatalog>('/billing/plans');
   },
-  /** Returns the payment page URL to redirect to. */
-  checkout(kind: CheckoutKind) {
+  /** Returns the payment page URL to redirect to (after the buyer's consent). */
+  checkout(kind: CheckoutKind, consent: CheckoutConsent) {
     return apiRequest<{ url: string }>('/billing/checkout', {
       method: 'POST',
-      body: jsonBody({ kind }),
+      body: jsonBody({ kind, ...consent }),
     });
   },
   /** Returns the URL of the provider's customer portal (change plan, card, cancel). */

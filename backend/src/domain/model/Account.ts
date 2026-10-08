@@ -37,7 +37,7 @@ export interface AccountInput {
 }
 
 function cleanName(name: string): string {
-  const trimmed = (name ?? '').trim();
+  const trimmed = name.trim();
   if (!trimmed) throw new ValidationError('El nombre de la cuenta no puede estar vacío');
   if (trimmed.length > 50) throw new ValidationError('El nombre no puede superar 50 caracteres');
   return trimmed;
@@ -104,9 +104,6 @@ export class Account {
 
   get id(): string {
     return this.props.id;
-  }
-  get userId(): string {
-    return this.props.userId;
   }
   get name(): string {
     return this.props.name;

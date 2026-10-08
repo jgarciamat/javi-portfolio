@@ -55,11 +55,10 @@ module.exports = {
         'src/__tests__/**/*.ts',
         'src/__tests__/**/*.tsx',
         'src/__mocks__/**/*.js',
-        'cypress/**/*.ts',
-        'cypress.config.ts',
+        'e2e/**/*.ts',
+        'playwright.config.ts',
         'capacitor.config.ts',
         'vite.config.ts',
-        'setupTests.ts',
       ],
       parserOptions: {
         project: null,

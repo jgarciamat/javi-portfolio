@@ -445,7 +445,7 @@ describe('SettingsView', () => {
   it('saves settings and reloads the months when the start day changes', async () => {
     mockUpdateSettings.mockResolvedValue({ notificationsEnabled: false, monthStartDay: 25 });
     useApi.mockReturnValue({ dataApi: { exportAll: jest.fn() } });
-    render(<SettingsView onOpenProfile={jest.fn()} />);
+    render(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />);
     const day = screen.getByDisplayValue(t('app.settings.calendarMonth'));
     fireEvent.change(day, { target: { value: '25' } });
     await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledWith({ monthStartDay: 25 }));

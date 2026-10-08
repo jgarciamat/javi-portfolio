@@ -31,6 +31,7 @@ const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
 
 interface SettingsViewProps {
   onOpenProfile: () => void;
+  onStartTour: () => void;
 }
 
 function PreferencesCard({
@@ -153,6 +154,45 @@ function PreferencesCard({
   );
 }
 
+function TourCard({
+  settings,
+  saving,
+  save,
+  onStartTour,
+}: {
+  settings: UserSettings;
+  saving: boolean;
+  save: (changes: SettingsChanges) => Promise<boolean>;
+  onStartTour: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="card">
+      <h2 className="section-title">🧭 {t('app.settings.tour')}</h2>
+      <p className="section-hint">{t('app.settings.tourHint')}</p>
+      <div className="settings-list">
+        <label className="setting-row">
+          <span>
+            <strong>{t('app.settings.showTour')}</strong>
+          </span>
+          <input
+            type="checkbox"
+            className="toggle"
+            disabled={saving}
+            checked={settings.showTour}
+            onChange={(e) => save({ showTour: e.target.checked })}
+          />
+        </label>
+      </div>
+      <div className="button-row">
+        <button className="btn-secondary" onClick={onStartTour}>
+          ▶️ {t('app.settings.startTour')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function DataCard({ onError }: { onError: (message: string) => void }) {
   const { t } = useI18n();
   const { dataApi } = useApi();
@@ -220,7 +260,7 @@ function SecurityCard({
   );
 }
 
-export function SettingsView({ onOpenProfile }: SettingsViewProps) {
+export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) {
   const { t } = useI18n();
   const { settings, updateSettings } = useSettings();
   const { accounts, refresh } = useFinances();
@@ -274,6 +314,7 @@ export function SettingsView({ onOpenProfile }: SettingsViewProps) {
           toggleNotifications={toggleNotifications}
         />
       </div>
+      <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />
     </div>

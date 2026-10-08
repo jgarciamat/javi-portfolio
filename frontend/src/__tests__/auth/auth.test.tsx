@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { authApi } from '@core/api/authApi';
@@ -354,6 +355,16 @@ describe('static pages', () => {
     expect(
       screen.getByRole('button', { name: tr('app.auth.register.submit') })
     ).toBeInTheDocument();
+  });
+
+  it('links to the prices on the web but not in the store apps', () => {
+    const { unmount } = publicRender(<AuthPage />);
+    expect(screen.getByRole('link', { name: tr('pricing.link') })).toBeInTheDocument();
+    unmount();
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    publicRender(<AuthPage />);
+    expect(screen.queryByRole('link', { name: tr('pricing.link') })).toBeNull();
+    expect(screen.getByRole('link', { name: tr('app.privacy.link') })).toBeInTheDocument();
   });
 });
 

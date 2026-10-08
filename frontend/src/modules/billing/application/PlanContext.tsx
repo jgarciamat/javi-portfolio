@@ -5,6 +5,7 @@ import { ApiError, registerPaymentRequiredHandler } from '@core/api/http';
 import { redirectTo } from '@shared/utils/navigation';
 import type {
   BillingOverview,
+  CheckoutConsent,
   CheckoutKind,
   LimitedResource,
   PremiumFeature,
@@ -23,7 +24,7 @@ interface PlanContextValue {
   upgradeReason: UpgradeReason | null;
   openUpgrade: (reason?: UpgradeReason) => void;
   closeUpgrade: () => void;
-  checkout: (kind: CheckoutKind) => Promise<void>;
+  checkout: (kind: CheckoutKind, consent: CheckoutConsent) => Promise<void>;
   openPortal: () => Promise<void>;
   notice: BillingNotice | null;
   dismissNotice: () => void;
@@ -105,8 +106,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const checkout = useCallback(
-    async (kind: CheckoutKind) => {
-      const { url } = await billingApi.checkout(kind);
+    async (kind: CheckoutKind, consent: CheckoutConsent) => {
+      const { url } = await billingApi.checkout(kind, consent);
       redirectTo(url);
     },
     [billingApi]

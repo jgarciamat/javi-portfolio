@@ -38,7 +38,7 @@ export function metricNeedsCategory(metric: CustomAlertMetric): boolean {
 }
 
 function validate(props: CustomAlertProps): CustomAlertProps {
-  const name = (props.name ?? '').trim();
+  const name = props.name.trim();
   if (!name) throw new ValidationError('El nombre de la alerta no puede estar vacío');
   if (name.length > 80) throw new ValidationError('Nombre demasiado largo');
   if (!CUSTOM_ALERT_METRICS.includes(props.metric)) {
@@ -95,13 +95,6 @@ export class CustomAlert {
     if (changes.color !== undefined) next.color = changes.color;
     if (changes.active !== undefined) next.active = changes.active;
     return new CustomAlert(validate(next));
-  }
-
-  get id(): string {
-    return this.props.id;
-  }
-  get categoryId(): string | null {
-    return this.props.categoryId;
   }
 
   toPrimitives(): CustomAlertProps {

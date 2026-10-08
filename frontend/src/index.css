@@ -143,3 +143,88 @@ input[type='date'] {
   font-size: 0.85rem;
   margin: 0.4rem 0;
 }
+
+/* ─── App splash (session or page chunk loading) ─────────────────────────────────── */
+
+.app-splash {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-splash-logo {
+  font-size: 3rem;
+  animation: splash-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes splash-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ─── Error screen (ErrorBoundary) ────────────── */
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.error-screen--page {
+  min-height: 80vh;
+  justify-content: center;
+}
+
+.error-screen-icon {
+  font-size: 2.5rem;
+}
+
+.error-screen-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.error-screen-text {
+  margin: 0;
+  max-width: 28rem;
+  color: #94a3b8;
+}
+
+.error-screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.error-screen-actions .btn-primary {
+  width: auto;
+}
+
+/* ─── Offline banner ──────────────────────────── */
+.offline-banner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 1100;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  background: #78350f;
+  border: 1px solid #b45309;
+  color: #fef3c7;
+  font-size: 0.875rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Dialogs take focus on open (to announce them); no ring around the whole panel. */
+[role='dialog']:focus {
+  outline: none;
+}

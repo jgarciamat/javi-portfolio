@@ -26,6 +26,10 @@ interface AuthContextValue {
   token: string | null;
   status: AuthStatus;
   isAuthenticated: boolean;
+  /** True right after signing in with a password or Google (not when a session is restored). */
+  freshSignIn: boolean;
+  /** Marks the fresh sign-in as handled (the welcome tour asks once per sign-in). */
+  acknowledgeSignIn: () => void;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (token: string, locale?: Locale) => Promise<void>;
   register: (email: string, password: string, name: string, locale?: Locale) => Promise<string>;
@@ -68,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>(initial.status);
   const [token, setToken] = useState<string | null>(initial.token);
   const [user, setUser] = useState<AuthUser | null>(initial.user);
+  const [freshSignIn, setFreshSignIn] = useState(false);
 
   const clearSession = useCallback(() => {
     tokenStore.clear();
@@ -112,9 +117,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(result.accessToken);
       setUser(result.user);
       setStatus('authenticated');
+      setFreshSignIn(true);
     },
     []
   );
+
+  const acknowledgeSignIn = useCallback(() => setFreshSignIn(false), []);
 
   const login = useCallback(
     async (email: string, password: string) => persist(await authApi.login({ email, password })),
@@ -182,6 +190,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       token,
       status,
       isAuthenticated: status === 'authenticated',
+      freshSignIn,
+      acknowledgeSignIn,
       login,
       loginWithGoogle,
       register,
@@ -196,6 +206,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       token,
       status,
+      freshSignIn,
+      acknowledgeSignIn,
       login,
       loginWithGoogle,
       register,

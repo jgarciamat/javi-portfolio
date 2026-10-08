@@ -93,7 +93,9 @@ describe('header', () => {
     localStorage.setItem('mm_user', JSON.stringify(f.user({ avatarUrl: 'data:x' })));
     renderWithProviders(<Dashboard />);
     fireEvent.click(screen.getByRole('button', { name: tr('app.header.openProfile') }));
-    expect(screen.getByRole('dialog', { name: tr('app.profile.title') })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('dialog', { name: tr('app.profile.title') })
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.common.close') }));
     expect(screen.queryByRole('dialog')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.header.logout') }));
@@ -110,7 +112,7 @@ describe('import', () => {
     await screen.findByText('Cena');
     fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('menuitem', { name: literal(tr('app.import.open')) }));
-    const dialog = screen.getByRole('dialog', { name: tr('app.import.title') });
+    const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
     fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
     expect(screen.queryByRole('dialog')).toBeNull();
   });

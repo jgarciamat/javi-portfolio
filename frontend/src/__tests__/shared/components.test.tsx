@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { act, fireEvent, screen } from '@testing-library/react';
 import { Modal } from '@shared/components/Modal';
 import { EmptyState } from '@shared/components/EmptyState';
@@ -39,6 +40,103 @@ describe('Modal', () => {
     fireEvent.mouseDown(container.querySelector('.o')!);
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('Modal focus and keyboard', () => {
+  function Opener({ autoFocus = false }: { autoFocus?: boolean }) {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <button onClick={() => setOpen(true)}>abrir</button>
+        {open && (
+          <Modal label="Diálogo" onClose={() => setOpen(false)}>
+            <input aria-label="campo" autoFocus={autoFocus} />
+            <button>último</button>
+          </Modal>
+        )}
+      </>
+    );
+  }
+
+  /** Presses Tab on the focused element; true when the dialog moved focus itself. */
+  const tab = (shiftKey = false) =>
+    !fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Tab', shiftKey });
+
+  it('moves focus into the dialog and gives it back on close', () => {
+    renderWithI18n(<Opener />);
+    const trigger = screen.getByRole('button', { name: 'abrir' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    expect(screen.getByRole('dialog')).toHaveFocus();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(trigger).toHaveFocus();
+  });
+
+  it('leaves focus on a field that asked for it', () => {
+    renderWithI18n(<Opener autoFocus />);
+    fireEvent.click(screen.getByRole('button', { name: 'abrir' }));
+    expect(screen.getByRole('textbox', { name: 'campo' })).toHaveFocus();
+  });
+
+  it('keeps Tab inside the dialog', () => {
+    renderWithI18n(<Opener />);
+    fireEvent.click(screen.getByRole('button', { name: 'abrir' }));
+    const field = screen.getByRole('textbox', { name: 'campo' });
+    const last = screen.getByRole('button', { name: 'último' });
+
+    expect(tab(true)).toBe(true); // from the panel itself, backwards → last
+    expect(last).toHaveFocus();
+    expect(tab()).toBe(true); // forwards from the last → first
+    expect(field).toHaveFocus();
+    expect(tab()).toBe(false); // in the middle: the browser moves focus
+    expect(tab(true)).toBe(true); // backwards from the first → last
+    expect(last).toHaveFocus();
+
+    screen.getByRole('button', { name: 'abrir' }).focus(); // focus escaped the dialog
+    expect(tab()).toBe(true);
+    expect(field).toHaveFocus();
+    expect(fireEvent.keyDown(field, { key: 'Enter' })).toBe(true);
+  });
+
+  it('keeps focus on a dialog with nothing focusable', () => {
+    renderWithI18n(
+      <Modal label="Vacío" onClose={() => undefined}>
+        <p>solo texto</p>
+      </Modal>
+    );
+    const dialog = screen.getByRole('dialog');
+    expect(tab()).toBe(true);
+    expect(dialog).toHaveFocus();
+  });
+
+  it('lets only the innermost of nested dialogs react', () => {
+    const closeOuter = jest.fn();
+    function Nested() {
+      const [inner, setInner] = useState(true);
+      return (
+        <Modal label="Fuera" onClose={closeOuter}>
+          <button>fuera</button>
+          {inner && (
+            <Modal label="Dentro" onClose={() => setInner(false)}>
+              <button>dentro</button>
+            </Modal>
+          )}
+        </Modal>
+      );
+    }
+    renderWithI18n(<Nested />);
+    const inside = screen.getByRole('button', { name: 'dentro' });
+    inside.focus();
+    // The outer dialog would send focus to its first button; the inner one keeps it.
+    expect(tab()).toBe(true);
+    expect(inside).toHaveFocus();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog', { name: 'Dentro' })).toBeNull();
+    expect(closeOuter).not.toHaveBeenCalled();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(closeOuter).toHaveBeenCalledTimes(1);
   });
 });
 
