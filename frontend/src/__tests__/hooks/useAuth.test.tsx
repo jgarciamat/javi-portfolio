@@ -16,18 +16,20 @@ jest.mock('@core/api/authApi', () => ({
       refreshToken: 'fake-refresh-token-xyz',
       user: { id: 'u1', name: 'Test', email: 'a@b' },
     }),
-    register: jest
-      .fn()
-      .mockResolvedValue({
-        message: 'Registro exitoso. Revisa tu email para verificar tu cuenta.',
-      }),
+    register: jest.fn().mockResolvedValue({
+      message: 'Registro exitoso. Revisa tu email para verificar tu cuenta.',
+    }),
     logout: jest.fn().mockResolvedValue(undefined),
+    updatePassword: jest.fn().mockResolvedValue({
+      message: 'ok',
+      accessToken: 'new-access-token',
+      refreshToken: 'new-refresh-token',
+    }),
   },
-  registerUnauthorizedHandler: jest.fn(),
 }));
 
 function TestComponent() {
-  const { user, token, login, register, logout, isAuthenticated } = useAuth();
+  const { user, token, login, register, logout, isAuthenticated, updatePassword } = useAuth();
   return (
     <div>
       <div data-testid="user">{user ? user.name : 'no-user'}</div>
@@ -36,6 +38,7 @@ function TestComponent() {
       <button onClick={() => login('a@b', 'pw')}>login</button>
       <button onClick={() => register('n@b', 'pw', 'New')}>register</button>
       <button onClick={() => logout()}>logout</button>
+      <button onClick={() => updatePassword('Old-pass1!', 'New-pass1!')}>password</button>
     </div>
   );
 }
@@ -119,47 +122,62 @@ describe('useAuth / AuthProvider', () => {
     expect(screen.getByTestId('auth').textContent).toBe('false');
   });
 
-  test('expired token on mount results in user being null', () => {
+  test('an expired access token is renewed with the refresh token (old bug: forced logout)', async () => {
     const expired = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6MX0.sig';
     localStorage.setItem('mm_token', expired);
-    localStorage.setItem('mm_refresh_token', 'some-refresh');
+    localStorage.setItem('mm_refresh_token', 'still-valid-refresh');
     localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'OldUser', email: 'o@b' }));
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ accessToken: FAKE_ACCESS_TOKEN }),
+    });
+    global.fetch = fetchMock;
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
     );
-    expect(screen.getByTestId('user').textContent).toBe('no-user');
+    // While restoring, the app is not considered signed in yet…
     expect(screen.getByTestId('auth').textContent).toBe('false');
+    // …and then the session is back without asking for the password again.
+    await waitFor(() => expect(screen.getByTestId('auth').textContent).toBe('true'));
+    expect(screen.getByTestId('user').textContent).toBe('OldUser');
+    expect(screen.getByTestId('token').textContent).toBe(FAKE_ACCESS_TOKEN);
+    expect(localStorage.getItem('mm_refresh_token')).toBe('still-valid-refresh');
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/refresh'),
+      expect.objectContaining({ method: 'POST' })
+    );
   });
 
-  test('loadToken clears all stale localStorage entries when token is expired', () => {
+  test('a rejected refresh token ends the session and clears storage', async () => {
     const expired = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6MX0.sig';
     localStorage.setItem('mm_token', expired);
-    localStorage.setItem('mm_refresh_token', 'stale-refresh');
+    localStorage.setItem('mm_refresh_token', 'revoked-refresh');
     localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'OldUser', email: 'o@b' }));
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 401, json: async () => ({}) });
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
     );
+    await waitFor(() => expect(localStorage.getItem('mm_refresh_token')).toBeNull());
     expect(localStorage.getItem('mm_token')).toBeNull();
-    expect(localStorage.getItem('mm_refresh_token')).toBeNull();
     expect(localStorage.getItem('mm_user')).toBeNull();
+    expect(screen.getByTestId('auth').textContent).toBe('false');
+    expect(screen.getByTestId('user').textContent).toBe('no-user');
   });
 
-  test('loadToken clears stale storage when no token is present', () => {
-    // No token in storage but user and refresh still there (e.g. from logout gone wrong)
-    localStorage.setItem('mm_refresh_token', 'leftover-refresh');
+  test('without any token the user starts signed out', () => {
     localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'Ghost', email: 'g@b' }));
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
     );
-    expect(localStorage.getItem('mm_refresh_token')).toBeNull();
-    expect(localStorage.getItem('mm_user')).toBeNull();
     expect(screen.getByTestId('auth').textContent).toBe('false');
+    expect(screen.getByTestId('user').textContent).toBe('no-user');
   });
 
   test('handles corrupt localStorage gracefully (loadUser error branch)', () => {
@@ -170,6 +188,20 @@ describe('useAuth / AuthProvider', () => {
       </AuthProvider>
     );
     expect(screen.getByTestId('user').textContent).toBe('no-user');
+  });
+
+  test('changing the password stores the new tokens issued by the API', async () => {
+    localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+    localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
+    localStorage.setItem('mm_user', JSON.stringify({ id: 'u1', name: 'Test', email: 'a@b' }));
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+    fireEvent.click(screen.getByText('password'));
+    await waitFor(() => expect(localStorage.getItem('mm_refresh_token')).toBe('new-refresh-token'));
+    expect(localStorage.getItem('mm_token')).toBe('new-access-token');
   });
 
   test('useAuth throws when used outside AuthProvider', () => {

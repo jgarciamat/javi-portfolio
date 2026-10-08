@@ -1,0 +1,12 @@
+node_modules
+dist
+dev-dist
+coverage
+android
+ios
+e2e
+playwright.config.ts
+test-results
+playwright-report
+.env
+.env.local

@@ -1,4 +1,4 @@
-import { evaluateAlerts } from '@modules/finances/application/hooks/useCustomAlerts';
+import { evaluateAlerts } from '@modules/finances/domain/customAlerts';
 import type { CustomAlert } from '@modules/finances/domain/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

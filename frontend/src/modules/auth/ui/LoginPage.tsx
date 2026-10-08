@@ -1,8 +1,9 @@
-import { useLoginForm } from '../application/useLoginForm';
-import { useI18n } from '@core/i18n/I18nContext';
-import { useAuth } from '@shared/hooks/useAuth';
-import { useGoogleLogin } from '@react-oauth/google';
 import { Link } from 'react-router-dom';
+import { useI18n } from '@core/i18n/I18nContext';
+import { useLoginForm } from '../application/useLoginForm';
+import { AuthPasswordInput } from './AuthPasswordInput';
+import { GoogleSignIn } from './GoogleButton';
+import { isNativeApp } from '@shared/utils/platform';
 
 interface Props {
   onSwitch: () => void;
@@ -10,85 +11,37 @@ interface Props {
   onSuccess?: () => void;
 }
 
-function GoogleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" style={{ flexShrink: 0 }}>
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-      />
-    </svg>
-  );
-}
-
 export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
   const { t } = useI18n();
-  const { loginWithGoogle } = useAuth();
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPass,
-    setShowPass,
-    remember,
-    setRemember,
-    error,
-    loading,
-    handleSubmit,
-  } = useLoginForm(onSuccess);
-
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        await loginWithGoogle(tokenResponse.access_token);
-        onSuccess?.();
-      } catch {
-        // ignore — useAuth errors bubble to UI if needed
-      }
-    },
-    flow: 'implicit',
-  });
+  const form = useLoginForm(onSuccess);
 
   return (
-    <form onSubmit={handleSubmit} className="auth-card">
+    <form onSubmit={form.handleSubmit} className="auth-card">
       <h1 className="auth-title">{t('app.auth.login.title')}</h1>
       <p className="auth-sub">
         {t('app.auth.login.switch')}{' '}
-        <span className="auth-link" onClick={onSwitch}>
+        <button type="button" className="auth-link" onClick={onSwitch}>
           {t('app.auth.login.switchLink')}
-        </span>
+        </button>
       </p>
 
-      <button type="button" className="auth-google-btn" onClick={() => handleGoogleLogin()}>
-        <GoogleIcon />
-        {t('app.auth.login.google')}
-      </button>
-
-      <div className="auth-divider">
-        <span>{t('app.auth.login.orDivider')}</span>
-      </div>
+      <GoogleSignIn
+        label={t('app.auth.login.google')}
+        onToken={form.handleGoogleToken}
+        onError={form.reportGoogleError}
+      />
 
       <div className="auth-field">
-        <label className="auth-field-label">{t('app.auth.login.emailLabel')}</label>
+        <label className="auth-field-label" htmlFor="login-email">
+          {t('app.auth.login.emailLabel')}
+        </label>
         <input
+          id="login-email"
           className="auth-input"
           type="email"
           placeholder={t('app.auth.login.email')}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={form.email}
+          onChange={(e) => form.setEmail(e.target.value)}
           required
           autoComplete="email"
           inputMode="email"
@@ -97,50 +50,55 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
 
       <div className="auth-field">
         <div className="auth-field-header">
-          <label className="auth-field-label">{t('app.auth.login.passwordLabel')}</label>
-          <span className="auth-link auth-forgot-link" onClick={onForgot}>
+          <span className="auth-field-label">{t('app.auth.login.passwordLabel')}</span>
+          <button type="button" className="auth-link auth-forgot-link" onClick={onForgot}>
             {t('app.auth.forgot.link')}
-          </span>
-        </div>
-        <div className="auth-pass-wrap">
-          <input
-            className="auth-input auth-pass-input"
-            type={showPass ? 'text' : 'password'}
-            placeholder={t('app.auth.login.password')}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            className="auth-eye"
-            onClick={() => setShowPass((v) => !v)}
-            aria-label={
-              showPass ? t('app.auth.login.hidePassword') : t('app.auth.login.showPassword')
-            }
-          >
-            {showPass ? '🙈' : '👁️'}
           </button>
         </div>
+        <AuthPasswordInput
+          value={form.password}
+          onChange={form.setPassword}
+          placeholder={t('app.auth.login.password')}
+          autoComplete="current-password"
+        />
       </div>
 
       <label className="auth-remember">
-        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+        <input
+          type="checkbox"
+          checked={form.remember}
+          onChange={(e) => form.setRemember(e.target.checked)}
+        />
         <span>{t('app.auth.login.remember')}</span>
       </label>
 
-      {error && <p className="auth-error">{error}</p>}
+      {form.error && (
+        <p className="auth-error" role="alert">
+          {form.error}
+        </p>
+      )}
+      {form.needsVerification &&
+        (form.verificationSent ? (
+          <p className="auth-sub">{t('app.auth.verify.resentSub')}</p>
+        ) : (
+          <button type="button" className="auth-link auth-resend" onClick={form.resendVerification}>
+            {t('app.auth.verify.resend')}
+          </button>
+        ))}
 
-      <button type="submit" className="auth-btn" disabled={loading}>
-        {loading ? t('app.auth.login.loading') : t('app.auth.login.submit')}
+      <button type="submit" className="auth-btn" disabled={form.loading}>
+        {form.loading ? t('app.auth.login.loading') : t('app.auth.login.submit')}
       </button>
 
-      <p
-        style={{ marginTop: '0.5rem', fontSize: '0.75rem', textAlign: 'center', color: '#64748b' }}
-      >
-        <Link to="/privacy" style={{ color: '#6366f1', textDecoration: 'none' }}>
-          {t('app.privacy.link')}
-        </Link>
+      <p className="auth-footer-links">
+        {/* The store apps do not advertise web prices (Google Play payments policy). */}
+        {!isNativeApp() && (
+          <>
+            <Link to="/pricing">{t('pricing.link')}</Link>
+            {' · '}
+          </>
+        )}
+        <Link to="/privacy">{t('app.privacy.link')}</Link>
       </p>
     </form>
   );

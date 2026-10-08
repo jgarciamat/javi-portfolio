@@ -15,14 +15,15 @@ const config: CapacitorConfig = {
   // Uncomment ONLY for local development with a real device.
   // MUST be commented out for Play Store builds.
   // server: {
-  //     url: 'http://10.0.2.2:5173', // Android emulator → host loopback
+  //     url: 'http://10.0.2.2:5176', // Android emulator → host loopback
   //     cleartext: true,             // Allow plain HTTP in dev (Android only)
   // },
 
   // ─── Android overrides ────────────────────────────────────────────────────
   android: {
-    // Allows network requests to localhost during development
-    allowMixedContent: true,
+    // The app only talks to the HTTPS API: never allow mixed (HTTP) content.
+    // For local development against http://10.0.2.2 enable it temporarily.
+    allowMixedContent: false,
     // minSdkVersion is set in android/app/build.gradle → defaultConfig.minSdkVersion
   },
 

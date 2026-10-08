@@ -21,6 +21,8 @@ export interface UseTransactionViewOptions {
   /** Year shown in the parent MonthlyView selector (1-based month) */
   year: number;
   month: number;
+  /** Period range when it differs from the calendar month (custom month start day). */
+  range?: { start: string; end: string } | null;
 }
 
 export interface UseTransactionViewReturn {
@@ -41,6 +43,7 @@ export function useTransactionView({
   locale,
   year,
   month,
+  range,
 }: UseTransactionViewOptions): UseTransactionViewReturn {
   const [mode, setMode] = useState<TransactionViewMode>('day');
 
@@ -49,8 +52,8 @@ export function useTransactionView({
   const weekGroups = useMemo(() => groupByWeek(transactions, locale), [transactions, locale]);
 
   const calendarRows = useMemo(
-    () => buildCalendarMonth(year, month, transactions),
-    [year, month, transactions]
+    () => buildCalendarMonth(year, month, transactions, range ?? undefined),
+    [year, month, transactions, range]
   );
 
   return { mode, setMode, dayGroups, weekGroups, calendarRows };

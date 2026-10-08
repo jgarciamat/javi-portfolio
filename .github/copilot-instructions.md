@@ -57,7 +57,7 @@ Keep this short and concrete — reference files are included so you can open th
 8. If adding tests
 
 - Backend uses Jest (`backend/jest.config.js`). Use `InMemory` repo implementations for unit tests and `Sqlite` only for integration tests where necessary.
-- Frontend uses Jest + React Testing Library + Cypress for E2E. See `frontend/setupTests.ts` and `frontend/cypress`.
+- Frontend uses Jest + React Testing Library (100 % coverage enforced; helpers in `frontend/src/test-utils`, setup in `frontend/src/setupTests.ts`) and Playwright for E2E (`frontend/e2e`, run with `npm run e2e`).
 
 9. Quick file references (open these first)
 

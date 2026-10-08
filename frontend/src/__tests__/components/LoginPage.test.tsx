@@ -101,7 +101,7 @@ describe('LoginPage', () => {
       target: { value: 'pw' },
     });
     fireEvent.submit(screen.getByRole('button', { name: /Iniciar sesión/i }).closest('form')!);
-    await waitFor(() => expect(screen.getByText('Error al iniciar sesión')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(t('app.auth.error.generic'))).toBeInTheDocument());
   });
 
   test('toggles password visibility', () => {

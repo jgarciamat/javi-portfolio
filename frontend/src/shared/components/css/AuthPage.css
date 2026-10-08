@@ -79,10 +79,7 @@
   font-weight: 500;
   color: #374151;
   cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
   width: 100%;
   box-sizing: border-box;
   touch-action: manipulation;
@@ -208,9 +205,7 @@
   font-weight: 700;
   cursor: pointer;
   font-size: 1rem;
-  transition:
-    background 0.15s,
-    box-shadow 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
   touch-action: manipulation;
   width: 100%;
   box-sizing: border-box;
@@ -325,4 +320,38 @@
   .auth-btn {
     padding: 0.7rem;
   }
+}
+.auth-google-icon {
+  flex-shrink: 0;
+}
+
+button.auth-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+
+.auth-footer-links {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.auth-footer-links a {
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.auth-note {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: -8px 0 12px;
+}
+
+.auth-sub--center {
+  text-align: center;
+  line-height: 1.6;
 }

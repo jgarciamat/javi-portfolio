@@ -10,15 +10,21 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/*.d.ts',
     '!src/**/*.interface.ts',
-    '!src/infrastructure/express/server.ts',
+    '!src/main.ts',
+    '!src/infrastructure/sqlite/cli.ts',
+    '!src/tests/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
+  // Floor at the current level: coverage may only go up.
+  coverageThreshold: {
+    global: { statements: 96, branches: 85, functions: 97, lines: 97 },
+  },
   moduleNameMapper: {
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
     '^@infrastructure/(.*)$': '<rootDir>/src/infrastructure/$1',
-    '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+    '^@config/(.*)$': '<rootDir>/src/config/$1',
   },
   verbose: true,
 };

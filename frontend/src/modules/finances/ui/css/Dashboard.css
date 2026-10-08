@@ -70,9 +70,7 @@
   cursor: pointer;
   font-size: 0.8rem;
   white-space: nowrap;
-  transition:
-    border-color 0.15s,
-    color 0.15s;
+  transition: border-color 0.15s, color 0.15s;
 }
 
 .btn-logout:hover {
@@ -172,9 +170,7 @@
   padding: 0.45rem 0.9rem;
   cursor: pointer;
   font-size: 0.9rem;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
 }
 
@@ -257,9 +253,7 @@
   padding: 0.4rem 0.8rem;
   cursor: pointer;
   font-size: 0.85rem;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .btn-cancel:hover {
@@ -366,9 +360,7 @@
   padding: 0.6rem 1rem;
   cursor: pointer;
   margin-bottom: -1px;
-  transition:
-    color 0.15s,
-    border-color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -394,9 +386,7 @@
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .header-user-btn:hover {
@@ -644,9 +634,7 @@
   line-height: 1;
   padding: 0.25rem;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
+  transition: border-color 0.15s, background 0.15s;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -768,9 +756,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: background 0.15s, color 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -785,4 +771,9 @@
 .btn-delete-account:focus-visible {
   outline: 2px solid #ef4444;
   outline-offset: 2px;
+}
+
+.profile-password-form .auth-pass-wrap + .auth-pass-wrap,
+.profile-password-form .auth-password-hints + .auth-pass-wrap {
+  margin-top: 0.5rem;
 }

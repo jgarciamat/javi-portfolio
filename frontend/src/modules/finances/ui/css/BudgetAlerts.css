@@ -51,9 +51,7 @@
   border-radius: 4px;
   line-height: 1;
   flex-shrink: 0;
-  transition:
-    color 0.15s,
-    background 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
 
 .alert-card-dismiss:hover {

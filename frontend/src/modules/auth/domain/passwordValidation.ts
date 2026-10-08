@@ -1,30 +1,20 @@
 /**
- * Password strength rules:
- *  - At least 8 characters
- *  - At least one uppercase letter
- *  - At least one digit
- *  - At least one symbol (non-alphanumeric)
+ * Password policy (same as the API): at least 8 characters, an uppercase
+ * letter, a digit and a symbol. Errors are i18n keys.
  */
 export interface PasswordValidationResult {
   valid: boolean;
   errors: string[];
 }
 
+const RULES: { key: string; ok: (password: string) => boolean }[] = [
+  { key: 'app.password.rule.length', ok: (p) => p.length >= 8 },
+  { key: 'app.password.rule.upper', ok: (p) => /[A-Z]/.test(p) },
+  { key: 'app.password.rule.digit', ok: (p) => /[0-9]/.test(p) },
+  { key: 'app.password.rule.symbol', ok: (p) => /[^A-Za-z0-9]/.test(p) },
+];
+
 export function validatePassword(password: string): PasswordValidationResult {
-  const errors: string[] = [];
-
-  if (password.length < 8) {
-    errors.push('Al menos 8 caracteres');
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Al menos una mayúscula');
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('Al menos un número');
-  }
-  if (!/[^A-Za-z0-9]/.test(password)) {
-    errors.push('Al menos un símbolo (p. ej. @, #, !)');
-  }
-
+  const errors = RULES.filter((r) => !r.ok(password)).map((r) => r.key);
   return { valid: errors.length === 0, errors };
 }

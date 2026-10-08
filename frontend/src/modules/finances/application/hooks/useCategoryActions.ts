@@ -1,45 +1,59 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
+import { useResource } from '@shared/hooks/useResource';
 import type { Category, CreateCategoryDTO } from '@modules/finances/domain/types';
 
 interface CategoryApi {
   getAll: () => Promise<Category[]>;
   create: (dto: CreateCategoryDTO) => Promise<Category>;
-  delete: (id: string) => Promise<void>;
+  update: (id: string, dto: Partial<CreateCategoryDTO>) => Promise<Category>;
+  delete: (id: string, reassignTo?: string) => Promise<void>;
 }
 
+const sortByName = (list: Category[]) => [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+/** The user's categories, alphabetical, kept in sync with each change. */
 export function useCategoryActions(categoryApi: CategoryApi) {
   const { token } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  const fetchCategories = useCallback(async () => {
-    if (!token) return;
-    categoryApi
-      .getAll()
-      .then((cats) => setCategories([...cats].sort((a, b) => a.name.localeCompare(b.name))))
-      .catch(() => setCategories([]));
-  }, [token, categoryApi]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  const resource = useResource(() => categoryApi.getAll().then(sortByName), [categoryApi], {
+    enabled: !!token,
+    initial: [] as Category[],
+  });
+  const { setData } = resource;
 
   const addCategory = useCallback(
     async (dto: CreateCategoryDTO) => {
       const cat = await categoryApi.create(dto);
-      setCategories((prev) => [...prev, cat].sort((a, b) => a.name.localeCompare(b.name)));
+      setData((prev) => sortByName([...prev, cat]));
       return cat;
     },
-    [categoryApi]
+    [categoryApi, setData]
   );
 
-  const removeCategory = useCallback(
-    async (id: string) => {
-      await categoryApi.delete(id);
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+  /** Renames / recolours a category. Movements follow it because they reference its id. */
+  const updateCategory = useCallback(
+    async (id: string, dto: Partial<CreateCategoryDTO>) => {
+      const cat = await categoryApi.update(id, dto);
+      setData((prev) => sortByName(prev.map((c) => (c.id === id ? cat : c))));
+      return cat;
     },
-    [categoryApi]
+    [categoryApi, setData]
   );
 
-  return { categories, addCategory, removeCategory };
+  /** Throws ApiError CATEGORY_IN_USE when the category has data and no `reassignTo` is given. */
+  const removeCategory = useCallback(
+    async (id: string, reassignTo?: string) => {
+      await categoryApi.delete(id, reassignTo);
+      setData((prev) => prev.filter((c) => c.id !== id));
+    },
+    [categoryApi, setData]
+  );
+
+  return {
+    categories: resource.data,
+    addCategory,
+    updateCategory,
+    removeCategory,
+    refreshCategories: resource.reload,
+  };
 }

@@ -80,3 +80,13 @@
   outline: 2px solid #f87171;
   outline-offset: 2px;
 }
+
+.confirm-delete-warning {
+  color: #f87171;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.confirm-delete-error {
+  color: #f87171;
+}

@@ -1,12 +1,10 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useI18n } from '@core/i18n/I18nContext';
 import './css/UpdatePrompt.css';
 
-/**
- * Muestra un banner en la parte inferior de la pantalla cuando hay una nueva
- * versión de la PWA disponible. El usuario puede actualizar con un toque o
- * ignorar el aviso.
- */
+/** Banner shown when a new version of the PWA is ready. */
 export function UpdatePrompt() {
+  const { t } = useI18n();
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -16,19 +14,19 @@ export function UpdatePrompt() {
 
   return (
     <div className="update-prompt" role="status" aria-live="polite">
-      <span className="update-prompt__text">🆕 Nueva versión disponible</span>
+      <span className="update-prompt__text">🆕 {t('app.update.available')}</span>
       <div className="update-prompt__actions">
         <button
           className="update-prompt__btn update-prompt__btn--update"
           onClick={() => updateServiceWorker(true)}
         >
-          Actualizar
+          {t('app.update.reload')}
         </button>
         <button
           className="update-prompt__btn update-prompt__btn--dismiss"
           onClick={() => setNeedRefresh(false)}
         >
-          Ahora no
+          {t('app.update.later')}
         </button>
       </div>
     </div>

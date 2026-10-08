@@ -5,9 +5,21 @@ winjgm.com {
 www.winjgm.com {
   encode zstd gzip
 
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    X-Frame-Options "DENY"
+    Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    # Report-only first: the Google sign-in popup needs these origins. Switch the
+    # header name to Content-Security-Policy once the browser console shows no reports.
+    Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://accounts.google.com https://apis.google.com; frame-src https://accounts.google.com; connect-src 'self' https://accounts.google.com https://www.googleapis.com https://oauth2.googleapis.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    -Server
+  }
+
   handle /api/* {
     request_body {
-      max_size 4MB
+      max_size 5MB
     }
     reverse_proxy api:3000
   }

@@ -109,9 +109,7 @@
   max-width: 14px;
   border-radius: 3px 3px 0 0;
   min-height: 2px;
-  transition:
-    height 0.3s ease,
-    filter 0.15s;
+  transition: height 0.3s ease, filter 0.15s;
   cursor: pointer;
 }
 
@@ -150,9 +148,7 @@
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
 
 .annual-month-btn:hover {
@@ -242,4 +238,8 @@
   .annual-totals {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.annual-error {
+  color: #f87171;
 }

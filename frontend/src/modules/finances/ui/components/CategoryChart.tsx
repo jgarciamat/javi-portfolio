@@ -1,67 +1,66 @@
-import type { CategoryChartProps, BarChartProps } from '../types';
-import '../css/CategoryChart.css';
-import { formatCurrency } from '../types/CategoryChart.types';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useFormat } from '@core/settings/SettingsContext';
+import type { FinancialSummary } from '@modules/finances/domain/types';
+import { TYPE_COLORS } from '@modules/finances/domain/transactionTypes';
+import '../css/CategoryChart.css';
 
-function BarChart({
-  data,
-  title,
-  color,
-  total,
-  tCategory,
-}: BarChartProps & { tCategory: (n: string) => string }) {
-  const sorted = Object.entries(data).sort(([, a], [, b]) => b - a);
-  if (sorted.length === 0) return null;
+interface BarChartProps {
+  data: Record<string, number>;
+  title: string;
+  color: string;
+  total: number;
+}
 
+/** Horizontal bars of each category's share of a total. */
+function BarChart({ data, title, color, total }: BarChartProps) {
+  const { tCategory } = useI18n();
+  const { money, percent } = useFormat();
+  const rows = Object.entries(data).sort(([, a], [, b]) => b - a);
+  if (rows.length === 0) return null;
   return (
     <div>
       <h4 className="chart-title">{title}</h4>
-      <div>
-        {sorted.map(([cat, amount]) => {
-          const pct = total > 0 ? (amount / total) * 100 : 0;
-          return (
-            <div key={cat} className="bar-row">
-              <div className="bar-label">
-                <span className="bar-label-name">{tCategory(cat)}</span>
-                <span className="bar-label-value">
-                  {formatCurrency(amount)} ({pct.toFixed(1)}%)
-                </span>
-              </div>
-              <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${pct}%`, background: color }} />
-              </div>
+      {rows.map(([category, amount]) => {
+        const pct = total > 0 ? (amount / total) * 100 : 0;
+        return (
+          <div key={category} className="bar-row">
+            <div className="bar-label">
+              <span className="bar-label-name">{tCategory(category)}</span>
+              <span className="bar-label-value">
+                {money(amount)} ({percent(pct)})
+              </span>
             </div>
-          );
-        })}
-      </div>
+            <div className="bar-track">
+              <div className="bar-fill" style={{ width: `${pct}%`, background: color }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export function CategoryChart({ summary }: CategoryChartProps) {
-  const { t, tCategory } = useI18n();
+export function CategoryChart({ summary }: { summary: FinancialSummary }) {
+  const { t } = useI18n();
   return (
     <div className="chart-grid">
       <BarChart
         data={summary.expensesByCategory}
         title={t('app.categoryChart.expenses')}
-        color="#f87171"
+        color={TYPE_COLORS.EXPENSE}
         total={summary.totalExpenses}
-        tCategory={tCategory}
       />
       <BarChart
         data={summary.incomeByCategory}
         title={t('app.categoryChart.income')}
-        color="#4ade80"
+        color={TYPE_COLORS.INCOME}
         total={summary.totalIncome}
-        tCategory={tCategory}
       />
       <BarChart
         data={summary.savingByCategory}
         title={t('app.categoryChart.saving')}
-        color="#a78bfa"
+        color={TYPE_COLORS.SAVING}
         total={summary.totalSaving}
-        tCategory={tCategory}
       />
     </div>
   );

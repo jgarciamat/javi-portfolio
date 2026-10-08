@@ -94,12 +94,7 @@
   border-top: 1px solid #1e293b;
 }
 
-.tx-day-separator--clickable {
-  cursor: pointer;
-  user-select: none;
-}
-
-.tx-day-separator--clickable:hover td {
+.tx-day-separator:hover td {
   background: #0f172a;
 }
 
@@ -312,4 +307,51 @@
   .tx-card-list {
     display: block;
   }
+}
+
+/* Only one layout is rendered (see MOBILE_QUERY); this class shows the cards. */
+.tx-card-list--visible {
+  display: block;
+}
+
+.tx-day-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tx-day-label.tx-day-toggle {
+  padding: 0;
+}
+
+.tx-notes-text {
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  padding: 0;
+}
+
+.tx-row-actions {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.tx-cell-date {
+  color: #94a3b8;
+}
+
+.tx-cell-description {
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+.tx-cell-amount {
+  font-weight: 700;
 }

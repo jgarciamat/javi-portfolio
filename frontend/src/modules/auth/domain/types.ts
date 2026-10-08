@@ -5,6 +5,8 @@ export interface AuthUser {
   email: string;
   name: string;
   avatarUrl?: string | null;
+  /** False for accounts that only sign in with Google. */
+  hasPassword?: boolean;
 }
 
 export interface AuthResult {
@@ -15,19 +17,4 @@ export interface AuthResult {
 
 export interface RegisterResult {
   message: string;
-}
-
-export interface RefreshResult {
-  accessToken: string;
-}
-
-export interface LoginDTO {
-  email: string;
-  password: string;
-}
-
-export interface RegisterDTO {
-  email: string;
-  password: string;
-  name: string;
 }

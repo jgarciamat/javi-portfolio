@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './css/AuthPage.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
 import { LoginPage } from '@modules/auth/ui/LoginPage';
 import { RegisterPage } from '@modules/auth/ui/RegisterPage';
@@ -8,7 +8,10 @@ import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
 import { PublicHeader } from './PublicHeader';
 
 export function AuthPage() {
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
+  const [params] = useSearchParams();
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(() =>
+    params.get('mode') === 'register' ? 'register' : 'login'
+  );
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
