@@ -4,7 +4,8 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
-import { NetWorthPoint } from '@application/insights/InsightsServices';
+import { ProjectedMonth } from '@domain/services/forecast';
+import { ForecastResult, NetWorthPoint } from '@application/insights/InsightsServices';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
 import { AnnualOverview, MonthOverview } from '@application/transactions/TransactionService';
@@ -233,5 +234,39 @@ export function presentNetWorth(p: NetWorthPoint) {
     available: m(p.availableCents),
     saved: m(p.savedCents),
     netWorth: m(p.netWorthCents),
+  };
+}
+
+export function presentForecast(f: ForecastResult) {
+  const month = (p: ProjectedMonth) => ({
+    year: p.year,
+    month: p.month,
+    income: m(p.incomeCents),
+    fixedExpenses: m(p.fixedExpenseCents),
+    variableExpenses: m(p.variableExpenseCents),
+    saving: m(p.savingCents),
+    balance: m(p.balanceCents),
+    endAvailable: m(p.endAvailableCents),
+  });
+  return {
+    year: f.year,
+    month: f.month,
+    safeToSpend: {
+      available: m(f.safeToSpend.availableCents),
+      daysLeft: f.safeToSpend.daysLeft,
+      daily: m(f.safeToSpend.dailyCents),
+      projectedEnd: m(f.safeToSpend.projectedEndCents),
+      status: f.safeToSpend.status,
+    },
+    locked: f.locked,
+    projection: f.projection ? f.projection.map(month) : null,
+    firstShortfall: f.firstShortfall,
+    rules: f.rules.map((r) => ({
+      id: r.id,
+      description: r.description,
+      type: r.type,
+      amount: m(r.amountCents),
+      frequency: r.frequency,
+    })),
   };
 }

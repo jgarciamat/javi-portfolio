@@ -1,11 +1,21 @@
 import { createHash } from 'crypto';
+import { RecurringRule } from '@domain/model/RecurringRule';
 import {
   AccountRepository,
   AiUsageRepository,
   CategoryBudgetRepository,
+  RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
 } from '@domain/ports/repositories';
+import {
+  ProjectedMonth,
+  SafeToSpend,
+  averageVariable,
+  firstShortfall,
+  projectMonths,
+  safeToSpend,
+} from '@domain/services/forecast';
 import { Clock, FinancialAdvisor } from '@domain/ports/services';
 import {
   Advice,
@@ -21,7 +31,11 @@ import {
   assertValidPeriod,
   comparePeriods,
   currentPeriod,
+  periodEnd,
+  periodOrdinal,
+  periodStart,
   periodsBetween,
+  todayDateOnly,
 } from '@domain/shared/period';
 import { AiAllowance, AiDenial, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from '@application/billing/EntitlementService';
@@ -40,6 +54,19 @@ export interface NetWorthPoint {
   netWorthCents: Cents;
 }
 
+export interface ForecastResult extends Period {
+  safeToSpend: SafeToSpend;
+  /** True when the month-by-month outlook is a Premium feature the user does not have. */
+  locked: boolean;
+  projection: ProjectedMonth[] | null;
+  firstShortfall: Period | null;
+  /** Active recurring rules, so the outlook can be tried without any of them. */
+  rules: RecurringRule[];
+}
+
+/** Past periods used to learn the usual non-recurring spending. */
+const VARIABLE_HISTORY = 3;
+
 export class StatsService {
   constructor(
     private readonly transactions: TransactionRepository,
@@ -47,8 +74,57 @@ export class StatsService {
     private readonly settings: SettingsRepository,
     private readonly transactionService: TransactionService,
     private readonly entitlements: EntitlementService,
+    private readonly rules: RecurringRuleRepository,
     private readonly clock: Clock
   ) {}
+
+  /**
+   * "Can I reach the end of the month?" for everyone; the month-by-month outlook
+   * (with "what if I cancel…" scenarios) is Premium and comes back locked otherwise.
+   */
+  forecast(userId: string, options: { months: number; exclude: string[] }): ForecastResult {
+    const startDay = this.settings.get(userId).monthStartDay;
+    const now = this.clock.now();
+    const period = currentPeriod(startDay, now);
+    const month = this.transactionService.getMonth(userId, period);
+    const past = Array.from({ length: VARIABLE_HISTORY }, (_, i) =>
+      this.transactions.listByPeriod(userId, addMonths(period, -(i + 1)))
+    );
+    const variable = averageVariable(past);
+    const safe = safeToSpend({
+      availableCents: month.availableCents,
+      today: todayDateOnly(now),
+      periodStart: periodStart(period, startDay),
+      periodEnd: periodEnd(period, startDay),
+      variable,
+    });
+    const rules = this.rules.listByUser(userId).filter((r) => r.active);
+    const locked = !this.entitlements.limits(userId).features.forecast;
+    const projection = locked
+      ? null
+      : projectMonths({
+          from: addMonths(period, 1),
+          months: options.months,
+          startAvailableCents: safe.projectedEndCents,
+          rules,
+          variable,
+          excludedRuleIds: new Set(options.exclude),
+          skipped: new Map(
+            rules.map((r) => [
+              r.id,
+              new Set(this.rules.skippedPeriods(r.id).map((p) => periodOrdinal(p))),
+            ])
+          ),
+        });
+    return {
+      ...period,
+      safeToSpend: safe,
+      locked,
+      projection,
+      firstShortfall: projection ? firstShortfall(projection) : null,
+      rules,
+    };
+  }
 
   trends(
     userId: string,

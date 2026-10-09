@@ -245,6 +245,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.settings,
       transactions,
       entitlements,
+      repos.rules,
       clock
     ),
     advice: new AdviceService(

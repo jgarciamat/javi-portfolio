@@ -6,6 +6,7 @@ import {
   addTransaction,
   createTestApp,
   createUser,
+  expireTrial,
 } from '../helpers/testApp';
 
 describe('Import', () => {
@@ -191,6 +192,92 @@ describe('Stats', () => {
       { year: 2026, month: 3, available: 800, saved: 200, netWorth: 1000 },
       { year: 2026, month: 4, available: 700, saved: 200, netWorth: 900 },
     ]);
+  });
+});
+
+describe('Forecast', () => {
+  let ctx: TestContext;
+  let user: TestUser;
+
+  beforeEach(async () => {
+    ctx = createTestApp({ now: '2026-04-11T12:00:00Z' });
+    user = await createUser(ctx);
+    for (const [date, amount] of [
+      ['2026-01-10', 300],
+      ['2026-02-10', 300],
+      ['2026-03-10', 300],
+    ] as const) {
+      await addTransaction(ctx, user, { amount, date });
+    }
+    await addTransaction(ctx, user, {
+      type: 'INCOME',
+      category: 'Salario',
+      amount: 2000,
+      date: '2026-04-01',
+    });
+  });
+
+  const forecast = (query = '') =>
+    request(ctx.app).get(`/api/stats/forecast${query}`).set(user.auth);
+
+  it('says how much can be spent per day and how the month will probably end', async () => {
+    const res = await forecast().expect(200);
+    // Carry-over: −900 (three months of spending); April: +2000 → 1100 available.
+    // 20 of the 30 days are left; the usual 300 €/month of spending leaves 200 € still to come.
+    expect(res.body.safeToSpend).toEqual({
+      available: 1100,
+      daysLeft: 20,
+      daily: 55,
+      projectedEnd: 900,
+      status: 'ok',
+    });
+    expect(res.body).toMatchObject({ year: 2026, month: 4, locked: false });
+    expect(res.body.projection).toHaveLength(6);
+  });
+
+  it('projects the next months from the recurring rules and lets rules be left out', async () => {
+    const rule = await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Alquiler',
+        type: 'EXPENSE',
+        category: 'Vivienda',
+        amount: 700,
+        startYear: 2026,
+        startMonth: 5,
+      })
+      .expect(201);
+    const full = (await forecast('?months=2').expect(200)).body;
+    expect(full.rules).toEqual([
+      {
+        id: rule.body.id,
+        description: 'Alquiler',
+        type: 'EXPENSE',
+        amount: 700,
+        frequency: 'monthly',
+      },
+    ]);
+    expect(full.projection[0]).toMatchObject({
+      month: 5,
+      fixedExpenses: 700,
+      variableExpenses: 300,
+      balance: -1000,
+      endAvailable: -100,
+    });
+    expect(full.firstShortfall).toEqual({ year: 2026, month: 5 });
+
+    const without = (await forecast(`?months=2&exclude=${rule.body.id},unknown`).expect(200)).body;
+    expect(without.projection[0]).toMatchObject({ fixedExpenses: 0, endAvailable: 600 });
+    expect(without.firstShortfall).toBeNull();
+  });
+
+  it('keeps the month-by-month outlook for Premium and answers the rest for free', async () => {
+    expireTrial(ctx, user);
+    const res = await forecast().expect(200);
+    expect(res.body).toMatchObject({ locked: true, projection: null, firstShortfall: null });
+    expect(res.body.safeToSpend.daily).toBe(55);
+    await forecast('?months=13').expect(400);
   });
 });
 

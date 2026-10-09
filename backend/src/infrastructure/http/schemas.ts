@@ -245,6 +245,15 @@ export const adviceBody = z.object({ year, month, locale });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });
+export const forecastQuery = z.object({
+  months: z.coerce.number().int().min(1).max(12).default(6),
+  /** Comma-separated recurring rule ids left out of the projection ("what if I cancel…"). */
+  exclude: z
+    .string()
+    .max(2000)
+    .default('')
+    .transform((value) => value.split(',').filter(Boolean).slice(0, 50)),
+});
 
 // ─── Billing & offers ────────────────────────────────────────────────────────
 

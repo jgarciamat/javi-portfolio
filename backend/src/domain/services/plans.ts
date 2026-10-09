@@ -4,7 +4,7 @@ import { PlanId } from '@domain/model/Subscription';
 export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
 
 /** Capabilities only available in Premium. */
-export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor';
+export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast';
 
 export interface PlanLimits {
   resources: Record<LimitedResource, number>;
@@ -15,8 +15,8 @@ export interface PlanLimits {
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: {
-    resources: { accounts: 1, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
-    features: { import: false, insights: false, aiAdvisor: false },
+    resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+    features: { import: false, insights: false, aiAdvisor: false, forecast: false },
     aiMonthlyQuota: 0,
   },
   premium: {
@@ -27,7 +27,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       recurringRules: Infinity,
       customAlerts: Infinity,
     },
-    features: { import: true, insights: true, aiAdvisor: true },
+    features: { import: true, insights: true, aiAdvisor: true, forecast: true },
     aiMonthlyQuota: 30,
   },
 };
