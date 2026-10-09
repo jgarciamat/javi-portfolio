@@ -66,7 +66,7 @@ describe('Plans and limits', () => {
       plan: 'premium',
       trialDaysLeft: 14,
       subscription: { status: 'trialing', source: 'trial', canManage: false },
-      usage: { accounts: 1, budgets: 0 },
+      usage: { accounts: 1, budgets: 0, movements: 0 },
       ai: { used: 0, quota: 30 },
     });
     ctx.clock.set(new Date(ctx.clock.now().getTime() + 15 * DAY).toISOString());
@@ -75,6 +75,12 @@ describe('Plans and limits', () => {
       trialDaysLeft: 0,
       limits: { resources: { accounts: 2 } },
     });
+  });
+
+  it('reports how many movements the user has registered', async () => {
+    await addTransaction(ctx, user, { amount: 5 });
+    await addTransaction(ctx, user, { amount: 7 });
+    expect((await billing()).usage.movements).toBe(2);
   });
 
   it('answers 402 with the limit when the free plan is full', async () => {

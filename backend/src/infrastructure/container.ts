@@ -272,6 +272,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         goals: repos.goals.listByUser(userId).length,
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
+        movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,
       uow,

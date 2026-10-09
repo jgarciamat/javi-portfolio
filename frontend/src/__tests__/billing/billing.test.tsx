@@ -195,6 +195,36 @@ describe('PlanBanner', () => {
     expect(onOpenPlan).toHaveBeenCalled();
   });
 
+  it('recaps the trial and what the free plan would no longer let them add', async () => {
+    withPlan(
+      <PlanBanner onOpenPlan={jest.fn()} />,
+      f.billing({
+        trialDaysLeft: 4,
+        usage: {
+          accounts: 2,
+          budgets: 5,
+          goals: 1,
+          recurringRules: 4,
+          customAlerts: 0,
+          movements: 37,
+        },
+      })
+    );
+    const banner = await screen.findByRole('status');
+    expect(banner).toHaveTextContent(/registrado 37 movimientos/);
+    expect(banner).toHaveTextContent(
+      /5 presupuestos \(gratis: 3\), 4 movimientos automáticos \(gratis: 3\)/
+    );
+    expect(banner).not.toHaveTextContent(/cuentas \(gratis/);
+  });
+
+  it('only recaps the movements when everything fits in the free plan', async () => {
+    withPlan(<PlanBanner onOpenPlan={jest.fn()} />, f.billing({ trialDaysLeft: 1 }));
+    const banner = await screen.findByRole('status');
+    expect(banner).toHaveTextContent(/registrado 5 movimientos/);
+    expect(banner).not.toHaveTextContent(/no podrás añadir más/);
+  });
+
   it('says nothing outside the provider or with a long trial', () => {
     const { container, unmount } = renderWithProviders(<PlanBanner onOpenPlan={jest.fn()} />, {
       finances: false,

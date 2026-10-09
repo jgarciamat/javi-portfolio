@@ -39,7 +39,8 @@ export interface BillingOverview {
     canManage: boolean;
   };
   limits: PlanLimits;
-  usage: Record<LimitedResource, number>;
+  /** What the user has created (`movements` is informational, not limited). */
+  usage: Record<LimitedResource, number> & { movements: number };
   ai: { used: number; quota: number };
   catalog: PlanCatalog;
 }

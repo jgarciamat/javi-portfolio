@@ -183,6 +183,8 @@ export interface TransactionRepository {
   listAllByUser(userId: string): Transaction[];
   exportAll(userId: string): TransactionView[];
   earliestPeriod(userId: string): Period | null;
+  /** How many movements the user has in total. */
+  count(userId: string): number;
 }
 
 export interface RecurringRuleRepository {

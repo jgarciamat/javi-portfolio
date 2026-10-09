@@ -43,6 +43,8 @@ function setup(overview = f.overview({ transactions: [dinner, salary, saving] })
 
 beforeEach(() => {
   localStorage.clear();
+  // The recap of the previous month has its own tests: keep it out of the way here.
+  localStorage.setItem('mm_recap_seen', '2026-3');
   freezeTime('2026-03-15T12:00:00');
 });
 afterEach(restoreTime);

@@ -12,11 +12,15 @@ import {
   useTransactionView,
   type TransactionViewMode,
 } from '../../application/hooks/useTransactionView';
+import { useGettingStarted } from '../../application/hooks/useGettingStarted';
+import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { ForecastPanel } from './ForecastPanel';
+import { GettingStarted } from './GettingStarted';
+import { MonthRecap } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
@@ -166,15 +170,18 @@ interface MonthlyViewProps {
   onEditTransaction: (tx: Transaction) => void;
   onManageCategories: () => void;
   onManageBudgets: () => void;
+  onOpenTab: (tab: DashboardTab) => void;
 }
 
 export function MonthlyView({
   onEditTransaction,
   onManageCategories,
   onManageBudgets,
+  onOpenTab,
 }: MonthlyViewProps) {
   const { t } = useI18n();
   const f = useFinances();
+  const checklist = useGettingStarted();
   const [params, setParams] = useSearchParams();
   const quickAdd = QUICK_ADD[params.get('add') ?? ''] ?? null;
   // Until the month arrives its first day is a good guess for the period start.
@@ -202,6 +209,12 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        {f.isCurrentPeriod &&
+          (checklist.visible ? (
+            <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
+          ) : (
+            <MonthRecap />
+          ))}
         {f.isCurrentPeriod && <ForecastPanel />}
 
         <TransactionForm

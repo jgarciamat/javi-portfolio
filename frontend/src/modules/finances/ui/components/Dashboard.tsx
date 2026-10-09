@@ -80,6 +80,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
           onEditTransaction={dash.setEditingTransaction}
           onManageCategories={dash.openCategoryModal}
           onManageBudgets={() => dash.setTab('budgets')}
+          onOpenTab={dash.setTab}
         />
       );
   }

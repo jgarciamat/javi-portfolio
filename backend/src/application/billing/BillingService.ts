@@ -26,7 +26,9 @@ import { AiAllowance, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from './EntitlementService';
 
 /** How many of each limited resource a user has (active ones). */
-export type ResourceCounter = (userId: string) => Record<LimitedResource, number>;
+/** What the user has created so far (`movements` is informational: it is not limited). */
+export type ResourceUsage = Record<LimitedResource, number> & { movements: number };
+export type ResourceCounter = (userId: string) => ResourceUsage;
 
 /** What the buyer agrees to before paying (both are required). */
 export interface CheckoutConsent {
@@ -76,7 +78,7 @@ export interface BillingOverview {
     canManage: boolean;
   };
   limits: ReturnType<typeof serializableLimits>;
-  usage: Record<LimitedResource, number>;
+  usage: ResourceUsage;
   ai: AiQuota;
   catalog: PlanCatalog;
 }
