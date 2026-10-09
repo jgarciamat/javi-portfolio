@@ -3,10 +3,26 @@ import { ReferralRepository } from '@domain/ports/repositories';
 import { Clock, MetricsRecorder } from '@domain/ports/services';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
-/** Free Premium days each side gets when an invited user verifies the e-mail. */
+/** Free Premium days of every reward (the invited friend gets one too). */
 export const REFERRAL_REWARD_DAYS = 30;
-/** Rewards one person can collect for the invitations they send (a year of Premium). */
-export const MAX_REFERRAL_REWARDS = 12;
+/** Extra friends needed for each new reward after the first: 5, then 10, then 15… */
+export const REFERRAL_STEP = 5;
+
+/**
+ * Friends that must have completed the first steps in total to have earned `n` rewards:
+ * 1 for the first, then 5 more for the second (6), 10 more for the third (16), 15 more… (31).
+ */
+export function friendsForReward(n: number): number {
+  if (n <= 0) return 0;
+  return 1 + (REFERRAL_STEP * (n - 1) * n) / 2;
+}
+
+/** Rewards earned with this many friends who completed the first steps. */
+export function rewardsEarned(qualifiedFriends: number): number {
+  let n = 0;
+  while (friendsForReward(n + 1) <= qualifiedFriends) n++;
+  return n;
+}
 
 /** No 0/O/1/I: codes are read out and typed by hand. */
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -15,19 +31,26 @@ const ATTEMPTS = 8;
 
 export interface ReferralSummary {
   code: string;
-  rewarded: number;
+  /** Friends who completed the first steps / who have not yet. */
+  qualified: number;
   pending: number;
   rewardDays: number;
-  /** Rewards still available for this user. */
-  remaining: number;
+  /** Months of Premium earned so far. */
+  rewardsEarned: number;
+  /** Friends still needed for the next free month. */
+  missing: number;
 }
+
+/** The first steps an invited user must complete before the invitation counts. */
+export type FirstStepsCheck = (userId: string) => boolean;
 
 export class ReferralService {
   constructor(
     private readonly referrals: ReferralRepository,
     private readonly entitlements: EntitlementService,
     private readonly metrics: MetricsRecorder,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly completedFirstSteps: FirstStepsCheck
   ) {}
 
   private newCode(): string {
@@ -46,13 +69,17 @@ export class ReferralService {
   }
 
   summary(userId: string): ReferralSummary {
-    const { rewarded, pending } = this.referrals.counts(userId);
+    // Friends may have finished their first steps since the last time this was looked at.
+    for (const referredId of this.referrals.pendingReferred(userId)) this.reward(referredId);
+    const { qualified, pending } = this.referrals.counts(userId);
+    const earned = rewardsEarned(qualified);
     return {
       code: this.codeFor(userId),
-      rewarded,
+      qualified,
       pending,
       rewardDays: REFERRAL_REWARD_DAYS,
-      remaining: Math.max(0, MAX_REFERRAL_REWARDS - rewarded),
+      rewardsEarned: earned,
+      missing: friendsForReward(earned + 1) - qualified,
     };
   }
 
@@ -68,14 +95,22 @@ export class ReferralService {
     });
   }
 
-  /** Called when a user verifies the e-mail: if they were invited, both get Premium days (once). */
+  /**
+   * Called for an invited user: once they have done the first steps the invitation counts, they
+   * get their free month and the inviter gets a month whenever a new tier is reached.
+   */
   reward(referredId: string): void {
     const referral = this.referrals.findByReferred(referredId);
-    if (!referral || referral.rewardedAt) return;
+    if (!referral || referral.rewardedAt || !this.completedFirstSteps(referredId)) return;
     this.referrals.markRewarded(referredId, this.clock.now().toISOString());
     this.entitlements.grantDays(referredId, REFERRAL_REWARD_DAYS);
-    if (this.referrals.counts(referral.referrerId).rewarded <= MAX_REFERRAL_REWARDS) {
-      this.entitlements.grantDays(referral.referrerId, REFERRAL_REWARD_DAYS);
+
+    const inviter = referral.referrerId;
+    const earned = rewardsEarned(this.referrals.counts(inviter).qualified);
+    const granted = this.referrals.rewardsGranted(inviter);
+    if (earned > granted) {
+      this.entitlements.grantDays(inviter, (earned - granted) * REFERRAL_REWARD_DAYS);
+      this.referrals.setRewardsGranted(inviter, earned);
     }
     this.metrics.record('referral_joined');
   }

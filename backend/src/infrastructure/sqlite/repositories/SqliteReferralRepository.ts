@@ -61,15 +61,35 @@ export class SqliteReferralRepository implements ReferralRepository {
       .run(at, referredId);
   }
 
-  counts(referrerId: string): { rewarded: number; pending: number } {
+  counts(referrerId: string): { qualified: number; pending: number } {
     const row = this.db
       .prepare(
         `SELECT
-           COALESCE(SUM(rewarded_at IS NOT NULL), 0) AS rewarded,
+           COALESCE(SUM(rewarded_at IS NOT NULL), 0) AS qualified,
            COALESCE(SUM(rewarded_at IS NULL), 0)     AS pending
          FROM referrals WHERE referrer_id = ?`
       )
-      .get(referrerId) as { rewarded: number; pending: number };
+      .get(referrerId) as { qualified: number; pending: number };
     return row;
+  }
+
+  pendingReferred(referrerId: string): string[] {
+    const rows = this.db
+      .prepare('SELECT referred_id FROM referrals WHERE referrer_id = ? AND rewarded_at IS NULL')
+      .all(referrerId) as { referred_id: string }[];
+    return rows.map((r) => r.referred_id);
+  }
+
+  rewardsGranted(userId: string): number {
+    const row = this.db
+      .prepare('SELECT rewards_granted FROM referral_codes WHERE user_id = ?')
+      .get(userId) as { rewards_granted: number } | undefined;
+    return row?.rewards_granted ?? 0;
+  }
+
+  setRewardsGranted(userId: string, count: number): void {
+    this.db
+      .prepare('UPDATE referral_codes SET rewards_granted = ? WHERE user_id = ?')
+      .run(count, userId);
   }
 }

@@ -283,7 +283,38 @@ export interface ReferralRepository {
   /** Records who invited a user (a user can only be invited once). */
   addReferral(record: ReferralRecord): boolean;
   findByReferred(referredId: string): ReferralRecord | null;
+  /** Marks the invited user as having completed the first steps. */
   markRewarded(referredId: string, at: string): void;
-  /** How many invitations of this user were rewarded / are still waiting for the e-mail check. */
-  counts(referrerId: string): { rewarded: number; pending: number };
+  /** Invited users who completed the first steps (`qualified`) and those who have not yet. */
+  counts(referrerId: string): { qualified: number; pending: number };
+  /** Invited users still waiting to complete the first steps. */
+  pendingReferred(referrerId: string): string[];
+  /** Months of Premium already granted to the inviter for their invitations. */
+  rewardsGranted(userId: string): number;
+  setRewardsGranted(userId: string, count: number): void;
+}
+
+// ─── Household ───────────────────────────────────────────────────────────────
+
+export interface HouseholdMemberRecord {
+  memberId: string;
+  joinedAt: string;
+}
+
+export interface HouseholdInviteRecord {
+  ownerId: string;
+  expiresAt: string;
+}
+
+export interface HouseholdRepository {
+  /** Owner of the data this user works on (null when the user works on their own). */
+  ownerOf(memberId: string): string | null;
+  membersOf(ownerId: string): HouseholdMemberRecord[];
+  addMember(memberId: string, ownerId: string, joinedAt: string): void;
+  removeMember(memberId: string): boolean;
+  /** Replaces the pending invitation of the owner. */
+  saveInvite(ownerId: string, codeHash: string, createdAt: string, expiresAt: string): void;
+  findInvite(codeHash: string): HouseholdInviteRecord | null;
+  pendingInvite(ownerId: string): HouseholdInviteRecord | null;
+  deleteInvite(ownerId: string): void;
 }

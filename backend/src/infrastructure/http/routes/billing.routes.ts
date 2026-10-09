@@ -39,7 +39,25 @@ export function billingRoutes(c: Container, limiter: RateLimiterFactory): Router
 
   router.get(
     '/billing',
-    authed((req, res) => res.json(c.billing.overview(req.userId)))
+    authed((req, res) => {
+      // An invited user who has just finished the first steps makes the invitation count.
+      c.referrals.reward(req.userId);
+      const own = c.billing.overview(req.userId);
+      const household = c.household.status(req.userId);
+      if (req.dataUserId === req.userId) return res.json({ ...own, household });
+      // Someone working in a household uses the plan, limits and quota of its owner.
+      const shared = c.billing.overview(req.dataUserId);
+      return res.json({
+        ...own,
+        plan: shared.plan,
+        trialDaysLeft: shared.trialDaysLeft,
+        limits: shared.limits,
+        usage: shared.usage,
+        ai: shared.ai,
+        subscription: { ...shared.subscription, canManage: false },
+        household,
+      });
+    })
   );
   router.post(
     '/billing/checkout',

@@ -1,5 +1,5 @@
 import { authApi } from '@core/api/authApi';
-import { billingApi, offersApi } from '@core/api/billingApi';
+import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import {
   accountApi,
   budgetApi,
@@ -220,6 +220,13 @@ const cases: Case[] = [
   ],
   ['portal', () => billingApi.portal(), 'POST', '/billing/portal'],
   ['referral', () => billingApi.referral(), 'GET', '/referral'],
+  ['household', () => householdApi.status(), 'GET', '/household'],
+  ['household invite', () => householdApi.invite(), 'POST', '/household/invite'],
+  ['household cancel invite', () => householdApi.cancelInvite(), 'DELETE', '/household/invite'],
+  ['household preview', () => householdApi.preview('A B'), 'GET', '/household/invite/A%20B'],
+  ['household join', () => householdApi.join('CODE'), 'POST', '/household/join'],
+  ['household leave', () => householdApi.leave(), 'DELETE', '/household/membership'],
+  ['household remove', () => householdApi.remove('u 1'), 'DELETE', '/household/members/u%201'],
   ['offers', () => offersApi.list(), 'GET', '/offers'],
   ['offer click', () => offersApi.click('a b'), 'POST', '/offers/a%20b/click'],
   [

@@ -325,7 +325,7 @@ describe('Invite a friend', () => {
     withPlan(<PlanView />);
     expect(await screen.findByText('https://www.winjgm.com/?ref=ABCD2345')).toBeInTheDocument();
     expect(
-      screen.getByText(/Invitaciones completadas: 2 · pendientes de verificar: 1 · .*: 10/)
+      screen.getByText(/primeros pasos: 2 · en camino: 1 · meses ganados: 1\. Te faltan 4/)
     ).toBeVisible();
     expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));

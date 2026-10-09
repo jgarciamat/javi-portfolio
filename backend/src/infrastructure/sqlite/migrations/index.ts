@@ -8,6 +8,8 @@ import { withdrawalAndTour } from './006-withdrawal-and-tour';
 import { immediateStart } from './007-immediate-start';
 import { metrics } from './008-metrics';
 import { referrals } from './009-referrals';
+import { household } from './010-household';
+import { referralTiers } from './011-referral-tiers';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
 export const migrations: Migration[] = [
@@ -20,4 +22,6 @@ export const migrations: Migration[] = [
   immediateStart,
   metrics,
   referrals,
+  household,
+  referralTiers,
 ];

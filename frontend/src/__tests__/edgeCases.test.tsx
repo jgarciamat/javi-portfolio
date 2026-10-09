@@ -229,8 +229,8 @@ describe('billing edge cases', () => {
       { api, authenticated: false }
     );
     expect(await screen.findByText(/quedan 87 plazas/)).toBeInTheDocument();
-    // Import is free in this catalog: four ticks instead of three (import, analysis, forecast, advisor).
-    expect(screen.getAllByText('✓')).toHaveLength(4);
+    // Import is free in this catalog: five ticks instead of four (import, analysis, forecast, household, advisor).
+    expect(screen.getAllByText('✓')).toHaveLength(5);
     fireEvent.click(screen.getByRole('button', { name: tr('pricing.cta', { days: 14 }) }));
     expect(screen.getByText('registro')).toBeInTheDocument();
   });

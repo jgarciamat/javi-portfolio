@@ -14,7 +14,10 @@ import {
 import { AuthService } from '@application/auth/AuthService';
 
 export interface AuthedRequest extends Request {
+  /** Who is signed in: profile, password, billing, sessions. */
   userId: string;
+  /** Whose data the request works on: the same user, or the owner of the household they joined. */
+  dataUserId: string;
 }
 
 type Handler = (req: Request, res: Response, next: NextFunction) => unknown | Promise<unknown>;
@@ -33,7 +36,10 @@ export function authed(
   return asyncHandler((req, res) => fn(req as AuthedRequest, res));
 }
 
-export function requireAuth(auth: AuthService): RequestHandler {
+export function requireAuth(
+  auth: AuthService,
+  dataOwnerOf: (userId: string) => string = (userId) => userId
+): RequestHandler {
   return (req, _res, next) => {
     const header = req.headers.authorization;
     if (!header?.startsWith('Bearer ')) {
@@ -41,7 +47,9 @@ export function requireAuth(auth: AuthService): RequestHandler {
       return;
     }
     try {
-      (req as AuthedRequest).userId = auth.authenticate(header.slice(7)).userId;
+      const { userId } = auth.authenticate(header.slice(7));
+      (req as AuthedRequest).userId = userId;
+      (req as AuthedRequest).dataUserId = dataOwnerOf(userId);
       next();
     } catch (e) {
       next(e);

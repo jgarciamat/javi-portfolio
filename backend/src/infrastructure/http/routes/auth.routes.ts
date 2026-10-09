@@ -93,8 +93,7 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
 
   const verify = asyncHandler((req, res) => {
     const { token } = verifyQuery.parse({ ...req.body, ...req.query });
-    const userId = c.auth.verifyEmail(token);
-    c.referrals.reward(userId);
+    c.auth.verifyEmail(token);
     c.repos.metrics.record('email_verified');
     res.json({ message: 'Email verificado correctamente. Ya puedes iniciar sesión.' });
   });

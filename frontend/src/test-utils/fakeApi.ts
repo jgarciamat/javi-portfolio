@@ -83,6 +83,15 @@ export function createFakeApi(): FakeApi {
       portal: ok({ url: 'https://portal.test' }),
       referral: ok(f.referral()),
     },
+    householdApi: {
+      status: ok(f.household()),
+      invite: ok({ code: 'CODE-123456789', expiresAt: '2026-03-22T12:00:00Z' }),
+      cancelInvite: ok(undefined),
+      preview: ok({ owner: { id: 'o1', name: 'Marta' }, expiresAt: '2026-03-22T12:00:00Z' }),
+      join: ok(undefined),
+      leave: ok(undefined),
+      remove: ok(undefined),
+    },
     offersApi: { list: ok({ enabled: true, offers: [] }), click: ok({ url: 'https://x.test' }) },
   } as unknown as FakeApi;
 }

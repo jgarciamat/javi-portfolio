@@ -7,7 +7,7 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { errorMessage } from '@shared/utils/errors';
 import { isNativeApp } from '@shared/utils/platform';
 import { usePlan } from '../application/PlanContext';
-import type { BillingOverview, LimitedResource } from '../domain/types';
+import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domain/types';
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
@@ -71,6 +71,17 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
           </strong>
         </li>
       </ul>
+    </div>
+  );
+}
+
+/** A household member uses the plan of the person who owns the shared data. */
+function HouseholdPlanCard({ name }: { name: string }) {
+  const { t } = useI18n();
+  return (
+    <div className="card plan-card">
+      <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
+      <p>{t('billing.householdPlan', { name })}</p>
     </div>
   );
 }
@@ -171,9 +182,10 @@ function InviteCard() {
       </div>
       <p className="plan-note">
         {t('billing.invite.stats', {
-          rewarded: data.rewarded,
+          qualified: data.qualified,
           pending: data.pending,
-          remaining: data.remaining,
+          earned: data.rewardsEarned,
+          missing: data.missing,
         })}
       </p>
     </div>
@@ -189,13 +201,18 @@ export function PlanView() {
   if (!overview) return <div className="card form-error">{t('billing.loadError')}</div>;
 
   const paying = overview.plan === 'premium' && overview.subscription.source !== 'trial';
+  const member = overview.household.role === 'member';
 
   return (
     <div className="section-view">
-      <PlanCard overview={overview} />
+      {member ? (
+        <HouseholdPlanCard name={(overview.household.owner as HouseholdPerson).name} />
+      ) : (
+        <PlanCard overview={overview} />
+      )}
       <UsageCard overview={overview} />
-      <InviteCard />
-      {!paying && <UpgradeCard overview={overview} />}
+      {!member && <InviteCard />}
+      {!paying && !member && <UpgradeCard overview={overview} />}
     </div>
   );
 }

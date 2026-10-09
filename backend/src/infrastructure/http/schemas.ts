@@ -249,6 +249,9 @@ export const askBody = z.object({
   locale,
 });
 export const yearParams = z.object({ year: z.coerce.number().int().min(1970).max(9999) });
+export const householdJoinBody = z.object({ code: z.string().trim().min(10).max(64) });
+export const householdCodeParams = z.object({ code: z.string().trim().min(10).max(64) });
+export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

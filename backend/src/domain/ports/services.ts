@@ -168,7 +168,8 @@ export type MetricName =
   | 'ai_analysis'
   | 'ai_question'
   | 'import_done'
-  | 'referral_joined';
+  | 'referral_joined'
+  | 'household_joined';
 
 export interface MetricsRecorder {
   record(name: MetricName): void;

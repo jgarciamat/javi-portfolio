@@ -38,14 +38,19 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
   router.get(
     '/months/:year/:month',
     authed((req, res) => {
-      res.json(presentMonth(c.transactions.getMonth(req.userId, periodParams.parse(req.params))));
+      res.json(
+        presentMonth(c.transactions.getMonth(req.dataUserId, periodParams.parse(req.params)))
+      );
     })
   );
 
   router.get(
     '/transactions',
     authed((req, res) => {
-      const month = c.transactions.getMonth(req.userId, periodOrCurrent(req.userId, req.query));
+      const month = c.transactions.getMonth(
+        req.dataUserId,
+        periodOrCurrent(req.dataUserId, req.query)
+      );
       res.json(month.transactions.map(presentTransaction));
     })
   );
@@ -53,8 +58,8 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
   router.get(
     '/transactions/summary',
     authed((req, res) => {
-      const period = periodOrCurrent(req.userId, req.query);
-      res.json(presentSummary(c.transactions.getMonth(req.userId, period).summary, period));
+      const period = periodOrCurrent(req.dataUserId, req.query);
+      res.json(presentSummary(c.transactions.getMonth(req.dataUserId, period).summary, period));
     })
   );
 
@@ -64,7 +69,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
       const q = searchQuery.parse(req.query);
       res.json(
         presentSearch(
-          c.transactions.search(req.userId, {
+          c.transactions.search(req.dataUserId, {
             text: q.q,
             type: q.type,
             categoryIds: q.categoryIds,
@@ -85,7 +90,9 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
   router.get(
     '/transactions/annual/:year',
     authed((req, res) => {
-      res.json(presentAnnual(c.transactions.annual(req.userId, yearParam.parse(req.params).year)));
+      res.json(
+        presentAnnual(c.transactions.annual(req.dataUserId, yearParam.parse(req.params).year))
+      );
     })
   );
 
@@ -95,7 +102,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
     authed(async (req, res) => {
       const body = importBody.parse(req.body);
       const result = await c.importer.import(
-        req.userId,
+        req.dataUserId,
         body.rows.map((r) => ({ ...r, amountCents: r.amount })),
         { accountId: body.accountId, dryRun: body.dryRun }
       );
@@ -119,7 +126,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
         .status(201)
         .json(
           presentTransaction(
-            c.transactions.create(req.userId, { ...body, amountCents: body.amount })
+            c.transactions.create(req.dataUserId, { ...body, amountCents: body.amount })
           )
         );
     })
@@ -130,7 +137,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
     const body = transactionPatchBody.parse(req.body);
     res.json(
       presentTransaction(
-        c.transactions.update(req.userId, id, { ...body, amountCents: body.amount })
+        c.transactions.update(req.dataUserId, id, { ...body, amountCents: body.amount })
       )
     );
   });
@@ -140,7 +147,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
   router.delete(
     '/transactions/:id',
     authed((req, res) => {
-      c.transactions.delete(req.userId, idParam.parse(req.params).id);
+      c.transactions.delete(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );
@@ -151,7 +158,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
     authed((req, res) => {
       const period = periodParams.parse(req.params);
       res.json({
-        carryover: c.transactions.getMonth(req.userId, period).carryoverCents / 100,
+        carryover: c.transactions.getMonth(req.dataUserId, period).carryoverCents / 100,
         ...period,
       });
     })

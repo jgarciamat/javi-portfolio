@@ -25,6 +25,7 @@ import {
   CustomAlertService,
   GoalService,
 } from '@application/planning/PlanningServices';
+import { HouseholdService } from '@application/household/HouseholdService';
 import { ProfileService } from '@application/profile/ProfileService';
 import { ReferralService } from '@application/referrals/ReferralService';
 import { RecurringMaterializer } from '@application/recurring/RecurringMaterializer';
@@ -58,6 +59,7 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
@@ -118,6 +120,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     affiliateClicks: new SqliteAffiliateClickRepository(db),
     metrics: new SqliteMetricsRepository(db, clock),
     referrals: new SqliteReferralRepository(db),
+    household: new SqliteHouseholdRepository(db),
   };
 
   const tokens = new JwtTokenService(
@@ -203,7 +206,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     transactions,
     materializer,
     entitlements,
-    referrals: new ReferralService(repos.referrals, entitlements, repos.metrics, clock),
+    referrals: new ReferralService(
+      repos.referrals,
+      entitlements,
+      repos.metrics,
+      clock,
+      // First steps: 3 movements, a budget, a goal and an automation.
+      (userId) =>
+        repos.transactions.count(userId) >= 3 &&
+        repos.budgets.listByUser(userId).length > 0 &&
+        repos.goals.listByUser(userId).length > 0 &&
+        repos.rules.listByUser(userId).length > 0
+    ),
+    household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
     payments,
     profile: new ProfileService(repos.users, repos.refreshTokens, hasher, auth, uow),

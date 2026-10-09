@@ -8,7 +8,7 @@ export interface CheckoutConsent {
   waiveWithdrawal: boolean;
 }
 export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
-export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast';
+export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
 
 export interface PlanLimits {
   /** null = unlimited */
@@ -26,7 +26,25 @@ export interface PlanCatalog {
   limits: { free: PlanLimits; premium: PlanLimits };
 }
 
+export interface HouseholdPerson {
+  id: string;
+  name: string;
+}
+
+/** Who the user shares their data with (a couple: the owner and one member). */
+export interface HouseholdStatus {
+  role: 'owner' | 'member' | 'none';
+  /** The household a member works in. */
+  owner: HouseholdPerson | null;
+  members: HouseholdPerson[];
+  /** An invitation waiting to be used (its code is only shown when created). */
+  pendingInvite: { expiresAt: string } | null;
+  maxMembers: number;
+}
+
 export interface BillingOverview {
+  /** Members use the plan of the household owner. */
+  household: HouseholdStatus;
   plan: PlanId;
   trialDaysLeft: number;
   subscription: {
@@ -45,16 +63,18 @@ export interface BillingOverview {
   catalog: PlanCatalog;
 }
 
-/** Invitation code of the user and what their invitations earned. */
+/** Invitation code of the user and what their invitations have earned. */
 export interface ReferralSummary {
   code: string;
-  /** Invitations already rewarded / waiting for the invited user to verify the e-mail. */
-  rewarded: number;
+  /** Friends who completed the first steps / who have not yet. */
+  qualified: number;
   pending: number;
-  /** Free Premium days per invitation, for each side. */
+  /** Free Premium days per reward, for each side. */
   rewardDays: number;
-  /** Rewards still available. */
-  remaining: number;
+  /** Free months earned so far. */
+  rewardsEarned: number;
+  /** Friends still needed for the next free month. */
+  missing: number;
 }
 
 /** Why the paywall was opened. */

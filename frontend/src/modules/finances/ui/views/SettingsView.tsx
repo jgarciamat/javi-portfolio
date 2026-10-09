@@ -16,7 +16,9 @@ import type {
   SettingsChanges,
   UserSettings,
 } from '@modules/finances/domain/types';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { HouseholdCard } from '../components/HouseholdCard';
 import {
   downloadFile,
   useExportCSV,
@@ -40,7 +42,10 @@ function PreferencesCard({
   saving,
   save,
   toggleNotifications,
+  sharedLocked,
 }: {
+  /** Currency, month start and default account belong to the household owner. */
+  sharedLocked: boolean;
   settings: UserSettings;
   accounts: Account[];
   saving: boolean;
@@ -58,7 +63,7 @@ function PreferencesCard({
         </span>
         <select
           className="tx-input"
-          disabled={saving}
+          disabled={saving || sharedLocked}
           value={settings.currency}
           onChange={(e) => save({ currency: e.target.value as Currency })}
         >
@@ -90,7 +95,7 @@ function PreferencesCard({
         </span>
         <select
           className="tx-input"
-          disabled={saving}
+          disabled={saving || sharedLocked}
           value={settings.monthStartDay}
           onChange={(e) => save({ monthStartDay: Number(e.target.value) })}
         >
@@ -110,7 +115,7 @@ function PreferencesCard({
           </span>
           <select
             className="tx-input"
-            disabled={saving}
+            disabled={saving || sharedLocked}
             value={settings.defaultAccountId ?? ''}
             onChange={(e) => save({ defaultAccountId: e.target.value })}
           >
@@ -266,6 +271,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
   const { accounts, refresh } = useFinances();
   const action = useAction();
   const [saved, setSaved] = useState(false);
+  const sharedLocked = useOptionalPlan()?.overview?.household.role === 'member';
 
   if (!settings) return <div className="card">{t('app.common.loading')}</div>;
 
@@ -312,8 +318,11 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
           saving={action.pending}
           save={save}
           toggleNotifications={toggleNotifications}
+          sharedLocked={sharedLocked}
         />
+        {sharedLocked && <p className="plan-note">{t('app.household.sharedSettings')}</p>}
       </div>
+      <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />

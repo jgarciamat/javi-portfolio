@@ -1,6 +1,27 @@
 import request from 'supertest';
-import { MAX_REFERRAL_REWARDS } from '@application/referrals/ReferralService';
-import { TestContext, TestUser, createTestApp, createUser, expireTrial } from '../helpers/testApp';
+import {
+  ReferralService,
+  REFERRAL_REWARD_DAYS,
+  friendsForReward,
+  rewardsEarned,
+} from '@application/referrals/ReferralService';
+import {
+  TestContext,
+  TestUser,
+  addTransaction,
+  createTestApp,
+  createUser,
+  expireTrial,
+} from '../helpers/testApp';
+
+describe('reward tiers', () => {
+  it('asks for 1 friend, then 5 more, then 10 more, then 15 more…', () => {
+    expect([0, 1, 2, 3, 4, 5].map(friendsForReward)).toEqual([0, 1, 6, 16, 31, 51]);
+    expect([0, 1, 5, 6, 15, 16, 30, 31, 50, 51].map(rewardsEarned)).toEqual([
+      0, 1, 1, 2, 2, 3, 3, 4, 4, 5,
+    ]);
+  });
+});
 
 describe('Invite a friend', () => {
   let ctx: TestContext;
@@ -16,44 +37,84 @@ describe('Invite a friend', () => {
   const trialDays = async (user: TestUser) =>
     (await request(ctx.app).get('/api/billing').set(user.auth).expect(200)).body.trialDaysLeft;
 
-  it('gives each user a stable code and counts what they have earned', async () => {
+  /** 3 movements, a budget, a goal and an automation: what the first-steps list asks for. */
+  const doFirstSteps = async (user: TestUser) => {
+    for (const amount of [1, 2, 3]) await addTransaction(ctx, user, { amount });
+    await request(ctx.app)
+      .put('/api/budgets')
+      .set(user.auth)
+      .send({ category: 'Ocio', amount: 100 })
+      .expect(200);
+    await request(ctx.app)
+      .post('/api/goals')
+      .set(user.auth)
+      .send({ name: 'Viaje', target: 500 })
+      .expect(201);
+    await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Alquiler',
+        type: 'EXPENSE',
+        category: 'Vivienda',
+        amount: 700,
+        startYear: 2026,
+        startMonth: 4,
+      })
+      .expect(201);
+  };
+
+  it('gives each user a stable code and shows what is missing for the next month', async () => {
     const first = await summary();
     expect(first.code).toMatch(/^[A-HJ-NP-Z2-9]{8}$/);
-    expect(first).toMatchObject({ rewarded: 0, pending: 0, rewardDays: 30, remaining: 12 });
+    expect(first).toMatchObject({
+      qualified: 0,
+      pending: 0,
+      rewardDays: 30,
+      rewardsEarned: 0,
+      missing: 1,
+    });
     expect((await summary()).code).toBe(first.code);
     expect((await summary(await createUser(ctx))).code).not.toBe(first.code);
     await request(ctx.app).get('/api/referral').expect(401);
   });
 
-  it('gives both a free month when the invited user verifies the e-mail, once', async () => {
+  it('counts the invitation only once the friend has done the first steps, then rewards both', async () => {
     const { code } = await summary();
     const friend = await createUser(ctx, undefined, code.toLowerCase()); // typed by hand
-    expect(await summary()).toMatchObject({ rewarded: 1, pending: 0, remaining: 11 });
-    expect(await trialDays(host)).toBe(44);
+    expect(await summary()).toMatchObject({ qualified: 0, pending: 1, missing: 1 });
+    expect(await trialDays(host)).toBe(14);
+    expect(await trialDays(friend)).toBe(14);
+
+    for (const amount of [1, 2]) await addTransaction(ctx, friend, { amount });
+    expect(await trialDays(friend)).toBe(14); // not enough yet
+    await doFirstSteps(friend);
     expect(await trialDays(friend)).toBe(44);
+    expect(await summary()).toMatchObject({
+      qualified: 1,
+      pending: 0,
+      rewardsEarned: 1,
+      missing: 5,
+    });
+    expect(await trialDays(host)).toBe(44);
     expect(ctx.container.repos.metrics.totals('2026-03-01', '2026-03-31')).toContainEqual({
       name: 'referral_joined',
       count: 1,
     });
-
-    ctx.container.referrals.reward(friend.id); // nothing more to give
-    expect(await trialDays(host)).toBe(44);
+    expect(await trialDays(friend)).toBe(44); // nothing more to give
   });
 
-  it('keeps an invitation pending until the e-mail is verified', async () => {
+  it('notices the friend’s progress when the inviter looks at their numbers', async () => {
     const { code } = await summary();
-    const email = 'late@example.com';
-    await request(ctx.app)
-      .post('/api/auth/register')
-      .send({ email, password: 'Sup3r-secret!', name: 'Late', referralCode: code })
-      .expect(201);
-    expect(await summary()).toMatchObject({ rewarded: 0, pending: 1 });
-    expect(await trialDays(host)).toBe(14);
+    const friend = await createUser(ctx, undefined, code);
+    await doFirstSteps(friend);
+    expect(await summary()).toMatchObject({ qualified: 1, rewardsEarned: 1 });
+    expect(await trialDays(host)).toBe(44);
   });
 
   it('ignores unknown codes, one’s own code and a second invitation', async () => {
     await createUser(ctx, undefined, 'NOSUCHCD');
-    expect(await summary()).toMatchObject({ rewarded: 0, pending: 0 });
+    expect(await summary()).toMatchObject({ pending: 0 });
     const { code } = await summary();
     ctx.container.referrals.attach(host.id, code); // own code
     expect(await summary()).toMatchObject({ pending: 0 });
@@ -61,33 +122,56 @@ describe('Invite a friend', () => {
     const other = await createUser(ctx);
     const friend = await createUser(ctx, undefined, code);
     ctx.container.referrals.attach(friend.id, (await summary(other)).code); // already invited
-    expect(await summary(other)).toMatchObject({ pending: 0, rewarded: 0 });
-    expect(await summary()).toMatchObject({ rewarded: 1 });
+    expect(await summary(other)).toMatchObject({ pending: 0, qualified: 0 });
+    expect(await summary()).toMatchObject({ pending: 1 });
   });
 
-  it('restarts Premium for a user whose trial ended and skips lifetime users', async () => {
+  it('restarts Premium for an inviter whose trial ended', async () => {
     expireTrial(ctx, host);
     expect(await trialDays(host)).toBe(0);
     const friend = await createUser(ctx, undefined, (await summary()).code);
+    await doFirstSteps(friend);
+    await trialDays(friend);
     expect(await trialDays(host)).toBe(30);
-    expect(await trialDays(friend)).toBe(44);
-
-    const founder = await createUser(ctx);
-    const subs = ctx.container.repos.subscriptions;
-    subs.save({ ...subs.get(founder.id)!, lifetime: true, trialEndsAt: null });
-    const before = subs.get(founder.id);
-    await createUser(ctx, undefined, (await summary(founder)).code);
-    expect(subs.get(founder.id)).toEqual(before);
-    expect(await summary(founder)).toMatchObject({ rewarded: 1 });
   });
 
-  it('stops rewarding the inviter after a year of free months but still rewards the guest', async () => {
+  it('asks for 5 more friends for the second month and 10 more for the third', async () => {
+    // Same rules, with the first-steps check answered "done" so friends need no data.
+    const service = new ReferralService(
+      ctx.container.repos.referrals,
+      ctx.container.entitlements,
+      ctx.container.repos.metrics,
+      ctx.container.clock,
+      () => true
+    );
     const { code } = await summary();
-    let last = host;
-    for (let i = 0; i < MAX_REFERRAL_REWARDS + 1; i++)
-      last = await createUser(ctx, undefined, code);
-    expect(await summary()).toMatchObject({ rewarded: MAX_REFERRAL_REWARDS + 1, remaining: 0 });
-    expect(await trialDays(host)).toBe(14 + 30 * MAX_REFERRAL_REWARDS);
-    expect(await trialDays(last)).toBe(44);
+    const friends: TestUser[] = [];
+    for (let i = 0; i < 16; i++) friends.push(await createUser(ctx, undefined, code));
+    const days = () => trialDays(host);
+    const qualify = (count: number) => friends.slice(0, count).forEach((f) => service.reward(f.id));
+
+    qualify(1);
+    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
+    qualify(5); // 5 qualified: the second month needs 6
+    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
+    qualify(6);
+    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
+    qualify(15); // the third needs 16
+    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
+    qualify(16);
+    expect(await days()).toBe(14 + 3 * REFERRAL_REWARD_DAYS);
+    expect(ctx.container.repos.referrals.rewardsGranted(host.id)).toBe(3);
+    expect(await summary()).toMatchObject({ qualified: 16, rewardsEarned: 3, missing: 15 });
+  });
+
+  it('skips lifetime users', async () => {
+    const subs = ctx.container.repos.subscriptions;
+    subs.save({ ...subs.get(host.id)!, lifetime: true, trialEndsAt: null });
+    const before = subs.get(host.id);
+    const friend = await createUser(ctx, undefined, (await summary()).code);
+    await doFirstSteps(friend);
+    await trialDays(friend);
+    expect(subs.get(host.id)).toEqual(before);
+    expect(await summary()).toMatchObject({ qualified: 1, rewardsEarned: 1 });
   });
 });

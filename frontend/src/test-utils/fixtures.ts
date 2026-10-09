@@ -19,7 +19,12 @@ import type {
   UserSettings,
 } from '@modules/finances/domain/types';
 import type { AuthUser } from '@modules/auth/domain/types';
-import type { BillingOverview, PlanCatalog, ReferralSummary } from '@modules/billing/domain/types';
+import type {
+  BillingOverview,
+  HouseholdStatus,
+  PlanCatalog,
+  ReferralSummary,
+} from '@modules/billing/domain/types';
 
 let seq = 0;
 const nextId = (prefix: string) => `${prefix}${++seq}`;
@@ -307,10 +312,11 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
 
 export const referral = (over: Partial<ReferralSummary> = {}): ReferralSummary => ({
   code: 'ABCD2345',
-  rewarded: 2,
+  qualified: 2,
   pending: 1,
   rewardDays: 30,
-  remaining: 10,
+  rewardsEarned: 1,
+  missing: 4,
   ...over,
 });
 
@@ -323,7 +329,13 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   limits: {
     free: {
       resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
-      features: { import: false, insights: false, aiAdvisor: false, forecast: false },
+      features: {
+        import: false,
+        insights: false,
+        aiAdvisor: false,
+        forecast: false,
+        household: false,
+      },
       aiMonthlyQuota: 0,
     },
     premium: {
@@ -334,14 +346,24 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         recurringRules: null,
         customAlerts: null,
       },
-      features: { import: true, insights: true, aiAdvisor: true, forecast: true },
+      features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
       aiMonthlyQuota: 30,
     },
   },
   ...over,
 });
 
+export const household = (over: Partial<HouseholdStatus> = {}): HouseholdStatus => ({
+  role: 'none',
+  owner: null,
+  members: [],
+  pendingInvite: null,
+  maxMembers: 1,
+  ...over,
+});
+
 export const billing = (over: Partial<BillingOverview> = {}): BillingOverview => ({
+  household: household(),
   plan: 'premium',
   trialDaysLeft: 10,
   subscription: {

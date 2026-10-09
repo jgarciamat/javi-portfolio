@@ -9,6 +9,7 @@ const LABELS: Record<string, string> = {
   ai_question: 'Preguntas al asistente IA',
   import_done: 'Importaciones',
   referral_joined: 'Registros por invitación',
+  household_joined: 'Hogares compartidos',
 };
 
 /** Text table of the anonymous counters for the last `days` days (today included). */
