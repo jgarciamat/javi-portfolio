@@ -265,3 +265,25 @@ export interface AffiliateClickRepository {
   record(userId: string, offerId: string, at: Date): void;
   countByOffer(since: Date): Record<string, number>;
 }
+
+// ─── Referrals ───────────────────────────────────────────────────────────────
+
+export interface ReferralRecord {
+  referredId: string;
+  referrerId: string;
+  createdAt: string;
+  rewardedAt: string | null;
+}
+
+export interface ReferralRepository {
+  codeOf(userId: string): string | null;
+  /** Stores a new code; false when the code is already taken. */
+  saveCode(userId: string, code: string): boolean;
+  userByCode(code: string): string | null;
+  /** Records who invited a user (a user can only be invited once). */
+  addReferral(record: ReferralRecord): boolean;
+  findByReferred(referredId: string): ReferralRecord | null;
+  markRewarded(referredId: string, at: string): void;
+  /** How many invitations of this user were rewarded / are still waiting for the e-mail check. */
+  counts(referrerId: string): { rewarded: number; pending: number };
+}

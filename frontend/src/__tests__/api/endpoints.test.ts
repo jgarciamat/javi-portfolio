@@ -217,6 +217,7 @@ const cases: Case[] = [
     { kind: 'monthly', acceptTerms: true, waiveWithdrawal: true },
   ],
   ['portal', () => billingApi.portal(), 'POST', '/billing/portal'],
+  ['referral', () => billingApi.referral(), 'GET', '/referral'],
   ['offers', () => offersApi.list(), 'GET', '/offers'],
   ['offer click', () => offersApi.click('a b'), 'POST', '/offers/a%20b/click'],
   [

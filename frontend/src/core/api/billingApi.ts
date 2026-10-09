@@ -4,6 +4,7 @@ import type {
   CheckoutKind,
   OffersResponse,
   PlanCatalog,
+  ReferralSummary,
 } from '@modules/billing/domain/types';
 import { apiRequest, jsonBody, publicRequest } from './http';
 
@@ -22,6 +23,10 @@ export const billingApi = {
       method: 'POST',
       body: jsonBody({ kind, ...consent }),
     });
+  },
+  /** The user's invitation code and what the invitations have earned. */
+  referral() {
+    return apiRequest<ReferralSummary>('/referral');
   },
   /** Returns the URL of the provider's customer portal (change plan, card, cancel). */
   portal() {

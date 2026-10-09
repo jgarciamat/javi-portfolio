@@ -312,6 +312,50 @@ describe('PlanView', () => {
   });
 });
 
+describe('Invite a friend', () => {
+  const originalShare = navigator.share;
+  afterEach(() => {
+    Object.defineProperty(navigator, 'share', { value: originalShare, configurable: true });
+  });
+
+  it('shows the link and what the invitations earned, and copies the link', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    withPlan(<PlanView />);
+    expect(await screen.findByText('https://www.winjgm.com/?ref=ABCD2345')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Invitaciones completadas: 2 · pendientes de verificar: 1 · .*: 10/)
+    ).toBeVisible();
+    expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith('https://www.winjgm.com/?ref=ABCD2345')
+    );
+    expect(await screen.findByText(tr('billing.invite.copied'))).toBeInTheDocument();
+  });
+
+  it('offers the native share sheet when the device has one', async () => {
+    const share = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    withPlan(<PlanView />);
+    fireEvent.click(await screen.findByRole('button', { name: tr('billing.invite.share') }));
+    expect(share).toHaveBeenCalledWith({
+      title: 'Money Manager',
+      text: tr('billing.invite.shareText'),
+      url: 'https://www.winjgm.com/?ref=ABCD2345',
+    });
+  });
+
+  it('stays out of the way until the code arrives', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockReturnValue(new Promise(() => undefined));
+    withPlan(<PlanView />, f.billing(), api);
+    await screen.findByRole('heading', { name: new RegExp(tr('billing.yourPlan')) });
+    expect(screen.queryByText(new RegExp(tr('billing.invite.title')))).toBeNull();
+  });
+});
+
 describe('Cancelling', () => {
   const paying = f.billing({
     trialDaysLeft: 0,

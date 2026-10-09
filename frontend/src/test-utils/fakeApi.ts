@@ -79,6 +79,7 @@ export function createFakeApi(): FakeApi {
       plans: ok(f.catalog()),
       checkout: ok({ url: 'https://checkout.test' }),
       portal: ok({ url: 'https://portal.test' }),
+      referral: ok(f.referral()),
     },
     offersApi: { list: ok({ enabled: true, offers: [] }), click: ok({ url: 'https://x.test' }) },
   } as unknown as FakeApi;

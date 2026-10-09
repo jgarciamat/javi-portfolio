@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
+import { inviteLink } from '@core/referral';
+import { useResource } from '@shared/hooks/useResource';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { errorMessage } from '@shared/utils/errors';
@@ -130,6 +133,53 @@ function UpgradeCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
+/** "Invite a friend": a link that gives both a free month of Premium. */
+function InviteCard() {
+  const { billingApi } = useApi();
+  const { t } = useI18n();
+  const { data } = useResource(() => billingApi.referral(), [billingApi]);
+  const [copied, setCopied] = useState(false);
+  if (!data) return null;
+  const link = inviteLink(data.code);
+  const share = typeof navigator.share === 'function' ? navigator.share.bind(navigator) : null;
+  const copy = async () => {
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+  };
+
+  return (
+    <div className="card invite-card">
+      <h2 className="section-title">🎁 {t('billing.invite.title')}</h2>
+      <p className="section-hint">{t('billing.invite.hint', { days: data.rewardDays })}</p>
+      <p className="invite-link">
+        <code>{link}</code>
+      </p>
+      <div className="button-row">
+        <button className="btn-secondary" onClick={copy}>
+          {copied ? t('billing.invite.copied') : t('billing.invite.copy')}
+        </button>
+        {share && (
+          <button
+            className="btn-secondary"
+            onClick={() =>
+              share({ title: 'Money Manager', text: t('billing.invite.shareText'), url: link })
+            }
+          >
+            {t('billing.invite.share')}
+          </button>
+        )}
+      </div>
+      <p className="plan-note">
+        {t('billing.invite.stats', {
+          rewarded: data.rewarded,
+          pending: data.pending,
+          remaining: data.remaining,
+        })}
+      </p>
+    </div>
+  );
+}
+
 /** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
 export function PlanView() {
   const { t } = useI18n();
@@ -144,6 +194,7 @@ export function PlanView() {
     <div className="section-view">
       <PlanCard overview={overview} />
       <UsageCard overview={overview} />
+      <InviteCard />
       {!paying && <UpgradeCard overview={overview} />}
     </div>
   );

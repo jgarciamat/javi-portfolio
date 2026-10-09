@@ -17,7 +17,7 @@ import type {
   UserSettings,
 } from '@modules/finances/domain/types';
 import type { AuthUser } from '@modules/auth/domain/types';
-import type { BillingOverview, PlanCatalog } from '@modules/billing/domain/types';
+import type { BillingOverview, PlanCatalog, ReferralSummary } from '@modules/billing/domain/types';
 
 let seq = 0;
 const nextId = (prefix: string) => `${prefix}${++seq}`;
@@ -273,6 +273,15 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       priceIncrease: null,
     },
   ],
+  ...over,
+});
+
+export const referral = (over: Partial<ReferralSummary> = {}): ReferralSummary => ({
+  code: 'ABCD2345',
+  rewarded: 2,
+  pending: 1,
+  rewardDays: 30,
+  remaining: 10,
   ...over,
 });
 

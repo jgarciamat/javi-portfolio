@@ -58,6 +58,11 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   );
 
   router.get(
+    '/referral',
+    authed((req, res) => res.json(c.referrals.summary(req.userId)))
+  );
+
+  router.get(
     '/settings',
     authed((req, res) => res.json(c.settings.get(req.userId)))
   );

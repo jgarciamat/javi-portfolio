@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { normalizeEmail } from '@domain/model/User';
 import { Container } from '../../container';
 import {
   RateLimiterFactory,
@@ -39,7 +40,10 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     '/register',
     registerLimiter,
     asyncHandler(async (req, res) => {
-      const result = await c.auth.register(registerBody.parse(req.body));
+      const { referralCode, ...input } = registerBody.parse(req.body);
+      const result = await c.auth.register(input);
+      const created = c.repos.users.findByEmail(normalizeEmail(input.email));
+      if (created && referralCode) c.referrals.attach(created.id, referralCode);
       c.repos.metrics.record('signup');
       res.status(201).json(result);
     })
@@ -89,7 +93,8 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
 
   const verify = asyncHandler((req, res) => {
     const { token } = verifyQuery.parse({ ...req.body, ...req.query });
-    c.auth.verifyEmail(token);
+    const userId = c.auth.verifyEmail(token);
+    c.referrals.reward(userId);
     c.repos.metrics.record('email_verified');
     res.json({ message: 'Email verificado correctamente. Ya puedes iniciar sesión.' });
   });

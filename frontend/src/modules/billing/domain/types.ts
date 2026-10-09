@@ -45,6 +45,18 @@ export interface BillingOverview {
   catalog: PlanCatalog;
 }
 
+/** Invitation code of the user and what their invitations earned. */
+export interface ReferralSummary {
+  code: string;
+  /** Invitations already rewarded / waiting for the invited user to verify the e-mail. */
+  rewarded: number;
+  pending: number;
+  /** Free Premium days per invitation, for each side. */
+  rewardDays: number;
+  /** Rewards still available. */
+  remaining: number;
+}
+
 /** Why the paywall was opened. */
 export type UpgradeReason =
   | { kind: 'limit'; resource: LimitedResource; limit: number }

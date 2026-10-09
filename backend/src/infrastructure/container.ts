@@ -26,6 +26,7 @@ import {
   GoalService,
 } from '@application/planning/PlanningServices';
 import { ProfileService } from '@application/profile/ProfileService';
+import { ReferralService } from '@application/referrals/ReferralService';
 import { RecurringMaterializer } from '@application/recurring/RecurringMaterializer';
 import { RecurringService } from '@application/recurring/RecurringService';
 import { SettingsService } from '@application/settings/SettingsService';
@@ -58,6 +59,7 @@ import {
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
+import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
   SqliteRefreshTokenRepository,
@@ -115,6 +117,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     aiUsage: new SqliteAiUsageRepository(db),
     affiliateClicks: new SqliteAffiliateClickRepository(db),
     metrics: new SqliteMetricsRepository(db, clock),
+    referrals: new SqliteReferralRepository(db),
   };
 
   const tokens = new JwtTokenService(
@@ -200,6 +203,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     transactions,
     materializer,
     entitlements,
+    referrals: new ReferralService(repos.referrals, entitlements, repos.metrics, clock),
     allowance,
     payments,
     profile: new ProfileService(repos.users, repos.refreshTokens, hasher, auth, uow),

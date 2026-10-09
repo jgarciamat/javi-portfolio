@@ -36,6 +36,8 @@ export const registerBody = z.object({
   password: z.string().min(1).max(128),
   name: z.string().trim().min(1).max(80),
   locale,
+  /** Code of the user who invited this one. */
+  referralCode: z.string().trim().max(32).optional(),
 });
 export const loginBody = z.object({
   email: z.string().trim().min(1).max(254),
