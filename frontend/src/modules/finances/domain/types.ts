@@ -434,6 +434,24 @@ export interface AIAnswer {
   ai: { used: number; quota: number };
 }
 
+export interface ReportTotals {
+  income: number;
+  expenses: number;
+  saving: number;
+  balance: number;
+}
+
+export interface AnnualReport {
+  year: number;
+  currency: string;
+  months: { month: number; income: number; expenses: number; saving: number }[];
+  quarters: ({ quarter: number } & ReportTotals)[];
+  totals: ReportTotals;
+  /** Whole-year totals per category, largest first. */
+  incomeByCategory: { categoryName: string; amount: number }[];
+  expensesByCategory: { categoryName: string; amount: number }[];
+}
+
 export interface DetectedSubscription {
   key: string;
   description: string;

@@ -1,13 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { OptionsDropdown } from '@shared/components/OptionsDropdown';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { buildAnnualChartData, type AnnualMonthEntry } from '@modules/finances/domain/annual';
 import { isBeyondHorizon } from '@modules/finances/domain/nextMonthLogic';
 import { useFinances } from '../../application/FinancesContext';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
 import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { AnnualReportDialog } from './AnnualReportDialog';
 import '../css/AnnualChart.css';
 
 interface AnnualChartProps {
@@ -134,9 +136,16 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
   const { t } = useI18n();
   const format = useFormat();
   const { exportAnnualCSV } = useExportCSV();
+  const plan = useOptionalPlan();
+  const [reportOpen, setReportOpen] = useState(false);
+  const openReport = () =>
+    plan && !plan.isPremium
+      ? plan.openUpgrade({ kind: 'feature', feature: 'insights' })
+      : setReportOpen(true);
 
   return (
     <div className="annual-view">
+      {reportOpen && <AnnualReportDialog year={year} onClose={() => setReportOpen(false)} />}
       <nav className="annual-header" aria-label={t('app.nav.yearNav')}>
         <button
           className="btn-nav"
@@ -157,6 +166,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
                   label: t('app.export.annual'),
                   onClick: () => exportAnnualCSV(months, year),
                 },
+                { icon: '📄', label: t('app.report.open'), onClick: openReport },
               ]}
             />
           )}

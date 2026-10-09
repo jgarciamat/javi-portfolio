@@ -191,6 +191,7 @@ const cases: Case[] = [
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],
   ['net worth range', () => insightsApi.netWorth(24), 'GET', '/stats/net-worth?months=24'],
+  ['annual report', () => insightsApi.report(2026), 'GET', '/stats/report/2026'],
   ['ask the assistant', () => insightsApi.ask('hola', 'es'), 'POST', '/ai/ask'],
   ['subscriptions', () => insightsApi.subscriptions(), 'GET', '/stats/subscriptions'],
   ['forecast', () => insightsApi.forecast(), 'GET', '/stats/forecast?months=6'],

@@ -74,6 +74,23 @@ export interface ForecastResult extends Period {
 /** Past periods used to learn the usual non-recurring spending. */
 const VARIABLE_HISTORY = 3;
 
+export interface AnnualReport {
+  year: number;
+  currency: string;
+  months: { month: number; incomeCents: Cents; expenseCents: Cents; savingCents: Cents }[];
+  quarters: {
+    quarter: number;
+    incomeCents: Cents;
+    expenseCents: Cents;
+    savingCents: Cents;
+    balanceCents: Cents;
+  }[];
+  totals: { incomeCents: Cents; expenseCents: Cents; savingCents: Cents; balanceCents: Cents };
+  /** Whole-year totals per category, largest first. */
+  incomeByCategory: { categoryName: string; cents: Cents }[];
+  expensesByCategory: { categoryName: string; cents: Cents }[];
+}
+
 export class StatsService {
   constructor(
     private readonly transactions: TransactionRepository,
@@ -147,6 +164,60 @@ export class StatsService {
       'EXPENSE'
     );
     return { ...period, categories: computeCategoryTrends(period, totals) };
+  }
+
+  /** Year summary for the accountant or the tax return: months, quarters and categories. */
+  annualReport(userId: string, year: number): AnnualReport {
+    assertValidPeriod({ year, month: 1 });
+    this.entitlements.assertFeature(userId, 'insights');
+    const from = { year, month: 1 };
+    const to = { year, month: 12 };
+    // Makes sure the recurring movements of the year exist before they are added up.
+    this.transactionService.getMonth(userId, to);
+    const byMonth = new Map(
+      this.transactions.totalsByPeriod(userId, from, to).map((t) => [t.month, t])
+    );
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const t = byMonth.get(i + 1);
+      return {
+        month: i + 1,
+        incomeCents: t?.incomeCents ?? 0,
+        expenseCents: t?.expenseCents ?? 0,
+        savingCents: t?.savingCents ?? 0,
+      };
+    });
+    const sum = (list: typeof months) => {
+      const incomeCents = list.reduce((s, m) => s + m.incomeCents, 0);
+      const expenseCents = list.reduce((s, m) => s + m.expenseCents, 0);
+      const savingCents = list.reduce((s, m) => s + m.savingCents, 0);
+      return {
+        incomeCents,
+        expenseCents,
+        savingCents,
+        balanceCents: incomeCents - expenseCents - savingCents,
+      };
+    };
+    const byCategory = (type: 'INCOME' | 'EXPENSE') => {
+      const totals = new Map<string, Cents>();
+      for (const row of this.transactions.categoryTotals(userId, from, to, type)) {
+        totals.set(row.categoryName, (totals.get(row.categoryName) ?? 0) + row.cents);
+      }
+      return [...totals.entries()]
+        .map(([categoryName, cents]) => ({ categoryName, cents }))
+        .sort((a, b) => b.cents - a.cents || a.categoryName.localeCompare(b.categoryName));
+    };
+    return {
+      year,
+      currency: this.settings.get(userId).currency,
+      months,
+      quarters: [1, 2, 3, 4].map((quarter) => ({
+        quarter,
+        ...sum(months.slice((quarter - 1) * 3, quarter * 3)),
+      })),
+      totals: sum(months),
+      incomeByCategory: byCategory('INCOME'),
+      expensesByCategory: byCategory('EXPENSE'),
+    };
   }
 
   /** Charges that repeat like a subscription, so the user can review what they pay for. */

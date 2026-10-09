@@ -2,6 +2,7 @@ import type {
   Account,
   AIAdvice,
   AIAnswer,
+  AnnualReport,
   Forecast,
   SubscriptionReport,
   BudgetLine,
@@ -244,6 +245,27 @@ export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
     { id: 'r-rent', description: 'Alquiler', type: 'EXPENSE', amount: 700, frequency: 'monthly' },
     { id: 'r-pay', description: 'Nómina', type: 'INCOME', amount: 2000, frequency: 'monthly' },
   ],
+  ...over,
+});
+
+export const report = (over: Partial<AnnualReport> = {}): AnnualReport => ({
+  year: 2026,
+  currency: 'EUR',
+  months: Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    income: i === 0 ? 2000 : 0,
+    expenses: i === 0 ? 100 : 0,
+    saving: 0,
+  })),
+  quarters: [
+    { quarter: 1, income: 2000, expenses: 100, saving: 0, balance: 1900 },
+    { quarter: 2, income: 0, expenses: 0, saving: 0, balance: 0 },
+    { quarter: 3, income: 0, expenses: 0, saving: 0, balance: 0 },
+    { quarter: 4, income: 0, expenses: 0, saving: 0, balance: 0 },
+  ],
+  totals: { income: 2000, expenses: 100, saving: 0, balance: 1900 },
+  incomeByCategory: [{ categoryName: 'Salario', amount: 2000 }],
+  expensesByCategory: [{ categoryName: 'Ocio', amount: 100 }],
   ...over,
 });
 

@@ -6,7 +6,11 @@ import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
 import { ProjectedMonth } from '@domain/services/forecast';
 import { SubscriptionReport } from '@domain/services/subscriptions';
-import { ForecastResult, NetWorthPoint } from '@application/insights/InsightsServices';
+import {
+  AnnualReport,
+  ForecastResult,
+  NetWorthPoint,
+} from '@application/insights/InsightsServices';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
 import { AnnualOverview, MonthOverview } from '@application/transactions/TransactionService';
@@ -289,5 +293,32 @@ export function presentSubscriptions(r: SubscriptionReport) {
         ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
         : null,
     })),
+  };
+}
+
+export function presentAnnualReport(r: AnnualReport) {
+  const totals = (t: AnnualReport['totals']) => ({
+    income: m(t.incomeCents),
+    expenses: m(t.expenseCents),
+    saving: m(t.savingCents),
+    balance: m(t.balanceCents),
+  });
+  const category = (c: { categoryName: string; cents: Cents }) => ({
+    categoryName: c.categoryName,
+    amount: m(c.cents),
+  });
+  return {
+    year: r.year,
+    currency: r.currency,
+    months: r.months.map((x) => ({
+      month: x.month,
+      income: m(x.incomeCents),
+      expenses: m(x.expenseCents),
+      saving: m(x.savingCents),
+    })),
+    quarters: r.quarters.map((q) => ({ quarter: q.quarter, ...totals(q) })),
+    totals: totals(r.totals),
+    incomeByCategory: r.incomeByCategory.map(category),
+    expensesByCategory: r.expensesByCategory.map(category),
   };
 }

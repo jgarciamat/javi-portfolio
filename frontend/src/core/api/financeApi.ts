@@ -3,6 +3,7 @@ import type {
   AccountInput,
   AIAdvice,
   AIAnswer,
+  AnnualReport,
   Forecast,
   SubscriptionReport,
   AnnualSummary,
@@ -197,6 +198,9 @@ export const insightsApi = {
   },
   netWorth(months = 12) {
     return apiRequest<NetWorthPoint[]>(`/stats/net-worth${query({ months })}`);
+  },
+  report(year: number) {
+    return apiRequest<AnnualReport>(`/stats/report/${year}`);
   },
   ask(question: string, locale: string) {
     return apiRequest<AIAnswer>('/ai/ask', {

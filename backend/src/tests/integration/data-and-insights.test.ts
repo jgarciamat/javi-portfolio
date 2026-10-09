@@ -281,6 +281,55 @@ describe('Forecast', () => {
   });
 });
 
+describe('Annual report', () => {
+  let ctx: TestContext;
+  let user: TestUser;
+
+  beforeEach(async () => {
+    ctx = createTestApp({ now: '2026-04-20T12:00:00Z' });
+    user = await createUser(ctx);
+    const add = (body: Record<string, unknown>) => addTransaction(ctx, user, body);
+    await add({ type: 'INCOME', category: 'Salario', amount: 2000, date: '2026-01-05' });
+    await add({ type: 'INCOME', category: 'Freelance', amount: 500, date: '2026-04-02' });
+    await add({ category: 'Ocio', amount: 100, date: '2026-01-20' });
+    await add({ category: 'Ocio', amount: 50, date: '2026-05-10' });
+    await add({ category: 'Vivienda', amount: 700, date: '2026-02-01' });
+    await add({ type: 'SAVING', category: 'Ahorro', amount: 300, date: '2026-03-01' });
+    await add({ category: 'Ocio', amount: 999, date: '2025-12-31' }); // another year
+  });
+
+  it('adds the year up by month, quarter and category', async () => {
+    const res = await request(ctx.app).get('/api/stats/report/2026').set(user.auth).expect(200);
+    const { body } = res;
+    expect(body).toMatchObject({ year: 2026, currency: 'EUR' });
+    expect(body.months).toHaveLength(12);
+    expect(body.months[0]).toEqual({ month: 1, income: 2000, expenses: 100, saving: 0 });
+    expect(body.months[2]).toEqual({ month: 3, income: 0, expenses: 0, saving: 300 });
+    expect(body.quarters).toEqual([
+      { quarter: 1, income: 2000, expenses: 800, saving: 300, balance: 900 },
+      { quarter: 2, income: 500, expenses: 50, saving: 0, balance: 450 },
+      { quarter: 3, income: 0, expenses: 0, saving: 0, balance: 0 },
+      { quarter: 4, income: 0, expenses: 0, saving: 0, balance: 0 },
+    ]);
+    expect(body.totals).toEqual({ income: 2500, expenses: 850, saving: 300, balance: 1350 });
+    expect(body.expensesByCategory).toEqual([
+      { categoryName: 'Vivienda', amount: 700 },
+      { categoryName: 'Ocio', amount: 150 },
+    ]);
+    expect(body.incomeByCategory).toEqual([
+      { categoryName: 'Salario', amount: 2000 },
+      { categoryName: 'Freelance', amount: 500 },
+    ]);
+  });
+
+  it('keeps the report for Premium and validates the year', async () => {
+    await request(ctx.app).get('/api/stats/report/abc').set(user.auth).expect(400);
+    await request(ctx.app).get('/api/stats/report/2026').expect(401);
+    expireTrial(ctx, user);
+    await request(ctx.app).get('/api/stats/report/2026').set(user.auth).expect(402);
+  });
+});
+
 describe('Subscriptions', () => {
   let ctx: TestContext;
   let user: TestUser;

@@ -3,6 +3,7 @@ import { SettingsChanges } from '@domain/model/UserSettings';
 import { Container } from '../../container';
 import { RateLimiterFactory, authed } from '../middleware';
 import {
+  presentAnnualReport,
   presentForecast,
   presentNetWorth,
   presentSubscriptions,
@@ -18,6 +19,7 @@ import {
   passwordBody,
   periodParams,
   settingsBody,
+  yearParams,
 } from '../schemas';
 
 /** Profile, settings, data export and insights (stats + AI advice). */
@@ -111,6 +113,13 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     })
   );
 
+  router.get(
+    '/stats/report/:year',
+    authed((req, res) => {
+      const { year } = yearParams.parse(req.params);
+      res.json(presentAnnualReport(c.stats.annualReport(req.userId, year)));
+    })
+  );
   router.get(
     '/stats/subscriptions',
     authed((req, res) => res.json(presentSubscriptions(c.stats.subscriptions(req.userId))))

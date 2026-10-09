@@ -1,0 +1,97 @@
+/* ─── Annual report ──────────────────────────────────────────────────────── */
+
+.report-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.8);
+  overflow-y: auto;
+}
+
+.report-sheet {
+  width: min(900px, 100%);
+  padding: 1.2rem 1.4rem;
+  border-radius: 14px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.report-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.report-head h2 {
+  margin: 0;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.report-actions .btn-secondary {
+  width: auto;
+}
+
+.report-section {
+  margin-top: 1.4rem;
+}
+
+.report-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.report-note {
+  margin-top: 1.4rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* Printing / saving as PDF: only the report, on white, without buttons. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .report-sheet,
+  .report-sheet * {
+    visibility: visible;
+  }
+
+  .report-overlay {
+    position: static;
+    padding: 0;
+    background: none;
+    overflow: visible;
+  }
+
+  .report-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: none;
+    background: #fff;
+    color: #000;
+  }
+
+  .report-actions {
+    display: none;
+  }
+
+  .report-sheet .data-table th,
+  .report-sheet .data-table td {
+    color: #000;
+    border-color: #999;
+  }
+}
