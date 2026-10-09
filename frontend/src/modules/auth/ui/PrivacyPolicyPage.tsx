@@ -106,6 +106,7 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s8.title')}</h2>
           <p>{t('app.privacy.s8.p1')}</p>
+          <p>{t('app.privacy.s8.p2')}</p>
         </section>
 
         {/* Section 9 */}

@@ -15,7 +15,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "db:migrate": "ts-node --transpile-only -r tsconfig-paths/register src/infrastructure/sqlite/cli.ts migrate",
     "prepare": "husky install",
-    "db:backup": "ts-node --transpile-only -r tsconfig-paths/register src/infrastructure/sqlite/cli.ts backup"
+    "db:backup": "ts-node --transpile-only -r tsconfig-paths/register src/infrastructure/sqlite/cli.ts backup",
+    "stats": "ts-node --transpile-only -r tsconfig-paths/register src/infrastructure/sqlite/cli.ts stats"
   },
   "keywords": [
     "personal-finance",

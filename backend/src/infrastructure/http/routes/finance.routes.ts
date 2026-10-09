@@ -99,6 +99,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
         body.rows.map((r) => ({ ...r, amountCents: r.amount })),
         { accountId: body.accountId, dryRun: body.dryRun }
       );
+      if (!body.dryRun) c.repos.metrics.record('import_done');
       res.status(body.dryRun ? 200 : 201).json({
         ...result,
         rows: result.rows.map((r) => ({

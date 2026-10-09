@@ -57,6 +57,7 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
   SqliteRefreshTokenRepository,
@@ -113,6 +114,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     billingEvents: new SqliteBillingEventRepository(db),
     aiUsage: new SqliteAiUsageRepository(db),
     affiliateClicks: new SqliteAffiliateClickRepository(db),
+    metrics: new SqliteMetricsRepository(db, clock),
   };
 
   const tokens = new JwtTokenService(
@@ -283,6 +285,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         founderLimit: config.billing.founderLimit,
         // Without Stripe config the gateway is either disabled or a test double.
         lifetimeConfigured: config.billing.stripe ? !!config.billing.stripe.prices.lifetime : true,
+        metrics: repos.metrics,
       }
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),

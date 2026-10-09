@@ -151,3 +151,17 @@ export interface AffiliateOffer {
 export interface OfferCatalog {
   list(): AffiliateOffer[];
 }
+
+/** Anonymous, aggregated product counters (no user, no content): what happens, not who. */
+export type MetricName =
+  | 'signup'
+  | 'email_verified'
+  | 'checkout_started'
+  | 'purchase'
+  | 'ai_analysis'
+  | 'import_done'
+  | 'referral_joined';
+
+export interface MetricsRecorder {
+  record(name: MetricName): void;
+}

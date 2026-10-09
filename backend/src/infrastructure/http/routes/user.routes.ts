@@ -119,7 +119,9 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     }),
     authed(async (req, res) => {
       const { year, month, locale } = adviceBody.parse(req.body);
-      res.json(await c.advice.getAdvice(req.userId, { year, month }, locale));
+      const advice = await c.advice.getAdvice(req.userId, { year, month }, locale);
+      if (advice.source === 'ai') c.repos.metrics.record('ai_analysis');
+      res.json(advice);
     })
   );
 

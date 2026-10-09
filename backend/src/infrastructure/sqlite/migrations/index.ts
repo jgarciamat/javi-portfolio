@@ -6,6 +6,7 @@ import { recurringSkips } from './004-recurring-skips';
 import { monetization } from './005-monetization';
 import { withdrawalAndTour } from './006-withdrawal-and-tour';
 import { immediateStart } from './007-immediate-start';
+import { metrics } from './008-metrics';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
 export const migrations: Migration[] = [
@@ -16,4 +17,5 @@ export const migrations: Migration[] = [
   monetization,
   withdrawalAndTour,
   immediateStart,
+  metrics,
 ];

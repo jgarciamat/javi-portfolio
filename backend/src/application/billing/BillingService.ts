@@ -19,6 +19,7 @@ import {
   Clock,
   EmailLocale,
   EmailSender,
+  MetricsRecorder,
   PaymentGateway,
 } from '@domain/ports/services';
 import { LimitedResource, PLAN_LIMITS, serializableLimits } from '@domain/services/plans';
@@ -51,6 +52,7 @@ export interface BillingOptions {
   displayPrices: { monthly: number; yearly: number; lifetime: number };
   founderLimit: number;
   lifetimeConfigured: boolean;
+  metrics: MetricsRecorder;
 }
 
 export interface PlanCatalog {
@@ -238,6 +240,7 @@ export class BillingService {
 
   /** Durable confirmation of the purchase and of the immediate start (no withdrawal). */
   private confirmPurchase(userId: string): void {
+    this.options.metrics.record('purchase');
     const user = this.users.findById(userId)!;
     this.email
       .sendPurchaseConfirmation(user.email, user.name, this.localeOf(userId))
