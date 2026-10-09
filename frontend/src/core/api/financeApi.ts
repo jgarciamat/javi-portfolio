@@ -3,6 +3,7 @@ import type {
   AccountInput,
   AIAdvice,
   Forecast,
+  SubscriptionReport,
   AnnualSummary,
   Category,
   CategoryBudget,
@@ -195,6 +196,9 @@ export const insightsApi = {
   },
   netWorth(months = 12) {
     return apiRequest<NetWorthPoint[]>(`/stats/net-worth${query({ months })}`);
+  },
+  subscriptions() {
+    return apiRequest<SubscriptionReport>('/stats/subscriptions');
   },
   forecast(months = 6, exclude: string[] = []) {
     return apiRequest<Forecast>(

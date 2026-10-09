@@ -281,6 +281,62 @@ describe('Forecast', () => {
   });
 });
 
+describe('Subscriptions', () => {
+  let ctx: TestContext;
+  let user: TestUser;
+
+  beforeEach(async () => {
+    ctx = createTestApp({ now: '2026-04-20T12:00:00Z' });
+    user = await createUser(ctx);
+    for (const [date, amount] of [
+      ['2026-01-05', 12.99],
+      ['2026-02-05', 12.99],
+      ['2026-03-05', 12.99],
+      ['2026-04-05', 13.99],
+    ] as const) {
+      await addTransaction(ctx, user, { description: 'Netflix', amount, date });
+    }
+    await addTransaction(ctx, user, { description: 'Cena', amount: 40, date: '2026-04-01' });
+  });
+
+  it('lists charges that repeat like a subscription with their yearly cost', async () => {
+    const res = await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200);
+    expect(res.body).toMatchObject({ monthly: 13.99, annual: 167.88 });
+    expect(res.body.subscriptions).toEqual([
+      {
+        key: 'netflix',
+        description: 'Netflix',
+        cadence: 'monthly',
+        amount: 13.99,
+        annualCost: 167.88,
+        count: 4,
+        lastDate: '2026-04-05',
+        nextDate: '2026-05-05',
+        priceIncrease: { from: 12.99, to: 13.99 },
+      },
+    ]);
+  });
+
+  it('leaves out what is already a recurring rule and keeps the view for Premium', async () => {
+    await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Netflix',
+        type: 'EXPENSE',
+        category: 'Ocio',
+        amount: 13.99,
+        startYear: 2026,
+        startMonth: 5,
+      })
+      .expect(201);
+    const res = await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200);
+    expect(res.body.subscriptions).toEqual([]);
+    expireTrial(ctx, user);
+    await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(402);
+  });
+});
+
 describe('AI advice', () => {
   it('uses the AI provider and falls back to rules when it fails', async () => {
     const advisor: FinancialAdvisor = {

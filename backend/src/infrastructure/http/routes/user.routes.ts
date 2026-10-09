@@ -2,7 +2,12 @@ import { Router } from 'express';
 import { SettingsChanges } from '@domain/model/UserSettings';
 import { Container } from '../../container';
 import { RateLimiterFactory, authed } from '../middleware';
-import { presentForecast, presentNetWorth, presentTrend } from '../presenters';
+import {
+  presentForecast,
+  presentNetWorth,
+  presentSubscriptions,
+  presentTrend,
+} from '../presenters';
 import {
   adviceBody,
   avatarBody,
@@ -98,6 +103,11 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       const { months, exclude } = forecastQuery.parse(req.query);
       res.json(presentForecast(c.stats.forecast(req.userId, { months, exclude })));
     })
+  );
+
+  router.get(
+    '/stats/subscriptions',
+    authed((req, res) => res.json(presentSubscriptions(c.stats.subscriptions(req.userId))))
   );
 
   router.post(

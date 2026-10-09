@@ -5,6 +5,7 @@ import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
 import { ProjectedMonth } from '@domain/services/forecast';
+import { SubscriptionReport } from '@domain/services/subscriptions';
 import { ForecastResult, NetWorthPoint } from '@application/insights/InsightsServices';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
@@ -267,6 +268,26 @@ export function presentForecast(f: ForecastResult) {
       type: r.type,
       amount: m(r.amountCents),
       frequency: r.frequency,
+    })),
+  };
+}
+
+export function presentSubscriptions(r: SubscriptionReport) {
+  return {
+    monthly: m(r.monthlyCents),
+    annual: m(r.annualCents),
+    subscriptions: r.subscriptions.map((s) => ({
+      key: s.key,
+      description: s.description,
+      cadence: s.cadence,
+      amount: m(s.amountCents),
+      annualCost: m(s.annualCostCents),
+      count: s.count,
+      lastDate: s.lastDate,
+      nextDate: s.nextDate,
+      priceIncrease: s.priceIncrease
+        ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
+        : null,
     })),
   };
 }

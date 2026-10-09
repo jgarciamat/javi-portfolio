@@ -2,6 +2,7 @@ import type {
   Account,
   AIAdvice,
   Forecast,
+  SubscriptionReport,
   BudgetLine,
   Category,
   CategoryBudget,
@@ -241,6 +242,36 @@ export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
   rules: [
     { id: 'r-rent', description: 'Alquiler', type: 'EXPENSE', amount: 700, frequency: 'monthly' },
     { id: 'r-pay', description: 'Nómina', type: 'INCOME', amount: 2000, frequency: 'monthly' },
+  ],
+  ...over,
+});
+
+export const subscriptions = (over: Partial<SubscriptionReport> = {}): SubscriptionReport => ({
+  monthly: 18.99,
+  annual: 227.88,
+  subscriptions: [
+    {
+      key: 'netflix',
+      description: 'Netflix',
+      cadence: 'monthly',
+      amount: 13.99,
+      annualCost: 167.88,
+      count: 4,
+      lastDate: '2026-03-05',
+      nextDate: '2026-04-04',
+      priceIncrease: { from: 12.99, to: 13.99 },
+    },
+    {
+      key: 'seguro coche',
+      description: 'Seguro coche',
+      cadence: 'yearly',
+      amount: 60,
+      annualCost: 60,
+      count: 2,
+      lastDate: '2026-03-02',
+      nextDate: '2027-03-02',
+      priceIncrease: null,
+    },
   ],
   ...over,
 });

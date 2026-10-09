@@ -9,6 +9,11 @@ import {
   TransactionRepository,
 } from '@domain/ports/repositories';
 import {
+  SubscriptionReport,
+  detectSubscriptions,
+  subscriptionKey,
+} from '@domain/services/subscriptions';
+import {
   ProjectedMonth,
   SafeToSpend,
   averageVariable,
@@ -140,6 +145,25 @@ export class StatsService {
       'EXPENSE'
     );
     return { ...period, categories: computeCategoryTrends(period, totals) };
+  }
+
+  /** Charges that repeat like a subscription, so the user can review what they pay for. */
+  subscriptions(userId: string): SubscriptionReport {
+    this.entitlements.assertFeature(userId, 'insights');
+    const movements = this.transactions.listAllByUser(userId).map((tx) => {
+      const { description, amountCents, date, type, recurringRuleId } = tx.toPrimitives();
+      return { description, amountCents, date, type, recurringRuleId };
+    });
+    const coveredKeys = new Set(
+      this.rules
+        .listByUser(userId)
+        .filter((r) => r.active)
+        .map((r) => subscriptionKey(r.description))
+    );
+    return detectSubscriptions(movements, {
+      today: todayDateOnly(this.clock.now()),
+      coveredKeys,
+    });
   }
 
   netWorth(userId: string, months: number): NetWorthPoint[] {

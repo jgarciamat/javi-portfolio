@@ -70,6 +70,7 @@ export function createFakeApi(): FakeApi {
       trends: ok({ year: 2026, month: 3, categories: [] }),
       netWorth: ok([]),
       forecast: ok(f.forecast()),
+      subscriptions: ok(f.subscriptions()),
       advice: ok(f.advice()),
     },
     dataApi: { exportAll: ok({ transactions: [] }) },

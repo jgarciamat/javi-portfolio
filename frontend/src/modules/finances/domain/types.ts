@@ -428,6 +428,25 @@ export interface Forecast {
   rules: ForecastRule[];
 }
 
+export interface DetectedSubscription {
+  key: string;
+  description: string;
+  cadence: 'monthly' | 'yearly';
+  /** Latest charge. */
+  amount: number;
+  annualCost: number;
+  count: number;
+  lastDate: string;
+  nextDate: string;
+  priceIncrease: { from: number; to: number } | null;
+}
+
+export interface SubscriptionReport {
+  monthly: number;
+  annual: number;
+  subscriptions: DetectedSubscription[];
+}
+
 export interface AIAdvice {
   summary: string;
   tips: string[];

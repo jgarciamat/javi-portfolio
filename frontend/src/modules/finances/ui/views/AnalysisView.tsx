@@ -3,7 +3,11 @@ import { useResource } from '@shared/hooks/useResource';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
-import type { CategoryTrend, NetWorthPoint } from '@modules/finances/domain/types';
+import type {
+  CategoryTrend,
+  DetectedSubscription,
+  NetWorthPoint,
+} from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
@@ -220,9 +224,82 @@ function NetWorthCard() {
   );
 }
 
+function SubscriptionRow({ item }: { item: DetectedSubscription }) {
+  const { t } = useI18n();
+  const { money, date } = useFormat();
+  return (
+    <tr>
+      <td>
+        {item.description}
+        {item.priceIncrease && (
+          <span className="trend trend--up">
+            {' '}
+            ▲{' '}
+            {t('app.subscriptions.increase', {
+              from: money(item.priceIncrease.from),
+              to: money(item.priceIncrease.to),
+            })}
+          </span>
+        )}
+      </td>
+      <td>{t(`app.subscriptions.${item.cadence}`)}</td>
+      <td>{money(item.amount)}</td>
+      <td>{money(item.annualCost)}</td>
+      <td>{date(item.nextDate)}</td>
+    </tr>
+  );
+}
+
+/** Charges that repeat like a subscription, to review what is being paid for. */
+function SubscriptionsCard() {
+  const { insightsApi } = useApi();
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const { data, error } = useResource(() => insightsApi.subscriptions(), [insightsApi]);
+  const columns = ['name', 'cadence', 'amount', 'perYear', 'next'];
+
+  return (
+    <div className="card">
+      <h2 className="section-title">🔁 {t('app.subscriptions.title')}</h2>
+      <p className="section-hint">{t('app.subscriptions.hint')}</p>
+      {error && <p className="form-error">{error}</p>}
+      {data?.subscriptions.length === 0 && (
+        <p className="empty-state">{t('app.subscriptions.none')}</p>
+      )}
+      {data && data.subscriptions.length > 0 && (
+        <>
+          <p className="section-total-line">
+            {t('app.subscriptions.total', {
+              monthly: money(data.monthly),
+              annual: money(data.annual),
+            })}
+          </p>
+          <div className="table-scroll">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  {columns.map((c) => (
+                    <th key={c}>{t(`app.subscriptions.col.${c}`)}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.subscriptions.map((item) => (
+                  <SubscriptionRow key={item.key} item={item} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function AnalysisContent() {
   return (
     <div className="section-view">
+      <SubscriptionsCard />
       <TrendsCard />
       <NetWorthCard />
     </div>
