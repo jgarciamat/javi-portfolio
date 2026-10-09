@@ -686,6 +686,50 @@ describe('JwtTokenService', () => {
   });
 });
 
+describe('GoogleOAuthIdentityVerifier tokeninfo details', () => {
+  const verifierWith = (info: Record<string, unknown>) => {
+    const verifier = new GoogleOAuthIdentityVerifier('my-client');
+    (verifier as unknown as { client: { getTokenInfo: jest.Mock } }).client.getTokenInfo = jest
+      .fn()
+      .mockResolvedValue({ aud: 'my-client', sub: '42', email: 'a@gmail.com', ...info });
+    jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}', { status: 200 }));
+    return verifier;
+  };
+  afterEach(() => jest.restoreAllMocks());
+
+  it('reads the verified flag Google sends as the text "true"', async () => {
+    await expect(verifierWith({ email_verified: 'true' }).verify('ya29.t')).resolves.toMatchObject({
+      emailVerified: true,
+    });
+    await expect(verifierWith({ email_verified: 'false' }).verify('ya29.t')).resolves.toMatchObject(
+      {
+        emailVerified: false,
+      }
+    );
+  });
+
+  it('logs why a token was rejected, without the token', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const verifier = new GoogleOAuthIdentityVerifier('my-client');
+    (verifier as unknown as { client: { getTokenInfo: jest.Mock } }).client.getTokenInfo = jest
+      .fn()
+      .mockRejectedValue(new Error('Request failed with status code 400'));
+    await expect(verifier.verify('ya29.secret-token')).rejects.toMatchObject({
+      code: 'GOOGLE_AUTH_FAILED',
+    });
+    expect(warn).toHaveBeenCalledWith(
+      '[google] token rejected: Request failed with status code 400'
+    );
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('secret-token');
+    const other = new GoogleOAuthIdentityVerifier('my-client');
+    (other as unknown as { client: { getTokenInfo: jest.Mock } }).client.getTokenInfo = jest
+      .fn()
+      .mockRejectedValue('boom');
+    await expect(other.verify('ya29.t')).rejects.toMatchObject({ code: 'GOOGLE_AUTH_FAILED' });
+    expect(warn).toHaveBeenLastCalledWith('[google] token rejected: boom');
+  });
+});
+
 describe('GoogleOAuthIdentityVerifier', () => {
   it('is disabled without a client id', async () => {
     await expect(new GoogleOAuthIdentityVerifier(null).verify('x')).rejects.toMatchObject({
