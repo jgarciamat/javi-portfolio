@@ -14,7 +14,7 @@ const RESOURCES: LimitedResource[] = [
   'recurringRules',
   'customAlerts',
 ];
-const FEATURES: PremiumFeature[] = ['import', 'insights', 'aiAdvisor'];
+const FEATURES: PremiumFeature[] = ['import', 'insights', 'forecast', 'aiAdvisor'];
 
 /** Public page with the plans and what each one includes. */
 export function PricingPage() {

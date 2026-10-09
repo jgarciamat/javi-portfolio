@@ -45,6 +45,8 @@ describe('App routes', () => {
     ['/privacy', 'app.privacy.title'],
     ['/verify-email', 'app.auth.verify.error'],
     ['/reset-password', 'app.auth.reset.title'],
+    ['/calculadora-50-30-20', 'tools.rule.title'],
+    ['/simulador-ahorro', 'tools.savings.title'],
   ])('serves the public page %s', async (path, key) => {
     visit(path);
     expect(await screen.findByRole('heading', { name: tr(key) })).toBeInTheDocument();

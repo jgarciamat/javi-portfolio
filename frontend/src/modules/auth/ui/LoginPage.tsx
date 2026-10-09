@@ -96,6 +96,10 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
           <>
             <Link to="/pricing">{t('pricing.link')}</Link>
             {' · '}
+            <Link to="/calculadora-50-30-20">{t('tools.rule.nav')}</Link>
+            {' · '}
+            <Link to="/simulador-ahorro">{t('tools.savings.nav')}</Link>
+            {' · '}
           </>
         )}
         <Link to="/privacy">{t('app.privacy.link')}</Link>

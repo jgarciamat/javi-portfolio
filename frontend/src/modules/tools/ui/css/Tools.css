@@ -1,0 +1,82 @@
+/* ─── Public calculators ─────────────────────────────────────────────────── */
+
+.tools-main {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.tools-form {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.tools-field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.tools-input {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tools-input .tx-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.tools-results {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.tools-result {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #0f172a;
+}
+
+.tools-result h2 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: #94a3b8;
+}
+
+.tools-amount {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.tools-result--needs {
+  border-color: #6366f1;
+}
+
+.tools-result--wants {
+  border-color: #f59e0b;
+}
+
+.tools-result--saving {
+  border-color: #22c55e;
+}
+
+.tools-cta {
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 1px solid #4338ca;
+  background: #1e1b4b;
+  text-align: center;
+}
+
+.tools-cta .btn-primary {
+  display: inline-block;
+  width: auto;
+  padding: 0.6rem 1.4rem;
+  text-decoration: none;
+}
