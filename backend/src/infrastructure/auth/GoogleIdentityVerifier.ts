@@ -11,6 +11,9 @@ import { GoogleIdentity, GoogleIdentityVerifier } from '@domain/ports/services';
  *  - Access tokens (what the custom button's implicit flow returns) are checked
  *    with Google's tokeninfo endpoint and their `aud` must equal our client id.
  */
+/** Google's tokeninfo endpoint answers the flag as the text "true"; ID tokens carry a boolean. */
+const isTrue = (value: unknown): boolean => value === true || value === 'true';
+
 export class GoogleOAuthIdentityVerifier implements GoogleIdentityVerifier {
   private readonly client: OAuth2Client;
 
@@ -31,6 +34,8 @@ export class GoogleOAuthIdentityVerifier implements GoogleIdentityVerifier {
         : await this.verifyAccessToken(token);
     } catch (e) {
       if (e instanceof UnauthorizedError) throw e;
+      // The reason (never the token) helps to tell a misconfiguration from a bad token.
+      console.warn(`[google] token rejected: ${e instanceof Error ? e.message : String(e)}`);
       throw new UnauthorizedError('Token de Google inválido', 'GOOGLE_AUTH_FAILED');
     }
   }
@@ -42,7 +47,7 @@ export class GoogleOAuthIdentityVerifier implements GoogleIdentityVerifier {
     return {
       googleId: payload.sub,
       email: payload.email,
-      emailVerified: payload.email_verified === true,
+      emailVerified: isTrue(payload.email_verified),
       name: payload.name ?? null,
     };
   }
@@ -60,7 +65,7 @@ export class GoogleOAuthIdentityVerifier implements GoogleIdentityVerifier {
     return {
       googleId: info.sub,
       email: info.email,
-      emailVerified: info.email_verified === true,
+      emailVerified: isTrue(info.email_verified),
       name,
     };
   }
