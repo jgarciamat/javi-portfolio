@@ -2,6 +2,7 @@ import type {
   Account,
   AccountInput,
   AIAdvice,
+  AIAnswer,
   Forecast,
   SubscriptionReport,
   AnnualSummary,
@@ -196,6 +197,12 @@ export const insightsApi = {
   },
   netWorth(months = 12) {
     return apiRequest<NetWorthPoint[]>(`/stats/net-worth${query({ months })}`);
+  },
+  ask(question: string, locale: string) {
+    return apiRequest<AIAnswer>('/ai/ask', {
+      method: 'POST',
+      body: jsonBody({ question, locale }),
+    });
   },
   subscriptions() {
     return apiRequest<SubscriptionReport>('/stats/subscriptions');

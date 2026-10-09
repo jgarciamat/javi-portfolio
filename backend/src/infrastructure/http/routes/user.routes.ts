@@ -10,6 +10,7 @@ import {
 } from '../presenters';
 import {
   adviceBody,
+  askBody,
   avatarBody,
   forecastQuery,
   nameBody,
@@ -127,6 +128,21 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       const advice = await c.advice.getAdvice(req.userId, { year, month }, locale);
       if (advice.source === 'ai') c.repos.metrics.record('ai_analysis');
       res.json(advice);
+    })
+  );
+
+  router.post(
+    '/ai/ask',
+    limiter({
+      windowMs: 60 * 60 * 1000,
+      limit: 20,
+      keyGenerator: (req) => (req as { userId?: string }).userId ?? req.ip ?? '',
+    }),
+    authed(async (req, res) => {
+      const { question, locale } = askBody.parse(req.body);
+      const result = await c.advice.ask(req.userId, question, locale);
+      c.repos.metrics.record('ai_question');
+      res.json(result);
     })
   );
 

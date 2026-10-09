@@ -312,3 +312,39 @@
     font-size: 0.82rem;
   }
 }
+
+/* ─── Ask the assistant ──────────────────────────────────────────────────── */
+
+.ai-ask {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #1e293b;
+}
+
+.ai-ask-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ai-ask-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ai-ask-row .tx-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-ask-answer {
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+.ai-ask-answer p {
+  margin: 0.2rem 0;
+}

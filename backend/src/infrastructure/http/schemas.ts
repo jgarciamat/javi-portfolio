@@ -244,6 +244,10 @@ export const goalPatchBody = goalBody.partial().extend({ archived: z.boolean().o
 // ─── Insights ────────────────────────────────────────────────────────────────
 
 export const adviceBody = z.object({ year, month, locale });
+export const askBody = z.object({
+  question: z.string().trim().min(3).max(300),
+  locale,
+});
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

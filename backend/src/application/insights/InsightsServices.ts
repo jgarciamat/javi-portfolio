@@ -1,5 +1,7 @@
 import { createHash } from 'crypto';
+import { BusinessRuleError, PaymentRequiredError } from '@domain/errors';
 import { RecurringRule } from '@domain/model/RecurringRule';
+import { buildQuestionFacts } from '@domain/services/question-facts';
 import {
   AccountRepository,
   AiUsageRepository,
@@ -292,6 +294,71 @@ export class AdviceService {
     } catch (e) {
       this.logger.error(`[advice] ${this.advisor.name} failed, using rules`, e);
       return rules('error');
+    }
+  }
+
+  /** Months of history the assistant can answer from. */
+  private static readonly QUESTION_MONTHS = 12;
+
+  /**
+   * Free-form question about the user's own figures. Premium, counted as one analysis of
+   * the monthly quota, and answered only from aggregated figures (never descriptions).
+   */
+  async ask(
+    userId: string,
+    rawQuestion: string,
+    locale: 'es' | 'en'
+  ): Promise<{ answer: string; ai: AiQuota }> {
+    const answer = this.advisor?.answerQuestion?.bind(this.advisor);
+    if (!this.advisor || !answer) {
+      throw new BusinessRuleError('AI_UNAVAILABLE', 'El asistente no está disponible ahora mismo');
+    }
+    const denial = this.allowance.check(userId, 'analysis');
+    if (denial === 'premium_required') {
+      throw new PaymentRequiredError('PREMIUM_REQUIRED', 'Esta función es parte de Premium', {
+        feature: 'aiAdvisor',
+      });
+    }
+    if (denial) {
+      throw new BusinessRuleError(
+        denial === 'quota' ? 'AI_QUOTA' : 'AI_BUDGET',
+        denial === 'quota'
+          ? 'Has usado todos tus análisis con IA de este mes'
+          : 'El asistente ha llegado a su límite de hoy; vuelve a intentarlo mañana'
+      );
+    }
+
+    const startDay = this.settings.get(userId).monthStartDay;
+    const now = this.clock.now();
+    const to = currentPeriod(startDay, now);
+    const from = addMonths(to, -(AdviceService.QUESTION_MONTHS - 1));
+    const month = this.transactionService.getMonth(userId, to);
+    const totals = new Map(
+      this.transactions.totalsByPeriod(userId, from, to).map((t) => [`${t.year}-${t.month}`, t])
+    );
+    const facts = buildQuestionFacts({
+      currency: this.settings.get(userId).currency,
+      today: todayDateOnly(now),
+      availableCents: month.availableCents,
+      months: periodsBetween(from, to).map((p) => {
+        const t = totals.get(`${p.year}-${p.month}`);
+        return {
+          ...p,
+          incomeCents: t?.incomeCents ?? 0,
+          expenseCents: t?.expenseCents ?? 0,
+          savingCents: t?.savingCents ?? 0,
+        };
+      }),
+      categoryTotals: this.transactions.categoryTotals(userId, from, to, 'EXPENSE'),
+    });
+
+    try {
+      const result = await answer({ question: rawQuestion.trim(), locale, facts });
+      this.allowance.record(userId, 'analysis', result.usage);
+      return { answer: result.answer, ai: this.allowance.quota(userId) };
+    } catch (e) {
+      this.logger.error(`[ask] ${this.advisor.name} failed`, e);
+      throw new BusinessRuleError('AI_ERROR', 'No he podido responder ahora; inténtalo de nuevo');
     }
   }
 }

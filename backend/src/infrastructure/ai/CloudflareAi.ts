@@ -1,13 +1,17 @@
 import { AiUsage, CategorySuggester, FinancialAdvisor } from '@domain/ports/services';
+import { QuestionFacts } from '@domain/services/question-facts';
 import { Advice, AdviceContext } from '@domain/services/rule-based-advisor';
 import {
   ADVICE_JSON_SCHEMA,
   ADVICE_SYSTEM_PROMPT,
   CATEGORIZATION_SYSTEM_PROMPT,
+  QUESTION_SYSTEM_PROMPT,
   buildCategorizationPrompt,
+  buildQuestionPrompt,
   buildPrompt,
   categorizationJsonSchema,
   parseAdvice,
+  parseAnswer,
   parseCategorization,
 } from './prompts';
 
@@ -63,6 +67,25 @@ export class CloudflareAi implements FinancialAdvisor, CategorySuggester {
     return { advice: parseAdvice(output), usage };
   }
 
+  async answerQuestion(request: {
+    question: string;
+    locale: 'es' | 'en';
+    facts: QuestionFacts;
+  }): Promise<{ answer: string; usage: AiUsage }> {
+    const { output, usage } = await this.run(
+      [
+        { role: 'system', content: QUESTION_SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: buildQuestionPrompt(request.question, request.locale, request.facts),
+        },
+      ],
+      400,
+      null
+    );
+    return { answer: parseAnswer(output), usage };
+  }
+
   async suggestCategories(
     descriptions: string[],
     categories: string[]
@@ -85,7 +108,8 @@ export class CloudflareAi implements FinancialAdvisor, CategorySuggester {
   private async run(
     messages: Message[],
     maxTokens: number,
-    schema: object
+    /** JSON schema for constrained output; null for a plain-text answer. */
+    schema: object | null
   ): Promise<{ output: string | object; usage: AiUsage }> {
     const { accountId, apiToken, model, jsonMode, timeoutMs = 20_000 } = this.options;
     const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(
@@ -99,7 +123,9 @@ export class CloudflareAi implements FinancialAdvisor, CategorySuggester {
         messages,
         max_tokens: maxTokens,
         temperature: 0.3,
-        ...(jsonMode ? { response_format: { type: 'json_schema', json_schema: schema } } : {}),
+        ...(jsonMode && schema
+          ? { response_format: { type: 'json_schema', json_schema: schema } }
+          : {}),
       }),
     });
     if (!response.ok) {

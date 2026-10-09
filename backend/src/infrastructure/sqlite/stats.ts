@@ -6,6 +6,7 @@ const LABELS: Record<string, string> = {
   checkout_started: 'Pagos iniciados',
   purchase: 'Compras confirmadas',
   ai_analysis: 'Análisis con IA',
+  ai_question: 'Preguntas al asistente IA',
   import_done: 'Importaciones',
   referral_joined: 'Registros por invitación',
 };

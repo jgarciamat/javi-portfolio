@@ -1,6 +1,7 @@
 import type {
   Account,
   AIAdvice,
+  AIAnswer,
   Forecast,
   SubscriptionReport,
   BudgetLine,
@@ -243,6 +244,12 @@ export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
     { id: 'r-rent', description: 'Alquiler', type: 'EXPENSE', amount: 700, frequency: 'monthly' },
     { id: 'r-pay', description: 'Nómina', type: 'INCOME', amount: 2000, frequency: 'monthly' },
   ],
+  ...over,
+});
+
+export const answer = (over: Partial<AIAnswer> = {}): AIAnswer => ({
+  answer: 'Gastaste 120 € en ocio.',
+  ai: { used: 2, quota: 30 },
   ...over,
 });
 

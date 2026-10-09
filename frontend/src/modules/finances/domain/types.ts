@@ -428,6 +428,12 @@ export interface Forecast {
   rules: ForecastRule[];
 }
 
+/** Answer to a free-form question about the user's figures. */
+export interface AIAnswer {
+  answer: string;
+  ai: { used: number; quota: number };
+}
+
 export interface DetectedSubscription {
   key: string;
   description: string;
