@@ -1,6 +1,7 @@
 import { PaymentRequiredError } from '@domain/errors';
 import {
   PlanId,
+  emptySubscription,
   SubscriptionProps,
   newTrial,
   planOf,
@@ -74,6 +75,24 @@ export class EntitlementService {
         { resource, limit }
       );
     }
+  }
+
+  /**
+   * Extra Premium days (invitations): added after the current trial end or from today.
+   * Lifetime users already have everything.
+   */
+  grantDays(userId: string, days: number): boolean {
+    const now = this.clock.now();
+    const sub = this.subscriptions.get(userId) ?? emptySubscription(userId, now);
+    if (sub.lifetime) return false;
+    const base = Math.max(now.getTime(), sub.trialEndsAt ? new Date(sub.trialEndsAt).getTime() : 0);
+    this.subscriptions.save({
+      ...sub,
+      status: sub.status === 'none' ? 'trialing' : sub.status,
+      trialEndsAt: new Date(base + days * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: now.toISOString(),
+    });
+    return true;
   }
 
   /** New users get the trial once; a user that already had any subscription keeps it. */

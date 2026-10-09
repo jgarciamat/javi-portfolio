@@ -19,6 +19,7 @@ import {
   Clock,
   EmailLocale,
   EmailSender,
+  MetricsRecorder,
   PaymentGateway,
 } from '@domain/ports/services';
 import { LimitedResource, PLAN_LIMITS, serializableLimits } from '@domain/services/plans';
@@ -26,7 +27,9 @@ import { AiAllowance, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from './EntitlementService';
 
 /** How many of each limited resource a user has (active ones). */
-export type ResourceCounter = (userId: string) => Record<LimitedResource, number>;
+/** What the user has created so far (`movements` is informational: it is not limited). */
+export type ResourceUsage = Record<LimitedResource, number> & { movements: number };
+export type ResourceCounter = (userId: string) => ResourceUsage;
 
 /** What the buyer agrees to before paying (both are required). */
 export interface CheckoutConsent {
@@ -49,6 +52,7 @@ export interface BillingOptions {
   displayPrices: { monthly: number; yearly: number; lifetime: number };
   founderLimit: number;
   lifetimeConfigured: boolean;
+  metrics: MetricsRecorder;
 }
 
 export interface PlanCatalog {
@@ -76,7 +80,7 @@ export interface BillingOverview {
     canManage: boolean;
   };
   limits: ReturnType<typeof serializableLimits>;
-  usage: Record<LimitedResource, number>;
+  usage: ResourceUsage;
   ai: AiQuota;
   catalog: PlanCatalog;
 }
@@ -236,6 +240,7 @@ export class BillingService {
 
   /** Durable confirmation of the purchase and of the immediate start (no withdrawal). */
   private confirmPurchase(userId: string): void {
+    this.options.metrics.record('purchase');
     const user = this.users.findById(userId)!;
     this.email
       .sendPurchaseConfirmation(user.email, user.name, this.localeOf(userId))

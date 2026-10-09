@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
+import { inviteLink } from '@core/referral';
+import { useResource } from '@shared/hooks/useResource';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { errorMessage } from '@shared/utils/errors';
 import { isNativeApp } from '@shared/utils/platform';
 import { usePlan } from '../application/PlanContext';
-import type { BillingOverview, LimitedResource } from '../domain/types';
+import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domain/types';
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
@@ -72,6 +75,17 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
+/** A household member uses the plan of the person who owns the shared data. */
+function HouseholdPlanCard({ name }: { name: string }) {
+  const { t } = useI18n();
+  return (
+    <div className="card plan-card">
+      <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
+      <p>{t('billing.householdPlan', { name })}</p>
+    </div>
+  );
+}
+
 /** Plan, status and the subscription portal (where it can be cancelled). */
 function PlanCard({ overview }: { overview: BillingOverview }) {
   const { t } = useI18n();
@@ -130,6 +144,54 @@ function UpgradeCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
+/** "Invite a friend": a link that gives both a free month of Premium. */
+function InviteCard() {
+  const { billingApi } = useApi();
+  const { t } = useI18n();
+  const { data } = useResource(() => billingApi.referral(), [billingApi]);
+  const [copied, setCopied] = useState(false);
+  if (!data) return null;
+  const link = inviteLink(data.code);
+  const share = typeof navigator.share === 'function' ? navigator.share.bind(navigator) : null;
+  const copy = async () => {
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+  };
+
+  return (
+    <div className="card invite-card">
+      <h2 className="section-title">🎁 {t('billing.invite.title')}</h2>
+      <p className="section-hint">{t('billing.invite.hint', { days: data.rewardDays })}</p>
+      <p className="invite-link">
+        <code>{link}</code>
+      </p>
+      <div className="button-row">
+        <button className="btn-secondary" onClick={copy}>
+          {copied ? t('billing.invite.copied') : t('billing.invite.copy')}
+        </button>
+        {share && (
+          <button
+            className="btn-secondary"
+            onClick={() =>
+              share({ title: 'Money Manager', text: t('billing.invite.shareText'), url: link })
+            }
+          >
+            {t('billing.invite.share')}
+          </button>
+        )}
+      </div>
+      <p className="plan-note">
+        {t('billing.invite.stats', {
+          qualified: data.qualified,
+          pending: data.pending,
+          earned: data.rewardsEarned,
+          missing: data.missing,
+        })}
+      </p>
+    </div>
+  );
+}
+
 /** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
 export function PlanView() {
   const { t } = useI18n();
@@ -139,12 +201,18 @@ export function PlanView() {
   if (!overview) return <div className="card form-error">{t('billing.loadError')}</div>;
 
   const paying = overview.plan === 'premium' && overview.subscription.source !== 'trial';
+  const member = overview.household.role === 'member';
 
   return (
     <div className="section-view">
-      <PlanCard overview={overview} />
+      {member ? (
+        <HouseholdPlanCard name={(overview.household.owner as HouseholdPerson).name} />
+      ) : (
+        <PlanCard overview={overview} />
+      )}
       <UsageCard overview={overview} />
-      {!paying && <UpgradeCard overview={overview} />}
+      {!member && <InviteCard />}
+      {!paying && !member && <UpgradeCard overview={overview} />}
     </div>
   );
 }

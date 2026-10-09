@@ -9,7 +9,7 @@ export const TRIAL_DAYS = 14;
 /** Days a failed renewal keeps Premium while the payment provider retries. */
 export const PAST_DUE_GRACE_DAYS = 3;
 /** Version (date) of the terms of sale the user accepts before paying. */
-export const TERMS_VERSION = '2026-10-08';
+export const TERMS_VERSION = '2026-10-09';
 
 export type PlanId = 'free' | 'premium';
 export type SubscriptionStatus = 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';

@@ -31,6 +31,14 @@ const PrivacyPolicyPage = lazyNamed(
 );
 const PricingPage = lazyNamed(() => import('./modules/billing/ui/PricingPage'), 'PricingPage');
 const TermsPage = lazyNamed(() => import('./modules/billing/ui/TermsPage'), 'TermsPage');
+const BudgetRulePage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'BudgetRulePage'
+);
+const SavingsSimulatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'SavingsSimulatorPage'
+);
 
 export default function App() {
   return (
@@ -48,6 +56,8 @@ export default function App() {
                     <Route path="/privacy" element={<PrivacyPolicyPage />} />
                     <Route path="/pricing" element={<PricingPage />} />
                     <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/calculadora-50-30-20" element={<BudgetRulePage />} />
+                    <Route path="/simulador-ahorro" element={<SavingsSimulatorPage />} />
                     <Route element={<ProtectedRoute />}>
                       <Route path="/" element={<DashboardPage />} />
                     </Route>

@@ -183,6 +183,8 @@ export interface TransactionRepository {
   listAllByUser(userId: string): Transaction[];
   exportAll(userId: string): TransactionView[];
   earliestPeriod(userId: string): Period | null;
+  /** How many movements the user has in total. */
+  count(userId: string): number;
 }
 
 export interface RecurringRuleRepository {
@@ -262,4 +264,57 @@ export interface AiUsageRepository {
 export interface AffiliateClickRepository {
   record(userId: string, offerId: string, at: Date): void;
   countByOffer(since: Date): Record<string, number>;
+}
+
+// ─── Referrals ───────────────────────────────────────────────────────────────
+
+export interface ReferralRecord {
+  referredId: string;
+  referrerId: string;
+  createdAt: string;
+  rewardedAt: string | null;
+}
+
+export interface ReferralRepository {
+  codeOf(userId: string): string | null;
+  /** Stores a new code; false when the code is already taken. */
+  saveCode(userId: string, code: string): boolean;
+  userByCode(code: string): string | null;
+  /** Records who invited a user (a user can only be invited once). */
+  addReferral(record: ReferralRecord): boolean;
+  findByReferred(referredId: string): ReferralRecord | null;
+  /** Marks the invited user as having completed the first steps. */
+  markRewarded(referredId: string, at: string): void;
+  /** Invited users who completed the first steps (`qualified`) and those who have not yet. */
+  counts(referrerId: string): { qualified: number; pending: number };
+  /** Invited users still waiting to complete the first steps. */
+  pendingReferred(referrerId: string): string[];
+  /** Months of Premium already granted to the inviter for their invitations. */
+  rewardsGranted(userId: string): number;
+  setRewardsGranted(userId: string, count: number): void;
+}
+
+// ─── Household ───────────────────────────────────────────────────────────────
+
+export interface HouseholdMemberRecord {
+  memberId: string;
+  joinedAt: string;
+}
+
+export interface HouseholdInviteRecord {
+  ownerId: string;
+  expiresAt: string;
+}
+
+export interface HouseholdRepository {
+  /** Owner of the data this user works on (null when the user works on their own). */
+  ownerOf(memberId: string): string | null;
+  membersOf(ownerId: string): HouseholdMemberRecord[];
+  addMember(memberId: string, ownerId: string, joinedAt: string): void;
+  removeMember(memberId: string): boolean;
+  /** Replaces the pending invitation of the owner. */
+  saveInvite(ownerId: string, codeHash: string, createdAt: string, expiresAt: string): void;
+  findInvite(codeHash: string): HouseholdInviteRecord | null;
+  pendingInvite(ownerId: string): HouseholdInviteRecord | null;
+  deleteInvite(ownerId: string): void;
 }

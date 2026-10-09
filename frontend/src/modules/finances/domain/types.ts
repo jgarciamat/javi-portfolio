@@ -387,6 +387,90 @@ export interface NetWorthPoint {
   netWorth: number;
 }
 
+export interface SafeToSpend {
+  /** Money left in the period (carry-over included). */
+  available: number;
+  daysLeft: number;
+  /** What can be spent per day without going below zero. */
+  daily: number;
+  /** Estimated money left when the period ends, at the usual pace. */
+  projectedEnd: number;
+  status: 'ok' | 'tight' | 'over';
+}
+
+export interface ProjectedMonth {
+  year: number;
+  month: number;
+  income: number;
+  fixedExpenses: number;
+  variableExpenses: number;
+  saving: number;
+  balance: number;
+  endAvailable: number;
+}
+
+export interface ForecastRule {
+  id: string;
+  description: string;
+  type: 'INCOME' | 'EXPENSE' | 'SAVING';
+  amount: number;
+  frequency: 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';
+}
+
+export interface Forecast {
+  year: number;
+  month: number;
+  safeToSpend: SafeToSpend;
+  /** The month-by-month outlook is Premium. */
+  locked: boolean;
+  projection: ProjectedMonth[] | null;
+  firstShortfall: { year: number; month: number } | null;
+  rules: ForecastRule[];
+}
+
+/** Answer to a free-form question about the user's figures. */
+export interface AIAnswer {
+  answer: string;
+  ai: { used: number; quota: number };
+}
+
+export interface ReportTotals {
+  income: number;
+  expenses: number;
+  saving: number;
+  balance: number;
+}
+
+export interface AnnualReport {
+  year: number;
+  currency: string;
+  months: { month: number; income: number; expenses: number; saving: number }[];
+  quarters: ({ quarter: number } & ReportTotals)[];
+  totals: ReportTotals;
+  /** Whole-year totals per category, largest first. */
+  incomeByCategory: { categoryName: string; amount: number }[];
+  expensesByCategory: { categoryName: string; amount: number }[];
+}
+
+export interface DetectedSubscription {
+  key: string;
+  description: string;
+  cadence: 'monthly' | 'yearly';
+  /** Latest charge. */
+  amount: number;
+  annualCost: number;
+  count: number;
+  lastDate: string;
+  nextDate: string;
+  priceIncrease: { from: number; to: number } | null;
+}
+
+export interface SubscriptionReport {
+  monthly: number;
+  annual: number;
+  subscriptions: DetectedSubscription[];
+}
+
 export interface AIAdvice {
   summary: string;
   tips: string[];

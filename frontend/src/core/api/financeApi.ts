@@ -2,6 +2,10 @@ import type {
   Account,
   AccountInput,
   AIAdvice,
+  AIAnswer,
+  AnnualReport,
+  Forecast,
+  SubscriptionReport,
   AnnualSummary,
   Category,
   CategoryBudget,
@@ -194,6 +198,26 @@ export const insightsApi = {
   },
   netWorth(months = 12) {
     return apiRequest<NetWorthPoint[]>(`/stats/net-worth${query({ months })}`);
+  },
+  report(year: number) {
+    return apiRequest<AnnualReport>(`/stats/report/${year}`);
+  },
+  ask(question: string, locale: string) {
+    return apiRequest<AIAnswer>('/ai/ask', {
+      method: 'POST',
+      body: jsonBody({ question, locale }),
+    });
+  },
+  subscriptions() {
+    return apiRequest<SubscriptionReport>('/stats/subscriptions');
+  },
+  forecast(months = 6, exclude: string[] = []) {
+    return apiRequest<Forecast>(
+      `/stats/forecast${query({
+        months,
+        ...(exclude.length > 0 ? { exclude: exclude.join(',') } : {}),
+      })}`
+    );
   },
   advice(year: number, month: number, locale: string) {
     return apiRequest<AIAdvice>('/ai/advice', {

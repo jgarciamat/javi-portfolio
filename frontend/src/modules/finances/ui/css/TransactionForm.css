@@ -98,3 +98,8 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Wrapper that only gives the app shortcut something to scroll to. */
+.tx-form-anchor {
+  display: contents;
+}

@@ -1,3 +1,4 @@
+import { clearReferral, pendingReferral } from '@core/referral';
 import type { AuthResult, RegisterResult } from '@modules/auth/domain/types';
 import type { Locale } from '@core/i18n/I18nContext';
 import { apiRequest, jsonBody, publicRequest } from './http';
@@ -8,8 +9,13 @@ export interface SessionTokens {
 }
 
 export const authApi = {
-  register(dto: { email: string; password: string; name: string; locale?: Locale }) {
-    return publicRequest<RegisterResult>('/auth/register', { method: 'POST', body: jsonBody(dto) });
+  async register(dto: { email: string; password: string; name: string; locale?: Locale }) {
+    const result = await publicRequest<RegisterResult>('/auth/register', {
+      method: 'POST',
+      body: jsonBody({ ...dto, referralCode: pendingReferral() }),
+    });
+    clearReferral();
+    return result;
   },
   login(dto: { email: string; password: string }) {
     return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: jsonBody(dto) });

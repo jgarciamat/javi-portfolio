@@ -1,5 +1,5 @@
 import { authApi } from '@core/api/authApi';
-import { billingApi, offersApi } from '@core/api/billingApi';
+import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import {
   accountApi,
   budgetApi,
@@ -191,6 +191,16 @@ const cases: Case[] = [
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],
   ['net worth range', () => insightsApi.netWorth(24), 'GET', '/stats/net-worth?months=24'],
+  ['annual report', () => insightsApi.report(2026), 'GET', '/stats/report/2026'],
+  ['ask the assistant', () => insightsApi.ask('hola', 'es'), 'POST', '/ai/ask'],
+  ['subscriptions', () => insightsApi.subscriptions(), 'GET', '/stats/subscriptions'],
+  ['forecast', () => insightsApi.forecast(), 'GET', '/stats/forecast?months=6'],
+  [
+    'forecast without rules',
+    () => insightsApi.forecast(3, ['a', 'b']),
+    'GET',
+    '/stats/forecast?months=3&exclude=a%2Cb',
+  ],
   [
     'advice',
     () => insightsApi.advice(2026, 3, 'es'),
@@ -209,6 +219,14 @@ const cases: Case[] = [
     { kind: 'monthly', acceptTerms: true, waiveWithdrawal: true },
   ],
   ['portal', () => billingApi.portal(), 'POST', '/billing/portal'],
+  ['referral', () => billingApi.referral(), 'GET', '/referral'],
+  ['household', () => householdApi.status(), 'GET', '/household'],
+  ['household invite', () => householdApi.invite(), 'POST', '/household/invite'],
+  ['household cancel invite', () => householdApi.cancelInvite(), 'DELETE', '/household/invite'],
+  ['household preview', () => householdApi.preview('A B'), 'GET', '/household/invite/A%20B'],
+  ['household join', () => householdApi.join('CODE'), 'POST', '/household/join'],
+  ['household leave', () => householdApi.leave(), 'DELETE', '/household/membership'],
+  ['household remove', () => householdApi.remove('u 1'), 'DELETE', '/household/members/u%201'],
   ['offers', () => offersApi.list(), 'GET', '/offers'],
   ['offer click', () => offersApi.click('a b'), 'POST', '/offers/a%20b/click'],
   [

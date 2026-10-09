@@ -1,20 +1,26 @@
 import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { OptionsDropdown, type DropdownOption } from '@shared/components/OptionsDropdown';
 import { todayDateOnly } from '@shared/utils/format';
-import type { Transaction } from '@modules/finances/domain/types';
+import type { Transaction, TransactionType } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
 import {
   useTransactionView,
   type TransactionViewMode,
 } from '../../application/hooks/useTransactionView';
+import { useGettingStarted } from '../../application/hooks/useGettingStarted';
+import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
+import { ForecastPanel } from './ForecastPanel';
+import { GettingStarted } from './GettingStarted';
+import { MonthRecap } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
@@ -83,6 +89,13 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
     </div>
   );
 }
+
+/** `?add=expense|income|saving` (the app icon shortcuts) opens the new-movement form. */
+const QUICK_ADD: Record<string, TransactionType> = {
+  expense: 'EXPENSE',
+  income: 'INCOME',
+  saving: 'SAVING',
+};
 
 // ─── Movements panel ──────────────────────────────────────────────────────────
 
@@ -157,15 +170,20 @@ interface MonthlyViewProps {
   onEditTransaction: (tx: Transaction) => void;
   onManageCategories: () => void;
   onManageBudgets: () => void;
+  onOpenTab: (tab: DashboardTab) => void;
 }
 
 export function MonthlyView({
   onEditTransaction,
   onManageCategories,
   onManageBudgets,
+  onOpenTab,
 }: MonthlyViewProps) {
   const { t } = useI18n();
   const f = useFinances();
+  const checklist = useGettingStarted();
+  const [params, setParams] = useSearchParams();
+  const quickAdd = QUICK_ADD[params.get('add') ?? ''] ?? null;
   // Until the month arrives its first day is a good guess for the period start.
   const defaultDate = f.isCurrentPeriod
     ? todayDateOnly()
@@ -191,6 +209,13 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        {f.isCurrentPeriod &&
+          (checklist.visible ? (
+            <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
+          ) : (
+            <MonthRecap />
+          ))}
+        {f.isCurrentPeriod && <ForecastPanel />}
 
         <TransactionForm
           categories={f.categories}
@@ -201,6 +226,8 @@ export function MonthlyView({
           onManageCategories={onManageCategories}
           defaultDate={defaultDate}
           availableBalance={f.available}
+          quickAdd={quickAdd}
+          onQuickAddDone={() => setParams({}, { replace: true })}
         />
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />

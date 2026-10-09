@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useDialog } from '@shared/hooks/useDialog';
 import type { DashboardTab } from '../navigation';
@@ -19,23 +19,61 @@ const POLL_MS = 100;
 const SETTLE_MS = 450;
 const PADDING = 8;
 const GAP = 14;
+/** Gap kept between whatever the page pins to the top and the highlighted element. */
+const TOP_GAP = 12;
+/** Breathing room between the highlighted element and the card on phones. */
+const CARD_MARGIN = 24;
+/** Pinned bars are looked for in this top part of the screen. */
+const PINNED_ZONE = 250;
 const CARD_WIDTH = 360;
 const CARD_HEIGHT = 290;
 /** Narrower screens always get the card at the bottom. */
 const MOBILE_WIDTH = 640;
 
-/** Part of the element inside the viewport (big sections are clipped to the screen). */
-function visibleRect(element: Element): Rect {
+/** Part of the element inside the free area (big sections are clipped to what the card leaves). */
+function visibleRect(element: Element, inset: number): Rect {
   const r = element.getBoundingClientRect();
   const top = Math.max(r.top, 0);
   const left = Math.max(r.left, 0);
-  const bottom = Math.min(r.bottom, window.innerHeight);
+  const bottom = Math.min(r.bottom, window.innerHeight - inset);
   const right = Math.min(r.right, window.innerWidth);
   return { top, left, width: Math.max(right - left, 0), height: Math.max(bottom - top, 0) };
 }
 
+/** Whether the page keeps the element on screen by itself (header buttons, sticky bars). */
+function isPinned(element: Element): boolean {
+  for (let node: Element | null = element; node; node = node.parentElement) {
+    const { position } = window.getComputedStyle(node);
+    if (position === 'fixed' || position === 'sticky') return true;
+  }
+  return false;
+}
+
+/** Bottom edge of what the page pins to the top of the screen (header, month bar…). */
+function pinnedTop(): number {
+  let bottom = 0;
+  document.body.querySelectorAll('*').forEach((node) => {
+    const { position } = window.getComputedStyle(node);
+    if ((position !== 'fixed' && position !== 'sticky') || node.closest('.tour-root')) return;
+    const r = node.getBoundingClientRect();
+    // A bar is wide and short: full-screen overlays and side panels are not.
+    const isBar = r.width > window.innerWidth / 2 && r.height < window.innerHeight / 2;
+    if (r.top < PINNED_ZONE && isBar) bottom = Math.max(bottom, r.bottom);
+  });
+  return bottom;
+}
+
+/** Space the card takes at the bottom of a phone screen (0 when it sits next to the element). */
+function bottomInset(card: RefObject<HTMLDivElement | null>): number {
+  if (window.innerWidth >= MOBILE_WIDTH) return 0;
+  return (card.current as HTMLDivElement).getBoundingClientRect().height + CARD_MARGIN;
+}
+
 /** Rectangle of the step's target, followed through scrolls, resizes and lazy loading. */
-function useTargetRect(target: string | undefined): Rect | null {
+function useTargetRect(
+  target: string | undefined,
+  card: RefObject<HTMLDivElement | null>
+): Rect | null {
   const [rect, setRect] = useState<Rect | null>(null);
 
   useEffect(() => {
@@ -46,13 +84,25 @@ function useTargetRect(target: string | undefined): Rect | null {
     let timer = 0;
     const started = Date.now();
     const measure = () => {
-      if (element) setRect(visibleRect(element));
+      if (element) setRect(visibleRect(element, bottomInset(card)));
     };
     const find = () => {
       element = document.querySelector(selector);
-      if (element) {
-        const tall = element.getBoundingClientRect().height > window.innerHeight * 0.6;
-        element.scrollIntoView({ block: tall ? 'start' : 'center', behavior: 'smooth' });
+      const size = element?.getBoundingClientRect();
+      if (element && size && size.width > 0 && size.height > 0) {
+        // Scroll it into the part of the screen the pinned bars and the card leave free.
+        if (!isPinned(element)) {
+          const html = element as HTMLElement;
+          const top = pinnedTop() + TOP_GAP;
+          const inset = bottomInset(card);
+          const free = window.innerHeight - top - inset;
+          html.style.scrollMarginTop = `${top}px`;
+          html.style.scrollMarginBottom = `${inset}px`;
+          html.scrollIntoView({
+            block: size.height > free * 0.9 ? 'start' : 'center',
+            behavior: 'smooth',
+          });
+        }
         measure();
         timer = window.setTimeout(measure, SETTLE_MS);
       } else if (Date.now() - started < WAIT_MS) {
@@ -66,8 +116,12 @@ function useTargetRect(target: string | undefined): Rect | null {
       window.clearTimeout(timer);
       window.removeEventListener('resize', measure);
       window.removeEventListener('scroll', measure, true);
+      if (element) {
+        (element as HTMLElement).style.scrollMarginTop = '';
+        (element as HTMLElement).style.scrollMarginBottom = '';
+      }
     };
-  }, [target]);
+  }, [target, card]);
 
   return rect;
 }
@@ -105,9 +159,19 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
   const bodyId = useId();
   const step = steps[index];
   const last = index === steps.length - 1;
-  const rect = useTargetRect(step.target);
+  const rect = useTargetRect(step.target, card);
   const close = () => onClose(dontShowAgain);
   useDialog(card, close, true);
+
+  // Short pages cannot scroll their last section above the card: give them room while it is open.
+  useEffect(() => {
+    if (window.innerWidth >= MOBILE_WIDTH) return;
+    const previous = document.body.style.paddingBottom;
+    document.body.style.paddingBottom = `${CARD_HEIGHT + CARD_MARGIN}px`;
+    return () => {
+      document.body.style.paddingBottom = previous;
+    };
+  }, []);
 
   useEffect(() => {
     if (step.tab) onShowTab(step.tab);

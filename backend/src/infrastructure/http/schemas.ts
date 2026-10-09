@@ -36,6 +36,8 @@ export const registerBody = z.object({
   password: z.string().min(1).max(128),
   name: z.string().trim().min(1).max(80),
   locale,
+  /** Code of the user who invited this one. */
+  referralCode: z.string().trim().max(32).optional(),
 });
 export const loginBody = z.object({
   email: z.string().trim().min(1).max(254),
@@ -242,8 +244,25 @@ export const goalPatchBody = goalBody.partial().extend({ archived: z.boolean().o
 // ─── Insights ────────────────────────────────────────────────────────────────
 
 export const adviceBody = z.object({ year, month, locale });
+export const askBody = z.object({
+  question: z.string().trim().min(3).max(300),
+  locale,
+});
+export const yearParams = z.object({ year: z.coerce.number().int().min(1970).max(9999) });
+export const householdJoinBody = z.object({ code: z.string().trim().min(10).max(64) });
+export const householdCodeParams = z.object({ code: z.string().trim().min(10).max(64) });
+export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
+});
+export const forecastQuery = z.object({
+  months: z.coerce.number().int().min(1).max(12).default(6),
+  /** Comma-separated recurring rule ids left out of the projection ("what if I cancel…"). */
+  exclude: z
+    .string()
+    .max(2000)
+    .default('')
+    .transform((value) => value.split(',').filter(Boolean).slice(0, 50)),
 });
 
 // ─── Billing & offers ────────────────────────────────────────────────────────

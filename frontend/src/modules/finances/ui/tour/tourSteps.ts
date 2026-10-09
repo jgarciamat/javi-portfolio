@@ -17,6 +17,7 @@ const STEPS: TourStep[] = [
   { id: 'monthNav', tab: 'monthly', target: '[data-tour="month-nav"]' },
   { id: 'options', tab: 'monthly', target: '.month-nav .options-dropdown' },
   { id: 'summary', tab: 'monthly', target: '[data-tour="summary"]' },
+  { id: 'forecast', tab: 'monthly', target: '[data-tour="forecast"]' },
   { id: 'newTransaction', tab: 'monthly', target: '[data-tour="new-transaction"]' },
   { id: 'movements', tab: 'monthly', target: '[data-tour="movements"]' },
   { id: 'aiAdvisor', tab: 'monthly', target: '.ai-advisor' },

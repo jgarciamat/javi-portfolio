@@ -89,7 +89,8 @@ export class AuthService {
     return { message: 'Registro completado. Revisa tu email para verificar tu cuenta.' };
   }
 
-  verifyEmail(token: string): void {
+  /** Marks the e-mail as verified and returns the id of the user. */
+  verifyEmail(token: string): string {
     const user = this.users.findByVerificationTokenHash(this.tokens.hash(token));
     if (!user) {
       throw new ValidationError(
@@ -102,6 +103,7 @@ export class AuthService {
       throw new ValidationError('El enlace ha caducado. Solicita uno nuevo.', 'TOKEN_EXPIRED');
     }
     this.users.save(user.markEmailVerified());
+    return user.id;
   }
 
   /** Always succeeds from the caller's point of view (no account enumeration). */

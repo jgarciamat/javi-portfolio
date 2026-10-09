@@ -37,6 +37,8 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s2.item5')}</li>
             <li>{t('app.privacy.s2.item6')}</li>
             <li>{t('app.privacy.s2.item7')}</li>
+            <li>{t('app.privacy.s2.item8')}</li>
+            <li>{t('app.privacy.s2.item9')}</li>
           </ul>
         </section>
 
@@ -106,6 +108,7 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s8.title')}</h2>
           <p>{t('app.privacy.s8.p1')}</p>
+          <p>{t('app.privacy.s8.p2')}</p>
         </section>
 
         {/* Section 9 */}

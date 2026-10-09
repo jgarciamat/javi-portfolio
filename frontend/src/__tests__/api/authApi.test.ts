@@ -3,6 +3,7 @@
  * fetch is mocked; api.config is stubbed via moduleNameMapper → src/__mocks__/api.config.ts
  */
 
+import { captureReferral } from '@core/referral';
 import { authApi } from '@core/api/authApi';
 import {
   ApiError,
@@ -61,6 +62,17 @@ describe('public auth endpoints', () => {
       locale: 'en',
     });
     expect(headersOf(0).Authorization).toBeUndefined();
+  });
+
+  test('register sends the invitation code once and then forgets it', async () => {
+    window.history.replaceState(null, '', '/?ref=%20abcd2345%20');
+    captureReferral();
+    mockFetch.mockResolvedValue(makeResponse({ message: 'ok' }, 201));
+    await authApi.register({ email: 'a@b.co', password: 'pw', name: 'A' });
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body).referralCode).toBe('abcd2345');
+    await authApi.register({ email: 'c@d.co', password: 'pw', name: 'B' });
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body)).not.toHaveProperty('referralCode');
+    window.history.replaceState(null, '', '/');
   });
 
   test('login returns the tokens', async () => {

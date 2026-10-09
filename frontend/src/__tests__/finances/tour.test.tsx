@@ -13,14 +13,15 @@ afterEach(() => {
   jest.useRealTimers();
   document.body.innerHTML = '';
   Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+  Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
 });
 
 /** A page element at a fixed place on the screen. */
-function placeTarget(id: string, top: number, height: number, left = 40) {
+function placeTarget(id: string, top: number, height: number, left = 40, width = 300) {
   const element = document.createElement('div');
   element.id = id;
   document.body.appendChild(element);
-  const rect = { top, height, left, width: 300, bottom: top + height, right: left + 300 };
+  const rect = { top, height, left, width, bottom: top + height, right: left + width };
   jest
     .spyOn(element, 'getBoundingClientRect')
     .mockImplementation(() => ({ ...rect, x: left, y: top, toJSON: () => rect } as DOMRect));
@@ -42,7 +43,7 @@ describe('GuidedTour', () => {
   function renderTour(initialDontShowAgain = false) {
     const onShowTab = jest.fn();
     const onClose = jest.fn();
-    renderWithI18n(
+    const view = renderWithI18n(
       <GuidedTour
         steps={steps}
         onShowTab={onShowTab}
@@ -50,7 +51,7 @@ describe('GuidedTour', () => {
         initialDontShowAgain={initialDontShowAgain}
       />
     );
-    return { onShowTab, onClose };
+    return { onShowTab, onClose, unmount: view.unmount };
   }
 
   it('walks through the steps, placing the card next to what it explains', () => {
@@ -139,6 +140,84 @@ describe('GuidedTour', () => {
       window.dispatchEvent(new Event('resize'));
     });
     expect(document.querySelector('.tour-spotlight')).toHaveStyle({ top: '2px' });
+  });
+
+  it('on phones keeps the element clear of the card: scroll margins and a clipped highlight', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 500, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 700, configurable: true });
+    const small = placeTarget('near-top', 100, 50).element;
+    const big = placeTarget('tall', 100, 600).element;
+    const real = Element.prototype.getBoundingClientRect;
+    jest
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: Element) {
+        return this.getAttribute('role') === 'dialog'
+          ? ({ height: 200, width: 300, top: 0, left: 0, bottom: 200, right: 300 } as DOMRect)
+          : real.call(this);
+      });
+    const centre = jest.spyOn(small, 'scrollIntoView');
+    const start = jest.spyOn(big, 'scrollIntoView');
+    const view = renderTour();
+
+    next(); // fits in the free area: centred between the header and the card
+    expect(small.style.scrollMarginTop).toBe('12px');
+    expect(document.body.style.paddingBottom).toBe('314px'); // room to scroll short pages
+    expect(small.style.scrollMarginBottom).toBe('224px');
+    expect(centre).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' });
+
+    next();
+    next(); // taller than the free area: top aligned and clipped above the card
+    expect(start).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' });
+    expect(small.style.scrollMarginBottom).toBe(''); // margins are given back
+    expect(document.querySelector('.tour-spotlight')).toHaveStyle({ top: '92px', height: '392px' });
+    view.unmount();
+    expect(big.style.scrollMarginTop).toBe('');
+    expect(document.body.style.paddingBottom).toBe('');
+  });
+
+  it('scrolls below the bars the page pins to the top, and leaves pinned targets alone', () => {
+    const pin = (id: string, top: number, bottom: number, width: number, position = 'sticky') => {
+      const { element } = placeTarget(id, top, bottom - top, 0, width);
+      element.style.position = position;
+      return element;
+    };
+    pin('header', 0, 120, 1024); // pinned bar: counts
+    pin('side-button', 0, 300, 100, 'fixed'); // too narrow to be a bar
+    pin('overlay', 0, 768, 1024, 'fixed'); // full-screen overlay (closed side menu): not a bar
+    pin('table-head', 400, 450, 1024); // outside the top of the screen
+    const target = placeTarget('near-top', 300, 50).element;
+    const scroll = jest.spyOn(target, 'scrollIntoView');
+    const pinned = pin('near-bottom', 600, 640, 300, 'fixed');
+    const noScroll = jest.spyOn(pinned, 'scrollIntoView');
+    renderTour();
+    card().style.position = 'fixed'; // the tour's own elements never count as page bars
+
+    next();
+    expect(target.style.scrollMarginTop).toBe('132px'); // 120 + the gap
+    expect(scroll).toHaveBeenCalled();
+
+    next(); // pinned: the page keeps it on screen, no scrolling, still highlighted
+    expect(noScroll).not.toHaveBeenCalled();
+    expect(document.querySelector('.tour-spotlight')).not.toBeNull();
+  });
+
+  it('centres the card when the highlighted element is not shown (hidden on this screen)', () => {
+    jest.useFakeTimers();
+    placeTarget('near-top', 100, 50, 40, 0); // no width
+    placeTarget('near-bottom', 600, 0); // no height
+    renderTour();
+    next();
+    act(() => {
+      jest.advanceTimersByTime(3500);
+    });
+    expect(document.querySelector('.tour-spotlight')).toBeNull();
+    expect(card()).toHaveClass('tour-card--center');
+    next();
+    act(() => {
+      jest.advanceTimersByTime(3500);
+    });
+    expect(document.querySelector('.tour-spotlight')).toBeNull();
+    expect(card()).toHaveClass('tour-card--center');
   });
 });
 

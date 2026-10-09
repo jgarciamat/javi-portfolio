@@ -55,12 +55,12 @@ export function planningRoutes(c: Container): Router {
   // ─── Categories ────────────────────────────────────────────────────────────
   router.get(
     '/categories',
-    authed((req, res) => res.json(c.categories.list(req.userId)))
+    authed((req, res) => res.json(c.categories.list(req.dataUserId)))
   );
   router.post(
     '/categories',
     authed((req, res) =>
-      res.status(201).json(c.categories.create(req.userId, categoryBody.parse(req.body)))
+      res.status(201).json(c.categories.create(req.dataUserId, categoryBody.parse(req.body)))
     )
   );
   router.patch(
@@ -68,7 +68,7 @@ export function planningRoutes(c: Container): Router {
     authed((req, res) =>
       res.json(
         c.categories.update(
-          req.userId,
+          req.dataUserId,
           idParam.parse(req.params).id,
           categoryPatchBody.parse(req.body)
         )
@@ -77,13 +77,13 @@ export function planningRoutes(c: Container): Router {
   );
   router.get(
     '/categories/:id/usage',
-    authed((req, res) => res.json(c.categories.usage(req.userId, idParam.parse(req.params).id)))
+    authed((req, res) => res.json(c.categories.usage(req.dataUserId, idParam.parse(req.params).id)))
   );
   router.delete(
     '/categories/:id',
     authed((req, res) => {
       const { reassignTo } = deleteCategoryQuery.parse(req.query);
-      c.categories.delete(req.userId, idParam.parse(req.params).id, reassignTo);
+      c.categories.delete(req.dataUserId, idParam.parse(req.params).id, reassignTo);
       res.status(204).end();
     })
   );
@@ -92,7 +92,7 @@ export function planningRoutes(c: Container): Router {
   router.get(
     '/accounts',
     authed((req, res) => {
-      const { accounts, totalCents } = c.accounts.list(req.userId);
+      const { accounts, totalCents } = c.accounts.list(req.dataUserId);
       res.json({ accounts: accounts.map(presentAccount), total: totalCents / 100 });
     })
   );
@@ -100,31 +100,31 @@ export function planningRoutes(c: Container): Router {
     '/accounts',
     authed((req, res) => {
       const { initialBalance, ...rest } = accountBody.parse(req.body);
-      c.accounts.create(req.userId, { ...rest, initialBalanceCents: initialBalance });
-      res.status(201).json(c.accounts.list(req.userId).accounts.map(presentAccount));
+      c.accounts.create(req.dataUserId, { ...rest, initialBalanceCents: initialBalance });
+      res.status(201).json(c.accounts.list(req.dataUserId).accounts.map(presentAccount));
     })
   );
   router.patch(
     '/accounts/:id',
     authed((req, res) => {
       const { initialBalance, ...rest } = accountPatchBody.parse(req.body);
-      c.accounts.update(req.userId, idParam.parse(req.params).id, {
+      c.accounts.update(req.dataUserId, idParam.parse(req.params).id, {
         ...rest,
         initialBalanceCents: initialBalance,
       });
-      res.json(c.accounts.list(req.userId).accounts.map(presentAccount));
+      res.json(c.accounts.list(req.dataUserId).accounts.map(presentAccount));
     })
   );
   router.delete(
     '/accounts/:id',
     authed((req, res) => {
-      c.accounts.delete(req.userId, idParam.parse(req.params).id);
+      c.accounts.delete(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );
   router.get(
     '/transfers',
-    authed((req, res) => res.json(c.accounts.listTransfers(req.userId).map(presentTransfer)))
+    authed((req, res) => res.json(c.accounts.listTransfers(req.dataUserId).map(presentTransfer)))
   );
   router.post(
     '/transfers',
@@ -133,14 +133,16 @@ export function planningRoutes(c: Container): Router {
       res
         .status(201)
         .json(
-          presentTransfer(c.accounts.createTransfer(req.userId, { ...rest, amountCents: amount }))
+          presentTransfer(
+            c.accounts.createTransfer(req.dataUserId, { ...rest, amountCents: amount })
+          )
         );
     })
   );
   router.delete(
     '/transfers/:id',
     authed((req, res) => {
-      c.accounts.deleteTransfer(req.userId, idParam.parse(req.params).id);
+      c.accounts.deleteTransfer(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );
@@ -148,14 +150,16 @@ export function planningRoutes(c: Container): Router {
   // ─── Recurring rules ───────────────────────────────────────────────────────
   router.get(
     '/recurring-rules',
-    authed((req, res) => res.json(c.recurring.list(req.userId).map(presentRule)))
+    authed((req, res) => res.json(c.recurring.list(req.dataUserId).map(presentRule)))
   );
   router.post(
     '/recurring-rules',
     authed((req, res) =>
       res
         .status(201)
-        .json(presentRule(c.recurring.create(req.userId, ruleInput(recurringBody.parse(req.body)))))
+        .json(
+          presentRule(c.recurring.create(req.dataUserId, ruleInput(recurringBody.parse(req.body))))
+        )
     )
   );
   router.patch(
@@ -164,7 +168,7 @@ export function planningRoutes(c: Container): Router {
       res.json(
         presentRule(
           c.recurring.update(
-            req.userId,
+            req.dataUserId,
             idParam.parse(req.params).id,
             ruleInput(recurringPatchBody.parse(req.body))
           )
@@ -176,7 +180,7 @@ export function planningRoutes(c: Container): Router {
     '/recurring-rules/:id',
     authed((req, res) => {
       const { scope } = recurringDeleteQuery.parse(req.query);
-      c.recurring.delete(req.userId, idParam.parse(req.params).id, scope);
+      c.recurring.delete(req.dataUserId, idParam.parse(req.params).id, scope);
       res.status(204).end();
     })
   );
@@ -184,14 +188,14 @@ export function planningRoutes(c: Container): Router {
   // ─── Custom alerts ─────────────────────────────────────────────────────────
   router.get(
     '/custom-alerts',
-    authed((req, res) => res.json(c.alerts.list(req.userId).map(presentAlert)))
+    authed((req, res) => res.json(c.alerts.list(req.dataUserId).map(presentAlert)))
   );
   router.post(
     '/custom-alerts',
     authed((req, res) =>
       res
         .status(201)
-        .json(presentAlert(c.alerts.create(req.userId, customAlertBody.parse(req.body))))
+        .json(presentAlert(c.alerts.create(req.dataUserId, customAlertBody.parse(req.body))))
     )
   );
   router.patch(
@@ -200,7 +204,7 @@ export function planningRoutes(c: Container): Router {
       res.json(
         presentAlert(
           c.alerts.update(
-            req.userId,
+            req.dataUserId,
             idParam.parse(req.params).id,
             customAlertPatchBody.parse(req.body)
           )
@@ -211,7 +215,7 @@ export function planningRoutes(c: Container): Router {
   router.delete(
     '/custom-alerts/:id',
     authed((req, res) => {
-      c.alerts.delete(req.userId, idParam.parse(req.params).id);
+      c.alerts.delete(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );
@@ -219,19 +223,19 @@ export function planningRoutes(c: Container): Router {
   // ─── Category budgets ──────────────────────────────────────────────────────
   router.get(
     '/budgets',
-    authed((req, res) => res.json(c.budgets.list(req.userId).map(presentBudget)))
+    authed((req, res) => res.json(c.budgets.list(req.dataUserId).map(presentBudget)))
   );
   router.put(
     '/budgets',
     authed((req, res) => {
       const { amount, ...ref } = budgetBody.parse(req.body);
-      res.json(presentBudget(c.budgets.set(req.userId, ref, amount)));
+      res.json(presentBudget(c.budgets.set(req.dataUserId, ref, amount)));
     })
   );
   router.delete(
     '/budgets/:id',
     authed((req, res) => {
-      c.budgets.delete(req.userId, idParam.parse(req.params).id);
+      c.budgets.delete(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );
@@ -239,7 +243,7 @@ export function planningRoutes(c: Container): Router {
   // ─── Goals ─────────────────────────────────────────────────────────────────
   router.get(
     '/goals',
-    authed((req, res) => res.json(c.goals.list(req.userId).map(presentGoal)))
+    authed((req, res) => res.json(c.goals.list(req.dataUserId).map(presentGoal)))
   );
   router.post(
     '/goals',
@@ -247,7 +251,7 @@ export function planningRoutes(c: Container): Router {
       const { target, ...rest } = goalBody.parse(req.body);
       res
         .status(201)
-        .json(presentGoal(c.goals.create(req.userId, { ...rest, targetCents: target })));
+        .json(presentGoal(c.goals.create(req.dataUserId, { ...rest, targetCents: target })));
     })
   );
   router.patch(
@@ -256,7 +260,10 @@ export function planningRoutes(c: Container): Router {
       const { target, ...rest } = goalPatchBody.parse(req.body);
       res.json(
         presentGoal(
-          c.goals.update(req.userId, idParam.parse(req.params).id, { ...rest, targetCents: target })
+          c.goals.update(req.dataUserId, idParam.parse(req.params).id, {
+            ...rest,
+            targetCents: target,
+          })
         )
       );
     })
@@ -264,7 +271,7 @@ export function planningRoutes(c: Container): Router {
   router.delete(
     '/goals/:id',
     authed((req, res) => {
-      c.goals.delete(req.userId, idParam.parse(req.params).id);
+      c.goals.delete(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );

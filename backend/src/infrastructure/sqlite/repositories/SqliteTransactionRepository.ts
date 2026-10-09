@@ -378,4 +378,11 @@ export class SqliteTransactionRepository implements TransactionRepository {
       .get(userId) as { year: number; month: number } | undefined;
     return row ?? null;
   }
+
+  count(userId: string): number {
+    const row = this.db
+      .prepare('SELECT COUNT(*) AS n FROM transactions WHERE user_id = ?')
+      .get(userId) as { n: number };
+    return row.n;
+  }
 }

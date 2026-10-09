@@ -52,7 +52,10 @@ describe('Plans and limits', () => {
       prices: { monthly: 2.99, yearly: 24.99, lifetime: 49 },
       lifetime: { available: true, remaining: 100 },
       limits: {
-        free: { resources: { accounts: 1, budgets: 3 }, features: { import: false } },
+        free: {
+          resources: { accounts: 2, budgets: 3 },
+          features: { import: false, forecast: false },
+        },
         premium: { resources: { accounts: null }, aiMonthlyQuota: 30 },
       },
     });
@@ -63,27 +66,38 @@ describe('Plans and limits', () => {
       plan: 'premium',
       trialDaysLeft: 14,
       subscription: { status: 'trialing', source: 'trial', canManage: false },
-      usage: { accounts: 1, budgets: 0 },
+      usage: { accounts: 1, budgets: 0, movements: 0 },
       ai: { used: 0, quota: 30 },
     });
     ctx.clock.set(new Date(ctx.clock.now().getTime() + 15 * DAY).toISOString());
     expect(await billing()).toMatchObject({
       plan: 'free',
       trialDaysLeft: 0,
-      limits: { resources: { accounts: 1 } },
+      limits: { resources: { accounts: 2 } },
     });
+  });
+
+  it('reports how many movements the user has registered', async () => {
+    await addTransaction(ctx, user, { amount: 5 });
+    await addTransaction(ctx, user, { amount: 7 });
+    expect((await billing()).usage.movements).toBe(2);
   });
 
   it('answers 402 with the limit when the free plan is full', async () => {
     expireTrial(ctx, user);
-    const second = await request(ctx.app)
+    await request(ctx.app)
       .post('/api/accounts')
       .set(user.auth)
       .send({ name: 'Efectivo', type: 'cash' })
+      .expect(201);
+    const third = await request(ctx.app)
+      .post('/api/accounts')
+      .set(user.auth)
+      .send({ name: 'Tarjeta', type: 'card' })
       .expect(402);
-    expect(second.body).toMatchObject({
+    expect(third.body).toMatchObject({
       code: 'PLAN_LIMIT',
-      details: { resource: 'accounts', limit: 1 },
+      details: { resource: 'accounts', limit: 2 },
     });
 
     for (const category of ['Ocio', 'Vivienda', 'Alimentación']) {
@@ -131,10 +145,16 @@ describe('Plans and limits', () => {
       .set(user.auth)
       .send({ archived: true })
       .expect(200);
+    await request(ctx.app)
+      .post('/api/accounts')
+      .set(user.auth)
+      .send({ name: 'Tarjeta', type: 'card' })
+      .expect(201);
     expireTrial(ctx, user);
 
+    // Three accounts were created during the trial; the free plan allows two.
     const list = await request(ctx.app).get('/api/accounts').set(user.auth).expect(200);
-    expect(list.body.accounts).toHaveLength(2);
+    expect(list.body.accounts).toHaveLength(3);
     await request(ctx.app)
       .patch(`/api/accounts/${extra.id}`)
       .set(user.auth)

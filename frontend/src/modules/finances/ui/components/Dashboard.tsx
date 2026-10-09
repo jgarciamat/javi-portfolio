@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
+import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
@@ -80,6 +81,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
           onEditTransaction={dash.setEditingTransaction}
           onManageCategories={dash.openCategoryModal}
           onManageBudgets={() => dash.setTab('budgets')}
+          onOpenTab={dash.setTab}
         />
       );
   }
@@ -223,6 +225,7 @@ export function Dashboard() {
 
       <main className="main">
         <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
+        <HouseholdJoinPrompt />
         <div role="region" aria-label={t(section.labelKey)} data-tour="section">
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>

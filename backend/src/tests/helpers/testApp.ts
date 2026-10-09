@@ -124,11 +124,15 @@ export interface TestUser {
 let counter = 0;
 
 /** Registers, verifies and logs in a fresh user. */
-export async function createUser(ctx: TestContext, emailAddress?: string): Promise<TestUser> {
+export async function createUser(
+  ctx: TestContext,
+  emailAddress?: string,
+  referralCode?: string
+): Promise<TestUser> {
   const email = emailAddress ?? `user${++counter}@example.com`;
   await request(ctx.app)
     .post('/api/auth/register')
-    .send({ email, password: STRONG_PASSWORD, name: 'Test User' })
+    .send({ email, password: STRONG_PASSWORD, name: 'Test User', referralCode })
     .expect(201);
   const sent = [...ctx.email.sent].reverse().find((s) => s.to === email && s.kind === 'verify');
   await request(ctx.app).get('/api/auth/verify-email').query({ token: sent!.token }).expect(200);

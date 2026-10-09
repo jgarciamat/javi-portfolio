@@ -7,6 +7,7 @@ import { authRoutes } from './routes/auth.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
 import { clientErrorRoutes } from './routes/client.routes';
 import { financeRoutes } from './routes/finance.routes';
+import { householdRoutes } from './routes/household.routes';
 import { planningRoutes } from './routes/planning.routes';
 import { userRoutes } from './routes/user.routes';
 
@@ -49,8 +50,9 @@ export function createApp(c: Container): Express {
   api.use('/auth', authRoutes(c, limiter));
   api.use(publicBillingRoutes(c));
   api.use(clientErrorRoutes(limiter));
-  api.use(requireAuth(c.auth));
+  api.use(requireAuth(c.auth, (userId) => c.household.dataOwner(userId)));
   api.use(billingRoutes(c, limiter));
+  api.use(householdRoutes(c, limiter));
   api.use(financeRoutes(c, limiter));
   api.use(planningRoutes(c));
   api.use(userRoutes(c, limiter));

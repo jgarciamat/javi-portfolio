@@ -1,6 +1,10 @@
 import type {
   Account,
   AIAdvice,
+  AIAnswer,
+  AnnualReport,
+  Forecast,
+  SubscriptionReport,
   BudgetLine,
   Category,
   CategoryBudget,
@@ -15,7 +19,12 @@ import type {
   UserSettings,
 } from '@modules/finances/domain/types';
 import type { AuthUser } from '@modules/auth/domain/types';
-import type { BillingOverview, PlanCatalog } from '@modules/billing/domain/types';
+import type {
+  BillingOverview,
+  HouseholdStatus,
+  PlanCatalog,
+  ReferralSummary,
+} from '@modules/billing/domain/types';
 
 let seq = 0;
 const nextId = (prefix: string) => `${prefix}${++seq}`;
@@ -209,6 +218,108 @@ export const advice = (over: Partial<AIAdvice> = {}): AIAdvice => ({
   ...over,
 });
 
+export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
+  year: 2026,
+  month: 3,
+  safeToSpend: { available: 900, daysLeft: 18, daily: 50, projectedEnd: 500, status: 'ok' },
+  locked: false,
+  projection: [
+    {
+      year: 2026,
+      month: 4,
+      income: 2000,
+      fixedExpenses: 900,
+      variableExpenses: 400,
+      saving: 0,
+      balance: 700,
+      endAvailable: 1200,
+    },
+    {
+      year: 2026,
+      month: 5,
+      income: 2000,
+      fixedExpenses: 900,
+      variableExpenses: 400,
+      saving: 100,
+      balance: 600,
+      endAvailable: 1800,
+    },
+  ],
+  firstShortfall: null,
+  rules: [
+    { id: 'r-rent', description: 'Alquiler', type: 'EXPENSE', amount: 700, frequency: 'monthly' },
+    { id: 'r-pay', description: 'Nómina', type: 'INCOME', amount: 2000, frequency: 'monthly' },
+  ],
+  ...over,
+});
+
+export const report = (over: Partial<AnnualReport> = {}): AnnualReport => ({
+  year: 2026,
+  currency: 'EUR',
+  months: Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    income: i === 0 ? 2000 : 0,
+    expenses: i === 0 ? 100 : 0,
+    saving: 0,
+  })),
+  quarters: [
+    { quarter: 1, income: 2000, expenses: 100, saving: 0, balance: 1900 },
+    { quarter: 2, income: 0, expenses: 0, saving: 0, balance: 0 },
+    { quarter: 3, income: 0, expenses: 0, saving: 0, balance: 0 },
+    { quarter: 4, income: 0, expenses: 0, saving: 0, balance: 0 },
+  ],
+  totals: { income: 2000, expenses: 100, saving: 0, balance: 1900 },
+  incomeByCategory: [{ categoryName: 'Salario', amount: 2000 }],
+  expensesByCategory: [{ categoryName: 'Ocio', amount: 100 }],
+  ...over,
+});
+
+export const answer = (over: Partial<AIAnswer> = {}): AIAnswer => ({
+  answer: 'Gastaste 120 € en ocio.',
+  ai: { used: 2, quota: 30 },
+  ...over,
+});
+
+export const subscriptions = (over: Partial<SubscriptionReport> = {}): SubscriptionReport => ({
+  monthly: 18.99,
+  annual: 227.88,
+  subscriptions: [
+    {
+      key: 'netflix',
+      description: 'Netflix',
+      cadence: 'monthly',
+      amount: 13.99,
+      annualCost: 167.88,
+      count: 4,
+      lastDate: '2026-03-05',
+      nextDate: '2026-04-04',
+      priceIncrease: { from: 12.99, to: 13.99 },
+    },
+    {
+      key: 'seguro coche',
+      description: 'Seguro coche',
+      cadence: 'yearly',
+      amount: 60,
+      annualCost: 60,
+      count: 2,
+      lastDate: '2026-03-02',
+      nextDate: '2027-03-02',
+      priceIncrease: null,
+    },
+  ],
+  ...over,
+});
+
+export const referral = (over: Partial<ReferralSummary> = {}): ReferralSummary => ({
+  code: 'ABCD2345',
+  qualified: 2,
+  pending: 1,
+  rewardDays: 30,
+  rewardsEarned: 1,
+  missing: 4,
+  ...over,
+});
+
 export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
   trialDays: 14,
@@ -217,8 +328,14 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   lifetime: { available: true, remaining: 87 },
   limits: {
     free: {
-      resources: { accounts: 1, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
-      features: { import: false, insights: false, aiAdvisor: false },
+      resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+      features: {
+        import: false,
+        insights: false,
+        aiAdvisor: false,
+        forecast: false,
+        household: false,
+      },
       aiMonthlyQuota: 0,
     },
     premium: {
@@ -229,14 +346,24 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         recurringRules: null,
         customAlerts: null,
       },
-      features: { import: true, insights: true, aiAdvisor: true },
+      features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
       aiMonthlyQuota: 30,
     },
   },
   ...over,
 });
 
+export const household = (over: Partial<HouseholdStatus> = {}): HouseholdStatus => ({
+  role: 'none',
+  owner: null,
+  members: [],
+  pendingInvite: null,
+  maxMembers: 1,
+  ...over,
+});
+
 export const billing = (over: Partial<BillingOverview> = {}): BillingOverview => ({
+  household: household(),
   plan: 'premium',
   trialDaysLeft: 10,
   subscription: {
@@ -249,7 +376,14 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     canManage: false,
   },
   limits: catalog().limits.premium,
-  usage: { accounts: 1, budgets: 2, goals: 0, recurringRules: 1, customAlerts: 0 },
+  usage: {
+    accounts: 2,
+    budgets: 2,
+    goals: 0,
+    recurringRules: 1,
+    customAlerts: 0,
+    movements: 5,
+  },
   ai: { used: 0, quota: 30 },
   catalog: catalog(),
   ...over,

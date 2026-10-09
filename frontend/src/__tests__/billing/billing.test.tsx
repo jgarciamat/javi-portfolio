@@ -195,6 +195,36 @@ describe('PlanBanner', () => {
     expect(onOpenPlan).toHaveBeenCalled();
   });
 
+  it('recaps the trial and what the free plan would no longer let them add', async () => {
+    withPlan(
+      <PlanBanner onOpenPlan={jest.fn()} />,
+      f.billing({
+        trialDaysLeft: 4,
+        usage: {
+          accounts: 2,
+          budgets: 5,
+          goals: 1,
+          recurringRules: 4,
+          customAlerts: 0,
+          movements: 37,
+        },
+      })
+    );
+    const banner = await screen.findByRole('status');
+    expect(banner).toHaveTextContent(/registrado 37 movimientos/);
+    expect(banner).toHaveTextContent(
+      /5 presupuestos \(gratis: 3\), 4 movimientos automáticos \(gratis: 3\)/
+    );
+    expect(banner).not.toHaveTextContent(/cuentas \(gratis/);
+  });
+
+  it('only recaps the movements when everything fits in the free plan', async () => {
+    withPlan(<PlanBanner onOpenPlan={jest.fn()} />, f.billing({ trialDaysLeft: 1 }));
+    const banner = await screen.findByRole('status');
+    expect(banner).toHaveTextContent(/registrado 5 movimientos/);
+    expect(banner).not.toHaveTextContent(/no podrás añadir más/);
+  });
+
   it('says nothing outside the provider or with a long trial', () => {
     const { container, unmount } = renderWithProviders(<PlanBanner onOpenPlan={jest.fn()} />, {
       finances: false,
@@ -279,6 +309,50 @@ describe('PlanView', () => {
     expect(screen.getByText(tr('app.common.loading'))).toBeInTheDocument();
     await act(async () => fail(new Error('down')));
     expect(screen.getByText(tr('billing.loadError'))).toBeInTheDocument();
+  });
+});
+
+describe('Invite a friend', () => {
+  const originalShare = navigator.share;
+  afterEach(() => {
+    Object.defineProperty(navigator, 'share', { value: originalShare, configurable: true });
+  });
+
+  it('shows the link and what the invitations earned, and copies the link', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    withPlan(<PlanView />);
+    expect(await screen.findByText('https://www.winjgm.com/?ref=ABCD2345')).toBeInTheDocument();
+    expect(
+      screen.getByText(/primeros pasos: 2 · en camino: 1 · meses ganados: 1\. Te faltan 4/)
+    ).toBeVisible();
+    expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith('https://www.winjgm.com/?ref=ABCD2345')
+    );
+    expect(await screen.findByText(tr('billing.invite.copied'))).toBeInTheDocument();
+  });
+
+  it('offers the native share sheet when the device has one', async () => {
+    const share = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    withPlan(<PlanView />);
+    fireEvent.click(await screen.findByRole('button', { name: tr('billing.invite.share') }));
+    expect(share).toHaveBeenCalledWith({
+      title: 'Money Manager',
+      text: tr('billing.invite.shareText'),
+      url: 'https://www.winjgm.com/?ref=ABCD2345',
+    });
+  });
+
+  it('stays out of the way until the code arrives', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockReturnValue(new Promise(() => undefined));
+    withPlan(<PlanView />, f.billing(), api);
+    await screen.findByRole('heading', { name: new RegExp(tr('billing.yourPlan')) });
+    expect(screen.queryByText(new RegExp(tr('billing.invite.title')))).toBeNull();
   });
 });
 

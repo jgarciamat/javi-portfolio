@@ -27,12 +27,16 @@ export const FEATURE_KEYS: Record<PremiumFeature, string> = {
   import: 'billing.feature.import',
   insights: 'billing.feature.insights',
   aiAdvisor: 'billing.feature.aiAdvisor',
+  forecast: 'billing.feature.forecast',
+  household: 'billing.feature.household',
 };
 
 export const PREMIUM_BENEFITS = [
   'billing.benefit.unlimited',
   'billing.benefit.import',
   'billing.benefit.insights',
+  'billing.benefit.forecast',
+  'billing.benefit.household',
   'billing.benefit.ai',
   'billing.benefit.support',
 ];

@@ -1,0 +1,64 @@
+/* ─── Getting started checklist and month recap ──────────────────────────── */
+
+.getting-started-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.btn-link {
+  border: none;
+  background: none;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.getting-started-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #1e293b;
+  overflow: hidden;
+  margin: 0.4rem 0 0.9rem;
+}
+
+.getting-started-bar span {
+  display: block;
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.25s ease;
+}
+
+.getting-started-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.getting-started-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.getting-started-list li.is-done .getting-started-text {
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.getting-started-text {
+  flex: 1;
+}
+
+.getting-started-list .btn-secondary {
+  width: auto;
+}
+
+.month-recap p {
+  margin: 0.3rem 0;
+  color: #cbd5e1;
+}

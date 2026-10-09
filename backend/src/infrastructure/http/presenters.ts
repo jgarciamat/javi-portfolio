@@ -4,7 +4,13 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
-import { NetWorthPoint } from '@application/insights/InsightsServices';
+import { ProjectedMonth } from '@domain/services/forecast';
+import { SubscriptionReport } from '@domain/services/subscriptions';
+import {
+  AnnualReport,
+  ForecastResult,
+  NetWorthPoint,
+} from '@application/insights/InsightsServices';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
 import { AnnualOverview, MonthOverview } from '@application/transactions/TransactionService';
@@ -233,5 +239,86 @@ export function presentNetWorth(p: NetWorthPoint) {
     available: m(p.availableCents),
     saved: m(p.savedCents),
     netWorth: m(p.netWorthCents),
+  };
+}
+
+export function presentForecast(f: ForecastResult) {
+  const month = (p: ProjectedMonth) => ({
+    year: p.year,
+    month: p.month,
+    income: m(p.incomeCents),
+    fixedExpenses: m(p.fixedExpenseCents),
+    variableExpenses: m(p.variableExpenseCents),
+    saving: m(p.savingCents),
+    balance: m(p.balanceCents),
+    endAvailable: m(p.endAvailableCents),
+  });
+  return {
+    year: f.year,
+    month: f.month,
+    safeToSpend: {
+      available: m(f.safeToSpend.availableCents),
+      daysLeft: f.safeToSpend.daysLeft,
+      daily: m(f.safeToSpend.dailyCents),
+      projectedEnd: m(f.safeToSpend.projectedEndCents),
+      status: f.safeToSpend.status,
+    },
+    locked: f.locked,
+    projection: f.projection ? f.projection.map(month) : null,
+    firstShortfall: f.firstShortfall,
+    rules: f.rules.map((r) => ({
+      id: r.id,
+      description: r.description,
+      type: r.type,
+      amount: m(r.amountCents),
+      frequency: r.frequency,
+    })),
+  };
+}
+
+export function presentSubscriptions(r: SubscriptionReport) {
+  return {
+    monthly: m(r.monthlyCents),
+    annual: m(r.annualCents),
+    subscriptions: r.subscriptions.map((s) => ({
+      key: s.key,
+      description: s.description,
+      cadence: s.cadence,
+      amount: m(s.amountCents),
+      annualCost: m(s.annualCostCents),
+      count: s.count,
+      lastDate: s.lastDate,
+      nextDate: s.nextDate,
+      priceIncrease: s.priceIncrease
+        ? { from: m(s.priceIncrease.fromCents), to: m(s.priceIncrease.toCents) }
+        : null,
+    })),
+  };
+}
+
+export function presentAnnualReport(r: AnnualReport) {
+  const totals = (t: AnnualReport['totals']) => ({
+    income: m(t.incomeCents),
+    expenses: m(t.expenseCents),
+    saving: m(t.savingCents),
+    balance: m(t.balanceCents),
+  });
+  const category = (c: { categoryName: string; cents: Cents }) => ({
+    categoryName: c.categoryName,
+    amount: m(c.cents),
+  });
+  return {
+    year: r.year,
+    currency: r.currency,
+    months: r.months.map((x) => ({
+      month: x.month,
+      income: m(x.incomeCents),
+      expenses: m(x.expenseCents),
+      saving: m(x.savingCents),
+    })),
+    quarters: r.quarters.map((q) => ({ quarter: q.quarter, ...totals(q) })),
+    totals: totals(r.totals),
+    incomeByCategory: r.incomeByCategory.map(category),
+    expensesByCategory: r.expensesByCategory.map(category),
   };
 }

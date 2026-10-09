@@ -3,6 +3,7 @@ import { useAIAdvisor } from '../../application/hooks/useAIAdvisor';
 import { useI18n } from '@core/i18n/I18nContext';
 import '../css/AIAdvisor.css';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { AskAssistant } from './AskAssistant';
 import '@modules/billing/ui/css/Billing.css';
 import type { AIAdvice } from '@modules/finances/domain/types';
 
@@ -128,6 +129,7 @@ export function AIAdvisor({ year, month }: { year: number; month: number }) {
       <div id={bodyId} className={`ai-advisor-body${open ? ' ai-advisor-body--open' : ''}`}>
         <div className="ai-advisor-body-inner">
           <AIAdviceContent advice={advice} error={error} t={t} />
+          <AskAssistant />
         </div>
       </div>
     </div>

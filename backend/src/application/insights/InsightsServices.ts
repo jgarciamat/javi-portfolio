@@ -1,11 +1,28 @@
 import { createHash } from 'crypto';
+import { BusinessRuleError, PaymentRequiredError } from '@domain/errors';
+import { RecurringRule } from '@domain/model/RecurringRule';
+import { buildQuestionFacts } from '@domain/services/question-facts';
 import {
   AccountRepository,
   AiUsageRepository,
   CategoryBudgetRepository,
+  RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
 } from '@domain/ports/repositories';
+import {
+  SubscriptionReport,
+  detectSubscriptions,
+  subscriptionKey,
+} from '@domain/services/subscriptions';
+import {
+  ProjectedMonth,
+  SafeToSpend,
+  averageVariable,
+  firstShortfall,
+  projectMonths,
+  safeToSpend,
+} from '@domain/services/forecast';
 import { Clock, FinancialAdvisor } from '@domain/ports/services';
 import {
   Advice,
@@ -21,7 +38,11 @@ import {
   assertValidPeriod,
   comparePeriods,
   currentPeriod,
+  periodEnd,
+  periodOrdinal,
+  periodStart,
   periodsBetween,
+  todayDateOnly,
 } from '@domain/shared/period';
 import { AiAllowance, AiDenial, AiQuota } from '@application/ai/AiAllowance';
 import { EntitlementService } from '@application/billing/EntitlementService';
@@ -40,6 +61,36 @@ export interface NetWorthPoint {
   netWorthCents: Cents;
 }
 
+export interface ForecastResult extends Period {
+  safeToSpend: SafeToSpend;
+  /** True when the month-by-month outlook is a Premium feature the user does not have. */
+  locked: boolean;
+  projection: ProjectedMonth[] | null;
+  firstShortfall: Period | null;
+  /** Active recurring rules, so the outlook can be tried without any of them. */
+  rules: RecurringRule[];
+}
+
+/** Past periods used to learn the usual non-recurring spending. */
+const VARIABLE_HISTORY = 3;
+
+export interface AnnualReport {
+  year: number;
+  currency: string;
+  months: { month: number; incomeCents: Cents; expenseCents: Cents; savingCents: Cents }[];
+  quarters: {
+    quarter: number;
+    incomeCents: Cents;
+    expenseCents: Cents;
+    savingCents: Cents;
+    balanceCents: Cents;
+  }[];
+  totals: { incomeCents: Cents; expenseCents: Cents; savingCents: Cents; balanceCents: Cents };
+  /** Whole-year totals per category, largest first. */
+  incomeByCategory: { categoryName: string; cents: Cents }[];
+  expensesByCategory: { categoryName: string; cents: Cents }[];
+}
+
 export class StatsService {
   constructor(
     private readonly transactions: TransactionRepository,
@@ -47,8 +98,57 @@ export class StatsService {
     private readonly settings: SettingsRepository,
     private readonly transactionService: TransactionService,
     private readonly entitlements: EntitlementService,
+    private readonly rules: RecurringRuleRepository,
     private readonly clock: Clock
   ) {}
+
+  /**
+   * "Can I reach the end of the month?" for everyone; the month-by-month outlook
+   * (with "what if I cancel…" scenarios) is Premium and comes back locked otherwise.
+   */
+  forecast(userId: string, options: { months: number; exclude: string[] }): ForecastResult {
+    const startDay = this.settings.get(userId).monthStartDay;
+    const now = this.clock.now();
+    const period = currentPeriod(startDay, now);
+    const month = this.transactionService.getMonth(userId, period);
+    const past = Array.from({ length: VARIABLE_HISTORY }, (_, i) =>
+      this.transactions.listByPeriod(userId, addMonths(period, -(i + 1)))
+    );
+    const variable = averageVariable(past);
+    const safe = safeToSpend({
+      availableCents: month.availableCents,
+      today: todayDateOnly(now),
+      periodStart: periodStart(period, startDay),
+      periodEnd: periodEnd(period, startDay),
+      variable,
+    });
+    const rules = this.rules.listByUser(userId).filter((r) => r.active);
+    const locked = !this.entitlements.limits(userId).features.forecast;
+    const projection = locked
+      ? null
+      : projectMonths({
+          from: addMonths(period, 1),
+          months: options.months,
+          startAvailableCents: safe.projectedEndCents,
+          rules,
+          variable,
+          excludedRuleIds: new Set(options.exclude),
+          skipped: new Map(
+            rules.map((r) => [
+              r.id,
+              new Set(this.rules.skippedPeriods(r.id).map((p) => periodOrdinal(p))),
+            ])
+          ),
+        });
+    return {
+      ...period,
+      safeToSpend: safe,
+      locked,
+      projection,
+      firstShortfall: projection ? firstShortfall(projection) : null,
+      rules,
+    };
+  }
 
   trends(
     userId: string,
@@ -64,6 +164,79 @@ export class StatsService {
       'EXPENSE'
     );
     return { ...period, categories: computeCategoryTrends(period, totals) };
+  }
+
+  /** Year summary for the accountant or the tax return: months, quarters and categories. */
+  annualReport(userId: string, year: number): AnnualReport {
+    assertValidPeriod({ year, month: 1 });
+    this.entitlements.assertFeature(userId, 'insights');
+    const from = { year, month: 1 };
+    const to = { year, month: 12 };
+    // Makes sure the recurring movements of the year exist before they are added up.
+    this.transactionService.getMonth(userId, to);
+    const byMonth = new Map(
+      this.transactions.totalsByPeriod(userId, from, to).map((t) => [t.month, t])
+    );
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const t = byMonth.get(i + 1);
+      return {
+        month: i + 1,
+        incomeCents: t?.incomeCents ?? 0,
+        expenseCents: t?.expenseCents ?? 0,
+        savingCents: t?.savingCents ?? 0,
+      };
+    });
+    const sum = (list: typeof months) => {
+      const incomeCents = list.reduce((s, m) => s + m.incomeCents, 0);
+      const expenseCents = list.reduce((s, m) => s + m.expenseCents, 0);
+      const savingCents = list.reduce((s, m) => s + m.savingCents, 0);
+      return {
+        incomeCents,
+        expenseCents,
+        savingCents,
+        balanceCents: incomeCents - expenseCents - savingCents,
+      };
+    };
+    const byCategory = (type: 'INCOME' | 'EXPENSE') => {
+      const totals = new Map<string, Cents>();
+      for (const row of this.transactions.categoryTotals(userId, from, to, type)) {
+        totals.set(row.categoryName, (totals.get(row.categoryName) ?? 0) + row.cents);
+      }
+      return [...totals.entries()]
+        .map(([categoryName, cents]) => ({ categoryName, cents }))
+        .sort((a, b) => b.cents - a.cents || a.categoryName.localeCompare(b.categoryName));
+    };
+    return {
+      year,
+      currency: this.settings.get(userId).currency,
+      months,
+      quarters: [1, 2, 3, 4].map((quarter) => ({
+        quarter,
+        ...sum(months.slice((quarter - 1) * 3, quarter * 3)),
+      })),
+      totals: sum(months),
+      incomeByCategory: byCategory('INCOME'),
+      expensesByCategory: byCategory('EXPENSE'),
+    };
+  }
+
+  /** Charges that repeat like a subscription, so the user can review what they pay for. */
+  subscriptions(userId: string): SubscriptionReport {
+    this.entitlements.assertFeature(userId, 'insights');
+    const movements = this.transactions.listAllByUser(userId).map((tx) => {
+      const { description, amountCents, date, type, recurringRuleId } = tx.toPrimitives();
+      return { description, amountCents, date, type, recurringRuleId };
+    });
+    const coveredKeys = new Set(
+      this.rules
+        .listByUser(userId)
+        .filter((r) => r.active)
+        .map((r) => subscriptionKey(r.description))
+    );
+    return detectSubscriptions(movements, {
+      today: todayDateOnly(this.clock.now()),
+      coveredKeys,
+    });
   }
 
   netWorth(userId: string, months: number): NetWorthPoint[] {
@@ -192,6 +365,71 @@ export class AdviceService {
     } catch (e) {
       this.logger.error(`[advice] ${this.advisor.name} failed, using rules`, e);
       return rules('error');
+    }
+  }
+
+  /** Months of history the assistant can answer from. */
+  private static readonly QUESTION_MONTHS = 12;
+
+  /**
+   * Free-form question about the user's own figures. Premium, counted as one analysis of
+   * the monthly quota, and answered only from aggregated figures (never descriptions).
+   */
+  async ask(
+    userId: string,
+    rawQuestion: string,
+    locale: 'es' | 'en'
+  ): Promise<{ answer: string; ai: AiQuota }> {
+    const answer = this.advisor?.answerQuestion?.bind(this.advisor);
+    if (!this.advisor || !answer) {
+      throw new BusinessRuleError('AI_UNAVAILABLE', 'El asistente no está disponible ahora mismo');
+    }
+    const denial = this.allowance.check(userId, 'analysis');
+    if (denial === 'premium_required') {
+      throw new PaymentRequiredError('PREMIUM_REQUIRED', 'Esta función es parte de Premium', {
+        feature: 'aiAdvisor',
+      });
+    }
+    if (denial) {
+      throw new BusinessRuleError(
+        denial === 'quota' ? 'AI_QUOTA' : 'AI_BUDGET',
+        denial === 'quota'
+          ? 'Has usado todos tus análisis con IA de este mes'
+          : 'El asistente ha llegado a su límite de hoy; vuelve a intentarlo mañana'
+      );
+    }
+
+    const startDay = this.settings.get(userId).monthStartDay;
+    const now = this.clock.now();
+    const to = currentPeriod(startDay, now);
+    const from = addMonths(to, -(AdviceService.QUESTION_MONTHS - 1));
+    const month = this.transactionService.getMonth(userId, to);
+    const totals = new Map(
+      this.transactions.totalsByPeriod(userId, from, to).map((t) => [`${t.year}-${t.month}`, t])
+    );
+    const facts = buildQuestionFacts({
+      currency: this.settings.get(userId).currency,
+      today: todayDateOnly(now),
+      availableCents: month.availableCents,
+      months: periodsBetween(from, to).map((p) => {
+        const t = totals.get(`${p.year}-${p.month}`);
+        return {
+          ...p,
+          incomeCents: t?.incomeCents ?? 0,
+          expenseCents: t?.expenseCents ?? 0,
+          savingCents: t?.savingCents ?? 0,
+        };
+      }),
+      categoryTotals: this.transactions.categoryTotals(userId, from, to, 'EXPENSE'),
+    });
+
+    try {
+      const result = await answer({ question: rawQuestion.trim(), locale, facts });
+      this.allowance.record(userId, 'analysis', result.usage);
+      return { answer: result.answer, ai: this.allowance.quota(userId) };
+    } catch (e) {
+      this.logger.error(`[ask] ${this.advisor.name} failed`, e);
+      throw new BusinessRuleError('AI_ERROR', 'No he podido responder ahora; inténtalo de nuevo');
     }
   }
 }

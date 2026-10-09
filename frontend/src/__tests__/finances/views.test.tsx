@@ -496,6 +496,31 @@ describe('AnalysisView', () => {
     await waitFor(() => expect(api.insightsApi.netWorth).toHaveBeenLastCalledWith(24));
   });
 
+  it('lists the detected subscriptions with the yearly cost and price increases', async () => {
+    const api = createFakeApi();
+    renderWithProviders(<AnalysisView />, { api });
+    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
+    const rows = screen
+      .getAllByRole('row')
+      .filter((r) => /Netflix|Seguro coche/.test(r.textContent ?? ''));
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText(/subió de .*12,99.* a .*13,99/)).toBeInTheDocument();
+    expect(within(rows[0]).getByText(tr('app.subscriptions.monthly'))).toBeInTheDocument();
+    expect(within(rows[1]).getByText(tr('app.subscriptions.yearly'))).toBeInTheDocument();
+    expect(within(rows[1]).queryByText(/subió/)).toBeNull();
+  });
+
+  it('says so when there are no subscriptions or they cannot be loaded', async () => {
+    const api = createFakeApi();
+    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ subscriptions: [] }));
+    const { unmount } = renderWithProviders(<AnalysisView />, { api });
+    expect(await screen.findByText(tr('app.subscriptions.none'))).toBeInTheDocument();
+    unmount();
+    api.insightsApi.subscriptions.mockRejectedValue(new Error('Sin suscripciones'));
+    renderWithProviders(<AnalysisView />, { api });
+    expect(await screen.findByText('Sin suscripciones')).toBeInTheDocument();
+  });
+
   it('handles empty data and errors', async () => {
     const api = createFakeApi();
     api.insightsApi.netWorth.mockRejectedValue(new Error('Sin patrimonio'));

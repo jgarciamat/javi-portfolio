@@ -426,3 +426,16 @@
   color: #a5b4fc;
   text-decoration: none;
 }
+
+.invite-link {
+  margin: 0.4rem 0 0.8rem;
+  word-break: break-all;
+  font-size: 0.9rem;
+}
+
+.invite-link code {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #a5b4fc;
+}

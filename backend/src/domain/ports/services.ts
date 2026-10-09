@@ -1,3 +1,4 @@
+import { QuestionFacts } from '@domain/services/question-facts';
 import { Advice, AdviceContext } from '@domain/services/rule-based-advisor';
 
 export interface Clock {
@@ -66,6 +67,12 @@ export interface AiUsage {
 export interface FinancialAdvisor {
   readonly name: string;
   getAdvice(context: AdviceContext): Promise<{ advice: Advice; usage: AiUsage }>;
+  /** Free-form questions about the user's own figures (not every provider offers it). */
+  answerQuestion?(request: {
+    question: string;
+    locale: 'es' | 'en';
+    facts: QuestionFacts;
+  }): Promise<{ answer: string; usage: AiUsage }>;
 }
 
 /** Suggests a category (one of `categories`, or null) for each description. */
@@ -150,4 +157,20 @@ export interface AffiliateOffer {
 
 export interface OfferCatalog {
   list(): AffiliateOffer[];
+}
+
+/** Anonymous, aggregated product counters (no user, no content): what happens, not who. */
+export type MetricName =
+  | 'signup'
+  | 'email_verified'
+  | 'checkout_started'
+  | 'purchase'
+  | 'ai_analysis'
+  | 'ai_question'
+  | 'import_done'
+  | 'referral_joined'
+  | 'household_joined';
+
+export interface MetricsRecorder {
+  record(name: MetricName): void;
 }

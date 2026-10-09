@@ -8,7 +8,9 @@ import { GeminiAdvisor } from '@infrastructure/ai/GeminiAdvisor';
 import {
   buildCategorizationPrompt,
   buildPrompt,
+  buildQuestionPrompt,
   parseAdvice,
+  parseAnswer,
   parseCategorization,
 } from '@infrastructure/ai/prompts';
 import { DisabledPaymentGateway, StripeGateway } from '@infrastructure/billing/StripeGateway';
@@ -203,6 +205,31 @@ describe('AI prompts', () => {
     expect(
       parseCategorization('{"categories":["hogar","Inventada",null]}', 4, ['Hogar', 'Ocio'])
     ).toEqual(['Hogar', null, null, null]);
+  });
+});
+
+describe('questions about the figures', () => {
+  const facts = {
+    currency: 'EUR',
+    today: '2026-03-15',
+    available: 100,
+    months: [],
+    expensesByCategory: {},
+  };
+
+  it('builds a prompt with the figures, the question and the language', () => {
+    const prompt = buildQuestionPrompt('¿Cuánto gasté en ocio?', 'es', facts);
+    expect(prompt).toContain('Spanish (Spain)');
+    expect(prompt).toContain('"available":100');
+    expect(prompt).toContain('¿Cuánto gasté en ocio?');
+    expect(buildQuestionPrompt('How much?', 'en', facts)).toContain('Answer in English');
+  });
+
+  it('trims and caps the answer and refuses an empty one', () => {
+    expect(parseAnswer('  Gastaste 30 €.  ')).toBe('Gastaste 30 €.');
+    expect(parseAnswer({ a: 1 })).toBe('{"a":1}');
+    expect(parseAnswer('x'.repeat(5000))).toHaveLength(1500);
+    expect(() => parseAnswer('   ')).toThrow('Empty answer');
   });
 });
 
@@ -793,5 +820,49 @@ describe('BackupService', () => {
     expect(service.prune(new Date())).toEqual([old]);
     db.close();
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+});
+
+describe('CloudflareAi questions', () => {
+  const options = {
+    accountId: 'acc',
+    apiToken: 'tok',
+    model: '@cf/meta/llama-3.1-8b-instruct-fp8-fast',
+    jsonMode: true,
+    neuronsPerMInput: 4119,
+    neuronsPerMOutput: 34868,
+  };
+  afterEach(() => jest.restoreAllMocks());
+
+  it('asks for plain text (no JSON mode) and returns the answer with its cost', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          success: true,
+          result: {
+            response: 'Gastaste 30 €.',
+            usage: { prompt_tokens: 1000, completion_tokens: 100 },
+          },
+        }),
+        { status: 200 }
+      )
+    );
+    const { answer, usage } = await new CloudflareAi(options).answerQuestion({
+      question: '¿Cuánto en ocio?',
+      locale: 'es',
+      facts: {
+        currency: 'EUR',
+        today: '2026-03-15',
+        available: 0,
+        months: [],
+        expensesByCategory: {},
+      },
+    });
+    expect(answer).toBe('Gastaste 30 €.');
+    expect(usage.neurons).toBeCloseTo(4.119 + 3.4868, 4);
+    const body = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.response_format).toBeUndefined();
+    expect(body.max_tokens).toBe(400);
+    expect(body.messages[0].content).toMatch(/ONLY the JSON figures/);
   });
 });

@@ -25,7 +25,9 @@ import {
   CustomAlertService,
   GoalService,
 } from '@application/planning/PlanningServices';
+import { HouseholdService } from '@application/household/HouseholdService';
 import { ProfileService } from '@application/profile/ProfileService';
+import { ReferralService } from '@application/referrals/ReferralService';
 import { RecurringMaterializer } from '@application/recurring/RecurringMaterializer';
 import { RecurringService } from '@application/recurring/RecurringService';
 import { SettingsService } from '@application/settings/SettingsService';
@@ -57,6 +59,9 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
+import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
+import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
   SqliteRefreshTokenRepository,
@@ -113,6 +118,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     billingEvents: new SqliteBillingEventRepository(db),
     aiUsage: new SqliteAiUsageRepository(db),
     affiliateClicks: new SqliteAffiliateClickRepository(db),
+    metrics: new SqliteMetricsRepository(db, clock),
+    referrals: new SqliteReferralRepository(db),
+    household: new SqliteHouseholdRepository(db),
   };
 
   const tokens = new JwtTokenService(
@@ -198,6 +206,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     transactions,
     materializer,
     entitlements,
+    referrals: new ReferralService(
+      repos.referrals,
+      entitlements,
+      repos.metrics,
+      clock,
+      // First steps: 3 movements, a budget, a goal and an automation.
+      (userId) =>
+        repos.transactions.count(userId) >= 3 &&
+        repos.budgets.listByUser(userId).length > 0 &&
+        repos.goals.listByUser(userId).length > 0 &&
+        repos.rules.listByUser(userId).length > 0
+    ),
+    household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
     payments,
     profile: new ProfileService(repos.users, repos.refreshTokens, hasher, auth, uow),
@@ -245,6 +266,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.settings,
       transactions,
       entitlements,
+      repos.rules,
       clock
     ),
     advice: new AdviceService(
@@ -271,6 +293,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         goals: repos.goals.listByUser(userId).length,
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
+        movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,
       uow,
@@ -281,6 +304,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         founderLimit: config.billing.founderLimit,
         // Without Stripe config the gateway is either disabled or a test double.
         lifetimeConfigured: config.billing.stripe ? !!config.billing.stripe.prices.lifetime : true,
+        metrics: repos.metrics,
       }
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
