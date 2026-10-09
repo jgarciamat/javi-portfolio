@@ -59,7 +59,7 @@ function Outlook({
   onToggle: (id: string) => void;
 }) {
   const { t } = useI18n();
-  const { money, monthLabel } = useFormat();
+  const { money, monthLabel, monthName } = useFormat();
   const expenses = forecast.rules.filter((r) => r.type === 'EXPENSE');
   const shortfall = forecast.firstShortfall;
 
@@ -93,7 +93,7 @@ function Outlook({
         <table className="data-table">
           <thead>
             <tr>
-              {['month', 'income', 'expenses', 'saving', 'endAvailable'].map((c) => (
+              {['month', 'endAvailable', 'income', 'expenses', 'saving'].map((c) => (
                 <th key={c}>{t(`app.forecast.col.${c}`)}</th>
               ))}
             </tr>
@@ -101,13 +101,15 @@ function Outlook({
           <tbody>
             {forecast.projection?.map((p) => (
               <tr key={`${p.year}-${p.month}`}>
-                <td>{monthLabel(p.year, p.month)}</td>
+                <td>
+                  {monthName(p.month, 'short')} {String(p.year).slice(2)}
+                </td>
+                <td className={p.endAvailable < 0 ? 'forecast-negative' : undefined}>
+                  <strong>{money(p.endAvailable)}</strong>
+                </td>
                 <td>{money(p.income)}</td>
                 <td>{money(p.fixedExpenses + p.variableExpenses)}</td>
                 <td>{money(p.saving)}</td>
-                <td className={p.endAvailable < 0 ? 'forecast-negative' : undefined}>
-                  {money(p.endAvailable)}
-                </td>
               </tr>
             ))}
           </tbody>

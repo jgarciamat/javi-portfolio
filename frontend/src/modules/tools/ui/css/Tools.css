@@ -3,6 +3,19 @@
 .tools-main {
   display: grid;
   gap: 1.2rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+.tools-main .pricing-title {
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+}
+
+.tools-field {
+  min-width: 0;
 }
 
 .tools-form {

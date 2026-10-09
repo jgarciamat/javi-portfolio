@@ -752,6 +752,7 @@
   "billing.invite.shareText": "Controla tus finanzas con Money Manager. Con este enlace tienes un mes de Premium extra:",
   "billing.invite.stats": "Amigos que han completado los primeros pasos: {qualified} · en camino: {pending} · meses ganados: {earned}. Te faltan {missing} para el próximo mes gratis.",
   "app.privacy.s2.item8": "Si te registras con un enlace de invitación, guardamos quién te invitó para dar a ambos el mes de Premium gratis.",
+  "app.privacy.s2.item9": "Si compartes tu hogar con otra persona, esa persona ve y edita tus movimientos, presupuestos, metas y demás datos mientras esté en el hogar; puedes quitarla cuando quieras desde Ajustes.",
   "app.privacy.s3.item4": "Contar los clics en la sección «Ofertas» para liquidar comisiones con los partners (base legal: interés legítimo, art. 6.1.f RGPD). No compartimos tu identidad con ellos.",
   "app.privacy.s4.item4": "Stripe Payments Europe Ltd. (pagos de Premium): procesa el pago y los datos de facturación como responsable independiente. Consulta stripe.com/es/privacy.",
   "app.privacy.s4.item5": "Resend (envío de los emails de verificación, recuperación de contraseña y confirmación de compra): recibe tu email y tu nombre. Consulta resend.com/legal/privacy-policy.",

@@ -8,6 +8,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { reloadPage } from '@shared/utils/navigation';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import type { HouseholdStatus } from '@modules/billing/domain/types';
+import '@modules/billing/ui/css/Billing.css';
 import '../css/Sections.css';
 
 /** Share the data with a partner: invite, see who is in, remove or leave. */
