@@ -136,6 +136,34 @@ describe('month view', () => {
   });
 });
 
+describe('app shortcuts (?add=)', () => {
+  function setupWith(route: string) {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: [dinner] }));
+    api.categoryApi.getAll.mockResolvedValue(categories);
+    api.accountApi.getAll.mockResolvedValue({ accounts, total: 1000 });
+    return renderWithProviders(<Dashboard />, { api, route });
+  }
+  const typeSelect = () => screen.findByRole('combobox', { name: tr('app.transaction.form.type') });
+
+  it('opens the new-movement form for the requested type', async () => {
+    setupWith('/?add=income');
+    const select = await typeSelect();
+    expect(select).toHaveValue('INCOME');
+    expect(
+      screen.getByRole('button', { name: literal(tr('app.transaction.form.title')) })
+    ).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('keeps the form closed without a valid request', async () => {
+    setupWith('/?add=nonsense');
+    await screen.findByText('Cena');
+    expect(
+      screen.getByRole('button', { name: literal(tr('app.transaction.form.title')) })
+    ).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
 describe('new movement form', () => {
   const open = () =>
     fireEvent.click(

@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { OptionsDropdown, type DropdownOption } from '@shared/components/OptionsDropdown';
 import { todayDateOnly } from '@shared/utils/format';
-import type { Transaction } from '@modules/finances/domain/types';
+import type { Transaction, TransactionType } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
 import {
@@ -84,6 +85,13 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
     </div>
   );
 }
+
+/** `?add=expense|income|saving` (the app icon shortcuts) opens the new-movement form. */
+const QUICK_ADD: Record<string, TransactionType> = {
+  expense: 'EXPENSE',
+  income: 'INCOME',
+  saving: 'SAVING',
+};
 
 // ─── Movements panel ──────────────────────────────────────────────────────────
 
@@ -167,6 +175,8 @@ export function MonthlyView({
 }: MonthlyViewProps) {
   const { t } = useI18n();
   const f = useFinances();
+  const [params, setParams] = useSearchParams();
+  const quickAdd = QUICK_ADD[params.get('add') ?? ''] ?? null;
   // Until the month arrives its first day is a good guess for the period start.
   const defaultDate = f.isCurrentPeriod
     ? todayDateOnly()
@@ -203,6 +213,8 @@ export function MonthlyView({
           onManageCategories={onManageCategories}
           defaultDate={defaultDate}
           availableBalance={f.available}
+          quickAdd={quickAdd}
+          onQuickAddDone={() => setParams({}, { replace: true })}
         />
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />

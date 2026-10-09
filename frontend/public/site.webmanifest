@@ -1,55 +1,68 @@
 {
-    "id": "com.jgarciamat.moneymanager",
-    "name": "Money Manager",
-    "short_name": "MoneyMgr",
-    "description": "Control de gastos, ingresos y ahorros personales con gráficos mensuales y anuales.",
-    "start_url": "/",
-    "scope": "/",
-    "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#0f172a",
-    "theme_color": "#0f172a",
-    "lang": "es",
-    "dir": "ltr",
-    "categories": [
-        "finance",
-        "productivity"
-    ],
-    "prefer_related_applications": false,
-    "icons": [
-        {
-            "src": "/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "/screenshots/mobile-dashboard.png",
-            "sizes": "390x844",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Dashboard principal"
-        },
-        {
-            "src": "/screenshots/mobile-transactions.png",
-            "sizes": "390x844",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Listado de transacciones"
-        }
-    ]
+  "id": "com.jgarciamat.moneymanager",
+  "name": "Money Manager",
+  "short_name": "MoneyMgr",
+  "description": "Control de gastos, ingresos y ahorros personales con gráficos mensuales y anuales.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["finance", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Añadir gasto",
+      "short_name": "Gasto",
+      "description": "Registrar un gasto ahora mismo",
+      "url": "/?add=expense",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Añadir ingreso",
+      "short_name": "Ingreso",
+      "description": "Registrar un ingreso ahora mismo",
+      "url": "/?add=income",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard principal"
+    },
+    {
+      "src": "/screenshots/mobile-transactions.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Listado de transacciones"
+    }
+  ]
 }
