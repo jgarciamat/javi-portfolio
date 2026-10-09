@@ -285,7 +285,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     canManage: false,
   },
   limits: catalog().limits.premium,
-  usage: { accounts: 1, budgets: 2, goals: 0, recurringRules: 1, customAlerts: 0 },
+  usage: { accounts: 2, budgets: 2, goals: 0, recurringRules: 1, customAlerts: 0 },
   ai: { used: 0, quota: 30 },
   catalog: catalog(),
   ...over,
