@@ -1,6 +1,7 @@
 import type {
   Account,
   AIAdvice,
+  Forecast,
   BudgetLine,
   Category,
   CategoryBudget,
@@ -209,6 +210,41 @@ export const advice = (over: Partial<AIAdvice> = {}): AIAdvice => ({
   ...over,
 });
 
+export const forecast = (over: Partial<Forecast> = {}): Forecast => ({
+  year: 2026,
+  month: 3,
+  safeToSpend: { available: 900, daysLeft: 18, daily: 50, projectedEnd: 500, status: 'ok' },
+  locked: false,
+  projection: [
+    {
+      year: 2026,
+      month: 4,
+      income: 2000,
+      fixedExpenses: 900,
+      variableExpenses: 400,
+      saving: 0,
+      balance: 700,
+      endAvailable: 1200,
+    },
+    {
+      year: 2026,
+      month: 5,
+      income: 2000,
+      fixedExpenses: 900,
+      variableExpenses: 400,
+      saving: 100,
+      balance: 600,
+      endAvailable: 1800,
+    },
+  ],
+  firstShortfall: null,
+  rules: [
+    { id: 'r-rent', description: 'Alquiler', type: 'EXPENSE', amount: 700, frequency: 'monthly' },
+    { id: 'r-pay', description: 'Nómina', type: 'INCOME', amount: 2000, frequency: 'monthly' },
+  ],
+  ...over,
+});
+
 export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
   trialDays: 14,
@@ -217,8 +253,8 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   lifetime: { available: true, remaining: 87 },
   limits: {
     free: {
-      resources: { accounts: 1, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
-      features: { import: false, insights: false, aiAdvisor: false },
+      resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+      features: { import: false, insights: false, aiAdvisor: false, forecast: false },
       aiMonthlyQuota: 0,
     },
     premium: {
@@ -229,7 +265,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         recurringRules: null,
         customAlerts: null,
       },
-      features: { import: true, insights: true, aiAdvisor: true },
+      features: { import: true, insights: true, aiAdvisor: true, forecast: true },
       aiMonthlyQuota: 30,
     },
   },

@@ -191,6 +191,13 @@ const cases: Case[] = [
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],
   ['net worth range', () => insightsApi.netWorth(24), 'GET', '/stats/net-worth?months=24'],
+  ['forecast', () => insightsApi.forecast(), 'GET', '/stats/forecast?months=6'],
+  [
+    'forecast without rules',
+    () => insightsApi.forecast(3, ['a', 'b']),
+    'GET',
+    '/stats/forecast?months=3&exclude=a%2Cb',
+  ],
   [
     'advice',
     () => insightsApi.advice(2026, 3, 'es'),

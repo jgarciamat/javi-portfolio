@@ -8,7 +8,7 @@ export interface CheckoutConsent {
   waiveWithdrawal: boolean;
 }
 export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
-export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor';
+export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast';
 
 export interface PlanLimits {
   /** null = unlimited */

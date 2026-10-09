@@ -15,6 +15,7 @@ import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
+import { ForecastPanel } from './ForecastPanel';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
@@ -191,6 +192,7 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        {f.isCurrentPeriod && <ForecastPanel />}
 
         <TransactionForm
           categories={f.categories}
