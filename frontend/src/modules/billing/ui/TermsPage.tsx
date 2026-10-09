@@ -2,7 +2,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useGoBack } from '@shared/hooks/useGoBack';
 import '@modules/auth/ui/css/PrivacyPolicy.css';
 
-const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
+const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 's11'];
 
 /** Terms of sale. The seller's legal details are filled in from the locale files. */
 export function TermsPage() {

@@ -35,7 +35,7 @@ describe('Buying Premium: consent, confirmation and refunds', () => {
     await checkout({ acceptTerms: true, waiveWithdrawal: true }).expect(200);
     expect(ctx.container.repos.subscriptions.get(user.id)).toMatchObject({
       termsAcceptedAt: '2026-03-15T12:00:00.000Z',
-      termsVersion: '2026-10-08',
+      termsVersion: '2026-10-09',
       withdrawalWaivedAt: '2026-03-15T12:00:00.000Z',
     });
   });
