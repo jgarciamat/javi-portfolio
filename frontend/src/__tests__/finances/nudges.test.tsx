@@ -77,6 +77,76 @@ describe('Getting started', () => {
   });
 });
 
+describe('Getting started progress', () => {
+  const usage = (over: Partial<ReturnType<typeof f.billing>['usage']>) =>
+    f.billing({
+      usage: {
+        accounts: 1,
+        budgets: 0,
+        goals: 0,
+        recurringRules: 0,
+        customAlerts: 0,
+        movements: 1,
+        ...over,
+      },
+      ai: { used: 0, quota: 10 },
+    });
+  const card = () => screen.findByRole('region', { name: tr('app.gettingStarted.title') });
+  const goTo = (labelKey: string) => {
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    const menu = screen.getByRole('complementary', { name: tr('app.menu.ariaLabel') });
+    fireEvent.click(within(menu).getByRole('button', { name: new RegExp(tr(labelKey)) }));
+  };
+
+  it('ticks a step done in its section as soon as the user comes back', async () => {
+    const { api } = setup(usage({}));
+    expect(
+      within(await card()).getByText(tr('app.gettingStarted.progress', { done: 0, total: 5 }))
+    ).toBeVisible();
+    fireEvent.click(
+      within(await card()).getAllByRole('button', { name: tr('app.gettingStarted.go') })[0]
+    );
+    await screen.findByRole('region', { name: tr('app.tabs.budgets') });
+
+    // The budget is created there; back in the month view the counts are asked again.
+    api.billingApi.get.mockResolvedValue(usage({ budgets: 1 }));
+    goTo('app.tabs.monthly');
+    expect(
+      await within(await card()).findByText(
+        tr('app.gettingStarted.progress', { done: 1, total: 5 })
+      )
+    ).toBeVisible();
+    const budgetStep = within(await card())
+      .getByText(tr('app.gettingStarted.budget'))
+      .closest('li')!;
+    expect(budgetStep).toHaveClass('is-done');
+    expect(within(budgetStep).queryByRole('button')).toBeNull();
+  });
+
+  it('ticks the analysis even without the AI provider and disappears when all is done', async () => {
+    setup(usage({ movements: 5, budgets: 1, goals: 1, recurringRules: 1 }));
+    expect(
+      within(await card()).getByText(tr('app.gettingStarted.progress', { done: 4, total: 5 }))
+    ).toBeVisible();
+    // The analysis falls back to the rules: the AI quota stays at 0.
+    fireEvent.click(screen.getByRole('button', { name: /Analizar mes/ }));
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull()
+    );
+  });
+
+  it('keeps a step done after its data is gone or a new month starts', async () => {
+    localStorage.setItem(
+      `mm_getting_started_done:${f.user().id}`,
+      JSON.stringify(['budget', 'ai'])
+    );
+    setup(usage({}));
+    expect(
+      within(await card()).getByText(tr('app.gettingStarted.progress', { done: 2, total: 5 }))
+    ).toBeVisible();
+  });
+});
+
 describe('Month recap', () => {
   const recap = () => screen.findByRole('region', { name: /Resumen de febrero/i });
 

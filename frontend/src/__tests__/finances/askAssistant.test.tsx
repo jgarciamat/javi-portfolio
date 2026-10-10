@@ -82,7 +82,10 @@ describe('AI analysis for free users', () => {
     const api = createFakeApi();
     api.billingApi.get.mockResolvedValue(free);
     api.insightsApi.advice.mockResolvedValue(f.advice({ source: 'rules', reason: 'quota' }));
-    renderWithProviders(<AIAdvisor year={2026} month={3} />, { api, plan: true });
+    renderWithProviders(<AIAdvisor year={2026} month={3} onAnalyzed={jest.fn()} />, {
+      api,
+      plan: true,
+    });
     fireEvent.click(await screen.findByRole('button', { name: tr('app.ai.btn.analyze') }));
     expect(await screen.findByText(tr('app.ai.fallback.quotaFree'))).toBeInTheDocument();
     // One in the notice and one in the locked question box.

@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useAIAdvisor } from '../../application/hooks/useAIAdvisor';
 import { useI18n } from '@core/i18n/I18nContext';
 import '../css/AIAdvisor.css';
@@ -87,7 +87,16 @@ function AIAdviceContent({ advice, error, t }: AIAdviceContentProps) {
   );
 }
 
-export function AIAdvisor({ year, month }: { year: number; month: number }) {
+export function AIAdvisor({
+  year,
+  month,
+  onAnalyzed,
+}: {
+  year: number;
+  month: number;
+  /** A fresh analysis was made (the getting-started step). */
+  onAnalyzed: () => void;
+}) {
   const { t, locale } = useI18n();
   const { advice, loading, error, justAnalyzed, analyze } = useAIAdvisor({ year, month, locale });
   const plan = useOptionalPlan();
@@ -95,8 +104,12 @@ export function AIAdvisor({ year, month }: { year: number; month: number }) {
   const bodyId = useId();
 
   // A fresh analysis opens the panel; another month closes it.
+  const analyzed = useRef(onAnalyzed);
+  analyzed.current = onAnalyzed;
   useEffect(() => {
-    if (justAnalyzed) setOpen(true);
+    if (!justAnalyzed) return;
+    setOpen(true);
+    analyzed.current();
   }, [justAnalyzed]);
   useEffect(() => setOpen(false), [year, month]);
 
