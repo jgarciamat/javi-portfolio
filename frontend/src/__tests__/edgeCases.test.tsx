@@ -254,7 +254,10 @@ describe('billing edge cases', () => {
     api.insightsApi.advice.mockResolvedValue(
       f.advice({ source: 'rules', reason: 'premium_required' })
     );
-    renderWithProviders(<AIAdvisor year={2026} month={3} />, { api, plan: true });
+    renderWithProviders(<AIAdvisor year={2026} month={3} onAnalyzed={jest.fn()} />, {
+      api,
+      plan: true,
+    });
     fireEvent.click(screen.getByRole('button', { name: tr('app.ai.btn.analyze') }));
     fireEvent.click(
       await screen.findByRole('button', { name: new RegExp(tr('billing.seePlans')) })
