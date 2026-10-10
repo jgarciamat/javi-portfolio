@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSettings } from '@core/settings/SettingsContext';
 import { storage } from '@shared/utils/storage';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
@@ -6,6 +7,7 @@ import type { BillingOverview } from '@modules/billing/domain/types';
 import { useFinances } from '../FinancesContext';
 import type { DashboardTab } from '../../ui/navigation';
 
+/** Hidden on this device at once (and where it was hidden before it was saved in the account). */
 const HIDDEN_KEY = 'mm_getting_started_hidden';
 /** Steps done once stay done: deleting the budget later, or a new month, does not untick them. */
 const doneKey = (userId: string) => `mm_getting_started_done:${userId}`;
@@ -46,14 +48,17 @@ function reachedSteps(overview: BillingOverview): GettingStartedStepId[] {
  * What a new user should try first, derived from what they have created. The
  * counts are fetched again whenever the month view opens (coming back from the
  * section where the step was done) and whenever a movement is added or removed.
- * Once every step is done the checklist goes away.
+ * The panel stays, even with every step done, until the user hides it.
  */
 export function useGettingStarted() {
   const plan = useOptionalPlan();
   const overview = plan?.overview ?? null;
   const userId = useAuth().user?.id ?? '';
   const movementsThisMonth = useFinances().transactions.length;
-  const [hidden, setHidden] = useState(() => storage.get(HIDDEN_KEY) === '1');
+  const { settings, updateSettings } = useSettings();
+  const [hiddenHere, setHiddenHere] = useState(() => storage.get(HIDDEN_KEY) === '1');
+  // Only "Ocultar" hides it, for good and on every device: finishing every step does not.
+  const hidden = hiddenHere || settings?.showGettingStarted === false;
   const [remembered, setRemembered] = useState(() =>
     storage.getJSON<GettingStartedStepId[]>(doneKey(userId), [])
   );
@@ -92,12 +97,14 @@ export function useGettingStarted() {
   return {
     steps,
     completed,
-    visible: steps.length > 0 && completed < steps.length && !hidden,
+    visible: steps.length > 0 && !hidden,
+    allDone: steps.length > 0 && completed === steps.length,
     /** Marks a step done from the month view (an analysis, with or without the AI provider). */
     complete: (id: GettingStartedStepId) => remember([id]),
     hide: () => {
       storage.set(HIDDEN_KEY, '1');
-      setHidden(true);
+      setHiddenHere(true);
+      updateSettings({ showGettingStarted: false }).catch(() => undefined);
     },
   };
 }

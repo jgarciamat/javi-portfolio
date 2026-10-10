@@ -634,6 +634,7 @@
   "app.gettingStarted.title": "First steps",
   "app.gettingStarted.hide": "Hide",
   "app.gettingStarted.progress": "{done} of {total} done",
+  "app.gettingStarted.allDone": "🎉 All done! You know the basics. Hide this panel whenever you like.",
   "app.gettingStarted.movements": "Register 3 movements (expenses or income) with \"New transaction\"",
   "app.gettingStarted.budget": "Create a budget for a category",
   "app.gettingStarted.goal": "Set a savings goal",

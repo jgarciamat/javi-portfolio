@@ -66,3 +66,19 @@ test('ticks a first step as soon as it is done in its section', async ({ page })
   await expect(budgetStep).toHaveClass(/is-done/);
   await expect(budgetStep.getByRole('button', { name: 'Ir' })).toHaveCount(0);
 });
+
+test('the first steps stay until they are hidden, for good and on every device', async ({
+  page,
+}) => {
+  const steps = page.getByRole('region', { name: 'Primeros pasos' });
+  await expect(steps).toBeVisible();
+  await steps.getByRole('button', { name: 'Ocultar' }).click();
+  await expect(steps).toHaveCount(0);
+
+  // Saved in the account: a new session on a clean device does not bring it back.
+  await page.getByRole('button', { name: 'Salir' }).click();
+  await page.evaluate(() => localStorage.clear());
+  await signIn(page);
+  await page.waitForTimeout(1500);
+  await expect(steps).toHaveCount(0);
+});

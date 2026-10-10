@@ -634,6 +634,7 @@
   "app.gettingStarted.title": "Primeros pasos",
   "app.gettingStarted.hide": "Ocultar",
   "app.gettingStarted.progress": "{done} de {total} completados",
+  "app.gettingStarted.allDone": "🎉 ¡Todo completado! Ya conoces lo básico. Puedes ocultar este panel cuando quieras.",
   "app.gettingStarted.movements": "Registra 3 movimientos (gastos o ingresos) con «Nueva transacción»",
   "app.gettingStarted.budget": "Crea un presupuesto para una categoría",
   "app.gettingStarted.goal": "Fija una meta de ahorro",

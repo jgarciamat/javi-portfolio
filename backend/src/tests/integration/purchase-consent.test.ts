@@ -109,8 +109,21 @@ describe('Buying Premium: consent, confirmation and refunds', () => {
   });
 });
 
-describe('Guided tour setting', () => {
-  it('is on by default and can be turned off', async () => {
+describe('Onboarding settings', () => {
+  it('show the "first steps" panel until it is hidden, on every device', async () => {
+    const ctx = createTestApp();
+    const user = await createUser(ctx);
+    const settings = () => request(ctx.app).get('/api/settings').set(user.auth).expect(200);
+    expect((await settings()).body.showGettingStarted).toBe(true);
+    await request(ctx.app)
+      .patch('/api/settings')
+      .set(user.auth)
+      .send({ showGettingStarted: false })
+      .expect(200);
+    expect((await settings()).body.showGettingStarted).toBe(false);
+  });
+
+  it('show the guided tour by default until it is turned off', async () => {
     const ctx = createTestApp();
     const user = await createUser(ctx);
     const settings = () => request(ctx.app).get('/api/settings').set(user.auth).expect(200);
