@@ -27,6 +27,8 @@ export interface UserSettingsProps {
   showOffers: boolean;
   /** Open the guided tour after signing in (until the user asks not to). */
   showTour: boolean;
+  /** The "first steps" panel of the month view, until the user hides it. */
+  showGettingStarted: boolean;
 }
 
 export type SettingsChanges = Partial<Omit<UserSettingsProps, 'userId'>>;
@@ -41,6 +43,7 @@ export function defaultSettings(userId: string, locale: string = 'es'): UserSett
     notificationsEnabled: false,
     showOffers: true,
     showTour: true,
+    showGettingStarted: true,
   };
 }
 
