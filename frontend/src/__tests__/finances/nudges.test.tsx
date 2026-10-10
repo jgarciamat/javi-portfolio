@@ -19,6 +19,9 @@ const SETTLED = f.billing({
   ai: { used: 2, quota: 10 },
 });
 
+/** The user hid the "first steps" panel (on any device). */
+const PANEL_HIDDEN = f.settings({ showGettingStarted: false });
+
 function setup(billing = SETTLED, previous = f.overview({ month: 2 }), settings = f.settings()) {
   const api = createFakeApi();
   api.settingsApi.get.mockResolvedValue(settings);
@@ -55,7 +58,7 @@ describe('Getting started', () => {
         movements: 4,
       },
     });
-    const { unmount } = setup(partly);
+    const { api, unmount } = setup(partly);
     const card = await screen.findByRole('region', { name: tr('app.gettingStarted.title') });
     expect(
       within(card).getByText(tr('app.gettingStarted.progress', { done: 2, total: 5 }))
@@ -63,6 +66,8 @@ describe('Getting started', () => {
     expect(within(card).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2');
     fireEvent.click(within(card).getByRole('button', { name: tr('app.gettingStarted.hide') }));
     expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull();
+    // Saved in the account: it stays hidden on the web, in the app and on other devices.
+    expect(api.settingsApi.update).toHaveBeenCalledWith({ showGettingStarted: false });
     unmount();
 
     setup(partly);
@@ -70,9 +75,26 @@ describe('Getting started', () => {
     expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull();
   });
 
-  it('is not shown once everything was tried', async () => {
+  it('hides at once even if the account cannot be updated (offline)', async () => {
+    const { api } = setup(NEW_USER);
+    api.settingsApi.update.mockRejectedValue(new Error('offline'));
+    const card = await screen.findByRole('region', { name: tr('app.gettingStarted.title') });
+    fireEvent.click(within(card).getByRole('button', { name: tr('app.gettingStarted.hide') }));
+    await waitFor(() => expect(api.settingsApi.update).toHaveBeenCalled());
+    expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull();
+  });
+
+  it('stays with every step done until the user hides it', async () => {
     setup(SETTLED);
-    await screen.findByText(tr('app.nav.currentMonth'));
+    const card = await screen.findByRole('region', { name: tr('app.gettingStarted.title') });
+    expect(within(card).getByText(tr('app.gettingStarted.allDone'))).toBeVisible();
+    expect(within(card).queryByRole('button', { name: tr('app.gettingStarted.go') })).toBeNull();
+    expect(screen.queryByRole('region', { name: /Resumen de/ })).toBeNull();
+  });
+
+  it('is not shown where the user hid it on another device', async () => {
+    setup(NEW_USER, undefined, PANEL_HIDDEN);
+    await screen.findByRole('region', { name: /Resumen de febrero/i });
     expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull();
   });
 });
@@ -123,16 +145,14 @@ describe('Getting started progress', () => {
     expect(within(budgetStep).queryByRole('button')).toBeNull();
   });
 
-  it('ticks the analysis even without the AI provider and disappears when all is done', async () => {
+  it('ticks the analysis even without the AI provider and celebrates when all is done', async () => {
     setup(usage({ movements: 5, budgets: 1, goals: 1, recurringRules: 1 }));
     expect(
       within(await card()).getByText(tr('app.gettingStarted.progress', { done: 4, total: 5 }))
     ).toBeVisible();
     // The analysis falls back to the rules: the AI quota stays at 0.
     fireEvent.click(screen.getByRole('button', { name: /Analizar mes/ }));
-    await waitFor(() =>
-      expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull()
-    );
+    expect(await within(await card()).findByText(tr('app.gettingStarted.allDone'))).toBeVisible();
   });
 
   it('keeps a step done after its data is gone or a new month starts', async () => {
@@ -151,7 +171,7 @@ describe('Month recap', () => {
   const recap = () => screen.findByRole('region', { name: /Resumen de febrero/i });
 
   it('closes the previous month once and remembers it was seen', async () => {
-    const { api, unmount } = setup();
+    const { api, unmount } = setup(SETTLED, undefined, PANEL_HIDDEN);
     const card = await recap();
     expect(api.monthApi.get).toHaveBeenCalledWith(2026, 2);
     expect(
@@ -164,7 +184,7 @@ describe('Month recap', () => {
     expect(screen.queryByRole('region', { name: /Resumen de febrero/i })).toBeNull();
     unmount();
 
-    const again = setup();
+    const again = setup(SETTLED, undefined, PANEL_HIDDEN);
     await screen.findByText(tr('app.nav.currentMonth'));
     expect(screen.queryByRole('region', { name: /Resumen de febrero/i })).toBeNull();
     // Nothing was requested for a recap that is already seen.
@@ -184,7 +204,8 @@ describe('Month recap', () => {
           expensesByCategory: {},
           transactionCount: 1,
         }),
-      })
+      }),
+      PANEL_HIDDEN
     );
     const card = await recap();
     expect(within(card).getByText(/Cerraste el mes con .*90.* de más gastado/)).toBeVisible();
@@ -193,7 +214,11 @@ describe('Month recap', () => {
   });
 
   it('says nothing when the previous month had no movements', async () => {
-    setup(SETTLED, f.overview({ month: 2, summary: f.summary({ transactionCount: 0 }) }));
+    setup(
+      SETTLED,
+      f.overview({ month: 2, summary: f.summary({ transactionCount: 0 }) }),
+      PANEL_HIDDEN
+    );
     await waitFor(() => expect(screen.getByText(tr('app.nav.currentMonth'))).toBeVisible());
     await screen.findByRole('button', { name: new RegExp(tr('app.nav.prev')) });
     expect(screen.queryByRole('region', { name: /Resumen de/ })).toBeNull();
@@ -201,6 +226,7 @@ describe('Month recap', () => {
 
   it('looks at December of the previous year in January', async () => {
     const january = f.settings({
+      showGettingStarted: false,
       currentPeriod: { year: 2026, month: 1, start: '2026-01-01', end: '2026-01-31' },
     });
     const { api } = setup(SETTLED, f.overview({ year: 2025, month: 12 }), january);

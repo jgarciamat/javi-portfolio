@@ -24,7 +24,9 @@ export function GettingStarted({
         </button>
       </div>
       <p className="section-hint">
-        {t('app.gettingStarted.progress', { done: completed, total: steps.length })}
+        {checklist.allDone
+          ? t('app.gettingStarted.allDone')
+          : t('app.gettingStarted.progress', { done: completed, total: steps.length })}
       </p>
       <div
         className="getting-started-bar"

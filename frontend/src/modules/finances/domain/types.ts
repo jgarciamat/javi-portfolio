@@ -497,6 +497,8 @@ export interface UserSettings {
   showOffers: boolean;
   /** Open the guided tour after signing in. */
   showTour: boolean;
+  /** The "first steps" panel of the month view, until the user hides it. */
+  showGettingStarted: boolean;
   currentPeriod: { year: number; month: number; start: string; end: string };
 }
 
@@ -510,5 +512,6 @@ export type SettingsChanges = Partial<
     | 'notificationsEnabled'
     | 'showOffers'
     | 'showTour'
+    | 'showGettingStarted'
   >
 >;
