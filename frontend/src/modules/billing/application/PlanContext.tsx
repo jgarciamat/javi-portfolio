@@ -2,7 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { ApiError, registerPaymentRequiredHandler } from '@core/api/http';
+import { playBillingAvailable, purchasePremium } from '@core/billing/playStore';
+import { useAuth } from '@shared/hooks/useAuth';
 import { redirectTo } from '@shared/utils/navigation';
+import type { AuthUser } from '@modules/auth/domain/types';
 import type {
   BillingOverview,
   CheckoutConsent,
@@ -64,6 +67,7 @@ function clearNoticeFromUrl(): void {
 
 export function PlanProvider({ children }: { children: ReactNode }) {
   const { billingApi } = useApi();
+  const { user } = useAuth();
   const [overview, setOverview] = useState<BillingOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [upgradeReason, setUpgradeReason] = useState<UpgradeReason | null>(null);
@@ -107,10 +111,15 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const checkout = useCallback(
     async (kind: CheckoutKind, consent: CheckoutConsent) => {
+      if (playBillingAvailable()) {
+        // Google Play takes the payment; our server hears about it from RevenueCat.
+        if (await purchasePremium(kind, (user as AuthUser).id)) setNotice('success');
+        return;
+      }
       const { url } = await billingApi.checkout(kind, consent);
       redirectTo(url);
     },
-    [billingApi]
+    [billingApi, user]
   );
 
   const openPortal = useCallback(async () => {

@@ -16,12 +16,23 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
+jest.mock('@core/billing/playStore', () => ({
+  ...jest.requireActual('@core/billing/playStore'),
+  playBillingAvailable: jest.fn(() => false),
+  purchasePremium: jest.fn(),
+}));
+const playStore = jest.requireMock('@core/billing/playStore') as {
+  playBillingAvailable: jest.Mock;
+  purchasePremium: jest.Mock;
+};
+
 jest.mock('@shared/utils/navigation', () => ({ redirectTo: jest.fn() }));
 const { redirectTo } = jest.requireMock('@shared/utils/navigation') as { redirectTo: jest.Mock };
 
 beforeEach(() => {
   localStorage.clear();
   jest.clearAllMocks();
+  playStore.playBillingAvailable.mockReturnValue(false);
   window.history.replaceState(null, '', '/');
 });
 afterEach(() => jest.restoreAllMocks());
@@ -368,6 +379,22 @@ describe('Cancelling', () => {
     },
   });
 
+  it('sends Google Play subscribers to Google Play to manage the plan', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    const google = f.billing({
+      plan: 'premium',
+      subscription: { ...paying.subscription, source: 'google', canManage: false },
+    });
+    withPlan(<PlanView />, google);
+    expect(
+      await screen.findByText(tr('billing.status.renewsOn', { date: '15 abr 2026' }))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: new RegExp(tr('billing.manageGoogle')) })
+    ).toHaveAttribute('href', 'https://play.google.com/store/account/subscriptions');
+    expect(screen.getByText(tr('billing.manageGoogleHint'))).toBeInTheDocument();
+  });
+
   it('only offers to cancel the renewal, keeping Premium until the end of the period', async () => {
     withPlan(<PlanView />, paying);
     expect(await screen.findByText(tr('billing.cancelHint'))).toBeInTheDocument();
@@ -423,6 +450,29 @@ describe('PlanOptions', () => {
     fireEvent.click(await screen.findByRole('button', { name: literal(tr('billing.lifetime')) }));
     await waitFor(() => expect(api.billingApi.checkout).toHaveBeenCalledWith('lifetime', CONSENT));
     expect(screen.getByText(tr('billing.redirecting'))).toBeInTheDocument();
+  });
+
+  it('sells through Google Play inside the Android app, without the web consents', async () => {
+    playStore.playBillingAvailable.mockReturnValue(true);
+    playStore.purchasePremium.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const api = createFakeApi();
+    withPlan(<PlanView />, f.billing(), api);
+    const yearly = await screen.findByRole('button', { name: new RegExp(tr('billing.yearly')) });
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    expect(yearly).toBeEnabled();
+    // Cancelling the Google Play sheet leaves everything as it was.
+    fireEvent.click(yearly);
+    await waitFor(() => expect(playStore.purchasePremium).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(yearly).toBeEnabled());
+    expect(api.billingApi.checkout).not.toHaveBeenCalled();
+    // A purchase asks the server again until the webhook has landed.
+    fireEvent.click(yearly);
+    await waitFor(() => expect(playStore.purchasePremium).toHaveBeenCalledTimes(2));
+    expect(playStore.purchasePremium).toHaveBeenLastCalledWith('yearly', expect.any(String));
+    await waitFor(() => expect(api.billingApi.get.mock.calls.length).toBeGreaterThan(1), {
+      timeout: 4000,
+    });
+    expect(redirectTo).not.toHaveBeenCalled();
   });
 
   it('defers to the web in the native apps and when payments are off', async () => {

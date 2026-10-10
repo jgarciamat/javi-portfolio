@@ -214,7 +214,7 @@ export const advice = (over: Partial<AIAdvice> = {}): AIAdvice => ({
   positives: ['Gastos controlados'],
   warnings: ['Ocio alto'],
   source: 'ai',
-  ai: { used: 1, quota: 30 },
+  ai: { used: 1, quota: 10 },
   ...over,
 });
 
@@ -276,7 +276,7 @@ export const report = (over: Partial<AnnualReport> = {}): AnnualReport => ({
 
 export const answer = (over: Partial<AIAnswer> = {}): AIAnswer => ({
   answer: 'Gastaste 120 € en ocio.',
-  ai: { used: 2, quota: 30 },
+  ai: { used: 2, quota: 10 },
   ...over,
 });
 
@@ -336,7 +336,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         forecast: false,
         household: false,
       },
-      aiMonthlyQuota: 0,
+      aiMonthlyQuota: 1,
     },
     premium: {
       resources: {
@@ -347,7 +347,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         customAlerts: null,
       },
       features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
-      aiMonthlyQuota: 30,
+      aiMonthlyQuota: 10,
     },
   },
   ...over,
@@ -384,7 +384,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     customAlerts: 0,
     movements: 5,
   },
-  ai: { used: 0, quota: 30 },
+  ai: { used: 0, quota: 10 },
   catalog: catalog(),
   ...over,
 });

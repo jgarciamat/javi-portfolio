@@ -35,13 +35,25 @@ export class AiAllowance {
 
   /** null when the call may go ahead. `analysis` calls count towards the user's monthly quota. */
   check(userId: string, kind: 'analysis' | 'background'): AiDenial | null {
-    if (!this.entitlements.limits(userId).features.aiAdvisor) return 'premium_required';
+    const limits = this.entitlements.limits(userId);
+    // Background work (statement categorisation) is Premium; analyses follow the monthly quota,
+    // which free users also have (one) so they can see what the AI adds.
+    if (kind === 'background' ? !limits.features.aiAdvisor : limits.aiMonthlyQuota <= 0) {
+      return 'premium_required';
+    }
     if (kind === 'analysis') {
       const { used, quota } = this.quota(userId);
       if (used >= quota) return 'quota';
     }
     if (!this.budgetLeft()) return 'budget';
     return null;
+  }
+
+  /** Free-form questions are Premium; they share the monthly quota and the daily budget. */
+  checkQuestion(userId: string): AiDenial | null {
+    return this.entitlements.limits(userId).features.aiAdvisor
+      ? this.check(userId, 'analysis')
+      : 'premium_required';
   }
 
   budgetLeft(): boolean {

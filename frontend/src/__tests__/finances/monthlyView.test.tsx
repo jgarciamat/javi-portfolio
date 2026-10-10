@@ -430,7 +430,7 @@ describe('AI advisor', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.ai.btn.analyze') }));
     expect(await screen.findByText('Buen mes')).toBeInTheDocument();
     expect(api.insightsApi.advice).toHaveBeenCalledWith(2026, 3, 'es');
-    expect(screen.getByText(tr('app.ai.quota', { used: 1, quota: 30 }))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.ai.quota', { used: 1, quota: 10 }))).toBeInTheDocument();
     expect(screen.getByRole('button', { name: tr('app.ai.btn.reanalyze') })).toBeEnabled();
     const toggle = screen.getByRole('button', { name: literal(tr('app.ai.title')) });
     await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'true'));

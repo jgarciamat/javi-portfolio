@@ -45,7 +45,7 @@ describe('Asking the assistant', () => {
 
   it('answers from aggregated figures only and counts one analysis of the quota', async () => {
     const res = await ask().expect(200);
-    expect(res.body).toEqual({ answer: 'Gastaste 30 €.', ai: { used: 1, quota: 30 } });
+    expect(res.body).toEqual({ answer: 'Gastaste 30 €.', ai: { used: 1, quota: 10 } });
 
     const sent = answerQuestion.mock.calls[0][0];
     expect(sent).toMatchObject({ question: '¿Cuánto gasté en ocio?', locale: 'es' });
@@ -78,7 +78,7 @@ describe('Asking the assistant', () => {
   });
 
   it('stops at the monthly quota and at the daily budget of the service', async () => {
-    for (let i = 0; i < 30; i++) ctx.container.repos.aiUsage.addUserCall(user.id, '2026-03');
+    for (let i = 0; i < 10; i++) ctx.container.repos.aiUsage.addUserCall(user.id, '2026-03');
     expect((await ask().expect(400)).body.code).toBe('AI_QUOTA');
 
     const other = await createUser(ctx);

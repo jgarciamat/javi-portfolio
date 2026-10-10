@@ -14,6 +14,7 @@ import { AiAllowance } from '@application/ai/AiAllowance';
 import { AiCategorizer } from '@application/ai/AiCategorizer';
 import { BillingService } from '@application/billing/BillingService';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import { PlayBillingService } from '@application/billing/PlayBillingService';
 import { OfferService } from '@application/offers/OfferService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
@@ -306,6 +307,15 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         lifetimeConfigured: config.billing.stripe ? !!config.billing.stripe.prices.lifetime : true,
         metrics: repos.metrics,
       }
+    ),
+    playBilling: new PlayBillingService(
+      repos.subscriptions,
+      repos.billingEvents,
+      repos.users,
+      uow,
+      clock,
+      repos.metrics,
+      config.billing.revenueCatWebhookAuth
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer: new ImportService(

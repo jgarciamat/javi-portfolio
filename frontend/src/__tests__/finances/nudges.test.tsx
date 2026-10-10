@@ -16,7 +16,7 @@ const NEW_USER = f.billing({
 });
 const SETTLED = f.billing({
   usage: { accounts: 1, budgets: 1, goals: 1, recurringRules: 1, customAlerts: 0, movements: 20 },
-  ai: { used: 2, quota: 30 },
+  ai: { used: 2, quota: 10 },
 });
 
 function setup(billing = SETTLED, previous = f.overview({ month: 2 }), settings = f.settings()) {

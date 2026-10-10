@@ -10,6 +10,7 @@ import { metrics } from './008-metrics';
 import { referrals } from './009-referrals';
 import { household } from './010-household';
 import { referralTiers } from './011-referral-tiers';
+import { googlePlaySource } from './012-google-play-source';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
 export const migrations: Migration[] = [
@@ -24,4 +25,5 @@ export const migrations: Migration[] = [
   referrals,
   household,
   referralTiers,
+  googlePlaySource,
 ];

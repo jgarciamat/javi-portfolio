@@ -4,7 +4,7 @@ import { RateLimiterFactory, asyncHandler, authed } from '../middleware';
 import { checkoutBody, offerParams } from '../schemas';
 
 /**
- * Stripe calls this with a signed raw body, so it is mounted before the JSON
+ * Stripe calls its webhook with a signed raw body, so it is mounted before the JSON
  * parser and outside authentication.
  */
 export function billingWebhookRoute(c: Container): Router {
@@ -14,6 +14,15 @@ export function billingWebhookRoute(c: Container): Router {
     express.raw({ type: 'application/json', limit: '1mb' }),
     asyncHandler(async (req, res) => {
       await c.billing.handleWebhook(req.body as Buffer, req.header('stripe-signature'));
+      res.json({ received: true });
+    })
+  );
+  // RevenueCat reports purchases made in the Android app (Google Play).
+  router.post(
+    '/billing/play/webhook',
+    express.json({ limit: '1mb' }),
+    asyncHandler(async (req, res) => {
+      c.playBilling.handleWebhook(req.header('authorization'), req.body);
       res.json({ received: true });
     })
   );

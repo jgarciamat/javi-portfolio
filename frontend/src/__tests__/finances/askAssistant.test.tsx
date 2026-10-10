@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react';
+import { AIAdvisor } from '@modules/finances/ui/components/AIAdvisor';
 import { AskAssistant } from '@modules/finances/ui/components/AskAssistant';
 import { ApiError } from '@core/api/http';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -16,7 +17,7 @@ describe('Ask the assistant', () => {
     submit();
     expect(await screen.findByText('Gastaste 120 € en ocio.')).toBeInTheDocument();
     expect(api.insightsApi.ask).toHaveBeenCalledWith('¿Cuánto gasté en ocio?', 'es');
-    expect(screen.getByText(tr('app.ai.quota', { used: 2, quota: 30 }))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.ai.quota', { used: 2, quota: 10 }))).toBeInTheDocument();
     expect(screen.getByText(tr('app.ask.privacy'))).toBeInTheDocument();
   });
 
@@ -66,6 +67,28 @@ describe('Ask the assistant', () => {
     expect(await screen.findByText(tr('app.ask.locked'))).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('billing.seePlans')) }));
+    expect(
+      await screen.findByText(
+        tr('billing.reason.feature', { feature: tr('billing.feature.aiAdvisor') })
+      )
+    ).toBeInTheDocument();
+  });
+});
+
+describe('AI analysis for free users', () => {
+  const free = f.billing({ plan: 'free', trialDaysLeft: 0, limits: f.catalog().limits.free });
+
+  it('offers Premium once the one free analysis of the month is spent', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(free);
+    api.insightsApi.advice.mockResolvedValue(f.advice({ source: 'rules', reason: 'quota' }));
+    renderWithProviders(<AIAdvisor year={2026} month={3} />, { api, plan: true });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.ai.btn.analyze') }));
+    expect(await screen.findByText(tr('app.ai.fallback.quotaFree'))).toBeInTheDocument();
+    // One in the notice and one in the locked question box.
+    const plans = screen.getAllByRole('button', { name: new RegExp(tr('billing.seePlans')) });
+    expect(plans).toHaveLength(2);
+    fireEvent.click(plans[0]);
     expect(
       await screen.findByText(
         tr('billing.reason.feature', { feature: tr('billing.feature.aiAdvisor') })
