@@ -231,7 +231,7 @@ export function MonthlyView({
         />
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
-        <AIAdvisor year={f.year} month={f.month} />
+        <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
         <MovementsPanel onEdit={onEditTransaction} />
 
         {f.summary && f.transactions.length > 0 && (

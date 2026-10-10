@@ -46,3 +46,23 @@ test('warns while the connection is lost', async ({ page, context }) => {
   await context.setOffline(false);
   await expect(banner).toBeHidden();
 });
+
+test('ticks a first step as soon as it is done in its section', async ({ page }) => {
+  const steps = page.getByRole('region', { name: 'Primeros pasos' });
+  const budgetStep = steps.locator('li', { hasText: 'Crea un presupuesto para una categoría' });
+  await expect(budgetStep).not.toHaveClass(/is-done/);
+  await budgetStep.getByRole('button', { name: 'Ir' }).click();
+  await expect(page.getByRole('region', { name: 'Presupuestos' })).toBeVisible();
+
+  await page
+    .getByRole('spinbutton', { name: /^Límite para/ })
+    .first()
+    .fill('150');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Guardar', exact: true })).toHaveCount(0);
+
+  // Back in the month view, without reloading.
+  await openSection(page, 'Resumen mensual');
+  await expect(budgetStep).toHaveClass(/is-done/);
+  await expect(budgetStep.getByRole('button', { name: 'Ir' })).toHaveCount(0);
+});
