@@ -167,6 +167,12 @@ export class BillingService {
     if (sub.lifetime) {
       throw new ConflictError('Ya tienes Premium de por vida', 'ALREADY_PREMIUM');
     }
+    if (sub.source === 'google' && LIVE_STATUSES.has(sub.status)) {
+      throw new ConflictError(
+        'Tu suscripción está en Google Play. Gestiónala desde la app de Android.',
+        'ALREADY_SUBSCRIBED'
+      );
+    }
     if (kind !== 'lifetime' && sub.stripeSubscriptionId && LIVE_STATUSES.has(sub.status)) {
       throw new ConflictError(
         'Ya tienes una suscripción. Puedes cambiarla desde "Gestionar suscripción".',

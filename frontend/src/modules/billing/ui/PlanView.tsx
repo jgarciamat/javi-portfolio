@@ -6,6 +6,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { errorMessage } from '@shared/utils/errors';
 import { isNativeApp } from '@shared/utils/platform';
+import { PLAY_SUBSCRIPTIONS_URL } from '@core/billing/playStore';
 import { usePlan } from '../application/PlanContext';
 import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domain/types';
 import { PlanOptions } from './PlanOptions';
@@ -27,10 +28,11 @@ function StatusLine({ overview }: { overview: BillingOverview }) {
   const date = (iso: string | null) => (iso ? formatDate(iso) : '');
 
   if (sub.lifetime) return <p>{t('billing.status.lifetime')}</p>;
-  if (sub.source === 'stripe' && sub.status === 'past_due') {
+  const subscribed = sub.source === 'stripe' || sub.source === 'google';
+  if (subscribed && sub.status === 'past_due') {
     return <p className="form-error">{t('billing.status.pastDue')}</p>;
   }
-  if (sub.source === 'stripe' && overview.plan === 'premium') {
+  if (subscribed && overview.plan === 'premium') {
     return (
       <p>
         {sub.cancelAtPeriodEnd
@@ -102,6 +104,21 @@ function PlanCard({ overview }: { overview: BillingOverview }) {
       <StatusLine overview={overview} />
       {error && <p className="form-error">{error}</p>}
       {/* The provider's portal also sells plans: not inside the store apps. */}
+      {overview.subscription.source === 'google' && !overview.subscription.lifetime && (
+        <>
+          <div className="button-row">
+            <a
+              className="btn-secondary"
+              href={PLAY_SUBSCRIPTIONS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ⚙️ {t('billing.manageGoogle')}
+            </a>
+          </div>
+          <p className="plan-note">{t('billing.manageGoogleHint')}</p>
+        </>
+      )}
       {overview.subscription.canManage && !isNativeApp() && (
         <>
           <div className="button-row">

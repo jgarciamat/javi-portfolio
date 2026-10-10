@@ -34,6 +34,8 @@ const envSchema = z.object({
   STRIPE_PRICE_MONTHLY: z.string().optional(),
   STRIPE_PRICE_YEARLY: z.string().optional(),
   STRIPE_PRICE_LIFETIME: z.string().optional(),
+  /** Shared secret RevenueCat sends in the Authorization header of its webhooks (Google Play purchases). */
+  REVENUECAT_WEBHOOK_AUTH: z.string().min(16).optional(),
   /** Prices shown in the UI (must match the Stripe prices, VAT included). */
   PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
   PRICE_YEARLY: z.coerce.number().positive().default(24.99),
@@ -83,6 +85,8 @@ export interface AppConfig {
       webhookSecret: string;
       prices: { monthly: string; yearly: string; lifetime: string | null };
     } | null;
+    /** Secret that authenticates RevenueCat's webhooks; null leaves Google Play purchases off. */
+    revenueCatWebhookAuth: string | null;
     displayPrices: { monthly: number; yearly: number; lifetime: number };
     founderLimit: number;
   };
@@ -191,6 +195,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
               },
             }
           : null,
+      revenueCatWebhookAuth: raw.REVENUECAT_WEBHOOK_AUTH ?? null,
       displayPrices: {
         monthly: raw.PRICE_MONTHLY,
         yearly: raw.PRICE_YEARLY,

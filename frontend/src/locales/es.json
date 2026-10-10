@@ -622,6 +622,8 @@
   "billing.checkoutError": "No se ha podido iniciar el pago",
   "billing.paymentsDisabled": "Los pagos todavía no están disponibles.",
   "billing.nativeNote": "La contratación de Premium no está disponible en esta aplicación.",
+  "billing.manageGoogle": "Gestionar en Google Play",
+  "billing.manageGoogleHint": "Tu suscripción se paga con Google Play: allí puedes cambiar de plan, ver los recibos o cancelarla.",
   "billing.trialKeeps": "Te quedan {days} días de prueba: no se cobra nada hasta que termine.",
   "billing.acceptTerms": "He leído y acepto las condiciones de contratación",
   "billing.readTerms": "leer",

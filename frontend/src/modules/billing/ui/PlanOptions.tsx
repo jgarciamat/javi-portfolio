@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { playBillingAvailable } from '@core/billing/playStore';
 import { isNativeApp } from '@shared/utils/platform';
 import type { CheckoutConsent, CheckoutKind, PlanCatalog } from '../domain/types';
 import { formatPrice, yearlySavingPct } from './pricing';
@@ -12,6 +13,11 @@ interface PlanOptionsProps {
   disabled?: boolean;
   /** Days of trial left (nothing is charged until they end). */
   trialDaysLeft: number;
+}
+
+interface CheckoutOptionsProps extends PlanOptionsProps {
+  /** The web asks for the terms and the immediate start; Google Play has its own purchase sheet. */
+  consentRequired: boolean;
 }
 
 interface PlanChoice {
@@ -99,7 +105,13 @@ function ConsentBoxes({
 }
 
 /** Plan buttons; they stay disabled until both consents are given. */
-function CheckoutOptions({ catalog, onChoose, disabled, trialDaysLeft }: PlanOptionsProps) {
+function CheckoutOptions({
+  catalog,
+  onChoose,
+  disabled,
+  trialDaysLeft,
+  consentRequired,
+}: CheckoutOptionsProps) {
   const { t } = useI18n();
   const choices = useChoices(catalog);
   const [busy, setBusy] = useState<CheckoutKind | null>(null);
@@ -108,13 +120,15 @@ function CheckoutOptions({ catalog, onChoose, disabled, trialDaysLeft }: PlanOpt
     acceptTerms: false,
     waiveWithdrawal: false,
   });
-  const accepted = consent.acceptTerms && consent.waiveWithdrawal;
+  const accepted = !consentRequired || (consent.acceptTerms && consent.waiveWithdrawal);
 
   const choose = async (kind: CheckoutKind) => {
     setBusy(kind);
     setError(null);
     try {
       await onChoose(kind, consent);
+      // The web leaves for the payment page; the store sheet comes back here.
+      if (!consentRequired) setBusy(null);
     } catch (e) {
       setError(errorMessage(e, t('billing.checkoutError')));
       setBusy(null);
@@ -123,7 +137,9 @@ function CheckoutOptions({ catalog, onChoose, disabled, trialDaysLeft }: PlanOpt
 
   return (
     <div className="plan-options">
-      <ConsentBoxes consent={consent} onChange={setConsent} disabled={disabled} />
+      {consentRequired && (
+        <ConsentBoxes consent={consent} onChange={setConsent} disabled={disabled} />
+      )}
       {choices.map((c) => (
         <button
           key={c.kind}
@@ -153,10 +169,11 @@ function CheckoutOptions({ catalog, onChoose, disabled, trialDaysLeft }: PlanOpt
 /** Monthly / yearly / founder plans, where Premium can be bought. */
 export function PlanOptions(props: PlanOptionsProps) {
   const { t } = useI18n();
-  // Store rules: the Android/iOS app neither sells Premium nor points to where to buy it.
+  // Store rules: the app sells Premium only through Google Play, never pointing to the web.
+  if (playBillingAvailable()) return <CheckoutOptions {...props} consentRequired={false} />;
   if (isNativeApp()) return <p className="plan-note">{t('billing.nativeNote')}</p>;
   if (!props.catalog.paymentsEnabled) {
     return <p className="plan-note">{t('billing.paymentsDisabled')}</p>;
   }
-  return <CheckoutOptions {...props} />;
+  return <CheckoutOptions {...props} consentRequired />;
 }

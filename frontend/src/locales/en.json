@@ -622,6 +622,8 @@
   "billing.checkoutError": "Could not start the payment",
   "billing.paymentsDisabled": "Payments are not available yet.",
   "billing.nativeNote": "Premium can't be purchased in this app.",
+  "billing.manageGoogle": "Manage in Google Play",
+  "billing.manageGoogleHint": "Your subscription is billed by Google Play: you can change plan, see receipts or cancel it there.",
   "billing.trialKeeps": "{days} trial days left: nothing is charged until it ends.",
   "billing.acceptTerms": "I have read and accept the terms of sale",
   "billing.readTerms": "read",

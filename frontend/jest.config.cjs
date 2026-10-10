@@ -12,6 +12,7 @@ module.exports = {
     // import.meta is not available in Jest: the API base URL comes from a mock
     '^@core/config/api\\.config$': '<rootDir>/src/__mocks__/api.config.ts',
     '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
+    '^@revenuecat/purchases-capacitor$': '<rootDir>/src/__mocks__/purchases.ts',
     '^virtual:pwa-register/react$': '<rootDir>/src/__mocks__/pwaRegister.ts',
     '^@modules/(.*)$': '<rootDir>/src/modules/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',

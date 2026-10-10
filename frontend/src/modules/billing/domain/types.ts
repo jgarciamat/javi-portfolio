@@ -49,7 +49,7 @@ export interface BillingOverview {
   trialDaysLeft: number;
   subscription: {
     status: 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';
-    source: 'trial' | 'stripe' | 'lifetime' | 'manual';
+    source: 'trial' | 'stripe' | 'lifetime' | 'manual' | 'google';
     trialEndsAt: string | null;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;

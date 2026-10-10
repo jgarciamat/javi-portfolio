@@ -3,6 +3,7 @@
  *  - trial: 14 days granted automatically at sign-up (no card)
  *  - stripe: recurring subscription paid on the web
  *  - lifetime: one-time "founder" purchase
+ *  - google: subscription or lifetime bought in the Android app (Google Play)
  *  - manual: granted by hand (support, partners)
  */
 export const TRIAL_DAYS = 14;
@@ -13,7 +14,7 @@ export const TERMS_VERSION = '2026-10-09';
 
 export type PlanId = 'free' | 'premium';
 export type SubscriptionStatus = 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';
-export type SubscriptionSource = 'trial' | 'stripe' | 'lifetime' | 'manual';
+export type SubscriptionSource = 'trial' | 'stripe' | 'lifetime' | 'manual' | 'google';
 
 export interface SubscriptionProps {
   userId: string;
