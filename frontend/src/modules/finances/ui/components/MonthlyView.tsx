@@ -217,6 +217,8 @@ export function MonthlyView({
           ))}
         {f.isCurrentPeriod && <ForecastPanel />}
 
+        <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
+        <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
         <TransactionForm
           categories={f.categories}
           accounts={f.accounts}
@@ -229,9 +231,6 @@ export function MonthlyView({
           quickAdd={quickAdd}
           onQuickAddDone={() => setParams({}, { replace: true })}
         />
-
-        <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
-        <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />
         <MovementsPanel onEdit={onEditTransaction} />
 
         {f.summary && f.transactions.length > 0 && (
