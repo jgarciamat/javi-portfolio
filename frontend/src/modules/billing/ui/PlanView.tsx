@@ -47,7 +47,6 @@ function StatusLine({ overview }: { overview: BillingOverview }) {
 
 function UsageCard({ overview }: { overview: BillingOverview }) {
   const { t } = useI18n();
-  const isPremium = overview.plan === 'premium';
   return (
     <div className="card">
       <h2 className="section-title">📊 {t('billing.usage')}</h2>
@@ -66,9 +65,7 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
         })}
         <li>
           <span>{t('billing.aiAnalyses')}</span>
-          <strong>
-            {isPremium ? `${overview.ai.used} / ${overview.ai.quota}` : t('billing.premiumOnly')}
-          </strong>
+          <strong>{`${overview.ai.used} / ${overview.ai.quota}`}</strong>
         </li>
       </ul>
     </div>

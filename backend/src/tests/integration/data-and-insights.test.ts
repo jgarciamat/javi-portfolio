@@ -408,7 +408,7 @@ describe('AI advice', () => {
       .set(user.auth)
       .send({ year: 2026, month: 3 })
       .expect(200);
-    expect(ai.body).toMatchObject({ summary: 'IA', source: 'ai', ai: { used: 1, quota: 30 } });
+    expect(ai.body).toMatchObject({ summary: 'IA', source: 'ai', ai: { used: 1, quota: 10 } });
     const cached = await request(ctx.app)
       .post('/api/ai/advice')
       .set(user.auth)

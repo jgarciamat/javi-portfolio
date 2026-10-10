@@ -384,7 +384,8 @@ export class AdviceService {
     if (!this.advisor || !answer) {
       throw new BusinessRuleError('AI_UNAVAILABLE', 'El asistente no está disponible ahora mismo');
     }
-    const denial = this.allowance.check(userId, 'analysis');
+    // Free users can have one analysis, but free-form questions are Premium.
+    const denial = this.allowance.checkQuestion(userId);
     if (denial === 'premium_required') {
       throw new PaymentRequiredError('PREMIUM_REQUIRED', 'Esta función es parte de Premium', {
         feature: 'aiAdvisor',

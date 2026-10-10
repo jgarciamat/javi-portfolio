@@ -9,7 +9,7 @@ export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 
 export interface PlanLimits {
   resources: Record<LimitedResource, number>;
   features: Record<PremiumFeature, boolean>;
-  /** AI analyses per calendar month (the monthly report counts as one). */
+  /** AI analyses per calendar month (the monthly report counts as one); free users get a taste. */
   aiMonthlyQuota: number;
 }
 
@@ -23,7 +23,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       forecast: false,
       household: false,
     },
-    aiMonthlyQuota: 0,
+    aiMonthlyQuota: 1,
   },
   premium: {
     resources: {
@@ -34,7 +34,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       customAlerts: Infinity,
     },
     features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
-    aiMonthlyQuota: 30,
+    aiMonthlyQuota: 10,
   },
 };
 

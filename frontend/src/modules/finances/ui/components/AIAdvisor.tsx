@@ -31,13 +31,19 @@ const SECTIONS = [
 
 function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'>) {
   const plan = useOptionalPlan();
-  const fallbackKey =
-    advice?.source === 'rules' && advice.reason ? FALLBACK_KEYS[advice.reason] : null;
+  const reason = advice?.source === 'rules' ? advice.reason : undefined;
+  // A free user who spent their one analysis is offered Premium (10 a month).
+  const spentFree = reason === 'quota' && plan !== null && !plan.isPremium;
+  const fallbackKey = spentFree
+    ? 'app.ai.fallback.quotaFree'
+    : reason
+    ? FALLBACK_KEYS[reason]
+    : null;
   if (!fallbackKey) return null;
   return (
     <div className="ai-fallback">
       <span>{t(fallbackKey)}</span>
-      {advice?.reason === 'premium_required' && plan && (
+      {(reason === 'premium_required' || spentFree) && plan && (
         <button
           className="ai-btn ai-btn--primary"
           onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'aiAdvisor' })}

@@ -56,7 +56,7 @@ describe('Plans and limits', () => {
           resources: { accounts: 2, budgets: 3 },
           features: { import: false, forecast: false },
         },
-        premium: { resources: { accounts: null }, aiMonthlyQuota: 30 },
+        premium: { resources: { accounts: null }, aiMonthlyQuota: 10 },
       },
     });
   });
@@ -67,7 +67,7 @@ describe('Plans and limits', () => {
       trialDaysLeft: 14,
       subscription: { status: 'trialing', source: 'trial', canManage: false },
       usage: { accounts: 1, budgets: 0, movements: 0 },
-      ai: { used: 0, quota: 30 },
+      ai: { used: 0, quota: 10 },
     });
     ctx.clock.set(new Date(ctx.clock.now().getTime() + 15 * DAY).toISOString());
     expect(await billing()).toMatchObject({
@@ -439,22 +439,28 @@ describe('Premium AI', () => {
     getAdvice: jest.fn().mockResolvedValue({ advice, usage: { neurons: 25 } }),
   });
 
-  it('is part of Premium: free users get the rule-based analysis', async () => {
+  it('gives free users one AI analysis a month and then the rule-based one', async () => {
     const advisor = fakeAdvisor();
     const { ctx, user, ask } = await setup(advisor);
     expireTrial(ctx, user);
-    const res = await ask().expect(200);
-    expect(res.body).toMatchObject({ source: 'rules', reason: 'premium_required' });
-    expect(advisor.getAdvice).not.toHaveBeenCalled();
+    expect((await ask().expect(200)).body).toMatchObject({
+      source: 'ai',
+      ai: { used: 1, quota: 1 },
+    });
+    await addTransaction(ctx, user, { amount: 5 }); // other figures: no cache
+    expect((await ask().expect(200)).body).toMatchObject({ source: 'rules', reason: 'quota' });
+    expect(advisor.getAdvice).toHaveBeenCalledTimes(1);
+    ctx.clock.set('2026-04-02T08:00:00Z'); // a new month: one more
+    expect((await ask().expect(200)).body.source).toBe('ai');
   });
 
   it('counts analyses and neurons and stops at the monthly quota', async () => {
     const advisor = fakeAdvisor();
     const { ctx, user, ask } = await setup(advisor);
-    expect((await ask()).body).toMatchObject({ source: 'ai', ai: { used: 1, quota: 30 } });
+    expect((await ask()).body).toMatchObject({ source: 'ai', ai: { used: 1, quota: 10 } });
     expect(ctx.container.repos.aiUsage.neuronsOn('2026-03-25')).toBe(25);
 
-    for (let i = 1; i < 30; i++) ctx.container.repos.aiUsage.addUserCall(user.id, '2026-03');
+    for (let i = 1; i < 10; i++) ctx.container.repos.aiUsage.addUserCall(user.id, '2026-03');
     // Same figures: served from the cache even with the quota spent.
     expect((await ask()).body.source).toBe('ai');
     await addTransaction(ctx, user, { amount: 5 });
