@@ -4,4 +4,7 @@
     <string name="title_activity_main">Money Manager</string>
     <string name="package_name">com.jgarciamat.moneymanager</string>
     <string name="custom_url_scheme">com.jgarciamat.moneymanager</string>
+    <string name="widget_expense">➖ Gasto</string>
+    <string name="widget_income">➕ Ingreso</string>
+    <string name="widget_description">Añade un gasto o un ingreso con un toque</string>
 </resources>

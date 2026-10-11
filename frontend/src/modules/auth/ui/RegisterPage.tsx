@@ -3,6 +3,7 @@ import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleSignIn } from './GoogleButton';
 import { PasswordHints } from './PasswordHints';
+import { Icon } from '@shared/components/Icon';
 
 interface Props {
   onSwitch: () => void;
@@ -16,7 +17,9 @@ export function RegisterPage({ onSwitch }: Props) {
   if (form.registered) {
     return (
       <div className="auth-card">
-        <div className="auth-logo">📧</div>
+        <div className="auth-logo">
+          <Icon name="mail" />
+        </div>
         <h1 className="auth-title">{t('app.auth.register.verify.title')}</h1>
         <p className="auth-sub auth-sub--center">
           {t('app.auth.register.verify.sub')}

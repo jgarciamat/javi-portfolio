@@ -21,7 +21,7 @@
 }
 
 .ai-advisor-header:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
   border-radius: 12px;
 }
@@ -29,7 +29,7 @@
 .ai-advisor-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
   flex: 1;
   min-width: 0;
 }
@@ -43,7 +43,7 @@
 
 .ai-advisor-chevron {
   font-size: 1.25rem;
-  color: #64748b;
+  color: var(--slate-500);
   line-height: 1;
   transition: transform 0.25s ease;
   flex-shrink: 0;
@@ -71,7 +71,7 @@
 }
 
 .ai-advisor-toggle:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -98,7 +98,7 @@
 
 .ai-quota {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--slate-500);
   margin: 0.75rem 0 0;
   text-align: right;
 }
@@ -113,7 +113,7 @@
   border-radius: 8px;
   background: rgba(99, 102, 241, 0.1);
   border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #c7d2fe;
+  color: var(--accent-200);
   font-size: 0.82rem;
 }
 
@@ -132,7 +132,7 @@
 }
 
 .ai-btn--primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
   color: #fff;
 }
 
@@ -142,26 +142,26 @@
 
 .ai-btn--primary:disabled {
   background: #1e3a2f;
-  color: #4ade80;
+  color: var(--green-400);
   opacity: 1;
   cursor: default;
 }
 
 .ai-btn--primary.ai-btn--loading:disabled {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 .ai-btn--ghost {
   background: transparent;
-  color: #94a3b8;
-  border: 1px solid #334155;
+  color: var(--slate-400);
+  border: 1px solid var(--slate-700);
 }
 
 .ai-btn--ghost:hover {
-  color: #e2e8f0;
-  border-color: #475569;
+  color: var(--slate-200);
+  border-color: var(--slate-600);
 }
 
 .ai-spinner {
@@ -182,9 +182,9 @@
 
 .ai-error {
   font-size: 0.85rem;
-  color: #fca5a5;
-  background: #4c0519;
-  border: 1px solid #be123c;
+  color: var(--red-300);
+  background: var(--red-950);
+  border: 1px solid var(--red-700);
   border-radius: 8px;
   padding: 0.6rem 0.85rem;
   margin-bottom: 0.5rem;
@@ -192,7 +192,7 @@
 
 .ai-placeholder {
   font-size: 0.87rem;
-  color: #64748b;
+  color: var(--slate-500);
   margin: 0;
   font-style: italic;
 }
@@ -205,13 +205,13 @@
 
 .ai-summary {
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
   line-height: 1.55;
   margin: 0;
   padding: 0.6rem 0.9rem;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
-  border-left: 3px solid #6366f1;
+  border-left: 3px solid var(--accent);
 }
 
 .ai-section {
@@ -229,11 +229,11 @@
 }
 
 .ai-section-title--green {
-  color: #4ade80;
+  color: var(--green-400);
 }
 
 .ai-section-title--red {
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .ai-section-title--blue {
@@ -254,17 +254,17 @@
   line-height: 1.5;
   padding: 0.4rem 0.75rem;
   border-radius: 7px;
-  color: #e2e8f0;
+  color: var(--slate-200);
 }
 
 .ai-list-item--green {
   background: rgba(74, 222, 128, 0.08);
-  border-left: 2px solid #4ade80;
+  border-left: 2px solid var(--green-400);
 }
 
 .ai-list-item--red {
   background: rgba(248, 113, 113, 0.08);
-  border-left: 2px solid #f87171;
+  border-left: 2px solid var(--red-400);
 }
 
 .ai-list-item--blue {
@@ -320,7 +320,7 @@
   gap: 0.5rem;
   margin-top: 1rem;
   padding-top: 0.9rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
 }
 
 .ai-ask-label {
@@ -341,8 +341,8 @@
 .ai-ask-answer {
   padding: 0.7rem 0.9rem;
   border-radius: 10px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-700);
 }
 
 .ai-ask-answer p {

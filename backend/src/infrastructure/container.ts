@@ -2,6 +2,8 @@ import { AppConfig } from '@config/env';
 import {
   CategorySuggester,
   Clock,
+  ExchangeRates,
+  PushSender,
   EmailSender,
   FinancialAdvisor,
   GoogleIdentityVerifier,
@@ -16,8 +18,15 @@ import { BillingService } from '@application/billing/BillingService';
 import { EntitlementService } from '@application/billing/EntitlementService';
 import { PlayBillingService } from '@application/billing/PlayBillingService';
 import { OfferService } from '@application/offers/OfferService';
+import { PushService } from '@application/push/PushService';
+import { ReminderService } from '@application/push/ReminderService';
+import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
+import { SplitService } from '@application/split/SplitService';
+import { TaxService } from '@application/tax/TaxService';
+import { AssetService } from '@application/assets/AssetService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
+import { CategoryRuleService } from '@application/categories/CategoryRuleService';
 import { CategoryService } from '@application/categories/CategoryService';
 import { ExportService, ImportService } from '@application/data/DataServices';
 import { AdviceService, StatsService } from '@application/insights/InsightsServices';
@@ -37,6 +46,8 @@ import { TransactionService } from '@application/transactions/TransactionService
 import { CloudflareAi } from './ai/CloudflareAi';
 import { GeminiAdvisor } from './ai/GeminiAdvisor';
 import { DisabledPaymentGateway, StripeGateway } from './billing/StripeGateway';
+import { DisabledPushSender, WebPushSender } from './push/WebPushSender';
+import { FrankfurterRates } from './rates/FrankfurterRates';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
@@ -47,6 +58,7 @@ import {
   SqliteTransferRepository,
 } from './sqlite/repositories/SqliteAccountRepository';
 import { SqliteCategoryRepository } from './sqlite/repositories/SqliteCategoryRepository';
+import { SqliteCategoryRuleRepository } from './sqlite/repositories/SqliteCategoryRuleRepository';
 import {
   SqliteCategoryBudgetRepository,
   SqliteCustomAlertRepository,
@@ -60,6 +72,11 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository';
+import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
+import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
+import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
+import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
@@ -78,6 +95,8 @@ export interface ContainerOverrides {
   categorySuggester?: CategorySuggester | null;
   payments?: PaymentGateway;
   offers?: OfferCatalog;
+  rates?: ExchangeRates;
+  pushSender?: PushSender;
   hasher?: PasswordHasher;
 }
 
@@ -107,6 +126,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     categories: new SqliteCategoryRepository(db),
+    categoryRules: new SqliteCategoryRuleRepository(db),
+    assets: new SqliteAssetRepository(db),
+    digests: new SqliteDigestRepository(db),
+    business: new SqliteBusinessCategoryRepository(db),
+    splits: new SqliteSplitRepository(db),
+    push: new SqlitePushRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -149,6 +174,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       : new DisabledPaymentGateway());
   const offerCatalog = overrides.offers ?? new JsonOfferCatalog(config.affiliatesFile);
 
+  const pushSender =
+    overrides.pushSender ??
+    (config.push ? new WebPushSender(config.push) : new DisabledPushSender());
+  const pushService = new PushService(repos.push, pushSender, clock);
+  const weeklyDigest = new WeeklyDigestService(
+    repos.digests,
+    repos.transactions,
+    repos.rules,
+    repos.settings,
+    email,
+    clock
+  );
+
   const entitlements = new EntitlementService(repos.subscriptions, clock);
   const allowance = new AiAllowance(
     repos.aiUsage,
@@ -159,6 +197,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   );
 
   const categoryResolver = new CategoryResolver(repos.categories);
+  const categoryRules = new CategoryRuleService(
+    repos.categoryRules,
+    repos.categories,
+    categoryResolver,
+    clock
+  );
   const accountResolver = new AccountResolver(repos.accounts, repos.settings);
   const materializer = new RecurringMaterializer(
     repos.rules,
@@ -203,6 +247,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock,
     repos,
     email,
+    rates: overrides.rates ?? new FrankfurterRates(),
     auth,
     transactions,
     materializer,
@@ -231,6 +276,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       uow,
       clock
     ),
+    categoryRules,
     categories: new CategoryService(repos.categories, categoryResolver, materializer, uow),
     accounts: new AccountService(
       repos.accounts,
@@ -268,8 +314,15 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       transactions,
       entitlements,
       repos.rules,
-      clock
+      clock,
+      repos.assets
     ),
+    weeklyDigest,
+    push: pushService,
+    reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
+    split: new SplitService(repos.splits, uow, clock),
+    tax: new TaxService(repos.business, repos.categories, repos.transactions, entitlements),
+    assetService: new AssetService(repos.assets, entitlements, uow, clock),
     advice: new AdviceService(
       transactions,
       repos.transactions,
@@ -326,6 +379,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.settings,
       entitlements,
       new AiCategorizer(suggester, allowance),
+      categoryRules,
       uow,
       clock
     ),

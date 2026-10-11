@@ -87,7 +87,13 @@ export class SqliteCategoryRepository implements CategoryRepository {
   }
 
   reassign(userId: string, fromId: string, toId: string): void {
-    for (const table of ['transactions', 'recurring_rules', 'custom_alerts', 'goals']) {
+    for (const table of [
+      'transactions',
+      'recurring_rules',
+      'custom_alerts',
+      'goals',
+      'category_rules',
+    ]) {
       this.db
         .prepare(`UPDATE ${table} SET category_id = ? WHERE user_id = ? AND category_id = ?`)
         .run(toId, userId, fromId);

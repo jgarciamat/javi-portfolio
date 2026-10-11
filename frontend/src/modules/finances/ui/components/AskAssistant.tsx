@@ -5,6 +5,7 @@ import { errorMessage } from '@shared/utils/errors';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import type { AIAnswer } from '@modules/finances/domain/types';
 import '../css/AIAdvisor.css';
+import { Icon } from '@shared/components/Icon';
 
 /** Free-form questions about the user's own figures (Premium; answered from aggregated data). */
 export function AskAssistant() {
@@ -24,7 +25,7 @@ export function AskAssistant() {
           className="ai-btn ai-btn--primary"
           onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'aiAdvisor' })}
         >
-          ⭐ {t('billing.seePlans')}
+          <Icon name="star" /> {t('billing.seePlans')}
         </button>
       </div>
     );
@@ -64,7 +65,11 @@ export function AskAssistant() {
           {loading ? t('app.common.loading') : t('app.ask.submit')}
         </button>
       </div>
-      {error && <div className="ai-error">⚠️ {error}</div>}
+      {error && (
+        <div className="ai-error">
+          <Icon name="alert" /> {error}
+        </div>
+      )}
       {result && (
         <div className="ai-ask-answer" role="status">
           <p>{result.answer}</p>

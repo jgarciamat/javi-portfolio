@@ -77,6 +77,7 @@ export const settingsBody = z
     showOffers: z.boolean(),
     showTour: z.boolean(),
     showGettingStarted: z.boolean(),
+    weeklyDigest: z.boolean(),
   })
   .partial()
   .strict();
@@ -253,6 +254,40 @@ export const yearParams = z.object({ year: z.coerce.number().int().min(1970).max
 export const householdJoinBody = z.object({ code: z.string().trim().min(10).max(64) });
 export const householdCodeParams = z.object({ code: z.string().trim().min(10).max(64) });
 export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
+const assetValue = z.number().finite().min(0).max(1_000_000_000).transform(toCents);
+export const assetBody = z.object({
+  name: z.string().trim().min(1).max(60),
+  kind: z.enum(['investment', 'property', 'vehicle', 'other', 'debt']),
+  value: assetValue,
+  date: date.nullish(),
+});
+export const assetValueBody = z.object({ value: assetValue, date: date.nullish() });
+export const rateQuery = z.object({
+  from: z.string().length(3).toUpperCase(),
+  to: z.string().length(3).toUpperCase(),
+});
+export const businessCategoryBody = z.object({
+  vatRate: z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]),
+});
+export const categoryIdParam = z.object({ categoryId: id });
+export const splitGroupBody = z.object({
+  name: z.string().trim().min(1).max(60),
+  members: z.array(z.string().trim().min(1).max(40)).min(2).max(12),
+});
+export const splitExpenseBody = z.object({
+  description: z.string().trim().min(1).max(100),
+  amount: money,
+  paidBy: id,
+  participants: z.array(id).max(12).optional(),
+  date: date.nullish(),
+});
+export const splitSettleBody = z.object({ from: id, to: id, amount: money, date: date.nullish() });
+export const splitExpenseParams = z.object({ id, expenseId: id });
+export const pushSubscribeBody = z.object({
+  endpoint: z.string().url().max(1000),
+  keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
+});
+export const pushUnsubscribeBody = z.object({ endpoint: z.string().url().max(1000) });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });
@@ -273,6 +308,11 @@ export const checkoutBody = z.object({
   acceptTerms: z.boolean().default(false),
   waiveWithdrawal: z.boolean().default(false),
 });
+export const categoryRuleBody = z.object({
+  pattern: z.string().trim().min(1).max(200),
+  categoryId: id,
+});
+export const ruleSuggestQuery = z.object({ description: z.string().trim().min(1).max(200) });
 export const offerParams = z.object({ id: z.string().regex(/^[a-z0-9-]{2,40}$/) });
 
 // ---------- Client error reports ----------

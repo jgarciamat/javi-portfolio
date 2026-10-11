@@ -5,6 +5,8 @@ import {
   notificationId,
   notificationsSupported,
   requestNotificationPermission,
+  scheduleBillReminders,
+  cancelBillReminders,
   scheduleMonthlyReminder,
   showNotification,
 } from '@core/notifications/notifications';
@@ -68,6 +70,32 @@ describe('native (Android / iOS)', () => {
   });
 });
 
+describe('bill reminders in the Android app', () => {
+  beforeEach(() => setNative(true));
+
+  it('replaces the planned reminders, at most three, and clears them when there are none', async () => {
+    const at = new Date('2026-04-30T09:00:00');
+    await scheduleBillReminders([
+      { at, title: 'A', body: '1' },
+      { at, title: 'B', body: '2' },
+      { at, title: 'C', body: '3' },
+      { at, title: 'D', body: '4' },
+    ]);
+    expect(plugin.cancel).toHaveBeenCalledWith({
+      notifications: [{ id: 1011 }, { id: 1012 }, { id: 1013 }],
+    });
+    const { notifications } = plugin.schedule.mock.calls[0][0];
+    expect(notifications.map((n: { id: number }) => n.id)).toEqual([1011, 1012, 1013]);
+    expect(notifications[0]).toMatchObject({ title: 'A', schedule: { at, allowWhileIdle: true } });
+    plugin.schedule.mockClear();
+    await scheduleBillReminders([]);
+    expect(plugin.schedule).not.toHaveBeenCalled();
+    plugin.cancel.mockClear();
+    await cancelBillReminders();
+    expect(plugin.cancel).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('browser', () => {
   beforeEach(() => setNative(false));
 
@@ -78,6 +106,8 @@ describe('browser', () => {
     await showNotification(1, 'T', 'B');
     await scheduleMonthlyReminder(1, 'T', 'B');
     await cancelMonthlyReminder();
+    await scheduleBillReminders([{ at: new Date(), title: 'T', body: 'B' }]);
+    await cancelBillReminders();
     expect(plugin.schedule).not.toHaveBeenCalled();
   });
 

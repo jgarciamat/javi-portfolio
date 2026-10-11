@@ -7,6 +7,8 @@ import { isNativeApp } from '@shared/utils/platform';
  */
 
 const MONTHLY_REMINDER_ID = 1001;
+/** Ids of the scheduled "bills tomorrow" reminders (one per upcoming period). */
+const BILL_REMINDER_IDS = [1011, 1012, 1013];
 
 async function plugin() {
   const { LocalNotifications } = await import('@capacitor/local-notifications');
@@ -68,6 +70,30 @@ export async function scheduleMonthlyReminder(
       },
     ],
   });
+}
+
+/** Native only: replaces the "bills tomorrow" reminders with these (nothing in the past). */
+export async function scheduleBillReminders(
+  reminders: { at: Date; title: string; body: string }[]
+): Promise<void> {
+  if (!isNativeApp()) return;
+  const p = await plugin();
+  await p.cancel({ notifications: BILL_REMINDER_IDS.map((id) => ({ id })) });
+  if (reminders.length === 0) return;
+  await p.schedule({
+    notifications: reminders.slice(0, BILL_REMINDER_IDS.length).map((r, i) => ({
+      id: BILL_REMINDER_IDS[i],
+      title: r.title,
+      body: r.body,
+      schedule: { at: r.at, allowWhileIdle: true },
+    })),
+  });
+}
+
+export async function cancelBillReminders(): Promise<void> {
+  if (!isNativeApp()) return;
+  const p = await plugin();
+  await p.cancel({ notifications: BILL_REMINDER_IDS.map((id) => ({ id })) });
 }
 
 export async function cancelMonthlyReminder(): Promise<void> {

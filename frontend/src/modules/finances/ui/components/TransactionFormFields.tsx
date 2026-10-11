@@ -6,6 +6,8 @@ import {
   MANAGE_CATEGORIES,
   type UseTransactionFormReturn,
 } from '../../application/hooks/useTransactionForm';
+import { CurrencyConverter } from './CurrencyConverter';
+import { ReceiptScanner } from './ReceiptScanner';
 
 export interface TransactionFormFieldsProps {
   form: UseTransactionFormReturn;
@@ -50,6 +52,14 @@ export function TransactionFormFields({
         onChange={(e) => form.setAmount(e.target.value)}
         required
       />
+      <ReceiptScanner
+        onScanned={(r) => {
+          if (r.merchant && !fields.description.trim()) form.setDescription(r.merchant);
+          if (r.total !== null) form.setAmount(String(r.total));
+          if (r.date) form.setDate(r.date);
+        }}
+      />
+      <CurrencyConverter form={form} />
       <select
         className="tx-input"
         value={fields.type}
@@ -70,7 +80,7 @@ export function TransactionFormFields({
         required
       >
         <option value="">{t('app.transaction.form.category.placeholder')}</option>
-        <option value={MANAGE_CATEGORIES}>⚙️ {t('app.transaction.form.category.manage')}</option>
+        <option value={MANAGE_CATEGORIES}>⚙ {t('app.transaction.form.category.manage')}</option>
         <option disabled>──────────────</option>
         {categories.map((c) => (
           <option key={c.id} value={c.name}>

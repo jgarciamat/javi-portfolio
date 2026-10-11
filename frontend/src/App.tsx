@@ -1,7 +1,10 @@
 import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@shared/hooks/useAuth';
+import { NativeLinks } from '@core/native/NativeLinks';
+import { LockGate } from '@shared/components/LockGate';
 import { ProtectedRoute } from '@shared/components/ProtectedRoute';
+import { AppLockProvider } from '@shared/hooks/useAppLock';
 import { AppSplash } from '@shared/components/AppSplash';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { OfflineBanner } from '@shared/components/OfflineBanner';
@@ -35,6 +38,11 @@ const BudgetRulePage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'BudgetRulePage'
 );
+const GuidesIndexPage = lazyNamed(
+  () => import('./modules/guides/ui/GuidePages'),
+  'GuidesIndexPage'
+);
+const GuidePage = lazyNamed(() => import('./modules/guides/ui/GuidePages'), 'GuidePage');
 const SavingsSimulatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'SavingsSimulatorPage'
@@ -45,28 +53,35 @@ export default function App() {
     <I18nProvider>
       <ErrorBoundary fullPage>
         <AuthProvider>
-          <ApiProvider>
-            <SettingsProvider>
-              <BrowserRouter>
-                <Suspense fallback={<AppSplash />}>
-                  <Routes>
-                    <Route path="/login" element={<AuthPage />} />
-                    <Route path="/verify-email" element={<VerifyEmailPage />} />
-                    <Route path="/reset-password" element={<ResetPasswordPage />} />
-                    <Route path="/privacy" element={<PrivacyPolicyPage />} />
-                    <Route path="/pricing" element={<PricingPage />} />
-                    <Route path="/terms" element={<TermsPage />} />
-                    <Route path="/calculadora-50-30-20" element={<BudgetRulePage />} />
-                    <Route path="/simulador-ahorro" element={<SavingsSimulatorPage />} />
-                    <Route element={<ProtectedRoute />}>
-                      <Route path="/" element={<DashboardPage />} />
-                    </Route>
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
-            </SettingsProvider>
-          </ApiProvider>
+          <AppLockProvider>
+            <ApiProvider>
+              <SettingsProvider>
+                <BrowserRouter>
+                  <NativeLinks />
+                  <Suspense fallback={<AppSplash />}>
+                    <Routes>
+                      <Route path="/login" element={<AuthPage />} />
+                      <Route path="/verify-email" element={<VerifyEmailPage />} />
+                      <Route path="/reset-password" element={<ResetPasswordPage />} />
+                      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                      <Route path="/pricing" element={<PricingPage />} />
+                      <Route path="/terms" element={<TermsPage />} />
+                      <Route path="/calculadora-50-30-20" element={<BudgetRulePage />} />
+                      <Route path="/simulador-ahorro" element={<SavingsSimulatorPage />} />
+                      <Route path="/guias" element={<GuidesIndexPage />} />
+                      <Route path="/guias/:slug" element={<GuidePage />} />
+                      <Route element={<ProtectedRoute />}>
+                        <Route element={<LockGate />}>
+                          <Route path="/" element={<DashboardPage />} />
+                        </Route>
+                      </Route>
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Suspense>
+                </BrowserRouter>
+              </SettingsProvider>
+            </ApiProvider>
+          </AppLockProvider>
         </AuthProvider>
       </ErrorBoundary>
       {/* Outside the boundary: a new version may be the fix for a crash. */}

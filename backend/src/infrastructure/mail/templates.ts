@@ -1,4 +1,5 @@
 import { EmailLocale } from '@domain/ports/services';
+import { DigestData } from '@domain/services/digest';
 
 /** Escapes text before putting it into HTML (user names are user-controlled). */
 export function escapeHtml(value: string): string {
@@ -209,3 +210,116 @@ export const verificationEmail = (locale: EmailLocale, name: string, url: string
 
 export const passwordResetEmail = (locale: EmailLocale, name: string, url: string): EmailContent =>
   render('reset', locale, name, url);
+
+const DIGEST_COPY: Record<
+  EmailLocale,
+  {
+    subject: string;
+    greeting: (name: string) => string;
+    week: (from: string, to: string) => string;
+    spent: string;
+    income: string;
+    vsPrevious: (pct: number) => string;
+    top: string;
+    upcoming: (date: string) => string;
+    open: string;
+    off: string;
+  }
+> = {
+  es: {
+    subject: 'Tu resumen semanal de Money Manager',
+    greeting: (n) => `Hola ${n},`,
+    week: (from, to) => `Así fue tu semana (${from} – ${to}):`,
+    spent: 'Gastado',
+    income: 'Ingresado',
+    vsPrevious: (p) =>
+      p === 0
+        ? 'Igual que la semana anterior.'
+        : `${Math.abs(p)} % ${p > 0 ? 'más' : 'menos'} que la semana anterior.`,
+    top: 'Donde más gastaste',
+    upcoming: (date) => `Se cobrarán el ${date} estas operaciones automáticas:`,
+    open: 'Abrir Money Manager',
+    off: 'Puedes dejar de recibir este resumen en Ajustes → Preferencias.',
+  },
+  en: {
+    subject: 'Your Money Manager weekly summary',
+    greeting: (n) => `Hi ${n},`,
+    week: (from, to) => `Here is your week (${from} – ${to}):`,
+    spent: 'Spent',
+    income: 'Income',
+    vsPrevious: (p) =>
+      p === 0
+        ? 'The same as the week before.'
+        : `${Math.abs(p)}% ${p > 0 ? 'more' : 'less'} than the week before.`,
+    top: 'Where you spent the most',
+    upcoming: (date) => `These automatic movements will be charged on ${date}:`,
+    open: 'Open Money Manager',
+    off: 'You can stop receiving this summary in Settings → Preferences.',
+  },
+};
+
+/** Optional Monday summary: last week's spending, the biggest categories and what is coming. */
+export function weeklyDigestEmail(
+  locale: EmailLocale,
+  name: string,
+  digest: DigestData,
+  currency: string,
+  appUrl: string
+): EmailContent {
+  const c = DIGEST_COPY[locale];
+  const tag = locale === 'es' ? 'es-ES' : 'en-GB';
+  const money = (cents: number): string =>
+    new Intl.NumberFormat(tag, { style: 'currency', currency }).format(cents / 100);
+  const day = (iso: string): string =>
+    new Date(`${iso}T00:00:00Z`).toLocaleDateString(tag, {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    });
+  const lines = [
+    c.week(day(digest.from), day(digest.to)),
+    `${c.spent}: ${money(digest.spentCents)}`,
+    `${c.income}: ${money(digest.incomeCents)}`,
+    ...(digest.changePct === null ? [] : [c.vsPrevious(digest.changePct)]),
+  ];
+  const top = digest.topCategories.map((t) => `${t.name}: ${money(t.cents)}`);
+  const upcoming = digest.upcoming
+    ? digest.upcoming.items.map((i) => `${i.description}: ${money(i.amountCents)}`)
+    : [];
+  const html = layout(
+    locale,
+    [
+      `      <p>${c.greeting(`<strong>${safeName(name)}</strong>`)}</p>`,
+      ...lines.map((l) => `      <p>${escapeHtml(l)}</p>`),
+      ...(top.length
+        ? [
+            `      <p><strong>${c.top}</strong></p>`,
+            `      <ul>${top.map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul>`,
+          ]
+        : []),
+      ...(digest.upcoming
+        ? [
+            `      <p><strong>${escapeHtml(c.upcoming(day(digest.upcoming.date)))}</strong></p>`,
+            `      <ul>${upcoming.map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul>`,
+          ]
+        : []),
+      `      <p style="text-align:center"><a class="btn" href="${escapeHtml(appUrl)}">${
+        c.open
+      }</a></p>`,
+      `      <p>${c.off}</p>`,
+    ].join('\n')
+  );
+  const text = [
+    c.greeting(plainName(name)),
+    '',
+    ...lines,
+    ...(top.length ? ['', `${c.top}:`, ...top.map((l) => `- ${l}`)] : []),
+    ...(digest.upcoming
+      ? ['', c.upcoming(day(digest.upcoming.date)), ...upcoming.map((l) => `- ${l}`)]
+      : []),
+    '',
+    `${c.open}: ${appUrl}`,
+    c.off,
+  ].join('\n');
+  return { subject: c.subject, html, text };
+}

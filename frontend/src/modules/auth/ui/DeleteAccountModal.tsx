@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { Modal } from '@shared/components/Modal';
 import '@shared/components/css/ConfirmDeleteModal.css';
+import { Icon } from '@shared/components/Icon';
 
 interface DeleteAccountModalProps {
   loading: boolean;
@@ -25,7 +26,7 @@ export function DeleteAccountModal({
       className="confirm-delete-modal"
     >
       <div className="confirm-delete-icon" aria-hidden="true">
-        🗑️
+        <Icon name="trash" />
       </div>
       <h2 className="confirm-delete-title">{t('app.profile.deleteAccount.modal.title')}</h2>
       <p className="confirm-delete-message confirm-delete-warning">

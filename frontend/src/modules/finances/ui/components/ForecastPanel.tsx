@@ -9,6 +9,7 @@ import type { Forecast, SafeToSpend } from '@modules/finances/domain/types';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/ForecastPanel.css';
+import { Icon } from '@shared/components/Icon';
 
 const RANGES = [3, 6, 12];
 
@@ -84,10 +85,13 @@ function Outlook({
       </div>
       {shortfall ? (
         <p className="forecast-warning" role="alert">
-          ⚠️ {t('app.forecast.shortfall', { month: monthLabel(shortfall.year, shortfall.month) })}
+          <Icon name="alert" />{' '}
+          {t('app.forecast.shortfall', { month: monthLabel(shortfall.year, shortfall.month) })}
         </p>
       ) : (
-        <p className="forecast-good">✅ {t('app.forecast.noShortfall')}</p>
+        <p className="forecast-good">
+          <Icon name="checkCircle" /> {t('app.forecast.noShortfall')}
+        </p>
       )}
       <div className="table-scroll">
         <table className="data-table">
@@ -150,7 +154,14 @@ export function ForecastPanel() {
     setExcluded((list) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]));
 
   return (
-    <CollapsiblePanel title={<>🔮 {t('app.forecast.title')}</>} tourId="forecast">
+    <CollapsiblePanel
+      title={
+        <>
+          <Icon name="sparkles" /> {t('app.forecast.title')}
+        </>
+      }
+      tourId="forecast"
+    >
       {error && <p className="form-error">{error}</p>}
       {!data && !error && <p className="section-hint">{t('app.common.loading')}</p>}
       {data && (
@@ -159,7 +170,8 @@ export function ForecastPanel() {
           {data.locked ? (
             <div className="forecast-locked">
               <p className="section-hint">
-                🔒 {t('app.forecast.locked')} <span className="premium-chip">Premium</span>
+                <Icon name="lock" /> {t('app.forecast.locked')}{' '}
+                <span className="premium-chip">Premium</span>
               </p>
               {plan && (
                 <button

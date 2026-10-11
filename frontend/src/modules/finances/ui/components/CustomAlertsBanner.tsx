@@ -11,6 +11,7 @@ import {
 import { useCustomAlerts } from '../../application/CustomAlertsContext';
 import { formatMetricValue } from './alertFormat';
 import '../css/BudgetAlerts.css';
+import { Icon } from '@shared/components/Icon';
 
 function BannerCard({
   triggered,
@@ -41,14 +42,16 @@ function BannerCard({
       style={{ background: `${color}22`, borderColor: `${color}88` }}
     >
       <div className="alert-card-header">
-        <span className="alert-card-icon">🔔</span>
+        <span className="alert-card-icon">
+          <Icon name="bell" />
+        </span>
         <span className="alert-card-message">{message}</span>
         <button
           className="alert-card-dismiss"
           onClick={onDismiss}
           aria-label={t('app.alert.dismiss')}
         >
-          ✕
+          <Icon name="close" />
         </button>
       </div>
       {progress !== null && (

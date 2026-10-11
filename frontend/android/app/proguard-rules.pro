@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ── Capacitor and its plugins are found by reflection: keep them when R8 shrinks the app ──
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin public class * {
+    @com.getcapacitor.annotation.PermissionCallback <methods>;
+    @com.getcapacitor.annotation.ActivityCallback <methods>;
+    @com.getcapacitor.PluginMethod public <methods>;
+}
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keep class com.aparajita.** { *; }
+-keep class com.revenuecat.** { *; }
+-dontwarn com.revenuecat.**
+-keep class com.jgarciamat.moneymanager.** { *; }

@@ -415,6 +415,8 @@ describe('finances edge cases', () => {
         month: i + 1,
         available: i * 10,
         saved: i,
+        assets: 0,
+        debts: 0,
         netWorth: i * 11,
       }))
     );
@@ -849,7 +851,12 @@ describe('more edge cases', () => {
     const file = Object.assign(new File([bytes as BlobPart], 'x.csv'), {
       arrayBuffer: async () => bytes.buffer,
     });
-    fireEvent.change(document.querySelector('input[type="file"]')!, { target: { files: [file] } });
+    fireEvent.change(
+      screen
+        .getByRole('dialog', { name: tr('app.import.title') })
+        .querySelector('input[type="file"]')!,
+      { target: { files: [file] } }
+    );
     fireEvent.click(await screen.findByRole('button', { name: tr('app.import.preview') }));
     fireEvent.click(
       await screen.findByRole('button', { name: tr('app.import.confirm', { count: 1 }) })

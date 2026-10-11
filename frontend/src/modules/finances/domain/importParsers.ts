@@ -155,7 +155,7 @@ export interface ColumnMapping {
 }
 
 const HEADER_HINTS: Record<keyof ColumnMapping, string[]> = {
-  date: ['fecha operacion', 'fecha', 'date', 'f. operacion', 'fecha valor'],
+  date: ['fecha operacion', 'fecha', 'date', 'f. operacion', 'fecha valor', 'f. valor', 'f.valor'],
   description: [
     'concepto',
     'descripcion',

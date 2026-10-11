@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { THEME_CHOICES, type ThemeChoice, loadTheme, saveTheme } from '@core/theme/theme';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useSettings } from '@core/settings/SettingsContext';
@@ -18,6 +19,9 @@ import type {
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { AppLockCard } from '../components/AppLockCard';
+import { PushSetting } from '../components/PushSetting';
+import { CategoryRulesCard } from '../components/CategoryRulesCard';
 import { HouseholdCard } from '../components/HouseholdCard';
 import {
   downloadFile,
@@ -27,6 +31,7 @@ import {
 import { todayDateOnly } from '@shared/utils/format';
 import { errorMessage } from '@shared/utils/errors';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'CHF'];
 const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
@@ -34,6 +39,35 @@ const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
 interface SettingsViewProps {
   onOpenProfile: () => void;
   onStartTour: () => void;
+}
+
+/** The look of the app on this device: follow the system, light or dark. */
+function ThemeSetting() {
+  const { t } = useI18n();
+  const [choice, setChoice] = useState<ThemeChoice>(loadTheme);
+  return (
+    <label className="setting-row">
+      <span>
+        <strong>{t('app.settings.theme')}</strong>
+        <small>{t('app.settings.themeHint')}</small>
+      </span>
+      <select
+        className="tx-input"
+        value={choice}
+        onChange={(e) => {
+          const next = e.target.value as ThemeChoice;
+          setChoice(next);
+          saveTheme(next);
+        }}
+      >
+        {THEME_CHOICES.map((c) => (
+          <option key={c} value={c}>
+            {t(`app.settings.theme.${c}`)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 function PreferencesCard({
@@ -56,6 +90,7 @@ function PreferencesCard({
   const activeAccounts = accounts.filter((a) => !a.archived);
   return (
     <div className="settings-list">
+      <ThemeSetting />
       <label className="setting-row">
         <span>
           <strong>{t('app.settings.currency')}</strong>
@@ -140,6 +175,20 @@ function PreferencesCard({
           onChange={(e) => save({ showOffers: e.target.checked })}
         />
       </label>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.weeklyDigest')}</strong>
+          <small>{t('app.settings.weeklyDigestHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          disabled={saving}
+          checked={settings.weeklyDigest}
+          onChange={(e) => save({ weeklyDigest: e.target.checked })}
+        />
+      </label>
+      <PushSetting />
       {notificationsSupported() && (
         <label className="setting-row">
           <span>
@@ -173,7 +222,9 @@ function TourCard({
   const { t } = useI18n();
   return (
     <div className="card">
-      <h2 className="section-title">🧭 {t('app.settings.tour')}</h2>
+      <h2 className="section-title">
+        <Icon name="compass" /> {t('app.settings.tour')}
+      </h2>
       <p className="section-hint">{t('app.settings.tourHint')}</p>
       <div className="settings-list">
         <label className="setting-row">
@@ -220,7 +271,9 @@ function DataCard({ onError }: { onError: (message: string) => void }) {
 
   return (
     <div className="card">
-      <h2 className="section-title">📦 {t('app.settings.data')}</h2>
+      <h2 className="section-title">
+        <Icon name="package" /> {t('app.settings.data')}
+      </h2>
       <p className="section-hint">{t('app.settings.dataHint')}</p>
       <div className="button-row">
         <button className="btn-secondary" onClick={run(exportJson)}>
@@ -245,7 +298,9 @@ function SecurityCard({
   const { logoutEverywhere } = useAuth();
   return (
     <div className="card">
-      <h2 className="section-title">🔐 {t('app.settings.security')}</h2>
+      <h2 className="section-title">
+        <Icon name="shield" /> {t('app.settings.security')}
+      </h2>
       <div className="button-row">
         <button className="btn-secondary" onClick={onOpenProfile}>
           👤 {t('app.header.openProfile')}
@@ -308,7 +363,9 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
   return (
     <div className="section-view">
       <div className="card">
-        <h2 className="section-title">🛠️ {t('app.settings.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="wrench" /> {t('app.settings.title')}
+        </h2>
         {action.error && <p className="form-error">{action.error}</p>}
         {/* Rendered from the key: after a language change it shows in the new language. */}
         {saved && <p className="section-success">{t('app.settings.saved')}</p>}
@@ -322,8 +379,10 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
         />
         {sharedLocked && <p className="plan-note">{t('app.household.sharedSettings')}</p>}
       </div>
+      <CategoryRulesCard />
       <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
+      <AppLockCard />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />
     </div>

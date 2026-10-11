@@ -1,7 +1,8 @@
-import { Suspense, type ReactElement } from 'react';
+import { Suspense, type ReactElement, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
+import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { lazyNamed } from '@shared/utils/lazyNamed';
@@ -10,6 +11,7 @@ import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
+import { useBillReminders } from '../../application/hooks/useBillReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
@@ -26,6 +28,7 @@ const AnalysisView = lazyNamed(() => import('../views/AnalysisView'), 'AnalysisV
 const AccountsView = lazyNamed(() => import('../views/AccountsView'), 'AccountsView');
 const BudgetsView = lazyNamed(() => import('../views/BudgetsView'), 'BudgetsView');
 const GoalsView = lazyNamed(() => import('../views/GoalsView'), 'GoalsView');
+const SplitView = lazyNamed(() => import('../views/SplitView'), 'SplitView');
 const SearchView = lazyNamed(() => import('../views/SearchView'), 'SearchView');
 const SettingsView = lazyNamed(() => import('../views/SettingsView'), 'SettingsView');
 const PlanView = lazyNamed(() => import('@modules/billing/ui/PlanView'), 'PlanView');
@@ -43,6 +46,7 @@ const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
   accounts: () => <AccountsView />,
   budgets: () => <BudgetsView />,
   goals: () => <GoalsView />,
+  split: () => <SplitView />,
   plan: () => <PlanView />,
   offers: () => <OffersView />,
 };
@@ -87,7 +91,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
   }
 }
 
-function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: string }) {
+function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
   const { user, logout } = useAuth();
   return (
@@ -99,7 +103,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           aria-label={t('app.menu.open')}
           aria-expanded={dash.menuOpen}
         >
-          <span className="burger-btn-logo">💰</span>
+          <img className="burger-btn-logo" src="/icon-192.png" alt="" width="28" height="28" />
           <span className="burger-btn-lines" aria-hidden="true">
             <span />
             <span />
@@ -122,7 +126,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
             <img src={user.avatarUrl} alt="" className="header-avatar" />
           ) : (
             <span className="header-avatar-placeholder" aria-hidden="true">
-              👤
+              <Icon name="user" size={20} />
             </span>
           )}
           <span className="header-user-name">{user?.name}</span>
@@ -190,6 +194,7 @@ function useBudgetAlertNotifications() {
     title: t('app.header.title'),
     message: (alert) => monthAlertMessage(alert, t, tCategory),
   });
+  useBillReminders(!!settings?.notificationsEnabled, settings?.currentPeriod ?? null);
 }
 
 export function Dashboard() {
@@ -213,7 +218,14 @@ export function Dashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-sticky">
-        <Header dash={dash} sectionLabel={`${section.icon} ${t(section.labelKey)}`} />
+        <Header
+          dash={dash}
+          sectionLabel={
+            <>
+              <Icon name={section.icon} size={14} /> {t(section.labelKey)}
+            </>
+          }
+        />
         {dash.tab === 'monthly' && (
           <div className="sticky-nav">
             <div className="sticky-nav-inner">

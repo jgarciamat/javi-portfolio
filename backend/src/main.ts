@@ -52,6 +52,9 @@ async function main(): Promise<void> {
       '[config] no AI provider configured: AI analyses fall back to the rule-based ones'
     );
   }
+  if (!config.push) {
+    console.info('[config] VAPID keys are not set: push notifications are disabled');
+  }
   if (!config.billing.stripe) {
     console.info('[config] Stripe is not configured: upgrading to Premium is disabled');
   }
@@ -69,6 +72,18 @@ async function main(): Promise<void> {
     6 * 60 * 60 * 1000
   );
   cleanup.unref();
+
+  // The optional Monday summary: checked every hour, sent only on Monday mornings.
+  const digest = setInterval(() => {
+    container.weeklyDigest.run().catch((e) => console.error('[digest] run failed', e));
+  }, 60 * 60 * 1000);
+  digest.unref();
+
+  // Push notifications (bills due tomorrow, Monday summary): hourly, each goes out once.
+  const reminders = setInterval(() => {
+    container.reminders.run().catch((e) => console.error('[push] reminders failed', e));
+  }, 60 * 60 * 1000);
+  reminders.unref();
 
   const server = createApp(container).listen(config.port, () => {
     console.info(`Money Manager API listening on :${config.port} (${config.env})`);

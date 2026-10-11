@@ -7,6 +7,7 @@ import { SettingsProvider } from '@core/settings/SettingsContext';
 import { tokenStore } from '@core/api/http';
 import { AuthProvider } from '@shared/hooks/useAuth';
 import { FinancesProvider } from '@modules/finances/application/FinancesContext';
+import { AppLockProvider } from '@shared/hooks/useAppLock';
 import { PlanProvider } from '@modules/billing/application/PlanContext';
 import type { AuthUser } from '@modules/auth/domain/types';
 import { createFakeApi, type FakeApi } from './fakeApi';
@@ -69,11 +70,13 @@ export function renderWithProviders(ui: ReactElement, options: ProviderOptions =
     return (
       <I18nProvider>
         <AuthProvider>
-          <ApiProvider value={api}>
-            <SettingsProvider>
-              <MemoryRouter initialEntries={[route]}>{tree}</MemoryRouter>
-            </SettingsProvider>
-          </ApiProvider>
+          <AppLockProvider>
+            <ApiProvider value={api}>
+              <SettingsProvider>
+                <MemoryRouter initialEntries={[route]}>{tree}</MemoryRouter>
+              </SettingsProvider>
+            </ApiProvider>
+          </AppLockProvider>
         </AuthProvider>
       </I18nProvider>
     );

@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { useGoBack } from '@shared/hooks/useGoBack';
 import './css/PrivacyPolicy.css';
+import { Icon } from '@shared/components/Icon';
 
 export function PrivacyPolicyPage() {
   const { t } = useI18n();
@@ -39,6 +40,8 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s2.item7')}</li>
             <li>{t('app.privacy.s2.item8')}</li>
             <li>{t('app.privacy.s2.item9')}</li>
+            <li>{t('app.privacy.s2.item10')}</li>
+            <li>{t('app.privacy.s2.item11')}</li>
           </ul>
         </section>
 
@@ -51,6 +54,7 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s3.item2')}</li>
             <li>{t('app.privacy.s3.item3')}</li>
             <li>{t('app.privacy.s3.item4')}</li>
+            <li>{t('app.privacy.s3.item5')}</li>
           </ul>
           <p>
             <em>{t('app.privacy.s3.noMarketing')}</em>
@@ -68,6 +72,8 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s4.item4')}</li>
             <li>{t('app.privacy.s4.item5')}</li>
             <li>{t('app.privacy.s4.item6')}</li>
+            <li>{t('app.privacy.s4.item7')}</li>
+            <li>{t('app.privacy.s4.item8')}</li>
           </ul>
         </section>
 
@@ -87,6 +93,8 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s6.item2')}</li>
             <li>{t('app.privacy.s6.item3')}</li>
             <li>{t('app.privacy.s6.item4')}</li>
+            <li>{t('app.privacy.s6.item5')}</li>
+            <li>{t('app.privacy.s6.item6')}</li>
           </ul>
         </section>
 
@@ -144,7 +152,7 @@ export function PrivacyPolicyPage() {
           <h2 className="privacy-section-title">{t('app.privacy.contact.title')}</h2>
           <p>{t('app.privacy.contact.body')}</p>
           <p>
-            📧{' '}
+            <Icon name="mail" />{' '}
             <a href={`mailto:${t('app.privacy.contact.email')}`} className="privacy-link">
               {t('app.privacy.contact.email')}
             </a>

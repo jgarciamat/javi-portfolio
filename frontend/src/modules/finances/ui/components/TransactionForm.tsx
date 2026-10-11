@@ -11,6 +11,7 @@ import type {
 import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import { TransactionFormFields } from './TransactionFormFields';
 import '../css/TransactionForm.css';
+import { Icon } from '@shared/components/Icon';
 
 export interface TransactionFormProps {
   categories: Category[];
@@ -64,7 +65,11 @@ export function TransactionForm({
   return (
     <div ref={anchor} className="tx-form-anchor">
       <CollapsiblePanel
-        title={<>➕ {t('app.transaction.form.title')}</>}
+        title={
+          <>
+            <Icon name="plus" /> {t('app.transaction.form.title')}
+          </>
+        }
         tourId="new-transaction"
         open={open}
         onToggle={() => setOpen((v) => !v)}

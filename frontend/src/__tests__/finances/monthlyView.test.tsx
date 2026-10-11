@@ -376,6 +376,51 @@ describe('week and calendar views', () => {
   });
 });
 
+describe('teaching a rule while editing a movement', () => {
+  const open = async () => {
+    await screen.findByText('Cena');
+    fireEvent.click(
+      screen.getByRole('button', { name: `${tr('app.transaction.table.edit')}: Cena` })
+    );
+    return screen.getByRole('dialog', { name: tr('app.transaction.edit.title') });
+  };
+
+  it('offers to remember the category and creates the rule after saving', async () => {
+    const { api } = setup();
+    api.categoryRuleApi.suggest.mockResolvedValue({ pattern: 'cena', categoryId: null });
+    const dialog = await open();
+    const remember = await within(dialog).findByRole('checkbox', {
+      name: tr('app.rules.remember', { pattern: 'cena' }),
+    });
+    fireEvent.click(remember);
+    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.transaction.edit.save') }));
+    await waitFor(() =>
+      expect(api.categoryRuleApi.add).toHaveBeenCalledWith('cena', expect.any(String))
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('does not create a rule unless asked, nor offer one without a merchant text', async () => {
+    const { api } = setup();
+    api.categoryRuleApi.suggest.mockResolvedValue({ pattern: '', categoryId: null });
+    const dialog = await open();
+    expect(within(dialog).queryByRole('checkbox')).toBeNull();
+    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.transaction.edit.save') }));
+    await waitFor(() => expect(api.transactionApi.update).toHaveBeenCalled());
+    expect(api.categoryRuleApi.add).not.toHaveBeenCalled();
+  });
+
+  it('saves without a rule when the box is left unticked', async () => {
+    const { api } = setup();
+    api.categoryRuleApi.suggest.mockResolvedValue({ pattern: 'cena', categoryId: null });
+    const dialog = await open();
+    await within(dialog).findByRole('checkbox');
+    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.transaction.edit.save') }));
+    await waitFor(() => expect(api.transactionApi.update).toHaveBeenCalled());
+    expect(api.categoryRuleApi.add).not.toHaveBeenCalled();
+  });
+});
+
 describe('editing a movement', () => {
   it('saves changes through the edit dialog', async () => {
     const { api } = setup();

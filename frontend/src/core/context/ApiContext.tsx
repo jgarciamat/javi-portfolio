@@ -2,15 +2,21 @@ import { createContext, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import {
   accountApi,
+  assetApi,
   budgetApi,
+  businessApi,
   categoryApi,
+  categoryRuleApi,
   customAlertApi,
   dataApi,
   goalApi,
   insightsApi,
   monthApi,
+  pushApi,
+  ratesApi,
   recurringApi,
   settingsApi,
+  splitApi,
   transactionApi,
 } from '@core/api/financeApi';
 import { authApi } from '@core/api/authApi';
@@ -23,9 +29,15 @@ export interface IApiContext {
   monthApi: typeof monthApi;
   transactionApi: typeof transactionApi;
   categoryApi: typeof categoryApi;
+  categoryRuleApi: typeof categoryRuleApi;
   recurringApi: typeof recurringApi;
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
+  assetApi: typeof assetApi;
+  businessApi: typeof businessApi;
+  splitApi: typeof splitApi;
+  pushApi: typeof pushApi;
+  ratesApi: typeof ratesApi;
   budgetApi: typeof budgetApi;
   goalApi: typeof goalApi;
   settingsApi: typeof settingsApi;
@@ -45,9 +57,15 @@ const defaultValue: IApiContext = {
   monthApi,
   transactionApi,
   categoryApi,
+  categoryRuleApi,
   recurringApi,
   customAlertApi,
   accountApi,
+  assetApi,
+  businessApi,
+  splitApi,
+  pushApi,
+  ratesApi,
   budgetApi,
   goalApi,
   settingsApi,

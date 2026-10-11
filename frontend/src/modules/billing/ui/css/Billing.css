@@ -17,8 +17,8 @@
   max-width: 460px;
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-700);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -30,7 +30,7 @@
   right: 0.75rem;
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-size: 1.1rem;
   cursor: pointer;
 }
@@ -44,7 +44,7 @@
   margin: 0.25rem 0 0.5rem;
   text-align: center;
   font-size: 1.25rem;
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 .upgrade-reason {
@@ -53,7 +53,7 @@
   border-radius: 8px;
   background: rgba(99, 102, 241, 0.12);
   border: 1px solid rgba(99, 102, 241, 0.35);
-  color: #c7d2fe;
+  color: var(--accent-200);
   font-size: 0.875rem;
   text-align: center;
 }
@@ -65,7 +65,7 @@
   display: grid;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .upgrade-benefits li::before {
@@ -87,7 +87,7 @@
   align-items: flex-start;
   gap: 0.55rem;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
   cursor: pointer;
 }
 
@@ -96,11 +96,11 @@
   width: 1.05rem;
   height: 1.05rem;
   margin: 0.1rem 0 0;
-  accent-color: #6366f1;
+  accent-color: var(--accent);
 }
 
 .plan-terms a {
-  color: #a5b4fc;
+  color: var(--accent-300);
 }
 
 .plan-option {
@@ -110,15 +110,15 @@
   padding: 0.8rem 1rem;
   text-align: left;
   background: #111c33;
-  border: 1px solid #334155;
+  border: 1px solid var(--slate-700);
   border-radius: 12px;
-  color: #e2e8f0;
+  color: var(--slate-200);
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .plan-option:hover:not(:disabled) {
-  border-color: #6366f1;
+  border-color: var(--accent);
   background: #16213d;
 }
 
@@ -128,19 +128,19 @@
 }
 
 .plan-option--featured {
-  border-color: #6366f1;
+  border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
 }
 
 .plan-option small {
-  color: #94a3b8;
+  color: var(--slate-400);
   font-size: 0.78rem;
 }
 
 .plan-option-price {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--slate-50);
 }
 
 .plan-option-price small {
@@ -155,7 +155,7 @@
   right: 0.75rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  background: #22c55e;
+  background: var(--green-500);
   color: #052e16;
   font-size: 0.72rem;
   font-weight: 700;
@@ -164,12 +164,12 @@
 .plan-note {
   margin: 0.6rem 0 0;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   text-align: center;
 }
 
 .plan-note a {
-  color: #a5b4fc;
+  color: var(--accent-300);
 }
 
 /* ─── Plan view ───────────────────────────────── */
@@ -188,14 +188,14 @@
 }
 
 .plan-badge--premium {
-  background: linear-gradient(135deg, #6366f1, #a855f7);
+  background: linear-gradient(135deg, var(--accent), #a855f7);
   color: #fff;
 }
 
 .plan-badge--free {
-  background: #1e293b;
-  color: #cbd5e1;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  color: var(--slate-300);
+  border: 1px solid var(--slate-700);
 }
 
 .plan-usage {
@@ -213,18 +213,18 @@
   border-radius: 8px;
   background: #111c33;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .plan-usage li.plan-usage-full strong {
-  color: #fbbf24;
+  color: var(--amber-400);
 }
 
 .premium-chip {
   margin-left: 0.4rem;
   padding: 0.05rem 0.45rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
+  background: linear-gradient(135deg, var(--accent), #a855f7);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
@@ -275,7 +275,7 @@
 .offers-disclosure {
   margin: 0 0 0.5rem;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   line-height: 1.5;
 }
 
@@ -292,31 +292,31 @@
 .offer-title {
   margin: 0;
   font-size: 1rem;
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 .offer-partner {
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .offer-sponsored {
   margin-left: auto;
   padding: 0.1rem 0.5rem;
   border-radius: 6px;
-  border: 1px solid #475569;
-  color: #94a3b8;
+  border: 1px solid var(--slate-600);
+  color: var(--slate-400);
   font-size: 0.7rem;
   white-space: nowrap;
 }
 
 .offer-card p {
-  color: #cbd5e1;
+  color: var(--slate-300);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .offer-highlight {
-  color: #fcd34d !important;
+  color: var(--amber-300) !important;
 }
 
 .offer-cta {
@@ -328,7 +328,7 @@
 /* ─── Pricing page ────────────────────────────── */
 .pricing-page {
   min-height: 100vh;
-  background: #020617;
+  background: var(--slate-950);
 }
 
 .pricing-main {
@@ -341,13 +341,13 @@
   margin: 0;
   text-align: center;
   font-size: 1.8rem;
-  color: #f8fafc;
+  color: var(--slate-50);
 }
 
 .pricing-subtitle {
   margin: 0.5rem 0 1.5rem;
   text-align: center;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .pricing-grid {
@@ -360,19 +360,19 @@
 .pricing-plan {
   padding: 1.25rem;
   border-radius: 14px;
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
   text-align: center;
 }
 
 .pricing-plan h2 {
   margin: 0;
   font-size: 1.1rem;
-  color: #e2e8f0;
+  color: var(--slate-200);
 }
 
 .pricing-plan--featured {
-  border-color: #6366f1;
+  border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
 }
 
@@ -380,14 +380,14 @@
   margin: 0.5rem 0 0;
   font-size: 2rem;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--slate-50);
 }
 
 .pricing-price small {
   margin-left: 0.25rem;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .pricing-table {
@@ -395,13 +395,13 @@
   border-collapse: collapse;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .pricing-table th,
 .pricing-table td {
   padding: 0.55rem 0.5rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
   text-align: center;
 }
 
@@ -419,11 +419,11 @@
   margin-top: 2rem;
   text-align: center;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .pricing-links a {
-  color: #a5b4fc;
+  color: var(--accent-300);
   text-decoration: none;
 }
 
@@ -436,6 +436,6 @@
 .invite-link code {
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  background: #0f172a;
-  color: #a5b4fc;
+  background: var(--slate-900);
+  color: var(--accent-300);
 }

@@ -67,7 +67,8 @@ export class CategoryService {
     }
     if (reassignTo) this.resolver.requireById(userId, reassignTo);
     this.uow.run(() => {
-      if (reassignTo && inUse) this.categories.reassign(userId, id, reassignTo);
+      // Also when nothing uses it: the category's rules move with it.
+      if (reassignTo) this.categories.reassign(userId, id, reassignTo);
       this.categories.delete(userId, id);
     });
     this.materializer.invalidate(userId);

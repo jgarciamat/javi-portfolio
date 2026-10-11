@@ -2,9 +2,11 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
 import type { Account, ImportResult } from '@modules/finances/domain/types';
+import type { BankId } from '@modules/finances/domain/bankFormats';
 import type { ColumnMapping } from '@modules/finances/domain/importParsers';
 import { useImport } from '../../application/hooks/useImport';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 interface ImportModalProps {
   accounts: Account[];
@@ -24,8 +26,17 @@ const MAPPING_FIELDS: { key: keyof ColumnMapping; labelKey: string; optional?: b
   { key: 'category', labelKey: 'app.import.col.category', optional: true },
 ];
 
-/** How the category was chosen: "?" = fallback, ✨ = suggested by the AI. */
+const BANK_NAMES: Record<BankId, string> = {
+  caixabank: 'CaixaBank',
+  bbva: 'BBVA',
+  santander: 'Santander',
+  ing: 'ING',
+  revolut: 'Revolut',
+};
+
+/** How the category was chosen: "?" = fallback, ✨ = suggested by the AI, 📌 = your own rule. */
 const SOURCE_MARK: Partial<Record<NonNullable<ImportedRow['categorySource']>, string>> = {
+  rule: ' 📌',
   fallback: ' ?',
   ai: ' ✨',
 };
@@ -87,6 +98,11 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
         {imp.skipped.length > 0 &&
           ` · ${t('app.import.rowsSkipped', { count: imp.skipped.length })}`}
       </p>
+      {imp.bank && (
+        <p className="section-success">
+          <Icon name="checkCircle" /> {t('app.import.bankDetected', { bank: BANK_NAMES[imp.bank] })}
+        </p>
+      )}
       {imp.format === 'csv' && <ColumnMappingFields imp={imp} />}
       {accounts.length > 1 && (
         <label className="field">
@@ -183,7 +199,8 @@ function DoneStep({ result }: { result: ImportResult }) {
   return (
     <div className="modal-body">
       <p className="section-success">
-        ✅ {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
+        <Icon name="checkCircle" />{' '}
+        {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
       </p>
     </div>
   );
@@ -245,9 +262,11 @@ export function ImportModal({ accounts, onClose, onImported }: ImportModalProps)
       className="modal-panel modal-panel--wide"
     >
       <div className="modal-header">
-        <h2 className="modal-title">📤 {t('app.import.title')}</h2>
+        <h2 className="modal-title">
+          <Icon name="upload" /> {t('app.import.title')}
+        </h2>
         <button className="modal-close" onClick={onClose} aria-label={t('app.common.close')}>
-          ✕
+          <Icon name="close" />
         </button>
       </div>
       <StepBody imp={imp} accounts={activeAccounts} />

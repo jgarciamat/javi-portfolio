@@ -9,6 +9,9 @@ import {
   FinancialAdvisor,
   GoogleIdentity,
   GoogleIdentityVerifier,
+  ExchangeRates,
+  PushPayload,
+  PushSender,
   OfferCatalog,
   PaymentGateway,
 } from '@domain/ports/services';
@@ -81,6 +84,26 @@ export interface TestContext {
   email: ConsoleEmailSender;
   google: FakeGoogleVerifier;
   payments: FakePaymentGateway;
+  push: FakePushSender;
+}
+
+/** Push sender that records what it is asked to send; `gone` endpoints answer as removed. */
+export class FakePushSender implements PushSender {
+  enabled = true;
+  sent: { endpoint: string; payload: PushPayload }[] = [];
+  gone = new Set<string>();
+  fail = false;
+
+  publicKey(): string {
+    return 'test-public-key';
+  }
+
+  async send(subscription: { endpoint: string }, payload: PushPayload): Promise<'sent' | 'gone'> {
+    if (this.fail) throw new Error('push service down');
+    if (this.gone.has(subscription.endpoint)) return 'gone';
+    this.sent.push({ endpoint: subscription.endpoint, payload });
+    return 'sent';
+  }
 }
 
 export const STRONG_PASSWORD = 'Sup3r-secret!';
@@ -91,6 +114,8 @@ export function createTestApp(
     advisor?: FinancialAdvisor | null;
     categorySuggester?: CategorySuggester | null;
     offers?: OfferCatalog;
+    rates?: ExchangeRates;
+    pushEnabled?: boolean;
     env?: Record<string, string>;
   } = {}
 ): TestContext {
@@ -101,7 +126,10 @@ export function createTestApp(
   const email = new ConsoleEmailSender(config.appUrl, true);
   const google = new FakeGoogleVerifier();
   const payments = new FakePaymentGateway();
+  const push = new FakePushSender();
+  push.enabled = options.pushEnabled ?? true;
   const container = buildContainer(db, config, {
+    pushSender: push,
     clock,
     email,
     google,
@@ -109,8 +137,11 @@ export function createTestApp(
     advisor: options.advisor ?? null,
     categorySuggester: options.categorySuggester ?? null,
     offers: options.offers,
+    rates: options.rates ?? {
+      rate: async (from, to) => (from === 'USD' && to === 'EUR' ? 0.9 : 2),
+    },
   });
-  return { app: createApp(container), container, clock, email, google, payments };
+  return { app: createApp(container), container, clock, email, google, payments, push };
 }
 
 export interface TestUser {

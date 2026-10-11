@@ -7,6 +7,7 @@ import { errorMessage } from '@shared/utils/errors';
 import { validatePassword } from '../domain/passwordValidation';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { PasswordHints } from './PasswordHints';
+import { Icon } from '@shared/components/Icon';
 
 /** New password from the link sent by e-mail (`?token=`). */
 export function ResetPasswordPage() {
@@ -44,7 +45,9 @@ export function ResetPasswordPage() {
       <div className="auth-page-with-header">
         {done ? (
           <div className="auth-card">
-            <div className="auth-logo">✅</div>
+            <div className="auth-logo">
+              <Icon name="checkCircle" />
+            </div>
             <h1 className="auth-title">{t('app.auth.reset.success.title')}</h1>
             <p className="auth-sub auth-sub--center">{t('app.auth.reset.success.sub')}</p>
             <button className="auth-btn" onClick={goLogin}>
@@ -53,7 +56,9 @@ export function ResetPasswordPage() {
           </div>
         ) : (
           <form onSubmit={submit} className="auth-card">
-            <div className="auth-logo">🔐</div>
+            <div className="auth-logo">
+              <Icon name="shield" />
+            </div>
             <h1 className="auth-title">{t('app.auth.reset.title')}</h1>
             <p className="auth-note">{t('app.auth.reset.sub')}</p>
             <AuthPasswordInput

@@ -24,6 +24,7 @@ import { normalizeText } from '@domain/shared/text';
 import { AccountResolver, CategoryResolver } from '@application/shared/resolvers';
 import { AiCategorizer } from '@application/ai/AiCategorizer';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import { CategoryRuleService } from '@application/categories/CategoryRuleService';
 
 // ─── Import ──────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ export interface ImportedRowResult {
   amountCents?: Cents;
   type?: TransactionType;
   categoryName?: string;
-  categorySource?: 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
+  categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
 }
 
@@ -79,6 +80,7 @@ export class ImportService {
     private readonly settings: SettingsRepository,
     private readonly entitlements: EntitlementService,
     private readonly categorizer: AiCategorizer,
+    private readonly categoryRules: CategoryRuleService,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock
   ) {}
@@ -111,8 +113,9 @@ export class ImportService {
     const startDay = this.settings.get(userId).monthStartDay;
     const categoryNames = this.categories.listByUser(userId).map((c) => c.name);
     const knownNames = new Set(categoryNames.map(normalizeText));
+    const ruleFor = this.categoryRules.matcher(userId);
     const unplaced = prepared.filter((r) => {
-      if (existing.has(r.hash) || r.category) return false;
+      if (existing.has(r.hash) || r.category || ruleFor(r.description)) return false;
       if (history.has(normalizeText(r.description))) return false;
       const guess = guessCategoryName(r.description);
       return !guess || !knownNames.has(normalizeText(guess));
@@ -143,6 +146,7 @@ export class ImportService {
         const { category, source } = this.pickCategory(
           userId,
           row,
+          ruleFor,
           history,
           aiGuesses,
           byName,
@@ -234,6 +238,7 @@ export class ImportService {
   private pickCategory(
     userId: string,
     row: PreparedRow,
+    ruleFor: (description: string) => string | null,
     history: Map<string, string>,
     aiGuesses: Map<string, string>,
     byName: Map<string, Category>,
@@ -249,6 +254,10 @@ export class ImportService {
       byName.set(key, created);
       return created;
     };
+    // What the user taught beats the file's own category, their history and every guess.
+    const ruleId = ruleFor(row.description);
+    const ruleCategory = ruleId ? this.categories.findById(userId, ruleId) : null;
+    if (ruleCategory) return { category: ruleCategory, source: 'rule' };
     if (row.category) return { category: ensure(row.category), source: 'file' };
     const fromHistory = history.get(normalizeText(row.description));
     const historyCategory = fromHistory ? this.categories.findById(userId, fromHistory) : null;

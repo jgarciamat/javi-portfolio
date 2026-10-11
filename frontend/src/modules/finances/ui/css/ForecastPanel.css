@@ -3,8 +3,8 @@
 .forecast-safe {
   padding: 0.9rem 1rem;
   border-radius: 12px;
-  border: 1px solid #334155;
-  background: #0f172a;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
   margin-bottom: 1rem;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .forecast-safe--over {
-  border-color: #b91c1c;
+  border-color: var(--red-800);
 }
 
 .forecast-daily {
@@ -32,21 +32,21 @@
 .forecast-detail {
   margin: 0.15rem 0;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .forecast-status {
   margin: 0.5rem 0 0;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .forecast-safe--tight .forecast-status {
-  color: #fbbf24;
+  color: var(--amber-400);
 }
 
 .forecast-safe--over .forecast-status {
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .forecast-subtitle {
@@ -56,22 +56,22 @@
 
 .forecast-warning {
   margin: 0.6rem 0;
-  color: #fbbf24;
+  color: var(--amber-400);
 }
 
 .forecast-good {
   margin: 0.6rem 0;
-  color: #4ade80;
+  color: var(--green-400);
 }
 
 .forecast-negative {
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .forecast-whatif {
   margin: 1rem 0 0;
   padding: 0.7rem 0.9rem;
-  border: 1px solid #334155;
+  border: 1px solid var(--slate-700);
   border-radius: 10px;
   display: grid;
   gap: 0.4rem;
@@ -80,7 +80,7 @@
 
 .forecast-whatif legend {
   padding: 0 0.4rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-size: 0.82rem;
 }
 

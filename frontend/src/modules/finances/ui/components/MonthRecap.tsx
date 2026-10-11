@@ -6,6 +6,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { storage } from '@shared/utils/storage';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/GettingStarted.css';
+import { Icon } from '@shared/components/Icon';
 
 const STORAGE_KEY = 'mm_recap_seen';
 
@@ -40,7 +41,8 @@ export function MonthRecap() {
     >
       <div className="getting-started-head">
         <h2 className="section-title">
-          🗓️ {t('app.recap.title', { month: monthLabel(previous.year, previous.month) })}
+          <Icon name="calendar" />{' '}
+          {t('app.recap.title', { month: monthLabel(previous.year, previous.month) })}
         </h2>
         <button className="btn-link" onClick={dismiss}>
           {t('app.recap.dismiss')}

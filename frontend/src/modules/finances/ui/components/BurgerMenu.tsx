@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
+import { Icon } from '@shared/components/Icon';
 import { useEscapeKey } from '@shared/hooks/useEscapeKey';
 import { DASHBOARD_SECTIONS, SECTION_GROUPS, type DashboardTab } from '../navigation';
 import '../css/Sections.css';
@@ -44,11 +45,11 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
       >
         <div className="burger-panel-header">
           <div className="burger-brand">
-            <span className="burger-brand-logo">💰</span>
+            <img className="burger-brand-logo" src="/icon-192.png" alt="" width="28" height="28" />
             <span className="burger-brand-name">{t('app.header.title')}</span>
           </div>
           <button className="burger-close-btn" onClick={onClose} aria-label={t('app.menu.close')}>
-            ✕
+            <Icon name="close" />
           </button>
         </div>
         <nav className="burger-nav">
@@ -66,7 +67,9 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
                     }}
                     aria-current={tab === id ? 'page' : undefined}
                   >
-                    <span className="burger-nav-icon">{icon}</span>
+                    <span className="burger-nav-icon">
+                      <Icon name={icon} />
+                    </span>
                     <span className="burger-nav-label">{t(labelKey)}</span>
                     {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
                   </button>

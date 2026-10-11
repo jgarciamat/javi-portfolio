@@ -480,8 +480,8 @@ describe('AnalysisView', () => {
       ],
     });
     api.insightsApi.netWorth.mockResolvedValue([
-      { year: 2026, month: 2, available: 100, saved: 50, netWorth: 150 },
-      { year: 2026, month: 3, available: 200, saved: 60, netWorth: 260 },
+      { year: 2026, month: 2, available: 100, saved: 50, assets: 0, debts: 0, netWorth: 150 },
+      { year: 2026, month: 3, available: 200, saved: 60, assets: 0, debts: 0, netWorth: 260 },
     ]);
     renderWithProviders(<AnalysisView />, { api });
     expect(await screen.findByText(tr('app.categories.Ocio'))).toBeInTheDocument();
@@ -532,7 +532,7 @@ describe('AnalysisView', () => {
   it('draws a flat chart for a single point', async () => {
     const api = createFakeApi();
     api.insightsApi.netWorth.mockResolvedValue([
-      { year: 2026, month: 3, available: 0, saved: 0, netWorth: 0 },
+      { year: 2026, month: 3, available: 0, saved: 0, assets: 0, debts: 0, netWorth: 0 },
     ]);
     renderWithProviders(<AnalysisView />, { api });
     expect(
@@ -542,6 +542,242 @@ describe('AnalysisView', () => {
 });
 
 // ─── Settings ────────────────────────────────────────────────────────────────
+
+describe('SelfEmployedCard in the analysis', () => {
+  const quarter = (n: 1 | 2 | 3 | 4, income: number) => ({
+    quarter: n,
+    incomeBase: income,
+    vatCollected: income * 0.21,
+    expenseBase: 100,
+    vatPaid: 21,
+    vatDue: income * 0.21 - 21,
+    netIncome: income - 100,
+    irpfAdvance: income * 0.1,
+  });
+  const totals = {
+    incomeBase: 4000,
+    vatCollected: 840,
+    expenseBase: 400,
+    vatPaid: 84,
+    vatDue: 756,
+    netIncome: 3600,
+    irpfAdvance: 400,
+  };
+
+  const setup = (marked = [{ categoryId: 'c1', categoryName: 'Ocio', vatRate: 21 as const }]) => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([
+      f.category({ id: 'c1', name: 'Ocio' }),
+      f.category({ id: 'c2', name: 'Casa' }),
+    ]);
+    api.businessApi.categories.mockResolvedValue(marked);
+    api.businessApi.tax.mockResolvedValue({
+      year: 2026,
+      quarters: [quarter(1, 1000), quarter(2, 1000), quarter(3, 1000), quarter(4, 1000)],
+      totals,
+    });
+    renderWithProviders(<AnalysisView />, { api });
+    return api;
+  };
+
+  it('shows the quarterly estimate with its warning once a category is professional', async () => {
+    setup();
+    expect(await screen.findByText(tr('app.tax.estimate'))).toBeInTheDocument();
+    expect(screen.getByText('T1')).toBeInTheDocument();
+    expect(screen.getByText(tr('app.tax.disclaimer'))).toBeInTheDocument();
+    const row = screen.getByText(tr('app.tax.net')).closest('tr')!;
+    expect(row.textContent).toContain('3600,00');
+  });
+
+  it('marks, changes and unmarks categories, refreshing the estimate', async () => {
+    const api = setup([]);
+    expect(screen.queryByText(tr('app.tax.estimate'))).toBeNull();
+    const casa = await screen.findByRole('combobox', { name: /Casa/ });
+    fireEvent.change(casa, { target: { value: '10' } });
+    await waitFor(() => expect(api.businessApi.setCategory).toHaveBeenCalledWith('c2', 10));
+    fireEvent.change(casa, { target: { value: 'none' } });
+    await waitFor(() => expect(api.businessApi.removeCategory).toHaveBeenCalledWith('c2'));
+    await waitFor(() => expect(api.businessApi.tax.mock.calls.length).toBeGreaterThan(1));
+  });
+
+  it('changes the year and reports errors', async () => {
+    const api = setup();
+    fireEvent.change(await screen.findByRole('combobox', { name: tr('app.tax.year') }), {
+      target: { value: '2025' },
+    });
+    await waitFor(() => expect(api.businessApi.tax).toHaveBeenLastCalledWith(2025));
+    api.businessApi.setCategory.mockRejectedValueOnce(new Error('Premium requerido'));
+    fireEvent.change(screen.getByRole('combobox', { name: /Casa/ }), { target: { value: '4' } });
+    expect(await screen.findByText('Premium requerido')).toBeInTheDocument();
+  });
+});
+
+describe('AssetsCard in the analysis', () => {
+  const fund = {
+    id: 'a1',
+    name: 'Fondo indexado',
+    kind: 'investment' as const,
+    value: 1200,
+    valueDate: '2026-03-01',
+    previousValue: 1000,
+    history: [],
+  };
+  const loan = {
+    ...fund,
+    id: 'a2',
+    name: 'Préstamo',
+    kind: 'debt' as const,
+    value: 800,
+    previousValue: 1000,
+  };
+  const flat = { ...fund, id: 'a3', name: 'Piso', kind: 'property' as const, previousValue: null };
+  const zero = { ...fund, id: 'a4', name: 'Nuevo', previousValue: 0 };
+  const falling = { ...fund, id: 'a5', name: 'Bajista', previousValue: 1500 };
+  const growingDebt = { ...loan, id: 'a6', name: 'Crece', previousValue: 400 };
+
+  it('lists what the user values by hand, with the change and the total', async () => {
+    const api = createFakeApi();
+    api.assetApi.getAll.mockResolvedValue([fund, loan, flat, zero, falling, growingDebt]);
+    renderWithProviders(<AnalysisView />, { api });
+    expect(await screen.findByText('Fondo indexado')).toBeInTheDocument();
+    expect(screen.getByText('Préstamo')).toBeInTheDocument();
+    // Good: an investment that grows, a debt that shrinks. Bad: the opposite.
+    const marks = (pattern: RegExp) => screen.getAllByText(pattern).map((e) => e.className);
+    expect(marks(/▲ 20,0/)).toEqual(['amount-pos']);
+    expect(marks(/▼ 20,0/).sort()).toEqual(['amount-neg', 'amount-pos']);
+    expect(marks(/▲ 100,0/)).toEqual(['amount-neg']);
+    expect(screen.getByText(literal(tr('app.assets.total'))).parentElement?.textContent).toContain(
+      '3200,00'
+    );
+  });
+
+  it('adds, values and removes elements and refreshes the net worth', async () => {
+    const api = createFakeApi();
+    api.assetApi.getAll.mockResolvedValue([fund]);
+    renderWithProviders(<AnalysisView />, { api });
+    await screen.findByText('Fondo indexado');
+    const calls = api.insightsApi.netWorth.mock.calls.length;
+
+    const add = screen.getByRole('button', { name: tr('app.assets.add') });
+    expect(add).toBeDisabled();
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.name') }), {
+      target: { value: ' Casa ' },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.assets.kind') }), {
+      target: { value: 'property' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.value') }), {
+      target: { value: '150000,50' },
+    });
+    fireEvent.click(add);
+    await waitFor(() =>
+      expect(api.assetApi.create).toHaveBeenCalledWith({
+        name: 'Casa',
+        kind: 'property',
+        value: 150000.5,
+      })
+    );
+    await waitFor(() => expect(api.insightsApi.netWorth.mock.calls.length).toBeGreaterThan(calls));
+
+    const update = screen.getByRole('button', { name: tr('app.assets.update') });
+    expect(update).toBeDisabled();
+    const box = screen.getByRole('textbox', {
+      name: tr('app.assets.updateValue', { name: 'Fondo indexado' }),
+    });
+    fireEvent.change(box, { target: { value: 'abc' } });
+    expect(update).toBeDisabled();
+    fireEvent.change(box, { target: { value: '1300' } });
+    fireEvent.click(update);
+    await waitFor(() => expect(api.assetApi.setValue).toHaveBeenCalledWith('a1', 1300));
+    expect(box).toHaveValue('');
+
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.assets.remove', { name: 'Fondo indexado' }) })
+    );
+    await waitFor(() => expect(api.assetApi.remove).toHaveBeenCalledWith('a1'));
+  });
+
+  it('shows why a value was refused', async () => {
+    const api = createFakeApi();
+    api.assetApi.create.mockRejectedValueOnce(new Error('Máximo 30 elementos'));
+    renderWithProviders(<AnalysisView />, { api });
+    fireEvent.change(await screen.findByRole('textbox', { name: tr('app.assets.name') }), {
+      target: { value: 'x' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.assets.value') }), {
+      target: { value: '1' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.assets.add') }));
+    expect(await screen.findByText('Máximo 30 elementos')).toBeInTheDocument();
+  });
+});
+
+describe('CategoryRulesCard in the settings', () => {
+  const rule = { id: 'r1', pattern: 'mercadona', categoryId: 'c1', categoryName: 'Comida' };
+
+  it('lists, adds and removes the rules the user taught', async () => {
+    const api = createFakeApi();
+    api.categoryRuleApi.getAll.mockResolvedValue([rule]);
+    api.categoryApi.getAll.mockResolvedValue([
+      f.category({ id: 'c1', name: 'Comida' }),
+      f.category({ id: 'c2', name: 'Ocio' }),
+    ]);
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
+    expect(await screen.findByText(/«mercadona» →/)).toBeInTheDocument();
+
+    const add = screen.getByRole('button', { name: tr('app.rules.add') });
+    expect(add).toBeDisabled();
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.rules.pattern') }), {
+      target: { value: 'Netflix' },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.rules.category') }), {
+      target: { value: 'c2' },
+    });
+    fireEvent.click(add);
+    await waitFor(() => expect(api.categoryRuleApi.add).toHaveBeenCalledWith('Netflix', 'c2'));
+    await waitFor(() => expect(add).toBeDisabled());
+
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.rules.remove', { pattern: 'mercadona' }) })
+    );
+    await waitFor(() => expect(api.categoryRuleApi.remove).toHaveBeenCalledWith('r1'));
+  });
+
+  it('shows what went wrong when a rule is refused', async () => {
+    const api = createFakeApi();
+    api.categoryRuleApi.add.mockRejectedValueOnce(new Error('Regla no válida'));
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Comida' })]);
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
+    fireEvent.change(await screen.findByRole('textbox', { name: tr('app.rules.pattern') }), {
+      target: { value: 'abc' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.rules.add') }));
+    expect(await screen.findByText('Regla no válida')).toBeInTheDocument();
+  });
+});
+
+describe('the appearance setting', () => {
+  it('switches the look of the app on this device', async () => {
+    window.matchMedia = jest
+      .fn()
+      .mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia;
+    localStorage.clear();
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />);
+    const select = await screen.findByRole('combobox', {
+      name: new RegExp(tr('app.settings.theme')),
+    });
+    expect(select).toHaveValue('system');
+    fireEvent.change(select, { target: { value: 'light' } });
+    expect(localStorage.getItem('mm_theme')).toBe('light');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    fireEvent.change(select, { target: { value: 'dark' } });
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+});
 
 describe('SettingsView', () => {
   const mocked = notifications as jest.Mocked<typeof notifications>;
@@ -597,6 +833,12 @@ describe('SettingsView', () => {
       screen.getByRole('checkbox', { name: new RegExp(tr('app.settings.showOffers')) })
     );
     await waitFor(() => expect(api.settingsApi.update).toHaveBeenCalledWith({ showOffers: false }));
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: new RegExp(tr('app.settings.weeklyDigest')) })
+    );
+    await waitFor(() =>
+      expect(api.settingsApi.update).toHaveBeenCalledWith({ weeklyDigest: true })
+    );
   });
 
   it('turns notifications on and off', async () => {

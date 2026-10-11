@@ -21,13 +21,13 @@
   margin: 0 0 0.25rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 .recurring-tab-subtitle {
   margin: 0;
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 /* ─── Form panel ─────────────────────────────── */
@@ -39,7 +39,7 @@
   margin: 0 0 1.25rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 .recurring-form-grid {
@@ -61,7 +61,7 @@
 
 .recurring-label {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -84,7 +84,7 @@
   align-items: center;
   gap: 0.45rem;
   font-size: 0.875rem;
-  color: #f1f5f9;
+  color: var(--slate-100);
   cursor: pointer;
   user-select: none;
 }
@@ -102,7 +102,7 @@
 }
 
 .recurring-error {
-  color: #f87171;
+  color: var(--red-400);
   font-size: 0.85rem;
   margin: 0.4rem 0;
 }
@@ -116,8 +116,8 @@
 
 /* ─── Rule card ──────────────────────────────── */
 .recurring-card {
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
   border-radius: 12px;
   padding: 1.1rem 1.25rem;
   display: flex;
@@ -127,7 +127,7 @@
 }
 
 .recurring-card:hover {
-  border-color: #334155;
+  border-color: var(--slate-700);
 }
 
 .recurring-card--inactive {
@@ -150,17 +150,17 @@
 
 .recurring-type--income {
   background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
+  color: var(--green-400);
 }
 
 .recurring-type--expense {
   background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .recurring-type--saving {
   background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
+  color: var(--accent-400);
 }
 
 .recurring-status-badge {
@@ -172,12 +172,12 @@
 
 .recurring-status--active {
   background: rgba(34, 197, 94, 0.12);
-  color: #4ade80;
+  color: var(--green-400);
 }
 
 .recurring-status--inactive {
   background: rgba(148, 163, 184, 0.12);
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .recurring-card-body {
@@ -191,7 +191,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -203,7 +203,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--slate-100);
   flex-shrink: 0;
 }
 
@@ -215,7 +215,7 @@
 
 .recurring-meta-item {
   font-size: 0.78rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .recurring-card-actions {
@@ -223,7 +223,7 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   padding-top: 0.25rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
 }
 
 .recurring-btn-sm {
@@ -240,18 +240,18 @@
 .recurring-empty-title {
   margin: 0 0 0.5rem;
   font-size: 1rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-weight: 500;
 }
 
 .recurring-empty-hint {
   margin: 0;
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--slate-600);
 }
 
 .recurring-loading {
-  color: #64748b;
+  color: var(--slate-500);
   font-size: 0.9rem;
   padding: 1rem 0;
 }

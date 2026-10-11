@@ -11,6 +11,12 @@ import { referrals } from './009-referrals';
 import { household } from './010-household';
 import { referralTiers } from './011-referral-tiers';
 import { googlePlaySource } from './012-google-play-source';
+import { categoryRules } from './014-category-rules';
+import { assets } from './015-assets';
+import { weeklyDigest } from './016-weekly-digest';
+import { businessCategories } from './017-business-categories';
+import { splitExpenses } from './018-split-expenses';
+import { push } from './019-push';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -28,4 +34,10 @@ export const migrations: Migration[] = [
   referralTiers,
   googlePlaySource,
   gettingStartedSetting,
+  categoryRules,
+  assets,
+  weeklyDigest,
+  businessCategories,
+  splitExpenses,
+  push,
 ];

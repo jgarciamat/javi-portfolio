@@ -12,23 +12,23 @@
 .tx-table th {
   padding: 0.65rem 0.85rem;
   text-align: left;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid var(--slate-700);
   white-space: nowrap;
 }
 
 .tx-table td {
   padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
   font-size: 0.88rem;
   vertical-align: middle;
 }
 
 .tx-table tr:hover td {
-  background: #1e293b;
+  background: var(--slate-800);
 }
 
 /* ─── Mobile card list ───────────────────────── */
@@ -42,7 +42,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.9rem 0;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
 }
 
 .tx-card:last-child {
@@ -56,7 +56,7 @@
 
 .tx-card-desc {
   font-weight: 500;
-  color: #f1f5f9;
+  color: var(--slate-100);
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
@@ -65,7 +65,7 @@
 
 .tx-card-meta {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--slate-500);
   margin-top: 0.2rem;
 }
 
@@ -91,11 +91,11 @@
 
 .tx-day-separator:not(:first-child) td {
   padding-top: 1rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
 }
 
 .tx-day-separator:hover td {
-  background: #0f172a;
+  background: var(--slate-900);
 }
 
 .tx-day-label {
@@ -106,13 +106,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #475569;
+  color: var(--slate-600);
 }
 
 .tx-day-chevron {
   display: inline-block;
   font-size: 0.75rem;
-  color: #475569;
+  color: var(--slate-600);
   transition: transform 0.2s ease;
   transform: rotate(0deg);
   line-height: 1;
@@ -125,7 +125,7 @@
 .tx-day-count {
   font-size: 0.65rem;
   font-weight: 500;
-  color: #334155;
+  color: var(--slate-700);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -139,9 +139,9 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #475569;
+  color: var(--slate-600);
   padding: 0.9rem 0 0.35rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
 }
 
 .tx-day-header--clickable {
@@ -150,7 +150,7 @@
 }
 
 .tx-day-header--clickable:hover {
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .tx-card-list > div:first-child .tx-day-header {
@@ -173,13 +173,13 @@
 }
 
 .tx-badge-income {
-  background: #14532d;
-  color: #4ade80;
+  background: var(--green-900);
+  color: var(--green-400);
 }
 
 .tx-badge-expense {
-  background: #4c0519;
-  color: #f87171;
+  background: var(--red-950);
+  color: var(--red-400);
 }
 
 .tx-badge-saving {
@@ -188,18 +188,18 @@
 }
 
 .tx-cat-badge {
-  background: #334155;
+  background: var(--slate-700);
   border-radius: 999px;
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .btn-delete {
   background: none;
   border: none;
   cursor: pointer;
-  color: #64748b;
+  color: var(--slate-500);
   font-size: 1rem;
   padding: 0.25rem;
   line-height: 1;
@@ -207,14 +207,14 @@
 }
 
 .btn-delete:hover {
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .btn-edit {
   background: none;
   border: none;
   cursor: pointer;
-  color: #64748b;
+  color: var(--slate-500);
   font-size: 1rem;
   padding: 0.25rem;
   line-height: 1;
@@ -222,14 +222,14 @@
 }
 
 .btn-edit:hover {
-  color: #818cf8;
+  color: var(--accent-400);
 }
 
 /* ─── Done / notes ───────────────────────────── */
 .tx-done-checkbox {
   width: 1rem;
   height: 1rem;
-  accent-color: #6366f1;
+  accent-color: var(--accent);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -264,7 +264,7 @@
 
 .tx-notes-text {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--slate-400);
   cursor: pointer;
   display: block;
   max-width: 100%;
@@ -274,21 +274,21 @@
 }
 
 .tx-notes-text:hover {
-  color: #c7d2fe;
+  color: var(--accent-200);
 }
 
 .tx-notes-placeholder {
-  color: #475569;
+  color: var(--slate-600);
   font-style: italic;
   font-size: 0.78rem;
 }
 
 .tx-notes-edit-input {
-  background: #1e293b;
-  border: 1px solid #6366f1;
+  background: var(--slate-800);
+  border: 1px solid var(--accent);
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
-  color: #f1f5f9;
+  color: var(--slate-100);
   font-size: 0.8rem;
   width: 100%;
   min-width: 100px;
@@ -344,11 +344,11 @@
 }
 
 .tx-cell-date {
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .tx-cell-description {
-  color: #f1f5f9;
+  color: var(--slate-100);
   font-weight: 500;
 }
 

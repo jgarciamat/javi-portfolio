@@ -76,6 +76,50 @@ export interface CategoryRepository {
   seedDefaults(userId: string): void;
 }
 
+/** "Text found in a description → category" rules the user taught the app. */
+export interface CategoryRule {
+  id: string;
+  userId: string;
+  /** Normalised text (see `normalizeText`) searched inside the description. */
+  pattern: string;
+  categoryId: string;
+  createdAt: string;
+}
+
+export interface CategoryRuleRepository {
+  listByUser(userId: string): CategoryRule[];
+  /** One rule per pattern: saving an existing pattern changes its category. */
+  save(rule: CategoryRule): CategoryRule;
+  delete(userId: string, id: string): boolean;
+}
+
+export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
+
+export interface Asset {
+  id: string;
+  userId: string;
+  name: string;
+  kind: AssetKind;
+  createdAt: string;
+}
+
+export interface AssetValue {
+  assetId: string;
+  date: string;
+  valueCents: number;
+}
+
+export interface AssetRepository {
+  listByUser(userId: string): Asset[];
+  findById(userId: string, id: string): Asset | null;
+  save(asset: Asset): void;
+  delete(userId: string, id: string): boolean;
+  /** One value per asset and date: setting it again replaces it. */
+  setValue(value: AssetValue): void;
+  /** Every value of the user's assets, oldest first. */
+  valuesByUser(userId: string): AssetValue[];
+}
+
 export interface AccountRepository {
   listByUser(userId: string): Account[];
   findById(userId: string, id: string): Account | null;
@@ -230,6 +274,96 @@ export interface GoalRepository {
 export interface SettingsRepository {
   get(userId: string): UserSettingsProps;
   save(settings: UserSettingsProps): void;
+}
+
+// ─── Push notifications ──────────────────────────────────────────────────────
+
+export interface PushSubscriptionRecord {
+  id: string;
+  userId: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
+export interface PushRepository {
+  /** One row per endpoint: subscribing again from the same browser replaces it. */
+  save(subscription: PushSubscriptionRecord, createdAt: string): void;
+  remove(userId: string, endpoint: string): void;
+  /** Used when the push service says the subscription is gone. */
+  removeEndpoint(endpoint: string): void;
+  listByUser(userId: string): PushSubscriptionRecord[];
+  /** Users with at least one subscription. */
+  subscribedUsers(): string[];
+  /** Marks a notification as sent; false when that exact one (kind + key) already went out. */
+  claim(userId: string, kind: string, key: string, at: string): boolean;
+}
+
+// ─── Shared expenses ─────────────────────────────────────────────────────────
+
+export interface SplitGroup {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface SplitMember {
+  id: string;
+  name: string;
+}
+
+export interface SplitExpenseRecord {
+  id: string;
+  description: string;
+  amountCents: Cents;
+  paidBy: string;
+  date: string;
+  settlement: boolean;
+  shares: { memberId: string; shareCents: Cents }[];
+}
+
+export interface SplitRepository {
+  listGroups(userId: string): SplitGroup[];
+  findGroup(userId: string, id: string): SplitGroup | null;
+  createGroup(group: SplitGroup, members: SplitMember[]): void;
+  deleteGroup(userId: string, id: string): boolean;
+  members(groupId: string): SplitMember[];
+  expenses(groupId: string): SplitExpenseRecord[];
+  addExpense(groupId: string, expense: SplitExpenseRecord, createdAt: string): void;
+  deleteExpense(groupId: string, expenseId: string): boolean;
+}
+
+// ─── Self-employed ───────────────────────────────────────────────────────────
+
+export type VatRate = 0 | 4 | 10 | 21;
+export const VAT_RATES: VatRate[] = [21, 10, 4, 0];
+
+export interface BusinessCategory {
+  categoryId: string;
+  vatRate: VatRate;
+}
+
+export interface BusinessCategoryRepository {
+  listByUser(userId: string): BusinessCategory[];
+  set(userId: string, categoryId: string, vatRate: VatRate): void;
+  remove(userId: string, categoryId: string): void;
+}
+
+// ─── Weekly digest ───────────────────────────────────────────────────────────
+
+export interface DigestRecipient {
+  userId: string;
+  email: string;
+  name: string;
+  locale: 'es' | 'en';
+  currency: string;
+}
+
+export interface DigestRepository {
+  /** Verified users who asked for the digest and have not had one since `notSentSince`. */
+  due(notSentSince: string): DigestRecipient[];
+  markSent(userId: string, at: string): void;
 }
 
 // ─── Monetization ────────────────────────────────────────────────────────────

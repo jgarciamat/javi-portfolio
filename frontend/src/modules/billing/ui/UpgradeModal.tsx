@@ -5,6 +5,7 @@ import type { UpgradeReason } from '../domain/types';
 import { PlanOptions } from './PlanOptions';
 import { FEATURE_KEYS, PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
+import { Icon } from '@shared/components/Icon';
 
 function ReasonText({ reason }: { reason: UpgradeReason }) {
   const { t } = useI18n();
@@ -44,10 +45,10 @@ export function UpgradeModal({ reason }: { reason: UpgradeReason }) {
       className="upgrade-modal"
     >
       <button className="upgrade-close" onClick={closeUpgrade} aria-label={t('app.menu.close')}>
-        ✕
+        <Icon name="close" />
       </button>
       <div className="upgrade-icon" aria-hidden="true">
-        ⭐
+        <Icon name="star" />
       </div>
       <h2 className="upgrade-title">{t('billing.upgradeTitle')}</h2>
       <ReasonText reason={reason} />

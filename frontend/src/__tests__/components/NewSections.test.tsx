@@ -19,6 +19,9 @@ const t = (key: string, vars?: Record<string, string>) => {
   return v;
 };
 
+jest.mock('@shared/hooks/useAppLock', () => ({
+  useAppLock: () => ({ config: null, locked: false }),
+}));
 jest.mock('@core/i18n/I18nContext', () => ({
   useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
 }));
@@ -427,8 +430,8 @@ describe('AnalysisView', () => {
           ],
         }),
         netWorth: jest.fn().mockResolvedValue([
-          { year: 2026, month: 2, available: 1000, saved: 0, netWorth: 1000 },
-          { year: 2026, month: 3, available: 800, saved: 200, netWorth: 1000 },
+          { year: 2026, month: 2, available: 1000, saved: 0, assets: 0, debts: 0, netWorth: 1000 },
+          { year: 2026, month: 3, available: 800, saved: 200, assets: 0, debts: 0, netWorth: 1000 },
         ]),
       },
     });

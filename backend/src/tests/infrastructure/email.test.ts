@@ -24,6 +24,22 @@ describe('ResendEmailSender', () => {
     expect(send.mock.calls[0][0].text).toContain('https://app.test/terms');
   });
 
+  it('sends the weekly digest with a link back to the app', async () => {
+    const digest = {
+      from: '2026-03-02',
+      to: '2026-03-08',
+      spentCents: 1000,
+      previousSpentCents: 0,
+      changePct: null,
+      incomeCents: 0,
+      topCategories: [],
+      upcoming: null,
+    };
+    await sender.sendWeeklyDigest('a@b.c', 'Ana', 'es', digest, 'EUR');
+    expect(send.mock.calls[0][0]).toMatchObject({ to: 'a@b.c' });
+    expect(send.mock.calls[0][0].text).toContain('https://app.test');
+  });
+
   it("fails with the provider's error", async () => {
     send.mockResolvedValue({ error: { message: 'domain not verified' } });
     await expect(sender.sendVerification('a@b.c', 'Ana', 't', 'es')).rejects.toThrow(
@@ -39,11 +55,24 @@ describe('ConsoleEmailSender', () => {
     await sender.sendVerification('a@b.c', 'Ana', 'v1');
     await sender.sendPasswordReset('a@b.c', 'Ana', 'r1');
     await sender.sendPurchaseConfirmation('a@b.c');
+    const digest = {
+      from: 'a',
+      to: 'b',
+      spentCents: 0,
+      previousSpentCents: 0,
+      changePct: null,
+      incomeCents: 0,
+      topCategories: [],
+      upcoming: null,
+    };
+    await sender.sendWeeklyDigest('a@b.c', 'Ana', 'es', digest);
     expect(sender.sent).toEqual([
       { kind: 'verify', to: 'a@b.c', token: 'v1' },
       { kind: 'reset', to: 'a@b.c', token: 'r1' },
       { kind: 'purchase', to: 'a@b.c', token: '' },
+      { kind: 'digest', to: 'a@b.c', token: '', digest },
     ]);
+    expect(info).toHaveBeenCalledWith('[email] weekly digest a@b.c');
     expect(info).toHaveBeenCalledWith('[email] purchase confirmation a@b.c');
     expect(info).toHaveBeenCalledWith(
       '[email] verify a@b.c: http://localhost:5176/verify-email?token=v1'

@@ -5,6 +5,7 @@ import { errorCode } from '@core/api/http';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { errorMessage } from '@shared/utils/errors';
+import { Icon } from '@shared/components/Icon';
 
 type Status = 'loading' | 'success' | 'error' | 'resent';
 
@@ -62,7 +63,9 @@ export function VerifyEmailPage() {
           )}
           {status === 'success' && (
             <>
-              <div className="auth-logo">✅</div>
+              <div className="auth-logo">
+                <Icon name="checkCircle" />
+              </div>
               <h1 className="auth-title">{t('app.auth.verify.success')}</h1>
               <p className="auth-sub" style={{ textAlign: 'center' }}>
                 {t('app.auth.verify.successSub')}
@@ -78,7 +81,9 @@ export function VerifyEmailPage() {
           )}
           {status === 'resent' && (
             <>
-              <div className="auth-logo">📬</div>
+              <div className="auth-logo">
+                <Icon name="mail" />
+              </div>
               <h1 className="auth-title">{t('app.auth.verify.resent')}</h1>
               <p className="auth-sub" style={{ textAlign: 'center' }}>
                 {t('app.auth.verify.resentSub')}

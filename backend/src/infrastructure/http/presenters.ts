@@ -4,6 +4,9 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
+import { SplitGroupView } from '@application/split/SplitService';
+import { YearTax } from '@domain/services/tax';
+import { AssetView } from '@application/assets/AssetService';
 import { ProjectedMonth } from '@domain/services/forecast';
 import { SubscriptionReport } from '@domain/services/subscriptions';
 import {
@@ -238,6 +241,8 @@ export function presentNetWorth(p: NetWorthPoint) {
     month: p.month,
     available: m(p.availableCents),
     saved: m(p.savedCents),
+    assets: m(p.assetsCents),
+    debts: m(p.debtsCents),
     netWorth: m(p.netWorthCents),
   };
 }
@@ -320,5 +325,52 @@ export function presentAnnualReport(r: AnnualReport) {
     totals: totals(r.totals),
     incomeByCategory: r.incomeByCategory.map(category),
     expensesByCategory: r.expensesByCategory.map(category),
+  };
+}
+
+export function presentAsset(a: AssetView) {
+  return {
+    id: a.id,
+    name: a.name,
+    kind: a.kind,
+    value: m(a.valueCents),
+    valueDate: a.valueDate,
+    previousValue: a.previousCents === null ? null : m(a.previousCents),
+    history: a.history.map((h) => ({ date: h.date, value: m(h.valueCents) })),
+  };
+}
+
+export function presentTax(t: YearTax) {
+  const money = (q: Omit<YearTax['totals'], never>) => ({
+    incomeBase: m(q.incomeBaseCents),
+    vatCollected: m(q.vatCollectedCents),
+    expenseBase: m(q.expenseBaseCents),
+    vatPaid: m(q.vatPaidCents),
+    vatDue: m(q.vatDueCents),
+    netIncome: m(q.netIncomeCents),
+    irpfAdvance: m(q.irpfAdvanceCents),
+  });
+  return {
+    year: t.year,
+    quarters: t.quarters.map((q) => ({ quarter: q.quarter, ...money(q) })),
+    totals: money(t.totals),
+  };
+}
+
+export function presentSplitGroup(g: SplitGroupView) {
+  return {
+    id: g.id,
+    name: g.name,
+    members: g.members.map((mem) => ({ id: mem.id, name: mem.name, balance: m(mem.balanceCents) })),
+    expenses: g.expenses.map((e) => ({
+      id: e.id,
+      description: e.description,
+      amount: m(e.amountCents),
+      paidBy: e.paidBy,
+      date: e.date,
+      settlement: e.settlement,
+      shares: e.shares.map((s) => ({ memberId: s.memberId, share: m(s.shareCents) })),
+    })),
+    transfers: g.transfers.map((t) => ({ from: t.from, to: t.to, amount: m(t.cents) })),
   };
 }

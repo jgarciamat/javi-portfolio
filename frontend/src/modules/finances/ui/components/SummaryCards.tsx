@@ -1,3 +1,4 @@
+import { Icon } from '@shared/components/Icon';
 import type { CSSProperties } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -33,7 +34,7 @@ function Card({
       <div className="summary-card-header">
         <span className="summary-card-title">{title}</span>
         <span className="summary-card-icon" aria-hidden="true">
-          {icon}
+          <Icon name={icon} />
         </span>
       </div>
       <div className="summary-card-value">{value}</div>
@@ -54,7 +55,7 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
         <Card
           className="summary-card-carryover"
           title={t('app.summary.availableBalance')}
-          icon="🏦"
+          icon="bank"
           value={money(available)}
           sub={`${t('app.summary.carryover')}: ${money(carried)}`}
           accent={available >= 0 ? '#6366f1' : '#ef4444'}

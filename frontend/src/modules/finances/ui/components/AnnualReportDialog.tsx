@@ -7,6 +7,7 @@ import { useResource } from '@shared/hooks/useResource';
 import type { AnnualReport, ReportTotals } from '@modules/finances/domain/types';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
 import '../css/AnnualReportDialog.css';
+import { Icon } from '@shared/components/Icon';
 
 function PeriodTable({
   title,
@@ -120,16 +121,16 @@ export function AnnualReportDialog({ year, onClose }: { year: number; onClose: (
       >
         <header className="report-head">
           <h2>
-            📄 {t('app.report.title')} {year}
+            <Icon name="file" /> {t('app.report.title')} {year}
           </h2>
           <div className="report-actions">
             {data && (
               <>
                 <button className="btn-secondary" onClick={() => window.print()}>
-                  🖨️ {t('app.report.print')}
+                  <Icon name="print" /> {t('app.report.print')}
                 </button>
                 <button className="btn-secondary" onClick={() => exportReportCSV(data)}>
-                  📥 {t('app.report.csv')}
+                  <Icon name="download" /> {t('app.report.csv')}
                 </button>
               </>
             )}

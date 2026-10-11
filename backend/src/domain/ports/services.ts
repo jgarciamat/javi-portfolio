@@ -1,3 +1,4 @@
+import { DigestData } from '@domain/services/digest';
 import { QuestionFacts } from '@domain/services/question-facts';
 import { Advice, AdviceContext } from '@domain/services/rule-based-advisor';
 
@@ -45,6 +46,14 @@ export interface EmailSender {
    * once and the loss of the right of withdrawal (required for that loss to apply).
    */
   sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void>;
+  /** The optional Monday summary of the week. */
+  sendWeeklyDigest(
+    to: string,
+    name: string,
+    locale: EmailLocale,
+    digest: DigestData,
+    currency: string
+  ): Promise<void>;
 }
 
 export interface GoogleIdentity {
@@ -173,4 +182,27 @@ export type MetricName =
 
 export interface MetricsRecorder {
   record(name: MetricName): void;
+}
+
+/** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */
+export interface ExchangeRates {
+  /** How many `to` one `from` is worth. */
+  rate(from: string, to: string): Promise<number>;
+}
+
+export interface PushPayload {
+  title: string;
+  body: string;
+  /** Where the notification takes the user when tapped (a path of the app). */
+  url: string;
+}
+
+/** Sends a notification to a browser or installed app. `gone`: the subscription no longer exists. */
+export interface PushSender {
+  readonly enabled: boolean;
+  publicKey(): string | null;
+  send(
+    subscription: { endpoint: string; p256dh: string; auth: string },
+    payload: PushPayload
+  ): Promise<'sent' | 'gone'>;
 }

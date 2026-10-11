@@ -8,6 +8,7 @@ import type { Transaction } from '@modules/finances/domain/types';
 import { useTransactionTable } from '../../application/hooks/useTransactionTable';
 import { SignedAmount, TypeBadge } from './TransactionBits';
 import '../css/TransactionTable.css';
+import { Icon } from '@shared/components/Icon';
 
 /** Below this width movements are shown as cards instead of a table. */
 export const MOBILE_QUERY = '(max-width: 600px)';
@@ -70,7 +71,7 @@ function RowActions({ tx, table, onEdit }: RowProps) {
         title={t('app.transaction.table.edit')}
         aria-label={`${t('app.transaction.table.edit')}: ${tx.description}`}
       >
-        ✏️
+        <Icon name="edit" />
       </button>
       <button
         className="btn-delete"
@@ -78,7 +79,7 @@ function RowActions({ tx, table, onEdit }: RowProps) {
         title={t('app.transaction.table.delete')}
         aria-label={`${t('app.transaction.table.delete')}: ${tx.description}`}
       >
-        🗑️
+        <Icon name="trash" />
       </button>
     </span>
   );

@@ -13,9 +13,9 @@ export interface SummaryCard {
 
 /** Savings rate thresholds: ≥ 20 % good, ≥ 10 % fair. */
 export function savingsRateAccent(rate: number): string {
-  if (rate >= 20) return '#10b981';
-  if (rate >= 10) return '#f59e0b';
-  return '#ef4444';
+  if (rate >= 20) return 'var(--green-400)';
+  if (rate >= 10) return 'var(--amber-400)';
+  return 'var(--red-400)';
 }
 
 /** The month figures shown as cards (the available balance card is rendered apart). */
@@ -31,39 +31,39 @@ export function buildSummaryCards(
     {
       key: 'balance',
       title: t('app.summary.monthBalance'),
-      icon: '📊',
+      icon: 'chart',
       value: money(summary.balance),
       sub: t('app.summary.monthBalance.sub', { count: summary.transactionCount }),
-      accent: '#6b7280',
+      accent: 'var(--slate-400)',
     },
     {
       key: 'income',
       title: t('app.summary.income'),
-      icon: '💸',
+      icon: 'wallet',
       value: money(summary.totalIncome),
       sub: t('app.summary.income.sub'),
-      accent: '#10b981',
+      accent: 'var(--green-400)',
     },
     {
       key: 'expenses',
       title: t('app.summary.expenses'),
-      icon: '🧾',
+      icon: 'receipt',
       value: money(summary.totalExpenses),
       sub: t('app.summary.expenses.sub'),
-      accent: '#ef4444',
+      accent: 'var(--red-400)',
     },
     {
       key: 'saving',
       title: t('app.summary.saving'),
-      icon: '💰',
+      icon: 'piggy',
       value: money(summary.totalSaving),
       sub: t('app.summary.saving.sub'),
-      accent: '#f59e0b',
+      accent: 'var(--accent-400)',
     },
     {
       key: 'rate',
       title: t('app.summary.savingsRate'),
-      icon: '📈',
+      icon: 'trend',
       value: hasIncome ? percent(rate) : t('app.summary.savingsRate.noIncome'),
       sub: hasIncome
         ? t('app.summary.savingsRate.sub', { amount: money(summary.totalIncome) })

@@ -171,7 +171,7 @@ export interface ImportRowResult {
   amount?: number;
   type?: TransactionType;
   categoryName?: string;
-  categorySource?: 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
+  categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
 }
 
@@ -384,7 +384,25 @@ export interface NetWorthPoint {
   month: number;
   available: number;
   saved: number;
+  /** Investments, property and other assets valued by hand. */
+  assets: number;
+  /** Debts valued by hand. */
+  debts: number;
   netWorth: number;
+}
+
+export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
+
+/** An investment, property or debt the user values by hand. */
+export interface Asset {
+  id: string;
+  name: string;
+  kind: AssetKind;
+  value: number;
+  valueDate: string | null;
+  /** The value before the latest one (to show the change). */
+  previousValue: number | null;
+  history: { date: string; value: number }[];
 }
 
 export interface SafeToSpend {
@@ -499,6 +517,8 @@ export interface UserSettings {
   showTour: boolean;
   /** The "first steps" panel of the month view, until the user hides it. */
   showGettingStarted: boolean;
+  /** A summary of the week by e-mail every Monday. */
+  weeklyDigest: boolean;
   currentPeriod: { year: number; month: number; start: string; end: string };
 }
 
@@ -513,5 +533,68 @@ export type SettingsChanges = Partial<
     | 'showOffers'
     | 'showTour'
     | 'showGettingStarted'
+    | 'weeklyDigest'
   >
 >;
+
+/** "Text in the description → category" rule the user taught. */
+export interface CategoryRule {
+  id: string;
+  pattern: string;
+  categoryId: string;
+  categoryName: string;
+}
+
+export type VatRate = 0 | 4 | 10 | 21;
+
+/** A category the self-employed user marks as professional, with the VAT rate of its movements. */
+export interface BusinessCategory {
+  categoryId: string;
+  categoryName: string;
+  vatRate: VatRate;
+}
+
+export interface QuarterTax {
+  incomeBase: number;
+  vatCollected: number;
+  expenseBase: number;
+  vatPaid: number;
+  /** Positive: VAT to pay (modelo 303); negative: to offset. */
+  vatDue: number;
+  netIncome: number;
+  /** Advance income-tax payment (modelo 130). */
+  irpfAdvance: number;
+}
+
+export interface YearTax {
+  year: number;
+  quarters: (QuarterTax & { quarter: 1 | 2 | 3 | 4 })[];
+  totals: QuarterTax;
+}
+
+export interface SplitGroupSummary {
+  id: string;
+  name: string;
+  members: number;
+  expenses: number;
+}
+
+export interface SplitExpense {
+  id: string;
+  description: string;
+  amount: number;
+  paidBy: string;
+  date: string;
+  settlement: boolean;
+  shares: { memberId: string; share: number }[];
+}
+
+/** A group of people sharing expenses, with who owes whom. */
+export interface SplitGroup {
+  id: string;
+  name: string;
+  /** `balance` > 0: the others owe them; < 0: they owe the others. */
+  members: { id: string; name: string; balance: number }[];
+  expenses: SplitExpense[];
+  transfers: { from: string; to: string; amount: number }[];
+}

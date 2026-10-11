@@ -36,6 +36,10 @@ const envSchema = z.object({
   STRIPE_PRICE_LIFETIME: z.string().optional(),
   /** Shared secret RevenueCat sends in the Authorization header of its webhooks (Google Play purchases). */
   REVENUECAT_WEBHOOK_AUTH: z.string().min(16).optional(),
+  /** Web Push (phone and browser notifications): `npx web-push generate-vapid-keys`. */
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default('mailto:moneymanager@outlook.es'),
   /** Prices shown in the UI (must match the Stripe prices, VAT included). */
   PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
   PRICE_YEARLY: z.coerce.number().positive().default(24.99),
@@ -90,6 +94,8 @@ export interface AppConfig {
     displayPrices: { monthly: number; yearly: number; lifetime: number };
     founderLimit: number;
   };
+  /** Web Push keys; null leaves push notifications off. */
+  push: { publicKey: string; privateKey: string; subject: string } | null;
   affiliatesFile: string | null;
   email: { resendApiKey: string | null; fromEmail: string; fromName: string };
   backup: { dir: string | null; intervalHours: number; retentionDays: number };
@@ -179,6 +185,14 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     trustProxy: raw.TRUST_PROXY,
     google: { clientId: raw.GOOGLE_CLIENT_ID ?? null },
     ai: resolveAi(raw),
+    push:
+      raw.VAPID_PUBLIC_KEY && raw.VAPID_PRIVATE_KEY
+        ? {
+            publicKey: raw.VAPID_PUBLIC_KEY,
+            privateKey: raw.VAPID_PRIVATE_KEY,
+            subject: raw.VAPID_SUBJECT,
+          }
+        : null,
     billing: {
       stripe:
         raw.STRIPE_SECRET_KEY &&

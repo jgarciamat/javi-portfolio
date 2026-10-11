@@ -7,8 +7,16 @@ import type {
   Forecast,
   SubscriptionReport,
   AnnualSummary,
+  Asset,
+  AssetKind,
+  BusinessCategory,
+  SplitGroup,
+  SplitGroupSummary,
+  VatRate,
+  YearTax,
   Category,
   CategoryBudget,
+  CategoryRule,
   CategoryTrend,
   CreateCategoryDTO,
   CreateCustomAlertDTO,
@@ -87,6 +95,27 @@ export const categoryApi = {
   /** If the category is in use, `reassignTo` says where its movements, rules… go. */
   delete(id: string, reassignTo?: string) {
     return apiRequest<void>(`/categories/${id}${query({ reassignTo })}`, { method: 'DELETE' });
+  },
+};
+
+export const categoryRuleApi = {
+  getAll() {
+    return apiRequest<CategoryRule[]>('/category-rules');
+  },
+  add(pattern: string, categoryId: string) {
+    return apiRequest<CategoryRule>('/category-rules', {
+      method: 'POST',
+      body: jsonBody({ pattern, categoryId }),
+    });
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/category-rules/${id}`, { method: 'DELETE' });
+  },
+  /** The merchant text of a description and the category a rule already gives it. */
+  suggest(description: string) {
+    return apiRequest<{ pattern: string; categoryId: string | null }>(
+      `/category-rules/suggest${query({ description })}`
+    );
   },
 };
 
@@ -187,6 +216,102 @@ export const settingsApi = {
   },
   update(changes: SettingsChanges) {
     return apiRequest<UserSettings>('/settings', { method: 'PATCH', body: jsonBody(changes) });
+  },
+};
+
+export const ratesApi = {
+  /** Reference rate: how many `to` one `from` is worth. */
+  get(from: string, to: string) {
+    return apiRequest<{ from: string; to: string; rate: number }>(`/rates${query({ from, to })}`);
+  },
+};
+
+export const pushApi = {
+  /** Whether the server can send push notifications and the key to subscribe with. */
+  key() {
+    return apiRequest<{ enabled: boolean; publicKey: string | null }>('/push/key');
+  },
+  subscribe(subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) {
+    return apiRequest<void>('/push/subscribe', {
+      method: 'POST',
+      body: jsonBody(subscription),
+    });
+  },
+  unsubscribe(endpoint: string) {
+    return apiRequest<void>('/push/unsubscribe', { method: 'POST', body: jsonBody({ endpoint }) });
+  },
+  test() {
+    return apiRequest<{ sent: number }>('/push/test', { method: 'POST' });
+  },
+};
+
+export const splitApi = {
+  list() {
+    return apiRequest<SplitGroupSummary[]>('/splits');
+  },
+  create(name: string, members: string[]) {
+    return apiRequest<SplitGroup>('/splits', { method: 'POST', body: jsonBody({ name, members }) });
+  },
+  get(id: string) {
+    return apiRequest<SplitGroup>(`/splits/${id}`);
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/splits/${id}`, { method: 'DELETE' });
+  },
+  addExpense(
+    id: string,
+    expense: { description: string; amount: number; paidBy: string; participants?: string[] }
+  ) {
+    return apiRequest<SplitGroup>(`/splits/${id}/expenses`, {
+      method: 'POST',
+      body: jsonBody(expense),
+    });
+  },
+  settle(id: string, payment: { from: string; to: string; amount: number }) {
+    return apiRequest<SplitGroup>(`/splits/${id}/settlements`, {
+      method: 'POST',
+      body: jsonBody(payment),
+    });
+  },
+  removeExpense(id: string, expenseId: string) {
+    return apiRequest<SplitGroup>(`/splits/${id}/expenses/${expenseId}`, { method: 'DELETE' });
+  },
+};
+
+export const businessApi = {
+  categories() {
+    return apiRequest<BusinessCategory[]>('/business/categories');
+  },
+  setCategory(categoryId: string, vatRate: VatRate) {
+    return apiRequest<void>(`/business/categories/${categoryId}`, {
+      method: 'PUT',
+      body: jsonBody({ vatRate }),
+    });
+  },
+  removeCategory(categoryId: string) {
+    return apiRequest<void>(`/business/categories/${categoryId}`, { method: 'DELETE' });
+  },
+  tax(year: number) {
+    return apiRequest<YearTax>(`/business/tax/${year}`);
+  },
+};
+
+export const assetApi = {
+  getAll() {
+    return apiRequest<Asset[]>('/assets');
+  },
+  create(input: { name: string; kind: AssetKind; value: number; date?: string }) {
+    return apiRequest<Asset>('/assets', { method: 'POST', body: jsonBody(input) });
+  },
+  /** Records what the asset is worth now (or on `date`). */
+  setValue(id: string, value: number, date?: string) {
+    return apiRequest<Asset>(`/assets/${id}/values`, {
+      method: 'POST',
+      body: jsonBody({ value, date }),
+    });
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/assets/${id}`, { method: 'DELETE' });
   },
 };
 

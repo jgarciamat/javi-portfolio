@@ -168,7 +168,9 @@ describe('DateField', () => {
     });
     expect(onChange).toHaveBeenCalledWith('2026-03-09');
     rerender(<DateField value="" onChange={onChange} label="Fecha" />);
-    expect(screen.getByRole('button', { name: 'Fecha' })).toHaveTextContent(/^📅$/);
+    // An empty date shows the calendar icon instead of a date.
+    expect(screen.getByRole('button', { name: 'Fecha' })).toHaveTextContent(/^$/);
+    expect(screen.getByRole('button', { name: 'Fecha' }).querySelector('svg')).not.toBeNull();
   });
 });
 

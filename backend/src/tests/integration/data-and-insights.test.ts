@@ -188,9 +188,9 @@ describe('Stats', () => {
       .set(user.auth)
       .expect(200);
     expect(res.body).toEqual([
-      { year: 2026, month: 2, available: 1000, saved: 0, netWorth: 1000 },
-      { year: 2026, month: 3, available: 800, saved: 200, netWorth: 1000 },
-      { year: 2026, month: 4, available: 700, saved: 200, netWorth: 900 },
+      { year: 2026, month: 2, available: 1000, saved: 0, assets: 0, debts: 0, netWorth: 1000 },
+      { year: 2026, month: 3, available: 800, saved: 200, assets: 0, debts: 0, netWorth: 1000 },
+      { year: 2026, month: 4, available: 700, saved: 200, assets: 0, debts: 0, netWorth: 900 },
     ]);
   });
 });
