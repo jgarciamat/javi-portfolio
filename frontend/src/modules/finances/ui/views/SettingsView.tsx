@@ -18,6 +18,7 @@ import type {
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { CategoryRulesCard } from '../components/CategoryRulesCard';
 import { HouseholdCard } from '../components/HouseholdCard';
 import {
   downloadFile,
@@ -322,6 +323,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
         />
         {sharedLocked && <p className="plan-note">{t('app.household.sharedSettings')}</p>}
       </div>
+      <CategoryRulesCard />
       <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
       <DataCard onError={action.setError} />

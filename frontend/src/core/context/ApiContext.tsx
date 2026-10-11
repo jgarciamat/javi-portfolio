@@ -4,6 +4,7 @@ import {
   accountApi,
   budgetApi,
   categoryApi,
+  categoryRuleApi,
   customAlertApi,
   dataApi,
   goalApi,
@@ -23,6 +24,7 @@ export interface IApiContext {
   monthApi: typeof monthApi;
   transactionApi: typeof transactionApi;
   categoryApi: typeof categoryApi;
+  categoryRuleApi: typeof categoryRuleApi;
   recurringApi: typeof recurringApi;
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
@@ -45,6 +47,7 @@ const defaultValue: IApiContext = {
   monthApi,
   transactionApi,
   categoryApi,
+  categoryRuleApi,
   recurringApi,
   customAlertApi,
   accountApi,

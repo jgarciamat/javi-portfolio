@@ -273,6 +273,11 @@ export const checkoutBody = z.object({
   acceptTerms: z.boolean().default(false),
   waiveWithdrawal: z.boolean().default(false),
 });
+export const categoryRuleBody = z.object({
+  pattern: z.string().trim().min(1).max(200),
+  categoryId: id,
+});
+export const ruleSuggestQuery = z.object({ description: z.string().trim().min(1).max(200) });
 export const offerParams = z.object({ id: z.string().regex(/^[a-z0-9-]{2,40}$/) });
 
 // ---------- Client error reports ----------

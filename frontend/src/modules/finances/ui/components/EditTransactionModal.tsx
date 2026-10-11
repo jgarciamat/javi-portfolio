@@ -1,6 +1,9 @@
+import { useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
+import { useResource } from '@shared/hooks/useResource';
 import type {
   Account,
   Category,
@@ -35,6 +38,12 @@ export function EditTransactionModal({
 }: EditTransactionModalProps) {
   const { t } = useI18n();
   const { money } = useFormat();
+  const { categoryRuleApi } = useApi();
+  const { data: suggestion } = useResource(
+    () => categoryRuleApi.suggest(transaction.description),
+    [categoryRuleApi, transaction.description]
+  );
+  const [remember, setRemember] = useState(false);
   const form = useTransactionForm({
     // Editing a saving: its own amount is already counted in the available balance.
     availableBalance:
@@ -42,7 +51,14 @@ export function EditTransactionModal({
     formatMoney: money,
     t,
     defaultDate: txDayKey(transaction.date),
-    onSubmit: (dto) => onSave(transaction.id, dto),
+    onSubmit: async (dto) => {
+      await onSave(transaction.id, dto);
+      if (remember && suggestion) {
+        // The category comes from the list, so it is always there.
+        const category = categories.find((c) => c.name === dto.category) as Category;
+        await categoryRuleApi.add(suggestion.pattern, category.id);
+      }
+    },
     initialValues: {
       description: transaction.description,
       amount: String(transaction.amount),
@@ -79,6 +95,16 @@ export function EditTransactionModal({
           onManageCategories={onManageCategories}
           accounts={accounts}
         />
+        {suggestion?.pattern && (
+          <label className="plan-terms">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            <span>{t('app.rules.remember', { pattern: suggestion.pattern })}</span>
+          </label>
+        )}
         {form.error && (
           <p className="inline-error" role="alert">
             {form.error}

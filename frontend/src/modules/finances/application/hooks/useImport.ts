@@ -3,8 +3,13 @@ import { useApi } from '@core/context/ApiContext';
 import { errorMessage } from '@shared/utils/errors';
 import type { ImportResult, ImportRowDTO } from '@modules/finances/domain/types';
 import {
+  type BankId,
+  bankMapping,
+  detectBank,
+  normalizeBankTable,
+} from '@modules/finances/domain/bankFormats';
+import {
   type ColumnMapping,
-  detectColumns,
   looksLikeNorma43,
   parseCSV,
   parseNorma43,
@@ -53,6 +58,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   const [fileName, setFileName] = useState('');
   const [format, setFormat] = useState<'csv' | 'norma43'>('csv');
   const [table, setTable] = useState<string[][]>([]);
+  const [bank, setBank] = useState<BankId | null>(null);
   const [mapping, setMapping] = useState<ColumnMapping>(NO_MAPPING);
   const [rows, setRows] = useState<ImportRowDTO[]>([]);
   const [skipped, setSkipped] = useState<number[]>([]);
@@ -83,9 +89,13 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
       } else {
         const parsedTable = parseCSV(text);
         if (parsedTable.length < 2) throw new Error('empty');
+        // Banks put account details above the header and some split their columns.
+        const found = detectBank(parsedTable);
+        const bankTable = normalizeBankTable(parsedTable.slice(found.headerRow), found.bank);
         setFormat('csv');
-        setTable(parsedTable);
-        applyMapping(parsedTable, detectColumns(parsedTable[0]));
+        setBank(found.bank);
+        setTable(bankTable);
+        applyMapping(bankTable, bankMapping(bankTable[0], found.bank));
       }
       setStep('mapping');
     } catch {
@@ -117,6 +127,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setStep('file');
     setFileName('');
     setTable([]);
+    setBank(null);
     setMapping(NO_MAPPING);
     setRows([]);
     setSkipped([]);
@@ -129,6 +140,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     step,
     fileName,
     format,
+    bank,
     headers: table[0] ?? [],
     mapping,
     rows,

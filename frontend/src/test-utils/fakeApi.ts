@@ -42,6 +42,12 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    categoryRuleApi: {
+      getAll: ok([]),
+      add: ok({ id: 'r1', pattern: 'x', categoryId: 'c1', categoryName: 'Comida' }),
+      remove: ok(undefined),
+      suggest: ok({ pattern: 'mercadona', categoryId: null }),
+    },
     recurringApi: {
       getAll: ok([]),
       create: ok(f.rule()),

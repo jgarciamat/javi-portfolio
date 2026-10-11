@@ -9,6 +9,7 @@ import type {
   AnnualSummary,
   Category,
   CategoryBudget,
+  CategoryRule,
   CategoryTrend,
   CreateCategoryDTO,
   CreateCustomAlertDTO,
@@ -87,6 +88,27 @@ export const categoryApi = {
   /** If the category is in use, `reassignTo` says where its movements, rules… go. */
   delete(id: string, reassignTo?: string) {
     return apiRequest<void>(`/categories/${id}${query({ reassignTo })}`, { method: 'DELETE' });
+  },
+};
+
+export const categoryRuleApi = {
+  getAll() {
+    return apiRequest<CategoryRule[]>('/category-rules');
+  },
+  add(pattern: string, categoryId: string) {
+    return apiRequest<CategoryRule>('/category-rules', {
+      method: 'POST',
+      body: jsonBody({ pattern, categoryId }),
+    });
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/category-rules/${id}`, { method: 'DELETE' });
+  },
+  /** The merchant text of a description and the category a rule already gives it. */
+  suggest(description: string) {
+    return apiRequest<{ pattern: string; categoryId: string | null }>(
+      `/category-rules/suggest${query({ description })}`
+    );
   },
 };
 

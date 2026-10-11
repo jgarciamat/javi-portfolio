@@ -171,7 +171,7 @@ export interface ImportRowResult {
   amount?: number;
   type?: TransactionType;
   categoryName?: string;
-  categorySource?: 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
+  categorySource?: 'rule' | 'file' | 'history' | 'keywords' | 'ai' | 'fallback';
   error?: string;
 }
 
@@ -515,3 +515,11 @@ export type SettingsChanges = Partial<
     | 'showGettingStarted'
   >
 >;
+
+/** "Text in the description → category" rule the user taught. */
+export interface CategoryRule {
+  id: string;
+  pattern: string;
+  categoryId: string;
+  categoryName: string;
+}

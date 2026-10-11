@@ -419,8 +419,9 @@
   "app.export.csv.total": "TOTAL",
   "app.import.open": "Import statement",
   "app.import.title": "Import movements",
-  "app.import.hint": "Upload your bank statement as CSV or Norma 43. Movements already imported are detected and skipped; categories are assigned from your history, keywords and, when needed, the AI (✨).",
+  "app.import.hint": "Upload your bank statement as CSV or Norma 43 (CaixaBank, BBVA, Santander, ING and Revolut are recognised). Movements already imported are detected and not duplicated; the category comes from your rules (📌), your history, keywords and, if needed, the AI (✨).",
   "app.import.choose": "Choose or drop a file (.csv, .txt, .n43)",
+  "app.import.bankDetected": "{bank} format recognised: columns and dates detected automatically.",
   "app.import.rowsFound": "{count} movements read",
   "app.import.rowsSkipped": "{count} rows could not be read",
   "app.import.col.date": "Date",
@@ -946,5 +947,12 @@
   "app.apiError.HOUSEHOLD_OWN_INVITE": "You cannot join your own household.",
   "app.apiError.HOUSEHOLD_IS_MEMBER": "You are already part of someone else's household.",
   "app.apiError.HOUSEHOLD_NOT_MEMBER": "That person is not in your household.",
-  "app.apiError.HOUSEHOLD_MEMBER_SETTINGS": "Only whoever created the household can change this."
+  "app.apiError.HOUSEHOLD_MEMBER_SETTINGS": "Only whoever created the household can change this.",
+  "app.rules.title": "Category rules",
+  "app.rules.hint": "Teach the app: when a description contains some text, the movement always goes to that category on import (📌). Your rules win over history and suggestions.",
+  "app.rules.pattern": "Description contains",
+  "app.rules.category": "Category",
+  "app.rules.add": "Add rule",
+  "app.rules.remove": "Remove the rule “{pattern}”",
+  "app.rules.remember": "Always use this category for “{pattern}”"
 }

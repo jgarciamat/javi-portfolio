@@ -76,6 +76,23 @@ export interface CategoryRepository {
   seedDefaults(userId: string): void;
 }
 
+/** "Text found in a description → category" rules the user taught the app. */
+export interface CategoryRule {
+  id: string;
+  userId: string;
+  /** Normalised text (see `normalizeText`) searched inside the description. */
+  pattern: string;
+  categoryId: string;
+  createdAt: string;
+}
+
+export interface CategoryRuleRepository {
+  listByUser(userId: string): CategoryRule[];
+  /** One rule per pattern: saving an existing pattern changes its category. */
+  save(rule: CategoryRule): CategoryRule;
+  delete(userId: string, id: string): boolean;
+}
+
 export interface AccountRepository {
   listByUser(userId: string): Account[];
   findById(userId: string, id: string): Account | null;

@@ -18,6 +18,7 @@ import { PlayBillingService } from '@application/billing/PlayBillingService';
 import { OfferService } from '@application/offers/OfferService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
+import { CategoryRuleService } from '@application/categories/CategoryRuleService';
 import { CategoryService } from '@application/categories/CategoryService';
 import { ExportService, ImportService } from '@application/data/DataServices';
 import { AdviceService, StatsService } from '@application/insights/InsightsServices';
@@ -47,6 +48,7 @@ import {
   SqliteTransferRepository,
 } from './sqlite/repositories/SqliteAccountRepository';
 import { SqliteCategoryRepository } from './sqlite/repositories/SqliteCategoryRepository';
+import { SqliteCategoryRuleRepository } from './sqlite/repositories/SqliteCategoryRuleRepository';
 import {
   SqliteCategoryBudgetRepository,
   SqliteCustomAlertRepository,
@@ -107,6 +109,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     categories: new SqliteCategoryRepository(db),
+    categoryRules: new SqliteCategoryRuleRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -159,6 +162,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   );
 
   const categoryResolver = new CategoryResolver(repos.categories);
+  const categoryRules = new CategoryRuleService(
+    repos.categoryRules,
+    repos.categories,
+    categoryResolver,
+    clock
+  );
   const accountResolver = new AccountResolver(repos.accounts, repos.settings);
   const materializer = new RecurringMaterializer(
     repos.rules,
@@ -231,6 +240,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       uow,
       clock
     ),
+    categoryRules,
     categories: new CategoryService(repos.categories, categoryResolver, materializer, uow),
     accounts: new AccountService(
       repos.accounts,
@@ -326,6 +336,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.settings,
       entitlements,
       new AiCategorizer(suggester, allowance),
+      categoryRules,
       uow,
       clock
     ),

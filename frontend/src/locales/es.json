@@ -419,8 +419,9 @@
   "app.export.csv.total": "TOTAL",
   "app.import.open": "Importar extracto",
   "app.import.title": "Importar movimientos",
-  "app.import.hint": "Sube el extracto de tu banco en CSV o Norma 43. Los movimientos ya importados se detectan y no se duplican; la categoría se asigna según tu historial, palabras clave y, si hace falta, la IA (✨).",
+  "app.import.hint": "Sube el extracto de tu banco en CSV o Norma 43 (reconocemos CaixaBank, BBVA, Santander, ING y Revolut). Los movimientos ya importados se detectan y no se duplican; la categoría se asigna según tus reglas (📌), tu historial, palabras clave y, si hace falta, la IA (✨).",
   "app.import.choose": "Elige o arrastra un fichero (.csv, .txt, .n43)",
+  "app.import.bankDetected": "Formato de {bank} reconocido: columnas y fechas detectadas automáticamente.",
   "app.import.rowsFound": "{count} movimientos leídos",
   "app.import.rowsSkipped": "{count} filas no se pudieron leer",
   "app.import.col.date": "Fecha",
@@ -946,5 +947,12 @@
   "app.apiError.HOUSEHOLD_OWN_INVITE": "No puedes unirte a tu propio hogar.",
   "app.apiError.HOUSEHOLD_IS_MEMBER": "Ya formas parte del hogar de otra persona.",
   "app.apiError.HOUSEHOLD_NOT_MEMBER": "Esa persona no está en tu hogar.",
-  "app.apiError.HOUSEHOLD_MEMBER_SETTINGS": "Solo quien creó el hogar puede cambiar esto."
+  "app.apiError.HOUSEHOLD_MEMBER_SETTINGS": "Solo quien creó el hogar puede cambiar esto.",
+  "app.rules.title": "Reglas de categoría",
+  "app.rules.hint": "Enseña a la app: cuando el concepto contenga un texto, el movimiento irá siempre a esa categoría al importar (📌). Tus reglas mandan sobre el historial y las sugerencias.",
+  "app.rules.pattern": "El concepto contiene",
+  "app.rules.category": "Categoría",
+  "app.rules.add": "Añadir regla",
+  "app.rules.remove": "Quitar la regla «{pattern}»",
+  "app.rules.remember": "Usar siempre esta categoría para «{pattern}»"
 }

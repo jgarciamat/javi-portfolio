@@ -13,12 +13,14 @@ import {
   accountBody,
   accountPatchBody,
   budgetBody,
+  categoryRuleBody,
   categoryBody,
   categoryPatchBody,
   customAlertBody,
   customAlertPatchBody,
   deleteCategoryQuery,
   goalBody,
+  ruleSuggestQuery,
   goalPatchBody,
   idParam,
   recurringBody,
@@ -216,6 +218,33 @@ export function planningRoutes(c: Container): Router {
     '/custom-alerts/:id',
     authed((req, res) => {
       c.alerts.delete(req.dataUserId, idParam.parse(req.params).id);
+      res.status(204).end();
+    })
+  );
+
+  // ─── Rules: "movements like this go to that category" ────────────────────
+  router.get(
+    '/category-rules',
+    authed((req, res) => res.json(c.categoryRules.list(req.dataUserId)))
+  );
+  router.get(
+    '/category-rules/suggest',
+    authed((req, res) =>
+      res.json(
+        c.categoryRules.suggest(req.dataUserId, ruleSuggestQuery.parse(req.query).description)
+      )
+    )
+  );
+  router.post(
+    '/category-rules',
+    authed((req, res) =>
+      res.status(201).json(c.categoryRules.add(req.dataUserId, categoryRuleBody.parse(req.body)))
+    )
+  );
+  router.delete(
+    '/category-rules/:id',
+    authed((req, res) => {
+      c.categoryRules.remove(req.dataUserId, idParam.parse(req.params).id);
       res.status(204).end();
     })
   );

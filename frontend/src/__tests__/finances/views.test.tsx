@@ -543,6 +543,54 @@ describe('AnalysisView', () => {
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
+describe('CategoryRulesCard in the settings', () => {
+  const rule = { id: 'r1', pattern: 'mercadona', categoryId: 'c1', categoryName: 'Comida' };
+
+  it('lists, adds and removes the rules the user taught', async () => {
+    const api = createFakeApi();
+    api.categoryRuleApi.getAll.mockResolvedValue([rule]);
+    api.categoryApi.getAll.mockResolvedValue([
+      f.category({ id: 'c1', name: 'Comida' }),
+      f.category({ id: 'c2', name: 'Ocio' }),
+    ]);
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
+    expect(await screen.findByText(/«mercadona» →/)).toBeInTheDocument();
+
+    const add = screen.getByRole('button', { name: tr('app.rules.add') });
+    expect(add).toBeDisabled();
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.rules.pattern') }), {
+      target: { value: 'Netflix' },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: tr('app.rules.category') }), {
+      target: { value: 'c2' },
+    });
+    fireEvent.click(add);
+    await waitFor(() => expect(api.categoryRuleApi.add).toHaveBeenCalledWith('Netflix', 'c2'));
+    await waitFor(() => expect(add).toBeDisabled());
+
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.rules.remove', { pattern: 'mercadona' }) })
+    );
+    await waitFor(() => expect(api.categoryRuleApi.remove).toHaveBeenCalledWith('r1'));
+  });
+
+  it('shows what went wrong when a rule is refused', async () => {
+    const api = createFakeApi();
+    api.categoryRuleApi.add.mockRejectedValueOnce(new Error('Regla no válida'));
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Comida' })]);
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+    });
+    fireEvent.change(await screen.findByRole('textbox', { name: tr('app.rules.pattern') }), {
+      target: { value: 'abc' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.rules.add') }));
+    expect(await screen.findByText('Regla no válida')).toBeInTheDocument();
+  });
+});
+
 describe('SettingsView', () => {
   const mocked = notifications as jest.Mocked<typeof notifications>;
 
