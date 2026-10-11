@@ -430,8 +430,8 @@ describe('AnalysisView', () => {
           ],
         }),
         netWorth: jest.fn().mockResolvedValue([
-          { year: 2026, month: 2, available: 1000, saved: 0, netWorth: 1000 },
-          { year: 2026, month: 3, available: 800, saved: 200, netWorth: 1000 },
+          { year: 2026, month: 2, available: 1000, saved: 0, assets: 0, debts: 0, netWorth: 1000 },
+          { year: 2026, month: 3, available: 800, saved: 200, assets: 0, debts: 0, netWorth: 1000 },
         ]),
       },
     });

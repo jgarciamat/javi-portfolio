@@ -384,7 +384,25 @@ export interface NetWorthPoint {
   month: number;
   available: number;
   saved: number;
+  /** Investments, property and other assets valued by hand. */
+  assets: number;
+  /** Debts valued by hand. */
+  debts: number;
   netWorth: number;
+}
+
+export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
+
+/** An investment, property or debt the user values by hand. */
+export interface Asset {
+  id: string;
+  name: string;
+  kind: AssetKind;
+  value: number;
+  valueDate: string | null;
+  /** The value before the latest one (to show the change). */
+  previousValue: number | null;
+  history: { date: string; value: number }[];
 }
 
 export interface SafeToSpend {

@@ -826,3 +826,39 @@ button.entity-item {
   justify-content: space-between;
   gap: 0.6rem;
 }
+
+/* ─── Assets and debts ───────────────────────── */
+.asset-list {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0;
+  margin: 0.8rem 0;
+  list-style: none;
+}
+
+.asset-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 0.8rem;
+  align-items: center;
+}
+
+.asset-main,
+.asset-value {
+  display: grid;
+}
+
+.asset-value {
+  text-align: right;
+}
+
+.asset-update {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 0.4rem;
+}
+
+.asset-update .tx-input {
+  flex: 1;
+  min-width: 0;
+}

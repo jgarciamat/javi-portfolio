@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import {
   accountApi,
+  assetApi,
   budgetApi,
   categoryApi,
   categoryRuleApi,
@@ -28,6 +29,7 @@ export interface IApiContext {
   recurringApi: typeof recurringApi;
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
+  assetApi: typeof assetApi;
   budgetApi: typeof budgetApi;
   goalApi: typeof goalApi;
   settingsApi: typeof settingsApi;
@@ -51,6 +53,7 @@ const defaultValue: IApiContext = {
   recurringApi,
   customAlertApi,
   accountApi,
+  assetApi,
   budgetApi,
   goalApi,
   settingsApi,

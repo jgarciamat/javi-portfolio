@@ -42,6 +42,28 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    assetApi: {
+      getAll: ok([]),
+      create: ok({
+        id: 'as1',
+        name: 'Fondo',
+        kind: 'investment',
+        value: 100,
+        valueDate: '2026-03-01',
+        previousValue: null,
+        history: [],
+      }),
+      setValue: ok({
+        id: 'as1',
+        name: 'Fondo',
+        kind: 'investment',
+        value: 100,
+        valueDate: '2026-03-01',
+        previousValue: null,
+        history: [],
+      }),
+      remove: ok(undefined),
+    },
     categoryRuleApi: {
       getAll: ok([]),
       add: ok({ id: 'r1', pattern: 'x', categoryId: 'c1', categoryName: 'Comida' }),

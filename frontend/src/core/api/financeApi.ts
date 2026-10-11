@@ -7,6 +7,8 @@ import type {
   Forecast,
   SubscriptionReport,
   AnnualSummary,
+  Asset,
+  AssetKind,
   Category,
   CategoryBudget,
   CategoryRule,
@@ -209,6 +211,25 @@ export const settingsApi = {
   },
   update(changes: SettingsChanges) {
     return apiRequest<UserSettings>('/settings', { method: 'PATCH', body: jsonBody(changes) });
+  },
+};
+
+export const assetApi = {
+  getAll() {
+    return apiRequest<Asset[]>('/assets');
+  },
+  create(input: { name: string; kind: AssetKind; value: number; date?: string }) {
+    return apiRequest<Asset>('/assets', { method: 'POST', body: jsonBody(input) });
+  },
+  /** Records what the asset is worth now (or on `date`). */
+  setValue(id: string, value: number, date?: string) {
+    return apiRequest<Asset>(`/assets/${id}/values`, {
+      method: 'POST',
+      body: jsonBody({ value, date }),
+    });
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/assets/${id}`, { method: 'DELETE' });
   },
 };
 

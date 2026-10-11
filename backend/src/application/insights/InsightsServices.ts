@@ -5,6 +5,7 @@ import { buildQuestionFacts } from '@domain/services/question-facts';
 import {
   AccountRepository,
   AiUsageRepository,
+  AssetRepository,
   CategoryBudgetRepository,
   RecurringRuleRepository,
   SettingsRepository,
@@ -29,6 +30,7 @@ import {
   AdviceContext,
   generateRuleBasedAdvice,
 } from '@domain/services/rule-based-advisor';
+import { assetTotalsAt } from '@domain/services/net-worth';
 import { savingsRate } from '@domain/services/summary';
 import { CategoryTrend, computeCategoryTrends } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
@@ -57,7 +59,11 @@ export interface NetWorthPoint {
   availableCents: Cents;
   /** Savings accumulated up to the end of the period. */
   savedCents: Cents;
-  /** available + saved. */
+  /** Investments, property and other assets valued by hand, at the end of the period. */
+  assetsCents: Cents;
+  /** Debts valued by hand, at the end of the period. */
+  debtsCents: Cents;
+  /** available + saved + assets - debts. */
   netWorthCents: Cents;
 }
 
@@ -99,7 +105,8 @@ export class StatsService {
     private readonly transactionService: TransactionService,
     private readonly entitlements: EntitlementService,
     private readonly rules: RecurringRuleRepository,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly assets: AssetRepository
   ) {}
 
   /**
@@ -251,6 +258,8 @@ export class StatsService {
         .totalsByPeriod(userId, earliest, to)
         .map((t) => [`${t.year}-${t.month}`, t] as const)
     );
+    const assetList = this.assets.listByUser(userId);
+    const assetValues = this.assets.valuesByUser(userId);
     let available = initial;
     let saved = 0;
     const points: NetWorthPoint[] = [];
@@ -262,11 +271,18 @@ export class StatsService {
         saved += t.savingCents;
       }
       if (comparePeriods(p, from) >= 0) {
+        const { assetsCents, debtsCents } = assetTotalsAt(
+          assetList,
+          assetValues,
+          periodEnd(p, startDay)
+        );
         points.push({
           ...p,
           availableCents: available,
           savedCents: saved,
-          netWorthCents: available + saved,
+          assetsCents,
+          debtsCents,
+          netWorthCents: available + saved + assetsCents - debtsCents,
         });
       }
     }

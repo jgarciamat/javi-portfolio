@@ -93,6 +93,33 @@ export interface CategoryRuleRepository {
   delete(userId: string, id: string): boolean;
 }
 
+export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
+
+export interface Asset {
+  id: string;
+  userId: string;
+  name: string;
+  kind: AssetKind;
+  createdAt: string;
+}
+
+export interface AssetValue {
+  assetId: string;
+  date: string;
+  valueCents: number;
+}
+
+export interface AssetRepository {
+  listByUser(userId: string): Asset[];
+  findById(userId: string, id: string): Asset | null;
+  save(asset: Asset): void;
+  delete(userId: string, id: string): boolean;
+  /** One value per asset and date: setting it again replaces it. */
+  setValue(value: AssetValue): void;
+  /** Every value of the user's assets, oldest first. */
+  valuesByUser(userId: string): AssetValue[];
+}
+
 export interface AccountRepository {
   listByUser(userId: string): Account[];
   findById(userId: string, id: string): Account | null;

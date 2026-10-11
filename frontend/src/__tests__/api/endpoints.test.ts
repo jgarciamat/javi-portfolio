@@ -2,6 +2,7 @@ import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import {
   accountApi,
+  assetApi,
   budgetApi,
   categoryApi,
   categoryRuleApi,
@@ -205,6 +206,22 @@ const cases: Case[] = [
     { currency: 'USD' },
   ],
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
+  ['assets', () => assetApi.getAll(), 'GET', '/assets'],
+  [
+    'add asset',
+    () => assetApi.create({ name: 'Fondo', kind: 'investment', value: 100 }),
+    'POST',
+    '/assets',
+    { name: 'Fondo', kind: 'investment', value: 100 },
+  ],
+  [
+    'value an asset',
+    () => assetApi.setValue('a1', 120, '2026-03-01'),
+    'POST',
+    '/assets/a1/values',
+    { value: 120, date: '2026-03-01' },
+  ],
+  ['remove asset', () => assetApi.remove('a1'), 'DELETE', '/assets/a1'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],
   ['net worth range', () => insightsApi.netWorth(24), 'GET', '/stats/net-worth?months=24'],
   ['annual report', () => insightsApi.report(2026), 'GET', '/stats/report/2026'],

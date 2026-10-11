@@ -415,6 +415,8 @@ describe('finances edge cases', () => {
         month: i + 1,
         available: i * 10,
         saved: i,
+        assets: 0,
+        debts: 0,
         netWorth: i * 11,
       }))
     );

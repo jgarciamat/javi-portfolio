@@ -4,6 +4,7 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
+import { AssetView } from '@application/assets/AssetService';
 import { ProjectedMonth } from '@domain/services/forecast';
 import { SubscriptionReport } from '@domain/services/subscriptions';
 import {
@@ -238,6 +239,8 @@ export function presentNetWorth(p: NetWorthPoint) {
     month: p.month,
     available: m(p.availableCents),
     saved: m(p.savedCents),
+    assets: m(p.assetsCents),
+    debts: m(p.debtsCents),
     netWorth: m(p.netWorthCents),
   };
 }
@@ -320,5 +323,17 @@ export function presentAnnualReport(r: AnnualReport) {
     totals: totals(r.totals),
     incomeByCategory: r.incomeByCategory.map(category),
     expensesByCategory: r.expensesByCategory.map(category),
+  };
+}
+
+export function presentAsset(a: AssetView) {
+  return {
+    id: a.id,
+    name: a.name,
+    kind: a.kind,
+    value: m(a.valueCents),
+    valueDate: a.valueDate,
+    previousValue: a.previousCents === null ? null : m(a.previousCents),
+    history: a.history.map((h) => ({ date: h.date, value: m(h.valueCents) })),
   };
 }

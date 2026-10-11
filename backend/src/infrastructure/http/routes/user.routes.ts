@@ -5,6 +5,7 @@ import { Container } from '../../container';
 import { RateLimiterFactory, authed } from '../middleware';
 import {
   presentAnnualReport,
+  presentAsset,
   presentForecast,
   presentNetWorth,
   presentSubscriptions,
@@ -16,6 +17,9 @@ import {
   avatarBody,
   forecastQuery,
   nameBody,
+  assetBody,
+  assetValueBody,
+  idParam,
   netWorthQuery,
   passwordBody,
   periodParams,
@@ -129,6 +133,39 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed((req, res) => {
       const { months } = netWorthQuery.parse(req.query);
       res.json(c.stats.netWorth(req.dataUserId, months).map(presentNetWorth));
+    })
+  );
+
+  // Investments, property and debts valued by hand: part of the net worth.
+  router.get(
+    '/assets',
+    authed((req, res) => res.json(c.assetService.list(req.dataUserId).map(presentAsset)))
+  );
+  router.post(
+    '/assets',
+    authed((req, res) => {
+      const { value, ...rest } = assetBody.parse(req.body);
+      res
+        .status(201)
+        .json(presentAsset(c.assetService.create(req.dataUserId, { ...rest, valueCents: value })));
+    })
+  );
+  router.post(
+    '/assets/:id/values',
+    authed((req, res) => {
+      const { value, date } = assetValueBody.parse(req.body);
+      res.json(
+        presentAsset(
+          c.assetService.setValue(req.dataUserId, idParam.parse(req.params).id, value, date)
+        )
+      );
+    })
+  );
+  router.delete(
+    '/assets/:id',
+    authed((req, res) => {
+      c.assetService.delete(req.dataUserId, idParam.parse(req.params).id);
+      res.status(204).end();
     })
   );
 
