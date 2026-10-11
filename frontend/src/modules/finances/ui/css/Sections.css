@@ -862,3 +862,46 @@ button.entity-item {
   flex: 1;
   min-width: 0;
 }
+
+/* ─── Shared expenses ────────────────────────── */
+.split-groups,
+.split-balances,
+.split-transfers,
+.split-expenses {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0.8rem 0;
+  list-style: none;
+}
+
+.split-group {
+  display: grid;
+  width: 100%;
+  padding: 0.8rem;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.split-balances li,
+.split-transfers li,
+.split-expenses li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.split-expenses li > span:first-child {
+  display: grid;
+}
+
+.split-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}

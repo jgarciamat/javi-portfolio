@@ -15,6 +15,7 @@ import {
   ratesApi,
   recurringApi,
   settingsApi,
+  splitApi,
   transactionApi,
 } from '@core/api/financeApi';
 
@@ -209,6 +210,36 @@ const cases: Case[] = [
   ],
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
   ['exchange rate', () => ratesApi.get('USD', 'EUR'), 'GET', '/rates?from=USD&to=EUR'],
+  ['split groups', () => splitApi.list(), 'GET', '/splits'],
+  [
+    'create split group',
+    () => splitApi.create('Piso', ['Ana', 'Ben']),
+    'POST',
+    '/splits',
+    { name: 'Piso', members: ['Ana', 'Ben'] },
+  ],
+  ['split group', () => splitApi.get('g1'), 'GET', '/splits/g1'],
+  ['delete split group', () => splitApi.remove('g1'), 'DELETE', '/splits/g1'],
+  [
+    'split expense',
+    () => splitApi.addExpense('g1', { description: 'Cena', amount: 30, paidBy: 'm1' }),
+    'POST',
+    '/splits/g1/expenses',
+    { description: 'Cena', amount: 30, paidBy: 'm1' },
+  ],
+  [
+    'split payment',
+    () => splitApi.settle('g1', { from: 'm1', to: 'm2', amount: 10 }),
+    'POST',
+    '/splits/g1/settlements',
+    { from: 'm1', to: 'm2', amount: 10 },
+  ],
+  [
+    'delete split expense',
+    () => splitApi.removeExpense('g1', 'e1'),
+    'DELETE',
+    '/splits/g1/expenses/e1',
+  ],
   ['business categories', () => businessApi.categories(), 'GET', '/business/categories'],
   [
     'mark a professional category',

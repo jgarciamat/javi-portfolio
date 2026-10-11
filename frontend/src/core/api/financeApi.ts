@@ -10,6 +10,8 @@ import type {
   Asset,
   AssetKind,
   BusinessCategory,
+  SplitGroup,
+  SplitGroupSummary,
   VatRate,
   YearTax,
   Category,
@@ -221,6 +223,39 @@ export const ratesApi = {
   /** Reference rate: how many `to` one `from` is worth. */
   get(from: string, to: string) {
     return apiRequest<{ from: string; to: string; rate: number }>(`/rates${query({ from, to })}`);
+  },
+};
+
+export const splitApi = {
+  list() {
+    return apiRequest<SplitGroupSummary[]>('/splits');
+  },
+  create(name: string, members: string[]) {
+    return apiRequest<SplitGroup>('/splits', { method: 'POST', body: jsonBody({ name, members }) });
+  },
+  get(id: string) {
+    return apiRequest<SplitGroup>(`/splits/${id}`);
+  },
+  remove(id: string) {
+    return apiRequest<void>(`/splits/${id}`, { method: 'DELETE' });
+  },
+  addExpense(
+    id: string,
+    expense: { description: string; amount: number; paidBy: string; participants?: string[] }
+  ) {
+    return apiRequest<SplitGroup>(`/splits/${id}/expenses`, {
+      method: 'POST',
+      body: jsonBody(expense),
+    });
+  },
+  settle(id: string, payment: { from: string; to: string; amount: number }) {
+    return apiRequest<SplitGroup>(`/splits/${id}/settlements`, {
+      method: 'POST',
+      body: jsonBody(payment),
+    });
+  },
+  removeExpense(id: string, expenseId: string) {
+    return apiRequest<SplitGroup>(`/splits/${id}/expenses/${expenseId}`, { method: 'DELETE' });
   },
 };
 

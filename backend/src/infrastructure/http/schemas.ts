@@ -270,6 +270,19 @@ export const businessCategoryBody = z.object({
   vatRate: z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]),
 });
 export const categoryIdParam = z.object({ categoryId: id });
+export const splitGroupBody = z.object({
+  name: z.string().trim().min(1).max(60),
+  members: z.array(z.string().trim().min(1).max(40)).min(2).max(12),
+});
+export const splitExpenseBody = z.object({
+  description: z.string().trim().min(1).max(100),
+  amount: money,
+  paidBy: id,
+  participants: z.array(id).max(12).optional(),
+  date: date.nullish(),
+});
+export const splitSettleBody = z.object({ from: id, to: id, amount: money, date: date.nullish() });
+export const splitExpenseParams = z.object({ id, expenseId: id });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

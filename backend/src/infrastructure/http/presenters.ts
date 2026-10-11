@@ -4,6 +4,7 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
+import { SplitGroupView } from '@application/split/SplitService';
 import { YearTax } from '@domain/services/tax';
 import { AssetView } from '@application/assets/AssetService';
 import { ProjectedMonth } from '@domain/services/forecast';
@@ -353,5 +354,23 @@ export function presentTax(t: YearTax) {
     year: t.year,
     quarters: t.quarters.map((q) => ({ quarter: q.quarter, ...money(q) })),
     totals: money(t.totals),
+  };
+}
+
+export function presentSplitGroup(g: SplitGroupView) {
+  return {
+    id: g.id,
+    name: g.name,
+    members: g.members.map((mem) => ({ id: mem.id, name: mem.name, balance: m(mem.balanceCents) })),
+    expenses: g.expenses.map((e) => ({
+      id: e.id,
+      description: e.description,
+      amount: m(e.amountCents),
+      paidBy: e.paidBy,
+      date: e.date,
+      settlement: e.settlement,
+      shares: e.shares.map((s) => ({ memberId: s.memberId, share: m(s.shareCents) })),
+    })),
+    transfers: g.transfers.map((t) => ({ from: t.from, to: t.to, amount: m(t.cents) })),
   };
 }

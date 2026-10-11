@@ -571,3 +571,30 @@ export interface YearTax {
   quarters: (QuarterTax & { quarter: 1 | 2 | 3 | 4 })[];
   totals: QuarterTax;
 }
+
+export interface SplitGroupSummary {
+  id: string;
+  name: string;
+  members: number;
+  expenses: number;
+}
+
+export interface SplitExpense {
+  id: string;
+  description: string;
+  amount: number;
+  paidBy: string;
+  date: string;
+  settlement: boolean;
+  shares: { memberId: string; share: number }[];
+}
+
+/** A group of people sharing expenses, with who owes whom. */
+export interface SplitGroup {
+  id: string;
+  name: string;
+  /** `balance` > 0: the others owe them; < 0: they owe the others. */
+  members: { id: string; name: string; balance: number }[];
+  expenses: SplitExpense[];
+  transfers: { from: string; to: string; amount: number }[];
+}

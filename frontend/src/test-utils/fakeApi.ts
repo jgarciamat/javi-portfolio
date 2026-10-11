@@ -42,6 +42,15 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    splitApi: {
+      list: ok([]),
+      create: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
+      get: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
+      remove: ok(undefined),
+      addExpense: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
+      settle: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
+      removeExpense: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
+    },
     businessApi: {
       categories: ok([]),
       setCategory: ok(undefined),

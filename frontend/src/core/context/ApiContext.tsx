@@ -15,6 +15,7 @@ import {
   ratesApi,
   recurringApi,
   settingsApi,
+  splitApi,
   transactionApi,
 } from '@core/api/financeApi';
 import { authApi } from '@core/api/authApi';
@@ -33,6 +34,7 @@ export interface IApiContext {
   accountApi: typeof accountApi;
   assetApi: typeof assetApi;
   businessApi: typeof businessApi;
+  splitApi: typeof splitApi;
   ratesApi: typeof ratesApi;
   budgetApi: typeof budgetApi;
   goalApi: typeof goalApi;
@@ -59,6 +61,7 @@ const defaultValue: IApiContext = {
   accountApi,
   assetApi,
   businessApi,
+  splitApi,
   ratesApi,
   budgetApi,
   goalApi,

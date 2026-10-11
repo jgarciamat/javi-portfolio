@@ -7,6 +7,7 @@ export type DashboardTab =
   | 'accounts'
   | 'budgets'
   | 'goals'
+  | 'split'
   | 'automations'
   | 'custom-alerts'
   | 'plan'
@@ -29,6 +30,7 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'accounts', icon: '🏦', labelKey: 'app.tabs.accounts', group: 'planning' },
   { id: 'budgets', icon: '🎯', labelKey: 'app.tabs.budgets', group: 'planning' },
   { id: 'goals', icon: '🏁', labelKey: 'app.tabs.goals', group: 'planning' },
+  { id: 'split', icon: '🤝', labelKey: 'app.tabs.split', group: 'planning' },
   { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations', group: 'planning' },
   { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts', group: 'planning' },
   { id: 'plan', icon: '⭐', labelKey: 'app.tabs.plan', group: 'tools' },

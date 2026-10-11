@@ -276,6 +276,41 @@ export interface SettingsRepository {
   save(settings: UserSettingsProps): void;
 }
 
+// ─── Shared expenses ─────────────────────────────────────────────────────────
+
+export interface SplitGroup {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface SplitMember {
+  id: string;
+  name: string;
+}
+
+export interface SplitExpenseRecord {
+  id: string;
+  description: string;
+  amountCents: Cents;
+  paidBy: string;
+  date: string;
+  settlement: boolean;
+  shares: { memberId: string; shareCents: Cents }[];
+}
+
+export interface SplitRepository {
+  listGroups(userId: string): SplitGroup[];
+  findGroup(userId: string, id: string): SplitGroup | null;
+  createGroup(group: SplitGroup, members: SplitMember[]): void;
+  deleteGroup(userId: string, id: string): boolean;
+  members(groupId: string): SplitMember[];
+  expenses(groupId: string): SplitExpenseRecord[];
+  addExpense(groupId: string, expense: SplitExpenseRecord, createdAt: string): void;
+  deleteExpense(groupId: string, expenseId: string): boolean;
+}
+
 // ─── Self-employed ───────────────────────────────────────────────────────────
 
 export type VatRate = 0 | 4 | 10 | 21;

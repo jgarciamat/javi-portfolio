@@ -26,6 +26,7 @@ const AnalysisView = lazyNamed(() => import('../views/AnalysisView'), 'AnalysisV
 const AccountsView = lazyNamed(() => import('../views/AccountsView'), 'AccountsView');
 const BudgetsView = lazyNamed(() => import('../views/BudgetsView'), 'BudgetsView');
 const GoalsView = lazyNamed(() => import('../views/GoalsView'), 'GoalsView');
+const SplitView = lazyNamed(() => import('../views/SplitView'), 'SplitView');
 const SearchView = lazyNamed(() => import('../views/SearchView'), 'SearchView');
 const SettingsView = lazyNamed(() => import('../views/SettingsView'), 'SettingsView');
 const PlanView = lazyNamed(() => import('@modules/billing/ui/PlanView'), 'PlanView');
@@ -43,6 +44,7 @@ const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
   accounts: () => <AccountsView />,
   budgets: () => <BudgetsView />,
   goals: () => <GoalsView />,
+  split: () => <SplitView />,
   plan: () => <PlanView />,
   offers: () => <OffersView />,
 };

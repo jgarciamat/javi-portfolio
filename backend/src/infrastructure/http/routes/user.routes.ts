@@ -6,6 +6,7 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   presentAnnualReport,
   presentAsset,
+  presentSplitGroup,
   presentTax,
   presentForecast,
   presentNetWorth,
@@ -19,6 +20,10 @@ import {
   forecastQuery,
   nameBody,
   assetBody,
+  splitExpenseBody,
+  splitExpenseParams,
+  splitGroupBody,
+  splitSettleBody,
   businessCategoryBody,
   categoryIdParam,
   assetValueBody,
@@ -148,6 +153,62 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed(async (req, res) => {
       const { from, to } = rateQuery.parse(req.query);
       res.json({ from, to, rate: await c.rates.rate(from, to) });
+    })
+  );
+
+  // Shared expenses with friends or flatmates.
+  router.get(
+    '/splits',
+    authed((req, res) => res.json(c.split.list(req.dataUserId)))
+  );
+  router.post(
+    '/splits',
+    authed((req, res) =>
+      res
+        .status(201)
+        .json(presentSplitGroup(c.split.create(req.dataUserId, splitGroupBody.parse(req.body))))
+    )
+  );
+  router.get(
+    '/splits/:id',
+    authed((req, res) =>
+      res.json(presentSplitGroup(c.split.get(req.dataUserId, idParam.parse(req.params).id)))
+    )
+  );
+  router.delete(
+    '/splits/:id',
+    authed((req, res) => {
+      c.split.delete(req.dataUserId, idParam.parse(req.params).id);
+      res.status(204).end();
+    })
+  );
+  router.post(
+    '/splits/:id/expenses',
+    authed((req, res) => {
+      const { amount, ...rest } = splitExpenseBody.parse(req.body);
+      const group = c.split.addExpense(req.dataUserId, idParam.parse(req.params).id, {
+        ...rest,
+        amountCents: amount,
+      });
+      res.status(201).json(presentSplitGroup(group));
+    })
+  );
+  router.post(
+    '/splits/:id/settlements',
+    authed((req, res) => {
+      const { amount, ...rest } = splitSettleBody.parse(req.body);
+      const group = c.split.settle(req.dataUserId, idParam.parse(req.params).id, {
+        ...rest,
+        amountCents: amount,
+      });
+      res.status(201).json(presentSplitGroup(group));
+    })
+  );
+  router.delete(
+    '/splits/:id/expenses/:expenseId',
+    authed((req, res) => {
+      const { id, expenseId } = splitExpenseParams.parse(req.params);
+      res.json(presentSplitGroup(c.split.deleteExpense(req.dataUserId, id, expenseId)));
     })
   );
 
