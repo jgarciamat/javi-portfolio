@@ -276,6 +276,22 @@ export interface SettingsRepository {
   save(settings: UserSettingsProps): void;
 }
 
+// ─── Weekly digest ───────────────────────────────────────────────────────────
+
+export interface DigestRecipient {
+  userId: string;
+  email: string;
+  name: string;
+  locale: 'es' | 'en';
+  currency: string;
+}
+
+export interface DigestRepository {
+  /** Verified users who asked for the digest and have not had one since `notSentSince`. */
+  due(notSentSince: string): DigestRecipient[];
+  markSent(userId: string, at: string): void;
+}
+
 // ─── Monetization ────────────────────────────────────────────────────────────
 
 export interface SubscriptionRepository {

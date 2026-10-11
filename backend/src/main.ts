@@ -70,6 +70,12 @@ async function main(): Promise<void> {
   );
   cleanup.unref();
 
+  // The optional Monday summary: checked every hour, sent only on Monday mornings.
+  const digest = setInterval(() => {
+    container.weeklyDigest.run().catch((e) => console.error('[digest] run failed', e));
+  }, 60 * 60 * 1000);
+  digest.unref();
+
   const server = createApp(container).listen(config.port, () => {
     console.info(`Money Manager API listening on :${config.port} (${config.env})`);
   });

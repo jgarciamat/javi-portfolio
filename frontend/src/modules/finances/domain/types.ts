@@ -517,6 +517,8 @@ export interface UserSettings {
   showTour: boolean;
   /** The "first steps" panel of the month view, until the user hides it. */
   showGettingStarted: boolean;
+  /** A summary of the week by e-mail every Monday. */
+  weeklyDigest: boolean;
   currentPeriod: { year: number; month: number; start: string; end: string };
 }
 
@@ -531,6 +533,7 @@ export type SettingsChanges = Partial<
     | 'showOffers'
     | 'showTour'
     | 'showGettingStarted'
+    | 'weeklyDigest'
   >
 >;
 

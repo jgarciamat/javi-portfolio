@@ -142,6 +142,19 @@ function PreferencesCard({
           onChange={(e) => save({ showOffers: e.target.checked })}
         />
       </label>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.weeklyDigest')}</strong>
+          <small>{t('app.settings.weeklyDigestHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          disabled={saving}
+          checked={settings.weeklyDigest}
+          onChange={(e) => save({ weeklyDigest: e.target.checked })}
+        />
+      </label>
       {notificationsSupported() && (
         <label className="setting-row">
           <span>

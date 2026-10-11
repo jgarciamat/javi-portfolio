@@ -745,6 +745,12 @@ describe('SettingsView', () => {
       screen.getByRole('checkbox', { name: new RegExp(tr('app.settings.showOffers')) })
     );
     await waitFor(() => expect(api.settingsApi.update).toHaveBeenCalledWith({ showOffers: false }));
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: new RegExp(tr('app.settings.weeklyDigest')) })
+    );
+    await waitFor(() =>
+      expect(api.settingsApi.update).toHaveBeenCalledWith({ weeklyDigest: true })
+    );
   });
 
   it('turns notifications on and off', async () => {

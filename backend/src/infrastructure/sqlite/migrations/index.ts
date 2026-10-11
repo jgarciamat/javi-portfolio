@@ -13,6 +13,7 @@ import { referralTiers } from './011-referral-tiers';
 import { googlePlaySource } from './012-google-play-source';
 import { categoryRules } from './014-category-rules';
 import { assets } from './015-assets';
+import { weeklyDigest } from './016-weekly-digest';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -32,4 +33,5 @@ export const migrations: Migration[] = [
   gettingStartedSetting,
   categoryRules,
   assets,
+  weeklyDigest,
 ];

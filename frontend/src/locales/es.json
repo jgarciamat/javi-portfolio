@@ -995,5 +995,7 @@
   "app.assets.updateValue": "Nuevo valor de {name}",
   "app.assets.update": "Actualizar",
   "app.assets.remove": "Quitar {name}",
-  "app.assets.total": "Total (bienes − deudas)"
+  "app.assets.total": "Total (bienes − deudas)",
+  "app.settings.weeklyDigest": "Resumen semanal por correo",
+  "app.settings.weeklyDigestHint": "Cada lunes: lo que gastaste la semana pasada, dónde más y las operaciones automáticas que se cobrarán pronto."
 }

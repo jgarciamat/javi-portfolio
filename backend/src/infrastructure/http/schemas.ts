@@ -77,6 +77,7 @@ export const settingsBody = z
     showOffers: z.boolean(),
     showTour: z.boolean(),
     showGettingStarted: z.boolean(),
+    weeklyDigest: z.boolean(),
   })
   .partial()
   .strict();

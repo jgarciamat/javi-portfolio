@@ -16,6 +16,7 @@ import { BillingService } from '@application/billing/BillingService';
 import { EntitlementService } from '@application/billing/EntitlementService';
 import { PlayBillingService } from '@application/billing/PlayBillingService';
 import { OfferService } from '@application/offers/OfferService';
+import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
 import { AssetService } from '@application/assets/AssetService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
@@ -63,6 +64,7 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
 import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
@@ -113,6 +115,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     categories: new SqliteCategoryRepository(db),
     categoryRules: new SqliteCategoryRuleRepository(db),
     assets: new SqliteAssetRepository(db),
+    digests: new SqliteDigestRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -283,6 +286,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.rules,
       clock,
       repos.assets
+    ),
+    weeklyDigest: new WeeklyDigestService(
+      repos.digests,
+      repos.transactions,
+      repos.rules,
+      repos.settings,
+      email,
+      clock
     ),
     assetService: new AssetService(repos.assets, entitlements, uow, clock),
     advice: new AdviceService(

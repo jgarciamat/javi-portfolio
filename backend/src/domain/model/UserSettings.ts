@@ -29,6 +29,8 @@ export interface UserSettingsProps {
   showTour: boolean;
   /** The "first steps" panel of the month view, until the user hides it. */
   showGettingStarted: boolean;
+  /** A summary of the week by e-mail every Monday (opt-in). */
+  weeklyDigest: boolean;
 }
 
 export type SettingsChanges = Partial<Omit<UserSettingsProps, 'userId'>>;
@@ -44,6 +46,7 @@ export function defaultSettings(userId: string, locale: string = 'es'): UserSett
     showOffers: true,
     showTour: true,
     showGettingStarted: true,
+    weeklyDigest: false,
   };
 }
 

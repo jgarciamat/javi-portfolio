@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 import { EmailLocale, EmailSender } from '@domain/ports/services';
-import { passwordResetEmail, purchaseEmail, verificationEmail } from './templates';
+import { DigestData } from '@domain/services/digest';
+import {
+  passwordResetEmail,
+  purchaseEmail,
+  verificationEmail,
+  weeklyDigestEmail,
+} from './templates';
 
 export class ResendEmailSender implements EmailSender {
   private readonly resend: Resend;
@@ -30,11 +36,26 @@ export class ResendEmailSender implements EmailSender {
   sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void> {
     return this.send(to, purchaseEmail(locale, name, `${this.appUrl}/terms`, new Date()));
   }
+
+  sendWeeklyDigest(
+    to: string,
+    name: string,
+    locale: EmailLocale,
+    digest: DigestData,
+    currency: string
+  ): Promise<void> {
+    return this.send(to, weeklyDigestEmail(locale, name, digest, currency, this.appUrl));
+  }
 }
 
 /** Used when no e-mail provider is configured (local development): prints the links. */
 export class ConsoleEmailSender implements EmailSender {
-  readonly sent: { kind: 'verify' | 'reset' | 'purchase'; to: string; token: string }[] = [];
+  readonly sent: {
+    kind: 'verify' | 'reset' | 'purchase' | 'digest';
+    to: string;
+    token: string;
+    digest?: DigestData;
+  }[] = [];
 
   constructor(private readonly appUrl: string, private readonly silent = false) {}
 
@@ -53,5 +74,15 @@ export class ConsoleEmailSender implements EmailSender {
   async sendPurchaseConfirmation(to: string): Promise<void> {
     this.sent.push({ kind: 'purchase', to, token: '' });
     if (!this.silent) console.info(`[email] purchase confirmation ${to}`);
+  }
+
+  async sendWeeklyDigest(
+    to: string,
+    _name: string,
+    _locale: EmailLocale,
+    digest: DigestData
+  ): Promise<void> {
+    this.sent.push({ kind: 'digest', to, token: '', digest });
+    if (!this.silent) console.info(`[email] weekly digest ${to}`);
   }
 }

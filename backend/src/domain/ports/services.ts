@@ -1,3 +1,4 @@
+import { DigestData } from '@domain/services/digest';
 import { QuestionFacts } from '@domain/services/question-facts';
 import { Advice, AdviceContext } from '@domain/services/rule-based-advisor';
 
@@ -45,6 +46,14 @@ export interface EmailSender {
    * once and the loss of the right of withdrawal (required for that loss to apply).
    */
   sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void>;
+  /** The optional Monday summary of the week. */
+  sendWeeklyDigest(
+    to: string,
+    name: string,
+    locale: EmailLocale,
+    digest: DigestData,
+    currency: string
+  ): Promise<void>;
 }
 
 export interface GoogleIdentity {
