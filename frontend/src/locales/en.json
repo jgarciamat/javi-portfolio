@@ -1073,5 +1073,9 @@
   "app.push.denied": "The browser has blocked notifications. Allow them in the site settings and try again.",
   "app.push.error": "Notifications could not be changed.",
   "app.notifications.billsTitle": "Your automatic movements are charged tomorrow",
-  "app.notifications.billsBody": "{count} movements for {total}."
+  "app.notifications.billsBody": "{count} movements for {total}.",
+  "app.tabs.assets": "Investments and debts",
+  "app.tabs.business": "Self-employed",
+  "app.assets.locked": "Note your investments, home, car and debts to see your full net worth month by month. It is part of Premium.",
+  "app.tax.locked": "Mark your professional categories and get a quarterly VAT and income-tax estimate. It is part of Premium."
 }
