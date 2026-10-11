@@ -5,6 +5,8 @@ import { BudgetsView } from '@modules/finances/ui/views/BudgetsView';
 import { GoalsView } from '@modules/finances/ui/views/GoalsView';
 import { SearchView } from '@modules/finances/ui/views/SearchView';
 import { AnalysisView } from '@modules/finances/ui/views/AnalysisView';
+import { AssetsView } from '@modules/finances/ui/views/AssetsView';
+import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { SettingsView } from '@modules/finances/ui/views/SettingsView';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
@@ -543,7 +545,42 @@ describe('AnalysisView', () => {
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
-describe('SelfEmployedCard in the analysis', () => {
+describe('Premium sections', () => {
+  const sections = [
+    ['investments and debts', <AssetsView key="a" />, 'app.assets.locked'],
+    ['self-employed', <BusinessView key="b" />, 'app.tax.locked'],
+  ] as const;
+
+  it.each(sections)(
+    'invites free users to upgrade in the %s section',
+    async (_name, view, hint) => {
+      const api = createFakeApi();
+      api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free' }));
+      renderWithProviders(view, { api, plan: true });
+      expect(await screen.findByText(tr(hint))).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    }
+  );
+
+  it.each(sections)('waits for the plan before deciding in the %s section', async (_name, view) => {
+    const api = createFakeApi();
+    api.billingApi.get.mockReturnValue(new Promise(() => undefined));
+    renderWithProviders(view, { api, plan: true });
+    expect(await screen.findByText(tr('app.common.loading'))).toBeInTheDocument();
+  });
+
+  it.each(sections)('shows the %s section to Premium users', async (_name, view, hint) => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
+    renderWithProviders(view, { api, plan: true });
+    await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByText(tr(hint))).toBeNull());
+    expect(screen.queryByText(tr('app.common.loading'))).toBeNull();
+  });
+});
+
+describe('the self-employed section', () => {
   const quarter = (n: 1 | 2 | 3 | 4, income: number) => ({
     quarter: n,
     incomeBase: income,
@@ -576,7 +613,7 @@ describe('SelfEmployedCard in the analysis', () => {
       quarters: [quarter(1, 1000), quarter(2, 1000), quarter(3, 1000), quarter(4, 1000)],
       totals,
     });
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<BusinessView />, { api });
     return api;
   };
 
@@ -612,7 +649,7 @@ describe('SelfEmployedCard in the analysis', () => {
   });
 });
 
-describe('AssetsCard in the analysis', () => {
+describe('the investments and debts section', () => {
   const fund = {
     id: 'a1',
     name: 'Fondo indexado',
@@ -638,7 +675,7 @@ describe('AssetsCard in the analysis', () => {
   it('lists what the user values by hand, with the change and the total', async () => {
     const api = createFakeApi();
     api.assetApi.getAll.mockResolvedValue([fund, loan, flat, zero, falling, growingDebt]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AssetsView />, { api });
     expect(await screen.findByText('Fondo indexado')).toBeInTheDocument();
     expect(screen.getByText('Préstamo')).toBeInTheDocument();
     // Good: an investment that grows, a debt that shrinks. Bad: the opposite.
@@ -651,12 +688,11 @@ describe('AssetsCard in the analysis', () => {
     );
   });
 
-  it('adds, values and removes elements and refreshes the net worth', async () => {
+  it('adds, values and removes elements', async () => {
     const api = createFakeApi();
     api.assetApi.getAll.mockResolvedValue([fund]);
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AssetsView />, { api });
     await screen.findByText('Fondo indexado');
-    const calls = api.insightsApi.netWorth.mock.calls.length;
 
     const add = screen.getByRole('button', { name: tr('app.assets.add') });
     expect(add).toBeDisabled();
@@ -677,7 +713,6 @@ describe('AssetsCard in the analysis', () => {
         value: 150000.5,
       })
     );
-    await waitFor(() => expect(api.insightsApi.netWorth.mock.calls.length).toBeGreaterThan(calls));
 
     const update = screen.getByRole('button', { name: tr('app.assets.update') });
     expect(update).toBeDisabled();
@@ -700,7 +735,7 @@ describe('AssetsCard in the analysis', () => {
   it('shows why a value was refused', async () => {
     const api = createFakeApi();
     api.assetApi.create.mockRejectedValueOnce(new Error('Máximo 30 elementos'));
-    renderWithProviders(<AnalysisView />, { api });
+    renderWithProviders(<AssetsView />, { api });
     fireEvent.change(await screen.findByRole('textbox', { name: tr('app.assets.name') }), {
       target: { value: 'x' },
     });

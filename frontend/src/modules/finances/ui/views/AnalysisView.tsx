@@ -11,8 +11,6 @@ import type {
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
-import { AssetsCard } from '../components/AssetsCard';
-import { SelfEmployedCard } from '../components/SelfEmployedCard';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 
@@ -186,14 +184,14 @@ function TrendsCard() {
 
 const RANGES = [6, 12, 24];
 
-function NetWorthCard({ refreshKey }: { refreshKey: number }) {
+function NetWorthCard() {
   const { insightsApi } = useApi();
   const { t } = useI18n();
   const { money } = useFormat();
   const [months, setMonths] = useState(12);
   const { data: points, error } = useResource(
     () => insightsApi.netWorth(months),
-    [insightsApi, months, refreshKey]
+    [insightsApi, months]
   );
   const last: NetWorthPoint | undefined = points?.[points.length - 1];
 
@@ -305,15 +303,11 @@ function SubscriptionsCard() {
 }
 
 function AnalysisContent() {
-  // Valuing an asset changes the net worth chart.
-  const [refreshKey, setRefreshKey] = useState(0);
   return (
     <div className="section-view">
       <SubscriptionsCard />
       <TrendsCard />
-      <NetWorthCard refreshKey={refreshKey} />
-      <AssetsCard onChange={() => setRefreshKey((k) => k + 1)} />
-      <SelfEmployedCard />
+      <NetWorthCard />
     </div>
   );
 }

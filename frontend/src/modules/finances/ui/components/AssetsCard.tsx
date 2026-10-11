@@ -75,7 +75,7 @@ function AssetRow({
 }
 
 /** Investments, property and debts valued by hand: they are part of the net worth. */
-export function AssetsCard({ onChange }: { onChange: () => void }) {
+export function AssetsCard() {
   const { assetApi } = useApi();
   const { t } = useI18n();
   const { money } = useFormat();
@@ -94,7 +94,6 @@ export function AssetsCard({ onChange }: { onChange: () => void }) {
     action.run(async () => {
       await job();
       await reload();
-      onChange();
     });
 
   return (
