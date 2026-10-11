@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@shared/hooks/useAuth';
+import { NativeLinks } from '@core/native/NativeLinks';
 import { LockGate } from '@shared/components/LockGate';
 import { ProtectedRoute } from '@shared/components/ProtectedRoute';
 import { AppLockProvider } from '@shared/hooks/useAppLock';
@@ -56,6 +57,7 @@ export default function App() {
             <ApiProvider>
               <SettingsProvider>
                 <BrowserRouter>
+                  <NativeLinks />
                   <Suspense fallback={<AppSplash />}>
                     <Routes>
                       <Route path="/login" element={<AuthPage />} />
