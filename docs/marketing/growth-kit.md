@@ -95,3 +95,9 @@ Hashtags: #finanzaspersonales #ahorro #presupuesto #educacionfinanciera
 - Instalaciones y conversión de ficha: Play Console → Estadísticas.
 - Uso real: `npm run stats` (métricas anónimas).
 - Una acción por semana y mira cuál mueve la aguja antes de gastar en anuncios.
+
+## 6. Capturas de Play ya generadas
+
+`docs/marketing/play-screenshots/`: 6 capturas 1080×1920 con el beneficio escrito encima (datos de demostración, no reales)
+y el gráfico de funciones 1024×500. Para regenerarlas: `docs/marketing/tools/capture.mjs` (captura con Playwright) y
+`compose.mjs` (añade el texto). Hay que lanzar el backend con `SEED_DEMO_USER=true` y datos de ejemplo.
