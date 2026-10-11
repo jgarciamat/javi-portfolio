@@ -543,6 +543,75 @@ describe('AnalysisView', () => {
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
+describe('SelfEmployedCard in the analysis', () => {
+  const quarter = (n: 1 | 2 | 3 | 4, income: number) => ({
+    quarter: n,
+    incomeBase: income,
+    vatCollected: income * 0.21,
+    expenseBase: 100,
+    vatPaid: 21,
+    vatDue: income * 0.21 - 21,
+    netIncome: income - 100,
+    irpfAdvance: income * 0.1,
+  });
+  const totals = {
+    incomeBase: 4000,
+    vatCollected: 840,
+    expenseBase: 400,
+    vatPaid: 84,
+    vatDue: 756,
+    netIncome: 3600,
+    irpfAdvance: 400,
+  };
+
+  const setup = (marked = [{ categoryId: 'c1', categoryName: 'Ocio', vatRate: 21 as const }]) => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([
+      f.category({ id: 'c1', name: 'Ocio' }),
+      f.category({ id: 'c2', name: 'Casa' }),
+    ]);
+    api.businessApi.categories.mockResolvedValue(marked);
+    api.businessApi.tax.mockResolvedValue({
+      year: 2026,
+      quarters: [quarter(1, 1000), quarter(2, 1000), quarter(3, 1000), quarter(4, 1000)],
+      totals,
+    });
+    renderWithProviders(<AnalysisView />, { api });
+    return api;
+  };
+
+  it('shows the quarterly estimate with its warning once a category is professional', async () => {
+    setup();
+    expect(await screen.findByText(tr('app.tax.estimate'))).toBeInTheDocument();
+    expect(screen.getByText('T1')).toBeInTheDocument();
+    expect(screen.getByText(tr('app.tax.disclaimer'))).toBeInTheDocument();
+    const row = screen.getByText(tr('app.tax.net')).closest('tr')!;
+    expect(row.textContent).toContain('3600,00');
+  });
+
+  it('marks, changes and unmarks categories, refreshing the estimate', async () => {
+    const api = setup([]);
+    expect(screen.queryByText(tr('app.tax.estimate'))).toBeNull();
+    const casa = await screen.findByRole('combobox', { name: /Casa/ });
+    fireEvent.change(casa, { target: { value: '10' } });
+    await waitFor(() => expect(api.businessApi.setCategory).toHaveBeenCalledWith('c2', 10));
+    fireEvent.change(casa, { target: { value: 'none' } });
+    await waitFor(() => expect(api.businessApi.removeCategory).toHaveBeenCalledWith('c2'));
+    await waitFor(() => expect(api.businessApi.tax.mock.calls.length).toBeGreaterThan(1));
+  });
+
+  it('changes the year and reports errors', async () => {
+    const api = setup();
+    fireEvent.change(await screen.findByRole('combobox', { name: tr('app.tax.year') }), {
+      target: { value: '2025' },
+    });
+    await waitFor(() => expect(api.businessApi.tax).toHaveBeenLastCalledWith(2025));
+    api.businessApi.setCategory.mockRejectedValueOnce(new Error('Premium requerido'));
+    fireEvent.change(screen.getByRole('combobox', { name: /Casa/ }), { target: { value: '4' } });
+    expect(await screen.findByText('Premium requerido')).toBeInTheDocument();
+  });
+});
+
 describe('AssetsCard in the analysis', () => {
   const fund = {
     id: 'a1',

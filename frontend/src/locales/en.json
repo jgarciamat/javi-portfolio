@@ -1003,5 +1003,18 @@
   "app.currency.original": "Amount in that currency",
   "app.currency.rate": "1 {from} = ? {to}",
   "app.currency.convert": "Convert to {to}",
-  "app.currency.noRate": "We couldn't get the rate: type it in."
+  "app.currency.noRate": "We couldn't get the rate: type it in.",
+  "app.tax.title": "Self-employed: quarterly VAT and income tax",
+  "app.tax.hint": "Mark which categories belong to your professional activity and their VAT rate (the amounts you record include VAT). You will see a per-quarter estimate to plan ahead.",
+  "app.tax.personal": "Personal",
+  "app.tax.professional": "Professional · VAT {rate}%",
+  "app.tax.estimate": "Estimate for the year",
+  "app.tax.year": "Year",
+  "app.tax.total": "Year",
+  "app.tax.income": "Income (excl. VAT)",
+  "app.tax.expenses": "Expenses (excl. VAT)",
+  "app.tax.net": "Net income",
+  "app.tax.vat": "VAT to pay (303)",
+  "app.tax.irpf": "Income-tax advance (130)",
+  "app.tax.disclaimer": "Indicative estimate: it applies 20% of the accumulated net income and does not include deductions, withholdings or special regimes. Check with your tax adviser before filing anything."
 }

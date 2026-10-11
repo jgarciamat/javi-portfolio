@@ -266,6 +266,10 @@ export const rateQuery = z.object({
   from: z.string().length(3).toUpperCase(),
   to: z.string().length(3).toUpperCase(),
 });
+export const businessCategoryBody = z.object({
+  vatRate: z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]),
+});
+export const categoryIdParam = z.object({ categoryId: id });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

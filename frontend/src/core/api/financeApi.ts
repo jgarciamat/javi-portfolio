@@ -9,6 +9,9 @@ import type {
   AnnualSummary,
   Asset,
   AssetKind,
+  BusinessCategory,
+  VatRate,
+  YearTax,
   Category,
   CategoryBudget,
   CategoryRule,
@@ -218,6 +221,24 @@ export const ratesApi = {
   /** Reference rate: how many `to` one `from` is worth. */
   get(from: string, to: string) {
     return apiRequest<{ from: string; to: string; rate: number }>(`/rates${query({ from, to })}`);
+  },
+};
+
+export const businessApi = {
+  categories() {
+    return apiRequest<BusinessCategory[]>('/business/categories');
+  },
+  setCategory(categoryId: string, vatRate: VatRate) {
+    return apiRequest<void>(`/business/categories/${categoryId}`, {
+      method: 'PUT',
+      body: jsonBody({ vatRate }),
+    });
+  },
+  removeCategory(categoryId: string) {
+    return apiRequest<void>(`/business/categories/${categoryId}`, { method: 'DELETE' });
+  },
+  tax(year: number) {
+    return apiRequest<YearTax>(`/business/tax/${year}`);
   },
 };
 

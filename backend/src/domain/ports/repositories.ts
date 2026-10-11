@@ -276,6 +276,22 @@ export interface SettingsRepository {
   save(settings: UserSettingsProps): void;
 }
 
+// ─── Self-employed ───────────────────────────────────────────────────────────
+
+export type VatRate = 0 | 4 | 10 | 21;
+export const VAT_RATES: VatRate[] = [21, 10, 4, 0];
+
+export interface BusinessCategory {
+  categoryId: string;
+  vatRate: VatRate;
+}
+
+export interface BusinessCategoryRepository {
+  listByUser(userId: string): BusinessCategory[];
+  set(userId: string, categoryId: string, vatRate: VatRate): void;
+  remove(userId: string, categoryId: string): void;
+}
+
 // ─── Weekly digest ───────────────────────────────────────────────────────────
 
 export interface DigestRecipient {

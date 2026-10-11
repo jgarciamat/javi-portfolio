@@ -12,6 +12,7 @@ import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
 import { AssetsCard } from '../components/AssetsCard';
+import { SelfEmployedCard } from '../components/SelfEmployedCard';
 import '../css/Sections.css';
 
 function Change({ pct }: { pct: number | null }) {
@@ -306,6 +307,7 @@ function AnalysisContent() {
       <TrendsCard />
       <NetWorthCard refreshKey={refreshKey} />
       <AssetsCard onChange={() => setRefreshKey((k) => k + 1)} />
+      <SelfEmployedCard />
     </div>
   );
 }

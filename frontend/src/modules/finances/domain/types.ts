@@ -544,3 +544,30 @@ export interface CategoryRule {
   categoryId: string;
   categoryName: string;
 }
+
+export type VatRate = 0 | 4 | 10 | 21;
+
+/** A category the self-employed user marks as professional, with the VAT rate of its movements. */
+export interface BusinessCategory {
+  categoryId: string;
+  categoryName: string;
+  vatRate: VatRate;
+}
+
+export interface QuarterTax {
+  incomeBase: number;
+  vatCollected: number;
+  expenseBase: number;
+  vatPaid: number;
+  /** Positive: VAT to pay (modelo 303); negative: to offset. */
+  vatDue: number;
+  netIncome: number;
+  /** Advance income-tax payment (modelo 130). */
+  irpfAdvance: number;
+}
+
+export interface YearTax {
+  year: number;
+  quarters: (QuarterTax & { quarter: 1 | 2 | 3 | 4 })[];
+  totals: QuarterTax;
+}

@@ -1003,5 +1003,18 @@
   "app.currency.original": "Importe en esa moneda",
   "app.currency.rate": "1 {from} = ? {to}",
   "app.currency.convert": "Convertir a {to}",
-  "app.currency.noRate": "No hemos podido obtener el cambio: escríbelo a mano."
+  "app.currency.noRate": "No hemos podido obtener el cambio: escríbelo a mano.",
+  "app.tax.title": "Autónomos: IVA e IRPF trimestral",
+  "app.tax.hint": "Marca qué categorías son de tu actividad profesional y su tipo de IVA (los importes que registras llevan el IVA incluido). Aquí verás una estimación por trimestre para planificar.",
+  "app.tax.personal": "Personal",
+  "app.tax.professional": "Profesional · IVA {rate} %",
+  "app.tax.estimate": "Estimación del año",
+  "app.tax.year": "Año",
+  "app.tax.total": "Año",
+  "app.tax.income": "Ingresos (sin IVA)",
+  "app.tax.expenses": "Gastos (sin IVA)",
+  "app.tax.net": "Rendimiento neto",
+  "app.tax.vat": "IVA a ingresar (303)",
+  "app.tax.irpf": "Pago fraccionado IRPF (130)",
+  "app.tax.disclaimer": "Estimación orientativa: aplica el 20 % del rendimiento neto acumulado y no incluye deducciones, retenciones ni regímenes especiales. Consulta con tu gestor antes de presentar nada."
 }

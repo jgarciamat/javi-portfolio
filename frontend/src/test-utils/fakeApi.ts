@@ -42,6 +42,35 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    businessApi: {
+      categories: ok([]),
+      setCategory: ok(undefined),
+      removeCategory: ok(undefined),
+      tax: ok({
+        year: 2026,
+        quarters: [1, 2, 3, 4].map((quarter) => ({
+          quarter,
+          ...{
+            incomeBase: 0,
+            vatCollected: 0,
+            expenseBase: 0,
+            vatPaid: 0,
+            vatDue: 0,
+            netIncome: 0,
+            irpfAdvance: 0,
+          },
+        })),
+        totals: {
+          incomeBase: 0,
+          vatCollected: 0,
+          expenseBase: 0,
+          vatPaid: 0,
+          vatDue: 0,
+          netIncome: 0,
+          irpfAdvance: 0,
+        },
+      }),
+    },
     ratesApi: { get: ok({ from: 'USD', to: 'EUR', rate: 0.9 }) },
     assetApi: {
       getAll: ok([]),

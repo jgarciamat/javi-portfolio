@@ -4,6 +4,7 @@ import { Summary } from '@domain/services/summary';
 import { CategoryTrend } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
 import { AccountWithBalance } from '@application/accounts/AccountService';
+import { YearTax } from '@domain/services/tax';
 import { AssetView } from '@application/assets/AssetService';
 import { ProjectedMonth } from '@domain/services/forecast';
 import { SubscriptionReport } from '@domain/services/subscriptions';
@@ -335,5 +336,22 @@ export function presentAsset(a: AssetView) {
     valueDate: a.valueDate,
     previousValue: a.previousCents === null ? null : m(a.previousCents),
     history: a.history.map((h) => ({ date: h.date, value: m(h.valueCents) })),
+  };
+}
+
+export function presentTax(t: YearTax) {
+  const money = (q: Omit<YearTax['totals'], never>) => ({
+    incomeBase: m(q.incomeBaseCents),
+    vatCollected: m(q.vatCollectedCents),
+    expenseBase: m(q.expenseBaseCents),
+    vatPaid: m(q.vatPaidCents),
+    vatDue: m(q.vatDueCents),
+    netIncome: m(q.netIncomeCents),
+    irpfAdvance: m(q.irpfAdvanceCents),
+  });
+  return {
+    year: t.year,
+    quarters: t.quarters.map((q) => ({ quarter: q.quarter, ...money(q) })),
+    totals: money(t.totals),
   };
 }

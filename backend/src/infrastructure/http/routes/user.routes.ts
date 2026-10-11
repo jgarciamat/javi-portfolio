@@ -6,6 +6,7 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   presentAnnualReport,
   presentAsset,
+  presentTax,
   presentForecast,
   presentNetWorth,
   presentSubscriptions,
@@ -18,6 +19,8 @@ import {
   forecastQuery,
   nameBody,
   assetBody,
+  businessCategoryBody,
+  categoryIdParam,
   assetValueBody,
   idParam,
   netWorthQuery,
@@ -146,6 +149,33 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       const { from, to } = rateQuery.parse(req.query);
       res.json({ from, to, rate: await c.rates.rate(from, to) });
     })
+  );
+
+  // Self-employed: professional categories and the quarterly VAT / income-tax estimate.
+  router.get(
+    '/business/categories',
+    authed((req, res) => res.json(c.tax.list(req.dataUserId)))
+  );
+  router.put(
+    '/business/categories/:categoryId',
+    authed((req, res) => {
+      const { categoryId } = categoryIdParam.parse(req.params);
+      c.tax.set(req.dataUserId, categoryId, businessCategoryBody.parse(req.body).vatRate);
+      res.status(204).end();
+    })
+  );
+  router.delete(
+    '/business/categories/:categoryId',
+    authed((req, res) => {
+      c.tax.remove(req.dataUserId, categoryIdParam.parse(req.params).categoryId);
+      res.status(204).end();
+    })
+  );
+  router.get(
+    '/business/tax/:year',
+    authed((req, res) =>
+      res.json(presentTax(c.tax.yearly(req.dataUserId, yearParams.parse(req.params).year)))
+    )
   );
 
   // Investments, property and debts valued by hand: part of the net worth.
