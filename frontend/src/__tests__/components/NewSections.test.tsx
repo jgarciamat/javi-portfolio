@@ -19,6 +19,9 @@ const t = (key: string, vars?: Record<string, string>) => {
   return v;
 };
 
+jest.mock('@shared/hooks/useAppLock', () => ({
+  useAppLock: () => ({ config: null, locked: false }),
+}));
 jest.mock('@core/i18n/I18nContext', () => ({
   useI18n: () => ({ locale: 'es', setLocale: jest.fn(), t, tCategory: (n: string) => n }),
 }));

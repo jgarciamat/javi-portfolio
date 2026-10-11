@@ -18,6 +18,7 @@ import type {
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
+import { AppLockCard } from '../components/AppLockCard';
 import { CategoryRulesCard } from '../components/CategoryRulesCard';
 import { HouseholdCard } from '../components/HouseholdCard';
 import {
@@ -326,6 +327,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
       <CategoryRulesCard />
       <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
+      <AppLockCard />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />
     </div>

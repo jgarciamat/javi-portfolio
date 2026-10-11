@@ -23,3 +23,7 @@ if (typeof globalThis.TextDecoder === 'undefined') {
 
 // jsdom does not scroll: the guided tour scrolls the highlighted element into view.
 Element.prototype.scrollIntoView = function scrollIntoView() {};
+
+// jsdom has no WebCrypto: the app lock hashes its PIN with PBKDF2.
+import { webcrypto } from 'crypto';
+Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true });

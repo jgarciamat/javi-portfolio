@@ -1,0 +1,52 @@
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: #020617;
+  color: #f1f5f9;
+}
+
+.lock-card {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 340px);
+  text-align: center;
+}
+
+.lock-icon {
+  font-size: 3rem;
+}
+
+.lock-card h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.lock-field {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.lock-field input {
+  padding: 0.8rem;
+  font-size: 1.6rem;
+  letter-spacing: 0.5em;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: inherit;
+}
+
+.lock-forgot {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
