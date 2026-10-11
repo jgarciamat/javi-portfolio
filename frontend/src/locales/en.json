@@ -1071,5 +1071,7 @@
   "app.push.sent": "Sent: it should reach you in a few seconds.",
   "app.push.notSent": "We couldn't send it to this device.",
   "app.push.denied": "The browser has blocked notifications. Allow them in the site settings and try again.",
-  "app.push.error": "Notifications could not be changed."
+  "app.push.error": "Notifications could not be changed.",
+  "app.notifications.billsTitle": "Your automatic movements are charged tomorrow",
+  "app.notifications.billsBody": "{count} movements for {total}."
 }

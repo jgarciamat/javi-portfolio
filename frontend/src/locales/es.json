@@ -1071,5 +1071,7 @@
   "app.push.sent": "Enviada: debería llegarte en unos segundos.",
   "app.push.notSent": "No hemos podido enviarla a este dispositivo.",
   "app.push.denied": "El navegador ha bloqueado las notificaciones. Actívalas en los ajustes del sitio y vuelve a intentarlo.",
-  "app.push.error": "No se han podido cambiar las notificaciones."
+  "app.push.error": "No se han podido cambiar las notificaciones.",
+  "app.notifications.billsTitle": "Mañana se cobran tus operaciones automáticas",
+  "app.notifications.billsBody": "{count} operaciones por {total}."
 }

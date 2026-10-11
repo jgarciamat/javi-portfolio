@@ -11,6 +11,7 @@ import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
+import { useBillReminders } from '../../application/hooks/useBillReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
@@ -193,6 +194,7 @@ function useBudgetAlertNotifications() {
     title: t('app.header.title'),
     message: (alert) => monthAlertMessage(alert, t, tCategory),
   });
+  useBillReminders(!!settings?.notificationsEnabled, settings?.currentPeriod ?? null);
 }
 
 export function Dashboard() {
