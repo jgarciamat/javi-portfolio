@@ -366,7 +366,7 @@
   "app.privacy.s8.title": "8. Cookies y almacenamiento local",
   "app.privacy.s8.p1": "Esta aplicación no utiliza cookies de seguimiento ni analíticas. Únicamente usa localStorage del navegador para conservar tu sesión (token JWT) y tus preferencias de idioma. Estos datos no se envían a terceros.",
   "app.privacy.s8.p2": "Para saber si el servicio funciona llevamos contadores agregados y anónimos en nuestro servidor (por ejemplo, cuántos registros o compras hubo cada día). No incluyen datos personales, no se asocian a ninguna cuenta y no usamos herramientas de analítica de terceros.",
-  "app.privacy.updated": "Última actualización: 10 de octubre de 2026",
+  "app.privacy.updated": "Última actualización: 11 de octubre de 2026",
   "app.privacy.s9.title": "9. Menores de edad",
   "app.privacy.s9.p1": "El servicio no está dirigido a menores de 16 años. Si eres menor de 16 años, no debes crear una cuenta ni facilitarnos datos personales.",
   "app.privacy.s10.title": "10. Cambios en esta política",
@@ -1053,5 +1053,12 @@
   "app.settings.themeHint": "Claro, oscuro o el del sistema. Solo en este dispositivo.",
   "app.settings.theme.system": "Automático (el del sistema)",
   "app.settings.theme.light": "Claro",
-  "app.settings.theme.dark": "Oscuro"
+  "app.settings.theme.dark": "Oscuro",
+  "app.privacy.s2.item10": "Datos que tú añades en otras secciones: inversiones, bienes y deudas con su valor, grupos de gastos compartidos (los nombres que escribes de las demás personas y los importes), categorías marcadas como profesionales y tus reglas de categoría.",
+  "app.privacy.s2.item11": "Si compras Premium en la app de Android: el estado de la suscripción de Google Play (producto, fechas y renovación). Nunca recibimos tus datos de pago.",
+  "app.privacy.s3.item5": "Enviarte el resumen semanal por correo, solo si lo activas en Ajustes y mientras no lo desactives (base legal: consentimiento, art. 6.1.a RGPD).",
+  "app.privacy.s4.item7": "Google Play y RevenueCat, Inc. (compras en la app de Android): Google cobra y RevenueCat verifica la compra y nos avisa del estado de la suscripción; para ello usa tu identificador de usuario de Money Manager, sin tu nombre ni tu correo. Consulta revenuecat.com/privacy.",
+  "app.privacy.s4.item8": "Frankfurter (tipos de cambio del Banco Central Europeo): nuestro servidor consulta el cambio entre dos divisas; no se envía ningún dato tuyo.",
+  "app.privacy.s6.item5": "El bloqueo con PIN o huella se comprueba en tu dispositivo: el PIN se guarda solo en él, con un hash con sal, y nunca llega a nuestros servidores.",
+  "app.privacy.s6.item6": "El escaneo de tickets se hace en tu dispositivo: la foto no se sube a ningún servidor."
 }
