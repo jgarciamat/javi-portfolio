@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { Capacitor } from '@capacitor/core';
 import { parseReceipt } from '@modules/finances/domain/receiptParser';
 import { ReceiptScanner, readReceipt } from '@modules/finances/ui/components/ReceiptScanner';
 import { TransactionFormFields } from '@modules/finances/ui/components/TransactionFormFields';
@@ -20,6 +21,8 @@ C/ MAYOR 12 MADRID
 SUBTOTAL ............ 5,84
 TOTAL (EUR) ........ 5,84
 TARJETA ............. 5,84`;
+
+afterEach(() => jest.restoreAllMocks());
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -70,6 +73,17 @@ describe('readReceipt', () => {
       gzip: true,
     });
     expect(worker.terminate).toHaveBeenCalled();
+  });
+
+  it('loads the scanner files from the site inside the Android app, which does not carry them', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    await readReceipt(new File(['x'], 'ticket.jpg'));
+    expect(createWorker).toHaveBeenCalledWith('spa', 1, {
+      workerPath: 'https://www.winjgm.com/ocr/worker.min.js',
+      corePath: 'https://www.winjgm.com/ocr/',
+      langPath: 'https://www.winjgm.com/ocr/',
+      gzip: true,
+    });
   });
 
   it('frees the worker when reading fails', async () => {

@@ -31,7 +31,7 @@ for (const [file, title, sub] of slides) {
   n++;
 }
 // Feature graphic (1024x500)
-const logo = fs.readFileSync('/Users/javi/javi-portfolio/frontend/public/moneyLogo.png').toString('base64');
+const logo = fs.readFileSync('/Users/javi/javi-portfolio/docs/marketing/assets/moneyLogo.png').toString('base64');
 const fp = await b.newPage({ viewport: { width: 1024, height: 500 } });
 await fp.setContent(`<!doctype html><meta charset="utf-8"><style>*{margin:0;box-sizing:border-box}body{width:1024px;height:500px;display:flex;align-items:center;gap:48px;padding:0 70px;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(circle at 15% 0%,#6366f1 0%,#312e81 40%,#0b1020 85%);color:#fff}
 img{width:210px;height:210px;border-radius:44px;object-fit:cover}h1{font-size:68px;line-height:1.05;font-weight:800;letter-spacing:-1px}p{font-size:30px;opacity:.85;margin-top:16px}</style>
