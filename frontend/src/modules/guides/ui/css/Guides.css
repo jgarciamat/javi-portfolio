@@ -1,0 +1,45 @@
+.guide-main {
+  line-height: 1.65;
+}
+
+.guide-list {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.guide-list li {
+  padding: 1rem;
+  border: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+}
+
+.guide-list a {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.guide-list p {
+  margin: 0.4rem 0 0;
+  opacity: 0.8;
+}
+
+.guide-article h2 {
+  margin: 1.6rem 0 0.4rem;
+  font-size: 1.2rem;
+}
+
+.guide-intro {
+  font-size: 1.1rem;
+}
+
+.guide-related ul {
+  padding-left: 1.2rem;
+}
+
+.guide-tool,
+.guide-back {
+  margin: 0;
+}

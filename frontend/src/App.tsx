@@ -35,6 +35,11 @@ const BudgetRulePage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'BudgetRulePage'
 );
+const GuidesIndexPage = lazyNamed(
+  () => import('./modules/guides/ui/GuidePages'),
+  'GuidesIndexPage'
+);
+const GuidePage = lazyNamed(() => import('./modules/guides/ui/GuidePages'), 'GuidePage');
 const SavingsSimulatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'SavingsSimulatorPage'
@@ -58,6 +63,8 @@ export default function App() {
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/calculadora-50-30-20" element={<BudgetRulePage />} />
                     <Route path="/simulador-ahorro" element={<SavingsSimulatorPage />} />
+                    <Route path="/guias" element={<GuidesIndexPage />} />
+                    <Route path="/guias/:slug" element={<GuidePage />} />
                     <Route element={<ProtectedRoute />}>
                       <Route path="/" element={<DashboardPage />} />
                     </Route>

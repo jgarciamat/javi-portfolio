@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { cleanup, screen, waitFor } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import App from '../App';
 import * as f from '@test-utils/fixtures';
@@ -50,6 +50,18 @@ describe('App routes', () => {
   ])('serves the public page %s', async (path, key) => {
     visit(path);
     expect(await screen.findByRole('heading', { name: tr(key) })).toBeInTheDocument();
+  });
+
+  it('serves the guides and each guide', async () => {
+    visit('/guias');
+    expect(
+      await screen.findByRole('heading', { name: 'Guías de finanzas personales' })
+    ).toBeInTheDocument();
+    cleanup();
+    visit('/guias/metodo-50-30-20');
+    expect(
+      await screen.findByRole('heading', { name: /Método 50\/30\/20/, level: 1 })
+    ).toBeInTheDocument();
   });
 
   it('redirects unknown paths and shows the dashboard when signed in', async () => {

@@ -48,6 +48,7 @@ function CalculatorLayout({
         <p className="pricing-links">
           <Link to="/calculadora-50-30-20">{t('tools.rule.nav')}</Link> ·{' '}
           <Link to="/simulador-ahorro">{t('tools.savings.nav')}</Link> ·{' '}
+          <Link to="/guias">{t('tools.guides.nav')}</Link> ·{' '}
           <Link to="/pricing">{t('pricing.link')}</Link>
         </p>
       </main>
