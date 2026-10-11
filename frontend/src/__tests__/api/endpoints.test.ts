@@ -11,6 +11,7 @@ import {
   goalApi,
   insightsApi,
   monthApi,
+  ratesApi,
   recurringApi,
   settingsApi,
   transactionApi,
@@ -206,6 +207,7 @@ const cases: Case[] = [
     { currency: 'USD' },
   ],
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
+  ['exchange rate', () => ratesApi.get('USD', 'EUR'), 'GET', '/rates?from=USD&to=EUR'],
   ['assets', () => assetApi.getAll(), 'GET', '/assets'],
   [
     'add asset',

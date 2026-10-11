@@ -42,6 +42,7 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    ratesApi: { get: ok({ from: 'USD', to: 'EUR', rate: 0.9 }) },
     assetApi: {
       getAll: ok([]),
       create: ok({

@@ -997,5 +997,11 @@
   "app.assets.remove": "Remove {name}",
   "app.assets.total": "Total (assets − debts)",
   "app.settings.weeklyDigest": "Weekly summary by e-mail",
-  "app.settings.weeklyDigestHint": "Every Monday: what you spent last week, where the most, and the automatic movements coming up."
+  "app.settings.weeklyDigestHint": "Every Monday: what you spent last week, where the most, and the automatic movements coming up.",
+  "app.currency.other": "Other currency",
+  "app.currency.which": "Currency of the expense",
+  "app.currency.original": "Amount in that currency",
+  "app.currency.rate": "1 {from} = ? {to}",
+  "app.currency.convert": "Convert to {to}",
+  "app.currency.noRate": "We couldn't get the rate: type it in."
 }

@@ -9,6 +9,7 @@ import {
   FinancialAdvisor,
   GoogleIdentity,
   GoogleIdentityVerifier,
+  ExchangeRates,
   OfferCatalog,
   PaymentGateway,
 } from '@domain/ports/services';
@@ -91,6 +92,7 @@ export function createTestApp(
     advisor?: FinancialAdvisor | null;
     categorySuggester?: CategorySuggester | null;
     offers?: OfferCatalog;
+    rates?: ExchangeRates;
     env?: Record<string, string>;
   } = {}
 ): TestContext {
@@ -109,6 +111,9 @@ export function createTestApp(
     advisor: options.advisor ?? null,
     categorySuggester: options.categorySuggester ?? null,
     offers: options.offers,
+    rates: options.rates ?? {
+      rate: async (from, to) => (from === 'USD' && to === 'EUR' ? 0.9 : 2),
+    },
   });
   return { app: createApp(container), container, clock, email, google, payments };
 }

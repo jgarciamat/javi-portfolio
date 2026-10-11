@@ -183,3 +183,9 @@ export type MetricName =
 export interface MetricsRecorder {
   record(name: MetricName): void;
 }
+
+/** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */
+export interface ExchangeRates {
+  /** How many `to` one `from` is worth. */
+  rate(from: string, to: string): Promise<number>;
+}

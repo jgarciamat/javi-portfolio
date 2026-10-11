@@ -214,6 +214,13 @@ export const settingsApi = {
   },
 };
 
+export const ratesApi = {
+  /** Reference rate: how many `to` one `from` is worth. */
+  get(from: string, to: string) {
+    return apiRequest<{ from: string; to: string; rate: number }>(`/rates${query({ from, to })}`);
+  },
+};
+
 export const assetApi = {
   getAll() {
     return apiRequest<Asset[]>('/assets');

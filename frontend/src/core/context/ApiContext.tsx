@@ -11,6 +11,7 @@ import {
   goalApi,
   insightsApi,
   monthApi,
+  ratesApi,
   recurringApi,
   settingsApi,
   transactionApi,
@@ -30,6 +31,7 @@ export interface IApiContext {
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
   assetApi: typeof assetApi;
+  ratesApi: typeof ratesApi;
   budgetApi: typeof budgetApi;
   goalApi: typeof goalApi;
   settingsApi: typeof settingsApi;
@@ -54,6 +56,7 @@ const defaultValue: IApiContext = {
   customAlertApi,
   accountApi,
   assetApi,
+  ratesApi,
   budgetApi,
   goalApi,
   settingsApi,

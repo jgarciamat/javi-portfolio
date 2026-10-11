@@ -2,6 +2,7 @@ import { AppConfig } from '@config/env';
 import {
   CategorySuggester,
   Clock,
+  ExchangeRates,
   EmailSender,
   FinancialAdvisor,
   GoogleIdentityVerifier,
@@ -40,6 +41,7 @@ import { TransactionService } from '@application/transactions/TransactionService
 import { CloudflareAi } from './ai/CloudflareAi';
 import { GeminiAdvisor } from './ai/GeminiAdvisor';
 import { DisabledPaymentGateway, StripeGateway } from './billing/StripeGateway';
+import { FrankfurterRates } from './rates/FrankfurterRates';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
@@ -84,6 +86,7 @@ export interface ContainerOverrides {
   categorySuggester?: CategorySuggester | null;
   payments?: PaymentGateway;
   offers?: OfferCatalog;
+  rates?: ExchangeRates;
   hasher?: PasswordHasher;
 }
 
@@ -218,6 +221,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock,
     repos,
     email,
+    rates: overrides.rates ?? new FrankfurterRates(),
     auth,
     transactions,
     materializer,

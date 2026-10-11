@@ -103,3 +103,23 @@
 .tx-form-anchor {
   display: contents;
 }
+
+/* ─── Movement in another currency ───────────── */
+.tx-currency {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  grid-column: 1 / -1;
+}
+
+.tx-currency legend {
+  padding: 0 0.3rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.tx-currency-toggle {
+  justify-self: start;
+}

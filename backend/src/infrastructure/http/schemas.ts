@@ -262,6 +262,10 @@ export const assetBody = z.object({
   date: date.nullish(),
 });
 export const assetValueBody = z.object({ value: assetValue, date: date.nullish() });
+export const rateQuery = z.object({
+  from: z.string().length(3).toUpperCase(),
+  to: z.string().length(3).toUpperCase(),
+});
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

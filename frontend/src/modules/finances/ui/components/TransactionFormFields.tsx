@@ -6,6 +6,7 @@ import {
   MANAGE_CATEGORIES,
   type UseTransactionFormReturn,
 } from '../../application/hooks/useTransactionForm';
+import { CurrencyConverter } from './CurrencyConverter';
 
 export interface TransactionFormFieldsProps {
   form: UseTransactionFormReturn;
@@ -50,6 +51,7 @@ export function TransactionFormFields({
         onChange={(e) => form.setAmount(e.target.value)}
         required
       />
+      <CurrencyConverter form={form} />
       <select
         className="tx-input"
         value={fields.type}

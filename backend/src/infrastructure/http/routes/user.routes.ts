@@ -21,6 +21,7 @@ import {
   assetValueBody,
   idParam,
   netWorthQuery,
+  rateQuery,
   passwordBody,
   periodParams,
   settingsBody,
@@ -30,6 +31,7 @@ import {
 /** Profile, settings, data export and insights (stats + AI advice). */
 export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   const router = Router();
+  const ratesLimiter = limiter({ windowMs: 60 * 60 * 1000, limit: 120 });
 
   /** Personal settings are the user's own; currency and month start belong to the shared data. */
   const settingsFor = (userId: string, dataUserId: string) => {
@@ -133,6 +135,16 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed((req, res) => {
       const { months } = netWorthQuery.parse(req.query);
       res.json(c.stats.netWorth(req.dataUserId, months).map(presentNetWorth));
+    })
+  );
+
+  /** Reference exchange rate to enter a movement made in another currency. */
+  router.get(
+    '/rates',
+    ratesLimiter,
+    authed(async (req, res) => {
+      const { from, to } = rateQuery.parse(req.query);
+      res.json({ from, to, rate: await c.rates.rate(from, to) });
     })
   );
 
