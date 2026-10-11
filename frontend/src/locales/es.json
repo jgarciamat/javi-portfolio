@@ -1043,5 +1043,10 @@
   "app.split.paidByShort": "pagó {name}",
   "app.split.removeExpense": "Quitar el gasto «{name}»",
   "app.split.delete": "Borrar el grupo",
-  "app.split.deleteConfirm": "¿Borrar «{name}» y todos sus gastos?"
+  "app.split.deleteConfirm": "¿Borrar «{name}» y todos sus gastos?",
+  "app.receipt.scan": "Escanear ticket",
+  "app.receipt.reading": "Leyendo el ticket…",
+  "app.receipt.file": "Foto del ticket",
+  "app.receipt.nothing": "No hemos podido leer nada. Prueba con más luz y el ticket plano.",
+  "app.receipt.error": "No se ha podido leer el ticket en este dispositivo."
 }

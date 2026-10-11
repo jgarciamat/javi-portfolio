@@ -7,6 +7,7 @@ import {
   type UseTransactionFormReturn,
 } from '../../application/hooks/useTransactionForm';
 import { CurrencyConverter } from './CurrencyConverter';
+import { ReceiptScanner } from './ReceiptScanner';
 
 export interface TransactionFormFieldsProps {
   form: UseTransactionFormReturn;
@@ -50,6 +51,13 @@ export function TransactionFormFields({
         value={fields.amount}
         onChange={(e) => form.setAmount(e.target.value)}
         required
+      />
+      <ReceiptScanner
+        onScanned={(r) => {
+          if (r.merchant && !fields.description.trim()) form.setDescription(r.merchant);
+          if (r.total !== null) form.setAmount(String(r.total));
+          if (r.date) form.setDate(r.date);
+        }}
       />
       <CurrencyConverter form={form} />
       <select

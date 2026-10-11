@@ -16,6 +16,8 @@ export default defineConfig({
         clientsClaim: true,
         // Precachea todos los assets del build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // The receipt scanner's files are big: they are fetched when first used.
+        globIgnores: ['ocr/**'],
         // Las respuestas de /api nunca se cachean: son datos privados de cada usuario.
         navigateFallbackDenylist: [/^\/api\//],
       },

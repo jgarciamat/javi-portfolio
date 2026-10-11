@@ -1043,5 +1043,10 @@
   "app.split.paidByShort": "paid by {name}",
   "app.split.removeExpense": "Remove the expense “{name}”",
   "app.split.delete": "Delete the group",
-  "app.split.deleteConfirm": "Delete “{name}” and all its expenses?"
+  "app.split.deleteConfirm": "Delete “{name}” and all its expenses?",
+  "app.receipt.scan": "Scan a receipt",
+  "app.receipt.reading": "Reading the receipt…",
+  "app.receipt.file": "Photo of the receipt",
+  "app.receipt.nothing": "We couldn't read anything. Try with more light and the receipt flat.",
+  "app.receipt.error": "The receipt could not be read on this device."
 }
