@@ -18,6 +18,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // The receipt scanner's files are big: they are fetched when first used.
         globIgnores: ['ocr/**'],
+        // Shows the push notifications and opens the app when one is tapped.
+        importScripts: ['push-sw.js'],
         // Las respuestas de /api nunca se cachean: son datos privados de cada usuario.
         navigateFallbackDenylist: [/^\/api\//],
       },

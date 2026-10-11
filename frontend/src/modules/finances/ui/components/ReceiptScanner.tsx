@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { isNativeApp } from '@shared/utils/platform';
+import { CameraCapture, liveCameraAvailable } from './CameraCapture';
 import { useI18n } from '@core/i18n/I18nContext';
 import { type ScannedReceipt, parseReceipt } from '@modules/finances/domain/receiptParser';
 import { Icon } from '@shared/components/Icon';
@@ -35,6 +36,8 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [camera, setCamera] = useState(false);
+  const live = liveCameraAvailable(isNativeApp());
 
   const scan = async (file: File) => {
     setBusy(true);
@@ -59,7 +62,7 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
         ref={input}
         type="file"
         accept="image/*"
-        capture="environment"
+        {...(live ? {} : { capture: 'environment' as const })}
         hidden
         aria-label={t('app.receipt.file')}
         onChange={(e) => {
@@ -72,10 +75,29 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
         type="button"
         className="btn-secondary"
         disabled={busy}
-        onClick={() => input.current?.click()}
+        onClick={() => (live ? setCamera(true) : input.current?.click())}
       >
         <Icon name="camera" /> {busy ? t('app.receipt.reading') : t('app.receipt.scan')}
       </button>
+      {live && (
+        <button
+          type="button"
+          className="btn-secondary"
+          disabled={busy}
+          onClick={() => input.current?.click()}
+        >
+          <Icon name="image" /> {t('app.receipt.gallery')}
+        </button>
+      )}
+      {camera && (
+        <CameraCapture
+          onClose={() => setCamera(false)}
+          onCapture={(photo) => {
+            setCamera(false);
+            void scan(photo);
+          }}
+        />
+      )}
       {error && <p className="form-error">{t(error)}</p>}
     </div>
   );

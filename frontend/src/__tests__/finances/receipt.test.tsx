@@ -198,3 +198,119 @@ describe('the new-movement form with a scanned receipt', () => {
     expect(form.setDescription).not.toHaveBeenCalled();
   });
 });
+
+describe('the live camera of the web app', () => {
+  const stop = jest.fn();
+  const stream = { getTracks: () => [{ stop }] };
+  const getUserMedia = jest.fn();
+  const videoSize = jest.spyOn(HTMLVideoElement.prototype, 'videoWidth', 'get');
+  let blobResult: Blob | null = new Blob(['x'], { type: 'image/jpeg' });
+
+  beforeEach(() => {
+    stop.mockClear();
+    getUserMedia.mockReset().mockResolvedValue(stream);
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia },
+      configurable: true,
+    });
+    videoSize.mockReturnValue(640);
+    blobResult = new Blob(['x'], { type: 'image/jpeg' });
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'getContext')
+      .mockReturnValue({ drawImage: jest.fn() } as never);
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+      .mockImplementation((cb: BlobCallback) => cb(blobResult));
+  });
+  afterEach(() => {
+    Object.defineProperty(navigator, 'mediaDevices', { value: undefined, configurable: true });
+  });
+
+  const open = async (onScanned = jest.fn()) => {
+    renderWithI18n(<ReceiptScanner onScanned={onScanned} />);
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.receipt.scan')) }));
+    return {
+      onScanned,
+      take: await screen.findByRole('button', { name: new RegExp(tr('app.receipt.capture')) }),
+    };
+  };
+
+  it('opens the camera, takes the photo and reads it', async () => {
+    const { onScanned, take } = await open();
+    expect(getUserMedia).toHaveBeenCalledWith({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false,
+    });
+    await waitFor(() => expect(take).toBeEnabled());
+    fireEvent.click(take);
+    await waitFor(() =>
+      expect(onScanned).toHaveBeenCalledWith({
+        merchant: 'Mercadona',
+        date: '2026-03-15',
+        total: 5.84,
+      })
+    );
+    expect(stop).toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('offers the gallery too, and closes the camera when cancelled', async () => {
+    const { onScanned } = await open();
+    expect(
+      screen.getByRole('button', { name: new RegExp(tr('app.receipt.gallery')) })
+    ).toBeInTheDocument();
+    const input = screen.getByLabelText(tr('app.receipt.file'), { selector: 'input' });
+    expect(input).not.toHaveAttribute('capture');
+    fireEvent.click(screen.getByRole('button', { name: tr('app.common.cancel') }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await waitFor(() => expect(stop).toHaveBeenCalled());
+    expect(onScanned).not.toHaveBeenCalled();
+    const click = jest.spyOn(input, 'click').mockImplementation(() => undefined);
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.receipt.gallery')) }));
+    expect(click).toHaveBeenCalled();
+  });
+
+  it('says when the camera cannot be used', async () => {
+    getUserMedia.mockRejectedValueOnce(new Error('denied'));
+    const { take } = await open();
+    expect(await screen.findByText(tr('app.receipt.cameraDenied'))).toBeInTheDocument();
+    expect(take).toBeDisabled();
+  });
+
+  it('stops the camera if it was closed before it started', async () => {
+    let resolve: (s: typeof stream) => void = () => undefined;
+    getUserMedia.mockReturnValueOnce(new Promise((r) => (resolve = r)));
+    await open();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.common.cancel') }));
+    resolve(stream);
+    await waitFor(() => expect(stop).toHaveBeenCalled());
+  });
+
+  it('reports a photo that could not be made', async () => {
+    blobResult = null;
+    const { take } = await open();
+    await waitFor(() => expect(take).toBeEnabled());
+    fireEvent.click(take);
+    expect(await screen.findByText(tr('app.receipt.error'))).toBeInTheDocument();
+  });
+
+  it('takes a photo even where the canvas cannot draw (nothing to read)', async () => {
+    jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+    const { take } = await open();
+    await waitFor(() => expect(take).toBeEnabled());
+    fireEvent.click(take);
+    await waitFor(() => expect(worker.recognize).toHaveBeenCalled());
+  });
+
+  it('uses the phone camera app (file input) inside the Android app', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    renderWithI18n(<ReceiptScanner onScanned={jest.fn()} />);
+    expect(
+      screen.queryByRole('button', { name: new RegExp(tr('app.receipt.gallery')) })
+    ).toBeNull();
+    expect(screen.getByLabelText(tr('app.receipt.file'), { selector: 'input' })).toHaveAttribute(
+      'capture',
+      'environment'
+    );
+  });
+});

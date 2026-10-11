@@ -29,6 +29,8 @@ import {
   assetValueBody,
   idParam,
   netWorthQuery,
+  pushSubscribeBody,
+  pushUnsubscribeBody,
   rateQuery,
   passwordBody,
   periodParams,
@@ -153,6 +155,38 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed(async (req, res) => {
       const { from, to } = rateQuery.parse(req.query);
       res.json({ from, to, rate: await c.rates.rate(from, to) });
+    })
+  );
+
+  // Push notifications: the browser or the installed web app subscribes to receive them.
+  router.get(
+    '/push/key',
+    authed((_req, res) => res.json({ enabled: c.push.enabled, publicKey: c.push.publicKey() }))
+  );
+  router.post(
+    '/push/subscribe',
+    authed((req, res) => {
+      const { endpoint, keys } = pushSubscribeBody.parse(req.body);
+      c.push.subscribe(req.userId, { endpoint, p256dh: keys.p256dh, auth: keys.auth });
+      res.status(204).end();
+    })
+  );
+  router.post(
+    '/push/unsubscribe',
+    authed((req, res) => {
+      c.push.unsubscribe(req.userId, pushUnsubscribeBody.parse(req.body).endpoint);
+      res.status(204).end();
+    })
+  );
+  router.post(
+    '/push/test',
+    authed(async (req, res) => {
+      const sent = await c.push.notify(req.userId, {
+        title: 'Money Manager',
+        body: '✔ Las notificaciones funcionan en este dispositivo.',
+        url: '/',
+      });
+      res.json({ sent });
     })
   );
 

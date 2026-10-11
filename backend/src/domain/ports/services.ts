@@ -189,3 +189,20 @@ export interface ExchangeRates {
   /** How many `to` one `from` is worth. */
   rate(from: string, to: string): Promise<number>;
 }
+
+export interface PushPayload {
+  title: string;
+  body: string;
+  /** Where the notification takes the user when tapped (a path of the app). */
+  url: string;
+}
+
+/** Sends a notification to a browser or installed app. `gone`: the subscription no longer exists. */
+export interface PushSender {
+  readonly enabled: boolean;
+  publicKey(): string | null;
+  send(
+    subscription: { endpoint: string; p256dh: string; auth: string },
+    payload: PushPayload
+  ): Promise<'sent' | 'gone'>;
+}

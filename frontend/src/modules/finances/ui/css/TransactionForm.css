@@ -123,3 +123,24 @@
 .tx-currency-toggle {
   justify-self: start;
 }
+
+/* ─── Receipt camera ─────────────────────────── */
+.tx-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  grid-column: 1 / -1;
+}
+
+.camera-panel {
+  width: min(100%, 520px);
+}
+
+.camera-view video {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  border-radius: 10px;
+  background: #000;
+}

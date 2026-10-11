@@ -20,6 +20,7 @@ import type {
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useFinances } from '../../application/FinancesContext';
 import { AppLockCard } from '../components/AppLockCard';
+import { PushSetting } from '../components/PushSetting';
 import { CategoryRulesCard } from '../components/CategoryRulesCard';
 import { HouseholdCard } from '../components/HouseholdCard';
 import {
@@ -187,6 +188,7 @@ function PreferencesCard({
           onChange={(e) => save({ weeklyDigest: e.target.checked })}
         />
       </label>
+      <PushSetting />
       {notificationsSupported() && (
         <label className="setting-row">
           <span>

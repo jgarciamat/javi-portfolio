@@ -226,6 +226,25 @@ export const ratesApi = {
   },
 };
 
+export const pushApi = {
+  /** Whether the server can send push notifications and the key to subscribe with. */
+  key() {
+    return apiRequest<{ enabled: boolean; publicKey: string | null }>('/push/key');
+  },
+  subscribe(subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) {
+    return apiRequest<void>('/push/subscribe', {
+      method: 'POST',
+      body: jsonBody(subscription),
+    });
+  },
+  unsubscribe(endpoint: string) {
+    return apiRequest<void>('/push/unsubscribe', { method: 'POST', body: jsonBody({ endpoint }) });
+  },
+  test() {
+    return apiRequest<{ sent: number }>('/push/test', { method: 'POST' });
+  },
+};
+
 export const splitApi = {
   list() {
     return apiRequest<SplitGroupSummary[]>('/splits');

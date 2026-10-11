@@ -276,6 +276,29 @@ export interface SettingsRepository {
   save(settings: UserSettingsProps): void;
 }
 
+// ─── Push notifications ──────────────────────────────────────────────────────
+
+export interface PushSubscriptionRecord {
+  id: string;
+  userId: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
+export interface PushRepository {
+  /** One row per endpoint: subscribing again from the same browser replaces it. */
+  save(subscription: PushSubscriptionRecord, createdAt: string): void;
+  remove(userId: string, endpoint: string): void;
+  /** Used when the push service says the subscription is gone. */
+  removeEndpoint(endpoint: string): void;
+  listByUser(userId: string): PushSubscriptionRecord[];
+  /** Users with at least one subscription. */
+  subscribedUsers(): string[];
+  /** Marks a notification as sent; false when that exact one (kind + key) already went out. */
+  claim(userId: string, kind: string, key: string, at: string): boolean;
+}
+
 // ─── Shared expenses ─────────────────────────────────────────────────────────
 
 export interface SplitGroup {

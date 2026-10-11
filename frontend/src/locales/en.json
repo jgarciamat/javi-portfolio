@@ -1060,5 +1060,16 @@
   "app.privacy.s4.item7": "Google Play and RevenueCat, Inc. (purchases in the Android app): Google charges and RevenueCat verifies the purchase and tells us the subscription status; it uses your Money Manager user id, without your name or e-mail. See revenuecat.com/privacy.",
   "app.privacy.s4.item8": "Frankfurter (European Central Bank exchange rates): our server asks for the rate between two currencies; none of your data is sent.",
   "app.privacy.s6.item5": "The PIN or fingerprint lock is checked on your device: the PIN is only stored there, as a salted hash, and never reaches our servers.",
-  "app.privacy.s6.item6": "Receipt scanning is done on your device: the photo is not uploaded to any server."
+  "app.privacy.s6.item6": "Receipt scanning is done on your device: the photo is not uploaded to any server.",
+  "app.receipt.camera": "Camera",
+  "app.receipt.capture": "Take photo",
+  "app.receipt.gallery": "Choose an image",
+  "app.receipt.cameraDenied": "The camera cannot be used: allow it in the browser or choose an image.",
+  "app.push.title": "Push notifications on this device",
+  "app.push.hint": "We let you know the day before your automatic movements are charged and with the Monday summary. On iPhone, add the site to your home screen first.",
+  "app.push.test": "Send a test",
+  "app.push.sent": "Sent: it should reach you in a few seconds.",
+  "app.push.notSent": "We couldn't send it to this device.",
+  "app.push.denied": "The browser has blocked notifications. Allow them in the site settings and try again.",
+  "app.push.error": "Notifications could not be changed."
 }

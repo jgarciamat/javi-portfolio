@@ -283,6 +283,11 @@ export const splitExpenseBody = z.object({
 });
 export const splitSettleBody = z.object({ from: id, to: id, amount: money, date: date.nullish() });
 export const splitExpenseParams = z.object({ id, expenseId: id });
+export const pushSubscribeBody = z.object({
+  endpoint: z.string().url().max(1000),
+  keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
+});
+export const pushUnsubscribeBody = z.object({ endpoint: z.string().url().max(1000) });
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });

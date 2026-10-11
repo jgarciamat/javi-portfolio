@@ -42,6 +42,12 @@ export function createFakeApi(): FakeApi {
       update: ok(f.category()),
       delete: ok(undefined),
     },
+    pushApi: {
+      key: ok({ enabled: true, publicKey: 'BKey' }),
+      subscribe: ok(undefined),
+      unsubscribe: ok(undefined),
+      test: ok({ sent: 1 }),
+    },
     splitApi: {
       list: ok([]),
       create: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),

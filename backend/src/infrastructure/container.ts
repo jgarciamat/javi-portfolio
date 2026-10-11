@@ -3,6 +3,7 @@ import {
   CategorySuggester,
   Clock,
   ExchangeRates,
+  PushSender,
   EmailSender,
   FinancialAdvisor,
   GoogleIdentityVerifier,
@@ -17,6 +18,8 @@ import { BillingService } from '@application/billing/BillingService';
 import { EntitlementService } from '@application/billing/EntitlementService';
 import { PlayBillingService } from '@application/billing/PlayBillingService';
 import { OfferService } from '@application/offers/OfferService';
+import { PushService } from '@application/push/PushService';
+import { ReminderService } from '@application/push/ReminderService';
 import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
 import { SplitService } from '@application/split/SplitService';
 import { TaxService } from '@application/tax/TaxService';
@@ -43,6 +46,7 @@ import { TransactionService } from '@application/transactions/TransactionService
 import { CloudflareAi } from './ai/CloudflareAi';
 import { GeminiAdvisor } from './ai/GeminiAdvisor';
 import { DisabledPaymentGateway, StripeGateway } from './billing/StripeGateway';
+import { DisabledPushSender, WebPushSender } from './push/WebPushSender';
 import { FrankfurterRates } from './rates/FrankfurterRates';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
@@ -68,6 +72,7 @@ import {
   SqliteBillingEventRepository,
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
+import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
@@ -91,6 +96,7 @@ export interface ContainerOverrides {
   payments?: PaymentGateway;
   offers?: OfferCatalog;
   rates?: ExchangeRates;
+  pushSender?: PushSender;
   hasher?: PasswordHasher;
 }
 
@@ -125,6 +131,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     digests: new SqliteDigestRepository(db),
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
+    push: new SqlitePushRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -166,6 +173,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       ? new StripeGateway(config.billing.stripe)
       : new DisabledPaymentGateway());
   const offerCatalog = overrides.offers ?? new JsonOfferCatalog(config.affiliatesFile);
+
+  const pushSender =
+    overrides.pushSender ??
+    (config.push ? new WebPushSender(config.push) : new DisabledPushSender());
+  const pushService = new PushService(repos.push, pushSender, clock);
+  const weeklyDigest = new WeeklyDigestService(
+    repos.digests,
+    repos.transactions,
+    repos.rules,
+    repos.settings,
+    email,
+    clock
+  );
 
   const entitlements = new EntitlementService(repos.subscriptions, clock);
   const allowance = new AiAllowance(
@@ -297,14 +317,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       repos.assets
     ),
-    weeklyDigest: new WeeklyDigestService(
-      repos.digests,
-      repos.transactions,
-      repos.rules,
-      repos.settings,
-      email,
-      clock
-    ),
+    weeklyDigest,
+    push: pushService,
+    reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
     split: new SplitService(repos.splits, uow, clock),
     tax: new TaxService(repos.business, repos.categories, repos.transactions, entitlements),
     assetService: new AssetService(repos.assets, entitlements, uow, clock),

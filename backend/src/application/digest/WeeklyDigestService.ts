@@ -1,5 +1,4 @@
 import {
-  DigestRecipient,
   DigestRepository,
   RecurringRuleRepository,
   SettingsRepository,
@@ -47,7 +46,7 @@ export class WeeklyDigestService {
           user.email,
           user.name,
           user.locale,
-          this.build(user, now),
+          this.build(user.userId, now),
           user.currency
         );
         this.digests.markSent(user.userId, now.toISOString());
@@ -59,11 +58,11 @@ export class WeeklyDigestService {
     return sent;
   }
 
-  build(user: DigestRecipient, now: Date): DigestData {
+  build(userId: string, now: Date): DigestData {
     const from = isoDay(now, 7);
     const to = isoDay(now, 1);
     const week = (a: string, b: string, type: 'EXPENSE' | 'INCOME') =>
-      this.transactions.search(user.userId, {
+      this.transactions.search(userId, {
         type,
         from: a,
         to: b,
@@ -80,12 +79,12 @@ export class WeeklyDigestService {
       expenses: expenses.items,
       incomeCents: income.totals.incomeCents,
       previousSpentCents: before.totals.expenseCents,
-      upcoming: this.upcoming(user.userId, now),
+      upcoming: this.upcoming(userId, now),
     });
   }
 
   /** Recurring expenses that the next period charges, when it starts within a week. */
-  private upcoming(userId: string, now: Date): DigestUpcoming | null {
+  upcoming(userId: string, now: Date): DigestUpcoming | null {
     const startDay = this.settings.get(userId).monthStartDay;
     const next: Period = addMonths(currentPeriod(startDay, now), 1);
     const date = periodStart(next, startDay);

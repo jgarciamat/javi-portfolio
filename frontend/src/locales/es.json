@@ -1060,5 +1060,16 @@
   "app.privacy.s4.item7": "Google Play y RevenueCat, Inc. (compras en la app de Android): Google cobra y RevenueCat verifica la compra y nos avisa del estado de la suscripción; para ello usa tu identificador de usuario de Money Manager, sin tu nombre ni tu correo. Consulta revenuecat.com/privacy.",
   "app.privacy.s4.item8": "Frankfurter (tipos de cambio del Banco Central Europeo): nuestro servidor consulta el cambio entre dos divisas; no se envía ningún dato tuyo.",
   "app.privacy.s6.item5": "El bloqueo con PIN o huella se comprueba en tu dispositivo: el PIN se guarda solo en él, con un hash con sal, y nunca llega a nuestros servidores.",
-  "app.privacy.s6.item6": "El escaneo de tickets se hace en tu dispositivo: la foto no se sube a ningún servidor."
+  "app.privacy.s6.item6": "El escaneo de tickets se hace en tu dispositivo: la foto no se sube a ningún servidor.",
+  "app.receipt.camera": "Cámara",
+  "app.receipt.capture": "Hacer foto",
+  "app.receipt.gallery": "Elegir una imagen",
+  "app.receipt.cameraDenied": "No se puede usar la cámara: concede el permiso al navegador o elige una imagen.",
+  "app.push.title": "Notificaciones push en este dispositivo",
+  "app.push.hint": "Te avisamos el día antes de que se cobren tus operaciones automáticas y con el resumen de cada lunes. En iPhone, añade antes la web a la pantalla de inicio.",
+  "app.push.test": "Enviar una de prueba",
+  "app.push.sent": "Enviada: debería llegarte en unos segundos.",
+  "app.push.notSent": "No hemos podido enviarla a este dispositivo.",
+  "app.push.denied": "El navegador ha bloqueado las notificaciones. Actívalas en los ajustes del sitio y vuelve a intentarlo.",
+  "app.push.error": "No se han podido cambiar las notificaciones."
 }
