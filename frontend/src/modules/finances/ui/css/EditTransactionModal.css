@@ -11,8 +11,8 @@
 }
 
 .edit-tx-modal {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
   border-radius: 14px;
   padding: 1.5rem;
   width: 100%;
@@ -43,7 +43,7 @@
 .edit-tx-modal-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
   margin: 0;
 }
 
@@ -51,7 +51,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #64748b;
+  color: var(--slate-500);
   font-size: 1.2rem;
   line-height: 1;
   padding: 0.25rem;
@@ -59,7 +59,7 @@
 }
 
 .edit-tx-modal-close:hover {
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 .edit-tx-modal-actions {

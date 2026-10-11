@@ -9,6 +9,7 @@ import {
 } from '@core/security/appLock';
 import { useAppLock } from '@shared/hooks/useAppLock';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 type Mode = 'idle' | 'enable' | 'change' | 'disable';
 
@@ -54,7 +55,9 @@ export function AppLockCard() {
 
   return (
     <div className="card">
-      <h2 className="section-title">🔒 {t('app.lock.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="lock" /> {t('app.lock.title')}
+      </h2>
       <p className="section-hint">{t('app.lock.hint')}</p>
       {mode === 'idle' && !config && (
         <div className="button-row">
@@ -65,7 +68,9 @@ export function AppLockCard() {
       )}
       {mode === 'idle' && config && (
         <>
-          <p className="section-success">✅ {t('app.lock.on')}</p>
+          <p className="section-success">
+            <Icon name="checkCircle" /> {t('app.lock.on')}
+          </p>
           <label className="field">
             <span className="field-label">{t('app.lock.timeout')}</span>
             <select

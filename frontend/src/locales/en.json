@@ -1048,5 +1048,10 @@
   "app.receipt.reading": "Reading the receipt…",
   "app.receipt.file": "Photo of the receipt",
   "app.receipt.nothing": "We couldn't read anything. Try with more light and the receipt flat.",
-  "app.receipt.error": "The receipt could not be read on this device."
+  "app.receipt.error": "The receipt could not be read on this device.",
+  "app.settings.theme": "Appearance",
+  "app.settings.themeHint": "Light, dark or the system's. Only on this device.",
+  "app.settings.theme.system": "Automatic (system)",
+  "app.settings.theme.light": "Light",
+  "app.settings.theme.dark": "Dark"
 }

@@ -7,6 +7,7 @@ import { useResource } from '@shared/hooks/useResource';
 import type { VatRate } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 const RATES: VatRate[] = [21, 10, 4, 0];
 const NONE = 'none';
@@ -40,7 +41,9 @@ export function SelfEmployedCard() {
 
   return (
     <div className="card">
-      <h2 className="section-title">🧾 {t('app.tax.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="receipt" /> {t('app.tax.title')}
+      </h2>
       <p className="section-hint">{t('app.tax.hint')}</p>
       {action.error && <p className="form-error">{action.error}</p>}
       <div className="form-grid">

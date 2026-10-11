@@ -5,8 +5,8 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: #020617;
-  color: #f1f5f9;
+  background: var(--slate-950);
+  color: var(--slate-100);
 }
 
 .lock-card {
@@ -37,15 +37,15 @@
   letter-spacing: 0.5em;
   text-align: center;
   border-radius: 10px;
-  border: 1px solid #334155;
-  background: #0f172a;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
   color: inherit;
 }
 
 .lock-forgot {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--slate-400);
   text-decoration: underline;
   cursor: pointer;
   font-size: 0.85rem;

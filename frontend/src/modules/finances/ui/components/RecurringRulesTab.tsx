@@ -11,6 +11,7 @@ import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleFo
 import { useFinances } from '../../application/FinancesContext';
 import { DeleteRuleModal, type DeleteScope } from './DeleteRuleModal';
 import '../css/RecurringRulesTab.css';
+import { Icon } from '@shared/components/Icon';
 
 const TYPE_CLASS: Record<TransactionType, string> = {
   INCOME: 'recurring-type--income',
@@ -254,10 +255,11 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
       <div className="recurring-card-meta">
         <span className="recurring-meta-item">📁 {tCategory(rule.category)}</span>
         <span className="recurring-meta-item">
-          🔁 {t(`app.recurring.form.frequency.${rule.frequency}`)}
+          <Icon name="repeat" /> {t(`app.recurring.form.frequency.${rule.frequency}`)}
         </span>
         <span className="recurring-meta-item">
-          📅 {t('app.recurring.card.from')} {period(rule.startYear, rule.startMonth)}
+          <Icon name="calendar" /> {t('app.recurring.card.from')}{' '}
+          {period(rule.startYear, rule.startMonth)}
           {rule.endYear !== null && rule.endMonth !== null
             ? ` → ${period(rule.endYear, rule.endMonth)}`
             : ` — ${t('app.recurring.card.forever')}`}
@@ -270,7 +272,7 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
           onClick={() => onEdit(rule)}
           aria-label={`${t('app.recurring.card.edit')}: ${rule.description}`}
         >
-          ✏️ {t('app.recurring.card.edit')}
+          <Icon name="edit" /> {t('app.recurring.card.edit')}
         </button>
         <button
           className="btn-secondary recurring-btn-sm"
@@ -284,7 +286,7 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
           onClick={() => onDelete(rule)}
           aria-label={`${t('app.recurring.card.delete')}: ${rule.description}`}
         >
-          🗑 {t('app.recurring.card.delete')}
+          <Icon name="trash" /> {t('app.recurring.card.delete')}
         </button>
       </div>
     </div>
@@ -323,7 +325,9 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
       <div className="card recurring-header-card">
         <div className="recurring-tab-header">
           <div>
-            <h2 className="recurring-tab-title">⚙️ {t('app.recurring.title')}</h2>
+            <h2 className="recurring-tab-title">
+              <Icon name="settings" /> {t('app.recurring.title')}
+            </h2>
             <p className="recurring-tab-subtitle">{t('app.recurring.subtitle')}</p>
           </div>
           <button className="btn-primary" onClick={editor.openCreate}>

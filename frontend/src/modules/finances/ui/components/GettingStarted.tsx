@@ -2,6 +2,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import type { useGettingStarted } from '../../application/hooks/useGettingStarted';
 import type { DashboardTab } from '../navigation';
 import '../css/GettingStarted.css';
+import { Icon } from '@shared/components/Icon';
 
 type Checklist = ReturnType<typeof useGettingStarted>;
 
@@ -18,7 +19,9 @@ export function GettingStarted({
   return (
     <section className="card getting-started" aria-label={t('app.gettingStarted.title')}>
       <div className="getting-started-head">
-        <h2 className="section-title">🚀 {t('app.gettingStarted.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="rocket" /> {t('app.gettingStarted.title')}
+        </h2>
         <button className="btn-link" onClick={checklist.hide}>
           {t('app.gettingStarted.hide')}
         </button>

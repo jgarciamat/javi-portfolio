@@ -5,6 +5,7 @@ import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 /** "When the description contains … use this category": applied to imports and kept private. */
 export function CategoryRulesCard() {
@@ -30,7 +31,9 @@ export function CategoryRulesCard() {
 
   return (
     <div className="card">
-      <h2 className="section-title">🪄 {t('app.rules.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="wand" /> {t('app.rules.title')}
+      </h2>
       <p className="section-hint">{t('app.rules.hint')}</p>
       {action.error && <p className="form-error">{action.error}</p>}
       <div className="form-grid">
@@ -85,7 +88,7 @@ export function CategoryRulesCard() {
                   })
                 }
               >
-                🗑️
+                <Icon name="trash" />
               </button>
             </li>
           ))}

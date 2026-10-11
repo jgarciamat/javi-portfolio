@@ -3,6 +3,7 @@ import { RESOURCE_KEYS } from './pricing';
 import { useOptionalPlan, type BillingNotice } from '../application/PlanContext';
 import type { BillingOverview } from '../domain/types';
 import './css/Billing.css';
+import { Icon } from '@shared/components/Icon';
 
 const TRIAL_REMINDER_DAYS = 5;
 const RESOURCES = Object.keys(RESOURCE_KEYS) as (keyof typeof RESOURCE_KEYS)[];
@@ -26,7 +27,7 @@ export function PlanBanner({ onOpenPlan }: { onOpenPlan: () => void }) {
       <div className={`plan-banner plan-banner--${notice}`} role="status">
         <span>{t(noticeKey(notice, overview))}</span>
         <button className="plan-banner-close" onClick={dismissNotice} aria-label="OK">
-          ✕
+          <Icon name="close" />
         </button>
       </div>
     );

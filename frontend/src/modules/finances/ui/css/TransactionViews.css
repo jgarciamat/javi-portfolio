@@ -18,7 +18,7 @@
   display: none;
 }
 
-/* The active tab border-bottom merges with the card top border (1px #1e293b).
+/* The active tab border-bottom merges with the card top border (1px var(--slate-800)).
    We use the same .tab-btn / .active classes as the Dashboard. */
 .tx-tabs .tab-btn {
   border-radius: 8px 8px 0 0;
@@ -28,8 +28,8 @@
 }
 
 .tx-tabs .tab-btn.active {
-  color: #6366f1;
-  border-bottom-color: #6366f1;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
   background: #1e293b22;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .tx-week-block {
-  border: 1px solid #1e293b;
+  border: 1px solid var(--slate-800);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -53,8 +53,8 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.65rem 1rem;
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  background: var(--slate-900);
+  border-bottom: 1px solid var(--slate-800);
 }
 
 .tx-week-header--clickable {
@@ -70,7 +70,7 @@
 .tx-week-chevron {
   width: 1.1rem;
   height: 1.1rem;
-  color: #6366f1;
+  color: var(--accent);
   flex-shrink: 0;
   transition: transform 0.2s ease;
   transform: rotate(0deg);
@@ -86,7 +86,7 @@
   gap: 0.35rem;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--slate-400);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -106,13 +106,13 @@
 }
 
 .tx-week-total--income {
-  background: #14532d;
-  color: #86efac;
+  background: var(--green-900);
+  color: var(--green-300);
 }
 
 .tx-week-total--expense {
-  background: #4c0519;
-  color: #fca5a5;
+  background: var(--red-950);
+  color: var(--red-300);
 }
 
 .tx-week-total--saving {
@@ -121,13 +121,13 @@
 }
 
 .tx-week-total--pos {
-  background: #14532d;
-  color: #86efac;
+  background: var(--green-900);
+  color: var(--green-300);
 }
 
 .tx-week-total--neg {
-  background: #4c0519;
-  color: #fca5a5;
+  background: var(--red-950);
+  color: var(--red-300);
 }
 
 .tx-week-total--balance {
@@ -136,7 +136,7 @@
 
 .tx-week-day {
   padding: 0.5rem 1rem 0.25rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
 }
 
 .tx-week-day:last-child {
@@ -151,8 +151,8 @@
   padding: 0.55rem 0.5rem;
   border-radius: 8px;
   margin-bottom: 0.3rem;
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
   transition: background 0.12s;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .tx-week-item:hover {
-  background: #1e293b;
+  background: var(--slate-800);
 }
 
 .tx-week-item-accent {
@@ -172,15 +172,15 @@
 }
 
 .tx-week-item--income .tx-week-item-accent {
-  background: #4ade80;
+  background: var(--green-400);
 }
 
 .tx-week-item--expense .tx-week-item-accent {
-  background: #f87171;
+  background: var(--red-400);
 }
 
 .tx-week-item--saving .tx-week-item-accent {
-  background: #a78bfa;
+  background: var(--violet-400);
 }
 
 .tx-week-item-body {
@@ -194,7 +194,7 @@
 .tx-week-item-desc {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -202,7 +202,7 @@
 
 .tx-week-item-cat {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--slate-500);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -231,7 +231,7 @@
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--slate-400);
   text-transform: capitalize;
   margin-bottom: 0.75rem;
   letter-spacing: 0.04em;
@@ -247,7 +247,7 @@
   text-align: center;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--slate-600);
   text-transform: uppercase;
   padding: 0.3rem 0;
 }
@@ -260,7 +260,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.15rem;
-  background: #0f172a;
+  background: var(--slate-900);
   border: 1px solid transparent;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -272,23 +272,23 @@
 
 .tx-calendar-cell--has-tx {
   cursor: pointer;
-  border-color: #1e293b;
+  border-color: var(--slate-800);
 }
 
 .tx-calendar-cell--has-tx:hover {
-  background: #1e293b;
-  border-color: #334155;
+  background: var(--slate-800);
+  border-color: var(--slate-700);
 }
 
 .tx-calendar-cell--selected {
-  background: #1e293b;
-  border-color: #6366f1 !important;
+  background: var(--slate-800);
+  border-color: var(--accent) !important;
 }
 
 .tx-calendar-day-num {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--slate-400);
   line-height: 1;
 }
 
@@ -302,7 +302,7 @@
 /* ─── Day detail panel ────────────────────────── */
 .tx-calendar-detail {
   margin-top: 1rem;
-  border: 1px solid #334155;
+  border: 1px solid var(--slate-700);
   border-radius: 10px;
   overflow: hidden;
   animation: tx-cal-slide-in 0.15s ease;
@@ -325,18 +325,18 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 1rem;
-  background: #0f172a;
-  border-bottom: 1px solid #1e293b;
+  background: var(--slate-900);
+  border-bottom: 1px solid var(--slate-800);
   font-size: 0.82rem;
   font-weight: 700;
-  color: #cbd5e1;
+  color: var(--slate-300);
   text-transform: capitalize;
 }
 
 .tx-calendar-detail-close {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--slate-500);
   cursor: pointer;
   font-size: 0.85rem;
   line-height: 1;
@@ -345,8 +345,8 @@
 }
 
 .tx-calendar-detail-close:hover {
-  background: #1e293b;
-  color: #f1f5f9;
+  background: var(--slate-800);
+  color: var(--slate-100);
 }
 
 .tx-calendar-detail-row {
@@ -354,7 +354,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.55rem 1rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
   font-size: 0.85rem;
 }
 
@@ -363,7 +363,7 @@
 }
 
 .tx-calendar-detail-desc {
-  color: #f1f5f9;
+  color: var(--slate-100);
   font-weight: 500;
   flex: 1;
   margin-right: 1rem;
@@ -380,7 +380,7 @@
 .tx-calendar-empty {
   padding: 1rem;
   text-align: center;
-  color: #64748b;
+  color: var(--slate-500);
   font-size: 0.85rem;
 }
 
@@ -425,8 +425,8 @@
 }
 
 .cal-modal {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
   border-radius: 14px;
   width: 100%;
   max-width: 420px;
@@ -456,14 +456,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem 0.75rem;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid var(--slate-700);
 }
 
 .cal-modal-title {
   display: inline-block;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--slate-100);
 }
 
 /* "jueves, 8 de octubre" → "Jueves, 8 de octubre" (not every word). */
@@ -474,7 +474,7 @@
 .cal-modal-close {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--slate-500);
   cursor: pointer;
   font-size: 1rem;
   padding: 0.2rem 0.4rem;
@@ -484,8 +484,8 @@
 }
 
 .cal-modal-close:hover {
-  background: #334155;
-  color: #f1f5f9;
+  background: var(--slate-700);
+  color: var(--slate-100);
 }
 
 /* Summary totals */
@@ -494,8 +494,8 @@
   flex-direction: column;
   gap: 0;
   padding: 0.75rem 1.25rem;
-  background: #0f172a;
-  border-bottom: 1px solid #334155;
+  background: var(--slate-900);
+  border-bottom: 1px solid var(--slate-700);
 }
 
 .cal-modal-summary-row {
@@ -507,13 +507,13 @@
 }
 
 .cal-modal-summary-row--balance {
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
   margin-top: 0.3rem;
   padding-top: 0.5rem;
 }
 
 .cal-modal-summary-label {
-  color: #94a3b8;
+  color: var(--slate-400);
   font-weight: 500;
 }
 
@@ -539,14 +539,14 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.55rem 0.6rem;
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
   border-radius: 8px;
   transition: background 0.12s;
 }
 
 .cal-modal-item:hover {
-  background: #1e293b;
+  background: var(--slate-800);
 }
 
 .cal-modal-item-accent {
@@ -557,15 +557,15 @@
 }
 
 .cal-modal-item--income .cal-modal-item-accent {
-  background: #4ade80;
+  background: var(--green-400);
 }
 
 .cal-modal-item--expense .cal-modal-item-accent {
-  background: #f87171;
+  background: var(--red-400);
 }
 
 .cal-modal-item--saving .cal-modal-item-accent {
-  background: #a78bfa;
+  background: var(--violet-400);
 }
 
 .cal-modal-item-body {
@@ -579,7 +579,7 @@
 .cal-modal-item-desc {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--slate-100);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -587,7 +587,7 @@
 
 .cal-modal-item-cat {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .cal-modal-item-right {
@@ -607,15 +607,15 @@
 /* ─── Calendar cell amounts by type ──────────── */
 /* Shown inside the cell below the day number */
 .tx-calendar-bal--income {
-  color: #4ade80;
+  color: var(--green-400);
 }
 
 .tx-calendar-bal--expense {
-  color: #f87171;
+  color: var(--red-400);
 }
 
 .tx-calendar-bal--saving {
-  color: #a78bfa;
+  color: var(--violet-400);
 }
 
 /* Mobile modal */
@@ -643,11 +643,11 @@ button.tx-calendar-cell {
 
 button.tx-week-header {
   border: none;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
 }
 
 button.tx-calendar-cell:focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--accent);
 }
 
 .tx-week-items {

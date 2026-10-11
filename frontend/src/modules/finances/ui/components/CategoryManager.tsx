@@ -4,6 +4,7 @@ import type { Category, CreateCategoryDTO } from '@modules/finances/domain/types
 import { CATEGORY_COLORS, EMOJI_GROUPS } from '@modules/finances/domain/categoryPresets';
 import { useCategoryManager, type PendingDelete } from '../../application/hooks/useCategoryManager';
 import '../css/CategoryManager.css';
+import { Icon } from '@shared/components/Icon';
 
 export interface CategoryManagerProps {
   onClose: () => void;
@@ -71,7 +72,9 @@ function CreateCard({ cm }: { cm: ManagerState }) {
         void cm.handleCreate();
       }}
     >
-      <h3 className="cat-section-title">➕ {t('app.category.manager.new')}</h3>
+      <h3 className="cat-section-title">
+        <Icon name="plus" /> {t('app.category.manager.new')}
+      </h3>
       <div className="cat-form">
         <div className="cat-emoji-row">
           <button
@@ -130,7 +133,9 @@ function ReassignPanel({
   const { t, tCategory } = useI18n();
   return (
     <div className="cat-create-card" role="alert">
-      <h3 className="cat-section-title">⚠️ {t('app.category.manager.inUse.title')}</h3>
+      <h3 className="cat-section-title">
+        <Icon name="alert" /> {t('app.category.manager.inUse.title')}
+      </h3>
       <p className="cat-empty">
         {t('app.category.manager.inUse.body', {
           name: tCategory(pending.category.name),
@@ -239,13 +244,15 @@ export function CategoryManager({
       className="cat-modal"
     >
       <div className="cat-modal-header">
-        <span className="cat-modal-title">🗂️ {t('app.category.manager.title')}</span>
+        <span className="cat-modal-title">
+          <Icon name="clipboard" /> {t('app.category.manager.title')}
+        </span>
         <button
           className="cat-modal-close"
           onClick={onClose}
           aria-label={t('app.category.manager.close')}
         >
-          ✕
+          <Icon name="close" />
         </button>
       </div>
 

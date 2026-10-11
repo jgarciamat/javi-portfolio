@@ -16,9 +16,9 @@
   width: min(900px, 100%);
   padding: 1.2rem 1.4rem;
   border-radius: 14px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: #e2e8f0;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
+  color: var(--slate-200);
 }
 
 .report-head {
@@ -55,7 +55,7 @@
 .report-note {
   margin-top: 1.4rem;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 /* Printing / saving as PDF: only the report, on white, without buttons. */

@@ -4,6 +4,7 @@ import { biometricUnlock } from '@core/security/appLock';
 import { useAppLock } from '@shared/hooks/useAppLock';
 import { useAuth } from '@shared/hooks/useAuth';
 import './css/LockScreen.css';
+import { Icon } from '@shared/components/Icon';
 
 const MAX_FAILURES = 5;
 const WAIT_MS = 30_000;
@@ -50,7 +51,7 @@ export function LockScreen() {
     <div className="lock-screen" role="dialog" aria-modal="true" aria-label={t('app.lock.title')}>
       <div className="lock-card">
         <div className="lock-icon" aria-hidden="true">
-          🔒
+          <Icon name="lock" />
         </div>
         <h1>{t('app.lock.title')}</h1>
         <label className="lock-field">
@@ -79,7 +80,7 @@ export function LockScreen() {
         )}
         {settings.biometric && (
           <button className="btn-secondary" onClick={() => void askDevice()}>
-            👆 {t('app.lock.useBiometric')}
+            <Icon name="shield" /> {t('app.lock.useBiometric')}
           </button>
         )}
         <button className="lock-forgot" onClick={logout}>

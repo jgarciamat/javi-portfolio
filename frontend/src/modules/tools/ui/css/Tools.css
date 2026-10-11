@@ -28,7 +28,7 @@
   display: grid;
   gap: 0.3rem;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--slate-300);
 }
 
 .tools-input {
@@ -51,14 +51,14 @@
 .tools-result {
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid #334155;
-  background: #0f172a;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
 }
 
 .tools-result h2 {
   margin: 0 0 0.4rem;
   font-size: 0.95rem;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .tools-amount {
@@ -68,15 +68,15 @@
 }
 
 .tools-result--needs {
-  border-color: #6366f1;
+  border-color: var(--accent);
 }
 
 .tools-result--wants {
-  border-color: #f59e0b;
+  border-color: var(--amber-500);
 }
 
 .tools-result--saving {
-  border-color: #22c55e;
+  border-color: var(--green-500);
 }
 
 .tools-cta {

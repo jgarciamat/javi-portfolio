@@ -7,10 +7,10 @@
 }
 
 .summary-card {
-  background: #1e293b;
+  background: var(--slate-800);
   border-radius: 12px;
   padding: 1.1rem;
-  border-left: 4px solid var(--accent);
+  border-left: 3px solid var(--accent);
 }
 
 .summary-card-header {
@@ -22,17 +22,18 @@
 
 .summary-card-title {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .summary-card-icon {
-  font-size: 1.3rem;
-  line-height: 1;
+  display: inline-flex;
+  color: var(--slate-400);
 }
 
 .summary-card-value {
   font-size: 1.4rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--accent);
   margin-bottom: 0.25rem;
   word-break: break-all;
@@ -40,7 +41,7 @@
 
 .summary-card-sub {
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 /* ─── Carryover (saldo disponible) card ─────── */
@@ -64,7 +65,7 @@
 
 .carryover-edit-btn:hover {
   opacity: 1;
-  background: #334155;
+  background: var(--slate-700);
 }
 
 /* ─── Summary cards responsive ───────────────── */

@@ -23,19 +23,19 @@ export interface DashboardSection {
 }
 
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
-  { id: 'monthly', icon: '📅', labelKey: 'app.tabs.monthly', group: 'overview' },
-  { id: 'annual', icon: '📊', labelKey: 'app.tabs.annual', group: 'overview' },
-  { id: 'analysis', icon: '📈', labelKey: 'app.tabs.analysis', group: 'overview' },
-  { id: 'search', icon: '🔎', labelKey: 'app.tabs.search', group: 'overview' },
-  { id: 'accounts', icon: '🏦', labelKey: 'app.tabs.accounts', group: 'planning' },
-  { id: 'budgets', icon: '🎯', labelKey: 'app.tabs.budgets', group: 'planning' },
-  { id: 'goals', icon: '🏁', labelKey: 'app.tabs.goals', group: 'planning' },
-  { id: 'split', icon: '🤝', labelKey: 'app.tabs.split', group: 'planning' },
-  { id: 'automations', icon: '⚙️', labelKey: 'app.tabs.automations', group: 'planning' },
-  { id: 'custom-alerts', icon: '🔔', labelKey: 'app.tabs.customAlerts', group: 'planning' },
-  { id: 'plan', icon: '⭐', labelKey: 'app.tabs.plan', group: 'tools' },
-  { id: 'offers', icon: '🎁', labelKey: 'app.tabs.offers', group: 'tools' },
-  { id: 'settings', icon: '🛠️', labelKey: 'app.tabs.settings', group: 'tools' },
+  { id: 'monthly', icon: 'calendar', labelKey: 'app.tabs.monthly', group: 'overview' },
+  { id: 'annual', icon: 'chart', labelKey: 'app.tabs.annual', group: 'overview' },
+  { id: 'analysis', icon: 'trend', labelKey: 'app.tabs.analysis', group: 'overview' },
+  { id: 'search', icon: 'search', labelKey: 'app.tabs.search', group: 'overview' },
+  { id: 'accounts', icon: 'bank', labelKey: 'app.tabs.accounts', group: 'planning' },
+  { id: 'budgets', icon: 'target', labelKey: 'app.tabs.budgets', group: 'planning' },
+  { id: 'goals', icon: 'flag', labelKey: 'app.tabs.goals', group: 'planning' },
+  { id: 'split', icon: 'handshake', labelKey: 'app.tabs.split', group: 'planning' },
+  { id: 'automations', icon: 'settings', labelKey: 'app.tabs.automations', group: 'planning' },
+  { id: 'custom-alerts', icon: 'bell', labelKey: 'app.tabs.customAlerts', group: 'planning' },
+  { id: 'plan', icon: 'star', labelKey: 'app.tabs.plan', group: 'tools' },
+  { id: 'offers', icon: 'gift', labelKey: 'app.tabs.offers', group: 'tools' },
+  { id: 'settings', icon: 'wrench', labelKey: 'app.tabs.settings', group: 'tools' },
 ];
 
 export const SECTION_BY_ID = Object.fromEntries(DASHBOARD_SECTIONS.map((s) => [s.id, s])) as Record<

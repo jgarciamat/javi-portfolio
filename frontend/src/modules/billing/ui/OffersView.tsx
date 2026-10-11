@@ -2,6 +2,7 @@ import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useResource } from '@shared/hooks/useResource';
 import './css/Billing.css';
+import { Icon } from '@shared/components/Icon';
 
 /** Partner offers (affiliate links), clearly labelled as sponsored. */
 export function OffersView() {
@@ -17,7 +18,9 @@ export function OffersView() {
   return (
     <div className="section-view">
       <div className="card">
-        <h2 className="section-title">🎁 {t('offers.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="gift" /> {t('offers.title')}
+        </h2>
         <p className="offers-disclosure">{t('offers.disclosure')}</p>
         {error && <p className="form-error">{error}</p>}
         {!enabled && <p className="section-hint">{t('offers.disabled')}</p>}
@@ -41,7 +44,11 @@ export function OffersView() {
             <span className="offer-sponsored">{t('offers.sponsored')}</span>
           </div>
           <p>{text(offer.description)}</p>
-          {offer.highlight && <p className="offer-highlight">✨ {text(offer.highlight)}</p>}
+          {offer.highlight && (
+            <p className="offer-highlight">
+              <Icon name="sparkles" /> {text(offer.highlight)}
+            </p>
+          )}
           <a
             className="btn-primary offer-cta"
             href={offer.url}

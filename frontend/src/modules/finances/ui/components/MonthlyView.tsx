@@ -28,6 +28,7 @@ import { TransactionForm } from './TransactionForm';
 import { TransactionTable } from './TransactionTable';
 import { TransactionWeekView } from './TransactionWeekView';
 import '../css/TransactionViews.css';
+import { Icon } from '@shared/components/Icon';
 
 /** The period differs from the calendar month (custom month start day). */
 export function periodRange(
@@ -138,7 +139,12 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
         </div>
       )}
       <CollapsiblePanel
-        title={<>📋 {t('app.transactions.title', { count: f.transactions.length })}</>}
+        title={
+          <>
+            <Icon name="clipboard" />{' '}
+            {t('app.transactions.title', { count: f.transactions.length })}
+          </>
+        }
         className="collapsible-panel--flush"
         tourId="movements"
       >
@@ -193,7 +199,7 @@ export function MonthlyView({
     <>
       {f.error && (
         <div role="alert" className="error-banner">
-          ⚠️ {t('app.error.backendDown', { error: f.error })}
+          <Icon name="alert" /> {t('app.error.backendDown', { error: f.error })}
         </div>
       )}
 

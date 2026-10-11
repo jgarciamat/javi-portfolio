@@ -12,6 +12,7 @@ import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domai
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
+import { Icon } from '@shared/components/Icon';
 
 const RESOURCES: LimitedResource[] = [
   'accounts',
@@ -51,7 +52,9 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
   const { t } = useI18n();
   return (
     <div className="card">
-      <h2 className="section-title">📊 {t('billing.usage')}</h2>
+      <h2 className="section-title">
+        <Icon name="chart" /> {t('billing.usage')}
+      </h2>
       <ul className="plan-usage">
         {RESOURCES.map((r) => {
           const max = overview.limits.resources[r];
@@ -79,7 +82,9 @@ function HouseholdPlanCard({ name }: { name: string }) {
   const { t } = useI18n();
   return (
     <div className="card plan-card">
-      <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
+      <h2 className="section-title">
+        <Icon name="star" /> {t('billing.yourPlan')}
+      </h2>
       <p>{t('billing.householdPlan', { name })}</p>
     </div>
   );
@@ -96,7 +101,9 @@ function PlanCard({ overview }: { overview: BillingOverview }) {
   return (
     <div className="card plan-card">
       <div className="plan-card-head">
-        <h2 className="section-title">⭐ {t('billing.yourPlan')}</h2>
+        <h2 className="section-title">
+          <Icon name="star" /> {t('billing.yourPlan')}
+        </h2>
         <span className={`plan-badge plan-badge--${overview.plan}`}>
           {isPremium ? t('billing.premium') : t('billing.free')}
         </span>
@@ -113,7 +120,7 @@ function PlanCard({ overview }: { overview: BillingOverview }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              ⚙️ {t('billing.manageGoogle')}
+              <Icon name="settings" /> {t('billing.manageGoogle')}
             </a>
           </div>
           <p className="plan-note">{t('billing.manageGoogleHint')}</p>
@@ -123,7 +130,7 @@ function PlanCard({ overview }: { overview: BillingOverview }) {
         <>
           <div className="button-row">
             <button className="btn-secondary" onClick={portal}>
-              ⚙️ {t('billing.manage')}
+              <Icon name="settings" /> {t('billing.manage')}
             </button>
           </div>
           <p className="plan-note">{t('billing.cancelHint')}</p>
@@ -138,7 +145,9 @@ function UpgradeCard({ overview }: { overview: BillingOverview }) {
   const { checkout } = usePlan();
   return (
     <div className="card">
-      <h2 className="section-title">🚀 {t('billing.upgradeTitle')}</h2>
+      <h2 className="section-title">
+        <Icon name="rocket" /> {t('billing.upgradeTitle')}
+      </h2>
       <ul className="upgrade-benefits">
         {PREMIUM_BENEFITS.map((key) => (
           <li key={key}>{t(key)}</li>
@@ -174,7 +183,9 @@ function InviteCard() {
 
   return (
     <div className="card invite-card">
-      <h2 className="section-title">🎁 {t('billing.invite.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="gift" /> {t('billing.invite.title')}
+      </h2>
       <p className="section-hint">{t('billing.invite.hint', { days: data.rewardDays })}</p>
       <p className="invite-link">
         <code>{link}</code>

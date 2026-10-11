@@ -2,6 +2,7 @@ import { Component, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { reportError } from '@core/monitoring/errorReporting';
 import { reloadPage } from '@shared/utils/navigation';
+import { Icon } from '@shared/components/Icon';
 
 interface ErrorFallbackProps {
   onRetry: () => void;
@@ -13,7 +14,7 @@ function ErrorFallback({ onRetry, fullPage }: ErrorFallbackProps) {
   return (
     <div className={fullPage ? 'error-screen error-screen--page' : 'error-screen'} role="alert">
       <span className="error-screen-icon" aria-hidden="true">
-        ⚠️
+        <Icon name="alert" />
       </span>
       <h2 className="error-screen-title">{t('app.error.title')}</h2>
       <p className="error-screen-text">{t('app.error.text')}</p>

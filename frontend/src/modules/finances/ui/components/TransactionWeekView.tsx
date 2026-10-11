@@ -6,6 +6,7 @@ import type { WeekGroup } from '@modules/finances/domain/transactionGrouping';
 import type { Transaction } from '@modules/finances/domain/types';
 import { SignedAmount, TypeBadge } from './TransactionBits';
 import '../css/TransactionViews.css';
+import { Icon } from '@shared/components/Icon';
 
 /** Compact movement row shared by the week view and the calendar day popup. */
 export function MovementItem({ tx, prefix }: { tx: Transaction; prefix: 'tx-week' | 'cal-modal' }) {
@@ -37,7 +38,9 @@ function WeekTotals({ totals }: { totals: WeekGroup['totals'] }) {
         <span className="tx-week-total tx-week-total--expense">−{money(totals.expenses)}</span>
       )}
       {totals.saving > 0 && (
-        <span className="tx-week-total tx-week-total--saving">🏦 {money(totals.saving)}</span>
+        <span className="tx-week-total tx-week-total--saving">
+          <Icon name="bank" /> {money(totals.saving)}
+        </span>
       )}
       <span
         className={`tx-week-total tx-week-total--balance tx-week-total--${
@@ -85,7 +88,7 @@ export function TransactionWeekView({ weekGroups }: { weekGroups: WeekGroup[] })
                 >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
-                📅 {label}
+                <Icon name="calendar" /> {label}
               </span>
               <WeekTotals totals={totals} />
             </button>

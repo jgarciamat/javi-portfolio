@@ -20,6 +20,7 @@ import {
 } from '../../application/hooks/useAlertForm';
 import { formatMetricValue } from './alertFormat';
 import '../css/CustomAlertsTab.css';
+import { Icon } from '@shared/components/Icon';
 
 // ─── Form ─────────────────────────────────────────────────────────────────────
 
@@ -257,7 +258,7 @@ function AlertCard({ alert, currentValue, onEdit, onDelete, onToggle }: AlertCar
 
       <div className="ca-card-actions">
         <button className="btn-secondary ca-btn-sm" onClick={() => onEdit(alert)}>
-          ✏️ {t('app.customAlerts.edit')}
+          <Icon name="edit" /> {t('app.customAlerts.edit')}
         </button>
         <button
           className="btn-secondary ca-btn-sm"
@@ -268,7 +269,7 @@ function AlertCard({ alert, currentValue, onEdit, onDelete, onToggle }: AlertCar
             : `▶ ${t('app.customAlerts.activate')}`}
         </button>
         <button className="btn-danger ca-btn-sm" onClick={() => onDelete(alert.id)}>
-          🗑 {t('app.customAlerts.delete')}
+          <Icon name="trash" /> {t('app.customAlerts.delete')}
         </button>
       </div>
     </div>
@@ -340,7 +341,9 @@ export function CustomAlertsTab({ categories }: { categories: Category[] }) {
       <div className="card ca-header-card">
         <div className="ca-tab-header">
           <div>
-            <h2 className="ca-tab-title">🔔 {t('app.customAlerts.title')}</h2>
+            <h2 className="ca-tab-title">
+              <Icon name="bell" /> {t('app.customAlerts.title')}
+            </h2>
             <p className="ca-tab-subtitle">{t('app.customAlerts.subtitle')}</p>
           </div>
           <button className="btn-primary" onClick={editor.openCreate}>

@@ -6,6 +6,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { todayDateOnly } from '@shared/utils/format';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 const ACCOUNT_TYPES: { value: AccountType; icon: string }[] = [
   { value: 'checking', icon: '🏦' },
@@ -243,7 +244,7 @@ function AccountRow({
           title={t('app.common.edit')}
           aria-label={`${t('app.common.edit')} ${a.name}`}
         >
-          ✏️
+          <Icon name="edit" />
         </button>
         {!a.isDefault && !a.archived && (
           <button
@@ -252,7 +253,7 @@ function AccountRow({
             title={t('app.accounts.makeDefault')}
             aria-label={t('app.accounts.makeDefault')}
           >
-            ⭐
+            <Icon name="star" />
           </button>
         )}
         {!a.isDefault && (
@@ -271,7 +272,7 @@ function AccountRow({
               title={t('app.common.delete')}
               aria-label={`${t('app.common.delete')} ${a.name}`}
             >
-              🗑️
+              <Icon name="trash" />
             </button>
           </>
         )}
@@ -290,7 +291,9 @@ export function AccountsView() {
     <div className="section-view">
       <div className="card">
         <div className="section-header">
-          <h2 className="section-title">🏦 {t('app.accounts.title')}</h2>
+          <h2 className="section-title">
+            <Icon name="bank" /> {t('app.accounts.title')}
+          </h2>
           <span className="section-total">{money(acc.total)}</span>
         </div>
         <p className="section-hint">{t('app.accounts.hint')}</p>
@@ -320,18 +323,24 @@ export function AccountsView() {
             </li>
           ))}
         </ul>
-        <h3 className="subsection-title">➕ {t('app.accounts.new')}</h3>
+        <h3 className="subsection-title">
+          <Icon name="plus" /> {t('app.accounts.new')}
+        </h3>
         <AccountForm onSubmit={(input) => acc.create(input)} />
       </div>
 
       <div className="card">
-        <h2 className="section-title">🔁 {t('app.accounts.transfers')}</h2>
+        <h2 className="section-title">
+          <Icon name="repeat" /> {t('app.accounts.transfers')}
+        </h2>
         <TransferForm accounts={acc.accounts} onSubmit={(input) => acc.createTransfer(input)} />
         {acc.transfers.length > 0 && (
           <ul className="entity-list">
             {acc.transfers.map((tr) => (
               <li key={tr.id} className="entity-item">
-                <span className="entity-icon">🔁</span>
+                <span className="entity-icon">
+                  <Icon name="repeat" />
+                </span>
                 <div className="entity-main">
                   <span className="entity-name">
                     {tr.fromAccountName} → {tr.toAccountName}
@@ -351,7 +360,7 @@ export function AccountsView() {
                       tr.toAccountName
                     }`}
                   >
-                    🗑️
+                    <Icon name="trash" />
                   </button>
                 </div>
               </li>

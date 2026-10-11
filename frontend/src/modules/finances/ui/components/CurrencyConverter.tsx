@@ -6,6 +6,7 @@ import { errorMessage } from '@shared/utils/errors';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { Currency } from '@modules/finances/domain/types';
 import type { UseTransactionFormReturn } from '../../application/hooks/useTransactionForm';
+import { Icon } from '@shared/components/Icon';
 
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'CHF'];
 
@@ -59,7 +60,7 @@ export function CurrencyConverter({ form }: { form: UseTransactionFormReturn }) 
         className="btn-secondary tx-currency-toggle"
         onClick={() => setOpen(true)}
       >
-        💱 {t('app.currency.other')}
+        <Icon name="exchange" /> {t('app.currency.other')}
       </button>
     );
   }

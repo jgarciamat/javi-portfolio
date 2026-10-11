@@ -6,6 +6,7 @@ import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { AskAssistant } from './AskAssistant';
 import '@modules/billing/ui/css/Billing.css';
 import type { AIAdvice } from '@modules/finances/domain/types';
+import { Icon } from '@shared/components/Icon';
 
 interface AIAdviceContentProps {
   advice: AIAdvice | null;
@@ -48,7 +49,7 @@ function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'
           className="ai-btn ai-btn--primary"
           onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'aiAdvisor' })}
         >
-          ⭐ {t('billing.seePlans')}
+          <Icon name="star" /> {t('billing.seePlans')}
         </button>
       )}
     </div>
@@ -58,7 +59,11 @@ function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'
 function AIAdviceContent({ advice, error, t }: AIAdviceContentProps) {
   return (
     <>
-      {error && <div className="ai-error">⚠️ {error}</div>}
+      {error && (
+        <div className="ai-error">
+          <Icon name="alert" /> {error}
+        </div>
+      )}
       <FallbackNotice advice={advice} t={t} />
       {advice && (
         <div className="ai-content">

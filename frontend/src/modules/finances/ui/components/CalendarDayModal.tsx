@@ -6,6 +6,7 @@ import type { Transaction, TransactionType } from '@modules/finances/domain/type
 import { TYPE_COLORS, totalsByType } from '@modules/finances/domain/transactionTypes';
 import { MovementItem } from './TransactionWeekView';
 import '../css/TransactionViews.css';
+import { Icon } from '@shared/components/Icon';
 
 export interface CalendarDayModalProps {
   /** YYYY-MM-DD */
@@ -46,7 +47,7 @@ export function CalendarDayModal({ dayKey, items, onClose }: CalendarDayModalPro
           onClick={onClose}
           aria-label={t('app.transactions.calendar.popup.close')}
         >
-          ✕
+          <Icon name="close" />
         </button>
       </div>
 

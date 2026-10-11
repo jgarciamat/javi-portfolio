@@ -760,6 +760,25 @@ describe('CategoryRulesCard in the settings', () => {
   });
 });
 
+describe('the appearance setting', () => {
+  it('switches the look of the app on this device', async () => {
+    window.matchMedia = jest
+      .fn()
+      .mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia;
+    localStorage.clear();
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />);
+    const select = await screen.findByRole('combobox', {
+      name: new RegExp(tr('app.settings.theme')),
+    });
+    expect(select).toHaveValue('system');
+    fireEvent.change(select, { target: { value: 'light' } });
+    expect(localStorage.getItem('mm_theme')).toBe('light');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    fireEvent.change(select, { target: { value: 'dark' } });
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+});
+
 describe('SettingsView', () => {
   const mocked = notifications as jest.Mocked<typeof notifications>;
 

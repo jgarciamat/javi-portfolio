@@ -7,6 +7,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { Asset, AssetKind } from '@modules/finances/domain/types';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 const KINDS: AssetKind[] = ['investment', 'property', 'vehicle', 'other', 'debt'];
 
@@ -66,7 +67,7 @@ function AssetRow({
           aria-label={t('app.assets.remove', { name: asset.name })}
           onClick={() => onRemove(asset.id)}
         >
-          🗑️
+          <Icon name="trash" />
         </button>
       </div>
     </li>
@@ -98,7 +99,9 @@ export function AssetsCard({ onChange }: { onChange: () => void }) {
 
   return (
     <div className="card">
-      <h2 className="section-title">🏦 {t('app.assets.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="bank" /> {t('app.assets.title')}
+      </h2>
       <p className="section-hint">{t('app.assets.hint')}</p>
       {action.error && <p className="form-error">{action.error}</p>}
       {assets.length > 0 && (

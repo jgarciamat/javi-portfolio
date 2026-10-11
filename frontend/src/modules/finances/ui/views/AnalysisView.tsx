@@ -14,6 +14,7 @@ import { useFinances } from '../../application/FinancesContext';
 import { AssetsCard } from '../components/AssetsCard';
 import { SelfEmployedCard } from '../components/SelfEmployedCard';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 function Change({ pct }: { pct: number | null }) {
   const { percent } = useFormat();
@@ -115,7 +116,8 @@ export function AnalysisView() {
     return (
       <div className="card premium-locked">
         <h2 className="section-title">
-          📈 {t('app.tabs.analysis')} <span className="premium-chip">Premium</span>
+          <Icon name="trend" /> {t('app.tabs.analysis')}{' '}
+          <span className="premium-chip">Premium</span>
         </h2>
         <p className="section-hint">{t('app.analysis.locked')}</p>
         <button
@@ -144,7 +146,7 @@ function TrendsCard() {
   return (
     <div className="card">
       <h2 className="section-title">
-        📈 {t('app.analysis.trendsTitle', { month: monthLabel(year, month) })}
+        <Icon name="trend" /> {t('app.analysis.trendsTitle', { month: monthLabel(year, month) })}
       </h2>
       <p className="section-hint">{t('app.analysis.trendsHint')}</p>
       {error && <p className="form-error">{error}</p>}
@@ -198,7 +200,9 @@ function NetWorthCard({ refreshKey }: { refreshKey: number }) {
   return (
     <div className="card">
       <div className="section-header">
-        <h2 className="section-title">💼 {t('app.analysis.netWorthTitle')}</h2>
+        <h2 className="section-title">
+          <Icon name="briefcase" /> {t('app.analysis.netWorthTitle')}
+        </h2>
         <select
           className="tx-input select-compact"
           value={months}
@@ -262,7 +266,9 @@ function SubscriptionsCard() {
 
   return (
     <div className="card">
-      <h2 className="section-title">🔁 {t('app.subscriptions.title')}</h2>
+      <h2 className="section-title">
+        <Icon name="repeat" /> {t('app.subscriptions.title')}
+      </h2>
       <p className="section-hint">{t('app.subscriptions.hint')}</p>
       {error && <p className="form-error">{error}</p>}
       {data?.subscriptions.length === 0 && (

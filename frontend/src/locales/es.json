@@ -1048,5 +1048,10 @@
   "app.receipt.reading": "Leyendo el ticket…",
   "app.receipt.file": "Foto del ticket",
   "app.receipt.nothing": "No hemos podido leer nada. Prueba con más luz y el ticket plano.",
-  "app.receipt.error": "No se ha podido leer el ticket en este dispositivo."
+  "app.receipt.error": "No se ha podido leer el ticket en este dispositivo.",
+  "app.settings.theme": "Aspecto",
+  "app.settings.themeHint": "Claro, oscuro o el del sistema. Solo en este dispositivo.",
+  "app.settings.theme.system": "Automático (el del sistema)",
+  "app.settings.theme.light": "Claro",
+  "app.settings.theme.dark": "Oscuro"
 }

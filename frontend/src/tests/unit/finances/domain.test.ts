@@ -149,9 +149,9 @@ describe('summary cards', () => {
   });
 
   it('colours the savings rate', () => {
-    expect(savingsRateAccent(25)).toBe('#10b981');
-    expect(savingsRateAccent(15)).toBe('#f59e0b');
-    expect(savingsRateAccent(5)).toBe('#ef4444');
+    expect(savingsRateAccent(25)).toBe('var(--green-400)');
+    expect(savingsRateAccent(15)).toBe('var(--amber-400)');
+    expect(savingsRateAccent(5)).toBe('var(--red-400)');
   });
 });
 

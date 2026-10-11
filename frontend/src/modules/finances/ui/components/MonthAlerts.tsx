@@ -4,6 +4,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { monthAlertMessage } from './monthAlertMessage';
 import '../css/BudgetAlerts.css';
+import { Icon } from '@shared/components/Icon';
 
 interface MonthAlertsProps {
   alerts: MonthAlert[];
@@ -36,7 +37,7 @@ export function MonthAlerts({ alerts }: MonthAlertsProps) {
                 onClick={() => setDismissed((prev) => new Set(prev).add(alertKey(a)))}
                 aria-label={t('app.alert.dismiss')}
               >
-                ✕
+                <Icon name="close" />
               </button>
             </div>
             <div

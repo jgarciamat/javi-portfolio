@@ -7,6 +7,7 @@ import { AvatarSection } from './ProfileAvatarSection';
 import { DeleteAccountModal } from './DeleteAccountModal';
 import { NameSection } from './ProfileNameSection';
 import { PasswordSection } from './ProfilePasswordSection';
+import { Icon } from '@shared/components/Icon';
 
 type SectionId = 'avatar' | 'name' | 'password' | 'settings';
 
@@ -83,7 +84,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
           {t('app.profile.title')}
         </h2>
         <button className="profile-close" onClick={onClose} aria-label={t('app.common.close')}>
-          ✕
+          <Icon name="close" />
         </button>
       </div>
 
@@ -125,7 +126,7 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
       >
         <div className="profile-section profile-delete-section">
           <button className="btn-delete-account" onClick={() => setShowDelete(true)}>
-            🗑️ {t('app.profile.deleteAccount.button')}
+            <Icon name="trash" /> {t('app.profile.deleteAccount.button')}
           </button>
         </div>
       </AccordionSection>

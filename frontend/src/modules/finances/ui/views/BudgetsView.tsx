@@ -8,6 +8,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import type { CategoryBudget } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 /** Monthly spending limit per category, with this month's spending next to it. */
 export function BudgetsView() {
@@ -45,7 +46,9 @@ export function BudgetsView() {
     <div className="section-view">
       <div className="card">
         <div className="section-header">
-          <h2 className="section-title">🎯 {t('app.budgets.title')}</h2>
+          <h2 className="section-title">
+            <Icon name="target" /> {t('app.budgets.title')}
+          </h2>
           <span className="section-total">{money(totalLimit)}</span>
         </div>
         <p className="section-hint">{t('app.budgets.hint', { month: monthLabel(year, month) })}</p>

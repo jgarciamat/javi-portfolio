@@ -7,6 +7,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { SplitGroup } from '@modules/finances/domain/types';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 function NewGroup({
   onCreate,
@@ -23,7 +24,9 @@ function NewGroup({
 
   return (
     <div className="card">
-      <h2 className="section-title">➕ {t('app.split.new')}</h2>
+      <h2 className="section-title">
+        <Icon name="plus" /> {t('app.split.new')}
+      </h2>
       <div className="form-grid">
         <label className="field">
           <span className="field-label">{t('app.split.groupName')}</span>
@@ -178,7 +181,9 @@ function GroupDetail({
     <>
       <div className="card">
         <div className="section-header">
-          <h2 className="section-title">🤝 {group.name}</h2>
+          <h2 className="section-title">
+            <Icon name="handshake" /> {group.name}
+          </h2>
           <button className="btn-secondary" onClick={onBack}>
             ← {t('app.split.back')}
           </button>
@@ -225,12 +230,16 @@ function GroupDetail({
           </>
         ) : (
           group.expenses.length > 0 && (
-            <p className="section-success">✅ {t('app.split.allSettled')}</p>
+            <p className="section-success">
+              <Icon name="checkCircle" /> {t('app.split.allSettled')}
+            </p>
           )
         )}
       </div>
       <div className="card">
-        <h2 className="section-title">🧾 {t('app.split.expenses')}</h2>
+        <h2 className="section-title">
+          <Icon name="receipt" /> {t('app.split.expenses')}
+        </h2>
         <ExpenseForm group={group} onAdd={(e) => update(() => splitApi.addExpense(id, e))} />
         {group.expenses.length > 0 && (
           <ul className="split-expenses">
@@ -255,7 +264,7 @@ function GroupDetail({
                     aria-label={t('app.split.removeExpense', { name: e.description })}
                     onClick={() => void update(() => splitApi.removeExpense(id, e.id))}
                   >
-                    🗑️
+                    <Icon name="trash" />
                   </button>
                 </span>
               </li>
@@ -275,7 +284,7 @@ function GroupDetail({
             }
           }}
         >
-          🗑️ {t('app.split.delete')}
+          <Icon name="trash" /> {t('app.split.delete')}
         </button>
       </div>
     </>
@@ -308,7 +317,9 @@ export function SplitView() {
   return (
     <div className="section-view">
       <div className="card">
-        <h2 className="section-title">🤝 {t('app.split.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="handshake" /> {t('app.split.title')}
+        </h2>
         <p className="section-hint">{t('app.split.hint')}</p>
         {action.error && <p className="form-error">{action.error}</p>}
         {groups.length === 0 ? (

@@ -16,6 +16,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { useFinances } from '../../application/FinancesContext';
 import { SignedAmount } from '../components/TransactionBits';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 const PAGE = 50;
 
@@ -251,7 +252,9 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
   return (
     <div className="section-view">
       <div className="card">
-        <h2 className="section-title">🔎 {t('app.search.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="search" /> {t('app.search.title')}
+        </h2>
         <SearchFilters
           filters={filters}
           set={set}

@@ -8,6 +8,7 @@ import {
 } from '../../application/hooks/useTransactionForm';
 import { CurrencyConverter } from './CurrencyConverter';
 import { ReceiptScanner } from './ReceiptScanner';
+import { Icon } from '@shared/components/Icon';
 
 export interface TransactionFormFieldsProps {
   form: UseTransactionFormReturn;
@@ -80,7 +81,9 @@ export function TransactionFormFields({
         required
       >
         <option value="">{t('app.transaction.form.category.placeholder')}</option>
-        <option value={MANAGE_CATEGORIES}>⚙️ {t('app.transaction.form.category.manage')}</option>
+        <option value={MANAGE_CATEGORIES}>
+          <Icon name="settings" /> {t('app.transaction.form.category.manage')}
+        </option>
         <option disabled>──────────────</option>
         {categories.map((c) => (
           <option key={c.id} value={c.name}>

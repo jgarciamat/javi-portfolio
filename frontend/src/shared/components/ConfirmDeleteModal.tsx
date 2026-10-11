@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { Modal } from './Modal';
 import './css/ConfirmDeleteModal.css';
+import { Icon } from '@shared/components/Icon';
 
 interface ConfirmDeleteModalProps {
   onConfirm: () => void;
@@ -18,7 +19,7 @@ export function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalPr
       className="confirm-delete-modal"
     >
       <div className="confirm-delete-icon" aria-hidden="true">
-        🗑️
+        <Icon name="trash" />
       </div>
       <h2 className="confirm-delete-title">{t('app.confirm.delete.title')}</h2>
       <p className="confirm-delete-message">{t('app.confirm.delete.message')}</p>

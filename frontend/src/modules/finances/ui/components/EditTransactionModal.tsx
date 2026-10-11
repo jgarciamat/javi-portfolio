@@ -15,6 +15,7 @@ import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import { TransactionFormFields } from './TransactionFormFields';
 import '../css/TransactionForm.css';
 import '../css/EditTransactionModal.css';
+import { Icon } from '@shared/components/Icon';
 
 export interface EditTransactionModalProps {
   transaction: Transaction;
@@ -79,13 +80,15 @@ export function EditTransactionModal({
       className="edit-tx-modal"
     >
       <div className="edit-tx-modal-header">
-        <h2 className="edit-tx-modal-title">✏️ {t('app.transaction.edit.title')}</h2>
+        <h2 className="edit-tx-modal-title">
+          <Icon name="edit" /> {t('app.transaction.edit.title')}
+        </h2>
         <button
           className="edit-tx-modal-close"
           onClick={onClose}
           aria-label={t('app.transaction.form.cancel')}
         >
-          ✕
+          <Icon name="close" />
         </button>
       </div>
       <form onSubmit={form.handleSubmit} className="tx-form" noValidate>

@@ -1,3 +1,75 @@
+/* ─── Theme ──────────────────────────────────────────────────────────────────
+   The palette is a scale of slate greys plus one accent and three status colours. The dark
+   values are the original ones; the light theme turns the grey scale around so every text,
+   surface and border keeps its role. The theme is `data-theme` on <html> (see core/theme). */
+:root {
+  color-scheme: dark;
+  --slate-950: #020617;
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
+  --accent: #6366f1;
+  --accent-600: #4f46e5;
+  --accent-400: #818cf8;
+  --accent-300: #a5b4fc;
+  --accent-200: #c7d2fe;
+  --red-950: #4c0519;
+  --red-800: #b91c1c;
+  --red-700: #be123c;
+  --red-500: #ef4444;
+  --red-400: #f87171;
+  --red-300: #fca5a5;
+  --green-900: #14532d;
+  --green-500: #22c55e;
+  --green-400: #4ade80;
+  --green-300: #86efac;
+  --amber-500: #f59e0b;
+  --amber-400: #fbbf24;
+  --amber-300: #fcd34d;
+  --violet-400: #a78bfa;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --slate-950: #f4f6f9;
+  --slate-900: #ffffff;
+  --slate-800: #e8ecf3;
+  --slate-700: #cdd5e1;
+  --slate-600: #94a3b8;
+  --slate-500: #64748b;
+  --slate-400: #475569;
+  --slate-300: #334155;
+  --slate-200: #1e293b;
+  --slate-100: #0f172a;
+  --slate-50: #020617;
+  --accent: #4f46e5;
+  --accent-600: #4338ca;
+  --accent-400: #4f46e5;
+  --accent-300: #4338ca;
+  --accent-200: #3730a3;
+  --red-950: #fee2e2;
+  --red-800: #b91c1c;
+  --red-700: #fca5a5;
+  --red-500: #dc2626;
+  --red-400: #dc2626;
+  --red-300: #b91c1c;
+  --green-900: #dcfce7;
+  --green-500: #16a34a;
+  --green-400: #15803d;
+  --green-300: #166534;
+  --amber-500: #d97706;
+  --amber-400: #b45309;
+  --amber-300: #92400e;
+  --violet-400: #7c3aed;
+}
+
 *,
 *::before,
 *::after {
@@ -11,8 +83,8 @@ html {
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
-  background: #020617;
-  color: #f1f5f9;
+  background: var(--slate-950);
+  color: var(--slate-100);
   -webkit-text-size-adjust: 100%;
   /* Safe area para notch/status bar en Android e iOS (Capacitor) */
   padding-top: env(safe-area-inset-top);
@@ -38,8 +110,8 @@ input[type='date'] {
 
 /* ─── Card base ──────────────────────────────── */
 .card {
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
   border-radius: 12px;
   padding: 1.25rem;
   margin-bottom: 1.25rem;
@@ -47,7 +119,7 @@ input[type='date'] {
 
 /* ─── Shared buttons ─────────────────────────── */
 .btn-primary {
-  background: #6366f1;
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -60,7 +132,7 @@ input[type='date'] {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #4f46e5;
+  background: var(--accent-600);
 }
 
 .btn-primary:disabled {
@@ -69,9 +141,9 @@ input[type='date'] {
 }
 
 .btn-secondary {
-  background: #1e293b;
-  color: #cbd5e1;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  color: var(--slate-300);
+  border: 1px solid var(--slate-700);
   border-radius: 8px;
   padding: 0.55rem 1.25rem;
   font-size: 0.875rem;
@@ -81,13 +153,13 @@ input[type='date'] {
 }
 
 .btn-secondary:hover {
-  background: #334155;
-  color: #f1f5f9;
+  background: var(--slate-700);
+  color: var(--slate-100);
 }
 
 .btn-danger {
   background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
+  color: var(--red-400);
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 8px;
   padding: 0.55rem 1.25rem;
@@ -99,7 +171,7 @@ input[type='date'] {
 
 .btn-danger:hover {
   background: rgba(239, 68, 68, 0.22);
-  color: #fca5a5;
+  color: var(--red-300);
 }
 
 /* ─── Accessibility helpers ─────────────────── */
@@ -118,7 +190,7 @@ input[type='date'] {
 
 /* Focus ring visible for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -126,7 +198,7 @@ input[type='date'] {
 .empty-block {
   text-align: center;
   padding: 2.5rem;
-  color: #64748b;
+  color: var(--slate-500);
 }
 
 .empty-block-icon {
@@ -139,7 +211,7 @@ input[type='date'] {
 
 /* ─── Shared inline error ─────────────────────── */
 .inline-error {
-  color: #f87171;
+  color: var(--red-400);
   font-size: 0.85rem;
   margin: 0.4rem 0;
 }
@@ -191,7 +263,7 @@ input[type='date'] {
 .error-screen-text {
   margin: 0;
   max-width: 28rem;
-  color: #94a3b8;
+  color: var(--slate-400);
 }
 
 .error-screen-actions {
@@ -227,4 +299,16 @@ input[type='date'] {
 /* Dialogs take focus on open (to announce them); no ring around the whole panel. */
 [role='dialog']:focus {
   outline: none;
+}
+
+/* ─── Line icons ─────────────────────────────── */
+.icon {
+  flex-shrink: 0;
+  vertical-align: -0.2em;
+  margin-right: 0.15em;
+}
+
+button > .icon:only-child,
+.burger-nav-icon > .icon {
+  margin-right: 0;
 }

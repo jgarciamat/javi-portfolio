@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useFormat } from '@core/settings/SettingsContext';
+import { Icon } from '@shared/components/Icon';
 
 interface DateFieldProps {
   value: string;
@@ -31,7 +32,9 @@ export function DateField({ value, onChange, label, className = '' }: DateFieldP
       }}
       aria-label={label}
     >
-      <span className="tx-date-icon">📅</span>
+      <span className="tx-date-icon">
+        <Icon name="calendar" />
+      </span>
       <span>{value ? date(value) : ''}</span>
       <input
         ref={input}

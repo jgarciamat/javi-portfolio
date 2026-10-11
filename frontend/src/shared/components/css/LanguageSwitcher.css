@@ -7,10 +7,10 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
   border-radius: 8px;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-size: 0.82rem;
   padding: 0.35rem 0.6rem;
   cursor: pointer;
@@ -19,9 +19,9 @@
 }
 
 .lang-btn:hover {
-  background: #334155;
-  color: #f1f5f9;
-  border-color: #475569;
+  background: var(--slate-700);
+  color: var(--slate-100);
+  border-color: var(--slate-600);
 }
 
 .lang-flag {
@@ -43,8 +43,8 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
   border-radius: 10px;
   list-style: none;
   margin: 0;
@@ -74,19 +74,19 @@
   padding: 0.45rem 0.65rem;
   border-radius: 7px;
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--slate-400);
   font-size: 0.85rem;
   transition: background 0.12s, color 0.12s;
 }
 
 .lang-option:hover {
-  background: #334155;
-  color: #f1f5f9;
+  background: var(--slate-700);
+  color: var(--slate-100);
 }
 
 .lang-option.active {
-  color: #f1f5f9;
-  background: #334155;
+  color: var(--slate-100);
+  background: var(--slate-700);
   font-weight: 600;
 }
 

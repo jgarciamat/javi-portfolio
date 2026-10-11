@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 interface BudgetProgressProps {
   budgets: BudgetLine[];
@@ -27,7 +28,8 @@ export function BudgetProgress({ budgets, onManage }: BudgetProgressProps) {
     <CollapsiblePanel
       title={
         <>
-          🎯 {t('app.budgets.monthTitle')} · {money(totalSpent)} / {money(totalLimit)}
+          <Icon name="target" /> {t('app.budgets.monthTitle')} · {money(totalSpent)} /{' '}
+          {money(totalLimit)}
         </>
       }
       style={{ marginBottom: '1.25rem' }}

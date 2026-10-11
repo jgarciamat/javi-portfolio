@@ -11,6 +11,7 @@ import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
 import { AnnualReportDialog } from './AnnualReportDialog';
 import '../css/AnnualChart.css';
+import { Icon } from '@shared/components/Icon';
 
 interface AnnualChartProps {
   initialYear: number;
@@ -193,7 +194,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
       {loading && <div className="annual-empty">⏳ {t('app.annual.loading')}</div>}
       {error && (
         <div className="annual-empty annual-error" role="alert">
-          ⚠️ {error}
+          <Icon name="alert" /> {error}
         </div>
       )}
 

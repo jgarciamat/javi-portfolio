@@ -8,6 +8,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import type { Category, Goal, GoalInput } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 function GoalCard({
   goal,
@@ -48,7 +49,11 @@ function GoalCard({
       </div>
       <div className="goal-meta">
         <span>📁 {tCategory(goal.categoryName)}</span>
-        {goal.targetDate && <span>📅 {date(goal.targetDate)}</span>}
+        {goal.targetDate && (
+          <span>
+            <Icon name="calendar" /> {date(goal.targetDate)}
+          </span>
+        )}
         {progress.monthlyNeeded !== null && !progress.completed && (
           <span>{t('app.goals.monthlyNeeded', { amount: money(progress.monthlyNeeded) })}</span>
         )}
@@ -68,7 +73,7 @@ function GoalCard({
           aria-label={`${t('app.common.delete')} ${goal.name}`}
           title={t('app.common.delete')}
         >
-          🗑️
+          <Icon name="trash" />
         </button>
       </div>
     </li>
@@ -178,7 +183,9 @@ export function GoalsView() {
   return (
     <div className="section-view">
       <div className="card">
-        <h2 className="section-title">🏁 {t('app.goals.title')}</h2>
+        <h2 className="section-title">
+          <Icon name="flag" /> {t('app.goals.title')}
+        </h2>
         <p className="section-hint">{t('app.goals.hint')}</p>
         {(action.error ?? goals.error) && (
           <p className="form-error">{action.error ?? goals.error}</p>
@@ -203,7 +210,9 @@ export function GoalsView() {
         )}
       </div>
       <div className="card">
-        <h3 className="subsection-title">➕ {t('app.goals.new')}</h3>
+        <h3 className="subsection-title">
+          <Icon name="plus" /> {t('app.goals.new')}
+        </h3>
         <GoalForm
           categories={categories}
           saving={action.pending}

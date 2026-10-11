@@ -6,6 +6,7 @@ import type { BankId } from '@modules/finances/domain/bankFormats';
 import type { ColumnMapping } from '@modules/finances/domain/importParsers';
 import { useImport } from '../../application/hooks/useImport';
 import '../css/Sections.css';
+import { Icon } from '@shared/components/Icon';
 
 interface ImportModalProps {
   accounts: Account[];
@@ -99,7 +100,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
       </p>
       {imp.bank && (
         <p className="section-success">
-          ✅ {t('app.import.bankDetected', { bank: BANK_NAMES[imp.bank] })}
+          <Icon name="checkCircle" /> {t('app.import.bankDetected', { bank: BANK_NAMES[imp.bank] })}
         </p>
       )}
       {imp.format === 'csv' && <ColumnMappingFields imp={imp} />}
@@ -198,7 +199,8 @@ function DoneStep({ result }: { result: ImportResult }) {
   return (
     <div className="modal-body">
       <p className="section-success">
-        ✅ {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
+        <Icon name="checkCircle" />{' '}
+        {t('app.import.done', { imported: result.imported, duplicates: result.duplicates })}
       </p>
     </div>
   );
@@ -260,9 +262,11 @@ export function ImportModal({ accounts, onClose, onImported }: ImportModalProps)
       className="modal-panel modal-panel--wide"
     >
       <div className="modal-header">
-        <h2 className="modal-title">📤 {t('app.import.title')}</h2>
+        <h2 className="modal-title">
+          <Icon name="upload" /> {t('app.import.title')}
+        </h2>
         <button className="modal-close" onClick={onClose} aria-label={t('app.common.close')}>
-          ✕
+          <Icon name="close" />
         </button>
       </div>
       <StepBody imp={imp} accounts={activeAccounts} />

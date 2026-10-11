@@ -1,7 +1,8 @@
-import { Suspense, type ReactElement } from 'react';
+import { Suspense, type ReactElement, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
+import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { lazyNamed } from '@shared/utils/lazyNamed';
@@ -89,7 +90,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
   }
 }
 
-function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: string }) {
+function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
   const { user, logout } = useAuth();
   return (
@@ -101,7 +102,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           aria-label={t('app.menu.open')}
           aria-expanded={dash.menuOpen}
         >
-          <span className="burger-btn-logo">💰</span>
+          <img className="burger-btn-logo" src="/icon-192.png" alt="" width="28" height="28" />
           <span className="burger-btn-lines" aria-hidden="true">
             <span />
             <span />
@@ -124,7 +125,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
             <img src={user.avatarUrl} alt="" className="header-avatar" />
           ) : (
             <span className="header-avatar-placeholder" aria-hidden="true">
-              👤
+              <Icon name="user" size={20} />
             </span>
           )}
           <span className="header-user-name">{user?.name}</span>
@@ -215,7 +216,14 @@ export function Dashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-sticky">
-        <Header dash={dash} sectionLabel={`${section.icon} ${t(section.labelKey)}`} />
+        <Header
+          dash={dash}
+          sectionLabel={
+            <>
+              <Icon name={section.icon} size={14} /> {t(section.labelKey)}
+            </>
+          }
+        />
         {dash.tab === 'monthly' && (
           <div className="sticky-nav">
             <div className="sticky-nav-inner">

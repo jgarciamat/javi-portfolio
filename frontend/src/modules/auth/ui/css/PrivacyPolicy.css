@@ -2,8 +2,8 @@
 
 .privacy-page {
   min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--slate-900);
+  color: var(--slate-200);
   padding: 2rem 1rem 4rem;
 }
 
@@ -19,13 +19,13 @@
   gap: 1rem;
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--slate-800);
 }
 
 .privacy-back-btn {
   background: none;
-  border: 1px solid #334155;
-  color: #94a3b8;
+  border: 1px solid var(--slate-700);
+  color: var(--slate-400);
   border-radius: 8px;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
@@ -35,8 +35,8 @@
 }
 
 .privacy-back-btn:hover {
-  border-color: #6366f1;
-  color: #e2e8f0;
+  border-color: var(--accent);
+  color: var(--slate-200);
 }
 
 .privacy-header-text {
@@ -46,13 +46,13 @@
 .privacy-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--slate-100);
   margin: 0 0 0.25rem;
 }
 
 .privacy-subtitle {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--slate-500);
   margin: 0;
 }
 
@@ -64,16 +64,16 @@
 .privacy-section-title {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #a5b4fc;
+  color: var(--accent-300);
   margin: 0 0 0.75rem;
   padding-left: 0.75rem;
-  border-left: 3px solid #6366f1;
+  border-left: 3px solid var(--accent);
 }
 
 .privacy-section p {
   font-size: 0.92rem;
   line-height: 1.7;
-  color: #cbd5e1;
+  color: var(--slate-300);
   margin: 0 0 0.6rem;
 }
 
@@ -85,14 +85,14 @@
 .privacy-section li {
   font-size: 0.92rem;
   line-height: 1.65;
-  color: #cbd5e1;
+  color: var(--slate-300);
   margin-bottom: 0.3rem;
 }
 
 /* Contact block */
 .privacy-contact {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-700);
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
   margin-top: 0.5rem;
@@ -103,23 +103,23 @@
 }
 
 .privacy-contact a {
-  color: #818cf8;
+  color: var(--accent-400);
   text-decoration: none;
 }
 
 .privacy-contact a:hover {
   text-decoration: underline;
-  color: #a5b4fc;
+  color: var(--accent-300);
 }
 
 /* Footer */
 .privacy-footer {
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--slate-800);
   text-align: center;
   font-size: 0.8rem;
-  color: #475569;
+  color: var(--slate-600);
 }
 
 @media (max-width: 600px) {

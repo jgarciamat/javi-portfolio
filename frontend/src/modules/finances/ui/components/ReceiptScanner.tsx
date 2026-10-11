@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { type ScannedReceipt, parseReceipt } from '@modules/finances/domain/receiptParser';
+import { Icon } from '@shared/components/Icon';
 
 /** Where the scanner's files are served from (see scripts/copy-ocr.mjs): our server, not a CDN. */
 const OCR_PATH = '/ocr/';
@@ -67,7 +68,7 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
         disabled={busy}
         onClick={() => input.current?.click()}
       >
-        📷 {busy ? t('app.receipt.reading') : t('app.receipt.scan')}
+        <Icon name="camera" /> {busy ? t('app.receipt.reading') : t('app.receipt.scan')}
       </button>
       {error && <p className="form-error">{t(error)}</p>}
     </div>

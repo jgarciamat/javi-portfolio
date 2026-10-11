@@ -3,6 +3,7 @@ import { authApi } from '@core/api/authApi';
 import { errorCode } from '@core/api/http';
 import { useI18n } from '@core/i18n/I18nContext';
 import { errorMessage } from '@shared/utils/errors';
+import { Icon } from '@shared/components/Icon';
 
 interface Props {
   onBack: () => void;
@@ -37,7 +38,9 @@ export function ForgotPasswordPage({ onBack }: Props) {
   if (sent) {
     return (
       <div className="auth-card">
-        <div className="auth-logo">📬</div>
+        <div className="auth-logo">
+          <Icon name="mail" />
+        </div>
         <h1 className="auth-title">{t('app.auth.forgot.success.title')}</h1>
         <p className="auth-sub auth-sub--center">{t('app.auth.forgot.success.sub')}</p>
         <button className="auth-btn" onClick={onBack}>
@@ -49,7 +52,9 @@ export function ForgotPasswordPage({ onBack }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="auth-card">
-      <div className="auth-logo">🔑</div>
+      <div className="auth-logo">
+        <Icon name="key" />
+      </div>
       <h1 className="auth-title">Money Manager</h1>
       <p className="auth-sub">{t('app.auth.forgot.title')}</p>
       <p className="auth-note">{t('app.auth.forgot.sub')}</p>
