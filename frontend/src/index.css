@@ -34,6 +34,8 @@
   --amber-400: #fbbf24;
   --amber-300: #fcd34d;
   --violet-400: #a78bfa;
+  /* Chevron of the drop-downs (an image cannot read the colour tokens). */
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 :root[data-theme='light'] {
@@ -68,6 +70,7 @@
   --amber-400: #b45309;
   --amber-300: #92400e;
   --violet-400: #7c3aed;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23475569' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 *,
@@ -99,6 +102,24 @@ button,
 textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+/* Every drop-down draws its own chevron, away from the border (the native one sits
+   against it), and its text stops before reaching the chevron. */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--select-arrow);
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 0.75rem auto;
+  padding-right: 2.5rem;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+select:disabled {
+  cursor: not-allowed;
 }
 
 /* Prevent date pickers from overflowing their container on mobile */
