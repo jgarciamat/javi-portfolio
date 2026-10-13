@@ -30,6 +30,7 @@ import {
 } from '../../application/hooks/useExportCSV';
 import { todayDateOnly } from '@shared/utils/format';
 import { errorMessage } from '@shared/utils/errors';
+import { offersEnabled } from '../navigation';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 
@@ -162,19 +163,21 @@ function PreferencesCard({
           </select>
         </label>
       )}
-      <label className="setting-row">
-        <span>
-          <strong>{t('app.settings.showOffers')}</strong>
-          <small>{t('app.settings.showOffersHint')}</small>
-        </span>
-        <input
-          type="checkbox"
-          className="toggle"
-          disabled={saving}
-          checked={settings.showOffers !== false}
-          onChange={(e) => save({ showOffers: e.target.checked })}
-        />
-      </label>
+      {offersEnabled() && (
+        <label className="setting-row">
+          <span>
+            <strong>{t('app.settings.showOffers')}</strong>
+            <small>{t('app.settings.showOffersHint')}</small>
+          </span>
+          <input
+            type="checkbox"
+            className="toggle"
+            disabled={saving}
+            checked={settings.showOffers !== false}
+            onChange={(e) => save({ showOffers: e.target.checked })}
+          />
+        </label>
+      )}
       <label className="setting-row">
         <span>
           <strong>{t('app.settings.weeklyDigest')}</strong>

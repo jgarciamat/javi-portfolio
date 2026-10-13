@@ -293,7 +293,8 @@ describe('UpdatePrompt', () => {
 
 describe('PublicHeader', () => {
   it('shows the brand and the language picker', () => {
-    renderWithI18n(<PublicHeader />);
+    renderWithProviders(<PublicHeader />, { authenticated: false });
     expect(screen.getByText(tr('app.header.title'))).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: tr('app.header.title') })).toHaveAttribute('href', '/');
   });
 });

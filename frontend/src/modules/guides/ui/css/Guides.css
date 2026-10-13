@@ -43,3 +43,23 @@
 .guide-back {
   margin: 0;
 }
+
+.guide-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent, inherit);
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.guide-link:hover {
+  text-decoration: underline;
+}
+
+.guide-list .premium-chip {
+  margin-left: 0.5rem;
+}

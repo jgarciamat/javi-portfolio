@@ -1177,5 +1177,11 @@
   "app.rate.thanks": "Thank you! If it has helped you, the best way to help is to tell someone: we give you both a month of Premium.",
   "app.rate.invite": "Invite a friend",
   "app.rate.feedback": "Thanks for telling us. Tell us what is missing or what you dislike: we read every message.",
-  "app.rate.write": "Write a suggestion"
+  "app.rate.write": "Write a suggestion",
+  "app.tabs.learn": "Learn to save",
+  "app.learn.title": "Learn to save",
+  "app.learn.hint": "Short, jargon-free guides to organise your money, save more and get out of debt.",
+  "app.learn.count": "Tienes {total} guías para leer, todas gratis.",
+  "app.learn.back": "All guides",
+  "app.learn.tool": "Try the calculator: {label}"
 }

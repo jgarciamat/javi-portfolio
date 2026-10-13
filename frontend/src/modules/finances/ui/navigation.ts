@@ -10,11 +10,15 @@ export type DashboardTab =
   | 'split'
   | 'assets'
   | 'business'
+  | 'learn'
   | 'automations'
   | 'custom-alerts'
   | 'plan'
   | 'offers'
   | 'settings';
+
+/** Partner offers are hidden until there is a real one to show. */
+export const offersEnabled = (): boolean => false;
 
 export interface DashboardSection {
   id: DashboardTab;
@@ -37,6 +41,7 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'business', icon: 'briefcase', labelKey: 'app.tabs.business', group: 'planning' },
   { id: 'automations', icon: 'settings', labelKey: 'app.tabs.automations', group: 'planning' },
   { id: 'custom-alerts', icon: 'bell', labelKey: 'app.tabs.customAlerts', group: 'planning' },
+  { id: 'learn', icon: 'book', labelKey: 'app.tabs.learn', group: 'tools' },
   { id: 'plan', icon: 'star', labelKey: 'app.tabs.plan', group: 'tools' },
   { id: 'offers', icon: 'gift', labelKey: 'app.tabs.offers', group: 'tools' },
   { id: 'settings', icon: 'wrench', labelKey: 'app.tabs.settings', group: 'tools' },

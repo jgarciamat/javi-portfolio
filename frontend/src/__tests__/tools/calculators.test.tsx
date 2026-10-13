@@ -267,3 +267,10 @@ describe('the other calculator pages', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('calculator pages for signed-in users', () => {
+  it('do not show the sign-up panel', () => {
+    renderWithProviders(<BudgetRulePage />, { authenticated: true });
+    expect(screen.queryByRole('link', { name: tr('tools.cta.button') })).toBeNull();
+  });
+});

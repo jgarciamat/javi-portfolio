@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
@@ -38,6 +39,7 @@ function CalculatorLayout({
   children: ReactNode;
 }) {
   const { t } = useI18n();
+  const { isAuthenticated } = useAuth();
   usePageMeta(t(titleKey), t(descriptionKey), path);
   return (
     <div className="pricing-page">
@@ -46,13 +48,15 @@ function CalculatorLayout({
         <h1 className="pricing-title">{t(titleKey)}</h1>
         <p className="pricing-subtitle">{t(descriptionKey)}</p>
         {children}
-        <section className="tools-cta">
-          <h2>{t('tools.cta.title')}</h2>
-          <p>{t('tools.cta.body')}</p>
-          <Link className="btn-primary" to="/login?mode=register">
-            {t('tools.cta.button')}
-          </Link>
-        </section>
+        {!isAuthenticated && (
+          <section className="tools-cta">
+            <h2>{t('tools.cta.title')}</h2>
+            <p>{t('tools.cta.body')}</p>
+            <Link className="btn-primary" to="/login?mode=register">
+              {t('tools.cta.button')}
+            </Link>
+          </section>
+        )}
         <p className="pricing-links">
           {TOOL_PAGES.map((tool) => (
             <span key={tool.key}>
