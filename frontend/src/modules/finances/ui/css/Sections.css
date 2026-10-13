@@ -102,6 +102,11 @@
   gap: 0.75rem;
 }
 
+.form-grid + .button-row,
+.inline-form + .button-row {
+  margin-top: 1rem;
+}
+
 .pill {
   display: inline-block;
   margin-left: 0.5rem;

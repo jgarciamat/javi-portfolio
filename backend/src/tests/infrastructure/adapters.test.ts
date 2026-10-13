@@ -52,6 +52,11 @@ describe('config', () => {
     expect(config.demoSeed.enabled).toBe(false);
   });
 
+  it('never points email links to localhost in production when APP_URL is missing', () => {
+    const config = loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) });
+    expect(config.appUrl).toBe('https://www.winjgm.com');
+  });
+
   it('rejects malformed values', () => {
     expect(() => loadConfig({ PORT: 'abc' })).toThrow(ConfigError);
   });

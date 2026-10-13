@@ -5,6 +5,8 @@ const booleanish = z
   .optional()
   .transform((v) => v === 'true' || v === '1');
 
+const PRODUCTION_URL = 'https://www.winjgm.com';
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -12,7 +14,7 @@ const envSchema = z.object({
   /** Legacy name kept so old deploy files keep working. */
   DATABASE_URL: z.string().optional(),
   JWT_SECRET: z.string().optional(),
-  APP_URL: z.string().url().default('http://localhost:5176'),
+  APP_URL: z.string().url().optional(),
   CORS_ORIGINS: z.string().optional(),
   TRUST_PROXY: z.coerce.number().int().min(0).default(1),
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -162,7 +164,10 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
   }
   const raw = parsed.data;
   const accessSecret = resolveAccessSecret(raw);
-  const appUrl = raw.APP_URL.replace(/\/$/, '');
+  // Emails and payment redirects must never point to localhost in production, even if APP_URL is missing.
+  const appUrl = (
+    raw.APP_URL ?? (raw.NODE_ENV === 'production' ? PRODUCTION_URL : 'http://localhost:5176')
+  ).replace(/\/$/, '');
   const extraOrigins = (raw.CORS_ORIGINS ?? '')
     .split(',')
     .map((o) => o.trim())
