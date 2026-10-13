@@ -1169,5 +1169,13 @@
   "tools.goal.result": "{years} años y {months} meses ({total} meses)",
   "tools.goal.already": "Ya has llegado a tu meta",
   "tools.goal.never": "Más de 100 años: sube la aportación",
-  "tools.goal.disclaimer": "Simulación con rentabilidad constante: la real puede variar y no está garantizada. No es asesoramiento financiero."
+  "tools.goal.disclaimer": "Simulación con rentabilidad constante: la real puede variar y no está garantizada. No es asesoramiento financiero.",
+  "app.rate.title": "¿Te está gustando Money Manager?",
+  "app.rate.yes": "Sí, mucho",
+  "app.rate.no": "Podría mejorar",
+  "app.rate.later": "Más tarde",
+  "app.rate.thanks": "¡Gracias! Si te ha servido, la mejor ayuda es que se lo cuentes a alguien: a los dos os damos un mes de Premium.",
+  "app.rate.invite": "Invitar a un amigo",
+  "app.rate.feedback": "Gracias por decírnoslo. Cuéntanos qué te falta o qué no te gusta: leemos todos los mensajes.",
+  "app.rate.write": "Escribir una sugerencia"
 }

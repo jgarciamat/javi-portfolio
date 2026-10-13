@@ -1169,5 +1169,13 @@
   "tools.goal.result": "{years} years and {months} months ({total} months)",
   "tools.goal.already": "You have already reached your goal",
   "tools.goal.never": "More than 100 years: raise your contribution",
-  "tools.goal.disclaimer": "Simulation with a constant return: the real one may vary and is not guaranteed. Not financial advice."
+  "tools.goal.disclaimer": "Simulation with a constant return: the real one may vary and is not guaranteed. Not financial advice.",
+  "app.rate.title": "Are you enjoying Money Manager?",
+  "app.rate.yes": "Yes, a lot",
+  "app.rate.no": "It could be better",
+  "app.rate.later": "Later",
+  "app.rate.thanks": "Thank you! If it has helped you, the best way to help is to tell someone: we give you both a month of Premium.",
+  "app.rate.invite": "Invite a friend",
+  "app.rate.feedback": "Thanks for telling us. Tell us what is missing or what you dislike: we read every message.",
+  "app.rate.write": "Write a suggestion"
 }

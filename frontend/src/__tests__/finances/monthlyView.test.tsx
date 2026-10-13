@@ -49,6 +49,31 @@ beforeEach(() => {
 });
 afterEach(restoreTime);
 
+describe('the review prompt of the month view', () => {
+  it('appears after real use and its invitation opens the plan section', async () => {
+    localStorage.setItem(
+      'mm_review',
+      JSON.stringify({
+        days: ['2026-03-01', '2026-03-05', '2026-03-09', '2026-03-12'],
+        askedAt: null,
+        done: false,
+      })
+    );
+    const api = createFakeApi();
+    const many = Array.from({ length: 8 }, (_, i) =>
+      f.transaction({ id: `t${i}`, description: `Compra ${i}` })
+    );
+    api.monthApi.get.mockResolvedValue(f.overview({ transactions: many }));
+    api.categoryApi.getAll.mockResolvedValue(categories);
+    api.accountApi.getAll.mockResolvedValue({ accounts, total: 1000 });
+    api.settingsApi.get.mockResolvedValue(f.settings({ showGettingStarted: false }));
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.yes') }));
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.invite') }));
+    expect(await screen.findByRole('region', { name: tr('app.tabs.plan') })).toBeInTheDocument();
+  });
+});
+
 describe('month view', () => {
   it('shows the figures, alerts and movements of the month', async () => {
     setup(

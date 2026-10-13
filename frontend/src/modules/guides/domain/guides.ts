@@ -296,6 +296,201 @@ export const GUIDES: Guide[] = [
     ],
     related: ['como-hacer-un-presupuesto-mensual', 'fondo-de-emergencia'],
   },
+  {
+    slug: 'como-calcular-la-cuota-de-una-hipoteca',
+    title: 'Cómo calcular la cuota de una hipoteca y cuánto pagarás en intereses',
+    description:
+      'Qué influye en la cuota de una hipoteca o un préstamo, cómo se calcula con cuota fija y por qué el plazo cambia tanto el total que pagas.',
+    intro:
+      'Antes de firmar una hipoteca o un préstamo conviene saber cuánto pagarás cada mes y, sobre todo, cuánto de ese dinero son intereses.',
+    sections: [
+      {
+        heading: 'De qué depende la cuota',
+        paragraphs: [
+          'Tres datos mandan: el importe que pides, el tipo de interés y el plazo. Con cuota fija, cada mes pagas lo mismo; al principio la mayor parte son intereses y con el tiempo va pesando más el capital.',
+        ],
+      },
+      {
+        heading: 'Un ejemplo con números',
+        paragraphs: [
+          'Para 150.000 € al 3 % durante 25 años, la cuota ronda los 711 € al mes. En total pagarías unos 213.000 €: más de 63.000 € serían intereses.',
+          'Con el mismo importe e interés a 15 años, la cuota sube a unos 1.036 € al mes, pero los intereses totales bajan a unos 36.000 €. Cuanto más largo el plazo, más baja la cuota y más caro sale el préstamo.',
+        ],
+      },
+      {
+        heading: 'Qué más mirar',
+        paragraphs: [
+          'La cuota no incluye comisiones, seguros vinculados ni el impuesto de la operación. Compara siempre la TAE, que recoge más costes que el tipo nominal, y pide la oferta vinculante (FEIN) a cada banco.',
+          'Como regla prudente, muchos expertos recomiendan que las deudas no superen un tercio de tus ingresos netos mensuales.',
+        ],
+      },
+    ],
+    tool: { to: '/calculadora-hipoteca', label: 'Calculadora de hipoteca y préstamo' },
+    related: ['como-salir-de-deudas', 'como-hacer-un-presupuesto-mensual'],
+  },
+  {
+    slug: 'inflacion-y-ahorro',
+    title: 'Inflación y ahorro: por qué el dinero parado pierde valor',
+    description:
+      'Qué es la inflación, cuánto poder adquisitivo pierde tu dinero con los años con ejemplos y qué opciones existen para protegerlo.',
+    intro:
+      'Con una inflación del 3 % anual, 10.000 € parados en una cuenta sin rentabilidad compran un 26 % menos al cabo de diez años. Sigue siendo la misma cantidad, pero vale menos.',
+    sections: [
+      {
+        heading: 'Cómo funciona',
+        paragraphs: [
+          'La inflación es la subida generalizada de los precios. Si todo cuesta un 3 % más cada año, lo que hoy compras con 100 € dentro de un año costará 103 €.',
+          'Con ese ritmo, 10.000 € de hoy equivalen a unos 7.441 € dentro de diez años, o al revés: necesitarás unos 13.439 € para comprar lo mismo.',
+        ],
+      },
+      {
+        heading: 'Qué puedes hacer',
+        paragraphs: [
+          'Primero, separar el fondo de emergencia (que debe estar disponible y seguro) del dinero que no vas a necesitar en años.',
+          'Para ese segundo bloque existen opciones con rentabilidades que intentan compensar la inflación, pero casi todas implican algún riesgo o falta de liquidez. Infórmate bien y, si hace falta, consulta a un asesor independiente.',
+        ],
+      },
+      {
+        heading: 'Calcula tu caso',
+        paragraphs: [
+          'Con la calculadora puedes probar tu cantidad, la inflación que supones y los años. Es una estimación con inflación constante, solo para entender el efecto.',
+        ],
+      },
+    ],
+    tool: { to: '/calculadora-inflacion', label: 'Calculadora de inflación' },
+    related: ['interes-compuesto', 'fondo-de-emergencia'],
+  },
+  {
+    slug: 'iva-para-autonomos-modelo-303',
+    title: 'IVA para autónomos: cómo se calcula y el modelo 303 trimestral',
+    description:
+      'Qué es el IVA repercutido y soportado, cómo desglosar una factura, cuándo se presenta el modelo 303 y el pago fraccionado del IRPF (modelo 130).',
+    intro:
+      'Si eres autónomo cobras IVA en tus facturas, pagas IVA en tus gastos y cada trimestre liquidas la diferencia con Hacienda. Entenderlo evita sustos.',
+    sections: [
+      {
+        heading: 'IVA repercutido y soportado',
+        paragraphs: [
+          'El IVA repercutido es el que cobras a tus clientes. El soportado es el que pagas en gastos de tu actividad. Cada trimestre la diferencia es lo que ingresas (o compensas si sale a tu favor).',
+          'Para desglosar una factura: una base de 100 € más un 21 % de IVA es un total de 121 €. Si solo tienes el total, la base es 121 / 1,21 = 100 €.',
+        ],
+      },
+      {
+        heading: 'Cuándo se presenta',
+        paragraphs: [
+          'El modelo 303 es trimestral y se presenta, en general, en los primeros 20 días de abril, julio y octubre; el del último trimestre, hasta el 30 de enero. El pago fraccionado del IRPF (modelo 130) sigue un calendario parecido.',
+          'En el modelo 130, el caso general es adelantar el 20 % del rendimiento neto acumulado del año, descontando lo ya pagado en trimestres anteriores.',
+        ],
+      },
+      {
+        heading: 'Cómo ayuda Money Manager',
+        paragraphs: [
+          'En la sección Autónomos marcas qué categorías son de tu actividad y su tipo de IVA, y ves una estimación por trimestre. Es solo orientativa: no incluye deducciones ni regímenes especiales, así que contrástala con tu gestor.',
+        ],
+      },
+    ],
+    tool: { to: '/calculadora-iva', label: 'Calculadora de IVA' },
+    related: ['como-hacer-un-presupuesto-mensual', 'metodo-50-30-20'],
+  },
+  {
+    slug: 'presupuesto-en-pareja',
+    title: 'Cómo llevar el dinero en pareja sin discutir',
+    description:
+      'Tres formas de organizar las finanzas de una pareja (todo junto, separado o proporcional), cómo repartir gastos y consejos para hablar de dinero.',
+    intro:
+      'Hablar de dinero en pareja es incómodo, pero acordar un sistema evita muchas discusiones. No hay uno perfecto: depende de vuestros ingresos y de cómo os sentís cómodos.',
+    sections: [
+      {
+        heading: 'Tres sistemas habituales',
+        paragraphs: [
+          'Todo en común: un solo fondo del que salen todos los gastos. Es sencillo y transparente, y funciona mejor con ingresos parecidos.',
+          'Cada uno lo suyo: cada persona paga sus gastos y se reparten los comunes a partes iguales. Da independencia, pero puede resultar injusto si los ingresos son muy distintos.',
+          'Proporcional: los gastos comunes se reparten según lo que gana cada uno. Si una persona gana el doble que la otra, paga el doble de la cuenta común.',
+        ],
+      },
+      {
+        heading: 'Pasos para acordarlo',
+        paragraphs: [
+          'Listad juntos los gastos comunes del mes, decidid el sistema y fijad una aportación mensual a una cuenta compartida. Reservad también una cantidad personal para cada uno, sin tener que dar explicaciones.',
+          'Revisad el acuerdo una vez al año o cuando cambie algo importante, como un sueldo o un hijo.',
+        ],
+      },
+      {
+        heading: 'Herramientas',
+        paragraphs: [
+          'En Money Manager puedes compartir tus movimientos, presupuestos y metas con tu pareja, y repartir gastos con amigos en «Gastos compartidos», donde se calcula quién debe a quién.',
+        ],
+      },
+    ],
+    related: ['metodo-50-30-20', 'como-hacer-un-presupuesto-mensual'],
+  },
+  {
+    slug: 'como-ahorrar-para-un-viaje',
+    title: 'Cómo ahorrar para un viaje: plan paso a paso',
+    description:
+      'Calcula cuánto cuesta tu viaje, en cuántos meses puedes reunirlo y cómo automatizar el ahorro para llegar a la fecha sin agobios.',
+    intro:
+      'Un viaje es una de las mejores metas de ahorro porque tiene fecha y cantidad. Con un plan sencillo llegarás sin tirar de tarjeta.',
+    sections: [
+      {
+        heading: '1. Ponle cifra y fecha',
+        paragraphs: [
+          'Suma vuelos, alojamiento, comidas, transporte local y un colchón del 10-15 % para imprevistos. Ese es tu objetivo, y la fecha de salida marca cuánto tiempo tienes.',
+        ],
+      },
+      {
+        heading: '2. Calcula la aportación mensual',
+        paragraphs: [
+          'Divide el objetivo entre los meses que faltan. Para reunir 3.000 € en 20 meses necesitas apartar 150 € al mes. Si no te cuadra, alarga la fecha o recorta el presupuesto del viaje.',
+        ],
+      },
+      {
+        heading: '3. Automatízalo',
+        paragraphs: [
+          'Programa una transferencia mensual a una cuenta aparte el día que cobras. Crea una meta en Money Manager con la cantidad y la fecha: verás el progreso y cuánto necesitas ahorrar cada mes.',
+        ],
+      },
+      {
+        heading: '4. Reserva con cabeza',
+        paragraphs: [
+          'Comparar fechas y reservar con antelación suele abaratar vuelos y alojamiento. Mantén el fondo de emergencia aparte: el viaje no debe vaciarlo.',
+        ],
+      },
+    ],
+    tool: { to: '/calculadora-objetivo-ahorro', label: 'Calculadora de objetivo de ahorro' },
+    related: ['como-ahorrar-el-20-por-ciento', 'fondo-de-emergencia'],
+  },
+  {
+    slug: 'independencia-financiera-regla-del-4',
+    title: 'Independencia financiera y la regla del 4 %: qué es y sus límites',
+    description:
+      'Qué significa la independencia financiera, cómo se calcula el capital necesario con la regla del 4 % y por qué hay que tomarla solo como una referencia.',
+    intro:
+      'La independencia financiera consiste en tener un patrimonio que cubra tus gastos sin depender de un sueldo. La regla del 4 % es una referencia muy citada para estimarlo.',
+    sections: [
+      {
+        heading: 'La idea de la regla del 4 %',
+        paragraphs: [
+          'Propone que, retirando cada año alrededor del 4 % de un capital invertido, este ha podido durar décadas en el pasado. Dicho al revés: necesitas unas 25 veces tus gastos anuales.',
+          'Si gastas 24.000 € al año, la cifra de referencia son unos 600.000 €. Con gastos de 12.000 €, serían 300.000 €.',
+        ],
+      },
+      {
+        heading: 'Sus límites',
+        paragraphs: [
+          'Nació de datos históricos de un mercado concreto y no garantiza nada. Cambian la rentabilidad futura, la inflación, los impuestos y los años que quieras que dure. Úsala como orden de magnitud, no como promesa.',
+        ],
+      },
+      {
+        heading: 'Qué puedes hacer ya',
+        paragraphs: [
+          'Conocer tus gastos reales, subir tu tasa de ahorro y revisar cuánto pesan las suscripciones y los gastos hormiga es el primer paso, tengas o no esta meta. Con el simulador puedes ver cuánto tardarías en llegar a un capital con tus aportaciones.',
+        ],
+      },
+    ],
+    tool: { to: '/simulador-ahorro', label: 'Simulador de ahorro' },
+    related: ['interes-compuesto', 'inflacion-y-ahorro'],
+  },
 ];
 
 export const findGuide = (slug: string | undefined): Guide | undefined =>
