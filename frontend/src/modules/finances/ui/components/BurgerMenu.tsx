@@ -3,7 +3,12 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useEscapeKey } from '@shared/hooks/useEscapeKey';
-import { DASHBOARD_SECTIONS, SECTION_GROUPS, type DashboardTab } from '../navigation';
+import {
+  DASHBOARD_SECTIONS,
+  offersEnabled,
+  SECTION_GROUPS,
+  type DashboardTab,
+} from '../navigation';
 import '../css/Sections.css';
 
 interface BurgerMenuProps {
@@ -17,7 +22,9 @@ interface BurgerMenuProps {
 export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps) {
   const { t } = useI18n();
   const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
-  const sections = DASHBOARD_SECTIONS.filter((s) => s.id !== 'offers' || showOffers);
+  const sections = DASHBOARD_SECTIONS.filter(
+    (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
+  );
 
   useEscapeKey(onClose, open);
 

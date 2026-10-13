@@ -1,23 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useOptionalPlan } from '@modules/billing/application/PlanContext';
-import { GUIDES, findGuide, isFreeGuide } from '@modules/guides/domain/guides';
+import { GUIDES, findGuide } from '@modules/guides/domain/guides';
 import { GuideBody } from '@modules/guides/ui/GuideBody';
 import { Icon } from '@shared/components/Icon';
 import '@modules/guides/ui/css/Guides.css';
 import '../css/Sections.css';
 
-/** Savings guides: a couple are open to every account, the whole library is part of Premium. */
+/** Savings guides, open to every account. */
 export function LearnView() {
   const { t } = useI18n();
-  const plan = useOptionalPlan();
   const [open, setOpen] = useState<string | null>(null);
-  if (plan?.loading && !plan.overview) return <div className="card">{t('app.common.loading')}</div>;
-
-  const premium = !plan || plan.isPremium;
   const guide = open ? findGuide(open) : undefined;
-  const unlock = () => plan?.openUpgrade({ kind: 'feature', feature: 'insights' });
 
   if (guide) {
     return (
@@ -40,7 +34,6 @@ export function LearnView() {
     );
   }
 
-  const free = GUIDES.filter((g) => isFreeGuide(g.slug)).length;
   return (
     <div className="section-view">
       <div className="card">
@@ -48,31 +41,16 @@ export function LearnView() {
           <Icon name="book" /> {t('app.learn.title')}
         </h2>
         <p className="section-hint">{t('app.learn.hint')}</p>
-        <p className="section-hint">
-          {premium
-            ? t('app.learn.premiumNote', { total: GUIDES.length })
-            : t('app.learn.freeNote', { free, total: GUIDES.length })}
-        </p>
+        <p className="section-hint">{t('app.learn.count', { total: GUIDES.length })}</p>
         <ul className="guide-list">
-          {GUIDES.map((g) => {
-            const available = premium || isFreeGuide(g.slug);
-            return (
-              <li key={g.slug}>
-                <button
-                  className="guide-link"
-                  onClick={() => (available ? setOpen(g.slug) : unlock())}
-                >
-                  {!available && <Icon name="lock" />} {g.title}
-                </button>
-                {!premium && (
-                  <span className="premium-chip">
-                    {available ? t('app.learn.free') : t('app.learn.locked')}
-                  </span>
-                )}
-                <p>{g.description}</p>
-              </li>
-            );
-          })}
+          {GUIDES.map((g) => (
+            <li key={g.slug}>
+              <button className="guide-link" onClick={() => setOpen(g.slug)}>
+                {g.title}
+              </button>
+              <p>{g.description}</p>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

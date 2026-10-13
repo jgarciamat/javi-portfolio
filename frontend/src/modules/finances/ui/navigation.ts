@@ -17,6 +17,9 @@ export type DashboardTab =
   | 'offers'
   | 'settings';
 
+/** Partner offers are hidden until there is a real one to show. */
+export const offersEnabled = (): boolean => false;
+
 export interface DashboardSection {
   id: DashboardTab;
   icon: string;

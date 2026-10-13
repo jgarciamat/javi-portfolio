@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { tourSteps } from '../../ui/tour/tourSteps';
-import type { DashboardTab } from '../../ui/navigation';
+import { offersEnabled, type DashboardTab } from '../../ui/navigation';
 
 /**
  * The guided tour: opens after every sign-in until the user ticks "don't show
@@ -37,7 +37,10 @@ export function useWelcomeTour(tab: DashboardTab, setTab: (tab: DashboardTab) =>
     [origin, setTab, dontShowAgain, settingsContext]
   );
 
-  const steps = useMemo(() => tourSteps(settings?.showOffers !== false), [settings?.showOffers]);
+  const steps = useMemo(
+    () => tourSteps(offersEnabled() && settings?.showOffers !== false),
+    [settings?.showOffers]
+  );
 
   return {
     open: origin !== null,

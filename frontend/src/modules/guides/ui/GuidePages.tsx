@@ -1,5 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { PublicHeader } from '@shared/components/PublicHeader';
+import { useAuth } from '@shared/hooks/useAuth';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { GUIDES, findGuide } from '../domain/guides';
 import { GuideBody } from './GuideBody';
@@ -7,6 +8,8 @@ import '@modules/tools/ui/css/Tools.css';
 import './css/Guides.css';
 
 function GuideCta() {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) return null;
   return (
     <section className="tools-cta">
       <h2>Controla tu dinero con Money Manager</h2>

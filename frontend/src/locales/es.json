@@ -1181,11 +1181,7 @@
   "app.tabs.learn": "Aprende a ahorrar",
   "app.learn.title": "Aprende a ahorrar",
   "app.learn.hint": "Guías cortas y sin jerga para ordenar tu dinero, ahorrar más y salir de deudas.",
-  "app.learn.freeNote": "Tu cuenta incluye {free} guías gratis. Con Premium tienes las {total}.",
-  "app.learn.premiumNote": "Tienes las {total} guías.",
-  "app.learn.free": "Gratis",
-  "app.learn.locked": "Con Premium",
+  "app.learn.count": "Tienes {total} guías para leer, todas gratis.",
   "app.learn.back": "Todas las guías",
-  "app.learn.unlock": "Desbloquear con Premium",
   "app.learn.tool": "Probar la calculadora: {label}"
 }

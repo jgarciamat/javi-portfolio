@@ -85,4 +85,17 @@ describe('guide pages', () => {
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(0);
     guide.related = original;
   });
+
+  it('shows the sign-up panel to visitors but not to people who are signed in', () => {
+    const { unmount } = renderAt('/guias');
+    expect(screen.getByRole('link', { name: /Crear mi cuenta/ })).toBeInTheDocument();
+    unmount();
+    renderWithProviders(
+      <Routes>
+        <Route path="/guias" element={<GuidesIndexPage />} />
+      </Routes>,
+      { authenticated: true, route: '/guias' }
+    );
+    expect(screen.queryByRole('link', { name: /Crear mi cuenta/ })).toBeNull();
+  });
 });

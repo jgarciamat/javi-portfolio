@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import * as notifications from '@core/notifications/notifications';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
+import * as navigation from '@modules/finances/ui/navigation';
 import { DASHBOARD_SECTIONS } from '@modules/finances/ui/navigation';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
@@ -27,6 +28,7 @@ afterEach(restoreTime);
 
 describe('menu and sections', () => {
   it('opens every section and remembers the last one', async () => {
+    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
     const api = createFakeApi();
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalled());
@@ -54,7 +56,18 @@ describe('menu and sections', () => {
     expect(openButton).toHaveAttribute('aria-expanded', 'false');
   });
 
+  it('has no offers entry while there are no offers', async () => {
+    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(false);
+    const api = createFakeApi();
+    renderWithProviders(<Dashboard />, { api });
+    await waitFor(() => expect(api.settingsApi.get).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    expect(screen.queryByRole('button', { name: literal(tr('app.tabs.offers')) })).toBeNull();
+    expect(screen.getByRole('button', { name: literal(tr('app.tabs.learn')) })).toBeInTheDocument();
+  });
+
   it('hides the offers entry when the user turned offers off', async () => {
+    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
     const api = createFakeApi();
     api.settingsApi.get.mockResolvedValue(f.settings({ showOffers: false }));
     renderWithProviders(<Dashboard />, { api });

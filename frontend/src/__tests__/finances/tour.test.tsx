@@ -1,3 +1,4 @@
+import * as navigation from '@modules/finances/ui/navigation';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { authApi } from '@core/api/authApi';
 import { useAuth } from '@shared/hooks/useAuth';
@@ -252,6 +253,7 @@ describe('Welcome tour in the dashboard', () => {
   };
 
   it('opens after signing in and visits every section on the way', async () => {
+    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
     const { api } = renderWithProviders(
       <>
         <SignInButton />

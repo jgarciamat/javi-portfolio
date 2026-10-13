@@ -495,8 +495,3 @@ export const GUIDES: Guide[] = [
 
 export const findGuide = (slug: string | undefined): Guide | undefined =>
   GUIDES.find((g) => g.slug === slug);
-
-/** Guides open to every account inside the app; the rest are part of Premium. */
-export const FREE_GUIDE_SLUGS = ['metodo-50-30-20', 'gastos-hormiga'];
-
-export const isFreeGuide = (slug: string): boolean => FREE_GUIDE_SLUGS.includes(slug);

@@ -1,3 +1,4 @@
+import * as navigation from '@modules/finances/ui/navigation';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import * as notifications from '@core/notifications/notifications';
 import { AccountsView } from '@modules/finances/ui/views/AccountsView';
@@ -835,6 +836,7 @@ describe('SettingsView', () => {
   }
 
   it('saves preferences and reloads the months when the start day changes', async () => {
+    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
     const { api } = setup();
     api.settingsApi.update.mockResolvedValue(
       f.settings({ monthStartDay: 25, notificationsEnabled: true })
