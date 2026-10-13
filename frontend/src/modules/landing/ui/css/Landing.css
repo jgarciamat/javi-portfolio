@@ -1,0 +1,155 @@
+.landing {
+  min-height: 100vh;
+  background: var(--slate-950);
+  color: var(--slate-100);
+}
+
+.landing main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+.landing-hero {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.landing-hero h1 {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.landing-hero p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--slate-300);
+  font-size: 1.1rem;
+}
+
+.landing-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+.landing-cta .btn-primary,
+.landing-cta .btn-secondary {
+  width: auto;
+  padding: 0.8rem 1.6rem;
+  text-decoration: none;
+}
+
+.landing-note {
+  font-size: 0.85rem;
+  color: var(--slate-400);
+}
+
+.landing-play {
+  color: var(--accent-400);
+  font-weight: 600;
+}
+
+.landing-shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.landing-shots figure {
+  margin: 0;
+}
+
+.landing-shots img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 1px solid var(--slate-700);
+}
+
+.landing-section {
+  padding: 1.5rem 0;
+}
+
+.landing-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.landing-features li {
+  padding: 1.1rem;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+}
+
+.landing-features h3 {
+  margin: 0.5rem 0 0.3rem;
+  font-size: 1.05rem;
+}
+
+.landing-features p {
+  margin: 0;
+  color: var(--slate-400);
+  font-size: 0.92rem;
+}
+
+.landing-plans {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: start;
+}
+
+.landing-plans .btn-secondary {
+  text-decoration: none;
+}
+
+.landing-faq details {
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--slate-800);
+}
+
+.landing-faq summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.landing-faq p {
+  margin: 0.5rem 0 0;
+  color: var(--slate-300);
+}
+
+.landing-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  padding: 1.5rem 1rem 2.5rem;
+  border-top: 1px solid var(--slate-800);
+  font-size: 0.9rem;
+}

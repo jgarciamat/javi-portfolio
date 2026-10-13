@@ -211,6 +211,13 @@ const cases: Case[] = [
   ],
   ['trends', () => insightsApi.trends(2026, 3), 'GET', '/stats/trends/2026/3'],
   ['exchange rate', () => ratesApi.get('USD', 'EUR'), 'GET', '/rates?from=USD&to=EUR'],
+  [
+    'acquisition',
+    () => authApi.acquisition('reddit'),
+    'POST',
+    '/acquisition',
+    { source: 'reddit' },
+  ],
   ['push key', () => pushApi.key(), 'GET', '/push/key'],
   [
     'push subscribe',

@@ -1,6 +1,21 @@
 import { fireEvent, screen, within } from '@testing-library/react';
-import { budgetRule, simulateSavings } from '@modules/tools/domain/calculators';
-import { BudgetRulePage, SavingsSimulatorPage } from '@modules/tools/ui/CalculatorPages';
+import {
+  budgetRule,
+  inflationEffect,
+  loanPayment,
+  monthsToGoal,
+  simulateSavings,
+  vatBreakdown,
+} from '@modules/tools/domain/calculators';
+import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
+import {
+  BudgetRulePage,
+  GoalCalculatorPage,
+  InflationCalculatorPage,
+  LoanCalculatorPage,
+  SavingsSimulatorPage,
+  VatCalculatorPage,
+} from '@modules/tools/ui/CalculatorPages';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 describe('budgetRule', () => {
@@ -107,5 +122,148 @@ describe('calculator pages', () => {
     renderWithProviders(<BudgetRulePage />, { authenticated: false, locale: 'en' });
     expect(screen.getByText('€900')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /50\s?% · Needs/ })).toBeInTheDocument();
+  });
+});
+
+describe('loanPayment', () => {
+  it('computes the fixed instalment, the total and the interest', () => {
+    const loan = loanPayment({ principal: 150000, annualRatePct: 3, years: 25 });
+    expect(loan.monthlyPayment).toBeCloseTo(711.37, 1);
+    expect(Math.abs(loan.totalPaid - loan.monthlyPayment * 300)).toBeLessThan(1);
+    expect(loan.totalInterest).toBeCloseTo(loan.totalPaid - 150000, 1);
+  });
+
+  it('is the principal split evenly without interest, and zero for nonsense', () => {
+    expect(loanPayment({ principal: 12000, annualRatePct: 0, years: 1 })).toEqual({
+      monthlyPayment: 1000,
+      totalPaid: 12000,
+      totalInterest: 0,
+    });
+    const none = { monthlyPayment: 0, totalPaid: 0, totalInterest: 0 };
+    expect(loanPayment({ principal: -1, annualRatePct: 3, years: 5 })).toEqual(none);
+    expect(loanPayment({ principal: 1000, annualRatePct: 3, years: 0 })).toEqual(none);
+    expect(
+      loanPayment({ principal: Number.NaN, annualRatePct: Number.NaN, years: Number.NaN })
+    ).toEqual(none);
+    expect(loanPayment({ principal: 1000, annualRatePct: -5, years: 1 }).totalInterest).toBe(0);
+    // Capped at 50 years.
+    expect(loanPayment({ principal: 600000, annualRatePct: 0, years: 500 }).monthlyPayment).toBe(
+      1000
+    );
+  });
+});
+
+describe('vatBreakdown', () => {
+  it('adds the VAT to a base and takes it out of a total', () => {
+    expect(vatBreakdown(100, 21, false)).toEqual({ base: 100, vat: 21, total: 121 });
+    expect(vatBreakdown(121, 21, true)).toEqual({ base: 100, vat: 21, total: 121 });
+    expect(vatBreakdown(100, 0, true)).toEqual({ base: 100, vat: 0, total: 100 });
+    expect(vatBreakdown(-5, Number.NaN, false)).toEqual({ base: 0, vat: 0, total: 0 });
+    expect(vatBreakdown(Number.NaN, -3, true)).toEqual({ base: 0, vat: 0, total: 0 });
+  });
+});
+
+describe('inflationEffect', () => {
+  it('shows what the money is worth and what the same goods will cost', () => {
+    const r = inflationEffect(10000, 3, 10);
+    expect(r.worth).toBeCloseTo(7440.94, 1);
+    expect(r.needed).toBeCloseTo(13439.16, 1);
+    expect(r.lostPct).toBeCloseTo(25.6, 1);
+  });
+
+  it('is neutral with no inflation or years, and copes with nonsense', () => {
+    expect(inflationEffect(500, 0, 5)).toEqual({ worth: 500, needed: 500, lostPct: 0 });
+    expect(inflationEffect(500, 3, 0)).toEqual({ worth: 500, needed: 500, lostPct: 0 });
+    expect(inflationEffect(Number.NaN, Number.NaN, Number.NaN)).toEqual({
+      worth: 0,
+      needed: 0,
+      lostPct: 0,
+    });
+    expect(inflationEffect(100, 3, 1000).worth).toBeGreaterThanOrEqual(0);
+    expect(inflationEffect(100, -90, 1).needed).toBe(50);
+  });
+});
+
+describe('monthsToGoal', () => {
+  it('counts the months until the balance reaches the target', () => {
+    expect(monthsToGoal({ target: 1200, initial: 0, monthly: 100, annualRatePct: 0 })).toBe(12);
+    expect(
+      monthsToGoal({ target: 1000, initial: 0, monthly: 100, annualRatePct: 100 })
+    ).toBeLessThan(10);
+  });
+
+  it('is zero when already there or without a target, and null when it never gets there', () => {
+    expect(monthsToGoal({ target: 100, initial: 100, monthly: 0, annualRatePct: 0 })).toBe(0);
+    expect(monthsToGoal({ target: 0, initial: 0, monthly: 0, annualRatePct: 0 })).toBe(0);
+    expect(monthsToGoal({ target: 1000, initial: 0, monthly: 0, annualRatePct: 0 })).toBeNull();
+    expect(
+      monthsToGoal({
+        target: Number.NaN,
+        initial: Number.NaN,
+        monthly: Number.NaN,
+        annualRatePct: Number.NaN,
+      })
+    ).toBe(0);
+    expect(monthsToGoal({ target: 100, initial: 1, monthly: 5, annualRatePct: Number.NaN })).toBe(
+      20
+    );
+    expect(monthsToGoal({ target: 100, initial: 1, monthly: 5, annualRatePct: -500 })).toBeNull();
+  });
+});
+
+describe('the other calculator pages', () => {
+  const field = (key: string) => screen.getByLabelText(tr(key));
+  const result = (key: string) =>
+    screen.getByRole('heading', { name: tr(key) }).closest('section') as HTMLElement;
+
+  it('lists every public calculator in the links, each with its own texts', () => {
+    renderWithProviders(<LoanCalculatorPage />, { authenticated: false });
+    for (const tool of TOOL_PAGES) {
+      expect(screen.getByRole('link', { name: tr(`tools.${tool.key}.nav`) })).toHaveAttribute(
+        'href',
+        tool.path
+      );
+    }
+  });
+
+  it('calculates the loan instalment while typing', () => {
+    renderWithProviders(<LoanCalculatorPage />, { authenticated: false });
+    expect(document.title).toBe(tr('tools.loan.title'));
+    expect(within(result('tools.loan.payment')).getByText(/711/)).toBeInTheDocument();
+    fireEvent.change(field('tools.loan.years'), { target: { value: '0' } });
+    expect(within(result('tools.loan.payment')).getByText(/^0\s?€$/)).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.loan.disclaimer'))).toBeInTheDocument();
+  });
+
+  it('adds and removes the VAT', () => {
+    renderWithProviders(<VatCalculatorPage />, { authenticated: false });
+    expect(within(result('tools.vat.total')).getByText(/121/)).toBeInTheDocument();
+    fireEvent.change(field('tools.vat.mode'), { target: { value: 'with' } });
+    fireEvent.change(field('tools.vat.amount'), { target: { value: '121' } });
+    expect(within(result('tools.vat.base')).getByText(/100/)).toBeInTheDocument();
+    fireEvent.change(field('tools.vat.rate'), { target: { value: '10' } });
+    expect(within(result('tools.vat.vat')).getByText(/11/)).toBeInTheDocument();
+    fireEvent.change(field('tools.vat.mode'), { target: { value: 'without' } });
+    expect(within(result('tools.vat.total')).getByText(/133/)).toBeInTheDocument();
+  });
+
+  it('shows what inflation does to the money', () => {
+    renderWithProviders(<InflationCalculatorPage />, { authenticated: false });
+    expect(within(result('tools.inflation.worth')).getByText(/7\.?441/)).toBeInTheDocument();
+    expect(within(result('tools.inflation.lost')).getByText(/25,6 %|25\.6 %/)).toBeInTheDocument();
+    fireEvent.change(field('tools.inflation.years'), { target: { value: '0' } });
+    expect(within(result('tools.inflation.lost')).getByText(/^0 %$/)).toBeInTheDocument();
+  });
+
+  it('tells how long it takes to reach the goal', () => {
+    renderWithProviders(<GoalCalculatorPage />, { authenticated: false });
+    expect(within(result('tools.goal.time')).getByText(/2 años y \d+ meses/)).toBeInTheDocument();
+    fireEvent.change(field('tools.goal.monthly'), { target: { value: '0' } });
+    fireEvent.change(field('tools.goal.rate'), { target: { value: '0' } });
+    expect(within(result('tools.goal.time')).getByText(tr('tools.goal.never'))).toBeInTheDocument();
+    fireEvent.change(field('tools.goal.initial'), { target: { value: '9000' } });
+    expect(
+      within(result('tools.goal.time')).getByText(tr('tools.goal.already'))
+    ).toBeInTheDocument();
   });
 });

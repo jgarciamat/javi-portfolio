@@ -178,7 +178,9 @@ export type MetricName =
   | 'ai_question'
   | 'import_done'
   | 'referral_joined'
-  | 'household_joined';
+  | 'household_joined'
+  /** Where a new user came from (`signup:reddit`, `signup:google.com`…): a counter, never a person. */
+  | `signup:${string}`;
 
 export interface MetricsRecorder {
   record(name: MetricName): void;
