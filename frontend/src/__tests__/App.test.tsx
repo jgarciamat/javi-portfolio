@@ -1,5 +1,6 @@
 import { cleanup, screen, waitFor } from '@testing-library/react';
 import { render } from '@testing-library/react';
+import { Capacitor } from '@capacitor/core';
 import App from '../App';
 import * as f from '@test-utils/fixtures';
 import { signIn, tr } from '@test-utils/render';
@@ -31,12 +32,22 @@ beforeEach(() => {
 });
 
 describe('App routes', () => {
-  it('sends anonymous visitors to the login page', async () => {
+  it('shows the presentation page to anonymous visitors at the home address', async () => {
+    visit('/');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: tr('landing.hero.title') })
+    ).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/');
+  });
+
+  it('sends anonymous visitors of the mobile apps straight to the login page', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     visit('/');
     expect(
       await screen.findByRole('button', { name: tr('app.auth.login.submit') })
     ).toBeInTheDocument();
     expect(window.location.pathname).toBe('/login');
+    jest.restoreAllMocks();
   });
 
   it.each([
@@ -47,6 +58,10 @@ describe('App routes', () => {
     ['/reset-password', 'app.auth.reset.title'],
     ['/calculadora-50-30-20', 'tools.rule.title'],
     ['/simulador-ahorro', 'tools.savings.title'],
+    ['/calculadora-hipoteca', 'tools.loan.title'],
+    ['/calculadora-iva', 'tools.vat.title'],
+    ['/calculadora-inflacion', 'tools.inflation.title'],
+    ['/calculadora-objetivo-ahorro', 'tools.goal.title'],
   ])('serves the public page %s', async (path, key) => {
     visit(path);
     expect(await screen.findByRole('heading', { name: tr(key) })).toBeInTheDocument();

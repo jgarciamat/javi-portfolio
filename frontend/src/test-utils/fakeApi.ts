@@ -12,6 +12,7 @@ const ok = <T>(value: T) => jest.fn().mockResolvedValue(value);
 export function createFakeApi(): FakeApi {
   return {
     authApi: {
+      acquisition: ok(undefined),
       register: ok({ message: 'ok' }),
       login: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
       googleLogin: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),

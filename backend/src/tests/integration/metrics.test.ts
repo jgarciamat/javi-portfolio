@@ -86,6 +86,27 @@ describe('Anonymous product counters', () => {
     expect(totals(noAi).ai_analysis).toBeUndefined();
   });
 
+  it('counts where new users come from, anonymously, and rejects odd labels', async () => {
+    const ctx = createTestApp();
+    const user = await createUser(ctx);
+    const send = (source: string) =>
+      request(ctx.app).post('/api/acquisition').set(user.auth).send({ source });
+    await send('Reddit').expect(204);
+    await send('reddit').expect(204);
+    await send('google.com').expect(204);
+    ctx.clock.set(new Date(ctx.clock.now().getTime() + 2 * 60 * 60 * 1000).toISOString());
+    await send('later').expect(204);
+    expect(totals(ctx)['signup:later']).toBeUndefined();
+    ctx.clock.set(new Date(ctx.clock.now().getTime() - 2 * 60 * 60 * 1000).toISOString());
+    await send('x y').expect(400);
+    await send('').expect(400);
+    await request(ctx.app).post('/api/acquisition').send({ source: 'reddit' }).expect(401);
+    expect(totals(ctx)['signup:reddit']).toBe(2);
+    expect(totals(ctx)['signup:google.com']).toBe(1);
+    const text = formatStats(ctx.container.repos.metrics, 30, new Date('2026-03-20T10:00:00Z'));
+    expect(text).toContain('Registros desde reddit');
+  });
+
   it('prints the counters of the last days', async () => {
     const ctx = createTestApp();
     await createUser(ctx);

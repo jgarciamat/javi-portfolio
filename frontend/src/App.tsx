@@ -2,8 +2,7 @@ import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@shared/hooks/useAuth';
 import { NativeLinks } from '@core/native/NativeLinks';
-import { LockGate } from '@shared/components/LockGate';
-import { ProtectedRoute } from '@shared/components/ProtectedRoute';
+import { HomeGate } from '@modules/landing/ui/HomeGate';
 import { AppLockProvider } from '@shared/hooks/useAppLock';
 import { AppSplash } from '@shared/components/AppSplash';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
@@ -43,6 +42,22 @@ const GuidesIndexPage = lazyNamed(
   'GuidesIndexPage'
 );
 const GuidePage = lazyNamed(() => import('./modules/guides/ui/GuidePages'), 'GuidePage');
+const LoanCalculatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'LoanCalculatorPage'
+);
+const VatCalculatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'VatCalculatorPage'
+);
+const InflationCalculatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'InflationCalculatorPage'
+);
+const GoalCalculatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'GoalCalculatorPage'
+);
 const SavingsSimulatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'SavingsSimulatorPage'
@@ -68,12 +83,14 @@ export default function App() {
                       <Route path="/terms" element={<TermsPage />} />
                       <Route path="/calculadora-50-30-20" element={<BudgetRulePage />} />
                       <Route path="/simulador-ahorro" element={<SavingsSimulatorPage />} />
+                      <Route path="/calculadora-hipoteca" element={<LoanCalculatorPage />} />
+                      <Route path="/calculadora-iva" element={<VatCalculatorPage />} />
+                      <Route path="/calculadora-inflacion" element={<InflationCalculatorPage />} />
+                      <Route path="/calculadora-objetivo-ahorro" element={<GoalCalculatorPage />} />
                       <Route path="/guias" element={<GuidesIndexPage />} />
                       <Route path="/guias/:slug" element={<GuidePage />} />
-                      <Route element={<ProtectedRoute />}>
-                        <Route element={<LockGate />}>
-                          <Route path="/" element={<DashboardPage />} />
-                        </Route>
+                      <Route path="/" element={<HomeGate />}>
+                        <Route index element={<DashboardPage />} />
                       </Route>
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>

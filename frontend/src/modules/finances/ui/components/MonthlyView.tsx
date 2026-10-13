@@ -20,6 +20,7 @@ import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
+import { RatePrompt } from './RatePrompt';
 import { MonthRecap } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
@@ -221,6 +222,9 @@ export function MonthlyView({
           ) : (
             <MonthRecap />
           ))}
+        {f.isCurrentPeriod && !checklist.visible && (
+          <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
+        )}
         {f.isCurrentPeriod && <ForecastPanel />}
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />

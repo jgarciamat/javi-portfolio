@@ -11,6 +11,7 @@ import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
+import { useAcquisition } from '../../application/hooks/useAcquisition';
 import { useBillReminders } from '../../application/hooks/useBillReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
@@ -212,6 +213,7 @@ export function Dashboard() {
   const section = SECTION_BY_ID[dash.tab];
   const tour = useWelcomeTour(dash.tab, dash.setTab);
   useBudgetAlertNotifications();
+  useAcquisition();
 
   // Free plan: the import button opens the paywall instead of the importer.
   const openImport =

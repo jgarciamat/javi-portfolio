@@ -19,6 +19,7 @@ import {
   avatarBody,
   forecastQuery,
   nameBody,
+  acquisitionBody,
   assetBody,
   splitExpenseBody,
   splitExpenseParams,
@@ -155,6 +156,20 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed(async (req, res) => {
       const { from, to } = rateQuery.parse(req.query);
       res.json({ from, to, rate: await c.rates.rate(from, to) });
+    })
+  );
+
+  // Where a new user came from: counted anonymously, only within the hour after sign-up, so
+  // someone who simply signs in on another browser is not counted as a new user.
+  router.post(
+    '/acquisition',
+    authed((req, res) => {
+      const { source } = acquisitionBody.parse(req.body);
+      const created = c.repos.users.findById(req.userId)?.toPrimitives().createdAt as string;
+      if (c.clock.now().getTime() - new Date(created).getTime() < 60 * 60 * 1000) {
+        c.repos.metrics.record(`signup:${source}`);
+      }
+      res.status(204).end();
     })
   );
 

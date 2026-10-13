@@ -9,6 +9,10 @@ export interface SessionTokens {
 }
 
 export const authApi = {
+  /** Tells the server, anonymously, where a new user came from (it ignores old accounts). */
+  acquisition(source: string) {
+    return apiRequest<void>('/acquisition', { method: 'POST', body: jsonBody({ source }) });
+  },
   async register(dto: { email: string; password: string; name: string; locale?: Locale }) {
     const result = await publicRequest<RegisterResult>('/auth/register', {
       method: 'POST',

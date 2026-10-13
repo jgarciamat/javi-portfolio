@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
 import { GUIDES, findGuide } from '@modules/guides/domain/guides';
 import { GuidePage, GuidesIndexPage } from '@modules/guides/ui/GuidePages';
 import { renderWithProviders } from '@test-utils/render';
@@ -24,7 +25,7 @@ describe('guide content', () => {
       expect(g.sections.length).toBeGreaterThan(1);
       expect(g.description.length).toBeLessThan(200);
       g.related.forEach((r) => expect(slugs).toContain(r));
-      if (g.tool) expect(['/calculadora-50-30-20', '/simulador-ahorro']).toContain(g.tool.to);
+      if (g.tool) expect(TOOL_PAGES.map((p) => p.path)).toContain(g.tool.to);
     }
     expect(findGuide('nope')).toBeUndefined();
     expect(findGuide(undefined)).toBeUndefined();
@@ -34,6 +35,7 @@ describe('guide content', () => {
     const { readFileSync } = await import('fs');
     const sitemap = readFileSync('public/sitemap.xml', 'utf8');
     expect(sitemap).toContain('https://www.winjgm.com/guias</loc>');
+    for (const tool of TOOL_PAGES) expect(sitemap).toContain(`${tool.path}</loc>`);
     for (const g of GUIDES) expect(sitemap).toContain(`/guias/${g.slug}</loc>`);
   });
 });

@@ -1,7 +1,13 @@
 import { expect, test } from './fixtures';
 
-test('sends visitors without a session to the login page', async ({ page }) => {
+test('shows the presentation page to visitors without a session, with a way in', async ({
+  page,
+}) => {
   await page.goto('/');
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Controla tu dinero sin hojas de cálculo' })
+  ).toBeVisible();
+  await page.getByRole('link', { name: 'Ya tengo cuenta' }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole('button', { name: 'Iniciar sesión', exact: true })).toBeVisible();
 });
@@ -20,9 +26,9 @@ test('publishes robots.txt and the sitemap', async ({ request }) => {
 test('the back button of the legal pages works when they are opened directly', async ({ page }) => {
   await page.goto('/terms');
   await page.getByRole('button', { name: '← Volver' }).click();
-  // Home without a session is the login page.
-  await expect(page).toHaveURL(/\/login$/);
+  // Home without a session is the presentation page.
+  await expect(page).toHaveURL(/\/$/);
   await page.goto('/privacy');
   await page.getByRole('button', { name: '← Volver' }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/$/);
 });
