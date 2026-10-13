@@ -4,7 +4,6 @@
   "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/patch-plugins.mjs",
     "predev": "node scripts/copy-ocr.mjs",
     "dev": "vite",
     "prebuild": "node scripts/copy-ocr.mjs",
