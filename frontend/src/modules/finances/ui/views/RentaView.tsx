@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
-import { Link } from 'react-router-dom';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { Icon } from '@shared/components/Icon';
 import { useFinances } from '../../application/FinancesContext';
@@ -47,11 +46,6 @@ export function RentaView() {
         </div>
         <p className="section-hint">{t('app.renta.hint')}</p>
         <p>{t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}</p>
-        <p>
-          <Link className="btn-secondary" to="/calculadora-renta">
-            {t('app.renta.openCalculator')}
-          </Link>
-        </p>
         <div className="tools-main renta-tools">
           <RentaPlanner
             key={`${year}-${Math.round(income)}`}

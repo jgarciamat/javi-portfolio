@@ -1380,7 +1380,6 @@
   "tools.renta.disclaimerFull": "Indicative estimate with the rules of the {year} tax year for residents of the common-regime regions, with one payer and individual filing. It does not include savings income (interest, dividends), rents or other income. The figures come from the Tax Agency manual; always check them on its site or with your advisor before filing.",
   "tools.renta.obligation.yes": "With this pay you have to file the return (more than 22,000 € gross from a single payer).",
   "tools.renta.obligation.no": "With this pay and a single payer you do not have to file, but it is worth it if too much was withheld or you have deductions: you may get money back.",
-  "app.renta.openCalculator": "Open the full-screen calculator",
   "billing.resource.rentaCalculations": "tax return calculations",
   "tools.renta.calculate": "Calculate my tax return",
   "tools.renta.freeOne": "Your free account includes 1 calculation. With Premium you calculate without limit and it updates instantly as you change the data.",

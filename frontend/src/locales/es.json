@@ -1380,7 +1380,6 @@
   "tools.renta.disclaimerFull": "Estimación orientativa con las reglas de la Renta {year} para residentes en comunidades de régimen común, con un solo pagador y tributación individual. No incluye ahorro (intereses, dividendos), alquileres ni otros rendimientos. Las cifras salen del manual de la Agencia Tributaria; compruébalas siempre en su sede o con tu gestor antes de presentar.",
   "tools.renta.obligation.yes": "Con este sueldo estás obligado a presentar la declaración (más de 22.000 € brutos de un solo pagador).",
   "tools.renta.obligation.no": "Con este sueldo y un solo pagador no estás obligado a declarar, pero te conviene hacerlo si te han retenido de más o tienes deducciones: puede salirte a devolver.",
-  "app.renta.openCalculator": "Abrir la calculadora a pantalla completa",
   "billing.resource.rentaCalculations": "cálculos de la Renta",
   "tools.renta.calculate": "Calcular mi Renta",
   "tools.renta.freeOne": "Tu cuenta gratuita incluye 1 cálculo. Con Premium calculas sin límite y se actualiza al momento mientras cambias los datos.",

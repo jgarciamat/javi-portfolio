@@ -43,11 +43,10 @@ describe('Renta section', () => {
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2024));
   });
 
-  it('links to the full-screen calculator', async () => {
+  it('does the calculation inside the app, without a link to the public page', async () => {
     renderWithProviders(<RentaView />);
-    expect(
-      await screen.findByRole('link', { name: tr('app.renta.openCalculator') })
-    ).toHaveAttribute('href', '/calculadora-renta');
+    expect(await screen.findByText(tr('tools.renta.step1'))).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /pantalla completa/ })).toBeNull();
   });
 
   it('lists what to gather and links to the Tax Agency', async () => {
