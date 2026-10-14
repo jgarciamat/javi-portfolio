@@ -234,3 +234,27 @@ describe('Month summary on demand', () => {
     expect(create).not.toHaveBeenCalled();
   });
 });
+
+describe('Month summary dialog with unusual months', () => {
+  it('copes with a month without income, expenses or savings', async () => {
+    mockCanvas();
+    Object.assign(URL, { createObjectURL: jest.fn(() => 'blob:x'), revokeObjectURL: jest.fn() });
+    const { MonthRecapDialog } = await import('@modules/finances/ui/components/MonthRecap');
+    renderWithProviders(
+      <MonthRecapDialog
+        summary={f.summary({
+          totalIncome: 0,
+          totalExpenses: 50,
+          totalSaving: 0,
+          balance: -50,
+          expensesByCategory: {},
+        })}
+        month="marzo"
+        onClose={jest.fn()}
+      />
+    );
+    expect(screen.queryByText(/Tu mayor gasto fue/)).toBeNull();
+    expect(screen.getByText(/de más gastado/)).toBeInTheDocument();
+    expect(screen.getAllByText(/^0\s?%$/).length).toBeGreaterThan(0);
+  });
+});
