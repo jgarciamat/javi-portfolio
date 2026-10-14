@@ -126,7 +126,8 @@ export function reveal(row: HTMLElement | null | undefined): void {
   const target = row ?? (document.querySelector('.renta-result') as HTMLElement);
   const group = target.closest('details');
   if (group) group.open = true;
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // A deduction is centred; the result is shown from its heading.
+  target.scrollIntoView({ behavior: 'smooth', block: row ? 'center' : 'start' });
   const field = target.querySelector<HTMLElement>('.renta-deduction-fields input');
   target.tabIndex = -1;
   (field ?? target).focus({ preventScroll: true });

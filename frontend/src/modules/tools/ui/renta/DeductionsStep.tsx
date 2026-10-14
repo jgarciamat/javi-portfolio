@@ -39,11 +39,13 @@ function DeductionRow({
     },
     1
   );
+  const needsAmount = deduction.kind === 'percent' || deduction.kind === 'special';
   const perChild = !!deduction.perChild && deduction.perChild.length > 0;
 
   return (
     <li
       id={rowId(deduction.id)}
+      data-pending={choice.on && needsAmount && number(choice.amount) <= 0 ? 'true' : undefined}
       tabIndex={-1}
       className={`renta-deduction${choice.on ? ' renta-deduction--on' : ''}`}
     >
@@ -231,7 +233,10 @@ export function PendingNotice({ pending }: { pending: string[] }) {
       <p>{t('tools.renta.pending', { count: pending.length })}</p>
       <button
         className="btn-secondary"
-        onClick={() => reveal(document.getElementById(rowId(pending[0])))}
+        onClick={() =>
+          // The first one on the page, whatever the order of the lists.
+          reveal(document.querySelector<HTMLElement>('.renta-deduction[data-pending]'))
+        }
       >
         {t('tools.renta.goToPending')}
       </button>
@@ -248,7 +253,6 @@ export function DeductionsStep({
   family,
   blocked,
   hints,
-  pending,
   onChange,
 }: {
   state: RentaState;
@@ -258,7 +262,6 @@ export function DeductionsStep({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
-  pending: string[];
   onChange: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -291,7 +294,6 @@ export function DeductionsStep({
         />
       )}
       {!ccaa && !loadError && <p className="section-hint">{t('tools.renta.pickCcaa')}</p>}
-      <PendingNotice pending={pending} />
     </Step>
   );
 }

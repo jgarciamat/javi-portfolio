@@ -344,6 +344,9 @@ describe('Renta planner: going through the marked deductions', () => {
   it('warns about the marked deductions that are missing an amount, and goes to them', async () => {
     render();
     await answerAll();
+    // One single notice, above the result.
+    expect(screen.getAllByText(/Te faltan datos en/)).toHaveLength(1);
+    expect(screen.getByText(/Te faltan datos en/).closest('.renta-result')).not.toBeNull();
     const alert = screen
       .getAllByRole('alert')
       .find((a) => /Te faltan datos en 2/.test(a.textContent ?? ''));

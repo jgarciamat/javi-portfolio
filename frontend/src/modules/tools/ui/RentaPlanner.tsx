@@ -189,7 +189,6 @@ export function RentaPlanner({
         family={family}
         blocked={live.result.blocked}
         hints={hints}
-        pending={pending}
         onChange={setChoice}
       />
 
