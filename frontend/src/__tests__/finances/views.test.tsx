@@ -311,6 +311,7 @@ describe('GoalsView', () => {
       target: 10,
       targetDate: null,
       category: undefined,
+      icon: '🎯',
     });
 
     fireEvent.click(screen.getByRole('button', { name: tr('app.accounts.archive') }));
@@ -336,6 +337,30 @@ describe('GoalsView', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.goals.create') }));
     await waitFor(() => expect(api.categoryApi.getAll.mock.calls.length).toBeGreaterThan(calls));
     expect(await screen.findByRole('option', { name: /Moto/ })).toBeInTheDocument();
+  });
+
+  it('lets you choose the emoji of the category a goal creates, and hides it for an existing one', async () => {
+    const { api } = setup();
+    await screen.findByRole('progressbar', { name: 'Viaje' });
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.goals.name') }), {
+      target: { value: 'Japón' },
+    });
+    fireEvent.change(screen.getByRole('spinbutton', { name: tr('app.goals.target') }), {
+      target: { value: '3000' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.category.manager.emoji.choose') }));
+    fireEvent.click(screen.getByRole('button', { name: '✈️' }));
+    expect(screen.queryByRole('button', { name: '🏦' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.goals.create') }));
+    await waitFor(() =>
+      expect(api.goalApi.create).toHaveBeenLastCalledWith(expect.objectContaining({ icon: '✈️' }))
+    );
+    fireEvent.change(screen.getByLabelText(tr('app.goals.category')), {
+      target: { value: 'Ahorro' },
+    });
+    expect(
+      screen.queryByRole('button', { name: tr('app.category.manager.emoji.choose') })
+    ).toBeNull();
   });
 
   it('shows the empty state', async () => {

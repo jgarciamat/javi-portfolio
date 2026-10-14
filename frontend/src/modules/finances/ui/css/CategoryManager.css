@@ -363,3 +363,19 @@
   border-top: 1px solid var(--slate-800);
   flex-shrink: 0;
 }
+
+.goal-category-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.emoji-picker-inline {
+  position: relative;
+}
+.emoji-picker-popover {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: min(22rem, 85vw);
+}

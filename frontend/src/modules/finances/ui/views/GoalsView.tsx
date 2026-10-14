@@ -8,6 +8,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import type { Category, Goal, GoalInput } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
+import { EmojiPickerButton } from '../components/EmojiPickerButton';
 import { Icon } from '@shared/components/Icon';
 
 function GoalCard({
@@ -80,7 +81,7 @@ function GoalCard({
   );
 }
 
-const EMPTY_GOAL = { name: '', target: '', targetDate: '', category: '' };
+const EMPTY_GOAL = { name: '', target: '', targetDate: '', category: '', icon: '🎯' };
 
 function GoalForm({
   categories,
@@ -106,6 +107,8 @@ function GoalForm({
           target: parseDecimal(form.target),
           targetDate: form.targetDate || null,
           category: form.category || undefined,
+          // The emoji only matters when the goal creates its own category.
+          icon: form.category ? undefined : form.icon,
         });
         if (created) setForm(EMPTY_GOAL);
       }}
@@ -140,17 +143,32 @@ function GoalForm({
           onChange={set('targetDate')}
         />
       </label>
-      <label className="field">
-        <span className="field-label">{t('app.goals.category')}</span>
-        <select className="tx-input" value={form.category} onChange={set('category')}>
-          <option value="">{t('app.goals.ownCategory')}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.name}>
-              {c.icon} {tCategory(c.name)}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="field">
+        <label className="field-label" htmlFor="goal-category">
+          {t('app.goals.category')}
+        </label>
+        <span className="goal-category-field">
+          {!form.category && (
+            <EmojiPickerButton
+              value={form.icon}
+              onChange={(icon) => setForm((f) => ({ ...f, icon }))}
+            />
+          )}
+          <select
+            id="goal-category"
+            className="tx-input"
+            value={form.category}
+            onChange={set('category')}
+          >
+            <option value="">{t('app.goals.ownCategory')}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.icon} {tCategory(c.name)}
+              </option>
+            ))}
+          </select>
+        </span>
+      </div>
       <div className="inline-form-actions">
         <button type="submit" className="btn-primary" disabled={saving}>
           {t('app.goals.create')}

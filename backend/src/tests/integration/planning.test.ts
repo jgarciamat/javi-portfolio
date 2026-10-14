@@ -192,6 +192,17 @@ describe('Categories, budgets, alerts and goals', () => {
       });
     });
 
+    it('gives the goal category the emoji that was chosen', async () => {
+      const goal = await request(ctx.app)
+        .post('/api/goals')
+        .set(user.auth)
+        .send({ name: 'Viaje', target: 3000, icon: '✈️' })
+        .expect(201);
+      expect(goal.body.categoryName).toBe('Viaje');
+      const categories = (await request(ctx.app).get('/api/categories').set(user.auth)).body;
+      expect(categories.find((c: { name: string }) => c.name === 'Viaje').icon).toBe('✈️');
+    });
+
     it('can use an existing category and be archived', async () => {
       const goal = await request(ctx.app)
         .post('/api/goals')
