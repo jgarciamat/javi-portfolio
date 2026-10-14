@@ -292,10 +292,14 @@
   background: rgba(255, 255, 255, 0.04);
 }
 .renta-badge--missing {
-  background: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.5);
 }
 .renta-badge--inDraft {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.18);
+  color: #86efac;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.5);
 }
 
 .renta-deduction-nav {
@@ -310,9 +314,20 @@
 }
 
 .renta-badge--model {
-  background: rgba(99, 102, 241, 0.25);
+  background: rgba(99, 102, 241, 0.22);
+  color: #c7d2fe;
+  box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.6);
 }
 .renta-advance {
   display: block;
-  margin: 0.25rem 0 0.25rem 1.75rem;
+  margin: 0.5rem 0 0.25rem 2.1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--text-secondary, #cbd5e1);
+  line-height: 1.45;
+}
+.renta-advance a {
+  color: #c7d2fe;
+  font-weight: 600;
 }
