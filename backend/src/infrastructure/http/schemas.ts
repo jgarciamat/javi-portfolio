@@ -276,6 +276,23 @@ export const rateQuery = z.object({
 export const businessCategoryBody = z.object({
   vatRate: z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]),
 });
+const euroAmount = z.number().finite().min(0).max(100_000_000);
+const quarterExtras = z.object({
+  withheld: euroAmount.default(0),
+  socialSecurity: euroAmount.default(0),
+  vatNotDeductible: euroAmount.default(0),
+});
+export const autonomoDraftBody = z.object({
+  year,
+  quarter: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  inputs: z.object({
+    quarters: z.tuple([quarterExtras, quarterExtras, quarterExtras, quarterExtras]),
+    hardToJustify: z.boolean().default(false),
+    priorYearNet: z.number().finite().min(-100_000_000).max(100_000_000).nullable().default(null),
+    exempt130: z.boolean().default(false),
+    vatToOffset: euroAmount.default(0),
+  }),
+});
 export const categoryIdParam = z.object({ categoryId: id });
 export const splitGroupBody = z.object({
   name: z.string().trim().min(1).max(60),

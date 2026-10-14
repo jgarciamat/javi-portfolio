@@ -593,7 +593,6 @@ describe('AnalysisView', () => {
 describe('Premium sections', () => {
   const sections = [
     ['investments and debts', <AssetsView key="a" />, 'app.assets.locked'],
-    ['self-employed', <BusinessView key="b" />, 'app.tax.locked'],
   ] as const;
 
   it.each(sections)(
@@ -691,6 +690,132 @@ describe('the self-employed section', () => {
     api.businessApi.setCategory.mockRejectedValueOnce(new Error('Premium requerido'));
     fireEvent.change(screen.getByRole('combobox', { name: /Casa/ }), { target: { value: '4' } });
     expect(await screen.findByText('Premium requerido')).toBeInTheDocument();
+  });
+});
+
+describe('the self-employed draft', () => {
+  const free = (usage = 0) => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ocio' })]);
+    const overview = f.billing({ plan: 'free' });
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      limits: f.catalog().limits.free,
+      usage: { ...overview.usage, autonomoDrafts: usage },
+    });
+    return api;
+  };
+  const open = (api = free(), draftLimitOverride?: boolean) => {
+    renderWithProviders(<BusinessView />, { api, plan: draftLimitOverride !== false });
+    return api;
+  };
+
+  beforeEach(() => localStorage.clear());
+
+  it('prepares a draft with the extras and shows the boxes, the contribution and the deadlines', async () => {
+    const api = open();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    expect(await screen.findByText(/Borrador de 2026, 1.º trimestre/)).toBeInTheDocument();
+    expect(screen.getAllByText('Modelo 303').length).toBeGreaterThan(0);
+    expect(screen.getByText('Modelo 130')).toBeInTheDocument();
+    expect(screen.getByText('Base imponible al 21 %')).toBeInTheDocument();
+    expect(screen.getByText('21 %')).toBeInTheDocument();
+    expect(screen.getByText(/tramo R1/)).toBeInTheDocument();
+    expect(screen.getByText('IVA trimestral')).toBeInTheDocument();
+    expect(api.businessApi.draft).toHaveBeenCalledWith(
+      new Date().getFullYear(),
+      expect.any(Number),
+      expect.objectContaining({ hardToJustify: false, exempt130: false, priorYearNet: null })
+    );
+  });
+
+  it('sends what the person adds', async () => {
+    const api = open();
+    fireEvent.change(await screen.findByLabelText(tr('app.autonomo.quarter')), {
+      target: { value: '2' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.year')), {
+      target: { value: String(new Date().getFullYear() - 1) },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.withheld')} 1`), {
+      target: { value: '120,5' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.socialSecurity')} 2`), {
+      target: { value: '300' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.vatNotDeductible')} 2`), {
+      target: { value: '12' },
+    });
+    fireEvent.click(screen.getByLabelText(new RegExp('gastos de difícil justificación')));
+    fireEvent.click(screen.getByLabelText(new RegExp('no presento el modelo 130')));
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.priorNet'))), {
+      target: { value: '9500' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.toOffset')), {
+      target: { value: '40' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(new Date().getFullYear() - 1, 2, {
+        quarters: [
+          { withheld: 120.5, socialSecurity: 0, vatNotDeductible: 0 },
+          { withheld: 0, socialSecurity: 300, vatNotDeductible: 12 },
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+        ],
+        hardToJustify: true,
+        priorYearNet: 9500,
+        exempt130: true,
+        vatToOffset: 40,
+      })
+    );
+  });
+
+  it('says a professional with 70 % withheld has no modelo 130, and shows the other results', async () => {
+    const api = open();
+    api.businessApi.draft.mockResolvedValue(
+      f.autonomoDraft({
+        irpf: { required: false, result: 'notRequired', amountDue: 0, boxes: [] },
+        vat: { ...f.autonomoDraft().vat, result: 'offset', amountDue: -21 },
+      })
+    );
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    expect(await screen.findByText(tr('app.autonomo.irpf.notRequiredText'))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.autonomo.vat.offset'))).toBeInTheDocument();
+  });
+
+  it('lets the free plan prepare one draft, keeps it, and then asks for Premium', async () => {
+    const api = open(free(1));
+    expect(await screen.findByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.goPremium') }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(api.businessApi.draft).not.toHaveBeenCalled();
+  });
+
+  it('shows the draft prepared before, even when the plan is out of drafts', async () => {
+    localStorage.setItem('mm_autonomo_draft', JSON.stringify(f.autonomoDraft()));
+    open(free(1));
+    expect(await screen.findByText(/Borrador de 2026, 1.º trimestre/)).toBeInTheDocument();
+  });
+
+  it('has no limit with Premium and reports errors', async () => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ocio' })]);
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
+    api.businessApi.draft.mockRejectedValueOnce(new Error('Sin conexión'));
+    renderWithProviders(<BusinessView />, { api, plan: true });
+    expect(screen.queryByText(tr('app.autonomo.freeOne'))).toBeNull();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    expect(await screen.findByText('Sin conexión')).toBeInTheDocument();
+  });
+
+  it('works outside the plan context too', async () => {
+    const api = createFakeApi();
+    api.categoryApi.getAll.mockResolvedValue([f.category({ id: 'c1', name: 'Ocio' })]);
+    renderWithProviders(<BusinessView />, { api });
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    expect(await screen.findByText(/Borrador de 2026/)).toBeInTheDocument();
   });
 });
 

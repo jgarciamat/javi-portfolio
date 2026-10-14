@@ -296,6 +296,12 @@ export interface RentaPassRepository {
   remove(userId: string): void;
 }
 
+export interface AutonomoUsageRepository {
+  count(userId: string): number;
+  /** One more draft; returns how many there are now. */
+  increment(userId: string): number;
+}
+
 export interface RentaUsageRepository {
   count(userId: string): number;
   /** One more calculation; returns how many there are now. */

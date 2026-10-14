@@ -1,11 +1,13 @@
 import { NotFoundError } from '@domain/errors';
 import {
+  AutonomoUsageRepository,
   BusinessCategoryRepository,
   CategoryRepository,
   TransactionRepository,
   VatRate,
 } from '@domain/ports/repositories';
-import { YearTax, yearlyTax } from '@domain/services/tax';
+import { DraftInputs, DraftResult, prepareDraft } from '@domain/services/autonomo';
+import { BusinessMovement, YearTax, yearlyTax } from '@domain/services/tax';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
 export interface BusinessCategoryView {
@@ -20,11 +22,11 @@ export class TaxService {
     private readonly business: BusinessCategoryRepository,
     private readonly categories: CategoryRepository,
     private readonly transactions: TransactionRepository,
-    private readonly entitlements: EntitlementService
+    private readonly entitlements: EntitlementService,
+    private readonly drafts: AutonomoUsageRepository
   ) {}
 
   list(userId: string): BusinessCategoryView[] {
-    this.entitlements.assertFeature(userId, 'insights');
     const names = new Map(this.categories.listByUser(userId).map((c) => [c.id, c.name]));
     // A category's row goes away with it, so the name is always known.
     return this.business.listByUser(userId).map((b) => ({
@@ -35,7 +37,6 @@ export class TaxService {
   }
 
   set(userId: string, categoryId: string, vatRate: VatRate): void {
-    this.entitlements.assertFeature(userId, 'insights');
     if (!this.categories.findById(userId, categoryId)) {
       throw new NotFoundError('Categoría no encontrada', 'CATEGORY_NOT_FOUND');
     }
@@ -43,14 +44,31 @@ export class TaxService {
   }
 
   remove(userId: string, categoryId: string): void {
-    this.entitlements.assertFeature(userId, 'insights');
     this.business.remove(userId, categoryId);
   }
 
   yearly(userId: string, year: number): YearTax {
-    this.entitlements.assertFeature(userId, 'insights');
+    return yearlyTax(year, this.movements(userId));
+  }
+
+  /**
+   * The draft of a quarter (modelo 303, modelo 130 and the contribution): the free plan can prepare
+   * one, Premium as many as it wants.
+   */
+  draft(
+    userId: string,
+    year: number,
+    quarter: 1 | 2 | 3 | 4,
+    inputs: DraftInputs
+  ): DraftResult & { used: number } {
+    this.entitlements.assertCanCreate(userId, 'autonomoDrafts', this.drafts.count(userId));
+    const result = prepareDraft(year, quarter, this.movements(userId), inputs);
+    return { ...result, used: this.drafts.increment(userId) };
+  }
+
+  private movements(userId: string): BusinessMovement[] {
     const rates = new Map(this.business.listByUser(userId).map((b) => [b.categoryId, b.vatRate]));
-    const movements = this.transactions
+    return this.transactions
       .listAllByUser(userId)
       .map((t) => t.toPrimitives())
       .filter((t) => rates.has(t.categoryId) && (t.type === 'INCOME' || t.type === 'EXPENSE'))
@@ -60,6 +78,5 @@ export class TaxService {
         amountCents: t.amountCents,
         vatRate: rates.get(t.categoryId) as VatRate,
       }));
-    return yearlyTax(year, movements);
   }
 }

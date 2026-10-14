@@ -1,0 +1,74 @@
+.autonomo-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.autonomo-tile {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.autonomo-tile strong {
+  font-size: 1.4rem;
+}
+.autonomo-tile--pay {
+  border-color: rgba(248, 113, 113, 0.6);
+}
+.autonomo-tile--offset,
+.autonomo-tile--negative {
+  border-color: rgba(34, 197, 94, 0.6);
+}
+.autonomo-boxes {
+  margin-top: 1.25rem;
+  overflow-x: auto;
+}
+.autonomo-boxes table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.autonomo-boxes th,
+.autonomo-boxes td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.autonomo-boxes td:last-child,
+.autonomo-boxes th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+.autonomo-boxes td:first-child {
+  font-variant-numeric: tabular-nums;
+  color: #c7d2fe;
+}
+.autonomo-extras {
+  margin: 1rem 0;
+}
+.autonomo-quarter {
+  margin: 0.75rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+.autonomo-deadlines {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.autonomo-deadlines li {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.autonomo-deadlines span {
+  margin-left: auto;
+  color: #c7d2fe;
+}

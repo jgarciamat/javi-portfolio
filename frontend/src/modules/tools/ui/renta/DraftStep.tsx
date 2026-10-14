@@ -112,8 +112,18 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
             </strong>
           </p>
           <p className="section-hint">{t('tools.renta.draft.passHint')}</p>
-          {access.consentRequired && <ConsentBoxes consent={consent} onChange={setConsent} />}
-          <button className="btn-primary" disabled={busy || !accepted} onClick={() => void buy()}>
+          {access.consentRequired && (
+            <ConsentBoxes
+              consent={consent}
+              onChange={setConsent}
+              immediateKey="tools.renta.draft.immediate"
+            />
+          )}
+          <button
+            className="btn-primary renta-buy"
+            disabled={busy || !accepted}
+            onClick={() => void buy()}
+          >
             {t('tools.renta.draft.buyPass', { price: formatPrice(access.price, locale) })}
           </button>
           {error && <p className="form-error">{error}</p>}

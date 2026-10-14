@@ -19,6 +19,7 @@ const NEW_USER = f.billing({
     recurringRules: 0,
     customAlerts: 0,
     rentaCalculations: 0,
+    autonomoDrafts: 0,
     movements: 1,
   },
 });
@@ -30,6 +31,7 @@ const SETTLED = f.billing({
     recurringRules: 1,
     customAlerts: 0,
     rentaCalculations: 0,
+    autonomoDrafts: 0,
     movements: 20,
   },
   ai: { used: 2, quota: 10 },
@@ -72,6 +74,7 @@ describe('Getting started', () => {
         recurringRules: 0,
         customAlerts: 0,
         rentaCalculations: 0,
+        autonomoDrafts: 0,
         movements: 4,
       },
     });
@@ -126,6 +129,7 @@ describe('Getting started progress', () => {
         recurringRules: 0,
         customAlerts: 0,
         rentaCalculations: 0,
+        autonomoDrafts: 0,
         movements: 1,
         ...over,
       },

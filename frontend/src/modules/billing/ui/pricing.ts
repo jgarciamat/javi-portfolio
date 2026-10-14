@@ -22,6 +22,7 @@ export const RESOURCE_KEYS: Record<LimitedResource, string> = {
   recurringRules: 'billing.resource.recurringRules',
   customAlerts: 'billing.resource.customAlerts',
   rentaCalculations: 'billing.resource.rentaCalculations',
+  autonomoDrafts: 'billing.resource.autonomoDrafts',
 };
 
 export const FEATURE_KEYS: Record<PremiumFeature, string> = {

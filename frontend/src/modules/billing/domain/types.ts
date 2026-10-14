@@ -13,7 +13,8 @@ export type LimitedResource =
   | 'goals'
   | 'recurringRules'
   | 'customAlerts'
-  | 'rentaCalculations';
+  | 'rentaCalculations'
+  | 'autonomoDrafts';
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
 
 export interface PlanLimits {

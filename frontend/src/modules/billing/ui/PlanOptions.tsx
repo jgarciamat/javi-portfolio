@@ -68,10 +68,13 @@ export function ConsentBoxes({
   consent,
   onChange,
   disabled,
+  immediateKey = 'billing.immediateStart',
 }: {
   consent: CheckoutConsent;
   onChange: (consent: CheckoutConsent) => void;
   disabled?: boolean;
+  /** The text of the second tick (the pass starts "now" just as Premium does). */
+  immediateKey?: string;
 }) {
   const { t } = useI18n();
   return (
@@ -98,7 +101,7 @@ export function ConsentBoxes({
           onChange={(e) => onChange({ ...consent, waiveWithdrawal: e.target.checked })}
           disabled={disabled}
         />
-        <span>{t('billing.immediateStart')}</span>
+        <span>{t(immediateKey)}</span>
       </label>
     </>
   );

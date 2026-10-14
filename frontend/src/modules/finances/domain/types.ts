@@ -589,6 +589,56 @@ export interface YearTax {
   totals: QuarterTax;
 }
 
+/** A box of an official tax form, with what goes in it. */
+export interface TaxBox {
+  box: string;
+  label: string;
+  amount: number;
+}
+
+export interface QuarterExtras {
+  withheld: number;
+  socialSecurity: number;
+  vatNotDeductible: number;
+}
+
+export interface AutonomoInputs {
+  quarters: [QuarterExtras, QuarterExtras, QuarterExtras, QuarterExtras];
+  hardToJustify: boolean;
+  priorYearNet: number | null;
+  exempt130: boolean;
+  vatToOffset: number;
+}
+
+export interface AutonomoDraft {
+  year: number;
+  quarter: 1 | 2 | 3 | 4;
+  used: number;
+  vat: {
+    result: 'pay' | 'offset' | 'zero' | 'noActivity';
+    amountDue: number;
+    accrued: TaxBox[];
+    deductible: TaxBox[];
+    settlement: TaxBox[];
+  };
+  irpf: {
+    required: boolean;
+    result: 'pay' | 'negative' | 'zero' | 'notRequired';
+    amountDue: number;
+    boxes: TaxBox[];
+  };
+  reta: {
+    monthlyNet: number;
+    bracket: string;
+    baseMin: number;
+    baseMax: number;
+    feeMin: number;
+    feeMax: number;
+    rate: number;
+  };
+  deadlines: { model: string; label: string; date: string }[];
+}
+
 export interface SplitGroupSummary {
   id: string;
   name: string;

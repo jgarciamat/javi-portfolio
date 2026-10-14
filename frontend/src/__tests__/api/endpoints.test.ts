@@ -283,6 +283,24 @@ const cases: Case[] = [
   ['quarterly tax', () => businessApi.tax(2026), 'GET', '/business/tax/2026'],
   ['assets', () => assetApi.getAll(), 'GET', '/assets'],
   ['count a tax return calculation', () => rentaApi.register(), 'POST', '/renta/calculation'],
+  [
+    'prepare a self-employed draft',
+    () =>
+      businessApi.draft(2026, 1, {
+        quarters: [
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+          { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 },
+        ],
+        hardToJustify: false,
+        priorYearNet: null,
+        exempt130: false,
+        vatToOffset: 0,
+      }),
+    'POST',
+    '/business/draft',
+  ],
   ['register the use of the draft reader', () => rentaApi.draft(), 'POST', '/renta/draft'],
   ['inbox', () => inboxApi.get(), 'GET', '/inbox'],
   ['new inbox address', () => inboxApi.rotate(), 'POST', '/inbox/rotate'],

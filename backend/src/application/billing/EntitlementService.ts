@@ -28,6 +28,7 @@ const RESOURCE_LABELS: Record<LimitedResource, string> = {
   recurringRules: 'movimientos recurrentes',
   customAlerts: 'alertas',
   rentaCalculations: 'cálculos de la Renta',
+  autonomoDrafts: 'borradores de autónomo',
 };
 
 /** Answers "what can this user do right now?" and enforces it. */
