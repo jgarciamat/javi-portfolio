@@ -358,6 +358,7 @@ describe('GoalsView', () => {
         target: 2000,
         targetDate: null,
         category: undefined,
+        icon: '🎯',
       })
     );
   });

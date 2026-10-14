@@ -22,10 +22,10 @@ export class CategoryResolver {
     return category;
   }
 
-  findOrCreate(userId: string, name: string): Category {
+  findOrCreate(userId: string, name: string, icon?: string): Category {
     const existing = this.categories.findByName(userId, name);
     if (existing) return existing;
-    const created = Category.create({ userId, name });
+    const created = Category.create({ userId, name, icon });
     this.categories.save(created);
     return created;
   }

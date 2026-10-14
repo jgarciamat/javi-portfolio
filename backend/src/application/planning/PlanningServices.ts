@@ -179,7 +179,7 @@ export class GoalService {
     const goal = this.uow.run(() => {
       const category =
         this.categories.resolveOptional(userId, input) ??
-        this.categories.findOrCreate(userId, input.name ?? '');
+        this.categories.findOrCreate(userId, input.name ?? '', input.icon);
       const created = Goal.create(
         userId,
         { ...(input as GoalInput), categoryId: category.id },
