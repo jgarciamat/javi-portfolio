@@ -8,16 +8,25 @@ import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
-import type {
-  AutonomoDraft,
-  AutonomoInputs,
-  QuarterExtras,
-  TaxBox,
+import { buildAutonomoPdf, type PdfText } from '../../application/autonomoPdf';
+import { shareImage } from '@shared/utils/shareImage';
+import {
+  EXPENSE_KINDS,
+  type AutonomoDraft,
+  type AutonomoInputs,
+  type QuarterExtras,
+  type TaxBox,
 } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
-const SNAPSHOT_KEY = 'mm_autonomo_draft';
+const SNAPSHOT_KEY = 'mm_autonomo_draft2';
+
+/** The last draft with the data it was prepared from (to put them in the PDF). */
+interface Snapshot {
+  draft: AutonomoDraft;
+  inputs: AutonomoInputs | null;
+}
 const MANUAL_KEY = 'mm_autonomo_manual2';
 const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
@@ -104,9 +113,98 @@ function Deductible({ lines }: { lines: NonNullable<AutonomoDraft['expenses']> }
 }
 
 /** What the draft says, in words, and the boxes behind it. */
-function DraftResult({ draft }: { draft: AutonomoDraft }) {
+function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: AutonomoInputs | null }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const download = async () => {
+    setSaving(true);
+    setFailed(false);
+    try {
+      const kinds = Object.fromEntries(EXPENSE_KINDS.map((k) => [k, t(`app.autonomo.kind.${k}`)]));
+      const notes = Object.fromEntries(
+        ['supplies', 'vehicle', 'meals', 'clients', 'health', 'fines'].map((n) => [
+          n,
+          t(`app.autonomo.note.${n}`),
+        ])
+      );
+      const text: PdfText = {
+        title: t('app.autonomo.pdf.title'),
+        subtitle: t('app.autonomo.draftOf', { year: draft.year, n: draft.quarter }),
+        generated: t('app.autonomo.pdf.generated', { date: date(new Date().toISOString()) }),
+        data: t('app.autonomo.pdf.data'),
+        quarter: t('app.autonomo.quarter'),
+        income: t('app.autonomo.incomeTitle'),
+        withheld: t('app.autonomo.withheld'),
+        other: t('app.autonomo.extras'),
+        box: t('app.autonomo.box'),
+        concept: t('app.autonomo.concept'),
+        amount: t('app.autonomo.amount'),
+        vatAccrued: t('app.autonomo.accrued'),
+        vatDeductible: t('app.autonomo.deductible'),
+        vatSettlement: t('app.autonomo.settlement'),
+        irpf: t('app.autonomo.irpfBoxes'),
+        irpfNotRequired: t('app.autonomo.irpf.notRequiredText'),
+        expenses: t('app.autonomo.deductibleTitle'),
+        paid: t('app.autonomo.paid'),
+        deductibleIrpf: t('app.autonomo.deductibleIrpf'),
+        deductibleVat: t('app.autonomo.deductibleVat'),
+        total: t('app.autonomo.total'),
+        reta: t('app.autonomo.retaTitle'),
+        retaText: t('app.autonomo.retaText', {
+          net: money(draft.reta.monthlyNet),
+          bracket: draft.reta.bracket,
+          baseMin: money(draft.reta.baseMin),
+          baseMax: money(draft.reta.baseMax),
+        }),
+        deadlines: t('app.autonomo.deadlines'),
+        disclaimer: t('app.autonomo.disclaimer'),
+        summary: [
+          {
+            model: t('app.autonomo.model', { model: '303' }),
+            text: t(`app.autonomo.vat.${draft.vat.result}`),
+            amount: money(Math.abs(draft.vat.amountDue)),
+          },
+          {
+            model: t('app.autonomo.model', { model: '130' }),
+            text: t(`app.autonomo.irpf.${draft.irpf.result}`),
+            amount: money(Math.abs(draft.irpf.amountDue)),
+          },
+          {
+            model: t('app.autonomo.retaTitle'),
+            text: t('app.autonomo.perMonth'),
+            amount: `${money(draft.reta.feeMin)} – ${money(draft.reta.feeMax)}`,
+          },
+        ],
+        kinds,
+        notes,
+        incomeLabels: {
+          r21: t('app.autonomo.income.r21'),
+          r10: t('app.autonomo.income.r10'),
+          r4: t('app.autonomo.income.r4'),
+          r0: t('app.autonomo.income.r0'),
+        },
+        flags: {
+          hardToJustify: t('app.autonomo.pdf.hardToJustify'),
+          exempt: t('app.autonomo.pdf.exempt'),
+          priorNet: t('app.autonomo.priorNet'),
+          toOffset: t('app.autonomo.toOffset'),
+        },
+      };
+      const blob = await buildAutonomoPdf(draft, inputs, text, date);
+      await shareImage(
+        blob,
+        `borrador-autonomo-${draft.year}-T${draft.quarter}.pdf`,
+        t('app.autonomo.pdf.title')
+      );
+    } catch {
+      setFailed(true);
+    } finally {
+      setSaving(false);
+    }
+  };
   const { vat, irpf, reta } = draft;
   return (
     <div className="autonomo-result" aria-live="polite">
@@ -161,6 +259,13 @@ function DraftResult({ draft }: { draft: AutonomoDraft }) {
         ))}
       </ul>
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
+      <div className="button-row">
+        <button className="btn-primary" disabled={saving} onClick={() => void download()}>
+          {saving ? t('app.autonomo.pdf.preparing') : t('app.autonomo.pdf.download')}
+        </button>
+        <small className="section-hint">{t('app.autonomo.pdf.hint')}</small>
+      </div>
+      {failed && <p className="form-error">{t('app.autonomo.pdf.error')}</p>}
     </div>
   );
 }
@@ -184,8 +289,8 @@ export function AutonomoDraftCard() {
     storage.setJSON(MANUAL_KEY, next);
     setManual(next);
   };
-  const [draft, setDraft] = useState<AutonomoDraft | null>(() =>
-    storage.getJSON<AutonomoDraft | null>(SNAPSHOT_KEY, null)
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
+    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
 
   const limit = plan?.overview?.limits.resources.autonomoDrafts;
@@ -209,8 +314,9 @@ export function AutonomoDraftCard() {
         manual: manualData,
       };
       const result = await businessApi.draft(year, quarter, inputs);
-      storage.setJSON(SNAPSHOT_KEY, result);
-      setDraft(result);
+      const next: Snapshot = { draft: result, inputs };
+      storage.setJSON(SNAPSHOT_KEY, next);
+      setSnapshot(next);
       await plan?.refresh();
     });
 
@@ -320,12 +426,12 @@ export function AutonomoDraftCard() {
         </div>
       )}
 
-      {draft && (
+      {snapshot && (
         <>
           <h3 className="subsection-title">
-            {t('app.autonomo.draftOf', { year: draft.year, n: draft.quarter })}
+            {t('app.autonomo.draftOf', { year: snapshot.draft.year, n: snapshot.draft.quarter })}
           </h3>
-          <DraftResult draft={draft} />
+          <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
         </>
       )}
     </div>

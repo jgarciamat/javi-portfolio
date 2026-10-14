@@ -7,6 +7,8 @@ import { GoalsView } from '@modules/finances/ui/views/GoalsView';
 import { SearchView } from '@modules/finances/ui/views/SearchView';
 import { AnalysisView } from '@modules/finances/ui/views/AnalysisView';
 import { AssetsView } from '@modules/finances/ui/views/AssetsView';
+import { buildAutonomoPdf } from '@modules/finances/application/autonomoPdf';
+import { shareImage } from '@shared/utils/shareImage';
 import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { SettingsView } from '@modules/finances/ui/views/SettingsView';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
@@ -33,6 +35,11 @@ beforeEach(() => {
 afterEach(restoreTime);
 
 // ─── Accounts ────────────────────────────────────────────────────────────────
+
+jest.mock('@modules/finances/application/autonomoPdf', () => ({
+  buildAutonomoPdf: jest.fn(async () => new Blob(['pdf'], { type: 'application/pdf' })),
+}));
+jest.mock('@shared/utils/shareImage', () => ({ shareImage: jest.fn(async () => 'saved') }));
 
 describe('AccountsView', () => {
   const main = f.account({ id: 'a1', name: 'Principal', isDefault: true, balance: 900 });
@@ -850,6 +857,23 @@ describe('the self-employed draft', () => {
     expect(await screen.findByLabelText(tr('app.autonomo.workArea'))).toHaveValue('15');
   });
 
+  it('downloads the draft as a PDF, and reports when it cannot', async () => {
+    open();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+    const download = await screen.findByRole('button', { name: tr('app.autonomo.pdf.download') });
+    fireEvent.click(download);
+    await waitFor(() =>
+      expect(shareImage).toHaveBeenCalledWith(
+        expect.any(Blob),
+        `borrador-autonomo-2026-T1.pdf`,
+        tr('app.autonomo.pdf.title')
+      )
+    );
+    (buildAutonomoPdf as jest.Mock).mockRejectedValueOnce(new Error('boom'));
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.pdf.download') }));
+    expect(await screen.findByText(tr('app.autonomo.pdf.error'))).toBeInTheDocument();
+  });
+
   it('says a professional with 70 % withheld has no modelo 130, and shows the other results', async () => {
     const api = open();
     api.businessApi.draft.mockResolvedValue(
@@ -873,7 +897,10 @@ describe('the self-employed draft', () => {
   });
 
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {
-    localStorage.setItem('mm_autonomo_draft', JSON.stringify(f.autonomoDraft()));
+    localStorage.setItem(
+      'mm_autonomo_draft2',
+      JSON.stringify({ draft: f.autonomoDraft(), inputs: null })
+    );
     open(free(1));
     expect(await screen.findByText(/Borrador de 2026, 1.º trimestre/)).toBeInTheDocument();
   });

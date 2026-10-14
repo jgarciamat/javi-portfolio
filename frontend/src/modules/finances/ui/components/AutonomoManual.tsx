@@ -191,70 +191,74 @@ export function AutonomoManual({
           <ul className="autonomo-expenses">
             {quarter.expenses.map((expense, i) => (
               <li key={i}>
-                <label className="field autonomo-expense-kind">
-                  <span className="field-label">{t('app.autonomo.expenseKind')}</span>
-                  <select
-                    className="tx-input"
-                    aria-label={`${t('app.autonomo.expenseKind')} ${q + 1}.${i + 1}`}
-                    value={expense.kind}
-                    onChange={(e) => setExpense(q, i, { kind: e.target.value as ExpenseKind })}
-                  >
-                    {EXPENSE_KINDS.map((kind) => (
-                      <option key={kind} value={kind}>
-                        {t(`app.autonomo.kind.${kind}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="field">
-                  <span className="field-label">{t('app.autonomo.expenseAmount')}</span>
-                  <input
-                    className="tx-input"
-                    inputMode="decimal"
-                    aria-label={`${t('app.autonomo.expenseAmount')} ${q + 1}.${i + 1}`}
-                    value={expense.amount}
-                    onChange={(e) => setExpense(q, i, { amount: e.target.value })}
-                  />
-                </label>
-                <label className="field">
-                  <span className="field-label">{t('app.autonomo.expenseVat')}</span>
-                  <select
-                    className="tx-input"
-                    aria-label={`${t('app.autonomo.expenseVat')} ${q + 1}.${i + 1}`}
-                    value={expense.vatRate}
-                    onChange={(e) =>
-                      setExpense(q, i, { vatRate: Number(e.target.value) as VatRate })
+                <div className="autonomo-expense-top">
+                  <label className="field autonomo-expense-kind">
+                    <span className="field-label">{t('app.autonomo.expenseKind')}</span>
+                    <select
+                      className="tx-input"
+                      aria-label={`${t('app.autonomo.expenseKind')} ${q + 1}.${i + 1}`}
+                      value={expense.kind}
+                      onChange={(e) => setExpense(q, i, { kind: e.target.value as ExpenseKind })}
+                    >
+                      {EXPENSE_KINDS.map((kind) => (
+                        <option key={kind} value={kind}>
+                          {t(`app.autonomo.kind.${kind}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn-secondary autonomo-remove"
+                    aria-label={`${t('app.common.delete')} ${q + 1}.${i + 1}`}
+                    onClick={() =>
+                      setQuarter(q, { expenses: quarter.expenses.filter((_, j) => j !== i) })
                     }
                   >
-                    {RATES.map((r) => (
-                      <option key={r} value={r}>
-                        {r} %
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {expense.kind === 'meals' && (
+                    ✕
+                  </button>
+                </div>
+                <div className="autonomo-expense-fields">
                   <label className="field">
-                    <span className="field-label">{t('app.autonomo.days')}</span>
+                    <span className="field-label">{t('app.autonomo.expenseAmount')}</span>
                     <input
                       className="tx-input"
-                      inputMode="numeric"
-                      aria-label={`${t('app.autonomo.days')} ${q + 1}.${i + 1}`}
-                      value={expense.days}
-                      onChange={(e) => setExpense(q, i, { days: e.target.value })}
+                      inputMode="decimal"
+                      aria-label={`${t('app.autonomo.expenseAmount')} ${q + 1}.${i + 1}`}
+                      value={expense.amount}
+                      onChange={(e) => setExpense(q, i, { amount: e.target.value })}
                     />
                   </label>
-                )}
-                <button
-                  type="button"
-                  className="btn-secondary autonomo-remove"
-                  aria-label={`${t('app.common.delete')} ${q + 1}.${i + 1}`}
-                  onClick={() =>
-                    setQuarter(q, { expenses: quarter.expenses.filter((_, j) => j !== i) })
-                  }
-                >
-                  ✕
-                </button>
+                  <label className="field">
+                    <span className="field-label">{t('app.autonomo.expenseVat')}</span>
+                    <select
+                      className="tx-input"
+                      aria-label={`${t('app.autonomo.expenseVat')} ${q + 1}.${i + 1}`}
+                      value={expense.vatRate}
+                      onChange={(e) =>
+                        setExpense(q, i, { vatRate: Number(e.target.value) as VatRate })
+                      }
+                    >
+                      {RATES.map((r) => (
+                        <option key={r} value={r}>
+                          {r} %
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {expense.kind === 'meals' && (
+                    <label className="field">
+                      <span className="field-label">{t('app.autonomo.days')}</span>
+                      <input
+                        className="tx-input"
+                        inputMode="numeric"
+                        aria-label={`${t('app.autonomo.days')} ${q + 1}.${i + 1}`}
+                        value={expense.days}
+                        onChange={(e) => setExpense(q, i, { days: e.target.value })}
+                      />
+                    </label>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
