@@ -293,6 +293,111 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       );
     });
 
+    describe('with the income and expenses typed by hand', () => {
+      const profile = {
+        workArea: 20,
+        homeArea: 100,
+        vehicleExclusive: false,
+        healthPeople: 2,
+        healthDisability: false,
+      };
+      const q = (income: Record<string, number>, expenses: unknown[] = []) => ({
+        income: { r21: 0, r10: 0, r4: 0, r0: 0, ...income },
+        expenses,
+      });
+      const manual = (first: ReturnType<typeof q>, over: Record<string, unknown> = {}) => ({
+        quarters: [first, q({}), q({}), q({})],
+        profile: { ...profile, ...over },
+      });
+      const line = (body: { expenses: { kind: string }[] }, kind: string) =>
+        body.expenses.find((l) => l.kind === kind) as Record<string, number | string>;
+
+      it('does not use the movements and applies the rule of each kind of expense', async () => {
+        const { body } = await draft(1, {
+          manual: manual(
+            q({ r21: 5000, r10: 1000 }, [
+              { kind: 'quota', amount: 300, vatRate: 0 },
+              { kind: 'supplies', amount: 121, vatRate: 21 },
+              { kind: 'vehicle', amount: 121, vatRate: 21 },
+              { kind: 'meals', amount: 121, vatRate: 21, days: 2 },
+              { kind: 'clients', amount: 121, vatRate: 21 },
+              { kind: 'health', amount: 1500, vatRate: 0 },
+              { kind: 'training', amount: 121, vatRate: 21 },
+              { kind: 'fines', amount: 100, vatRate: 0 },
+            ])
+          ),
+        }).expect(201);
+        // Income only from the manual data (the movements of the beforeEach are ignored).
+        expect(box(body.vat.accrued, '07')).toBe(5000);
+        expect(box(body.vat.accrued, '04')).toBe(1000);
+        expect(line(body, 'quota')).toMatchObject({ deductible: 300, vatDeductible: 0 });
+        // 30 % of 20 m2 over 100 m2 = 6 %.
+        expect(line(body, 'supplies')).toMatchObject({
+          deductible: 6,
+          vatDeductible: 1.26,
+          note: 'supplies',
+        });
+        // Mixed-use car: no expense for the income tax, half of the VAT.
+        expect(line(body, 'vehicle')).toMatchObject({
+          deductible: 0,
+          vatDeductible: 10.5,
+          note: 'vehicle',
+        });
+        // Two days at 26.67 = 53.34 of the 121 paid: 44.08 of expense plus the VAT recovered in proportion.
+        expect(line(body, 'meals')).toMatchObject({ deductible: 44.08, note: 'meals' });
+        // Client gifts: deductible expense, but the VAT is not.
+        expect(line(body, 'clients')).toMatchObject({ deductible: 121, vatDeductible: 0 });
+        // Insurance for two people: 1,000 of the 1,500.
+        expect(line(body, 'health')).toMatchObject({ deductible: 1000, note: 'health' });
+        expect(line(body, 'training')).toMatchObject({ deductible: 100, vatDeductible: 21 });
+        expect(line(body, 'fines')).toMatchObject({ deductible: 0, note: 'fines' });
+      });
+
+      it('deducts the whole car when it is used only for the activity', async () => {
+        const { body } = await draft(1, {
+          manual: manual(q({ r21: 1000 }, [{ kind: 'vehicle', amount: 121, vatRate: 21 }]), {
+            vehicleExclusive: true,
+          }),
+        }).expect(201);
+        expect(line(body, 'vehicle')).toMatchObject({ deductible: 100, vatDeductible: 21 });
+        expect(body.vat.deductible.find((b: { box: string }) => b.box === '29').amount).toBe(21);
+        expect(box(body.irpf.boxes, '02')).toBe(100);
+      });
+
+      it('handles the empty cases: no area, no days, no people, 1,500 with a disability', async () => {
+        const { body } = await draft(1, {
+          manual: manual(
+            q({}, [
+              { kind: 'supplies', amount: 121, vatRate: 21 },
+              { kind: 'meals', amount: 121, vatRate: 21 },
+              { kind: 'health', amount: 0, vatRate: 0 },
+              { kind: 'vehicle', amount: 0, vatRate: 0 },
+            ]),
+            { homeArea: 0, healthPeople: 0 }
+          ),
+        }).expect(201);
+        expect(line(body, 'supplies')).toMatchObject({ deductible: 0, vatDeductible: 0 });
+        expect(line(body, 'meals')).toMatchObject({ deductible: 0 });
+        expect(line(body, 'health')).toMatchObject({ deductible: 0 });
+        const disabled = (
+          await draft(1, {
+            manual: manual(q({}, [{ kind: 'health', amount: 1500, vatRate: 0 }]), {
+              healthPeople: 1,
+              healthDisability: true,
+            }),
+          }).expect(201)
+        ).body;
+        expect(line(disabled, 'health')).toMatchObject({ deductible: 1500 });
+      });
+
+      it('rejects an unknown kind of expense and has no breakdown without manual data', async () => {
+        await draft(1, {
+          manual: manual(q({}, [{ kind: 'yacht', amount: 1, vatRate: 21 }])),
+        }).expect(400);
+        expect((await draft(1).expect(201)).body.expenses).toBeNull();
+      });
+    });
+
     it('lets the free plan prepare one draft only, and Premium as many as it wants', async () => {
       expireTrial(ctx, user);
       expect((await draft(1).expect(201)).body.used).toBe(1);

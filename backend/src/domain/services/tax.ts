@@ -10,6 +10,10 @@ export interface BusinessMovement {
   /** Amount paid or received, VAT included. */
   amountCents: Cents;
   vatRate: VatRate;
+  /** Share of an expense that counts for the income tax (default 1). */
+  irpfShare?: number;
+  /** Share of the VAT of an expense that can be deducted (default 1). */
+  vatShare?: number;
 }
 
 export interface QuarterTax {

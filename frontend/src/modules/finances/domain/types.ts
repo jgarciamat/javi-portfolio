@@ -596,6 +596,58 @@ export interface TaxBox {
   amount: number;
 }
 
+export const EXPENSE_KINDS = [
+  'quota',
+  'supplies',
+  'vehicle',
+  'meals',
+  'clients',
+  'health',
+  'staff',
+  'training',
+  'management',
+  'software',
+  'rent',
+  'advertising',
+  'material',
+  'other',
+  'fines',
+] as const;
+export type ExpenseKind = (typeof EXPENSE_KINDS)[number];
+
+export interface ManualExpense {
+  kind: ExpenseKind;
+  amount: number;
+  vatRate: VatRate;
+  days?: number;
+}
+
+export interface ManualQuarter {
+  income: { r21: number; r10: number; r4: number; r0: number };
+  expenses: ManualExpense[];
+}
+
+export interface ManualData {
+  quarters: [ManualQuarter, ManualQuarter, ManualQuarter, ManualQuarter];
+  profile: {
+    workArea: number;
+    homeArea: number;
+    vehicleExclusive: boolean;
+    healthPeople: number;
+    healthDisability: boolean;
+  };
+}
+
+/** What an expense typed by hand lets the person deduct. */
+export interface ExpenseLine {
+  quarter: number;
+  kind: ExpenseKind;
+  amount: number;
+  deductible: number;
+  vatDeductible: number;
+  note: string;
+}
+
 export interface QuarterExtras {
   withheld: number;
   socialSecurity: number;
@@ -608,6 +660,8 @@ export interface AutonomoInputs {
   priorYearNet: number | null;
   exempt130: boolean;
   vatToOffset: number;
+  /** Income and expenses typed by hand: they replace the movements. */
+  manual?: ManualData | null;
 }
 
 export interface AutonomoDraft {
@@ -637,6 +691,8 @@ export interface AutonomoDraft {
     rate: number;
   };
   deadlines: { model: string; label: string; date: string }[];
+  /** Breakdown of the expenses typed by hand (null when the movements were used). */
+  expenses: ExpenseLine[] | null;
 }
 
 export interface SplitGroupSummary {
