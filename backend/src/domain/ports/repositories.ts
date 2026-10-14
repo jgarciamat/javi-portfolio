@@ -289,6 +289,26 @@ export interface PushSubscriptionRecord {
   auth: string;
 }
 
+export type InboxStatus = 'imported' | 'duplicate' | 'unreadable' | 'failed';
+
+export interface InboxMessage {
+  id: string;
+  receivedAt: string;
+  status: InboxStatus;
+  description: string | null;
+  amountCents: number | null;
+}
+
+export interface InboxRepository {
+  tokenOf(userId: string): string | null;
+  userOf(token: string): string | null;
+  /** Replaces the token of the user (a new address). */
+  setToken(userId: string, token: string, at: string): void;
+  log(userId: string, message: InboxMessage): void;
+  /** The latest messages, newest first (older ones are dropped). */
+  recent(userId: string, limit: number): InboxMessage[];
+}
+
 export interface PushRepository {
   /** One row per endpoint: subscribing again from the same browser replaces it. */
   save(subscription: PushSubscriptionRecord, createdAt: string): void;

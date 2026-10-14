@@ -1290,5 +1290,17 @@
   "app.renta.check.certificate": "El certificado de retenciones de tu empresa, si lo necesitas para comprobar los datos.",
   "app.renta.check.receipts": "Justificantes de donativos, plan de pensiones, alquiler o hipoteca, si te los deduces.",
   "app.renta.check.review": "Revisa los datos del borrador antes de confirmarlo: un error te lo pueden reclamar después.",
-  "app.renta.aeat": "Abrir la Agencia Tributaria"
+  "app.renta.aeat": "Abrir la Agencia Tributaria",
+  "app.inbox.title": "Facturas por email",
+  "app.inbox.hint": "Reenvía a esta dirección el recibo o la factura que te llegue por correo y se apunta sola como gasto. Es privada: solo tú la conoces. Función Premium, como importar el banco.",
+  "app.inbox.copy": "Copiar dirección",
+  "app.inbox.copied": "Copiada",
+  "app.inbox.rotate": "Cambiar dirección",
+  "app.inbox.rotateConfirm": "La dirección actual dejará de funcionar. ¿Quieres una nueva?",
+  "app.inbox.recent": "Últimos correos recibidos",
+  "app.inbox.unknown": "Sin concepto",
+  "app.inbox.status.imported": "Añadido",
+  "app.inbox.status.duplicate": "Ya estaba",
+  "app.inbox.status.unreadable": "No encontramos el importe",
+  "app.inbox.status.failed": "No se pudo añadir"
 }

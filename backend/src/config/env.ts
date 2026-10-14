@@ -38,6 +38,9 @@ const envSchema = z.object({
   STRIPE_PRICE_LIFETIME: z.string().optional(),
   /** Shared secret RevenueCat sends in the Authorization header of its webhooks (Google Play purchases). */
   REVENUECAT_WEBHOOK_AUTH: z.string().min(16).optional(),
+  /** Receipts forwarded by e-mail: domain of the addresses and the secret of the forwarding service. */
+  INBOUND_EMAIL_DOMAIN: z.string().optional(),
+  INBOUND_EMAIL_SECRET: z.string().min(16).optional(),
   /** Web Push (phone and browser notifications): `npx web-push generate-vapid-keys`. */
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
@@ -96,6 +99,8 @@ export interface AppConfig {
     displayPrices: { monthly: number; yearly: number; lifetime: number };
     founderLimit: number;
   };
+  /** Receipts by e-mail; both values are needed to turn it on. */
+  inbox: { domain: string | null; secret: string | null };
   /** Web Push keys; null leaves push notifications off. */
   push: { publicKey: string; privateKey: string; subject: string } | null;
   affiliatesFile: string | null;
@@ -190,6 +195,10 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     trustProxy: raw.TRUST_PROXY,
     google: { clientId: raw.GOOGLE_CLIENT_ID ?? null },
     ai: resolveAi(raw),
+    inbox: {
+      domain: raw.INBOUND_EMAIL_DOMAIN?.trim().toLowerCase() || null,
+      secret: raw.INBOUND_EMAIL_SECRET ?? null,
+    },
     push:
       raw.VAPID_PUBLIC_KEY && raw.VAPID_PRIVATE_KEY
         ? {

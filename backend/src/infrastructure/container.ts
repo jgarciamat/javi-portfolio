@@ -73,6 +73,8 @@ import {
   SqliteSubscriptionRepository,
 } from './sqlite/repositories/SqliteMonetizationRepositories';
 import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository';
+import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxRepository';
+import { InboxService } from '@application/inbox/InboxService';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
@@ -132,6 +134,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
     push: new SqlitePushRepository(db),
+    inbox: new SqliteInboxRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -237,6 +240,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     categoryResolver,
     accountResolver,
     materializer,
+    uow,
+    clock
+  );
+
+  const importer = new ImportService(
+    repos.transactions,
+    repos.categories,
+    categoryResolver,
+    accountResolver,
+    repos.settings,
+    entitlements,
+    new AiCategorizer(suggester, allowance),
+    categoryRules,
     uow,
     clock
   );
@@ -371,18 +387,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       config.billing.revenueCatWebhookAuth
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
-    importer: new ImportService(
-      repos.transactions,
-      repos.categories,
-      categoryResolver,
-      accountResolver,
-      repos.settings,
-      entitlements,
-      new AiCategorizer(suggester, allowance),
-      categoryRules,
-      uow,
-      clock
-    ),
+    importer,
+    inbox: new InboxService(repos.inbox, importer, config.inbox, clock),
     exporter: new ExportService(
       repos.users,
       repos.settings,

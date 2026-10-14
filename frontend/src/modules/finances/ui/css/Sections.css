@@ -962,3 +962,29 @@ button.entity-item {
   padding-left: 1.2rem;
   margin: 0.5rem 0 1rem;
 }
+
+/* ─── Receipts by e-mail ─────────────────────────────────────────────────── */
+
+.inbox-recent {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  list-style: none;
+}
+
+.inbox-recent li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.inbox-recent small {
+  display: block;
+  color: var(--slate-400);
+}
+
+.inbox-recent em {
+  color: var(--slate-400);
+  font-style: normal;
+}

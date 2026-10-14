@@ -391,6 +391,20 @@ export interface NetWorthPoint {
   netWorth: number;
 }
 
+export type InboxStatus = 'imported' | 'duplicate' | 'unreadable' | 'failed';
+
+/** Receipts forwarded by e-mail: the private address (null while it is not set up) and what happened. */
+export interface Inbox {
+  address: string | null;
+  recent: {
+    id: string;
+    receivedAt: string;
+    status: InboxStatus;
+    description: string | null;
+    amount: number | null;
+  }[];
+}
+
 export type AssetKind = 'investment' | 'property' | 'vehicle' | 'other' | 'debt';
 
 /** An investment, property or debt the user values by hand. */

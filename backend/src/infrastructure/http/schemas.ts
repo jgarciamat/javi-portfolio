@@ -336,3 +336,27 @@ export const clientErrorBody = z.object({
   stack: z.string().max(4000).optional(),
   path: z.string().max(300).optional(),
 });
+
+const stripTags = (html: string) =>
+  html
+    .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&euro;/g, '€')
+    .replace(/&amp;/g, '&');
+
+/** A message forwarded by the e-mail service: plain text, or html when there is no text. */
+export const inboundMailBody = z
+  .object({
+    to: z.union([z.string(), z.array(z.string())]),
+    from: z.string().max(300).default(''),
+    subject: z.string().max(500).default(''),
+    text: z.string().max(100_000).default(''),
+    html: z.string().max(300_000).optional(),
+    date: z.string().max(40).nullish(),
+  })
+  .transform(({ to, html, text, ...rest }) => ({
+    ...rest,
+    to: Array.isArray(to) ? to.join(',') : to,
+    text: text.trim() ? text : html ? stripTags(html) : '',
+  }));

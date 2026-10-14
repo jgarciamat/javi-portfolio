@@ -3,6 +3,7 @@ import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import {
   accountApi,
   assetApi,
+  inboxApi,
   budgetApi,
   businessApi,
   categoryApi,
@@ -280,6 +281,8 @@ const cases: Case[] = [
   ],
   ['quarterly tax', () => businessApi.tax(2026), 'GET', '/business/tax/2026'],
   ['assets', () => assetApi.getAll(), 'GET', '/assets'],
+  ['inbox', () => inboxApi.get(), 'GET', '/inbox'],
+  ['new inbox address', () => inboxApi.rotate(), 'POST', '/inbox/rotate'],
   [
     'add asset',
     () => assetApi.create({ name: 'Fondo', kind: 'investment', value: 100 }),

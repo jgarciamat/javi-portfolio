@@ -18,6 +18,7 @@ import { businessCategories } from './017-business-categories';
 import { splitExpenses } from './018-split-expenses';
 import { push } from './019-push';
 import { debtTerms } from './020-debt-terms';
+import { inbox } from './021-inbox';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -42,4 +43,5 @@ export const migrations: Migration[] = [
   splitExpenses,
   push,
   debtTerms,
+  inbox,
 ];

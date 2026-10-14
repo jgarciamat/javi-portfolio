@@ -125,6 +125,10 @@ export function createFakeApi(): FakeApi {
       }),
       remove: ok(undefined),
     },
+    inboxApi: {
+      get: ok({ address: 'mm-0123456789abcdef0123@facturas.winjgm.com', recent: [] }),
+      rotate: ok({ address: 'mm-fedcba98765432100123@facturas.winjgm.com', recent: [] }),
+    },
     categoryRuleApi: {
       getAll: ok([]),
       add: ok({ id: 'r1', pattern: 'x', categoryId: 'c1', categoryName: 'Comida' }),

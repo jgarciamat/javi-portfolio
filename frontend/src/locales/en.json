@@ -1290,5 +1290,17 @@
   "app.renta.check.certificate": "The withholding certificate from your employer, if you need it to check the data.",
   "app.renta.check.receipts": "Receipts for donations, pension plan, rent or mortgage, if you deduct them.",
   "app.renta.check.review": "Review the draft before confirming it: a mistake can be claimed back later.",
-  "app.renta.aeat": "Open the Tax Agency"
+  "app.renta.aeat": "Open the Tax Agency",
+  "app.inbox.title": "Receipts by e-mail",
+  "app.inbox.hint": "Forward the receipt or invoice you get by e-mail to this address and it is recorded as an expense. It is private: only you know it. A Premium feature, like importing your bank.",
+  "app.inbox.copy": "Copy address",
+  "app.inbox.copied": "Copied",
+  "app.inbox.rotate": "Change address",
+  "app.inbox.rotateConfirm": "The current address will stop working. Do you want a new one?",
+  "app.inbox.recent": "Latest e-mails received",
+  "app.inbox.unknown": "No description",
+  "app.inbox.status.imported": "Added",
+  "app.inbox.status.duplicate": "Already there",
+  "app.inbox.status.unreadable": "We could not find the amount",
+  "app.inbox.status.failed": "Could not be added"
 }

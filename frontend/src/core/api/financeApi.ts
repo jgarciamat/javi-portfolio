@@ -17,6 +17,7 @@ import type {
   Category,
   CategoryBudget,
   CategoryRule,
+  Inbox,
   CategoryTrend,
   CreateCategoryDTO,
   CreateCustomAlertDTO,
@@ -95,6 +96,16 @@ export const categoryApi = {
   /** If the category is in use, `reassignTo` says where its movements, rules… go. */
   delete(id: string, reassignTo?: string) {
     return apiRequest<void>(`/categories/${id}${query({ reassignTo })}`, { method: 'DELETE' });
+  },
+};
+
+export const inboxApi = {
+  get() {
+    return apiRequest<Inbox>('/inbox');
+  },
+  /** A new address: the old one stops working. */
+  rotate() {
+    return apiRequest<Inbox>('/inbox/rotate', { method: 'POST' });
   },
 };
 

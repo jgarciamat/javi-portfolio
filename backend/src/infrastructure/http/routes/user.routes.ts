@@ -6,6 +6,7 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   presentAnnualReport,
   presentAsset,
+  presentInbox,
   presentSplitGroup,
   presentTax,
   presentForecast,
@@ -319,6 +320,15 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
         )
       );
     })
+  );
+  // Receipts forwarded by e-mail: the user's private address and what happened to each message.
+  router.get(
+    '/inbox',
+    authed((req, res) => res.json(presentInbox(c.inbox.overview(req.dataUserId))))
+  );
+  router.post(
+    '/inbox/rotate',
+    authed((req, res) => res.json(presentInbox(c.inbox.rotate(req.dataUserId))))
   );
   router.patch(
     '/assets/:id/terms',
