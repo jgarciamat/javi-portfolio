@@ -11,7 +11,7 @@ import { loadCcaa } from '../data/renta';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
-import { mentionedIn, missingDeductions, normalize } from '../domain/rentaDraft';
+import { mentionedIn, missingDeductions } from '../domain/rentaDraft';
 import { DeductionsStep } from './renta/DeductionsStep';
 import { DraftStep, NO_DRAFT, type DraftState } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
@@ -95,7 +95,7 @@ export function RentaPlanner({
 
   const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
   const mentioned = useMemo(
-    () => (draft.reading ? mentionedIn(normalize(draft.text), all) : []),
+    () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
     [all, draft]
   );
   const missing = useMemo(
@@ -143,7 +143,6 @@ export function RentaPlanner({
       <DraftStep
         form={form}
         set={set}
-        mentioned={mentioned}
         missing={missing}
         premium={access.premium}
         upgrade={<UpgradeCta access={access} />}

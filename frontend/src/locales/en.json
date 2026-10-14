@@ -1467,7 +1467,6 @@
   "tools.renta.draft.found": "This is what I found",
   "tools.renta.draft.nothing": "I did not recognise any figure. Check it is the draft and fill in the data by hand.",
   "tools.renta.draft.applied": "It is already in the calculator: check every figure, reading may fail depending on the format.",
-  "tools.renta.draft.mentioned": "Your draft seems to include {count} deduction(s); you will see them marked below.",
   "tools.renta.draft.ccaa": "Community",
   "tools.renta.draft.questions": "Deductions you could claim",
   "tools.renta.draft.rents": "I rent my home",
@@ -1475,5 +1474,6 @@
   "tools.renta.draft.yes": "It applies to me",
   "tools.renta.draft.no": "It does not apply",
   "tools.renta.hint.inDraft": "Already in your draft",
-  "tools.renta.hint.missing": "You could claim it"
+  "tools.renta.hint.missing": "You could claim it",
+  "tools.renta.draft.alreadyApplied": "Deductions your draft already applies"
 }

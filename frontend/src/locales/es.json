@@ -1467,7 +1467,6 @@
   "tools.renta.draft.found": "Esto es lo que he encontrado",
   "tools.renta.draft.nothing": "No he reconocido ninguna cifra. Revisa que sea el borrador y completa los datos a mano.",
   "tools.renta.draft.applied": "Ya lo he puesto en la calculadora: revisa cada dato, la lectura puede fallar según el formato.",
-  "tools.renta.draft.mentioned": "Parece que tu borrador ya incluye {count} deducción(es); las verás marcadas abajo.",
   "tools.renta.draft.ccaa": "Comunidad autónoma",
   "tools.renta.draft.questions": "Deducciones que podrías pedir",
   "tools.renta.draft.rents": "Vivo de alquiler",
@@ -1475,5 +1474,6 @@
   "tools.renta.draft.yes": "Me corresponde",
   "tools.renta.draft.no": "No me corresponde",
   "tools.renta.hint.inDraft": "Ya en tu borrador",
-  "tools.renta.hint.missing": "Podrías pedirla"
+  "tools.renta.hint.missing": "Podrías pedirla",
+  "tools.renta.draft.alreadyApplied": "Deducciones que ya aplicas en tu borrador"
 }

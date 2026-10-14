@@ -10,13 +10,11 @@ import { Step, useMoney } from './shared';
 /** What the planner keeps about the draft: what was read, and what the person answered. */
 export interface DraftState {
   reading: DraftReading | null;
-  /** The text that was read, to find the deductions it mentions once the community is loaded. */
-  text: string;
   rents: boolean;
   dismissed: string[];
 }
 
-export const NO_DRAFT: DraftState = { reading: null, text: '', rents: false, dismissed: [] };
+export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [] };
 
 const FIELD_LABELS: { key: keyof DraftReading; label: string }[] = [
   { key: 'ccaaId', label: 'tools.renta.draft.ccaa' },
@@ -40,6 +38,11 @@ export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaFor
     savings: text(r.savings, form.savings),
     rentalOn: r.rentalIncome !== null || form.rentalOn,
     rentalIncome: text(r.rentalIncome, form.rentalIncome),
+    age: r.age === null ? form.age : String(r.age),
+    ascendants:
+      r.ascendantAges.length > 0
+        ? r.ascendantAges.map((age) => ({ over75: age > 75, disability: 0 as const }))
+        : form.ascendants,
     children:
       r.childAges.length > 0
         ? r.childAges.map((age) => ({ age: String(age), disability: 0 as const }))
@@ -51,7 +54,6 @@ export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaFor
 export function DraftStep({
   form,
   set,
-  mentioned,
   missing,
   premium,
   upgrade,
@@ -61,8 +63,6 @@ export function DraftStep({
 }: {
   form: RentaForm;
   set: (patch: Partial<RentaForm>) => void;
-  /** Ids of the deductions the draft seems to include already. */
-  mentioned: string[];
   missing: Deduction[];
   premium: boolean;
   upgrade: React.ReactNode;
@@ -80,7 +80,7 @@ export function DraftStep({
 
   const analyse = async (text: string) => {
     const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
-    onDraft({ ...draft, reading: result, text, dismissed: [] });
+    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [] });
     set(applyReading(form, result));
   };
   const fromFile = async (file: File) => {
@@ -169,10 +169,18 @@ export function DraftStep({
                 </ul>
               )}
               <p className="section-hint">{t('tools.renta.draft.applied')}</p>
-              {mentioned.length > 0 && (
-                <p className="section-hint">
-                  {t('tools.renta.draft.mentioned', { count: mentioned.length })}
-                </p>
+              {reading.applied.length > 0 && (
+                <>
+                  <h3>{t('tools.renta.draft.alreadyApplied')}</h3>
+                  <ul className="renta-minimum">
+                    {reading.applied.map((a) => (
+                      <li key={a.label}>
+                        <span>{a.label}</span>
+                        <strong>{money(a.amount)}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
 
               <h3>{t('tools.renta.draft.questions')}</h3>

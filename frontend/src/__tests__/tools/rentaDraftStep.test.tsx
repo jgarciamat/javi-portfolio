@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { readPdfText } from '@modules/tools/application/readPdf';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -28,9 +28,12 @@ const paste = async (text: string) => {
   fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.draft.read') }));
 };
 
-const DRAFT = `Comunitat Valenciana Retribuciones dinerarias 30.000,00
-  Total retenciones 4.100,00 Ingresos íntegros computables 5.000,00
-  Descendientes 12/03/2023 Ascendientes`;
+const DRAFT = `Comunitat Valenciana Fecha de nacimiento 20/06/1994 0010
+  Total ingresos íntegros computables 30.000,00 0012
+  Total pagos a cuenta 4.100,00 0609 Fecha de nacimiento 12/03/2023 0077
+  Deducciones autonómicas de la Comunitat Valenciana
+  Por nacimiento, adopción o acogimiento 600,00 1961
+  Suma de deducciones autonómicas 600,00 0564`;
 
 describe('Renta planner: the draft', () => {
   it('is a Premium feature', () => {
@@ -64,13 +67,14 @@ describe('Renta planner: the draft', () => {
     expect(screen.getAllByText(tr('tools.renta.hint.missing')).length).toBeGreaterThan(0);
   });
 
-  it('asks about rent when the person rents', async () => {
+  it('assumes rent when the draft has no main home, and stops asking when it is unticked', async () => {
     render();
     await paste(DRAFT);
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
     const before = screen.queryAllByRole('button', { name: /alquiler/i }).length;
     fireEvent.click(screen.getByLabelText(tr('tools.renta.draft.rents')));
-    expect(screen.queryAllByRole('button', { name: /alquiler/i }).length).toBeGreaterThan(before);
+    expect(before).toBeGreaterThan(0);
+    expect(screen.queryAllByRole('button', { name: /alquiler/i }).length).toBe(0);
   });
 
   it('says so when nothing is recognised', async () => {
@@ -102,10 +106,10 @@ describe('Renta planner: the draft', () => {
 
   it('marks what the draft already includes', async () => {
     render();
-    await paste(`${DRAFT} Deducción por nacimiento, adopción o acogimiento`);
+    await paste(DRAFT);
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
     expect(await screen.findAllByText(tr('tools.renta.hint.inDraft'))).not.toHaveLength(0);
-    expect(within(document.body).queryByText(tr('tools.renta.draft.noneMissing'))).toBeNull();
+    expect(screen.getByText(tr('tools.renta.draft.alreadyApplied'))).toBeInTheDocument();
   });
 });
 
@@ -137,5 +141,15 @@ describe('Renta planner: the family decides what is asked', () => {
     expect(
       screen.getAllByRole('button', { name: /^Me corresponde: .*discapacidad/i }).length
     ).toBeGreaterThan(0);
+  });
+});
+
+describe('Renta planner: relatives in the draft', () => {
+  it('copies the relatives of the draft, keeping the form when there are none', async () => {
+    render();
+    await paste(`${DRAFT} Fecha de nacimiento 01/01/1940 0092`);
+    await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    expect(screen.getByLabelText(tr('tools.renta.over75', { n: 1 }))).toBeChecked();
+    expect(screen.getByLabelText(tr('tools.renta.age'))).toHaveValue('31');
   });
 });
