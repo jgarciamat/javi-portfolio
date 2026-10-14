@@ -94,7 +94,7 @@ export function Step({
   return (
     <section className={`renta-step ${className}`.trim()}>
       <h2>
-        <span className="renta-number">{n}</span> {t(titleKey)}
+        <span className="renta-number">{n === 0 ? '★' : n}</span> {t(titleKey)}
       </h2>
       {children}
     </section>

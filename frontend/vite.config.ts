@@ -16,6 +16,7 @@ export default defineConfig({
         clientsClaim: true,
         // Precachea todos los assets del build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['**/pdf-*.js'],
         // The receipt scanner's files are big: they are fetched when first used.
         globIgnores: ['ocr/**'],
         // Shows the push notifications and opens the app when one is tapped.

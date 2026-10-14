@@ -11,7 +11,9 @@ import { loadCcaa } from '../data/renta';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
+import { mentionedIn, missingDeductions, normalize } from '../domain/rentaDraft';
 import { DeductionsStep } from './renta/DeductionsStep';
+import { DraftStep, NO_DRAFT, type DraftState } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { IncomeStep } from './renta/IncomeStep';
 import { PropertyStep } from './renta/PropertyStep';
@@ -59,6 +61,7 @@ export function RentaPlanner({
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
   const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
   const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
 
   useEffect(() => {
@@ -90,6 +93,38 @@ export function RentaPlanner({
     };
   }, [form, ccaa, reduction, family]);
 
+  const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
+  const mentioned = useMemo(
+    () => (draft.reading ? mentionedIn(normalize(draft.text), all) : []),
+    [all, draft]
+  );
+  const missing = useMemo(
+    () =>
+      draft.reading
+        ? missingDeductions(
+            all.filter((d) => !draft.dismissed.includes(d.id) && !form.choices[d.id]?.on),
+            mentioned,
+            {
+              childAges: family.children.map((c) => c.age),
+              ascendants: form.ascendants.length,
+              disability: [
+                form.disability,
+                ...form.children.map((c) => c.disability),
+                ...form.ascendants.map((a) => a.disability),
+              ].some((level) => level > 0),
+              rents: draft.rents,
+            }
+          )
+        : [],
+    [all, draft, form, family, mentioned]
+  );
+  const hints = useMemo(() => {
+    const map: Record<string, 'inDraft' | 'missing'> = {};
+    for (const id of mentioned) map[id] = 'inDraft';
+    for (const d of missing) map[d.id] = 'missing';
+    return map;
+  }, [mentioned, missing]);
+
   const shown = access.premium ? live : snapshot;
   const calculate = async () => {
     setBusy(true);
@@ -105,6 +140,17 @@ export function RentaPlanner({
 
   return (
     <div className="renta-planner">
+      <DraftStep
+        form={form}
+        set={set}
+        mentioned={mentioned}
+        missing={missing}
+        premium={access.premium}
+        upgrade={<UpgradeCta access={access} />}
+        draft={draft}
+        onDraft={setDraft}
+        accept={(id) => setChoice(id, { on: true, amount: '', units: '' })}
+      />
       <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
       <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
       <PropertyStep form={form} set={set} property={rentaProperty} />
@@ -115,6 +161,7 @@ export function RentaPlanner({
         choices={form.choices}
         family={family}
         blocked={live.result.blocked}
+        hints={hints}
         onChange={setChoice}
       />
 

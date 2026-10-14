@@ -240,10 +240,9 @@ describe('Renta planner: one calculation for free accounts', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     expect(await screen.findByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
     expect(screen.getByText(tr('tools.renta.usedFree'))).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: tr('tools.renta.createAccount') })).toHaveAttribute(
-      'href',
-      '/login?mode=register'
-    );
+    expect(
+      screen.getAllByRole('link', { name: tr('tools.renta.createAccount') })[0]
+    ).toHaveAttribute('href', '/login?mode=register');
     // The result stays frozen while the data change.
     const before = screen.getByText(new RegExp(tr('tools.renta.toPay'))).textContent;
     fill('tools.renta.gross', '90000');
@@ -303,7 +302,9 @@ describe('Renta planner: one calculation for free accounts', () => {
     fireEvent.click(await screen.findByRole('button', { name: tr('tools.renta.calculate') }));
     await waitFor(() => expect(api.rentaApi.register).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
-    fireEvent.click(await screen.findByRole('button', { name: tr('tools.renta.goPremium') }));
+    fireEvent.click(
+      (await screen.findAllByRole('button', { name: tr('tools.renta.goPremium') }))[0]
+    );
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
@@ -331,7 +332,7 @@ describe('Renta planner: one calculation for free accounts', () => {
     renderWithProviders(<RentaPlanner mode="account" />, { api, plan: true });
     expect(await screen.findByText(tr('tools.renta.usedNoSnapshot'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('tools.renta.calculate') })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.goPremium') }));
+    fireEvent.click(screen.getAllByRole('button', { name: tr('tools.renta.goPremium') })[0]);
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 

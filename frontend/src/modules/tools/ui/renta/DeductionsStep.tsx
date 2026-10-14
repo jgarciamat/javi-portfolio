@@ -7,6 +7,7 @@ import { number } from '../../domain/rentaForm';
 import { Step, useMoney } from './shared';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
+export type Hint = 'inDraft' | 'missing';
 const EMPTY: Choice = { on: false, amount: '', units: '' };
 
 /** One deduction: what it gives, who it is for and the fields to see what it would save. */
@@ -16,6 +17,7 @@ function DeductionRow({
   childCount,
   suggested,
   blocked,
+  hint,
   onChange,
 }: {
   deduction: Deduction;
@@ -23,6 +25,7 @@ function DeductionRow({
   childCount: number;
   suggested: boolean;
   blocked: boolean;
+  hint?: Hint;
   onChange: (choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -49,6 +52,9 @@ function DeductionRow({
         <span>
           <strong>{deduction.title}</strong>
           {suggested && <em className="renta-badge">{t('tools.renta.suggested')}</em>}
+          {hint && (
+            <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
+          )}
           <small>{deduction.summary}</small>
         </span>
       </label>
@@ -125,6 +131,7 @@ function DeductionList({
   choices,
   family,
   blocked,
+  hints,
   openGroups,
   onChange,
 }: {
@@ -134,6 +141,7 @@ function DeductionList({
   choices: Record<string, Choice>;
   family: Family;
   blocked: string[];
+  hints: Record<string, Hint>;
   openGroups: DeductionGroup[];
   onChange: (id: string, choice: Choice) => void;
 }) {
@@ -180,6 +188,7 @@ function DeductionList({
                   childCount={family.children.length}
                   suggested={isSuggested(d)}
                   blocked={blocked.includes(d.id)}
+                  hint={hints[d.id]}
                   onChange={(c) => onChange(d.id, c)}
                 />
               ))}
@@ -199,6 +208,7 @@ export function DeductionsStep({
   choices,
   family,
   blocked,
+  hints,
   onChange,
 }: {
   state: RentaState;
@@ -207,6 +217,7 @@ export function DeductionsStep({
   choices: Record<string, Choice>;
   family: Family;
   blocked: string[];
+  hints: Record<string, Hint>;
   onChange: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -221,6 +232,7 @@ export function DeductionsStep({
         choices={choices}
         family={family}
         blocked={blocked}
+        hints={hints}
         openGroups={['family', 'housing']}
         onChange={onChange}
       />
@@ -232,6 +244,7 @@ export function DeductionsStep({
           choices={choices}
           family={family}
           blocked={blocked}
+          hints={hints}
           openGroups={['family', 'health', 'education']}
           onChange={onChange}
         />
