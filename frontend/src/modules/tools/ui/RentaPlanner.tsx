@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
-import { computeRenta, descendantBreakdown, incomeFactor } from '../domain/rentaCalc';
+import { computeRenta, descendantBreakdown, incomeFactor, limitBaseFor } from '../domain/rentaCalc';
 import type { RentaCcaa } from '../domain/rentaData';
 import {
   emptyForm,
@@ -106,7 +106,6 @@ export function RentaPlanner({
     [all, draft]
   );
   // With the person's income some deductions cannot be claimed: asking about them would be pointless.
-  const limitBase = live.result.taxBase + live.result.savingsBase;
   const missing = useMemo(
     () =>
       draft.reading
@@ -115,7 +114,7 @@ export function RentaPlanner({
               (d) =>
                 !draft.dismissed.includes(d.id) &&
                 !form.choices[d.id]?.on &&
-                incomeFactor(d, limitBase) > 0
+                incomeFactor(d, limitBaseFor(d, live.result)) > 0
             ),
             mentioned,
             {
@@ -130,7 +129,7 @@ export function RentaPlanner({
             }
           )
         : [],
-    [all, draft, form, family, mentioned, limitBase]
+    [all, draft, form, family, mentioned, live.result]
   );
   const pending = useMemo(
     () =>
