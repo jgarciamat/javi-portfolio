@@ -16,6 +16,7 @@ import { useGettingStarted } from '../../application/hooks/useGettingStarted';
 import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
+import { CapturedPayments } from './CapturedPayments';
 import { CategoryChart } from './CategoryChart';
 import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { ForecastPanel } from './ForecastPanel';
@@ -228,6 +229,7 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <TodayCard />}
+        {f.isCurrentPeriod && <CapturedPayments />}
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {f.isCurrentPeriod &&
           (checklist.visible ? (

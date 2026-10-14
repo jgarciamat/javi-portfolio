@@ -1302,5 +1302,22 @@
   "app.inbox.status.imported": "Added",
   "app.inbox.status.duplicate": "Already there",
   "app.inbox.status.unreadable": "We could not find the amount",
-  "app.inbox.status.failed": "Could not be added"
+  "app.inbox.status.failed": "Could not be added",
+  "app.capture.title": "Detect bank payments",
+  "app.capture.hint": "On Android, the app can read the notifications of your bank and payment apps (BBVA, Santander, CaixaBank, ING, N26, Revolut, Google Wallet, PayPal) and suggest the expense or income so you can add it with one tap.",
+  "app.capture.privacy": "Only the notifications of those apps are read, on your phone. Nothing is sent to our servers until you tap \"Add\", and only that payment is sent.",
+  "app.capture.toggle": "Detect payments in notifications",
+  "app.capture.needsAccess": "Notification access is missing: on the screen that opens, find Money Manager and turn it on.",
+  "app.capture.giveAccess": "Give access to notifications",
+  "app.capture.active": "On: the payments we detect will appear in your month summary.",
+  "app.capture.locked": "Detect your payments from your bank's notifications and add them with one tap. It is part of Premium.",
+  "app.capture.detected": "Detected payments",
+  "app.capture.detectedHint": "We found {count} in your bank notifications. Add them with their category or ignore them.",
+  "app.capture.add": "Add",
+  "app.capture.addOne": "Add {name}",
+  "app.capture.ignoreOne": "Ignore {name}",
+  "app.capture.addAll": "Add all",
+  "app.capture.ignoreAll": "Ignore all",
+  "app.privacy.s2.item12": "Receipts and invoices you forward to your private e-mail address (optional feature): the text of the message is read to extract the amount, merchant and date; the content of the e-mail is not stored.",
+  "app.privacy.s2.item13": "Notifications from your bank and payment apps (Android, optional and off by default): they are read only on your phone to suggest payments; only the payment you decide to add is sent to the server."
 }

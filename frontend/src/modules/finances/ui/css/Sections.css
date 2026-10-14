@@ -988,3 +988,17 @@ button.entity-item {
   color: var(--slate-400);
   font-style: normal;
 }
+
+/* ─── Payments detected in notifications ─────────────────────────────────── */
+
+.capture-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capture-access {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}

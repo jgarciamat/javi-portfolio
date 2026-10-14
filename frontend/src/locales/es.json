@@ -1302,5 +1302,22 @@
   "app.inbox.status.imported": "Añadido",
   "app.inbox.status.duplicate": "Ya estaba",
   "app.inbox.status.unreadable": "No encontramos el importe",
-  "app.inbox.status.failed": "No se pudo añadir"
+  "app.inbox.status.failed": "No se pudo añadir",
+  "app.capture.title": "Detectar pagos del banco",
+  "app.capture.hint": "En Android, la app puede leer las notificaciones de tus apps de banco y de pagos (BBVA, Santander, CaixaBank, ING, N26, Revolut, Google Wallet, PayPal) y proponerte el gasto o el ingreso para añadirlo con un toque.",
+  "app.capture.privacy": "Solo se leen las notificaciones de esas apps, en tu móvil. Nada se envía a nuestros servidores hasta que tú pulsas «Añadir», y solo se envía ese pago.",
+  "app.capture.toggle": "Detectar pagos en las notificaciones",
+  "app.capture.needsAccess": "Falta dar acceso a las notificaciones: en la pantalla que se abre, busca Money Manager y actívalo.",
+  "app.capture.giveAccess": "Dar acceso a las notificaciones",
+  "app.capture.active": "Activado: los pagos que detectemos aparecerán en tu resumen del mes.",
+  "app.capture.locked": "Detecta tus pagos desde las notificaciones del banco y añádelos con un toque. Es parte de Premium.",
+  "app.capture.detected": "Pagos detectados",
+  "app.capture.detectedHint": "Hemos encontrado {count} en las notificaciones de tu banco. Añádelos con su categoría o ignóralos.",
+  "app.capture.add": "Añadir",
+  "app.capture.addOne": "Añadir {name}",
+  "app.capture.ignoreOne": "Ignorar {name}",
+  "app.capture.addAll": "Añadir todos",
+  "app.capture.ignoreAll": "Ignorar todos",
+  "app.privacy.s2.item12": "Recibos y facturas que reenvías a tu dirección privada de correo (función opcional): se lee el texto del mensaje para extraer importe, comercio y fecha; el contenido del correo no se guarda.",
+  "app.privacy.s2.item13": "Notificaciones de tus apps de banco y de pagos (Android, función opcional y desactivada por defecto): se leen solo en tu móvil, para proponerte pagos; únicamente se envía al servidor el pago que tú decides añadir."
 }

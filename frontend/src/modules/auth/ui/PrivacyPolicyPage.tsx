@@ -42,6 +42,8 @@ export function PrivacyPolicyPage() {
             <li>{t('app.privacy.s2.item9')}</li>
             <li>{t('app.privacy.s2.item10')}</li>
             <li>{t('app.privacy.s2.item11')}</li>
+            <li>{t('app.privacy.s2.item12')}</li>
+            <li>{t('app.privacy.s2.item13')}</li>
           </ul>
         </section>
 
