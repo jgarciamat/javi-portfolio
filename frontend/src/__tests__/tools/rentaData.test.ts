@@ -28,6 +28,10 @@ function expectValidDeduction(d: Deduction) {
   expect({ where, len: d.requirements.length <= 280 }).toEqual({ where, len: true });
   expect(d.summary.trim().length).toBeGreaterThan(10);
   expect({ where, url: d.url.startsWith('https://') }).toEqual({ where, url: true });
+  if (d.advance) {
+    expect({ where, model: /^\d{3}$/.test(d.advance.model) }).toEqual({ where, model: true });
+    expect({ where, url: d.advance.url.startsWith('https://') }).toEqual({ where, url: true });
+  }
   if (d.kind === 'fixed') {
     expect({ where, has: d.amount !== undefined || (d.perChild?.length ?? 0) > 0 }).toEqual({
       where,

@@ -1490,5 +1490,8 @@
   "tools.renta.draft.tryNext": "Try the {year} tax return",
   "tools.renta.draft.scenarioOn": "You are trying the {year} tax return with the same income and properties as your draft, one year older. Change your children and anything that has changed (for example, a baby on the way) and see the result. The 2025 rules are used until the new ones are published.",
   "tools.renta.draft.scenarioBack": "Back to my draft",
-  "tools.renta.draft.noneInterest": "None of these interest me"
+  "tools.renta.draft.noneInterest": "None of these interest me",
+  "tools.renta.model": "Form {model}",
+  "tools.renta.advance": "You can collect it every month, without waiting for the return, by asking for the advance payment with form {model}.",
+  "tools.renta.advanceLink": "How to file form {model}"
 }

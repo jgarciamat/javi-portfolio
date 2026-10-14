@@ -10,6 +10,15 @@ const C16 = `${MANUAL}/c16-deducciones-generales-cuota`;
 const C18 = `${MANUAL}/c18-cuota-liquida-resultante-autoliquidacion`;
 const MATERNIDAD = `${C18}/resultado-declaracion/deduccion-maternidad-incremento-adicional-gastos-custodia`;
 const FAMILIA = `${C18}/resultado-declaracion/deducciones-familia-numerosa-personas-discapacidad-cargo`;
+/** Advance payment (monthly) of maternity: model 140. Large family, disability and separated ascendant: model 143. */
+const ADVANCE_MATERNITY = {
+  model: '140',
+  url: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GZ25.shtml',
+};
+const ADVANCE_FAMILY = {
+  model: '143',
+  url: 'https://sede.agenciatributaria.gob.es/Sede/ciudadanos-familias-personas-discapacidad/deducciones-relacionadas-hijos-descendientes/deduccion-familia-numerosa/solicitud-cesion-abono-anticipado.html',
+};
 const DONATIVOS = `${C16}/deducciones-donativos-otras-aportaciones`;
 const EFICIENCIA = `${C16}/deducciones-obras-mejora-eficiencia-energetica-viviendas`;
 const VEHICULOS = `${C16}/deducciones-adquisicion-vehiculos-electricos-puntos-recarga`;
@@ -41,6 +50,7 @@ const deductions: Deduction[] = [
   // ---------------------------------------------------------------- Familia (abonables)
   {
     id: 'estado-maternidad',
+    advance: ADVANCE_MATERNITY,
     group: 'family',
     title: 'Por maternidad (hijos menores de 3 años)',
     summary:
@@ -69,6 +79,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-descendiente-discapacidad',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por hijo con discapacidad a cargo',
     summary:
@@ -83,6 +94,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-discapacidad',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por padre o madre con discapacidad a cargo',
     summary:
@@ -97,6 +109,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-conyuge-discapacidad',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por cónyuge con discapacidad a cargo',
     summary:
@@ -111,6 +124,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría general',
     summary:
@@ -125,6 +139,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-especial',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría especial',
     summary:
@@ -139,6 +154,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-hijo-adicional',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Incremento de familia numerosa por cada hijo de más',
     summary:
@@ -153,6 +169,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-separado-dos-hijos',
+    advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por separado o sin matrimonio con dos hijos',
     summary:

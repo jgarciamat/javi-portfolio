@@ -30,6 +30,14 @@ export interface IncomeLimit {
  */
 export type DeductionKind = 'fixed' | 'percent' | 'special';
 
+/** Some refundable deductions can be collected monthly, before the return, by filing a model. */
+export interface AdvancePayment {
+  /** The tax form that asks for it ("140", "143"). */
+  model: string;
+  /** The Tax Agency page about the advance payment. */
+  url: string;
+}
+
 export interface Deduction {
   /** Unique, kebab-case, prefixed by the place: `madrid-nacimiento-adopcion`. */
   id: string;
@@ -53,6 +61,8 @@ export interface Deduction {
   baseLimit?: number;
   /** Limit on the taxpayer's base to apply it (the checker warns when the person is over it). */
   incomeLimit?: IncomeLimit;
+  /** Can be paid monthly in advance with a model (maternity: 140; large family and disability: 143). */
+  advance?: AdvancePayment;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */
   requirements: string;
   /** The Tax Agency page that explains it. */
