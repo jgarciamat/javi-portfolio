@@ -1486,5 +1486,9 @@
   "tools.renta.nextDeduction": "Siguiente deducción",
   "tools.renta.draft.goFirst": "Ir a la primera deducción marcada ({count})",
   "tools.renta.pending": "Te faltan datos en {count} deducción(es) marcada(s): no se cuentan hasta que pongas el importe.",
-  "tools.renta.goToPending": "Ir a la deducción que falta"
+  "tools.renta.goToPending": "Ir a la deducción que falta",
+  "tools.renta.draft.tryNext": "Probar la renta de {year}",
+  "tools.renta.draft.scenarioOn": "Estás probando la renta de {year} con los mismos ingresos y bienes de tu borrador, un año más mayor. Cambia tus hijos y lo que haya cambiado (por ejemplo, un bebé en camino) y mira cómo queda. Se usan las reglas de 2025 hasta que se publiquen las nuevas.",
+  "tools.renta.draft.scenarioBack": "Volver a mi borrador",
+  "tools.renta.draft.noneInterest": "No me interesa ninguna deducción"
 }

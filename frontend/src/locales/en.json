@@ -1486,5 +1486,9 @@
   "tools.renta.nextDeduction": "Next deduction",
   "tools.renta.draft.goFirst": "Go to the first marked deduction ({count})",
   "tools.renta.pending": "{count} marked deduction(s) still need an amount: they do not count until you fill it in.",
-  "tools.renta.goToPending": "Go to the deduction that is missing"
+  "tools.renta.goToPending": "Go to the deduction that is missing",
+  "tools.renta.draft.tryNext": "Try the {year} tax return",
+  "tools.renta.draft.scenarioOn": "You are trying the {year} tax return with the same income and properties as your draft, one year older. Change your children and anything that has changed (for example, a baby on the way) and see the result. The 2025 rules are used until the new ones are published.",
+  "tools.renta.draft.scenarioBack": "Back to my draft",
+  "tools.renta.draft.noneInterest": "None of these interest me"
 }

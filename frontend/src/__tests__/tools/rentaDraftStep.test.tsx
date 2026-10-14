@@ -377,3 +377,41 @@ describe('Renta planner: the income limit', () => {
     ).toBeNull();
   });
 });
+
+describe('Renta planner: none of them interest me, and next year', () => {
+  it('closes every question with a single button', async () => {
+    render();
+    await paste(DRAFT);
+    await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    await screen.findAllByRole('button', { name: /^Me corresponde:/ });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.draft.noneInterest') }));
+    expect(screen.queryAllByRole('button', { name: /^Me corresponde:/ })).toHaveLength(0);
+    expect(screen.getByText(tr('tools.renta.draft.noneMissing'))).toBeInTheDocument();
+  });
+
+  it('tries the next return with the same income, a year older, and goes back', async () => {
+    render();
+    await paste(DRAFT);
+    await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    fireEvent.click(await screen.findByRole('button', { name: 'Probar la renta de 2027' }));
+    expect(screen.getByText(/Estás probando la renta de 2027/)).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('30000');
+    expect(screen.getByLabelText(tr('tools.renta.age'))).toHaveValue('32');
+    expect(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 }))).toHaveValue('3');
+
+    // A baby on the way: the deductions for a newborn are asked about.
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('tools.renta.addChild')) }));
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.childAge', { n: 2 })), {
+      target: { value: '0' },
+    });
+    expect(
+      await screen.findAllByRole('button', { name: /^Me corresponde: .*nacimiento/i })
+    ).not.toHaveLength(0);
+
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.draft.scenarioBack') }));
+    expect(screen.queryByText(/Estás probando la renta/)).toBeNull();
+    expect(screen.getByLabelText(tr('tools.renta.age'))).toHaveValue('31');
+    expect(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 }))).toHaveValue('2');
+    expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
+  });
+});
