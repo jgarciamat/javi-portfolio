@@ -255,21 +255,23 @@ export function AutonomoDraftCard() {
 
       <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
 
-      <section className="autonomo-extras">
-        <h3 className="subsection-title">{t('app.autonomo.extras')}</h3>
-        <label className="renta-check">
-          <input
-            type="checkbox"
-            checked={hardToJustify}
-            onChange={(e) => setHardToJustify(e.target.checked)}
-          />
-          <span>{t('app.autonomo.hardToJustify')}</span>
-        </label>
-        <label className="renta-check">
-          <input type="checkbox" checked={exempt} onChange={(e) => setExempt(e.target.checked)} />
-          <span>{t('app.autonomo.exempt')}</span>
-        </label>
-        <div className="form-grid">
+      <section className="autonomo-panel autonomo-extras">
+        <h3>{t('app.autonomo.extras')}</h3>
+        <div className="autonomo-options">
+          <label className="autonomo-option">
+            <input
+              type="checkbox"
+              checked={hardToJustify}
+              onChange={(e) => setHardToJustify(e.target.checked)}
+            />
+            <span>{t('app.autonomo.hardToJustify')}</span>
+          </label>
+          <label className="autonomo-option">
+            <input type="checkbox" checked={exempt} onChange={(e) => setExempt(e.target.checked)} />
+            <span>{t('app.autonomo.exempt')}</span>
+          </label>
+        </div>
+        <div className="autonomo-grid autonomo-grid--top">
           <label className="field">
             <span className="field-label">{t('app.autonomo.priorNet')}</span>
             <input
@@ -278,7 +280,7 @@ export function AutonomoDraftCard() {
               value={priorNet}
               onChange={(e) => setPriorNet(e.target.value)}
             />
-            <small className="renta-field-hint">{t('app.autonomo.priorNetHint')}</small>
+            <small className="autonomo-hint">{t('app.autonomo.priorNetHint')}</small>
           </label>
           <label className="field">
             <span className="field-label">{t('app.autonomo.toOffset')}</span>
@@ -288,6 +290,7 @@ export function AutonomoDraftCard() {
               value={toOffset}
               onChange={(e) => setToOffset(e.target.value)}
             />
+            <small className="autonomo-hint">{t('app.autonomo.toOffsetHint')}</small>
           </label>
         </div>
       </section>

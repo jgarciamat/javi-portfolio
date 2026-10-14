@@ -1580,5 +1580,6 @@
   "app.autonomo.deductibleVat": "Deductible VAT",
   "app.autonomo.total": "Total",
   "app.autonomo.incomeTitle": "Income of the quarter",
-  "app.autonomo.expensesTitle": "Expenses of the quarter"
+  "app.autonomo.expensesTitle": "Expenses of the quarter",
+  "app.autonomo.toOffsetHint": "VAT from earlier quarters you have not yet offset (box 110)."
 }

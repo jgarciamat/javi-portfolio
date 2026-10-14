@@ -1580,5 +1580,6 @@
   "app.autonomo.deductibleVat": "IVA deducible",
   "app.autonomo.total": "Total",
   "app.autonomo.incomeTitle": "Ingresos del trimestre",
-  "app.autonomo.expensesTitle": "Gastos del trimestre"
+  "app.autonomo.expensesTitle": "Gastos del trimestre",
+  "app.autonomo.toOffsetHint": "IVA de trimestres anteriores que aún no has compensado (casilla 110)."
 }

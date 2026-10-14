@@ -161,3 +161,39 @@
     padding: 0.5rem 0.8rem;
   }
 }
+
+.autonomo-options {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.autonomo-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.8rem;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  line-height: 1.4;
+  cursor: pointer;
+}
+.autonomo-option input {
+  margin-top: 0.2rem;
+  flex: none;
+}
+.autonomo-grid--top {
+  align-items: start;
+}
+.autonomo-grid--top .field {
+  align-content: start;
+}
+.autonomo-hint {
+  color: var(--text-secondary, #9aa4b8);
+  line-height: 1.35;
+}
+.autonomo-panel .autonomo-checks .renta-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
