@@ -1501,11 +1501,8 @@
   "app.autonomo.year": "Draft year",
   "app.autonomo.quarter": "Quarter",
   "app.autonomo.quarterN": "Quarter {n}",
-  "app.autonomo.extras": "Data you must add (withholdings, fees, non-deductible VAT…)",
-  "app.autonomo.extrasHint": "Your movements do not say how much your clients withheld, what you paid in contributions or which VAT is not deductible. Fill it in by quarter; blank counts as zero.",
+  "app.autonomo.extras": "Other data for the forms",
   "app.autonomo.withheld": "Withholdings applied to you",
-  "app.autonomo.socialSecurity": "Contribution paid",
-  "app.autonomo.vatNotDeductible": "Non-deductible VAT",
   "app.autonomo.hardToJustify": "Apply hard-to-justify expenses (5 %, up to 2,000 € a year, simplified direct estimation)",
   "app.autonomo.exempt": "I am a professional and last year at least 70 % of my income was withheld (no modelo 130)",
   "app.autonomo.priorNet": "Net income of last year",
@@ -1540,10 +1537,7 @@
   "app.autonomo.retaNote": "The contribution is {rate} % of the base. It is a forecast: Social Security settles the next year with your real income. If you are on the flat rate, you pay the reduced fee of your sign-up.",
   "app.autonomo.deadlines": "Deadlines",
   "app.autonomo.disclaimer": "Indicative draft with the 2026 rules: it does not include investment goods, pro rata, special regimes or intra-EU operations, and public holidays are not taken into account in the dates. Check it with your adviser before filing anything.",
-  "app.autonomo.source": "Where do your income and expenses come from?",
-  "app.autonomo.sourceMovements": "From my movements (professional categories)",
-  "app.autonomo.sourceManual": "I type them once by hand (and they are kept)",
-  "app.autonomo.manualHint": "Type your income without VAT by rate and each expense with the VAT included. We tell you how much you can deduct from each one. What you type stays saved on this device.",
+  "app.autonomo.manualHint": "Type your income without VAT by rate and each expense with the VAT included. We tell you how much you can deduct from each one. What you type is saved on this device.",
   "app.autonomo.profile": "Your situation (valid for the whole year)",
   "app.autonomo.workArea": "Square metres of your home used for work",
   "app.autonomo.homeArea": "Total square metres of the home",
@@ -1584,5 +1578,7 @@
   "app.autonomo.paid": "Paid",
   "app.autonomo.deductibleIrpf": "Deductible expense",
   "app.autonomo.deductibleVat": "Deductible VAT",
-  "app.autonomo.total": "Total"
+  "app.autonomo.total": "Total",
+  "app.autonomo.incomeTitle": "Income of the quarter",
+  "app.autonomo.expensesTitle": "Expenses of the quarter"
 }

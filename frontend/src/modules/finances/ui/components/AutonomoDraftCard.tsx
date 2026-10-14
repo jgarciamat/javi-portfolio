@@ -18,18 +18,11 @@ import '../css/Sections.css';
 import '../css/Autonomo.css';
 
 const SNAPSHOT_KEY = 'mm_autonomo_draft';
-const MANUAL_KEY = 'mm_autonomo_manual';
+const MANUAL_KEY = 'mm_autonomo_manual2';
 const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
-interface ExtrasForm {
-  withheld: string;
-  socialSecurity: string;
-  vatNotDeductible: string;
-}
-
-const emptyExtras = (): ExtrasForm => ({ withheld: '', socialSecurity: '', vatNotDeductible: '' });
 const number = (text: string): number => {
   const parsed = parseDecimal(text);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -180,12 +173,10 @@ export function AutonomoDraftCard() {
   const action = useAction();
   const [year, setYear] = useState(THIS_YEAR);
   const [quarter, setQuarter] = useState<1 | 2 | 3 | 4>(quarterNow);
-  const [extras, setExtras] = useState<ExtrasForm[]>(() => QUARTERS.map(emptyExtras));
   const [hardToJustify, setHardToJustify] = useState(false);
   const [exempt, setExempt] = useState(false);
   const [priorNet, setPriorNet] = useState('');
   const [toOffset, setToOffset] = useState('');
-  const [source, setSource] = useState<'movements' | 'manual'>('movements');
   const [manual, setManual] = useState<ManualForm>(() =>
     storage.getJSON<ManualForm>(MANUAL_KEY, emptyManual())
   );
@@ -200,24 +191,22 @@ export function AutonomoDraftCard() {
   const limit = plan?.overview?.limits.resources.autonomoDrafts;
   const used = plan?.overview?.usage.autonomoDrafts ?? 0;
   const locked = limit !== null && limit !== undefined && used >= limit;
-  const setExtra = (q: number, key: keyof ExtrasForm, value: string) =>
-    setExtras((all) => all.map((e, i) => (i === q ? { ...e, [key]: value } : e)));
-
   const prepare = () =>
     action.run(async () => {
+      const manualData = toManualData(manual);
       const inputs: AutonomoInputs = {
-        quarters: extras.map(
-          (e): QuarterExtras => ({
-            withheld: number(e.withheld),
-            socialSecurity: number(e.socialSecurity),
-            vatNotDeductible: number(e.vatNotDeductible),
+        quarters: manual.quarters.map(
+          (q): QuarterExtras => ({
+            withheld: number(q.withheld),
+            socialSecurity: 0,
+            vatNotDeductible: 0,
           })
         ) as AutonomoInputs['quarters'],
         hardToJustify,
         priorYearNet: priorNet.trim() === '' ? null : parseDecimal(priorNet),
         exempt130: exempt,
         vatToOffset: number(toOffset),
-        manual: source === 'manual' ? toManualData(manual) : null,
+        manual: manualData,
       };
       const result = await businessApi.draft(year, quarter, inputs);
       storage.setJSON(SNAPSHOT_KEY, result);
@@ -264,69 +253,10 @@ export function AutonomoDraftCard() {
         </label>
       </div>
 
-      <fieldset className="autonomo-source">
-        <legend>{t('app.autonomo.source')}</legend>
-        <label className="renta-check">
-          <input
-            type="radio"
-            name="autonomo-source"
-            checked={source === 'movements'}
-            onChange={() => setSource('movements')}
-          />
-          <span>{t('app.autonomo.sourceMovements')}</span>
-        </label>
-        <label className="renta-check">
-          <input
-            type="radio"
-            name="autonomo-source"
-            checked={source === 'manual'}
-            onChange={() => setSource('manual')}
-          />
-          <span>{t('app.autonomo.sourceManual')}</span>
-        </label>
-      </fieldset>
-      {source === 'manual' && (
-        <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
-      )}
+      <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
 
       <section className="autonomo-extras">
         <h3 className="subsection-title">{t('app.autonomo.extras')}</h3>
-        <p className="section-hint">{t('app.autonomo.extrasHint')}</p>
-        {QUARTERS.filter((q) => q <= quarter).map((q) => (
-          <fieldset key={q} className="autonomo-quarter">
-            <legend>{t('app.autonomo.quarterN', { n: q })}</legend>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.withheld')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.withheld')} ${q}`}
-                value={extras[q - 1].withheld}
-                onChange={(e) => setExtra(q - 1, 'withheld', e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.socialSecurity')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.socialSecurity')} ${q}`}
-                value={extras[q - 1].socialSecurity}
-                onChange={(e) => setExtra(q - 1, 'socialSecurity', e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.vatNotDeductible')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.vatNotDeductible')} ${q}`}
-                value={extras[q - 1].vatNotDeductible}
-                onChange={(e) => setExtra(q - 1, 'vatNotDeductible', e.target.value)}
-              />
-            </label>
-          </fieldset>
-        ))}
         <label className="renta-check">
           <input
             type="checkbox"
