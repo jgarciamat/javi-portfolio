@@ -38,6 +38,9 @@ export const PREMIUM_BENEFITS = [
   'billing.benefit.insights',
   'billing.benefit.forecast',
   'billing.benefit.household',
+  'billing.benefit.debts',
+  'billing.benefit.renta',
+  'billing.benefit.receipts',
   'billing.benefit.ai',
   'billing.benefit.support',
 ];

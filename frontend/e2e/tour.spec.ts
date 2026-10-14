@@ -1,6 +1,19 @@
 import { expect, logIn, openSection, test } from './fixtures';
 
-const SECTIONS = ['Balance anual', 'Análisis', 'Buscar', 'Cuentas', 'Presupuestos', 'Metas'];
+const SECTIONS = [
+  'Balance anual',
+  'Análisis',
+  'Salud financiera',
+  'Buscar',
+  'Cuentas',
+  'Presupuestos',
+  'Metas',
+  'Gastos compartidos',
+  'Inversiones y deudas',
+  'Autónomos',
+  'Renta (IRPF)',
+  'Aprende a ahorrar',
+];
 
 test('the welcome tour visits every section after signing in, until it is turned off', async ({
   page,
