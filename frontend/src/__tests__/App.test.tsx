@@ -62,6 +62,7 @@ describe('App routes', () => {
     ['/calculadora-iva', 'tools.vat.title'],
     ['/calculadora-inflacion', 'tools.inflation.title'],
     ['/calculadora-objetivo-ahorro', 'tools.goal.title'],
+    ['/calculadora-renta', 'tools.renta.title'],
   ])('serves the public page %s', async (path, key) => {
     visit(path);
     expect(await screen.findByRole('heading', { name: tr(key) })).toBeInTheDocument();
