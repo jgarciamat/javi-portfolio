@@ -27,6 +27,7 @@ import {
   splitExpenseParams,
   splitGroupBody,
   splitSettleBody,
+  autonomoDraftBody,
   businessCategoryBody,
   categoryIdParam,
   assetValueBody,
@@ -281,6 +282,13 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed((req, res) => {
       c.tax.remove(req.dataUserId, categoryIdParam.parse(req.params).categoryId);
       res.status(204).end();
+    })
+  );
+  router.post(
+    '/business/draft',
+    authed((req, res) => {
+      const { year, quarter, inputs } = autonomoDraftBody.parse(req.body);
+      res.status(201).json(c.tax.draft(req.dataUserId, year, quarter, inputs));
     })
   );
   router.get(

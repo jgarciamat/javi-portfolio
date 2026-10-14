@@ -86,19 +86,231 @@ describe('Self-employed: professional categories and quarterly tax', () => {
     expect(res.body.totals).toMatchObject({ incomeBase: 1500, expenseBase: 200, irpfAdvance: 260 });
   });
 
-  it('is private and Premium', async () => {
+  it('is private to each user', async () => {
     const other = await createUser(ctx, 'otra@example.com');
     await put(categories['Salario'], 21).expect(204);
     expect((await request(ctx.app).get('/api/business/categories').set(other.auth)).body).toEqual(
       []
     );
     expireTrial(ctx, user);
-    await request(ctx.app).get('/api/business/categories').set(user.auth).expect(402);
-    await request(ctx.app).get('/api/business/tax/2026').set(user.auth).expect(402);
-    await put(categories['Salario'], 21).expect(402);
+    // The categories and the estimate are open to the free plan: the drafts are what is limited.
+    await request(ctx.app).get('/api/business/categories').set(user.auth).expect(200);
+    await request(ctx.app).get('/api/business/tax/2026').set(user.auth).expect(200);
+    await put(categories['Salario'], 21).expect(204);
     await request(ctx.app)
       .delete(`/api/business/categories/${categories['Salario']}`)
       .set(user.auth)
-      .expect(402);
+      .expect(204);
+  });
+
+  describe('the draft of a quarter', () => {
+    const extras = { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 };
+    const inputs = (over: Record<string, unknown> = {}) => ({
+      quarters: [extras, extras, extras, extras],
+      hardToJustify: false,
+      priorYearNet: null,
+      exempt130: false,
+      vatToOffset: 0,
+      ...over,
+    });
+    const draft = (quarter: number, over: Record<string, unknown> = {}, year = 2026) =>
+      request(ctx.app)
+        .post('/api/business/draft')
+        .set(user.auth)
+        .send({ year, quarter, inputs: inputs(over) });
+    const add = async (body: Record<string, unknown>) => {
+      expect((await addTransaction(ctx, user, body)).status).toBe(201);
+    };
+    const box = (list: { box: string; amount: number }[], n: string) =>
+      list.find((b) => b.box === n)?.amount;
+
+    beforeEach(async () => {
+      await put(categories['Salario'], 21).expect(204);
+      await put(categories['Educación'], 10).expect(204);
+      await put(categories['Gastos'], 21).expect(204);
+      // 2026-Q1: 1,210 with 21 % VAT and 110 with 10 %; 242 of expenses with 21 % VAT.
+      await add({
+        type: 'INCOME',
+        category: 'Salario',
+        amount: 1210,
+        date: '2026-02-10',
+      });
+      await add({
+        type: 'INCOME',
+        category: 'Educación',
+        amount: 110,
+        date: '2026-03-10',
+      });
+      await add({
+        type: 'EXPENSE',
+        category: 'Gastos',
+        amount: 242,
+        date: '2026-03-12',
+      });
+    });
+
+    it('fills the VAT boxes by rate, the deductible VAT and the result', async () => {
+      const { body } = await draft(1).expect(201);
+      expect(box(body.vat.accrued, '07')).toBe(1000);
+      expect(box(body.vat.accrued, '09')).toBe(210);
+      expect(box(body.vat.accrued, '04')).toBe(100);
+      expect(box(body.vat.accrued, '06')).toBe(10);
+      expect(box(body.vat.accrued, '27')).toBe(220);
+      expect(box(body.vat.deductible, '29')).toBe(42);
+      expect(box(body.vat.settlement, '46')).toBe(178);
+      expect(body.vat).toMatchObject({ result: 'pay', amountDue: 178 });
+    });
+
+    it('does not deduct the VAT that cannot be deducted, and offsets what was pending', async () => {
+      const { body } = await draft(1, {
+        quarters: [{ ...extras, vatNotDeductible: 12 }, extras, extras, extras],
+        vatToOffset: 50,
+      }).expect(201);
+      expect(box(body.vat.deductible, '29')).toBe(30);
+      expect(box(body.vat.settlement, '78')).toBe(50);
+      expect(box(body.vat.settlement, '87')).toBe(0);
+      expect(box(body.vat.settlement, '46')).toBe(190);
+      expect(body.vat.amountDue).toBe(140);
+    });
+
+    it('says to offset when the VAT is negative, and when there was no activity', async () => {
+      const offset = await draft(1, {}).expect(201);
+      expect(offset.body.vat.result).toBe('pay');
+      // Q2 has an expense only.
+      await add({
+        type: 'EXPENSE',
+        category: 'Gastos',
+        amount: 121,
+        date: '2026-05-05',
+      });
+      const q2 = (await draft(2).expect(201)).body;
+      expect(q2.vat).toMatchObject({ result: 'offset', amountDue: -21 });
+      const q3 = (await draft(3).expect(201)).body;
+      expect(q3.vat.result).toBe('noActivity');
+    });
+
+    it('works the income tax advance out on the accumulated figures', async () => {
+      const { body } = await draft(1).expect(201);
+      expect(box(body.irpf.boxes, '01')).toBe(1100);
+      expect(box(body.irpf.boxes, '02')).toBe(200);
+      expect(box(body.irpf.boxes, '03')).toBe(900);
+      expect(box(body.irpf.boxes, '04')).toBe(180);
+      expect(body.irpf).toMatchObject({ required: true, result: 'pay', amountDue: 180 });
+    });
+
+    it('subtracts the contribution, the withholdings and the payments of earlier quarters', async () => {
+      await add({
+        type: 'INCOME',
+        category: 'Salario',
+        amount: 1210,
+        date: '2026-05-10',
+      });
+      const q2 = (
+        await draft(2, {
+          quarters: [
+            { ...extras, socialSecurity: 100 },
+            { ...extras, socialSecurity: 100, withheld: 30 },
+            extras,
+            extras,
+          ],
+        }).expect(201)
+      ).body;
+      // Income 2,100; expenses 200 + 200 of fees; net 1,700; 20 % = 340; Q1 paid 160; withheld 30.
+      expect(box(q2.irpf.boxes, '01')).toBe(2100);
+      expect(box(q2.irpf.boxes, '02')).toBe(400);
+      expect(box(q2.irpf.boxes, '04')).toBe(340);
+      expect(box(q2.irpf.boxes, '05')).toBe(160);
+      expect(box(q2.irpf.boxes, '06')).toBe(30);
+      expect(q2.irpf.amountDue).toBe(150);
+    });
+
+    it('applies the hard-to-justify expenses, the low-income reduction and the exemption', async () => {
+      const hard = (await draft(1, { hardToJustify: true }).expect(201)).body;
+      // 5 % of 900 = 45 extra expenses.
+      expect(box(hard.irpf.boxes, '02')).toBe(245);
+      const low = (await draft(1, { priorYearNet: 9500 }).expect(201)).body;
+      expect(box(low.irpf.boxes, '13')).toBe(75);
+      expect(low.irpf.amountDue).toBe(105);
+      const none = (await draft(1, { priorYearNet: 20000 }).expect(201)).body;
+      expect(box(none.irpf.boxes, '13')).toBe(0);
+      const exempt = (await draft(1, { exempt130: true }).expect(201)).body;
+      expect(exempt.irpf).toMatchObject({ required: false, result: 'notRequired', boxes: [] });
+    });
+
+    it('does not carry a negative advance, but does carry what the low-income reduction left', async () => {
+      const q1 = (
+        await draft(1, {
+          quarters: [{ ...extras, withheld: 250 }, extras, extras, extras],
+          priorYearNet: 5000,
+        }).expect(201)
+      ).body;
+      // 20 % of 900 = 180, less 250 withheld: negative, lost; the reduction of 100 is left over.
+      expect(box(q1.irpf.boxes, '07')).toBe(-70);
+      expect(box(q1.irpf.boxes, '14')).toBe(-100);
+      expect(q1.irpf).toMatchObject({ result: 'negative', amountDue: -100 });
+      await add({ type: 'INCOME', category: 'Salario', amount: 1210, date: '2026-05-10' });
+      const q2 = (
+        await draft(2, {
+          quarters: [{ ...extras, withheld: 250 }, extras, extras, extras],
+          priorYearNet: 5000,
+        }).expect(201)
+      ).body;
+      expect(box(q2.irpf.boxes, '14')).toBe(30);
+      expect(box(q2.irpf.boxes, '15')).toBe(30);
+      expect(q2.irpf).toMatchObject({ result: 'zero', amountDue: 0 });
+      const plain = (await draft(1, { priorYearNet: 5000 }).expect(201)).body;
+      expect(box(plain.irpf.boxes, '14')).toBe(80);
+    });
+
+    it('estimates the contribution of the self-employed scheme', async () => {
+      const { body } = await draft(1).expect(201);
+      // 900 net in the quarter = 300 a month, minus 7 %: the first reduced bracket.
+      expect(body.reta).toMatchObject({ bracket: 'R1', baseMin: 653.59, feeMin: 205.88 });
+      await add({
+        type: 'INCOME',
+        category: 'Salario',
+        amount: 30000,
+        date: '2026-03-20',
+      });
+      const high = (await draft(1).expect(201)).body;
+      expect(high.reta).toMatchObject({ bracket: 'G12', baseMin: 1928.1, feeMax: 1606.88 });
+      expect(high.reta.rate).toBe(0.315);
+    });
+
+    it('lists the deadlines of the quarter, with the annual ones at the year end', async () => {
+      const q1 = (await draft(1).expect(201)).body;
+      expect(q1.deadlines.find((d: { model: string }) => d.model === '303').date).toBe(
+        '2026-04-20'
+      );
+      const q4 = (await draft(4).expect(201)).body;
+      const models = q4.deadlines.map((d: { model: string }) => d.model);
+      expect(models).toEqual(
+        expect.arrayContaining(['303', '130', '111', '115', '390', '190', '347'])
+      );
+      // 30 January 2027 is a Saturday: the next working day.
+      expect(q4.deadlines.find((d: { model: string }) => d.model === '303').date).toBe(
+        '2027-02-01'
+      );
+    });
+
+    it('lets the free plan prepare one draft only, and Premium as many as it wants', async () => {
+      expireTrial(ctx, user);
+      expect((await draft(1).expect(201)).body.used).toBe(1);
+      const refused = await draft(1).expect(402);
+      expect(refused.body.code).toBe('PLAN_LIMIT');
+      expect(refused.body.details).toEqual({ resource: 'autonomoDrafts', limit: 1 });
+      const overview = (await request(ctx.app).get('/api/billing').set(user.auth)).body;
+      expect(overview.usage.autonomoDrafts).toBe(1);
+    });
+
+    it('is unlimited in the trial and rejects invalid data', async () => {
+      for (let i = 1; i <= 3; i++) expect((await draft(1).expect(201)).body.used).toBe(i);
+      await request(ctx.app)
+        .post('/api/business/draft')
+        .set(user.auth)
+        .send({ year: 2026, quarter: 5, inputs: inputs() })
+        .expect(400);
+      await request(ctx.app).post('/api/business/draft').send({}).expect(401);
+    });
   });
 });

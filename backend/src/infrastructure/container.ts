@@ -349,7 +349,13 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     push: pushService,
     reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
     split: new SplitService(repos.splits, uow, clock),
-    tax: new TaxService(repos.business, repos.categories, repos.transactions, entitlements),
+    tax: new TaxService(
+      repos.business,
+      repos.categories,
+      repos.transactions,
+      entitlements,
+      repos.autonomoDrafts
+    ),
     assetService: new AssetService(repos.assets, entitlements, uow, clock),
     advice: new AdviceService(
       transactions,
