@@ -107,3 +107,27 @@ export function Step({
     </section>
   );
 }
+
+/** The id of the row of a deduction, to take the person to it. */
+export const rowId = (deductionId: string) => `renta-ded-${deductionId}`;
+
+/** Deductions marked as "applies to me", in the order they appear on the page. */
+const markedRows = () => [...document.querySelectorAll<HTMLElement>('.renta-deduction--on')];
+
+/** The marked deduction that follows `id` (the first one when `id` is null). */
+export function markedAfter(id: string | null): HTMLElement | undefined {
+  const rows = markedRows();
+  return rows[id === null ? 0 : rows.findIndex((row) => row.id === rowId(id)) + 1];
+}
+
+/** Scrolls to a deduction (opening its group) and puts the focus on the amount to fill in. */
+export function reveal(row: HTMLElement | null | undefined): void {
+  // Without a row, the end of the list: the result.
+  const target = row ?? (document.querySelector('.renta-result') as HTMLElement);
+  const group = target.closest('details');
+  if (group) group.open = true;
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const field = target.querySelector<HTMLElement>('.renta-deduction-fields input');
+  target.tabIndex = -1;
+  (field ?? target).focus({ preventScroll: true });
+}

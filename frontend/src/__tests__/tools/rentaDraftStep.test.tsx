@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { useRentaAccess } from '@modules/tools/application/useRentaAccess';
 import { readPdfText } from '@modules/tools/application/readPdf';
@@ -282,5 +282,92 @@ describe('Renta planner: who can read a draft', () => {
     open({}, api);
     await paste(DRAFT);
     expect(await screen.findByText(tr('tools.renta.draft.refused'))).toBeInTheDocument();
+  });
+});
+
+describe('Renta planner: going through the marked deductions', () => {
+  /** Answers every question: the first two apply, the rest do not. */
+  const answerAll = async () => {
+    await paste(DRAFT);
+    await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    const yes = () => screen.queryAllByRole('button', { name: /^Me corresponde:/ });
+    await screen.findAllByRole('button', { name: /^Me corresponde:/ });
+    fireEvent.click(
+      screen.getByRole('button', { name: /^Me corresponde: Dentista y salud bucodental/ })
+    );
+    fireEvent.click(screen.getByRole('button', { name: /^Me corresponde: Gafas y lentillas/ }));
+    for (let i = 0; i < 300 && yes().length > 0; i++) {
+      fireEvent.click(screen.getAllByRole('button', { name: /^No me corresponde:/ })[0]);
+    }
+  };
+  const rowOf = (title: string) =>
+    screen.getByText(title, { selector: 'strong' }).closest('.renta-deduction') as HTMLElement;
+
+  it('takes the person to each marked deduction, one after another', async () => {
+    render();
+    await answerAll();
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: tr('tools.renta.draft.goFirst', { count: 2 }),
+      })
+    );
+    const first = rowOf('Dentista y salud bucodental');
+    expect(first.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).toHaveAttribute('inputmode', 'decimal');
+
+    fireEvent.click(within(first).getByRole('button', { name: tr('tools.renta.nextDeduction') }));
+    expect(rowOf('Gafas y lentillas').contains(document.activeElement)).toBe(true);
+
+    // The last one leads to the result.
+    fireEvent.click(
+      within(rowOf('Gafas y lentillas')).getByRole('button', {
+        name: tr('tools.renta.nextDeduction'),
+      })
+    );
+    expect(document.activeElement).toBe(document.querySelector('.renta-result'));
+  });
+
+  it('lets a mistake be undone, and moves on to the next marked deduction', async () => {
+    render();
+    await answerAll();
+    const first = rowOf('Dentista y salud bucodental');
+    fireEvent.click(within(first).getByRole('button', { name: tr('tools.renta.draft.no') }));
+    expect(first).not.toHaveClass('renta-deduction--on');
+    expect(rowOf('Gafas y lentillas').contains(document.activeElement)).toBe(true);
+    // Unmarking the last one has nowhere else to go but the result.
+    fireEvent.click(
+      within(rowOf('Gafas y lentillas')).getByRole('button', { name: tr('tools.renta.draft.no') })
+    );
+    expect(screen.queryByRole('button', { name: /Ir a la primera deducción/ })).toBeNull();
+  });
+
+  it('warns about the marked deductions that are missing an amount, and goes to them', async () => {
+    render();
+    await answerAll();
+    const alert = screen
+      .getAllByRole('alert')
+      .find((a) => /Te faltan datos en 2/.test(a.textContent ?? ''));
+    expect(alert).toBeDefined();
+    fireEvent.click(
+      within(alert as HTMLElement).getByRole('button', { name: tr('tools.renta.goToPending') })
+    );
+    expect(rowOf('Dentista y salud bucodental').contains(document.activeElement)).toBe(true);
+    fireEvent.change(document.activeElement as HTMLElement, { target: { value: '100' } });
+    expect(
+      screen.getAllByRole('alert').some((a) => /Te faltan datos en 1/.test(a.textContent ?? ''))
+    ).toBe(true);
+  });
+});
+
+describe('Renta planner: the income limit', () => {
+  it('does not ask about deductions the income rules out', async () => {
+    render();
+    await paste(DRAFT.replace('30.000,00', '120.000,00'));
+    await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    await screen.findAllByRole('button', { name: /^Me corresponde:/ });
+    expect(screen.queryByRole('button', { name: /^Me corresponde: Dentista/ })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /^Me corresponde: Por material escolar/ })
+    ).toBeNull();
   });
 });

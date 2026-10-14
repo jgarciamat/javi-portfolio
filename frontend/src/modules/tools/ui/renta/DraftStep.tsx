@@ -10,7 +10,7 @@ import { readDraft, type DraftReading } from '../../domain/rentaDraft';
 import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
 import { CCAA_OPTIONS } from '../../data/renta';
-import { Step, useDate, useMoney } from './shared';
+import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
 
 /** What the planner keeps about the draft: what was read, and what the person answered. */
 export interface DraftState {
@@ -111,6 +111,7 @@ export function DraftStep({
   form,
   set,
   missing,
+  marked,
   access,
   local,
   upgrade,
@@ -121,6 +122,8 @@ export function DraftStep({
   form: RentaForm;
   set: (patch: Partial<RentaForm>) => void;
   missing: Deduction[];
+  /** How many deductions are marked as applying to the person. */
+  marked: number;
   access: DraftAccess;
   /** The public page: there is no account to buy anything with. */
   local: boolean;
@@ -272,7 +275,14 @@ export function DraftStep({
                 <span>{t('tools.renta.draft.rents')}</span>
               </label>
               {missing.length === 0 ? (
-                <p className="section-hint">{t('tools.renta.draft.noneMissing')}</p>
+                <>
+                  <p className="section-hint">{t('tools.renta.draft.noneMissing')}</p>
+                  {marked > 0 && (
+                    <button className="btn-primary" onClick={() => reveal(markedAfter(null))}>
+                      {t('tools.renta.draft.goFirst', { count: marked })}
+                    </button>
+                  )}
+                </>
               ) : (
                 <ul className="renta-questions">
                   {missing.map((d) => (

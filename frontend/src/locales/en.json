@@ -1482,5 +1482,9 @@
   "tools.renta.draft.passHint": "Read your draft and calculate your tax return as often as you want for 30 days. It is not a subscription: it does not renew.",
   "tools.renta.draft.buyPass": "Buy the pass for {price}",
   "tools.renta.draft.passUntil": "Your tax return pass is active until {date}.",
-  "tools.renta.draft.refused": "The use could not be registered: your access to the draft reader has changed. Reload the page."
+  "tools.renta.draft.refused": "The use could not be registered: your access to the draft reader has changed. Reload the page.",
+  "tools.renta.nextDeduction": "Next deduction",
+  "tools.renta.draft.goFirst": "Go to the first marked deduction ({count})",
+  "tools.renta.pending": "{count} marked deduction(s) still need an amount: they do not count until you fill it in.",
+  "tools.renta.goToPending": "Go to the deduction that is missing"
 }

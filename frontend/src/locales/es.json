@@ -1482,5 +1482,9 @@
   "tools.renta.draft.passHint": "Lee tu borrador y calcula tu Renta las veces que quieras durante 30 días. No es una suscripción: no se renueva.",
   "tools.renta.draft.buyPass": "Comprar el pase por {price}",
   "tools.renta.draft.passUntil": "Tu pase de la Renta está activo hasta el {date}.",
-  "tools.renta.draft.refused": "No se ha podido registrar el uso: tu acceso al lector de borradores ha cambiado. Recarga la página."
+  "tools.renta.draft.refused": "No se ha podido registrar el uso: tu acceso al lector de borradores ha cambiado. Recarga la página.",
+  "tools.renta.nextDeduction": "Siguiente deducción",
+  "tools.renta.draft.goFirst": "Ir a la primera deducción marcada ({count})",
+  "tools.renta.pending": "Te faltan datos en {count} deducción(es) marcada(s): no se cuentan hasta que pongas el importe.",
+  "tools.renta.goToPending": "Ir a la deducción que falta"
 }

@@ -4,7 +4,7 @@ import { deductionAmount, type Family } from '../../domain/rentaCalc';
 import type { Deduction, DeductionGroup, RentaCcaa, RentaState } from '../../domain/rentaData';
 import type { Choice } from '../../domain/rentaForm';
 import { number } from '../../domain/rentaForm';
-import { Step, useMoney } from './shared';
+import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
@@ -42,7 +42,11 @@ function DeductionRow({
   const perChild = !!deduction.perChild && deduction.perChild.length > 0;
 
   return (
-    <li className={`renta-deduction${choice.on ? ' renta-deduction--on' : ''}`}>
+    <li
+      id={rowId(deduction.id)}
+      tabIndex={-1}
+      className={`renta-deduction${choice.on ? ' renta-deduction--on' : ''}`}
+    >
       <label className="renta-deduction-head">
         <input
           type="checkbox"
@@ -118,6 +122,24 @@ function DeductionRow({
               {t('tools.renta.gives')} <strong>{money(value)}</strong>
             </p>
           )}
+        </div>
+      )}
+      {choice.on && (
+        <div className="button-row renta-deduction-nav">
+          <button className="btn-primary" onClick={() => reveal(markedAfter(deduction.id))}>
+            {t('tools.renta.nextDeduction')}
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              // The next one is found first: this row is about to stop being marked.
+              const next = markedAfter(deduction.id);
+              onChange({ ...choice, on: false });
+              reveal(next);
+            }}
+          >
+            {t('tools.renta.draft.no')}
+          </button>
         </div>
       )}
     </li>
@@ -200,6 +222,23 @@ function DeductionList({
   );
 }
 
+/** Marked deductions that still need an amount: a warning and a way to the first one. */
+export function PendingNotice({ pending }: { pending: string[] }) {
+  const { t } = useI18n();
+  if (pending.length === 0) return null;
+  return (
+    <div className="form-error renta-pending" role="alert">
+      <p>{t('tools.renta.pending', { count: pending.length })}</p>
+      <button
+        className="btn-secondary"
+        onClick={() => reveal(document.getElementById(rowId(pending[0])))}
+      >
+        {t('tools.renta.goToPending')}
+      </button>
+    </div>
+  );
+}
+
 /** Step 4: the deductions of the State and of the community, by group. */
 export function DeductionsStep({
   state,
@@ -209,6 +248,7 @@ export function DeductionsStep({
   family,
   blocked,
   hints,
+  pending,
   onChange,
 }: {
   state: RentaState;
@@ -218,6 +258,7 @@ export function DeductionsStep({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
+  pending: string[];
   onChange: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -250,6 +291,7 @@ export function DeductionsStep({
         />
       )}
       {!ccaa && !loadError && <p className="section-hint">{t('tools.renta.pickCcaa')}</p>}
+      <PendingNotice pending={pending} />
     </Step>
   );
 }

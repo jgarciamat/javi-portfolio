@@ -2,9 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
-import { computeRenta, descendantBreakdown } from '../domain/rentaCalc';
+import { computeRenta, descendantBreakdown, incomeFactor } from '../domain/rentaCalc';
 import type { RentaCcaa } from '../domain/rentaData';
-import { emptyForm, familyOf, toInput, type Choice, type RentaForm } from '../domain/rentaForm';
+import {
+  emptyForm,
+  familyOf,
+  number,
+  toInput,
+  type Choice,
+  type RentaForm,
+} from '../domain/rentaForm';
 import { workReductionOf } from '../domain/rentaWork';
 import { useRentaAccess, type RentaAccess, type RentaMode } from '../application/useRentaAccess';
 import { loadCcaa } from '../data/renta';
@@ -12,7 +19,7 @@ import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
 import { mentionedIn, missingDeductions } from '../domain/rentaDraft';
-import { DeductionsStep } from './renta/DeductionsStep';
+import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep, NO_DRAFT, type DraftState } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { IncomeStep } from './renta/IncomeStep';
@@ -98,11 +105,18 @@ export function RentaPlanner({
     () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
     [all, draft]
   );
+  // With the person's income some deductions cannot be claimed: asking about them would be pointless.
+  const limitBase = live.result.taxBase + live.result.savingsBase;
   const missing = useMemo(
     () =>
       draft.reading
         ? missingDeductions(
-            all.filter((d) => !draft.dismissed.includes(d.id) && !form.choices[d.id]?.on),
+            all.filter(
+              (d) =>
+                !draft.dismissed.includes(d.id) &&
+                !form.choices[d.id]?.on &&
+                incomeFactor(d, limitBase) > 0
+            ),
             mentioned,
             {
               childAges: family.children.map((c) => c.age),
@@ -116,8 +130,20 @@ export function RentaPlanner({
             }
           )
         : [],
-    [all, draft, form, family, mentioned]
+    [all, draft, form, family, mentioned, limitBase]
   );
+  const pending = useMemo(
+    () =>
+      all
+        .filter((d) => {
+          const choice = form.choices[d.id];
+          const needsAmount = d.kind === 'percent' || d.kind === 'special';
+          return choice?.on && needsAmount && number(choice.amount) <= 0;
+        })
+        .map((d) => d.id),
+    [all, form.choices]
+  );
+  const marked = Object.values(form.choices).filter((c) => c.on).length;
   const hints = useMemo(() => {
     const map: Record<string, 'inDraft' | 'missing'> = {};
     for (const id of mentioned) map[id] = 'inDraft';
@@ -144,6 +170,7 @@ export function RentaPlanner({
         form={form}
         set={set}
         missing={missing}
+        marked={marked}
         access={access.draft}
         local={mode === 'local'}
         upgrade={<UpgradeCta access={access} />}
@@ -162,6 +189,7 @@ export function RentaPlanner({
         family={family}
         blocked={live.result.blocked}
         hints={hints}
+        pending={pending}
         onChange={setChoice}
       />
 
@@ -184,6 +212,7 @@ export function RentaPlanner({
           )}
           {shown && (
             <>
+              <PendingNotice pending={pending} />
               <ResultCard shown={shown} money={money} />
               {!access.premium && (
                 <div className="renta-gate">
