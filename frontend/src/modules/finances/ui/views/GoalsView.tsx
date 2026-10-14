@@ -167,7 +167,7 @@ function GoalForm({
 export function GoalsView() {
   const { goalApi } = useApi();
   const { t } = useI18n();
-  const { categories } = useFinances();
+  const { categories, refreshCategories } = useFinances();
   const goals = useResource(() => goalApi.getAll(), [goalApi], { initial: [] as Goal[] });
   const action = useAction();
   const [showArchived, setShowArchived] = useState(false);
@@ -177,7 +177,8 @@ export function GoalsView() {
   const run = (change: () => Promise<unknown>) =>
     action.run(async () => {
       await change();
-      await goals.reload();
+      // A goal without a category creates its own on the server: the lists must know it.
+      await Promise.all([goals.reload(), refreshCategories()]);
     });
 
   return (

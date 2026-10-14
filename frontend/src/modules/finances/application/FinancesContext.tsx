@@ -59,6 +59,8 @@ interface FinancesActions {
   updateCategory: (id: string, dto: Partial<CreateCategoryDTO>) => Promise<Category>;
   removeCategory: (id: string, reassignTo?: string) => Promise<void>;
   refreshAccounts: () => Promise<void>;
+  /** Re-reads the categories (a goal, for one, creates its own on the server). */
+  refreshCategories: () => Promise<void>;
   /** Re-fetches the viewed month; `invalidate` drops every cached month first. */
   refresh: (opts?: { invalidate?: boolean }) => Promise<void>;
 }
@@ -142,6 +144,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     addCategory,
     updateCategory: renameCategory,
     removeCategory: dropCategory,
+    refreshCategories,
   } = useCategoryActions(categoryApi);
 
   const updateCategory = useCallback(
@@ -184,6 +187,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       updateCategory,
       removeCategory,
       refreshAccounts,
+      refreshCategories,
       refresh: fetchMonth,
     }),
     [
@@ -201,6 +205,7 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       updateCategory,
       removeCategory,
       refreshAccounts,
+      refreshCategories,
       fetchMonth,
     ]
   );

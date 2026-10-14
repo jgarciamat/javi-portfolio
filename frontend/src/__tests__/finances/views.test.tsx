@@ -319,6 +319,25 @@ describe('GoalsView', () => {
     await waitFor(() => expect(api.goalApi.delete).toHaveBeenCalledWith('g1'));
   });
 
+  it('shows the category a new goal creates in the list of categories at once', async () => {
+    const { api } = setup();
+    await screen.findByRole('progressbar', { name: 'Viaje' });
+    const calls = api.categoryApi.getAll.mock.calls.length;
+    api.categoryApi.getAll.mockResolvedValue([
+      f.category({ id: 'c1', name: 'Ahorro' }),
+      f.category({ id: 'c2', name: 'Moto' }),
+    ]);
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.goals.name') }), {
+      target: { value: 'Moto' },
+    });
+    fireEvent.change(screen.getByRole('spinbutton', { name: tr('app.goals.target') }), {
+      target: { value: '1500' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.goals.create') }));
+    await waitFor(() => expect(api.categoryApi.getAll.mock.calls.length).toBeGreaterThan(calls));
+    expect(await screen.findByRole('option', { name: /Moto/ })).toBeInTheDocument();
+  });
+
   it('shows the empty state', async () => {
     setup([]);
     expect(await screen.findByText(tr('app.goals.empty'))).toBeInTheDocument();
