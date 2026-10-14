@@ -11,6 +11,7 @@ export type DashboardTab =
   | 'split'
   | 'assets'
   | 'business'
+  | 'renta'
   | 'learn'
   | 'automations'
   | 'custom-alerts'
@@ -41,6 +42,7 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'split', icon: 'handshake', labelKey: 'app.tabs.split', group: 'planning' },
   { id: 'assets', icon: 'wallet', labelKey: 'app.tabs.assets', group: 'planning' },
   { id: 'business', icon: 'briefcase', labelKey: 'app.tabs.business', group: 'planning' },
+  { id: 'renta', icon: 'file', labelKey: 'app.tabs.renta', group: 'planning' },
   { id: 'automations', icon: 'settings', labelKey: 'app.tabs.automations', group: 'planning' },
   { id: 'custom-alerts', icon: 'bell', labelKey: 'app.tabs.customAlerts', group: 'planning' },
   { id: 'learn', icon: 'book', labelKey: 'app.tabs.learn', group: 'tools' },

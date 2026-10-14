@@ -948,3 +948,17 @@ button.entity-item {
   margin: 0.4rem 0 0;
   padding-left: 1.2rem;
 }
+
+/* ─── Income tax return ──────────────────────────────────────────────────── */
+
+.renta-tools {
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.renta-checklist {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.2rem;
+  margin: 0.5rem 0 1rem;
+}
