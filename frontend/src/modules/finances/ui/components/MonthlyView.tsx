@@ -25,7 +25,6 @@ import { RatePrompt } from './RatePrompt';
 import { MonthRecap, MonthRecapDialog } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
-import { TodayCard } from './TodayCard';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
 import { TransactionTable } from './TransactionTable';
@@ -228,7 +227,6 @@ export function MonthlyView({
 
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
-        {f.isCurrentPeriod && <TodayCard />}
         {f.isCurrentPeriod && <CapturedPayments />}
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {f.isCurrentPeriod &&
