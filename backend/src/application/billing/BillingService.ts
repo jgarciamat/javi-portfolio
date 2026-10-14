@@ -1,6 +1,7 @@
 import { BusinessRuleError, ConflictError, NotFoundError, ValidationError } from '@domain/errors';
 import {
   PlanId,
+  RentaAccess,
   SubscriptionProps,
   TERMS_VERSION,
   TRIAL_DAYS,
@@ -49,9 +50,10 @@ interface FollowUp {
 
 export interface BillingOptions {
   appUrl: string;
-  displayPrices: { monthly: number; yearly: number; lifetime: number };
+  displayPrices: { monthly: number; yearly: number; lifetime: number; rentaPass: number };
   founderLimit: number;
   lifetimeConfigured: boolean;
+  rentaPassConfigured: boolean;
   metrics: MetricsRecorder;
 }
 
@@ -59,7 +61,9 @@ export interface PlanCatalog {
   currency: 'EUR';
   trialDays: number;
   paymentsEnabled: boolean;
-  prices: { monthly: number; yearly: number; lifetime: number };
+  prices: { monthly: number; yearly: number; lifetime: number; rentaPass: number };
+  /** The one-month pass that includes reading a tax return draft. */
+  rentaPass: { available: boolean };
   lifetime: { available: boolean; remaining: number };
   limits: {
     free: ReturnType<typeof serializableLimits>;
@@ -80,6 +84,7 @@ export interface BillingOverview {
     canManage: boolean;
   };
   limits: ReturnType<typeof serializableLimits>;
+  renta: RentaAccess;
   usage: ResourceUsage;
   ai: AiQuota;
   catalog: PlanCatalog;
@@ -112,6 +117,7 @@ export class BillingService {
       trialDays: TRIAL_DAYS,
       paymentsEnabled: this.gateway.enabled,
       prices: this.options.displayPrices,
+      rentaPass: { available: this.gateway.enabled && this.options.rentaPassConfigured },
       lifetime: {
         available: this.gateway.enabled && this.options.lifetimeConfigured && remaining > 0,
         remaining,
@@ -139,6 +145,7 @@ export class BillingService {
         canManage: this.gateway.enabled && !!sub.stripeCustomerId,
       },
       limits: serializableLimits(status.limits),
+      renta: this.entitlements.rentaAccess(userId),
       usage: this.countResources(userId),
       ai: this.allowance.quota(userId),
       catalog: this.catalog(),
@@ -164,6 +171,7 @@ export class BillingService {
     if (!user) throw new NotFoundError('Usuario no encontrado', 'USER_NOT_FOUND');
     const now = this.clock.now();
     const sub = this.subscriptions.get(userId) ?? emptySubscription(userId, now);
+    if (kind === 'renta_pass') return this.checkoutRentaPass(userId, user.email, sub, now);
     if (sub.lifetime) {
       throw new ConflictError('Ya tienes Premium de por vida', 'ALREADY_PREMIUM');
     }
@@ -192,6 +200,41 @@ export class BillingService {
       cancelUrl: `${this.options.appUrl}/?billing=cancel`,
     });
     // Proof of what was accepted, and the customer for the coming webhooks.
+    const fresh = this.subscriptions.get(userId) ?? sub;
+    this.subscriptions.save({
+      ...fresh,
+      stripeCustomerId: customerId ?? fresh.stripeCustomerId,
+      termsAcceptedAt: now.toISOString(),
+      termsVersion: TERMS_VERSION,
+      withdrawalWaivedAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    });
+    return { url };
+  }
+
+  /** The one-month pass: for anybody, unless the draft reader is already included. */
+  private async checkoutRentaPass(
+    userId: string,
+    email: string,
+    sub: SubscriptionProps,
+    now: Date
+  ): Promise<{ url: string }> {
+    const access = this.entitlements.rentaAccess(userId);
+    if (access.draft.reason === 'premium') {
+      throw new ConflictError('Tu Premium ya incluye leer el borrador', 'ALREADY_INCLUDED');
+    }
+    if (!this.catalog().rentaPass.available) {
+      throw new BusinessRuleError('PASS_UNAVAILABLE', 'El pase de la Renta no está disponible');
+    }
+    const { url, customerId } = await this.gateway.createCheckout({
+      userId,
+      email,
+      kind: 'renta_pass',
+      customerId: sub.stripeCustomerId,
+      trialEnd: null,
+      successUrl: `${this.options.appUrl}/?billing=success&renta=1`,
+      cancelUrl: `${this.options.appUrl}/?billing=cancel`,
+    });
     const fresh = this.subscriptions.get(userId) ?? sub;
     this.subscriptions.save({
       ...fresh,
@@ -271,6 +314,20 @@ export class BillingService {
           this.subscriptions.save({ ...sub, stripeCustomerId: event.customerId, updatedAt: stamp });
         }
         return { confirmPurchase: sub.userId };
+      }
+      case 'renta_pass_purchased': {
+        const sub = find(event.userId, event.customerId);
+        if (!sub) {
+          this.logger.warn(`[billing] pass purchase ${event.id} without a known user`);
+          return {};
+        }
+        this.entitlements.grantRentaPass(sub.userId);
+        return { confirmPurchase: sub.userId };
+      }
+      case 'renta_pass_refunded': {
+        const sub = find(event.userId, event.customerId);
+        if (sub) this.entitlements.revokeRentaPass(sub.userId);
+        return {};
       }
       case 'lifetime_refunded': {
         const sub = find(event.userId, event.customerId);

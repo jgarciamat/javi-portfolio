@@ -17,6 +17,7 @@ import type {
   Category,
   CategoryBudget,
   CategoryRule,
+  Inbox,
   CategoryTrend,
   CreateCategoryDTO,
   CreateCustomAlertDTO,
@@ -95,6 +96,27 @@ export const categoryApi = {
   /** If the category is in use, `reassignTo` says where its movements, rules… go. */
   delete(id: string, reassignTo?: string) {
     return apiRequest<void>(`/categories/${id}${query({ reassignTo })}`, { method: 'DELETE' });
+  },
+};
+
+export const rentaApi = {
+  /** Asked before reading a tax return draft (refused with a 402 when it is not included). */
+  draft() {
+    return apiRequest<unknown>('/renta/draft', { method: 'POST' });
+  },
+  /** Counts a calculation of the income tax return calculator (refused with a 402 when the plan has no more). */
+  register() {
+    return apiRequest<{ used: number }>('/renta/calculation', { method: 'POST' });
+  },
+};
+
+export const inboxApi = {
+  get() {
+    return apiRequest<Inbox>('/inbox');
+  },
+  /** A new address: the old one stops working. */
+  rotate() {
+    return apiRequest<Inbox>('/inbox/rotate', { method: 'POST' });
   },
 };
 
@@ -300,7 +322,14 @@ export const assetApi = {
   getAll() {
     return apiRequest<Asset[]>('/assets');
   },
-  create(input: { name: string; kind: AssetKind; value: number; date?: string }) {
+  create(input: {
+    name: string;
+    kind: AssetKind;
+    value: number;
+    date?: string;
+    interestRate?: number | null;
+    minPayment?: number | null;
+  }) {
     return apiRequest<Asset>('/assets', { method: 'POST', body: jsonBody(input) });
   },
   /** Records what the asset is worth now (or on `date`). */
@@ -308,6 +337,13 @@ export const assetApi = {
     return apiRequest<Asset>(`/assets/${id}/values`, {
       method: 'POST',
       body: jsonBody({ value, date }),
+    });
+  },
+  /** Interest rate and minimum payment of a debt. */
+  setTerms(id: string, terms: { interestRate: number | null; minPayment: number | null }) {
+    return apiRequest<Asset>(`/assets/${id}/terms`, {
+      method: 'PATCH',
+      body: jsonBody(terms),
     });
   },
   remove(id: string) {

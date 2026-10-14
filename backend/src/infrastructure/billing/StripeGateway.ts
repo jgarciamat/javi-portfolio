@@ -5,7 +5,12 @@ import { BillingEvent, CheckoutRequest, PaymentGateway } from '@domain/ports/ser
 export interface StripeConfig {
   secretKey: string;
   webhookSecret: string;
-  prices: { monthly: string; yearly: string; lifetime: string | null };
+  prices: {
+    monthly: string;
+    yearly: string;
+    lifetime: string | null;
+    rentaPass?: string | null;
+  };
 }
 
 /** Checkout only accepts a trial end at least 48 hours away. */
@@ -65,6 +70,17 @@ export class StripeGateway implements PaymentGateway {
         ...common,
         mode: 'payment',
         line_items: [{ price: this.config.prices.lifetime, quantity: 1 }],
+        payment_intent_data: { metadata },
+        invoice_creation: { enabled: true },
+      });
+    } else if (request.kind === 'renta_pass') {
+      if (!this.config.prices.rentaPass) {
+        throw new ValidationError('El pase de la Renta no está disponible', 'PLAN_UNAVAILABLE');
+      }
+      session = await this.stripe.checkout.sessions.create({
+        ...common,
+        mode: 'payment',
+        line_items: [{ price: this.config.prices.rentaPass, quantity: 1 }],
         payment_intent_data: { metadata },
         invoice_creation: { enabled: true },
       });
@@ -131,6 +147,11 @@ export class StripeGateway implements PaymentGateway {
             ? { id: event.id, type: 'lifetime_purchased', userId, customerId }
             : { id: event.id, type: 'ignored' };
         }
+        if (session.metadata?.kind === 'renta_pass') {
+          return session.payment_status === 'paid'
+            ? { id: event.id, type: 'renta_pass_purchased', userId, customerId }
+            : { id: event.id, type: 'ignored' };
+        }
         return event.type === 'checkout.session.completed'
           ? { id: event.id, type: 'checkout_completed', userId, customerId }
           : { id: event.id, type: 'ignored' };
@@ -141,10 +162,12 @@ export class StripeGateway implements PaymentGateway {
         // Partial refunds keep the purchase; only the founder payment matters here.
         if (!charge.refunded || !paymentIntentId) return { id: event.id, type: 'ignored' };
         const { metadata } = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-        if (metadata?.kind !== 'lifetime') return { id: event.id, type: 'ignored' };
+        if (metadata?.kind !== 'lifetime' && metadata?.kind !== 'renta_pass') {
+          return { id: event.id, type: 'ignored' };
+        }
         return {
           id: event.id,
-          type: 'lifetime_refunded',
+          type: metadata.kind === 'renta_pass' ? 'renta_pass_refunded' : 'lifetime_refunded',
           userId: metadata.userId ?? null,
           customerId: idOf(charge.customer),
         };

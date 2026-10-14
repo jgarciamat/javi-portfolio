@@ -14,6 +14,7 @@ import {
   vatBreakdown,
 } from '../domain/calculators';
 import { TOOL_PAGES } from '../domain/toolPages';
+import { RentaPlanner } from './RentaPlanner';
 import './css/Tools.css';
 
 function useMoney() {
@@ -486,6 +487,30 @@ export function GoalCalculatorPage() {
         </section>
       </div>
       <p className="plan-note">{t('tools.goal.disclaimer')}</p>
+    </CalculatorLayout>
+  );
+}
+
+/** Public page of the income tax return calculator; signed-in people use the section of the app. */
+export function RentaCalculatorPage() {
+  const { t } = useI18n();
+  const { isAuthenticated } = useAuth();
+  return (
+    <CalculatorLayout
+      path="/calculadora-renta"
+      titleKey="tools.renta.title"
+      descriptionKey="tools.renta.description"
+    >
+      {isAuthenticated ? (
+        <section className="tools-result">
+          <p>{t('tools.renta.inApp')}</p>
+          <Link className="btn-primary" to="/">
+            {t('tools.renta.openApp')}
+          </Link>
+        </section>
+      ) : (
+        <RentaPlanner mode="local" />
+      )}
     </CalculatorLayout>
   );
 }

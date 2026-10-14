@@ -98,7 +98,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     const timer = window.setInterval(async () => {
       attempts += 1;
       const data = await refresh();
-      if (data?.plan === 'premium' && data.subscription.source !== 'trial') attempts = 10;
+      const paid = data?.plan === 'premium' && data.subscription.source !== 'trial';
+      if (paid || data?.renta.passUntil) attempts = 10;
       if (attempts >= 10) window.clearInterval(timer);
     }, 2000);
     return () => window.clearInterval(timer);

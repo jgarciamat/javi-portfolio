@@ -154,3 +154,48 @@ export function monthsToGoal(input: {
   }
   return null;
 }
+
+// ─── Income tax return (Renta, Spain) ─────────────────────────────────────────
+
+export interface RentaInput {
+  /** Gross yearly income from work of the main payer. */
+  mainIncome: number;
+  /** Gross yearly income from every other payer. */
+  otherIncome: number;
+}
+
+export type RentaReason = 'overLimit' | 'twoPayers' | 'none';
+
+export const RENTA_LIMIT_ONE_PAYER = 22_000;
+export const RENTA_LIMIT_SEVERAL_PAYERS = 15_000;
+export const RENTA_SECOND_PAYER_MIN = 1_500;
+
+const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
+
+/**
+ * Whether the person has to file the return because of the income from work: more than
+ * 22,000 € in total, or more than 15,000 € when the payers after the first paid more than
+ * 1,500 €. Other reasons (rent, capital gains…) exist: this is only a guide.
+ */
+export function rentaObligation(input: RentaInput): { required: boolean; reason: RentaReason } {
+  const main = positive(input.mainIncome);
+  const others = positive(input.otherIncome);
+  const total = main + others;
+  if (total > RENTA_LIMIT_ONE_PAYER) return { required: true, reason: 'overLimit' };
+  if (total > RENTA_LIMIT_SEVERAL_PAYERS && others > RENTA_SECOND_PAYER_MIN) {
+    return { required: true, reason: 'twoPayers' };
+  }
+  return { required: false, reason: 'none' };
+}
+
+/** Tax saved by paying into a pension plan: up to 1,500 € a year lowers the taxable base. */
+export function pensionSaving(contribution: number, marginalRatePct: number): number {
+  const reducible = Math.min(positive(contribution), 1_500);
+  return Math.round(reducible * (positive(marginalRatePct) / 100) * 100) / 100;
+}
+
+/** Deduction for donations to NGOs: 80 % of the first 250 €, 40 % of the rest. */
+export function donationDeduction(amount: number): number {
+  const donated = positive(amount);
+  return Math.round((Math.min(donated, 250) * 0.8 + Math.max(0, donated - 250) * 0.4) * 100) / 100;
+}

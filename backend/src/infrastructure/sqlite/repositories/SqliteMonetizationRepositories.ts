@@ -5,6 +5,7 @@ import {
 } from '@domain/model/Subscription';
 import {
   AffiliateClickRepository,
+  RentaPassRepository,
   AiUsageRepository,
   BillingEventRepository,
   SubscriptionRepository,
@@ -25,6 +26,7 @@ interface SubscriptionRow {
   terms_accepted_at: string | null;
   terms_version: string | null;
   withdrawal_waived_at: string | null;
+  paid_since: string | null;
   updated_at: string;
 }
 
@@ -41,6 +43,7 @@ const toSubscription = (r: SubscriptionRow): SubscriptionProps => ({
   termsAcceptedAt: r.terms_accepted_at,
   termsVersion: r.terms_version,
   withdrawalWaivedAt: r.withdrawal_waived_at,
+  paidSince: r.paid_since,
   updatedAt: r.updated_at,
 });
 
@@ -71,17 +74,22 @@ export class SqliteSubscriptionRepository implements SubscriptionRepository {
       .prepare(
         `INSERT INTO subscriptions (user_id, status, source, trial_ends_at, current_period_end,
            cancel_at_period_end, lifetime, stripe_customer_id, stripe_subscription_id,
-           terms_accepted_at, terms_version, withdrawal_waived_at, updated_at)
+           terms_accepted_at, terms_version, withdrawal_waived_at, paid_since, updated_at)
          VALUES (@userId, @status, @source, @trialEndsAt, @currentPeriodEnd, @cancelAtPeriodEnd,
            @lifetime, @stripeCustomerId, @stripeSubscriptionId, @termsAcceptedAt,
-           @termsVersion, @withdrawalWaivedAt, @updatedAt)
+           @termsVersion, @withdrawalWaivedAt,
+           CASE WHEN @source != 'trial' AND (@lifetime = 1 OR @status IN ('active', 'past_due'))
+                THEN @updatedAt END,
+           @updatedAt)
          ON CONFLICT(user_id) DO UPDATE SET status = excluded.status, source = excluded.source,
            trial_ends_at = excluded.trial_ends_at, current_period_end = excluded.current_period_end,
            cancel_at_period_end = excluded.cancel_at_period_end, lifetime = excluded.lifetime,
            stripe_customer_id = excluded.stripe_customer_id,
            stripe_subscription_id = excluded.stripe_subscription_id,
            terms_accepted_at = excluded.terms_accepted_at, terms_version = excluded.terms_version,
-           withdrawal_waived_at = excluded.withdrawal_waived_at, updated_at = excluded.updated_at`
+           withdrawal_waived_at = excluded.withdrawal_waived_at,
+           paid_since = COALESCE(subscriptions.paid_since, excluded.paid_since),
+           updated_at = excluded.updated_at`
       )
       .run({ ...s, cancelAtPeriodEnd: s.cancelAtPeriodEnd ? 1 : 0, lifetime: s.lifetime ? 1 : 0 });
   }
@@ -178,5 +186,29 @@ export class SqliteAffiliateClickRepository implements AffiliateClickRepository 
       )
       .all(since.toISOString()) as { offer_id: string; n: number }[];
     return Object.fromEntries(rows.map((r) => [r.offer_id, r.n]));
+  }
+}
+
+export class SqliteRentaPassRepository implements RentaPassRepository {
+  constructor(private readonly db: Db) {}
+
+  endsAt(userId: string): string | null {
+    const row = this.db
+      .prepare('SELECT ends_at FROM renta_passes WHERE user_id = ?')
+      .get(userId) as { ends_at: string } | undefined;
+    return row?.ends_at ?? null;
+  }
+
+  set(userId: string, endsAt: string): void {
+    this.db
+      .prepare(
+        `INSERT INTO renta_passes (user_id, ends_at) VALUES (?, ?)
+         ON CONFLICT(user_id) DO UPDATE SET ends_at = excluded.ends_at`
+      )
+      .run(userId, endsAt);
+  }
+
+  remove(userId: string): void {
+    this.db.prepare('DELETE FROM renta_passes WHERE user_id = ?').run(userId);
   }
 }

@@ -1,13 +1,16 @@
 import { PaymentRequiredError } from '@domain/errors';
 import {
   PlanId,
+  RENTA_PASS_DAYS,
+  RentaAccess,
+  rentaAccessOf,
   emptySubscription,
   SubscriptionProps,
   newTrial,
   planOf,
   trialDaysLeft,
 } from '@domain/model/Subscription';
-import { SubscriptionRepository } from '@domain/ports/repositories';
+import { RentaPassRepository, SubscriptionRepository } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { LimitedResource, PLAN_LIMITS, PlanLimits, PremiumFeature } from '@domain/services/plans';
 
@@ -24,14 +27,44 @@ const RESOURCE_LABELS: Record<LimitedResource, string> = {
   goals: 'metas',
   recurringRules: 'movimientos recurrentes',
   customAlerts: 'alertas',
+  rentaCalculations: 'cálculos de la Renta',
 };
 
 /** Answers "what can this user do right now?" and enforces it. */
 export class EntitlementService {
   constructor(
     private readonly subscriptions: SubscriptionRepository,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly passes: RentaPassRepository,
+    /** Local development: the draft reader is open to everybody. */
+    private readonly draftOpen = false
   ) {}
+
+  /** Whether the person can read a tax return draft, and what is missing when they cannot. */
+  rentaAccess(userId: string): RentaAccess {
+    const access = rentaAccessOf(
+      this.subscriptions.get(userId),
+      this.passes.endsAt(userId),
+      this.clock.now()
+    );
+    return this.draftOpen && !access.draft.allowed
+      ? { ...access, draft: { allowed: true, reason: 'pass' } }
+      : access;
+  }
+
+  /** The one-month pass: added after the current one, or from today. */
+  grantRentaPass(userId: string): string {
+    const now = this.clock.now();
+    const current = this.passes.endsAt(userId);
+    const base = Math.max(now.getTime(), current ? new Date(current).getTime() : 0);
+    const endsAt = new Date(base + RENTA_PASS_DAYS * 24 * 60 * 60 * 1000).toISOString();
+    this.passes.set(userId, endsAt);
+    return endsAt;
+  }
+
+  revokeRentaPass(userId: string): void {
+    this.passes.remove(userId);
+  }
 
   status(userId: string): PlanStatus {
     const now = this.clock.now();

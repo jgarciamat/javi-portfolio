@@ -30,7 +30,7 @@ describe('LandingPage', () => {
   it('shows the screenshots, the features, the plans, the questions and the learning links', () => {
     renderWithProviders(<LandingPage />, { authenticated: false });
     expect(screen.getAllByRole('img').length).toBeGreaterThanOrEqual(4);
-    expect(screen.getAllByRole('heading', { level: 3 }).length).toBe(8);
+    expect(screen.getAllByRole('heading', { level: 3 }).length).toBe(12);
     expect(screen.getByRole('link', { name: tr('landing.plans.link') })).toHaveAttribute(
       'href',
       '/pricing'

@@ -100,6 +100,9 @@ export interface Asset {
   userId: string;
   name: string;
   kind: AssetKind;
+  /** Debts: yearly interest rate in percent and minimum monthly payment. */
+  interestRate: number | null;
+  minPaymentCents: number | null;
   createdAt: string;
 }
 
@@ -284,6 +287,39 @@ export interface PushSubscriptionRecord {
   endpoint: string;
   p256dh: string;
   auth: string;
+}
+
+/** The one-month passes that include reading a tax return draft. */
+export interface RentaPassRepository {
+  endsAt(userId: string): string | null;
+  set(userId: string, endsAt: string): void;
+  remove(userId: string): void;
+}
+
+export interface RentaUsageRepository {
+  count(userId: string): number;
+  /** One more calculation; returns how many there are now. */
+  increment(userId: string): number;
+}
+
+export type InboxStatus = 'imported' | 'duplicate' | 'unreadable' | 'failed';
+
+export interface InboxMessage {
+  id: string;
+  receivedAt: string;
+  status: InboxStatus;
+  description: string | null;
+  amountCents: number | null;
+}
+
+export interface InboxRepository {
+  tokenOf(userId: string): string | null;
+  userOf(token: string): string | null;
+  /** Replaces the token of the user (a new address). */
+  setToken(userId: string, token: string, at: string): void;
+  log(userId: string, message: InboxMessage): void;
+  /** The latest messages, newest first (older ones are dropped). */
+  recent(userId: string, limit: number): InboxMessage[];
 }
 
 export interface PushRepository {

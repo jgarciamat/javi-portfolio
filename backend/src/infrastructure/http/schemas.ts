@@ -255,11 +255,18 @@ export const householdJoinBody = z.object({ code: z.string().trim().min(10).max(
 export const householdCodeParams = z.object({ code: z.string().trim().min(10).max(64) });
 export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
 const assetValue = z.number().finite().min(0).max(1_000_000_000).transform(toCents);
+const assetRate = z.number().finite().min(0).max(100);
 export const assetBody = z.object({
   name: z.string().trim().min(1).max(60),
   kind: z.enum(['investment', 'property', 'vehicle', 'other', 'debt']),
   value: assetValue,
   date: date.nullish(),
+  interestRate: assetRate.nullish(),
+  minPayment: assetValue.nullish(),
+});
+export const assetTermsBody = z.object({
+  interestRate: assetRate.nullable(),
+  minPayment: assetValue.nullable(),
 });
 export const assetValueBody = z.object({ value: assetValue, date: date.nullish() });
 export const rateQuery = z.object({
@@ -311,7 +318,7 @@ export const forecastQuery = z.object({
 // ─── Billing & offers ────────────────────────────────────────────────────────
 
 export const checkoutBody = z.object({
-  kind: z.enum(['monthly', 'yearly', 'lifetime']),
+  kind: z.enum(['monthly', 'yearly', 'lifetime', 'renta_pass']),
   acceptTerms: z.boolean().default(false),
   waiveWithdrawal: z.boolean().default(false),
 });
@@ -329,3 +336,27 @@ export const clientErrorBody = z.object({
   stack: z.string().max(4000).optional(),
   path: z.string().max(300).optional(),
 });
+
+const stripTags = (html: string) =>
+  html
+    .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&euro;/g, '€')
+    .replace(/&amp;/g, '&');
+
+/** A message forwarded by the e-mail service: plain text, or html when there is no text. */
+export const inboundMailBody = z
+  .object({
+    to: z.union([z.string(), z.array(z.string())]),
+    from: z.string().max(300).default(''),
+    subject: z.string().max(500).default(''),
+    text: z.string().max(100_000).default(''),
+    html: z.string().max(300_000).optional(),
+    date: z.string().max(40).nullish(),
+  })
+  .transform(({ to, html, text, ...rest }) => ({
+    ...rest,
+    to: Array.isArray(to) ? to.join(',') : to,
+    text: text.trim() ? text : html ? stripTags(html) : '',
+  }));

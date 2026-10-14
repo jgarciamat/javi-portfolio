@@ -274,3 +274,36 @@ describe('calculator pages for signed-in users', () => {
     expect(screen.queryByRole('link', { name: tr('tools.cta.button') })).toBeNull();
   });
 });
+
+describe('income tax return helpers', () => {
+  it('requires the return above 22,000 € or 15,000 € with a second payer over 1,500 €', async () => {
+    const { rentaObligation } = await import('@modules/tools/domain/calculators');
+    expect(rentaObligation({ mainIncome: 22_000, otherIncome: 0 })).toEqual({
+      required: false,
+      reason: 'none',
+    });
+    expect(rentaObligation({ mainIncome: 22_001, otherIncome: 0 })).toEqual({
+      required: true,
+      reason: 'overLimit',
+    });
+    expect(rentaObligation({ mainIncome: 15_500, otherIncome: 1_501 })).toEqual({
+      required: true,
+      reason: 'twoPayers',
+    });
+    expect(rentaObligation({ mainIncome: 20_000, otherIncome: 1_500 }).required).toBe(false);
+    expect(rentaObligation({ mainIncome: 15_000, otherIncome: 100 }).required).toBe(false);
+    expect(rentaObligation({ mainIncome: -5, otherIncome: Number.NaN }).required).toBe(false);
+  });
+
+  it('estimates the pension plan and donation deductions', async () => {
+    const { pensionSaving, donationDeduction } = await import('@modules/tools/domain/calculators');
+    expect(pensionSaving(1000, 30)).toBe(300);
+    expect(pensionSaving(5000, 30)).toBe(450);
+    expect(pensionSaving(-5, 30)).toBe(0);
+    expect(pensionSaving(1000, Number.NaN)).toBe(0);
+    expect(donationDeduction(100)).toBe(80);
+    expect(donationDeduction(250)).toBe(200);
+    expect(donationDeduction(450)).toBe(280);
+    expect(donationDeduction(-1)).toBe(0);
+  });
+});

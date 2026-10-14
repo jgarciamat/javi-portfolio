@@ -3,6 +3,7 @@ import type {
   AIAdvice,
   AIAnswer,
   AnnualReport,
+  Asset,
   Forecast,
   SubscriptionReport,
   BudgetLine,
@@ -326,11 +327,19 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
   trialDays: 14,
   paymentsEnabled: true,
-  prices: { monthly: 2.99, yearly: 24.99, lifetime: 49 },
+  prices: { monthly: 2.99, yearly: 24.99, lifetime: 49, rentaPass: 10 },
+  rentaPass: { available: true },
   lifetime: { available: true, remaining: 87 },
   limits: {
     free: {
-      resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+      resources: {
+        accounts: 2,
+        budgets: 3,
+        goals: 1,
+        recurringRules: 3,
+        customAlerts: 3,
+        rentaCalculations: 1,
+      },
       features: {
         import: false,
         insights: false,
@@ -347,6 +356,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         goals: null,
         recurringRules: null,
         customAlerts: null,
+        rentaCalculations: null,
       },
       features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
       aiMonthlyQuota: 10,
@@ -378,15 +388,30 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     canManage: false,
   },
   limits: catalog().limits.premium,
+  renta: { draft: { allowed: false, reason: null }, eligibleOn: null, passUntil: null },
   usage: {
     accounts: 2,
     budgets: 2,
     goals: 0,
     recurringRules: 1,
     customAlerts: 0,
+    rentaCalculations: 0,
     movements: 5,
   },
   ai: { used: 0, quota: 10 },
   catalog: catalog(),
+  ...over,
+});
+
+export const asset = (over: Partial<Asset> = {}): Asset => ({
+  id: nextId('as'),
+  name: 'Fondo',
+  kind: 'investment',
+  interestRate: null,
+  minPayment: null,
+  value: 1000,
+  valueDate: '2026-03-01',
+  previousValue: null,
+  history: [],
   ...over,
 });

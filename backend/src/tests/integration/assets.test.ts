@@ -87,6 +87,47 @@ describe('Assets, debts and the net worth', () => {
     expect(points[2]).toMatchObject({ month: 4, assets: 500, debts: 200, netWorth: 1300 });
   });
 
+  it('keeps the interest and minimum payment of a debt', async () => {
+    const debt = await post('/api/assets', {
+      name: 'Tarjeta',
+      kind: 'debt',
+      value: 1500,
+      interestRate: 19.5,
+      minPayment: 60,
+    }).expect(201);
+    expect(debt.body).toMatchObject({ interestRate: 19.5, minPayment: 60 });
+    const changed = await request(ctx.app)
+      .patch(`/api/assets/${debt.body.id}/terms`)
+      .set(user.auth)
+      .send({ interestRate: 12, minPayment: null })
+      .expect(200);
+    expect(changed.body).toMatchObject({ interestRate: 12, minPayment: null, value: 1500 });
+    // Only debts have terms: they are ignored on other kinds and cannot be set afterwards.
+    const fund = await post('/api/assets', {
+      name: 'Fondo',
+      kind: 'investment',
+      value: 10,
+      interestRate: 3,
+      minPayment: 5,
+    }).expect(201);
+    expect(fund.body).toMatchObject({ interestRate: null, minPayment: null });
+    await request(ctx.app)
+      .patch(`/api/assets/${fund.body.id}/terms`)
+      .set(user.auth)
+      .send({ interestRate: 1, minPayment: 1 })
+      .expect(400);
+    await request(ctx.app)
+      .patch('/api/assets/nope/terms')
+      .set(user.auth)
+      .send({ interestRate: 1, minPayment: 1 })
+      .expect(404);
+    await request(ctx.app)
+      .patch(`/api/assets/${debt.body.id}/terms`)
+      .set(user.auth)
+      .send({ interestRate: 101, minPayment: 1 })
+      .expect(400);
+  });
+
   it('validates the input and limits how many there are', async () => {
     await post('/api/assets', { name: '', kind: 'investment', value: 1 }).expect(400);
     await post('/api/assets', { name: 'x', kind: 'crypto', value: 1 }).expect(400);

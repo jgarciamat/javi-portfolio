@@ -6,6 +6,7 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   presentAnnualReport,
   presentAsset,
+  presentInbox,
   presentSplitGroup,
   presentTax,
   presentForecast,
@@ -21,6 +22,7 @@ import {
   nameBody,
   acquisitionBody,
   assetBody,
+  assetTermsBody,
   splitExpenseBody,
   splitExpenseParams,
   splitGroupBody,
@@ -296,10 +298,16 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   router.post(
     '/assets',
     authed((req, res) => {
-      const { value, ...rest } = assetBody.parse(req.body);
-      res
-        .status(201)
-        .json(presentAsset(c.assetService.create(req.dataUserId, { ...rest, valueCents: value })));
+      const { value, minPayment, ...rest } = assetBody.parse(req.body);
+      res.status(201).json(
+        presentAsset(
+          c.assetService.create(req.dataUserId, {
+            ...rest,
+            valueCents: value,
+            minPaymentCents: minPayment,
+          })
+        )
+      );
     })
   );
   router.post(
@@ -309,6 +317,39 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       res.json(
         presentAsset(
           c.assetService.setValue(req.dataUserId, idParam.parse(req.params).id, value, date)
+        )
+      );
+    })
+  );
+  // Income tax return calculator: each calculation is counted (the free plan has one).
+  router.post(
+    '/renta/draft',
+    authed((req, res) => res.status(201).json(c.renta.useDraft(req.userId)))
+  );
+  router.post(
+    '/renta/calculation',
+    authed((req, res) => res.status(201).json(c.renta.register(req.userId)))
+  );
+
+  // Receipts forwarded by e-mail: the user's private address and what happened to each message.
+  router.get(
+    '/inbox',
+    authed((req, res) => res.json(presentInbox(c.inbox.overview(req.dataUserId))))
+  );
+  router.post(
+    '/inbox/rotate',
+    authed((req, res) => res.json(presentInbox(c.inbox.rotate(req.dataUserId))))
+  );
+  router.patch(
+    '/assets/:id/terms',
+    authed((req, res) => {
+      const { interestRate, minPayment } = assetTermsBody.parse(req.body);
+      res.json(
+        presentAsset(
+          c.assetService.setTerms(req.dataUserId, idParam.parse(req.params).id, {
+            interestRate,
+            minPaymentCents: minPayment,
+          })
         )
       );
     })

@@ -910,3 +910,95 @@ button.entity-item {
   flex-wrap: wrap;
   gap: 0.4rem 1rem;
 }
+
+/* ─── Debt payoff plan ───────────────────────────────────────────────────── */
+
+.debt-terms-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0 0 1rem;
+  list-style: none;
+}
+
+.debt-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  align-items: end;
+  padding: 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.debt-terms > strong {
+  grid-column: 1 / -1;
+}
+
+.debt-result {
+  margin: 1rem 0;
+}
+
+.debt-free {
+  font-size: 1.15rem;
+  margin: 0 0 0.4rem;
+}
+
+.debt-order {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+/* ─── Income tax return ──────────────────────────────────────────────────── */
+
+.renta-tools {
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.renta-checklist {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.2rem;
+  margin: 0.5rem 0 1rem;
+}
+
+/* ─── Receipts by e-mail ─────────────────────────────────────────────────── */
+
+.inbox-recent {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  list-style: none;
+}
+
+.inbox-recent li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.inbox-recent small {
+  display: block;
+  color: var(--slate-400);
+}
+
+.inbox-recent em {
+  color: var(--slate-400);
+  font-style: normal;
+}
+
+/* ─── Payments detected in notifications ─────────────────────────────────── */
+
+.capture-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capture-access {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}

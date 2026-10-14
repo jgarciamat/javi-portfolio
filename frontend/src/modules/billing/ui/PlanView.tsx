@@ -15,6 +15,7 @@ import './css/Billing.css';
 import { Icon } from '@shared/components/Icon';
 
 const RESOURCES: LimitedResource[] = [
+  'rentaCalculations',
   'accounts',
   'budgets',
   'goals',

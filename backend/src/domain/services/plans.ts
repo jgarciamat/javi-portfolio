@@ -1,7 +1,13 @@
 import { PlanId } from '@domain/model/Subscription';
 
 /** Things a user creates that the free plan limits. */
-export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
+export type LimitedResource =
+  | 'accounts'
+  | 'budgets'
+  | 'goals'
+  | 'recurringRules'
+  | 'customAlerts'
+  | 'rentaCalculations';
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
@@ -15,7 +21,15 @@ export interface PlanLimits {
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: {
-    resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+    resources: {
+      accounts: 2,
+      budgets: 3,
+      goals: 1,
+      recurringRules: 3,
+      customAlerts: 3,
+      // The tax return calculator: one calculation to try it, unlimited with Premium.
+      rentaCalculations: 1,
+    },
     features: {
       import: false,
       insights: false,
@@ -32,6 +46,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       goals: Infinity,
       recurringRules: Infinity,
       customAlerts: Infinity,
+      rentaCalculations: Infinity,
     },
     features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
     aiMonthlyQuota: 10,

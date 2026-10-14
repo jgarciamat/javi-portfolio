@@ -12,12 +12,26 @@ const dist = 'dist';
 const es = JSON.parse(readFileSync('src/locales/es.json', 'utf8'));
 const t = (key) => es[key] ?? key;
 const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
 /** The TypeScript data of the app (guides, calculators), bundled once to read it from here. */
 async function load(entry) {
-  const outfile = join(tmpdir(), `prerender-${Date.now()}-${Math.random().toString(36).slice(2)}.mjs`);
-  await build({ entryPoints: [entry], bundle: true, format: 'esm', platform: 'node', outfile, logLevel: 'silent' });
+  const outfile = join(
+    tmpdir(),
+    `prerender-${Date.now()}-${Math.random().toString(36).slice(2)}.mjs`
+  );
+  await build({
+    entryPoints: [entry],
+    bundle: true,
+    format: 'esm',
+    platform: 'node',
+    outfile,
+    logLevel: 'silent',
+  });
   return import(pathToFileURL(outfile).href);
 }
 
@@ -41,9 +55,14 @@ function render({ path, title, description, body, jsonLd = [] }) {
   html = html
     .replace(/(<meta\s+property="og:description"\s+content=")[^"]*(")/, `$1${description2}$2`)
     .replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, `$1${description2}$2`);
-  const ld = jsonLd.map((d) => `<script type="application/ld+json">${JSON.stringify(d)}</script>`).join('');
+  const ld = jsonLd
+    .map((d) => `<script type="application/ld+json">${JSON.stringify(d)}</script>`)
+    .join('');
   html = html.replace('</head>', `${ld}</head>`);
-  return html.replace('<div id="root"></div>', `<div id="root"><div id="seo-fallback">${body}</div></div>`);
+  return html.replace(
+    '<div id="root"></div>',
+    `<div id="root"><div id="seo-fallback">${body}</div></div>`
+  );
 }
 
 function write(path, html) {
@@ -53,10 +72,26 @@ function write(path, html) {
 }
 
 const link = (href, text) => `<a href="${href}">${esc(text)}</a>`;
-const nav = `<nav>${link('/', 'Money Manager')} · ${link('/guias', t('landing.learn.guides'))} · ${link('/pricing', t('pricing.link'))}</nav>`;
+const nav = `<nav>${link('/', 'Money Manager')} · ${link(
+  '/guias',
+  t('landing.learn.guides')
+)} · ${link('/pricing', t('pricing.link'))}</nav>`;
 
 // Home: the presentation page.
-const features = ['overview', 'budgets', 'forecast', 'subscriptions', 'import', 'together', 'ai', 'privacy'];
+const features = [
+  'overview',
+  'budgets',
+  'forecast',
+  'subscriptions',
+  'import',
+  'together',
+  'ai',
+  'health',
+  'debts',
+  'renta',
+  'receipts',
+  'privacy',
+];
 write(
   '/',
   render({
@@ -66,7 +101,12 @@ write(
     body: `<main><h1>${esc(t('landing.hero.title'))}</h1><p>${esc(t('landing.hero.subtitle'))}</p>
 ${link('/login?mode=register', t('landing.cta.register'))} ${link('/login', t('landing.cta.login'))}
 <h2>${esc(t('landing.features.title'))}</h2><ul>${features
-      .map((f) => `<li><h3>${esc(t(`landing.features.${f}.title`))}</h3><p>${esc(t(`landing.features.${f}.body`))}</p></li>`)
+      .map(
+        (f) =>
+          `<li><h3>${esc(t(`landing.features.${f}.title`))}</h3><p>${esc(
+            t(`landing.features.${f}.body`)
+          )}</p></li>`
+      )
       .join('')}</ul>
 <h2>${esc(t('landing.faq.title'))}</h2>${FAQ.map(
       (id) => `<h3>${esc(t(`landing.faq.${id}.q`))}</h3><p>${esc(t(`landing.faq.${id}.a`))}</p>`
@@ -106,8 +146,12 @@ for (const g of GUIDES) {
       title: `${g.title} | Money Manager`,
       description: g.description,
       body: `<main><article><h1>${esc(g.title)}</h1><p>${esc(g.intro)}</p>${g.sections
-        .map((s) => `<h2>${esc(s.heading)}</h2>${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}`)
-        .join('')}</article>${g.tool ? `<p>${link(g.tool.to, g.tool.label)}</p>` : ''}${nav}</main>`,
+        .map(
+          (s) => `<h2>${esc(s.heading)}</h2>${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}`
+        )
+        .join('')}</article>${
+        g.tool ? `<p>${link(g.tool.to, g.tool.label)}</p>` : ''
+      }${nav}</main>`,
       jsonLd: [
         {
           '@context': 'https://schema.org',
@@ -132,7 +176,9 @@ for (const tool of TOOL_PAGES) {
       path: tool.path,
       title: t(`tools.${tool.key}.title`),
       description: t(`tools.${tool.key}.description`),
-      body: `<main><h1>${esc(t(`tools.${tool.key}.title`))}</h1><p>${esc(t(`tools.${tool.key}.description`))}</p>${nav}</main>`,
+      body: `<main><h1>${esc(t(`tools.${tool.key}.title`))}</h1><p>${esc(
+        t(`tools.${tool.key}.description`)
+      )}</p>${nav}</main>`,
       jsonLd: [
         {
           '@context': 'https://schema.org',

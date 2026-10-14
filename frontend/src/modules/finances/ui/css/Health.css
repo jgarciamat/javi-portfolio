@@ -1,0 +1,109 @@
+/* ─── Financial health ───────────────────────────────────────────────────── */
+
+.health-head {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin: 1rem 0;
+}
+
+.health-level {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.health-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.health-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.health-ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.health-ring-track {
+  stroke: var(--slate-800);
+}
+
+.health-ring-value {
+  stroke: var(--green-500);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.health-ring--good .health-ring-value {
+  stroke: var(--green-400);
+}
+
+.health-ring--improvable .health-ring-value {
+  stroke: var(--amber-400);
+}
+
+.health-ring--fragile .health-ring-value {
+  stroke: var(--red-400);
+}
+
+.health-ring strong {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+}
+
+.health-pillars,
+.challenge-list {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.health-pillar-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.health-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--slate-800);
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.health-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green-500);
+}
+
+.challenge-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.challenge-list small {
+  display: block;
+  color: var(--slate-400);
+}
+
+.challenge-active {
+  display: grid;
+  gap: 0.5rem;
+}

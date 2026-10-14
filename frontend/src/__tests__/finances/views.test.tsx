@@ -655,6 +655,8 @@ describe('the investments and debts section', () => {
     id: 'a1',
     name: 'Fondo indexado',
     kind: 'investment' as const,
+    interestRate: null,
+    minPayment: null,
     value: 1200,
     valueDate: '2026-03-01',
     previousValue: 1000,
@@ -678,7 +680,7 @@ describe('the investments and debts section', () => {
     api.assetApi.getAll.mockResolvedValue([fund, loan, flat, zero, falling, growingDebt]);
     renderWithProviders(<AssetsView />, { api });
     expect(await screen.findByText('Fondo indexado')).toBeInTheDocument();
-    expect(screen.getByText('Préstamo')).toBeInTheDocument();
+    expect(screen.getAllByText('Préstamo').length).toBeGreaterThan(0);
     // Good: an investment that grows, a debt that shrinks. Bad: the opposite.
     const marks = (pattern: RegExp) => screen.getAllByText(pattern).map((e) => e.className);
     expect(marks(/▲ 20,0/)).toEqual(['amount-pos']);

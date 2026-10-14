@@ -6,4 +6,5 @@ export const TOOL_PAGES = [
   { path: '/calculadora-iva', key: 'vat' },
   { path: '/calculadora-inflacion', key: 'inflation' },
   { path: '/calculadora-objetivo-ahorro', key: 'goal' },
+  { path: '/calculadora-renta', key: 'renta' },
 ] as const;

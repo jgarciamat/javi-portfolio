@@ -21,6 +21,7 @@ export const RESOURCE_KEYS: Record<LimitedResource, string> = {
   goals: 'billing.resource.goals',
   recurringRules: 'billing.resource.recurringRules',
   customAlerts: 'billing.resource.customAlerts',
+  rentaCalculations: 'billing.resource.rentaCalculations',
 };
 
 export const FEATURE_KEYS: Record<PremiumFeature, string> = {
@@ -37,6 +38,9 @@ export const PREMIUM_BENEFITS = [
   'billing.benefit.insights',
   'billing.benefit.forecast',
   'billing.benefit.household',
+  'billing.benefit.debts',
+  'billing.benefit.renta',
+  'billing.benefit.receipts',
   'billing.benefit.ai',
   'billing.benefit.support',
 ];

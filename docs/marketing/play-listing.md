@@ -22,11 +22,15 @@ Apunta tus gastos e ingresos en segundos y ve a dónde se va tu dinero, con grá
 • Multidivisa, tema claro y oscuro
 • Bloqueo con PIN o huella, resumen semanal y recordatorios
 • Widget para añadir gastos desde la pantalla de inicio
+• Salud financiera: nota de 0 a 100 y retos mensuales
+• Plan para salir de deudas (avalancha o bola de nieve)
+• Calculadora de la Renta con deducciones del Estado y de tu comunidad (1 cálculo gratis)
+• Facturas por email y detección de pagos desde las notificaciones del banco (Premium)
 • Asesor financiero con IA (Premium)
 
 Tus datos son tuyos: puedes exportarlos o borrarlos cuando quieras.
 
-Gratis para empezar. Premium opcional: 2,99 €/mes, 24,99 €/año o 49 € de por vida.
+Gratis para empezar. Premium opcional (previsión, importación, plan de deudas, Renta sin límite, IA y más): 2,99 €/mes, 24,99 €/año o 49 € de por vida.
 
 ## English (en-GB)
 

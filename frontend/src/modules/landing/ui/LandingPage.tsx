@@ -14,6 +14,10 @@ const FEATURES = [
   { icon: 'upload', key: 'import' },
   { icon: 'handshake', key: 'together' },
   { icon: 'sparkles', key: 'ai' },
+  { icon: 'heart', key: 'health' },
+  { icon: 'target', key: 'debts' },
+  { icon: 'file', key: 'renta' },
+  { icon: 'mail', key: 'receipts' },
   { icon: 'lock', key: 'privacy' },
 ] as const;
 

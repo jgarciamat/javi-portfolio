@@ -54,6 +54,10 @@ const InflationCalculatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'InflationCalculatorPage'
 );
+const RentaCalculatorPage = lazyNamed(
+  () => import('./modules/tools/ui/CalculatorPages'),
+  'RentaCalculatorPage'
+);
 const GoalCalculatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'GoalCalculatorPage'
@@ -87,6 +91,7 @@ export default function App() {
                       <Route path="/calculadora-iva" element={<VatCalculatorPage />} />
                       <Route path="/calculadora-inflacion" element={<InflationCalculatorPage />} />
                       <Route path="/calculadora-objetivo-ahorro" element={<GoalCalculatorPage />} />
+                      <Route path="/calculadora-renta" element={<RentaCalculatorPage />} />
                       <Route path="/guias" element={<GuidesIndexPage />} />
                       <Route path="/guias/:slug" element={<GuidePage />} />
                       <Route path="/" element={<HomeGate />}>

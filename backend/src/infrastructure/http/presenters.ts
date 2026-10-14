@@ -7,6 +7,7 @@ import { AccountWithBalance } from '@application/accounts/AccountService';
 import { SplitGroupView } from '@application/split/SplitService';
 import { YearTax } from '@domain/services/tax';
 import { AssetView } from '@application/assets/AssetService';
+import { InboxOverview } from '@application/inbox/InboxService';
 import { ProjectedMonth } from '@domain/services/forecast';
 import { SubscriptionReport } from '@domain/services/subscriptions';
 import {
@@ -333,6 +334,8 @@ export function presentAsset(a: AssetView) {
     id: a.id,
     name: a.name,
     kind: a.kind,
+    interestRate: a.interestRate,
+    minPayment: a.minPaymentCents === null ? null : m(a.minPaymentCents),
     value: m(a.valueCents),
     valueDate: a.valueDate,
     previousValue: a.previousCents === null ? null : m(a.previousCents),
@@ -372,5 +375,18 @@ export function presentSplitGroup(g: SplitGroupView) {
       shares: e.shares.map((s) => ({ memberId: s.memberId, share: m(s.shareCents) })),
     })),
     transfers: g.transfers.map((t) => ({ from: t.from, to: t.to, amount: m(t.cents) })),
+  };
+}
+
+export function presentInbox(i: InboxOverview) {
+  return {
+    address: i.address,
+    recent: i.recent.map((msg) => ({
+      id: msg.id,
+      receivedAt: msg.receivedAt,
+      status: msg.status,
+      description: msg.description,
+      amount: msg.amountCents === null ? null : m(msg.amountCents),
+    })),
   };
 }

@@ -22,6 +22,8 @@ import { useFinances } from '../../application/FinancesContext';
 import { AppLockCard } from '../components/AppLockCard';
 import { PushSetting } from '../components/PushSetting';
 import { CategoryRulesCard } from '../components/CategoryRulesCard';
+import { CaptureCard } from '../components/CaptureCard';
+import { InboxCard } from '../components/InboxCard';
 import { HouseholdCard } from '../components/HouseholdCard';
 import {
   downloadFile,
@@ -383,6 +385,8 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
         {sharedLocked && <p className="plan-note">{t('app.household.sharedSettings')}</p>}
       </div>
       <CategoryRulesCard />
+      <InboxCard />
+      <CaptureCard />
       <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
       <AppLockCard />

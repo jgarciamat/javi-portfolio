@@ -10,11 +10,13 @@ import {
   customAlertApi,
   dataApi,
   goalApi,
+  inboxApi,
   insightsApi,
   monthApi,
   pushApi,
   ratesApi,
   recurringApi,
+  rentaApi,
   settingsApi,
   splitApi,
   transactionApi,
@@ -31,6 +33,7 @@ export interface IApiContext {
   categoryApi: typeof categoryApi;
   categoryRuleApi: typeof categoryRuleApi;
   recurringApi: typeof recurringApi;
+  rentaApi: typeof rentaApi;
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
   assetApi: typeof assetApi;
@@ -40,6 +43,7 @@ export interface IApiContext {
   ratesApi: typeof ratesApi;
   budgetApi: typeof budgetApi;
   goalApi: typeof goalApi;
+  inboxApi: typeof inboxApi;
   settingsApi: typeof settingsApi;
   insightsApi: typeof insightsApi;
   dataApi: typeof dataApi;
@@ -59,6 +63,7 @@ const defaultValue: IApiContext = {
   categoryApi,
   categoryRuleApi,
   recurringApi,
+  rentaApi,
   customAlertApi,
   accountApi,
   assetApi,
@@ -68,6 +73,7 @@ const defaultValue: IApiContext = {
   ratesApi,
   budgetApi,
   goalApi,
+  inboxApi,
   settingsApi,
   insightsApi,
   dataApi,

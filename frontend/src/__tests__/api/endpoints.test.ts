@@ -3,6 +3,8 @@ import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import {
   accountApi,
   assetApi,
+  inboxApi,
+  rentaApi,
   budgetApi,
   businessApi,
   categoryApi,
@@ -280,6 +282,10 @@ const cases: Case[] = [
   ],
   ['quarterly tax', () => businessApi.tax(2026), 'GET', '/business/tax/2026'],
   ['assets', () => assetApi.getAll(), 'GET', '/assets'],
+  ['count a tax return calculation', () => rentaApi.register(), 'POST', '/renta/calculation'],
+  ['register the use of the draft reader', () => rentaApi.draft(), 'POST', '/renta/draft'],
+  ['inbox', () => inboxApi.get(), 'GET', '/inbox'],
+  ['new inbox address', () => inboxApi.rotate(), 'POST', '/inbox/rotate'],
   [
     'add asset',
     () => assetApi.create({ name: 'Fondo', kind: 'investment', value: 100 }),
@@ -293,6 +299,13 @@ const cases: Case[] = [
     'POST',
     '/assets/a1/values',
     { value: 120, date: '2026-03-01' },
+  ],
+  [
+    'debt terms',
+    () => assetApi.setTerms('a1', { interestRate: 12, minPayment: 50 }),
+    'PATCH',
+    '/assets/a1/terms',
+    { interestRate: 12, minPayment: 50 },
   ],
   ['remove asset', () => assetApi.remove('a1'), 'DELETE', '/assets/a1'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],

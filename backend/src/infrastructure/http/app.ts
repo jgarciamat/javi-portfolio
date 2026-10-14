@@ -5,6 +5,7 @@ import { Container } from '../container';
 import { errorHandler, notFoundHandler, rateLimiterFactory, requireAuth } from './middleware';
 import { authRoutes } from './routes/auth.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
+import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
 import { financeRoutes } from './routes/finance.routes';
 import { householdRoutes } from './routes/household.routes';
@@ -34,6 +35,7 @@ export function createApp(c: Container): Express {
   );
   // Needs the raw body to check Stripe's signature: before the JSON parser.
   app.use('/api', billingWebhookRoute(c));
+  app.use('/api', inboundMailRoute(c));
   app.use(express.json({ limit: '4mb' }));
 
   const api = express.Router();

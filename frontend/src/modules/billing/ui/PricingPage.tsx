@@ -13,6 +13,7 @@ const RESOURCES: LimitedResource[] = [
   'goals',
   'recurringRules',
   'customAlerts',
+  'rentaCalculations',
 ];
 const FEATURES: PremiumFeature[] = ['import', 'insights', 'forecast', 'household', 'aiAdvisor'];
 

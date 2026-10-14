@@ -9,6 +9,7 @@ import {
   UserRepository,
 } from '@domain/ports/repositories';
 import { Clock, MetricsRecorder } from '@domain/ports/services';
+import { EntitlementService } from './EntitlementService';
 
 /** What RevenueCat sends for a purchase made in the Android app (only what we use). */
 const playEvent = z.object({
@@ -31,6 +32,7 @@ const GRANTING = new Set([
 const LIVE = new Set(['active', 'trialing', 'past_due']);
 
 const isLifetimeProduct = (productId: string) => productId.includes('lifetime');
+const isRentaPass = (productId: string) => productId.includes('renta');
 
 /**
  * Purchases made inside the Android app. Google Play charges and RevenueCat verifies the
@@ -44,6 +46,7 @@ export class PlayBillingService {
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
     private readonly metrics: MetricsRecorder,
+    private readonly entitlements: EntitlementService,
     /** Value of the Authorization header RevenueCat is configured to send; null = off. */
     private readonly webhookAuth: string | null,
     private readonly logger: Pick<Console, 'warn'> = console
@@ -81,6 +84,7 @@ export class PlayBillingService {
       }
       return;
     }
+    if (isRentaPass(event.product_id)) return this.applyRentaPass(event);
     const now = this.clock.now();
     const current =
       this.subscriptions.get(event.app_user_id) ?? emptySubscription(event.app_user_id, now);
@@ -93,6 +97,16 @@ export class PlayBillingService {
     if (!next) return;
     this.subscriptions.save({ ...next, updatedAt: now.toISOString() });
     if (event.type === 'INITIAL_PURCHASE' || event.type === 'NON_RENEWING_PURCHASE') {
+      this.metrics.record('purchase');
+    }
+  }
+
+  /** The one-month pass for reading a tax return draft: bought once, never touches the subscription. */
+  private applyRentaPass(event: z.infer<typeof playEvent>['event']): void {
+    if (event.type === 'CANCELLATION') {
+      this.entitlements.revokeRentaPass(event.app_user_id);
+    } else if (GRANTING.has(event.type)) {
+      this.entitlements.grantRentaPass(event.app_user_id);
       this.metrics.record('purchase');
     }
   }

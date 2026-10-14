@@ -16,7 +16,15 @@ function load(key: string, native = true): PlayStore {
 }
 
 let purchases: Record<string, jest.Mock>;
-const offering = { monthly: { id: 'm' }, annual: { id: 'a' }, lifetime: { id: 'l' } };
+const offering = {
+  monthly: { id: 'm' },
+  annual: { id: 'a' },
+  lifetime: { id: 'l' },
+  availablePackages: [
+    { id: 'other', product: { identifier: 'premium_monthly' } },
+    { id: 'r', product: { identifier: 'renta_pass_1m' } },
+  ],
+};
 
 const loadReady = (key = 'goog_key'): PlayStore => {
   const store = load(key);
@@ -46,6 +54,12 @@ describe('purchasePremium', () => {
       'm',
       'l',
     ]);
+  });
+
+  it('buys the one-month tax return pass by its product', async () => {
+    const store = loadReady();
+    await expect(store.purchasePremium('renta_pass', 'u1')).resolves.toBe(true);
+    expect(purchases.purchasePackage.mock.calls[0][0].aPackage.id).toBe('r');
   });
 
   it('switches RevenueCat to the new user when another person signs in', async () => {

@@ -6,6 +6,8 @@ const asset = (id: string, kind: Asset['kind']): Asset => ({
   userId: 'u',
   name: id,
   kind,
+  interestRate: null,
+  minPaymentCents: null,
   createdAt: '2026-01-01T00:00:00Z',
 });
 const value = (assetId: string, date: string, valueCents: number): AssetValue => ({

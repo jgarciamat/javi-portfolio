@@ -13,6 +13,8 @@ export interface AssetView {
   id: string;
   name: string;
   kind: AssetKind;
+  interestRate: number | null;
+  minPaymentCents: Cents | null;
   /** Latest value, its date and the one before it (to show the change). */
   valueCents: Cents;
   valueDate: string | null;
@@ -41,6 +43,8 @@ export class AssetService {
         id: a.id,
         name: a.name,
         kind: a.kind,
+        interestRate: a.interestRate,
+        minPaymentCents: a.minPaymentCents,
         valueCents: last?.valueCents ?? 0,
         valueDate: last?.date ?? null,
         previousCents: history.length > 1 ? history[history.length - 2].valueCents : null,
@@ -51,7 +55,14 @@ export class AssetService {
 
   create(
     userId: string,
-    input: { name: string; kind: AssetKind; valueCents: Cents; date?: string | null }
+    input: {
+      name: string;
+      kind: AssetKind;
+      valueCents: Cents;
+      date?: string | null;
+      interestRate?: number | null;
+      minPaymentCents?: Cents | null;
+    }
   ): AssetView {
     this.entitlements.assertFeature(userId, 'insights');
     const name = input.name.trim();
@@ -65,6 +76,8 @@ export class AssetService {
       userId,
       name,
       kind: input.kind,
+      interestRate: input.kind === 'debt' ? input.interestRate ?? null : null,
+      minPaymentCents: input.kind === 'debt' ? input.minPaymentCents ?? null : null,
       createdAt: this.clock.now().toISOString(),
     };
     this.uow.run(() => {
@@ -81,6 +94,20 @@ export class AssetService {
       throw new NotFoundError('Elemento no encontrado', 'ASSET_NOT_FOUND');
     }
     this.setValueUnchecked(id, valueCents, date);
+    return this.list(userId).find((a) => a.id === id) as AssetView;
+  }
+
+  /** Interest rate and minimum payment of a debt. */
+  setTerms(
+    userId: string,
+    id: string,
+    terms: { interestRate: number | null; minPaymentCents: Cents | null }
+  ): AssetView {
+    this.entitlements.assertFeature(userId, 'insights');
+    const asset = this.assets.findById(userId, id);
+    if (!asset) throw new NotFoundError('Elemento no encontrado', 'ASSET_NOT_FOUND');
+    if (asset.kind !== 'debt') throw new ValidationError('Solo las deudas tienen condiciones');
+    this.assets.save({ ...asset, ...terms });
     return this.list(userId).find((a) => a.id === id) as AssetView;
   }
 
