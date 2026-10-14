@@ -7,7 +7,6 @@ import {
   computeRenta,
   deductionAmount,
   descendantBreakdown,
-  mergeMinimums,
   type Disability,
   type Family,
   type RentaResult,
@@ -239,6 +238,9 @@ function DeductionList({
   );
 }
 
+/** An amount that is taken off, shown with a minus sign unless it is zero. */
+const minus = (n: number, money: (n: number) => string) => (n > 0 ? `−${money(n)}` : money(0));
+
 interface Snapshot {
   result: RentaResult;
   kids: ReturnType<typeof descendantBreakdown>;
@@ -259,7 +261,7 @@ function ResultCard({ shown, money }: { shown: Snapshot; money: (n: number) => s
         <dt>{t('tools.renta.line.netIncome')}</dt>
         <dd>{money(result.netIncome)}</dd>
         <dt>{t('tools.renta.line.reductions')}</dt>
-        <dd>−{money(result.workReduction + result.pensionReduction)}</dd>
+        <dd>{minus(result.workReduction + result.pensionReduction, money)}</dd>
         <dt>{t('tools.renta.line.base')}</dt>
         <dd>{money(result.taxBase)}</dd>
         <dt>{t('tools.renta.line.minimum')}</dt>
@@ -269,11 +271,13 @@ function ResultCard({ shown, money }: { shown: Snapshot; money: (n: number) => s
         <dt>{t('tools.renta.line.regionalQuota')}</dt>
         <dd>{money(result.regionalQuota)}</dd>
         <dt>{t('tools.renta.line.deductions')}</dt>
-        <dd>−{money(result.stateDeductions + result.regionalDeductions + result.refundable)}</dd>
+        <dd>
+          {minus(result.stateDeductions + result.regionalDeductions + result.refundable, money)}
+        </dd>
         <dt>{t('tools.renta.line.netQuota')}</dt>
         <dd>{money(result.netQuota)}</dd>
         <dt>{t('tools.renta.line.withheld')}</dt>
-        <dd>−{money(result.withheld)}</dd>
+        <dd>{minus(result.withheld, money)}</dd>
       </dl>
       <h3>{t('tools.renta.minimumTitle')}</h3>
       <p className="section-hint">{t('tools.renta.minimumHint')}</p>
@@ -415,8 +419,7 @@ export function RentaPlanner({
       children.length,
     ]
   );
-  const minimums = mergeMinimums(rentaState.minimums, effective.minimums);
-  const kids = descendantBreakdown(family, minimums);
+  const kids = descendantBreakdown(family, rentaState.minimums);
   const live: Snapshot = { result: resultData, kids };
   const shown = access.premium ? live : snapshot;
   const calculate = async () => {

@@ -47,7 +47,7 @@
 
 .renta-people li {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) auto;
+  grid-template-columns: 1fr 1fr auto;
   gap: 0.6rem;
   align-items: end;
   padding: 0.75rem;
@@ -225,4 +225,20 @@
   padding: 0.7rem 0.9rem;
   border-radius: 12px;
   background: rgba(99, 102, 241, 0.14);
+}
+
+.renta-people li .btn-secondary {
+  width: auto;
+  height: 2.6rem;
+  padding: 0 0.9rem;
+}
+
+@media (max-width: 560px) {
+  .renta-people li {
+    grid-template-columns: 1fr auto;
+  }
+
+  .renta-people li .tools-field {
+    grid-column: 1 / -1;
+  }
 }
