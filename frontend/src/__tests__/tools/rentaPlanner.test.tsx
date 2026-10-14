@@ -260,7 +260,7 @@ describe('Renta planner: one calculation for free accounts', () => {
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     expect(screen.getByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
 
-    localStorage.removeItem('mm_renta_snapshot');
+    localStorage.removeItem('mm_renta_snapshot_v2');
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     expect(screen.getAllByText(tr('tools.renta.usedNoSnapshot')).length).toBeGreaterThan(0);
   });

@@ -2,7 +2,7 @@ import { CCAA_OPTIONS, loadCcaa } from '@modules/tools/data/renta';
 import { rentaState } from '@modules/tools/data/renta/state';
 import type { Deduction, TaxBracket } from '@modules/tools/domain/rentaData';
 
-const GROUPS = ['family', 'housing', 'donations', 'other'];
+const GROUPS = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 const KINDS = ['fixed', 'percent', 'special'];
 
 function expectValidScale(scale: TaxBracket[]) {

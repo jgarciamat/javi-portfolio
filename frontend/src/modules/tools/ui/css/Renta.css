@@ -242,3 +242,31 @@
     grid-column: 1 / -1;
   }
 }
+
+.renta-limit {
+  display: block;
+  margin: 0.25rem 0 0.25rem 1.75rem;
+  color: var(--text-secondary, #9aa4b8);
+}
+.renta-field-hint {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text-secondary, #9aa4b8);
+  line-height: 1.4;
+}
+.renta-notes {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.renta-notes summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.renta-child-aids ol {
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+}

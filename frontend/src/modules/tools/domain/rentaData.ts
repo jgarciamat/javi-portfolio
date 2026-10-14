@@ -6,7 +6,20 @@ export interface TaxBracket {
   rate: number;
 }
 
-export type DeductionGroup = 'family' | 'housing' | 'donations' | 'other';
+export type DeductionGroup = 'family' | 'housing' | 'health' | 'education' | 'donations' | 'other';
+
+/**
+ * Limit on the tax base (general + savings) to use a deduction. Over `individual` it cannot be used;
+ * between `phaseOutFrom` and `phaseOutTo` (when set) the amount goes down in proportion.
+ */
+export interface IncomeLimit {
+  individual: number;
+  joint?: number;
+  phaseOutFrom?: number;
+  phaseOutTo?: number;
+  /** How the limit works, in plain words, when it is not a simple threshold. */
+  note?: string;
+}
 
 /**
  * - fixed: a fixed amount in euros (`amount`, or `perChild` by order of birth).
@@ -36,6 +49,8 @@ export interface Deduction {
   limit?: number;
   /** percent: maximum amount of the expense or investment the percentage applies to. */
   baseLimit?: number;
+  /** Limit on the taxpayer's base to apply it (the checker warns when the person is over it). */
+  incomeLimit?: IncomeLimit;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */
   requirements: string;
   /** The Tax Agency page that explains it. */

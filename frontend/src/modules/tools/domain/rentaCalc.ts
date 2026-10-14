@@ -1,3 +1,4 @@
+import type { RentaWorkExtras } from './rentaExtras';
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -152,8 +153,22 @@ export interface DeductionChoice {
   units?: number;
 }
 
-/** What a deduction gives for the choices the person made. */
-export function deductionAmount(d: Deduction, choice: DeductionChoice): number {
+/** How much of a deduction the person can use given their tax base: 1 = all, 0 = none. */
+export function incomeFactor(d: Deduction, taxBase: number, joint = false): number {
+  const limit = d.incomeLimit;
+  if (!limit) return 1;
+  const max = joint && limit.joint !== undefined ? limit.joint : limit.individual;
+  const base = positive(taxBase);
+  if (limit.phaseOutFrom !== undefined && limit.phaseOutTo !== undefined) {
+    if (base <= limit.phaseOutFrom) return 1;
+    if (base >= limit.phaseOutTo) return 0;
+    return (limit.phaseOutTo - base) / (limit.phaseOutTo - limit.phaseOutFrom);
+  }
+  return base > max ? 0 : 1;
+}
+
+/** What a deduction gives for the choices the person made (`factor`: share allowed by the income limit). */
+export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 1): number {
   if (!choice.on) return 0;
   let value = 0;
   if (d.kind === 'fixed') {
@@ -164,14 +179,14 @@ export function deductionAmount(d: Deduction, choice: DeductionChoice): number {
       // The limit of a fixed amount is per unit (1,200 € for each child under 3), not for the total.
       value = Math.min(d.amount ?? 0, d.limit ?? Infinity) * units;
     }
-    return round2(value);
+    return round2(value * factor);
   } else if (d.kind === 'percent') {
     const spent = positive(choice.amount ?? 0);
     value = (Math.min(spent, d.baseLimit ?? Infinity) * (d.percent ?? 0)) / 100;
   } else {
     value = positive(choice.amount ?? 0);
   }
-  return round2(Math.min(value, d.limit ?? Infinity));
+  return round2(Math.min(value, d.limit ?? Infinity) * factor);
 }
 
 /** The deductions that are paid out even when there is no tax to pay (maternity, large family, disability). */
@@ -180,6 +195,17 @@ export const isRefundable = (d: Deduction): boolean =>
 
 // ─── The whole calculation ────────────────────────────────────────────────────
 
+export interface RentalInput {
+  /** Rent charged in the year. */
+  income: number;
+  /** Deductible expenses (interest, IBI, community fees, insurance, repairs...). */
+  expenses: number;
+  /** Yearly depreciation of the building. */
+  amortization: number;
+  /** Share of the net rent that is not taxed (0 to 90). */
+  reductionPercent: number;
+}
+
 export interface RentaInput {
   /** Gross yearly pay from work. */
   gross: number;
@@ -187,11 +213,29 @@ export interface RentaInput {
   socialSecurity: number;
   /** Income tax already withheld by the payer. */
   withheld: number;
-  /** Own contributions to pension plans (euros). */
+  /** Union fees, professional association and legal defence (already within their limits). */
+  workExpensesExtra: number;
+  /** Change of residence for work reasons. */
+  geographicMobility: boolean;
+  /** Own contributions to pension plans, and those the employer makes (euros). */
   pensionPlan: number;
+  pensionPlanEmployer: number;
+  /** Contributions to the plan of a spouse with low income. */
+  spousePlan: number;
+  /** Compensatory pension paid to an ex-spouse. */
+  compensatoryPension: number;
+  /** Rented properties, all together. */
+  rental: RentalInput | null;
+  /** Cadastral value of properties that are not rented, with revised and not revised values. */
+  imputedValues: { standard: number; revised: number };
+  /** Interest, dividends and capital gains (net), taxed on the savings base. */
+  savings: number;
   family: Family;
   state: RentaState;
   ccaa: RentaCcaa;
+  extras: Pick<RentaWorkExtras, 'savingsScale' | 'geographicMobilityExtra'>;
+  /** Rates (%) of the imputed income of properties that are not rented. */
+  imputationRates: { standard: number; revised: number };
   /** The deductions chosen, by id. */
   choices: Record<string, DeductionChoice>;
   /** Reduction of the net income from work for low incomes (see the State's rules). */
@@ -201,20 +245,61 @@ export interface RentaInput {
 export interface RentaResult {
   netIncome: number;
   workReduction: number;
+  rentalNet: number;
+  imputedIncome: number;
   pensionReduction: number;
+  /** Other reductions: spouse plan and compensatory pension. */
+  otherReductions: number;
+  /** General tax base. */
   taxBase: number;
+  /** Savings tax base. */
+  savingsBase: number;
   minimum: { total: number; items: MinimumItem[]; regionalTotal: number };
   stateQuota: number;
   regionalQuota: number;
+  /** The part of the quotas that comes from the savings base. */
+  savingsQuota: number;
   /** What each part of the minimum saves in tax (state + regional). */
   minimumSavings: Record<MinimumItem['key'], number>;
   stateDeductions: number;
   regionalDeductions: number;
   refundable: number;
+  /** Deductions that were chosen but cannot be used because of the income limit. */
+  blocked: string[];
+  /** What each chosen deduction gives (after the income limit), State's first. */
+  lines: DeductionLine[];
   netQuota: number;
   withheld: number;
   /** Positive: to pay; negative: to be refunded. */
   result: number;
+}
+
+export interface DeductionLine {
+  id: string;
+  title: string;
+  group: Deduction['group'];
+  scope: 'state' | 'regional';
+  amount: number;
+}
+
+const OTHER_INCOME_LIMIT = 6500;
+const LOW_PAY_FULL = 16576;
+const LOW_PAY_END = 18276;
+const LOW_PAY_AMOUNT = 340;
+
+/** Deduction for low pay (Renta 2025): 340 euros up to 16,576 of gross pay, falling by 20 cents per euro to zero at 18,276. */
+export function lowPayDeduction(grossPay: number, otherIncome: number): number {
+  if (otherIncome > OTHER_INCOME_LIMIT || grossPay >= LOW_PAY_END || grossPay <= 0) return 0;
+  if (grossPay < LOW_PAY_FULL) return LOW_PAY_AMOUNT;
+  return round2(LOW_PAY_AMOUNT - 0.2 * (grossPay - LOW_PAY_FULL));
+}
+
+/** Rent after expenses, depreciation and the reduction (it can be negative). */
+export function rentalNet(rental: RentalInput | null): number {
+  if (!rental) return 0;
+  const net = positive(rental.income) - positive(rental.expenses) - positive(rental.amortization);
+  const percent = Math.min(90, positive(rental.reductionPercent));
+  return round2(net > 0 ? net * (1 - percent / 100) : net);
 }
 
 /** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
@@ -226,64 +311,141 @@ export function computeRenta(input: RentaInput): RentaResult {
       ? state.workExpenses.disability65
       : family.disability >= 33
       ? state.workExpenses.disability33
-      : 0);
+      : 0) +
+    (input.geographicMobility ? input.extras.geographicMobilityExtra : 0) +
+    positive(input.workExpensesExtra);
   const netIncome = round2(
     Math.max(0, positive(input.gross) - positive(input.socialSecurity) - expenses)
   );
-  const reduction = round2(Math.min(netIncome, positive(input.workReduction(netIncome))));
-  const pensionLimit = state.baseReductions.pensionPlanLimit;
-  const pensionReduction = round2(
-    Math.min(positive(input.pensionPlan), pensionLimit, netIncome - reduction)
+
+  const rentNet = rentalNet(input.rental);
+  const imputed = round2(
+    (positive(input.imputedValues.standard) * input.imputationRates.standard +
+      positive(input.imputedValues.revised) * input.imputationRates.revised) /
+      100
   );
-  const taxBase = round2(Math.max(0, netIncome - reduction - pensionReduction));
+  const savingsBase = round2(positive(input.savings));
+  // The reduction for low pay only applies when the other income does not pass 6,500 euros.
+  const otherIncome = Math.max(0, rentNet) + imputed + savingsBase;
+  const reduction = round2(
+    otherIncome > OTHER_INCOME_LIMIT
+      ? 0
+      : Math.min(netIncome, positive(input.workReduction(netIncome)))
+  );
+
+  const beforeReductions = netIncome - reduction + rentNet + imputed;
+  // Pension plans: own and employer's together up to the limit, and up to 30 % of the net work income.
+  const pensionCap = Math.min(
+    state.baseReductions.pensionPlanLimit + state.baseReductions.pensionPlanEmployerLimit,
+    netIncome * 0.3
+  );
+  const pensionReduction = round2(
+    Math.min(
+      positive(input.pensionPlan) + positive(input.pensionPlanEmployer),
+      pensionCap,
+      Math.max(0, beforeReductions)
+    )
+  );
+  const otherReductions = round2(
+    Math.min(
+      Math.min(positive(input.spousePlan), 1000) + positive(input.compensatoryPension),
+      Math.max(0, beforeReductions - pensionReduction)
+    )
+  );
+  const taxBase = round2(Math.max(0, beforeReductions - pensionReduction - otherReductions));
 
   const stateMin = computeMinimum(family, state.minimums);
   const regionMinimums = mergeMinimums(state.minimums, ccaa.minimums);
   const regionMin = computeMinimum(family, regionMinimums);
   const regionScale = ccaa.scale ?? state.defaultRegionalScale;
+  const { savingsScale } = input.extras;
 
-  const stateQuota = applyMinimum(state.scale, taxBase, stateMin.total);
-  const regionalQuota = applyMinimum(regionScale, taxBase, regionMin.total);
+  /** State and regional tax for a given minimum: the minimum that does not fit in the general base goes to savings. */
+  const quotas = (minState: number, minRegion: number) => {
+    const general = (scale: TaxBracket[], min: number) => applyMinimum(scale, taxBase, min);
+    const savings = (scale: TaxBracket[], min: number) =>
+      applyScale(scale, Math.max(0, savingsBase - Math.max(0, min - taxBase)));
+    return {
+      stateGeneral: general(state.scale, minState),
+      regionalGeneral: general(regionScale, minRegion),
+      stateSavings: savings(savingsScale.state, minState),
+      regionalSavings: savings(savingsScale.regional, minRegion),
+    };
+  };
+  const base = quotas(stateMin.total, regionMin.total);
+  const stateQuota = round2(base.stateGeneral + base.stateSavings);
+  const regionalQuota = round2(base.regionalGeneral + base.regionalSavings);
 
   const minimumSavings = {} as RentaResult['minimumSavings'];
   for (const item of stateMin.items) {
     // Both minimums are built from the same family, so the item is always there.
     const regionAmount = (regionMin.items.find((i) => i.key === item.key) as MinimumItem).amount;
-    const stateSaving =
-      applyMinimum(state.scale, taxBase, stateMin.total - item.amount) - stateQuota;
-    const regionSaving =
-      applyMinimum(regionScale, taxBase, regionMin.total - regionAmount) - regionalQuota;
-    minimumSavings[item.key] = round2(Math.max(0, stateSaving) + Math.max(0, regionSaving));
+    const without = quotas(stateMin.total - item.amount, regionMin.total - regionAmount);
+    const saved =
+      without.stateGeneral +
+      without.stateSavings +
+      without.regionalGeneral +
+      without.regionalSavings -
+      (stateQuota + regionalQuota);
+    minimumSavings[item.key] = round2(Math.max(0, saved));
   }
 
+  const limitBase = taxBase + savingsBase;
+  const blocked: string[] = [];
+  const lines: DeductionLine[] = [];
+  const amountOf = (d: Deduction, scope: DeductionLine['scope']): number => {
+    const choice = input.choices[d.id] ?? { on: false };
+    const factor = incomeFactor(d, limitBase);
+    if (choice.on && factor === 0) blocked.push(d.id);
+    const amount = deductionAmount(d, choice, factor);
+    if (choice.on) lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });
+    return amount;
+  };
   let stateDeductions = 0;
   let regionalDeductions = 0;
   let refundable = 0;
   for (const d of state.deductions) {
-    const value = deductionAmount(d, input.choices[d.id] ?? { on: false });
+    const value = amountOf(d, 'state');
     if (isRefundable(d)) refundable += value;
     else stateDeductions += value;
   }
-  for (const d of ccaa.deductions) {
-    regionalDeductions += deductionAmount(d, input.choices[d.id] ?? { on: false });
-  }
+  for (const d of ccaa.deductions) regionalDeductions += amountOf(d, 'regional');
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
-  const netQuota = round2(
-    stateQuota - appliedState + (regionalQuota - appliedRegional) - refundable
+  const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
+  const lowPay = Math.min(
+    quotaLeft,
+    lowPayDeduction(input.gross, Math.max(0, rentNet) + imputed + positive(input.savings))
   );
+  if (lowPay > 0) {
+    lines.push({
+      id: 'estado-rendimientos-trabajo-bajos',
+      title: 'Deducción por rendimientos del trabajo bajos',
+      group: 'other',
+      scope: 'state',
+      amount: round2(lowPay),
+    });
+  }
+  const netQuota = round2(quotaLeft - lowPay - refundable);
   return {
     netIncome,
     workReduction: reduction,
+    rentalNet: rentNet,
+    imputedIncome: imputed,
     pensionReduction,
+    otherReductions,
     taxBase,
+    savingsBase,
     minimum: { total: stateMin.total, items: stateMin.items, regionalTotal: regionMin.total },
     stateQuota,
     regionalQuota,
+    savingsQuota: round2(base.stateSavings + base.regionalSavings),
     minimumSavings,
-    stateDeductions: round2(appliedState),
+    stateDeductions: round2(appliedState + lowPay),
     regionalDeductions: round2(appliedRegional),
     refundable: round2(refundable),
+    blocked,
+    lines,
     netQuota,
     withheld: round2(positive(input.withheld)),
     result: round2(netQuota - positive(input.withheld)),
