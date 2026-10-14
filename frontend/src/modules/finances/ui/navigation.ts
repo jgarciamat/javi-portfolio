@@ -3,6 +3,7 @@ export type DashboardTab =
   | 'monthly'
   | 'annual'
   | 'analysis'
+  | 'health'
   | 'search'
   | 'accounts'
   | 'budgets'
@@ -32,6 +33,7 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'monthly', icon: 'calendar', labelKey: 'app.tabs.monthly', group: 'overview' },
   { id: 'annual', icon: 'chart', labelKey: 'app.tabs.annual', group: 'overview' },
   { id: 'analysis', icon: 'trend', labelKey: 'app.tabs.analysis', group: 'overview' },
+  { id: 'health', icon: 'heart', labelKey: 'app.tabs.health', group: 'overview' },
   { id: 'search', icon: 'search', labelKey: 'app.tabs.search', group: 'overview' },
   { id: 'accounts', icon: 'bank', labelKey: 'app.tabs.accounts', group: 'planning' },
   { id: 'budgets', icon: 'target', labelKey: 'app.tabs.budgets', group: 'planning' },
