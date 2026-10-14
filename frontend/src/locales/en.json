@@ -1456,7 +1456,7 @@
   "tools.renta.childAids.total": "Estimated total for children:",
   "tools.renta.draft.title": "Import your draft and find what is missing",
   "tools.renta.draft.hint": "Download your draft from the Tax Agency as a PDF and upload it: we read it, fill in your data and ask about the State and community deductions you have not ticked and could claim.",
-  "tools.renta.draft.premium": "Reading your draft is a Premium feature (included in the 14-day trial).",
+  "tools.renta.draft.premium": "Reading your draft is an exclusive feature: create your account to get it.",
   "tools.renta.draft.privacy": "Your draft is read on your own device: the PDF is not uploaded to any server. We only use the figures to fill in the calculator.",
   "tools.renta.draft.upload": "Upload my draft (PDF)",
   "tools.renta.draft.file": "Draft file",
@@ -1475,5 +1475,12 @@
   "tools.renta.draft.no": "It does not apply",
   "tools.renta.hint.inDraft": "Already in your draft",
   "tools.renta.hint.missing": "You could claim it",
-  "tools.renta.draft.alreadyApplied": "Deductions your draft already applies"
+  "tools.renta.draft.alreadyApplied": "Deductions your draft already applies",
+  "tools.renta.draft.locked": "Reading your draft is not included in the free 14-day trial. It unlocks after more than 2 months of paid Premium, or you can use it now with the 1-month pass.",
+  "tools.renta.draft.unlocksOn": "With your paid Premium it unlocks on {date}.",
+  "tools.renta.draft.passTitle": "Tax return pass: {price}, one payment",
+  "tools.renta.draft.passHint": "Read your draft and calculate your tax return as often as you want for 30 days. It is not a subscription: it does not renew.",
+  "tools.renta.draft.buyPass": "Buy the pass for {price}",
+  "tools.renta.draft.passUntil": "Your tax return pass is active until {date}.",
+  "tools.renta.draft.refused": "The use could not be registered: your access to the draft reader has changed. Reload the page."
 }

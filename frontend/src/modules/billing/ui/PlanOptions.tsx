@@ -64,7 +64,7 @@ function useChoices(catalog: PlanCatalog): PlanChoice[] {
  * Accepting the terms and asking Premium to start at once (which gives up the
  * 14-day right of withdrawal): two explicit ticks, as consumer law expects.
  */
-function ConsentBoxes({
+export function ConsentBoxes({
   consent,
   onChange,
   disabled,

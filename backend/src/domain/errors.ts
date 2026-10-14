@@ -56,7 +56,7 @@ export class BusinessRuleError extends DomainError {
  */
 export class PaymentRequiredError extends DomainError {
   constructor(
-    code: 'PREMIUM_REQUIRED' | 'PLAN_LIMIT',
+    code: 'PREMIUM_REQUIRED' | 'PLAN_LIMIT' | 'RENTA_DRAFT_LOCKED',
     message: string,
     details?: Record<string, unknown>
   ) {

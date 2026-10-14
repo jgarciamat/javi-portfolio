@@ -20,6 +20,13 @@ export function useMoney() {
   return (n: number) => formatter.format(n);
 }
 
+/** A long date in the language of the app. */
+export function useDate() {
+  const { locale } = useI18n();
+  return (iso: string) =>
+    new Date(iso).toLocaleDateString(locale === 'en' ? 'en-IE' : 'es-ES', { dateStyle: 'long' });
+}
+
 export function DisabilitySelect({
   id,
   value,

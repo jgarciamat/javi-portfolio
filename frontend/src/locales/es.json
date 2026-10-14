@@ -1456,7 +1456,7 @@
   "tools.renta.childAids.total": "Total estimado por hijos:",
   "tools.renta.draft.title": "Importa tu borrador y descubre lo que te falta",
   "tools.renta.draft.hint": "Descarga tu borrador de la Agencia Tributaria en PDF y súbelo: lo leemos, rellenamos tus datos y te preguntamos por las deducciones de tu comunidad y del Estado que no has marcado y podrías pedir.",
-  "tools.renta.draft.premium": "Leer tu borrador es una función Premium (incluida en la prueba de 14 días).",
+  "tools.renta.draft.premium": "Leer tu borrador es una función exclusiva: crea tu cuenta para conseguirla.",
   "tools.renta.draft.privacy": "Tu borrador se lee en tu propio dispositivo: el PDF no se sube a ningún servidor. Solo usamos las cifras para rellenar la calculadora.",
   "tools.renta.draft.upload": "Subir mi borrador (PDF)",
   "tools.renta.draft.file": "Archivo del borrador",
@@ -1475,5 +1475,12 @@
   "tools.renta.draft.no": "No me corresponde",
   "tools.renta.hint.inDraft": "Ya en tu borrador",
   "tools.renta.hint.missing": "Podrías pedirla",
-  "tools.renta.draft.alreadyApplied": "Deducciones que ya aplicas en tu borrador"
+  "tools.renta.draft.alreadyApplied": "Deducciones que ya aplicas en tu borrador",
+  "tools.renta.draft.locked": "Leer tu borrador no está incluido en la prueba gratuita de 14 días. Se desbloquea cuando llevas más de 2 meses con Premium de pago, o puedes usarlo ya con el pase de 1 mes.",
+  "tools.renta.draft.unlocksOn": "Con tu Premium de pago se desbloquea el {date}.",
+  "tools.renta.draft.passTitle": "Pase de la Renta: {price}, un solo pago",
+  "tools.renta.draft.passHint": "Lee tu borrador y calcula tu Renta las veces que quieras durante 30 días. No es una suscripción: no se renueva.",
+  "tools.renta.draft.buyPass": "Comprar el pase por {price}",
+  "tools.renta.draft.passUntil": "Tu pase de la Renta está activo hasta el {date}.",
+  "tools.renta.draft.refused": "No se ha podido registrar el uso: tu acceso al lector de borradores ha cambiado. Recarga la página."
 }

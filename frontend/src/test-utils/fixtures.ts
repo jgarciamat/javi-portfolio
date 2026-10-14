@@ -327,7 +327,8 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
   trialDays: 14,
   paymentsEnabled: true,
-  prices: { monthly: 2.99, yearly: 24.99, lifetime: 49 },
+  prices: { monthly: 2.99, yearly: 24.99, lifetime: 49, rentaPass: 10 },
+  rentaPass: { available: true },
   lifetime: { available: true, remaining: 87 },
   limits: {
     free: {
@@ -387,6 +388,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     canManage: false,
   },
   limits: catalog().limits.premium,
+  renta: { draft: { allowed: false, reason: null }, eligibleOn: null, passUntil: null },
   usage: {
     accounts: 2,
     budgets: 2,

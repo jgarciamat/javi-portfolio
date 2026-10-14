@@ -144,7 +144,8 @@ export function RentaPlanner({
         form={form}
         set={set}
         missing={missing}
-        premium={access.premium}
+        access={access.draft}
+        local={mode === 'local'}
         upgrade={<UpgradeCta access={access} />}
         draft={draft}
         onDraft={setDraft}

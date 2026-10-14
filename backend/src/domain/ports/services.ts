@@ -94,7 +94,7 @@ export interface CategorySuggester {
 
 // ─── Payments ────────────────────────────────────────────────────────────────
 
-export type CheckoutKind = 'monthly' | 'yearly' | 'lifetime';
+export type CheckoutKind = 'monthly' | 'yearly' | 'lifetime' | 'renta_pass';
 
 export interface CheckoutRequest {
   userId: string;
@@ -121,12 +121,17 @@ export type BillingEvent =
     }
   | {
       id: string;
-      type: 'lifetime_purchased' | 'checkout_completed';
+      type: 'lifetime_purchased' | 'checkout_completed' | 'renta_pass_purchased';
       userId: string | null;
       customerId: string | null;
     }
   /** The founder payment was refunded in full (from the payment provider's dashboard). */
-  | { id: string; type: 'lifetime_refunded'; userId: string | null; customerId: string | null }
+  | {
+      id: string;
+      type: 'lifetime_refunded' | 'renta_pass_refunded';
+      userId: string | null;
+      customerId: string | null;
+    }
   | { id: string; type: 'ignored' };
 
 export interface PaymentGateway {

@@ -318,7 +318,7 @@ export const forecastQuery = z.object({
 // ─── Billing & offers ────────────────────────────────────────────────────────
 
 export const checkoutBody = z.object({
-  kind: z.enum(['monthly', 'yearly', 'lifetime']),
+  kind: z.enum(['monthly', 'yearly', 'lifetime', 'renta_pass']),
   acceptTerms: z.boolean().default(false),
   waiveWithdrawal: z.boolean().default(false),
 });

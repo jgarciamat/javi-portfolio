@@ -289,6 +289,13 @@ export interface PushSubscriptionRecord {
   auth: string;
 }
 
+/** The one-month passes that include reading a tax return draft. */
+export interface RentaPassRepository {
+  endsAt(userId: string): string | null;
+  set(userId: string, endsAt: string): void;
+  remove(userId: string): void;
+}
+
 export interface RentaUsageRepository {
   count(userId: string): number;
   /** One more calculation; returns how many there are now. */

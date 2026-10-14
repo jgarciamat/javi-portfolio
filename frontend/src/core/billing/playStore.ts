@@ -14,6 +14,9 @@ export function playBillingAvailable(): boolean {
 /** The package of each plan in RevenueCat's current offering. */
 const PACKAGE_OF = { monthly: 'monthly', yearly: 'annual', lifetime: 'lifetime' } as const;
 
+/** The one-month tax return pass is a one-time product whose id contains "renta". */
+const RENTA_PASS = 'renta';
+
 let configuredFor: string | null = null;
 
 /** RevenueCat identifies the buyer with our own user id: the webhook then knows who paid. */
@@ -38,7 +41,10 @@ function wasCancelled(error: unknown): boolean {
 export async function purchasePremium(kind: CheckoutKind, userId: string): Promise<boolean> {
   await configure(userId);
   const offerings = await Purchases.getOfferings();
-  const aPackage = offerings.current?.[PACKAGE_OF[kind]];
+  const aPackage =
+    kind === 'renta_pass'
+      ? offerings.current?.availablePackages.find((p) => p.product.identifier.includes(RENTA_PASS))
+      : offerings.current?.[PACKAGE_OF[kind]];
   if (!aPackage) throw new Error('Plan not available in Google Play');
   try {
     await Purchases.purchasePackage({ aPackage });

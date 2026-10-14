@@ -9,6 +9,8 @@ const PRODUCTION_URL = 'https://www.winjgm.com';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  /** Opens the tax return draft reader to everybody (development: always on, to try it). */
+  RENTA_DRAFT_OPEN: z.enum(['true', 'false']).optional(),
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_PATH: z.string().optional(),
   /** Legacy name kept so old deploy files keep working. */
@@ -36,6 +38,7 @@ const envSchema = z.object({
   STRIPE_PRICE_MONTHLY: z.string().optional(),
   STRIPE_PRICE_YEARLY: z.string().optional(),
   STRIPE_PRICE_LIFETIME: z.string().optional(),
+  STRIPE_PRICE_RENTA_PASS: z.string().optional(),
   /** Shared secret RevenueCat sends in the Authorization header of its webhooks (Google Play purchases). */
   REVENUECAT_WEBHOOK_AUTH: z.string().min(16).optional(),
   /** Receipts forwarded by e-mail: domain of the addresses and the secret of the forwarding service. */
@@ -49,6 +52,7 @@ const envSchema = z.object({
   PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
   PRICE_YEARLY: z.coerce.number().positive().default(24.99),
   PRICE_LIFETIME: z.coerce.number().positive().default(49),
+  PRICE_RENTA_PASS: z.coerce.number().positive().default(10),
   FOUNDER_LIMIT: z.coerce.number().int().nonnegative().default(100),
   AFFILIATES_FILE: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
@@ -68,6 +72,8 @@ const envSchema = z.object({
 export interface AppConfig {
   env: 'development' | 'test' | 'production';
   isProduction: boolean;
+  /** Anybody can read a tax return draft, with no pass (local development). */
+  rentaDraftOpen: boolean;
   port: number;
   databasePath: string;
   jwt: { accessSecret: string; accessTtl: string; refreshTtlMs: number };
@@ -92,11 +98,16 @@ export interface AppConfig {
     stripe: {
       secretKey: string;
       webhookSecret: string;
-      prices: { monthly: string; yearly: string; lifetime: string | null };
+      prices: {
+        monthly: string;
+        yearly: string;
+        lifetime: string | null;
+        rentaPass: string | null;
+      };
     } | null;
     /** Secret that authenticates RevenueCat's webhooks; null leaves Google Play purchases off. */
     revenueCatWebhookAuth: string | null;
-    displayPrices: { monthly: number; yearly: number; lifetime: number };
+    displayPrices: { monthly: number; yearly: number; lifetime: number; rentaPass: number };
     founderLimit: number;
   };
   /** Receipts by e-mail; both values are needed to turn it on. */
@@ -183,6 +194,9 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     env: raw.NODE_ENV,
     isProduction: raw.NODE_ENV === 'production',
+    rentaDraftOpen: raw.RENTA_DRAFT_OPEN
+      ? raw.RENTA_DRAFT_OPEN === 'true'
+      : raw.NODE_ENV === 'development',
     port: raw.PORT,
     databasePath: raw.DATABASE_PATH ?? raw.DATABASE_URL ?? './data/money-manager.db',
     jwt: {
@@ -220,6 +234,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
                 monthly: raw.STRIPE_PRICE_MONTHLY,
                 yearly: raw.STRIPE_PRICE_YEARLY,
                 lifetime: raw.STRIPE_PRICE_LIFETIME || null,
+                rentaPass: raw.STRIPE_PRICE_RENTA_PASS || null,
               },
             }
           : null,
@@ -228,6 +243,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
         monthly: raw.PRICE_MONTHLY,
         yearly: raw.PRICE_YEARLY,
         lifetime: raw.PRICE_LIFETIME,
+        rentaPass: raw.PRICE_RENTA_PASS,
       },
       founderLimit: raw.FOUNDER_LIMIT,
     },

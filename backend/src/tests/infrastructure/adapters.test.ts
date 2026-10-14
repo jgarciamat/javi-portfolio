@@ -81,8 +81,14 @@ describe('config', () => {
       monthly: 'price_m',
       yearly: 'price_y',
       lifetime: null,
+      rentaPass: null,
     });
-    expect(config.billing.displayPrices).toEqual({ monthly: 2.99, yearly: 24.99, lifetime: 49 });
+    expect(config.billing.displayPrices).toEqual({
+      monthly: 2.99,
+      yearly: 24.99,
+      lifetime: 49,
+      rentaPass: 10,
+    });
   });
 });
 
@@ -477,6 +483,63 @@ describe('StripeGateway', () => {
     ).rejects.toMatchObject({ code: 'PLAN_UNAVAILABLE' });
   });
 
+  it('sells the one-month pass of the tax return as a single payment', async () => {
+    const { stripe, client, create } = fakeClient();
+    const priced = { ...config, prices: { ...config.prices, rentaPass: 'price_r' } };
+    const gateway = new StripeGateway(priced, client);
+    await gateway.createCheckout({
+      userId: 'u1',
+      email: 'a@b.c',
+      kind: 'renta_pass',
+      customerId: 'cus_1',
+      trialEnd: null,
+      successUrl: 's',
+      cancelUrl: 'c',
+    });
+    expect(create.mock.calls[0][0]).toMatchObject({
+      mode: 'payment',
+      line_items: [{ price: 'price_r', quantity: 1 }],
+      metadata: { userId: 'u1', kind: 'renta_pass' },
+    });
+    await expect(
+      new StripeGateway(config, client).createCheckout({
+        userId: 'u1',
+        email: 'a@b.c',
+        kind: 'renta_pass',
+        customerId: 'cus_1',
+        trialEnd: null,
+        successUrl: 's',
+        cancelUrl: 'c',
+      })
+    ).rejects.toMatchObject({ code: 'PLAN_UNAVAILABLE' });
+
+    const session = (payment_status: string) =>
+      signed(stripe, {
+        id: `evt_${payment_status}`,
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            client_reference_id: 'u1',
+            customer: 'cus_1',
+            metadata: { userId: 'u1', kind: 'renta_pass' },
+            payment_status,
+          },
+        },
+      });
+    const paid = session('paid');
+    await expect(gateway.parseWebhook(paid.body, paid.signature)).resolves.toEqual({
+      id: 'evt_paid',
+      type: 'renta_pass_purchased',
+      userId: 'u1',
+      customerId: 'cus_1',
+    });
+    const unpaid = session('unpaid');
+    await expect(gateway.parseWebhook(unpaid.body, unpaid.signature)).resolves.toEqual({
+      id: 'evt_unpaid',
+      type: 'ignored',
+    });
+  });
+
   it('opens the customer portal and cancels now or at the end of the period', async () => {
     const portal = jest.fn().mockResolvedValue({ url: 'https://billing.stripe.test/p' });
     const update = jest.fn().mockResolvedValue({});
@@ -617,7 +680,8 @@ describe('StripeGateway', () => {
       .fn()
       .mockResolvedValueOnce({ metadata: { kind: 'lifetime', userId: 'u1' } })
       .mockResolvedValueOnce({ metadata: {} })
-      .mockResolvedValueOnce({ metadata: { kind: 'lifetime' } });
+      .mockResolvedValueOnce({ metadata: { kind: 'lifetime' } })
+      .mockResolvedValueOnce({ metadata: { kind: 'renta_pass', userId: 'u1' } });
     const client = { webhooks: stripe.webhooks, paymentIntents: { retrieve } } as unknown as Stripe;
     const gateway = new StripeGateway(config, client);
     const refund = (id: string, charge: object) => {
@@ -647,7 +711,13 @@ describe('StripeGateway', () => {
       id: 'evt_r5',
       type: 'ignored',
     });
-    expect(retrieve).toHaveBeenCalledTimes(3);
+    await expect(refund('evt_r6', {})).resolves.toEqual({
+      id: 'evt_r6',
+      type: 'renta_pass_refunded',
+      userId: 'u1',
+      customerId: 'cus_1',
+    });
+    expect(retrieve).toHaveBeenCalledTimes(4);
   });
 
   it('builds its own Stripe client from the secret key', () => {

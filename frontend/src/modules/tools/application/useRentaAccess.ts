@@ -1,6 +1,9 @@
 import { useCallback, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { playBillingAvailable } from '@core/billing/playStore';
+import { isNativeApp } from '@shared/utils/platform';
+import type { CheckoutConsent } from '@modules/billing/domain/types';
 import { storage } from '@shared/utils/storage';
 
 const LOCAL_KEY = 'mm_renta_uses';
@@ -19,7 +22,35 @@ export interface RentaAccess {
   consume: () => Promise<boolean>;
   /** Opens the way to Premium (the upgrade dialog, or null outside the app). */
   upgrade: (() => void) | null;
+  draft: DraftAccess;
 }
+
+/** Reading a tax return draft: included with over two months of Premium, or with the one-month pass. */
+export interface DraftAccess {
+  allowed: boolean;
+  /** When paid Premium reaches the two months (null: never, or already). */
+  eligibleOn: string | null;
+  /** Until when the pass lasts. */
+  passUntil: string | null;
+  /** The pass can be bought here (the web needs the terms first; Google Play has its own sheet). */
+  canBuy: boolean;
+  consentRequired: boolean;
+  price: number | null;
+  /** Registers the use on the server; false when it was refused. */
+  use: () => Promise<boolean>;
+  buy: (consent: CheckoutConsent) => Promise<void>;
+}
+
+const NO_DRAFT: DraftAccess = {
+  allowed: false,
+  eligibleOn: null,
+  passUntil: null,
+  canBuy: false,
+  consentRequired: false,
+  price: null,
+  use: async () => false,
+  buy: async () => undefined,
+};
 
 export function useRentaAccess(mode: RentaMode): RentaAccess {
   const { rentaApi } = useApi();
@@ -49,17 +80,43 @@ export function useRentaAccess(mode: RentaMode): RentaAccess {
         return true;
       },
       upgrade: null,
+      draft: NO_DRAFT,
     };
   }
+
+  const renta = plan.overview?.renta;
+  const catalog = plan.overview?.catalog;
+  const onWeb = !isNativeApp();
+  const draft: DraftAccess = {
+    allowed: !!renta?.draft.allowed,
+    eligibleOn: renta?.eligibleOn ?? null,
+    passUntil: renta?.passUntil ?? null,
+    canBuy:
+      !!catalog?.rentaPass.available &&
+      (playBillingAvailable() || (onWeb && catalog.paymentsEnabled)),
+    consentRequired: !playBillingAvailable(),
+    price: catalog?.prices.rentaPass ?? null,
+    use: async () => {
+      try {
+        await rentaApi.draft();
+        return true;
+      } catch {
+        await plan.refresh();
+        return false;
+      }
+    },
+    buy: (consent) => plan.checkout('renta_pass', consent),
+  };
 
   const limit = plan.overview?.limits.resources.rentaCalculations;
   const max = limit ?? 1;
   const count = plan.overview?.usage.rentaCalculations ?? 0;
   return {
-    premium: plan.isPremium && !!plan.overview && limit === null,
+    premium: (plan.isPremium && !!plan.overview && limit === null) || !!renta?.passUntil,
     loading: plan.loading && !plan.overview,
-    used: limit !== null && limit !== undefined && count >= limit,
+    used: limit !== null && limit !== undefined && count >= limit && !renta?.passUntil,
     consume: consumeAccount,
     upgrade: () => plan.openUpgrade({ kind: 'limit', resource: 'rentaCalculations', limit: max }),
+    draft,
   };
 }

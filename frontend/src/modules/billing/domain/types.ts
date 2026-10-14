@@ -1,5 +1,5 @@
 export type PlanId = 'free' | 'premium';
-export type CheckoutKind = 'monthly' | 'yearly' | 'lifetime';
+export type CheckoutKind = 'monthly' | 'yearly' | 'lifetime' | 'renta_pass';
 
 /** What the buyer agrees to before paying (the API requires both). */
 export interface CheckoutConsent {
@@ -27,7 +27,9 @@ export interface PlanCatalog {
   currency: 'EUR';
   trialDays: number;
   paymentsEnabled: boolean;
-  prices: { monthly: number; yearly: number; lifetime: number };
+  prices: { monthly: number; yearly: number; lifetime: number; rentaPass: number };
+  /** The one-month pass that includes reading a tax return draft. */
+  rentaPass: { available: boolean };
   lifetime: { available: boolean; remaining: number };
   limits: { free: PlanLimits; premium: PlanLimits };
 }
@@ -48,6 +50,15 @@ export interface HouseholdStatus {
   maxMembers: number;
 }
 
+/** Who can read a tax return draft: paid Premium for over two months, or the one-month pass. */
+export interface RentaAccess {
+  draft: { allowed: boolean; reason: 'premium' | 'pass' | null };
+  /** When paid Premium reaches the two months that include it. */
+  eligibleOn: string | null;
+  /** Until when the pass lasts. */
+  passUntil: string | null;
+}
+
 export interface BillingOverview {
   /** Members use the plan of the household owner. */
   household: HouseholdStatus;
@@ -63,6 +74,7 @@ export interface BillingOverview {
     canManage: boolean;
   };
   limits: PlanLimits;
+  renta: RentaAccess;
   /** What the user has created (`movements` is informational, not limited). */
   usage: Record<LimitedResource, number> & { movements: number };
   ai: { used: number; quota: number };

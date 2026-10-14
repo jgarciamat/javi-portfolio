@@ -1,23 +1,48 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
+import { useRentaAccess } from '@modules/tools/application/useRentaAccess';
 import { readPdfText } from '@modules/tools/application/readPdf';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
+import type { RentaAccess } from '@modules/billing/domain/types';
 
 jest.mock('@modules/tools/application/readPdf', () => ({ readPdfText: jest.fn() }));
 const read = readPdfText as jest.Mock;
 
+jest.mock('@core/billing/playStore', () => ({
+  ...jest.requireActual('@core/billing/playStore'),
+  playBillingAvailable: jest.fn(() => false),
+  purchasePremium: jest.fn(),
+}));
+const playStore = jest.requireMock('@core/billing/playStore') as {
+  playBillingAvailable: jest.Mock;
+  purchasePremium: jest.Mock;
+};
+jest.mock('@shared/utils/navigation', () => ({ redirectTo: jest.fn() }));
+const { redirectTo } = jest.requireMock('@shared/utils/navigation') as { redirectTo: jest.Mock };
+
 beforeEach(() => {
   localStorage.clear();
   read.mockReset();
+  playStore.playBillingAvailable.mockReturnValue(false);
+  playStore.purchasePremium.mockReset();
+  redirectTo.mockReset();
 });
 
-const premium = () => {
+const INCLUDED: RentaAccess = {
+  draft: { allowed: true, reason: 'premium' },
+  eligibleOn: null,
+  passUntil: null,
+};
+const withRenta = (renta: Partial<RentaAccess>) => {
   const api = createFakeApi();
-  api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
+  api.billingApi.get.mockResolvedValue(
+    f.billing({ plan: 'premium', renta: { ...INCLUDED, ...renta } })
+  );
   return api;
 };
+const premium = () => withRenta({});
 const render = () =>
   renderWithProviders(<RentaPlanner mode="account" />, { api: premium(), plan: true });
 const paste = async (text: string) => {
@@ -151,5 +176,111 @@ describe('Renta planner: relatives in the draft', () => {
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
     expect(screen.getByLabelText(tr('tools.renta.over75', { n: 1 }))).toBeChecked();
     expect(screen.getByLabelText(tr('tools.renta.age'))).toHaveValue('31');
+  });
+});
+
+describe('Renta planner: who can read a draft', () => {
+  const locked: RentaAccess = {
+    draft: { allowed: false, reason: null },
+    eligibleOn: null,
+    passUntil: null,
+  };
+  const open = (renta: Partial<RentaAccess>, api = withRenta(renta)) => {
+    renderWithProviders(<RentaPlanner mode="account" />, { api, plan: true });
+    return api;
+  };
+
+  it('keeps the trial out, says when it unlocks and sells the pass on the web', async () => {
+    const api = open({ ...locked, eligibleOn: '2026-12-01T00:00:00Z' });
+    expect(await screen.findByText(tr('tools.renta.draft.locked'))).toBeInTheDocument();
+    expect(screen.getByText(/1 de diciembre de 2026/)).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.renta.draft.upload'))).toBeNull();
+    const buy = screen.getByRole('button', { name: /Comprar el pase por/ });
+    expect(buy).toBeDisabled();
+    fireEvent.click(screen.getByLabelText(new RegExp(tr('billing.acceptTerms'))));
+    fireEvent.click(screen.getByLabelText(tr('billing.immediateStart')));
+    fireEvent.click(buy);
+    await waitFor(() =>
+      expect(api.billingApi.checkout).toHaveBeenCalledWith('renta_pass', {
+        acceptTerms: true,
+        waiveWithdrawal: true,
+      })
+    );
+  });
+
+  it('reports a payment that fails to start', async () => {
+    const api = withRenta(locked);
+    api.billingApi.checkout.mockRejectedValue(new Error('boom'));
+    open(locked, api);
+    fireEvent.click(await screen.findByLabelText(new RegExp(tr('billing.acceptTerms'))));
+    fireEvent.click(screen.getByLabelText(tr('billing.immediateStart')));
+    fireEvent.click(screen.getByRole('button', { name: /Comprar el pase por/ }));
+    expect(await screen.findByText(/boom|billing/i)).toBeInTheDocument();
+  });
+
+  it('buys with Google Play in the app, without asking for the terms', async () => {
+    playStore.playBillingAvailable.mockReturnValue(true);
+    playStore.purchasePremium.mockResolvedValue(true);
+    open(locked);
+    expect(screen.queryByLabelText(tr('billing.immediateStart'))).toBeNull();
+    fireEvent.click(await screen.findByRole('button', { name: /Comprar el pase por/ }));
+    await waitFor(() =>
+      expect(playStore.purchasePremium).toHaveBeenCalledWith('renta_pass', expect.any(String))
+    );
+  });
+
+  it('offers nothing to buy when payments are off', async () => {
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'premium', renta: locked });
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      catalog: { ...overview.catalog, rentaPass: { available: false } },
+    });
+    open(locked, api);
+    expect(await screen.findByText(tr('tools.renta.draft.locked'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Comprar el pase por/ })).toBeNull();
+  });
+
+  it('shows how long the pass lasts, and unlimited results with it', async () => {
+    open({
+      draft: { allowed: true, reason: 'pass' },
+      eligibleOn: null,
+      passUntil: '2026-12-01T00:00:00Z',
+    });
+    expect(
+      await screen.findByText(/pase de la Renta está activo hasta el 1 de diciembre/)
+    ).toBeInTheDocument();
+  });
+
+  it('speaks English, dates included', async () => {
+    renderWithProviders(<RentaPlanner mode="account" />, {
+      api: withRenta({ ...locked, eligibleOn: '2026-12-01T00:00:00Z' }),
+      plan: true,
+      authenticated: false,
+      locale: 'en',
+    });
+    expect(await screen.findByText(/1 December 2026/)).toBeInTheDocument();
+  });
+
+  it('has nothing to use or buy on the public page', async () => {
+    let access!: ReturnType<typeof useRentaAccess>;
+    const Probe = () => {
+      access = useRentaAccess('local');
+      return null;
+    };
+    renderWithProviders(<Probe />, { authenticated: false });
+    expect(access.draft.allowed).toBe(false);
+    await expect(access.draft.use()).resolves.toBe(false);
+    await expect(
+      access.draft.buy({ acceptTerms: true, waiveWithdrawal: true })
+    ).resolves.toBeUndefined();
+  });
+
+  it('says so when the server refuses the use', async () => {
+    const api = withRenta({});
+    api.rentaApi.draft.mockRejectedValue(new Error('402'));
+    open({}, api);
+    await paste(DRAFT);
+    expect(await screen.findByText(tr('tools.renta.draft.refused'))).toBeInTheDocument();
   });
 });

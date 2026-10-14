@@ -77,6 +77,7 @@ import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxReposito
 import { InboxService } from '@application/inbox/InboxService';
 import { RentaService } from '@application/renta/RentaService';
 import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
+import { SqliteRentaPassRepository } from './sqlite/repositories/SqliteMonetizationRepositories';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
@@ -138,6 +139,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     push: new SqlitePushRepository(db),
     inbox: new SqliteInboxRepository(db),
     renta: new SqliteRentaUsageRepository(db),
+    rentaPasses: new SqliteRentaPassRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -193,7 +195,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock
   );
 
-  const entitlements = new EntitlementService(repos.subscriptions, clock);
+  const entitlements = new EntitlementService(
+    repos.subscriptions,
+    clock,
+    repos.rentaPasses,
+    config.rentaDraftOpen
+  );
   const allowance = new AiAllowance(
     repos.aiUsage,
     entitlements,
@@ -378,6 +385,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         founderLimit: config.billing.founderLimit,
         // Without Stripe config the gateway is either disabled or a test double.
         lifetimeConfigured: config.billing.stripe ? !!config.billing.stripe.prices.lifetime : true,
+        rentaPassConfigured: config.billing.stripe
+          ? !!config.billing.stripe.prices.rentaPass
+          : true,
         metrics: repos.metrics,
       }
     ),
@@ -388,6 +398,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       uow,
       clock,
       repos.metrics,
+      entitlements,
       config.billing.revenueCatWebhookAuth
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
