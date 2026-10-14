@@ -787,7 +787,7 @@ describe('the self-employed draft', () => {
     fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.priorNet'))), {
       target: { value: '9500' },
     });
-    fireEvent.change(screen.getByLabelText(tr('app.autonomo.toOffset')), {
+    fireEvent.change(screen.getByLabelText(new RegExp(tr('app.autonomo.toOffset'))), {
       target: { value: '40' },
     });
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
