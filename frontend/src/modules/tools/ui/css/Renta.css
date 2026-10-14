@@ -308,3 +308,11 @@
   width: auto;
   flex: 0 0 auto;
 }
+
+.renta-badge--model {
+  background: rgba(99, 102, 241, 0.25);
+}
+.renta-advance {
+  display: block;
+  margin: 0.25rem 0 0.25rem 1.75rem;
+}

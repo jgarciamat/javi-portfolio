@@ -153,3 +153,24 @@ describe('Renta planner: children and income limits', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('Renta planner: the model that asks for the advance payment', () => {
+  it('shows the model next to the deductions that can be collected every month', async () => {
+    render();
+    const maternity = (await screen.findByText(/Por maternidad/, { selector: 'strong' })).closest(
+      '.renta-deduction'
+    ) as HTMLElement;
+    expect(within(maternity).getByText('Modelo 140')).toBeInTheDocument();
+    expect(
+      within(maternity).getByRole('link', { name: 'Cómo pedir el modelo 140' })
+    ).toHaveAttribute('href', expect.stringContaining('GZ25'));
+    const large = screen
+      .getByText(/Por familia numerosa de categoría general/, { selector: 'strong' })
+      .closest('.renta-deduction') as HTMLElement;
+    expect(within(large).getByText('Modelo 143')).toBeInTheDocument();
+    const donations = screen
+      .getByText(/Donativos a ONG/, { selector: 'strong' })
+      .closest('.renta-deduction') as HTMLElement;
+    expect(within(donations).queryByText(/Modelo/)).toBeNull();
+  });
+});

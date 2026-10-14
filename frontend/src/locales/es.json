@@ -1490,5 +1490,8 @@
   "tools.renta.draft.tryNext": "Probar la renta de {year}",
   "tools.renta.draft.scenarioOn": "Estás probando la renta de {year} con los mismos ingresos y bienes de tu borrador, un año más mayor. Cambia tus hijos y lo que haya cambiado (por ejemplo, un bebé en camino) y mira cómo queda. Se usan las reglas de 2025 hasta que se publiquen las nuevas.",
   "tools.renta.draft.scenarioBack": "Volver a mi borrador",
-  "tools.renta.draft.noneInterest": "No me interesa ninguna deducción"
+  "tools.renta.draft.noneInterest": "No me interesa ninguna deducción",
+  "tools.renta.model": "Modelo {model}",
+  "tools.renta.advance": "La puedes cobrar cada mes, sin esperar a la declaración, pidiendo el abono anticipado con el modelo {model}.",
+  "tools.renta.advanceLink": "Cómo pedir el modelo {model}"
 }

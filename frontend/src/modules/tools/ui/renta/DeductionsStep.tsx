@@ -58,12 +58,25 @@ function DeductionRow({
         <span>
           <strong>{deduction.title}</strong>
           {suggested && <em className="renta-badge">{t('tools.renta.suggested')}</em>}
+          {deduction.advance && (
+            <em className="renta-badge renta-badge--model">
+              {t('tools.renta.model', { model: deduction.advance.model })}
+            </em>
+          )}
           {hint && (
             <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
           )}
           <small>{deduction.summary}</small>
         </span>
       </label>
+      {deduction.advance && (
+        <small className="renta-advance">
+          {t('tools.renta.advance', { model: deduction.advance.model })}{' '}
+          <a href={deduction.advance.url} target="_blank" rel="noopener noreferrer">
+            {t('tools.renta.advanceLink', { model: deduction.advance.model })}
+          </a>
+        </small>
+      )}
       {deduction.incomeLimit?.note && (
         <small className="renta-limit">
           {t('tools.renta.incomeLimit')}: {deduction.incomeLimit.note}
