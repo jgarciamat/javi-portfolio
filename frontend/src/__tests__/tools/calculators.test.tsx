@@ -307,37 +307,3 @@ describe('income tax return helpers', () => {
     expect(donationDeduction(-1)).toBe(0);
   });
 });
-
-describe('Renta calculator page', () => {
-  it('says whether the return is compulsory and what the deductions save', async () => {
-    const { RentaCalculatorPage } = await import('@modules/tools/ui/CalculatorPages');
-    renderWithProviders(<RentaCalculatorPage />, { authenticated: false });
-    expect(document.title).toBe(tr('tools.renta.title'));
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.main')), { target: { value: '30000' } });
-    expect(screen.getByText(tr('tools.renta.required'))).toBeInTheDocument();
-    expect(screen.getByText(tr('tools.renta.reason.overLimit'))).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.main')), { target: { value: '16000' } });
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.others')), {
-      target: { value: '2000' },
-    });
-    expect(screen.getByText(tr('tools.renta.reason.twoPayers'))).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.others')), { target: { value: '0' } });
-    expect(screen.getByText(tr('tools.renta.notRequired'))).toBeInTheDocument();
-    expect(screen.getByText(tr('tools.renta.reason.none'))).toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.pension')), {
-      target: { value: '2000' },
-    });
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.marginal')), {
-      target: { value: '37' },
-    });
-    const pension = screen.getByRole('heading', { name: tr('tools.renta.pensionResult') });
-    expect(within(pension.closest('section') as HTMLElement).getByText(/555/)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.donations')), {
-      target: { value: '450' },
-    });
-    const donation = screen.getByRole('heading', { name: tr('tools.renta.donationResult') });
-    expect(within(donation.closest('section') as HTMLElement).getByText(/280/)).toBeInTheDocument();
-    expect(screen.getByText(tr('tools.renta.disclaimer'))).toBeInTheDocument();
-  });
-});

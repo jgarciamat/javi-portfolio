@@ -1,0 +1,228 @@
+/* ─── Income tax return planner ──────────────────────────────────────────── */
+
+.renta-planner {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.renta-step {
+  padding: 1.25rem;
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 16px;
+  background: var(--slate-900, transparent);
+}
+
+.renta-step h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.renta-step h3 {
+  margin: 1.4rem 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.renta-number {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--accent, #6366f1);
+  color: #fff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.renta-people {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  list-style: none;
+}
+
+.renta-people li {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) auto;
+  gap: 0.6rem;
+  align-items: end;
+  padding: 0.75rem;
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+}
+
+.renta-check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+  cursor: pointer;
+}
+
+.renta-foral {
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--amber-400, #f59e0b);
+}
+
+.renta-block {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.renta-group {
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+}
+
+.renta-group > summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.3rem 0;
+}
+
+.renta-group > summary span {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.renta-deductions {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0.6rem 0 0.3rem;
+  list-style: none;
+}
+
+.renta-deduction {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.renta-deduction--on {
+  border-color: var(--accent, #6366f1);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.renta-deduction-head {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.renta-deduction-head input {
+  margin-top: 0.3rem;
+}
+
+.renta-deduction-head small {
+  display: block;
+  margin-top: 0.2rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.renta-badge {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--green-500, #22c55e);
+  color: #052e16;
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.renta-requirements {
+  margin: 0.5rem 0 0 1.7rem;
+  font-size: 0.9rem;
+}
+
+.renta-requirements summary {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.renta-deduction-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.8rem;
+  margin: 0.6rem 0 0 1.7rem;
+}
+
+.renta-gives {
+  margin: 0;
+}
+
+.renta-total {
+  margin: 0 0 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  font-size: 1.15rem;
+}
+
+.renta-total strong {
+  font-size: 1.9rem;
+  display: block;
+}
+
+.renta-total--refund {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid var(--green-500, #22c55e);
+}
+
+.renta-total--pay {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid var(--red-400, #f87171);
+}
+
+.renta-lines {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.renta-lines dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.renta-minimum {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0 0 1rem;
+  list-style: none;
+}
+
+.renta-minimum li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.renta-kid {
+  padding-left: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.renta-obligation {
+  margin: 0.5rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.14);
+}

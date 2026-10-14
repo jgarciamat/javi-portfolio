@@ -217,6 +217,7 @@ describe('PlanBanner', () => {
           goals: 1,
           recurringRules: 4,
           customAlerts: 0,
+          rentaCalculations: 0,
           movements: 37,
         },
       })

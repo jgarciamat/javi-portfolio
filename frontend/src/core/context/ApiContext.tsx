@@ -16,6 +16,7 @@ import {
   pushApi,
   ratesApi,
   recurringApi,
+  rentaApi,
   settingsApi,
   splitApi,
   transactionApi,
@@ -32,6 +33,7 @@ export interface IApiContext {
   categoryApi: typeof categoryApi;
   categoryRuleApi: typeof categoryRuleApi;
   recurringApi: typeof recurringApi;
+  rentaApi: typeof rentaApi;
   customAlertApi: typeof customAlertApi;
   accountApi: typeof accountApi;
   assetApi: typeof assetApi;
@@ -61,6 +63,7 @@ const defaultValue: IApiContext = {
   categoryApi,
   categoryRuleApi,
   recurringApi,
+  rentaApi,
   customAlertApi,
   accountApi,
   assetApi,

@@ -31,16 +31,23 @@ describe('Renta section', () => {
       )
     ).toBeInTheDocument();
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenCalledWith(2025));
-    expect(screen.getByLabelText(tr('tools.renta.main'))).toHaveValue('25000');
-    expect(screen.getByText(tr('tools.renta.required'))).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('25000');
+    expect(screen.getByText(tr('tools.renta.obligation.yes'))).toBeInTheDocument();
   });
 
   it('changes the year and starts empty when nothing was recorded', async () => {
     const api = createFakeApi();
     renderWithProviders(<RentaView />, { api });
-    expect(await screen.findByLabelText(tr('tools.renta.main'))).toHaveValue('');
+    expect(await screen.findByLabelText(tr('tools.renta.gross'))).toHaveValue('');
     fireEvent.change(screen.getByLabelText(tr('app.renta.year')), { target: { value: '2024' } });
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2024));
+  });
+
+  it('links to the full-screen calculator', async () => {
+    renderWithProviders(<RentaView />);
+    expect(
+      await screen.findByRole('link', { name: tr('app.renta.openCalculator') })
+    ).toHaveAttribute('href', '/calculadora-renta');
   });
 
   it('lists what to gather and links to the Tax Agency', async () => {

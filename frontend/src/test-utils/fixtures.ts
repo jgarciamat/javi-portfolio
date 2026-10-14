@@ -331,7 +331,14 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   lifetime: { available: true, remaining: 87 },
   limits: {
     free: {
-      resources: { accounts: 2, budgets: 3, goals: 1, recurringRules: 3, customAlerts: 3 },
+      resources: {
+        accounts: 2,
+        budgets: 3,
+        goals: 1,
+        recurringRules: 3,
+        customAlerts: 3,
+        rentaCalculations: 1,
+      },
       features: {
         import: false,
         insights: false,
@@ -348,6 +355,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         goals: null,
         recurringRules: null,
         customAlerts: null,
+        rentaCalculations: null,
       },
       features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
       aiMonthlyQuota: 10,
@@ -385,6 +393,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     goals: 0,
     recurringRules: 1,
     customAlerts: 0,
+    rentaCalculations: 0,
     movements: 5,
   },
   ai: { used: 0, quota: 10 },

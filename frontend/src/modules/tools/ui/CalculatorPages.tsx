@@ -7,16 +7,14 @@ import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
   budgetRule,
-  donationDeduction,
   inflationEffect,
   loanPayment,
   monthsToGoal,
-  pensionSaving,
-  rentaObligation,
   simulateSavings,
   vatBreakdown,
 } from '../domain/calculators';
 import { TOOL_PAGES } from '../domain/toolPages';
+import { RentaPlanner } from './RentaPlanner';
 import './css/Tools.css';
 
 function useMoney() {
@@ -493,100 +491,26 @@ export function GoalCalculatorPage() {
   );
 }
 
-/** Do I have to file the income tax return, and what do a pension plan and donations save. */
-export function RentaTools({ initialIncome = '' }: { initialIncome?: string }) {
-  const { t } = useI18n();
-  const money = useMoney();
-  const [main, setMain] = useState(initialIncome);
-  const [others, setOthers] = useState('');
-  const [pension, setPension] = useState('');
-  const [marginal, setMarginal] = useState('30');
-  const [donations, setDonations] = useState('');
-  const result = rentaObligation({ mainIncome: number(main), otherIncome: number(others) });
-
-  return (
-    <>
-      <div className="tools-form">
-        <NumberField
-          id="renta-main"
-          label={t('tools.renta.main')}
-          value={main}
-          onChange={setMain}
-          suffix="€"
-        />
-        <NumberField
-          id="renta-others"
-          label={t('tools.renta.others')}
-          value={others}
-          onChange={setOthers}
-          suffix="€"
-        />
-      </div>
-      <div className="tools-results" aria-live="polite">
-        <section className="tools-result">
-          <h2>{t('tools.renta.result')}</h2>
-          <p className="tools-amount">
-            {result.required ? t('tools.renta.required') : t('tools.renta.notRequired')}
-          </p>
-          <p>{t(`tools.renta.reason.${result.reason}`)}</p>
-        </section>
-      </div>
-      <h2 className="tools-subtitle">{t('tools.renta.deductions')}</h2>
-      <div className="tools-form">
-        <NumberField
-          id="renta-pension"
-          label={t('tools.renta.pension')}
-          value={pension}
-          onChange={setPension}
-          suffix="€"
-        />
-        <div className="tools-field">
-          <label htmlFor="renta-marginal">{t('tools.renta.marginal')}</label>
-          <select
-            id="renta-marginal"
-            className="tx-input"
-            value={marginal}
-            onChange={(e) => setMarginal(e.target.value)}
-          >
-            {['19', '24', '30', '37', '45', '47'].map((r) => (
-              <option key={r} value={r}>
-                {r} %
-              </option>
-            ))}
-          </select>
-        </div>
-        <NumberField
-          id="renta-donations"
-          label={t('tools.renta.donations')}
-          value={donations}
-          onChange={setDonations}
-          suffix="€"
-        />
-      </div>
-      <div className="tools-results" aria-live="polite">
-        <section className="tools-result">
-          <h2>{t('tools.renta.pensionResult')}</h2>
-          <p className="tools-amount">{money(pensionSaving(number(pension), number(marginal)))}</p>
-        </section>
-        <section className="tools-result">
-          <h2>{t('tools.renta.donationResult')}</h2>
-          <p className="tools-amount">{money(donationDeduction(number(donations)))}</p>
-        </section>
-      </div>
-      <p className="plan-note">{t('tools.renta.disclaimer')}</p>
-    </>
-  );
-}
-
-/** Public page: am I obliged to file the income tax return? */
+/** Public page of the income tax return calculator; signed-in people use the section of the app. */
 export function RentaCalculatorPage() {
+  const { t } = useI18n();
+  const { isAuthenticated } = useAuth();
   return (
     <CalculatorLayout
       path="/calculadora-renta"
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
     >
-      <RentaTools />
+      {isAuthenticated ? (
+        <section className="tools-result">
+          <p>{t('tools.renta.inApp')}</p>
+          <Link className="btn-primary" to="/">
+            {t('tools.renta.openApp')}
+          </Link>
+        </section>
+      ) : (
+        <RentaPlanner mode="local" />
+      )}
     </CalculatorLayout>
   );
 }

@@ -7,7 +7,13 @@ export interface CheckoutConsent {
   /** Premium starts at once, so the 14-day right of withdrawal is lost. */
   waiveWithdrawal: boolean;
 }
-export type LimitedResource = 'accounts' | 'budgets' | 'goals' | 'recurringRules' | 'customAlerts';
+export type LimitedResource =
+  | 'accounts'
+  | 'budgets'
+  | 'goals'
+  | 'recurringRules'
+  | 'customAlerts'
+  | 'rentaCalculations';
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
 
 export interface PlanLimits {

@@ -99,6 +99,13 @@ export const categoryApi = {
   },
 };
 
+export const rentaApi = {
+  /** Counts a calculation of the income tax return calculator (refused with a 402 when the plan has no more). */
+  register() {
+    return apiRequest<{ used: number }>('/renta/calculation', { method: 'POST' });
+  },
+};
+
 export const inboxApi = {
   get() {
     return apiRequest<Inbox>('/inbox');

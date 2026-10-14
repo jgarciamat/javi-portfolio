@@ -75,6 +75,8 @@ import {
 import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository';
 import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxRepository';
 import { InboxService } from '@application/inbox/InboxService';
+import { RentaService } from '@application/renta/RentaService';
+import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
@@ -135,6 +137,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     splits: new SqliteSplitRepository(db),
     push: new SqlitePushRepository(db),
     inbox: new SqliteInboxRepository(db),
+    renta: new SqliteRentaUsageRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -363,6 +366,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         goals: repos.goals.listByUser(userId).length,
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
+        rentaCalculations: repos.renta.count(userId),
         movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,
@@ -388,6 +392,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,
+    renta: new RentaService(repos.renta, entitlements),
     inbox: new InboxService(repos.inbox, importer, config.inbox, clock),
     exporter: new ExportService(
       repos.users,

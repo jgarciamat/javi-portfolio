@@ -24,6 +24,7 @@ const RESOURCE_LABELS: Record<LimitedResource, string> = {
   goals: 'metas',
   recurringRules: 'movimientos recurrentes',
   customAlerts: 'alertas',
+  rentaCalculations: 'cálculos de la Renta',
 };
 
 /** Answers "what can this user do right now?" and enforces it. */

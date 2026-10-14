@@ -289,6 +289,12 @@ export interface PushSubscriptionRecord {
   auth: string;
 }
 
+export interface RentaUsageRepository {
+  count(userId: string): number;
+  /** One more calculation; returns how many there are now. */
+  increment(userId: string): number;
+}
+
 export type InboxStatus = 'imported' | 'duplicate' | 'unreadable' | 'failed';
 
 export interface InboxMessage {

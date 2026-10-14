@@ -4,6 +4,7 @@ import {
   accountApi,
   assetApi,
   inboxApi,
+  rentaApi,
   budgetApi,
   businessApi,
   categoryApi,
@@ -281,6 +282,7 @@ const cases: Case[] = [
   ],
   ['quarterly tax', () => businessApi.tax(2026), 'GET', '/business/tax/2026'],
   ['assets', () => assetApi.getAll(), 'GET', '/assets'],
+  ['count a tax return calculation', () => rentaApi.register(), 'POST', '/renta/calculation'],
   ['inbox', () => inboxApi.get(), 'GET', '/inbox'],
   ['new inbox address', () => inboxApi.rotate(), 'POST', '/inbox/rotate'],
   [

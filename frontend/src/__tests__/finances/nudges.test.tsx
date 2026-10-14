@@ -12,10 +12,26 @@ beforeEach(() => {
 afterEach(restoreTime);
 
 const NEW_USER = f.billing({
-  usage: { accounts: 1, budgets: 0, goals: 0, recurringRules: 0, customAlerts: 0, movements: 1 },
+  usage: {
+    accounts: 1,
+    budgets: 0,
+    goals: 0,
+    recurringRules: 0,
+    customAlerts: 0,
+    rentaCalculations: 0,
+    movements: 1,
+  },
 });
 const SETTLED = f.billing({
-  usage: { accounts: 1, budgets: 1, goals: 1, recurringRules: 1, customAlerts: 0, movements: 20 },
+  usage: {
+    accounts: 1,
+    budgets: 1,
+    goals: 1,
+    recurringRules: 1,
+    customAlerts: 0,
+    rentaCalculations: 0,
+    movements: 20,
+  },
   ai: { used: 2, quota: 10 },
 });
 
@@ -55,6 +71,7 @@ describe('Getting started', () => {
         goals: 0,
         recurringRules: 0,
         customAlerts: 0,
+        rentaCalculations: 0,
         movements: 4,
       },
     });
@@ -108,6 +125,7 @@ describe('Getting started progress', () => {
         goals: 0,
         recurringRules: 0,
         customAlerts: 0,
+        rentaCalculations: 0,
         movements: 1,
         ...over,
       },

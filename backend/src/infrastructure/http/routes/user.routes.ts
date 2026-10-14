@@ -321,6 +321,12 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       );
     })
   );
+  // Income tax return calculator: each calculation is counted (the free plan has one).
+  router.post(
+    '/renta/calculation',
+    authed((req, res) => res.status(201).json(c.renta.register(req.userId)))
+  );
+
   // Receipts forwarded by e-mail: the user's private address and what happened to each message.
   router.get(
     '/inbox',

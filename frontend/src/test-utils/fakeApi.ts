@@ -125,6 +125,7 @@ export function createFakeApi(): FakeApi {
       }),
       remove: ok(undefined),
     },
+    rentaApi: { register: ok({ used: 1 }) },
     inboxApi: {
       get: ok({ address: 'mm-0123456789abcdef0123@facturas.winjgm.com', recent: [] }),
       rotate: ok({ address: 'mm-fedcba98765432100123@facturas.winjgm.com', recent: [] }),
