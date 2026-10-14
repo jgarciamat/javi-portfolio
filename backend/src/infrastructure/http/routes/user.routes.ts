@@ -21,6 +21,7 @@ import {
   nameBody,
   acquisitionBody,
   assetBody,
+  assetTermsBody,
   splitExpenseBody,
   splitExpenseParams,
   splitGroupBody,
@@ -296,10 +297,16 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   router.post(
     '/assets',
     authed((req, res) => {
-      const { value, ...rest } = assetBody.parse(req.body);
-      res
-        .status(201)
-        .json(presentAsset(c.assetService.create(req.dataUserId, { ...rest, valueCents: value })));
+      const { value, minPayment, ...rest } = assetBody.parse(req.body);
+      res.status(201).json(
+        presentAsset(
+          c.assetService.create(req.dataUserId, {
+            ...rest,
+            valueCents: value,
+            minPaymentCents: minPayment,
+          })
+        )
+      );
     })
   );
   router.post(
@@ -309,6 +316,20 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       res.json(
         presentAsset(
           c.assetService.setValue(req.dataUserId, idParam.parse(req.params).id, value, date)
+        )
+      );
+    })
+  );
+  router.patch(
+    '/assets/:id/terms',
+    authed((req, res) => {
+      const { interestRate, minPayment } = assetTermsBody.parse(req.body);
+      res.json(
+        presentAsset(
+          c.assetService.setTerms(req.dataUserId, idParam.parse(req.params).id, {
+            interestRate,
+            minPaymentCents: minPayment,
+          })
         )
       );
     })

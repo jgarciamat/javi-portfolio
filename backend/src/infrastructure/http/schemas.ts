@@ -255,11 +255,18 @@ export const householdJoinBody = z.object({ code: z.string().trim().min(10).max(
 export const householdCodeParams = z.object({ code: z.string().trim().min(10).max(64) });
 export const memberParams = z.object({ id: z.string().trim().min(1).max(64) });
 const assetValue = z.number().finite().min(0).max(1_000_000_000).transform(toCents);
+const assetRate = z.number().finite().min(0).max(100);
 export const assetBody = z.object({
   name: z.string().trim().min(1).max(60),
   kind: z.enum(['investment', 'property', 'vehicle', 'other', 'debt']),
   value: assetValue,
   date: date.nullish(),
+  interestRate: assetRate.nullish(),
+  minPayment: assetValue.nullish(),
+});
+export const assetTermsBody = z.object({
+  interestRate: assetRate.nullable(),
+  minPayment: assetValue.nullable(),
 });
 export const assetValueBody = z.object({ value: assetValue, date: date.nullish() });
 export const rateQuery = z.object({

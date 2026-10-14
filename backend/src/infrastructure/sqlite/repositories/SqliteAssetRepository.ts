@@ -6,6 +6,8 @@ interface AssetRow {
   user_id: string;
   name: string;
   kind: string;
+  interest_rate: number | null;
+  min_payment_cents: number | null;
   created_at: string;
 }
 
@@ -14,6 +16,8 @@ const toAsset = (r: AssetRow): Asset => ({
   userId: r.user_id,
   name: r.name,
   kind: r.kind as AssetKind,
+  interestRate: r.interest_rate,
+  minPaymentCents: r.min_payment_cents,
   createdAt: r.created_at,
 });
 
@@ -37,9 +41,10 @@ export class SqliteAssetRepository implements AssetRepository {
   save(asset: Asset): void {
     this.db
       .prepare(
-        `INSERT INTO assets (id, user_id, name, kind, created_at)
-         VALUES (@id, @userId, @name, @kind, @createdAt)
-         ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind`
+        `INSERT INTO assets (id, user_id, name, kind, interest_rate, min_payment_cents, created_at)
+         VALUES (@id, @userId, @name, @kind, @interestRate, @minPaymentCents, @createdAt)
+         ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind,
+           interest_rate = excluded.interest_rate, min_payment_cents = excluded.min_payment_cents`
       )
       .run(asset);
   }

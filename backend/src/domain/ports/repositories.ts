@@ -100,6 +100,9 @@ export interface Asset {
   userId: string;
   name: string;
   kind: AssetKind;
+  /** Debts: yearly interest rate in percent and minimum monthly payment. */
+  interestRate: number | null;
+  minPaymentCents: number | null;
   createdAt: string;
 }
 

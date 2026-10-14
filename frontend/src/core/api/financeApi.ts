@@ -300,7 +300,14 @@ export const assetApi = {
   getAll() {
     return apiRequest<Asset[]>('/assets');
   },
-  create(input: { name: string; kind: AssetKind; value: number; date?: string }) {
+  create(input: {
+    name: string;
+    kind: AssetKind;
+    value: number;
+    date?: string;
+    interestRate?: number | null;
+    minPayment?: number | null;
+  }) {
     return apiRequest<Asset>('/assets', { method: 'POST', body: jsonBody(input) });
   },
   /** Records what the asset is worth now (or on `date`). */
@@ -308,6 +315,13 @@ export const assetApi = {
     return apiRequest<Asset>(`/assets/${id}/values`, {
       method: 'POST',
       body: jsonBody({ value, date }),
+    });
+  },
+  /** Interest rate and minimum payment of a debt. */
+  setTerms(id: string, terms: { interestRate: number | null; minPayment: number | null }) {
+    return apiRequest<Asset>(`/assets/${id}/terms`, {
+      method: 'PATCH',
+      body: jsonBody(terms),
     });
   },
   remove(id: string) {

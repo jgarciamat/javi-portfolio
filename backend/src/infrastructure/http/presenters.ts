@@ -333,6 +333,8 @@ export function presentAsset(a: AssetView) {
     id: a.id,
     name: a.name,
     kind: a.kind,
+    interestRate: a.interestRate,
+    minPayment: a.minPaymentCents === null ? null : m(a.minPaymentCents),
     value: m(a.valueCents),
     valueDate: a.valueDate,
     previousValue: a.previousCents === null ? null : m(a.previousCents),

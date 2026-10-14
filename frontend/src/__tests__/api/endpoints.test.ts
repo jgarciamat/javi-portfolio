@@ -294,6 +294,13 @@ const cases: Case[] = [
     '/assets/a1/values',
     { value: 120, date: '2026-03-01' },
   ],
+  [
+    'debt terms',
+    () => assetApi.setTerms('a1', { interestRate: 12, minPayment: 50 }),
+    'PATCH',
+    '/assets/a1/terms',
+    { interestRate: 12, minPayment: 50 },
+  ],
   ['remove asset', () => assetApi.remove('a1'), 'DELETE', '/assets/a1'],
   ['net worth', () => insightsApi.netWorth(), 'GET', '/stats/net-worth?months=12'],
   ['net worth range', () => insightsApi.netWorth(24), 'GET', '/stats/net-worth?months=24'],

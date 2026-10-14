@@ -3,6 +3,7 @@ import type {
   AIAdvice,
   AIAnswer,
   AnnualReport,
+  Asset,
   Forecast,
   SubscriptionReport,
   BudgetLine,
@@ -388,5 +389,18 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
   },
   ai: { used: 0, quota: 10 },
   catalog: catalog(),
+  ...over,
+});
+
+export const asset = (over: Partial<Asset> = {}): Asset => ({
+  id: nextId('as'),
+  name: 'Fondo',
+  kind: 'investment',
+  interestRate: null,
+  minPayment: null,
+  value: 1000,
+  valueDate: '2026-03-01',
+  previousValue: null,
+  history: [],
   ...over,
 });

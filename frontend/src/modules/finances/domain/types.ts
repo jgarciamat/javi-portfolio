@@ -398,6 +398,9 @@ export interface Asset {
   id: string;
   name: string;
   kind: AssetKind;
+  /** Debts: yearly interest rate (%) and minimum monthly payment. */
+  interestRate: number | null;
+  minPayment: number | null;
   value: number;
   valueDate: string | null;
   /** The value before the latest one (to show the change). */
