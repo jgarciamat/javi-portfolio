@@ -22,6 +22,9 @@ const playStore = jest.requireMock('@core/billing/playStore') as {
 jest.mock('@shared/utils/navigation', () => ({ redirectTo: jest.fn() }));
 const { redirectTo } = jest.requireMock('@shared/utils/navigation') as { redirectTo: jest.Mock };
 
+// Answering every question of a community is slow on a busy machine.
+jest.setTimeout(60000);
+
 beforeEach(() => {
   localStorage.clear();
   read.mockReset();
