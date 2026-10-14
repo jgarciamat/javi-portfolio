@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { MonthNavCard } from '@modules/finances/ui/components/MonthlyView';
 import { RecapShare } from '@modules/finances/ui/components/RecapShare';
 import { recapImage } from '@modules/finances/domain/recapImage';
@@ -8,12 +8,26 @@ import { captureDownloads } from '@test-utils/dom';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+const gradient = { addColorStop: jest.fn() };
 const ctx = {
   fillStyle: '',
+  strokeStyle: '',
   font: '',
+  lineWidth: 0,
+  lineCap: '',
+  textAlign: '',
   fillRect: jest.fn(),
   fillText: jest.fn(),
-  createLinearGradient: jest.fn(() => ({ addColorStop: jest.fn() })),
+  fill: jest.fn(),
+  stroke: jest.fn(),
+  beginPath: jest.fn(),
+  closePath: jest.fn(),
+  moveTo: jest.fn(),
+  lineTo: jest.fn(),
+  quadraticCurveTo: jest.fn(),
+  arc: jest.fn(),
+  createLinearGradient: jest.fn(() => gradient),
+  createRadialGradient: jest.fn(() => gradient),
 };
 
 function mockCanvas(blob: Blob | null = new Blob(['png'], { type: 'image/png' }), context = true) {
@@ -44,17 +58,47 @@ describe('recapImage', () => {
     const blob = await recapImage({
       title: 'Mi mes',
       month: 'marzo',
+      rate: 10,
       headline: '10 %',
       headlineHint: 'ahorrado',
       lines: ['a', 'b'],
       footer: 'pie',
+      site: 'winjgm.com',
     });
     expect(blob.type).toBe('image/png');
-    expect(ctx.fillText).toHaveBeenCalledWith('10 %', 90, 560);
+    expect(ctx.fillText).toHaveBeenCalledWith('10 %', 540, 680);
+    expect(ctx.arc).toHaveBeenCalledTimes(2);
+  });
+
+  it('draws only the track of the ring when nothing was saved and caps what is above 100', async () => {
+    mockCanvas();
+    const base = {
+      title: '',
+      month: '',
+      headline: '',
+      headlineHint: '',
+      lines: [],
+      footer: '',
+      site: '',
+    };
+    await recapImage({ ...base, rate: 0 });
+    expect(ctx.arc).toHaveBeenCalledTimes(1);
+    ctx.arc.mockClear();
+    await recapImage({ ...base, rate: 250 });
+    expect(ctx.arc).toHaveBeenLastCalledWith(540, 640, 215, -Math.PI / 2, (3 * Math.PI) / 2);
   });
 
   it('fails without a canvas or without a picture', async () => {
-    const data = { title: '', month: '', headline: '', headlineHint: '', lines: [], footer: '' };
+    const data = {
+      title: '',
+      month: '',
+      rate: 0,
+      headline: '',
+      headlineHint: '',
+      lines: [],
+      footer: '',
+      site: '',
+    };
     mockCanvas(null, false);
     await expect(recapImage(data)).rejects.toThrow('canvas');
     jest.restoreAllMocks();
@@ -130,13 +174,63 @@ describe('Share the month', () => {
 });
 
 describe('Month summary on demand', () => {
-  it('opens from the options of the month and closes again', async () => {
+  const open = async () => {
     const api = createFakeApi();
     renderWithProviders(<MonthNavCard />, { api });
     fireEvent.click(await screen.findByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('menuitem', { name: new RegExp(tr('app.recap.open')) }));
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    return screen.findByRole('dialog');
+  };
+
+  it('opens from the options of the month, shows the figures and closes again', async () => {
+    mockCanvas();
+    Object.assign(URL, {
+      createObjectURL: jest.fn(() => 'blob:preview'),
+      revokeObjectURL: jest.fn(),
+    });
+    await open();
+    for (const key of ['income', 'expenses', 'saving', 'rateLabel']) {
+      expect(screen.getByText(tr(`app.recap.${key}`))).toBeInTheDocument();
+    }
+    expect(screen.getByText(/Tu mayor gasto fue/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.recap.dismiss') }));
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('shows a preview of the picture that follows the choice of showing the amounts', async () => {
+    mockCanvas();
+    const create = jest.fn(() => 'blob:preview');
+    const revoke = jest.fn();
+    Object.assign(URL, { createObjectURL: create, revokeObjectURL: revoke });
+    await open();
+    const preview = await screen.findByRole('img', { name: tr('app.recap.previewAlt') });
+    expect(preview).toHaveAttribute('src', 'blob:preview');
+    const drawn = () => ctx.fillText.mock.calls.map((c) => c[0] as string);
+    expect(drawn().some((t) => /\d+,\d{2}/.test(t))).toBe(false);
+    fireEvent.click(screen.getByLabelText(tr('app.recap.shareAmounts')));
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(2));
+    expect(revoke).toHaveBeenCalledWith('blob:preview');
+    expect(drawn().some((t) => /Ocio.*300/.test(t))).toBe(true);
+  });
+
+  it('has no preview when the picture cannot be drawn', async () => {
+    mockCanvas(null);
+    await open();
+    await act(async () => undefined);
+    expect(screen.queryByRole('img', { name: tr('app.recap.previewAlt') })).toBeNull();
+  });
+
+  it('does not show a preview that arrives after the dialog was closed', async () => {
+    let finish: (blob: Blob | null) => void = () => undefined;
+    jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(ctx as never);
+    jest
+      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+      .mockImplementation((cb: BlobCallback) => (finish = cb));
+    const create = jest.fn(() => 'blob:late');
+    Object.assign(URL, { createObjectURL: create, revokeObjectURL: jest.fn() });
+    await open();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.recap.dismiss') }));
+    await act(async () => finish(new Blob(['png'])));
+    expect(create).not.toHaveBeenCalled();
   });
 });

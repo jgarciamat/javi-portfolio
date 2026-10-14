@@ -1193,7 +1193,6 @@
   "app.recap.shareSaved": "I saved {amount}",
   "app.recap.shareUp": "I closed the month in the green",
   "app.recap.shareDown": "I overspent this month, on to the next",
-  "app.recap.shareFooter": "winjgm.com · Money Manager",
   "app.recap.shareText": "My monthly summary with Money Manager https://www.winjgm.com",
   "app.recap.shareSaved2": "Picture saved on your device.",
   "app.recap.shareError": "The picture could not be created.",
@@ -1314,5 +1313,11 @@
   "app.capture.addAll": "Add all",
   "app.capture.ignoreAll": "Ignore all",
   "app.privacy.s2.item12": "Receipts and invoices you forward to your private e-mail address (optional feature): the text of the message is read to extract the amount, merchant and date; the content of the e-mail is not stored.",
-  "app.privacy.s2.item13": "Notifications from your bank and payment apps (Android, optional and off by default): they are read only on your phone to suggest payments; only the payment you decide to add is sent to the server."
+  "app.privacy.s2.item13": "Notifications from your bank and payment apps (Android, optional and off by default): they are read only on your phone to suggest payments; only the payment you decide to add is sent to the server.",
+  "app.recap.shareBrand": "Money Manager",
+  "app.recap.previewAlt": "Preview of the month picture",
+  "app.recap.income": "Income",
+  "app.recap.expenses": "Expenses",
+  "app.recap.saving": "Saving",
+  "app.recap.rateLabel": "Savings rate"
 }

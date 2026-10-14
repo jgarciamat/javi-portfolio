@@ -39,7 +39,30 @@ function RecapLines({ summary }: { summary: FinancialSummary }) {
   );
 }
 
-/** The summary of the viewed month, on demand, with the option to share it. */
+/** The four figures of a month as tiles. */
+function RecapTiles({ summary }: { summary: FinancialSummary }) {
+  const { t } = useI18n();
+  const { money, percent } = useFormat();
+  const rate = summary.totalIncome > 0 ? (summary.totalSaving / summary.totalIncome) * 100 : 0;
+  const tiles = [
+    ['income', t('app.recap.income'), money(summary.totalIncome)],
+    ['expenses', t('app.recap.expenses'), money(summary.totalExpenses)],
+    ['saving', t('app.recap.saving'), money(summary.totalSaving)],
+    ['rate', t('app.recap.rateLabel'), percent(rate, 0)],
+  ];
+  return (
+    <div className="recap-tiles">
+      {tiles.map(([id, label, value]) => (
+        <div key={id} className={`recap-tile recap-tile--${id}`}>
+          <small>{label}</small>
+          <strong>{value}</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** The summary of the viewed month, on demand, with a preview of the picture to share. */
 export function MonthRecapDialog({
   summary,
   month,
@@ -49,15 +72,35 @@ export function MonthRecapDialog({
   month: string;
   onClose: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, tCategory } = useI18n();
+  const { money } = useFormat();
+  const top = Object.entries(summary.expensesByCategory).sort((a, b) => b[1] - a[1])[0];
   return (
-    <Modal label={t('app.recap.title', { month })} onClose={onClose}>
-      <h2 className="section-title">
-        <Icon name="calendar" /> {t('app.recap.title', { month })}
-      </h2>
-      <RecapLines summary={summary} />
-      <RecapShare summary={summary} month={month} />
-      <div className="button-row">
+    <Modal
+      label={t('app.recap.title', { month })}
+      onClose={onClose}
+      className="modal-panel recap-dialog"
+    >
+      <div className="modal-header">
+        <h2 className="modal-title">
+          <Icon name="calendar" /> {t('app.recap.title', { month })}
+        </h2>
+      </div>
+      <div className="modal-body recap-body">
+        <RecapTiles summary={summary} />
+        <div className="recap-highlights">
+          {top && (
+            <p>{t('app.recap.top', { category: tCategory(top[0]), amount: money(top[1]) })}</p>
+          )}
+          <p>
+            {summary.balance >= 0
+              ? t('app.recap.balanceUp', { balance: money(summary.balance) })
+              : t('app.recap.balanceDown', { balance: money(-summary.balance) })}
+          </p>
+        </div>
+        <RecapShare summary={summary} month={month} preview />
+      </div>
+      <div className="modal-footer">
         <button className="btn-secondary" onClick={onClose}>
           {t('app.recap.dismiss')}
         </button>
