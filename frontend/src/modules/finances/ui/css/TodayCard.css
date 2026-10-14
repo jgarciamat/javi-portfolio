@@ -1,0 +1,56 @@
+/* ─── "Today you can spend" hero ─────────────────────────────────────────── */
+
+.today-card {
+  border-left: 4px solid var(--green-500, #22c55e);
+}
+
+.today-card--tight {
+  border-left-color: var(--amber-400);
+}
+
+.today-card--over {
+  border-left-color: var(--red-400);
+}
+
+.today-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--slate-400);
+}
+
+.today-amount {
+  margin: 0.2rem 0 0.6rem;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--slate-100);
+}
+
+.today-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--slate-800);
+  overflow: hidden;
+}
+
+.today-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green-500, #22c55e);
+  transition: width 0.3s ease;
+}
+
+.today-card--tight .today-bar span {
+  background: var(--amber-400);
+}
+
+.today-card--over .today-bar span {
+  background: var(--red-400);
+}
+
+.today-detail {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--slate-300);
+}

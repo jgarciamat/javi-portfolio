@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -21,9 +21,10 @@ import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
 import { RatePrompt } from './RatePrompt';
-import { MonthRecap } from './MonthRecap';
+import { MonthRecap, MonthRecapDialog } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
 import { SummaryCards } from './SummaryCards';
+import { TodayCard } from './TodayCard';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
 import { TransactionTable } from './TransactionTable';
@@ -46,6 +47,7 @@ export function periodRange(
 
 export function MonthNavCard({ onImport }: { onImport?: () => void }) {
   const { t } = useI18n();
+  const [recapOpen, setRecapOpen] = useState(false);
   const format = useFormat();
   const { exportMonthCSV } = useExportCSV();
   const f = useFinances();
@@ -57,6 +59,9 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
       label: t('app.export.month'),
       onClick: () => exportMonthCSV(f.transactions, f.summary, f.year, f.month),
     });
+  }
+  if (f.summary && f.summary.transactionCount > 0) {
+    options.push({ icon: '✨', label: t('app.recap.open'), onClick: () => setRecapOpen(true) });
   }
   if (onImport) options.push({ icon: '📤', label: t('app.import.open'), onClick: onImport });
 
@@ -88,6 +93,13 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
           {t('app.nav.next')} ›
         </button>
       </nav>
+      {recapOpen && f.summary && (
+        <MonthRecapDialog
+          summary={f.summary}
+          month={format.monthLabel(f.year, f.month)}
+          onClose={() => setRecapOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -215,6 +227,7 @@ export function MonthlyView({
 
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
+        {f.isCurrentPeriod && <TodayCard />}
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {f.isCurrentPeriod &&
           (checklist.visible ? (
