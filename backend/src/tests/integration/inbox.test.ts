@@ -9,7 +9,11 @@ describe('Receipts forwarded by e-mail', () => {
 
   const inbox = async (who = user) =>
     (await request(ctx.app).get('/api/inbox').set(who.auth).expect(200)).body;
-  const mail = (to: string | string[], body: Record<string, unknown> = {}, secret: string | null = SECRET) => {
+  const mail = (
+    to: string | string[],
+    body: Record<string, unknown> = {},
+    secret: string | null = SECRET
+  ) => {
     const req = request(ctx.app).post('/api/inbound/email');
     if (secret) req.set('x-inbound-secret', secret);
     return req.send({
