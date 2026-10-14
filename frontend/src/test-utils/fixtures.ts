@@ -339,6 +339,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         recurringRules: 3,
         customAlerts: 3,
         rentaCalculations: 1,
+        autonomoDrafts: 1,
       },
       features: {
         import: false,
@@ -357,6 +358,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         recurringRules: null,
         customAlerts: null,
         rentaCalculations: null,
+        autonomoDrafts: null,
       },
       features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
       aiMonthlyQuota: 10,
@@ -396,6 +398,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     recurringRules: 1,
     customAlerts: 0,
     rentaCalculations: 0,
+    autonomoDrafts: 0,
     movements: 5,
   },
   ai: { used: 0, quota: 10 },

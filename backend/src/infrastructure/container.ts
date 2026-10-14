@@ -76,6 +76,7 @@ import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository
 import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxRepository';
 import { InboxService } from '@application/inbox/InboxService';
 import { RentaService } from '@application/renta/RentaService';
+import { SqliteAutonomoUsageRepository } from './sqlite/repositories/SqliteAutonomoUsageRepository';
 import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
 import { SqliteRentaPassRepository } from './sqlite/repositories/SqliteMonetizationRepositories';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
@@ -140,6 +141,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     inbox: new SqliteInboxRepository(db),
     renta: new SqliteRentaUsageRepository(db),
     rentaPasses: new SqliteRentaPassRepository(db),
+    autonomoDrafts: new SqliteAutonomoUsageRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -374,6 +376,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
         rentaCalculations: repos.renta.count(userId),
+        autonomoDrafts: repos.autonomoDrafts.count(userId),
         movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,

@@ -1,0 +1,23 @@
+import { AutonomoUsageRepository } from '@domain/ports/repositories';
+import { Db } from '../database';
+
+export class SqliteAutonomoUsageRepository implements AutonomoUsageRepository {
+  constructor(private readonly db: Db) {}
+
+  count(userId: string): number {
+    const row = this.db
+      .prepare('SELECT uses FROM autonomo_drafts WHERE user_id = ?')
+      .get(userId) as { uses: number } | undefined;
+    return row?.uses ?? 0;
+  }
+
+  increment(userId: string): number {
+    this.db
+      .prepare(
+        `INSERT INTO autonomo_drafts (user_id, uses) VALUES (?, 1)
+         ON CONFLICT(user_id) DO UPDATE SET uses = uses + 1`
+      )
+      .run(userId);
+    return this.count(userId);
+  }
+}

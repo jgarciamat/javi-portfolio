@@ -201,7 +201,7 @@ describe('Renta planner: who can read a draft', () => {
     const buy = screen.getByRole('button', { name: /Comprar el pase por/ });
     expect(buy).toBeDisabled();
     fireEvent.click(screen.getByLabelText(new RegExp(tr('billing.acceptTerms'))));
-    fireEvent.click(screen.getByLabelText(tr('billing.immediateStart')));
+    fireEvent.click(screen.getByLabelText(tr('tools.renta.draft.immediate')));
     fireEvent.click(buy);
     await waitFor(() =>
       expect(api.billingApi.checkout).toHaveBeenCalledWith('renta_pass', {
@@ -216,7 +216,7 @@ describe('Renta planner: who can read a draft', () => {
     api.billingApi.checkout.mockRejectedValue(new Error('boom'));
     open(locked, api);
     fireEvent.click(await screen.findByLabelText(new RegExp(tr('billing.acceptTerms'))));
-    fireEvent.click(screen.getByLabelText(tr('billing.immediateStart')));
+    fireEvent.click(screen.getByLabelText(tr('tools.renta.draft.immediate')));
     fireEvent.click(screen.getByRole('button', { name: /Comprar el pase por/ }));
     expect(await screen.findByText(/boom|billing/i)).toBeInTheDocument();
   });
@@ -225,7 +225,7 @@ describe('Renta planner: who can read a draft', () => {
     playStore.playBillingAvailable.mockReturnValue(true);
     playStore.purchasePremium.mockResolvedValue(true);
     open(locked);
-    expect(screen.queryByLabelText(tr('billing.immediateStart'))).toBeNull();
+    expect(screen.queryByLabelText(tr('tools.renta.draft.immediate'))).toBeNull();
     fireEvent.click(await screen.findByRole('button', { name: /Comprar el pase por/ }));
     await waitFor(() =>
       expect(playStore.purchasePremium).toHaveBeenCalledWith('renta_pass', expect.any(String))

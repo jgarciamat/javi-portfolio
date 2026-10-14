@@ -112,7 +112,13 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
             </strong>
           </p>
           <p className="section-hint">{t('tools.renta.draft.passHint')}</p>
-          {access.consentRequired && <ConsentBoxes consent={consent} onChange={setConsent} />}
+          {access.consentRequired && (
+            <ConsentBoxes
+              consent={consent}
+              onChange={setConsent}
+              immediateKey="tools.renta.draft.immediate"
+            />
+          )}
           <button
             className="btn-primary renta-buy"
             disabled={busy || !accepted}

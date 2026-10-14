@@ -21,6 +21,7 @@ import { debtTerms } from './020-debt-terms';
 import { inbox } from './021-inbox';
 import { rentaCalculations } from './022-renta-calculations';
 import { rentaPass } from './023-renta-pass';
+import { autonomoDrafts } from './024-autonomo-drafts';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -48,4 +49,5 @@ export const migrations: Migration[] = [
   inbox,
   rentaCalculations,
   rentaPass,
+  autonomoDrafts,
 ];

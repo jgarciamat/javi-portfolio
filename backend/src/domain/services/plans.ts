@@ -7,7 +7,8 @@ export type LimitedResource =
   | 'goals'
   | 'recurringRules'
   | 'customAlerts'
-  | 'rentaCalculations';
+  | 'rentaCalculations'
+  | 'autonomoDrafts';
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
@@ -29,6 +30,8 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       customAlerts: 3,
       // The tax return calculator: one calculation to try it, unlimited with Premium.
       rentaCalculations: 1,
+      // The self-employed tax drafts (VAT, income tax advance, contribution): one to try it.
+      autonomoDrafts: 1,
     },
     features: {
       import: false,
@@ -47,6 +50,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       recurringRules: Infinity,
       customAlerts: Infinity,
       rentaCalculations: Infinity,
+      autonomoDrafts: Infinity,
     },
     features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
     aiMonthlyQuota: 10,
