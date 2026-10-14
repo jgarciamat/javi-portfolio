@@ -13,6 +13,8 @@ import type {
   SplitGroup,
   SplitGroupSummary,
   VatRate,
+  AutonomoDraft,
+  AutonomoInputs,
   YearTax,
   Category,
   CategoryBudget,
@@ -315,6 +317,13 @@ export const businessApi = {
   },
   tax(year: number) {
     return apiRequest<YearTax>(`/business/tax/${year}`);
+  },
+  /** Prepares the draft of a quarter (the free plan has one; a 402 opens the plans). */
+  draft(year: number, quarter: 1 | 2 | 3 | 4, inputs: AutonomoInputs) {
+    return apiRequest<AutonomoDraft>('/business/draft', {
+      method: 'POST',
+      body: jsonBody({ year, quarter, inputs }),
+    });
   },
 };
 

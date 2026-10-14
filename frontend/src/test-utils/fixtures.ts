@@ -1,4 +1,5 @@
 import type {
+  AutonomoDraft,
   Account,
   AIAdvice,
   AIAnswer,
@@ -416,5 +417,39 @@ export const asset = (over: Partial<Asset> = {}): Asset => ({
   valueDate: '2026-03-01',
   previousValue: null,
   history: [],
+  ...over,
+});
+
+export const autonomoDraft = (over: Partial<AutonomoDraft> = {}): AutonomoDraft => ({
+  year: 2026,
+  quarter: 1,
+  used: 1,
+  vat: {
+    result: 'pay',
+    amountDue: 178,
+    accrued: [
+      { box: '07', label: 'Base imponible al 21 %', amount: 1000 },
+      { box: '08', label: 'Tipo 21 %', amount: 21 },
+      { box: '27', label: 'Total cuota devengada', amount: 220 },
+    ],
+    deductible: [{ box: '29', label: 'Cuotas soportadas', amount: 42 }],
+    settlement: [{ box: '71', label: 'Resultado de la liquidación', amount: 178 }],
+  },
+  irpf: {
+    required: true,
+    result: 'pay',
+    amountDue: 180,
+    boxes: [{ box: '04', label: '20 % del rendimiento neto', amount: 180 }],
+  },
+  reta: {
+    monthlyNet: 279,
+    bracket: 'R1',
+    baseMin: 653.59,
+    baseMax: 718.94,
+    feeMin: 205.88,
+    feeMax: 226.47,
+    rate: 0.315,
+  },
+  deadlines: [{ model: '303', label: 'IVA trimestral', date: '2026-04-20' }],
   ...over,
 });
