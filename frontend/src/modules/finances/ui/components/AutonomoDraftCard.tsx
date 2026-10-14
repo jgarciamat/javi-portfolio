@@ -7,6 +7,7 @@ import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
+import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import type {
   AutonomoDraft,
   AutonomoInputs,
@@ -17,6 +18,7 @@ import '../css/Sections.css';
 import '../css/Autonomo.css';
 
 const SNAPSHOT_KEY = 'mm_autonomo_draft';
+const MANUAL_KEY = 'mm_autonomo_manual';
 const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
@@ -64,6 +66,50 @@ function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
   );
 }
 
+/** What the expenses typed by hand let the person deduct, kind by kind. */
+function Deductible({ lines }: { lines: NonNullable<AutonomoDraft['expenses']> }) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const total = (pick: (l: (typeof lines)[number]) => number) =>
+    lines.reduce((sum, l) => sum + pick(l), 0);
+  return (
+    <div className="autonomo-boxes">
+      <h4>{t('app.autonomo.deductibleTitle')}</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>{t('app.autonomo.expenseKind')}</th>
+            <th>{t('app.autonomo.paid')}</th>
+            <th>{t('app.autonomo.deductibleIrpf')}</th>
+            <th>{t('app.autonomo.deductibleVat')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lines.map((l, i) => (
+            <tr key={i}>
+              <td>
+                {t(`app.autonomo.kind.${l.kind}`)}
+                {l.note && (
+                  <small className="autonomo-note">{t(`app.autonomo.note.${l.note}`)}</small>
+                )}
+              </td>
+              <td>{money(l.amount)}</td>
+              <td>{money(l.deductible)}</td>
+              <td>{money(l.vatDeductible)}</td>
+            </tr>
+          ))}
+          <tr className="autonomo-total">
+            <td>{t('app.autonomo.total')}</td>
+            <td>{money(total((l) => l.amount))}</td>
+            <td>{money(total((l) => l.deductible))}</td>
+            <td>{money(total((l) => l.vatDeductible))}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** What the draft says, in words, and the boxes behind it. */
 function DraftResult({ draft }: { draft: AutonomoDraft }) {
   const { t } = useI18n();
@@ -91,6 +137,7 @@ function DraftResult({ draft }: { draft: AutonomoDraft }) {
         </div>
       </div>
 
+      {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
       <Boxes title={t('app.autonomo.accrued')} boxes={vat.accrued} />
       <Boxes title={t('app.autonomo.deductible')} boxes={vat.deductible} />
       <Boxes title={t('app.autonomo.settlement')} boxes={vat.settlement} />
@@ -138,6 +185,14 @@ export function AutonomoDraftCard() {
   const [exempt, setExempt] = useState(false);
   const [priorNet, setPriorNet] = useState('');
   const [toOffset, setToOffset] = useState('');
+  const [source, setSource] = useState<'movements' | 'manual'>('movements');
+  const [manual, setManual] = useState<ManualForm>(() =>
+    storage.getJSON<ManualForm>(MANUAL_KEY, emptyManual())
+  );
+  const changeManual = (next: ManualForm) => {
+    storage.setJSON(MANUAL_KEY, next);
+    setManual(next);
+  };
   const [draft, setDraft] = useState<AutonomoDraft | null>(() =>
     storage.getJSON<AutonomoDraft | null>(SNAPSHOT_KEY, null)
   );
@@ -162,6 +217,7 @@ export function AutonomoDraftCard() {
         priorYearNet: priorNet.trim() === '' ? null : parseDecimal(priorNet),
         exempt130: exempt,
         vatToOffset: number(toOffset),
+        manual: source === 'manual' ? toManualData(manual) : null,
       };
       const result = await businessApi.draft(year, quarter, inputs);
       storage.setJSON(SNAPSHOT_KEY, result);
@@ -208,8 +264,33 @@ export function AutonomoDraftCard() {
         </label>
       </div>
 
-      <details className="autonomo-extras">
-        <summary>{t('app.autonomo.extras')}</summary>
+      <fieldset className="autonomo-source">
+        <legend>{t('app.autonomo.source')}</legend>
+        <label className="renta-check">
+          <input
+            type="radio"
+            name="autonomo-source"
+            checked={source === 'movements'}
+            onChange={() => setSource('movements')}
+          />
+          <span>{t('app.autonomo.sourceMovements')}</span>
+        </label>
+        <label className="renta-check">
+          <input
+            type="radio"
+            name="autonomo-source"
+            checked={source === 'manual'}
+            onChange={() => setSource('manual')}
+          />
+          <span>{t('app.autonomo.sourceManual')}</span>
+        </label>
+      </fieldset>
+      {source === 'manual' && (
+        <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
+      )}
+
+      <section className="autonomo-extras">
+        <h3 className="subsection-title">{t('app.autonomo.extras')}</h3>
         <p className="section-hint">{t('app.autonomo.extrasHint')}</p>
         {QUARTERS.filter((q) => q <= quarter).map((q) => (
           <fieldset key={q} className="autonomo-quarter">
@@ -279,7 +360,7 @@ export function AutonomoDraftCard() {
             />
           </label>
         </div>
-      </details>
+      </section>
 
       {locked ? (
         <div className="renta-gate">

@@ -451,5 +451,6 @@ export const autonomoDraft = (over: Partial<AutonomoDraft> = {}): AutonomoDraft 
     rate: 0.315,
   },
   deadlines: [{ model: '303', label: 'IVA trimestral', date: '2026-04-20' }],
+  expenses: null,
   ...over,
 });

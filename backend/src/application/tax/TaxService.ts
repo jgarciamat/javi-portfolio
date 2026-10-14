@@ -7,6 +7,7 @@ import {
   VatRate,
 } from '@domain/ports/repositories';
 import { DraftInputs, DraftResult, prepareDraft } from '@domain/services/autonomo';
+import { ExpenseLine, manualMovements } from '@domain/services/autonomo-expenses';
 import { BusinessMovement, YearTax, yearlyTax } from '@domain/services/tax';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
@@ -60,10 +61,15 @@ export class TaxService {
     year: number,
     quarter: 1 | 2 | 3 | 4,
     inputs: DraftInputs
-  ): DraftResult & { used: number } {
+  ): DraftResult & { used: number; expenses: ExpenseLine[] | null } {
     this.entitlements.assertCanCreate(userId, 'autonomoDrafts', this.drafts.count(userId));
-    const result = prepareDraft(year, quarter, this.movements(userId), inputs);
-    return { ...result, used: this.drafts.increment(userId) };
+    const manual = inputs.manual ? manualMovements(year, inputs.manual) : null;
+    const result = prepareDraft(year, quarter, manual?.movements ?? this.movements(userId), inputs);
+    return {
+      ...result,
+      expenses: manual ? manual.lines.filter((l) => l.quarter <= quarter) : null,
+      used: this.drafts.increment(userId),
+    };
   }
 
   private movements(userId: string): BusinessMovement[] {

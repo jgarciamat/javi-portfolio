@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
 import { toCents } from '@domain/shared/money';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
@@ -282,6 +283,32 @@ const quarterExtras = z.object({
   socialSecurity: euroAmount.default(0),
   vatNotDeductible: euroAmount.default(0),
 });
+const vatRateValue = z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]);
+const manualExpense = z.object({
+  kind: z.enum(EXPENSE_KINDS),
+  amount: euroAmount,
+  vatRate: vatRateValue,
+  days: z.number().int().min(0).max(366).optional(),
+});
+const manualQuarter = z.object({
+  income: z.object({
+    r21: euroAmount.default(0),
+    r10: euroAmount.default(0),
+    r4: euroAmount.default(0),
+    r0: euroAmount.default(0),
+  }),
+  expenses: z.array(manualExpense).max(200).default([]),
+});
+const manualData = z.object({
+  quarters: z.tuple([manualQuarter, manualQuarter, manualQuarter, manualQuarter]),
+  profile: z.object({
+    workArea: z.number().finite().min(0).max(100000).default(0),
+    homeArea: z.number().finite().min(0).max(100000).default(0),
+    vehicleExclusive: z.boolean().default(false),
+    healthPeople: z.number().int().min(0).max(20).default(0),
+    healthDisability: z.boolean().default(false),
+  }),
+});
 export const autonomoDraftBody = z.object({
   year,
   quarter: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
@@ -291,6 +318,8 @@ export const autonomoDraftBody = z.object({
     priorYearNet: z.number().finite().min(-100_000_000).max(100_000_000).nullable().default(null),
     exempt130: z.boolean().default(false),
     vatToOffset: euroAmount.default(0),
+    /** Income and expenses typed by hand instead of the movements. */
+    manual: manualData.nullish(),
   }),
 });
 export const categoryIdParam = z.object({ categoryId: id });

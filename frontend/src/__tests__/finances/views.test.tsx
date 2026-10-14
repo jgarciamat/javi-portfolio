@@ -767,6 +767,7 @@ describe('the self-employed draft', () => {
         priorYearNet: 9500,
         exempt130: true,
         vatToOffset: 40,
+        manual: null,
       })
     );
   });
@@ -808,6 +809,156 @@ describe('the self-employed draft', () => {
     expect(screen.queryByText(tr('app.autonomo.freeOne'))).toBeNull();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
     expect(await screen.findByText('Sin conexión')).toBeInTheDocument();
+  });
+
+  it('takes income and expenses typed by hand, keeps them, and shows what can be deducted', async () => {
+    const api = open();
+    api.businessApi.draft.mockResolvedValue(
+      f.autonomoDraft({
+        expenses: [
+          {
+            quarter: 1,
+            kind: 'supplies',
+            amount: 121,
+            deductible: 6,
+            vatDeductible: 1.26,
+            note: 'supplies',
+          },
+          {
+            quarter: 1,
+            kind: 'training',
+            amount: 121,
+            deductible: 100,
+            vatDeductible: 21,
+            note: '',
+          },
+        ],
+      })
+    );
+    fireEvent.click(await screen.findByLabelText(tr('app.autonomo.sourceManual')));
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.workArea')), {
+      target: { value: '20' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.homeArea')), {
+      target: { value: '100' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.healthPeople')), {
+      target: { value: '2' },
+    });
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.vehicleExclusive')));
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.healthDisability')));
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 1`), {
+      target: { value: '5000' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r10')} 1`), {
+      target: { value: '1000' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r4')} 1`), {
+      target: { value: '10' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r0')} 1`), {
+      target: { value: '20' },
+    });
+
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.autonomo.addExpense')) })
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.autonomo.addExpense')) })
+    );
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseKind')} 1.1`), {
+      target: { value: 'meals' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 1.1`), {
+      target: { value: '121' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseVat')} 1.1`), {
+      target: { value: '10' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.days')} 1.1`), {
+      target: { value: '2' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseKind')} 1.2`), {
+      target: { value: 'training' },
+    });
+    expect(screen.queryByLabelText(`${tr('app.autonomo.days')} 1.2`)).toBeNull();
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 1.2`), {
+      target: { value: '121' },
+    });
+    fireEvent.click(screen.getByLabelText(`${tr('app.common.delete')} 1.2`));
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.autonomo.addExpense')) })
+    );
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 1.2`), {
+      target: { value: '121' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseKind')} 1.2`), {
+      target: { value: 'supplies' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        new Date().getFullYear(),
+        expect.any(Number),
+        expect.objectContaining({
+          manual: expect.objectContaining({
+            profile: {
+              workArea: 20,
+              homeArea: 100,
+              vehicleExclusive: true,
+              healthPeople: 2,
+              healthDisability: true,
+            },
+            quarters: expect.arrayContaining([
+              expect.objectContaining({
+                income: { r21: 5000, r10: 1000, r4: 10, r0: 20 },
+                expenses: [
+                  { kind: 'meals', amount: 121, vatRate: 10, days: 2 },
+                  { kind: 'supplies', amount: 121, vatRate: 21, days: 0 },
+                ],
+              }),
+            ]),
+          }),
+        })
+      )
+    );
+    expect(await screen.findByText(tr('app.autonomo.deductibleTitle'))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.autonomo.note.supplies'))).toBeInTheDocument();
+    expect(screen.getAllByText(tr('app.autonomo.kind.training')).length).toBeGreaterThan(1);
+    expect(localStorage.getItem('mm_autonomo_manual')).toContain('"workArea":"20"');
+  });
+
+  it('goes back to the movements, and remembers what was typed by hand', async () => {
+    localStorage.setItem(
+      'mm_autonomo_manual',
+      JSON.stringify({
+        profile: {
+          workArea: '15',
+          homeArea: '',
+          vehicleExclusive: false,
+          healthPeople: '',
+          healthDisability: false,
+        },
+        quarters: [0, 1, 2, 3].map(() => ({
+          income: { r21: '', r10: '', r4: '', r0: '' },
+          expenses: [],
+        })),
+      })
+    );
+    const api = open();
+    fireEvent.click(await screen.findByLabelText(tr('app.autonomo.sourceManual')));
+    expect(screen.getByLabelText(tr('app.autonomo.workArea'))).toHaveValue('15');
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.sourceMovements')));
+    expect(screen.queryByLabelText(tr('app.autonomo.workArea'))).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.objectContaining({ manual: null })
+      )
+    );
   });
 
   it('works outside the plan context too', async () => {

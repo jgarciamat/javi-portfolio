@@ -8,6 +8,7 @@ import {
   RETA_GENERAL_EXPENSES,
   RETA_RATE_2026,
 } from './autonomo-data';
+import { ManualData } from './autonomo-expenses';
 import { BusinessMovement, splitVat } from './tax';
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -36,6 +37,8 @@ export interface DraftInputs {
   exempt130: boolean;
   /** VAT to offset from earlier periods that is still pending (modelo 303, box 110). */
   vatToOffset: number;
+  /** Income and expenses typed by hand: they replace the movements. */
+  manual?: ManualData | null;
 }
 
 export const EMPTY_EXTRAS: QuarterExtras = { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 };
@@ -93,8 +96,12 @@ export interface DraftResult {
 
 interface Quarter {
   income: Record<VatRate, { base: number; vat: number }>;
+  /** Base of the expenses whose VAT can be deducted. */
   expenseBase: number;
+  /** VAT of the expenses that can be deducted. */
   expenseVat: number;
+  /** What the expenses count for the income tax (base plus the VAT that cannot be deducted, by share). */
+  expenseIrpf: number;
 }
 
 const emptyRates = (): Quarter['income'] => ({
@@ -109,6 +116,7 @@ function bucket(year: number, movements: BusinessMovement[]): Quarter[] {
     income: emptyRates(),
     expenseBase: 0,
     expenseVat: 0,
+    expenseIrpf: 0,
   }));
   for (const m of movements) {
     if (!m.date.startsWith(`${year}-`)) continue;
@@ -118,8 +126,13 @@ function bucket(year: number, movements: BusinessMovement[]): Quarter[] {
       q.income[m.vatRate].base += baseCents;
       q.income[m.vatRate].vat += vatCents;
     } else {
-      q.expenseBase += baseCents;
-      q.expenseVat += vatCents;
+      const vatShare = m.vatShare ?? 1;
+      const deductibleVat = Math.round(vatCents * vatShare);
+      q.expenseBase += Math.round(baseCents * vatShare);
+      q.expenseVat += deductibleVat;
+      // The VAT that cannot be deducted is part of the expense for the share that does count.
+      const irpf = m.irpfShare ?? 1;
+      q.expenseIrpf += Math.round(baseCents * irpf + vatCents * Math.max(0, irpf - vatShare));
     }
   }
   return quarters;
@@ -179,7 +192,11 @@ function draft303(q: Quarter, extras: QuarterExtras, offsetPending: number): Dra
   ];
   const amountDue = round2(result46 - applied);
   const noActivity =
-    totalAccrued === 0 && q.expenseVat === 0 && q.expenseBase === 0 && q.income[0].base === 0;
+    totalAccrued === 0 &&
+    q.expenseVat === 0 &&
+    q.expenseBase === 0 &&
+    q.expenseIrpf === 0 &&
+    q.income[0].base === 0;
   const result: Draft303['result'] = noActivity
     ? 'noActivity'
     : amountDue > 0
@@ -211,7 +228,7 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
       0
     );
     const baseExpenses =
-      sel.reduce((s, q) => s + q.expenseBase, 0) +
+      sel.reduce((s, q) => s + q.expenseIrpf, 0) +
       extras.reduce((s, e) => s + Math.round((e.socialSecurity + e.vatNotDeductible) * 100), 0);
     const preNet = income - baseExpenses;
     const hard = inputs.hardToJustify
@@ -276,7 +293,7 @@ function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 
     0
   );
   const expenses =
-    sel.reduce((s, q) => s + q.expenseBase, 0) +
+    sel.reduce((s, q) => s + q.expenseIrpf, 0) +
     inputs.quarters.slice(0, upTo).reduce((s, e) => s + Math.round(e.vatNotDeductible * 100), 0);
   // The fees paid are added back: the contribution is worked out on the net income before them.
   const net = euros(income - expenses);

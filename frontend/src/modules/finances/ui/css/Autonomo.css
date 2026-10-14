@@ -72,3 +72,37 @@
   margin-left: auto;
   color: #c7d2fe;
 }
+
+.autonomo-source {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0.5rem;
+}
+.autonomo-source legend {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.autonomo-quarter--wide {
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+.autonomo-expenses {
+  grid-column: 1 / -1;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.autonomo-expenses li {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1.4fr) minmax(6rem, 1fr) 5.5rem 5rem auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+.autonomo-note {
+  display: block;
+  color: var(--text-secondary, #9aa4b8);
+}
+.autonomo-total td {
+  font-weight: 700;
+}
