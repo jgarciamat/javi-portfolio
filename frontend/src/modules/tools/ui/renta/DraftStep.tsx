@@ -17,9 +17,26 @@ export interface DraftState {
   reading: DraftReading | null;
   rents: boolean;
   dismissed: string[];
+  /** The draft as it was read, kept while the person tries next year's return with the same data. */
+  scenario: { form: RentaForm; reading: DraftReading } | null;
 }
 
-export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [] };
+export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
+
+/** The year of the return the draft belongs to (the exercise); the next campaign is two years on. */
+export const DRAFT_EXERCISE = 2025;
+export const NEXT_CAMPAIGN = DRAFT_EXERCISE + 2;
+
+/** The same income and properties a year later: a year older, with no deductions marked yet. */
+export function nextYearForm(form: RentaForm): RentaForm {
+  const older = (age: string) => String(Number(age) + 1);
+  return {
+    ...form,
+    age: older(form.age),
+    children: form.children.map((c) => ({ ...c, age: older(c.age) })),
+    choices: {},
+  };
+}
 
 const FIELD_LABELS: { key: keyof DraftReading; label: string }[] = [
   { key: 'ccaaId', label: 'tools.renta.draft.ccaa' },
@@ -148,7 +165,7 @@ export function DraftStep({
       return;
     }
     const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
-    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [] });
+    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
     set(applyReading(form, result));
   };
   const fromFile = async (file: File) => {
@@ -265,6 +282,44 @@ export function DraftStep({
                 </>
               )}
 
+              {draft.scenario ? (
+                <div className="renta-scenario" role="status">
+                  <p>{t('tools.renta.draft.scenarioOn', { year: NEXT_CAMPAIGN })}</p>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      set(draft.scenario!.form);
+                      onDraft({
+                        ...draft,
+                        reading: draft.scenario!.reading,
+                        dismissed: [],
+                        scenario: null,
+                      });
+                    }}
+                  >
+                    {t('tools.renta.draft.scenarioBack')}
+                  </button>
+                </div>
+              ) : (
+                <div className="button-row">
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      set(nextYearForm(form));
+                      onDraft({
+                        ...draft,
+                        reading: { ...reading, applied: [] },
+                        dismissed: [],
+                        scenario: { form, reading },
+                      });
+                      reveal(document.querySelector<HTMLElement>('.renta-step'));
+                    }}
+                  >
+                    {t('tools.renta.draft.tryNext', { year: NEXT_CAMPAIGN })}
+                  </button>
+                </div>
+              )}
+
               <h3>{t('tools.renta.draft.questions')}</h3>
               <label className="renta-check">
                 <input
@@ -284,32 +339,45 @@ export function DraftStep({
                   )}
                 </>
               ) : (
-                <ul className="renta-questions">
-                  {missing.map((d) => (
-                    <li key={d.id}>
-                      <strong>{d.title}</strong>
-                      <small>{d.summary}</small>
-                      <div className="button-row">
-                        <button
-                          className="btn-primary"
-                          onClick={() => accept(d.id)}
-                          aria-label={`${t('tools.renta.draft.yes')}: ${d.title}`}
-                        >
-                          {t('tools.renta.draft.yes')}
-                        </button>
-                        <button
-                          className="btn-secondary"
-                          onClick={() =>
-                            onDraft({ ...draft, dismissed: [...draft.dismissed, d.id] })
-                          }
-                          aria-label={`${t('tools.renta.draft.no')}: ${d.title}`}
-                        >
-                          {t('tools.renta.draft.no')}
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <button
+                    className="btn-secondary"
+                    onClick={() =>
+                      onDraft({
+                        ...draft,
+                        dismissed: [...draft.dismissed, ...missing.map((d) => d.id)],
+                      })
+                    }
+                  >
+                    {t('tools.renta.draft.noneInterest')}
+                  </button>
+                  <ul className="renta-questions">
+                    {missing.map((d) => (
+                      <li key={d.id}>
+                        <strong>{d.title}</strong>
+                        <small>{d.summary}</small>
+                        <div className="button-row">
+                          <button
+                            className="btn-primary"
+                            onClick={() => accept(d.id)}
+                            aria-label={`${t('tools.renta.draft.yes')}: ${d.title}`}
+                          >
+                            {t('tools.renta.draft.yes')}
+                          </button>
+                          <button
+                            className="btn-secondary"
+                            onClick={() =>
+                              onDraft({ ...draft, dismissed: [...draft.dismissed, d.id] })
+                            }
+                            aria-label={`${t('tools.renta.draft.no')}: ${d.title}`}
+                          >
+                            {t('tools.renta.draft.no')}
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </section>
           )}

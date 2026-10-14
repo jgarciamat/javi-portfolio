@@ -17,6 +17,8 @@ export interface IncomeLimit {
   joint?: number;
   phaseOutFrom?: number;
   phaseOutTo?: number;
+  /** The base is measured after taking off the personal and family minimum (Castilla y León). */
+  afterMinimum?: boolean;
   /** How the limit works, in plain words, when it is not a simple threshold. */
   note?: string;
 }

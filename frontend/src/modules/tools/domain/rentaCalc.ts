@@ -153,6 +153,15 @@ export interface DeductionChoice {
   units?: number;
 }
 
+/** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
+export function limitBaseFor(
+  d: Deduction,
+  base: { taxBase: number; savingsBase: number; minimum: { total: number } }
+): number {
+  const total = base.taxBase + base.savingsBase;
+  return d.incomeLimit?.afterMinimum ? total - base.minimum.total : total;
+}
+
 /** How much of a deduction the person can use given their tax base: 1 = all, 0 = none. */
 export function incomeFactor(d: Deduction, taxBase: number, joint = false): number {
   const limit = d.incomeLimit;
@@ -389,13 +398,11 @@ export function computeRenta(input: RentaInput): RentaResult {
       (stateQuota + regionalQuota);
     minimumSavings[item.key] = round2(Math.max(0, saved));
   }
-
-  const limitBase = taxBase + savingsBase;
   const blocked: string[] = [];
   const lines: DeductionLine[] = [];
   const amountOf = (d: Deduction, scope: DeductionLine['scope']): number => {
     const choice = input.choices[d.id] ?? { on: false };
-    const factor = incomeFactor(d, limitBase);
+    const factor = incomeFactor(d, limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }));
     if (choice.on && factor === 0) blocked.push(d.id);
     const amount = deductionAmount(d, choice, factor);
     if (choice.on) lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });

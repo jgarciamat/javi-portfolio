@@ -420,6 +420,28 @@ describe('computeRenta', () => {
     expect(below.blocked).toEqual([]);
   });
 
+  it('measures a limit after the personal minimum when the deduction says so', () => {
+    const afterMinimum: RentaState = {
+      ...state,
+      deductions: [
+        deduction({
+          id: 'estado-tras-minimo',
+          kind: 'fixed',
+          amount: 100,
+          incomeLimit: { individual: 18900, afterMinimum: true },
+        }),
+      ],
+    };
+    const choices = { 'estado-tras-minimo': { on: true } };
+    // Base 24,000 less the minimum is under 18,900; 26,000 is over it.
+    expect(
+      computeRenta(input({ state: afterMinimum, choices, gross: 26000, socialSecurity: 0 })).blocked
+    ).toEqual([]);
+    expect(
+      computeRenta(input({ state: afterMinimum, choices, gross: 28000, socialSecurity: 0 })).blocked
+    ).toEqual(['estado-tras-minimo']);
+  });
+
   it('shows what each part of the minimum saves', () => {
     const r = computeRenta(
       input({
