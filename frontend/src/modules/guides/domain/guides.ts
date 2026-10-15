@@ -1,3 +1,7 @@
+import { GUIDES_AUTONOMOS } from './guidesAutonomos';
+import { GUIDES_RENTA_DEDUCCIONES } from './guidesRentaDeducciones';
+import { GUIDES_RENTA_FAMILIA } from './guidesRentaFamilia';
+
 /** Short articles that answer what people search for and lead to the calculators and the app. */
 export interface GuideSection {
   heading: string;
@@ -390,7 +394,12 @@ export const GUIDES: Guide[] = [
       },
     ],
     tool: { to: '/calculadora-iva', label: 'Calculadora de IVA' },
-    related: ['como-hacer-un-presupuesto-mensual', 'metodo-50-30-20'],
+    related: [
+      'modelo-130-paso-a-paso',
+      'gastos-deducibles-autonomo',
+      'como-hacer-un-presupuesto-mensual',
+      'metodo-50-30-20',
+    ],
   },
   {
     slug: 'presupuesto-en-pareja',
@@ -491,7 +500,28 @@ export const GUIDES: Guide[] = [
     tool: { to: '/simulador-ahorro', label: 'Simulador de ahorro' },
     related: ['interes-compuesto', 'inflacion-y-ahorro'],
   },
+  ...GUIDES_AUTONOMOS,
+  ...GUIDES_RENTA_FAMILIA,
+  ...GUIDES_RENTA_DEDUCCIONES,
 ];
 
 export const findGuide = (slug: string | undefined): Guide | undefined =>
   GUIDES.find((g) => g.slug === slug);
+
+/** A piece of paragraph text: plain text or an internal link written as `[label](/path)`. */
+export type InlinePart = string | { label: string; to: string };
+
+const INLINE_LINK = /\[([^\]]+)\]\((\/[^)\s]*)\)/g;
+
+/** Splits a paragraph into text and internal links. */
+export function inlineParts(text: string): InlinePart[] {
+  const parts: InlinePart[] = [];
+  let last = 0;
+  for (const m of text.matchAll(INLINE_LINK)) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push({ label: m[1], to: m[2] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}

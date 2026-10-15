@@ -35,7 +35,7 @@ async function load(entry) {
   return import(pathToFileURL(outfile).href);
 }
 
-const { GUIDES } = await load('src/modules/guides/domain/guides.ts');
+const { GUIDES, inlineParts } = await load('src/modules/guides/domain/guides.ts');
 const { TOOL_PAGES } = await load('src/modules/tools/domain/toolPages.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
 
@@ -126,6 +126,11 @@ ${link('/login?mode=register', t('landing.cta.register'))} ${link('/login', t('l
 );
 
 // Guides.
+/** A paragraph's HTML: its text with the internal links as real anchors. */
+const paragraph = (text) =>
+  inlineParts(text)
+    .map((part) => (typeof part === 'string' ? esc(part) : link(part.to, part.label)))
+    .join('');
 write(
   '/guias',
   render({
@@ -147,7 +152,10 @@ for (const g of GUIDES) {
       description: g.description,
       body: `<main><article><h1>${esc(g.title)}</h1><p>${esc(g.intro)}</p>${g.sections
         .map(
-          (s) => `<h2>${esc(s.heading)}</h2>${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}`
+          (s) =>
+            `<h2>${esc(s.heading)}</h2>${s.paragraphs
+              .map((p) => `<p>${paragraph(p)}</p>`)
+              .join('')}`
         )
         .join('')}</article>${
         g.tool ? `<p>${link(g.tool.to, g.tool.label)}</p>` : ''
