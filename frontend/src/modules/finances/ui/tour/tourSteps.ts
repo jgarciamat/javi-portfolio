@@ -33,6 +33,8 @@ const STEPS: TourStep[] = [
   { id: 'assets', tab: 'assets', target: SECTION },
   { id: 'business', tab: 'business', target: SECTION },
   { id: 'autonomoDraft', tab: 'business', target: '.autonomo-card' },
+  { id: 'autonomoManual', tab: 'business', target: '.autonomo-manual' },
+  { id: 'autonomoShortcuts', tab: 'business', target: '.autonomo-manual' },
   { id: 'renta', tab: 'renta', target: SECTION },
   { id: 'rentaDraft', tab: 'renta', target: '.renta-draft' },
   { id: 'automations', tab: 'automations', target: SECTION },
