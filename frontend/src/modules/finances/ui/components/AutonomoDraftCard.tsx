@@ -9,6 +9,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { buildAutonomoPdf, type PdfText } from '../../application/autonomoPdf';
+import { isNativeApp } from '@shared/utils/platform';
 import { shareImage } from '@shared/utils/shareImage';
 import {
   EXPENSE_KINDS,
@@ -203,7 +204,9 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
       await shareImage(
         blob,
         `borrador-autonomo-${draft.year}-T${draft.quarter}.pdf`,
-        t('app.autonomo.pdf.title')
+        t('app.autonomo.pdf.title'),
+        // Phones and the app offer the share sheet; a computer just downloads the file.
+        isNativeApp() || window.matchMedia?.('(pointer: coarse)')?.matches ? 'share' : 'download'
       );
     } catch {
       setFailed(true);

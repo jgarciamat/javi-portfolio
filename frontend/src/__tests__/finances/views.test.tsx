@@ -951,12 +951,33 @@ describe('the self-employed draft', () => {
       expect(shareImage).toHaveBeenCalledWith(
         expect.any(Blob),
         `borrador-autonomo-2026-T1.pdf`,
-        tr('app.autonomo.pdf.title')
+        tr('app.autonomo.pdf.title'),
+        'download'
       )
     );
     (buildAutonomoPdf as jest.Mock).mockRejectedValueOnce(new Error('boom'));
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.pdf.download') }));
     expect(await screen.findByText(tr('app.autonomo.pdf.error'))).toBeInTheDocument();
+  });
+
+  it('offers the share sheet on a phone instead of downloading', async () => {
+    const original = window.matchMedia;
+    window.matchMedia = jest.fn(() => ({ matches: true })) as unknown as typeof window.matchMedia;
+    try {
+      open();
+      fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
+      fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.pdf.download') }));
+      await waitFor(() =>
+        expect(shareImage).toHaveBeenLastCalledWith(
+          expect.any(Blob),
+          expect.stringContaining('.pdf'),
+          expect.any(String),
+          'share'
+        )
+      );
+    } finally {
+      window.matchMedia = original;
+    }
   });
 
   it('says a professional with 70 % withheld has no modelo 130, and shows the other results', async () => {

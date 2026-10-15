@@ -2,10 +2,12 @@
 export async function shareImage(
   blob: Blob,
   fileName: string,
-  text: string
+  text: string,
+  /** `download` skips the share sheet: on a computer a download is what people expect. */
+  mode: 'share' | 'download' = 'share'
 ): Promise<'shared' | 'saved'> {
   const file = new File([blob], fileName, { type: blob.type });
-  if (navigator.canShare?.({ files: [file] })) {
+  if (mode === 'share' && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], text });
       return 'shared';
