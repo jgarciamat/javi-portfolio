@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { recordPositiveMoment } from '@core/review/review';
 import { useFormat } from '@core/settings/SettingsContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useAction } from '@shared/hooks/useAction';
@@ -336,6 +337,7 @@ export function AutonomoDraftCard() {
       const next: Snapshot = { draft: result, inputs };
       storage.setJSON(SNAPSHOT_KEY, next);
       setSnapshot(next);
+      recordPositiveMoment();
       await plan?.refresh();
     });
 

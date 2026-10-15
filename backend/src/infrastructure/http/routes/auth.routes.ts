@@ -62,7 +62,13 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     loginLimiter,
     asyncHandler(async (req, res) => {
       const body = googleBody.parse(req.body);
-      res.json(await c.auth.loginWithGoogle((body.token ?? body.idToken)!, body.locale));
+      const { referralCode } = body;
+      res.json(
+        await c.auth.loginWithGoogle((body.token ?? body.idToken)!, body.locale, (userId) => {
+          // Only a brand-new account can be an invited friend.
+          if (referralCode) c.referrals.attach(userId, referralCode);
+        })
+      );
     })
   );
 

@@ -1,6 +1,7 @@
 import request from 'supertest';
 import {
   ReferralService,
+  MAX_INVITED_PER_USER,
   REFERRAL_REWARD_DAYS,
   friendsForReward,
   rewardsEarned,
@@ -173,5 +174,31 @@ describe('Invite a friend', () => {
     await trialDays(friend);
     expect(subs.get(host.id)).toEqual(before);
     expect(await summary()).toMatchObject({ qualified: 1, rewardsEarned: 1 });
+  });
+
+  const googleSignup = (id: string, referralCode?: string) => {
+    ctx.google.identities.set(id, {
+      googleId: `g-${id}`,
+      email: `${id}@gmail.com`,
+      emailVerified: true,
+      name: null,
+    });
+    return request(ctx.app).post('/api/auth/google').send({ token: id, referralCode }).expect(200);
+  };
+
+  it('attaches the code when the friend signs up with Google, but not on later sign-ins', async () => {
+    const { code } = await summary();
+    await googleSignup('lu', code);
+    expect(await summary()).toMatchObject({ pending: 1 });
+    // Someone who already has an account cannot be "invited" by signing in again.
+    await googleSignup('lu', (await summary(await createUser(ctx))).code);
+    await googleSignup('pau');
+    expect(await summary()).toMatchObject({ pending: 1 });
+  });
+
+  it('stops attaching invitations to a user over the cap', async () => {
+    const { code } = await summary();
+    for (let i = 0; i < MAX_INVITED_PER_USER + 1; i++) await googleSignup(`u${i}`, code);
+    expect(await summary()).toMatchObject({ pending: MAX_INVITED_PER_USER });
   });
 });

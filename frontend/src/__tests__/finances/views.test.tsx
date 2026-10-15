@@ -1,5 +1,5 @@
 import * as navigation from '@modules/finances/ui/navigation';
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import * as notifications from '@core/notifications/notifications';
 import { AccountsView } from '@modules/finances/ui/views/AccountsView';
 import { BudgetsView } from '@modules/finances/ui/views/BudgetsView';
@@ -275,6 +275,19 @@ describe('GoalsView', () => {
     expect(screen.getByRole('progressbar', { name: 'Coche' })).toBeInTheDocument();
     expect(screen.getByText(tr('app.goals.completed'))).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.goals.hideArchived') }));
+  });
+
+  it('notes a reached goal as a good moment to ask for a review, and only then', async () => {
+    localStorage.removeItem('mm_review');
+    setup([f.goal({ id: 'g1' })]);
+    await screen.findByRole('progressbar', { name: 'Viaje' });
+    expect(localStorage.getItem('mm_review')).toBeNull();
+    cleanup();
+    setup();
+    await screen.findByRole('progressbar', { name: 'Viaje' });
+    await waitFor(() =>
+      expect(JSON.parse(localStorage.getItem('mm_review') as string).positive).toBe(true)
+    );
   });
 
   it('creates, archives and deletes goals', async () => {
@@ -680,6 +693,7 @@ describe('the self-employed draft', () => {
     const api = open();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.prepare') }));
     expect(await screen.findByText(/Borrador de \d{4}, \d\.º trimestre/)).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem('mm_review') as string).positive).toBe(true);
     expect(screen.getAllByText('Modelo 303').length).toBeGreaterThan(0);
     expect(screen.getByText('Modelo 130')).toBeInTheDocument();
     expect(screen.getByText('Base imponible al 21 %')).toBeInTheDocument();

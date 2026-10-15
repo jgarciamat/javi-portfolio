@@ -25,11 +25,13 @@ export const authApi = {
     return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: jsonBody(dto) });
   },
   /** Google access token (custom button) or ID token: the API verifies its audience. */
-  googleLogin(token: string, locale?: Locale) {
-    return publicRequest<AuthResult>('/auth/google', {
+  async googleLogin(token: string, locale?: Locale) {
+    const result = await publicRequest<AuthResult>('/auth/google', {
       method: 'POST',
-      body: jsonBody({ token, locale }),
+      body: jsonBody({ token, locale, referralCode: pendingReferral() }),
     });
+    clearReferral();
+    return result;
   },
   logout(refreshToken: string) {
     return publicRequest<void>('/auth/logout', {
