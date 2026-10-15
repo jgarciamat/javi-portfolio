@@ -1537,7 +1537,7 @@
   "app.autonomo.retaNote": "The contribution is {rate} % of the base. It is a forecast: Social Security settles the next year with your real income. If you are on the flat rate, you pay the reduced fee of your sign-up.",
   "app.autonomo.deadlines": "Deadlines",
   "app.autonomo.disclaimer": "Indicative draft with the 2026 rules: it does not include investment goods, pro rata, special regimes or intra-EU operations, and public holidays are not taken into account in the dates. Check it with your adviser before filing anything.",
-  "app.autonomo.manualHint": "Type your income without VAT by rate and each expense with the VAT included. We tell you how much you can deduct from each one. What you type is saved on this device.",
+  "app.autonomo.manualHint": "Type your income without VAT by rate and each expense with the VAT included. We tell you how much you can deduct from each one. Modelo 130 is cumulative (it adds up the whole year to the quarter you choose), which is why the earlier quarters are needed: if they are alike, use “Copy” so you do not type everything again. What you type is saved on this device.",
   "app.autonomo.profile": "Your situation (valid for the whole year)",
   "app.autonomo.workArea": "Square metres of your home used for work",
   "app.autonomo.homeArea": "Total square metres of the home",
@@ -1594,5 +1594,6 @@
   "app.autonomo.pdf.download": "Download the draft as PDF",
   "app.autonomo.pdf.preparing": "Preparing the PDF…",
   "app.autonomo.pdf.hint": "With all the data and the boxes, ready to send to your adviser.",
-  "app.autonomo.pdf.error": "The PDF could not be created. Try again."
+  "app.autonomo.pdf.error": "The PDF could not be created. Try again.",
+  "app.autonomo.copyPrevious": "Copy quarter {n}"
 }

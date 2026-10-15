@@ -158,7 +158,24 @@ export function AutonomoManual({
 
       {form.quarters.slice(0, upTo).map((quarter, q) => (
         <section key={q} className="autonomo-panel">
-          <h3>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
+          <div className="autonomo-panel-head">
+            <h3>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
+            {q > 0 && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() =>
+                  setQuarter(q, {
+                    income: { ...form.quarters[q - 1].income },
+                    withheld: form.quarters[q - 1].withheld,
+                    expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
+                  })
+                }
+              >
+                {t('app.autonomo.copyPrevious', { n: q })}
+              </button>
+            )}
+          </div>
           <h4>{t('app.autonomo.incomeTitle')}</h4>
           <div className="autonomo-grid">
             {INCOME_FIELDS.map((field) => (

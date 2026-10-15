@@ -840,6 +840,43 @@ describe('the self-employed draft', () => {
     expect(localStorage.getItem('mm_autonomo_manual2')).toContain('"workArea":"20"');
   });
 
+  it('copies the data of the previous quarter into the next one', async () => {
+    open();
+    fireEvent.change(await screen.findByLabelText(tr('app.autonomo.quarter')), {
+      target: { value: '3' },
+    });
+    expect(
+      screen.queryByRole('button', { name: tr('app.autonomo.copyPrevious', { n: 0 }) })
+    ).toBeNull();
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 1`), {
+      target: { value: '700' },
+    });
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.withheld')} 1`), {
+      target: { value: '50' },
+    });
+    fireEvent.click(
+      screen.getAllByRole('button', { name: new RegExp(tr('app.autonomo.addExpense')) })[0]
+    );
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 1.1`), {
+      target: { value: '121' },
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.autonomo.copyPrevious', { n: 1 }) })
+    );
+    expect(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 2`)).toHaveValue('700');
+    expect(screen.getByLabelText(`${tr('app.autonomo.withheld')} 2`)).toHaveValue('50');
+    expect(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 2.1`)).toHaveValue('121');
+    // The copy is independent of the original.
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 2.1`), {
+      target: { value: '60' },
+    });
+    expect(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 1.1`)).toHaveValue('121');
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.autonomo.copyPrevious', { n: 2 }) })
+    );
+    expect(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 3.1`)).toHaveValue('60');
+  });
+
   it('remembers what was typed the last time', async () => {
     localStorage.setItem(
       'mm_autonomo_manual2',

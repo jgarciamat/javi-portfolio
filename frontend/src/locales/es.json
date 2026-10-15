@@ -1537,7 +1537,7 @@
   "app.autonomo.retaNote": "La cuota es el {rate} % de la base. Es una previsión: la Seguridad Social regulariza al año siguiente con tus rendimientos reales. Si estás en tarifa plana, pagas la cuota reducida de tu alta.",
   "app.autonomo.deadlines": "Fechas límite",
   "app.autonomo.disclaimer": "Borrador orientativo con las reglas de 2026: no incluye bienes de inversión, prorrata, regímenes especiales ni operaciones intracomunitarias, y los festivos no se tienen en cuenta en las fechas. Revísalo con tu gestor antes de presentar nada.",
-  "app.autonomo.manualHint": "Escribe tus ingresos sin IVA por tipo y cada gasto con el IVA incluido. Te decimos cuánto puedes desgravar de cada uno. Lo que escribas se guarda en este dispositivo.",
+  "app.autonomo.manualHint": "Escribe tus ingresos sin IVA por tipo y cada gasto con el IVA incluido. Te decimos cuánto puedes desgravar de cada uno. El modelo 130 es acumulado (suma todo el año hasta el trimestre que elijas), por eso hacen falta los trimestres anteriores: si se parecen, usa «Copiar» para no escribirlo todo otra vez. Lo que escribas se guarda en este dispositivo.",
   "app.autonomo.profile": "Tu situación (vale para todo el año)",
   "app.autonomo.workArea": "Metros de tu vivienda que usas para trabajar",
   "app.autonomo.homeArea": "Metros totales de la vivienda",
@@ -1594,5 +1594,6 @@
   "app.autonomo.pdf.download": "Descargar el borrador en PDF",
   "app.autonomo.pdf.preparing": "Preparando el PDF…",
   "app.autonomo.pdf.hint": "Con todos los datos y las casillas, listo para enviárselo a tu gestor.",
-  "app.autonomo.pdf.error": "No se ha podido crear el PDF. Inténtalo de nuevo."
+  "app.autonomo.pdf.error": "No se ha podido crear el PDF. Inténtalo de nuevo.",
+  "app.autonomo.copyPrevious": "Copiar el {n}.º trimestre"
 }

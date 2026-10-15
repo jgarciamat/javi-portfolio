@@ -59,6 +59,13 @@
   margin: 0 0 0.75rem;
   font-size: 1.05rem;
 }
+.autonomo-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .autonomo-panel h4 {
   margin: 1rem 0 0.5rem;
   font-size: 0.8rem;
