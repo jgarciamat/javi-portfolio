@@ -8,28 +8,31 @@ import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
-import type {
-  AutonomoDraft,
-  AutonomoInputs,
-  QuarterExtras,
-  TaxBox,
+import { buildAutonomoPdf, type PdfText } from '../../application/autonomoPdf';
+import { isNativeApp } from '@shared/utils/platform';
+import { shareImage } from '@shared/utils/shareImage';
+import {
+  EXPENSE_KINDS,
+  type AutonomoDraft,
+  type AutonomoInputs,
+  type QuarterExtras,
+  type TaxBox,
 } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
-const SNAPSHOT_KEY = 'mm_autonomo_draft';
-const MANUAL_KEY = 'mm_autonomo_manual';
+const SNAPSHOT_KEY = 'mm_autonomo_draft2';
+
+/** The last draft with the data it was prepared from (to put them in the PDF). */
+interface Snapshot {
+  draft: AutonomoDraft;
+  inputs: AutonomoInputs | null;
+}
+const MANUAL_KEY = 'mm_autonomo_manual2';
 const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
-interface ExtrasForm {
-  withheld: string;
-  socialSecurity: string;
-  vatNotDeductible: string;
-}
-
-const emptyExtras = (): ExtrasForm => ({ withheld: '', socialSecurity: '', vatNotDeductible: '' });
 const number = (text: string): number => {
   const parsed = parseDecimal(text);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -111,9 +114,106 @@ function Deductible({ lines }: { lines: NonNullable<AutonomoDraft['expenses']> }
 }
 
 /** What the draft says, in words, and the boxes behind it. */
-function DraftResult({ draft }: { draft: AutonomoDraft }) {
+function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: AutonomoInputs | null }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const download = async () => {
+    setSaving(true);
+    setFailed(false);
+    try {
+      const kinds = Object.fromEntries(EXPENSE_KINDS.map((k) => [k, t(`app.autonomo.kind.${k}`)]));
+      const notes = Object.fromEntries(
+        ['supplies', 'vehicle', 'meals', 'clients', 'health', 'fines'].map((n) => [
+          n,
+          t(`app.autonomo.note.${n}`),
+        ])
+      );
+      const text: PdfText = {
+        title: t('app.autonomo.pdf.title'),
+        subtitle: t('app.autonomo.draftOf', { year: draft.year, n: draft.quarter }),
+        generated: t('app.autonomo.pdf.generated', { date: date(new Date().toISOString()) }),
+        data: t('app.autonomo.pdf.data'),
+        quarter: t('app.autonomo.quarter'),
+        income: t('app.autonomo.incomeTitle'),
+        withheld: t('app.autonomo.withheld'),
+        other: t('app.autonomo.extras'),
+        box: t('app.autonomo.box'),
+        concept: t('app.autonomo.concept'),
+        amount: t('app.autonomo.amount'),
+        vatAccrued: t('app.autonomo.accrued'),
+        vatDeductible: t('app.autonomo.deductible'),
+        vatSettlement: t('app.autonomo.settlement'),
+        irpf: t('app.autonomo.irpfBoxes'),
+        irpfNotRequired: t('app.autonomo.irpf.notRequiredText'),
+        expenses: t('app.autonomo.deductibleTitle'),
+        paid: t('app.autonomo.paid'),
+        deductibleIrpf: t('app.autonomo.deductibleIrpf'),
+        deductibleVat: t('app.autonomo.deductibleVat'),
+        total: t('app.autonomo.total'),
+        reta: t('app.autonomo.retaTitle'),
+        retaText: t('app.autonomo.retaText', {
+          net: money(draft.reta.monthlyNet),
+          bracket: draft.reta.bracket,
+          baseMin: money(draft.reta.baseMin),
+          baseMax: money(draft.reta.baseMax),
+        }),
+        deadlines: t('app.autonomo.deadlines'),
+        disclaimer: t('app.autonomo.disclaimer'),
+        summary: [
+          {
+            model: t('app.autonomo.model', { model: '303' }),
+            text: t(`app.autonomo.vat.${draft.vat.result}`),
+            amount: money(Math.abs(draft.vat.amountDue)),
+          },
+          {
+            model: t('app.autonomo.model', { model: '130' }),
+            text: t(`app.autonomo.irpf.${draft.irpf.result}`),
+            amount: money(Math.abs(draft.irpf.amountDue)),
+          },
+          {
+            model: t('app.autonomo.retaTitle'),
+            text: t('app.autonomo.perMonth'),
+            amount: `${money(draft.reta.feeMin)} – ${money(draft.reta.feeMax)}`,
+          },
+        ],
+        kinds,
+        notes,
+        incomeLabels: {
+          r21: t('app.autonomo.income.r21'),
+          r10: t('app.autonomo.income.r10'),
+          r4: t('app.autonomo.income.r4'),
+          r0: t('app.autonomo.income.r0'),
+        },
+        prior: t('app.autonomo.pdf.prior', {
+          income: '{income}',
+          expenses: '{expenses}',
+          payments: '{payments}',
+          withheld: '{withheld}',
+        }),
+        flags: {
+          hardToJustify: t('app.autonomo.pdf.hardToJustify'),
+          exempt: t('app.autonomo.pdf.exempt'),
+          priorNet: t('app.autonomo.priorNet'),
+          toOffset: t('app.autonomo.toOffset'),
+        },
+      };
+      const blob = await buildAutonomoPdf(draft, inputs, text, date);
+      await shareImage(
+        blob,
+        `borrador-autonomo-${draft.year}-T${draft.quarter}.pdf`,
+        t('app.autonomo.pdf.title'),
+        // Phones and the app offer the share sheet; a computer just downloads the file.
+        isNativeApp() || window.matchMedia?.('(pointer: coarse)')?.matches ? 'share' : 'download'
+      );
+    } catch {
+      setFailed(true);
+    } finally {
+      setSaving(false);
+    }
+  };
   const { vat, irpf, reta } = draft;
   return (
     <div className="autonomo-result" aria-live="polite">
@@ -168,6 +268,13 @@ function DraftResult({ draft }: { draft: AutonomoDraft }) {
         ))}
       </ul>
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
+      <div className="button-row">
+        <button className="btn-primary" disabled={saving} onClick={() => void download()}>
+          {saving ? t('app.autonomo.pdf.preparing') : t('app.autonomo.pdf.download')}
+        </button>
+        <small className="section-hint">{t('app.autonomo.pdf.hint')}</small>
+      </div>
+      {failed && <p className="form-error">{t('app.autonomo.pdf.error')}</p>}
     </div>
   );
 }
@@ -180,48 +287,55 @@ export function AutonomoDraftCard() {
   const action = useAction();
   const [year, setYear] = useState(THIS_YEAR);
   const [quarter, setQuarter] = useState<1 | 2 | 3 | 4>(quarterNow);
-  const [extras, setExtras] = useState<ExtrasForm[]>(() => QUARTERS.map(emptyExtras));
   const [hardToJustify, setHardToJustify] = useState(false);
   const [exempt, setExempt] = useState(false);
   const [priorNet, setPriorNet] = useState('');
   const [toOffset, setToOffset] = useState('');
-  const [source, setSource] = useState<'movements' | 'manual'>('movements');
-  const [manual, setManual] = useState<ManualForm>(() =>
-    storage.getJSON<ManualForm>(MANUAL_KEY, emptyManual())
-  );
+  const [manual, setManual] = useState<ManualForm>(() => ({
+    ...emptyManual(),
+    ...storage.getJSON<Partial<ManualForm>>(MANUAL_KEY, {}),
+  }));
   const changeManual = (next: ManualForm) => {
     storage.setJSON(MANUAL_KEY, next);
     setManual(next);
   };
-  const [draft, setDraft] = useState<AutonomoDraft | null>(() =>
-    storage.getJSON<AutonomoDraft | null>(SNAPSHOT_KEY, null)
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
+    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
 
   const limit = plan?.overview?.limits.resources.autonomoDrafts;
   const used = plan?.overview?.usage.autonomoDrafts ?? 0;
   const locked = limit !== null && limit !== undefined && used >= limit;
-  const setExtra = (q: number, key: keyof ExtrasForm, value: string) =>
-    setExtras((all) => all.map((e, i) => (i === q ? { ...e, [key]: value } : e)));
-
   const prepare = () =>
     action.run(async () => {
+      const manualData = toManualData(manual);
       const inputs: AutonomoInputs = {
-        quarters: extras.map(
-          (e): QuarterExtras => ({
-            withheld: number(e.withheld),
-            socialSecurity: number(e.socialSecurity),
-            vatNotDeductible: number(e.vatNotDeductible),
+        quarters: manual.quarters.map(
+          (q): QuarterExtras => ({
+            withheld: number(q.withheld),
+            socialSecurity: 0,
+            vatNotDeductible: 0,
           })
         ) as AutonomoInputs['quarters'],
         hardToJustify,
         priorYearNet: priorNet.trim() === '' ? null : parseDecimal(priorNet),
         exempt130: exempt,
         vatToOffset: number(toOffset),
-        manual: source === 'manual' ? toManualData(manual) : null,
+        manual: manualData,
+        prior:
+          manual.prior.on && quarter > 1
+            ? {
+                income: number(manual.prior.income),
+                expenses: number(manual.prior.expenses),
+                previousPayments: number(manual.prior.payments),
+                withheld: number(manual.prior.withheld),
+              }
+            : null,
       };
       const result = await businessApi.draft(year, quarter, inputs);
-      storage.setJSON(SNAPSHOT_KEY, result);
-      setDraft(result);
+      const next: Snapshot = { draft: result, inputs };
+      storage.setJSON(SNAPSHOT_KEY, next);
+      setSnapshot(next);
       await plan?.refresh();
     });
 
@@ -264,82 +378,25 @@ export function AutonomoDraftCard() {
         </label>
       </div>
 
-      <fieldset className="autonomo-source">
-        <legend>{t('app.autonomo.source')}</legend>
-        <label className="renta-check">
-          <input
-            type="radio"
-            name="autonomo-source"
-            checked={source === 'movements'}
-            onChange={() => setSource('movements')}
-          />
-          <span>{t('app.autonomo.sourceMovements')}</span>
-        </label>
-        <label className="renta-check">
-          <input
-            type="radio"
-            name="autonomo-source"
-            checked={source === 'manual'}
-            onChange={() => setSource('manual')}
-          />
-          <span>{t('app.autonomo.sourceManual')}</span>
-        </label>
-      </fieldset>
-      {source === 'manual' && (
-        <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
-      )}
+      <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
 
-      <section className="autonomo-extras">
-        <h3 className="subsection-title">{t('app.autonomo.extras')}</h3>
-        <p className="section-hint">{t('app.autonomo.extrasHint')}</p>
-        {QUARTERS.filter((q) => q <= quarter).map((q) => (
-          <fieldset key={q} className="autonomo-quarter">
-            <legend>{t('app.autonomo.quarterN', { n: q })}</legend>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.withheld')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.withheld')} ${q}`}
-                value={extras[q - 1].withheld}
-                onChange={(e) => setExtra(q - 1, 'withheld', e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.socialSecurity')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.socialSecurity')} ${q}`}
-                value={extras[q - 1].socialSecurity}
-                onChange={(e) => setExtra(q - 1, 'socialSecurity', e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">{t('app.autonomo.vatNotDeductible')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                aria-label={`${t('app.autonomo.vatNotDeductible')} ${q}`}
-                value={extras[q - 1].vatNotDeductible}
-                onChange={(e) => setExtra(q - 1, 'vatNotDeductible', e.target.value)}
-              />
-            </label>
-          </fieldset>
-        ))}
-        <label className="renta-check">
-          <input
-            type="checkbox"
-            checked={hardToJustify}
-            onChange={(e) => setHardToJustify(e.target.checked)}
-          />
-          <span>{t('app.autonomo.hardToJustify')}</span>
-        </label>
-        <label className="renta-check">
-          <input type="checkbox" checked={exempt} onChange={(e) => setExempt(e.target.checked)} />
-          <span>{t('app.autonomo.exempt')}</span>
-        </label>
-        <div className="form-grid">
+      <section className="autonomo-panel autonomo-extras">
+        <h3>{t('app.autonomo.extras')}</h3>
+        <div className="autonomo-options">
+          <label className="autonomo-option">
+            <input
+              type="checkbox"
+              checked={hardToJustify}
+              onChange={(e) => setHardToJustify(e.target.checked)}
+            />
+            <span>{t('app.autonomo.hardToJustify')}</span>
+          </label>
+          <label className="autonomo-option">
+            <input type="checkbox" checked={exempt} onChange={(e) => setExempt(e.target.checked)} />
+            <span>{t('app.autonomo.exempt')}</span>
+          </label>
+        </div>
+        <div className="autonomo-grid autonomo-grid--top">
           <label className="field">
             <span className="field-label">{t('app.autonomo.priorNet')}</span>
             <input
@@ -348,7 +405,7 @@ export function AutonomoDraftCard() {
               value={priorNet}
               onChange={(e) => setPriorNet(e.target.value)}
             />
-            <small className="renta-field-hint">{t('app.autonomo.priorNetHint')}</small>
+            <small className="autonomo-hint">{t('app.autonomo.priorNetHint')}</small>
           </label>
           <label className="field">
             <span className="field-label">{t('app.autonomo.toOffset')}</span>
@@ -358,6 +415,7 @@ export function AutonomoDraftCard() {
               value={toOffset}
               onChange={(e) => setToOffset(e.target.value)}
             />
+            <small className="autonomo-hint">{t('app.autonomo.toOffsetHint')}</small>
           </label>
         </div>
       </section>
@@ -387,12 +445,12 @@ export function AutonomoDraftCard() {
         </div>
       )}
 
-      {draft && (
+      {snapshot && (
         <>
           <h3 className="subsection-title">
-            {t('app.autonomo.draftOf', { year: draft.year, n: draft.quarter })}
+            {t('app.autonomo.draftOf', { year: snapshot.draft.year, n: snapshot.draft.quarter })}
           </h3>
-          <DraftResult draft={draft} />
+          <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
         </>
       )}
     </div>

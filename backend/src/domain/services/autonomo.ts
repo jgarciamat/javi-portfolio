@@ -39,6 +39,18 @@ export interface DraftInputs {
   vatToOffset: number;
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
+  /**
+   * Totals of the modelo 130 already filed for the quarters before the viewed one (boxes 01, 02, 05 and
+   * 06 of the last one), so the earlier quarters need not be typed again.
+   */
+  prior?: PriorTotals | null;
+}
+
+export interface PriorTotals {
+  income: number;
+  expenses: number;
+  previousPayments: number;
+  withheld: number;
 }
 
 export const EMPTY_EXTRAS: QuarterExtras = { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 };
@@ -213,31 +225,53 @@ const lowIncomeReduction = (priorYearNet: number | null): number => {
 };
 
 /** Modelo 130 up to a quarter: cumulative figures, with the payments of the earlier quarters. */
+/** Where the cumulative figures start: the first quarter, or the quarter after the filed totals. */
+function windowOf(inputs: DraftInputs, upTo: number) {
+  const prior = inputs.prior && upTo > 1 ? inputs.prior : null;
+  return {
+    prior,
+    start: prior ? upTo - 1 : 0,
+    income: Math.round((prior?.income ?? 0) * 100),
+    expenses: Math.round((prior?.expenses ?? 0) * 100),
+    payments: prior?.previousPayments ?? 0,
+    withheld: prior?.withheld ?? 0,
+  };
+}
+
 function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): Draft130 {
   if (inputs.exempt130) return { required: false, result: 'notRequired', amountDue: 0, boxes: [] };
   const reduction = lowIncomeReduction(inputs.priorYearNet);
-  let previousPayments = 0;
+  const window = windowOf(inputs, upTo);
+  let previousPayments = window.payments;
   let carriedNegative = 0;
   let last: Box[] = [];
   let amountDue = 0;
-  for (let n = 1; n <= upTo; n++) {
-    const sel = quarters.slice(0, n);
-    const extras = inputs.quarters.slice(0, n);
-    const income = sel.reduce(
-      (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
-      0
-    );
+  for (let n = window.start + 1; n <= upTo; n++) {
+    const sel = quarters.slice(window.start, n);
+    const extras = inputs.quarters.slice(window.start, n);
+    const income =
+      window.income +
+      sel.reduce(
+        (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
+        0
+      );
     const baseExpenses =
+      window.expenses +
       sel.reduce((s, q) => s + q.expenseIrpf, 0) +
       extras.reduce((s, e) => s + Math.round((e.socialSecurity + e.vatNotDeductible) * 100), 0);
     const preNet = income - baseExpenses;
-    const hard = inputs.hardToJustify
-      ? Math.min(Math.round(Math.max(0, preNet) * HARD_TO_JUSTIFY_RATE), HARD_TO_JUSTIFY_MAX * 100)
-      : 0;
+    // The filed total of box 02 already counts the hard-to-justify expenses of the earlier quarters.
+    const hard =
+      inputs.hardToJustify && !window.prior
+        ? Math.min(
+            Math.round(Math.max(0, preNet) * HARD_TO_JUSTIFY_RATE),
+            HARD_TO_JUSTIFY_MAX * 100
+          )
+        : 0;
     const expenses = baseExpenses + hard;
     const net = income - expenses;
     const fourth = Math.max(0, euros(net)) * IRPF_ADVANCE;
-    const withheld = extras.reduce((s, e) => s + e.withheld, 0);
+    const withheld = window.withheld + extras.reduce((s, e) => s + e.withheld, 0);
     const box07 = round2(round2(fourth) - previousPayments - withheld);
     const box12 = Math.max(0, box07);
     const box14 = round2(box12 - reduction);
@@ -287,14 +321,20 @@ export function retaFor(monthlyNet: number): RetaEstimate {
 
 /** The contribution a year-to-date result points to: annualised, plus the fees paid, minus 7 %. */
 function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): RetaEstimate {
-  const sel = quarters.slice(0, upTo);
-  const income = sel.reduce(
-    (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
-    0
-  );
+  const window = windowOf(inputs, upTo);
+  const sel = quarters.slice(window.start, upTo);
+  const income =
+    window.income +
+    sel.reduce(
+      (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
+      0
+    );
   const expenses =
+    window.expenses +
     sel.reduce((s, q) => s + q.expenseIrpf, 0) +
-    inputs.quarters.slice(0, upTo).reduce((s, e) => s + Math.round(e.vatNotDeductible * 100), 0);
+    inputs.quarters
+      .slice(window.start, upTo)
+      .reduce((s, e) => s + Math.round(e.vatNotDeductible * 100), 0);
   // The fees paid are added back: the contribution is worked out on the net income before them.
   const net = euros(income - expenses);
   const monthly = (Math.max(0, net) / (upTo * 3)) * (1 - RETA_GENERAL_EXPENSES);

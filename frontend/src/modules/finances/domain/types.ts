@@ -662,6 +662,8 @@ export interface AutonomoInputs {
   vatToOffset: number;
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
+  /** Totals of the modelo 130 already filed for the earlier quarters. */
+  prior?: { income: number; expenses: number; previousPayments: number; withheld: number } | null;
 }
 
 export interface AutonomoDraft {

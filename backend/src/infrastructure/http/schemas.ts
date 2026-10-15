@@ -320,6 +320,14 @@ export const autonomoDraftBody = z.object({
     vatToOffset: euroAmount.default(0),
     /** Income and expenses typed by hand instead of the movements. */
     manual: manualData.nullish(),
+    prior: z
+      .object({
+        income: euroAmount.default(0),
+        expenses: euroAmount.default(0),
+        previousPayments: euroAmount.default(0),
+        withheld: euroAmount.default(0),
+      })
+      .nullish(),
   }),
 });
 export const categoryIdParam = z.object({ categoryId: id });
