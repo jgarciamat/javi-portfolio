@@ -6,6 +6,7 @@ import {
   requestStoreReview,
   shouldAskForReview,
   snoozeReview,
+  storeListingUrl,
 } from '@core/review/review';
 import { Icon } from '@shared/components/Icon';
 import '../css/Sections.css';
@@ -49,7 +50,13 @@ export function RatePrompt({ movements, onInvite }: { movements: number; onInvit
             >
               {t('app.rate.yes')}
             </button>
-            <button className="btn-secondary" onClick={() => setStep('feedback')}>
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                finishReview();
+                setStep('feedback');
+              }}
+            >
               {t('app.rate.no')}
             </button>
             <button className="btn-secondary" onClick={close}>
@@ -62,6 +69,14 @@ export function RatePrompt({ movements, onInvite }: { movements: number; onInvit
         <>
           <p>{t('app.rate.thanks')}</p>
           <div className="button-row">
+            <a
+              className="btn-primary"
+              href={storeListingUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('app.rate.store')}
+            </a>
             <button className="btn-secondary" onClick={onInvite}>
               {t('app.rate.invite')}
             </button>
@@ -78,11 +93,11 @@ export function RatePrompt({ movements, onInvite }: { movements: number; onInvit
             <a
               className="btn-secondary"
               href="mailto:moneymanager@outlook.es?subject=Money%20Manager%3A%20sugerencias"
-              onClick={close}
+              onClick={() => setStep(null)}
             >
               {t('app.rate.write')}
             </a>
-            <button className="btn-secondary" onClick={close}>
+            <button className="btn-secondary" onClick={() => setStep(null)}>
               {t('app.common.close')}
             </button>
           </div>

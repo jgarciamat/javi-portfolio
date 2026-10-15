@@ -52,6 +52,7 @@ export const googleBody = z
     token: z.string().min(1).max(5000).optional(),
     idToken: z.string().min(1).max(5000).optional(),
     locale,
+    referralCode: z.string().trim().max(32).optional(),
   })
   .refine((b) => b.token || b.idToken, { message: 'token requerido' });
 export const resetBody = z.object({

@@ -218,7 +218,11 @@ export class AuthService {
 
   // ─── Google ───────────────────────────────────────────────────────────────
 
-  async loginWithGoogle(token: string, locale: EmailLocale = 'es'): Promise<AuthResult> {
+  async loginWithGoogle(
+    token: string,
+    locale: EmailLocale = 'es',
+    onCreated?: (userId: string) => void
+  ): Promise<AuthResult> {
     const identity = await this.google.verify(token);
     if (!identity.emailVerified) {
       throw new UnauthorizedError(
@@ -226,6 +230,7 @@ export class AuthService {
         'GOOGLE_EMAIL_NOT_VERIFIED'
       );
     }
+    let newUserId: string | null = null;
     const user = this.uow.run(() => {
       const linked = this.users.findByGoogleId(identity.googleId);
       if (linked) return linked;
@@ -247,8 +252,10 @@ export class AuthService {
         now: this.clock.now(),
       });
       this.createUserWithDefaults(created, locale);
+      newUserId = created.id;
       return created;
     });
+    if (newUserId) onCreated?.(newUserId);
     return { ...this.issueSession(user), user: user.toPublic() };
   }
 

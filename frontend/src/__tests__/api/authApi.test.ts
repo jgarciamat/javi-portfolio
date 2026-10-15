@@ -75,6 +75,17 @@ describe('public auth endpoints', () => {
     window.history.replaceState(null, '', '/');
   });
 
+  test('Google sign-in sends the invitation code once and then forgets it', async () => {
+    window.history.replaceState(null, '', '/?ref=abcd2345');
+    captureReferral();
+    mockFetch.mockResolvedValue(makeResponse({ message: 'ok' }));
+    await authApi.googleLogin('tok', 'es');
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body).referralCode).toBe('abcd2345');
+    await authApi.googleLogin('tok', 'es');
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body)).not.toHaveProperty('referralCode');
+    window.history.replaceState(null, '', '/');
+  });
+
   test('login returns the tokens', async () => {
     const result = {
       accessToken: VALID,
