@@ -31,7 +31,7 @@
     "@react-oauth/google": "^0.13.4",
     "@revenuecat/purchases-capacitor": "^13.7.3",
     "jspdf": "^2.5.2",
-    "jspdf-autotable": "^3.8.4",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.55.0",
     "pdfjs-dist": "^4.10.38",
     "react": "^19.0.0",
