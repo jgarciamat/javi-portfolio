@@ -32,6 +32,7 @@ const text: PdfText = {
   kinds: { supplies: 'Suministros', training: 'Formación' },
   notes: { supplies: 'Solo el 30 %' },
   incomeLabels: { r21: '21 %', r10: '10 %', r4: '4 %', r0: '0 %' },
+  prior: 'Ya presentado: {income} {expenses} {payments} {withheld}',
   flags: {
     hardToJustify: '5 %',
     exempt: 'Sin 130',
@@ -95,6 +96,13 @@ describe('the PDF of the self-employed draft', () => {
       date
     );
     expect(bare.size).toBeGreaterThan(1000);
+    const filed = await buildAutonomoPdf(
+      f.autonomoDraft({ quarter: 4 }),
+      inputs({ prior: { income: 3000, expenses: 600, previousPayments: 360, withheld: 100 } }),
+      text,
+      date
+    );
+    expect(filed.size).toBeGreaterThan(1000);
     const noManual = await buildAutonomoPdf(
       f.autonomoDraft(),
       inputs({ manual: null }),

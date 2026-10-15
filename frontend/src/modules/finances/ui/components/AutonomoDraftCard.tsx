@@ -186,6 +186,12 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
           r4: t('app.autonomo.income.r4'),
           r0: t('app.autonomo.income.r0'),
         },
+        prior: t('app.autonomo.pdf.prior', {
+          income: '{income}',
+          expenses: '{expenses}',
+          payments: '{payments}',
+          withheld: '{withheld}',
+        }),
         flags: {
           hardToJustify: t('app.autonomo.pdf.hardToJustify'),
           exempt: t('app.autonomo.pdf.exempt'),
@@ -282,9 +288,10 @@ export function AutonomoDraftCard() {
   const [exempt, setExempt] = useState(false);
   const [priorNet, setPriorNet] = useState('');
   const [toOffset, setToOffset] = useState('');
-  const [manual, setManual] = useState<ManualForm>(() =>
-    storage.getJSON<ManualForm>(MANUAL_KEY, emptyManual())
-  );
+  const [manual, setManual] = useState<ManualForm>(() => ({
+    ...emptyManual(),
+    ...storage.getJSON<Partial<ManualForm>>(MANUAL_KEY, {}),
+  }));
   const changeManual = (next: ManualForm) => {
     storage.setJSON(MANUAL_KEY, next);
     setManual(next);
@@ -312,6 +319,15 @@ export function AutonomoDraftCard() {
         exempt130: exempt,
         vatToOffset: number(toOffset),
         manual: manualData,
+        prior:
+          manual.prior.on && quarter > 1
+            ? {
+                income: number(manual.prior.income),
+                expenses: number(manual.prior.expenses),
+                previousPayments: number(manual.prior.payments),
+                withheld: number(manual.prior.withheld),
+              }
+            : null,
       };
       const result = await businessApi.draft(year, quarter, inputs);
       const next: Snapshot = { draft: result, inputs };

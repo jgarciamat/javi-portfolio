@@ -1595,5 +1595,12 @@
   "app.autonomo.pdf.preparing": "Preparing the PDF…",
   "app.autonomo.pdf.hint": "With all the data and the boxes, ready to send to your adviser.",
   "app.autonomo.pdf.error": "The PDF could not be created. Try again.",
-  "app.autonomo.copyPrevious": "Copy quarter {n}"
+  "app.autonomo.copyPrevious": "Copy quarter {n}",
+  "app.autonomo.priorOn": "I already filed modelo 130 for the earlier quarters: use its totals so I do not type them again",
+  "app.autonomo.priorHint": "Copy the figures of your last modelo 130 filed this year. Expenses are those of box 02 (they already include the hard-to-justify ones). That way you only fill in the quarter you are preparing.",
+  "app.autonomo.priorIncome": "Cumulative income (box 01)",
+  "app.autonomo.priorExpenses": "Cumulative expenses (box 02)",
+  "app.autonomo.priorPayments": "Payments of earlier quarters (box 05)",
+  "app.autonomo.priorWithheld": "Cumulative withholdings (box 06)",
+  "app.autonomo.pdf.prior": "Totals of the modelo 130 already filed: income {income}, expenses {expenses}, earlier payments {payments}, withholdings {withheld}"
 }

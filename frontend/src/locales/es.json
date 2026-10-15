@@ -1595,5 +1595,12 @@
   "app.autonomo.pdf.preparing": "Preparando el PDF…",
   "app.autonomo.pdf.hint": "Con todos los datos y las casillas, listo para enviárselo a tu gestor.",
   "app.autonomo.pdf.error": "No se ha podido crear el PDF. Inténtalo de nuevo.",
-  "app.autonomo.copyPrevious": "Copiar el {n}.º trimestre"
+  "app.autonomo.copyPrevious": "Copiar el {n}.º trimestre",
+  "app.autonomo.priorOn": "Ya presenté el modelo 130 de los trimestres anteriores: uso sus totales y no los escribo otra vez",
+  "app.autonomo.priorHint": "Copia las cifras de tu último modelo 130 presentado este año. Los gastos son los de la casilla 02 (ya incluyen los de difícil justificación). Así solo rellenas el trimestre que estás preparando.",
+  "app.autonomo.priorIncome": "Ingresos acumulados (casilla 01)",
+  "app.autonomo.priorExpenses": "Gastos acumulados (casilla 02)",
+  "app.autonomo.priorPayments": "Pagos de trimestres anteriores (casilla 05)",
+  "app.autonomo.priorWithheld": "Retenciones acumuladas (casilla 06)",
+  "app.autonomo.pdf.prior": "Totales del modelo 130 ya presentado: ingresos {income}, gastos {expenses}, pagos anteriores {payments}, retenciones {withheld}"
 }

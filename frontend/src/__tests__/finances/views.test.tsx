@@ -811,6 +811,7 @@ describe('the self-employed draft', () => {
         priorYearNet: 9500,
         exempt130: true,
         vatToOffset: 40,
+        prior: null,
         manual: {
           profile: {
             workArea: 20,
@@ -875,6 +876,53 @@ describe('the self-employed draft', () => {
       screen.getByRole('button', { name: tr('app.autonomo.copyPrevious', { n: 2 }) })
     );
     expect(screen.getByLabelText(`${tr('app.autonomo.expenseAmount')} 3.1`)).toHaveValue('60');
+  });
+
+  it('uses the totals of the modelo 130 already filed instead of the earlier quarters', async () => {
+    const api = open();
+    fireEvent.change(await screen.findByLabelText(tr('app.autonomo.quarter')), {
+      target: { value: '1' },
+    });
+    expect(screen.queryByLabelText(new RegExp(tr('app.autonomo.priorOn')))).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '4' } });
+    expect(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(new RegExp(tr('app.autonomo.priorOn'))));
+    // Only the viewed quarter is left to fill in.
+    expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toBeNull();
+    expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 3`)).toBeNull();
+    expect(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 4`)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.priorIncome')), {
+      target: { value: '3000' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.priorExpenses')), {
+      target: { value: '600' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.priorPayments')), {
+      target: { value: '360,5' },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.priorWithheld')), {
+      target: { value: '100' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        expect.any(Number),
+        4,
+        expect.objectContaining({
+          prior: { income: 3000, expenses: 600, previousPayments: 360.5, withheld: 100 },
+        })
+      )
+    );
+    // Back to the first quarter the totals are not sent.
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenLastCalledWith(
+        expect.any(Number),
+        1,
+        expect.objectContaining({ prior: null })
+      )
+    );
   });
 
   it('remembers what was typed the last time', async () => {

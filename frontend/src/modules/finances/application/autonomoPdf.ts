@@ -36,6 +36,8 @@ export interface PdfText {
   kinds: Record<string, string>;
   notes: Record<string, string>;
   incomeLabels: { r21: string; r10: string; r4: string; r0: string };
+  /** The totals of the modelo 130 already filed, as a sentence (with a placeholder per figure). */
+  prior: string;
   flags: { hardToJustify: string; exempt: string; priorNet: string; toOffset: string };
 }
 
@@ -107,7 +109,9 @@ export async function buildAutonomoPdf(
   if (inputs?.manual) {
     heading(text.data);
     const rows: string[][] = [];
-    inputs.manual.quarters.slice(0, draft.quarter).forEach((q, i) => {
+    const first = inputs.prior && draft.quarter > 1 ? draft.quarter - 1 : 0;
+    inputs.manual.quarters.slice(first, draft.quarter).forEach((q, k) => {
+      const i = first + k;
       const labels = text.incomeLabels;
       rows.push([
         `${text.quarter} ${i + 1}`,
@@ -119,6 +123,16 @@ export async function buildAutonomoPdf(
     });
     table([text.quarter, text.income, text.withheld], rows, [70, 365, 80]);
     const flags: string[] = [];
+    if (inputs.prior && draft.quarter > 1) {
+      const p = inputs.prior;
+      flags.push(
+        text.prior
+          .replace('{income}', eur(p.income))
+          .replace('{expenses}', eur(p.expenses))
+          .replace('{payments}', eur(p.previousPayments))
+          .replace('{withheld}', eur(p.withheld))
+      );
+    }
     if (inputs.hardToJustify) flags.push(text.flags.hardToJustify);
     if (inputs.exempt130) flags.push(text.flags.exempt);
     if (inputs.priorYearNet !== null) {

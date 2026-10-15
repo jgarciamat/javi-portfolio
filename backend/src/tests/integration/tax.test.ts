@@ -398,6 +398,52 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       });
     });
 
+    it('starts from the totals of the modelo 130 already filed, without the earlier quarters', async () => {
+      await add({ type: 'INCOME', category: 'Salario', amount: 1210, date: '2026-11-10' });
+      const { body } = await draft(4, {
+        prior: { income: 3000, expenses: 600, previousPayments: 360, withheld: 100 },
+        hardToJustify: true,
+        manual: {
+          quarters: [
+            { income: { r21: 0, r10: 0, r4: 0, r0: 0 }, expenses: [] },
+            { income: { r21: 0, r10: 0, r4: 0, r0: 0 }, expenses: [] },
+            { income: { r21: 0, r10: 0, r4: 0, r0: 0 }, expenses: [] },
+            {
+              income: { r21: 1000, r10: 0, r4: 0, r0: 0 },
+              expenses: [{ kind: 'training', amount: 121, vatRate: 21 }],
+            },
+          ],
+          profile: {
+            workArea: 0,
+            homeArea: 0,
+            vehicleExclusive: false,
+            healthPeople: 0,
+            healthDisability: false,
+          },
+        },
+        quarters: [extras, extras, extras, { ...extras, withheld: 50 }],
+      }).expect(201);
+      // 3,000 + 1,000 of income; 600 + 100 of expenses; no extra 5 % (it was in the filed 02).
+      expect(box(body.irpf.boxes, '01')).toBe(4000);
+      expect(box(body.irpf.boxes, '02')).toBe(700);
+      expect(box(body.irpf.boxes, '03')).toBe(3300);
+      expect(box(body.irpf.boxes, '04')).toBe(660);
+      expect(box(body.irpf.boxes, '05')).toBe(360);
+      expect(box(body.irpf.boxes, '06')).toBe(150);
+      expect(body.irpf.amountDue).toBe(150);
+      // The VAT is only of the viewed quarter, and the contribution counts the filed totals.
+      expect(box(body.vat.accrued, '07')).toBe(1000);
+      // 3,300 net over 12 months, less the 7 %.
+      expect(body.reta.monthlyNet).toBe(255.75);
+    });
+
+    it('ignores the filed totals in the first quarter', async () => {
+      const { body } = await draft(1, {
+        prior: { income: 9999, expenses: 0, previousPayments: 0, withheld: 0 },
+      }).expect(201);
+      expect(box(body.irpf.boxes, '01')).toBe(1100);
+    });
+
     it('lets the free plan prepare one draft only, and Premium as many as it wants', async () => {
       expireTrial(ctx, user);
       expect((await draft(1).expect(201)).body.used).toBe(1);
