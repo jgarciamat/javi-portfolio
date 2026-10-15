@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
-import { GUIDES, findGuide } from '@modules/guides/domain/guides';
+import { GUIDES, findGuide, inlineParts } from '@modules/guides/domain/guides';
 import { GuidePage, GuidesIndexPage } from '@modules/guides/ui/GuidePages';
 import { renderWithProviders } from '@test-utils/render';
 
@@ -37,6 +37,80 @@ describe('guide content', () => {
     expect(sitemap).toContain('https://www.winjgm.com/guias</loc>');
     for (const tool of TOOL_PAGES) expect(sitemap).toContain(`${tool.path}</loc>`);
     for (const g of GUIDES) expect(sitemap).toContain(`/guias/${g.slug}</loc>`);
+  });
+});
+
+const NEW_GUIDES = [
+  'modelo-130-paso-a-paso',
+  'cuota-autonomos-2026-por-tramos',
+  'gastos-deducibles-autonomo',
+  'fechas-modelos-trimestrales-autonomos-2026',
+  'deduccion-maternidad-modelo-140',
+  'familia-numerosa-deduccion-modelo-143',
+  'deducciones-renta-castilla-y-leon',
+  'deducciones-renta-comunitat-valenciana',
+  'como-leer-borrador-renta',
+  'renta-a-pagar-o-a-devolver',
+  'deduccion-alquiler-vivienda-habitual-renta',
+  'planes-de-pensiones-limite-renta',
+];
+
+const words = (text: string) =>
+  text
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+describe('tax and self-employed guides', () => {
+  it.each(NEW_GUIDES)('%s is a full article with a disclaimer and valid inline links', (slug) => {
+    const guide = findGuide(slug)!;
+    expect(guide).toBeDefined();
+    const text = [
+      guide.title,
+      guide.intro,
+      ...guide.sections.flatMap((s) => [s.heading, ...s.paragraphs]),
+    ].join(' ');
+    expect(words(text)).toBeGreaterThanOrEqual(700);
+    expect(words(text)).toBeLessThanOrEqual(1100);
+    expect(guide.description.length).toBeLessThan(200);
+    expect(text).toMatch(/orientativas/);
+    expect(guide.tool).toBeDefined();
+    expect(guide.related.length).toBeGreaterThanOrEqual(3);
+    const targets = guide.sections
+      .flatMap((s) => s.paragraphs)
+      .flatMap(inlineParts)
+      .filter((p) => typeof p !== 'string')
+      .map((p) => (p as { to: string }).to);
+    expect(targets.length).toBeGreaterThan(0);
+    for (const to of targets) {
+      const ok = to.startsWith('/guias/')
+        ? GUIDES.some((g) => `/guias/${g.slug}` === to)
+        : TOOL_PAGES.some((t) => t.path === to);
+      expect(ok).toBe(true);
+    }
+  });
+});
+
+describe('inlineParts', () => {
+  it('splits text and internal links', () => {
+    expect(inlineParts('Lee [esta guía](/guias/x) y [otra](/calculadora-iva).')).toEqual([
+      'Lee ',
+      { label: 'esta guía', to: '/guias/x' },
+      ' y ',
+      { label: 'otra', to: '/calculadora-iva' },
+      '.',
+    ]);
+    expect(inlineParts('Sin enlaces')).toEqual(['Sin enlaces']);
+    expect(inlineParts('[a](/b)')).toEqual([{ label: 'a', to: '/b' }]);
+    expect(inlineParts('[fuera](https://x.com)')).toEqual(['[fuera](https://x.com)']);
+  });
+
+  it('renders inline links inside the guide body', () => {
+    renderAt('/guias/modelo-130-paso-a-paso');
+    expect(screen.getByRole('link', { name: 'gastos deducibles de un autónomo' })).toHaveAttribute(
+      'href',
+      '/guias/gastos-deducibles-autonomo'
+    );
   });
 });
 
