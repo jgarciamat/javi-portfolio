@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { AssetMap } from './AssetMap';
 import { Learn } from './Learn';
-import { MarketsPanel } from './MarketsPanel';
+import { LearnLocked } from './LearnLocked';
 import '../../finances/ui/css/Sections.css';
 import './css/Invest.css';
 
-const SECTIONS = ['map', 'learn', 'markets'] as const;
+const SECTIONS = ['map', 'learn'] as const;
 type SectionId = (typeof SECTIONS)[number];
 
 const ICONS: Record<SectionId, string> = {
   map: '🗺️',
   learn: '📚',
-  markets: '🌍',
 };
 
 function Disclaimer() {
@@ -54,9 +54,36 @@ function useHeaderOffset(ref: RefObject<HTMLDivElement | null>) {
   }, [ref]);
 }
 
+/**
+ * "Learn to invest" is Premium. A free account gets the locked preview instead of the chapters:
+ * the text of a chapter is never rendered for it, whichever way it got here (a link in the map
+ * included). Outside the plan provider (tests, public pages) nothing is locked, like PremiumOnly.
+ */
+function LearnGate({
+  openId,
+  onOpen,
+}: {
+  openId: string | null;
+  onOpen: (id: string | null) => void;
+}) {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  if (plan && plan.loading && !plan.overview) {
+    return (
+      <p className="inv-empty" role="status">
+        {t('app.common.loading')}
+      </p>
+    );
+  }
+  if (plan && !plan.isPremium) return <LearnLocked onUpgrade={() => plan.openUpgrade()} />;
+  return <Learn openId={openId} onOpen={onOpen} />;
+}
+
 /** The "Invest" tab: asset map, educational chapters, market hours; charts and calculators live inside the chapters. */
 export function InvestView() {
   const { t } = useI18n();
+  const plan = useOptionalPlan();
+  const free = !!plan && !plan.isPremium;
   const [section, setSection] = useState<SectionId>('map');
   const [chapter, setChapter] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -94,6 +121,7 @@ export function InvestView() {
             onKeyDown={(e) => onKey(e, i)}
           >
             <span aria-hidden="true">{ICONS[id]}</span> {t(`app.invest.section.${id}`)}
+            {id === 'learn' && free && <span className="premium-chip">Premium</span>}
           </button>
         ))}
       </div>
@@ -115,13 +143,7 @@ export function InvestView() {
             }}
           />
         )}
-        {section === 'learn' && <Learn openId={chapter} onOpen={setChapter} />}
-        {section === 'markets' && (
-          <>
-            <p className="inv-lead">{t('app.invest.markets.lead')}</p>
-            <MarketsPanel />
-          </>
-        )}
+        {section === 'learn' && <LearnGate openId={chapter} onOpen={setChapter} />}
       </div>
       <p className="inv-note inv-footer">{t('app.invest.disclaimer.short')}</p>
     </div>

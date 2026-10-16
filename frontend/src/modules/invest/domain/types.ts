@@ -46,6 +46,7 @@ export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax' | 'stock';
 
 export type Block =
   | { k: 'h'; t: string }
+  | { k: 'sh'; t: string }
   | { k: 'p'; t: string }
   | { k: 'ul'; items: string[] }
   | { k: 'key' | 'warn' | 'tip' | 'ex'; title?: string; t: string }
@@ -59,7 +60,7 @@ export interface GlossaryTerm {
   def: string;
 }
 
-export type ChapterTopic = 'basics' | 'stocks' | 'funds' | 'markets' | 'bonds' | 'crypto' | 'tax';
+export type ChapterTopic = 'basics' | 'stocks' | 'funds' | 'bonds' | 'crypto' | 'tax';
 
 export interface Chapter {
   id: string;

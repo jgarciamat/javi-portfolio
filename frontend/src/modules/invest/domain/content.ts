@@ -21,7 +21,6 @@ export const CHAPTERS: Chapter[] = [
   ...CHAPTERS_FUNDS,
   CHAPTERS_MARKETS[1],
   CHAPTERS_MARKETS[2],
-  CHAPTERS_MARKETS[3],
   ...CHAPTERS_CRYPTO_A,
   ...CHAPTERS_CRYPTO_B,
 ];
@@ -30,7 +29,6 @@ export const TOPICS: { id: ChapterTopic; label: string; labelEn: string; emoji: 
   { id: 'basics', label: 'Lo básico', labelEn: 'Basics', emoji: '🎓' },
   { id: 'stocks', label: 'Acciones', labelEn: 'Shares', emoji: '🏢' },
   { id: 'funds', label: 'Fondos y ETF', labelEn: 'Funds and ETFs', emoji: '🧺' },
-  { id: 'markets', label: 'Bolsa y mercados', labelEn: 'Stock markets', emoji: '🌍' },
   { id: 'bonds', label: 'Renta fija', labelEn: 'Bonds', emoji: '🏛️' },
   { id: 'crypto', label: 'Criptomonedas', labelEn: 'Crypto', emoji: '🪙' },
   { id: 'tax', label: 'Impuestos', labelEn: 'Taxes', emoji: '🧾' },

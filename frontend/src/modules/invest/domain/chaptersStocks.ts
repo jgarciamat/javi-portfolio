@@ -12,9 +12,9 @@ export const CHAPTERS_STOCKS: Chapter[] = [
     title: 'Acciones: qué son, qué tipos hay y cómo se invierte paso a paso',
     titleEn: 'Shares: what they are, which types exist and how to invest step by step',
     summary:
-      'Todo sobre las acciones: por qué se mueven, tipos de empresas, cómo abrir cuenta y comprar, costes, dividendos, ratios, cómo leer una cotización, riesgos e impuestos en España.',
+      'Todo sobre las acciones: por qué se mueven, tipos de empresas, cómo abrir cuenta y comprar, costes, dividendos, ratios, cotizaciones, mercados bursátiles y sus horarios (¿abierto o cerrado ahora?), riesgos e impuestos en España.',
     summaryEn:
-      'Everything about shares: why they move, types of companies, how to open an account and buy, costs, dividends, ratios, how to read a quote, risks and Spanish taxes.',
+      'Everything about shares: why they move, types of companies, how to open an account and buy, costs, dividends, ratios, quotes, stock markets and their hours (open or closed now?), risks and Spanish taxes.',
     level: 1,
     topic: 'stocks',
     blocks: [
@@ -134,7 +134,7 @@ export const CHAPTERS_STOCKS: Chapter[] = [
         title: 'Garantía del bróker',
         t: 'Si tu bróker quiebra, en España el Fondo de Garantía de Inversiones cubre hasta 100.000 euros por inversor y entidad. Protege de la insolvencia de la entidad, no de que tus acciones pierdan valor.',
       },
-      { k: 'h', t: 'Tipos de orden' },
+      { k: 'sh', t: 'Tipos de orden' },
       {
         k: 'table',
         head: ['Orden', 'Qué hace', 'Cuándo se usa'],
@@ -259,7 +259,69 @@ export const CHAPTERS_STOCKS: Chapter[] = [
         t: 'Un índice como el IBEX 35 o el S&P 500 es una cesta de muchas empresas. Una acción suelta se mueve por lo que le ocurre a esa empresa, además de por el mercado. Por eso, de media, una acción tiene más sacudidas y caídas más profundas que el índice del que forma parte.',
       },
       { k: 'chart', id: 'stockVsIndex' },
-      { k: 'h', t: '10. Diversificación y riesgo' },
+      { k: 'h', t: '10. Mercados bursátiles: horarios, apertura y cierre' },
+      {
+        k: 'p',
+        t: 'El dinero no duerme, pero las bolsas sí. Cada una abre y cierra a su hora local, y por eso a lo largo del día "pasa el testigo" del este al oeste: primero Tokio y Shanghái, luego Europa, y por último Nueva York.',
+      },
+      { k: 'markets' },
+      { k: 'sh', t: 'Qué significan apertura y cierre' },
+      {
+        k: 'ul',
+        items: [
+          'Preapertura: antes de abrir, muchos mercados admiten órdenes que no se ejecutan hasta la subasta de apertura.',
+          'Subasta de apertura: se calcula un único precio que empareja el máximo de órdenes; es el precio de apertura.',
+          'Sesión continua: las órdenes se ejecutan al instante a medida que coinciden compradores y vendedores.',
+          'Subasta de cierre: al final del día se vuelve a calcular un único precio, el precio de cierre. Es la referencia que usan los fondos para valorar su cartera.',
+          'Pausa de mediodía: en Asia (Tokio, Shanghái, Hong Kong), el mercado se detiene a mediodía.',
+        ],
+      },
+      { k: 'sh', t: 'Horario extendido: antes y después del mercado' },
+      {
+        k: 'p',
+        t: 'En EE. UU. hay sesión previa (pre-market) y posterior (after-hours) en la que se puede operar, aunque con mucha menos liquidez: pocas órdenes, diferenciales más amplios y movimientos bruscos con las noticias de resultados. Muchos brókers europeos solo permiten operar en horario regular.',
+      },
+      {
+        k: 'tip',
+        title: 'El truco de la hora española',
+        t: 'Nueva York abre a las 15:30 de España casi todo el año. EE. UU. y Europa cambian de hora en fechas distintas (unas semanas en marzo y entre finales de octubre y principios de noviembre), y entonces la diferencia es de 5 horas en lugar de 6: abre a las 14:30. La tabla se ajusta sola a la fecha de hoy.',
+      },
+      { k: 'sh', t: 'Festivos y cierres especiales' },
+      {
+        k: 'p',
+        t: 'Cada bolsa tiene su propio calendario de festivos (Navidad, Año Nuevo, Día de Acción de Gracias en EE. UU., Año Nuevo Lunar en Asia...). Algunos días se cierra antes. El indicador de «abierto o cerrado» de esta sección se calcula solo con el horario habitual y el día de la semana: no incluye festivos, así que consulta el calendario oficial del mercado antes de operar.',
+      },
+      { k: 'sh', t: 'Los índices más conocidos' },
+      {
+        k: 'table',
+        head: ['Índice', 'Qué mide', 'Dónde cotizan sus valores'],
+        rows: [
+          ['S&P 500', '500 grandes empresas de EE. UU.', 'NYSE y Nasdaq'],
+          [
+            'Dow Jones Industrial',
+            '30 grandes empresas de EE. UU. (ponderado por precio)',
+            'NYSE y Nasdaq',
+          ],
+          ['Nasdaq 100', '100 empresas no financieras del Nasdaq, muy tecnológico', 'Nasdaq'],
+          ['IBEX 35', '35 empresas más líquidas de España', 'Bolsa de Madrid'],
+          ['DAX 40', '40 grandes empresas alemanas', 'Fráncfort'],
+          ['CAC 40', '40 grandes empresas francesas', 'París'],
+          ['FTSE 100', '100 mayores empresas del Reino Unido', 'Londres'],
+          ['Nikkei 225', '225 empresas japonesas (ponderado por precio)', 'Tokio'],
+          ['Hang Seng', 'Grandes empresas de Hong Kong', 'Hong Kong'],
+          [
+            'SSE Composite / CSI 300',
+            'Empresas cotizadas en Shanghái (y Shenzhen en el CSI 300)',
+            'Shanghái y Shenzhen',
+          ],
+        ],
+      },
+      {
+        k: 'key',
+        title: 'El mercado cripto no cierra',
+        t: 'Las criptomonedas cotizan las 24 horas, todos los días del año. No hay apertura ni cierre: eso también significa que un fin de semana puede haber movimientos bruscos sin que ninguna bolsa tradicional esté abierta.',
+      },
+      { k: 'h', t: '11. Diversificación y riesgo' },
       {
         k: 'ul',
         items: [
@@ -271,7 +333,7 @@ export const CHAPTERS_STOCKS: Chapter[] = [
           'Diversificar significa repartir entre muchas empresas, sectores y países. Los fondos indexados y los ETF lo hacen en un solo producto.',
         ],
       },
-      { k: 'h', t: '11. Impuestos en España' },
+      { k: 'h', t: '12. Impuestos en España' },
       {
         k: 'ul',
         items: [
@@ -285,7 +347,7 @@ export const CHAPTERS_STOCKS: Chapter[] = [
         ],
       },
       { k: 'calc', id: 'stock' },
-      { k: 'h', t: '12. Empresas conocidas por sector, solo como ilustración' },
+      { k: 'h', t: '13. Empresas conocidas por sector, solo como ilustración' },
       {
         k: 'p',
         t: 'Para reconocer cómo se agrupan las empresas en bolsa. Es una lista de ejemplos de cada sector a fecha de redacción: no son recomendaciones, no están ordenadas por calidad ni por atractivo, y no incluyen precios ni previsiones.',
@@ -304,7 +366,7 @@ export const CHAPTERS_STOCKS: Chapter[] = [
           ['Alimentación y bebidas', 'Nestlé, Coca-Cola, Danone'],
         ],
       },
-      { k: 'h', t: '13. Errores frecuentes' },
+      { k: 'h', t: '14. Errores frecuentes' },
       {
         k: 'ul',
         items: [
@@ -329,6 +391,23 @@ export const CHAPTERS_STOCKS: Chapter[] = [
       },
     ],
     glossary: [
+      {
+        term: 'Subasta',
+        def: 'Mecanismo que fija un único precio que empareja el mayor volumen posible de órdenes.',
+      },
+      {
+        term: 'Pre-market / after-hours',
+        def: 'Sesiones fuera del horario regular de un mercado, con menos liquidez.',
+      },
+      {
+        term: 'Hora local',
+        def: 'Hora en la ciudad de la bolsa; para ti, hay que convertirla a la hora de España.',
+      },
+      { term: 'Liquidez', def: 'Facilidad para comprar o vender sin mover el precio.' },
+      {
+        term: 'Horario de verano',
+        def: 'Cambio de hora que hace que la diferencia entre ciudades varíe unas semanas al año.',
+      },
       { term: 'Acción', def: 'Título que representa una parte del capital de una empresa.' },
       {
         term: 'Dividendo',
