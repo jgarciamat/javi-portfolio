@@ -6,11 +6,17 @@ import { MarketsPanel } from './MarketsPanel';
 
 const CALLOUT_ICON = { key: '💡', warn: '⚠️', tip: '✅', ex: '🧮' } as const;
 
-function BlockView({ block }: { block: Block }) {
+function BlockView({ block, anchor }: { block: Block; anchor: string }) {
   const { t } = useI18n();
   switch (block.k) {
     case 'h':
-      return <h3 className="inv-h">{block.t}</h3>;
+      return (
+        <h3 className="inv-h" id={anchor}>
+          {block.t}
+        </h3>
+      );
+    case 'sh':
+      return <h4 className="inv-sh">{block.t}</h4>;
     case 'p':
       return <p>{block.t}</p>;
     case 'ul':
@@ -84,10 +90,33 @@ function BlockView({ block }: { block: Block }) {
 /** The text, tables, charts and calculators of one chapter, and its glossary. */
 export function ChapterBody({ chapter }: { chapter: Chapter }) {
   const { t } = useI18n();
+  const anchors = chapter.blocks.map((_, i) => `${chapter.id}-s${i}`);
+  const headings = chapter.blocks.flatMap((b, i) =>
+    b.k === 'h' ? [{ id: anchors[i], text: b.t }] : []
+  );
+  const jump = (id: string) =>
+    (document.getElementById(id) as HTMLElement).scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   return (
     <div className="inv-chapter-body">
+      {headings.length >= 6 && (
+        <nav className="inv-toc" aria-label={t('app.invest.learn.toc')}>
+          <strong>{t('app.invest.learn.toc')}</strong>
+          <ol>
+            {headings.map((h) => (
+              <li key={h.id}>
+                <button type="button" className="inv-link" onClick={() => jump(h.id)}>
+                  {h.text.replace(/^\d+\.\s*/, '')}
+                </button>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
       {chapter.blocks.map((b, i) => (
-        <BlockView key={i} block={b} />
+        <BlockView key={i} block={b} anchor={anchors[i]} />
       ))}
       <section className="inv-glossary" aria-label={t('app.invest.learn.glossary')}>
         <h3 className="inv-h">📖 {t('app.invest.learn.glossary')}</h3>

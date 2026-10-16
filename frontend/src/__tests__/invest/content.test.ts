@@ -97,7 +97,6 @@ describe('chapters', () => {
       'ETF',
       'Interés compuesto',
       'acciones',
-      'mercados',
       'bonos',
       'blockchain',
       'apalancamiento',

@@ -26,7 +26,7 @@ describe('Invest tab', () => {
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.risk'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.advisor'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.past'));
-    expect(screen.getAllByRole('tab')).toHaveLength(3);
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
     expect(tab('map')).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', 'inv-tab-map');
     expect(screen.getByText(tr('app.invest.disclaimer.short'))).toBeInTheDocument();
@@ -38,16 +38,14 @@ describe('Invest tab', () => {
     expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
     fireEvent.keyDown(tab('learn'), { key: 'Enter' });
     expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
-    fireEvent.keyDown(tab('learn'), { key: 'ArrowLeft' });
-    fireEvent.keyDown(tab('map'), { key: 'ArrowLeft' });
-    expect(tab('markets')).toHaveAttribute('aria-selected', 'true');
-    fireEvent.keyDown(tab('markets'), { key: 'ArrowRight' });
+    fireEvent.keyDown(tab('learn'), { key: 'ArrowRight' });
     expect(tab('map')).toHaveAttribute('aria-selected', 'true');
-    for (const id of ['learn', 'markets', 'map']) {
+    fireEvent.keyDown(tab('map'), { key: 'ArrowLeft' });
+    expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
+    for (const id of ['map', 'learn', 'map']) {
       open(id);
       expect(tab(id)).toHaveAttribute('aria-selected', 'true');
     }
-    expect(screen.queryByRole('tab', { name: /Gráficos|Calculadoras/ })).toBeNull();
   });
 
   it('keeps the section menu under the header of the app', () => {
@@ -162,7 +160,7 @@ describe('Asset map', () => {
   it('is in English with English names and labels', () => {
     renderWithI18n(<InvestView />, 'en');
     expect(screen.getAllByText('Equities / stocks').length).toBeGreaterThan(0);
-    expect(screen.getByRole('tab', { name: /Markets/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Learn to invest/ })).toBeInTheDocument();
     expect(screen.getAllByText(/Risk 7\/7/).length).toBeGreaterThan(0);
   });
 });
@@ -280,15 +278,8 @@ describe('Learn', () => {
     fireEvent.click(
       screen.getByRole('button', { name: literal(`← ${tr('app.invest.learn.back')}`) })
     );
-    openChapter('Los grandes mercados del mundo: horarios, apertura y cierre');
-    expect(
-      screen.getByRole('region', { name: tr('app.invest.markets.title') })
-    ).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole('button', { name: literal(`← ${tr('app.invest.learn.back')}`) })
-    );
     openChapter('Las monedas principales y los proyectos que hay detrás');
-    expect(screen.getByText('Bitcoin (BTC): la primera')).toBeInTheDocument();
+    expect(screen.getAllByText('Bitcoin (BTC): la primera').length).toBeGreaterThan(0);
   });
 
   it('shows English titles and says the text is in Spanish', () => {
@@ -311,13 +302,18 @@ describe('Learn', () => {
   });
 });
 
-describe('Markets', () => {
+const openStocks = () => {
+  open('learn');
+  openChapter(CHAPTERS[0].title);
+};
+
+describe('Stock markets inside the Shares chapter', () => {
   beforeEach(() => jest.useFakeTimers({ now: new Date('2026-10-16T08:00:00Z') }));
   afterEach(() => jest.useRealTimers());
 
   it('shows local and Spanish hours and which markets are open now', () => {
     renderWithI18n(<InvestView />);
-    open('markets');
+    openStocks();
     expect(
       screen.getByText(tr('app.invest.markets.openCount', { open: 6, total: 14 }))
     ).toBeInTheDocument();
@@ -337,20 +333,27 @@ describe('Markets', () => {
     expect(row(/Tokio/)).toHaveTextContent('02:00–04:30');
     expect(screen.getByText(/Viernes/)).toHaveTextContent('10:00');
     expect(screen.getByText(tr('app.invest.markets.note'))).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Mercados bursátiles: horarios, apertura y cierre/ })
+    ).toBeInTheDocument();
     expect(screen.getByText(/Subasta de apertura desde las 08:30/)).toBeInTheDocument();
   });
 
   it('shows the lunch break of Asian markets', () => {
     jest.setSystemTime(new Date('2026-10-16T04:00:00Z'));
     renderWithI18n(<InvestView />);
-    open('markets');
-    expect(screen.getByRole('row', { name: /Shanghái/ })).toHaveAttribute('data-state', 'break');
+    openStocks();
+    const table = screen.getByRole('table', { name: tr('app.invest.markets.title') });
+    expect(within(table).getByRole('row', { name: /Shanghái/ })).toHaveAttribute(
+      'data-state',
+      'break'
+    );
   });
 
   it('is closed at the weekend and has no countdown', () => {
     jest.setSystemTime(new Date('2026-10-17T10:00:00Z'));
     renderWithI18n(<InvestView />);
-    open('markets');
+    openStocks();
     expect(
       screen.getByText(tr('app.invest.markets.openCount', { open: 0, total: 14 }))
     ).toBeInTheDocument();
@@ -359,7 +362,7 @@ describe('Markets', () => {
 
   it('refreshes by itself and stops when it closes', () => {
     const { unmount } = renderWithI18n(<InvestView />);
-    open('markets');
+    openStocks();
     expect(screen.getByText(/Viernes/)).toHaveTextContent('10:00');
     act(() => {
       jest.advanceTimersByTime(31 * 60 * 1000);
@@ -371,7 +374,8 @@ describe('Markets', () => {
 
   it('is in English', () => {
     renderWithI18n(<InvestView />, 'en');
-    fireEvent.click(screen.getByRole('tab', { name: /Markets/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /Learn to invest/ }));
+    fireEvent.click(screen.getByRole('button', { name: CHAPTERS[0].titleEn }));
     expect(screen.getByText(/Friday/)).toBeInTheDocument();
     expect(screen.getAllByText(/changes in/).length).toBeGreaterThan(0);
   });
@@ -407,9 +411,8 @@ describe('Charts inside the chapters', () => {
   it('has no separate charts or calculators section any more', () => {
     renderWithI18n(<InvestView />);
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([
-      expect.stringContaining('Mapa'),
-      expect.stringContaining('Aprende'),
-      expect.stringContaining('Mercados'),
+      expect.stringContaining('Información sobre inversión'),
+      expect.stringContaining('Aprende a invertir'),
     ]);
   });
 
@@ -511,5 +514,29 @@ describe('Shares chapter', () => {
     expect(
       screen.getByText(/Esto es educación, no una lista de acciones para comprar/)
     ).toBeInTheDocument();
+  });
+});
+
+describe('Chapter table of contents', () => {
+  it('lists the sections of a long chapter and jumps to one', () => {
+    renderWithI18n(<InvestView />);
+    openStocks();
+    const toc = screen.getByRole('navigation', { name: tr('app.invest.learn.toc') });
+    const links = within(toc).getAllByRole('button');
+    expect(links.length).toBeGreaterThanOrEqual(14);
+    expect(
+      within(toc).getByRole('button', { name: 'Mercados bursátiles: horarios, apertura y cierre' })
+    ).toBeInTheDocument();
+    const scroll = jest.spyOn(Element.prototype, 'scrollIntoView');
+    fireEvent.click(within(toc).getByRole('button', { name: 'Impuestos en España' }));
+    expect(scroll).toHaveBeenCalled();
+    scroll.mockRestore();
+  });
+
+  it('has no table of contents in a short chapter', () => {
+    renderWithI18n(<InvestView />);
+    open('learn');
+    openChapter('Fondos indexados: qué son y por qué los eligen tantos inversores');
+    expect(screen.queryByRole('navigation', { name: tr('app.invest.learn.toc') })).toBeNull();
   });
 });
