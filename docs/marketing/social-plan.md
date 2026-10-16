@@ -34,6 +34,10 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
 - **Al subir en la web de Instagram:** en el paso «Recortar», cambia el formato de **1:1 a 9:16**; si no, recorta el
   vídeo por arriba y por abajo.
 - Con 1 por día, los 90 vídeos cubren unos 3 meses.
+- **Historias:** cada vez que se publique un post, el mismo vídeo se publica también como **historia** de Instagram
+  (el mismo día, justo después del post). Si el vídeo dura más de lo que admite una historia (60 s en total, hasta
+  unos 15-60 s según el formato), se sube el vídeo entero igualmente o se corta por escenas; en la historia se puede
+  añadir una pegatina de enlace a la ficha de Google Play o a `winjgm.com`.
 
 ## 3. Cómo conseguir seguidores y usuarios (sin spam)
 
