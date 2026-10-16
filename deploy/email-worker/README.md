@@ -1,6 +1,6 @@
 # Facturas por email (Cloudflare Email Worker)
 
-Cada usuario Premium tiene una dirección privada `mm-<token>@facturas.winjgm.com`. Cuando reenvía
+Cada usuario Premium tiene una dirección privada `mm-<token>@facturas.finanverso.app`. Cuando reenvía
 un recibo o factura a esa dirección, este Worker lo recibe y lo manda a la API
 (`POST /api/inbound/email`), que lo convierte en un gasto.
 
@@ -9,7 +9,7 @@ un recibo o factura a esa dirección, este Worker lo recibe y lo manda a la API
 1. **Elige un secreto** largo (mínimo 16 caracteres), por ejemplo con `openssl rand -hex 32`.
 2. **Servidor**: añade a su archivo de entorno y reinicia el backend:
    ```
-   INBOUND_EMAIL_DOMAIN=facturas.winjgm.com
+   INBOUND_EMAIL_DOMAIN=facturas.finanverso.app
    INBOUND_EMAIL_SECRET=<el secreto>
    ```
 3. **Desplegar el Worker**:
@@ -20,11 +20,11 @@ un recibo o factura a esa dirección, este Worker lo recibe y lo manda a la API
    npx wrangler secret put INBOUND_SECRET     # pega el mismo secreto
    npx wrangler deploy
    ```
-4. **Cloudflare, Email Routing** (dominio `winjgm.com`): activa Email Routing y añade el subdominio
+4. **Cloudflare, Email Routing** (dominio `finanverso.app`): activa Email Routing y añade el subdominio
    `facturas` (Email, Email Routing, Settings, Subdomains). Cloudflare crea los registros MX.
    Después, en Routing rules, crea una **catch-all** del subdominio con la acción
    *Send to a Worker* y elige `money-manager-inbox`.
-   Usar un subdominio evita que el resto de direcciones de `winjgm.com` pasen por el Worker.
+   Usar un subdominio evita que el resto de direcciones de `finanverso.app` pasen por el Worker.
 
 Mientras `INBOUND_EMAIL_DOMAIN` e `INBOUND_EMAIL_SECRET` no estén definidos, la tarjeta de la app
 (Ajustes, Facturas por email) permanece oculta.

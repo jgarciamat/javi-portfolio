@@ -30,14 +30,14 @@ describe('Receipts forwarded by e-mail', () => {
   beforeEach(async () => {
     ctx = createTestApp({
       now: '2026-03-15T12:00:00Z',
-      env: { INBOUND_EMAIL_DOMAIN: 'Facturas.winjgm.com', INBOUND_EMAIL_SECRET: SECRET },
+      env: { INBOUND_EMAIL_DOMAIN: 'Facturas.finanverso.app', INBOUND_EMAIL_SECRET: SECRET },
     });
     user = await createUser(ctx);
   });
 
   it('gives every user a private address that stays the same until it is renewed', async () => {
     const first = await inbox();
-    expect(first.address).toMatch(/^mm-[a-f0-9]{20}@facturas\.winjgm\.com$/);
+    expect(first.address).toMatch(/^mm-[a-f0-9]{20}@facturas\.finanverso\.app$/);
     expect(first.recent).toEqual([]);
     expect((await inbox()).address).toBe(first.address);
     const other = await createUser(ctx, 'otra@example.com');
@@ -114,8 +114,8 @@ describe('Receipts forwarded by e-mail', () => {
   });
 
   it('ignores unknown addresses and refuses the wrong secret', async () => {
-    expect((await mail('hola@facturas.winjgm.com')).body).toEqual({ status: 'ignored' });
-    expect((await mail('mm-00000000000000000000@facturas.winjgm.com')).body).toEqual({
+    expect((await mail('hola@facturas.finanverso.app')).body).toEqual({ status: 'ignored' });
+    expect((await mail('mm-00000000000000000000@facturas.finanverso.app')).body).toEqual({
       status: 'ignored',
     });
     await mail('x@y.z', {}, 'not-the-secret').expect(401);

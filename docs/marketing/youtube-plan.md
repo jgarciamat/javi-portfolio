@@ -13,9 +13,9 @@ Crear un canal es crear una cuenta, así que lo tiene que hacer una persona.
 2. Nombre: **Money Manager**. Identificador (@): `@moneymanager.app` o similar, el que esté libre.
 3. Foto de perfil: `docs/marketing/assets/moneyLogo.png`. Banner: 2048×1152 px (se puede preparar a partir de las portadas).
 4. Descripción: «Aprende a controlar tus gastos, ahorrar, preparar la Renta y tus impuestos de autónomo, y entender las
-   inversiones. App gratis en Google Play y en https://www.winjgm.com. Contenido educativo; no es una recomendación de
+   inversiones. App gratis en Google Play y en https://finanverso.app. Contenido educativo; no es una recomendación de
    inversión.»
-5. Enlaces del canal: `https://www.winjgm.com` y la ficha de Google Play.
+5. Enlaces del canal: `https://finanverso.app` y la ficha de Google Play.
 6. En YouTube Studio: **Configuración → Canal → Ajustes avanzados** → «No, este canal no es contenido para niños».
    Activar la verificación en dos pasos en la cuenta de Google.
 
@@ -35,7 +35,7 @@ debe publicarse cuando esa sección ya esté disponible en la app de Google Play
 ## 3. Cómo se sube cada vídeo
 
 - Título: el de `calendario.csv`; descripción: el pie de `GUIONES.md` más «Descarga Money Manager gratis: Google Play y
-  winjgm.com» y la etiqueta `#Shorts`.
+  finanverso.app» y la etiqueta `#Shorts`.
 - Miniatura: la portada `covers/NN-*.png` (los Shorts usan un fotograma; la portada es el primer fotograma del vídeo).
 - Audiencia: «No, no es contenido para niños». Visibilidad: público (o programado).
 - YouTube Studio permite **programar** con fecha y hora (Visibilidad → Programar), así que se puede cargar un lote y que

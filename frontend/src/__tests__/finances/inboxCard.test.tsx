@@ -3,7 +3,7 @@ import { InboxCard } from '@modules/finances/ui/components/InboxCard';
 import { createFakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders, tr } from '@test-utils/render';
 
-const ADDRESS = 'mm-0123456789abcdef0123@facturas.winjgm.com';
+const ADDRESS = 'mm-0123456789abcdef0123@facturas.finanverso.app';
 
 afterEach(() => jest.restoreAllMocks());
 
@@ -57,7 +57,7 @@ describe('Receipts by e-mail card', () => {
     expect(api.inboxApi.rotate).not.toHaveBeenCalled();
     fireEvent.click(change);
     expect(
-      await screen.findByText('mm-fedcba98765432100123@facturas.winjgm.com')
+      await screen.findByText('mm-fedcba98765432100123@facturas.finanverso.app')
     ).toBeInTheDocument();
     expect(confirm).toHaveBeenCalledTimes(2);
   });

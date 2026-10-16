@@ -1,5 +1,5 @@
 // Cloudflare Email Worker: forwards every message sent to the receipts addresses
-// (mm-<token>@facturas.winjgm.com) to the Money Manager API, which turns it into an expense.
+// (mm-<token>@facturas.finanverso.app) to the Finanverso API, which turns it into an expense.
 import PostalMime from 'postal-mime';
 
 export default {
