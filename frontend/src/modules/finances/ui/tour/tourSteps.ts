@@ -40,6 +40,7 @@ const STEPS: TourStep[] = [
   { id: 'automations', tab: 'automations', target: SECTION },
   { id: 'alerts', tab: 'custom-alerts', target: SECTION },
   { id: 'learn', tab: 'learn', target: SECTION },
+  { id: 'invest', tab: 'invest', target: SECTION },
   { id: 'plan', tab: 'plan', target: SECTION },
   { id: 'offers', tab: 'offers', target: SECTION },
   { id: 'settings', tab: 'settings', target: SECTION },
