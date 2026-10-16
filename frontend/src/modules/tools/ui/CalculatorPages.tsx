@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
+import { appTabPath } from '@shared/utils/appLinks';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
   budgetRule,
@@ -491,26 +492,17 @@ export function GoalCalculatorPage() {
   );
 }
 
-/** Public page of the income tax return calculator; signed-in people use the section of the app. */
+/** Public page of the income tax return calculator; signed-in people go to the section of the app. */
 export function RentaCalculatorPage() {
-  const { t } = useI18n();
   const { isAuthenticated } = useAuth();
+  if (isAuthenticated) return <Navigate to={appTabPath('renta')} replace />;
   return (
     <CalculatorLayout
       path="/calculadora-renta"
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
     >
-      {isAuthenticated ? (
-        <section className="tools-result">
-          <p>{t('tools.renta.inApp')}</p>
-          <Link className="btn-primary" to="/">
-            {t('tools.renta.openApp')}
-          </Link>
-        </section>
-      ) : (
-        <RentaPlanner mode="local" />
-      )}
+      <RentaPlanner mode="local" />
     </CalculatorLayout>
   );
 }

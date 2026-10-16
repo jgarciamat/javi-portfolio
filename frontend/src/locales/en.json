@@ -1388,8 +1388,6 @@
   "tools.renta.usedNoSnapshot": "You have already used your free calculation. With Premium you calculate without limit.",
   "tools.renta.goPremium": "See Premium",
   "tools.renta.createAccount": "Create your free account: 14 days of Premium to calculate without limit.",
-  "tools.renta.inApp": "You are signed in: use the \"Tax return\" section of the app menu, where your calculations are kept.",
-  "tools.renta.openApp": "Open the app",
   "tools.renta.calculating": "Calculating…",
   "landing.features.health.title": "Financial health and challenges",
   "landing.features.health.body": "A score from 0 to 100 with what you can improve, and monthly challenges such as no-spend days.",

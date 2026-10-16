@@ -1,5 +1,5 @@
 import { fireEvent, screen, within } from '@testing-library/react';
-import { GUIDES } from '@modules/guides/domain/guides';
+import { GUIDES, findGuide } from '@modules/guides/domain/guides';
 import {
   GUIDE_CATEGORIES,
   categoryOf,
@@ -11,7 +11,7 @@ import { literal, renderWithProviders, tr } from '@test-utils/render';
 
 describe('Learn to save', () => {
   it('lists every guide and reads any of them', () => {
-    renderWithProviders(<LearnView />);
+    renderWithProviders(<LearnView onOpenTab={jest.fn()} />);
     expect(screen.getByText(tr('app.learn.count', { total: GUIDES.length }))).toBeInTheDocument();
     const guide = GUIDES.find((g) => g.tool)!;
     fireEvent.click(screen.getByRole('button', { name: literal(guide.title) }));
@@ -20,7 +20,7 @@ describe('Learn to save', () => {
   });
 
   it('goes back to the list and opens a guide without a calculator', () => {
-    renderWithProviders(<LearnView />);
+    renderWithProviders(<LearnView onOpenTab={jest.fn()} />);
     const plain = GUIDES.find((g) => !g.tool)!;
     fireEvent.click(screen.getByRole('button', { name: literal(plain.title) }));
     expect(screen.queryByRole('link')).toBeNull();
@@ -31,7 +31,7 @@ describe('Learn to save', () => {
 
 describe('Guide catalogue', () => {
   it('groups the guides by topic and filters by topic and search', () => {
-    renderWithProviders(<LearnView />);
+    renderWithProviders(<LearnView onOpenTab={jest.fn()} />);
     const groups = document.querySelectorAll('.guide-group');
     expect(groups.length).toBe(GUIDE_CATEGORIES.length);
     fireEvent.click(screen.getByRole('button', { name: /Autónomos/ }));
@@ -64,5 +64,42 @@ describe('Guide catalogue', () => {
       '20 %',
       '1.500 €',
     ]);
+  });
+});
+
+describe('Links inside the guides of the app', () => {
+  const open = (slug: string, onOpenTab = jest.fn()) => {
+    renderWithProviders(<LearnView onOpenTab={onOpenTab} />);
+    fireEvent.click(screen.getByRole('button', { name: literal(findGuide(slug)!.title) }));
+    return onOpenTab;
+  };
+
+  it('opens the section of the app from the calculator button and from the text', () => {
+    const slug = GUIDES.find((g) => g.tool?.to === '/calculadora-renta')!.slug;
+    const onOpenTab = open(slug);
+    fireEvent.click(screen.getByRole('button', { name: /Calculadora de la Renta/ }));
+    expect(onOpenTab).toHaveBeenCalledWith('renta');
+  });
+
+  it('opens another guide in place and the sections from a link in the text', () => {
+    const slug = GUIDES.find((g) =>
+      g.sections.some((s) => s.paragraphs.some((p) => p.includes('(/calculadora-renta)')))
+    )!.slug;
+    const onOpenTab = open(slug);
+    fireEvent.click(screen.getByRole('button', { name: 'calculadora de la Renta' }));
+    expect(onOpenTab).toHaveBeenCalledWith('renta');
+    fireEvent.click(screen.getByRole('button', { name: 'si te sale a pagar o a devolver' }));
+    expect(document.querySelector('.guide-article h2')?.textContent).toBe(
+      findGuide('renta-a-pagar-o-a-devolver')!.title
+    );
+  });
+
+  it('leaves the public calculators as links', () => {
+    const slug = GUIDES.find((g) => g.tool?.to === '/calculadora-iva')!.slug;
+    open(slug);
+    expect(screen.getByRole('link', { name: /Calculadora de IVA/ })).toHaveAttribute(
+      'href',
+      '/calculadora-iva'
+    );
   });
 });

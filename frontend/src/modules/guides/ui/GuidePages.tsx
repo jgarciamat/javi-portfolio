@@ -5,6 +5,7 @@ import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { findGuide } from '../domain/guides';
 import { GuideCatalog } from './GuideCatalog';
 import { GuideBody } from './GuideBody';
+import { PublicGuideLink } from './GuideLinks';
 import '@modules/tools/ui/css/Tools.css';
 import './css/Guides.css';
 
@@ -56,6 +57,7 @@ export function GuidesIndexPage() {
 /** One guide, with a link to its calculator and to related guides. */
 export function GuidePage() {
   const { slug } = useParams();
+  const { isAuthenticated } = useAuth();
   const guide = findGuide(slug);
   usePageMeta(
     guide ? `${guide.title} | Money Manager` : 'Guías | Money Manager',
@@ -73,13 +75,24 @@ export function GuidePage() {
         </p>
         <article className="guide-article">
           <h1 className="pricing-title">{guide.title}</h1>
-          <GuideBody guide={guide} />
+          <GuideBody
+            guide={guide}
+            renderLink={(to, label) => (
+              <PublicGuideLink to={to} authenticated={isAuthenticated}>
+                {label}
+              </PublicGuideLink>
+            )}
+          />
         </article>
         {guide.tool && (
           <p className="guide-tool">
-            <Link className="btn-secondary" to={guide.tool.to}>
+            <PublicGuideLink
+              className="btn-secondary"
+              to={guide.tool.to}
+              authenticated={isAuthenticated}
+            >
               🧮 {guide.tool.label}
-            </Link>
+            </PublicGuideLink>
           </p>
         )}
         <GuideCta />

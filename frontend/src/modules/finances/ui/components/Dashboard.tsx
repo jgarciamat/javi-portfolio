@@ -47,7 +47,9 @@ const ImportModal = lazyNamed(() => import('./ImportModal'), 'ImportModal');
 const ProfilePage = lazyNamed(() => import('@modules/auth/ui/ProfilePage'), 'ProfilePage');
 
 /** Sections that need nothing from the dashboard. */
-const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
+const SIMPLE_VIEWS: Partial<
+  Record<DashboardTab, (open: (tab: DashboardTab) => void) => ReactElement>
+> = {
   analysis: () => <AnalysisView />,
   health: () => <HealthView />,
   accounts: () => <AccountsView />,
@@ -57,7 +59,7 @@ const SIMPLE_VIEWS: Partial<Record<DashboardTab, () => ReactElement>> = {
   assets: () => <AssetsView />,
   business: () => <BusinessView />,
   renta: () => <RentaView />,
-  learn: () => <LearnView />,
+  learn: (open) => <LearnView onOpenTab={open} />,
   plan: () => <PlanView />,
   offers: () => <OffersView />,
 };
@@ -74,7 +76,7 @@ function SectionLoading() {
 function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTour: () => void }) {
   const { year, categories } = useFinances();
   const simple = SIMPLE_VIEWS[dash.tab];
-  if (simple) return simple();
+  if (simple) return simple(dash.setTab);
   switch (dash.tab) {
     case 'annual':
       return (

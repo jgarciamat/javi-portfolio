@@ -1388,8 +1388,6 @@
   "tools.renta.usedNoSnapshot": "Ya has usado tu cálculo gratuito. Con Premium calculas sin límite.",
   "tools.renta.goPremium": "Ver Premium",
   "tools.renta.createAccount": "Crea tu cuenta gratis: 14 días de Premium para calcular sin límite.",
-  "tools.renta.inApp": "Ya tienes sesión: usa la sección «Renta» del menú de la app, donde tus cálculos no se pierden.",
-  "tools.renta.openApp": "Abrir la app",
   "tools.renta.calculating": "Calculando…",
   "landing.features.health.title": "Salud financiera y retos",
   "landing.features.health.body": "Una nota de 0 a 100 con lo que puedes mejorar, y retos mensuales como los días sin gastar.",

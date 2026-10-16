@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { GUIDES, findGuide } from '@modules/guides/domain/guides';
 import { GuideCatalog } from '@modules/guides/ui/GuideCatalog';
+import { AppGuideLink } from '@modules/guides/ui/GuideLinks';
+import { isDashboardTab, type DashboardTab } from '../navigation';
 import { GuideBody } from '@modules/guides/ui/GuideBody';
 import { Icon } from '@shared/components/Icon';
 import '@modules/guides/ui/css/Guides.css';
 import '../css/Sections.css';
 
 /** Savings guides, open to every account. */
-export function LearnView() {
+export function LearnView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
   const { t } = useI18n();
   const [open, setOpen] = useState<string | null>(null);
   const guide = open ? findGuide(open) : undefined;
+  const openTab = (tab: string) => {
+    if (isDashboardTab(tab)) onOpenTab(tab);
+  };
 
   if (guide) {
     return (
@@ -22,12 +26,24 @@ export function LearnView() {
             ← {t('app.learn.back')}
           </button>
           <h2 className="section-title">{guide.title}</h2>
-          <GuideBody guide={guide} />
+          <GuideBody
+            guide={guide}
+            renderLink={(to, label) => (
+              <AppGuideLink to={to} onGuide={setOpen} onTab={openTab}>
+                {label}
+              </AppGuideLink>
+            )}
+          />
           {guide.tool && (
             <p className="guide-tool">
-              <Link className="btn-secondary" to={guide.tool.to}>
+              <AppGuideLink
+                className="btn-secondary"
+                to={guide.tool.to}
+                onGuide={setOpen}
+                onTab={openTab}
+              >
                 <Icon name="sparkles" /> {t('app.learn.tool', { label: guide.tool.label })}
-              </Link>
+              </AppGuideLink>
             </p>
           )}
         </div>

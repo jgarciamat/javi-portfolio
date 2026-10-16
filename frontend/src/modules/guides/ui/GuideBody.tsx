@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { inlineParts, type Guide } from '../domain/guides';
 import { categoryOf, readingMinutes } from '../domain/guideCategories';
@@ -18,7 +19,14 @@ export function highlight(text: string) {
 }
 
 /** The text of a guide: introduction and sections. */
-export function GuideBody({ guide }: { guide: Guide }) {
+export function GuideBody({
+  guide,
+  renderLink,
+}: {
+  guide: Guide;
+  /** How an internal link of the text is shown; by default a link to that address. */
+  renderLink?: (to: string, label: string) => ReactNode;
+}) {
   return (
     <div style={{ ['--cat' as string]: categoryOf(guide.slug).color }}>
       <p className="guide-kicker">
@@ -37,9 +45,13 @@ export function GuideBody({ guide }: { guide: Guide }) {
                 typeof part === 'string' ? (
                   highlight(part)
                 ) : (
-                  <Link key={part.to + part.label} to={part.to}>
-                    {part.label}
-                  </Link>
+                  <span key={part.to + part.label}>
+                    {renderLink ? (
+                      renderLink(part.to, part.label)
+                    ) : (
+                      <Link to={part.to}>{part.label}</Link>
+                    )}
+                  </span>
                 )
               )}
             </p>

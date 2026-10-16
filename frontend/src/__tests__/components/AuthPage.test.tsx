@@ -97,4 +97,24 @@ describe('AuthPage', () => {
     );
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
   });
+
+  test('goes to the section of the app the visitor came for', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <MemoryRouter initialEntries={['/login?next=%2F%3Ftab%3Drenta']}>
+        <AuthPage />
+      </MemoryRouter>
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/?tab=renta', { replace: true });
+  });
+
+  test('ignores a next address that does not point to the app', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <MemoryRouter initialEntries={['/login?next=https%3A%2F%2Fevil.example']}>
+        <AuthPage />
+      </MemoryRouter>
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+  });
 });
