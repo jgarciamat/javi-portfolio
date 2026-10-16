@@ -14,7 +14,7 @@ import { Heatmap, TaxGlance } from './Heatmap';
 const BANDS: RiskBand[] = ['low', 'mid', 'high'];
 
 /** The 12 asset classes as expandable cards, with search, a risk filter and the summary tables. */
-export function AssetMap() {
+export function AssetMap({ onOpenChapter }: { onOpenChapter: (id: string) => void }) {
   const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [band, setBand] = useState<RiskBand | null>(null);
@@ -25,7 +25,7 @@ export function AssetMap() {
 
   return (
     <div className="inv-map">
-      <p className="inv-lead">{t('app.invest.map.lead')}</p>
+      <p className="inv-lead">{t('app.invest.map.lead', { total: ASSET_CLASSES.length })}</p>
       <input
         type="search"
         className="tx-input inv-search"
@@ -63,6 +63,7 @@ export function AssetMap() {
             asset={a}
             open={open.has(a.id)}
             onToggle={() => open.toggle(a.id)}
+            onOpenChapter={onOpenChapter}
           />
         ))}
       </ul>

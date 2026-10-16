@@ -1,10 +1,10 @@
 import type { AssetClass } from './types';
 
-/** Asset classes 09-12: derivatives, currencies, interest-bearing savings, pensions and insurance. */
+/** Asset classes 07-09: derivatives, interest-bearing savings, pensions and insurance. */
 export const ASSET_CLASSES_C: AssetClass[] = [
   {
     id: 'derivados',
-    num: '09',
+    num: '07',
     emoji: '⚡',
     color: '#dc2626',
     name: 'Derivados y trading',
@@ -55,54 +55,8 @@ export const ASSET_CLASSES_C: AssetClass[] = [
     },
   },
   {
-    id: 'divisas',
-    num: '10',
-    emoji: '💱',
-    color: '#0891b2',
-    name: 'Divisas',
-    nameEn: 'Currencies',
-    tagline: 'Comprar una moneda vendiendo otra: euro frente a dólar, yen, libra…',
-    what: 'El mercado de divisas (Forex) es donde se cambian monedas. También puedes tener depósitos en moneda extranjera, que ganan los intereses de esa moneda pero se convierten a euros con el tipo de cambio del día.',
-    earns:
-      'Por la variación del tipo de cambio y, en depósitos, por el diferencial de intereses entre las dos monedas. Las divisas no tienen valor "intrínseco" de largo plazo: si una sube, otra baja.',
-    risk: 6,
-    liquidity: 5,
-    liquidityNote:
-      'Es el mercado más líquido del mundo: abierto de lunes a viernes casi las 24 horas.',
-    horizon:
-      'Corto plazo si es especulación; también puede ser cobertura (viajar, tener gastos en dólares).',
-    subtypes: [
-      'Forex (pares de divisas: EUR/USD, USD/JPY…)',
-      'Depósitos y cuentas en moneda extranjera',
-      'Divisas desde un ETF o ETC',
-      'Cobertura de divisa en fondos',
-    ],
-    pros: [
-      'Mercado enorme, con precios transparentes y costes bajos.',
-      'Útil para cubrirse si cobras o gastas en otra moneda.',
-      'Operable en ambos sentidos (subida o bajada).',
-    ],
-    cons: [
-      'Movimientos de pocos porcentajes se amplifican con apalancamiento y generan pérdidas rápidas.',
-      'Factores difíciles de prever: tipos de interés, política, geopolítica.',
-      'Los bancos centrales pueden intervenir.',
-      'Riesgo de cambio sobre inversiones en el extranjero: un fondo en dólares puede ganar en dólares y perder en euros.',
-    ],
-    example:
-      'Compras 1.000 € cuando 1 € = 1,10 $ y obtienes 1.100 $. Si el euro baja a 1 € = 1,00 $ y cambias de vuelta, recibes 1.100 € (+100 €). Si sube a 1,20 $, recuperas solo 916,67 € (−83 €).',
-    taxKind: 'savings',
-    taxShort: 'Diferencias de cambio y intereses: base del ahorro',
-    tax: [
-      'Compraventa de divisas (Forex): las ganancias o pérdidas se consideran patrimoniales y van a la base del ahorro (19-30 %). Si se opera con CFD o futuros sobre divisas, igual que en derivados.',
-      'Cuentas o depósitos en divisa: los intereses son rendimientos del capital mobiliario (base del ahorro, 19-30 %). Si cambias la divisa por euros con ganancia, esa diferencia de cambio también tributa como ganancia patrimonial.',
-      'Retención: los depósitos en bancos españoles se retienen al 19 %; en bancos extranjeros no hay retención y debes declarar tú los rendimientos.',
-      'Cuentas en el extranjero: si el saldo de tus cuentas bancarias fuera de España supera 50.000 € a 31 de diciembre, o su saldo medio del último trimestre, hay que presentar el modelo 720.',
-      'IVA: los servicios de cambio de divisas están exentos.',
-    ],
-  },
-  {
     id: 'ahorro',
-    num: '11',
+    num: '08',
     emoji: '🏦',
     color: '#22c55e',
     name: 'Ahorro remunerado',
@@ -147,7 +101,7 @@ export const ASSET_CLASSES_C: AssetClass[] = [
   },
   {
     id: 'pensiones',
-    num: '12',
+    num: '09',
     emoji: '🌅',
     color: '#ec4899',
     name: 'Planes de pensiones y seguros de inversión',

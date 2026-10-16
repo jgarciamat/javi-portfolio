@@ -910,6 +910,7 @@
 
 .inv-field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   gap: 0.25rem;
   min-width: 0;
@@ -1119,4 +1120,33 @@ textarea.tx-input {
   .inv-calc {
     padding: 0.8rem;
   }
+}
+
+/* Charts and calculators inside the chapters */
+.inv-embed {
+  margin: 1.4rem 0;
+}
+
+.inv-embed-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--cat, var(--accent));
+}
+
+.inv-embed .inv-chart-card {
+  margin-top: 0;
+}
+
+.inv-chapter-link {
+  justify-self: start;
+}
+
+.inv-chapter--featured {
+  grid-column: 1 / -1;
+  border-width: 2px;
+  background: color-mix(in srgb, var(--cat) 14%, var(--slate-900));
+}
+
+.inv-chapter--featured .inv-chapter-title {
+  font-size: 1.2rem;
 }

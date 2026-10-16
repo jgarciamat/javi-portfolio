@@ -89,6 +89,7 @@ export const CHAPTERS_FUNDS: Chapter[] = [
         ],
       },
       { k: 'chart', id: 'horizon' },
+      { k: 'calc', id: 'compound' },
       {
         k: 'tip',
         title: 'Antes de elegir un fondo, mira estas cinco cosas',
@@ -198,6 +199,7 @@ export const CHAPTERS_FUNDS: Chapter[] = [
         title: 'Brókers extranjeros',
         t: 'Si compras ETF a través de un bróker que no es español, normalmente no hay retención: tienes que declarar tú las ganancias y los dividendos, y si superas 50.000 € de valores en el extranjero a 31 de diciembre debes presentar el modelo 720.',
       },
+      { k: 'calc', id: 'compound' },
       {
         k: 'key',
         title: 'En una frase',
@@ -281,6 +283,7 @@ export const CHAPTERS_FUNDS: Chapter[] = [
         t: 'La calculadora usa un rendimiento constante porque es la forma más sencilla de explicar el efecto del tiempo. Los mercados reales suben y bajan, con años negativos incluidos; por eso se muestra una banda pesimista y optimista. Un 7 % medio no significa un 7 % cada año.',
       },
       { k: 'chart', id: 'volatility' },
+      { k: 'chart', id: 'horizon' },
       {
         k: 'tip',
         title: 'Tres hábitos que ayudan a que funcione',

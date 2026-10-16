@@ -15,11 +15,11 @@ import { CHART_IDS } from '@modules/invest/ui/charts/Charts';
 import { linearTicks, logTicks } from '@modules/invest/ui/charts/Charts';
 
 describe('asset classes', () => {
-  it('has the 12 classes in order, each one complete', () => {
+  it('has the 9 classes in order, each one complete', () => {
     expect(ASSET_CLASSES.map((a) => a.num)).toEqual(
-      Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
+      Array.from({ length: 9 }, (_, i) => String(i + 1).padStart(2, '0'))
     );
-    expect(new Set(ASSET_CLASSES.map((a) => a.id)).size).toBe(12);
+    expect(new Set(ASSET_CLASSES.map((a) => a.id)).size).toBe(9);
     for (const a of ASSET_CLASSES) {
       expect(a.what.length).toBeGreaterThan(40);
       expect(a.earns.length).toBeGreaterThan(40);
@@ -33,6 +33,20 @@ describe('asset classes', () => {
       expect(a.tax.length).toBeGreaterThanOrEqual(4);
       expect(a.color).toMatch(/^#[0-9a-f]{6}$/);
     }
+  });
+
+  it('has no alternatives, collective lending or currencies class', () => {
+    const ids = ASSET_CLASSES.map((a) => a.id);
+    for (const gone of ['alternativas', 'prestamos', 'divisas']) expect(ids).not.toContain(gone);
+    expect(ASSET_CLASSES[0].name).toBe('Renta variable / acciones');
+    expect(ASSET_CLASSES[0].nameEn).toBe('Equities / stocks');
+  });
+
+  it('links classes to chapters that exist', () => {
+    const linked = ASSET_CLASSES.filter((a) => a.chapterId);
+    expect(linked.length).toBeGreaterThanOrEqual(4);
+    for (const a of linked) expect(findChapter(a.chapterId as string)).toBeDefined();
+    expect(CHAPTERS[0].id).toBe('acciones');
   });
 
   it('mentions the key tax rules of every class', () => {
@@ -82,7 +96,7 @@ describe('chapters', () => {
       'indexados',
       'ETF',
       'Interés compuesto',
-      'bolsa',
+      'acciones',
       'mercados',
       'bonos',
       'blockchain',

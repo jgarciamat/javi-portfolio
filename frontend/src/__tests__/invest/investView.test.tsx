@@ -26,7 +26,7 @@ describe('Invest tab', () => {
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.risk'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.advisor'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.past'));
-    expect(screen.getAllByRole('tab')).toHaveLength(5);
+    expect(screen.getAllByRole('tab')).toHaveLength(3);
     expect(tab('map')).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', 'inv-tab-map');
     expect(screen.getByText(tr('app.invest.disclaimer.short'))).toBeInTheDocument();
@@ -40,13 +40,14 @@ describe('Invest tab', () => {
     expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
     fireEvent.keyDown(tab('learn'), { key: 'ArrowLeft' });
     fireEvent.keyDown(tab('map'), { key: 'ArrowLeft' });
-    expect(tab('calcs')).toHaveAttribute('aria-selected', 'true');
-    fireEvent.keyDown(tab('calcs'), { key: 'ArrowRight' });
+    expect(tab('markets')).toHaveAttribute('aria-selected', 'true');
+    fireEvent.keyDown(tab('markets'), { key: 'ArrowRight' });
     expect(tab('map')).toHaveAttribute('aria-selected', 'true');
-    for (const id of ['learn', 'markets', 'charts', 'calcs', 'map']) {
+    for (const id of ['learn', 'markets', 'map']) {
       open(id);
       expect(tab(id)).toHaveAttribute('aria-selected', 'true');
     }
+    expect(screen.queryByRole('tab', { name: /Gráficos|Calculadoras/ })).toBeNull();
   });
 
   it('keeps the section menu under the header of the app', () => {
@@ -73,11 +74,12 @@ describe('Invest tab', () => {
 });
 
 describe('Asset map', () => {
-  it('lists the 12 classes collapsed, with risk and liquidity', () => {
+  it('lists the 9 classes collapsed, with risk and liquidity', () => {
     const { container } = renderWithI18n(<InvestView />);
-    expect(container.querySelectorAll('.inv-asset')).toHaveLength(12);
+    expect(container.querySelectorAll('.inv-asset')).toHaveLength(9);
+    expect(screen.getByText(/Las 9 grandes clases/)).toBeInTheDocument();
     expect(container.querySelectorAll('.inv-asset-body')).toHaveLength(0);
-    expect(screen.getAllByText('Renta variable').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Renta variable / acciones').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Riesgo 7\/7/).length).toBeGreaterThan(0);
   });
 
@@ -118,20 +120,20 @@ describe('Asset map', () => {
     expect(low).toHaveAttribute('aria-pressed', 'true');
     expect(container.querySelectorAll('.inv-asset')).toHaveLength(1);
     fireEvent.click(low);
-    expect(container.querySelectorAll('.inv-asset')).toHaveLength(12);
+    expect(container.querySelectorAll('.inv-asset')).toHaveLength(9);
     fireEvent.click(screen.getByRole('button', { name: tr('app.invest.risk.high') }));
     const high = container.querySelectorAll('.inv-asset').length;
     fireEvent.click(screen.getByRole('button', { name: tr('app.invest.risk.mid') }));
     const mid = container.querySelectorAll('.inv-asset').length;
-    expect(high + mid + 1).toBe(12);
+    expect(high + mid + 1).toBe(9);
     fireEvent.click(screen.getByRole('button', { name: tr('app.invest.filter.all') }));
-    expect(container.querySelectorAll('.inv-asset')).toHaveLength(12);
+    expect(container.querySelectorAll('.inv-asset')).toHaveLength(9);
   });
 
   it('compares risk, liquidity and tax in a grid', () => {
     renderWithI18n(<InvestView />);
     const grid = screen.getByRole('table', { name: tr('app.invest.heat.title') });
-    expect(within(grid).getAllByRole('row')).toHaveLength(13);
+    expect(within(grid).getAllByRole('row')).toHaveLength(10);
     expect(
       within(grid).getAllByText('Ganancia patrimonial, base del ahorro').length
     ).toBeGreaterThan(0);
@@ -159,7 +161,7 @@ describe('Asset map', () => {
 
   it('is in English with English names and labels', () => {
     renderWithI18n(<InvestView />, 'en');
-    expect(screen.getAllByText('Equities').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Equities / stocks').length).toBeGreaterThan(0);
     expect(screen.getByRole('tab', { name: /Markets/ })).toBeInTheDocument();
     expect(screen.getAllByText(/Risk 7\/7/).length).toBeGreaterThan(0);
   });
@@ -270,6 +272,8 @@ describe('Learn', () => {
     open('learn');
     openChapter('Volatilidad y apalancamiento: por qué se pierde dinero tan rápido');
     expect(container.querySelectorAll('.inv-chart-card').length).toBe(2);
+    expect(screen.getAllByText(`📈 ${tr('app.invest.embed.chart')}`)).toHaveLength(2);
+    expect(screen.getByText(`🧮 ${tr('app.invest.embed.calc')}`)).toBeInTheDocument();
     expect(
       screen.getByRole('region', { name: tr('app.invest.calc.crypto.title') })
     ).toBeInTheDocument();
@@ -373,37 +377,59 @@ describe('Markets', () => {
   });
 });
 
-describe('Charts', () => {
-  it('shows the five illustrative charts, each marked as a simulation', () => {
+const RISK = 'Riesgo, volatilidad y horizonte: por qué los precios se mueven';
+
+describe('Charts inside the chapters', () => {
+  const back = () =>
+    fireEvent.click(
+      screen.getByRole('button', { name: literal(`← ${tr('app.invest.learn.back')}`) })
+    );
+
+  it('shows every chart in its chapter, marked as a simulation', () => {
     const { container } = renderWithI18n(<InvestView />);
-    open('charts');
-    expect(container.querySelectorAll('.inv-chart-card')).toHaveLength(5);
-    expect(screen.getAllByText(tr('app.invest.chart.badge'))).toHaveLength(5);
-    expect(screen.getAllByText(tr('app.invest.chart.foot'))).toHaveLength(5);
-    for (const key of ['vol', 'dd', 'hor', 'bond', 'lev']) {
-      expect(
-        screen.getAllByRole('img', {
-          name: new RegExp(tr(`app.invest.chart.${key}.title`).slice(0, 12)),
-        }).length
-      ).toBeGreaterThan(0);
+    open('learn');
+    const seen = new Set<string>();
+    for (const chapter of CHAPTERS) {
+      const charts = chapter.blocks.filter((b) => b.k === 'chart');
+      if (!charts.length) continue;
+      openChapter(chapter.title);
+      expect(container.querySelectorAll('.inv-chart-card')).toHaveLength(charts.length);
+      expect(container.querySelectorAll('.inv-sim-badge')).toHaveLength(charts.length);
+      expect(screen.getAllByText(tr('app.invest.chart.foot'))).toHaveLength(charts.length);
+      charts.forEach((c) => seen.add(c.k === 'chart' ? c.id : ''));
+      back();
     }
+    expect([...seen].sort()).toEqual(
+      ['bondCurve', 'drawdown', 'horizon', 'leverage', 'stockVsIndex', 'volatility'].sort()
+    );
+  });
+
+  it('has no separate charts or calculators section any more', () => {
+    renderWithI18n(<InvestView />);
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([
+      expect.stringContaining('Mapa'),
+      expect.stringContaining('Aprende'),
+      expect.stringContaining('Mercados'),
+    ]);
+  });
+
+  it('draws a new simulation when asked', () => {
+    const { container } = renderWithI18n(<InvestView />);
+    open('learn');
+    openChapter(RISK);
+    const card = container.querySelector('.inv-chart-card') as HTMLElement;
+    const before = card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d');
+    fireEvent.click(within(card).getByRole('button', { name: tr('app.invest.chart.reroll') }));
+    expect(card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d')).not.toBe(before);
     expect(
       screen.getByRole('table', { name: tr('app.invest.chart.hor.title') })
     ).toBeInTheDocument();
   });
 
-  it('draws a new simulation when asked', () => {
-    const { container } = renderWithI18n(<InvestView />);
-    open('charts');
-    const card = container.querySelector('.inv-chart-card') as HTMLElement;
-    const before = card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d');
-    fireEvent.click(within(card).getByRole('button', { name: tr('app.invest.chart.reroll') }));
-    expect(card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d')).not.toBe(before);
-  });
-
   it('describes the largest fall, with and without a recovery', () => {
     renderWithI18n(<InvestView />);
-    open('charts');
+    open('learn');
+    openChapter(RISK);
     const card = screen.getAllByRole('region', { name: tr('app.invest.chart.dd.title') })[0];
     const seen = new Set<string>();
     for (let i = 0; i < 40; i++) {
@@ -414,10 +440,23 @@ describe('Charts', () => {
     expect([...seen].sort()).toEqual(['never', 'recovered']);
   });
 
+  it('compares one share with the index and can draw another one', () => {
+    renderWithI18n(<InvestView />);
+    open('learn');
+    openChapter(CHAPTERS[0].title);
+    const card = screen.getByRole('region', { name: tr('app.invest.chart.stk.title') });
+    const text = () => card.querySelector('.inv-chart-result')?.textContent;
+    const before = text();
+    expect(before).toMatch(/índice -?\d+ %|índice −\d+ %|índice/);
+    fireEvent.click(within(card).getByRole('button', { name: tr('app.invest.chart.reroll') }));
+    expect(text()).not.toBe(before);
+  });
+
   it('draws smaller on phones', () => {
     const restore = mockMatchMedia(true);
     const { container } = renderWithI18n(<InvestView />);
-    open('charts');
+    open('learn');
+    openChapter(RISK);
     expect(container.querySelector('.inv-chart svg')?.getAttribute('viewBox')).toBe('0 0 340 270');
     restore();
   });
@@ -425,8 +464,52 @@ describe('Charts', () => {
   it('draws wide on larger screens', () => {
     const restore = mockMatchMedia(false);
     const { container } = renderWithI18n(<InvestView />);
-    open('charts');
+    open('learn');
+    openChapter(RISK);
     expect(container.querySelector('.inv-chart svg')?.getAttribute('viewBox')).toBe('0 0 640 300');
     restore();
+  });
+});
+
+describe('Shares chapter', () => {
+  it('is the first and a featured chapter of the list', () => {
+    const { container } = renderWithI18n(<InvestView />);
+    open('learn');
+    const first = container.querySelector('.inv-chapter') as HTMLElement;
+    expect(first).toHaveClass('inv-chapter--featured');
+    expect(first).toHaveTextContent(/Acciones: qué son/);
+    expect(container.querySelectorAll('.inv-chapter--featured')).toHaveLength(1);
+  });
+
+  it('is reached from the equities card of the map', () => {
+    renderWithI18n(<InvestView />);
+    fireEvent.click(screen.getByRole('button', { name: /Renta variable/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
+    );
+    expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Acciones: qué son/ })
+    ).toBeInTheDocument();
+  });
+
+  it('only some classes link to a chapter, and the links all exist', () => {
+    renderWithI18n(<InvestView />);
+    fireEvent.click(screen.getByRole('button', { name: /Derivados/ }));
+    expect(
+      screen.queryByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
+    ).toBeNull();
+  });
+
+  it('embeds the share calculator and says it is educational', () => {
+    renderWithI18n(<InvestView />);
+    open('learn');
+    openChapter(CHAPTERS[0].title);
+    expect(
+      screen.getByRole('region', { name: tr('app.invest.calc.stock.title') })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Esto es educación, no una lista de acciones para comprar/)
+    ).toBeInTheDocument();
   });
 });

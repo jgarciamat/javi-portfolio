@@ -5,7 +5,7 @@ import {
   categoryOf,
   readingMinutes,
 } from '@modules/guides/domain/guideCategories';
-import { highlight } from '@modules/guides/ui/GuideBody';
+import { GuideBody, highlight } from '@modules/guides/ui/GuideBody';
 import { LearnView } from '@modules/finances/ui/views/LearnView';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
@@ -100,6 +100,23 @@ describe('Links inside the guides of the app', () => {
     expect(screen.getByRole('link', { name: /Calculadora de IVA/ })).toHaveAttribute(
       'href',
       '/calculadora-iva'
+    );
+  });
+});
+
+describe('Guide body links', () => {
+  it('links to the app with a router link when no custom link renderer is given', () => {
+    renderWithProviders(
+      <GuideBody
+        guide={{
+          ...GUIDES[0],
+          sections: [{ heading: 'H', paragraphs: ['Mira [el simulador](/simulador-ahorro) hoy'] }],
+        }}
+      />
+    );
+    expect(screen.getByRole('link', { name: 'el simulador' })).toHaveAttribute(
+      'href',
+      '/simulador-ahorro'
     );
   });
 });

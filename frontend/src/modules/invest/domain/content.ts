@@ -2,6 +2,7 @@ import { ASSET_CLASSES_A } from './assetClassesA';
 import { ASSET_CLASSES_B } from './assetClassesB';
 import { ASSET_CLASSES_C } from './assetClassesC';
 import { CHAPTERS_FUNDS } from './chaptersFunds';
+import { CHAPTERS_STOCKS } from './chaptersStocks';
 import { CHAPTERS_MARKETS } from './chaptersMarkets';
 import { CHAPTERS_CRYPTO_A } from './chaptersCrypto';
 import { CHAPTERS_CRYPTO_B } from './chaptersCrypto2';
@@ -15,18 +16,19 @@ export const ASSET_CLASSES: AssetClass[] = [
 
 /** Chapters in reading order: from the basics to the most advanced topics. */
 export const CHAPTERS: Chapter[] = [
+  ...CHAPTERS_STOCKS,
   CHAPTERS_MARKETS[0],
   ...CHAPTERS_FUNDS,
   CHAPTERS_MARKETS[1],
   CHAPTERS_MARKETS[2],
   CHAPTERS_MARKETS[3],
-  CHAPTERS_MARKETS[4],
   ...CHAPTERS_CRYPTO_A,
   ...CHAPTERS_CRYPTO_B,
 ];
 
 export const TOPICS: { id: ChapterTopic; label: string; labelEn: string; emoji: string }[] = [
   { id: 'basics', label: 'Lo básico', labelEn: 'Basics', emoji: '🎓' },
+  { id: 'stocks', label: 'Acciones', labelEn: 'Shares', emoji: '🏢' },
   { id: 'funds', label: 'Fondos y ETF', labelEn: 'Funds and ETFs', emoji: '🧺' },
   { id: 'markets', label: 'Bolsa y mercados', labelEn: 'Stock markets', emoji: '🌍' },
   { id: 'bonds', label: 'Renta fija', labelEn: 'Bonds', emoji: '🏛️' },

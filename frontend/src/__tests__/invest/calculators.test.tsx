@@ -4,6 +4,7 @@ import { BondCalc } from '@modules/invest/ui/calculators/BondCalc';
 import { CompoundCalc } from '@modules/invest/ui/calculators/CompoundCalc';
 import { CryptoCalc } from '@modules/invest/ui/calculators/CryptoCalc';
 import { Field, num } from '@modules/invest/ui/calculators/Fields';
+import { StockCalc } from '@modules/invest/ui/calculators/StockCalc';
 import { TaxCalc } from '@modules/invest/ui/calculators/TaxCalc';
 import { renderWithI18n, tr } from '@test-utils/render';
 
@@ -248,5 +249,40 @@ describe('tax calculator', () => {
     set(label('other'), '6000');
     set(label('gain'), '1000');
     expect(stat(container, label('tax'))).toHaveTextContent(/210/);
+  });
+});
+
+describe('share position calculator', () => {
+  const label = (k: string) => tr(`app.invest.calc.stock.${k}`);
+  const stat = (container: HTMLElement, name: string) =>
+    Array.from(container.querySelectorAll('.inv-stat')).find((s) =>
+      s.textContent?.includes(name)
+    ) as HTMLElement;
+
+  it('shows gain, dividends, tax and net result', () => {
+    const { container } = renderWithI18n(<StockCalc />);
+    expect(stat(container, label('invested'))).toHaveTextContent(/2\.003/);
+    expect(stat(container, label('capital'))).toHaveTextContent(/494/);
+    expect(stat(container, label('dividends'))).toHaveTextContent(/80/);
+    expect(stat(container, label('tax'))).toHaveTextContent(/109,06/);
+    expect(stat(container, label('toPay'))).toHaveTextContent(/93,86/);
+    expect(stat(container, label('net'))).toHaveTextContent(/464,94/);
+    noNaN(container);
+  });
+
+  it('shows a loss, a refund and asks for valid data', () => {
+    const { container } = renderWithI18n(<StockCalc />);
+    set(label('sell'), '10');
+    expect(stat(container, label('capital')).className).toContain('inv-stat--bad');
+    set(label('dividend'), '0');
+    set(label('withholding'), '19');
+    set(label('dividend'), '3');
+    set(label('other'), '0');
+    set(label('sell'), '25');
+    set(label('withholding'), '60');
+    expect(stat(container, label('toGet'))).toBeInTheDocument();
+    set(label('shares'), '');
+    expect(screen.getByRole('alert')).toHaveTextContent(label('invalid'));
+    noNaN(container);
   });
 });

@@ -295,12 +295,62 @@ function LeverageChart() {
   );
 }
 
+function StockVsIndexChart() {
+  const { t } = useI18n();
+  const { pct } = useNumbers();
+  const [seed, setSeed] = useState(2);
+  const data = useMemo(() => {
+    const index = randomWalk({ seed: 70 + seed, steps: 120, driftPct: 0.6, volPct: 3.8 });
+    const stock = randomWalk({ seed: 90 + seed, steps: 120, driftPct: 0.6, volPct: 9 });
+    return { index, stock, ddIndex: maxDrawdown(index), ddStock: maxDrawdown(stock) };
+  }, [seed]);
+  const all = [...data.index, ...data.stock];
+  return (
+    <ChartFrame
+      title={t('app.invest.chart.stk.title')}
+      note={t('app.invest.chart.stk.note')}
+      onReroll={() => setSeed((n) => n + 1)}
+    >
+      <LineChart
+        title={t('app.invest.chart.stk.title')}
+        description={t('app.invest.chart.stk.desc')}
+        logY
+        series={[
+          {
+            id: 'index',
+            label: t('app.invest.chart.stk.index'),
+            color: GREEN,
+            points: toPoints(data.index),
+          },
+          {
+            id: 'stock',
+            label: t('app.invest.chart.stk.stock'),
+            color: AMBER,
+            points: toPoints(data.stock),
+          },
+        ]}
+        xTicks={[0, 2, 4, 6, 8, 10]}
+        xFormat={(x) => t('app.invest.chart.years', { n: x })}
+        yTicks={logTicks(Math.min(...all), Math.max(...all))}
+        yFormat={(y) => String(y)}
+      />
+      <p className="inv-chart-result">
+        {t('app.invest.chart.stk.result', {
+          index: pct(data.ddIndex.depthPct, 0),
+          stock: pct(data.ddStock.depthPct, 0),
+        })}
+      </p>
+    </ChartFrame>
+  );
+}
+
 const CHARTS: Record<ChartId, () => ReactElement> = {
   volatility: () => <VolatilityChart />,
   drawdown: () => <DrawdownChart />,
   horizon: () => <HorizonChart />,
   bondCurve: () => <BondCurveChart />,
   leverage: () => <LeverageChart />,
+  stockVsIndex: () => <StockVsIndexChart />,
 };
 
 export const CHART_IDS = Object.keys(CHARTS) as ChartId[];

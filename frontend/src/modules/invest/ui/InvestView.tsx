@@ -1,23 +1,19 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
-import { CALC_IDS, InvestCalc } from './calculators/Calculators';
-import { CHART_IDS, InvestChart } from './charts/Charts';
 import { AssetMap } from './AssetMap';
 import { Learn } from './Learn';
 import { MarketsPanel } from './MarketsPanel';
 import '../../finances/ui/css/Sections.css';
 import './css/Invest.css';
 
-const SECTIONS = ['map', 'learn', 'markets', 'charts', 'calcs'] as const;
+const SECTIONS = ['map', 'learn', 'markets'] as const;
 type SectionId = (typeof SECTIONS)[number];
 
 const ICONS: Record<SectionId, string> = {
   map: '🗺️',
   learn: '📚',
   markets: '🌍',
-  charts: '📉',
-  calcs: '🧮',
 };
 
 function Disclaimer() {
@@ -58,10 +54,11 @@ function useHeaderOffset(ref: RefObject<HTMLDivElement | null>) {
   }, [ref]);
 }
 
-/** The "Invest" tab: asset map, educational chapters, market hours, charts and calculators. */
+/** The "Invest" tab: asset map, educational chapters, market hours; charts and calculators live inside the chapters. */
 export function InvestView() {
   const { t } = useI18n();
   const [section, setSection] = useState<SectionId>('map');
+  const [chapter, setChapter] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   useHeaderOffset(root);
 
@@ -110,29 +107,20 @@ export function InvestView() {
         <p className="inv-varies" role="note">
           ℹ️ {t('app.invest.varies')}
         </p>
-        {section === 'map' && <AssetMap />}
-        {section === 'learn' && <Learn />}
+        {section === 'map' && (
+          <AssetMap
+            onOpenChapter={(id) => {
+              setChapter(id);
+              setSection('learn');
+            }}
+          />
+        )}
+        {section === 'learn' && <Learn openId={chapter} onOpen={setChapter} />}
         {section === 'markets' && (
           <>
             <p className="inv-lead">{t('app.invest.markets.lead')}</p>
             <MarketsPanel />
           </>
-        )}
-        {section === 'charts' && (
-          <div className="inv-stack">
-            <p className="inv-lead">{t('app.invest.charts.lead')}</p>
-            {CHART_IDS.map((id) => (
-              <InvestChart key={id} id={id} />
-            ))}
-          </div>
-        )}
-        {section === 'calcs' && (
-          <div className="inv-stack">
-            <p className="inv-lead">{t('app.invest.calcs.lead')}</p>
-            {CALC_IDS.map((id) => (
-              <InvestCalc key={id} id={id} />
-            ))}
-          </div>
         )}
       </div>
       <p className="inv-note inv-footer">{t('app.invest.disclaimer.short')}</p>

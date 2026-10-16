@@ -53,9 +53,19 @@ function BlockView({ block }: { block: Block }) {
         </div>
       );
     case 'chart':
-      return <InvestChart id={block.id} />;
+      return (
+        <section className="inv-embed inv-embed--chart">
+          <h3 className="inv-embed-title">📈 {t('app.invest.embed.chart')}</h3>
+          <InvestChart id={block.id} />
+        </section>
+      );
     case 'calc':
-      return <InvestCalc id={block.id} />;
+      return (
+        <section className="inv-embed inv-embed--calc">
+          <h3 className="inv-embed-title">🧮 {t('app.invest.embed.calc')}</h3>
+          <InvestCalc id={block.id} />
+        </section>
+      );
     case 'markets':
       return <MarketsPanel />;
     default:

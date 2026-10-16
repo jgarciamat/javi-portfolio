@@ -47,9 +47,14 @@ function Glossary({ onOpen }: { onOpen: (id: string) => void }) {
 }
 
 /** Educational chapters: a catalogue with search and topics, and a reader for each chapter. */
-export function Learn() {
+export function Learn({
+  openId,
+  onOpen,
+}: {
+  openId: string | null;
+  onOpen: (id: string | null) => void;
+}) {
   const { t, locale } = useI18n();
-  const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [topic, setTopic] = useState<ChapterTopic | null>(null);
   const top = useRef<HTMLDivElement>(null);
@@ -71,7 +76,7 @@ export function Learn() {
     return (
       <article className="inv-article" style={{ ['--cat' as string]: chapter.color }}>
         <div ref={top} />
-        <button type="button" className="btn-secondary" onClick={() => setOpenId(null)}>
+        <button type="button" className="btn-secondary" onClick={() => onOpen(null)}>
           ← {t('app.invest.learn.back')}
         </button>
         <p className="inv-kicker">
@@ -88,14 +93,14 @@ export function Learn() {
         <ChapterBody chapter={chapter} />
         <nav className="inv-pager" aria-label={t('app.invest.learn.pager')}>
           {prev ? (
-            <button type="button" className="btn-secondary" onClick={() => setOpenId(prev.id)}>
+            <button type="button" className="btn-secondary" onClick={() => onOpen(prev.id)}>
               ← {title(prev)}
             </button>
           ) : (
             <span />
           )}
           {next && (
-            <button type="button" className="btn-secondary" onClick={() => setOpenId(next.id)}>
+            <button type="button" className="btn-secondary" onClick={() => onOpen(next.id)}>
               {title(next)} →
             </button>
           )}
@@ -146,11 +151,15 @@ export function Learn() {
       {shown.length === 0 && <p className="inv-empty">{t('app.invest.learn.empty')}</p>}
       <ul className="inv-chapters">
         {shown.map((c) => (
-          <li key={c.id} className="inv-chapter" style={{ ['--cat' as string]: c.color }}>
+          <li
+            key={c.id}
+            className={`inv-chapter${c.topic === 'stocks' ? ' inv-chapter--featured' : ''}`}
+            style={{ ['--cat' as string]: c.color }}
+          >
             <span className="inv-chapter-emoji" aria-hidden="true">
               {c.emoji}
             </span>
-            <button type="button" className="inv-chapter-title" onClick={() => setOpenId(c.id)}>
+            <button type="button" className="inv-chapter-title" onClick={() => onOpen(c.id)}>
               {title(c)}
             </button>
             <p>{summary(c)}</p>
@@ -164,7 +173,7 @@ export function Learn() {
           </li>
         ))}
       </ul>
-      <Glossary onOpen={setOpenId} />
+      <Glossary onOpen={onOpen} />
     </div>
   );
 }

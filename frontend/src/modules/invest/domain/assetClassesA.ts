@@ -4,11 +4,12 @@ import type { AssetClass } from './types';
 export const ASSET_CLASSES_A: AssetClass[] = [
   {
     id: 'renta-variable',
+    chapterId: 'acciones',
     num: '01',
     emoji: '📈',
     color: '#6366f1',
-    name: 'Renta variable',
-    nameEn: 'Equities',
+    name: 'Renta variable / acciones',
+    nameEn: 'Equities / stocks',
     tagline: 'Comprar un trocito de una empresa y crecer con ella.',
     what: 'Una acción es una parte del capital de una empresa. Si compras acciones de una compañía te conviertes en copropietario (pequeñísimo) de su negocio y de sus beneficios futuros.',
     earns:
@@ -50,6 +51,7 @@ export const ASSET_CLASSES_A: AssetClass[] = [
   },
   {
     id: 'renta-fija',
+    chapterId: 'renta-fija-bonos',
     num: '02',
     emoji: '🏛️',
     color: '#0ea5e9',
@@ -95,6 +97,7 @@ export const ASSET_CLASSES_A: AssetClass[] = [
   },
   {
     id: 'fondos-etf',
+    chapterId: 'fondos-indexados',
     num: '03',
     emoji: '🧺',
     color: '#10b981',
@@ -143,6 +146,7 @@ export const ASSET_CLASSES_A: AssetClass[] = [
   },
   {
     id: 'cripto',
+    chapterId: 'cripto-y-blockchain',
     num: '04',
     emoji: '🪙',
     color: '#f59e0b',

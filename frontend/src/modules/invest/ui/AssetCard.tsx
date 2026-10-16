@@ -44,10 +44,12 @@ export function AssetCard({
   asset,
   open,
   onToggle,
+  onOpenChapter,
 }: {
   asset: AssetClass;
   open: boolean;
   onToggle: () => void;
+  onOpenChapter: (id: string) => void;
 }) {
   const { t, locale } = useI18n();
   const bodyId = `asset-${asset.id}`;
@@ -84,6 +86,15 @@ export function AssetCard({
       </div>
       {open && (
         <div id={bodyId} className="inv-asset-body">
+          {asset.chapterId && (
+            <button
+              type="button"
+              className="btn-secondary inv-chapter-link"
+              onClick={() => onOpenChapter(asset.chapterId as string)}
+            >
+              📖 {t('app.invest.map.goChapter')}
+            </button>
+          )}
           <Section title={t('app.invest.map.what')}>
             <p>{asset.what}</p>
           </Section>

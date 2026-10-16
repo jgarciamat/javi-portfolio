@@ -7,6 +7,8 @@ export type TaxKind = 'savings' | 'general' | 'mixed' | 'exempt';
 
 export interface AssetClass {
   id: string;
+  /** Chapter of the Learn section that explains this class in depth. */
+  chapterId?: string;
   num: string;
   emoji: string;
   color: string;
@@ -33,8 +35,14 @@ export interface AssetClass {
   lesson?: { title: string; text: string };
 }
 
-export type ChartId = 'volatility' | 'drawdown' | 'horizon' | 'bondCurve' | 'leverage';
-export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax';
+export type ChartId =
+  | 'volatility'
+  | 'drawdown'
+  | 'horizon'
+  | 'bondCurve'
+  | 'leverage'
+  | 'stockVsIndex';
+export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax' | 'stock';
 
 export type Block =
   | { k: 'h'; t: string }
@@ -51,7 +59,7 @@ export interface GlossaryTerm {
   def: string;
 }
 
-export type ChapterTopic = 'basics' | 'funds' | 'markets' | 'bonds' | 'crypto' | 'tax';
+export type ChapterTopic = 'basics' | 'stocks' | 'funds' | 'markets' | 'bonds' | 'crypto' | 'tax';
 
 export interface Chapter {
   id: string;

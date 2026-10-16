@@ -21,6 +21,7 @@ import {
   parsePrices,
   type LeverageInput,
 } from '@modules/invest/domain/crypto';
+import { stockPosition } from '@modules/invest/domain/stocks';
 import { SAVINGS_SCALE, savingsTax, taxOnGain } from '@modules/invest/domain/taxes';
 import { rentaWorkExtras } from '@modules/tools/data/renta/estado-extra';
 
@@ -356,5 +357,80 @@ describe('bonds', () => {
     expect(curve.map((c) => c.yieldPct)).toEqual([2, 3, 4]);
     expect(curve[0].price).toBeGreaterThan(curve[1].price);
     expect(curve[1].price).toBe(100);
+  });
+});
+
+describe('share position', () => {
+  const base = {
+    shares: 100,
+    buyPrice: 20,
+    sellPrice: 25,
+    feeBuy: 3,
+    feeSell: 3,
+    dividendPerShare: 0.8,
+    withholdingPct: 19,
+    otherSavingsIncome: 0,
+  };
+
+  it('computes gain, dividends, tax with the savings scale and what is left to settle', () => {
+    const r = stockPosition(base);
+    expect(r.valid).toBe(true);
+    expect(r.invested).toBe(2003);
+    expect(r.proceeds).toBe(2497);
+    expect(r.capitalGain).toBe(494);
+    expect(r.dividends).toBe(80);
+    expect(r.grossGain).toBe(574);
+    expect(r.taxable).toBe(574);
+    expect(r.tax).toBe(109.06);
+    expect(r.withheld).toBe(15.2);
+    expect(r.toSettle).toBe(93.86);
+    expect(r.netGain).toBe(464.94);
+    expect(r.netReturnPct).toBeCloseTo(23.21, 1);
+    expect(r.yieldOnCostPct).toBe(4);
+  });
+
+  it('lets a loss offset at most 25 % of the dividends', () => {
+    const r = stockPosition({ ...base, sellPrice: 10, dividendPerShare: 2 });
+    expect(r.capitalGain).toBe(-1006);
+    expect(r.dividends).toBe(200);
+    expect(r.taxable).toBe(150);
+    expect(r.tax).toBe(28.5);
+    const small = stockPosition({ ...base, sellPrice: 19.5, dividendPerShare: 2 });
+    expect(small.capitalGain).toBe(-56);
+    expect(small.taxable).toBe(200 - 50);
+    const tiny = stockPosition({
+      ...base,
+      sellPrice: 20.4,
+      feeBuy: 0,
+      feeSell: 0,
+      dividendPerShare: 2,
+    });
+    expect(tiny.capitalGain).toBe(40);
+    const flat = stockPosition({ ...base, sellPrice: 20, feeBuy: 0, feeSell: 0 });
+    expect(flat.taxable).toBe(80);
+  });
+
+  it('adds other savings income and ignores odd numbers', () => {
+    expect(stockPosition({ ...base, otherSavingsIncome: 6000 }).tax).toBeGreaterThan(
+      stockPosition(base).tax
+    );
+    const odd = stockPosition({
+      ...base,
+      feeBuy: NaN,
+      feeSell: -5,
+      dividendPerShare: NaN,
+      withholdingPct: 500,
+    });
+    expect(odd.valid).toBe(true);
+    expect(odd.dividends).toBe(0);
+    expect(odd.withheld).toBe(0);
+    for (const v of Object.values(odd))
+      if (typeof v === 'number') expect(Number.isNaN(v)).toBe(false);
+  });
+
+  it('is invalid without shares or prices', () => {
+    expect(stockPosition({ ...base, shares: 0 }).valid).toBe(false);
+    expect(stockPosition({ ...base, buyPrice: NaN }).valid).toBe(false);
+    expect(stockPosition({ ...base, sellPrice: -1 }).valid).toBe(false);
   });
 });

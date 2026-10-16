@@ -1,6 +1,6 @@
 import type { AssetClass } from './types';
 
-/** Asset classes 05-08: property, commodities, alternatives, collective lending. */
+/** Asset classes 05-06: property and commodities. */
 export const ASSET_CLASSES_B: AssetClass[] = [
   {
     id: 'inmuebles',
@@ -104,97 +104,5 @@ export const ASSET_CLASSES_B: AssetClass[] = [
       title: 'El oro: refugio, no inversión productiva',
       text: 'El oro no produce nada: ni dividendos, ni intereses. Su papel es el de seguro cuando los inversores pierden confianza en otros activos. Hay décadas en las que sube mucho y otras en las que se queda en el mismo sitio: su comportamiento a largo plazo depende de la inflación, de los tipos de interés reales y del dólar.',
     },
-  },
-  {
-    id: 'alternativas',
-    num: '07',
-    emoji: '🧪',
-    color: '#8b5cf6',
-    name: 'Inversiones alternativas',
-    nameEn: 'Alternative investments',
-    tagline: 'Private equity, venture capital, hedge funds y deuda privada.',
-    what: 'Son inversiones fuera de bolsa y de los bonos tradicionales: comprar empresas no cotizadas (private equity), financiar startups (venture capital), fondos de cobertura que usan estrategias complejas (hedge funds) o prestar a empresas sin pasar por un banco (deuda privada).',
-    earns:
-      'Por la revalorización de las empresas cuando se venden o salen a bolsa, o por intereses en la deuda privada. Los resultados dependen mucho del gestor.',
-    risk: 6,
-    liquidity: 1,
-    liquidityNote:
-      'El dinero queda bloqueado años (5-10 es habitual) y no se puede retirar cuando quieras.',
-    horizon: 'Muy largo plazo: 7-12 años.',
-    subtypes: [
-      'Private equity (compra de empresas no cotizadas)',
-      'Venture capital (startups)',
-      'Hedge funds (estrategias de cobertura y arbitraje)',
-      'Deuda privada (préstamos directos a empresas)',
-    ],
-    pros: [
-      'Acceso a empresas y estrategias que no están en bolsa.',
-      'Potencial de rentabilidad alta en los mejores gestores.',
-      'Algunas estrategias se mueven distinto que el mercado.',
-    ],
-    cons: [
-      'Mínimos de entrada altos y acceso restringido para el pequeño inversor.',
-      'Comisiones elevadas (fija más participación en beneficios).',
-      'Poca transparencia en la valoración y falta de liquidez.',
-      'Resultado muy dispar entre gestores: muchos no superan a la bolsa.',
-    ],
-    example:
-      'Un fondo de venture capital invierte en 20 startups. Quizá 10 cierran, 7 devuelven poco y 3 multiplican por 10 o más. El resultado total depende de acertar en esas pocas. Si inviertes 10.000 € y quedan bloqueados 8 años, puedes terminar con 30.000 € o con 4.000 €.',
-    taxKind: 'savings',
-    taxShort: 'Base del ahorro; depende del vehículo',
-    tax: [
-      'Participaciones en fondos de capital riesgo (ECR/SCR) y similares: las ganancias al transmitir o reembolsar son ganancias patrimoniales en la base del ahorro (19-30 %), y los dividendos que reparte el vehículo, rendimientos del capital mobiliario.',
-      'Deuda privada y préstamos: los intereses son rendimientos del capital mobiliario (base del ahorro, 19-30 %). Si el pagador retiene, será el 19 %.',
-      'Hedge funds y fondos de inversión alternativos de estructura extranjera: tributan según su régimen; no siempre se puede aplicar el traspaso sin tributar de los fondos españoles y puede exigirse el modelo 720 si están en el extranjero.',
-      'Invertir directamente en una startup (business angel): la ganancia al vender tributa en la base del ahorro, y hay deducciones por inversión en empresas de nueva creación en algunas comunidades y a nivel estatal, con requisitos estrictos.',
-      'Acceso: en España el capital riesgo suele exigir mínimos altos para no profesionales (de 100.000 € como orden de magnitud). Los ELTIF son una fórmula europea pensada para abrir estos activos al pequeño inversor, con condiciones y restricciones de rescate.',
-      'IVA: los servicios de gestión de estos vehículos están en general exentos.',
-    ],
-  },
-  {
-    id: 'prestamos',
-    num: '08',
-    emoji: '🤝',
-    color: '#14b8a6',
-    name: 'Préstamos e inversión colectiva',
-    nameEn: 'Crowdlending and crowdfunding',
-    tagline: 'Prestar a particulares o empresas, o comprar inmuebles entre muchos.',
-    what: 'En el crowdlending prestas dinero a empresas o proyectos a través de una plataforma regulada. En el crowdfunding inmobiliario varios inversores financian juntos un inmueble o una promoción a cambio de intereses o de parte de la venta.',
-    earns:
-      'Por los intereses que paga el prestatario (normalmente entre el 5 % y el 12 % anual en préstamos) o por la ganancia cuando se vende o termina la promoción.',
-    risk: 6,
-    liquidity: 1,
-    liquidityNote:
-      'El dinero queda bloqueado hasta el vencimiento (de 6 meses a varios años), con mercado secundario limitado.',
-    horizon: 'Corto-medio plazo: de 6 meses a 5 años.',
-    subtypes: [
-      'Crowdlending a empresas (pymes)',
-      'Crowdlending a particulares (consumo)',
-      'Crowdfunding inmobiliario (préstamo o capital)',
-      'Facturas (factoring)',
-    ],
-    pros: [
-      'Se puede empezar con importes pequeños.',
-      'Rentabilidades nominales superiores a las del ahorro tradicional.',
-      'Se pueden elegir proyectos y diversificar.',
-    ],
-    cons: [
-      'Riesgo de impago real: los préstamos pueden no devolverse total o parcialmente.',
-      'Poca liquidez y plazos que se alargan si hay problemas.',
-      'Riesgo de la plataforma (puede cerrar o tener fallos de gestión).',
-      'Sin cobertura del Fondo de Garantía de Depósitos.',
-    ],
-    example:
-      'Prestas 1.000 € a un 9 % anual durante un año: si todo va bien, recibes 1.090 €. Pero si de cada 100 préstamos 8 no se pagan, con una cartera mal diversificada puedes terminar por debajo del dinero que pusiste. Por eso conviene repartir en muchos proyectos pequeños.',
-    taxKind: 'savings',
-    taxShort: 'Intereses en base del ahorro (19-30 %)',
-    tax: [
-      'Intereses del crowdlending: rendimientos del capital mobiliario. Van a la base del ahorro (19-30 %). Lo habitual es que la plataforma no retenga y que tú declares en la renta; compruébalo con la plataforma y con tu certificado fiscal.',
-      'Impagos: si el préstamo se declara fallido, se puede registrar la pérdida (rendimiento negativo del capital mobiliario), que compensa otros rendimientos del capital mobiliario y, hasta el 25 %, ganancias de ventas.',
-      'Crowdfunding inmobiliario en forma de préstamo: intereses como arriba. En forma de capital (participaciones): la ganancia al salir va a la base del ahorro y los dividendos, como dividendos.',
-      'Plataformas extranjeras: pueden aplicar retenciones en origen; si se superan 50.000 € a 31 de diciembre, conviene valorar el modelo 720.',
-      'Regulación: las plataformas de financiación participativa están supervisadas por la CNMV y se rigen por el Reglamento europeo 2020/1503; verifica que figure en el registro oficial y lee la ficha de información clave.',
-      'IVA: sin IVA para el inversor.',
-    ],
   },
 ];
