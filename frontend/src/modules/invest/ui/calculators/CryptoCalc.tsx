@@ -44,15 +44,17 @@ function LeveragePanel() {
       <div className="inv-form">
         <div className="inv-field">
           <label htmlFor="cr-side">{t('app.invest.calc.crypto.side')}</label>
-          <select
-            id="cr-side"
-            className="tx-input"
-            value={side}
-            onChange={(e) => setSide(e.target.value as Side)}
-          >
-            <option value="long">{t('app.invest.calc.crypto.long')}</option>
-            <option value="short">{t('app.invest.calc.crypto.short')}</option>
-          </select>
+          <span className="inv-input">
+            <select
+              id="cr-side"
+              className="tx-input"
+              value={side}
+              onChange={(e) => setSide(e.target.value as Side)}
+            >
+              <option value="long">{t('app.invest.calc.crypto.long')}</option>
+              <option value="short">{t('app.invest.calc.crypto.short')}</option>
+            </select>
+          </span>
         </div>
         <Field
           id="cr-margin"

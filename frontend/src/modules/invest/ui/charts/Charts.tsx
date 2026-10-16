@@ -298,7 +298,7 @@ function LeverageChart() {
 function StockVsIndexChart() {
   const { t } = useI18n();
   const { pct } = useNumbers();
-  const [seed, setSeed] = useState(2);
+  const [seed, setSeed] = useState(5);
   const data = useMemo(() => {
     const index = randomWalk({ seed: 70 + seed, steps: 120, driftPct: 0.6, volPct: 3.8 });
     const stock = randomWalk({ seed: 90 + seed, steps: 120, driftPct: 0.6, volPct: 9 });
