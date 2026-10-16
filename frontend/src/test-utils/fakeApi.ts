@@ -128,8 +128,8 @@ export function createFakeApi(): FakeApi {
     },
     rentaApi: { register: ok({ used: 1 }), draft: ok({}) },
     inboxApi: {
-      get: ok({ address: 'mm-0123456789abcdef0123@facturas.winjgm.com', recent: [] }),
-      rotate: ok({ address: 'mm-fedcba98765432100123@facturas.winjgm.com', recent: [] }),
+      get: ok({ address: 'mm-0123456789abcdef0123@facturas.finanverso.app', recent: [] }),
+      rotate: ok({ address: 'mm-fedcba98765432100123@facturas.finanverso.app', recent: [] }),
     },
     categoryRuleApi: {
       getAll: ok([]),

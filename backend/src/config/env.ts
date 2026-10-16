@@ -5,7 +5,7 @@ const booleanish = z
   .optional()
   .transform((v) => v === 'true' || v === '1');
 
-const PRODUCTION_URL = 'https://www.winjgm.com';
+const PRODUCTION_URL = 'https://finanverso.app';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -251,7 +251,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     email: {
       resendApiKey: raw.RESEND_API_KEY || null,
       fromEmail: raw.RESEND_FROM_EMAIL,
-      fromName: raw.EMAIL_FROM_NAME ?? raw.SMTP_FROM_NAME ?? 'Money Manager',
+      fromName: raw.EMAIL_FROM_NAME ?? raw.SMTP_FROM_NAME ?? 'Finanverso',
     },
     backup: {
       dir: raw.BACKUP_DIR ?? null,

@@ -2,7 +2,7 @@ import { storage } from '@shared/utils/storage';
 
 const KEY = 'mm_ref';
 /** Where invitation links point to (the native apps cannot use their own origin). */
-export const PUBLIC_URL = 'https://www.winjgm.com';
+export const PUBLIC_URL = 'https://finanverso.app';
 
 /** Keeps the invitation code of an `/?ref=CODE` link until the user registers. */
 export function captureReferral(search: string = window.location.search): void {

@@ -56,9 +56,9 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo preparar el borrador con Money Manager',
+        heading: 'Cómo preparar el borrador con Finanverso',
         paragraphs: [
-          'En la sección Autónomos de Money Manager marcas qué categorías son de tu actividad y la app te prepara un borrador del 130 y del 303 de cada trimestre, con las casillas ya calculadas a partir de tus movimientos. Te sirve para saber cuánto vas a pagar antes de que llegue la fecha, no para presentarlo: el borrador es orientativo.',
+          'En la sección Autónomos de Finanverso marcas qué categorías son de tu actividad y la app te prepara un borrador del 130 y del 303 de cada trimestre, con las casillas ya calculadas a partir de tus movimientos. Te sirve para saber cuánto vas a pagar antes de que llegue la fecha, no para presentarlo: el borrador es orientativo.',
           CHECK,
         ],
       },
@@ -120,7 +120,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         heading: 'La cuota también es un gasto',
         paragraphs: [
           'La cuota de autónomos es un gasto deducible en el modelo 130 y en la declaración de la Renta, por lo que reduce lo que pagas a Hacienda. Está explicado en la guía de [modelo 130 paso a paso](/guias/modelo-130-paso-a-paso) y en la de [gastos deducibles de un autónomo](/guias/gastos-deducibles-autonomo).',
-          'En la sección Autónomos de Money Manager verás una estimación del tramo que te correspondería con tus ingresos y gastos del año, para anticiparte a la regularización.',
+          'En la sección Autónomos de Finanverso verás una estimación del tramo que te correspondería con tus ingresos y gastos del año, para anticiparte a la regularización.',
           CHECK,
         ],
       },
@@ -197,7 +197,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo llevarlo al día con Money Manager',
+        heading: 'Cómo llevarlo al día con Finanverso',
         paragraphs: [
           'En la sección Autónomos puedes marcar qué categorías son de tu actividad, indicar el tipo de IVA y los metros que dedicas al trabajo. La app aplica los límites de esta guía y te enseña cuánto de cada gasto cuenta para el IRPF y cuánto para el IVA.',
           CHECK,
@@ -270,7 +270,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         heading: 'Consejos para no olvidarte de ninguna fecha',
         paragraphs: [
           'Apunta los vencimientos en tu calendario con un aviso una semana antes, aparta cada mes una parte de lo que facturas para los impuestos y revisa tus facturas antes de presentar. Si dudas de cómo se calcula cada modelo, empieza por [el modelo 303](/guias/iva-para-autonomos-modelo-303) y por [el modelo 130](/guias/modelo-130-paso-a-paso).',
-          'En la sección Autónomos de Money Manager ves las fechas límite del trimestre en curso junto al borrador de cada modelo, así que sabes cuánto debes apartar y para cuándo.',
+          'En la sección Autónomos de Finanverso ves las fechas límite del trimestre en curso junto al borrador de cada modelo, así que sabes cuánto debes apartar y para cuándo.',
           CHECK,
         ],
       },

@@ -43,10 +43,10 @@ describe('config', () => {
     const config = loadConfig({
       NODE_ENV: 'production',
       JWT_SECRET: 'x'.repeat(48),
-      APP_URL: 'https://www.winjgm.com/',
+      APP_URL: 'https://finanverso.app/',
       DATABASE_URL: '/data/db.sqlite',
     });
-    expect(config.appUrl).toBe('https://www.winjgm.com');
+    expect(config.appUrl).toBe('https://finanverso.app');
     expect(config.databasePath).toBe('/data/db.sqlite');
     expect(config.corsOrigins).not.toContain('http://localhost:5173');
     expect(config.demoSeed.enabled).toBe(false);
@@ -54,7 +54,7 @@ describe('config', () => {
 
   it('never points email links to localhost in production when APP_URL is missing', () => {
     const config = loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) });
-    expect(config.appUrl).toBe('https://www.winjgm.com');
+    expect(config.appUrl).toBe('https://finanverso.app');
   });
 
   it('rejects malformed values', () => {

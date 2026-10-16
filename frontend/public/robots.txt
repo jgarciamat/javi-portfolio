@@ -3,4 +3,4 @@ Disallow: /api/
 Disallow: /verify-email
 Disallow: /reset-password
 
-Sitemap: https://www.winjgm.com/sitemap.xml
+Sitemap: https://finanverso.app/sitemap.xml

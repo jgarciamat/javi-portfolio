@@ -41,7 +41,7 @@ interface Copy {
 const COPY: Record<'verify' | 'reset', Record<EmailLocale, Copy>> = {
   verify: {
     es: {
-      subject: 'Verifica tu cuenta en Money Manager',
+      subject: 'Verifica tu cuenta en Finanverso',
       greeting: (n) => `Hola ${n},`,
       intro: 'Gracias por registrarte. Para activar tu cuenta, pulsa el botón:',
       button: 'Verificar mi cuenta',
@@ -50,7 +50,7 @@ const COPY: Record<'verify' | 'reset', Record<EmailLocale, Copy>> = {
       ignore: 'Si no te has registrado, puedes ignorar este email.',
     },
     en: {
-      subject: 'Verify your Money Manager account',
+      subject: 'Verify your Finanverso account',
       greeting: (n) => `Hi ${n},`,
       intro: 'Thanks for signing up. To activate your account, press the button:',
       button: 'Verify my account',
@@ -61,7 +61,7 @@ const COPY: Record<'verify' | 'reset', Record<EmailLocale, Copy>> = {
   },
   reset: {
     es: {
-      subject: 'Restablece tu contraseña de Money Manager',
+      subject: 'Restablece tu contraseña de Finanverso',
       greeting: (n) => `Hola ${n},`,
       intro: 'Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.',
       button: 'Restablecer contraseña',
@@ -70,7 +70,7 @@ const COPY: Record<'verify' | 'reset', Record<EmailLocale, Copy>> = {
       ignore: 'Si no has solicitado este cambio, ignora este email. Tu contraseña no cambiará.',
     },
     en: {
-      subject: 'Reset your Money Manager password',
+      subject: 'Reset your Finanverso password',
       greeting: (n) => `Hi ${n},`,
       intro: 'We received a request to reset the password of your account.',
       button: 'Reset password',
@@ -101,11 +101,11 @@ function layout(locale: EmailLocale, body: string): string {
 </head>
 <body>
   <div class="wrapper">
-    <div class="header"><h1>Money Manager</h1></div>
+    <div class="header"><h1>Finanverso</h1></div>
     <div class="body">
 ${body}
     </div>
-    <div class="footer">© ${new Date().getFullYear()} Money Manager</div>
+    <div class="footer">© ${new Date().getFullYear()} Finanverso</div>
   </div>
 </body>
 </html>`;
@@ -153,7 +153,7 @@ const PURCHASE_COPY: Record<
   }
 > = {
   es: {
-    subject: 'Confirmación de tu compra de Money Manager Premium',
+    subject: 'Confirmación de tu compra de Finanverso Premium',
     greeting: (n) => `Hola ${n},`,
     thanks: (date) => `Gracias por pasarte a Premium. Confirmamos tu compra del ${date}.`,
     immediateStart:
@@ -164,7 +164,7 @@ const PURCHASE_COPY: Record<
     contact: 'Si tienes cualquier duda, responde a este email o escribe a moneymanager@outlook.es.',
   },
   en: {
-    subject: 'Your Money Manager Premium purchase',
+    subject: 'Your Finanverso Premium purchase',
     greeting: (n) => `Hi ${n},`,
     thanks: (date) => `Thanks for upgrading to Premium. We confirm your purchase of ${date}.`,
     immediateStart:
@@ -227,7 +227,7 @@ const DIGEST_COPY: Record<
   }
 > = {
   es: {
-    subject: 'Tu resumen semanal de Money Manager',
+    subject: 'Tu resumen semanal de Finanverso',
     greeting: (n) => `Hola ${n},`,
     week: (from, to) => `Así fue tu semana (${from} – ${to}):`,
     spent: 'Gastado',
@@ -238,11 +238,11 @@ const DIGEST_COPY: Record<
         : `${Math.abs(p)} % ${p > 0 ? 'más' : 'menos'} que la semana anterior.`,
     top: 'Donde más gastaste',
     upcoming: (date) => `Se cobrarán el ${date} estas operaciones automáticas:`,
-    open: 'Abrir Money Manager',
+    open: 'Abrir Finanverso',
     off: 'Puedes dejar de recibir este resumen en Ajustes → Preferencias.',
   },
   en: {
-    subject: 'Your Money Manager weekly summary',
+    subject: 'Your Finanverso weekly summary',
     greeting: (n) => `Hi ${n},`,
     week: (from, to) => `Here is your week (${from} – ${to}):`,
     spent: 'Spent',
@@ -253,7 +253,7 @@ const DIGEST_COPY: Record<
         : `${Math.abs(p)}% ${p > 0 ? 'more' : 'less'} than the week before.`,
     top: 'Where you spent the most',
     upcoming: (date) => `These automatic movements will be charged on ${date}:`,
-    open: 'Open Money Manager',
+    open: 'Open Finanverso',
     off: 'You can stop receiving this summary in Settings → Preferences.',
   },
 };

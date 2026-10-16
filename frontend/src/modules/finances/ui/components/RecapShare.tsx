@@ -31,7 +31,7 @@ function useRecapData(summary: FinancialSummary, month: string, amounts: boolean
     headlineHint: t('app.recap.shareHeadline'),
     lines,
     footer: t('app.recap.shareBrand'),
-    site: 'winjgm.com',
+    site: 'finanverso.app',
   };
 }
 
@@ -73,7 +73,7 @@ export function RecapShare({
     setStatus('working');
     try {
       const blob = await recapImage(data);
-      const result = await shareImage(blob, 'money-manager-resumen.png', t('app.recap.shareText'));
+      const result = await shareImage(blob, 'finanverso-resumen.png', t('app.recap.shareText'));
       setStatus(result === 'saved' ? 'saved' : 'idle');
     } catch {
       setStatus('error');

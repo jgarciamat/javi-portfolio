@@ -16,17 +16,22 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
 4. Foto de perfil: el logo de la app (`docs/marketing/assets/moneyLogo.png`).
 5. Biografía (150 car. en Instagram, 80 en TikTok):
    - «Controla tus gastos, ahorra y prepara tu Renta y tus impuestos de autónomo. Gratis 👇»
-   - Enlace: `https://www.winjgm.com` (o la ficha de Google Play).
+   - Enlace: `https://finanverso.app` (o la ficha de Google Play).
 6. Activar la verificación en dos pasos en las dos cuentas y guardar los accesos en un gestor de contraseñas.
 7. Crear también un canal de YouTube Shorts con el mismo correo: los mismos vídeos, sin trabajo extra.
 
 ## 2. Calendario de publicación
 
-- **Primer día: 3 vídeos** de golpe, para que quien llegue al perfil entienda qué es la app y vea contenido: el 86
-  (primeros pasos), el 81 (movimientos por día, semana y calendario) y el 90 (avisos de presupuesto).
-- **Después, 1 vídeo al día**, a la misma hora (por ejemplo, 19:30). Orden: primero el resto de «cómo manejar la app»
-  (82-85, 87-89), luego las series por tema; los de renta y autónomos se adelantan o se retrasan para caer junto a sus
-  plazos fiscales (ver `CALENDARIO.md`).
+- **Ritmo:** 1 vídeo al día, **todos los días a las 12:00 (hora de España)**, en Instagram y en TikTok. En los dos se
+  publica el mismo vídeo ese día. El 86 ya está publicado en las dos redes; el 90 es el siguiente. Después: el 82, el 69
+  y el resto según el orden del calendario (los de renta y autónomos se adelantan o se retrasan para caer junto a sus
+  plazos fiscales; ver `CALENDARIO.md`).
+- **Antes de publicar cada día:** comprobar el estado de las dos cuentas y parar si alguna red vuelve a pedir una
+  verificación humana.
+- **Cómo se hace a las 12:00:** Claude no actúa entre conversaciones, así que hay dos vías. (1) Cada día a las 12:00 el
+  propietario dice «sube el siguiente» y Claude lo publica en las dos redes. (2) Programar los vídeos con antelación:
+  TikTok Studio (web) permite elegir «Programación» al cargar un vídeo, con fecha y hora; Instagram lo permite desde Meta
+  Business Suite. Con la segunda vía los vídeos salen solos a las 12:00 aunque nadie esté conectado.
 - **Serie «Cómo invertir»:** los vídeos 61-80 van seguidos y en orden (mapa de clases → acciones → fondos → bonos →
   cripto…) con la misma etiqueta, y solo cuando «Cómo invertir» ya esté publicada en la app.
 - Cada vídeo lleva el pie de foto de `GUIONES.md`: gancho en la primera línea, 3-5 etiquetas y el aviso
@@ -37,12 +42,12 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
 - **Historias:** cada vez que se publique un post, el mismo vídeo se publica también como **historia** de Instagram
   (el mismo día, justo después del post). Si el vídeo dura más de lo que admite una historia (60 s en total, hasta
   unos 15-60 s según el formato), se sube el vídeo entero igualmente o se corta por escenas; en la historia se puede
-  añadir una pegatina de enlace a la ficha de Google Play o a `winjgm.com`.
+  añadir una pegatina de enlace a la ficha de Google Play o a `finanverso.app`.
 - **Segunda historia, acto seguido:** justo después de la historia del vídeo se publica una segunda historia con el
-  enlace a Google Play y a `winjgm.com`. La imagen ya está preparada: `docs/marketing/assets/story-descarga.png`
-  (1080×1920, logo, «Disponible en Google Play» y `winjgm.com`). Enlaces:
+  enlace a Google Play y a `finanverso.app`. La imagen ya está preparada: `docs/marketing/assets/story-descarga.png`
+  (1080×1920, logo, «Disponible en Google Play» y `finanverso.app`). Enlaces:
   - Google Play: `https://play.google.com/store/apps/details?id=com.jgarciamat.moneymanager`
-  - Web: `https://www.winjgm.com`
+  - Web: `https://finanverso.app`
   Desde la web de Instagram no se pueden poner pegatinas de enlace: la historia se sube con la imagen (con los
   nombres escritos) y, para que sea pulsable, el propietario añade la **pegatina de enlace** desde la app del móvil
   (Historia → pegatina → Enlace), o pone el enlace de la biografía como alternativa.

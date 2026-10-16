@@ -17,6 +17,9 @@ const FEATURES = [
   { icon: 'heart', key: 'health' },
   { icon: 'target', key: 'debts' },
   { icon: 'file', key: 'renta' },
+  { icon: 'briefcase', key: 'autonomos' },
+  { icon: 'coins', key: 'invest' },
+  { icon: 'book', key: 'learn' },
   { icon: 'mail', key: 'receipts' },
   { icon: 'lock', key: 'privacy' },
 ] as const;

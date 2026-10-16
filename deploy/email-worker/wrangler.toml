@@ -3,6 +3,6 @@ main = "worker.js"
 compatibility_date = "2025-01-01"
 
 [vars]
-WEBHOOK_URL = "https://www.winjgm.com/api/inbound/email"
+WEBHOOK_URL = "https://www.finanverso.app/api/inbound/email"
 
 # The shared secret is not written here: wrangler secret put INBOUND_SECRET

@@ -86,7 +86,7 @@ describe('AnnualChart', () => {
     await screen.findByRole('table');
     fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('menuitem', { name: literal(tr('app.export.annual')) }));
-    expect(downloads.names).toEqual(['money-manager_2026.csv']);
+    expect(downloads.names).toEqual(['finanverso_2026.csv']);
     const [csv] = await downloads.text();
     expect(csv).toContain('"Enero","2000","500","100","1400"');
     expect(csv).toContain(`"${tr('app.export.csv.total')}","2000","800","100","1100"`);

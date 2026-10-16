@@ -1,7 +1,7 @@
 {
   "id": "com.jgarciamat.moneymanager",
-  "name": "Money Manager",
-  "short_name": "MoneyMgr",
+  "name": "Finanverso",
+  "short_name": "Finanverso",
   "description": "Control de gastos, ingresos y ahorros personales con gráficos mensuales y anuales.",
   "start_url": "/",
   "scope": "/",

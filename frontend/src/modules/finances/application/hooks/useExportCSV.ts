@@ -105,7 +105,7 @@ export function useExportCSV() {
     const name = format.monthName(month).toLowerCase();
     downloadFile(
       toCSV([header(), ...rows]),
-      `money-manager_${year}-${String(month).padStart(2, '0')}_${name}.csv`,
+      `finanverso_${year}-${String(month).padStart(2, '0')}_${name}.csv`,
       CSV_TYPE
     );
   }
@@ -114,7 +114,7 @@ export function useExportCSV() {
   function exportAllCSV(transactions: ExportableTransaction[]): void {
     downloadFile(
       toCSV([header(), ...rowsOf(transactions)]),
-      `money-manager_movimientos_${todayDateOnly()}.csv`,
+      `finanverso_movimientos_${todayDateOnly()}.csv`,
       CSV_TYPE
     );
   }
@@ -143,7 +143,7 @@ export function useExportCSV() {
         sum('balance'),
       ].map(csvCell)
     );
-    downloadFile(toCSV([head, ...rows]), `money-manager_${year}.csv`, CSV_TYPE);
+    downloadFile(toCSV([head, ...rows]), `finanverso_${year}.csv`, CSV_TYPE);
   }
 
   /** The yearly report: months, quarters and categories in one file. */
@@ -198,7 +198,7 @@ export function useExportCSV() {
         categoryRows(report.incomeByCategory)
       ),
     ];
-    downloadFile(toCSV(rows), `money-manager_informe_${report.year}.csv`, CSV_TYPE);
+    downloadFile(toCSV(rows), `finanverso_informe_${report.year}.csv`, CSV_TYPE);
   }
 
   return { exportMonthCSV, exportAnnualCSV, exportAllCSV, exportReportCSV };

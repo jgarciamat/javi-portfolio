@@ -263,7 +263,7 @@ function DataCard({ onError }: { onError: (message: string) => void }) {
     const data = await dataApi.exportAll();
     downloadFile(
       JSON.stringify(data, null, 2),
-      `money-manager-${todayDateOnly()}.json`,
+      `finanverso-${todayDateOnly()}.json`,
       'application/json'
     );
   };

@@ -55,7 +55,7 @@ export function ForgotPasswordPage({ onBack }: Props) {
       <div className="auth-logo">
         <Icon name="key" />
       </div>
-      <h1 className="auth-title">Money Manager</h1>
+      <h1 className="auth-title">Finanverso</h1>
       <p className="auth-sub">{t('app.auth.forgot.title')}</p>
       <p className="auth-note">{t('app.auth.forgot.sub')}</p>
 

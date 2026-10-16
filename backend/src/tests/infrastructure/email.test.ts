@@ -6,14 +6,14 @@ jest.mock('resend', () => ({
 }));
 
 describe('ResendEmailSender', () => {
-  const sender = new ResendEmailSender('re_key', 'Money Manager <hi@x.test>', 'https://app.test');
+  const sender = new ResendEmailSender('re_key', 'Finanverso <hi@x.test>', 'https://app.test');
 
   beforeEach(() => send.mockReset().mockResolvedValue({ error: null }));
 
   it('sends localised links with the token encoded', async () => {
     await sender.sendVerification('a@b.c', 'Ana', 'a b', 'es');
     await sender.sendPasswordReset('a@b.c', 'Ana', 't/1', 'en');
-    expect(send.mock.calls[0][0]).toMatchObject({ from: 'Money Manager <hi@x.test>', to: 'a@b.c' });
+    expect(send.mock.calls[0][0]).toMatchObject({ from: 'Finanverso <hi@x.test>', to: 'a@b.c' });
     expect(send.mock.calls[0][0].html).toContain('https://app.test/verify-email?token=a%20b');
     expect(send.mock.calls[1][0].text).toContain('https://app.test/reset-password?token=t%2F1');
   });

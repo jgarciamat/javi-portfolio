@@ -24,6 +24,6 @@ describe('referral', () => {
   });
 
   it('builds the public link', () => {
-    expect(inviteLink('A B')).toBe('https://www.winjgm.com/?ref=A%20B');
+    expect(inviteLink('A B')).toBe('https://finanverso.app/?ref=A%20B');
   });
 });

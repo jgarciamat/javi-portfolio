@@ -1,4 +1,4 @@
-# 📱 Publicar Money Manager en tiendas de apps
+# 📱 Publicar Finanverso en tiendas de apps
 
 La app es una **PWA (Progressive Web App)** empaquetada con [Capacitor](https://capacitorjs.com/)
 para generar builds nativos de Android e iOS desde el mismo código React/Vite.

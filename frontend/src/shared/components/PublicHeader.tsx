@@ -9,7 +9,7 @@ export function PublicHeader() {
   return (
     <header className="public-header">
       <Link className="public-header-brand" to="/" aria-label={t('app.header.title')}>
-        <span className="public-header-logo">💰</span>
+        <img className="public-header-logo" src="/logo-192.png" alt="" width="32" height="32" />
         <div className="public-header-text">
           <span className="public-header-title">{t('app.header.title')}</span>
           <span className="public-header-sub">{t('app.header.subtitle')}</span>

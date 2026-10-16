@@ -14,7 +14,7 @@ function GuideCta() {
   if (isAuthenticated) return null;
   return (
     <section className="tools-cta">
-      <h2>Controla tu dinero con Money Manager</h2>
+      <h2>Controla tu dinero con Finanverso</h2>
       <p>
         Registra tus gastos, pon presupuestos y metas de ahorro y mira cómo evolucionas cada mes.
         Gratis para empezar, con 14 días de Premium de regalo.
@@ -29,7 +29,7 @@ function GuideCta() {
 /** Index of the guides. */
 export function GuidesIndexPage() {
   usePageMeta(
-    'Guías de finanzas personales y ahorro | Money Manager',
+    'Guías de finanzas personales y ahorro | Finanverso',
     'Guías claras y cortas para ordenar tu dinero: presupuesto, ahorro, método 50/30/20, fondo de emergencia, interés compuesto y deudas.',
     '/guias'
   );
@@ -60,7 +60,7 @@ export function GuidePage() {
   const { isAuthenticated } = useAuth();
   const guide = findGuide(slug);
   usePageMeta(
-    guide ? `${guide.title} | Money Manager` : 'Guías | Money Manager',
+    guide ? `${guide.title} | Finanverso` : 'Guías | Finanverso',
     guide ? guide.description : 'Guías de finanzas personales',
     `/guias/${slug}`
   );

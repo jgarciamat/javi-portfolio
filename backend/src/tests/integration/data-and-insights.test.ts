@@ -85,7 +85,7 @@ describe('Export', () => {
     await request(ctx.app).post('/api/goals').set(user.auth).send({ name: 'Moto', target: 2000 });
     const res = await request(ctx.app).get('/api/export').set(user.auth).expect(200);
     expect(res.headers['content-disposition']).toMatch(
-      /attachment; filename="money-manager-2026-03-15.json"/
+      /attachment; filename="finanverso-2026-03-15.json"/
     );
     expect(res.body).toMatchObject({ format: 'money-manager-export', version: 2 });
     expect(res.body.profile.email).toBe(user.email);

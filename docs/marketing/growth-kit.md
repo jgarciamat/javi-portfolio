@@ -1,19 +1,19 @@
-# Money Manager — kit de crecimiento
+# Finanverso — kit de crecimiento
 
 Textos listos para copiar. Reglas: ser honesto (somos un proyecto pequeño, un desarrollador), no hacer
 spam, no prometer rentabilidades, y publicar solo donde las normas de la comunidad lo permitan.
 
 ## 1. Ficha de Google Play (ASO)
 
-**Título (30 car.):** `Money Manager: Gastos`
-Alternativas: `Gastos y Presupuesto – MM` · `Money Manager Ahorro`
+**Título (30 car.):** `Finanverso: Gastos`
+Alternativas: `Gastos y Presupuesto – MM` · `Finanverso Ahorro`
 
 **Descripción corta (80 car.):**
 `Controla tus gastos, crea presupuestos y ahorra más. Simple, en español y privada.`
 
 **Descripción larga:**
 
-> Money Manager te ayuda a saber a dónde se va tu dinero y a ahorrar más cada mes, sin hojas de cálculo.
+> Finanverso te ayuda a saber a dónde se va tu dinero y a ahorrar más cada mes, sin hojas de cálculo.
 >
 > ✔ Registra gastos e ingresos en segundos
 > ✔ Presupuestos por categoría con avisos antes de pasarte
@@ -55,19 +55,19 @@ ayudando a la gente y menciona la app solo cuando venga a cuento.
 
 > **Título:** Hice una app gratuita de control de gastos en español; busco feedback
 >
-> Llevo un tiempo desarrollando Money Manager, una app para registrar gastos, poner presupuestos por categoría
+> Llevo un tiempo desarrollando Finanverso, una app para registrar gastos, poner presupuestos por categoría
 > y ver si llegas a fin de mes. Es mi proyecto personal (soy el único desarrollador) y quiero que sea útil de verdad.
 > Es gratis; hay un plan Premium opcional que financia el desarrollo.
 >
 > Me ayudaría mucho saber: ¿qué le falta a las apps que usáis hoy? ¿Qué os haría dejar la hoja de cálculo?
-> Web: https://www.winjgm.com · Android en Google Play.
+> Web: https://finanverso.app · Android en Google Play.
 
 **Comentario tipo cuando alguien pregunta «¿qué app uso?»:**
-> Yo hice una, Money Manager, por si te sirve (soy el desarrollador): es gratis, en español y sin anuncios. Aun así,
+> Yo hice una, Finanverso, por si te sirve (soy el desarrollador): es gratis, en español y sin anuncios. Aun así,
 > lo importante es el hábito: cualquier herramienta que uses cada día vale más que la perfecta que abandonas.
 
 **Hilo para Telegram/Facebook de ahorro:** comparte una guía, no la app: «Os dejo una guía corta sobre el método 50/30/20,
-por si ayuda» + https://www.winjgm.com/guias/metodo-50-30-20.
+por si ayuda» + https://finanverso.app/guias/metodo-50-30-20.
 
 ## 3. Vídeos cortos (20–30 s) — guiones
 
@@ -86,9 +86,9 @@ Hashtags: #finanzaspersonales #ahorro #presupuesto #educacionfinanciera
 
 - **Product Hunt:** requiere cuenta personal tuya. Tagline: «Control de gastos simple, en español, con previsión de fin de mes».
   Primer comentario: historia breve (por qué la hiciste) + pedir feedback concreto.
-- **AlternativeTo:** alta de «Money Manager» como alternativa a Fintonic, Wallet y Spendee.
+- **AlternativeTo:** alta de «Finanverso» como alternativa a Fintonic, Wallet y Spendee.
 - Directorios de apps: AppBrain, Uptodown (requiere APK), listas de «mejores apps de finanzas».
-- **Google Search Console:** añade https://www.winjgm.com, envía `sitemap.xml` y pide indexar `/guias`.
+- **Google Search Console:** añade https://finanverso.app, envía `sitemap.xml` y pide indexar `/guias`.
 
 ## 5. Medir
 

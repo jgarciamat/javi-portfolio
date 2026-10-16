@@ -6,11 +6,11 @@ Remitente: moneymanager@outlook.es
 
 Hola {nombre}:
 
-Soy Javi, el creador de Money Manager, una app gratuita y sin anuncios para controlar gastos y presupuestos en español (web y Android). Importa el extracto del banco, detecta suscripciones y avisa de si llegas a fin de mes.
+Soy Javi, el creador de Finanverso, una app gratuita y sin anuncios para controlar gastos y presupuestos en español (web y Android). Importa el extracto del banco, detecta suscripciones y avisa de si llegas a fin de mes.
 
 Creo que podría encajar con lo que cuentas en {medio}. Si te apetece probarla, te doy Premium gratis para que la valores con libertad, y estaré encantado de recibir tu opinión sincera, buena o mala.
 
-Web: https://www.winjgm.com · Android: https://play.google.com/store/apps/details?id=com.jgarciamat.moneymanager
+Web: https://finanverso.app · Android: https://play.google.com/store/apps/details?id=com.jgarciamat.moneymanager
 
 Un saludo,
 Javi

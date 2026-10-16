@@ -128,7 +128,7 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     limiter({ windowMs: 60 * 60 * 1000, limit: 20 }),
     authed((req, res) => {
       const date = c.clock.now().toISOString().slice(0, 10);
-      res.setHeader('Content-Disposition', `attachment; filename="money-manager-${date}.json"`);
+      res.setHeader('Content-Disposition', `attachment; filename="finanverso-${date}.json"`);
       res.json(c.exporter.exportAll(req.userId));
     })
   );
@@ -200,7 +200,7 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     '/push/test',
     authed(async (req, res) => {
       const sent = await c.push.notify(req.userId, {
-        title: 'Money Manager',
+        title: 'Finanverso',
         body: '✔ Las notificaciones funcionan en este dispositivo.',
         url: '/',
       });

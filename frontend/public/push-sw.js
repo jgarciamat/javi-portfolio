@@ -7,7 +7,7 @@ self.addEventListener('push', (event) => {
     data = { body: event.data ? event.data.text() : '' };
   }
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Money Manager', {
+    self.registration.showNotification(data.title || 'Finanverso', {
       body: data.body || '',
       icon: '/icon-192.png',
       badge: '/favicon-64.png',

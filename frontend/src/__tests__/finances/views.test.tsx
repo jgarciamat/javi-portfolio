@@ -1321,11 +1321,9 @@ describe('SettingsView', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: literal(tr('app.settings.exportJson')) })
     );
-    await waitFor(() => expect(downloads.names).toEqual(['money-manager-2026-03-15.json']));
+    await waitFor(() => expect(downloads.names).toEqual(['finanverso-2026-03-15.json']));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.settings.exportCsv')) }));
-    await waitFor(() =>
-      expect(downloads.names[1]).toBe('money-manager_movimientos_2026-03-15.csv')
-    );
+    await waitFor(() => expect(downloads.names[1]).toBe('finanverso_movimientos_2026-03-15.csv'));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.settings.exportCsv')) }));
     expect(await screen.findByText('Export fallida')).toBeInTheDocument();
     downloads.restore();

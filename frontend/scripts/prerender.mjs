@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
 
-const ORIGIN = 'https://www.winjgm.com';
+const ORIGIN = 'https://finanverso.app';
 const dist = 'dist';
 const es = JSON.parse(readFileSync('src/locales/es.json', 'utf8'));
 const t = (key) => es[key] ?? key;
@@ -72,7 +72,7 @@ function write(path, html) {
 }
 
 const link = (href, text) => `<a href="${href}">${esc(text)}</a>`;
-const nav = `<nav>${link('/', 'Money Manager')} · ${link(
+const nav = `<nav>${link('/', 'Finanverso')} · ${link(
   '/guias',
   t('landing.learn.guides')
 )} · ${link('/pricing', t('pricing.link'))}</nav>`;
@@ -135,7 +135,7 @@ write(
   '/guias',
   render({
     path: '/guias',
-    title: 'Guías de finanzas personales y ahorro | Money Manager',
+    title: 'Guías de finanzas personales y ahorro | Finanverso',
     description:
       'Guías claras y cortas para ordenar tu dinero: presupuesto, ahorro, método 50/30/20, fondo de emergencia, interés compuesto y deudas.',
     body: `<main><h1>Guías de finanzas personales</h1><ul>${GUIDES.map(
@@ -148,7 +148,7 @@ for (const g of GUIDES) {
     `/guias/${g.slug}`,
     render({
       path: `/guias/${g.slug}`,
-      title: `${g.title} | Money Manager`,
+      title: `${g.title} | Finanverso`,
       description: g.description,
       body: `<main><article><h1>${esc(g.title)}</h1><p>${esc(g.intro)}</p>${g.sections
         .map(
@@ -169,7 +169,7 @@ for (const g of GUIDES) {
           inLanguage: 'es',
           mainEntityOfPage: `${ORIGIN}/guias/${g.slug}`,
           author: { '@type': 'Person', name: 'Javi García' },
-          publisher: { '@type': 'Organization', name: 'Money Manager', url: ORIGIN },
+          publisher: { '@type': 'Organization', name: 'Finanverso', url: ORIGIN },
         },
       ],
     })

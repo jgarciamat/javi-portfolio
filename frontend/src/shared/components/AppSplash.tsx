@@ -2,9 +2,7 @@
 export function AppSplash() {
   return (
     <div className="app-splash" role="status" aria-live="polite">
-      <span className="app-splash-logo" aria-hidden="true">
-        💰
-      </span>
+      <img className="app-splash-logo" src="/logo-192.png" alt="" width="72" height="72" />
     </div>
   );
 }

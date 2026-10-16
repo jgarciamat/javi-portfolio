@@ -49,7 +49,7 @@ describe('invitation link storage', () => {
     captureHouseholdInvite();
     expect(pendingHouseholdInvite()).toBe('FROMURLCODE1');
     window.history.replaceState(null, '', '/');
-    expect(householdInviteLink('A B')).toBe('https://www.winjgm.com/?join=A%20B');
+    expect(householdInviteLink('A B')).toBe('https://finanverso.app/?join=A%20B');
   });
 });
 
@@ -59,11 +59,11 @@ describe('Household card', () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     const api = setup();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.household.invite') }));
-    expect(await screen.findByText('https://www.winjgm.com/?join=CODE-123456789')).toBeVisible();
+    expect(await screen.findByText('https://finanverso.app/?join=CODE-123456789')).toBeVisible();
     expect(api.householdApi.invite).toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));
     await waitFor(() =>
-      expect(writeText).toHaveBeenCalledWith('https://www.winjgm.com/?join=CODE-123456789')
+      expect(writeText).toHaveBeenCalledWith('https://finanverso.app/?join=CODE-123456789')
     );
     expect(await screen.findByText(tr('billing.invite.copied'))).toBeInTheDocument();
     expect(screen.getByRole('button', { name: tr('app.household.newInvite') })).toBeInTheDocument();
