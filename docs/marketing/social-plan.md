@@ -38,6 +38,14 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
   (el mismo día, justo después del post). Si el vídeo dura más de lo que admite una historia (60 s en total, hasta
   unos 15-60 s según el formato), se sube el vídeo entero igualmente o se corta por escenas; en la historia se puede
   añadir una pegatina de enlace a la ficha de Google Play o a `winjgm.com`.
+- **Segunda historia, acto seguido:** justo después de la historia del vídeo se publica una segunda historia con el
+  enlace a Google Play y a `winjgm.com`. La imagen ya está preparada: `docs/marketing/assets/story-descarga.png`
+  (1080×1920, logo, «Disponible en Google Play» y `winjgm.com`). Enlaces:
+  - Google Play: `https://play.google.com/store/apps/details?id=com.jgarciamat.moneymanager`
+  - Web: `https://www.winjgm.com`
+  Desde la web de Instagram no se pueden poner pegatinas de enlace: la historia se sube con la imagen (con los
+  nombres escritos) y, para que sea pulsable, el propietario añade la **pegatina de enlace** desde la app del móvil
+  (Historia → pegatina → Enlace), o pone el enlace de la biografía como alternativa.
 
 ## 3. Cómo conseguir seguidores y usuarios (sin spam)
 
