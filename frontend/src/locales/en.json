@@ -1890,5 +1890,10 @@
   "app.invest.calc.stock.withheldNote": "Already withheld: {amount}",
   "app.invest.calc.stock.net": "Net gain",
   "app.invest.calc.stock.netReturn": "Net return: {pct}",
-  "app.invest.calc.stock.footnote": "A loss on the sale offsets at most 25 % of the year’s dividends; the rest carries forward 4 years and is not calculated here. Uses the savings scale from the app data. Illustrative."
+  "app.invest.calc.stock.footnote": "A loss on the sale offsets at most 25 % of the year’s dividends; the rest carries forward 4 years and is not calculated here. Uses the savings scale from the app data. Illustrative.",
+  "app.split.simplify": "Simplify debts",
+  "app.split.simplified": "Simplified debts",
+  "app.split.showOriginal": "Show the original split",
+  "app.split.simplifiedNote": "{n} payments instead of {m}: the fewest possible to settle everything.",
+  "app.split.alreadyMinimal": "These are already the fewest: {n} payments is the least needed to settle everything."
 }

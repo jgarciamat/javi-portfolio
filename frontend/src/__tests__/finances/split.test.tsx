@@ -193,4 +193,41 @@ describe('SplitView', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.split.create') }));
     expect(await screen.findByText('Máximo 20 grupos')).toBeInTheDocument();
   });
+
+  it('simplifies the debts to the fewest payments and goes back to the original split', async () => {
+    // Greedy needs 5 payments here, the best split of the group needs 4.
+    const members = [90, 40, 70, -90, 60, -170].map((balance, i) => ({
+      id: `m${i}`,
+      name: `P${i}`,
+      balance,
+    }));
+    const greedy = [
+      { from: 'm5', to: 'm0', amount: 90 },
+      { from: 'm5', to: 'm2', amount: 70 },
+      { from: 'm3', to: 'm4', amount: 60 },
+      { from: 'm3', to: 'm1', amount: 30 },
+      { from: 'm5', to: 'm1', amount: 10 },
+    ];
+    const api = setup(undefined, group({ members, transfers: greedy, expenses: [] }));
+    await openGroup();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.split.simplify') }));
+    expect(screen.getByText(new RegExp(tr('app.split.simplified')))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.split.simplifiedNote', { n: 4, m: 5 }))).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: tr('app.split.registerPayment') })).toHaveLength(
+      4
+    );
+    fireEvent.click(screen.getAllByRole('button', { name: tr('app.split.registerPayment') })[0]);
+    await waitFor(() => expect(api.splitApi.settle).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: tr('app.split.showOriginal') }));
+    expect(screen.getAllByRole('button', { name: tr('app.split.registerPayment') })).toHaveLength(
+      5
+    );
+  });
+
+  it('says so when the payments were already the fewest', async () => {
+    setup();
+    await openGroup();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.split.simplify') }));
+    expect(screen.getByText(tr('app.split.alreadyMinimal', { n: 2 }))).toBeInTheDocument();
+  });
 });

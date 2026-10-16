@@ -1890,5 +1890,10 @@
   "app.invest.calc.stock.withheldNote": "Ya retenido: {amount}",
   "app.invest.calc.stock.net": "Ganancia neta",
   "app.invest.calc.stock.netReturn": "Rentabilidad neta: {pct}",
-  "app.invest.calc.stock.footnote": "Una pérdida en la venta compensa como máximo el 25 % de los dividendos del año; el sobrante se arrastra 4 años y aquí no se calcula. Usa la escala del ahorro de los datos de la app. Ilustrativo."
+  "app.invest.calc.stock.footnote": "Una pérdida en la venta compensa como máximo el 25 % de los dividendos del año; el sobrante se arrastra 4 años y aquí no se calcula. Usa la escala del ahorro de los datos de la app. Ilustrativo.",
+  "app.split.simplify": "Simplificar cuentas",
+  "app.split.simplified": "Cuentas simplificadas",
+  "app.split.showOriginal": "Ver el reparto original",
+  "app.split.simplifiedNote": "{n} pagos en lugar de {m}: es el menor número de movimientos posible para saldar todo.",
+  "app.split.alreadyMinimal": "Ya son los mínimos: {n} pagos es lo menos que se puede hacer para saldar todo."
 }

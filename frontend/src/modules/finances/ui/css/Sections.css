@@ -953,6 +953,28 @@ button.entity-item {
   content: attr(data-initial);
 }
 
+.split-settle-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  margin-top: 1.4rem;
+}
+
+.split-settle-head .split-subtitle {
+  margin: 0;
+}
+
+.split-simplify-note {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.8rem;
+  border-left: 4px solid var(--green-400);
+  border-radius: 8px;
+  background: rgba(74, 222, 128, 0.08);
+  font-size: 0.88rem;
+}
+
 .split-subtitle {
   margin: 1.4rem 0 0;
   font-size: 1rem;
