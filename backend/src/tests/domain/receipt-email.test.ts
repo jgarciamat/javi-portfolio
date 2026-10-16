@@ -95,7 +95,9 @@ describe('inboxTokenOf', () => {
   it('reads the token out of the recipient', () => {
     expect(inboxTokenOf('mm-abcdefghij12@facturas.finanverso.app')).toBe('mm-abcdefghij12');
     expect(inboxTokenOf('Money <MM-ABCDEFGHIJ12@facturas.finanverso.app>')).toBe('mm-abcdefghij12');
-    expect(inboxTokenOf('otro@x.com, mm-abcdefghij12@facturas.finanverso.app')).toBe('mm-abcdefghij12');
+    expect(inboxTokenOf('otro@x.com, mm-abcdefghij12@facturas.finanverso.app')).toBe(
+      'mm-abcdefghij12'
+    );
   });
 
   it('refuses other addresses', () => {
