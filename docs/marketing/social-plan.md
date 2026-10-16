@@ -22,11 +22,16 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
 
 ## 2. Calendario de publicación
 
-- **Primer día: 3 vídeos** de golpe, para que quien llegue al perfil entienda qué es la app y vea contenido: el 86
-  (primeros pasos), el 81 (movimientos por día, semana y calendario) y el 90 (avisos de presupuesto).
-- **Después, 1 vídeo al día**, a la misma hora (por ejemplo, 19:30). Orden: primero el resto de «cómo manejar la app»
-  (82-85, 87-89), luego las series por tema; los de renta y autónomos se adelantan o se retrasan para caer junto a sus
-  plazos fiscales (ver `CALENDARIO.md`).
+- **Ritmo:** 1 vídeo al día, **todos los días a las 12:00 (hora de España)**, en Instagram y en TikTok. En los dos se
+  publica el mismo vídeo ese día. El 86 ya está publicado en las dos redes; el 90 es el siguiente. Después: el 82, el 69
+  y el resto según el orden del calendario (los de renta y autónomos se adelantan o se retrasan para caer junto a sus
+  plazos fiscales; ver `CALENDARIO.md`).
+- **Antes de publicar cada día:** comprobar el estado de las dos cuentas y parar si alguna red vuelve a pedir una
+  verificación humana.
+- **Cómo se hace a las 12:00:** Claude no actúa entre conversaciones, así que hay dos vías. (1) Cada día a las 12:00 el
+  propietario dice «sube el siguiente» y Claude lo publica en las dos redes. (2) Programar los vídeos con antelación:
+  TikTok Studio (web) permite elegir «Programación» al cargar un vídeo, con fecha y hora; Instagram lo permite desde Meta
+  Business Suite. Con la segunda vía los vídeos salen solos a las 12:00 aunque nadie esté conectado.
 - **Serie «Cómo invertir»:** los vídeos 61-80 van seguidos y en orden (mapa de clases → acciones → fondos → bonos →
   cripto…) con la misma etiqueta, y solo cuando «Cómo invertir» ya esté publicada en la app.
 - Cada vídeo lleva el pie de foto de `GUIONES.md`: gancho en la primera línea, 3-5 etiquetas y el aviso
