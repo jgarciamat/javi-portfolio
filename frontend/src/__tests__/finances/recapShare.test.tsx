@@ -63,7 +63,7 @@ describe('recapImage', () => {
       headlineHint: 'ahorrado',
       lines: ['a', 'b'],
       footer: 'pie',
-      site: 'winjgm.com',
+      site: 'finanverso.app',
     });
     expect(blob.type).toBe('image/png');
     expect(ctx.fillText).toHaveBeenCalledWith('10 %', 540, 680);
@@ -141,7 +141,7 @@ describe('Share the month', () => {
     view();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.recap.share')) }));
     expect(await screen.findByText(tr('app.recap.shareSaved2'))).toBeInTheDocument();
-    expect(downloads.names).toEqual(['money-manager-resumen.png']);
+    expect(downloads.names).toEqual(['finanverso-resumen.png']);
     downloads.restore();
   });
 

@@ -629,6 +629,7 @@
 .burger-btn-logo {
   font-size: 1.75rem;
   line-height: 1;
+  border-radius: 6px;
 }
 
 .burger-btn-lines {
@@ -707,6 +708,7 @@
 .burger-brand-logo {
   font-size: 1.6rem;
   line-height: 1;
+  border-radius: 6px;
 }
 
 .burger-brand-name {

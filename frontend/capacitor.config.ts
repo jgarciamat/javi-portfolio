@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   // appId must be a unique reverse-domain identifier.
   // Change "com.jgarciamat" to your own domain before publishing.
   appId: 'com.jgarciamat.moneymanager',
-  appName: 'Money Manager',
+  appName: 'Finanverso',
 
   // ─── Web assets ───────────────────────────────────────────────────────────
   // Points to Vite's output directory so `cap sync` copies the latest build.

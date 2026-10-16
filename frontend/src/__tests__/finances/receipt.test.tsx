@@ -79,9 +79,9 @@ describe('readReceipt', () => {
     jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     await readReceipt(new File(['x'], 'ticket.jpg'));
     expect(createWorker).toHaveBeenCalledWith('spa', 1, {
-      workerPath: 'https://www.winjgm.com/ocr/worker.min.js',
-      corePath: 'https://www.winjgm.com/ocr/',
-      langPath: 'https://www.winjgm.com/ocr/',
+      workerPath: 'https://finanverso.app/ocr/worker.min.js',
+      corePath: 'https://finanverso.app/ocr/',
+      langPath: 'https://finanverso.app/ocr/',
       gzip: true,
     });
   });

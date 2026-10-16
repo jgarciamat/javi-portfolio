@@ -1,4 +1,4 @@
-# Backend — Money Manager API
+# Backend — Finanverso API
 
 Express + SQLite con arquitectura hexagonal. Visión general del proyecto en el [README raíz](../README.md).
 

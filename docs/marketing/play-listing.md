@@ -2,12 +2,12 @@
 
 ## Español (es-ES)
 
-**Título (30):** Money Manager: gastos y ahorro
+**Título (30):** Finanverso: gastos y ahorro
 
 **Descripción breve (80):** Presupuestos, ahorro, renta y autónomos. Gratis, en español y sin anuncios.
 
 **Descripción completa:**
-¿Llegas a fin de mes? Money Manager te lo dice antes de que ocurra.
+¿Llegas a fin de mes? Finanverso te lo dice antes de que ocurra.
 
 Controla tus gastos y presupuestos, ahorra con metas y prepara tu declaración de la Renta y tus impuestos de autónomo desde el móvil. Gratis, en español y sin anuncios.
 
@@ -48,11 +48,11 @@ Las estimaciones fiscales son orientativas: revísalas con tu gestor antes de pr
 
 ## English (en-GB)
 
-**Title:** Money Manager: spend & save
+**Title:** Finanverso: spend & save
 
 **Short:** Budgets, savings, income tax and self-employed taxes. Free, ad-free, private.
 
-**Full:** Will you make it to the end of the month? Money Manager tells you before it happens. Log expenses and income in seconds, set budgets with alerts, save towards goals and get an end-of-month forecast.
+**Full:** Will you make it to the end of the month? Finanverso tells you before it happens. Log expenses and income in seconds, set budgets with alerts, save towards goals and get an end-of-month forecast.
 
 Also: bank statement import (CSV), auto-categorisation, subscription detection, receipt scanning, split expenses, net worth, debt payoff plan, multi-currency, PIN/biometric lock and a home-screen widget.
 

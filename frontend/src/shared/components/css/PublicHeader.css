@@ -23,8 +23,9 @@
 }
 
 .public-header-logo {
-  font-size: 1.4rem;
-  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 

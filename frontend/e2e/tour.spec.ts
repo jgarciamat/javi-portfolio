@@ -20,7 +20,7 @@ test('the welcome tour visits every section after signing in, until it is turned
 }) => {
   await logIn(page);
   const tour = page.getByRole('dialog');
-  await expect(tour.getByRole('heading', { name: /Bienvenido a Money Manager/ })).toBeVisible();
+  await expect(tour.getByRole('heading', { name: /Bienvenido a Finanverso/ })).toBeVisible();
   const progress = await tour.getByText(/^Paso 1 de \d+$/).textContent();
   const total = Number(progress!.split(' de ')[1]);
 

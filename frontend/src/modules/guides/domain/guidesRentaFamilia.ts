@@ -61,7 +61,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo comprobar tu caso con Money Manager',
+        heading: 'Cómo comprobar tu caso con Finanverso',
         paragraphs: [
           'En la calculadora de la Renta puedes añadir a tus hijos, elegir tu comunidad y marcar las deducciones. Para cada una te explica los requisitos y, cuando se puede cobrar por adelantado, te enseña el enlace para pedir el modelo que corresponda. Si quieres entender el resultado final, lee [si te sale a pagar o a devolver](/guias/renta-a-pagar-o-a-devolver).',
           CHECK,
@@ -134,7 +134,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo calcularlo con Money Manager',
+        heading: 'Cómo calcularlo con Finanverso',
         paragraphs: [
           'La calculadora de la Renta incluye estas deducciones, te enseña el requisito de cada una y, si se puede cobrar por adelantado, te lleva al trámite del modelo 143. Así ves el efecto de todas las ayudas por hijos en un resumen único antes de presentar.',
           CHECK,
@@ -211,7 +211,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo ayuda Money Manager',
+        heading: 'Cómo ayuda Finanverso',
         paragraphs: [
           'En la calculadora de la Renta puedes subir el PDF del borrador. Se lee en tu propio dispositivo, sin enviarlo a ningún servidor, rellena tus datos y te pregunta por las deducciones de tu comunidad y del Estado que no has marcado y podrías pedir. Es una función exclusiva de Premium o del pase de la Renta, así que consulta en la app qué incluye tu plan.',
           CHECK,

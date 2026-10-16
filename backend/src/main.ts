@@ -86,7 +86,7 @@ async function main(): Promise<void> {
   reminders.unref();
 
   const server = createApp(container).listen(config.port, () => {
-    console.info(`Money Manager API listening on :${config.port} (${config.env})`);
+    console.info(`Finanverso API listening on :${config.port} (${config.env})`);
   });
 
   const shutdown = (signal: string): void => {

@@ -49,7 +49,7 @@ export const GUIDES: Guide[] = [
         heading: 'Cómo ponerlo en práctica',
         paragraphs: [
           'Calcula tus tres cantidades con la calculadora, crea un presupuesto por categoría para cada bloque y programa una transferencia automática al ahorro el día que cobras.',
-          'En Money Manager puedes poner un presupuesto a cada categoría y la app te avisa cuando te acercas al límite.',
+          'En Finanverso puedes poner un presupuesto a cada categoría y la app te avisa cuando te acercas al límite.',
         ],
       },
     ],
@@ -91,7 +91,7 @@ export const GUIDES: Guide[] = [
       {
         heading: '5. Mide cada mes',
         paragraphs: [
-          'Mira tu tasa de ahorro, que es el porcentaje de tus ingresos que has guardado. Money Manager la calcula sola cada mes y te la enseña en el resumen.',
+          'Mira tu tasa de ahorro, que es el porcentaje de tus ingresos que has guardado. Finanverso la calcula sola cada mes y te la enseña en el resumen.',
         ],
       },
     ],
@@ -117,7 +117,7 @@ export const GUIDES: Guide[] = [
         heading: 'Cómo construirlo',
         paragraphs: [
           'No hace falta llegar a la cifra completa de golpe. Marca un primer objetivo pequeño, como un mes de gastos, y ve subiendo.',
-          'Una meta de ahorro con una cantidad y una fecha te ayuda a mantener el ritmo. En Money Manager puedes crearla y ver el progreso.',
+          'Una meta de ahorro con una cantidad y una fecha te ayuda a mantener el ritmo. En Finanverso puedes crearla y ver el progreso.',
         ],
       },
       {
@@ -198,7 +198,7 @@ export const GUIDES: Guide[] = [
       {
         heading: '5. Revisa y ajusta',
         paragraphs: [
-          'A mitad de mes comprueba cómo vas. Un presupuesto que nunca se revisa se abandona. En Money Manager ves cuánto llevas gastado en cada categoría y recibes un aviso si te acercas al límite.',
+          'A mitad de mes comprueba cómo vas. Un presupuesto que nunca se revisa se abandona. En Finanverso ves cuánto llevas gastado en cada categoría y recibes un aviso si te acercas al límite.',
         ],
       },
     ],
@@ -259,7 +259,7 @@ export const GUIDES: Guide[] = [
         heading: 'Cancela con cabeza',
         paragraphs: [
           'Pregúntate si la has usado en el último mes. Si no, cancela: casi siempre puedes volver a contratarla. Anota la fecha de renovación de las que mantengas para no llevarte sorpresas.',
-          'Money Manager detecta los pagos recurrentes en tus movimientos y te muestra cuánto te cuestan al mes y al año.',
+          'Finanverso detecta los pagos recurrentes en tus movimientos y te muestra cuánto te cuestan al mes y al año.',
         ],
       },
     ],
@@ -387,7 +387,7 @@ export const GUIDES: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo ayuda Money Manager',
+        heading: 'Cómo ayuda Finanverso',
         paragraphs: [
           'En la sección Autónomos marcas qué categorías son de tu actividad y su tipo de IVA, y ves una estimación por trimestre. Es solo orientativa: no incluye deducciones ni regímenes especiales, así que contrástala con tu gestor.',
         ],
@@ -427,7 +427,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Herramientas',
         paragraphs: [
-          'En Money Manager puedes compartir tus movimientos, presupuestos y metas con tu pareja, y repartir gastos con amigos en «Gastos compartidos», donde se calcula quién debe a quién.',
+          'En Finanverso puedes compartir tus movimientos, presupuestos y metas con tu pareja, y repartir gastos con amigos en «Gastos compartidos», donde se calcula quién debe a quién.',
         ],
       },
     ],
@@ -456,7 +456,7 @@ export const GUIDES: Guide[] = [
       {
         heading: '3. Automatízalo',
         paragraphs: [
-          'Programa una transferencia mensual a una cuenta aparte el día que cobras. Crea una meta en Money Manager con la cantidad y la fecha: verás el progreso y cuánto necesitas ahorrar cada mes.',
+          'Programa una transferencia mensual a una cuenta aparte el día que cobras. Crea una meta en Finanverso con la cantidad y la fecha: verás el progreso y cuánto necesitas ahorrar cada mes.',
         ],
       },
       {

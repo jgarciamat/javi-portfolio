@@ -34,7 +34,7 @@ describe('guide content', () => {
   it('every guide is published in the sitemap', async () => {
     const { readFileSync } = await import('fs');
     const sitemap = readFileSync('public/sitemap.xml', 'utf8');
-    expect(sitemap).toContain('https://www.winjgm.com/guias</loc>');
+    expect(sitemap).toContain('https://finanverso.app/guias</loc>');
     for (const tool of TOOL_PAGES) expect(sitemap).toContain(`${tool.path}</loc>`);
     for (const g of GUIDES) expect(sitemap).toContain(`/guias/${g.slug}</loc>`);
   });

@@ -336,14 +336,14 @@ describe('Invite a friend', () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
     withPlan(<PlanView />);
-    expect(await screen.findByText('https://www.winjgm.com/?ref=ABCD2345')).toBeInTheDocument();
+    expect(await screen.findByText('https://finanverso.app/?ref=ABCD2345')).toBeInTheDocument();
     expect(
       screen.getByText(/primeros pasos: 2 · en camino: 1 · meses ganados: 1\. Te faltan 4/)
     ).toBeVisible();
     expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));
     await waitFor(() =>
-      expect(writeText).toHaveBeenCalledWith('https://www.winjgm.com/?ref=ABCD2345')
+      expect(writeText).toHaveBeenCalledWith('https://finanverso.app/?ref=ABCD2345')
     );
     expect(await screen.findByText(tr('billing.invite.copied'))).toBeInTheDocument();
   });
@@ -354,9 +354,9 @@ describe('Invite a friend', () => {
     withPlan(<PlanView />);
     fireEvent.click(await screen.findByRole('button', { name: tr('billing.invite.share') }));
     expect(share).toHaveBeenCalledWith({
-      title: 'Money Manager',
+      title: 'Finanverso',
       text: tr('billing.invite.shareText'),
-      url: 'https://www.winjgm.com/?ref=ABCD2345',
+      url: 'https://finanverso.app/?ref=ABCD2345',
     });
   });
 

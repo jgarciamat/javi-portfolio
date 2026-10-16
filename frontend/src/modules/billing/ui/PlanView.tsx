@@ -200,7 +200,7 @@ function InviteCard() {
           <button
             className="btn-secondary"
             onClick={() =>
-              share({ title: 'Money Manager', text: t('billing.invite.shareText'), url: link })
+              share({ title: 'Finanverso', text: t('billing.invite.shareText'), url: link })
             }
           >
             {t('billing.invite.share')}

@@ -1,7 +1,7 @@
-# Money Manager
+# Finanverso
 
 Gestor de finanzas personales: web (PWA) + app Android/iOS (Capacitor) + API.
-Producción: <https://www.winjgm.com>
+Producción: <https://finanverso.app>
 
 | Parte | Tecnología |
 |---|---|

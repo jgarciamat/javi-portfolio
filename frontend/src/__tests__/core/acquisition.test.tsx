@@ -14,30 +14,30 @@ beforeEach(() => localStorage.clear());
 
 describe('sourceOf', () => {
   it('prefers the campaign and cleans it', () => {
-    expect(sourceOf('?utm_source=Reddit', 'https://x.com/a', 'winjgm.com')).toBe('reddit');
-    expect(sourceOf('?utm_source=%20Tik%20Tok!', '', 'winjgm.com')).toBe('tiktok');
-    expect(sourceOf(`?utm_source=${'a'.repeat(60)}`, '', 'winjgm.com')).toHaveLength(40);
+    expect(sourceOf('?utm_source=Reddit', 'https://x.com/a', 'finanverso.app')).toBe('reddit');
+    expect(sourceOf('?utm_source=%20Tik%20Tok!', '', 'finanverso.app')).toBe('tiktok');
+    expect(sourceOf(`?utm_source=${'a'.repeat(60)}`, '', 'finanverso.app')).toHaveLength(40);
   });
 
   it('falls back to the site that linked here, ignoring ours', () => {
-    expect(sourceOf('', 'https://www.google.com/search?q=x', 'www.winjgm.com')).toBe('google.com');
-    expect(sourceOf('?utm_source=!!!', 'https://news.ycombinator.com/', 'winjgm.com')).toBe(
+    expect(sourceOf('', 'https://www.google.com/search?q=x', 'finanverso.app')).toBe('google.com');
+    expect(sourceOf('?utm_source=!!!', 'https://news.ycombinator.com/', 'finanverso.app')).toBe(
       'news.ycombinator.com'
     );
-    expect(sourceOf('', 'https://www.winjgm.com/guias', 'winjgm.com')).toBeNull();
-    expect(sourceOf('', '', 'winjgm.com')).toBeNull();
-    expect(sourceOf('', 'not a url', 'winjgm.com')).toBeNull();
+    expect(sourceOf('', 'https://finanverso.app/guias', 'finanverso.app')).toBeNull();
+    expect(sourceOf('', '', 'finanverso.app')).toBeNull();
+    expect(sourceOf('', 'not a url', 'finanverso.app')).toBeNull();
   });
 });
 
 describe('captureAcquisition', () => {
   it('keeps the first source until it is reported', () => {
-    captureAcquisition('?utm_source=reddit', '', 'winjgm.com');
-    captureAcquisition('?utm_source=tiktok', '', 'winjgm.com');
+    captureAcquisition('?utm_source=reddit', '', 'finanverso.app');
+    captureAcquisition('?utm_source=tiktok', '', 'finanverso.app');
     expect(pendingAcquisition()).toBe('reddit');
     clearAcquisition();
     expect(pendingAcquisition()).toBeUndefined();
-    captureAcquisition('', '', 'winjgm.com');
+    captureAcquisition('', '', 'finanverso.app');
     expect(pendingAcquisition()).toBeUndefined();
   });
 

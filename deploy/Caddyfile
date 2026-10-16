@@ -1,8 +1,7 @@
-winjgm.com {
-  redir https://www.winjgm.com{uri} permanent
-}
+# The app lives at finanverso.app. winjgm.com is the old domain: the pages redirect to the new one,
+# but /api keeps working there because installed Android apps (v30 and older) call https://www.winjgm.com/api.
+(app) {
 
-www.winjgm.com {
   encode zstd gzip
 
   header {
@@ -27,4 +26,29 @@ www.winjgm.com {
   handle {
     reverse_proxy web:80
   }
+}
+
+finanverso.app {
+  import app
+}
+
+www.finanverso.app {
+  redir https://finanverso.app{uri} permanent
+}
+
+www.winjgm.com {
+  handle /api/* {
+    request_body {
+      max_size 5MB
+    }
+    reverse_proxy api:3000
+  }
+
+  handle {
+    redir https://finanverso.app{uri} permanent
+  }
+}
+
+winjgm.com {
+  redir https://finanverso.app{uri} permanent
 }

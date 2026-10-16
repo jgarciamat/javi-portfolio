@@ -56,7 +56,7 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
         ],
       },
       {
-        heading: 'Cómo encontrar las tuyas con Money Manager',
+        heading: 'Cómo encontrar las tuyas con Finanverso',
         paragraphs: [
           'En la calculadora de la Renta eliges Castilla y León y ves todas sus deducciones con su requisito, su límite de renta y el enlace oficial. Marcas las que creas que te corresponden y comprobamos si tu renta lo permite. Para entender el resultado, lee [si te sale a pagar o a devolver](/guias/renta-a-pagar-o-a-devolver).',
           CHECK,
@@ -119,7 +119,7 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
         heading: 'Cómo aplicar bien las deducciones',
         paragraphs: [
           'Casi todas se aplican a mano en el borrador. Revisa los requisitos de cada una y guarda las facturas. Si no estás seguro de qué falta en tu declaración, la guía de [cómo leer tu borrador](/guias/como-leer-borrador-renta) te da un recorrido apartado por apartado.',
-          'La calculadora de la Renta de Money Manager lista todas las deducciones valencianas con su límite de renta, y te dice si tu base te lo permite o te lo bloquea. También puedes comparar con las de [Castilla y León](/guias/deducciones-renta-castilla-y-leon).',
+          'La calculadora de la Renta de Finanverso lista todas las deducciones valencianas con su límite de renta, y te dice si tu base te lo permite o te lo bloquea. También puedes comparar con las de [Castilla y León](/guias/deducciones-renta-castilla-y-leon).',
           CHECK,
         ],
       },

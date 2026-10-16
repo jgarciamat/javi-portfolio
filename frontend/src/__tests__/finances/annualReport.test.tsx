@@ -53,7 +53,7 @@ describe('Annual report', () => {
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.report.print')) }));
     expect(print).toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.report.csv')) }));
-    expect(downloads.names).toEqual(['money-manager_informe_2026.csv']);
+    expect(downloads.names).toEqual(['finanverso_informe_2026.csv']);
     const [csv] = await downloads.text();
     expect(csv).toContain(`"${tr('app.report.title')} 2026"`);
     expect(csv).toContain('"Enero","2000","100","0","1900"');

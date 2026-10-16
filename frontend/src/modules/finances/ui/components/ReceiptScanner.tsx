@@ -9,7 +9,7 @@ import { Icon } from '@shared/components/Icon';
  * Where the scanner's files are served from (see scripts/copy-ocr.mjs): our own server, not a
  * CDN. The Android app does not carry them (they weigh 14 MB): it fetches them from the site.
  */
-const WEB_OCR_PATH = 'https://www.winjgm.com/ocr/';
+const WEB_OCR_PATH = 'https://finanverso.app/ocr/';
 const ocrPath = (): string => (isNativeApp() ? WEB_OCR_PATH : '/ocr/');
 
 /** Reads the text of a ticket photo on the device; nothing is uploaded. */
