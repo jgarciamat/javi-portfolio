@@ -22,13 +22,18 @@ Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no 
 
 ## 2. Calendario de publicación
 
-- 4 vídeos por semana (lunes, miércoles, viernes y domingo), a la misma hora, del 19 de octubre de 2026 en adelante.
-  Orden y fechas exactas en `CALENDARIO.md`; los de renta y autónomos van pegados a los plazos fiscales.
-- **Serie «Cómo invertir»:** los vídeos de esa serie van en orden (mapa de clases → acciones → fondos → bonos → cripto…)
-  y con la misma etiqueta para que se pueda seguir de uno en uno.
+- **Primer día: 3 vídeos** de golpe, para que quien llegue al perfil entienda qué es la app y vea contenido: el 86
+  (primeros pasos), el 81 (movimientos por día, semana y calendario) y el 90 (avisos de presupuesto).
+- **Después, 1 vídeo al día**, a la misma hora (por ejemplo, 19:30). Orden: primero el resto de «cómo manejar la app»
+  (82-85, 87-89), luego las series por tema; los de renta y autónomos se adelantan o se retrasan para caer junto a sus
+  plazos fiscales (ver `CALENDARIO.md`).
+- **Serie «Cómo invertir»:** los vídeos 61-80 van seguidos y en orden (mapa de clases → acciones → fondos → bonos →
+  cripto…) con la misma etiqueta, y solo cuando «Cómo invertir» ya esté publicada en la app.
 - Cada vídeo lleva el pie de foto de `GUIONES.md`: gancho en la primera línea, 3-5 etiquetas y el aviso
   «orientativo, consulta con tu gestor» en los de impuestos.
-- Primera semana: publicar 3-4 vídeos de golpe antes de pedir seguidores, para que quien llegue al perfil vea contenido.
+- **Al subir en la web de Instagram:** en el paso «Recortar», cambia el formato de **1:1 a 9:16**; si no, recorta el
+  vídeo por arriba y por abajo.
+- Con 1 por día, los 90 vídeos cubren unos 3 meses.
 
 ## 3. Cómo conseguir seguidores y usuarios (sin spam)
 
