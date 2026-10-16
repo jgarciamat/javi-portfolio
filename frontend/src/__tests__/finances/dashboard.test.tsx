@@ -99,6 +99,18 @@ describe('menu and sections', () => {
     window.history.pushState({}, '', '/');
   });
 
+  it('opens the Invest section from the menu, free for every account', async () => {
+    renderWithProviders(<Dashboard />);
+    goTo('app.tabs.invest');
+    expect(screen.getByRole('region', { name: tr('app.tabs.invest') })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: tr('app.invest.title') })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('note', { name: tr('app.invest.disclaimer.title') })
+    ).toBeInTheDocument();
+  });
+
   it('opens a month from the annual view', async () => {
     const api = createFakeApi();
     api.transactionApi.getAnnual.mockResolvedValue({
