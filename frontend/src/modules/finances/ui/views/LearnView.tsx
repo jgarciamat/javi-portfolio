@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { GUIDES, findGuide } from '@modules/guides/domain/guides';
+import { GuideCatalog } from '@modules/guides/ui/GuideCatalog';
 import { GuideBody } from '@modules/guides/ui/GuideBody';
 import { Icon } from '@shared/components/Icon';
 import '@modules/guides/ui/css/Guides.css';
@@ -42,16 +43,13 @@ export function LearnView() {
         </h2>
         <p className="section-hint">{t('app.learn.hint')}</p>
         <p className="section-hint">{t('app.learn.count', { total: GUIDES.length })}</p>
-        <ul className="guide-list">
-          {GUIDES.map((g) => (
-            <li key={g.slug}>
-              <button className="guide-link" onClick={() => setOpen(g.slug)}>
-                {g.title}
-              </button>
-              <p>{g.description}</p>
-            </li>
-          ))}
-        </ul>
+        <GuideCatalog
+          renderLink={(g, className, children) => (
+            <button className={`${className} guide-link`} onClick={() => setOpen(g.slug)}>
+              {children}
+            </button>
+          )}
+        />
       </div>
     </div>
   );
