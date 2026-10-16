@@ -52,7 +52,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
       >
         <div className="burger-panel-header">
           <div className="burger-brand">
-            <img className="burger-brand-logo" src="/icon-192.png" alt="" width="28" height="28" />
+            <img className="burger-brand-logo" src="/logo-192.png" alt="" width="28" height="28" />
             <span className="burger-brand-name">{t('app.header.title')}</span>
           </div>
           <button className="burger-close-btn" onClick={onClose} aria-label={t('app.menu.close')}>

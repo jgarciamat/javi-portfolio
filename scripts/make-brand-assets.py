@@ -88,4 +88,7 @@ tw = d.textlength(t, font=font)
 d.text(((1200 - tw) / 2, 470), t, fill=(15, 52, 80), font=font)
 og.convert("RGB").save(f"{FE}/public/og-image.png")
 mark.resize((256, int(mark.height * 256 / mark.width)), Image.LANCZOS).save(f"{FE}/public/logo-mark.png")
+# transparent logo for the in-app headers and favicons
+for name, size, pad in [("logo-192", 192, 0.04), ("logo-512", 512, 0.04), ("favicon-64", 64, 0.02), ("favicon-32", 32, 0.02)]:
+    square(mark, size, pad).save(f"{FE}/public/{name}.png")
 print("ok")
