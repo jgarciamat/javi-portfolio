@@ -25,6 +25,11 @@ function Disclaimer() {
   return (
     <aside className="inv-disclaimer" role="note" aria-label={t('app.invest.disclaimer.title')}>
       <strong>⚠️ {t('app.invest.disclaimer.title')}</strong>
+      <ul className="inv-key-points">
+        <li>{t('app.invest.disclaimer.key1')}</li>
+        <li>{t('app.invest.disclaimer.key2')}</li>
+        <li>{t('app.invest.disclaimer.key3')}</li>
+      </ul>
       <p>{t('app.invest.disclaimer.edu')}</p>
       <p>{t('app.invest.disclaimer.risk')}</p>
       <details>
@@ -102,6 +107,9 @@ export function InvestView() {
         id={`inv-panel-${section}`}
         aria-labelledby={`inv-tab-${section}`}
       >
+        <p className="inv-varies" role="note">
+          ℹ️ {t('app.invest.varies')}
+        </p>
         {section === 'map' && <AssetMap />}
         {section === 'learn' && <Learn />}
         {section === 'markets' && (

@@ -49,6 +49,33 @@
   color: var(--accent-400);
 }
 
+.inv-key-points {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0.2rem !important;
+  padding: 0 !important;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.inv-key-points li {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--amber-500) 16%, transparent);
+}
+
+.inv-varies {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.8rem;
+  border-left: 4px solid var(--amber-500);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--amber-500) 10%, transparent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .inv-disclaimer ul {
   margin: 0.4rem 0 0;
   padding-left: 1.1rem;

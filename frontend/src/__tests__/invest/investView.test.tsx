@@ -18,6 +18,10 @@ describe('Invest tab', () => {
       screen.getByRole('heading', { level: 2, name: tr('app.invest.title') })
     ).toBeInTheDocument();
     const note = screen.getByRole('note', { name: tr('app.invest.disclaimer.title') });
+    expect(note).toHaveTextContent(tr('app.invest.disclaimer.key1'));
+    expect(note).toHaveTextContent(tr('app.invest.disclaimer.key2'));
+    expect(note).toHaveTextContent(tr('app.invest.disclaimer.key3'));
+    expect(screen.getByText(new RegExp(tr('app.invest.varies').slice(0, 30)))).toBeInTheDocument();
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.edu'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.risk'));
     expect(note).toHaveTextContent(tr('app.invest.disclaimer.advisor'));

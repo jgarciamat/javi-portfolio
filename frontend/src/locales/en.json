@@ -1854,5 +1854,9 @@
   "app.invest.calc.tax.range": "From {from} to {to}",
   "app.invest.calc.tax.footnote": "Scale from the app’s tax-return data (tax year 2025). Indicative: it leaves out reductions and the specifics of your case or of Navarra and the Basque Country.",
   "app.invest.calc.tax.source": "Source: Tax Agency",
-  "app.invest.disclaimer.more": "See the full notice"
+  "app.invest.disclaimer.more": "See the full notice",
+  "app.invest.disclaimer.key1": "This is not investment advice.",
+  "app.invest.disclaimer.key2": "It is educational content only, to learn how the products work.",
+  "app.invest.disclaimer.key3": "Percentages, amounts, taxes and limits can change over time, by product and with your situation: check them with official sources.",
+  "app.invest.varies": "For educational use only, not an investment recommendation. Percentages and amounts are indicative and may change."
 }

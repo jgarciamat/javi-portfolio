@@ -1854,5 +1854,9 @@
   "app.invest.calc.tax.range": "De {from} a {to}",
   "app.invest.calc.tax.footnote": "Escala de los datos de renta de la app (ejercicio 2025). Orientativo: no incluye reducciones ni particularidades de tu caso ni de Navarra y el País Vasco.",
   "app.invest.calc.tax.source": "Fuente: Agencia Tributaria",
-  "app.invest.disclaimer.more": "Ver el aviso completo"
+  "app.invest.disclaimer.more": "Ver el aviso completo",
+  "app.invest.disclaimer.key1": "No es una recomendación de inversión.",
+  "app.invest.disclaimer.key2": "Es contenido solo didáctico, para aprender cómo funcionan los productos.",
+  "app.invest.disclaimer.key3": "Los porcentajes, cantidades, impuestos y límites pueden variar con el tiempo, el producto y tu situación: compruébalos en fuentes oficiales.",
+  "app.invest.varies": "Solo uso didáctico, no es una recomendación de inversión. Los porcentajes y las cantidades son orientativos y pueden variar."
 }
