@@ -1901,13 +1901,7 @@
   "app.split.simplifiedNote": "{n} payments instead of {m}: the fewest possible to settle everything.",
   "app.split.alreadyMinimal": "These are already the fewest: {n} payments is the least needed to settle everything.",
   "app.invest.learn.toc": "In this chapter",
-  "app.invest.locked.title": "Learn to invest is Premium",
-  "app.invest.locked.text": "With Premium you unlock the teaching chapters of this section, with examples, charts and calculators. The investment information stays free.",
-  "app.invest.locked.item.stocks": "Shares: types, how to invest step by step and ratios",
-  "app.invest.locked.item.funds": "Index funds, ETFs and compound growth",
-  "app.invest.locked.item.bonds": "Fixed income and bonds",
-  "app.invest.locked.item.crypto": "Crypto, leverage, scams and MiCA",
-  "app.invest.locked.item.tools": "Calculators and illustrative charts",
-  "app.invest.locked.item.markets": "Stock markets: hours and open or closed",
+  "app.invest.locked.title": "Go Premium to see the content of the chapters",
+  "app.invest.locked.text": "With Premium you read the teaching chapters, with examples, charts and calculators. The investment information stays free.",
   "app.invest.locked.cta": "See the Premium plans"
 }

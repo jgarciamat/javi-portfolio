@@ -1197,7 +1197,7 @@ textarea.tx-input {
 
 .inv-locked {
   display: grid;
-  min-height: 36rem;
+  min-height: 26rem;
 }
 
 .inv-locked > * {
@@ -1205,9 +1205,9 @@ textarea.tx-input {
 }
 
 .inv-locked-preview {
-  max-height: 34rem;
+  max-height: 26rem;
   overflow: hidden;
-  filter: blur(4px) saturate(1.5);
+  opacity: 0.4;
   pointer-events: none;
   user-select: none;
 }
@@ -1229,8 +1229,9 @@ textarea.tx-input {
 }
 
 .inv-locked-panel {
-  align-self: center;
+  align-self: start;
   justify-self: center;
+  margin-top: 2.5rem;
   z-index: 1;
   display: grid;
   gap: 0.6rem;

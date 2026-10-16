@@ -1901,13 +1901,7 @@
   "app.split.simplifiedNote": "{n} pagos en lugar de {m}: es el menor número de movimientos posible para saldar todo.",
   "app.split.alreadyMinimal": "Ya son los mínimos: {n} pagos es lo menos que se puede hacer para saldar todo.",
   "app.invest.learn.toc": "En este capítulo",
-  "app.invest.locked.title": "Aprende a invertir es Premium",
-  "app.invest.locked.text": "Con Premium desbloqueas los capítulos didácticos de esta sección, con ejemplos, gráficos y calculadoras. La información sobre inversión sigue siendo gratis.",
-  "app.invest.locked.item.stocks": "Acciones: tipos, cómo invertir paso a paso y ratios",
-  "app.invest.locked.item.funds": "Fondos indexados, ETF e interés compuesto",
-  "app.invest.locked.item.bonds": "Renta fija y bonos",
-  "app.invest.locked.item.crypto": "Criptomonedas, apalancamiento, estafas y MiCA",
-  "app.invest.locked.item.tools": "Calculadoras y gráficos ilustrativos",
-  "app.invest.locked.item.markets": "Mercados bursátiles: horarios y abierto o cerrado",
+  "app.invest.locked.title": "Hazte Premium para ver el contenido de los capítulos",
+  "app.invest.locked.text": "Con Premium lees los capítulos didácticos, con ejemplos, gráficos y calculadoras. La información sobre inversión sigue siendo gratis.",
   "app.invest.locked.cta": "Ver los planes Premium"
 }
