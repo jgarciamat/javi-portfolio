@@ -77,6 +77,7 @@ import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxReposito
 import { InboxService } from '@application/inbox/InboxService';
 import { RentaService } from '@application/renta/RentaService';
 import { SqliteAutonomoUsageRepository } from './sqlite/repositories/SqliteAutonomoUsageRepository';
+import { SqliteAutonomoPdfRepository } from './sqlite/repositories/SqliteAutonomoPdfRepository';
 import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
 import { SqliteRentaPassRepository } from './sqlite/repositories/SqliteMonetizationRepositories';
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
@@ -142,6 +143,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     renta: new SqliteRentaUsageRepository(db),
     rentaPasses: new SqliteRentaPassRepository(db),
     autonomoDrafts: new SqliteAutonomoUsageRepository(db),
+    autonomoPdfs: new SqliteAutonomoPdfRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -354,7 +356,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.categories,
       repos.transactions,
       entitlements,
-      repos.autonomoDrafts
+      repos.autonomoDrafts,
+      repos.autonomoPdfs
     ),
     assetService: new AssetService(repos.assets, entitlements, uow, clock),
     advice: new AdviceService(
@@ -383,6 +386,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         customAlerts: repos.alerts.listByUser(userId).length,
         rentaCalculations: repos.renta.count(userId),
         autonomoDrafts: repos.autonomoDrafts.count(userId),
+        autonomoPdfs: repos.autonomoPdfs.count(userId),
+        assets: repos.assets.listByUser(userId).length,
         movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,

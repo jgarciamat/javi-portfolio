@@ -325,6 +325,10 @@ export const businessApi = {
       body: jsonBody({ year, quarter, inputs }),
     });
   },
+  /** Counts a draft downloaded as a PDF (the free plan has one; a 402 opens the plans). */
+  recordPdf() {
+    return apiRequest<{ used: number }>('/business/draft/pdf', { method: 'POST' });
+  },
 };
 
 export const assetApi = {

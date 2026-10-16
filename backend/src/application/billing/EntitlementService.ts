@@ -29,6 +29,8 @@ const RESOURCE_LABELS: Record<LimitedResource, string> = {
   customAlerts: 'alertas',
   rentaCalculations: 'cálculos de la Renta',
   autonomoDrafts: 'borradores de autónomo',
+  autonomoPdfs: 'PDF de borradores de autónomo',
+  assets: 'inversiones y deudas',
 };
 
 /** Answers "what can this user do right now?" and enforces it. */

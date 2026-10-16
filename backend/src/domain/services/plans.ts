@@ -8,7 +8,9 @@ export type LimitedResource =
   | 'recurringRules'
   | 'customAlerts'
   | 'rentaCalculations'
-  | 'autonomoDrafts';
+  | 'autonomoDrafts'
+  | 'autonomoPdfs'
+  | 'assets';
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
@@ -32,6 +34,10 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       rentaCalculations: 1,
       // The self-employed tax drafts (VAT, income tax advance, contribution): one to try it.
       autonomoDrafts: 1,
+      // ...and one of those drafts downloaded as a PDF.
+      autonomoPdfs: 1,
+      // Investments, property and debts (any kind, in total): one to try the net worth tools.
+      assets: 1,
     },
     features: {
       import: false,
@@ -51,6 +57,8 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       customAlerts: Infinity,
       rentaCalculations: Infinity,
       autonomoDrafts: Infinity,
+      autonomoPdfs: Infinity,
+      assets: Infinity,
     },
     features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
     aiMonthlyQuota: 10,

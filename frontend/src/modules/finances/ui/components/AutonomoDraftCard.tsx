@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ApiError } from '@core/api/http';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { recordPositiveMoment } from '@core/review/review';
@@ -116,15 +117,23 @@ function Deductible({ lines }: { lines: NonNullable<AutonomoDraft['expenses']> }
 
 /** What the draft says, in words, and the boxes behind it. */
 function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: AutonomoInputs | null }) {
+  const { businessApi } = useApi();
   const { t } = useI18n();
   const { money, date } = useFormat();
+  const plan = useOptionalPlan();
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  const limit = plan?.overview?.limits.resources.autonomoPdfs;
+  const used = plan?.overview?.usage.autonomoPdfs ?? 0;
+  const locked = limit !== null && limit !== undefined && used >= limit;
 
   const download = async () => {
     setSaving(true);
     setFailed(false);
     try {
+      // Counted first: the free plan has one PDF, and a 402 opens the plans instead.
+      await businessApi.recordPdf();
       const kinds = Object.fromEntries(EXPENSE_KINDS.map((k) => [k, t(`app.autonomo.kind.${k}`)]));
       const notes = Object.fromEntries(
         ['supplies', 'vehicle', 'meals', 'clients', 'health', 'fines'].map((n) => [
@@ -209,8 +218,10 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
         // Phones and the app offer the share sheet; a computer just downloads the file.
         isNativeApp() || window.matchMedia?.('(pointer: coarse)')?.matches ? 'share' : 'download'
       );
-    } catch {
-      setFailed(true);
+      await plan?.refresh();
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 402) await plan?.refresh();
+      else setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -269,12 +280,27 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
         ))}
       </ul>
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
-      <div className="button-row">
-        <button className="btn-primary" disabled={saving} onClick={() => void download()}>
-          {saving ? t('app.autonomo.pdf.preparing') : t('app.autonomo.pdf.download')}
-        </button>
-        <small className="section-hint">{t('app.autonomo.pdf.hint')}</small>
-      </div>
+      {locked ? (
+        <div className="renta-gate">
+          <p className="section-hint">{t('app.autonomo.pdf.usedFree')}</p>
+          <button
+            className="btn-primary"
+            onClick={() =>
+              plan?.openUpgrade({ kind: 'limit', resource: 'autonomoPdfs', limit: limit as number })
+            }
+          >
+            {t('app.autonomo.goPremium')}
+          </button>
+        </div>
+      ) : (
+        <div className="button-row">
+          <button className="btn-primary" disabled={saving} onClick={() => void download()}>
+            {saving ? t('app.autonomo.pdf.preparing') : t('app.autonomo.pdf.download')}
+          </button>
+          <small className="section-hint">{t('app.autonomo.pdf.hint')}</small>
+          {limit === 1 && <small className="section-hint">{t('app.autonomo.pdf.freeOne')}</small>}
+        </div>
+      )}
       {failed && <p className="form-error">{t('app.autonomo.pdf.error')}</p>}
     </div>
   );

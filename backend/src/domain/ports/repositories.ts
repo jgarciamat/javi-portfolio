@@ -302,6 +302,13 @@ export interface AutonomoUsageRepository {
   increment(userId: string): number;
 }
 
+/** How many draft PDFs a self-employed user has downloaded. */
+export interface AutonomoPdfRepository {
+  count(userId: string): number;
+  /** One more download; returns how many there are now. */
+  increment(userId: string): number;
+}
+
 export interface RentaUsageRepository {
   count(userId: string): number;
   /** One more calculation; returns how many there are now. */

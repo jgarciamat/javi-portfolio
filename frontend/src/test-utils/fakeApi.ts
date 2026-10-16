@@ -63,6 +63,7 @@ export function createFakeApi(): FakeApi {
       setCategory: ok(undefined),
       removeCategory: ok(undefined),
       draft: ok(f.autonomoDraft()),
+      recordPdf: ok({ used: 1 }),
       tax: ok({
         year: 2026,
         quarters: [1, 2, 3, 4].map((quarter) => ({

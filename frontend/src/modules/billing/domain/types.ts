@@ -14,7 +14,9 @@ export type LimitedResource =
   | 'recurringRules'
   | 'customAlerts'
   | 'rentaCalculations'
-  | 'autonomoDrafts';
+  | 'autonomoDrafts'
+  | 'autonomoPdfs'
+  | 'assets';
 export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
 
 export interface PlanLimits {

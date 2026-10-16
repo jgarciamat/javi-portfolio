@@ -22,7 +22,7 @@ export interface AssetView {
   history: { date: string; valueCents: Cents }[];
 }
 
-/** Investments, property and debts valued by hand (Premium, part of the net worth). */
+/** Investments, property and debts valued by hand (the free plan can keep one; part of the net worth). */
 export class AssetService {
   constructor(
     private readonly assets: AssetRepository,
@@ -32,7 +32,6 @@ export class AssetService {
   ) {}
 
   list(userId: string): AssetView[] {
-    this.entitlements.assertFeature(userId, 'insights');
     const values = this.assets.valuesByUser(userId);
     return this.assets.listByUser(userId).map((a) => {
       const history = values
@@ -64,11 +63,12 @@ export class AssetService {
       minPaymentCents?: Cents | null;
     }
   ): AssetView {
-    this.entitlements.assertFeature(userId, 'insights');
     const name = input.name.trim();
     if (!name || name.length > 60)
       throw new ValidationError('El nombre debe tener entre 1 y 60 caracteres');
-    if (this.assets.listByUser(userId).length >= MAX_ASSETS) {
+    const count = this.assets.listByUser(userId).length;
+    this.entitlements.assertCanCreate(userId, 'assets', count);
+    if (count >= MAX_ASSETS) {
       throw new ValidationError(`Máximo ${MAX_ASSETS} elementos`, 'TOO_MANY_ASSETS');
     }
     const asset: Asset = {
@@ -89,7 +89,6 @@ export class AssetService {
 
   /** Records what the asset is worth on a date (today by default). */
   setValue(userId: string, id: string, valueCents: Cents, date?: string | null): AssetView {
-    this.entitlements.assertFeature(userId, 'insights');
     if (!this.assets.findById(userId, id)) {
       throw new NotFoundError('Elemento no encontrado', 'ASSET_NOT_FOUND');
     }
@@ -103,7 +102,6 @@ export class AssetService {
     id: string,
     terms: { interestRate: number | null; minPaymentCents: Cents | null }
   ): AssetView {
-    this.entitlements.assertFeature(userId, 'insights');
     const asset = this.assets.findById(userId, id);
     if (!asset) throw new NotFoundError('Elemento no encontrado', 'ASSET_NOT_FOUND');
     if (asset.kind !== 'debt') throw new ValidationError('Solo las deudas tienen condiciones');
@@ -112,7 +110,6 @@ export class AssetService {
   }
 
   delete(userId: string, id: string): void {
-    this.entitlements.assertFeature(userId, 'insights');
     if (!this.assets.delete(userId, id)) {
       throw new NotFoundError('Elemento no encontrado', 'ASSET_NOT_FOUND');
     }
