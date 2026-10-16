@@ -93,3 +93,4 @@ frontend/dev-dist/
 # Playwright
 frontend/test-results/
 frontend/playwright-report/
+.claude/worktrees/

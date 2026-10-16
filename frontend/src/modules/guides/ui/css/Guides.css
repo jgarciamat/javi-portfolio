@@ -63,3 +63,178 @@
 .guide-list .premium-chip {
   margin-left: 0.5rem;
 }
+
+/* Catalogue by topic */
+.guide-catalog {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.guide-search {
+  width: 100%;
+}
+
+.guide-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.guide-chip {
+  --cat: var(--accent, #6366f1);
+  padding: 0.4rem 0.85rem;
+  border: 1.5px solid color-mix(in srgb, var(--cat) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat) 10%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guide-chip-on {
+  background: var(--cat);
+  border-color: var(--cat);
+  color: #fff;
+}
+
+.guide-empty {
+  opacity: 0.7;
+  text-align: center;
+}
+
+.guide-group {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.guide-group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.guide-group-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.guide-group-head p {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.guide-group-emoji {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--cat) 20%, transparent);
+  font-size: 1.5rem;
+}
+
+.guide-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.8rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.guide-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 1rem 0.9rem;
+  border: 1px solid var(--border, rgba(128, 128, 128, 0.3));
+  border-top: 4px solid var(--cat);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--cat) 6%, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.guide-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--cat) 25%, transparent);
+}
+
+.guide-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  opacity: 0.8;
+}
+
+.guide-card-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+/* The whole card is the click target */
+.guide-card-title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.guide-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.guide-card-tag {
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat) 22%, transparent);
+  font-weight: 600;
+}
+
+/* Inside a guide */
+.guide-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.guide-kicker-tag {
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat) 22%, transparent);
+  font-weight: 700;
+}
+
+.guide-article .guide-intro {
+  padding: 0.8rem 1rem;
+  border-left: 4px solid var(--cat, var(--accent));
+  border-radius: 0 12px 12px 0;
+  background: color-mix(in srgb, var(--cat, var(--accent)) 10%, transparent);
+}
+
+.guide-article h2 {
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--cat, var(--accent)) 45%, transparent);
+}
+
+.guide-num {
+  padding: 0 0.15rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--cat, var(--accent)) 20%, transparent);
+  white-space: nowrap;
+}

@@ -1,3 +1,4 @@
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RentaCalculatorPage } from '@modules/tools/ui/CalculatorPages';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
@@ -344,6 +345,11 @@ describe('Renta planner: one calculation for free accounts', () => {
   });
 });
 
+const Where = () => {
+  const l = useLocation();
+  return <p data-testid="where">{l.pathname + l.search}</p>;
+};
+
 describe('Renta calculator page', () => {
   it('shows the planner to visitors', () => {
     renderWithProviders(<RentaCalculatorPage />, { authenticated: false });
@@ -351,13 +357,15 @@ describe('Renta calculator page', () => {
     expect(screen.getByText(tr('tools.renta.step1'))).toBeInTheDocument();
   });
 
-  it('sends people who are signed in to the app', () => {
-    renderWithProviders(<RentaCalculatorPage />);
-    expect(screen.getByText(tr('tools.renta.inApp'))).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: tr('tools.renta.openApp') })).toHaveAttribute(
-      'href',
-      '/'
+  it('sends people who are signed in to the section of the app', () => {
+    renderWithProviders(
+      <Routes>
+        <Route path="/calculadora-renta" element={<RentaCalculatorPage />} />
+        <Route path="*" element={<Where />} />
+      </Routes>,
+      { route: '/calculadora-renta' }
     );
+    expect(screen.getByTestId('where').textContent).toBe('/?tab=renta');
     expect(screen.queryByText(tr('tools.renta.step1'))).toBeNull();
   });
 });

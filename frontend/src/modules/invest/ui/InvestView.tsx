@@ -1,0 +1,151 @@
+import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
+import { useI18n } from '@core/i18n/I18nContext';
+import { Icon } from '@shared/components/Icon';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { AssetMap } from './AssetMap';
+import { Learn } from './Learn';
+import { LearnLocked } from './LearnLocked';
+import '../../finances/ui/css/Sections.css';
+import './css/Invest.css';
+
+const SECTIONS = ['map', 'learn'] as const;
+type SectionId = (typeof SECTIONS)[number];
+
+const ICONS: Record<SectionId, string> = {
+  map: '🗺️',
+  learn: '📚',
+};
+
+function Disclaimer() {
+  const { t } = useI18n();
+  return (
+    <aside className="inv-disclaimer" role="note" aria-label={t('app.invest.disclaimer.title')}>
+      <strong>⚠️ {t('app.invest.disclaimer.title')}</strong>
+      <ul className="inv-key-points">
+        <li>{t('app.invest.disclaimer.key1')}</li>
+        <li>{t('app.invest.disclaimer.key2')}</li>
+        <li>{t('app.invest.disclaimer.key3')}</li>
+      </ul>
+      <p>{t('app.invest.disclaimer.edu')}</p>
+      <p>{t('app.invest.disclaimer.risk')}</p>
+      <details>
+        <summary>{t('app.invest.disclaimer.more')}</summary>
+        <ul>
+          <li>{t('app.invest.disclaimer.past')}</li>
+          <li>{t('app.invest.disclaimer.advisor')}</li>
+          <li>{t('app.invest.disclaimer.figures')}</li>
+        </ul>
+      </details>
+    </aside>
+  );
+}
+
+/** Keeps the section menu under the header of the app, whatever its height is. */
+function useHeaderOffset(ref: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const update = () => {
+      const header = document.querySelector('.dashboard-sticky');
+      const height = header ? header.getBoundingClientRect().height : 0;
+      (ref.current as HTMLDivElement).style.setProperty('--inv-top', `${height}px`);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [ref]);
+}
+
+/**
+ * "Learn to invest" is Premium. A free account gets the locked preview instead of the chapters:
+ * the text of a chapter is never rendered for it, whichever way it got here (a link in the map
+ * included). Outside the plan provider (tests, public pages) nothing is locked, like PremiumOnly.
+ */
+function LearnGate({
+  openId,
+  onOpen,
+}: {
+  openId: string | null;
+  onOpen: (id: string | null) => void;
+}) {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  if (plan && plan.loading && !plan.overview) {
+    return (
+      <p className="inv-empty" role="status">
+        {t('app.common.loading')}
+      </p>
+    );
+  }
+  if (plan && !plan.isPremium) return <LearnLocked onUpgrade={() => plan.openUpgrade()} />;
+  return <Learn openId={openId} onOpen={onOpen} />;
+}
+
+/** The "Invest" tab: asset map, educational chapters, market hours; charts and calculators live inside the chapters. */
+export function InvestView() {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  const free = !!plan && !plan.isPremium;
+  const [section, setSection] = useState<SectionId>('map');
+  const [chapter, setChapter] = useState<string | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  useHeaderOffset(root);
+
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    setSection(SECTIONS[(index + step + SECTIONS.length) % SECTIONS.length]);
+  };
+
+  return (
+    <div className="section-view invest" ref={root}>
+      <div className="card inv-hero">
+        <h2 className="section-title">
+          <Icon name="coins" /> {t('app.invest.title')}
+        </h2>
+        <p className="section-hint">{t('app.invest.hint')}</p>
+        <Disclaimer />
+      </div>
+
+      <div className="inv-nav" role="tablist" aria-label={t('app.invest.nav')}>
+        {SECTIONS.map((id, i) => (
+          <button
+            key={id}
+            id={`inv-tab-${id}`}
+            type="button"
+            role="tab"
+            aria-selected={section === id}
+            aria-controls={`inv-panel-${id}`}
+            tabIndex={section === id ? 0 : -1}
+            className={`inv-tab${section === id ? ' inv-tab--on' : ''}`}
+            onClick={() => setSection(id)}
+            onKeyDown={(e) => onKey(e, i)}
+          >
+            <span aria-hidden="true">{ICONS[id]}</span> {t(`app.invest.section.${id}`)}
+            {id === 'learn' && free && <span className="premium-chip">Premium</span>}
+          </button>
+        ))}
+      </div>
+
+      <div
+        className="card inv-panel"
+        role="tabpanel"
+        id={`inv-panel-${section}`}
+        aria-labelledby={`inv-tab-${section}`}
+      >
+        <p className="inv-varies" role="note">
+          ℹ️ {t('app.invest.varies')}
+        </p>
+        {section === 'map' && (
+          <AssetMap
+            onOpenChapter={(id) => {
+              setChapter(id);
+              setSection('learn');
+            }}
+          />
+        )}
+        {section === 'learn' && <LearnGate openId={chapter} onOpen={setChapter} />}
+      </div>
+      <p className="inv-note inv-footer">{t('app.invest.disclaimer.short')}</p>
+    </div>
+  );
+}

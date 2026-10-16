@@ -5,6 +5,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 import { LoginPage } from '@modules/auth/ui/LoginPage';
 import { RegisterPage } from '@modules/auth/ui/RegisterPage';
 import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
+import { safeNext } from '@shared/utils/appLinks';
 import { PublicHeader } from './PublicHeader';
 
 export function AuthPage() {
@@ -16,8 +17,8 @@ export function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated) navigate(safeNext(params.get('next')), { replace: true });
+  }, [isAuthenticated, navigate, params]);
 
   return (
     <div className="auth-page-root">

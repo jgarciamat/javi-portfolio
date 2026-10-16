@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { recordPositiveMoment } from '@core/review/review';
 import { useFormat } from '@core/settings/SettingsContext';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
@@ -191,6 +192,11 @@ export function GoalsView() {
   const [showArchived, setShowArchived] = useState(false);
   const all = goals.data;
   const visible = all.filter((g) => showArchived || !g.archived);
+  const reached = all.some((g) => g.progress.completed);
+  // Reaching a goal is a good moment to ask for a review.
+  useEffect(() => {
+    if (reached) recordPositiveMoment();
+  }, [reached]);
 
   const run = (change: () => Promise<unknown>) =>
     action.run(async () => {

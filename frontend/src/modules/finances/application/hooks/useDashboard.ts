@@ -6,6 +6,12 @@ import { isDashboardTab, type DashboardTab } from '../../ui/navigation';
 const TAB_KEY = 'mm_last_tab';
 
 const loadTab = (): DashboardTab => {
+  // A link to a section (`/?tab=renta`) wins over the remembered one, and is dropped from the address.
+  const linked = new URLSearchParams(window.location.search).get('tab');
+  if (isDashboardTab(linked)) {
+    window.history.replaceState(null, '', window.location.pathname);
+    return linked;
+  }
   const stored = storage.get(TAB_KEY);
   return isDashboardTab(stored) ? stored : 'monthly';
 };

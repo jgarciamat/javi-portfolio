@@ -6,6 +6,7 @@ import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { SplitGroup } from '@modules/finances/domain/types';
+import { simplifyPayments } from '@modules/finances/domain/splitSimplify';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 
@@ -119,10 +120,10 @@ function ExpenseForm({
           </select>
         </label>
       </div>
-      <p className="field-label">{t('app.split.sharedBy')}</p>
+      <p className="field-label split-shared-label">{t('app.split.sharedBy')}</p>
       <div className="split-people">
         {group.members.map((m) => (
-          <label key={m.id} className="plan-terms">
+          <label key={m.id} className="plan-terms split-person">
             <input
               type="checkbox"
               checked={!excluded.includes(m.id)}
@@ -154,6 +155,66 @@ function ExpenseForm({
         </button>
       </div>
     </div>
+  );
+}
+
+function SettleUp({
+  group,
+  onPay,
+}: {
+  group: SplitGroup;
+  onPay: (payment: { from: string; to: string; amount: number }) => void;
+}) {
+  const { t } = useI18n();
+  const { money } = useFormat();
+  const [simplified, setSimplified] = useState(false);
+  // Expenses only ever point to members of the group.
+  const name = (memberId: string): string =>
+    (group.members.find((m) => m.id === memberId) as { name: string }).name;
+
+  if (group.transfers.length === 0) {
+    return group.expenses.length > 0 ? (
+      <p className="section-success">
+        <Icon name="checkCircle" /> {t('app.split.allSettled')}
+      </p>
+    ) : null;
+  }
+  const best = simplifyPayments(group.members.map((m) => ({ id: m.id, balance: m.balance })));
+  const payments = simplified ? best : group.transfers;
+  return (
+    <>
+      <div className="split-settle-head">
+        <h3 className="split-subtitle">
+          {simplified ? `✨ ${t('app.split.simplified')}` : t('app.split.settleUp')}
+        </h3>
+        <button className="btn-secondary" onClick={() => setSimplified(!simplified)}>
+          {simplified ? t('app.split.showOriginal') : t('app.split.simplify')}
+        </button>
+      </div>
+      {simplified && (
+        <p className="split-simplify-note">
+          {best.length < group.transfers.length
+            ? t('app.split.simplifiedNote', { n: best.length, m: group.transfers.length })
+            : t('app.split.alreadyMinimal', { n: best.length })}
+        </p>
+      )}
+      <ul className="split-transfers">
+        {payments.map((tr) => (
+          <li key={`${tr.from}-${tr.to}`}>
+            <span className="split-transfer-text">
+              {t('app.split.pays', {
+                from: name(tr.from),
+                to: name(tr.to),
+                amount: money(tr.amount),
+              })}
+            </span>
+            <button className="btn-secondary" onClick={() => onPay(tr)}>
+              {t('app.split.registerPayment')}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -191,8 +252,9 @@ function GroupDetail({
         {action.error && <p className="form-error">{action.error}</p>}
         <ul className="split-balances">
           {group.members.map((m) => (
-            <li key={m.id}>
-              <span>{m.name}</span>
+            <li key={m.id} className={m.balance < 0 ? 'owes' : m.balance > 0 ? 'owed' : undefined}>
+              <span className="split-avatar" aria-hidden="true" data-initial={m.name.charAt(0)} />
+              <span className="split-name">{m.name}</span>
               <strong
                 className={m.balance < 0 ? 'amount-neg' : m.balance > 0 ? 'amount-pos' : undefined}
               >
@@ -201,40 +263,7 @@ function GroupDetail({
             </li>
           ))}
         </ul>
-        {group.transfers.length > 0 ? (
-          <>
-            <h3>{t('app.split.settleUp')}</h3>
-            <ul className="split-transfers">
-              {group.transfers.map((tr) => (
-                <li key={`${tr.from}-${tr.to}`}>
-                  <span>
-                    {t('app.split.pays', {
-                      from: name(tr.from),
-                      to: name(tr.to),
-                      amount: money(tr.amount),
-                    })}
-                  </span>
-                  <button
-                    className="btn-secondary"
-                    onClick={() =>
-                      void update(() =>
-                        splitApi.settle(id, { from: tr.from, to: tr.to, amount: tr.amount })
-                      )
-                    }
-                  >
-                    {t('app.split.registerPayment')}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          group.expenses.length > 0 && (
-            <p className="section-success">
-              <Icon name="checkCircle" /> {t('app.split.allSettled')}
-            </p>
-          )
-        )}
+        <SettleUp group={group} onPay={(p) => void update(() => splitApi.settle(id, p))} />
       </div>
       <div className="card">
         <h2 className="section-title">
@@ -244,7 +273,7 @@ function GroupDetail({
         {group.expenses.length > 0 && (
           <ul className="split-expenses">
             {group.expenses.map((e) => (
-              <li key={e.id}>
+              <li key={e.id} className={e.settlement ? 'settlement' : undefined}>
                 <span>
                   <strong>{e.settlement ? t('app.split.payment') : e.description}</strong>
                   <small>
@@ -257,8 +286,8 @@ function GroupDetail({
                       : t('app.split.paidByShort', { name: name(e.paidBy) })}
                   </small>
                 </span>
-                <span>
-                  {money(e.amount)}
+                <span className="split-expense-end">
+                  <b className="split-expense-amount">{money(e.amount)}</b>
                   <button
                     className="btn-secondary"
                     aria-label={t('app.split.removeExpense', { name: e.description })}
@@ -272,9 +301,9 @@ function GroupDetail({
           </ul>
         )}
       </div>
-      <div className="card">
+      <div className="card split-danger">
         <button
-          className="btn-secondary"
+          className="btn-secondary split-delete"
           onClick={() => {
             if (window.confirm(t('app.split.deleteConfirm', { name: group.name }))) {
               void action.run(async () => {

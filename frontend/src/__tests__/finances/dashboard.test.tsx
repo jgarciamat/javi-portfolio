@@ -84,6 +84,33 @@ describe('menu and sections', () => {
     expect(screen.getByRole('region', { name: tr('app.tabs.goals') })).toBeInTheDocument();
   });
 
+  it('opens the section a link points to and removes it from the address', () => {
+    localStorage.setItem('mm_last_tab', 'goals');
+    window.history.pushState({}, '', '/?tab=renta');
+    renderWithProviders(<Dashboard />);
+    expect(screen.getByRole('region', { name: tr('app.tabs.renta') })).toBeInTheDocument();
+    expect(window.location.search).toBe('');
+  });
+
+  it('ignores a link to a section that does not exist', () => {
+    window.history.pushState({}, '', '/?tab=nope');
+    renderWithProviders(<Dashboard />);
+    expect(screen.getByRole('region', { name: tr('app.tabs.monthly') })).toBeInTheDocument();
+    window.history.pushState({}, '', '/');
+  });
+
+  it('opens the Invest section from the menu, free for every account', async () => {
+    renderWithProviders(<Dashboard />);
+    goTo('app.tabs.invest');
+    expect(screen.getByRole('region', { name: tr('app.tabs.invest') })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: tr('app.invest.title') })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('note', { name: tr('app.invest.disclaimer.title') })
+    ).toBeInTheDocument();
+  });
+
   it('opens a month from the annual view', async () => {
     const api = createFakeApi();
     api.transactionApi.getAnnual.mockResolvedValue({

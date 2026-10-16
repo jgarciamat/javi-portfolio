@@ -24,6 +24,9 @@ export function rewardsEarned(qualifiedFriends: number): number {
   return n;
 }
 
+/** Invitations one user can have attached in total: farming accounts stops paying off here. */
+export const MAX_INVITED_PER_USER = 50;
+
 /** No 0/O/1/I: codes are read out and typed by hand. */
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_LENGTH = 8;
@@ -83,10 +86,12 @@ export class ReferralService {
     };
   }
 
-  /** Remembers who invited a new user. Unknown codes and self-invitations are ignored silently. */
+  /** Remembers who invited a new user. Unknown codes, self-invitations and invitations over the cap are ignored silently. */
   attach(referredId: string, rawCode: string): void {
     const referrerId = this.referrals.userByCode(rawCode.trim().toUpperCase());
     if (!referrerId || referrerId === referredId) return;
+    const { qualified, pending } = this.referrals.counts(referrerId);
+    if (qualified + pending >= MAX_INVITED_PER_USER) return;
     this.referrals.addReferral({
       referredId,
       referrerId,
