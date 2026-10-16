@@ -119,10 +119,10 @@ function ExpenseForm({
           </select>
         </label>
       </div>
-      <p className="field-label">{t('app.split.sharedBy')}</p>
+      <p className="field-label split-shared-label">{t('app.split.sharedBy')}</p>
       <div className="split-people">
         {group.members.map((m) => (
-          <label key={m.id} className="plan-terms">
+          <label key={m.id} className="plan-terms split-person">
             <input
               type="checkbox"
               checked={!excluded.includes(m.id)}
@@ -191,8 +191,9 @@ function GroupDetail({
         {action.error && <p className="form-error">{action.error}</p>}
         <ul className="split-balances">
           {group.members.map((m) => (
-            <li key={m.id}>
-              <span>{m.name}</span>
+            <li key={m.id} className={m.balance < 0 ? 'owes' : m.balance > 0 ? 'owed' : undefined}>
+              <span className="split-avatar" aria-hidden="true" data-initial={m.name.charAt(0)} />
+              <span className="split-name">{m.name}</span>
               <strong
                 className={m.balance < 0 ? 'amount-neg' : m.balance > 0 ? 'amount-pos' : undefined}
               >
@@ -203,11 +204,11 @@ function GroupDetail({
         </ul>
         {group.transfers.length > 0 ? (
           <>
-            <h3>{t('app.split.settleUp')}</h3>
+            <h3 className="split-subtitle">{t('app.split.settleUp')}</h3>
             <ul className="split-transfers">
               {group.transfers.map((tr) => (
                 <li key={`${tr.from}-${tr.to}`}>
-                  <span>
+                  <span className="split-transfer-text">
                     {t('app.split.pays', {
                       from: name(tr.from),
                       to: name(tr.to),
@@ -244,7 +245,7 @@ function GroupDetail({
         {group.expenses.length > 0 && (
           <ul className="split-expenses">
             {group.expenses.map((e) => (
-              <li key={e.id}>
+              <li key={e.id} className={e.settlement ? 'settlement' : undefined}>
                 <span>
                   <strong>{e.settlement ? t('app.split.payment') : e.description}</strong>
                   <small>
@@ -257,8 +258,8 @@ function GroupDetail({
                       : t('app.split.paidByShort', { name: name(e.paidBy) })}
                   </small>
                 </span>
-                <span>
-                  {money(e.amount)}
+                <span className="split-expense-end">
+                  <b className="split-expense-amount">{money(e.amount)}</b>
                   <button
                     className="btn-secondary"
                     aria-label={t('app.split.removeExpense', { name: e.description })}
@@ -272,9 +273,9 @@ function GroupDetail({
           </ul>
         )}
       </div>
-      <div className="card">
+      <div className="card split-danger">
         <button
-          className="btn-secondary"
+          className="btn-secondary split-delete"
           onClick={() => {
             if (window.confirm(t('app.split.deleteConfirm', { name: group.name }))) {
               void action.run(async () => {
