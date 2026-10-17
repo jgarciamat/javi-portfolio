@@ -19,7 +19,12 @@ import { JsonOfferCatalog } from '@infrastructure/offers/JsonOfferCatalog';
 import { JwtTokenService } from '@infrastructure/auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from '@infrastructure/auth/GoogleIdentityVerifier';
 import { BackupService } from '@infrastructure/backup/BackupService';
-import { escapeHtml, purchaseEmail, verificationEmail } from '@infrastructure/mail/templates';
+import {
+  accountExistsEmail,
+  escapeHtml,
+  purchaseEmail,
+  verificationEmail,
+} from '@infrastructure/mail/templates';
 import { openDatabase } from '@infrastructure/sqlite/database';
 import { AdviceContext } from '@domain/services/rule-based-advisor';
 
@@ -123,6 +128,25 @@ describe('e-mail templates', () => {
   it('is localised', () => {
     expect(verificationEmail('en', 'Ann', 'u').subject).toMatch(/Verify/);
     expect(verificationEmail('es', 'Ana', 'u').subject).toMatch(/Verifica/);
+  });
+});
+
+describe('account exists e-mail', () => {
+  it('links to sign in and to the password reset, in both languages, escaping the name', () => {
+    const es = accountExistsEmail(
+      'es',
+      '<b>Ana</b>',
+      'https://app/login',
+      'https://app/login?mode=forgot'
+    );
+    expect(es.subject).toBe('Ya tienes una cuenta en Finanverso');
+    expect(es.html).toContain('&lt;b&gt;Ana&lt;/b&gt;');
+    expect(es.html).toContain('href="https://app/login"');
+    expect(es.html).toContain('href="https://app/login?mode=forgot"');
+    expect(es.text).toContain('Restablécela aquí: https://app/login?mode=forgot');
+    const en = accountExistsEmail('en', 'Ann', 'https://app/login', 'https://app/reset');
+    expect(en.subject).toBe('You already have a Finanverso account');
+    expect(en.text).toContain('Sign in: https://app/login');
   });
 });
 

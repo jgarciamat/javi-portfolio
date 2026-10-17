@@ -29,13 +29,43 @@ describe('Auth API', () => {
       expect(accounts.body.accounts[0].isDefault).toBe(true);
     });
 
-    it('rejects a duplicated e-mail with EMAIL_TAKEN', async () => {
-      await createUser(ctx, 'dup@example.com');
+    it('answers a duplicated e-mail like a new one and tells the owner instead', async () => {
+      const owner = await createUser(ctx, 'dup@example.com');
+      const fresh = await request(ctx.app)
+        .post('/api/auth/register')
+        .send({ email: 'brand-new@example.com', password: STRONG_PASSWORD, name: 'N' })
+        .expect(201);
+      const signups = () =>
+        ctx.container.repos.metrics
+          .totals('2026-03-01', '2026-03-31')
+          .find((r) => r.name === 'signup')?.count;
+      expect(signups()).toBe(2);
+      const before = ctx.email.sent.length;
       const res = await request(ctx.app)
         .post('/api/auth/register')
-        .send({ email: 'DUP@example.com', password: STRONG_PASSWORD, name: 'B' })
-        .expect(409);
-      expect(res.body.code).toBe('EMAIL_TAKEN');
+        .send({
+          email: 'DUP@example.com',
+          password: 'An0ther-pass!',
+          name: 'B',
+          locale: 'en',
+          referralCode: 'SOMECODE',
+        })
+        .expect(201);
+      expect(res.body).toEqual(fresh.body);
+      await new Promise((r) => setImmediate(r));
+      expect(ctx.email.sent.slice(before)).toEqual([
+        { kind: 'exists', to: 'dup@example.com', token: '' },
+      ]);
+      // Nothing changes on the existing account: same password, no new sign-up counted.
+      expect(signups()).toBe(2);
+      await request(ctx.app)
+        .post('/api/auth/login')
+        .send({ email: owner.email, password: STRONG_PASSWORD })
+        .expect(200);
+      await request(ctx.app)
+        .post('/api/auth/login')
+        .send({ email: owner.email, password: 'An0ther-pass!' })
+        .expect(401);
     });
   });
 

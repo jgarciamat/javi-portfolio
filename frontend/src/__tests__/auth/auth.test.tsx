@@ -379,6 +379,11 @@ describe('static pages', () => {
     ).toBeInTheDocument();
   });
 
+  it('opens the password reset from the "you already have an account" e-mail', () => {
+    publicRender(<AuthPage />, '/login?mode=forgot');
+    expect(screen.getByText(tr('app.auth.forgot.title'))).toBeInTheDocument();
+  });
+
   it('links to the prices on the web but not in the store apps', () => {
     const { unmount } = publicRender(<AuthPage />);
     expect(screen.getByRole('link', { name: tr('pricing.link') })).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from '@domain/errors';
+import { ForbiddenError, UnauthorizedError, ValidationError } from '@domain/errors';
 import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
 import { User, normalizeEmail } from '@domain/model/User';
 import { defaultSettings } from '@domain/model/UserSettings';
@@ -24,6 +24,7 @@ import { EntitlementService } from '@application/billing/EntitlementService';
 
 export const VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 export const RESET_TTL_MS = 60 * 60 * 1000;
+const REGISTERED_MESSAGE = 'Registro completado. Revisa tu email para verificar tu cuenta.';
 /** A new reset e-mail is not sent if the previous one is younger than this. */
 export const RESET_RESEND_COOLDOWN_MS = 2 * 60 * 1000;
 
@@ -63,18 +64,29 @@ export class AuthService {
 
   // ─── Registration & verification ──────────────────────────────────────────
 
+  /**
+   * Same answer whether the e-mail is new or not (no account enumeration): an existing
+   * owner gets an e-mail explaining how to sign in instead. `createdUserId` is for the
+   * caller only (referrals, metrics) and must never reach the client.
+   */
   async register(input: {
     email: string;
     password: string;
     name: string;
     locale?: EmailLocale;
-  }): Promise<{ message: string }> {
+  }): Promise<{ message: string; createdUserId: string | null }> {
     assertStrongPassword(input.password);
     const email = normalizeEmail(input.email);
-    if (this.users.findByEmail(email)) {
-      throw new ConflictError('El email ya está registrado', 'EMAIL_TAKEN');
-    }
+    const locale = input.locale ?? 'es';
+    // Hashed in both cases, so the time taken does not tell them apart either.
     const passwordHash = await this.hasher.hash(input.password);
+    const existing = this.users.findByEmail(email);
+    if (existing) {
+      this.sendInBackground(() =>
+        this.email.sendAccountExists(existing.email, existing.name, locale)
+      );
+      return { message: REGISTERED_MESSAGE, createdUserId: null };
+    }
     const verification = this.tokens.issueEmailToken(VERIFICATION_TTL_MS);
     const user = User.register({
       email,
@@ -82,11 +94,11 @@ export class AuthService {
       passwordHash,
       now: this.clock.now(),
     }).withVerificationToken(verification.hash, verification.expiresAt);
-    this.uow.run(() => this.createUserWithDefaults(user, input.locale ?? 'es'));
+    this.uow.run(() => this.createUserWithDefaults(user, locale));
     this.sendInBackground(() =>
-      this.email.sendVerification(user.email, user.name, verification.token, input.locale ?? 'es')
+      this.email.sendVerification(user.email, user.name, verification.token, locale)
     );
-    return { message: 'Registro completado. Revisa tu email para verificar tu cuenta.' };
+    return { message: REGISTERED_MESSAGE, createdUserId: user.id };
   }
 
   /** Marks the e-mail as verified and returns the id of the user. */

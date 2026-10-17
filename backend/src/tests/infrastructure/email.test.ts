@@ -18,6 +18,14 @@ describe('ResendEmailSender', () => {
     expect(send.mock.calls[1][0].text).toContain('https://app.test/reset-password?token=t%2F1');
   });
 
+  it('tells the owner of an existing account how to sign in or reset the password', async () => {
+    await sender.sendAccountExists('a@b.c', 'Ana', 'es');
+    const mail = send.mock.calls[0][0];
+    expect(mail).toMatchObject({ to: 'a@b.c', subject: 'Ya tienes una cuenta en Finanverso' });
+    expect(mail.html).toContain('href="https://app.test/login"');
+    expect(mail.text).toContain('https://app.test/login?mode=forgot');
+  });
+
   it('confirms purchases with a link to the terms', async () => {
     await sender.sendPurchaseConfirmation('a@b.c', 'Ana', 'es');
     expect(send.mock.calls[0][0]).toMatchObject({ to: 'a@b.c' });
@@ -55,6 +63,7 @@ describe('ConsoleEmailSender', () => {
     await sender.sendVerification('a@b.c', 'Ana', 'v1');
     await sender.sendPasswordReset('a@b.c', 'Ana', 'r1');
     await sender.sendPurchaseConfirmation('a@b.c');
+    await sender.sendAccountExists('a@b.c');
     const digest = {
       from: 'a',
       to: 'b',
@@ -70,10 +79,12 @@ describe('ConsoleEmailSender', () => {
       { kind: 'verify', to: 'a@b.c', token: 'v1' },
       { kind: 'reset', to: 'a@b.c', token: 'r1' },
       { kind: 'purchase', to: 'a@b.c', token: '' },
+      { kind: 'exists', to: 'a@b.c', token: '' },
       { kind: 'digest', to: 'a@b.c', token: '', digest },
     ]);
     expect(info).toHaveBeenCalledWith('[email] weekly digest a@b.c');
     expect(info).toHaveBeenCalledWith('[email] purchase confirmation a@b.c');
+    expect(info).toHaveBeenCalledWith('[email] account already exists a@b.c');
     expect(info).toHaveBeenCalledWith(
       '[email] verify a@b.c: http://localhost:5176/verify-email?token=v1'
     );

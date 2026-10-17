@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { normalizeEmail } from '@domain/model/User';
 import { Container } from '../../container';
 import {
   RateLimiterFactory,
@@ -57,11 +56,13 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     registerLimiter,
     asyncHandler(async (req, res) => {
       const { referralCode, ...input } = registerBody.parse(req.body);
-      const result = await c.auth.register(input);
-      const created = c.repos.users.findByEmail(normalizeEmail(input.email));
-      if (created && referralCode) c.referrals.attach(created.id, referralCode);
-      c.repos.metrics.record('signup');
-      res.status(201).json(result);
+      const { message, createdUserId } = await c.auth.register(input);
+      // An e-mail that already had an account gets the same answer and nothing else.
+      if (createdUserId) {
+        if (referralCode) c.referrals.attach(createdUserId, referralCode);
+        c.repos.metrics.record('signup');
+      }
+      res.status(201).json({ message });
     })
   );
 

@@ -41,6 +41,8 @@ export type EmailLocale = 'es' | 'en';
 export interface EmailSender {
   sendVerification(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
   sendPasswordReset(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
+  /** Someone tried to sign up with an address that already has an account. */
+  sendAccountExists(to: string, name: string, locale: EmailLocale): Promise<void>;
   /**
    * Confirms a purchase on a durable medium, including the request to start at
    * once and the loss of the right of withdrawal (required for that loss to apply).
