@@ -75,9 +75,7 @@
 }
 
 .header-learn-btn[aria-current='page'] {
-  box-shadow:
-    0 0 0 2px var(--slate-900),
-    0 0 0 4px #0e7490;
+  box-shadow: 0 0 0 2px var(--slate-900), 0 0 0 4px #0e7490;
 }
 
 .header-learn-short {
