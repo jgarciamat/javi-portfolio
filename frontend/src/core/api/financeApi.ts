@@ -77,7 +77,10 @@ export const transactionApi = {
   getAnnual(year: number) {
     return apiRequest<AnnualSummary>(`/transactions/annual/${year}`);
   },
-  import(rows: ImportRowDTO[], options: { accountId?: string | null; dryRun?: boolean }) {
+  import(
+    rows: ImportRowDTO[],
+    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
+  ) {
     return apiRequest<ImportResult>('/transactions/import', {
       method: 'POST',
       body: jsonBody({ rows, ...options }),

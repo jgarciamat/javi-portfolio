@@ -161,7 +161,7 @@ const PURCHASE_COPY: Record<
     cancel:
       'Si tu plan es mensual o anual, puedes cancelar la renovación cuando quieras desde «Tu plan → Gestionar suscripción» en la web: no se te vuelve a cobrar y conservas Premium hasta el final del periodo ya pagado.',
     terms: 'Condiciones de contratación:',
-    contact: 'Si tienes cualquier duda, responde a este email o escribe a moneymanager@outlook.es.',
+    contact: 'Si tienes cualquier duda, responde a este email o escribe a support@finanverso.app.',
   },
   en: {
     subject: 'Your Finanverso Premium purchase',
@@ -172,7 +172,7 @@ const PURCHASE_COPY: Record<
     cancel:
       'If your plan is monthly or yearly, you can cancel the renewal at any time from "Your plan → Manage subscription" on the web: you are not charged again and you keep Premium until the end of the period already paid.',
     terms: 'Terms of sale:',
-    contact: 'If you have any questions, reply to this e-mail or write to moneymanager@outlook.es.',
+    contact: 'If you have any questions, reply to this e-mail or write to support@finanverso.app.',
   },
 };
 

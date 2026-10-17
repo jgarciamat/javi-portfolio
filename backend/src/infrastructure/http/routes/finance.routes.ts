@@ -104,7 +104,7 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
       const result = await c.importer.import(
         req.dataUserId,
         body.rows.map((r) => ({ ...r, amountCents: r.amount })),
-        { accountId: body.accountId, dryRun: body.dryRun }
+        { accountId: body.accountId, dryRun: body.dryRun, useAi: body.useAi }
       );
       if (!body.dryRun) c.repos.metrics.record('import_done');
       res.status(body.dryRun ? 200 : 201).json({

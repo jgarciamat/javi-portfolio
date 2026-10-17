@@ -1,5 +1,5 @@
 # Borradores de outreach (NO enviar sin OK de Javi por destinatario)
-Remitente: moneymanager@outlook.es
+Remitente: support@finanverso.app
 
 ## Blogs / newsletters de finanzas personales
 **Asunto:** Una app gratuita en español para controlar gastos (por si encaja con tu audiencia)
