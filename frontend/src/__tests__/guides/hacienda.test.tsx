@@ -106,7 +106,10 @@ describe('Hacienda paso a paso in the app', () => {
     });
     expect(video).toHaveAttribute('href', OFFICIAL_VIDEOS.all);
     expect(video).toHaveAttribute('target', '_blank');
-    expect(screen.queryByRole('link', { name: literal(tr('hacienda.videoOwn')) })).toBeNull();
+    expect(screen.getByRole('link', { name: literal(tr('hacienda.videoOwn')) })).toHaveAttribute(
+      'href',
+      guideVideoUrl('m303')
+    );
     expect(screen.getByText(tr('hacienda.disclaimer'))).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: literal(`← ${tr('hacienda.back')}`) }));
     expect(screen.getByText(tr('hacienda.hint'))).toBeInTheDocument();

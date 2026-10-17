@@ -108,7 +108,7 @@ describe('Videoteca in the app', () => {
       publishedVideos().length
     );
     // Not on YouTube yet: neither the video nor its section are shown.
-    expect(screen.queryByText(VIDEOS[20].title)).not.toBeInTheDocument();
+    expect(screen.queryByText(VIDEOS.find((v) => !v.youtubeId)!.title)).not.toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: tr('videos.section.home') })
     ).not.toBeInTheDocument();
