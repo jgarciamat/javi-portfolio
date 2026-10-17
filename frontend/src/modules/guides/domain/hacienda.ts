@@ -8,6 +8,23 @@ import { guideVideoUrl } from './videos';
 /** Day the official sources were checked (shown at the bottom of every guide). */
 export const SOURCE_CHECKED = '2026-10-17';
 
+/**
+ * The last Renta campaign the guides' dates refer to: the income of this year, filed the next one
+ * (Renta 2025, filed from April to June 2026). When the AEAT publishes the dates of the next
+ * campaign, change it here and the days in `hacienda.renta.deadline*` and `hacienda.start.deadline2`.
+ */
+export const RENTA_CAMPAIGN_YEAR = 2025;
+
+/** Values of the deadline texts: `{year}` (Renta of…) and `{filed}` (year it is filed). */
+export const DEADLINE_PARAMS = {
+  year: String(RENTA_CAMPAIGN_YEAR),
+  filed: String(RENTA_CAMPAIGN_YEAR + 1),
+};
+
+/** A deadline text with its years filled in (for the pre-rendered pages, which have no i18n). */
+export const withCampaign = (text: string): string =>
+  text.replace(/\{year\}/g, DEADLINE_PARAMS.year).replace(/\{filed\}/g, DEADLINE_PARAMS.filed);
+
 /** Official pages the guides link to (labels in `hacienda.link.<id>`). */
 export const OFFICIAL_LINKS = {
   sede: 'https://sede.agenciatributaria.gob.es/',

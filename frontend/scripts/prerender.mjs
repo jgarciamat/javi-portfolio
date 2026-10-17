@@ -182,7 +182,8 @@ for (const g of GUIDES) {
 }
 
 // «Hacienda paso a paso»: step-by-step guides for the website of the Agencia Tributaria.
-const { HACIENDA_GUIDES, HACIENDA_PATH, haciendaPath, guideKey, stepKey, upTo } = hacienda;
+const { HACIENDA_GUIDES, HACIENDA_PATH, haciendaPath, guideKey, stepKey, upTo, withCampaign } =
+  hacienda;
 const source = t('hacienda.source').replace('{date}', t('hacienda.sourceDate'));
 write(
   HACIENDA_PATH,
@@ -218,7 +219,7 @@ for (const g of HACIENDA_GUIDES) {
               .join('')}</li>`
         )
         .join('')}</ol><h2>${esc(t('hacienda.deadlines'))}</h2><ul>${upTo(g.deadlines)
-        .map((n) => `<li>${esc(t(guideKey(g, `deadline${n}`)))}</li>`)
+        .map((n) => `<li>${esc(withCampaign(t(guideKey(g, `deadline${n}`))))}</li>`)
         .join('')}</ul><p>${esc(source)}</p><p>${esc(
         t('hacienda.disclaimer')
       )}</p></article>${nav}</main>`,

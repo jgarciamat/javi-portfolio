@@ -3,6 +3,9 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import es from '@locales/es.json';
 import en from '@locales/en.json';
 import {
+  DEADLINE_PARAMS,
+  RENTA_CAMPAIGN_YEAR,
+  withCampaign,
   FINANVERSO_VIDEOS,
   HACIENDA_GUIDES,
   OFFICIAL_LINKS,
@@ -59,6 +62,22 @@ describe('Hacienda paso a paso: content', () => {
     expect(tr('hacienda.source', { date: tr('hacienda.sourceDate') })).toBe(
       'Fuente: Agencia Tributaria (sede.agenciatributaria.gob.es), consultado el 17 de octubre de 2026.'
     );
+  });
+
+  it('dates the Renta deadlines as those of the last campaign, from a single year', () => {
+    expect(RENTA_CAMPAIGN_YEAR).toBe(2025);
+    expect(withCampaign(es['hacienda.renta.deadline1'])).toBe(
+      'Fechas de la última campaña (Campaña de la Renta 2025, presentada en 2026): del 8 de abril al 30 de junio de 2026.'
+    );
+    expect(tr('hacienda.renta.deadline1', DEADLINE_PARAMS)).toBe(
+      withCampaign(es['hacienda.renta.deadline1'])
+    );
+    expect(es['hacienda.renta.deadline5']).toContain('principios de abril');
+    // No year is written by hand in the Renta deadlines: they all come from the constant.
+    for (const n of [1, 2, 3, 4, 5]) {
+      expect(es[`hacienda.renta.deadline${n}` as keyof typeof es]).not.toMatch(/20\d\d/);
+      expect(en[`hacienda.renta.deadline${n}` as keyof typeof en]).not.toMatch(/20\d\d/);
+    }
   });
 
   it('every guide is published in the sitemap', async () => {

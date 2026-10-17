@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import {
+  DEADLINE_PARAMS,
   FINANVERSO_VIDEOS,
   HACIENDA_GUIDES,
   OFFICIAL_LINKS,
@@ -190,7 +191,7 @@ export function HaciendaGuideBody({
         <h2>📅 {t('hacienda.deadlines')}</h2>
         <ul>
           {upTo(guide.deadlines).map((n) => (
-            <li key={n}>{t(guideKey(guide, `deadline${n}`))}</li>
+            <li key={n}>{t(guideKey(guide, `deadline${n}`), DEADLINE_PARAMS)}</li>
           ))}
         </ul>
       </section>
