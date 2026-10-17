@@ -239,6 +239,53 @@
   width: auto;
 }
 
+/* ─── Inline gate (free try used) ─────────────── */
+.renta-gate {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  margin: 0.75rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--slate-900));
+  color: var(--slate-200);
+}
+
+.renta-gate--locked {
+  border-left: 3px solid var(--accent);
+}
+
+.renta-gate > p,
+.renta-gate .section-hint {
+  margin: 0;
+}
+
+.renta-gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent-400);
+}
+
+.renta-gate-badge .premium-chip {
+  margin-left: 0;
+}
+
+.renta-gate .btn-primary {
+  width: auto;
+}
+
+@media (max-width: 480px) {
+  .renta-gate {
+    padding: 0.8rem 0.85rem;
+  }
+
+  .renta-gate .btn-primary {
+    width: 100%;
+  }
+}
+
 /* ─── Banner ──────────────────────────────────── */
 .plan-banner {
   display: flex;

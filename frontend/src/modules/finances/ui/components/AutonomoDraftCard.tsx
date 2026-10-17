@@ -23,6 +23,7 @@ import {
 } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const SNAPSHOT_KEY = 'mm_autonomo_draft2';
 
@@ -282,7 +283,7 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
       </ul>
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
       {locked ? (
-        <div className="renta-gate">
+        <PremiumGate>
           <p className="section-hint">{t('app.autonomo.pdf.usedFree')}</p>
           <button
             className="btn-primary"
@@ -292,7 +293,7 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
           >
             {t('app.autonomo.goPremium')}
           </button>
-        </div>
+        </PremiumGate>
       ) : (
         <div className="button-row">
           <button className="btn-primary" disabled={saving} onClick={() => void download()}>
@@ -453,7 +454,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
       </section>
 
       {locked ? (
-        <div className="renta-gate">
+        <PremiumGate>
           <p className="section-hint">{t('app.autonomo.usedFree')}</p>
           <button
             className="btn-primary"
@@ -467,7 +468,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           >
             {t('app.autonomo.goPremium')}
           </button>
-        </div>
+        </PremiumGate>
       ) : (
         <div className="button-row">
           <button className="btn-primary" disabled={action.pending} onClick={() => void prepare()}>

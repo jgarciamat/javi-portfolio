@@ -10,6 +10,7 @@ import type { Asset, AssetKind } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { DebtPlanCard } from './DebtPlanCard';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const KINDS: AssetKind[] = ['investment', 'property', 'vehicle', 'other', 'debt'];
 
@@ -131,7 +132,7 @@ export function AssetsCard() {
           </>
         )}
         {locked ? (
-          <div className="renta-gate">
+          <PremiumGate>
             <p className="section-hint">{t('app.assets.usedFree')}</p>
             <button
               className="btn-primary"
@@ -141,7 +142,7 @@ export function AssetsCard() {
             >
               {t('billing.seePlans')}
             </button>
-          </div>
+          </PremiumGate>
         ) : (
           <>
             <div className="form-grid">

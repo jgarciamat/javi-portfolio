@@ -27,6 +27,7 @@ import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
 import { Step, useMoney } from './renta/shared';
 import './css/Renta.css';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const SNAPSHOT_KEY = 'mm_renta_snapshot_v2';
 const NO_CCAA: RentaCcaa = { id: '', name: '', regime: 'common', deductions: [], source: '' };
@@ -195,7 +196,7 @@ export function RentaPlanner({
         <div aria-live="polite">
           {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
           {!access.loading && !shown && (
-            <div className="renta-gate">
+            <PremiumGate locked={access.used}>
               <p className="section-hint">
                 {access.used ? t('tools.renta.usedNoSnapshot') : t('tools.renta.freeOne')}
               </p>
@@ -206,17 +207,17 @@ export function RentaPlanner({
                   {busy ? t('tools.renta.calculating') : t('tools.renta.calculate')}
                 </button>
               )}
-            </div>
+            </PremiumGate>
           )}
           {shown && (
             <>
               <PendingNotice pending={pending} />
               <ResultCard shown={shown} money={money} />
               {!access.premium && (
-                <div className="renta-gate">
+                <PremiumGate>
                   <p className="section-hint">{t('tools.renta.usedFree')}</p>
                   <UpgradeCta access={access} />
-                </div>
+                </PremiumGate>
               )}
             </>
           )}
