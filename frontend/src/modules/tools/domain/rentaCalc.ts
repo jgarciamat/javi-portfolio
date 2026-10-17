@@ -176,26 +176,35 @@ export function incomeFactor(d: Deduction, taxBase: number, joint = false): numb
   return base > max ? 0 : 1;
 }
 
+/** A fixed deduction for `units` times: by position for `perChild`, else the amount (capped per unit). */
+function fixedValue(d: Deduction, units: number): number {
+  let value = 0;
+  if (d.perChild && d.perChild.length > 0) {
+    for (let i = 0; i < units; i++) value += nth(d.perChild, i);
+  } else {
+    // The limit of a fixed amount is per unit (1,200 € for each child under 3), not for the total.
+    value = Math.min(d.amount ?? 0, d.limit ?? Infinity) * units;
+  }
+  return value;
+}
+
+/** A percent deduction gives a share of what was spent (up to its base); a special one, the amount itself. */
+function spentValue(d: Deduction, choice: DeductionChoice): number {
+  if (d.kind === 'percent') {
+    const spent = positive(choice.amount ?? 0);
+    return (Math.min(spent, d.baseLimit ?? Infinity) * (d.percent ?? 0)) / 100;
+  }
+  return positive(choice.amount ?? 0);
+}
+
 /** What a deduction gives for the choices the person made (`factor`: share allowed by the income limit). */
 export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 1): number {
   if (!choice.on) return 0;
-  let value = 0;
   if (d.kind === 'fixed') {
     const units = Math.max(1, Math.floor(choice.units ?? 1));
-    if (d.perChild && d.perChild.length > 0) {
-      for (let i = 0; i < units; i++) value += nth(d.perChild, i);
-    } else {
-      // The limit of a fixed amount is per unit (1,200 € for each child under 3), not for the total.
-      value = Math.min(d.amount ?? 0, d.limit ?? Infinity) * units;
-    }
-    return round2(value * factor);
-  } else if (d.kind === 'percent') {
-    const spent = positive(choice.amount ?? 0);
-    value = (Math.min(spent, d.baseLimit ?? Infinity) * (d.percent ?? 0)) / 100;
-  } else {
-    value = positive(choice.amount ?? 0);
+    return round2(fixedValue(d, units) * factor);
   }
-  return round2(Math.min(value, d.limit ?? Infinity) * factor);
+  return round2(Math.min(spentValue(d, choice), d.limit ?? Infinity) * factor);
 }
 
 /** The deductions that are paid out even when there is no tax to pay (maternity, large family, disability). */
@@ -311,10 +320,10 @@ export function rentalNet(rental: RentalInput | null): number {
   return round2(net > 0 ? net * (1 - percent / 100) : net);
 }
 
-/** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
-export function computeRenta(input: RentaInput): RentaResult {
-  const { state, ccaa, family } = input;
-  const expenses =
+/** Deductible expenses of work: the general amount, more with a disability or a move, plus the extra ones. */
+function workExpenses(input: RentaInput): number {
+  const { state, family } = input;
+  return (
     state.workExpenses.general +
     (family.disability >= 65
       ? state.workExpenses.disability65
@@ -322,7 +331,14 @@ export function computeRenta(input: RentaInput): RentaResult {
       ? state.workExpenses.disability33
       : 0) +
     (input.geographicMobility ? input.extras.geographicMobilityExtra : 0) +
-    positive(input.workExpensesExtra);
+    positive(input.workExpensesExtra)
+  );
+}
+
+/** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
+export function computeRenta(input: RentaInput): RentaResult {
+  const { state, ccaa, family } = input;
+  const expenses = workExpenses(input);
   const netIncome = round2(
     Math.max(0, positive(input.gross) - positive(input.socialSecurity) - expenses)
   );

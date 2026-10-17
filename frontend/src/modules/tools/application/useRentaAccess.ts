@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
+import type { IApiContext } from '@core/context/ApiContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { playBillingAvailable } from '@core/billing/playStore';
 import { isNativeApp } from '@shared/utils/platform';
@@ -52,6 +53,55 @@ const NO_DRAFT: DraftAccess = {
   buy: async () => undefined,
 };
 
+type Plan = NonNullable<ReturnType<typeof useOptionalPlan>>;
+
+/** The draft reading as the plan allows it. */
+function draftAccess(plan: Plan, rentaApi: IApiContext['rentaApi']): DraftAccess {
+  const renta = plan.overview?.renta;
+  const catalog = plan.overview?.catalog;
+  const onWeb = !isNativeApp();
+  return {
+    allowed: !!renta?.draft.allowed,
+    eligibleOn: renta?.eligibleOn ?? null,
+    passUntil: renta?.passUntil ?? null,
+    canBuy:
+      !!catalog?.rentaPass.available &&
+      (playBillingAvailable() || (onWeb && catalog.paymentsEnabled)),
+    consentRequired: !playBillingAvailable(),
+    price: catalog?.prices.rentaPass ?? null,
+    use: async () => {
+      try {
+        await rentaApi.draft();
+        return true;
+      } catch {
+        await plan.refresh();
+        return false;
+      }
+    },
+    buy: (consent) => plan.checkout('renta_pass', consent),
+  };
+}
+
+/** Inside the app: the plan's limit of calculations, unless it has none or the pass is on. */
+function accountAccess(
+  plan: Plan,
+  draft: DraftAccess,
+  consume: () => Promise<boolean>
+): RentaAccess {
+  const renta = plan.overview?.renta;
+  const limit = plan.overview?.limits.resources.rentaCalculations;
+  const max = limit ?? 1;
+  const count = plan.overview?.usage.rentaCalculations ?? 0;
+  return {
+    premium: (plan.isPremium && !!plan.overview && limit === null) || !!renta?.passUntil,
+    loading: plan.loading && !plan.overview,
+    used: limit !== null && limit !== undefined && count >= limit && !renta?.passUntil,
+    consume,
+    upgrade: () => plan.openUpgrade({ kind: 'limit', resource: 'rentaCalculations', limit: max }),
+    draft,
+  };
+}
+
 export function useRentaAccess(mode: RentaMode): RentaAccess {
   const { rentaApi } = useApi();
   const plan = useOptionalPlan();
@@ -84,39 +134,5 @@ export function useRentaAccess(mode: RentaMode): RentaAccess {
     };
   }
 
-  const renta = plan.overview?.renta;
-  const catalog = plan.overview?.catalog;
-  const onWeb = !isNativeApp();
-  const draft: DraftAccess = {
-    allowed: !!renta?.draft.allowed,
-    eligibleOn: renta?.eligibleOn ?? null,
-    passUntil: renta?.passUntil ?? null,
-    canBuy:
-      !!catalog?.rentaPass.available &&
-      (playBillingAvailable() || (onWeb && catalog.paymentsEnabled)),
-    consentRequired: !playBillingAvailable(),
-    price: catalog?.prices.rentaPass ?? null,
-    use: async () => {
-      try {
-        await rentaApi.draft();
-        return true;
-      } catch {
-        await plan.refresh();
-        return false;
-      }
-    },
-    buy: (consent) => plan.checkout('renta_pass', consent),
-  };
-
-  const limit = plan.overview?.limits.resources.rentaCalculations;
-  const max = limit ?? 1;
-  const count = plan.overview?.usage.rentaCalculations ?? 0;
-  return {
-    premium: (plan.isPremium && !!plan.overview && limit === null) || !!renta?.passUntil,
-    loading: plan.loading && !plan.overview,
-    used: limit !== null && limit !== undefined && count >= limit && !renta?.passUntil,
-    consume: consumeAccount,
-    upgrade: () => plan.openUpgrade({ kind: 'limit', resource: 'rentaCalculations', limit: max }),
-    draft,
-  };
+  return accountAccess(plan, draftAccess(plan, rentaApi), consumeAccount);
 }
