@@ -135,6 +135,19 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           <p className="header-sub">{sectionLabel}</p>
         </div>
       </div>
+      <button
+        type="button"
+        className="header-learn-btn"
+        onClick={() => dash.setTab('videos')}
+        aria-label={t('app.header.learn')}
+        aria-current={dash.tab === 'videos' ? 'page' : undefined}
+      >
+        <Icon name="video" size={18} />
+        <span className="header-learn-long">{t('app.header.learn')}</span>
+        <span className="header-learn-short" aria-hidden="true">
+          {t('app.header.learnShort')}
+        </span>
+      </button>
       <div className="header-actions">
         <button
           className="header-user header-user-btn"

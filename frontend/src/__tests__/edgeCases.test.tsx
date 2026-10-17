@@ -455,6 +455,19 @@ describe('dashboard edge cases', () => {
       })
     );
 
+    // Header link → Videoteca, marked as the current page.
+    const learn = screen.getByRole('button', { name: tr('app.header.learn') });
+    fireEvent.click(learn);
+    expect(screen.getByRole('region', { name: tr('app.tabs.videos') })).toBeInTheDocument();
+    expect(learn).toHaveAttribute('aria-current', 'page');
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: literal(tr('app.tabs.monthly')),
+      })
+    );
+    expect(learn).not.toHaveAttribute('aria-current');
+
     // Budget panel → budgets section and back.
     fireEvent.click(await screen.findByRole('button', { name: tr('app.budgets.manage') }));
     expect(screen.getByRole('region', { name: tr('app.tabs.budgets') })).toBeInTheDocument();

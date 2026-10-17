@@ -48,6 +48,65 @@
   color: var(--slate-500);
 }
 
+/* Link to the Videoteca: an accent pill so it reads as an invitation, not as a tab. */
+.header-learn-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent-400) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-400) 14%, transparent);
+  color: var(--accent-400);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.header-learn-btn:hover,
+.header-learn-btn[aria-current='page'] {
+  background: color-mix(in srgb, var(--accent-400) 24%, transparent);
+  border-color: var(--accent-400);
+}
+
+.header-learn-short {
+  display: none;
+}
+
+/* Tablets: short label in the same row. */
+@media (max-width: 900px) and (min-width: 601px) {
+  .header-learn-long {
+    display: none;
+  }
+
+  .header-learn-short {
+    display: inline;
+  }
+}
+
+/* Phones: no room in the row, so it gets its own full-width line under the brand. */
+@media (max-width: 600px) {
+  .header {
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+  }
+
+  .header-brand {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .header-learn-btn {
+    order: 3;
+    flex-basis: 100%;
+    white-space: normal;
+  }
+}
+
 .header-actions {
   display: flex;
   align-items: center;
