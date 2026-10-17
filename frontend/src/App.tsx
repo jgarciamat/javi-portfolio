@@ -50,6 +50,7 @@ const HaciendaGuidePage = lazyNamed(
   () => import('./modules/guides/ui/HaciendaPages'),
   'HaciendaGuidePage'
 );
+const VideosPage = lazyNamed(() => import('./modules/guides/ui/VideosPage'), 'VideosPage');
 const LoanCalculatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'LoanCalculatorPage'
@@ -104,6 +105,7 @@ export default function App() {
                       <Route path="/guias/:slug" element={<GuidePage />} />
                       <Route path="/hacienda-paso-a-paso" element={<HaciendaIndexPage />} />
                       <Route path="/hacienda-paso-a-paso/:slug" element={<HaciendaGuidePage />} />
+                      <Route path="/videoteca" element={<VideosPage />} />
                       <Route path="/" element={<HomeGate />}>
                         <Route index element={<DashboardPage />} />
                       </Route>

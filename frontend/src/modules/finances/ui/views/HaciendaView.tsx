@@ -48,6 +48,12 @@ export function HaciendaView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => 
         </h2>
         <p className="section-hint">{t('hacienda.hint')}</p>
         <p className="section-hint">{t('hacienda.free')}</p>
+        <p className="hacienda-banner">
+          <span>🎬 {t('videos.banner')}</span>
+          <button className="btn-secondary" onClick={() => onOpenTab('videos')}>
+            {t('videos.cta')}
+          </button>
+        </p>
         <HaciendaCatalog
           renderLink={(g, className, children) => (
             <button className={`${className} guide-link`} onClick={() => setOpen(g.slug)}>

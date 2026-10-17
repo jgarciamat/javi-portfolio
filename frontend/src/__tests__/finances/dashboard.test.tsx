@@ -111,6 +111,12 @@ describe('menu and sections', () => {
     ).toBeInTheDocument();
   });
 
+  it('opens the Videoteca from the menu, free for every account', async () => {
+    renderWithProviders(<Dashboard />);
+    goTo('app.tabs.videos');
+    expect(await screen.findByRole('link', { name: tr('videos.channel') })).toBeInTheDocument();
+  });
+
   it('opens a month from the annual view', async () => {
     const api = createFakeApi();
     api.transactionApi.getAnnual.mockResolvedValue({

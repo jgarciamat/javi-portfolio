@@ -14,6 +14,7 @@ import {
   haciendaPath,
   stepKey,
 } from '@modules/guides/domain/hacienda';
+import { guideVideoUrl } from '@modules/guides/domain/videos';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
 import { HaciendaGuidePage, HaciendaIndexPage } from '@modules/guides/ui/HaciendaPages';
 import { GuidesIndexPage } from '@modules/guides/ui/GuidePages';
@@ -48,7 +49,10 @@ describe('Hacienda paso a paso: content', () => {
       );
     }
     expect(findHaciendaGuide('nope')).toBeUndefined();
-    expect(Object.values(FINANVERSO_VIDEOS).every((v) => v === '')).toBe(true);
+    // Filled from the Videoteca: a link once the guide's video is on YouTube.
+    for (const id of ['start', 'renta', 'm303', 'm130'] as const) {
+      expect(FINANVERSO_VIDEOS[id]).toBe(guideVideoUrl(id));
+    }
   });
 
   it('cites the source and the date it was checked, with the disclaimer', () => {

@@ -7,6 +7,7 @@ import { GuideCatalog } from './GuideCatalog';
 import { GuideBody } from './GuideBody';
 import { PublicGuideLink } from './GuideLinks';
 import { HACIENDA_PATH } from '../domain/hacienda';
+import { VIDEOS_PATH } from '../domain/videos';
 import { useI18n } from '@core/i18n/I18nContext';
 import './css/Hacienda.css';
 import '@modules/tools/ui/css/Tools.css';
@@ -50,6 +51,12 @@ export function GuidesIndexPage() {
           <span>🏛️ {t('hacienda.banner')}</span>
           <Link className="btn-secondary" to={HACIENDA_PATH}>
             {t('hacienda.cta')}
+          </Link>
+        </p>
+        <p className="hacienda-banner">
+          <span>🎬 {t('videos.banner')}</span>
+          <Link className="btn-secondary" to={VIDEOS_PATH}>
+            {t('videos.cta')}
           </Link>
         </p>
         <GuideCatalog

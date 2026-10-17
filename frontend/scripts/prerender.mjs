@@ -39,6 +39,7 @@ const { GUIDES, inlineParts } = await load('src/modules/guides/domain/guides.ts'
 const { TOOL_PAGES } = await load('src/modules/tools/domain/toolPages.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
 const hacienda = await load('src/modules/guides/domain/hacienda.ts');
+const videos = await load('src/modules/guides/domain/videos.ts');
 
 const template = readFileSync(join(dist, 'index.html'), 'utf8');
 
@@ -243,6 +244,28 @@ for (const g of HACIENDA_GUIDES) {
   );
 }
 
+// «Videoteca»: our YouTube tutorials, by section.
+write(
+  videos.VIDEOS_PATH,
+  render({
+    path: videos.VIDEOS_PATH,
+    title: t('videos.metaTitle'),
+    description: t('videos.metaDescription'),
+    body: `<main><h1>${esc(t('videos.title'))}</h1><p>${esc(t('videos.hint'))}</p><p>${link(
+      videos.YOUTUBE_CHANNEL_URL,
+      t('videos.channel')
+    )}</p>${videos
+      .videoGroups()
+      .map(
+        ({ section, videos: list }) =>
+          `<h2>${esc(t(`videos.section.${section.id}`))}</h2><ul>${list
+            .map((v) => `<li>${link(videos.videoUrl(v), v.title)}</li>`)
+            .join('')}</ul>`
+      )
+      .join('')}${nav}</main>`,
+  })
+);
+
 // Calculators.
 for (const tool of TOOL_PAGES) {
   write(
@@ -269,4 +292,4 @@ for (const tool of TOOL_PAGES) {
   );
 }
 
-console.info(`[prerender] ${3 + GUIDES.length + HACIENDA_GUIDES.length + TOOL_PAGES.length} pages`);
+console.info(`[prerender] ${4 + GUIDES.length + HACIENDA_GUIDES.length + TOOL_PAGES.length} pages`);

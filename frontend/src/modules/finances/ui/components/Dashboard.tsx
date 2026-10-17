@@ -36,6 +36,7 @@ const InvestView = lazyNamed(() => import('@modules/invest/ui/InvestView'), 'Inv
 const HealthView = lazyNamed(() => import('../views/HealthView'), 'HealthView');
 const RentaView = lazyNamed(() => import('../views/RentaView'), 'RentaView');
 const HaciendaView = lazyNamed(() => import('../views/HaciendaView'), 'HaciendaView');
+const VideosView = lazyNamed(() => import('../views/VideosView'), 'VideosView');
 const SplitView = lazyNamed(() => import('../views/SplitView'), 'SplitView');
 const SearchView = lazyNamed(() => import('../views/SearchView'), 'SearchView');
 const SettingsView = lazyNamed(() => import('../views/SettingsView'), 'SettingsView');
@@ -64,6 +65,7 @@ const SIMPLE_VIEWS: Partial<
   hacienda: (open) => <HaciendaView onOpenTab={open} />,
   learn: (open) => <LearnView onOpenTab={open} />,
   invest: () => <InvestView />,
+  videos: () => <VideosView />,
   plan: () => <PlanView />,
   offers: () => <OffersView />,
 };

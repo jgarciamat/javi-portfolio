@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { RegisterPage } from '@modules/auth/ui/RegisterPage';
 import esJson from '@locales/es.json';
@@ -34,6 +34,26 @@ describe('RegisterPage', () => {
   const mockOnSwitch = jest.fn();
 
   beforeEach(() => jest.clearAllMocks());
+
+  test('links to our social profiles in a new tab', () => {
+    render(
+      <MemoryRouter>
+        <RegisterPage onSwitch={mockOnSwitch} />
+      </MemoryRouter>
+    );
+    const socials = screen.getByRole('navigation', { name: 'Síguenos en' });
+    for (const [network, url] of [
+      ['Instagram', 'https://www.instagram.com/finanverso.app/'],
+      ['TikTok', 'https://www.tiktok.com/@money.manager00'],
+      ['YouTube', 'https://www.youtube.com/@finanversoapp'],
+    ]) {
+      const link = within(socials).getByRole('link', { name: `Síguenos en ${network}` });
+      expect(link).toHaveAttribute('href', url);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(link).toHaveTextContent(network);
+    }
+  });
 
   test('renders name, email, password inputs and submit button', () => {
     render(

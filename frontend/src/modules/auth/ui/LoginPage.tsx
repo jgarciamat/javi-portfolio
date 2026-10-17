@@ -4,6 +4,7 @@ import { useLoginForm } from '../application/useLoginForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleSignIn } from './GoogleButton';
 import { isNativeApp } from '@shared/utils/platform';
+import { SocialLinks } from '@shared/components/SocialLinks';
 
 interface Props {
   onSwitch: () => void;
@@ -104,6 +105,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
         )}
         <Link to="/privacy">{t('app.privacy.link')}</Link>
       </p>
+      <SocialLinks />
     </form>
   );
 }

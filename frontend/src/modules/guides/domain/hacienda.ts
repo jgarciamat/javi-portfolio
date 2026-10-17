@@ -3,6 +3,7 @@
  * (AEAT). The structure lives here; every text is in the locale files under `hacienda.<guide>.…`, so
  * the same guide is shown in the app, on the public site and in the pre-rendered pages.
  */
+import { guideVideoUrl } from './videos';
 
 /** Day the official sources were checked (shown at the bottom of every guide). */
 export const SOURCE_CHECKED = '2026-10-17';
@@ -84,14 +85,14 @@ export interface HaciendaGuide {
 }
 
 /**
- * Our own videos for each guide (YouTube links). Empty until they are recorded: the guide shows the
- * «Vídeo de Finanverso» link only when there is one.
+ * Our own video for each guide (YouTube link), taken from the Videoteca. Empty until it is published:
+ * the guide shows the «Vídeo de Finanverso» link only when there is one.
  */
 export const FINANVERSO_VIDEOS: Record<HaciendaGuideId, string> = {
-  start: '',
-  renta: '',
-  m303: '',
-  m130: '',
+  start: guideVideoUrl('start'),
+  renta: guideVideoUrl('renta'),
+  m303: guideVideoUrl('m303'),
+  m130: guideVideoUrl('m130'),
 };
 
 export const HACIENDA_GUIDES: HaciendaGuide[] = [

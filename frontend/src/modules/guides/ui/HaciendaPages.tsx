@@ -11,6 +11,7 @@ import {
   haciendaPath,
   type HaciendaTool,
 } from '../domain/hacienda';
+import { VIDEOS_PATH } from '../domain/videos';
 import { HaciendaCatalog, HaciendaGuideBody } from './HaciendaGuides';
 import { GuideCta } from './GuidePages';
 import '@modules/tools/ui/css/Tools.css';
@@ -39,6 +40,12 @@ export function HaciendaIndexPage() {
         </p>
         <h1 className="pricing-title">{t('hacienda.title')}</h1>
         <p className="pricing-subtitle">{t('hacienda.hint')}</p>
+        <p className="hacienda-banner">
+          <span>🎬 {t('videos.banner')}</span>
+          <Link className="btn-secondary" to={VIDEOS_PATH}>
+            {t('videos.cta')}
+          </Link>
+        </p>
         <HaciendaCatalog
           renderLink={(g, className, children) => (
             <Link className={className} to={haciendaPath(g)}>

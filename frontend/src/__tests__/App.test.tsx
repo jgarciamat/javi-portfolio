@@ -92,6 +92,13 @@ describe('App routes', () => {
     ).toBeInTheDocument();
   });
 
+  it('serves the Videoteca', async () => {
+    visit('/videoteca');
+    expect(
+      await screen.findByRole('heading', { name: tr('videos.title'), level: 1 })
+    ).toBeInTheDocument();
+  });
+
   it('redirects unknown paths and shows the dashboard when signed in', async () => {
     signIn();
     visit('/nothing-here');

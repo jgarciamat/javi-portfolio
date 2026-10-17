@@ -15,6 +15,7 @@ export type DashboardTab =
   | 'hacienda'
   | 'learn'
   | 'invest'
+  | 'videos'
   | 'automations'
   | 'custom-alerts'
   | 'plan'
@@ -50,6 +51,7 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'custom-alerts', icon: 'bell', labelKey: 'app.tabs.customAlerts', group: 'planning' },
   { id: 'learn', icon: 'book', labelKey: 'app.tabs.learn', group: 'tools' },
   { id: 'invest', icon: 'coins', labelKey: 'app.tabs.invest', group: 'tools' },
+  { id: 'videos', icon: 'video', labelKey: 'app.tabs.videos', group: 'tools' },
   { id: 'plan', icon: 'star', labelKey: 'app.tabs.plan', group: 'tools' },
   { id: 'offers', icon: 'gift', labelKey: 'app.tabs.offers', group: 'tools' },
   { id: 'settings', icon: 'wrench', labelKey: 'app.tabs.settings', group: 'tools' },

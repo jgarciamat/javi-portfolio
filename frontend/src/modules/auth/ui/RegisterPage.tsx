@@ -4,6 +4,7 @@ import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleSignIn } from './GoogleButton';
 import { PasswordHints } from './PasswordHints';
 import { Icon } from '@shared/components/Icon';
+import { SocialLinks } from '@shared/components/SocialLinks';
 
 interface Props {
   onSwitch: () => void;
@@ -93,6 +94,7 @@ export function RegisterPage({ onSwitch }: Props) {
       <button type="submit" className="auth-btn" disabled={form.loading}>
         {form.loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
       </button>
+      <SocialLinks />
     </form>
   );
 }
