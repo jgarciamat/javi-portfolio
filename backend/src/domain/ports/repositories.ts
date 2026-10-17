@@ -336,7 +336,7 @@ export interface InboxRepository {
 }
 
 export interface PushRepository {
-  /** One row per endpoint: subscribing again from the same browser replaces it. */
+  /** One row per endpoint; another user only takes it over with the same keys (same browser). */
   save(subscription: PushSubscriptionRecord, createdAt: string): void;
   remove(userId: string, endpoint: string): void;
   /** Used when the push service says the subscription is gone. */

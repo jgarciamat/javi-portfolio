@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { ValidationError } from '@domain/errors';
 import { PushRepository } from '@domain/ports/repositories';
 import { Clock, PushPayload, PushSender } from '@domain/ports/services';
+import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 
 /** Notifications to the phones and browsers that asked for them. */
 export class PushService {
@@ -35,6 +36,11 @@ export class PushService {
   async notify(userId: string, payload: PushPayload): Promise<number> {
     let sent = 0;
     for (const subscription of this.subscriptions.listByUser(userId)) {
+      // Saved before endpoints were checked: never send a request to an unknown host.
+      if (!isAllowedPushEndpoint(subscription.endpoint)) {
+        this.subscriptions.removeEndpoint(subscription.endpoint);
+        continue;
+      }
       try {
         if ((await this.sender.send(subscription, payload)) === 'gone') {
           this.subscriptions.removeEndpoint(subscription.endpoint);

@@ -8,7 +8,7 @@ import {
 } from '../helpers/testApp';
 
 const SUB = {
-  endpoint: 'https://push.example.test/send/abc123',
+  endpoint: 'https://fcm.googleapis.com/fcm/send/abc123',
   keys: { p256dh: 'BPublicKey', auth: 'authSecret' },
 };
 
@@ -55,6 +55,30 @@ describe('Push notifications', () => {
   it('validates the subscription and refuses it when push is off', async () => {
     await subscribe({ endpoint: 'nope', keys: SUB.keys }).expect(400);
     await subscribe({ endpoint: SUB.endpoint }).expect(400);
+    // Only the browsers' push services: no other host, IP, port, credentials or plain http.
+    for (const endpoint of [
+      'https://push.example.test/send/abc',
+      'http://fcm.googleapis.com/fcm/send/abc',
+      'https://fcm.googleapis.com:8443/fcm/send/abc',
+      'https://user:pass@fcm.googleapis.com/fcm/send/abc',
+      'https://169.254.169.254/latest/meta-data',
+      'https://[::1]/x',
+      'https://evil-fcm.googleapis.com.example.com/x',
+      'https://storage.googleapis.com/bucket',
+      'https://notify.windows.com.evil.test/x',
+    ]) {
+      const refused = await subscribe({ endpoint, keys: SUB.keys }).expect(400);
+      expect(refused.body.code).toBe('VALIDATION_ERROR');
+    }
+    for (const endpoint of [
+      'https://fcm.googleapis.com:443/fcm/send/abc',
+      'https://updates.push.services.mozilla.com/wpush/v2/abc',
+      'https://wns2-db5p.notify.windows.com/w/?token=abc',
+      'https://web.push.apple.com/QAbc',
+      'https://api.push.apple.com/3/device/abc',
+    ]) {
+      await subscribe({ endpoint, keys: SUB.keys }).expect(204);
+    }
     ctx.push.enabled = false;
     const res = await subscribe().expect(400);
     expect(res.body.code).toBe('PUSH_DISABLED');
@@ -72,6 +96,43 @@ describe('Push notifications', () => {
     ctx.push.gone.clear();
     expect((await request(ctx.app).post('/api/push/test').set(user.auth)).body.sent).toBe(0);
     error.mockRestore();
+  });
+
+  it('never sends to an endpoint of an unknown host saved before the check', async () => {
+    ctx.container.repos.push.save(
+      {
+        id: 'legacy',
+        userId: user.id,
+        endpoint: 'http://127.0.0.1:8080/x',
+        p256dh: 'p',
+        auth: 'a',
+      },
+      ctx.clock.now().toISOString()
+    );
+    expect((await request(ctx.app).post('/api/push/test').set(user.auth)).body.sent).toBe(0);
+    expect(ctx.push.sent).toHaveLength(0);
+    expect(ctx.container.repos.push.listByUser(user.id)).toHaveLength(0);
+  });
+
+  it('does not let another user take over an endpoint without its keys', async () => {
+    const other = await createUser(ctx, 'intruso@example.com');
+    await subscribe().expect(204);
+    await subscribe(
+      { endpoint: SUB.endpoint, keys: { p256dh: 'BOther', auth: 'other' } },
+      other
+    ).expect(204);
+    expect(ctx.container.repos.push.listByUser(user.id)).toHaveLength(1);
+    expect(ctx.container.repos.push.listByUser(other.id)).toHaveLength(0);
+    // The owner can renew its own keys.
+    await subscribe({ endpoint: SUB.endpoint, keys: { p256dh: 'BNew', auth: 'new' } }).expect(204);
+    expect(ctx.container.repos.push.listByUser(user.id)[0]).toMatchObject({ p256dh: 'BNew' });
+    // The same browser (same keys) subscribed by whoever signs in on it next moves over.
+    await subscribe(
+      { endpoint: SUB.endpoint, keys: { p256dh: 'BNew', auth: 'new' } },
+      other
+    ).expect(204);
+    expect(ctx.container.repos.push.listByUser(user.id)).toHaveLength(0);
+    expect(ctx.container.repos.push.listByUser(other.id)).toHaveLength(1);
   });
 
   it('keeps subscriptions private to their owner', async () => {
