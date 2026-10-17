@@ -1,6 +1,5 @@
 import { AccountResolver, CategoryResolver } from '@application/shared/resolvers';
-import { Account } from '@domain/model/Account';
-import { FALLBACK_CATEGORY_NAME } from '@domain/model/Category';
+import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
 import { TestContext, TestUser, createTestApp, createUser } from '../helpers/testApp';
 
 describe('resolvers', () => {
@@ -39,6 +38,22 @@ describe('resolvers', () => {
     expect(accounts.defaultAccount(user.id).id).toBe(created.id);
   });
 
+  it('brings back the archived default account instead of creating a duplicate', () => {
+    const repo = ctx.container.repos.accounts;
+    const principal = accounts.defaultAccount(user.id);
+    expect(principal.name).toBe(DEFAULT_ACCOUNT_NAME);
+    const savings = Account.create(user.id, { name: 'Ahorro' });
+    repo.save(savings);
+    archiveAll();
+    // Used to throw ACCOUNT_EXISTS: it tried to create a second «Principal».
+    const restored = accounts.defaultAccount(user.id);
+    expect(restored.id).toBe(principal.id);
+    expect(repo.findById(user.id, principal.id)?.archived).toBe(false);
+    expect(repo.findById(user.id, savings.id)?.archived).toBe(true);
+    expect(repo.listByUser(user.id)).toHaveLength(2);
+    expect(ctx.container.repos.settings.get(user.id).defaultAccountId).toBe(principal.id);
+  });
+
   it('refuses archived or unknown accounts for a movement', () => {
     const account = accounts.defaultAccount(user.id);
     expect(accounts.resolveForMovement(user.id, null).id).toBe(account.id);
@@ -52,10 +67,9 @@ describe('resolvers', () => {
     );
   });
 
-  it('finds or creates categories by name, and the fallback one', () => {
-    const fallback = categories.fallback(user.id);
-    expect(fallback.name).toBe(FALLBACK_CATEGORY_NAME);
-    expect(categories.fallback(user.id).id).toBe(fallback.id);
+  it('finds or creates categories by name', () => {
+    const found = categories.findOrCreate(user.id, 'Otros');
+    expect(categories.findOrCreate(user.id, 'Otros').id).toBe(found.id);
     expect(categories.resolveOptional(user.id, { category: '   ' })).toBeNull();
     expect(categories.resolveOptional(user.id, {})).toBeNull();
     const created = categories.resolve(user.id, { category: 'Mascotas' });

@@ -7,7 +7,6 @@ import { toDateOnly, todayDateOnly } from '@domain/shared/period';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
 export const MAX_ASSETS = 30;
-export const ASSET_KINDS: AssetKind[] = ['investment', 'property', 'vehicle', 'other', 'debt'];
 
 export interface AssetView {
   id: string;

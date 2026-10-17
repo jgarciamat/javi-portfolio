@@ -394,7 +394,6 @@ export interface SplitRepository {
 // ─── Self-employed ───────────────────────────────────────────────────────────
 
 export type VatRate = 0 | 4 | 10 | 21;
-export const VAT_RATES: VatRate[] = [21, 10, 4, 0];
 
 export interface BusinessCategory {
   categoryId: string;

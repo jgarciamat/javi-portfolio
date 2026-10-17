@@ -21,10 +21,6 @@ export class RentaService {
     return { used: this.usage.increment(userId) };
   }
 
-  access(userId: string): RentaAccess {
-    return this.entitlements.rentaAccess(userId);
-  }
-
   /** Asked before reading a draft: refused (402) with what is missing when it is not included. */
   useDraft(userId: string): RentaAccess {
     const access = this.entitlements.rentaAccess(userId);
