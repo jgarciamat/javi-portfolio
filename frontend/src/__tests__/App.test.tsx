@@ -80,6 +80,18 @@ describe('App routes', () => {
     ).toBeInTheDocument();
   });
 
+  it('serves the «Hacienda paso a paso» guides', async () => {
+    visit('/hacienda-paso-a-paso');
+    expect(
+      await screen.findByRole('heading', { name: tr('hacienda.title'), level: 1 })
+    ).toBeInTheDocument();
+    cleanup();
+    visit('/hacienda-paso-a-paso/modelo-303');
+    expect(
+      await screen.findByRole('heading', { name: tr('hacienda.m303.title'), level: 1 })
+    ).toBeInTheDocument();
+  });
+
   it('redirects unknown paths and shows the dashboard when signed in', async () => {
     signIn();
     visit('/nothing-here');

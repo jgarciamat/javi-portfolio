@@ -9,6 +9,7 @@ import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
+import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { buildAutonomoPdf, type PdfText } from '../../application/autonomoPdf';
 import { isNativeApp } from '@shared/utils/platform';
@@ -306,8 +307,11 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
   );
 }
 
-/** Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution. */
-export function AutonomoDraftCard() {
+/**
+ * Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution.
+ * `onHowToFile` opens the step-by-step guide to file a form on the Agencia Tributaria website.
+ */
+export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string) => void }) {
   const { businessApi } = useApi();
   const { t } = useI18n();
   const plan = useOptionalPlan();
@@ -481,6 +485,7 @@ export function AutonomoDraftCard() {
           <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
         </>
       )}
+      {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
     </div>
   );
 }
