@@ -16,7 +16,9 @@ export function VideosPage() {
       <PublicHeader />
       <main className="pricing-main tools-main guide-main">
         <p className="guide-back">
-          <Link to="/guias">← {t('landing.learn.guides')}</Link>
+          <Link className="back-btn" to="/guias">
+            ← {t('landing.learn.guides')}
+          </Link>
         </p>
         <h1 className="pricing-title">{t('videos.title')}</h1>
         <p className="pricing-subtitle">{t('videos.hint')}</p>

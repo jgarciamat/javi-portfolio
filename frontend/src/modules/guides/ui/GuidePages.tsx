@@ -89,7 +89,9 @@ export function GuidePage() {
       <PublicHeader />
       <main className="pricing-main tools-main guide-main">
         <p className="guide-back">
-          <Link to="/guias">← Todas las guías</Link>
+          <Link className="back-btn" to="/guias">
+            ← Todas las guías
+          </Link>
         </p>
         <article className="guide-article">
           <h1 className="pricing-title">{guide.title}</h1>

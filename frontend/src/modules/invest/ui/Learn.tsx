@@ -76,7 +76,7 @@ export function Learn({
     return (
       <article className="inv-article" style={{ ['--cat' as string]: chapter.color }}>
         <div ref={top} />
-        <button type="button" className="btn-secondary" onClick={() => onOpen(null)}>
+        <button type="button" className="back-btn" onClick={() => onOpen(null)}>
           ← {t('app.invest.learn.back')}
         </button>
         <p className="inv-kicker">

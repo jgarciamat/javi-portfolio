@@ -23,7 +23,7 @@ export function HaciendaView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => 
     return (
       <div className="section-view">
         <div className="card guide-article">
-          <button className="btn-secondary" onClick={() => setOpen(null)}>
+          <button type="button" className="back-btn" onClick={() => setOpen(null)}>
             ← {t('hacienda.back')}
           </button>
           <h2 className="section-title">{t(guideKey(guide, 'title'))}</h2>
