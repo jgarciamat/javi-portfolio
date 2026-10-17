@@ -24,6 +24,10 @@ import { EntitlementService } from '@application/billing/EntitlementService';
 
 export const VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 export const RESET_TTL_MS = 60 * 60 * 1000;
+/** A sign-in lasts at most this long, however often it is refreshed. */
+export const REFRESH_FAMILY_MAX_MS = 90 * 24 * 60 * 60 * 1000;
+/** The token just exchanged still works this long (two tabs refreshing at once). */
+export const REFRESH_GRACE_MS = 30 * 1000;
 const REGISTERED_MESSAGE = 'Registro completado. Revisa tu email para verificar tu cuenta.';
 /** A new reset e-mail is not sent if the previous one is younger than this. */
 export const RESET_RESEND_COOLDOWN_MS = 2 * 60 * 1000;
@@ -39,6 +43,7 @@ export interface AuthResult extends SessionTokens {
 
 interface Logger {
   error(message: string, error?: unknown): void;
+  warn(message: string): void;
 }
 
 export class AuthService {
@@ -58,7 +63,6 @@ export class AuthService {
     private readonly entitlements: EntitlementService,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
-    private readonly refreshTtlMs: number,
     private readonly logger: Logger = console
   ) {}
 
@@ -147,30 +151,51 @@ export class AuthService {
     return { ...this.issueSession(user), user: user.toPublic() };
   }
 
-  refresh(refreshToken: string): { accessToken: string } {
+  /**
+   * Exchanges the refresh token for a new pair (rotation). A token that was already
+   * exchanged is a replay, typically a stolen copy: the whole family (that sign-in, on
+   * every copy) is closed. The previous token still works for a few seconds so two
+   * tabs refreshing at the same time do not look like theft.
+   */
+  refresh(refreshToken: string): SessionTokens {
     const hash = this.tokens.hash(refreshToken);
     const record = this.refreshTokens.findByHash(hash);
     const now = this.clock.now();
-    if (!record || new Date(record.expiresAt) < now) {
-      if (record) this.refreshTokens.deleteByHash(hash);
-      throw new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+    const expired = () =>
+      new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+    if (!record) throw expired();
+    if (
+      record.rotatedAt &&
+      now.getTime() - new Date(record.rotatedAt).getTime() > REFRESH_GRACE_MS
+    ) {
+      this.refreshTokens.deleteFamily(record.familyId);
+      this.logger.warn(`[auth] refresh token replayed: session closed for user ${record.userId}`);
+      throw expired();
+    }
+    if (new Date(record.expiresAt) < now || new Date(record.familyExpiresAt) < now) {
+      this.refreshTokens.deleteFamily(record.familyId);
+      throw expired();
     }
     const user = this.users.findById(record.userId);
     if (!user) {
-      this.refreshTokens.deleteByHash(hash);
-      throw new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+      this.refreshTokens.deleteFamily(record.familyId);
+      throw expired();
     }
-    this.refreshTokens.extend(hash, new Date(now.getTime() + this.refreshTtlMs).toISOString());
-    return {
-      accessToken: this.tokens.issueAccessToken({
-        userId: user.id,
-        sessionVersion: user.sessionVersion,
-      }),
-    };
+    return this.uow.run(() => {
+      if (!record.rotatedAt) this.refreshTokens.markRotated(hash, now.toISOString());
+      return this.issueTokens(user, {
+        familyId: record.familyId,
+        familyExpiresAt: record.familyExpiresAt,
+        authTime: record.authTime,
+      });
+    });
   }
 
+  /** Closes this sign-in: the token and every other one of its family. */
   logout(refreshToken: string | undefined): void {
-    if (refreshToken) this.refreshTokens.deleteByHash(this.tokens.hash(refreshToken));
+    if (!refreshToken) return;
+    const record = this.refreshTokens.findByHash(this.tokens.hash(refreshToken));
+    if (record) this.refreshTokens.deleteFamily(record.familyId);
   }
 
   /** Closes every session of the user, on every device. */
@@ -184,13 +209,13 @@ export class AuthService {
   }
 
   /** Used by the auth middleware: the token must match the user's current session version. */
-  authenticate(accessToken: string): { userId: string } {
+  authenticate(accessToken: string): { userId: string; authTime: number | null } {
     const claims = this.tokens.verifyAccessToken(accessToken);
     const user = this.users.findById(claims.userId);
     if (!user || user.sessionVersion !== claims.sessionVersion) {
       throw new UnauthorizedError('Sesión no válida', 'INVALID_TOKEN');
     }
-    return { userId: user.id };
+    return { userId: user.id, authTime: claims.authTime };
   }
 
   // ─── Password reset ───────────────────────────────────────────────────────
@@ -273,19 +298,40 @@ export class AuthService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  issueSession(user: User): SessionTokens {
+  /** Starts a new family of refresh tokens: a sign-in. */
+  issueSession(user: User, authTime: Date = this.clock.now()): SessionTokens {
+    return this.issueTokens(user, {
+      familyId: randomUUID(),
+      familyExpiresAt: new Date(authTime.getTime() + REFRESH_FAMILY_MAX_MS).toISOString(),
+      authTime: authTime.toISOString(),
+    });
+  }
+
+  private issueTokens(
+    user: User,
+    family: { familyId: string; familyExpiresAt: string; authTime: string }
+  ): SessionTokens {
     const refresh = this.tokens.issueRefreshToken();
+    const now = this.clock.now();
+    // Each token lives refreshTtlMs, but never beyond the end of its family.
+    const expiresAt = Math.min(
+      refresh.expiresAt.getTime(),
+      new Date(family.familyExpiresAt).getTime()
+    );
     this.refreshTokens.save({
       id: randomUUID(),
       userId: user.id,
       tokenHash: refresh.hash,
-      expiresAt: refresh.expiresAt.toISOString(),
-      createdAt: this.clock.now().toISOString(),
+      expiresAt: new Date(expiresAt).toISOString(),
+      createdAt: now.toISOString(),
+      rotatedAt: null,
+      ...family,
     });
     return {
       accessToken: this.tokens.issueAccessToken({
         userId: user.id,
         sessionVersion: user.sessionVersion,
+        authTime: new Date(family.authTime).getTime(),
       }),
       refreshToken: refresh.token,
     };

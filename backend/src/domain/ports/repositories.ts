@@ -43,14 +43,22 @@ export interface RefreshTokenRecord {
   tokenHash: string;
   expiresAt: string;
   createdAt: string;
+  /** Every token issued from one sign-in shares the family (rotation). */
+  familyId: string;
+  /** Absolute end of the family, however often it is refreshed. */
+  familyExpiresAt: string;
+  /** When the user signed in (password, Google) to start the family. */
+  authTime: string;
+  /** Set once the token was exchanged for a new one; using it again is a replay. */
+  rotatedAt: string | null;
 }
 
 export interface RefreshTokenRepository {
   save(record: RefreshTokenRecord): void;
   findByHash(tokenHash: string): RefreshTokenRecord | null;
-  /** Sliding expiration: active sessions stay alive. */
-  extend(tokenHash: string, expiresAt: string): void;
+  markRotated(tokenHash: string, at: string): void;
   deleteByHash(tokenHash: string): void;
+  deleteFamily(familyId: string): void;
   deleteByUser(userId: string): void;
   deleteExpired(now: Date): number;
 }

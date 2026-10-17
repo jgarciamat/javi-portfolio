@@ -65,7 +65,10 @@ describe('AuthService', () => {
 
   it('closing every session invalidates the access tokens already issued', async () => {
     const user = await createUser(ctx);
-    expect(auth().authenticate(user.token)).toEqual({ userId: user.id });
+    expect(auth().authenticate(user.token)).toEqual({
+      userId: user.id,
+      authTime: Date.parse('2026-03-15T12:00:00Z'),
+    });
     auth().logoutEverywhere('unknown-user');
     auth().logoutEverywhere(user.id);
     expect(() => auth().authenticate(user.token)).toThrow(

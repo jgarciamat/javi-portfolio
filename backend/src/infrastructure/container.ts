@@ -242,8 +242,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     google,
     entitlements,
     uow,
-    clock,
-    config.jwt.refreshTtlMs
+    clock
   );
   const transactions = new TransactionService(
     repos.transactions,

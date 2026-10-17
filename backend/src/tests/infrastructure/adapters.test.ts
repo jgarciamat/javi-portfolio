@@ -806,14 +806,27 @@ describe('JwtTokenService', () => {
   const service = new JwtTokenService('s'.repeat(40), '15m', 1000);
 
   it('round-trips access tokens with the session version', () => {
-    const token = service.issueAccessToken({ userId: 'u1', sessionVersion: 3 });
-    expect(service.verifyAccessToken(token)).toEqual({ userId: 'u1', sessionVersion: 3 });
+    const token = service.issueAccessToken({ userId: 'u1', sessionVersion: 3, authTime: null });
+    expect(service.verifyAccessToken(token)).toEqual({
+      userId: 'u1',
+      sessionVersion: 3,
+      authTime: null,
+    });
+    // The sign-in time travels in seconds (auth_time) and comes back in ms.
+    const signedIn = service.issueAccessToken({
+      userId: 'u1',
+      sessionVersion: 3,
+      authTime: Date.parse('2026-03-15T12:00:00.900Z'),
+    });
+    expect(service.verifyAccessToken(signedIn).authTime).toBe(Date.parse('2026-03-15T12:00:00Z'));
   });
 
   it('rejects tokens signed with another secret or without session version', () => {
     const other = new JwtTokenService('o'.repeat(40), '15m', 1000);
     expect(() =>
-      service.verifyAccessToken(other.issueAccessToken({ userId: 'u', sessionVersion: 0 }))
+      service.verifyAccessToken(
+        other.issueAccessToken({ userId: 'u', sessionVersion: 0, authTime: null })
+      )
     ).toThrow(expect.objectContaining({ code: 'INVALID_TOKEN' }));
     const secret = 's'.repeat(40);
     const noVersion = jwt.sign({}, secret, { subject: 'u', algorithm: 'HS256' });

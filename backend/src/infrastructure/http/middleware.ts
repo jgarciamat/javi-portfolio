@@ -18,6 +18,8 @@ export interface AuthedRequest extends Request {
   userId: string;
   /** Whose data the request works on: the same user, or the owner of the household they joined. */
   dataUserId: string;
+  /** When the user signed in (ms), from the access token; null in older tokens. */
+  authTime: number | null;
 }
 
 type Handler = (req: Request, res: Response, next: NextFunction) => unknown | Promise<unknown>;
@@ -47,8 +49,9 @@ export function requireAuth(
       return;
     }
     try {
-      const { userId } = auth.authenticate(header.slice(7));
+      const { userId, authTime } = auth.authenticate(header.slice(7));
       (req as AuthedRequest).userId = userId;
+      (req as AuthedRequest).authTime = authTime;
       (req as AuthedRequest).dataUserId = dataOwnerOf(userId);
       next();
     } catch (e) {

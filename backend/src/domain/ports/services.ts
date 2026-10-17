@@ -16,6 +16,8 @@ export interface PasswordHasher {
 export interface AccessTokenClaims {
   userId: string;
   sessionVersion: number;
+  /** When the user last proved who they are (sign-in), in ms; null in older tokens. */
+  authTime: number | null;
 }
 
 export interface IssuedToken {
