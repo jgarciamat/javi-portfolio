@@ -29,7 +29,8 @@ jest.mock('@core/api/authApi', () => ({
 }));
 
 function TestComponent() {
-  const { user, token, login, register, logout, isAuthenticated, updatePassword } = useAuth();
+  const { user, token, login, register, logout, endSession, isAuthenticated, updatePassword } =
+    useAuth();
   return (
     <div>
       <div data-testid="user">{user ? user.name : 'no-user'}</div>
@@ -38,6 +39,7 @@ function TestComponent() {
       <button onClick={() => login('a@b', 'pw')}>login</button>
       <button onClick={() => register('n@b', 'pw', 'New')}>register</button>
       <button onClick={() => logout()}>logout</button>
+      <button onClick={() => endSession()}>end</button>
       <button onClick={() => updatePassword('Old-pass1!', 'New-pass1!')}>password</button>
     </div>
   );
@@ -92,6 +94,49 @@ describe('useAuth / AuthProvider', () => {
     await waitFor(() => expect(screen.getByTestId('user').textContent).toBe('no-user'));
     expect(localStorage.getItem('mm_token')).toBeNull();
     expect(localStorage.getItem('mm_refresh_token')).toBeNull();
+  });
+
+  const seedPersonalData = () => {
+    localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+    localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
+    localStorage.setItem('mm_user', JSON.stringify({ id: 'u0', name: 'Seed' }));
+    localStorage.setItem('mm_renta_snapshot_v2', '{"income":30000}');
+    localStorage.setItem('mm_captured', '[{"amount":9.99}]');
+    localStorage.setItem('mm_hacienda_checks', '[]');
+    localStorage.setItem('mm_getting_started_done:u0', '["goal"]');
+    localStorage.setItem('mm_remember_email', 'seed@b');
+    localStorage.setItem('mm_theme', 'dark');
+    localStorage.setItem('mm_locale', 'en');
+    localStorage.setItem('other_app', 'x');
+  };
+
+  test('logout wipes the personal data on the device but keeps preferences and "remember me"', async () => {
+    seedPersonalData();
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+    fireEvent.click(screen.getByText('logout'));
+    await waitFor(() => expect(screen.getByTestId('user').textContent).toBe('no-user'));
+    expect(Object.keys(localStorage).sort()).toEqual([
+      'mm_locale',
+      'mm_remember_email',
+      'mm_theme',
+      'other_app',
+    ]);
+  });
+
+  test('ending the session after deleting the account also forgets the remembered e-mail', async () => {
+    seedPersonalData();
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+    fireEvent.click(screen.getByText('end'));
+    await waitFor(() => expect(screen.getByTestId('user').textContent).toBe('no-user'));
+    expect(Object.keys(localStorage).sort()).toEqual(['mm_locale', 'mm_theme', 'other_app']);
   });
 
   test('loads persisted user from localStorage on mount', () => {

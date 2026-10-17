@@ -905,6 +905,30 @@ describe('BackupService', () => {
     db.close();
     fs.rmSync(dir, { recursive: true, force: true });
   });
+
+  it('prunes pre-migration copies older than 14 days on each run', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mm-backup-'));
+    const live = path.join(dir, 'live.db');
+    const db = openDatabase(live);
+    const old = path.join(dir, 'pre-migration-v3-old.db');
+    const recent = path.join(dir, 'pre-migration-v4-recent.db');
+    fs.writeFileSync(old, '');
+    fs.writeFileSync(recent, '');
+    fs.utimesSync(old, new Date('2026-03-01'), new Date('2026-03-01'));
+    fs.utimesSync(recent, new Date('2026-03-10'), new Date('2026-03-10'));
+    const service = new BackupService(
+      db,
+      path.join(dir, 'backups'),
+      7,
+      { info: () => undefined, error: () => undefined },
+      live
+    );
+    await service.runOnce(new Date('2026-03-20T00:00:00Z'));
+    expect(fs.existsSync(old)).toBe(false);
+    expect(fs.existsSync(recent)).toBe(true);
+    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('CloudflareAi questions', () => {

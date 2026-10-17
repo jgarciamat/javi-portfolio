@@ -91,6 +91,7 @@ describe('sign-up form', () => {
     fireEvent.change(screen.getByLabelText(tr('app.auth.register.confirmPassword')), {
       target: { value: confirm },
     });
+    fireEvent.click(screen.getByRole('checkbox', { name: tr('app.auth.register.age') }));
   };
   const submit = () =>
     fireEvent.click(screen.getByRole('button', { name: tr('app.auth.register.submit') }));

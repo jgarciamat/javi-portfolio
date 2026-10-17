@@ -348,11 +348,13 @@ button.auth-link {
 
 .auth-footer-links a {
   color: var(--accent-400);
-  text-decoration: none;
+  /* Links inside a sentence need more than colour to stand out. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .auth-note {
-  color: #6b7280;
+  color: var(--slate-400);
   font-size: 0.875rem;
   text-align: center;
   margin: -8px 0 12px;

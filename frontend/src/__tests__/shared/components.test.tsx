@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { Capacitor } from '@capacitor/core';
 import { Modal } from '@shared/components/Modal';
 import { EmptyState } from '@shared/components/EmptyState';
 import { DateField } from '@shared/components/DateField';
@@ -304,6 +305,31 @@ describe('UpdatePrompt', () => {
     expect(pwaState.updateServiceWorker).toHaveBeenCalledWith(true);
     fireEvent.click(screen.getByRole('button', { name: tr('app.update.later') }));
     expect(pwaState.setNeedRefresh).toHaveBeenCalledWith(false);
+  });
+
+  describe('in the mobile app', () => {
+    beforeEach(() => jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true));
+    afterEach(() => {
+      jest.restoreAllMocks();
+      delete (navigator as { serviceWorker?: unknown }).serviceWorker;
+    });
+
+    it('never offers an update and drops the service worker of older versions', async () => {
+      const unregister = jest.fn().mockResolvedValue(true);
+      Object.defineProperty(navigator, 'serviceWorker', {
+        configurable: true,
+        value: { getRegistrations: jest.fn().mockResolvedValue([{ unregister }]) },
+      });
+      pwaState.needRefresh = true;
+      renderWithI18n(<UpdatePrompt />);
+      expect(screen.queryByRole('status')).toBeNull();
+      await waitFor(() => expect(unregister).toHaveBeenCalled());
+    });
+
+    it('does nothing where service workers do not exist', () => {
+      renderWithI18n(<UpdatePrompt />);
+      expect(screen.queryByRole('status')).toBeNull();
+    });
   });
 });
 

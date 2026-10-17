@@ -21,6 +21,7 @@ import { BurgerMenu } from './BurgerMenu';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
+import { BrandLogo } from '@shared/components/BrandLogo';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
 
@@ -122,7 +123,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           aria-label={t('app.menu.open')}
           aria-expanded={dash.menuOpen}
         >
-          <img className="burger-btn-logo" src="/logo-192.png" alt="" width="28" height="28" />
+          <BrandLogo className="burger-btn-logo" size={28} />
           <span className="burger-btn-lines" aria-hidden="true">
             <span />
             <span />

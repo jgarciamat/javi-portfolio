@@ -91,4 +91,7 @@ mark.resize((256, int(mark.height * 256 / mark.width)), Image.LANCZOS).save(f"{F
 # transparent logo for the in-app headers and favicons
 for name, size, pad in [("logo-192", 192, 0.04), ("logo-512", 512, 0.04), ("favicon-64", 64, 0.02), ("favicon-32", 32, 0.02)]:
     square(mark, size, pad).save(f"{FE}/public/{name}.png")
+# the logo the app shows (28 to 72 px): small WebP files, 1x and 2x
+for size in (96, 192):
+    square(mark, size, 0.04).save(f"{FE}/public/logo-{size}.webp", "WEBP", quality=85, method=6)
 print("ok")

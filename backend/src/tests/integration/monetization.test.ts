@@ -499,8 +499,15 @@ describe('Premium AI', () => {
       { date: '2026-03-02', description: 'ZXQ 42', amount: -5 },
       { date: '2026-03-03', description: 'MERCADONA VALENCIA', amount: -20 },
     ];
-    const send = (dryRun: boolean) =>
-      request(ctx.app).post('/api/transactions/import').set(user.auth).send({ rows, dryRun });
+    const send = (dryRun: boolean, useAi = true) =>
+      request(ctx.app)
+        .post('/api/transactions/import')
+        .set(user.auth)
+        .send({ rows, dryRun, useAi });
+    // Without the user's opt-in nothing leaves for the AI provider.
+    const plain = (await send(true, false).expect(200)).body.rows;
+    expect(plain[0]).toMatchObject({ categoryName: 'Otros', categorySource: 'fallback' });
+    expect(suggester.suggestCategories).not.toHaveBeenCalled();
     const preview = (await send(true).expect(200)).body.rows;
     expect(preview[0]).toMatchObject({ categoryName: 'Ocio', categorySource: 'ai' });
     expect(preview[1]).toMatchObject({ categoryName: 'Otros', categorySource: 'fallback' });

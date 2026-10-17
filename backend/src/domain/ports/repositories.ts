@@ -501,3 +501,13 @@ export interface HouseholdRepository {
   pendingInvite(ownerId: string): HouseholdInviteRecord | null;
   deleteInvite(ownerId: string): void;
 }
+
+// ─── Data export ─────────────────────────────────────────────────────────────
+
+/**
+ * Read-only view of the records that have no repository read fit for the GDPR export
+ * (assets, splits, inbox, billing, referrals…). Sections are plain JSON, amounts in euros.
+ */
+export interface PersonalDataReader {
+  sectionsFor(userId: string): Record<string, unknown>;
+}

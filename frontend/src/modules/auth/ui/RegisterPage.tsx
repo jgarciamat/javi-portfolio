@@ -1,4 +1,5 @@
-import { useRef, type FormEvent, type RefObject } from 'react';
+import { useRef, useState, type FormEvent, type RefObject } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
@@ -96,14 +97,41 @@ function PasswordFields({
   );
 }
 
+/** First layer of the privacy notice: `{terms}` and `{privacy}` in the text become links. */
+function LegalNotice({ textKey }: { textKey: string }) {
+  const { t } = useI18n();
+  return (
+    <p className="auth-footer-links">
+      {t(textKey)
+        .split(/(\{terms\}|\{privacy\})/)
+        .map((part, i) =>
+          part === '{terms}' ? (
+            <Link key={i} to="/terms">
+              {t('app.auth.register.legal.terms')}
+            </Link>
+          ) : part === '{privacy}' ? (
+            <Link key={i} to="/privacy">
+              {t('app.auth.register.legal.privacy')}
+            </Link>
+          ) : (
+            part
+          )
+        )}
+    </p>
+  );
+}
+
 export function RegisterPage({ onSwitch }: Props) {
   const { t } = useI18n();
   const form = useRegisterForm();
+  // Spain sets 14 as the age to consent to data processing (LOPDGDD art. 7).
+  const [oldEnough, setOldEnough] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmRef = useRef<HTMLInputElement>(null);
 
   // A refused submit takes focus to the field to fix.
   const submit = async (e: FormEvent) => {
+    if (!oldEnough) return e.preventDefault();
     const invalid = await form.handleSubmit(e);
     if (invalid) (invalid === 'password' ? passwordRef : confirmRef).current!.focus();
   };
@@ -125,6 +153,7 @@ export function RegisterPage({ onSwitch }: Props) {
         onToken={form.handleGoogleToken}
         onError={form.reportGoogleError}
       />
+      <LegalNotice textKey="app.auth.register.legal.google" />
 
       <div className="auth-field">
         <label className="auth-field-label" htmlFor="register-name">
@@ -162,9 +191,20 @@ export function RegisterPage({ onSwitch }: Props) {
           {form.error}
         </p>
       )}
-      <button type="submit" className="auth-btn" aria-disabled={form.loading}>
+      <label className="auth-remember">
+        <input
+          type="checkbox"
+          checked={oldEnough}
+          onChange={(e) => setOldEnough(e.target.checked)}
+          required
+        />
+        <span>{t('app.auth.register.age')}</span>
+      </label>
+      {/* Sending is aria-disabled, not disabled: the button keeps focus while it runs. */}
+      <button type="submit" className="auth-btn" disabled={!oldEnough} aria-disabled={form.loading}>
         {form.loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
       </button>
+      <LegalNotice textKey="app.auth.register.legal.email" />
       <SocialLinks />
     </form>
   );

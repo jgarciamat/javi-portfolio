@@ -1,6 +1,7 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
+import { BrandLogo } from '@shared/components/BrandLogo';
 import { Icon } from '@shared/components/Icon';
 import { useDialog } from '@shared/hooks/useDialog';
 import {
@@ -76,7 +77,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
         {open && <MenuFocus panel={panel} closeButton={closeButton} onClose={onClose} />}
         <div className="burger-panel-header">
           <div className="burger-brand">
-            <img className="burger-brand-logo" src="/logo-192.png" alt="" width="28" height="28" />
+            <BrandLogo className="burger-brand-logo" size={28} />
             <span className="burger-brand-name">{t('app.header.title')}</span>
           </div>
           <button

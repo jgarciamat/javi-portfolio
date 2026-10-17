@@ -4,7 +4,7 @@ import os from 'os';
 import path from 'path';
 import { createHash } from 'crypto';
 import { openDatabase, Db } from '@infrastructure/sqlite/database';
-import { migrate } from '@infrastructure/sqlite/migrator';
+import { migrate, prunePreMigrationCopies } from '@infrastructure/sqlite/migrator';
 import { migrations } from '@infrastructure/sqlite/migrations';
 import { baseline } from '@infrastructure/sqlite/migrations/001-baseline';
 
@@ -45,6 +45,24 @@ describe('migrations', () => {
     expect(result).toEqual({ from: 0, to: migrations.length, backupFile: null });
     expect(db.pragma('user_version', { simple: true })).toBe(migrations.length);
     expect(migrate(db, migrations).to).toBe(migrations.length);
+  });
+
+  it('indexes every foreign key', () => {
+    const db = openDatabase(':memory:');
+    migrate(db, migrations);
+    const tables = db
+      .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+      .pluck()
+      .all() as string[];
+    const unindexed = tables.flatMap((table) => {
+      const leading = (db.pragma(`index_list(${table})`) as { name: string }[]).map(
+        (i) => (db.pragma(`index_info(${i.name})`) as { name: string }[])[0]?.name
+      );
+      return (db.pragma(`foreign_key_list(${table})`) as { from: string }[])
+        .filter((fk) => !leading.includes(fk.from))
+        .map((fk) => `${table}.${fk.from}`);
+    });
+    expect(unindexed).toEqual([]);
   });
 
   describe('upgrading a v1 database', () => {
@@ -164,6 +182,30 @@ describe('migrations', () => {
     expect(backup.pragma('user_version', { simple: true })).toBe(0);
     backup.close();
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('prunes pre-migration copies older than 14 days and keeps the rest', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mm-migrate-'));
+    const file = path.join(dir, 'money-manager.db');
+    const old = path.join(dir, 'pre-migration-v1-old.db');
+    const recent = path.join(dir, 'pre-migration-v2-recent.db');
+    const unrelated = path.join(dir, 'other.db');
+    for (const f of [old, recent, unrelated]) fs.writeFileSync(f, '');
+    for (const f of [old, unrelated])
+      fs.utimesSync(f, new Date('2026-01-01'), new Date('2026-01-01'));
+    fs.utimesSync(recent, new Date('2026-01-20'), new Date('2026-01-20'));
+    expect(prunePreMigrationCopies(file, new Date('2026-01-25T00:00:00Z'))).toEqual([old]);
+    expect(fs.existsSync(recent)).toBe(true);
+    expect(fs.existsSync(unrelated)).toBe(true);
+    expect(prunePreMigrationCopies(':memory:')).toEqual([]);
+    expect(prunePreMigrationCopies(path.join(dir, 'missing', 'x.db'))).toEqual([]);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('turns on secure_delete so deleted rows are overwritten', () => {
+    const db = openDatabase(':memory:');
+    expect(db.pragma('secure_delete', { simple: true })).toBe(1);
+    db.close();
   });
 
   it('rolls back a migration that fails', () => {
