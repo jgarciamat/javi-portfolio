@@ -124,8 +124,12 @@ export function rateLimiterFactory(disabled: boolean): RateLimiterFactory {
   };
 }
 
+/** The e-mail of the body, normalised ('' when there is none). */
+export function emailKey(req: Request): string {
+  return typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+}
+
 /** Key by e-mail + IP so one attacker cannot lock out a user from every network. */
 export function emailAndIpKey(req: Request): string {
-  const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-  return `${req.ip}|${email}`;
+  return `${req.ip}|${emailKey(req)}`;
 }

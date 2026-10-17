@@ -6,6 +6,7 @@ import {
   asyncHandler,
   authed,
   emailAndIpKey,
+  emailKey,
   requireAuth,
 } from '../middleware';
 import {
@@ -31,6 +32,21 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     limit: 10,
     keyGenerator: emailAndIpKey,
   });
+  // Password spraying: only failed attempts count, so people signing in are never slowed.
+  // One network trying many accounts...
+  const failedLoginsByIp = limiter({
+    windowMs: fifteenMinutes,
+    limit: 30,
+    skipSuccessfulRequests: true,
+  });
+  // ...and one account tried from many networks: locked for a while, with the generic message.
+  const failedLoginsByAccount = limiter({
+    windowMs: fifteenMinutes,
+    limit: 10,
+    skipSuccessfulRequests: true,
+    keyGenerator: emailKey,
+    skip: (req) => !emailKey(req),
+  });
   const registerLimiter = limiter({ windowMs: hour, limit: 10 });
   const emailLimiter = limiter({ windowMs: hour, limit: 5, keyGenerator: emailAndIpKey });
   const tokenLimiter = limiter({ windowMs: fifteenMinutes, limit: 30 });
@@ -51,6 +67,8 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
 
   router.post(
     '/login',
+    failedLoginsByIp,
+    failedLoginsByAccount,
     loginLimiter,
     asyncHandler(async (req, res) => {
       res.json(await c.auth.login(loginBody.parse(req.body)));
@@ -59,6 +77,7 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
 
   router.post(
     '/google',
+    failedLoginsByIp,
     loginLimiter,
     asyncHandler(async (req, res) => {
       const body = googleBody.parse(req.body);
