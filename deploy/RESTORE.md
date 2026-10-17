@@ -59,4 +59,4 @@ ls -lt "$(docker volume inspect --format '{{.Mountpoint}}' "$(docker volume ls -
 Haz los pasos 1 a 3 (sin parar nada). Si `integrity_check` dice `ok` y el número de usuarios
 tiene sentido, la copia sirve. Apunta la fecha de la prueba aquí:
 
-- (pendiente la primera prueba)
+- 2026-10-17: primera prueba. Restaurada desde R2, `integrity_check` ok, 51 usuarios, 1,2 MB.
