@@ -35,7 +35,7 @@ export function createApp(c: Container): Express {
   );
   // Needs the raw body to check Stripe's signature: before the JSON parser.
   app.use('/api', billingWebhookRoute(c));
-  app.use('/api', inboundMailRoute(c));
+  app.use('/api', inboundMailRoute(c, limiter));
   app.use(express.json({ limit: '4mb' }));
 
   const api = express.Router();

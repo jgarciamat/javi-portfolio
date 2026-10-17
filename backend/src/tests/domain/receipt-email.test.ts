@@ -106,3 +106,13 @@ describe('inboxTokenOf', () => {
     expect(inboxTokenOf('')).toBeNull();
   });
 });
+
+describe('stripTags', () => {
+  it('drops style and script blocks and tags, and decodes the usual entities', () => {
+    const { stripTags } = jest.requireActual('../../infrastructure/http/schemas');
+    expect(
+      stripTags('<style>p{}</style><p>Total:&nbsp;10&euro;</p><SCRIPT>x</SCRIPT>A &amp; B<b')
+    ).toBe('  Total: 10€  A & B<b');
+    expect(stripTags('<style>never closed')).toBe(' never closed');
+  });
+});
