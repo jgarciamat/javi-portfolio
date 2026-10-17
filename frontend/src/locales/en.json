@@ -878,6 +878,7 @@
   "app.apiError.TERMS_REQUIRED": "Accept the terms of sale and the immediate start to continue.",
   "app.password.rules": "Password requirements",
   "app.password.rule.length": "At least 8 characters",
+  "app.password.rule.maxLength": "At most 72 bytes: about 72 characters (accented letters and emojis take more)",
   "app.password.rule.upper": "At least one uppercase letter",
   "app.password.rule.digit": "At least one number",
   "app.password.rule.symbol": "At least one symbol (e.g. @, #, !)",

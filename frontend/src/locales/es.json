@@ -878,6 +878,7 @@
   "app.apiError.TERMS_REQUIRED": "Acepta las condiciones de contratación y el inicio inmediato para continuar.",
   "app.password.rules": "Requisitos de la contraseña",
   "app.password.rule.length": "Al menos 8 caracteres",
+  "app.password.rule.maxLength": "Como máximo 72 bytes: unos 72 caracteres (las tildes y los emojis ocupan más)",
   "app.password.rule.upper": "Al menos una mayúscula",
   "app.password.rule.digit": "Al menos un número",
   "app.password.rule.symbol": "Al menos un símbolo (p. ej. @, #, !)",
