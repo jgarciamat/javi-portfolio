@@ -44,6 +44,7 @@ describe('config', () => {
     const config = loadConfig({
       NODE_ENV: 'production',
       JWT_SECRET: 'x'.repeat(48),
+      RESEND_API_KEY: 're_test',
       APP_URL: 'https://finanverso.app/',
       DATABASE_URL: '/data/db.sqlite',
     });
@@ -54,8 +55,20 @@ describe('config', () => {
   });
 
   it('never points email links to localhost in production when APP_URL is missing', () => {
-    const config = loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) });
+    const config = loadConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'x'.repeat(48),
+      RESEND_API_KEY: 're_test',
+    });
     expect(config.appUrl).toBe('https://finanverso.app');
+  });
+
+  it('refuses to start in production without an e-mail provider (links would go to the logs)', () => {
+    expect(() => loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) })).toThrow(
+      /RESEND_API_KEY is required in production/
+    );
+    expect(loadConfig({ NODE_ENV: 'development' }).email.resendApiKey).toBeNull();
+    expect(loadConfig({ NODE_ENV: 'test' }).email.resendApiKey).toBeNull();
   });
 
   it('rejects malformed values', () => {
