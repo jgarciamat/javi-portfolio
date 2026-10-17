@@ -74,6 +74,6 @@ Free to start. Optional Premium adds the forecast, import, unlimited tax drafts 
 - Gráfico de cabecera: docs/marketing/play-store-header.png
 
 ## Plantillas de respuesta a reseñas
-- 5★: «¡Gracias por tu valoración! Si echas algo en falta, escríbenos a moneymanager@outlook.es y lo tendremos en cuenta.»
-- 1-3★ (fallo): «Lamentamos el problema. ¿Nos cuentas qué versión usas y qué ocurrió en moneymanager@outlook.es? Lo revisamos enseguida.»
+- 5★: «¡Gracias por tu valoración! Si echas algo en falta, escríbenos a support@finanverso.app y lo tendremos en cuenta.»
+- 1-3★ (fallo): «Lamentamos el problema. ¿Nos cuentas qué versión usas y qué ocurrió en support@finanverso.app? Lo revisamos enseguida.»
 - 1-3★ (precio/Premium): «Lo esencial es gratis y sin anuncios; Premium solo añade el asesor con IA y extras. Gracias por tu opinión, nos ayuda a mejorar.»

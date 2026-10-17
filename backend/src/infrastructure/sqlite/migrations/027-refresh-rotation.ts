@@ -7,7 +7,7 @@ const FAMILY_MAX_MS = 90 * 24 * 60 * 60 * 1000;
  * has an absolute end. A used token is kept (rotated_at) to spot it being replayed.
  */
 export const refreshRotation: Migration = {
-  version: 26,
+  version: 27,
   name: 'refresh token rotation',
   up(db) {
     db.exec(`

@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { UnauthorizedError } from '@domain/errors';
+import { BcryptWorkerPool, sharedBcryptPool } from './bcryptPool';
 import {
   AccessTokenClaims,
   IssuedToken,
@@ -61,14 +61,18 @@ export class JwtTokenService implements TokenService {
   }
 }
 
+/** bcrypt (bcryptjs) in worker threads, so hashing does not block other requests. */
 export class BcryptPasswordHasher implements PasswordHasher {
-  constructor(private readonly rounds = 12) {}
+  constructor(
+    private readonly rounds = 12,
+    private readonly pool: BcryptWorkerPool = sharedBcryptPool()
+  ) {}
 
   hash(password: string): Promise<string> {
-    return bcrypt.hash(password, this.rounds);
+    return this.pool.hash(password, this.rounds);
   }
 
   verify(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+    return this.pool.compare(password, hash);
   }
 }

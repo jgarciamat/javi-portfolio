@@ -17,6 +17,7 @@ import {
 } from '@core/api/http';
 import type { Locale } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
+import { clearLocalUserData } from '@shared/utils/localData';
 
 /** 'loading' while a stored session is being restored with the refresh token. */
 export type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
@@ -34,7 +35,10 @@ interface AuthContextValue {
   loginWithGoogle: (token: string, locale?: Locale) => Promise<void>;
   register: (email: string, password: string, name: string, locale?: Locale) => Promise<string>;
   logout: () => void;
-  /** Forgets the session locally without calling the API (e.g. after deleting the account). */
+  /**
+   * Forgets the session and every local trace of the person, "remember me" included,
+   * without calling the API (after deleting the account).
+   */
   endSession: () => void;
   logoutEverywhere: () => Promise<void>;
   updateName: (name: string) => Promise<void>;
@@ -143,16 +147,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  /** Signing out also wipes the person's data on this device (drafts, captured payments…). */
+  const signOut = useCallback(
+    (keepRememberedEmail: boolean) => {
+      clearLocalUserData({ keepRememberedEmail });
+      clearSession();
+    },
+    [clearSession]
+  );
+
   const logout = useCallback(() => {
     const refreshToken = tokenStore.getRefresh();
     if (refreshToken) authApi.logout(refreshToken).catch(() => undefined);
-    clearSession();
-  }, [clearSession]);
+    signOut(true);
+  }, [signOut]);
+
+  const endSession = useCallback(() => signOut(false), [signOut]);
 
   const logoutEverywhere = useCallback(async () => {
     await authApi.logoutEverywhere();
-    clearSession();
-  }, [clearSession]);
+    signOut(true);
+  }, [signOut]);
 
   const updateUser = useCallback((changes: Partial<AuthUser>) => {
     setUser((u) => {
@@ -196,7 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithGoogle,
       register,
       logout,
-      endSession: clearSession,
+      endSession,
       logoutEverywhere,
       updateName,
       updatePassword,
@@ -212,7 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithGoogle,
       register,
       logout,
-      clearSession,
+      endSession,
       logoutEverywhere,
       updateName,
       updatePassword,

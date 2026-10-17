@@ -23,7 +23,8 @@ import { rentaCalculations } from './022-renta-calculations';
 import { rentaPass } from './023-renta-pass';
 import { autonomoDrafts } from './024-autonomo-drafts';
 import { autonomoPdfs } from './025-autonomo-pdfs';
-import { refreshRotation } from './026-refresh-rotation';
+import { foreignKeyIndexes } from './026-foreign-key-indexes';
+import { refreshRotation } from './027-refresh-rotation';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -53,5 +54,6 @@ export const migrations: Migration[] = [
   rentaPass,
   autonomoDrafts,
   autonomoPdfs,
+  foreignKeyIndexes,
   refreshRotation,
 ];

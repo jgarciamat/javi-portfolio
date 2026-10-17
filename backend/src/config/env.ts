@@ -47,7 +47,7 @@ const envSchema = z.object({
   /** Web Push (phone and browser notifications): `npx web-push generate-vapid-keys`. */
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_SUBJECT: z.string().default('mailto:moneymanager@outlook.es'),
+  VAPID_SUBJECT: z.string().default('mailto:support@finanverso.app'),
   /** Prices shown in the UI (must match the Stripe prices, VAT included). */
   PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
   PRICE_YEARLY: z.coerce.number().positive().default(24.99),

@@ -1,7 +1,16 @@
+# Docker keeps container logs (stdout/stderr) on disk; cap them at 3 x 10 MB per
+# service so old request logs are rotated away.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   caddy:
     image: caddy:2
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - "80:80"
       - "443:443"
@@ -20,6 +29,7 @@ services:
       context: ../frontend
     image: money-manager-web:latest
     restart: unless-stopped
+    logging: *default-logging
     volumes:
       - ./nginx-web.conf:/etc/nginx/conf.d/default.conf:ro
 
@@ -28,6 +38,7 @@ services:
       context: ../backend
     image: money-manager-api:latest
     restart: unless-stopped
+    logging: *default-logging
     # Secrets and settings live in deploy/.env (see .env.example). The variables
     # below are fixed by the container layout and override the file.
     env_file: .env
@@ -37,6 +48,8 @@ services:
       DATABASE_PATH: /data/money-manager.db
       AFFILIATES_FILE: /config/affiliates.json
       BACKUP_DIR: /backups
+      # Cloudflare -> Caddy -> API: two proxies, so rate limits see the visitor's real IP.
+      TRUST_PROXY: "2"
       # Public client id (the web bundle carries the same one): without it "Sign in with Google"
       # is disabled. deploy/.env may override it with its own GOOGLE_CLIENT_ID.
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-222588618476-je92uouf083h8vr2ef7hrrqbkrop1u2p.apps.googleusercontent.com}

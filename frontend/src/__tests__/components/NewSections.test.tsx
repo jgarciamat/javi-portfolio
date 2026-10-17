@@ -502,7 +502,7 @@ describe('ImportModal', () => {
     await waitFor(() =>
       expect(importFn).toHaveBeenCalledWith(
         [{ date: '2026-03-02', description: 'MERCADONA', amount: -54.3, category: null }],
-        { accountId: 'a1', dryRun: true }
+        { accountId: 'a1', dryRun: true, useAi: false }
       )
     );
     expect(await screen.findByText('Alimentación')).toBeInTheDocument();
@@ -511,6 +511,7 @@ describe('ImportModal', () => {
     expect(importFn).toHaveBeenLastCalledWith(expect.any(Array), {
       accountId: 'a1',
       dryRun: false,
+      useAi: false,
     });
   });
 });

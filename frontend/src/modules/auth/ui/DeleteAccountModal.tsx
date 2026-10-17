@@ -8,7 +8,7 @@ import './css/DeleteAccountModal.css';
 import { Icon } from '@shared/components/Icon';
 import { PLAY_SUBSCRIPTIONS_URL } from '../application/useDeleteAccount';
 import { AuthPasswordInput } from './AuthPasswordInput';
-import { GoogleButton } from './GoogleButton';
+import { GoogleConfirmButton } from './GoogleButton';
 
 interface DeleteAccountModalProps {
   loading: boolean;
@@ -83,7 +83,7 @@ export function DeleteAccountModal({
         <div className="delete-account-field">
           <p className="confirm-delete-message">{t('app.profile.deleteAccount.google')}</p>
           {GOOGLE_CLIENT_ID && (!playActive || playCancelled) && (
-            <GoogleButton
+            <GoogleConfirmButton
               label={t('app.profile.deleteAccount.googleConfirm')}
               onToken={(googleToken) => {
                 setGoogleFailed(false);

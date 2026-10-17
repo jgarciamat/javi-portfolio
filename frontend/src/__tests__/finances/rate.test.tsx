@@ -158,7 +158,7 @@ describe('RatePrompt', () => {
     mount();
     fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.no') }));
     const write = await screen.findByRole('link', { name: tr('app.rate.write') });
-    expect(write.getAttribute('href')).toContain('mailto:moneymanager@outlook.es');
+    expect(write.getAttribute('href')).toContain('mailto:support@finanverso.app');
     fireEvent.click(write);
     expect(screen.queryByRole('region')).toBeNull();
     expect(shouldAskForReview(MIN_MOVEMENTS, day(11))).toBe(false);

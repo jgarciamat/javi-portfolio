@@ -10,7 +10,7 @@ import {
 } from '@domain/ports/repositories';
 import { CategoryPeriodTotal } from '@domain/services/trends';
 import { Cents } from '@domain/shared/money';
-import { Period, periodOrdinal } from '@domain/shared/period';
+import { Period } from '@domain/shared/period';
 import { normalizeText } from '@domain/shared/text';
 import { Db, escapeLike, inChunks, placeholders } from '../database';
 
@@ -46,7 +46,9 @@ const VIEW_SELECT = `
     JOIN categories c ON c.id = t.category_id
     JOIN accounts a ON a.id = t.account_id`;
 
-const ORDINAL = '(t.year * 12 + t.month - 1)';
+// Compared as a row value, so the (user_id, year, month) index serves the range. Same order as
+// periodOrdinal() for months 1 to 12.
+const PERIOD = '(t.year, t.month)';
 
 const SORTS: Record<TransactionSort, string> = {
   date_desc: 't.date DESC, t.created_at DESC',
@@ -243,9 +245,9 @@ export class SqliteTransactionRepository implements TransactionRepository {
       .prepare(
         `SELECT COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount_cents ELSE -amount_cents END), 0) AS net
            FROM transactions t
-          WHERE t.user_id = ? AND ${ORDINAL} < ?`
+          WHERE t.user_id = ? AND ${PERIOD} < (?, ?)`
       )
-      .get(userId, periodOrdinal(period)) as { net: number };
+      .get(userId, period.year, period.month) as { net: number };
     return row.net;
   }
 
@@ -257,11 +259,11 @@ export class SqliteTransactionRepository implements TransactionRepository {
                 COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount_cents END), 0) AS expense,
                 COALESCE(SUM(CASE WHEN t.type = 'SAVING' THEN t.amount_cents END), 0) AS saving
            FROM transactions t
-          WHERE t.user_id = ? AND ${ORDINAL} BETWEEN ? AND ?
+          WHERE t.user_id = ? AND ${PERIOD} BETWEEN (?, ?) AND (?, ?)
           GROUP BY t.year, t.month
           ORDER BY t.year, t.month`
       )
-      .all(userId, periodOrdinal(from), periodOrdinal(to)) as {
+      .all(userId, from.year, from.month, to.year, to.month) as {
       year: number;
       month: number;
       income: number;
@@ -287,10 +289,10 @@ export class SqliteTransactionRepository implements TransactionRepository {
       .prepare(
         `SELECT t.year, t.month, c.name AS categoryName, SUM(t.amount_cents) AS cents
            FROM transactions t JOIN categories c ON c.id = t.category_id
-          WHERE t.user_id = ? AND t.type = ? AND ${ORDINAL} BETWEEN ? AND ?
+          WHERE t.user_id = ? AND t.type = ? AND ${PERIOD} BETWEEN (?, ?) AND (?, ?)
           GROUP BY t.year, t.month, c.id`
       )
-      .all(userId, type, periodOrdinal(from), periodOrdinal(to)) as CategoryPeriodTotal[];
+      .all(userId, type, from.year, from.month, to.year, to.month) as CategoryPeriodTotal[];
   }
 
   savedByCategory(userId: string): Record<string, Cents> {
@@ -351,9 +353,9 @@ export class SqliteTransactionRepository implements TransactionRepository {
     return this.db
       .prepare(
         `DELETE FROM transactions
-          WHERE user_id = ? AND recurring_rule_id = ? AND (year * 12 + month - 1) >= ?`
+          WHERE user_id = ? AND recurring_rule_id = ? AND (year, month) >= (?, ?)`
       )
-      .run(userId, ruleId, periodOrdinal(fromPeriod)).changes;
+      .run(userId, ruleId, fromPeriod.year, fromPeriod.month).changes;
   }
 
   listAllByUser(userId: string): Transaction[] {

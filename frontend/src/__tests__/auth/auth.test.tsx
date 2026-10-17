@@ -111,6 +111,13 @@ describe('RegisterPage', () => {
     const register = jest.spyOn(authApi, 'register').mockResolvedValue({ message: 'ok' });
     const onSwitch = jest.fn();
     publicRender(<RegisterPage onSwitch={onSwitch} />);
+    expect(
+      screen.getAllByRole('link', { name: tr('app.auth.register.legal.terms') })[0]
+    ).toHaveAttribute('href', '/terms');
+    expect(
+      screen.getAllByRole('link', { name: tr('app.auth.register.legal.privacy') })[0]
+    ).toHaveAttribute('href', '/privacy');
+    fireEvent.click(screen.getByRole('checkbox', { name: tr('app.auth.register.age') }));
     fireEvent.change(screen.getByLabelText(tr('app.auth.register.name')), {
       target: { value: 'Ana' },
     });
@@ -167,6 +174,12 @@ describe('RegisterPage', () => {
     fireEvent.change(screen.getByLabelText(tr('app.auth.register.confirmPassword')), {
       target: { value: STRONG },
     });
+    // Without the age statement the account cannot be created.
+    const submit = screen.getByRole('button', { name: tr('app.auth.register.submit') });
+    expect(submit).toBeDisabled();
+    fireEvent.submit(submit.closest('form')!);
+    expect(authApi.register).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('checkbox', { name: tr('app.auth.register.age') }));
     fireEvent.submit(
       screen.getByRole('button', { name: tr('app.auth.register.submit') }).closest('form')!
     );

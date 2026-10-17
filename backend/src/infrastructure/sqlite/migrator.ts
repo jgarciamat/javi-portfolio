@@ -18,6 +18,36 @@ interface Logger {
   info(message: string): void;
 }
 
+const PRE_MIGRATION_PREFIX = 'pre-migration-v';
+
+/** Days a pre-migration copy is kept: the same window as the daily backups. */
+export const PRE_MIGRATION_RETENTION_DAYS = 14;
+
+/**
+ * Deletes the pre-migration copies next to `databaseFile` older than `retentionDays`,
+ * so data removed from the live database (deleted accounts) does not survive in them.
+ */
+export function prunePreMigrationCopies(
+  databaseFile: string,
+  now = new Date(),
+  retentionDays = PRE_MIGRATION_RETENTION_DAYS
+): string[] {
+  if (databaseFile === ':memory:') return [];
+  const dir = path.dirname(path.resolve(databaseFile));
+  if (!fs.existsSync(dir)) return [];
+  const limit = now.getTime() - retentionDays * 24 * 60 * 60 * 1000;
+  const removed: string[] = [];
+  for (const name of fs.readdirSync(dir)) {
+    if (!name.startsWith(PRE_MIGRATION_PREFIX) || !name.endsWith('.db')) continue;
+    const full = path.join(dir, name);
+    if (fs.statSync(full).mtimeMs < limit) {
+      fs.unlinkSync(full);
+      removed.push(full);
+    }
+  }
+  return removed;
+}
+
 function hasUserTables(db: Db): boolean {
   const row = db
     .prepare(
@@ -33,7 +63,8 @@ function hasUserTables(db: Db): boolean {
  * commit, so a migration either applies completely or not at all.
  *
  * When `databaseFile` is given and the database already has data, a copy is taken
- * with VACUUM INTO before touching anything.
+ * with VACUUM INTO before touching anything. Copies older than
+ * PRE_MIGRATION_RETENTION_DAYS are pruned by prunePreMigrationCopies.
  */
 export function migrate(
   db: Db,
@@ -51,7 +82,7 @@ export function migrate(
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
     backupFile = path.join(
       path.dirname(path.resolve(options.databaseFile)),
-      `pre-migration-v${from}-${stamp}.db`
+      `${PRE_MIGRATION_PREFIX}${from}-${stamp}.db`
     );
     fs.mkdirSync(path.dirname(backupFile), { recursive: true });
     db.prepare('VACUUM INTO ?').run(backupFile);
