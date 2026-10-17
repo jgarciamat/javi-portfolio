@@ -185,6 +185,52 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
 
 // ─── Month view ───────────────────────────────────────────────────────────────
 
+const quickAddOf = (param: string | null): TransactionType | null => QUICK_ADD[param ?? ''] ?? null;
+
+/** Today in the current period; until the month arrives its first day is a good guess. */
+function defaultDateOf(f: ReturnType<typeof useFinances>): string {
+  return f.isCurrentPeriod
+    ? todayDateOnly()
+    : f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`;
+}
+
+/** Only for the current period: first steps or the recap, the rate prompt and the forecast. */
+function CurrentPeriodPanels({
+  checklist,
+  onOpenTab,
+}: {
+  checklist: ReturnType<typeof useGettingStarted>;
+  onOpenTab: (tab: DashboardTab) => void;
+}) {
+  const f = useFinances();
+  if (!f.isCurrentPeriod) return null;
+  return (
+    <>
+      {checklist.visible ? (
+        <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
+      ) : (
+        <MonthRecap />
+      )}
+      {!checklist.visible && (
+        <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
+      )}
+      <ForecastPanel />
+    </>
+  );
+}
+
+/** Spinner over the month while it loads. */
+function MonthLoading() {
+  const { t } = useI18n();
+  return (
+    <div className="month-loading-overlay" role="status" aria-label={t('app.loading')}>
+      <svg className="month-spinner" viewBox="0 0 50 50" aria-hidden="true">
+        <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
+      </svg>
+    </div>
+  );
+}
+
 interface MonthlyViewProps {
   onEditTransaction: (tx: Transaction) => void;
   onManageCategories: () => void;
@@ -202,11 +248,8 @@ export function MonthlyView({
   const f = useFinances();
   const checklist = useGettingStarted();
   const [params, setParams] = useSearchParams();
-  const quickAdd = QUICK_ADD[params.get('add') ?? ''] ?? null;
-  // Until the month arrives its first day is a good guess for the period start.
-  const defaultDate = f.isCurrentPeriod
-    ? todayDateOnly()
-    : f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`;
+  const quickAdd = quickAddOf(params.get('add'));
+  const defaultDate = defaultDateOf(f);
 
   return (
     <>
@@ -217,28 +260,13 @@ export function MonthlyView({
       )}
 
       <div className="month-content">
-        {f.loading && (
-          <div className="month-loading-overlay" role="status" aria-label={t('app.loading')}>
-            <svg className="month-spinner" viewBox="0 0 50 50" aria-hidden="true">
-              <circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
-            </svg>
-          </div>
-        )}
+        {f.loading && <MonthLoading />}
 
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
-        {f.isCurrentPeriod &&
-          (checklist.visible ? (
-            <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
-          ) : (
-            <MonthRecap />
-          ))}
-        {f.isCurrentPeriod && !checklist.visible && (
-          <RatePrompt movements={f.transactions.length} onInvite={() => onOpenTab('plan')} />
-        )}
-        {f.isCurrentPeriod && <ForecastPanel />}
+        <CurrentPeriodPanels checklist={checklist} onOpenTab={onOpenTab} />
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
         <AIAdvisor year={f.year} month={f.month} onAnalyzed={() => checklist.complete('ai')} />

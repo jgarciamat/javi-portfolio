@@ -26,6 +26,9 @@ export interface ManualForm {
   }[];
 }
 
+type QuarterForm = ManualForm['quarters'][number];
+type ExpenseForm = QuarterForm['expenses'][number];
+
 export const emptyManual = (): ManualForm => ({
   profile: {
     workArea: '',
@@ -76,6 +79,277 @@ export function toManualData(form: ManualForm): ManualData {
 
 const RATES: VatRate[] = [21, 10, 4, 0];
 const INCOME_FIELDS = ['r21', 'r10', 'r4', 'r0'] as const;
+const PRIOR_FIELDS = [
+  ['income', 'priorIncome'],
+  ['expenses', 'priorExpenses'],
+  ['payments', 'priorPayments'],
+  ['withheld', 'priorWithheld'],
+] as const;
+
+/** Office and home areas, people in the health insurance, exclusive vehicle, disability. */
+function ProfilePanel({
+  profile,
+  onChange,
+}: {
+  profile: ManualForm['profile'];
+  onChange: (patch: Partial<ManualForm['profile']>) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <section className="autonomo-panel">
+      <h3>{t('app.autonomo.profile')}</h3>
+      <div className="autonomo-grid">
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.workArea')}</span>
+          <input
+            className="tx-input"
+            inputMode="decimal"
+            value={profile.workArea}
+            onChange={(e) => onChange({ workArea: e.target.value })}
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.homeArea')}</span>
+          <input
+            className="tx-input"
+            inputMode="decimal"
+            value={profile.homeArea}
+            onChange={(e) => onChange({ homeArea: e.target.value })}
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.healthPeople')}</span>
+          <input
+            className="tx-input"
+            inputMode="numeric"
+            value={profile.healthPeople}
+            onChange={(e) => onChange({ healthPeople: e.target.value })}
+          />
+        </label>
+      </div>
+      <div className="autonomo-checks">
+        <label className="renta-check">
+          <input
+            type="checkbox"
+            checked={profile.vehicleExclusive}
+            onChange={(e) => onChange({ vehicleExclusive: e.target.checked })}
+          />
+          <span>{t('app.autonomo.vehicleExclusive')}</span>
+        </label>
+        <label className="renta-check">
+          <input
+            type="checkbox"
+            checked={profile.healthDisability}
+            onChange={(e) => onChange({ healthDisability: e.target.checked })}
+          />
+          <span>{t('app.autonomo.healthDisability')}</span>
+        </label>
+      </div>
+    </section>
+  );
+}
+
+/** The totals of the modelo 130 already filed for the earlier quarters. */
+function PriorPanel({
+  prior,
+  onChange,
+}: {
+  prior: ManualForm['prior'];
+  onChange: (patch: Partial<ManualForm['prior']>) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <section className="autonomo-panel">
+      <label className="autonomo-option">
+        <input
+          type="checkbox"
+          checked={prior.on}
+          onChange={(e) => onChange({ on: e.target.checked })}
+        />
+        <span>{t('app.autonomo.priorOn')}</span>
+      </label>
+      {prior.on && (
+        <>
+          <p className="section-hint">{t('app.autonomo.priorHint')}</p>
+          <div className="autonomo-grid">
+            {PRIOR_FIELDS.map(([field, key]) => (
+              <label key={field} className="field">
+                <span className="field-label">{t(`app.autonomo.${key}`)}</span>
+                <input
+                  className="tx-input"
+                  inputMode="decimal"
+                  value={prior[field]}
+                  onChange={(e) => onChange({ [field]: e.target.value })}
+                />
+              </label>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** One expense: kind, amount, VAT and, for meals, the days. `id` is "quarter.line". */
+function ExpenseRow({
+  expense,
+  id,
+  onChange,
+  onRemove,
+}: {
+  expense: ExpenseForm;
+  id: string;
+  onChange: (patch: Partial<ExpenseForm>) => void;
+  onRemove: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <li>
+      <div className="autonomo-expense-top">
+        <label className="field autonomo-expense-kind">
+          <span className="field-label">{t('app.autonomo.expenseKind')}</span>
+          <select
+            className="tx-input"
+            aria-label={`${t('app.autonomo.expenseKind')} ${id}`}
+            value={expense.kind}
+            onChange={(e) => onChange({ kind: e.target.value as ExpenseKind })}
+          >
+            {EXPENSE_KINDS.map((kind) => (
+              <option key={kind} value={kind}>
+                {t(`app.autonomo.kind.${kind}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="btn-secondary autonomo-remove"
+          aria-label={`${t('app.common.delete')} ${id}`}
+          onClick={onRemove}
+        >
+          ✕
+        </button>
+      </div>
+      <div className="autonomo-expense-fields">
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.expenseAmount')}</span>
+          <input
+            className="tx-input"
+            inputMode="decimal"
+            aria-label={`${t('app.autonomo.expenseAmount')} ${id}`}
+            value={expense.amount}
+            onChange={(e) => onChange({ amount: e.target.value })}
+          />
+        </label>
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.expenseVat')}</span>
+          <select
+            className="tx-input"
+            aria-label={`${t('app.autonomo.expenseVat')} ${id}`}
+            value={expense.vatRate}
+            onChange={(e) => onChange({ vatRate: Number(e.target.value) as VatRate })}
+          >
+            {RATES.map((r) => (
+              <option key={r} value={r}>
+                {r} %
+              </option>
+            ))}
+          </select>
+        </label>
+        {expense.kind === 'meals' && (
+          <label className="field">
+            <span className="field-label">{t('app.autonomo.days')}</span>
+            <input
+              className="tx-input"
+              inputMode="numeric"
+              aria-label={`${t('app.autonomo.days')} ${id}`}
+              value={expense.days}
+              onChange={(e) => onChange({ days: e.target.value })}
+            />
+          </label>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** Income, withholdings and expenses of one quarter (`q` counts from 0). */
+function QuarterPanel({
+  quarter,
+  q,
+  onChange,
+  onCopyPrevious,
+}: {
+  quarter: QuarterForm;
+  q: number;
+  onChange: (patch: Partial<QuarterForm>) => void;
+  onCopyPrevious: () => void;
+}) {
+  const { t } = useI18n();
+  const setExpense = (e: number, patch: Partial<ExpenseForm>) =>
+    onChange({ expenses: quarter.expenses.map((x, i) => (i === e ? { ...x, ...patch } : x)) });
+  return (
+    <section className="autonomo-panel">
+      <div className="autonomo-panel-head">
+        <h3>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
+        {q > 0 && (
+          <button type="button" className="btn-secondary" onClick={onCopyPrevious}>
+            {t('app.autonomo.copyPrevious', { n: q })}
+          </button>
+        )}
+      </div>
+      <h4>{t('app.autonomo.incomeTitle')}</h4>
+      <div className="autonomo-grid">
+        {INCOME_FIELDS.map((field) => (
+          <label key={field} className="field">
+            <span className="field-label">{t(`app.autonomo.income.${field}`)}</span>
+            <input
+              className="tx-input"
+              inputMode="decimal"
+              aria-label={`${t(`app.autonomo.income.${field}`)} ${q + 1}`}
+              value={quarter.income[field]}
+              onChange={(e) => onChange({ income: { ...quarter.income, [field]: e.target.value } })}
+            />
+          </label>
+        ))}
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.withheld')}</span>
+          <input
+            className="tx-input"
+            inputMode="decimal"
+            aria-label={`${t('app.autonomo.withheld')} ${q + 1}`}
+            value={quarter.withheld}
+            onChange={(e) => onChange({ withheld: e.target.value })}
+          />
+        </label>
+      </div>
+
+      <h4>{t('app.autonomo.expensesTitle')}</h4>
+      <ul className="autonomo-expenses">
+        {quarter.expenses.map((expense, i) => (
+          <ExpenseRow
+            key={i}
+            expense={expense}
+            id={`${q + 1}.${i + 1}`}
+            onChange={(patch) => setExpense(i, patch)}
+            onRemove={() => onChange({ expenses: quarter.expenses.filter((_, j) => j !== i) })}
+          />
+        ))}
+      </ul>
+      <button
+        type="button"
+        className="autonomo-add"
+        onClick={() =>
+          onChange({
+            expenses: [...quarter.expenses, { kind: 'other', amount: '', vatRate: 21, days: '' }],
+          })
+        }
+      >
+        + {t('app.autonomo.addExpense')}
+      </button>
+    </section>
+  );
+}
 
 /** Income and expenses typed once by hand, with what each kind of expense needs to be deducted. */
 export function AutonomoManual({
@@ -90,18 +364,16 @@ export function AutonomoManual({
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
     onChange({ ...form, profile: { ...form.profile, ...patch } });
-  const setQuarter = (index: number, patch: Partial<ManualForm['quarters'][number]>) =>
+  const setQuarter = (index: number, patch: Partial<QuarterForm>) =>
     onChange({
       ...form,
       quarters: form.quarters.map((q, i) => (i === index ? { ...q, ...patch } : q)),
     });
-  const setExpense = (
-    q: number,
-    e: number,
-    patch: Partial<ManualForm['quarters'][number]['expenses'][number]>
-  ) =>
+  const copyPrevious = (q: number) =>
     setQuarter(q, {
-      expenses: form.quarters[q].expenses.map((x, i) => (i === e ? { ...x, ...patch } : x)),
+      income: { ...form.quarters[q - 1].income },
+      withheld: form.quarters[q - 1].withheld,
+      expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
     });
 
   const from = form.prior.on && upTo > 1 ? upTo - 1 : 0;
@@ -112,236 +384,23 @@ export function AutonomoManual({
     <div className="autonomo-manual">
       <p className="section-hint">{t('app.autonomo.manualHint')}</p>
 
-      <section className="autonomo-panel">
-        <h3>{t('app.autonomo.profile')}</h3>
-        <div className="autonomo-grid">
-          <label className="field">
-            <span className="field-label">{t('app.autonomo.workArea')}</span>
-            <input
-              className="tx-input"
-              inputMode="decimal"
-              value={form.profile.workArea}
-              onChange={(e) => setProfile({ workArea: e.target.value })}
-            />
-          </label>
-          <label className="field">
-            <span className="field-label">{t('app.autonomo.homeArea')}</span>
-            <input
-              className="tx-input"
-              inputMode="decimal"
-              value={form.profile.homeArea}
-              onChange={(e) => setProfile({ homeArea: e.target.value })}
-            />
-          </label>
-          <label className="field">
-            <span className="field-label">{t('app.autonomo.healthPeople')}</span>
-            <input
-              className="tx-input"
-              inputMode="numeric"
-              value={form.profile.healthPeople}
-              onChange={(e) => setProfile({ healthPeople: e.target.value })}
-            />
-          </label>
-        </div>
-        <div className="autonomo-checks">
-          <label className="renta-check">
-            <input
-              type="checkbox"
-              checked={form.profile.vehicleExclusive}
-              onChange={(e) => setProfile({ vehicleExclusive: e.target.checked })}
-            />
-            <span>{t('app.autonomo.vehicleExclusive')}</span>
-          </label>
-          <label className="renta-check">
-            <input
-              type="checkbox"
-              checked={form.profile.healthDisability}
-              onChange={(e) => setProfile({ healthDisability: e.target.checked })}
-            />
-            <span>{t('app.autonomo.healthDisability')}</span>
-          </label>
-        </div>
-      </section>
+      <ProfilePanel profile={form.profile} onChange={setProfile} />
 
-      {upTo > 1 && (
-        <section className="autonomo-panel">
-          <label className="autonomo-option">
-            <input
-              type="checkbox"
-              checked={form.prior.on}
-              onChange={(e) => setPrior({ on: e.target.checked })}
+      {upTo > 1 && <PriorPanel prior={form.prior} onChange={setPrior} />}
+
+      {form.quarters
+        .slice(0, upTo)
+        .map((quarter, q) =>
+          q < from ? null : (
+            <QuarterPanel
+              key={q}
+              quarter={quarter}
+              q={q}
+              onChange={(patch) => setQuarter(q, patch)}
+              onCopyPrevious={() => copyPrevious(q)}
             />
-            <span>{t('app.autonomo.priorOn')}</span>
-          </label>
-          {form.prior.on && (
-            <>
-              <p className="section-hint">{t('app.autonomo.priorHint')}</p>
-              <div className="autonomo-grid">
-                {(
-                  [
-                    ['income', 'priorIncome'],
-                    ['expenses', 'priorExpenses'],
-                    ['payments', 'priorPayments'],
-                    ['withheld', 'priorWithheld'],
-                  ] as const
-                ).map(([field, key]) => (
-                  <label key={field} className="field">
-                    <span className="field-label">{t(`app.autonomo.${key}`)}</span>
-                    <input
-                      className="tx-input"
-                      inputMode="decimal"
-                      value={form.prior[field]}
-                      onChange={(e) => setPrior({ [field]: e.target.value })}
-                    />
-                  </label>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-      )}
-
-      {form.quarters.slice(0, upTo).map((quarter, q) =>
-        q < from ? null : (
-          <section key={q} className="autonomo-panel">
-            <div className="autonomo-panel-head">
-              <h3>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
-              {q > 0 && (
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() =>
-                    setQuarter(q, {
-                      income: { ...form.quarters[q - 1].income },
-                      withheld: form.quarters[q - 1].withheld,
-                      expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
-                    })
-                  }
-                >
-                  {t('app.autonomo.copyPrevious', { n: q })}
-                </button>
-              )}
-            </div>
-            <h4>{t('app.autonomo.incomeTitle')}</h4>
-            <div className="autonomo-grid">
-              {INCOME_FIELDS.map((field) => (
-                <label key={field} className="field">
-                  <span className="field-label">{t(`app.autonomo.income.${field}`)}</span>
-                  <input
-                    className="tx-input"
-                    inputMode="decimal"
-                    aria-label={`${t(`app.autonomo.income.${field}`)} ${q + 1}`}
-                    value={quarter.income[field]}
-                    onChange={(e) =>
-                      setQuarter(q, { income: { ...quarter.income, [field]: e.target.value } })
-                    }
-                  />
-                </label>
-              ))}
-              <label className="field">
-                <span className="field-label">{t('app.autonomo.withheld')}</span>
-                <input
-                  className="tx-input"
-                  inputMode="decimal"
-                  aria-label={`${t('app.autonomo.withheld')} ${q + 1}`}
-                  value={quarter.withheld}
-                  onChange={(e) => setQuarter(q, { withheld: e.target.value })}
-                />
-              </label>
-            </div>
-
-            <h4>{t('app.autonomo.expensesTitle')}</h4>
-            <ul className="autonomo-expenses">
-              {quarter.expenses.map((expense, i) => (
-                <li key={i}>
-                  <div className="autonomo-expense-top">
-                    <label className="field autonomo-expense-kind">
-                      <span className="field-label">{t('app.autonomo.expenseKind')}</span>
-                      <select
-                        className="tx-input"
-                        aria-label={`${t('app.autonomo.expenseKind')} ${q + 1}.${i + 1}`}
-                        value={expense.kind}
-                        onChange={(e) => setExpense(q, i, { kind: e.target.value as ExpenseKind })}
-                      >
-                        {EXPENSE_KINDS.map((kind) => (
-                          <option key={kind} value={kind}>
-                            {t(`app.autonomo.kind.${kind}`)}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button
-                      type="button"
-                      className="btn-secondary autonomo-remove"
-                      aria-label={`${t('app.common.delete')} ${q + 1}.${i + 1}`}
-                      onClick={() =>
-                        setQuarter(q, { expenses: quarter.expenses.filter((_, j) => j !== i) })
-                      }
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="autonomo-expense-fields">
-                    <label className="field">
-                      <span className="field-label">{t('app.autonomo.expenseAmount')}</span>
-                      <input
-                        className="tx-input"
-                        inputMode="decimal"
-                        aria-label={`${t('app.autonomo.expenseAmount')} ${q + 1}.${i + 1}`}
-                        value={expense.amount}
-                        onChange={(e) => setExpense(q, i, { amount: e.target.value })}
-                      />
-                    </label>
-                    <label className="field">
-                      <span className="field-label">{t('app.autonomo.expenseVat')}</span>
-                      <select
-                        className="tx-input"
-                        aria-label={`${t('app.autonomo.expenseVat')} ${q + 1}.${i + 1}`}
-                        value={expense.vatRate}
-                        onChange={(e) =>
-                          setExpense(q, i, { vatRate: Number(e.target.value) as VatRate })
-                        }
-                      >
-                        {RATES.map((r) => (
-                          <option key={r} value={r}>
-                            {r} %
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    {expense.kind === 'meals' && (
-                      <label className="field">
-                        <span className="field-label">{t('app.autonomo.days')}</span>
-                        <input
-                          className="tx-input"
-                          inputMode="numeric"
-                          aria-label={`${t('app.autonomo.days')} ${q + 1}.${i + 1}`}
-                          value={expense.days}
-                          onChange={(e) => setExpense(q, i, { days: e.target.value })}
-                        />
-                      </label>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              className="autonomo-add"
-              onClick={() =>
-                setQuarter(q, {
-                  expenses: [
-                    ...quarter.expenses,
-                    { kind: 'other', amount: '', vatRate: 21, days: '' },
-                  ],
-                })
-              }
-            >
-              + {t('app.autonomo.addExpense')}
-            </button>
-          </section>
-        )
-      )}
+          )
+        )}
     </div>
   );
 }

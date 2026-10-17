@@ -21,6 +21,58 @@ interface DeleteAccountModalProps {
   onCancel: () => void;
 }
 
+/** The Play subscription must be cancelled there first: link and confirmation. */
+function PlaySubscriptionNotice({
+  cancelled,
+  onCancelled,
+}: {
+  cancelled: boolean;
+  onCancelled: (cancelled: boolean) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="delete-account-play" role="alert">
+      <p>{t('app.profile.deleteAccount.play.warning')}</p>
+      <a href={PLAY_SUBSCRIPTIONS_URL} target="_blank" rel="noopener noreferrer">
+        {t('app.profile.deleteAccount.play.link')}
+      </a>
+      <label className="delete-account-check">
+        <input
+          type="checkbox"
+          checked={cancelled}
+          onChange={(e) => onCancelled(e.target.checked)}
+        />
+        {t('app.profile.deleteAccount.play.confirm')}
+      </label>
+    </div>
+  );
+}
+
+/** Google-only accounts confirm with a fresh Google sign-in. */
+function GoogleProofField({
+  canConfirm,
+  onToken,
+  onError,
+}: {
+  canConfirm: boolean;
+  onToken: (googleToken: string) => void;
+  onError: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="delete-account-field">
+      <p className="confirm-delete-message">{t('app.profile.deleteAccount.google')}</p>
+      {GOOGLE_CLIENT_ID && canConfirm && (
+        <GoogleConfirmButton
+          label={t('app.profile.deleteAccount.googleConfirm')}
+          onToken={onToken}
+          onError={onError}
+        />
+      )}
+    </div>
+  );
+}
+
 export function DeleteAccountModal({
   loading,
   error,
@@ -34,7 +86,9 @@ export function DeleteAccountModal({
   const [playCancelled, setPlayCancelled] = useState(false);
   const [googleFailed, setGoogleFailed] = useState(false);
   const play = playActive ? { confirmPlayCancelled: true } : {};
-  const ready = (!hasPassword || password.length > 0) && (!playActive || playCancelled);
+  const playReady = !playActive || playCancelled;
+  const ready = (!hasPassword || password.length > 0) && playReady;
+  const errorText = googleFailed ? t('app.auth.error.google') : error;
 
   return (
     <Modal
@@ -54,20 +108,7 @@ export function DeleteAccountModal({
       <p className="confirm-delete-message">{t('app.profile.deleteAccount.modal.body')}</p>
 
       {playActive && (
-        <div className="delete-account-play" role="alert">
-          <p>{t('app.profile.deleteAccount.play.warning')}</p>
-          <a href={PLAY_SUBSCRIPTIONS_URL} target="_blank" rel="noopener noreferrer">
-            {t('app.profile.deleteAccount.play.link')}
-          </a>
-          <label className="delete-account-check">
-            <input
-              type="checkbox"
-              checked={playCancelled}
-              onChange={(e) => setPlayCancelled(e.target.checked)}
-            />
-            {t('app.profile.deleteAccount.play.confirm')}
-          </label>
-        </div>
+        <PlaySubscriptionNotice cancelled={playCancelled} onCancelled={setPlayCancelled} />
       )}
 
       {hasPassword ? (
@@ -80,41 +121,59 @@ export function DeleteAccountModal({
           />
         </div>
       ) : (
-        <div className="delete-account-field">
-          <p className="confirm-delete-message">{t('app.profile.deleteAccount.google')}</p>
-          {GOOGLE_CLIENT_ID && (!playActive || playCancelled) && (
-            <GoogleConfirmButton
-              label={t('app.profile.deleteAccount.googleConfirm')}
-              onToken={(googleToken) => {
-                setGoogleFailed(false);
-                onConfirm({ googleToken, ...play });
-              }}
-              onError={() => setGoogleFailed(true)}
-            />
-          )}
-        </div>
+        <GoogleProofField
+          canConfirm={playReady}
+          onToken={(googleToken) => {
+            setGoogleFailed(false);
+            onConfirm({ googleToken, ...play });
+          }}
+          onError={() => setGoogleFailed(true)}
+        />
       )}
 
-      {(error || googleFailed) && (
+      {errorText && (
         <p className="confirm-delete-message confirm-delete-error" role="alert">
-          {googleFailed ? t('app.auth.error.google') : error}
+          {errorText}
         </p>
       )}
-      <div className="confirm-delete-actions">
-        <button className="btn-cancel" onClick={onCancel} disabled={loading}>
-          {t('app.profile.deleteAccount.modal.cancel')}
-        </button>
-        <button
-          className="btn-delete"
-          onClick={() => onConfirm(hasPassword ? { password, ...play } : play)}
-          disabled={loading || !ready}
-          aria-busy={loading}
-        >
-          {loading
-            ? t('app.profile.deleteAccount.deleting')
-            : t('app.profile.deleteAccount.modal.confirm')}
-        </button>
-      </div>
+      <DeleteAccountActions
+        loading={loading}
+        ready={ready}
+        onCancel={onCancel}
+        onConfirm={() => onConfirm(hasPassword ? { password, ...play } : play)}
+      />
     </Modal>
+  );
+}
+
+/** Cancel, and delete once the proof is ready. */
+function DeleteAccountActions({
+  loading,
+  ready,
+  onCancel,
+  onConfirm,
+}: {
+  loading: boolean;
+  ready: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="confirm-delete-actions">
+      <button className="btn-cancel" onClick={onCancel} disabled={loading}>
+        {t('app.profile.deleteAccount.modal.cancel')}
+      </button>
+      <button
+        className="btn-delete"
+        onClick={onConfirm}
+        disabled={loading || !ready}
+        aria-busy={loading}
+      >
+        {loading
+          ? t('app.profile.deleteAccount.deleting')
+          : t('app.profile.deleteAccount.modal.confirm')}
+      </button>
+    </div>
   );
 }
