@@ -36,6 +36,22 @@ describe('balances and transfers', () => {
     ]);
   });
 
+  it('only reports the listed members, even if someone else paid or shared', () => {
+    // «dan» left the group: what he paid or owed is not shown for anybody else.
+    const old = {
+      paidBy: 'dan',
+      amountCents: 2000,
+      shares: [
+        { memberId: 'ana', shareCents: 1000 },
+        { memberId: 'eva', shareCents: 1000 },
+      ],
+    };
+    expect(computeBalances(['ana', 'ben'], [old])).toEqual([
+      { memberId: 'ana', cents: -1000 },
+      { memberId: 'ben', cents: 0 },
+    ]);
+  });
+
   it('suggests few payments that settle everybody', () => {
     const taxi = {
       paidBy: 'ben',

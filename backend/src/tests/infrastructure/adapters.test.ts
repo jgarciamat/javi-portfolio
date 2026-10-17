@@ -3,6 +3,7 @@ import os from 'os';
 import path from 'path';
 import { ConfigError, loadConfig } from '@config/env';
 import Stripe from 'stripe';
+import jwt from 'jsonwebtoken';
 import { CloudflareAi } from '@infrastructure/ai/CloudflareAi';
 import { GeminiAdvisor } from '@infrastructure/ai/GeminiAdvisor';
 import {
@@ -777,6 +778,14 @@ describe('JwtTokenService', () => {
     expect(() =>
       service.verifyAccessToken(other.issueAccessToken({ userId: 'u', sessionVersion: 0 }))
     ).toThrow(expect.objectContaining({ code: 'INVALID_TOKEN' }));
+    const secret = 's'.repeat(40);
+    const noVersion = jwt.sign({}, secret, { subject: 'u', algorithm: 'HS256' });
+    const noSubject = jwt.sign({ sv: 1 }, secret, { algorithm: 'HS256' });
+    for (const token of [noVersion, noSubject]) {
+      expect(() => service.verifyAccessToken(token)).toThrow(
+        expect.objectContaining({ code: 'INVALID_TOKEN' })
+      );
+    }
   });
 
   it('issues random opaque tokens and stores only their hash', () => {

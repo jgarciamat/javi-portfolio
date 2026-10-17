@@ -158,4 +158,30 @@ describe('Scheduled push reminders', () => {
     await ctx.container.reminders.run();
     expect(ctx.push.sent[0].payload.body).toContain('1 movement for');
   });
+
+  it('announces a single bill in Spanish', async () => {
+    await rule('Alquiler', 700);
+    await ctx.container.reminders.run();
+    expect(ctx.push.sent[0].payload.body).toMatch(/^1 operación por 700,00\s€\.$/);
+  });
+
+  it('shows a drop in spending without a plus sign, in both languages', async () => {
+    ctx.clock.set('2026-03-09T08:00:00Z');
+    await addTransaction(ctx, user, { amount: 20, date: '2026-03-03' });
+    await addTransaction(ctx, user, { amount: 40, date: '2026-02-26' });
+    await ctx.container.reminders.run();
+    expect(ctx.push.sent[0].payload.body).toContain('(-50 % respecto a la anterior)');
+
+    await request(ctx.app).patch('/api/settings').set(user.auth).send({ locale: 'en' }).expect(200);
+    await addTransaction(ctx, user, { amount: 30, date: '2026-03-10' });
+    ctx.clock.set('2026-03-16T08:00:00Z');
+    await ctx.container.reminders.run();
+    expect(ctx.push.sent[1].payload.body).toBe(
+      'Last week you spent €30.00 (+50% vs the week before).'
+    );
+
+    ctx.clock.set('2026-03-30T08:00:00Z');
+    await ctx.container.reminders.run();
+    expect(ctx.push.sent[2].payload.body).toBe('Last week you spent €0.00.');
+  });
 });
