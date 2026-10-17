@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { normalizeEmail } from '@domain/model/User';
 import { Container } from '../../container';
 import {
   RateLimiterFactory,
   asyncHandler,
   authed,
   emailAndIpKey,
+  emailKey,
   requireAuth,
 } from '../middleware';
 import {
@@ -31,6 +31,21 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     limit: 10,
     keyGenerator: emailAndIpKey,
   });
+  // Password spraying: only failed attempts count, so people signing in are never slowed.
+  // One network trying many accounts...
+  const failedLoginsByIp = limiter({
+    windowMs: fifteenMinutes,
+    limit: 30,
+    skipSuccessfulRequests: true,
+  });
+  // ...and one account tried from many networks: locked for a while, with the generic message.
+  const failedLoginsByAccount = limiter({
+    windowMs: fifteenMinutes,
+    limit: 10,
+    skipSuccessfulRequests: true,
+    keyGenerator: emailKey,
+    skip: (req) => !emailKey(req),
+  });
   const registerLimiter = limiter({ windowMs: hour, limit: 10 });
   const emailLimiter = limiter({ windowMs: hour, limit: 5, keyGenerator: emailAndIpKey });
   const tokenLimiter = limiter({ windowMs: fifteenMinutes, limit: 30 });
@@ -41,16 +56,20 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     registerLimiter,
     asyncHandler(async (req, res) => {
       const { referralCode, ...input } = registerBody.parse(req.body);
-      const result = await c.auth.register(input);
-      const created = c.repos.users.findByEmail(normalizeEmail(input.email));
-      if (created && referralCode) c.referrals.attach(created.id, referralCode);
-      c.repos.metrics.record('signup');
-      res.status(201).json(result);
+      const { message, createdUserId } = await c.auth.register(input);
+      // An e-mail that already had an account gets the same answer and nothing else.
+      if (createdUserId) {
+        if (referralCode) c.referrals.attach(createdUserId, referralCode);
+        c.repos.metrics.record('signup');
+      }
+      res.status(201).json({ message });
     })
   );
 
   router.post(
     '/login',
+    failedLoginsByIp,
+    failedLoginsByAccount,
     loginLimiter,
     asyncHandler(async (req, res) => {
       res.json(await c.auth.login(loginBody.parse(req.body)));
@@ -59,6 +78,7 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
 
   router.post(
     '/google',
+    failedLoginsByIp,
     loginLimiter,
     asyncHandler(async (req, res) => {
       const body = googleBody.parse(req.body);

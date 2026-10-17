@@ -100,7 +100,7 @@ npm run dev                # API en :3000 y app en http://localhost:5176 (se abr
 
 `npm run dev` (raíz) arranca la API, espera a que responda y lanza Vite en el puerto 5176; `Ctrl+C`
 para los dos. También puedes arrancarlos por separado con `npm run dev` dentro de `backend/` y `frontend/`.
-Sin `RESEND_API_KEY` los enlaces de verificación y recuperación se imprimen en la consola de la API.
+Sin `RESEND_API_KEY` los enlaces de verificación y recuperación se imprimen en la consola de la API (solo en desarrollo: en producción la API no arranca sin ella).
 Para el login con Google en local, añade `http://localhost:5176` como origen autorizado en Google Cloud.
 
 La base de datos SQLite se crea y migra sola al arrancar (`DATABASE_PATH`, por defecto `backend/data/money-manager.db`).

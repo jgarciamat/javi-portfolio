@@ -67,3 +67,12 @@ export function GoogleSignIn(props: GoogleButtonProps) {
     </>
   );
 }
+
+/** The Google button alone, with its provider: to confirm who you are (e.g. deleting the account). */
+export function GoogleConfirmButton(props: GoogleButtonProps) {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <GoogleButton {...props} />
+    </GoogleOAuthProvider>
+  );
+}

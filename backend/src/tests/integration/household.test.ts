@@ -1,5 +1,6 @@
 import request from 'supertest';
 import {
+  STRONG_PASSWORD,
   TestContext,
   TestUser,
   addTransaction,
@@ -30,6 +31,8 @@ describe('Shared household', () => {
     };
   const join = (code: string, user = partner) =>
     request(ctx.app).post('/api/household/join').set(user.auth).send({ code });
+  const preview = (code: string, user = partner) =>
+    request(ctx.app).post('/api/household/invite/preview').set(user.auth).send({ code });
   const joined = async () => {
     await join((await invite()).code).expect(204);
   };
@@ -111,17 +114,22 @@ describe('Shared household', () => {
     const third = await invite();
     await join(third.code).expect(204);
     await join(third.code, stranger).expect(404); // used
+    await preview('short', stranger).expect(400);
     await request(ctx.app).get('/api/household/invite/short').set(stranger.auth).expect(400);
   });
 
   it('shows who is inviting before joining and lets the owner cancel', async () => {
     const { code } = await invite();
-    const res = await request(ctx.app)
+    const res = await preview(code).expect(200);
+    expect(res.body.owner).toEqual({ id: owner.id, name: 'Test User' });
+    // Older app versions still send the code in the path.
+    const legacy = await request(ctx.app)
       .get(`/api/household/invite/${code}`)
       .set(partner.auth)
       .expect(200);
-    expect(res.body.owner).toEqual({ id: owner.id, name: 'Test User' });
+    expect(legacy.body).toEqual(res.body);
     await request(ctx.app).delete('/api/household/invite').set(owner.auth).expect(204);
+    await preview(code).expect(404);
     await request(ctx.app).get(`/api/household/invite/${code}`).set(partner.auth).expect(404);
   });
 
@@ -219,7 +227,11 @@ describe('Shared household', () => {
   it('frees the member when the owner deletes the account', async () => {
     await addTransaction(ctx, partner, { description: 'Mío', amount: 3 });
     await joined();
-    await request(ctx.app).delete('/api/profile/account').set(owner.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(owner.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     expect(
       (await month(partner)).transactions.map((t: { description: string }) => t.description)
     ).toEqual(['Mío']);

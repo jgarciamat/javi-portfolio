@@ -135,6 +135,8 @@ export function ProfilePage({ onClose }: { onClose: () => void }) {
         <DeleteAccountModal
           loading={deletion.loading}
           error={deletion.error}
+          hasPassword={user?.hasPassword !== false}
+          playActive={deletion.playActive}
           onConfirm={deletion.handleDelete}
           onCancel={() => setShowDelete(false)}
         />

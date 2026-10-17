@@ -59,11 +59,12 @@ export const householdApi = {
   cancelInvite() {
     return apiRequest<void>('/household/invite', { method: 'DELETE' });
   },
-  /** Who is inviting, before joining. */
+  /** Who is inviting, before joining (the code goes in the body, never in the URL). */
   preview(code: string) {
-    return apiRequest<{ owner: HouseholdPerson; expiresAt: string }>(
-      `/household/invite/${encodeURIComponent(code)}`
-    );
+    return apiRequest<{ owner: HouseholdPerson; expiresAt: string }>('/household/invite/preview', {
+      method: 'POST',
+      body: jsonBody({ code }),
+    });
   },
   join(code: string) {
     return apiRequest<void>('/household/join', { method: 'POST', body: jsonBody({ code }) });

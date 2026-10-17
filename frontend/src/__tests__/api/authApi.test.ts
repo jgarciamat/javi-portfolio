@@ -249,6 +249,19 @@ describe('apiRequest', () => {
       mockFetch.mock.calls.filter(([url]) => String(url).endsWith('/auth/refresh'))
     ).toHaveLength(1);
   });
+
+  test('keeps the rotated refresh token and uses it for the next refresh', async () => {
+    tokenStore.setSession(EXPIRED, 'refresh-1');
+    mockFetch
+      .mockResolvedValueOnce(makeResponse({ accessToken: EXPIRED, refreshToken: 'refresh-2' }))
+      .mockResolvedValueOnce(makeResponse({ accessToken: VALID, refreshToken: 'refresh-3' }));
+    await refreshAccessToken();
+    expect(tokenStore.getRefresh()).toBe('refresh-2');
+    await refreshAccessToken();
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body)).toEqual({ refreshToken: 'refresh-2' });
+    expect(tokenStore.getRefresh()).toBe('refresh-3');
+    expect(tokenStore.getAccess()).toBe(VALID);
+  });
 });
 
 describe('authenticated profile endpoints', () => {

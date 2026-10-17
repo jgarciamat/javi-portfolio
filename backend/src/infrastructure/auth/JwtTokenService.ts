@@ -18,7 +18,9 @@ export class JwtTokenService implements TokenService {
   ) {}
 
   issueAccessToken(claims: AccessTokenClaims): string {
-    return jwt.sign({ sv: claims.sessionVersion }, this.accessSecret, {
+    const authTime =
+      claims.authTime === null ? {} : { auth_time: Math.floor(claims.authTime / 1000) };
+    return jwt.sign({ sv: claims.sessionVersion, ...authTime }, this.accessSecret, {
       subject: claims.userId,
       expiresIn: this.accessTtl as jwt.SignOptions['expiresIn'],
       algorithm: 'HS256',
@@ -31,7 +33,11 @@ export class JwtTokenService implements TokenService {
         algorithms: ['HS256'],
       }) as jwt.JwtPayload;
       if (!payload.sub || typeof payload.sv !== 'number') throw new Error('missing claims');
-      return { userId: payload.sub, sessionVersion: payload.sv };
+      return {
+        userId: payload.sub,
+        sessionVersion: payload.sv,
+        authTime: typeof payload.auth_time === 'number' ? payload.auth_time * 1000 : null,
+      };
     } catch {
       throw new UnauthorizedError('Token inválido o expirado', 'INVALID_TOKEN');
     }

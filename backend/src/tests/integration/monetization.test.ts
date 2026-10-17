@@ -2,6 +2,7 @@ import request from 'supertest';
 import { CategorySuggester, FinancialAdvisor } from '@domain/ports/services';
 import { StaticOfferCatalog } from '@infrastructure/offers/JsonOfferCatalog';
 import {
+  STRONG_PASSWORD,
   TestContext,
   TestUser,
   addTransaction,
@@ -338,7 +339,11 @@ describe('Payments', () => {
 
   it('cancels the subscription when the account is deleted', async () => {
     await webhook(ctx, subscriptionEvent(user)).expect(200);
-    await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(user.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     expect(ctx.payments.cancelled).toEqual([{ subscriptionId: 'sub_1', atPeriodEnd: false }]);
   });
 
@@ -346,7 +351,11 @@ describe('Payments', () => {
     await webhook(ctx, subscriptionEvent(user)).expect(200);
     const logged = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     jest.spyOn(ctx.payments, 'cancelSubscription').mockRejectedValue(new Error('Stripe down'));
-    const res = await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(400);
+    const res = await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(user.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(400);
     expect(res.body.code).toBe('BILLING_UNAVAILABLE');
     await request(ctx.app).get('/api/profile').set(user.auth).expect(200);
     logged.mockRestore();

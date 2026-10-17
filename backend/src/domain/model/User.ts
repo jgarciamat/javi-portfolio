@@ -154,6 +154,9 @@ export class User {
   get emailVerified(): boolean {
     return this.props.emailVerified;
   }
+  get googleId(): string | null {
+    return this.props.googleId;
+  }
   get verificationTokenExpiresAt(): string | null {
     return this.props.verificationTokenExpiresAt;
   }

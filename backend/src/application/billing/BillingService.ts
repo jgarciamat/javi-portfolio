@@ -91,6 +91,8 @@ export interface BillingOverview {
 }
 
 const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due']);
+/** Where Android users cancel a Google Play subscription. */
+export const PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';
 
 /** Plans, checkout and the payment provider's webhooks. */
 export class BillingService {
@@ -255,9 +257,28 @@ export class BillingService {
     return this.gateway.createPortal(customerId, `${this.options.appUrl}/?billing=portal`);
   }
 
-  /** Called before deleting an account so nobody keeps being charged. */
-  async cancelBeforeAccountDeletion(userId: string): Promise<void> {
+  /**
+   * Called before deleting an account so nobody keeps being charged. A Google Play
+   * subscription cannot be cancelled from here: the user must confirm having cancelled
+   * it in Google Play (or it would keep renewing after the account is gone).
+   */
+  async cancelBeforeAccountDeletion(
+    userId: string,
+    options: { playCancelled?: boolean } = {}
+  ): Promise<void> {
     const sub = this.subscriptions.get(userId);
+    const renewsInPlay =
+      sub?.source === 'google' &&
+      !sub.lifetime &&
+      LIVE_STATUSES.has(sub.status) &&
+      !sub.cancelAtPeriodEnd;
+    if (renewsInPlay && !options.playCancelled) {
+      throw new ConflictError(
+        'Tienes una suscripción de Google Play activa: cancélala en Google Play o seguirá cobrándose.',
+        'PLAY_SUBSCRIPTION_ACTIVE',
+        { manageUrl: PLAY_SUBSCRIPTIONS_URL }
+      );
+    }
     if (!sub?.stripeSubscriptionId || !LIVE_STATUSES.has(sub.status)) return;
     try {
       await this.gateway.cancelSubscription(sub.stripeSubscriptionId, false);

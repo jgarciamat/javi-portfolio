@@ -17,6 +17,15 @@ describe('validatePassword', () => {
   it('accepts a strong password', () => {
     expect(validatePassword('Sup3r-secret!')).toEqual({ valid: true, errors: [] });
   });
+
+  it('refuses more than 72 bytes, counting accents and emojis as bcrypt does', () => {
+    const tooLong = { valid: false, errors: ['app.password.rule.maxLength'] };
+    expect(validatePassword(`Aa1!${'x'.repeat(68)}`).valid).toBe(true);
+    expect(validatePassword(`Aa1!${'x'.repeat(69)}`)).toEqual(tooLong);
+    expect(validatePassword(`Aa1!${'ñ'.repeat(34)}`).valid).toBe(true);
+    expect(validatePassword(`Aa1!${'ñ'.repeat(35)}`)).toEqual(tooLong);
+    expect(validatePassword(`Aa1!${'💶'.repeat(18)}`)).toEqual(tooLong);
+  });
 });
 
 describe('emojiAvatar', () => {

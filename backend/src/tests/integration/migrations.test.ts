@@ -137,6 +137,20 @@ describe('migrations', () => {
       expect(db.prepare("SELECT token_hash FROM refresh_tokens WHERE id = 'rt1'").get()).toEqual({
         token_hash: sha256('legacy-refresh-jwt'),
       });
+      // Open sessions become a family of their own, ending 90 days after the sign-in at the
+      // earliest and never before their current expiry.
+      expect(
+        db
+          .prepare(
+            "SELECT family_id, family_expires_at, auth_time, rotated_at FROM refresh_tokens WHERE id = 'rt1'"
+          )
+          .get()
+      ).toEqual({
+        family_id: 'rt1',
+        family_expires_at: '2099-01-01T00:00:00.000Z',
+        auth_time: '2026-01-01T00:00:00Z',
+        rotated_at: null,
+      });
       const google = db
         .prepare(
           "SELECT password_hash, verification_token_hash, verification_token_expires_at FROM users WHERE id = 'u2'"

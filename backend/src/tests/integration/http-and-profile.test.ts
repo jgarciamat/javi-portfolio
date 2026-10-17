@@ -78,6 +78,56 @@ describe('HTTP platform', () => {
     await attempt('b@example.com').expect(401);
     await attempt().expect(401);
   });
+
+  it('limits failed sign-ins per network, whatever the e-mail (password spraying)', async () => {
+    const live = createTestApp({ env: { NODE_ENV: 'development' } });
+    const attempt = (email: string, ip = '203.0.113.7') =>
+      request(live.app)
+        .post('/api/auth/google')
+        .set('X-Forwarded-For', ip)
+        .send({ token: 'forged', email });
+    for (let i = 0; i < 30; i++) await attempt(`victim${i}@example.com`).expect(401);
+    const limited = await attempt('another@example.com').expect(429);
+    expect(limited.body).toEqual({
+      error: 'Demasiados intentos. Espera un poco y vuelve a probar.',
+      code: 'RATE_LIMITED',
+    });
+    await request(live.app)
+      .post('/api/auth/login')
+      .set('X-Forwarded-For', '203.0.113.7')
+      .send({ email: 'another@example.com', password: 'Wrong-pass1' })
+      .expect(429);
+    // Other networks are not affected.
+    await attempt('another@example.com', '198.51.100.1').expect(401);
+  });
+
+  it('locks an account for a while after failed sign-ins from many networks', async () => {
+    const live = createTestApp({ env: { NODE_ENV: 'development' } });
+    const user = await createUser(live, 'target@example.com');
+    const login = (password: string, ip: string, email = user.email) =>
+      request(live.app)
+        .post('/api/auth/login')
+        .set('X-Forwarded-For', ip)
+        .send({ email, password });
+    // Successful sign-ins never count.
+    for (let i = 0; i < 12; i++) await login(STRONG_PASSWORD, `198.51.100.${i % 2}`).expect(200);
+    for (let i = 0; i < 10; i++) {
+      const failed = await login('Wrong-pass1', `203.0.113.${i}`).expect(401);
+      expect(failed.body.code).toBe('INVALID_CREDENTIALS');
+    }
+    // Locked from a new network, even with the right password, with the generic message.
+    const locked = await login(STRONG_PASSWORD, '192.0.2.50').expect(429);
+    expect(locked.body.code).toBe('RATE_LIMITED');
+    // Same message for an e-mail that has no account: nothing is revealed.
+    for (let i = 0; i < 10; i++) {
+      await login('Wrong-pass1', `192.0.2.${100 + i}`, 'nobody@example.com').expect(401);
+    }
+    expect((await login('Wrong-pass1', '192.0.2.200', 'nobody@example.com')).body).toEqual(
+      locked.body
+    );
+    // Other accounts keep working.
+    await login('Wrong-pass1', '192.0.2.50', 'other@example.com').expect(401);
+  });
 });
 
 describe('Profile', () => {
@@ -118,7 +168,11 @@ describe('Profile', () => {
   });
 
   it('rejects the tokens of a deleted account at once', async () => {
-    await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(user.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     const res = await request(ctx.app).get('/api/profile').set(user.auth).expect(401);
     expect(res.body.code).toBe('INVALID_TOKEN');
   });

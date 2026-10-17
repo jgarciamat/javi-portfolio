@@ -68,7 +68,11 @@ describe('Auth edge cases', () => {
     await refresh().expect(200);
 
     const other = await createUser(ctx);
-    await request(ctx.app).delete('/api/profile/account').set(other.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(other.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     const gone = await request(ctx.app)
       .post('/api/auth/refresh')
       .send({ refreshToken: other.refreshToken })

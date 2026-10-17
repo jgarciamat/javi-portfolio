@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
 import { toCents } from '@domain/shared/money';
+import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
 export const money = z
@@ -67,6 +68,12 @@ export const nameBody = z.object({ name: z.string().trim().min(1).max(80) });
 export const passwordBody = z.object({
   currentPassword: z.string().max(128).optional(),
   newPassword: z.string().min(1).max(128),
+});
+/** Deleting the account: proof of identity, and the Google Play cancellation acknowledged. */
+export const deleteAccountBody = z.object({
+  password: z.string().max(128).optional(),
+  googleToken: z.string().min(1).max(5000).optional(),
+  confirmPlayCancelled: z.boolean().optional(),
 });
 export const avatarBody = z.object({ avatarDataUrl: z.string().max(3_000_000).nullable() });
 export const settingsBody = z
@@ -348,7 +355,11 @@ export const splitExpenseBody = z.object({
 export const splitSettleBody = z.object({ from: id, to: id, amount: money, date: date.nullish() });
 export const splitExpenseParams = z.object({ id, expenseId: id });
 export const pushSubscribeBody = z.object({
-  endpoint: z.string().url().max(1000),
+  endpoint: z
+    .string()
+    .url()
+    .max(1000)
+    .refine(isAllowedPushEndpoint, { message: 'Servicio de notificaciones no admitido' }),
   keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
 });
 export const pushUnsubscribeBody = z.object({ endpoint: z.string().url().max(1000) });

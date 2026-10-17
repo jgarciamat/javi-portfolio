@@ -392,6 +392,11 @@ describe('static pages', () => {
     ).toBeInTheDocument();
   });
 
+  it('opens the password reset from the "you already have an account" e-mail', () => {
+    publicRender(<AuthPage />, '/login?mode=forgot');
+    expect(screen.getByText(tr('app.auth.forgot.title'))).toBeInTheDocument();
+  });
+
   it('links to the prices on the web but not in the store apps', () => {
     const { unmount } = publicRender(<AuthPage />);
     expect(screen.getByRole('link', { name: tr('pricing.link') })).toBeInTheDocument();
@@ -406,16 +411,27 @@ describe('static pages', () => {
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
 describe('ProfilePage', () => {
-  function setup(user = f.user()) {
+  function setup(user = f.user(), api = createFakeApi(), plan = false) {
     const onClose = jest.fn();
-    const api = createFakeApi();
     const view = renderWithProviders(<ProfilePage onClose={onClose} />, {
       api,
       finances: false,
       user,
+      plan,
     });
     return { ...view, onClose };
   }
+  const openDeletion = () => {
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.profile.settings.title')) })
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('app.profile.deleteAccount.button')) })
+    );
+    return screen.getByRole('dialog', { name: tr('app.profile.deleteAccount.modal.title') });
+  };
+  const confirmButton = (dialog: HTMLElement) =>
+    within(dialog).getByRole('button', { name: tr('app.profile.deleteAccount.modal.confirm') });
   const openPasswordSection = () =>
     fireEvent.click(
       screen.getByRole('button', {
@@ -597,13 +613,16 @@ describe('ProfilePage', () => {
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.profile.deleteAccount.button')) })
     );
-    const confirm = () =>
-      fireEvent.click(
-        within(
-          screen.getByRole('dialog', { name: tr('app.profile.deleteAccount.modal.title') })
-        ).getByRole('button', { name: tr('app.profile.deleteAccount.modal.confirm') })
-      );
+    const current = () =>
+      screen.getByRole('dialog', { name: tr('app.profile.deleteAccount.modal.title') });
+    const confirm = () => fireEvent.click(confirmButton(current()));
+    // The current password is required before anything is sent.
+    expect(confirmButton(current())).toBeDisabled();
+    fireEvent.change(within(current()).getByLabelText(tr('app.profile.deleteAccount.password')), {
+      target: { value: STRONG },
+    });
     confirm();
+    expect(api.authApi.deleteAccount).toHaveBeenCalledWith({ password: STRONG });
     expect(await screen.findByText('No se pudo borrar')).toBeInTheDocument();
     confirm();
     expect(await screen.findByText(tr('app.profile.deleteAccount.error'))).toBeInTheDocument();
@@ -611,6 +630,95 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(localStorage.getItem('mm_token')).toBeNull());
     expect(dialog).toBeDefined();
     await act(async () => undefined);
+  });
+
+  it('confirms a Google-only account with Google, or directly after a recent sign-in', async () => {
+    const { api } = setup(f.user({ hasPassword: false }));
+    api.authApi.deleteAccount.mockRejectedValueOnce(
+      new ApiError('Vuelve a iniciar sesión', 403, 'REAUTH_REQUIRED')
+    );
+    const dialog = openDeletion();
+    expect(within(dialog).queryByLabelText(tr('app.profile.deleteAccount.password'))).toBeNull();
+    expect(within(dialog).getByText(tr('app.profile.deleteAccount.google'))).toBeInTheDocument();
+    fireEvent.click(confirmButton(dialog));
+    expect(api.authApi.deleteAccount).toHaveBeenCalledWith({});
+    expect(await within(dialog).findByText('Vuelve a iniciar sesión')).toBeInTheDocument();
+    const googleMock = (await import('@react-oauth/google')) as unknown as {
+      googleMock: { fail: boolean };
+    };
+    googleMock.googleMock.fail = true;
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: tr('app.profile.deleteAccount.googleConfirm') })
+    );
+    expect(await within(dialog).findByText(tr('app.auth.error.google'))).toBeInTheDocument();
+    googleMock.googleMock.fail = false;
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: tr('app.profile.deleteAccount.googleConfirm') })
+    );
+    await waitFor(() =>
+      expect(api.authApi.deleteAccount).toHaveBeenLastCalledWith({ googleToken: 'mock-token' })
+    );
+    await waitFor(() => expect(localStorage.getItem('mm_token')).toBeNull());
+  });
+
+  it('warns about an active Google Play subscription and asks to confirm it is cancelled', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(
+      f.billing({
+        subscription: {
+          ...f.billing().subscription,
+          status: 'active',
+          source: 'google',
+          trialEndsAt: null,
+        },
+      })
+    );
+    setup(f.user(), api, true);
+    const dialog = openDeletion();
+    expect(
+      await within(dialog).findByText(tr('app.profile.deleteAccount.play.warning'))
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('link', { name: tr('app.profile.deleteAccount.play.link') })
+    ).toHaveAttribute('href', 'https://play.google.com/store/account/subscriptions');
+    fireEvent.change(within(dialog).getByLabelText(tr('app.profile.deleteAccount.password')), {
+      target: { value: STRONG },
+    });
+    expect(confirmButton(dialog)).toBeDisabled();
+    fireEvent.click(within(dialog).getByLabelText(tr('app.profile.deleteAccount.play.confirm')));
+    fireEvent.click(confirmButton(dialog));
+    expect(api.authApi.deleteAccount).toHaveBeenCalledWith({
+      password: STRONG,
+      confirmPlayCancelled: true,
+    });
+    await waitFor(() => expect(localStorage.getItem('mm_token')).toBeNull());
+  });
+
+  it('shows the Google Play notice when the API reports a subscription the app did not know', async () => {
+    const { api } = setup(f.user({ hasPassword: false }));
+    api.authApi.deleteAccount.mockRejectedValueOnce(
+      new ApiError('Google Play', 409, 'PLAY_SUBSCRIPTION_ACTIVE')
+    );
+    const dialog = openDeletion();
+    fireEvent.click(confirmButton(dialog));
+    expect(
+      await within(dialog).findByText(tr('app.profile.deleteAccount.play.warning'))
+    ).toBeInTheDocument();
+    // No duplicated error text, and Google stays hidden until the box is ticked.
+    expect(within(dialog).queryByText('Google Play')).toBeNull();
+    expect(
+      within(dialog).queryByRole('button', { name: tr('app.profile.deleteAccount.googleConfirm') })
+    ).toBeNull();
+    fireEvent.click(within(dialog).getByLabelText(tr('app.profile.deleteAccount.play.confirm')));
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: tr('app.profile.deleteAccount.googleConfirm') })
+    );
+    await waitFor(() =>
+      expect(api.authApi.deleteAccount).toHaveBeenLastCalledWith({
+        googleToken: 'mock-token',
+        confirmPlayCancelled: true,
+      })
+    );
   });
 
   it('cancels the account deletion', () => {

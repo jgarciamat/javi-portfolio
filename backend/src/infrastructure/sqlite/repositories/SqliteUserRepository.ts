@@ -108,6 +108,10 @@ interface RefreshTokenRow {
   token_hash: string;
   expires_at: string;
   created_at: string;
+  family_id: string;
+  family_expires_at: string;
+  auth_time: string;
+  rotated_at: string | null;
 }
 
 export class SqliteRefreshTokenRepository implements RefreshTokenRepository {
@@ -116,9 +120,11 @@ export class SqliteRefreshTokenRepository implements RefreshTokenRepository {
   save(record: RefreshTokenRecord): void {
     this.db
       .prepare(
-        'INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, ?)'
+        `INSERT INTO refresh_tokens
+           (id, user_id, token_hash, expires_at, created_at, family_id, family_expires_at, auth_time, rotated_at)
+         VALUES (@id, @userId, @tokenHash, @expiresAt, @createdAt, @familyId, @familyExpiresAt, @authTime, @rotatedAt)`
       )
-      .run(record.id, record.userId, record.tokenHash, record.expiresAt, record.createdAt);
+      .run(record);
   }
 
   findByHash(tokenHash: string): RefreshTokenRecord | null {
@@ -132,18 +138,26 @@ export class SqliteRefreshTokenRepository implements RefreshTokenRepository {
           tokenHash: row.token_hash,
           expiresAt: row.expires_at,
           createdAt: row.created_at,
+          familyId: row.family_id,
+          familyExpiresAt: row.family_expires_at,
+          authTime: row.auth_time,
+          rotatedAt: row.rotated_at,
         }
       : null;
   }
 
-  extend(tokenHash: string, expiresAt: string): void {
+  markRotated(tokenHash: string, at: string): void {
     this.db
-      .prepare('UPDATE refresh_tokens SET expires_at = ? WHERE token_hash = ?')
-      .run(expiresAt, tokenHash);
+      .prepare('UPDATE refresh_tokens SET rotated_at = ? WHERE token_hash = ?')
+      .run(at, tokenHash);
   }
 
   deleteByHash(tokenHash: string): void {
     this.db.prepare('DELETE FROM refresh_tokens WHERE token_hash = ?').run(tokenHash);
+  }
+
+  deleteFamily(familyId: string): void {
+    this.db.prepare('DELETE FROM refresh_tokens WHERE family_id = ?').run(familyId);
   }
 
   deleteByUser(userId: string): void {
@@ -151,7 +165,9 @@ export class SqliteRefreshTokenRepository implements RefreshTokenRepository {
   }
 
   deleteExpired(now: Date): number {
-    return this.db.prepare('DELETE FROM refresh_tokens WHERE expires_at < ?').run(now.toISOString())
-      .changes;
+    const at = now.toISOString();
+    return this.db
+      .prepare('DELETE FROM refresh_tokens WHERE expires_at < ? OR family_expires_at < ?')
+      .run(at, at).changes;
   }
 }

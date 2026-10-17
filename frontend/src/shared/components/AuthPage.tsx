@@ -10,9 +10,11 @@ import { PublicHeader } from './PublicHeader';
 
 export function AuthPage() {
   const [params] = useSearchParams();
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(() =>
-    params.get('mode') === 'register' ? 'register' : 'login'
-  );
+  // ?mode=register (pricing links) and ?mode=forgot (the "you already have an account" e-mail).
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(() => {
+    const requested = params.get('mode');
+    return requested === 'register' || requested === 'forgot' ? requested : 'login';
+  });
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 

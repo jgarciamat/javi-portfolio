@@ -361,7 +361,13 @@ const cases: Case[] = [
   ['household', () => householdApi.status(), 'GET', '/household'],
   ['household invite', () => householdApi.invite(), 'POST', '/household/invite'],
   ['household cancel invite', () => householdApi.cancelInvite(), 'DELETE', '/household/invite'],
-  ['household preview', () => householdApi.preview('A B'), 'GET', '/household/invite/A%20B'],
+  [
+    'household preview',
+    () => householdApi.preview('A B'),
+    'POST',
+    '/household/invite/preview',
+    { code: 'A B' },
+  ],
   ['household join', () => householdApi.join('CODE'), 'POST', '/household/join'],
   ['household leave', () => householdApi.leave(), 'DELETE', '/household/membership'],
   ['household remove', () => householdApi.remove('u 1'), 'DELETE', '/household/members/u%201'],
@@ -421,7 +427,14 @@ const cases: Case[] = [
     { newPassword: 'N' },
   ],
   ['avatar', () => authApi.updateAvatar(null), 'PATCH', '/profile/avatar', { avatarDataUrl: null }],
-  ['delete account', () => authApi.deleteAccount(), 'DELETE', '/profile/account'],
+  ['delete account', () => authApi.deleteAccount(), 'DELETE', '/profile/account', {}],
+  [
+    'delete account with proof',
+    () => authApi.deleteAccount({ password: 'P', confirmPlayCancelled: true }),
+    'DELETE',
+    '/profile/account',
+    { password: 'P', confirmPlayCancelled: true },
+  ],
 ];
 
 describe('API endpoints', () => {
