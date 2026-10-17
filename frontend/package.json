@@ -67,7 +67,7 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.1",
     "typescript": "^5.3.3",
-    "vite": "^6.4.1",
+    "vite": "^8.3.2",
     "vite-plugin-pwa": "^1.2.0"
   },
   "overrides": {
