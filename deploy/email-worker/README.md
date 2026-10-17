@@ -23,7 +23,7 @@ un recibo o factura a esa dirección, este Worker lo recibe y lo manda a la API
 4. **Cloudflare, Email Routing** (dominio `finanverso.app`): activa Email Routing y añade el subdominio
    `facturas` (Email, Email Routing, Settings, Subdomains). Cloudflare crea los registros MX.
    Después, en Routing rules, crea una **catch-all** del subdominio con la acción
-   *Send to a Worker* y elige `money-manager-inbox`.
+   *Send to a Worker* y elige `finanverso-inbox`.
    Usar un subdominio evita que el resto de direcciones de `finanverso.app` pasen por el Worker.
 
 Mientras `INBOUND_EMAIL_DOMAIN` e `INBOUND_EMAIL_SECRET` no estén definidos, la tarjeta de la app

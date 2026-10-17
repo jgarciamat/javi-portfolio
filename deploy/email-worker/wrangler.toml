@@ -1,4 +1,4 @@
-name = "money-manager-inbox"
+name = "finanverso-inbox"
 main = "worker.js"
 compatibility_date = "2025-01-01"
 
