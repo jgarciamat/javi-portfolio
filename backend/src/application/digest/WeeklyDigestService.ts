@@ -3,6 +3,7 @@ import {
   RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
+  TransactionSearchResult,
 } from '@domain/ports/repositories';
 import { Clock, EmailSender } from '@domain/ports/services';
 import { DigestData, DigestUpcoming, buildDigest, isDigestWindow } from '@domain/services/digest';
@@ -61,7 +62,7 @@ export class WeeklyDigestService {
   build(userId: string, now: Date): DigestData {
     const from = isoDay(now, 7);
     const to = isoDay(now, 1);
-    const week = (a: string, b: string, type: 'EXPENSE' | 'INCOME') =>
+    const week = (a: string, b: string, type: 'EXPENSE' | 'INCOME'): TransactionSearchResult =>
       this.transactions.search(userId, {
         type,
         from: a,

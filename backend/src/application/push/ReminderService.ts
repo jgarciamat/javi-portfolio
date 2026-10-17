@@ -59,7 +59,7 @@ export class ReminderService {
       const { locale, currency } = this.settings.get(userId);
       const copy = COPY[locale];
       const tag = locale === 'es' ? 'es-ES' : 'en-GB';
-      const money = (cents: number) =>
+      const money = (cents: number): string =>
         new Intl.NumberFormat(tag, { style: 'currency', currency }).format(cents / 100);
 
       const bills = this.digest.upcoming(userId, now);

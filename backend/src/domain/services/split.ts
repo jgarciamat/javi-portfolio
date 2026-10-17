@@ -40,7 +40,7 @@ export function suggestTransfers(balances: Balance[]): Transfer[] {
   const debtors = balances.filter((b) => b.cents < 0).map((b) => ({ ...b, cents: -b.cents }));
   const creditors = balances.filter((b) => b.cents > 0).map((b) => ({ ...b }));
   const transfers: Transfer[] = [];
-  const byAmount = (a: Balance, b: Balance) =>
+  const byAmount = (a: Balance, b: Balance): number =>
     b.cents - a.cents || a.memberId.localeCompare(b.memberId);
   while (debtors.length > 0 && creditors.length > 0) {
     debtors.sort(byAmount);
