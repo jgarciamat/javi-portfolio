@@ -146,7 +146,10 @@ const CHILD = /hij|nacimiento|adopci|guarder|maternidad|descend|menor/;
 
 /** What makes a deduction relevant, by words of its id or title: the first rule that matches decides. */
 const RULES: [RegExp, (s: DraftSituation) => boolean][] = [
-  [/numerosa|monoparental/, (s) => s.childAges.length >= 2 || s.childAges.length > 0],
+  // A single-parent family has one child or more; a large family (Ley 40/2003, art. 2) at least
+  // two (three in general, two in the special cases), as does the separated parent with two.
+  [/monoparental/, (s) => s.childAges.length > 0],
+  [/numerosa|dos hijos/, (s) => s.childAges.length >= 2],
   [/maternidad|guarder/, (s) => s.childAges.some((a) => a < 3)],
   [/nacimiento|adopci/, (s) => s.childAges.some((a) => a < 2)],
   [CHILD, (s) => s.childAges.length > 0],
