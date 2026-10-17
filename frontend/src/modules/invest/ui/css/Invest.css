@@ -532,7 +532,9 @@
   border-radius: 2px;
 }
 
-.inv-legend-line {
+/* Sample of the line (colour and pattern); more specific than `.inv-chart svg`. */
+.inv-legend .inv-legend-line {
+  display: inline-block;
   width: 22px;
   height: 6px;
   flex: none;
