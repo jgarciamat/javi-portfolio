@@ -54,6 +54,8 @@ describe('Detect bank payments (settings)', () => {
     api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free' }));
     renderWithProviders(<CaptureCard />, { api, plan: true });
     expect(await screen.findByText(tr('app.capture.locked'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
   it('is off until it is turned on, then asks for access to the notifications', async () => {

@@ -219,6 +219,8 @@ describe('PlanBanner', () => {
           customAlerts: 0,
           rentaCalculations: 0,
           autonomoDrafts: 0,
+          autonomoPdfs: 0,
+          assets: 0,
           movements: 37,
         },
       })

@@ -23,6 +23,8 @@ export const RESOURCE_KEYS: Record<LimitedResource, string> = {
   customAlerts: 'billing.resource.customAlerts',
   rentaCalculations: 'billing.resource.rentaCalculations',
   autonomoDrafts: 'billing.resource.autonomoDrafts',
+  autonomoPdfs: 'billing.resource.autonomoPdfs',
+  assets: 'billing.resource.assets',
 };
 
 export const FEATURE_KEYS: Record<PremiumFeature, string> = {

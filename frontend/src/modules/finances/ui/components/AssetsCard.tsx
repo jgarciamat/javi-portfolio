@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
@@ -80,6 +81,7 @@ export function AssetsCard() {
   const { assetApi } = useApi();
   const { t } = useI18n();
   const { money } = useFormat();
+  const plan = useOptionalPlan();
   const action = useAction();
   const { data: assets, reload } = useResource(() => assetApi.getAll(), [assetApi], {
     initial: [],
@@ -92,6 +94,9 @@ export function AssetsCard() {
   const amount = parseDecimal(value);
   const debts = assets.filter((a) => a.kind === 'debt' && a.value > 0);
   const valid = name.trim() !== '' && Number.isFinite(amount) && amount >= 0 && value.trim() !== '';
+  // The free plan keeps one element (of any kind); adding more needs Premium.
+  const limit = plan?.overview?.limits.resources.assets;
+  const locked = limit !== null && limit !== undefined && assets.length >= limit;
   const total = assets.reduce((sum, a) => sum + (a.kind === 'debt' ? -a.value : a.value), 0);
 
   const run = (job: () => Promise<unknown>) =>
@@ -125,89 +130,105 @@ export function AssetsCard() {
             </p>
           </>
         )}
-        <div className="form-grid">
-          <label className="field">
-            <span className="field-label">{t('app.assets.name')}</span>
-            <input
-              className="tx-input"
-              value={name}
-              maxLength={60}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </label>
-          <label className="field">
-            <span className="field-label">{t('app.assets.kind')}</span>
-            <select
-              className="tx-input"
-              value={kind}
-              onChange={(e) => setKind(e.target.value as AssetKind)}
+        {locked ? (
+          <div className="renta-gate">
+            <p className="section-hint">{t('app.assets.usedFree')}</p>
+            <button
+              className="btn-primary"
+              onClick={() =>
+                plan?.openUpgrade({ kind: 'limit', resource: 'assets', limit: limit as number })
+              }
             >
-              {KINDS.map((k) => (
-                <option key={k} value={k}>
-                  {t(`app.assets.kind.${k}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span className="field-label">{t('app.assets.value')}</span>
-            <input
-              className="tx-input"
-              inputMode="decimal"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-          </label>
-          {kind === 'debt' && (
-            <>
+              {t('billing.seePlans')}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="form-grid">
               <label className="field">
-                <span className="field-label">{t('app.assets.rate')}</span>
+                <span className="field-label">{t('app.assets.name')}</span>
                 <input
                   className="tx-input"
-                  inputMode="decimal"
-                  value={rate}
-                  onChange={(e) => setRate(e.target.value)}
+                  value={name}
+                  maxLength={60}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </label>
               <label className="field">
-                <span className="field-label">{t('app.assets.minPayment')}</span>
+                <span className="field-label">{t('app.assets.kind')}</span>
+                <select
+                  className="tx-input"
+                  value={kind}
+                  onChange={(e) => setKind(e.target.value as AssetKind)}
+                >
+                  {KINDS.map((k) => (
+                    <option key={k} value={k}>
+                      {t(`app.assets.kind.${k}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span className="field-label">{t('app.assets.value')}</span>
                 <input
                   className="tx-input"
                   inputMode="decimal"
-                  value={minPayment}
-                  onChange={(e) => setMinPayment(e.target.value)}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
                 />
               </label>
-            </>
-          )}
-        </div>
-        <div className="button-row">
-          <button
-            className="btn-secondary"
-            disabled={!valid || action.pending}
-            onClick={() =>
-              void run(async () => {
-                await assetApi.create({
-                  name: name.trim(),
-                  kind,
-                  value: amount,
-                  ...(kind === 'debt' && rate.trim() !== ''
-                    ? { interestRate: parseDecimal(rate) }
-                    : {}),
-                  ...(kind === 'debt' && minPayment.trim() !== ''
-                    ? { minPayment: parseDecimal(minPayment) }
-                    : {}),
-                });
-                setName('');
-                setValue('');
-                setRate('');
-                setMinPayment('');
-              })
-            }
-          >
-            {t('app.assets.add')}
-          </button>
-        </div>
+              {kind === 'debt' && (
+                <>
+                  <label className="field">
+                    <span className="field-label">{t('app.assets.rate')}</span>
+                    <input
+                      className="tx-input"
+                      inputMode="decimal"
+                      value={rate}
+                      onChange={(e) => setRate(e.target.value)}
+                    />
+                  </label>
+                  <label className="field">
+                    <span className="field-label">{t('app.assets.minPayment')}</span>
+                    <input
+                      className="tx-input"
+                      inputMode="decimal"
+                      value={minPayment}
+                      onChange={(e) => setMinPayment(e.target.value)}
+                    />
+                  </label>
+                </>
+              )}
+            </div>
+            <div className="button-row">
+              <button
+                className="btn-secondary"
+                disabled={!valid || action.pending}
+                onClick={() =>
+                  void run(async () => {
+                    await assetApi.create({
+                      name: name.trim(),
+                      kind,
+                      value: amount,
+                      ...(kind === 'debt' && rate.trim() !== ''
+                        ? { interestRate: parseDecimal(rate) }
+                        : {}),
+                      ...(kind === 'debt' && minPayment.trim() !== ''
+                        ? { minPayment: parseDecimal(minPayment) }
+                        : {}),
+                    });
+                    setName('');
+                    setValue('');
+                    setRate('');
+                    setMinPayment('');
+                  })
+                }
+              >
+                {t('app.assets.add')}
+              </button>
+            </div>
+          </>
+        )}
       </div>
       {debts.length > 0 && <DebtPlanCard debts={debts} onChanged={() => void reload()} />}
     </>

@@ -291,6 +291,10 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
       res.status(201).json(c.tax.draft(req.dataUserId, year, quarter, inputs));
     })
   );
+  router.post(
+    '/business/draft/pdf',
+    authed((req, res) => res.status(201).json(c.tax.recordPdf(req.dataUserId)))
+  );
   router.get(
     '/business/tax/:year',
     authed((req, res) =>

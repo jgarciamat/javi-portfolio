@@ -301,6 +301,7 @@ const cases: Case[] = [
     'POST',
     '/business/draft',
   ],
+  ['count a self-employed draft PDF', () => businessApi.recordPdf(), 'POST', '/business/draft/pdf'],
   ['register the use of the draft reader', () => rentaApi.draft(), 'POST', '/renta/draft'],
   ['inbox', () => inboxApi.get(), 'GET', '/inbox'],
   ['new inbox address', () => inboxApi.rotate(), 'POST', '/inbox/rotate'],

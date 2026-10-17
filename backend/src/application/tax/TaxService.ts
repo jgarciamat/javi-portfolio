@@ -1,5 +1,6 @@
 import { NotFoundError } from '@domain/errors';
 import {
+  AutonomoPdfRepository,
   AutonomoUsageRepository,
   BusinessCategoryRepository,
   CategoryRepository,
@@ -24,7 +25,8 @@ export class TaxService {
     private readonly categories: CategoryRepository,
     private readonly transactions: TransactionRepository,
     private readonly entitlements: EntitlementService,
-    private readonly drafts: AutonomoUsageRepository
+    private readonly drafts: AutonomoUsageRepository,
+    private readonly pdfs: AutonomoPdfRepository
   ) {}
 
   list(userId: string): BusinessCategoryView[] {
@@ -70,6 +72,12 @@ export class TaxService {
       expenses: manual ? manual.lines.filter((l) => l.quarter <= quarter) : null,
       used: this.drafts.increment(userId),
     };
+  }
+
+  /** A draft downloaded as a PDF: the free plan can download one, Premium as many as it wants. */
+  recordPdf(userId: string): { used: number } {
+    this.entitlements.assertCanCreate(userId, 'autonomoPdfs', this.pdfs.count(userId));
+    return { used: this.pdfs.increment(userId) };
   }
 
   private movements(userId: string): BusinessMovement[] {

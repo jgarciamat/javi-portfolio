@@ -141,12 +141,29 @@ describe('Assets, debts and the net worth', () => {
     expect(res.body.code).toBe('TOO_MANY_ASSETS');
   });
 
-  it('is private and Premium', async () => {
+  it('is private, and the free plan keeps one element of any kind', async () => {
     const other = await createUser(ctx, 'otra@example.com');
-    await post('/api/assets', { name: 'Mío', kind: 'other', value: 1 }).expect(201);
+    const mine = await post('/api/assets', { name: 'Mío', kind: 'debt', value: 1 }).expect(201);
     expect((await request(ctx.app).get('/api/assets').set(other.auth)).body).toEqual([]);
     expireTrial(ctx, user);
-    await request(ctx.app).get('/api/assets').set(user.auth).expect(402);
-    await post('/api/assets', { name: 'x', kind: 'other', value: 1 }).expect(402);
+    // The one it has stays fully usable...
+    expect(
+      (await request(ctx.app).get('/api/assets').set(user.auth).expect(200)).body
+    ).toHaveLength(1);
+    await post(`/api/assets/${mine.body.id}/values`, { value: 2 }).expect(200);
+    await request(ctx.app)
+      .patch(`/api/assets/${mine.body.id}/terms`)
+      .set(user.auth)
+      .send({ interestRate: 5, minPayment: 10 })
+      .expect(200);
+    // ...but a second one needs Premium.
+    const refused = await post('/api/assets', { name: 'x', kind: 'other', value: 1 }).expect(402);
+    expect(refused.body.code).toBe('PLAN_LIMIT');
+    expect(refused.body.details).toEqual({ resource: 'assets', limit: 1 });
+    expect((await request(ctx.app).get('/api/billing').set(user.auth)).body.usage.assets).toBe(1);
+    await request(ctx.app).delete(`/api/assets/${mine.body.id}`).set(user.auth).expect(204);
+    await post('/api/assets', { name: 'x', kind: 'investment', value: 1 }).expect(201);
+    // The net worth is still a Premium insight.
+    await request(ctx.app).get('/api/stats/net-worth?months=3').set(user.auth).expect(402);
   });
 });

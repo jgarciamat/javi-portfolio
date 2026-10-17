@@ -17,6 +17,8 @@ import { Icon } from '@shared/components/Icon';
 const RESOURCES: LimitedResource[] = [
   'rentaCalculations',
   'autonomoDrafts',
+  'autonomoPdfs',
+  'assets',
   'accounts',
   'budgets',
   'goals',

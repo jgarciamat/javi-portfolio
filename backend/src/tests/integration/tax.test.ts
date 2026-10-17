@@ -454,6 +454,17 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       expect(overview.usage.autonomoDrafts).toBe(1);
     });
 
+    it('lets the free plan download one PDF only, and Premium as many as it wants', async () => {
+      const pdf = () => request(ctx.app).post('/api/business/draft/pdf').set(user.auth);
+      for (let i = 1; i <= 2; i++) expect((await pdf().expect(201)).body).toEqual({ used: i });
+      expireTrial(ctx, user);
+      const refused = await pdf().expect(402);
+      expect(refused.body.details).toEqual({ resource: 'autonomoPdfs', limit: 1 });
+      const overview = (await request(ctx.app).get('/api/billing').set(user.auth)).body;
+      expect(overview.usage.autonomoPdfs).toBe(2);
+      await request(ctx.app).post('/api/business/draft/pdf').expect(401);
+    });
+
     it('is unlimited in the trial and rejects invalid data', async () => {
       for (let i = 1; i <= 3; i++) expect((await draft(1).expect(201)).body.used).toBe(i);
       await request(ctx.app)

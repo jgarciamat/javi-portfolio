@@ -30,15 +30,12 @@ describe('Learn to invest: free accounts', () => {
     expect(within(tab('map')).queryByText('Premium')).toBeNull();
   });
 
-  it('shows a blurred preview and an upgrade panel instead of the chapters', async () => {
+  it('shows the intro, a translucent preview and an upgrade panel instead of the chapters', async () => {
     const { container } = renderInvest(FREE);
     await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
     fireEvent.click(tab('learn'));
     const panel = screen.getByRole('region', { name: tr('app.invest.locked.title') });
     expect(panel).toHaveTextContent(tr('app.invest.locked.text'));
-    for (const k of ['stocks', 'funds', 'bonds', 'crypto', 'tools', 'markets']) {
-      expect(panel).toHaveTextContent(tr(`app.invest.locked.item.${k}`));
-    }
     const preview = container.querySelector('.inv-locked-preview') as HTMLElement;
     expect(preview).toHaveAttribute('aria-hidden', 'true');
     expect(preview).toHaveAttribute('inert');
@@ -140,7 +137,7 @@ describe('Locked preview in English', () => {
   it('is in English and still has no real text', () => {
     const upgrade = jest.fn();
     const { container } = renderWithI18n(<LearnLocked onUpgrade={upgrade} />, 'en');
-    expect(screen.getByText('Learn to invest is Premium')).toBeInTheDocument();
+    expect(screen.getByText('Go Premium to see the content of the chapters')).toBeInTheDocument();
     expect(screen.getByText(CHAPTERS[0].titleEn)).toBeInTheDocument();
     expect(container.textContent).not.toContain(CHAPTERS[0].summaryEn);
     fireEvent.click(screen.getByRole('button', { name: 'See the Premium plans' }));

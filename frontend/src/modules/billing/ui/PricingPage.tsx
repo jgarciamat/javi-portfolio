@@ -15,6 +15,8 @@ const RESOURCES: LimitedResource[] = [
   'customAlerts',
   'rentaCalculations',
   'autonomoDrafts',
+  'autonomoPdfs',
+  'assets',
 ];
 const FEATURES: PremiumFeature[] = ['import', 'insights', 'forecast', 'household', 'aiAdvisor'];
 

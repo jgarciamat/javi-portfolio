@@ -16,6 +16,7 @@ import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 import { captureDownloads } from '@test-utils/dom';
+import { ApiError } from '@core/api/http';
 
 jest.mock('@core/notifications/notifications', () => ({
   notificationsSupported: jest.fn(() => true),
@@ -610,48 +611,14 @@ describe('AnalysisView', () => {
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
-describe('Premium sections', () => {
-  const sections = [
-    ['investments and debts', <AssetsView key="a" />, 'app.assets.locked'],
-  ] as const;
-
-  it.each(sections)(
-    'invites free users to upgrade in the %s section',
-    async (_name, view, hint) => {
-      const api = createFakeApi();
-      api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free' }));
-      renderWithProviders(view, { api, plan: true });
-      expect(await screen.findByText(tr(hint))).toBeInTheDocument();
-      fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
-      expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    }
-  );
-
-  it.each(sections)('waits for the plan before deciding in the %s section', async (_name, view) => {
-    const api = createFakeApi();
-    api.billingApi.get.mockReturnValue(new Promise(() => undefined));
-    renderWithProviders(view, { api, plan: true });
-    expect(await screen.findByText(tr('app.common.loading'))).toBeInTheDocument();
-  });
-
-  it.each(sections)('shows the %s section to Premium users', async (_name, view, hint) => {
-    const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
-    renderWithProviders(view, { api, plan: true });
-    await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
-    await waitFor(() => expect(screen.queryByText(tr(hint))).toBeNull());
-    expect(screen.queryByText(tr('app.common.loading'))).toBeNull();
-  });
-});
-
 describe('the self-employed draft', () => {
-  const free = (usage = 0) => {
+  const free = (usage = 0, pdfs = 0) => {
     const api = createFakeApi();
     const overview = f.billing({ plan: 'free' });
     api.billingApi.get.mockResolvedValue({
       ...overview,
       limits: f.catalog().limits.free,
-      usage: { ...overview.usage, autonomoDrafts: usage },
+      usage: { ...overview.usage, autonomoDrafts: usage, autonomoPdfs: pdfs },
     });
     return api;
   };
@@ -974,6 +941,47 @@ describe('the self-employed draft', () => {
     expect(await screen.findByText(tr('app.autonomo.pdf.error'))).toBeInTheDocument();
   });
 
+  describe('the PDF on the free plan', () => {
+    const prepared = () =>
+      localStorage.setItem(
+        'mm_autonomo_draft2',
+        JSON.stringify({ draft: f.autonomoDraft(), inputs: null })
+      );
+
+    it('counts the one free download and refreshes the plan', async () => {
+      prepared();
+      const api = open(free(1));
+      expect(await screen.findByText(tr('app.autonomo.pdf.freeOne'))).toBeInTheDocument();
+      await waitFor(() => expect(api.billingApi.get).toHaveBeenCalledTimes(1));
+      fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.pdf.download') }));
+      await waitFor(() => expect(api.billingApi.get).toHaveBeenCalledTimes(2));
+      expect(api.businessApi.recordPdf).toHaveBeenCalledTimes(1);
+      expect(shareImage).toHaveBeenCalledTimes(1);
+    });
+
+    it('asks for Premium once the free PDF is used', async () => {
+      prepared();
+      const api = open(free(0, 1));
+      expect(await screen.findByText(tr('app.autonomo.pdf.usedFree'))).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: tr('app.autonomo.pdf.download') })).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.goPremium') }));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+      expect(api.businessApi.recordPdf).not.toHaveBeenCalled();
+    });
+
+    it('builds no PDF when the server refuses it, and shows no error', async () => {
+      prepared();
+      const api = open(free(1));
+      api.businessApi.recordPdf.mockRejectedValueOnce(
+        new ApiError('Límite', 402, 'PLAN_LIMIT', { resource: 'autonomoPdfs', limit: 1 })
+      );
+      fireEvent.click(await screen.findByRole('button', { name: tr('app.autonomo.pdf.download') }));
+      await waitFor(() => expect(api.billingApi.get).toHaveBeenCalledTimes(2));
+      expect(buildAutonomoPdf).not.toHaveBeenCalled();
+      expect(screen.queryByText(tr('app.autonomo.pdf.error'))).toBeNull();
+    });
+  });
+
   it('offers the share sheet on a phone instead of downloading', async () => {
     const original = window.matchMedia;
     window.matchMedia = jest.fn(() => ({ matches: true })) as unknown as typeof window.matchMedia;
@@ -1125,6 +1133,37 @@ describe('the investments and debts section', () => {
       screen.getByRole('button', { name: tr('app.assets.remove', { name: 'Fondo indexado' }) })
     );
     await waitFor(() => expect(api.assetApi.remove).toHaveBeenCalledWith('a1'));
+  });
+
+  describe('on the free plan', () => {
+    const free = () => {
+      const api = createFakeApi();
+      api.billingApi.get.mockResolvedValue({
+        ...f.billing({ plan: 'free' }),
+        limits: f.catalog().limits.free,
+      });
+      return api;
+    };
+
+    it('lets a free account add its first element', async () => {
+      const api = free();
+      renderWithProviders(<AssetsView />, { api, plan: true });
+      await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
+      expect(await screen.findByRole('button', { name: tr('app.assets.add') })).toBeInTheDocument();
+      expect(screen.queryByText(tr('app.assets.usedFree'))).toBeNull();
+    });
+
+    it('asks for Premium to add a second one, and keeps the first usable', async () => {
+      const api = free();
+      api.assetApi.getAll.mockResolvedValue([fund]);
+      renderWithProviders(<AssetsView />, { api, plan: true });
+      expect(await screen.findByText(tr('app.assets.usedFree'))).toBeInTheDocument();
+      expect(screen.getByText('Fondo indexado')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: tr('app.assets.add') })).toBeNull();
+      expect(screen.queryByRole('textbox', { name: tr('app.assets.name') })).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    });
   });
 
   it('shows why a value was refused', async () => {
