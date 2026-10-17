@@ -147,4 +147,26 @@ describe('Receipts forwarded by e-mail', () => {
     expect(recent).toHaveLength(10);
     expect(recent[0].description).toBe('Tienda11');
   });
+
+  it('rejects callers without the secret before reading the message, however large it is', async () => {
+    const started = Date.now();
+    await request(ctx.app)
+      .post('/api/inbound/email')
+      .send({ to: 'x@y.z', html: '<'.repeat(199_000) })
+      .expect(401);
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+
+  it('reads hostile html and long digit runs quickly when the secret is right', async () => {
+    const { address } = await inbox();
+    const started = Date.now();
+    await mail(address, { text: '', html: '<'.repeat(199_000) }).expect(200);
+    await mail(address, { text: `${'1'.repeat(49_000)} €` }).expect(200);
+    await mail(`${'<'.repeat(900)}${address}`).expect(200);
+    expect(Date.now() - started).toBeLessThan(2000);
+  });
+
+  it('refuses oversized recipients', async () => {
+    await mail('a'.repeat(1001)).expect(400);
+  });
 });

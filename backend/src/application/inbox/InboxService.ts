@@ -58,8 +58,13 @@ export class InboxService {
     return this.overview(userId);
   }
 
-  async receive(secret: string | undefined, mail: IncomingMail): Promise<InboxStatus | 'ignored'> {
+  /** Rejects callers without the shared secret; called before the message is even parsed. */
+  assertAuthorized(secret: string | undefined): void {
     if (!this.authorized(secret)) throw new UnauthorizedError('Servicio no autorizado');
+  }
+
+  async receive(secret: string | undefined, mail: IncomingMail): Promise<InboxStatus | 'ignored'> {
+    this.assertAuthorized(secret);
     const token = inboxTokenOf(mail.to);
     const userId = token ? this.repo.userOf(token) : null;
     if (!userId) return 'ignored';

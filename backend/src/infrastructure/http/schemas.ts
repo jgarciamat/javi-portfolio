@@ -392,26 +392,53 @@ export const clientErrorBody = z.object({
   path: z.string().max(300).optional(),
 });
 
-const stripTags = (html: string) =>
-  html
-    .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+/** Removes every `<open ...>...</close>` block of the given tag, scanning the text once. */
+function dropBlocks(html: string, tag: 'style' | 'script'): string {
+  const lower = html.toLowerCase();
+  let out = '';
+  let from = 0;
+  for (;;) {
+    const start = lower.indexOf(`<${tag}`, from);
+    if (start < 0) break;
+    const end = lower.indexOf(`</${tag}>`, start);
+    if (end < 0) break;
+    out += `${html.slice(from, start)} `;
+    from = end + tag.length + 3;
+  }
+  return out + html.slice(from);
+}
+
+/** Plain text out of an html e-mail. Linear in the size of the input, whatever it contains. */
+export function stripTags(html: string): string {
+  const body = dropBlocks(dropBlocks(html, 'style'), 'script');
+  let out = '';
+  let from = 0;
+  for (;;) {
+    const open = body.indexOf('<', from);
+    if (open < 0) break;
+    const close = body.indexOf('>', open + 1);
+    if (close < 0) break;
+    out += `${body.slice(from, open)} `;
+    from = close + 1;
+  }
+  return (out + body.slice(from))
     .replace(/&nbsp;/g, ' ')
     .replace(/&euro;/g, '€')
     .replace(/&amp;/g, '&');
+}
 
 /** A message forwarded by the e-mail service: plain text, or html when there is no text. */
 export const inboundMailBody = z
   .object({
-    to: z.union([z.string(), z.array(z.string())]),
+    to: z.union([z.string().max(1000), z.array(z.string().max(320)).max(20)]),
     from: z.string().max(300).default(''),
     subject: z.string().max(500).default(''),
-    text: z.string().max(100_000).default(''),
-    html: z.string().max(300_000).optional(),
+    text: z.string().max(50_000).default(''),
+    html: z.string().max(200_000).optional(),
     date: z.string().max(40).nullish(),
   })
   .transform(({ to, html, text, ...rest }) => ({
     ...rest,
     to: Array.isArray(to) ? to.join(',') : to,
-    text: text.trim() ? text : html ? stripTags(html) : '',
+    text: (text.trim() ? text : html ? stripTags(html) : '').slice(0, 50_000),
   }));
