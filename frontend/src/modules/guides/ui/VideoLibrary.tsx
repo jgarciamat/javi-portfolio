@@ -1,5 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
+import { scrollBehavior } from '@shared/utils/motion';
 import {
   YOUTUBE_CHANNEL_URL,
   YOUTUBE_SUBSCRIBE_URL,
@@ -8,6 +9,7 @@ import {
   videoThumbnail,
   videoUrl,
   type VideoEntry,
+  type VideoSectionId,
 } from '../domain/videos';
 import './css/Guides.css';
 import './css/Videos.css';
@@ -34,6 +36,38 @@ export function VideoChannelLinks() {
         {t('videos.subscribe')}
       </a>
     </p>
+  );
+}
+
+/** The id of a section of the catalogue, the target of its button in {@link VideoSectionNav}. */
+const sectionId = (id: VideoSectionId) => `video-section-${id}`;
+
+/** One button per section shown in the catalogue: it scrolls to it and moves the focus there. */
+export function VideoSectionNav() {
+  const { t } = useI18n();
+  const jump = (id: VideoSectionId) => {
+    // Every button has its section: both lists come from videoGroups().
+    const target = document.getElementById(sectionId(id)) as HTMLElement;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+  };
+  return (
+    <nav className="video-jump" aria-label={t('videos.jump')}>
+      <ul>
+        {videoGroups().map(({ section }) => (
+          <li key={section.id}>
+            <button
+              type="button"
+              className="video-jump-chip"
+              style={{ ['--cat' as string]: section.color }}
+              onClick={() => jump(section.id)}
+            >
+              <span aria-hidden="true">{section.emoji}</span> {t(`videos.section.${section.id}`)}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -73,7 +107,10 @@ export function VideoCatalog() {
       {videoGroups().map(({ section, videos }) => (
         <section
           key={section.id}
-          className="guide-group"
+          id={sectionId(section.id)}
+          tabIndex={-1}
+          aria-labelledby={`${sectionId(section.id)}-title`}
+          className="guide-group video-group"
           style={{ ['--cat' as string]: section.color }}
         >
           <header className="guide-group-head">
@@ -81,7 +118,7 @@ export function VideoCatalog() {
               {section.emoji}
             </span>
             <div>
-              <h2>{t(`videos.section.${section.id}`)}</h2>
+              <h2 id={`${sectionId(section.id)}-title`}>{t(`videos.section.${section.id}`)}</h2>
               <p>{t('videos.count', { n: videos.length })}</p>
             </div>
           </header>

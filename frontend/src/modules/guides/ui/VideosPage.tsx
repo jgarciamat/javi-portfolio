@@ -4,7 +4,7 @@ import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { VIDEOS_PATH } from '../domain/videos';
 import { GuideCta } from './GuidePages';
-import { VideoCatalog, VideoChannelLinks } from './VideoLibrary';
+import { VideoCatalog, VideoChannelLinks, VideoSectionNav } from './VideoLibrary';
 import '@modules/tools/ui/css/Tools.css';
 
 /** Public «Videoteca»: our YouTube tutorials. */
@@ -23,6 +23,7 @@ export function VideosPage() {
         <h1 className="pricing-title">{t('videos.title')}</h1>
         <p className="pricing-subtitle">{t('videos.hint')}</p>
         <VideoChannelLinks />
+        <VideoSectionNav />
         <VideoCatalog />
         <GuideCta />
       </main>

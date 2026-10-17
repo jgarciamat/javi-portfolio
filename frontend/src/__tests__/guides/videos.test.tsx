@@ -126,6 +126,36 @@ describe('Videoteca in the app', () => {
     }
   });
 
+  it('has a button per shown section that scrolls to it and moves the focus there', () => {
+    const scroll = jest.fn();
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scroll;
+    try {
+      renderWithProviders(<VideosView />);
+      const nav = screen.getByRole('navigation', { name: tr('videos.jump') });
+      const buttons = within(nav).getAllByRole('button');
+      expect(buttons).toHaveLength(videoGroups().length);
+      // Sections without published videos get no button.
+      expect(
+        within(nav).queryByRole('button', { name: literal(tr('videos.section.home')) })
+      ).not.toBeInTheDocument();
+
+      const { section } = videoGroups()[1];
+      fireEvent.click(
+        within(nav).getByRole('button', { name: literal(tr(`videos.section.${section.id}`)) })
+      );
+      const target = screen.getByRole('region', { name: tr(`videos.section.${section.id}`) });
+      expect(target).toHaveAttribute('id', `video-section-${section.id}`);
+      expect(target).toHaveAttribute('tabindex', '-1');
+      expect(target).toHaveFocus();
+      expect(scroll).toHaveBeenCalledTimes(1);
+      expect(scroll.mock.contexts[0]).toBe(target);
+      expect(scroll).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
   it('is shown in English too', () => {
     renderWithProviders(<VideosView />, { locale: 'en' });
     expect(screen.getByRole('heading', { name: 'Video library' })).toBeInTheDocument();

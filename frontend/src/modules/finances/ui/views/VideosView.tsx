@@ -1,5 +1,5 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import { VideoCatalog, VideoChannelLinks } from '@modules/guides/ui/VideoLibrary';
+import { VideoCatalog, VideoChannelLinks, VideoSectionNav } from '@modules/guides/ui/VideoLibrary';
 import { Icon } from '@shared/components/Icon';
 import '../css/Sections.css';
 
@@ -14,6 +14,7 @@ export function VideosView() {
         </h2>
         <p className="section-hint">{t('videos.hint')}</p>
         <VideoChannelLinks />
+        <VideoSectionNav />
         <VideoCatalog />
       </div>
     </div>

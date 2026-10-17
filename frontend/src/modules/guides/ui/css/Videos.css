@@ -101,3 +101,62 @@
   font-weight: 600;
   color: var(--red-400);
 }
+
+/* «Ir a un apartado»: a chip per section, tinted with its colour. */
+.video-jump ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.video-jump-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: auto;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--cat) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat) 12%, transparent);
+  color: color-mix(in srgb, var(--cat) 60%, var(--tint-ink));
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.video-jump-chip:hover {
+  border-color: var(--cat);
+  background: color-mix(in srgb, var(--cat) 22%, transparent);
+}
+
+.video-jump-chip:focus-visible {
+  outline: 2px solid var(--cat);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .video-jump ul {
+    gap: 0.4rem;
+  }
+
+  .video-jump-chip {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* The target of a chip: below any sticky header, and no ring when focused by the button. */
+.video-group {
+  scroll-margin-top: 5rem;
+}
+
+.video-group:focus {
+  outline: none;
+}

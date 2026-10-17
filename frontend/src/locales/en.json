@@ -2254,6 +2254,7 @@
   "videos.subscribe": "Subscribe",
   "videos.watch": "Watch on YouTube",
   "videos.opens": "Watch on YouTube (opens in a new tab)",
+  "videos.jump": "Jump to a section",
   "videos.count": "Videos: {n}",
   "videos.banner": "New: the video library. Step-by-step Finanverso videos on YouTube.",
   "videos.cta": "See the videos",
