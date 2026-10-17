@@ -7,7 +7,7 @@ import { buildContainer, Container } from '@infrastructure/container';
 import { createApp } from '@infrastructure/http/app';
 import { BackupService } from '@infrastructure/backup/BackupService';
 import { openDatabase } from '@infrastructure/sqlite/database';
-import { migrate } from '@infrastructure/sqlite/migrator';
+import { migrate, prunePreMigrationCopies } from '@infrastructure/sqlite/migrator';
 import { migrations } from '@infrastructure/sqlite/migrations';
 
 /** Optional demo user for local development only (never in production). */
@@ -38,6 +38,9 @@ async function main(): Promise<void> {
   const db = openDatabase(config.databasePath);
   const result = migrate(db, migrations, { databaseFile: config.databasePath, logger: console });
   if (result.to !== result.from) console.info(`[db] migrated ${result.from} → ${result.to}`);
+  for (const file of prunePreMigrationCopies(config.databasePath)) {
+    console.info(`[db] removed old pre-migration copy ${file}`);
+  }
 
   const container = buildContainer(db, config);
   await seedDemoUser(container, config);
@@ -63,7 +66,13 @@ async function main(): Promise<void> {
   }
 
   const backups = config.backup.dir
-    ? new BackupService(db, config.backup.dir, config.backup.retentionDays)
+    ? new BackupService(
+        db,
+        config.backup.dir,
+        config.backup.retentionDays,
+        console,
+        config.databasePath
+      )
     : null;
   backups?.start(config.backup.intervalHours);
 

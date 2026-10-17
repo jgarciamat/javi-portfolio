@@ -1,13 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { Db } from '../sqlite/database';
+import { prunePreMigrationCopies } from '../sqlite/migrator';
 
 const PREFIX = 'money-manager-';
 
 /**
  * Online backups with SQLite's backup API (consistent even while the app writes).
  * Files land in BACKUP_DIR; copy that directory off the server (rclone, restic…)
- * to have an off-site copy.
+ * to have an off-site copy. When `databaseFile` is given, each run also prunes the
+ * pre-migration copies written next to it.
  */
 export class BackupService {
   private timer: NodeJS.Timeout | null = null;
@@ -16,7 +18,8 @@ export class BackupService {
     private readonly db: Db,
     private readonly dir: string,
     private readonly retentionDays: number,
-    private readonly logger: Pick<Console, 'info' | 'error'> = console
+    private readonly logger: Pick<Console, 'info' | 'error'> = console,
+    private readonly databaseFile?: string
   ) {}
 
   async runOnce(now = new Date()): Promise<string> {
@@ -24,6 +27,7 @@ export class BackupService {
     const file = path.join(this.dir, `${PREFIX}${now.toISOString().replace(/[:.]/g, '-')}.db`);
     await this.db.backup(file);
     this.prune(now);
+    if (this.databaseFile) prunePreMigrationCopies(this.databaseFile, now);
     this.logger.info(`[backup] written ${file}`);
     return file;
   }

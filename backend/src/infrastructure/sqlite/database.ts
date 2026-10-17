@@ -13,6 +13,8 @@ export function openDatabase(filePath: string): Db {
   db.pragma('synchronous = NORMAL');
   db.pragma('busy_timeout = 5000');
   db.pragma('foreign_keys = ON');
+  // Overwrite deleted content with zeros so removed accounts do not linger in free pages.
+  db.pragma('secure_delete = ON');
   return db;
 }
 
