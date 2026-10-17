@@ -163,7 +163,7 @@ export class AuthService {
     const hash = this.tokens.hash(refreshToken);
     const record = this.refreshTokens.findByHash(hash);
     const now = this.clock.now();
-    const expired = () =>
+    const expired = (): UnauthorizedError =>
       new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
     if (!record) throw expired();
     if (

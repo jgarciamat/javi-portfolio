@@ -1,4 +1,4 @@
-import { NotFoundError, UnauthorizedError, ValidationError } from '@domain/errors';
+import { ForbiddenError, NotFoundError, ValidationError } from '@domain/errors';
 import { User } from '@domain/model/User';
 import { RefreshTokenRepository, UnitOfWork, UserRepository } from '@domain/ports/repositories';
 import { PasswordHasher } from '@domain/ports/services';
@@ -38,7 +38,8 @@ export class ProfileService {
    * Changes (or, for Google-only accounts, sets) the password. Every other session
    * is closed; the caller receives fresh tokens for the current device. Setting the
    * first password needs a recent Google sign-in: otherwise a stolen session could
-   * add one and use it to get past the checks that ask for the password.
+   * add one and use it to get past the checks that ask for the password. A wrong
+   * current password answers 403, never 401, so the client does not sign out.
    */
   async changePassword(
     userId: string,
@@ -50,7 +51,7 @@ export class ProfileService {
     if (user.passwordHash) {
       const valid = await this.hasher.verify(currentPassword ?? '', user.passwordHash);
       if (!valid) {
-        throw new UnauthorizedError('La contraseña actual es incorrecta', 'WRONG_PASSWORD');
+        throw new ForbiddenError('La contraseña actual es incorrecta', 'WRONG_PASSWORD');
       }
     } else {
       await this.auth.confirmIdentity(userId, { authTime });

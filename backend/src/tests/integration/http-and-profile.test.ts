@@ -182,7 +182,11 @@ describe('Profile', () => {
       .patch('/api/profile/password')
       .set(user.auth)
       .send({ currentPassword: 'nope', newPassword: `${STRONG_PASSWORD}2` })
-      .expect(401);
+      .expect(403);
     expect(res.body.code).toBe('WRONG_PASSWORD');
+    await request(ctx.app)
+      .post('/api/auth/login')
+      .send({ email: user.email, password: STRONG_PASSWORD })
+      .expect(200);
   });
 });
