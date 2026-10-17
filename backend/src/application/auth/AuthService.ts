@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { ForbiddenError, UnauthorizedError, ValidationError } from '@domain/errors';
+import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@domain/errors';
 import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
 import { User, normalizeEmail } from '@domain/model/User';
 import { defaultSettings } from '@domain/model/UserSettings';
@@ -28,6 +28,8 @@ export const RESET_TTL_MS = 60 * 60 * 1000;
 export const REFRESH_FAMILY_MAX_MS = 90 * 24 * 60 * 60 * 1000;
 /** The token just exchanged still works this long (two tabs refreshing at once). */
 export const REFRESH_GRACE_MS = 30 * 1000;
+/** Google-only accounts must have signed in this recently for actions that cannot be undone. */
+export const REAUTH_WINDOW_MS = 10 * 60 * 1000;
 const REGISTERED_MESSAGE = 'Registro completado. Revisa tu email para verificar tu cuenta.';
 /** A new reset e-mail is not sent if the previous one is younger than this. */
 export const RESET_RESEND_COOLDOWN_MS = 2 * 60 * 1000;
@@ -216,6 +218,38 @@ export class AuthService {
       throw new UnauthorizedError('Sesión no válida', 'INVALID_TOKEN');
     }
     return { userId: user.id, authTime: claims.authTime };
+  }
+
+  /**
+   * Proof of identity before something that cannot be undone (deleting the account): the
+   * current password, or for Google-only accounts a fresh Google credential or a sign-in
+   * in the last 10 minutes. Answers 403, never 401, so the client does not sign out.
+   */
+  async confirmIdentity(
+    userId: string,
+    proof: { password?: string; googleToken?: string; authTime: number | null }
+  ): Promise<void> {
+    const user = this.users.findById(userId);
+    if (!user) throw new NotFoundError('Usuario no encontrado', 'USER_NOT_FOUND');
+    if (user.passwordHash) {
+      if (!(await this.hasher.verify(proof.password ?? '', user.passwordHash))) {
+        throw new ForbiddenError('La contraseña no es correcta', 'WRONG_PASSWORD');
+      }
+      return;
+    }
+    if (proof.googleToken) {
+      const identity = await this.google.verify(proof.googleToken).catch(() => null);
+      if (identity && identity.googleId === user.googleId) return;
+    } else if (
+      proof.authTime !== null &&
+      this.clock.now().getTime() - proof.authTime <= REAUTH_WINDOW_MS
+    ) {
+      return;
+    }
+    throw new ForbiddenError(
+      'Por seguridad, vuelve a iniciar sesión con Google y repite la operación.',
+      'REAUTH_REQUIRED'
+    );
   }
 
   // ─── Password reset ───────────────────────────────────────────────────────

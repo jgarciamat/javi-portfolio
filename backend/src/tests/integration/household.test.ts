@@ -1,5 +1,6 @@
 import request from 'supertest';
 import {
+  STRONG_PASSWORD,
   TestContext,
   TestUser,
   addTransaction,
@@ -226,7 +227,11 @@ describe('Shared household', () => {
   it('frees the member when the owner deletes the account', async () => {
     await addTransaction(ctx, partner, { description: 'Mío', amount: 3 });
     await joined();
-    await request(ctx.app).delete('/api/profile/account').set(owner.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(owner.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     expect(
       (await month(partner)).transactions.map((t: { description: string }) => t.description)
     ).toEqual(['Mío']);

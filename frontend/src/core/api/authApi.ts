@@ -8,6 +8,14 @@ export interface SessionTokens {
   refreshToken: string;
 }
 
+export interface DeleteAccountProof {
+  password?: string;
+  /** Fresh Google credential, for accounts without a password. */
+  googleToken?: string;
+  /** The user says the Google Play subscription is already cancelled. */
+  confirmPlayCancelled?: boolean;
+}
+
 export const authApi = {
   /** Tells the server, anonymously, where a new user came from (it ignores old accounts). */
   acquisition(source: string) {
@@ -84,7 +92,8 @@ export const authApi = {
       body: jsonBody({ avatarDataUrl }),
     });
   },
-  deleteAccount() {
-    return apiRequest<void>('/profile/account', { method: 'DELETE' });
+  /** Needs the current password (or, for Google-only accounts, a recent Google sign-in). */
+  deleteAccount(proof: DeleteAccountProof = {}) {
+    return apiRequest<void>('/profile/account', { method: 'DELETE', body: jsonBody(proof) });
   },
 };

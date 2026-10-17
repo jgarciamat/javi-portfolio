@@ -69,6 +69,12 @@ export const passwordBody = z.object({
   currentPassword: z.string().max(128).optional(),
   newPassword: z.string().min(1).max(128),
 });
+/** Deleting the account: proof of identity, and the Google Play cancellation acknowledged. */
+export const deleteAccountBody = z.object({
+  password: z.string().max(128).optional(),
+  googleToken: z.string().min(1).max(5000).optional(),
+  confirmPlayCancelled: z.boolean().optional(),
+});
 export const avatarBody = z.object({ avatarDataUrl: z.string().max(3_000_000).nullable() });
 export const settingsBody = z
   .object({

@@ -168,7 +168,11 @@ describe('Profile', () => {
   });
 
   it('rejects the tokens of a deleted account at once', async () => {
-    await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
+    await request(ctx.app)
+      .delete('/api/profile/account')
+      .set(user.auth)
+      .send({ password: STRONG_PASSWORD })
+      .expect(204);
     const res = await request(ctx.app).get('/api/profile').set(user.auth).expect(401);
     expect(res.body.code).toBe('INVALID_TOKEN');
   });

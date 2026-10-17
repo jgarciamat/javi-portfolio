@@ -259,7 +259,11 @@ describe('Auth API', () => {
 
     it('a deleted account cannot keep using its tokens', async () => {
       const user = await createUser(ctx);
-      await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
+      await request(ctx.app)
+        .delete('/api/profile/account')
+        .set(user.auth)
+        .send({ password: STRONG_PASSWORD })
+        .expect(204);
       await request(ctx.app).get('/api/categories').set(user.auth).expect(401);
     });
   });

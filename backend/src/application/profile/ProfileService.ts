@@ -36,12 +36,15 @@ export class ProfileService {
 
   /**
    * Changes (or, for Google-only accounts, sets) the password. Every other session
-   * is closed; the caller receives fresh tokens for the current device.
+   * is closed; the caller receives fresh tokens for the current device. Setting the
+   * first password needs a recent Google sign-in: otherwise a stolen session could
+   * add one and use it to get past the checks that ask for the password.
    */
   async changePassword(
     userId: string,
     currentPassword: string | undefined,
-    newPassword: string
+    newPassword: string,
+    authTime: number | null = null
   ): Promise<SessionTokens> {
     const user = this.requireUser(userId);
     if (user.passwordHash) {
@@ -49,6 +52,8 @@ export class ProfileService {
       if (!valid) {
         throw new UnauthorizedError('La contraseña actual es incorrecta', 'WRONG_PASSWORD');
       }
+    } else {
+      await this.auth.confirmIdentity(userId, { authTime });
     }
     assertStrongPassword(newPassword);
     const updated = user.withPasswordHash(await this.hasher.hash(newPassword));

@@ -33,7 +33,7 @@ interface GoogleButtonProps {
 }
 
 /** "Continue with Google" (implicit flow, custom button). */
-function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
+export function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
   const login = useGoogleLogin({
     onSuccess: (response) => onToken(response.access_token),
     onError,

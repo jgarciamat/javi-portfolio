@@ -427,7 +427,14 @@ const cases: Case[] = [
     { newPassword: 'N' },
   ],
   ['avatar', () => authApi.updateAvatar(null), 'PATCH', '/profile/avatar', { avatarDataUrl: null }],
-  ['delete account', () => authApi.deleteAccount(), 'DELETE', '/profile/account'],
+  ['delete account', () => authApi.deleteAccount(), 'DELETE', '/profile/account', {}],
+  [
+    'delete account with proof',
+    () => authApi.deleteAccount({ password: 'P', confirmPlayCancelled: true }),
+    'DELETE',
+    '/profile/account',
+    { password: 'P', confirmPlayCancelled: true },
+  ],
 ];
 
 describe('API endpoints', () => {
