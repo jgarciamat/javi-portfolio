@@ -532,6 +532,12 @@
   border-radius: 2px;
 }
 
+.inv-legend-line {
+  width: 22px;
+  height: 6px;
+  flex: none;
+}
+
 .inv-legend--wrap i {
   height: 10px;
   border-radius: 3px;

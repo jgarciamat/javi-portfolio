@@ -11,13 +11,14 @@ import {
 } from '../../domain/simulation';
 import type { ChartId } from '../../domain/types';
 import { useNumbers } from '../calculators/Fields';
-import { LineChart, type Point } from './LineChart';
+import { LineChart, type Dash, type Point } from './LineChart';
 
-const GREEN = '#22c55e';
-const BLUE = '#38bdf8';
-const AMBER = '#f59e0b';
-const RED = '#f43f5e';
-const VIOLET = '#a78bfa';
+// Theme tokens: at least 3:1 against the card in the light and the dark theme (WCAG 1.4.11).
+const GREEN = 'var(--green-400)';
+const BLUE = 'var(--blue-400)';
+const AMBER = 'var(--amber-400)';
+const RED = 'var(--red-400)';
+const VIOLET = 'var(--violet-400)';
 
 /** Round, readable tick values between `lo` and `hi` (about `count` of them). */
 export function linearTicks(lo: number, hi: number, count = 4): number[] {
@@ -100,6 +101,7 @@ function VolatilityChart() {
             id: 'bond',
             label: t('app.invest.chart.vol.bond'),
             color: BLUE,
+            dash: 'dotted',
             points: toPoints(data.bond),
           },
           {
@@ -112,6 +114,7 @@ function VolatilityChart() {
             id: 'crypto',
             label: t('app.invest.chart.vol.crypto'),
             color: AMBER,
+            dash: 'dashed',
             points: toPoints(data.crypto),
           },
         ]}
@@ -258,7 +261,7 @@ function BondCurveChart() {
             label: t('app.invest.chart.bond.short'),
             color: GREEN,
             points: toPts(2),
-            dashed: true,
+            dash: 'dashed',
           },
         ]}
         lines={[{ y: 100, label: t('app.invest.chart.bond.par'), color: AMBER }]}
@@ -274,10 +277,12 @@ function BondCurveChart() {
 function LeverageChart() {
   const { t } = useI18n();
   const moves = Array.from({ length: 41 }, (_, i) => i - 20);
+  const dashes: (Dash | undefined)[] = [undefined, 'dashed', 'dotted', 'dashDot'];
   const series = [1, 3, 5, 10].map((lev, i) => ({
     id: `l${lev}`,
     label: t('app.invest.chart.lev.x', { n: lev }),
     color: [BLUE, GREEN, AMBER, RED][i],
+    dash: dashes[i],
     points: moves.map((m): Point => [m, leverageRoi(m, lev)]),
   }));
   return (
@@ -327,6 +332,7 @@ function StockVsIndexChart() {
             id: 'stock',
             label: t('app.invest.chart.stk.stock'),
             color: AMBER,
+            dash: 'dashed',
             points: toPoints(data.stock),
           },
         ]}

@@ -3,12 +3,25 @@ import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 
 export type Point = [number, number];
 
+/**
+ * Line patterns, so series stay apart without relying on the hue alone (WCAG 1.4.1). The
+ * colours are theme tokens (`var(--green-400)`…): set through `style`, since SVG presentation
+ * attributes do not resolve CSS variables.
+ */
+export const DASHES = {
+  dashed: '5 4',
+  dotted: '0.1 4.5',
+  dashDot: '8 4 0.1 4',
+};
+
+export type Dash = keyof typeof DASHES;
+
 export interface ChartSeries {
   id: string;
   label: string;
   color: string;
   points: Point[];
-  dashed?: boolean;
+  dash?: Dash;
 }
 
 export interface ChartBand {
@@ -106,7 +119,7 @@ export function LineChart({
           <path
             key={b.id}
             d={`${path(map(b.upper))} ${path(map([...b.lower].reverse())).replace('M', 'L')} Z`}
-            fill={b.color}
+            style={{ fill: b.color }}
             opacity={0.18}
           />
         ))}
@@ -117,7 +130,7 @@ export function LineChart({
               x2={W - M.right}
               y1={sy(l.y)}
               y2={sy(l.y)}
-              stroke={l.color}
+              style={{ stroke: l.color }}
               strokeWidth="1.5"
               strokeDasharray="6 4"
             />
@@ -126,7 +139,7 @@ export function LineChart({
               x={W - M.right - 4}
               y={sy(l.y) - 5}
               textAnchor="end"
-              fill={l.color}
+              style={{ fill: l.color }}
             >
               {l.label}
             </text>
@@ -135,13 +148,14 @@ export function LineChart({
         {series.map((s) => (
           <path
             key={s.id}
+            data-series={s.id}
             d={path(map(s.points))}
             fill="none"
-            stroke={s.color}
+            style={{ stroke: s.color }}
             strokeWidth="2.2"
             strokeLinejoin="round"
             strokeLinecap="round"
-            strokeDasharray={s.dashed ? '5 4' : undefined}
+            strokeDasharray={s.dash && DASHES[s.dash]}
           />
         ))}
       </svg>
@@ -149,7 +163,18 @@ export function LineChart({
         <ul className="inv-legend">
           {series.map((s) => (
             <li key={s.id}>
-              <i style={{ background: s.color }} aria-hidden="true" />
+              <svg className="inv-legend-line" viewBox="0 0 22 6" aria-hidden="true">
+                <line
+                  x1="2"
+                  x2="20"
+                  y1="3"
+                  y2="3"
+                  style={{ stroke: s.color }}
+                  strokeWidth="2.6"
+                  strokeLinecap="round"
+                  strokeDasharray={s.dash && DASHES[s.dash]}
+                />
+              </svg>
               {s.label}
             </li>
           ))}

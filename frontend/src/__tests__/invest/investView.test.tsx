@@ -421,9 +421,17 @@ describe('Charts inside the chapters', () => {
     open('learn');
     openChapter(RISK);
     const card = container.querySelector('.inv-chart-card') as HTMLElement;
-    const before = card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d');
+    const crypto = card.querySelector('path[data-series="crypto"]') as SVGPathElement;
+    // Theme tokens (3:1 in both themes) plus a line pattern, so the hue is not the only cue.
+    expect(crypto.style.stroke).toBe('var(--amber-400)');
+    expect(crypto).toHaveAttribute('stroke-dasharray', '5 4');
+    expect(card.querySelector('path[data-series="equity"]')).not.toHaveAttribute(
+      'stroke-dasharray'
+    );
+    expect(card.querySelectorAll('.inv-legend-line line[stroke-dasharray]')).toHaveLength(2);
+    const before = crypto.getAttribute('d');
     fireEvent.click(within(card).getByRole('button', { name: tr('app.invest.chart.reroll') }));
-    expect(card.querySelector('path[stroke="#f59e0b"]')?.getAttribute('d')).not.toBe(before);
+    expect(card.querySelector('path[data-series="crypto"]')?.getAttribute('d')).not.toBe(before);
     expect(
       screen.getByRole('table', { name: tr('app.invest.chart.hor.title') })
     ).toBeInTheDocument();
