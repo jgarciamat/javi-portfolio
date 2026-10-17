@@ -1,4 +1,4 @@
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { GOOGLE_CLIENT_ID } from '@core/config/api.config';
 import { useI18n } from '@core/i18n/I18nContext';
 
@@ -50,13 +50,17 @@ function GoogleButton({ label, onToken, onError }: GoogleButtonProps) {
 /**
  * Google sign-in and the "or" divider below it. Hidden when no client id is
  * configured: Google's library throws without one, which would break the page.
+ * Google's script only loads here (its provider is not around the whole app), so
+ * visitors who never open the login page do not download it.
  */
 export function GoogleSignIn(props: GoogleButtonProps) {
   const { t } = useI18n();
   if (!GOOGLE_CLIENT_ID) return null;
   return (
     <>
-      <GoogleButton {...props} />
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <GoogleButton {...props} />
+      </GoogleOAuthProvider>
       <div className="auth-divider">
         <span>{t('app.auth.login.orDivider')}</span>
       </div>

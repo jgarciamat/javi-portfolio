@@ -23,7 +23,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
-    // Bootstrapping only: renders <App /> into #root with the Google client id.
+    // Bootstrapping only: renders <App /> into #root.
     '!src/main.tsx',
     // Reads import.meta.env (Vite only); replaced by a mock in tests.
     '!src/core/config/api.config.ts',
