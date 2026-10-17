@@ -24,10 +24,10 @@ const VALID_PASS = 'Secure1!Pass';
 
 /** Fill out the register form with a valid password that passes all rules */
 function fillForm(name = 'John', email = 'j@test.com', pass = VALID_PASS) {
-  fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: name } });
-  fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: email } });
-  fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: pass } });
-  fireEvent.change(screen.getByPlaceholderText('Repetir contraseña'), { target: { value: pass } });
+  fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: name } });
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: email } });
+  fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: pass } });
+  fireEvent.change(screen.getByLabelText('Repetir contraseña'), { target: { value: pass } });
 }
 
 describe('RegisterPage', () => {
@@ -61,10 +61,10 @@ describe('RegisterPage', () => {
         <RegisterPage onSwitch={mockOnSwitch} />
       </MemoryRouter>
     );
-    expect(screen.getByPlaceholderText('Nombre')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Contraseña')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Repetir contraseña')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nombre')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Contraseña')).toBeInTheDocument();
+    expect(screen.getByLabelText('Repetir contraseña')).toBeInTheDocument();
     expect(screen.getByText('Crear cuenta')).toBeInTheDocument();
   });
 
@@ -123,10 +123,10 @@ describe('RegisterPage', () => {
         <RegisterPage onSwitch={mockOnSwitch} />
       </MemoryRouter>
     );
-    fireEvent.change(screen.getByPlaceholderText('Nombre'), { target: { value: 'X' } });
-    fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'x@x.com' } });
-    fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: VALID_PASS } });
-    fireEvent.change(screen.getByPlaceholderText('Repetir contraseña'), {
+    fireEvent.change(screen.getByLabelText('Nombre'), { target: { value: 'X' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'x@x.com' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: VALID_PASS } });
+    fireEvent.change(screen.getByLabelText('Repetir contraseña'), {
       target: { value: 'DifferentPass1!' },
     });
     fireEvent.submit(screen.getByRole('button', { name: /Crear cuenta/i }).closest('form')!);
@@ -163,7 +163,7 @@ describe('RegisterPage', () => {
         <RegisterPage onSwitch={mockOnSwitch} />
       </MemoryRouter>
     );
-    const passInput = screen.getByPlaceholderText('Contraseña');
+    const passInput = screen.getByLabelText('Contraseña');
     expect(passInput).toHaveAttribute('type', 'password');
     // The first eye button belongs to the password field
     const eyeButtons = screen.getAllByLabelText('Mostrar contraseña');

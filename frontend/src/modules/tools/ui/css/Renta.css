@@ -31,7 +31,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--accent, #6366f1);
+  background: var(--accent-600);
   color: #fff;
   font-size: 1rem;
   flex-shrink: 0;
@@ -246,12 +246,12 @@
 .renta-limit {
   display: block;
   margin: 0.25rem 0 0.25rem 1.75rem;
-  color: var(--text-secondary, #9aa4b8);
+  color: var(--text-secondary);
 }
 .renta-field-hint {
   display: block;
   margin-top: 0.25rem;
-  color: var(--text-secondary, #9aa4b8);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 .renta-notes {
@@ -272,10 +272,10 @@
 }
 
 .renta-draft {
-  border: 1px solid var(--primary, #6366f1);
+  border: 1px solid var(--primary);
 }
 .renta-privacy {
-  color: var(--text-secondary, #9aa4b8);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 .renta-questions {
@@ -293,12 +293,12 @@
 }
 .renta-badge--missing {
   background: rgba(245, 158, 11, 0.18);
-  color: #fcd34d;
+  color: var(--amber-300);
   box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.5);
 }
 .renta-badge--inDraft {
   background: rgba(34, 197, 94, 0.18);
-  color: #86efac;
+  color: var(--green-300);
   box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.5);
 }
 
@@ -315,7 +315,7 @@
 
 .renta-badge--model {
   background: rgba(99, 102, 241, 0.22);
-  color: #c7d2fe;
+  color: var(--accent-200);
   box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.6);
 }
 .renta-advance {
@@ -324,11 +324,11 @@
   padding: 0.5rem 0.75rem;
   border-radius: 0.6rem;
   background: rgba(99, 102, 241, 0.1);
-  color: var(--text-secondary, #cbd5e1);
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 .renta-advance a {
-  color: #c7d2fe;
+  color: var(--accent-200);
   font-weight: 600;
 }
 

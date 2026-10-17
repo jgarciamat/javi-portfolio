@@ -42,7 +42,7 @@ export function ResetPasswordPage() {
   return (
     <>
       <PublicHeader />
-      <div className="auth-page-with-header">
+      <main className="auth-page-with-header">
         {done ? (
           <div className="auth-card">
             <div className="auth-logo">
@@ -94,7 +94,7 @@ export function ResetPasswordPage() {
             </p>
           </form>
         )}
-      </div>
+      </main>
     </>
   );
 }

@@ -148,24 +148,24 @@ describe('EmptyState', () => {
 });
 
 describe('DateField', () => {
-  it('shows the date in the user language and opens the picker', () => {
+  it('is a button named after the date that opens the picker', () => {
     const onChange = jest.fn();
     const showPicker = jest.fn();
     HTMLInputElement.prototype.showPicker = showPicker;
     const { container, rerender } = renderWithI18n(
       <DateField value="2026-03-04" onChange={onChange} label="Fecha" className="extra" />
     );
-    const field = screen.getByRole('button', { name: 'Fecha' });
+    const field = screen.getByRole('button', { name: 'Fecha: 4 mar 2026' });
+    expect(field.tagName).toBe('BUTTON');
     expect(field).toHaveTextContent('4 mar 2026');
-    expect(field).toHaveClass('extra');
+    expect(container.firstElementChild).toHaveClass('extra');
+    // The native input is beside the button, not inside it.
+    const native = container.querySelector('input[type="date"]')!;
+    expect(field).not.toContainElement(native as HTMLElement);
     fireEvent.click(field);
-    fireEvent.keyDown(field, { key: 'Enter' });
-    fireEvent.keyDown(field, { key: ' ' });
-    fireEvent.keyDown(field, { key: 'a' });
-    expect(showPicker).toHaveBeenCalledTimes(3);
-    fireEvent.change(container.querySelector('input[type="date"]')!, {
-      target: { value: '2026-03-09' },
-    });
+    fireEvent.click(native);
+    expect(showPicker).toHaveBeenCalledTimes(2);
+    fireEvent.change(native, { target: { value: '2026-03-09' } });
     expect(onChange).toHaveBeenCalledWith('2026-03-09');
     rerender(<DateField value="" onChange={onChange} label="Fecha" />);
     // An empty date shows the calendar icon instead of a date.
@@ -190,25 +190,40 @@ describe('OptionsDropdown', () => {
       </div>
     );
     const toggle = screen.getByRole('button', { name: 'Opciones' });
+    // A disclosure with plain buttons: no menu roles that would promise arrow keys.
+    expect(toggle).not.toHaveAttribute('aria-haspopup');
     fireEvent.click(toggle);
-    fireEvent.click(screen.getByRole('menuitem', { name: /Exportar/ }));
-    expect(onClick).toHaveBeenCalled();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(screen.queryByRole('menu')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Exportar/ }));
+    expect(onClick).toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
+    // The list is gone: focus goes back to the toggle instead of the page.
+    expect(toggle).toHaveFocus();
     fireEvent.click(toggle);
     fireEvent.mouseDown(screen.getByText('fuera'));
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
     fireEvent.click(toggle);
+    screen.getByRole('button', { name: 'Otra' }).focus();
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
+    expect(toggle).toHaveFocus();
   });
 });
 
 describe('LanguageSwitcher', () => {
   it('changes the language without an account', () => {
     renderWithI18n(<LanguageSwitcher />);
-    fireEvent.click(screen.getByRole('button', { name: /Idioma: Español/ }));
+    const toggle = screen.getByRole('button', { name: /Idioma: Español/ });
+    fireEvent.click(toggle);
+    expect(screen.queryByRole('listbox')).toBeNull();
+    // The current language is marked; each name is in its own language.
+    expect(screen.getByRole('button', { name: /Español/, current: true })).toHaveAttribute(
+      'lang',
+      'es'
+    );
     fireEvent.click(screen.getByRole('button', { name: /English/ }));
-    expect(screen.getByRole('button', { name: /Language: English/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Language: English/ })).toHaveFocus();
     expect(localStorage.getItem('mm_locale')).toBe('en');
   });
 
@@ -229,10 +244,11 @@ describe('LanguageSwitcher', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /Idioma/ }));
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: /English/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /Idioma/ })).toHaveFocus();
     fireEvent.click(screen.getByRole('button', { name: /Idioma/ }));
     fireEvent.mouseDown(screen.getByText('fuera'));
-    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: /English/ })).toBeNull();
   });
 });
 

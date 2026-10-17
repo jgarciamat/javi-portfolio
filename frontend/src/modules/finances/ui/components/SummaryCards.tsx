@@ -58,7 +58,7 @@ export function SummaryCards({ summary, carryover }: SummaryCardsProps) {
           icon="bank"
           value={money(available)}
           sub={`${t('app.summary.carryover')}: ${money(carried)}`}
-          accent={available >= 0 ? '#6366f1' : '#ef4444'}
+          accent={available >= 0 ? 'var(--accent-400)' : 'var(--red-400)'}
         />
         {buildSummaryCards(summary, t, money, (n) => percent(n)).map(({ key, ...card }) => (
           <Card key={key} {...card} />

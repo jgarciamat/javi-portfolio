@@ -41,6 +41,8 @@ export function useLoginForm(onSuccess?: () => void) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // The button is only aria-disabled while sending: ignore a second submit.
+    if (loading) return;
     setLoading(true);
     setError(null);
     setNeedsVerification(false);

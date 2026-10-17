@@ -178,7 +178,7 @@ describe('Month summary on demand', () => {
     const api = createFakeApi();
     renderWithProviders(<MonthNavCard />, { api });
     fireEvent.click(await screen.findByRole('button', { name: tr('app.export.options') }));
-    fireEvent.click(screen.getByRole('menuitem', { name: new RegExp(tr('app.recap.open')) }));
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.recap.open')) }));
     return screen.findByRole('dialog');
   };
 

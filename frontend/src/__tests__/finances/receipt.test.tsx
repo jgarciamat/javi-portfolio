@@ -156,6 +156,8 @@ describe('the new-movement form with a scanned receipt', () => {
       setType: jest.fn(),
       setAccountId: jest.fn(),
       handleCategoryChange: jest.fn(),
+      invalid: [],
+      errorId: 'tx-error',
     } as unknown as UseTransactionFormReturn);
 
   const scan = async (form: UseTransactionFormReturn, text: string) => {

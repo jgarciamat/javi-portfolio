@@ -109,7 +109,7 @@ export function EditTransactionModal({
           </label>
         )}
         {form.error && (
-          <p className="inline-error" role="alert">
+          <p id={form.errorId} className="inline-error" role="alert">
             {form.error}
           </p>
         )}

@@ -13,8 +13,8 @@
 }
 
 .alert-card--warning {
-  background: #422006;
-  border-color: #92400e;
+  background: color-mix(in srgb, var(--amber-500) 14%, var(--slate-900));
+  border-color: color-mix(in srgb, var(--amber-500) 55%, transparent);
 }
 
 .alert-card--danger {
@@ -51,17 +51,19 @@
   border-radius: 4px;
   line-height: 1;
   flex-shrink: 0;
+  min-width: 28px;
+  min-height: 28px;
   transition: color 0.15s, background 0.15s;
 }
 
 .alert-card-dismiss:hover {
   color: var(--slate-100);
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--slate-100) 10%, transparent);
 }
 
 .alert-progress-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--slate-100) 12%, transparent);
   border-radius: 99px;
   overflow: hidden;
   margin-bottom: 0.5rem;

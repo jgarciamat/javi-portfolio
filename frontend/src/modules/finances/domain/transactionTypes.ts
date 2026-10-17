@@ -9,10 +9,11 @@ export const TYPE_LABEL_KEYS: Record<TransactionType, string> = {
   SAVING: 'app.transaction.form.type.saving',
 };
 
+/** Theme colours, so the text stays readable in light and dark. */
 export const TYPE_COLORS: Record<TransactionType, string> = {
-  INCOME: '#4ade80',
-  EXPENSE: '#f87171',
-  SAVING: '#a78bfa',
+  INCOME: 'var(--green-400)',
+  EXPENSE: 'var(--red-400)',
+  SAVING: 'var(--violet-400)',
 };
 
 export const TYPE_BADGE_CLASS: Record<TransactionType, string> = {

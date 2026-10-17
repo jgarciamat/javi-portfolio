@@ -345,10 +345,10 @@ describe('GoalsView', () => {
   it('creates a goal', async () => {
     render(<GoalsView />);
     await screen.findByText(/Viaje/, { selector: '.goal-name' });
-    fireEvent.change(screen.getByPlaceholderText(t('app.goals.name')), {
+    fireEvent.change(screen.getByLabelText(t('app.goals.name')), {
       target: { value: 'Moto' },
     });
-    fireEvent.change(screen.getByPlaceholderText(t('app.goals.target')), {
+    fireEvent.change(screen.getByLabelText(t('app.goals.target')), {
       target: { value: '2000' },
     });
     fireEvent.click(screen.getByRole('button', { name: t('app.goals.create') }));

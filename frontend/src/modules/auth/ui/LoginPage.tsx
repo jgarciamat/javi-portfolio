@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useLoginForm } from '../application/useLoginForm';
@@ -15,6 +16,13 @@ interface Props {
 export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
   const { t } = useI18n();
   const form = useLoginForm(onSuccess);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const invalid = form.error !== null;
+
+  // After a failed sign-in the first field takes focus; it is described by the error.
+  useEffect(() => {
+    if (form.error) emailRef.current!.focus();
+  }, [form.error]);
 
   return (
     <form onSubmit={form.handleSubmit} className="auth-card">
@@ -37,6 +45,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
           {t('app.auth.login.emailLabel')}
         </label>
         <input
+          ref={emailRef}
           id="login-email"
           className="auth-input"
           type="email"
@@ -46,17 +55,24 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
           required
           autoComplete="email"
           inputMode="email"
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? 'login-error' : undefined}
         />
       </div>
 
       <div className="auth-field">
         <div className="auth-field-header">
-          <span className="auth-field-label">{t('app.auth.login.passwordLabel')}</span>
+          <label className="auth-field-label" htmlFor="login-password">
+            {t('app.auth.login.passwordLabel')}
+          </label>
           <button type="button" className="auth-link auth-forgot-link" onClick={onForgot}>
             {t('app.auth.forgot.link')}
           </button>
         </div>
         <AuthPasswordInput
+          id="login-password"
+          invalid={invalid}
+          describedBy={invalid ? 'login-error' : undefined}
           value={form.password}
           onChange={form.setPassword}
           placeholder={t('app.auth.login.password')}
@@ -74,7 +90,7 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
       </label>
 
       {form.error && (
-        <p className="auth-error" role="alert">
+        <p id="login-error" className="auth-error" role="alert">
           {form.error}
         </p>
       )}
@@ -87,7 +103,8 @@ export function LoginPage({ onSwitch, onForgot, onSuccess }: Props) {
           </button>
         ))}
 
-      <button type="submit" className="auth-btn" disabled={form.loading}>
+      {/* aria-disabled, not disabled: the button keeps focus while the request runs. */}
+      <button type="submit" className="auth-btn" aria-disabled={form.loading}>
         {form.loading ? t('app.auth.login.loading') : t('app.auth.login.submit')}
       </button>
 

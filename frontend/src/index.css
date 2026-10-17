@@ -9,13 +9,16 @@
   --slate-800: #1e293b;
   --slate-700: #334155;
   --slate-600: #475569;
-  --slate-500: #64748b;
+  /* Lighter than Tailwind's slate-500: small secondary text keeps 4.5:1 on the cards. */
+  --slate-500: #8391a7;
   --slate-400: #94a3b8;
   --slate-300: #cbd5e1;
   --slate-200: #e2e8f0;
   --slate-100: #f1f5f9;
   --slate-50: #f8fafc;
+  /* Text on the surfaces uses --accent-400; white text sits on --accent-600 or darker. */
   --accent: #6366f1;
+  --accent-700: #4338ca;
   --accent-600: #4f46e5;
   --accent-400: #818cf8;
   --accent-300: #a5b4fc;
@@ -34,6 +37,13 @@
   --amber-400: #fbbf24;
   --amber-300: #fcd34d;
   --violet-400: #a78bfa;
+  --blue-400: #60a5fa;
+  --blue-300: #93c5fd;
+  /* Aliases some components were written against. */
+  --text-secondary: var(--slate-400);
+  --primary: var(--accent);
+  /* Mixed into a category colour so text in that colour stays readable on the surfaces. */
+  --tint-ink: #fff;
   /* Chevron of the drop-downs (an image cannot read the colour tokens). */
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
@@ -45,13 +55,14 @@
   --slate-800: #e8ecf3;
   --slate-700: #cdd5e1;
   --slate-600: #94a3b8;
-  --slate-500: #64748b;
+  --slate-500: #5b6578;
   --slate-400: #475569;
   --slate-300: #334155;
   --slate-200: #1e293b;
   --slate-100: #0f172a;
   --slate-50: #020617;
   --accent: #4f46e5;
+  --accent-700: #3730a3;
   --accent-600: #4338ca;
   --accent-400: #4f46e5;
   --accent-300: #4338ca;
@@ -60,16 +71,21 @@
   --red-800: #b91c1c;
   --red-700: #fca5a5;
   --red-500: #dc2626;
-  --red-400: #dc2626;
-  --red-300: #b91c1c;
+  --red-400: #b91c1c;
+  --red-300: #991b1b;
   --green-900: #dcfce7;
   --green-500: #16a34a;
-  --green-400: #15803d;
-  --green-300: #166534;
+  --green-400: #166534;
+  --green-300: #14532d;
   --amber-500: #d97706;
-  --amber-400: #b45309;
-  --amber-300: #92400e;
-  --violet-400: #7c3aed;
+  --amber-400: #92400e;
+  --amber-300: #78350f;
+  --violet-400: #6d28d9;
+  --blue-400: #1d4ed8;
+  --blue-300: #1e40af;
+  --text-secondary: var(--slate-400);
+  --primary: var(--accent);
+  --tint-ink: #000;
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23475569' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
@@ -140,7 +156,7 @@ input[type='date'] {
 
 /* ─── Shared buttons ─────────────────────────── */
 .btn-primary {
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -153,7 +169,7 @@ input[type='date'] {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent-600);
+  background: var(--accent-700);
 }
 
 .btn-primary:disabled {
@@ -211,7 +227,7 @@ input[type='date'] {
 
 /* Focus ring visible for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-400);
   outline-offset: 2px;
 }
 
@@ -334,4 +350,17 @@ input[type='date'] {
 button > .icon:only-child,
 .burger-nav-icon > .icon {
   margin-right: 0;
+}
+
+/* ─── Reduced motion ─────────────────────────── */
+/* Animations and transitions end at once when the device asks for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

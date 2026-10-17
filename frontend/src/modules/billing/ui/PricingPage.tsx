@@ -71,7 +71,9 @@ export function PricingPage() {
             <table className="pricing-table">
               <thead>
                 <tr>
-                  <th />
+                  <th scope="col">
+                    <span className="sr-only">{t('pricing.featureColumn')}</span>
+                  </th>
                   <th>{t('billing.free')}</th>
                   <th>{t('billing.premium')}</th>
                 </tr>

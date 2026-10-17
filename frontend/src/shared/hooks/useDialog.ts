@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 const FOCUSABLE = [
   'a[href]',
@@ -39,15 +39,16 @@ export function useDialog(
   close.current = onClose;
   const canDismiss = useRef(dismissible);
   canDismiss.current = dismissible;
+  // Read while rendering: by the time effects run, an autoFocus field inside already has focus.
+  const [opener] = useState(() => document.activeElement as HTMLElement | null);
 
   useEffect(() => {
     const panel = panelRef.current!;
-    const previous = document.activeElement as HTMLElement;
     // Mounted together, the inner dialog's effect runs first: keep it after its container.
     const inner = openDialogs.findIndex((dialog) => panel.contains(dialog));
     openDialogs.splice(inner === -1 ? openDialogs.length : inner, 0, panel);
     // Not the first field: on mobile that would open the keyboard over the dialog.
-    if (!panel.contains(previous)) panel.focus();
+    if (!panel.contains(document.activeElement)) panel.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (openDialogs[openDialogs.length - 1] !== panel) return;
@@ -58,7 +59,7 @@ export function useDialog(
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       openDialogs.splice(openDialogs.indexOf(panel), 1);
-      previous.focus();
+      opener?.focus();
     };
-  }, [panelRef]);
+  }, [panelRef, opener]);
 }

@@ -4,6 +4,8 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { errorMessage } from '@shared/utils/errors';
 import { validatePassword } from '../domain/passwordValidation';
 
+type InvalidField = 'password' | 'confirm';
+
 export function useRegisterForm() {
   const { register, loginWithGoogle } = useAuth();
   const { t, locale } = useI18n();
@@ -14,21 +16,28 @@ export function useRegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [registered, setRegistered] = useState(false);
+  /** The field a refused submit points at (marked invalid and focused by the page). */
+  const [invalidField, setInvalidField] = useState<InvalidField | null>(null);
 
   const passwordValidation = validatePassword(password);
   const passwordsMatch = password === confirmPassword;
   const confirmTouched = confirmPassword.length > 0;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /** Resolves with the field to fix when the form is refused before sending. */
+  const handleSubmit = async (e: React.FormEvent): Promise<InvalidField | null> => {
     e.preventDefault();
+    // The button is only aria-disabled while sending: ignore a second submit.
+    if (loading) return null;
     setError(null);
-    if (!passwordValidation.valid) {
+    const invalid = !passwordValidation.valid ? 'password' : !passwordsMatch ? 'confirm' : null;
+    setInvalidField(invalid);
+    if (invalid === 'password') {
       setError(passwordValidation.errors.map((key) => t(key)).join(' · '));
-      return;
+      return invalid;
     }
-    if (!passwordsMatch) {
+    if (invalid === 'confirm') {
       setError(t('app.auth.register.mismatch'));
-      return;
+      return invalid;
     }
     setLoading(true);
     try {
@@ -39,6 +48,7 @@ export function useRegisterForm() {
     } finally {
       setLoading(false);
     }
+    return null;
   };
 
   /** Signing up with Google signs in at once (the auth page then redirects). */
@@ -65,6 +75,7 @@ export function useRegisterForm() {
     registered,
     passwordsMatch,
     confirmTouched,
+    invalidField,
     handleSubmit,
     handleGoogleToken,
     reportGoogleError: () => setError(t('app.auth.error.google')),

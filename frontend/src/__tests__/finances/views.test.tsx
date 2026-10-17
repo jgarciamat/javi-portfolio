@@ -558,6 +558,15 @@ describe('AnalysisView', () => {
     expect(
       await screen.findByRole('img', { name: tr('app.analysis.netWorthTitle') })
     ).toBeInTheDocument();
+    // The chart's figures are also a table for screen readers.
+    const data = screen.getByRole('table', { name: tr('app.analysis.netWorthTitle') });
+    expect(within(data).getAllByRole('row')).toHaveLength(3);
+    expect(
+      within(data).getByRole('columnheader', { name: tr('app.analysis.month') })
+    ).toBeVisible();
+    // The wide tables scroll inside a named region the keyboard can reach.
+    const trends = screen.getByRole('region', { name: /Tendencias de gasto/ });
+    expect(trends).toHaveAttribute('tabindex', '0');
     fireEvent.change(screen.getByRole('combobox', { name: tr('app.analysis.range') }), {
       target: { value: '24' },
     });

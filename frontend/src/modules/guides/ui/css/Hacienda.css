@@ -89,14 +89,14 @@
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  background: var(--cat);
+  background: color-mix(in srgb, var(--cat) 60%, #000);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
 }
 
 .hacienda-step-done .hacienda-step-n {
-  background: #10b981;
+  background: #047857;
 }
 
 .hacienda-note {

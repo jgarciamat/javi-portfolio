@@ -1,3 +1,4 @@
+import { useRef, type FormEvent, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
@@ -10,33 +11,107 @@ interface Props {
   onSwitch: () => void;
 }
 
+/** Shown after signing up: the account waits for the e-mail to be verified. */
+function VerifyNotice({ email, onSwitch }: { email: string; onSwitch: () => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="auth-card">
+      <div className="auth-logo">
+        <Icon name="mail" />
+      </div>
+      <h1 className="auth-title">{t('app.auth.register.verify.title')}</h1>
+      <p className="auth-sub auth-sub--center">
+        {t('app.auth.register.verify.sub')}
+        <br />
+        <strong>{email}</strong>
+      </p>
+      <p className="auth-note">{t('app.auth.register.verify.instructions')}</p>
+      <button className="auth-btn" onClick={onSwitch}>
+        {t('app.auth.register.verify.goLogin')}
+      </button>
+    </div>
+  );
+}
+
+/** Ids of the texts that explain a field, for aria-describedby. */
+const describedBy = (...ids: (string | false)[]) => ids.filter(Boolean).join(' ') || undefined;
+
+/** Password and its confirmation, each pointing at the rules or the error that applies. */
+function PasswordFields({
+  form,
+  passwordRef,
+  confirmRef,
+}: {
+  form: ReturnType<typeof useRegisterForm>;
+  passwordRef: RefObject<HTMLInputElement | null>;
+  confirmRef: RefObject<HTMLInputElement | null>;
+}) {
+  const { t } = useI18n();
+  const mismatch = form.confirmTouched && !form.passwordsMatch;
+  return (
+    <>
+      <div className="auth-field">
+        <label className="auth-field-label" htmlFor="register-password">
+          {t('app.auth.register.password')}
+        </label>
+        <AuthPasswordInput
+          id="register-password"
+          inputRef={passwordRef}
+          value={form.password}
+          onChange={form.setPassword}
+          invalid={form.invalidField === 'password'}
+          describedBy={describedBy(
+            form.password.length > 0 && 'register-password-rules',
+            form.invalidField === 'password' && 'register-error'
+          )}
+        />
+        <PasswordHints
+          id="register-password-rules"
+          password={form.password}
+          okText={t('app.auth.register.passwordOk')}
+        />
+      </div>
+      <div className="auth-field">
+        <label className="auth-field-label" htmlFor="register-confirm">
+          {t('app.auth.register.confirmPassword')}
+        </label>
+        <AuthPasswordInput
+          id="register-confirm"
+          inputRef={confirmRef}
+          value={form.confirmPassword}
+          onChange={form.setConfirmPassword}
+          invalid={mismatch || form.invalidField === 'confirm'}
+          describedBy={describedBy(
+            mismatch && 'register-mismatch',
+            form.invalidField === 'confirm' && 'register-error'
+          )}
+        />
+        {mismatch && (
+          <p id="register-mismatch" className="auth-hint-error">
+            ✗ {t('app.auth.register.mismatch')}
+          </p>
+        )}
+      </div>
+    </>
+  );
+}
+
 export function RegisterPage({ onSwitch }: Props) {
   const { t } = useI18n();
   const form = useRegisterForm();
-  const mismatch = form.confirmTouched && !form.passwordsMatch;
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLInputElement>(null);
 
-  if (form.registered) {
-    return (
-      <div className="auth-card">
-        <div className="auth-logo">
-          <Icon name="mail" />
-        </div>
-        <h1 className="auth-title">{t('app.auth.register.verify.title')}</h1>
-        <p className="auth-sub auth-sub--center">
-          {t('app.auth.register.verify.sub')}
-          <br />
-          <strong>{form.email}</strong>
-        </p>
-        <p className="auth-note">{t('app.auth.register.verify.instructions')}</p>
-        <button className="auth-btn" onClick={onSwitch}>
-          {t('app.auth.register.verify.goLogin')}
-        </button>
-      </div>
-    );
-  }
+  // A refused submit takes focus to the field to fix.
+  const submit = async (e: FormEvent) => {
+    const invalid = await form.handleSubmit(e);
+    if (invalid) (invalid === 'password' ? passwordRef : confirmRef).current!.focus();
+  };
+
+  if (form.registered) return <VerifyNotice email={form.email} onSwitch={onSwitch} />;
 
   return (
-    <form onSubmit={form.handleSubmit} className="auth-card">
+    <form onSubmit={submit} className="auth-card">
       <h1 className="auth-title">{t('app.auth.register.title')}</h1>
       <p className="auth-sub">
         {t('app.auth.register.subtitle')}{' '}
@@ -51,47 +126,43 @@ export function RegisterPage({ onSwitch }: Props) {
         onError={form.reportGoogleError}
       />
 
-      <input
-        className="auth-input"
-        type="text"
-        placeholder={t('app.auth.register.name')}
-        aria-label={t('app.auth.register.name')}
-        value={form.name}
-        onChange={(e) => form.setName(e.target.value)}
-        required
-        autoFocus
-        autoComplete="name"
-      />
-      <input
-        className="auth-input"
-        type="email"
-        placeholder={t('app.auth.register.email')}
-        aria-label={t('app.auth.register.email')}
-        value={form.email}
-        onChange={(e) => form.setEmail(e.target.value)}
-        required
-        autoComplete="email"
-      />
-      <AuthPasswordInput
-        value={form.password}
-        onChange={form.setPassword}
-        placeholder={t('app.auth.register.password')}
-      />
-      <PasswordHints password={form.password} okText={t('app.auth.register.passwordOk')} />
-      <AuthPasswordInput
-        value={form.confirmPassword}
-        onChange={form.setConfirmPassword}
-        placeholder={t('app.auth.register.confirmPassword')}
-        invalid={mismatch}
-      />
-      {mismatch && <p className="auth-hint-error">✗ {t('app.auth.register.mismatch')}</p>}
+      <div className="auth-field">
+        <label className="auth-field-label" htmlFor="register-name">
+          {t('app.auth.register.name')}
+        </label>
+        <input
+          id="register-name"
+          className="auth-input"
+          type="text"
+          value={form.name}
+          onChange={(e) => form.setName(e.target.value)}
+          required
+          autoFocus
+          autoComplete="name"
+        />
+      </div>
+      <div className="auth-field">
+        <label className="auth-field-label" htmlFor="register-email">
+          {t('app.auth.register.email')}
+        </label>
+        <input
+          id="register-email"
+          className="auth-input"
+          type="email"
+          value={form.email}
+          onChange={(e) => form.setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+      </div>
+      <PasswordFields form={form} passwordRef={passwordRef} confirmRef={confirmRef} />
 
       {form.error && (
-        <p className="auth-error" role="alert">
+        <p id="register-error" className="auth-error" role="alert">
           {form.error}
         </p>
       )}
-      <button type="submit" className="auth-btn" disabled={form.loading}>
+      <button type="submit" className="auth-btn" aria-disabled={form.loading}>
         {form.loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
       </button>
       <SocialLinks />

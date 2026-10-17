@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { SAVINGS_SCALE, taxOnGain } from '../../domain/taxes';
@@ -56,7 +57,7 @@ export function TaxCalc() {
           tone="accent"
         />
       </div>
-      <div className="inv-table-wrap">
+      <ScrollRegion className="inv-table-wrap" label={t('app.invest.calc.tax.scale')}>
         <table className="inv-table">
           <caption className="sr-only">{t('app.invest.calc.tax.scale')}</caption>
           <thead>
@@ -81,7 +82,7 @@ export function TaxCalc() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <p className="inv-note">
         {t('app.invest.calc.tax.footnote')}{' '}
         <a href={SAVINGS_SCALE_SOURCE} target="_blank" rel="noopener noreferrer">

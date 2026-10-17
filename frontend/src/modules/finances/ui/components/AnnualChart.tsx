@@ -20,12 +20,12 @@ interface AnnualChartProps {
 }
 
 const SERIES = [
-  { key: 'income', color: '#4ade80', className: 'annual-bar-income' },
-  { key: 'expenses', color: '#f87171', className: 'annual-bar-expense' },
-  { key: 'saving', color: '#a78bfa', className: 'annual-bar-saving' },
+  { key: 'income', color: 'var(--green-400)', className: 'annual-bar-income' },
+  { key: 'expenses', color: 'var(--red-400)', className: 'annual-bar-expense' },
+  { key: 'saving', color: 'var(--violet-400)', className: 'annual-bar-saving' },
 ] as const;
 
-const BALANCE_COLOR = (balance: number) => (balance >= 0 ? '#6366f1' : '#ef4444');
+const BALANCE_COLOR = (balance: number) => (balance >= 0 ? 'var(--accent-400)' : 'var(--red-400)');
 
 function MonthLabel({
   year,

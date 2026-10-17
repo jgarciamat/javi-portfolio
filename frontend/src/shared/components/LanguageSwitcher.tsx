@@ -14,29 +14,39 @@ const BY_LOCALE = Object.fromEntries(LANGUAGES.map((l) => [l.locale, l])) as Rec
   (typeof LANGUAGES)[number]
 >;
 
-/** Language picker. Signed in, the choice is also saved in the account. */
+/**
+ * Language picker: a toggle that shows the languages as plain buttons (a disclosure).
+ * Signed in, the choice is also saved in the account.
+ */
 export function LanguageSwitcher() {
   const { locale, setLocale, t } = useI18n();
   const settings = useOptionalSettings();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
   const close = () => setOpen(false);
+  // Escape and a choice give focus back to the toggle (the list goes away).
+  const closeToToggle = () => {
+    close();
+    toggle.current!.focus();
+  };
   useClickOutside(ref, close, open);
-  useEscapeKey(close, open);
+  useEscapeKey(closeToToggle, open);
 
   const current = BY_LOCALE[locale];
   const choose = (next: Locale) => {
     if (settings) settings.changeLocale(next);
     else setLocale(next);
-    close();
+    closeToToggle();
   };
 
   return (
     <div className="lang-switcher" ref={ref}>
       <button
+        ref={toggle}
+        type="button"
         className="lang-btn"
         onClick={() => setOpen((v) => !v)}
-        aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`${t('app.language.label')}: ${current.label}`}
       >
@@ -49,13 +59,15 @@ export function LanguageSwitcher() {
         </span>
       </button>
       {open && (
-        <ul className="lang-dropdown" role="listbox" aria-label={t('app.language.label')}>
+        <ul className="lang-dropdown" aria-label={t('app.language.label')}>
           {LANGUAGES.map(({ locale: loc, flag, label }) => (
-            <li key={loc} role="option" aria-selected={loc === locale}>
+            <li key={loc}>
               <button
                 type="button"
                 className={`lang-option${loc === locale ? ' active' : ''}`}
                 onClick={() => choose(loc)}
+                lang={loc}
+                aria-current={loc === locale ? 'true' : undefined}
               >
                 <span className="lang-flag" aria-hidden="true">
                   {flag}

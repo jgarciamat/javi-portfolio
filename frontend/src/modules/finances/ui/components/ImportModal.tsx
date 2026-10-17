@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
@@ -154,7 +155,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           invalid: preview.invalid,
         })}
       </p>
-      <div className="table-scroll">
+      <ScrollRegion className="table-scroll" label={t('app.import.preview')}>
         <table className="data-table">
           <thead>
             <tr>
@@ -175,7 +176,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <div className="modal-footer">
         <button className="btn-secondary" onClick={imp.back}>
           {t('app.common.back')}

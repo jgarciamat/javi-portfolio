@@ -114,27 +114,29 @@ function GoalForm({
         if (created) setForm(EMPTY_GOAL);
       }}
     >
-      <input
-        className="tx-input"
-        placeholder={t('app.goals.name')}
-        aria-label={t('app.goals.name')}
-        value={form.name}
-        onChange={set('name')}
-        maxLength={80}
-        required
-      />
-      <input
-        className="tx-input"
-        type="number"
-        min="1"
-        step="0.01"
-        inputMode="decimal"
-        placeholder={t('app.goals.target')}
-        aria-label={t('app.goals.target')}
-        value={form.target}
-        onChange={set('target')}
-        required
-      />
+      <label className="field">
+        <span className="field-label">{t('app.goals.name')}</span>
+        <input
+          className="tx-input"
+          value={form.name}
+          onChange={set('name')}
+          maxLength={80}
+          required
+        />
+      </label>
+      <label className="field">
+        <span className="field-label">{t('app.goals.target')}</span>
+        <input
+          className="tx-input"
+          type="number"
+          min="1"
+          step="0.01"
+          inputMode="decimal"
+          value={form.target}
+          onChange={set('target')}
+          required
+        />
+      </label>
       <label className="field">
         <span className="field-label">{t('app.goals.targetDate')}</span>
         <input

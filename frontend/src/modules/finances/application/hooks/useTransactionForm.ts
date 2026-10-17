@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { CreateTransactionDTO, TransactionType } from '@modules/finances/domain/types';
 import { useAction } from '@shared/hooks/useAction';
 import { isPositiveAmount, parseDecimal } from '@shared/utils/numbers';
@@ -27,6 +27,9 @@ interface Options {
   initialValues?: TransactionFields;
 }
 
+/** Fields a refused submit can point at, in the order they are shown. */
+export type CheckedField = 'description' | 'amount' | 'category';
+
 /** Value of the category select that opens the category manager. */
 export const MANAGE_CATEGORIES = '__manage__';
 
@@ -51,10 +54,14 @@ export function useTransactionForm({
   const [fields, setFields] = useState<TransactionFields>(() => initialValues ?? blank());
   const action = useAction(t('app.transaction.form.error'));
   const { setError } = action;
+  /** Fields the last refused submit found wrong; the error text describes them. */
+  const [invalid, setInvalid] = useState<CheckedField[]>([]);
+  const errorId = useId();
 
   const set = <K extends keyof TransactionFields>(key: K, value: TransactionFields[K]) => {
     setFields((f) => ({ ...f, [key]: value }));
     setError(null);
+    setInvalid([]);
   };
 
   // A new movement follows the viewed month (each month has its own default date).
@@ -81,12 +88,19 @@ export function useTransactionForm({
     e.preventDefault();
     const amount = parseDecimal(fields.amount);
     const description = fields.description.trim();
-    if (!description || !fields.category || !isPositiveAmount(amount)) {
+    const missing: CheckedField[] = [
+      ...(description ? [] : ['description' as const]),
+      ...(isPositiveAmount(amount) ? [] : ['amount' as const]),
+      ...(fields.category ? [] : ['category' as const]),
+    ];
+    if (missing.length > 0) {
       setError(t('app.transaction.form.required'));
+      setInvalid(missing);
       return false;
     }
     if (fields.type === 'SAVING' && amount > availableBalance) {
       setError(t('app.transaction.form.insufficient', { amount: formatMoney(availableBalance) }));
+      setInvalid(['amount']);
       return false;
     }
     const saved = await action.run(() =>
@@ -117,7 +131,11 @@ export function useTransactionForm({
     reset: () => {
       setFields(initialValues ?? blank());
       setError(null);
+      setInvalid([]);
     },
+    invalid,
+    /** Id of the error text, for aria-describedby. */
+    errorId,
     loading: action.pending,
     error: action.error,
   };

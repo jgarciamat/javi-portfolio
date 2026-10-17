@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useState } from 'react';
 import { useResource } from '@shared/hooks/useResource';
 import { useApi } from '@core/context/ApiContext';
@@ -30,15 +31,16 @@ const SERIES: {
   color: string;
   labelKey: string;
 }[] = [
-  { key: 'netWorth', color: '#6366f1', labelKey: 'app.analysis.netWorth' },
-  { key: 'available', color: '#22c55e', labelKey: 'app.analysis.available' },
-  { key: 'saved', color: '#a78bfa', labelKey: 'app.analysis.saved' },
+  // Theme colours: lighter shades on dark, darker ones on light.
+  { key: 'netWorth', color: 'var(--accent-400)', labelKey: 'app.analysis.netWorth' },
+  { key: 'available', color: 'var(--green-400)', labelKey: 'app.analysis.available' },
+  { key: 'saved', color: 'var(--violet-400)', labelKey: 'app.analysis.saved' },
 ];
 
 /** Small dependency-free line chart (SVG) for the net worth evolution. */
 function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
   const { t } = useI18n();
-  const { money, monthName } = useFormat();
+  const { money, monthName, monthLabel } = useFormat();
   const width = 640;
   const height = 300;
   const pad = { top: 20, right: 20, bottom: 40, left: 110 };
@@ -85,7 +87,7 @@ function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
           <polyline
             key={s.key}
             fill="none"
-            stroke={s.color}
+            style={{ stroke: s.color }}
             strokeWidth={s.key === 'netWorth' ? 3 : 2}
             points={points.map((p, i) => `${x(i)},${y(p[s.key])}`).join(' ')}
           >
@@ -93,6 +95,30 @@ function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
           </polyline>
         ))}
       </svg>
+      {/* The same figures as text, for screen readers. */}
+      <table className="sr-only">
+        <caption>{t('app.analysis.netWorthTitle')}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t('app.analysis.month')}</th>
+            {SERIES.map((s) => (
+              <th key={s.key} scope="col">
+                {t(s.labelKey)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {points.map((p) => (
+            <tr key={`${p.year}-${p.month}`}>
+              <th scope="row">{monthLabel(p.year, p.month)}</th>
+              {SERIES.map((s) => (
+                <td key={s.key}>{money(p[s.key])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <figcaption className="chart-legend">
         {SERIES.map((s) => (
           <span key={s.key}>
@@ -150,7 +176,10 @@ function TrendsCard() {
       {error && <p className="form-error">{error}</p>}
       {trends?.length === 0 && <p className="empty-state">{t('app.analysis.noData')}</p>}
       {trends && trends.length > 0 && (
-        <div className="table-scroll">
+        <ScrollRegion
+          className="table-scroll"
+          label={t('app.analysis.trendsTitle', { month: monthLabel(year, month) })}
+        >
           <table className="data-table">
             <thead>
               <tr>
@@ -176,7 +205,7 @@ function TrendsCard() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       )}
     </div>
   );
@@ -280,7 +309,7 @@ function SubscriptionsCard() {
               annual: money(data.annual),
             })}
           </p>
-          <div className="table-scroll">
+          <ScrollRegion className="table-scroll" label={t('app.subscriptions.title')}>
             <table className="data-table">
               <thead>
                 <tr>
@@ -295,7 +324,7 @@ function SubscriptionsCard() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </>
       )}
     </div>

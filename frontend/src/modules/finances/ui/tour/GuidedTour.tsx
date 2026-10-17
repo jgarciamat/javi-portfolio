@@ -4,6 +4,7 @@ import { useDialog } from '@shared/hooks/useDialog';
 import type { DashboardTab } from '../navigation';
 import type { TourStep } from './tourSteps';
 import '../css/GuidedTour.css';
+import { scrollBehavior } from '@shared/utils/motion';
 
 interface Rect {
   top: number;
@@ -100,7 +101,7 @@ function useTargetRect(
           html.style.scrollMarginBottom = `${inset}px`;
           html.scrollIntoView({
             block: size.height > free * 0.9 ? 'start' : 'center',
-            behavior: 'smooth',
+            behavior: scrollBehavior(),
           });
         }
         measure();

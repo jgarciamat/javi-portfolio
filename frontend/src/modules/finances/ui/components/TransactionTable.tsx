@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { Fragment } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -112,7 +113,7 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
   const { date } = useFormat();
   const headers = ['date', 'description', 'notes', 'category', 'type', 'amount'];
   return (
-    <div className="tx-table-wrap">
+    <ScrollRegion className="tx-table-wrap" label={t('app.transaction.table.caption')}>
       <table className="tx-table">
         <caption className="sr-only">{t('app.transaction.table.caption')}</caption>
         <thead>
@@ -122,7 +123,9 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
                 {t(`app.transaction.table.${h}`)}
               </th>
             ))}
-            <th scope="col" aria-label={t('app.transaction.table.actions')} />
+            <th scope="col">
+              <span className="sr-only">{t('app.transaction.table.actions')}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -168,7 +171,7 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
           })}
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
   );
 }
 

@@ -1,4 +1,4 @@
-import { Suspense, type ReactElement, type ReactNode } from 'react';
+import { Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
@@ -138,7 +138,12 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
         <button
           className="header-user header-user-btn"
           onClick={dash.openProfile}
-          aria-label={t('app.header.openProfile')}
+          // The name shown on the button is part of its accessible name.
+          aria-label={
+            user?.name
+              ? t('app.header.openProfileOf', { name: user.name })
+              : t('app.header.openProfile')
+          }
           title={t('app.header.openProfile')}
         >
           {user?.avatarUrl ? (
@@ -225,9 +230,31 @@ export function Dashboard() {
     updateTransaction: finances.updateTransaction,
   });
   const section = SECTION_BY_ID[dash.tab];
+  const sectionLabel = t(section.labelKey);
   const tour = useWelcomeTour(dash.tab, dash.setTab);
   useBudgetAlertNotifications();
   useAcquisition();
+
+  // The browser tab names the open section: "Presupuestos · Finanverso".
+  const appName = t('app.header.title');
+  useEffect(() => {
+    const previous = document.title;
+    document.title = `${sectionLabel} · ${appName}`;
+    return () => {
+      document.title = previous;
+    };
+  }, [sectionLabel, appName]);
+
+  // A section chosen in the menu takes the focus (after the menu gives it back to its button).
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [menuPicks, setMenuPicks] = useState(0);
+  useEffect(() => {
+    if (menuPicks > 0) sectionRef.current!.focus();
+  }, [menuPicks]);
+  const selectFromMenu = (next: DashboardTab) => {
+    dash.setTab(next);
+    setMenuPicks((n) => n + 1);
+  };
 
   // Free plan: the import button opens the paywall instead of the importer.
   const openImport =
@@ -242,7 +269,7 @@ export function Dashboard() {
           dash={dash}
           sectionLabel={
             <>
-              <Icon name={section.icon} size={14} /> {t(section.labelKey)}
+              <Icon name={section.icon} size={14} /> {sectionLabel}
             </>
           }
         />
@@ -258,7 +285,14 @@ export function Dashboard() {
       <main className="main">
         <PlanBanner onOpenPlan={() => dash.setTab('plan')} />
         <HouseholdJoinPrompt />
-        <div role="region" aria-label={t(section.labelKey)} data-tour="section">
+        <div
+          ref={sectionRef}
+          className="dashboard-section"
+          role="region"
+          aria-label={sectionLabel}
+          tabIndex={-1}
+          data-tour="section"
+        >
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
             <Suspense fallback={<SectionLoading />}>
@@ -271,7 +305,7 @@ export function Dashboard() {
       <BurgerMenu
         open={dash.menuOpen}
         tab={dash.tab}
-        onSelectTab={dash.setTab}
+        onSelectTab={selectFromMenu}
         onClose={() => dash.setMenuOpen(false)}
       />
       <Suspense fallback={null}>

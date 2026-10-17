@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useEffect, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { intlLocale } from '@shared/utils/format';
@@ -84,7 +85,7 @@ export function MarketsPanel({ now: fixedNow }: { now?: Date }) {
           {t('app.invest.markets.openCount', { open: openCount, total: rows.length })}
         </p>
       </div>
-      <div className="inv-table-wrap">
+      <ScrollRegion className="inv-table-wrap" label={t('app.invest.markets.title')}>
         <table className="inv-table inv-markets-table">
           <caption className="sr-only">{t('app.invest.markets.title')}</caption>
           <thead>
@@ -134,7 +135,7 @@ export function MarketsPanel({ now: fixedNow }: { now?: Date }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <p className="inv-note">{t('app.invest.markets.note')}</p>
       <details className="inv-notes">
         <summary>{t('app.invest.markets.details')}</summary>

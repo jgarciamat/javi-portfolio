@@ -82,8 +82,8 @@
 .tools-cta {
   padding: 1.2rem;
   border-radius: 12px;
-  border: 1px solid #4338ca;
-  background: #1e1b4b;
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--slate-900));
   text-align: center;
 }
 

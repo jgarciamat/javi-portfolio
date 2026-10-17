@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, type Ref } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 
 interface AuthPasswordInputProps {
+  /** Set when a visible <label htmlFor> names the field; otherwise the placeholder does. */
+  id?: string;
+  /** Id of the hint or error that explains the field. */
+  describedBy?: string;
+  inputRef?: Ref<HTMLInputElement>;
   value: string;
   onChange: (value: string) => void;
-  placeholder: string;
+  placeholder?: string;
   /** Marks the field as wrong (e.g. confirmation that does not match). */
   invalid?: boolean;
   required?: boolean;
@@ -14,6 +19,9 @@ interface AuthPasswordInputProps {
 
 /** Password field with a button to show / hide what was typed. */
 export function AuthPasswordInput({
+  id,
+  describedBy,
+  inputRef,
   value,
   onChange,
   placeholder,
@@ -27,11 +35,14 @@ export function AuthPasswordInput({
   return (
     <div className="auth-pass-wrap">
       <input
+        id={id}
+        ref={inputRef}
         className={`auth-input auth-pass-input${invalid ? ' auth-input-error' : ''}`}
         type={visible ? 'text' : 'password'}
         placeholder={placeholder}
-        aria-label={placeholder}
+        aria-label={id ? undefined : placeholder}
         aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}

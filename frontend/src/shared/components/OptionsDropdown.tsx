@@ -15,21 +15,29 @@ interface OptionsDropdownProps {
   ariaLabel: string;
 }
 
-/** Small menu of actions; closes on choice, outside click or Escape. */
+/**
+ * Small list of actions behind a toggle (a disclosure: plain buttons, Tab moves through
+ * them). Closes on choice, outside click or Escape; the last two give focus back to the toggle.
+ */
 export function OptionsDropdown({ options, ariaLabel }: OptionsDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
   const close = () => setOpen(false);
+  const closeToToggle = () => {
+    close();
+    toggle.current!.focus();
+  };
   useClickOutside(ref, close, open);
-  useEscapeKey(close, open);
+  useEscapeKey(closeToToggle, open);
 
   return (
     <div className="options-dropdown" ref={ref}>
       <button
+        ref={toggle}
         type="button"
         className={`options-dropdown-toggle${open ? ' options-dropdown-toggle--open' : ''}`}
         onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
         aria-expanded={open}
         aria-label={ariaLabel}
       >
@@ -49,19 +57,22 @@ export function OptionsDropdown({ options, ariaLabel }: OptionsDropdownProps) {
         </svg>
       </button>
       {open && (
-        <ul className="options-dropdown-menu" role="menu">
+        <ul className="options-dropdown-menu">
           {options.map((opt) => (
-            <li key={opt.label} role="none">
+            <li key={opt.label}>
               <button
                 type="button"
-                role="menuitem"
                 className="options-dropdown-item"
                 onClick={() => {
-                  close();
+                  closeToToggle();
                   opt.onClick();
                 }}
               >
-                {opt.icon && <span className="options-dropdown-item-icon">{opt.icon}</span>}
+                {opt.icon && (
+                  <span className="options-dropdown-item-icon" aria-hidden="true">
+                    {opt.icon}
+                  </span>
+                )}
                 {opt.label}
               </button>
             </li>

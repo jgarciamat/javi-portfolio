@@ -34,7 +34,7 @@ describe('LoginPage', () => {
     fireEvent.change(screen.getByLabelText(tr('app.auth.login.emailLabel')), {
       target: { value: 'ana@example.com' },
     });
-    fireEvent.change(screen.getByLabelText(tr('app.auth.login.password')), {
+    fireEvent.change(screen.getByLabelText(tr('app.auth.login.passwordLabel')), {
       target: { value: STRONG },
     });
   };

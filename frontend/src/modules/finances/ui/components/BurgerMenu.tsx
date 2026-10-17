@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
-import { useEscapeKey } from '@shared/hooks/useEscapeKey';
+import { useDialog } from '@shared/hooks/useDialog';
 import {
   DASHBOARD_SECTIONS,
   offersEnabled,
@@ -18,6 +18,24 @@ interface BurgerMenuProps {
   onClose: () => void;
 }
 
+/**
+ * Modal behaviour while the menu is open: focus starts on the close button, Tab stays
+ * inside and Escape closes it; on close, focus goes back to the menu button.
+ */
+function MenuFocus({
+  panel,
+  closeButton,
+  onClose,
+}: {
+  panel: RefObject<HTMLElement | null>;
+  closeButton: RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+}) {
+  useDialog(panel, onClose, true);
+  useEffect(() => closeButton.current?.focus(), [closeButton]);
+  return null;
+}
+
 /** Side menu with every section; the offers entry hides when the user turned offers off. */
 export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps) {
   const { t } = useI18n();
@@ -26,7 +44,8 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
     (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
   );
 
-  useEscapeKey(onClose, open);
+  const panel = useRef<HTMLElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
 
   // No page scroll behind the open menu.
   useEffect(() => {
@@ -45,17 +64,27 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
         aria-hidden="true"
       />
       <aside
+        ref={panel}
         className={`burger-panel${open ? ' burger-panel--open' : ''}`}
+        role="dialog"
+        aria-modal="true"
         aria-label={t('app.menu.ariaLabel')}
         aria-hidden={!open}
         inert={!open}
+        tabIndex={-1}
       >
+        {open && <MenuFocus panel={panel} closeButton={closeButton} onClose={onClose} />}
         <div className="burger-panel-header">
           <div className="burger-brand">
             <img className="burger-brand-logo" src="/logo-192.png" alt="" width="28" height="28" />
             <span className="burger-brand-name">{t('app.header.title')}</span>
           </div>
-          <button className="burger-close-btn" onClick={onClose} aria-label={t('app.menu.close')}>
+          <button
+            ref={closeButton}
+            className="burger-close-btn"
+            onClick={onClose}
+            aria-label={t('app.menu.close')}
+          >
             <Icon name="close" />
           </button>
         </div>

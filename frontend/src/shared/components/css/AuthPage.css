@@ -96,7 +96,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--slate-600);
+  color: var(--slate-500);
   font-size: 0.8rem;
   margin: -0.15rem 0;
 }
@@ -188,6 +188,12 @@
   font-size: 1.1rem;
   line-height: 1;
   padding: 0;
+  /* Big enough to tap (24 × 24 px at least). */
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--slate-500);
   transition: color 0.15s;
 }
@@ -197,7 +203,7 @@
 }
 
 .auth-btn {
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -212,12 +218,13 @@
   margin-top: 0.25rem;
 }
 
-.auth-btn:hover:not(:disabled) {
-  background: var(--accent-600);
+.auth-btn:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--accent-700);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
 }
 
-.auth-btn:disabled {
+.auth-btn:disabled,
+.auth-btn[aria-disabled='true'] {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -237,7 +244,7 @@
 }
 
 .auth-link {
-  color: var(--accent);
+  color: var(--accent-400);
   cursor: pointer;
   font-weight: 600;
 }
@@ -340,7 +347,7 @@ button.auth-link {
 }
 
 .auth-footer-links a {
-  color: var(--accent);
+  color: var(--accent-400);
   text-decoration: none;
 }
 
@@ -391,5 +398,5 @@ button.auth-link {
 
 .auth-socials a:hover,
 .auth-socials a:focus-visible {
-  color: var(--accent);
+  color: var(--accent-400);
 }

@@ -67,7 +67,7 @@
 .cat-save-btn {
   white-space: nowrap;
   padding: 0.6rem 1.25rem;
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -78,7 +78,7 @@
 }
 
 .cat-save-btn:hover:not(:disabled) {
-  background: var(--accent-600);
+  background: var(--accent-700);
 }
 
 .cat-save-btn:disabled {

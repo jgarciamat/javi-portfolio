@@ -119,7 +119,7 @@
 
 .inv-tab--on {
   border-color: var(--accent);
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
 }
 
@@ -196,7 +196,8 @@
 
 .inv-pill--on {
   border-color: var(--c);
-  background: var(--c);
+  /* Darkened so the white label keeps 4.5:1 on every level colour. */
+  background: color-mix(in srgb, var(--c) 60%, #000);
   color: #fff;
 }
 
@@ -257,7 +258,7 @@
 
 .inv-asset-title small {
   font-weight: 700;
-  color: var(--cat);
+  color: color-mix(in srgb, var(--cat) 60%, var(--tint-ink));
 }
 
 .inv-asset-title strong {
@@ -361,7 +362,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--cat);
+  color: color-mix(in srgb, var(--cat) 60%, var(--tint-ink));
 }
 
 .inv-facts dd {
@@ -1153,7 +1154,7 @@ textarea.tx-input {
 .inv-embed-title {
   margin: 0 0 0.4rem;
   font-size: 0.95rem;
-  color: var(--cat, var(--accent));
+  color: color-mix(in srgb, var(--cat, var(--accent)) 60%, var(--tint-ink));
 }
 
 .inv-embed .inv-chart-card {

@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import esMessages from '@locales/es.json';
 import enMessages from '@locales/en.json';
 import { storage } from '@shared/utils/storage';
@@ -59,6 +67,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     storage.set(STORAGE_KEY, next);
     setLocaleState(next);
   }, []);
+
+  // Screen readers pick the voice from <html lang>.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const value = useMemo<I18nContextValue>(
     () => ({
