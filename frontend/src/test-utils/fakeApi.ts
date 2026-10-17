@@ -8,25 +8,63 @@ export type FakeApi = { [K in keyof IApiContext]: Mocked<IApiContext[K]> };
 
 const ok = <T>(value: T) => jest.fn().mockResolvedValue(value);
 
+function fakeAuthApi(): FakeApi['authApi'] {
+  return {
+    acquisition: ok(undefined),
+    register: ok({ message: 'ok' }),
+    login: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
+    googleLogin: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
+    logout: ok(undefined),
+    logoutEverywhere: ok(undefined),
+    verifyEmail: ok({ message: 'ok' }),
+    resendVerification: ok({ message: 'ok' }),
+    requestPasswordReset: ok({ message: 'ok' }),
+    resetPassword: ok({ message: 'ok' }),
+    updateName: ok({ name: 'Ana' }),
+    updatePassword: ok({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' }),
+    updateAvatar: ok({ avatarUrl: null }),
+    deleteAccount: ok(undefined),
+  };
+}
+
+function fakeBusinessApi(): FakeApi['businessApi'] {
+  return {
+    categories: ok([]),
+    setCategory: ok(undefined),
+    removeCategory: ok(undefined),
+    draft: ok(f.autonomoDraft()),
+    recordPdf: ok({ used: 1 }),
+    tax: ok({
+      year: 2026,
+      quarters: [1, 2, 3, 4].map((quarter) => ({
+        quarter,
+        ...{
+          incomeBase: 0,
+          vatCollected: 0,
+          expenseBase: 0,
+          vatPaid: 0,
+          vatDue: 0,
+          netIncome: 0,
+          irpfAdvance: 0,
+        },
+      })),
+      totals: {
+        incomeBase: 0,
+        vatCollected: 0,
+        expenseBase: 0,
+        vatPaid: 0,
+        vatDue: 0,
+        netIncome: 0,
+        irpfAdvance: 0,
+      },
+    }),
+  };
+}
+
 /** Every API call answered with sensible fixtures; override what a test needs. */
 export function createFakeApi(): FakeApi {
   return {
-    authApi: {
-      acquisition: ok(undefined),
-      register: ok({ message: 'ok' }),
-      login: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
-      googleLogin: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
-      logout: ok(undefined),
-      logoutEverywhere: ok(undefined),
-      verifyEmail: ok({ message: 'ok' }),
-      resendVerification: ok({ message: 'ok' }),
-      requestPasswordReset: ok({ message: 'ok' }),
-      resetPassword: ok({ message: 'ok' }),
-      updateName: ok({ name: 'Ana' }),
-      updatePassword: ok({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' }),
-      updateAvatar: ok({ avatarUrl: null }),
-      deleteAccount: ok(undefined),
-    },
+    authApi: fakeAuthApi(),
     monthApi: { get: ok(f.overview()) },
     transactionApi: {
       create: ok(f.transaction()),
@@ -58,37 +96,7 @@ export function createFakeApi(): FakeApi {
       settle: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
       removeExpense: ok({ id: 'g1', name: 'Piso', members: [], expenses: [], transfers: [] }),
     },
-    businessApi: {
-      categories: ok([]),
-      setCategory: ok(undefined),
-      removeCategory: ok(undefined),
-      draft: ok(f.autonomoDraft()),
-      recordPdf: ok({ used: 1 }),
-      tax: ok({
-        year: 2026,
-        quarters: [1, 2, 3, 4].map((quarter) => ({
-          quarter,
-          ...{
-            incomeBase: 0,
-            vatCollected: 0,
-            expenseBase: 0,
-            vatPaid: 0,
-            vatDue: 0,
-            netIncome: 0,
-            irpfAdvance: 0,
-          },
-        })),
-        totals: {
-          incomeBase: 0,
-          vatCollected: 0,
-          expenseBase: 0,
-          vatPaid: 0,
-          vatDue: 0,
-          netIncome: 0,
-          irpfAdvance: 0,
-        },
-      }),
-    },
+    businessApi: fakeBusinessApi(),
     ratesApi: { get: ok({ from: 'USD', to: 'EUR', rate: 0.9 }) },
     assetApi: {
       getAll: ok([]),
