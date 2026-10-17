@@ -33,7 +33,8 @@ export function parseAmountCents(raw: string): number | null {
   return cents > 0 && cents <= 100_000_000 ? cents : null;
 }
 
-const AMOUNT = '(\\d{1,3}(?:[.,]\\d{3})*[.,]\\d{2}|\\d+[.,]\\d{2}|\\d+)';
+// Digit runs are bounded so that a long run of digits cannot make the search quadratic.
+const AMOUNT = '(\\d{1,3}(?:[.,]\\d{3}){0,4}[.,]\\d{2}|\\d{1,9}[.,]\\d{2}|\\d{1,9})';
 const CURRENCY = '(?:€|eur\\b|euros?\\b)';
 const TOTAL_LABEL =
   '(?:total(?:\\s+a\\s+pagar|\\s+pagado|\\s+factura|\\s+del\\s+pedido|\\s+con\\s+iva)?|importe(?:\\s+total)?|importe\\s+cobrado|pagado|amount(?:\\s+paid)?|total\\s+paid|grand\\s+total)';
@@ -115,7 +116,9 @@ export function parseReceiptEmail(email: ReceiptEmail): ParsedReceipt | null {
 /** The token of the first recipient that has one ("Money <mm-abc123@dominio.es>, otro@x.com"). */
 export function inboxTokenOf(recipients: string): string | null {
   for (const recipient of recipients.split(/[,;]/)) {
-    const address = /<([^>]+)>/.exec(recipient)?.[1] ?? recipient;
+    const open = recipient.indexOf('<');
+    const close = open < 0 ? -1 : recipient.indexOf('>', open + 1);
+    const address = close > open + 1 ? recipient.slice(open + 1, close) : recipient;
     const local = normalizeText(address.split('@')[0] ?? '').replace(/\s/g, '');
     if (/^mm-[a-z0-9]{12,40}$/.test(local)) return local;
   }
