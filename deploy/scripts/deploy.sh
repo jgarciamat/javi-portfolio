@@ -42,6 +42,12 @@ fi
 echo "==> Starting services"
 docker compose up -d --remove-orphans
 
+# The Caddyfile is a bind mount, so editing it does not recreate the container: reload it explicitly.
+# A reload with an invalid file keeps the running configuration, so the sites stay up either way.
+echo "==> Reloading Caddy"
+docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile \
+  || echo "!! Caddy reload failed; the previous configuration is still running" >&2
+
 echo "==> Waiting for the API to be healthy"
 API_CONTAINER="$(docker compose ps -q api)"
 for _ in $(seq 1 30); do
