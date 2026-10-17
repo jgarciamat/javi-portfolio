@@ -81,6 +81,15 @@ describe('the PDF of the self-employed draft', () => {
     const blob = await buildAutonomoPdf(draft, inputs(), text, date);
     expect(blob.type).toBe('application/pdf');
     expect(blob.size).toBeGreaterThan(1000);
+    // A complete PDF file: header, pages with the tables, and the end marker.
+    const content = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsBinaryString(blob);
+    });
+    expect(content.startsWith('%PDF-1.')).toBe(true);
+    expect(content.trimEnd().endsWith('%%EOF')).toBe(true);
+    expect(content).toMatch(/\/Type \/Page\b/);
   });
 
   it('works without the data, without expenses and with no modelo 130', async () => {
