@@ -79,5 +79,8 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "engines": {
+    "node": ">=22 <25"
   }
 }
