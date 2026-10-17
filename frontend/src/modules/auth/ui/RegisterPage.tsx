@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
@@ -10,9 +12,35 @@ interface Props {
   onSwitch: () => void;
 }
 
+/** First layer of the privacy notice: `{terms}` and `{privacy}` in the text become links. */
+function LegalNotice({ textKey }: { textKey: string }) {
+  const { t } = useI18n();
+  return (
+    <p className="auth-footer-links">
+      {t(textKey)
+        .split(/(\{terms\}|\{privacy\})/)
+        .map((part, i) =>
+          part === '{terms}' ? (
+            <Link key={i} to="/terms">
+              {t('app.auth.register.legal.terms')}
+            </Link>
+          ) : part === '{privacy}' ? (
+            <Link key={i} to="/privacy">
+              {t('app.auth.register.legal.privacy')}
+            </Link>
+          ) : (
+            part
+          )
+        )}
+    </p>
+  );
+}
+
 export function RegisterPage({ onSwitch }: Props) {
   const { t } = useI18n();
   const form = useRegisterForm();
+  // Spain sets 14 as the age to consent to data processing (LOPDGDD art. 7).
+  const [oldEnough, setOldEnough] = useState(false);
   const mismatch = form.confirmTouched && !form.passwordsMatch;
 
   if (form.registered) {
@@ -36,7 +64,10 @@ export function RegisterPage({ onSwitch }: Props) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit} className="auth-card">
+    <form
+      onSubmit={(e) => (oldEnough ? form.handleSubmit(e) : e.preventDefault())}
+      className="auth-card"
+    >
       <h1 className="auth-title">{t('app.auth.register.title')}</h1>
       <p className="auth-sub">
         {t('app.auth.register.subtitle')}{' '}
@@ -50,6 +81,7 @@ export function RegisterPage({ onSwitch }: Props) {
         onToken={form.handleGoogleToken}
         onError={form.reportGoogleError}
       />
+      <LegalNotice textKey="app.auth.register.legal.google" />
 
       <input
         className="auth-input"
@@ -91,9 +123,19 @@ export function RegisterPage({ onSwitch }: Props) {
           {form.error}
         </p>
       )}
-      <button type="submit" className="auth-btn" disabled={form.loading}>
+      <label className="auth-remember">
+        <input
+          type="checkbox"
+          checked={oldEnough}
+          onChange={(e) => setOldEnough(e.target.checked)}
+          required
+        />
+        <span>{t('app.auth.register.age')}</span>
+      </label>
+      <button type="submit" className="auth-btn" disabled={form.loading || !oldEnough}>
         {form.loading ? t('app.auth.register.loading') : t('app.auth.register.submit')}
       </button>
+      <LegalNotice textKey="app.auth.register.legal.email" />
       <SocialLinks />
     </form>
   );

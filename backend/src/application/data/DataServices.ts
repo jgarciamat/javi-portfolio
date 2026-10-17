@@ -9,6 +9,7 @@ import {
   CategoryRepository,
   CustomAlertRepository,
   GoalRepository,
+  PersonalDataReader,
   RecurringRuleRepository,
   SettingsRepository,
   TransactionRepository,
@@ -89,12 +90,13 @@ export class ImportService {
    * Imports bank movements (Premium). Re-importing the same file is safe: every row gets a
    * fingerprint (date, amount, description and its position among identical rows)
    * and rows already imported are skipped. Categories come from the file, the
-   * user's own history for the same description, keyword rules, the AI, or "Otros".
+   * user's own history for the same description, keyword rules, the AI (only when the
+   * user opts in with `useAi`), or "Otros".
    */
   async import(
     userId: string,
     rows: ImportRow[],
-    options: { accountId?: string | null; dryRun?: boolean }
+    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
   ): Promise<ImportResult> {
     this.entitlements.assertFeature(userId, 'import');
     if (rows.length > MAX_IMPORT_ROWS) {
@@ -120,11 +122,13 @@ export class ImportService {
       const guess = guessCategoryName(r.description);
       return !guess || !knownNames.has(normalizeText(guess));
     });
-    const aiGuesses = await this.categorizer.suggest(
-      userId,
-      unplaced.map((r) => r.description),
-      categoryNames
-    );
+    const aiGuesses = options.useAi
+      ? await this.categorizer.suggest(
+          userId,
+          unplaced.map((r) => r.description),
+          categoryNames
+        )
+      : new Map<string, string>();
 
     const run = (): void => {
       const account = this.accountResolver.resolveForMovement(userId, options.accountId);
@@ -278,6 +282,9 @@ export class ImportService {
 
 const money = (cents: Cents): number => fromCents(cents);
 
+export const EXPORT_FORMAT = 'finanverso-export';
+export const EXPORT_VERSION = 3;
+
 export class ExportService {
   constructor(
     private readonly users: UserRepository,
@@ -290,15 +297,20 @@ export class ExportService {
     private readonly alerts: CustomAlertRepository,
     private readonly budgets: CategoryBudgetRepository,
     private readonly goals: GoalRepository,
+    private readonly personalData: PersonalDataReader,
     private readonly clock: Clock
   ) {}
 
-  /** Everything stored about the user, in a portable format (GDPR art. 20). */
+  /**
+   * Everything stored about the user, in a portable format (GDPR art. 20).
+   * Version 3 renamed the format from `money-manager-export` and added the sections
+   * of `PersonalDataReader`; nothing reads these files back, so old ones need no shim.
+   */
   exportAll(userId: string): Record<string, unknown> {
     const user = this.users.findById(userId);
     return {
-      format: 'money-manager-export',
-      version: 2,
+      format: EXPORT_FORMAT,
+      version: EXPORT_VERSION,
       exportedAt: this.clock.now().toISOString(),
       profile: user ? { ...user.toPublic(), createdAt: user.toPrimitives().createdAt } : null,
       settings: this.settings.get(userId),
@@ -331,6 +343,7 @@ export class ExportService {
         const p = g.toPrimitives();
         return { ...p, target: money(p.targetCents) };
       }),
+      ...this.personalData.sectionsFor(userId),
     };
   }
 }

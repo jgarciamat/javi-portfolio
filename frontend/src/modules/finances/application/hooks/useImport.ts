@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { errorMessage } from '@shared/utils/errors';
+import { storage } from '@shared/utils/storage';
 import type { ImportResult, ImportRowDTO } from '@modules/finances/domain/types';
 import {
   type BankId,
@@ -17,6 +18,9 @@ import {
 } from '@modules/finances/domain/importParsers';
 
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
+
+/** The person's choice to let the AI suggest categories (off until they turn it on). */
+const AI_KEY = 'mm_import_ai';
 
 const NO_MAPPING: ColumnMapping = {
   date: -1,
@@ -68,6 +72,12 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   const [result, setResult] = useState<ImportResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useAi, setUseAiState] = useState(() => storage.get(AI_KEY) === '1');
+
+  const setUseAi = (on: boolean) => {
+    setUseAiState(on);
+    storage.set(AI_KEY, on ? '1' : null);
+  };
 
   const applyMapping = (tableRows: string[][], next: ColumnMapping) => {
     setMapping(next);
@@ -107,7 +117,11 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setBusy(true);
     setError(null);
     try {
-      const response = await transactionApi.import(rows, { accountId: accountId || null, dryRun });
+      const response = await transactionApi.import(rows, {
+        accountId: accountId || null,
+        dryRun,
+        useAi,
+      });
       if (dryRun) {
         setPreview(response);
         setStep('preview');
@@ -147,6 +161,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     skipped,
     accountId,
     setAccountId,
+    useAi,
+    setUseAi,
     preview,
     result,
     busy,

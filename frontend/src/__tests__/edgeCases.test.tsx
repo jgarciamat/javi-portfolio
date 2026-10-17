@@ -680,6 +680,7 @@ describe('more edge cases', () => {
       expect(api.transactionApi.import).toHaveBeenCalledWith(expect.any(Array), {
         accountId: null,
         dryRun: true,
+        useAi: false,
       })
     );
     // A row without category data still renders.

@@ -134,6 +134,8 @@ export const searchQuery = z.object({
 export const importBody = z.object({
   accountId: optionalId,
   dryRun: z.boolean().default(false),
+  /** The user's opt-in to send unplaced descriptions to the AI provider. */
+  useAi: z.boolean().default(false),
   rows: z
     .array(
       z.object({

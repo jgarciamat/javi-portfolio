@@ -85,6 +85,7 @@ import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBu
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
 import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
+import { SqlitePersonalDataReader } from './sqlite/repositories/SqlitePersonalDataReader';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
@@ -430,6 +431,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.alerts,
       repos.budgets,
       repos.goals,
+      new SqlitePersonalDataReader(db, config.inbox.domain),
       clock
     ),
   };

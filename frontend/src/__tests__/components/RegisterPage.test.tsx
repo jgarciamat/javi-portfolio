@@ -28,6 +28,7 @@ function fillForm(name = 'John', email = 'j@test.com', pass = VALID_PASS) {
   fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: email } });
   fireEvent.change(screen.getByPlaceholderText('Contraseña'), { target: { value: pass } });
   fireEvent.change(screen.getByPlaceholderText('Repetir contraseña'), { target: { value: pass } });
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Tengo 14 años o más' }));
 }
 
 describe('RegisterPage', () => {

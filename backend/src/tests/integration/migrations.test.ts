@@ -173,7 +173,8 @@ describe('migrations', () => {
     const recent = path.join(dir, 'pre-migration-v2-recent.db');
     const unrelated = path.join(dir, 'other.db');
     for (const f of [old, recent, unrelated]) fs.writeFileSync(f, '');
-    for (const f of [old, unrelated]) fs.utimesSync(f, new Date('2026-01-01'), new Date('2026-01-01'));
+    for (const f of [old, unrelated])
+      fs.utimesSync(f, new Date('2026-01-01'), new Date('2026-01-01'));
     fs.utimesSync(recent, new Date('2026-01-20'), new Date('2026-01-20'));
     expect(prunePreMigrationCopies(file, new Date('2026-01-25T00:00:00Z'))).toEqual([old]);
     expect(fs.existsSync(recent)).toBe(true);
