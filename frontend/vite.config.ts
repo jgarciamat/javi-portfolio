@@ -16,8 +16,8 @@ export default defineConfig({
         clientsClaim: true,
         // Precachea todos los assets del build
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        globIgnores: ['**/pdf-*.js'],
-        // The receipt scanner's files are big: they are fetched when first used.
+        // The receipt scanner's files are big: they are fetched when first used. (A second
+        // `globIgnores` for '**/pdf-*.js' was overridden by this one, so the PDF reader is precached.)
         globIgnores: ['ocr/**'],
         // Shows the push notifications and opens the app when one is tapped.
         importScripts: ['push-sw.js'],
