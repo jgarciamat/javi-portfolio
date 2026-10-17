@@ -47,6 +47,24 @@ describe('migrations', () => {
     expect(migrate(db, migrations).to).toBe(migrations.length);
   });
 
+  it('indexes every foreign key', () => {
+    const db = openDatabase(':memory:');
+    migrate(db, migrations);
+    const tables = db
+      .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+      .pluck()
+      .all() as string[];
+    const unindexed = tables.flatMap((table) => {
+      const leading = (db.pragma(`index_list(${table})`) as { name: string }[]).map(
+        (i) => (db.pragma(`index_info(${i.name})`) as { name: string }[])[0]?.name
+      );
+      return (db.pragma(`foreign_key_list(${table})`) as { from: string }[])
+        .filter((fk) => !leading.includes(fk.from))
+        .map((fk) => `${table}.${fk.from}`);
+    });
+    expect(unindexed).toEqual([]);
+  });
+
   describe('upgrading a v1 database', () => {
     let db: Db;
 

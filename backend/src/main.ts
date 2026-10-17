@@ -38,6 +38,9 @@ async function main(): Promise<void> {
   const db = openDatabase(config.databasePath);
   const result = migrate(db, migrations, { databaseFile: config.databasePath, logger: console });
   if (result.to !== result.from) console.info(`[db] migrated ${result.from} → ${result.to}`);
+  // Refreshes the query planner's statistics where they are missing or stale (new indexes
+  // included); cheap, and again on shutdown as SQLite recommends for long-lived connections.
+  db.pragma('optimize=0x10002');
 
   const container = buildContainer(db, config);
   await seedDemoUser(container, config);
@@ -93,6 +96,7 @@ async function main(): Promise<void> {
     console.info(`[server] ${signal} received, shutting down`);
     backups?.stop();
     server.close(() => {
+      db.pragma('optimize');
       db.close();
       process.exit(0);
     });
