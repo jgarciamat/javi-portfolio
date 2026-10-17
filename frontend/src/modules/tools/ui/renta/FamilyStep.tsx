@@ -3,60 +3,11 @@ import { CCAA_OPTIONS } from '../../data/renta';
 import type { RentaCcaa } from '../../domain/rentaData';
 import { DisabilitySelect, Field, Step, type StepProps } from './shared';
 
-/** Step 1: where the person lives, their age and family. */
-export function FamilyStep({
-  form,
-  set,
-  ccaa,
-  loadError,
-}: StepProps & { ccaa: RentaCcaa | null; loadError: boolean }) {
+/** The children of the person, and whether the minimum is shared with the other parent. */
+function ChildrenSection({ form, set }: StepProps) {
   const { t } = useI18n();
-  const foral = ccaa?.regime === 'foral';
-
   return (
-    <Step n={1} titleKey="tools.renta.step1">
-      <div className="tools-form">
-        <div className="tools-field">
-          <label htmlFor="renta-ccaa">{t('tools.renta.ccaa')}</label>
-          <select
-            id="renta-ccaa"
-            className="tx-input"
-            value={form.ccaaId}
-            onChange={(e) => set({ ccaaId: e.target.value })}
-          >
-            <option value="">{t('tools.renta.chooseCcaa')}</option>
-            {CCAA_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Field
-          id="renta-age"
-          label={t('tools.renta.age')}
-          value={form.age}
-          onChange={(age) => set({ age })}
-        />
-        <div className="tools-field">
-          <label htmlFor="renta-disability">{t('tools.renta.ownDisability')}</label>
-          <DisabilitySelect
-            id="renta-disability"
-            value={form.disability}
-            onChange={(disability) => set({ disability })}
-          />
-        </div>
-      </div>
-      {loadError && <p className="form-error">{t('tools.renta.loadError')}</p>}
-      {foral && ccaa && (
-        <p className="renta-foral" role="note">
-          {t('tools.renta.foral', { name: ccaa.name })}{' '}
-          <a href={ccaa.source} target="_blank" rel="noopener noreferrer">
-            {t('tools.renta.officialSite')}
-          </a>
-        </p>
-      )}
-
+    <>
       <h3>{t('tools.renta.children')}</h3>
       <p className="section-hint">{t('tools.renta.childrenHint')}</p>
       <ul className="renta-people">
@@ -117,7 +68,15 @@ export function FamilyStep({
           <span>{t('tools.renta.shared')}</span>
         </label>
       )}
+    </>
+  );
+}
 
+/** The parents or grandparents who live with the person. */
+function AscendantsSection({ form, set }: StepProps) {
+  const { t } = useI18n();
+  return (
+    <>
       <h3>{t('tools.renta.ascendants')}</h3>
       <p className="section-hint">{t('tools.renta.ascendantsHint')}</p>
       <ul className="renta-people">
@@ -171,6 +130,67 @@ export function FamilyStep({
           + {t('tools.renta.addAscendant')}
         </button>
       </div>
+    </>
+  );
+}
+
+/** Step 1: where the person lives, their age and family. */
+export function FamilyStep({
+  form,
+  set,
+  ccaa,
+  loadError,
+}: StepProps & { ccaa: RentaCcaa | null; loadError: boolean }) {
+  const { t } = useI18n();
+  const foral = ccaa?.regime === 'foral';
+
+  return (
+    <Step n={1} titleKey="tools.renta.step1">
+      <div className="tools-form">
+        <div className="tools-field">
+          <label htmlFor="renta-ccaa">{t('tools.renta.ccaa')}</label>
+          <select
+            id="renta-ccaa"
+            className="tx-input"
+            value={form.ccaaId}
+            onChange={(e) => set({ ccaaId: e.target.value })}
+          >
+            <option value="">{t('tools.renta.chooseCcaa')}</option>
+            {CCAA_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Field
+          id="renta-age"
+          label={t('tools.renta.age')}
+          value={form.age}
+          onChange={(age) => set({ age })}
+        />
+        <div className="tools-field">
+          <label htmlFor="renta-disability">{t('tools.renta.ownDisability')}</label>
+          <DisabilitySelect
+            id="renta-disability"
+            value={form.disability}
+            onChange={(disability) => set({ disability })}
+          />
+        </div>
+      </div>
+      {loadError && <p className="form-error">{t('tools.renta.loadError')}</p>}
+      {foral && ccaa && (
+        <p className="renta-foral" role="note">
+          {t('tools.renta.foral', { name: ccaa.name })}{' '}
+          <a href={ccaa.source} target="_blank" rel="noopener noreferrer">
+            {t('tools.renta.officialSite')}
+          </a>
+        </p>
+      )}
+
+      <ChildrenSection form={form} set={set} />
+
+      <AscendantsSection form={form} set={set} />
     </Step>
   );
 }

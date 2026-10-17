@@ -51,56 +51,14 @@ function UpgradeCta({ access }: { access: RentaAccess }) {
   );
 }
 
-/** Step by step: your situation, your income, property, the deductions and the estimated result. */
-export function RentaPlanner({
-  initialIncome = '',
-  mode,
-}: {
-  initialIncome?: string;
-  mode: RentaMode;
-}) {
-  const { t } = useI18n();
-  const money = useMoney();
-  const [form, setForm] = useState<RentaForm>(() => emptyForm(initialIncome));
-  const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
-  const [loadError, setLoadError] = useState(false);
-  const access = useRentaAccess(mode);
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
-    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
-  );
-  const [busy, setBusy] = useState(false);
-  const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
-  const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
-
-  useEffect(() => {
-    let cancelled = false;
-    setCcaa(null);
-    setLoadError(false);
-    if (!form.ccaaId) return undefined;
-    loadCcaa(form.ccaaId)
-      .then((data) => !cancelled && setCcaa(data))
-      .catch(() => !cancelled && setLoadError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [form.ccaaId]);
-
-  const reduction = useMemo(() => workReductionOf(rentaState), []);
-  const family = useMemo(() => familyOf(form), [form]);
-  const live: Snapshot = useMemo(() => {
-    const input = toInput(form, {
-      state: rentaState,
-      ccaa: ccaa ?? NO_CCAA,
-      extras: rentaWorkExtras,
-      property: rentaProperty,
-      workReduction: reduction,
-    });
-    return {
-      result: computeRenta(input),
-      kids: descendantBreakdown(family, rentaState.minimums),
-    };
-  }, [form, ccaa, reduction, family]);
-
+/** What the draft says about the deductions: what is missing, pending an amount or already in it. */
+function useDeductionHints(
+  form: RentaForm,
+  ccaa: RentaCcaa | null,
+  draft: DraftState,
+  family: ReturnType<typeof familyOf>,
+  live: Snapshot
+) {
   const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
   const mentioned = useMemo(
     () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
@@ -151,6 +109,111 @@ export function RentaPlanner({
     return map;
   }, [mentioned, missing]);
 
+  return { missing, pending, marked, hints };
+}
+
+/** The estimated result, or the way to get it. */
+function ResultSection({
+  access,
+  shown,
+  busy,
+  pending,
+  calculate,
+}: {
+  access: RentaAccess;
+  shown: Snapshot | null;
+  busy: boolean;
+  pending: string[];
+  calculate: () => Promise<void>;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  return (
+    <Step n={5} titleKey="tools.renta.step4" className="renta-result">
+      <div aria-live="polite">
+        {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
+        {!access.loading && !shown && (
+          <PremiumGate locked={access.used}>
+            <p className="section-hint">
+              {access.used ? t('tools.renta.usedNoSnapshot') : t('tools.renta.freeOne')}
+            </p>
+            {access.used ? (
+              <UpgradeCta access={access} />
+            ) : (
+              <button className="btn-primary" disabled={busy} onClick={() => void calculate()}>
+                {busy ? t('tools.renta.calculating') : t('tools.renta.calculate')}
+              </button>
+            )}
+          </PremiumGate>
+        )}
+        {shown && (
+          <>
+            <PendingNotice pending={pending} />
+            <ResultCard shown={shown} money={money} />
+            {!access.premium && (
+              <PremiumGate>
+                <p className="section-hint">{t('tools.renta.usedFree')}</p>
+                <UpgradeCta access={access} />
+              </PremiumGate>
+            )}
+          </>
+        )}
+        <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
+      </div>
+    </Step>
+  );
+}
+
+/** Step by step: your situation, your income, property, the deductions and the estimated result. */
+export function RentaPlanner({
+  initialIncome = '',
+  mode,
+}: {
+  initialIncome?: string;
+  mode: RentaMode;
+}) {
+  const [form, setForm] = useState<RentaForm>(() => emptyForm(initialIncome));
+  const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const access = useRentaAccess(mode);
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
+    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
+  );
+  const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
+  const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
+
+  useEffect(() => {
+    let cancelled = false;
+    setCcaa(null);
+    setLoadError(false);
+    if (!form.ccaaId) return undefined;
+    loadCcaa(form.ccaaId)
+      .then((data) => !cancelled && setCcaa(data))
+      .catch(() => !cancelled && setLoadError(true));
+    return () => {
+      cancelled = true;
+    };
+  }, [form.ccaaId]);
+
+  const reduction = useMemo(() => workReductionOf(rentaState), []);
+  const family = useMemo(() => familyOf(form), [form]);
+  const live: Snapshot = useMemo(() => {
+    const input = toInput(form, {
+      state: rentaState,
+      ccaa: ccaa ?? NO_CCAA,
+      extras: rentaWorkExtras,
+      property: rentaProperty,
+      workReduction: reduction,
+    });
+    return {
+      result: computeRenta(input),
+      kids: descendantBreakdown(family, rentaState.minimums),
+    };
+  }, [form, ccaa, reduction, family]);
+
+  const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
+
   const shown = access.premium ? live : snapshot;
   const calculate = async () => {
     setBusy(true);
@@ -192,38 +255,13 @@ export function RentaPlanner({
         onChange={setChoice}
       />
 
-      <Step n={5} titleKey="tools.renta.step4" className="renta-result">
-        <div aria-live="polite">
-          {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
-          {!access.loading && !shown && (
-            <PremiumGate locked={access.used}>
-              <p className="section-hint">
-                {access.used ? t('tools.renta.usedNoSnapshot') : t('tools.renta.freeOne')}
-              </p>
-              {access.used ? (
-                <UpgradeCta access={access} />
-              ) : (
-                <button className="btn-primary" disabled={busy} onClick={() => void calculate()}>
-                  {busy ? t('tools.renta.calculating') : t('tools.renta.calculate')}
-                </button>
-              )}
-            </PremiumGate>
-          )}
-          {shown && (
-            <>
-              <PendingNotice pending={pending} />
-              <ResultCard shown={shown} money={money} />
-              {!access.premium && (
-                <PremiumGate>
-                  <p className="section-hint">{t('tools.renta.usedFree')}</p>
-                  <UpgradeCta access={access} />
-                </PremiumGate>
-              )}
-            </>
-          )}
-          <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
-        </div>
-      </Step>
+      <ResultSection
+        access={access}
+        shown={shown}
+        busy={busy}
+        pending={pending}
+        calculate={calculate}
+      />
     </div>
   );
 }

@@ -134,6 +134,270 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
   );
 }
 
+/** What was read from the draft, and the deductions it already applies. */
+function DraftFound({ reading }: { reading: DraftReading }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  const found = FIELD_LABELS.filter(({ key }) => reading[key] !== null);
+  const shown = (key: keyof DraftReading) => {
+    const value = reading[key];
+    if (key === 'ccaaId')
+      return (CCAA_OPTIONS.find((c) => c.id === value) as { name: string }).name;
+    return money(value as number);
+  };
+
+  return (
+    <>
+      <h3>{t('tools.renta.draft.found')}</h3>
+      {found.length === 0 ? (
+        <p className="form-error">{t('tools.renta.draft.nothing')}</p>
+      ) : (
+        <ul className="renta-minimum">
+          {found.map(({ key, label }) => (
+            <li key={key}>
+              <span>{t(label)}</span>
+              <strong>{shown(key)}</strong>
+            </li>
+          ))}
+          {reading.childAges.length > 0 && (
+            <li>
+              <span>{t('tools.renta.children')}</span>
+              <strong>{reading.childAges.length}</strong>
+            </li>
+          )}
+        </ul>
+      )}
+      <p className="section-hint">{t('tools.renta.draft.applied')}</p>
+      {reading.applied.length > 0 && (
+        <>
+          <h3>{t('tools.renta.draft.alreadyApplied')}</h3>
+          <ul className="renta-minimum">
+            {reading.applied.map((a) => (
+              <li key={a.label}>
+                <span>{a.label}</span>
+                <strong>{money(a.amount)}</strong>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  );
+}
+
+/** Trying next year's return with the same data, and the way back to the draft. */
+function DraftScenario({
+  form,
+  set,
+  reading,
+  draft,
+  onDraft,
+}: {
+  form: RentaForm;
+  set: (patch: Partial<RentaForm>) => void;
+  reading: DraftReading;
+  draft: DraftState;
+  onDraft: (draft: DraftState) => void;
+}) {
+  const { t } = useI18n();
+  const { scenario } = draft;
+  if (scenario) {
+    return (
+      <div className="renta-scenario" role="status">
+        <p>{t('tools.renta.draft.scenarioOn', { year: NEXT_CAMPAIGN })}</p>
+        <button
+          className="btn-secondary"
+          onClick={() => {
+            set(scenario.form);
+            onDraft({ ...draft, reading: scenario.reading, dismissed: [], scenario: null });
+          }}
+        >
+          {t('tools.renta.draft.scenarioBack')}
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="button-row">
+      <button
+        className="btn-secondary"
+        onClick={() => {
+          set(nextYearForm(form));
+          onDraft({
+            ...draft,
+            reading: { ...reading, applied: [] },
+            dismissed: [],
+            scenario: { form, reading },
+          });
+          reveal(document.querySelector<HTMLElement>('.renta-step'));
+        }}
+      >
+        {t('tools.renta.draft.tryNext', { year: NEXT_CAMPAIGN })}
+      </button>
+    </div>
+  );
+}
+
+/** The deductions the draft is missing, one question each. */
+function MissingQuestions({
+  missing,
+  marked,
+  draft,
+  onDraft,
+  accept,
+}: {
+  missing: Deduction[];
+  marked: number;
+  draft: DraftState;
+  onDraft: (draft: DraftState) => void;
+  accept: (id: string) => void;
+}) {
+  const { t } = useI18n();
+  if (missing.length === 0) {
+    return (
+      <>
+        <p className="section-hint">{t('tools.renta.draft.noneMissing')}</p>
+        {marked > 0 && (
+          <button className="btn-primary" onClick={() => reveal(markedAfter(null))}>
+            {t('tools.renta.draft.goFirst', { count: marked })}
+          </button>
+        )}
+      </>
+    );
+  }
+  return (
+    <>
+      <button
+        className="btn-secondary"
+        onClick={() =>
+          onDraft({
+            ...draft,
+            dismissed: [...draft.dismissed, ...missing.map((d) => d.id)],
+          })
+        }
+      >
+        {t('tools.renta.draft.noneInterest')}
+      </button>
+      <ul className="renta-questions">
+        {missing.map((d) => (
+          <li key={d.id}>
+            <strong>{d.title}</strong>
+            <small>{d.summary}</small>
+            <div className="button-row">
+              <button
+                className="btn-primary"
+                onClick={() => accept(d.id)}
+                aria-label={`${t('tools.renta.draft.yes')}: ${d.title}`}
+              >
+                {t('tools.renta.draft.yes')}
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => onDraft({ ...draft, dismissed: [...draft.dismissed, d.id] })}
+                aria-label={`${t('tools.renta.draft.no')}: ${d.title}`}
+              >
+                {t('tools.renta.draft.no')}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/** Reading the draft: from the PDF or pasted as text, in the browser. */
+function DraftReader({
+  form,
+  set,
+  access,
+  draft,
+  onDraft,
+}: {
+  form: RentaForm;
+  set: (patch: Partial<RentaForm>) => void;
+  access: DraftAccess;
+  draft: DraftState;
+  onDraft: (draft: DraftState) => void;
+}) {
+  const { t } = useI18n();
+  const date = useDate();
+  const input = useRef<HTMLInputElement>(null);
+  const [pasted, setPasted] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<'read' | 'locked' | null>(null);
+
+  const analyse = async (text: string) => {
+    setError(null);
+    if (!(await access.use())) {
+      setError('locked');
+      return;
+    }
+    const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
+    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
+    set(applyReading(form, result));
+  };
+  const fromFile = async (file: File) => {
+    setBusy(true);
+    try {
+      await analyse(await readPdfText(file));
+    } catch {
+      setError('read');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      {access.passUntil && (
+        <p className="section-hint">
+          {t('tools.renta.draft.passUntil', {
+            date: date(access.passUntil),
+          })}
+        </p>
+      )}
+      <p className="renta-privacy" role="note">
+        {t('tools.renta.draft.privacy')}
+      </p>
+      <div className="button-row">
+        <input
+          ref={input}
+          type="file"
+          accept="application/pdf"
+          hidden
+          aria-label={t('tools.renta.draft.file')}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void fromFile(file);
+          }}
+        />
+        <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
+          {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
+        </button>
+      </div>
+      {error && (
+        <p className="form-error">
+          {error === 'locked' ? t('tools.renta.draft.refused') : t('tools.renta.draft.error')}
+        </p>
+      )}
+      <details className="renta-requirements">
+        <summary>{t('tools.renta.draft.paste')}</summary>
+        <textarea
+          className="tx-input"
+          rows={6}
+          aria-label={t('tools.renta.draft.paste')}
+          value={pasted}
+          onChange={(e) => setPasted(e.target.value)}
+        />
+        <button className="btn-secondary" onClick={() => void analyse(pasted)}>
+          {t('tools.renta.draft.read')}
+        </button>
+      </details>
+    </>
+  );
+}
+
 /** Step 0 (two months of Premium or the pass): read the draft in the browser, fill in the form and ask about the deductions that are missing. */
 export function DraftStep({
   form,
@@ -161,42 +425,7 @@ export function DraftStep({
   accept: (id: string) => void;
 }) {
   const { t } = useI18n();
-  const date = useDate();
-  const money = useMoney();
-  const input = useRef<HTMLInputElement>(null);
-  const [pasted, setPasted] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<'read' | 'locked' | null>(null);
   const { reading } = draft;
-
-  const analyse = async (text: string) => {
-    setError(null);
-    if (!(await access.use())) {
-      setError('locked');
-      return;
-    }
-    const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
-    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
-    set(applyReading(form, result));
-  };
-  const fromFile = async (file: File) => {
-    setBusy(true);
-    try {
-      await analyse(await readPdfText(file));
-    } catch {
-      setError('read');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const found = reading ? FIELD_LABELS.filter(({ key }) => reading[key] !== null) : [];
-  const shown = (key: keyof DraftReading) => {
-    const value = reading?.[key];
-    if (key === 'ccaaId')
-      return (CCAA_OPTIONS.find((c) => c.id === value) as { name: string }).name;
-    return money(value as number);
-  };
 
   return (
     <Step n={0} titleKey="tools.renta.draft.title" className="renta-draft">
@@ -212,124 +441,17 @@ export function DraftStep({
         )
       ) : (
         <>
-          {access.passUntil && (
-            <p className="section-hint">
-              {t('tools.renta.draft.passUntil', {
-                date: date(access.passUntil),
-              })}
-            </p>
-          )}
-          <p className="renta-privacy" role="note">
-            {t('tools.renta.draft.privacy')}
-          </p>
-          <div className="button-row">
-            <input
-              ref={input}
-              type="file"
-              accept="application/pdf"
-              hidden
-              aria-label={t('tools.renta.draft.file')}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void fromFile(file);
-              }}
-            />
-            <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
-              {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
-            </button>
-          </div>
-          {error && (
-            <p className="form-error">
-              {error === 'locked' ? t('tools.renta.draft.refused') : t('tools.renta.draft.error')}
-            </p>
-          )}
-          <details className="renta-requirements">
-            <summary>{t('tools.renta.draft.paste')}</summary>
-            <textarea
-              className="tx-input"
-              rows={6}
-              aria-label={t('tools.renta.draft.paste')}
-              value={pasted}
-              onChange={(e) => setPasted(e.target.value)}
-            />
-            <button className="btn-secondary" onClick={() => void analyse(pasted)}>
-              {t('tools.renta.draft.read')}
-            </button>
-          </details>
-
+          <DraftReader form={form} set={set} access={access} draft={draft} onDraft={onDraft} />
           {reading && (
             <section className="renta-block" aria-live="polite">
-              <h3>{t('tools.renta.draft.found')}</h3>
-              {found.length === 0 ? (
-                <p className="form-error">{t('tools.renta.draft.nothing')}</p>
-              ) : (
-                <ul className="renta-minimum">
-                  {found.map(({ key, label }) => (
-                    <li key={key}>
-                      <span>{t(label)}</span>
-                      <strong>{shown(key)}</strong>
-                    </li>
-                  ))}
-                  {reading.childAges.length > 0 && (
-                    <li>
-                      <span>{t('tools.renta.children')}</span>
-                      <strong>{reading.childAges.length}</strong>
-                    </li>
-                  )}
-                </ul>
-              )}
-              <p className="section-hint">{t('tools.renta.draft.applied')}</p>
-              {reading.applied.length > 0 && (
-                <>
-                  <h3>{t('tools.renta.draft.alreadyApplied')}</h3>
-                  <ul className="renta-minimum">
-                    {reading.applied.map((a) => (
-                      <li key={a.label}>
-                        <span>{a.label}</span>
-                        <strong>{money(a.amount)}</strong>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-
-              {draft.scenario ? (
-                <div className="renta-scenario" role="status">
-                  <p>{t('tools.renta.draft.scenarioOn', { year: NEXT_CAMPAIGN })}</p>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => {
-                      set(draft.scenario!.form);
-                      onDraft({
-                        ...draft,
-                        reading: draft.scenario!.reading,
-                        dismissed: [],
-                        scenario: null,
-                      });
-                    }}
-                  >
-                    {t('tools.renta.draft.scenarioBack')}
-                  </button>
-                </div>
-              ) : (
-                <div className="button-row">
-                  <button
-                    className="btn-secondary"
-                    onClick={() => {
-                      set(nextYearForm(form));
-                      onDraft({
-                        ...draft,
-                        reading: { ...reading, applied: [] },
-                        dismissed: [],
-                        scenario: { form, reading },
-                      });
-                      reveal(document.querySelector<HTMLElement>('.renta-step'));
-                    }}
-                  >
-                    {t('tools.renta.draft.tryNext', { year: NEXT_CAMPAIGN })}
-                  </button>
-                </div>
-              )}
+              <DraftFound reading={reading} />
+              <DraftScenario
+                form={form}
+                set={set}
+                reading={reading}
+                draft={draft}
+                onDraft={onDraft}
+              />
 
               <h3>{t('tools.renta.draft.questions')}</h3>
               <label className="renta-check">
@@ -340,56 +462,13 @@ export function DraftStep({
                 />
                 <span>{t('tools.renta.draft.rents')}</span>
               </label>
-              {missing.length === 0 ? (
-                <>
-                  <p className="section-hint">{t('tools.renta.draft.noneMissing')}</p>
-                  {marked > 0 && (
-                    <button className="btn-primary" onClick={() => reveal(markedAfter(null))}>
-                      {t('tools.renta.draft.goFirst', { count: marked })}
-                    </button>
-                  )}
-                </>
-              ) : (
-                <>
-                  <button
-                    className="btn-secondary"
-                    onClick={() =>
-                      onDraft({
-                        ...draft,
-                        dismissed: [...draft.dismissed, ...missing.map((d) => d.id)],
-                      })
-                    }
-                  >
-                    {t('tools.renta.draft.noneInterest')}
-                  </button>
-                  <ul className="renta-questions">
-                    {missing.map((d) => (
-                      <li key={d.id}>
-                        <strong>{d.title}</strong>
-                        <small>{d.summary}</small>
-                        <div className="button-row">
-                          <button
-                            className="btn-primary"
-                            onClick={() => accept(d.id)}
-                            aria-label={`${t('tools.renta.draft.yes')}: ${d.title}`}
-                          >
-                            {t('tools.renta.draft.yes')}
-                          </button>
-                          <button
-                            className="btn-secondary"
-                            onClick={() =>
-                              onDraft({ ...draft, dismissed: [...draft.dismissed, d.id] })
-                            }
-                            aria-label={`${t('tools.renta.draft.no')}: ${d.title}`}
-                          >
-                            {t('tools.renta.draft.no')}
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+              <MissingQuestions
+                missing={missing}
+                marked={marked}
+                draft={draft}
+                onDraft={onDraft}
+                accept={accept}
+              />
             </section>
           )}
         </>

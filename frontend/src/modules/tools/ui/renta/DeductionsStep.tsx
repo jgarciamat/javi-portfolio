@@ -10,6 +10,158 @@ const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'd
 export type Hint = 'inDraft' | 'missing';
 const EMPTY: Choice = { on: false, amount: '', units: '' };
 
+/** The checkbox of a deduction, its title and its badges. */
+function DeductionHead({
+  deduction,
+  choice,
+  suggested,
+  hint,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  suggested: boolean;
+  hint?: Hint;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <label className="renta-deduction-head">
+      <input
+        type="checkbox"
+        checked={choice.on}
+        onChange={(e) => onChange({ ...choice, on: e.target.checked })}
+      />
+      <span>
+        <strong>{deduction.title}</strong>
+        {suggested && <em className="renta-badge">{t('tools.renta.suggested')}</em>}
+        {deduction.advance && (
+          <em className="renta-badge renta-badge--model">
+            {t('tools.renta.model', { model: deduction.advance.model })}
+          </em>
+        )}
+        {hint && (
+          <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
+        )}
+        <small>{deduction.summary}</small>
+      </span>
+    </label>
+  );
+}
+
+/** The fine print of a deduction: advance payments, income limit and requirements. */
+function DeductionInfo({ deduction }: { deduction: Deduction }) {
+  const { t } = useI18n();
+  return (
+    <>
+      {deduction.advance && (
+        <small className="renta-advance">
+          {t('tools.renta.advance', { model: deduction.advance.model })}{' '}
+          <a href={deduction.advance.url} target="_blank" rel="noopener noreferrer">
+            {t('tools.renta.advanceLink', { model: deduction.advance.model })}
+          </a>
+        </small>
+      )}
+      {deduction.incomeLimit?.note && (
+        <small className="renta-limit">
+          {t('tools.renta.incomeLimit')}: {deduction.incomeLimit.note}
+        </small>
+      )}
+      <details className="renta-requirements">
+        <summary>{t('tools.renta.requirements')}</summary>
+        <p>{deduction.requirements}</p>
+        <a href={deduction.url} target="_blank" rel="noopener noreferrer">
+          {t('tools.renta.official')}
+        </a>
+      </details>
+    </>
+  );
+}
+
+/** The field a marked deduction asks for, depending on its kind. */
+function DeductionInput({
+  deduction,
+  choice,
+  childCount,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  childCount: number;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  const perChild = !!deduction.perChild && deduction.perChild.length > 0;
+  if (deduction.kind === 'fixed') {
+    if (!perChild && !deduction.unit) return null;
+    return (
+      <label className="tools-field">
+        <span>{t('tools.renta.units', { unit: deduction.unit ?? t('tools.renta.child') })}</span>
+        <input
+          className="tx-input"
+          inputMode="numeric"
+          value={choice.units}
+          placeholder={String(childCount || 1)}
+          onChange={(e) => onChange({ ...choice, units: e.target.value })}
+        />
+      </label>
+    );
+  }
+  // A percentage of what was spent, or an amount given as it is.
+  return (
+    <label className="tools-field">
+      <span>
+        {deduction.kind === 'percent'
+          ? t('tools.renta.spent', { percent: deduction.percent as number })
+          : t('tools.renta.special')}
+      </span>
+      <input
+        className="tx-input"
+        inputMode="decimal"
+        value={choice.amount}
+        onChange={(e) => onChange({ ...choice, amount: e.target.value })}
+      />
+    </label>
+  );
+}
+
+/** The buttons of a marked deduction: on to the next one, or not this one after all. */
+function DeductionNav({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="button-row renta-deduction-nav">
+      <button className="btn-primary" onClick={() => reveal(markedAfter(deduction.id))}>
+        {t('tools.renta.nextDeduction')}
+      </button>
+      <button
+        className="btn-secondary"
+        onClick={() => {
+          // The next one is found first: this row is about to stop being marked.
+          const next = markedAfter(deduction.id);
+          onChange({ ...choice, on: false });
+          reveal(next);
+        }}
+      >
+        {t('tools.renta.draft.no')}
+      </button>
+    </div>
+  );
+}
+
+/** A marked deduction still waiting for the amount it is computed from. */
+const isPending = (deduction: Deduction, choice: Choice) =>
+  choice.on &&
+  (deduction.kind === 'percent' || deduction.kind === 'special') &&
+  number(choice.amount) <= 0;
+
 /** One deduction: what it gives, who it is for and the fields to see what it would save. */
 function DeductionRow({
   deduction,
@@ -39,56 +191,22 @@ function DeductionRow({
     },
     1
   );
-  const needsAmount = deduction.kind === 'percent' || deduction.kind === 'special';
-  const perChild = !!deduction.perChild && deduction.perChild.length > 0;
 
   return (
     <li
       id={rowId(deduction.id)}
-      data-pending={choice.on && needsAmount && number(choice.amount) <= 0 ? 'true' : undefined}
+      data-pending={isPending(deduction, choice) ? 'true' : undefined}
       tabIndex={-1}
       className={`renta-deduction${choice.on ? ' renta-deduction--on' : ''}`}
     >
-      <label className="renta-deduction-head">
-        <input
-          type="checkbox"
-          checked={choice.on}
-          onChange={(e) => onChange({ ...choice, on: e.target.checked })}
-        />
-        <span>
-          <strong>{deduction.title}</strong>
-          {suggested && <em className="renta-badge">{t('tools.renta.suggested')}</em>}
-          {deduction.advance && (
-            <em className="renta-badge renta-badge--model">
-              {t('tools.renta.model', { model: deduction.advance.model })}
-            </em>
-          )}
-          {hint && (
-            <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
-          )}
-          <small>{deduction.summary}</small>
-        </span>
-      </label>
-      {deduction.advance && (
-        <small className="renta-advance">
-          {t('tools.renta.advance', { model: deduction.advance.model })}{' '}
-          <a href={deduction.advance.url} target="_blank" rel="noopener noreferrer">
-            {t('tools.renta.advanceLink', { model: deduction.advance.model })}
-          </a>
-        </small>
-      )}
-      {deduction.incomeLimit?.note && (
-        <small className="renta-limit">
-          {t('tools.renta.incomeLimit')}: {deduction.incomeLimit.note}
-        </small>
-      )}
-      <details className="renta-requirements">
-        <summary>{t('tools.renta.requirements')}</summary>
-        <p>{deduction.requirements}</p>
-        <a href={deduction.url} target="_blank" rel="noopener noreferrer">
-          {t('tools.renta.official')}
-        </a>
-      </details>
+      <DeductionHead
+        deduction={deduction}
+        choice={choice}
+        suggested={suggested}
+        hint={hint}
+        onChange={onChange}
+      />
+      <DeductionInfo deduction={deduction} />
       {choice.on && blocked && (
         <p className="form-error" role="alert">
           {t('tools.renta.blocked')}
@@ -96,42 +214,12 @@ function DeductionRow({
       )}
       {choice.on && (
         <div className="renta-deduction-fields">
-          {deduction.kind === 'fixed' && (perChild || deduction.unit) && (
-            <label className="tools-field">
-              <span>
-                {t('tools.renta.units', { unit: deduction.unit ?? t('tools.renta.child') })}
-              </span>
-              <input
-                className="tx-input"
-                inputMode="numeric"
-                value={choice.units}
-                placeholder={String(childCount || 1)}
-                onChange={(e) => onChange({ ...choice, units: e.target.value })}
-              />
-            </label>
-          )}
-          {deduction.kind === 'percent' && (
-            <label className="tools-field">
-              <span>{t('tools.renta.spent', { percent: deduction.percent as number })}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                value={choice.amount}
-                onChange={(e) => onChange({ ...choice, amount: e.target.value })}
-              />
-            </label>
-          )}
-          {deduction.kind === 'special' && (
-            <label className="tools-field">
-              <span>{t('tools.renta.special')}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                value={choice.amount}
-                onChange={(e) => onChange({ ...choice, amount: e.target.value })}
-              />
-            </label>
-          )}
+          <DeductionInput
+            deduction={deduction}
+            choice={choice}
+            childCount={childCount}
+            onChange={onChange}
+          />
           {!blocked && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>
@@ -139,24 +227,7 @@ function DeductionRow({
           )}
         </div>
       )}
-      {choice.on && (
-        <div className="button-row renta-deduction-nav">
-          <button className="btn-primary" onClick={() => reveal(markedAfter(deduction.id))}>
-            {t('tools.renta.nextDeduction')}
-          </button>
-          <button
-            className="btn-secondary"
-            onClick={() => {
-              // The next one is found first: this row is about to stop being marked.
-              const next = markedAfter(deduction.id);
-              onChange({ ...choice, on: false });
-              reveal(next);
-            }}
-          >
-            {t('tools.renta.draft.no')}
-          </button>
-        </div>
-      )}
+      {choice.on && <DeductionNav deduction={deduction} choice={choice} onChange={onChange} />}
     </li>
   );
 }

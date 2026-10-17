@@ -2,15 +2,11 @@ import { useI18n } from '@core/i18n/I18nContext';
 import type { RentaProperty } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
 
-/** Step 3: rented properties, properties that are not rented, other savings and notes on property. */
-export function PropertyStep({ form, set, property }: StepProps & { property: RentaProperty }) {
+/** Rented properties: the income, the expenses and the reduction that applies. */
+function RentalSection({ form, set, rental }: StepProps & { rental: RentaProperty['rental'] }) {
   const { t } = useI18n();
-  const { rental, imputation } = property;
-  const setUnrented = (i: number, patch: Partial<(typeof form.unrented)[number]>) =>
-    set({ unrented: form.unrented.map((p, j) => (j === i ? { ...p, ...patch } : p)) });
-
   return (
-    <Step n={3} titleKey="tools.renta.step3Property">
+    <>
       <label className="renta-check">
         <input
           type="checkbox"
@@ -75,7 +71,22 @@ export function PropertyStep({ form, set, property }: StepProps & { property: Re
           <p className="section-hint">{rental.notes}</p>
         </div>
       )}
+    </>
+  );
+}
 
+/** Properties that are not rented: the imputed income of each one. */
+function UnrentedSection({
+  form,
+  set,
+  imputation,
+}: StepProps & { imputation: RentaProperty['imputation'] }) {
+  const { t } = useI18n();
+  const setUnrented = (i: number, patch: Partial<(typeof form.unrented)[number]>) =>
+    set({ unrented: form.unrented.map((p, j) => (j === i ? { ...p, ...patch } : p)) });
+
+  return (
+    <>
       <h3>{t('tools.renta.unrented')}</h3>
       <p className="section-hint">{imputation.summary}</p>
       <ul className="renta-people">
@@ -135,6 +146,19 @@ export function PropertyStep({ form, set, property }: StepProps & { property: Re
           {t('tools.renta.official')}
         </a>
       </details>
+    </>
+  );
+}
+
+/** Step 3: rented properties, properties that are not rented, other savings and notes on property. */
+export function PropertyStep({ form, set, property }: StepProps & { property: RentaProperty }) {
+  const { t } = useI18n();
+
+  return (
+    <Step n={3} titleKey="tools.renta.step3Property">
+      <RentalSection form={form} set={set} rental={property.rental} />
+
+      <UnrentedSection form={form} set={set} imputation={property.imputation} />
 
       <h3>{t('tools.renta.savingsTitle')}</h3>
       <div className="tools-form">
