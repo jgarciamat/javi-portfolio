@@ -89,7 +89,9 @@ describe('Getting started', () => {
     expect(
       within(card).getByText(tr('app.gettingStarted.progress', { done: 2, total: 5 }))
     ).toBeVisible();
-    expect(within(card).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2');
+    expect(
+      within(card).getByRole('progressbar', { name: tr('app.gettingStarted.title') })
+    ).toHaveAttribute('aria-valuenow', '2');
     fireEvent.click(within(card).getByRole('button', { name: tr('app.gettingStarted.hide') }));
     expect(screen.queryByRole('region', { name: tr('app.gettingStarted.title') })).toBeNull();
     // Saved in the account: it stays hidden on the web, in the app and on other devices.
@@ -146,7 +148,7 @@ describe('Getting started progress', () => {
   const card = () => screen.findByRole('region', { name: tr('app.gettingStarted.title') });
   const goTo = (labelKey: string) => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
-    const menu = screen.getByRole('complementary', { name: tr('app.menu.ariaLabel') });
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
     fireEvent.click(within(menu).getByRole('button', { name: new RegExp(tr(labelKey)) }));
   };
 

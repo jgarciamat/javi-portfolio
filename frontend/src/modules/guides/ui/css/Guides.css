@@ -48,7 +48,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent, inherit);
+  color: var(--accent-400);
   font: inherit;
   font-weight: 700;
   font-size: 1.05rem;
@@ -94,7 +94,8 @@
 }
 
 .guide-chip-on {
-  background: var(--cat);
+  /* Darkened so the white label keeps 4.5:1 on every category colour. */
+  background: color-mix(in srgb, var(--cat) 60%, #000);
   border-color: var(--cat);
   color: #fff;
 }

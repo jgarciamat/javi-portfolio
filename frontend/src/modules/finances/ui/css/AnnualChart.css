@@ -152,7 +152,7 @@
 }
 
 .annual-month-btn:hover {
-  color: var(--accent);
+  color: var(--accent-400);
   background: var(--slate-800);
 }
 

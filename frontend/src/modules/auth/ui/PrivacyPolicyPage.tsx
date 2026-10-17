@@ -3,6 +3,20 @@ import { useGoBack } from '@shared/hooks/useGoBack';
 import './css/PrivacyPolicy.css';
 import { Icon } from '@shared/components/Icon';
 
+/** The list of a section: `app.privacy.<section>.item1`…`item<count>`. */
+function Items({ section, count }: { section: string; count: number }) {
+  const { t } = useI18n();
+  return (
+    <ul>
+      {Array.from({ length: count }, (_, i) => (
+        <li key={i}>{t(`app.privacy.${section}.item${i + 1}`)}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Revisar con un abogado: los textos (app.privacy.* en es.json/en.json) describen lo que hace
+// el código a 17/10/2026; las dudas abiertas están en docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md.
 export function PrivacyPolicyPage() {
   const { t } = useI18n();
   const goBack = useGoBack();
@@ -30,34 +44,15 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s2.title')}</h2>
           <p>{t('app.privacy.s2.intro')}</p>
-          <ul>
-            <li>{t('app.privacy.s2.item1')}</li>
-            <li>{t('app.privacy.s2.item2')}</li>
-            <li>{t('app.privacy.s2.item3')}</li>
-            <li>{t('app.privacy.s2.item4')}</li>
-            <li>{t('app.privacy.s2.item5')}</li>
-            <li>{t('app.privacy.s2.item6')}</li>
-            <li>{t('app.privacy.s2.item7')}</li>
-            <li>{t('app.privacy.s2.item8')}</li>
-            <li>{t('app.privacy.s2.item9')}</li>
-            <li>{t('app.privacy.s2.item10')}</li>
-            <li>{t('app.privacy.s2.item11')}</li>
-            <li>{t('app.privacy.s2.item12')}</li>
-            <li>{t('app.privacy.s2.item13')}</li>
-          </ul>
+          <Items section="s2" count={15} />
         </section>
 
         {/* Section 3 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s3.title')}</h2>
           <p>{t('app.privacy.s3.intro')}</p>
-          <ul>
-            <li>{t('app.privacy.s3.item1')}</li>
-            <li>{t('app.privacy.s3.item2')}</li>
-            <li>{t('app.privacy.s3.item3')}</li>
-            <li>{t('app.privacy.s3.item4')}</li>
-            <li>{t('app.privacy.s3.item5')}</li>
-          </ul>
+          <Items section="s3" count={10} />
+          <p>{t('app.privacy.s3.withdraw')}</p>
           <p>
             <em>{t('app.privacy.s3.noMarketing')}</em>
           </p>
@@ -67,57 +62,38 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s4.title')}</h2>
           <p>{t('app.privacy.s4.p1')}</p>
-          <ul>
-            <li>{t('app.privacy.s4.item1')}</li>
-            <li>{t('app.privacy.s4.item2')}</li>
-            <li>{t('app.privacy.s4.item3')}</li>
-            <li>{t('app.privacy.s4.item4')}</li>
-            <li>{t('app.privacy.s4.item5')}</li>
-            <li>{t('app.privacy.s4.item6')}</li>
-            <li>{t('app.privacy.s4.item7')}</li>
-            <li>{t('app.privacy.s4.item8')}</li>
-          </ul>
+          <Items section="s4" count={9} />
+          <p>{t('app.privacy.s4.p2')}</p>
         </section>
 
         {/* Section 5 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s5.title')}</h2>
           <p>{t('app.privacy.s5.p1')}</p>
-          <p>{t('app.privacy.s5.p2')}</p>
+          <Items section="s5" count={8} />
         </section>
 
         {/* Section 6 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s6.title')}</h2>
           <p>{t('app.privacy.s6.p1')}</p>
-          <ul>
-            <li>{t('app.privacy.s6.item1')}</li>
-            <li>{t('app.privacy.s6.item2')}</li>
-            <li>{t('app.privacy.s6.item3')}</li>
-            <li>{t('app.privacy.s6.item4')}</li>
-            <li>{t('app.privacy.s6.item5')}</li>
-            <li>{t('app.privacy.s6.item6')}</li>
-          </ul>
+          <Items section="s6" count={7} />
         </section>
 
         {/* Section 7 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s7.title')}</h2>
           <p>{t('app.privacy.s7.intro')}</p>
-          <ul>
-            <li>{t('app.privacy.s7.item1')}</li>
-            <li>{t('app.privacy.s7.item2')}</li>
-            <li>{t('app.privacy.s7.item3')}</li>
-            <li>{t('app.privacy.s7.item4')}</li>
-            <li>{t('app.privacy.s7.item5')}</li>
-            <li>{t('app.privacy.s7.item6')}</li>
-          </ul>
+          <Items section="s7" count={6} />
+          <p>{t('app.privacy.s7.how')}</p>
         </section>
 
         {/* Section 8 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s8.title')}</h2>
           <p>{t('app.privacy.s8.p1')}</p>
+          <Items section="s8" count={6} />
+          <p>{t('app.privacy.s8.p3')}</p>
           <p>{t('app.privacy.s8.p2')}</p>
         </section>
 

@@ -90,7 +90,7 @@
 }
 
 .recurring-radio-label input[type='radio'] {
-  accent-color: var(--color-primary, #7c6af5);
+  accent-color: var(--accent);
   width: 16px;
   height: 16px;
   flex-shrink: 0;
@@ -247,7 +247,7 @@
 .recurring-empty-hint {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--slate-600);
+  color: var(--slate-500);
 }
 
 .recurring-loading {

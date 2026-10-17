@@ -14,6 +14,8 @@ module.exports = {
     '^@react-oauth/google$': '<rootDir>/src/__mocks__/@react-oauth/google.tsx',
     '^@revenuecat/purchases-capacitor$': '<rootDir>/src/__mocks__/purchases.ts',
     '^virtual:pwa-register/react$': '<rootDir>/src/__mocks__/pwaRegister.ts',
+    // jsdom picks jspdf's ES module build, which Jest cannot load: use the UMD one.
+    '^jspdf$': '<rootDir>/node_modules/jspdf/dist/jspdf.umd.min.js',
     '^@modules/(.*)$': '<rootDir>/src/modules/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@core/(.*)$': '<rootDir>/src/core/$1',
@@ -23,7 +25,7 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
-    // Bootstrapping only: renders <App /> into #root with the Google client id.
+    // Bootstrapping only: renders <App /> into #root.
     '!src/main.tsx',
     // Reads import.meta.env (Vite only); replaced by a mock in tests.
     '!src/core/config/api.config.ts',

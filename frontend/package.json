@@ -1,13 +1,13 @@
 {
   "name": "portfolio-frontend",
-  "version": "1.41.5",
+  "version": "1.41.6",
   "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
     "predev": "node scripts/copy-ocr.mjs",
     "dev": "vite",
     "prebuild": "node scripts/copy-ocr.mjs",
-    "build": "tsc && vite build && node scripts/prerender.mjs",
+    "build": "tsc && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs --passWithNoTests",
     "test:watch": "jest --config jest.config.cjs --watch",
@@ -30,8 +30,8 @@
     "@capacitor/local-notifications": "^8.3.1",
     "@react-oauth/google": "^0.13.4",
     "@revenuecat/purchases-capacitor": "^13.7.3",
-    "jspdf": "^2.5.2",
-    "jspdf-autotable": "^3.8.4",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.9",
     "lucide-react": "^1.55.0",
     "pdfjs-dist": "^4.10.38",
     "react": "^19.0.0",
@@ -79,5 +79,8 @@
       "eslint --fix",
       "git add"
     ]
+  },
+  "engines": {
+    "node": ">=22 <25"
   }
 }

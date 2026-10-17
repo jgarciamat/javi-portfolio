@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
@@ -120,6 +121,18 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           </select>
         </label>
       )}
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.import.useAi')}</strong>
+          <small>{t('app.import.useAiHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          checked={imp.useAi}
+          onChange={(e) => imp.setUseAi(e.target.checked)}
+        />
+      </label>
       <table className="data-table">
         <tbody>
           {imp.rows.slice(0, 5).map((r, i) => (
@@ -154,7 +167,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
           invalid: preview.invalid,
         })}
       </p>
-      <div className="table-scroll">
+      <ScrollRegion className="table-scroll" label={t('app.import.preview')}>
         <table className="data-table">
           <thead>
             <tr>
@@ -175,7 +188,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <div className="modal-footer">
         <button className="btn-secondary" onClick={imp.back}>
           {t('app.common.back')}

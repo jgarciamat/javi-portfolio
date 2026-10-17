@@ -11,6 +11,7 @@ import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 /** What the planner keeps about the draft: what was read, and what the person answered. */
 export interface DraftState {
@@ -97,7 +98,7 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
   };
 
   return (
-    <div className="renta-gate">
+    <PremiumGate>
       <p className="section-hint">{t('tools.renta.draft.locked')}</p>
       {access.eligibleOn && (
         <p className="section-hint">
@@ -129,7 +130,7 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
           {error && <p className="form-error">{error}</p>}
         </>
       )}
-    </div>
+    </PremiumGate>
   );
 }
 
@@ -202,10 +203,10 @@ export function DraftStep({
       <p className="section-hint">{t('tools.renta.draft.hint')}</p>
       {!access.allowed ? (
         local ? (
-          <div className="renta-gate">
+          <PremiumGate>
             <p className="section-hint">{t('tools.renta.draft.premium')}</p>
             {upgrade}
-          </div>
+          </PremiumGate>
         ) : (
           <DraftPaywall access={access} />
         )

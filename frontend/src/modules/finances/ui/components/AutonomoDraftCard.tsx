@@ -9,6 +9,7 @@ import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import { storage } from '@shared/utils/storage';
+import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { buildAutonomoPdf, type PdfText } from '../../application/autonomoPdf';
 import { isNativeApp } from '@shared/utils/platform';
@@ -22,6 +23,7 @@ import {
 } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const SNAPSHOT_KEY = 'mm_autonomo_draft2';
 
@@ -281,7 +283,7 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
       </ul>
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
       {locked ? (
-        <div className="renta-gate">
+        <PremiumGate>
           <p className="section-hint">{t('app.autonomo.pdf.usedFree')}</p>
           <button
             className="btn-primary"
@@ -291,7 +293,7 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
           >
             {t('app.autonomo.goPremium')}
           </button>
-        </div>
+        </PremiumGate>
       ) : (
         <div className="button-row">
           <button className="btn-primary" disabled={saving} onClick={() => void download()}>
@@ -306,8 +308,11 @@ function DraftResult({ draft, inputs }: { draft: AutonomoDraft; inputs: Autonomo
   );
 }
 
-/** Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution. */
-export function AutonomoDraftCard() {
+/**
+ * Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution.
+ * `onHowToFile` opens the step-by-step guide to file a form on the Agencia Tributaria website.
+ */
+export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string) => void }) {
   const { businessApi } = useApi();
   const { t } = useI18n();
   const plan = useOptionalPlan();
@@ -449,7 +454,7 @@ export function AutonomoDraftCard() {
       </section>
 
       {locked ? (
-        <div className="renta-gate">
+        <PremiumGate>
           <p className="section-hint">{t('app.autonomo.usedFree')}</p>
           <button
             className="btn-primary"
@@ -463,7 +468,7 @@ export function AutonomoDraftCard() {
           >
             {t('app.autonomo.goPremium')}
           </button>
-        </div>
+        </PremiumGate>
       ) : (
         <div className="button-row">
           <button className="btn-primary" disabled={action.pending} onClick={() => void prepare()}>
@@ -481,6 +486,7 @@ export function AutonomoDraftCard() {
           <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
         </>
       )}
+      {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
     </div>
   );
 }

@@ -43,14 +43,22 @@ export interface RefreshTokenRecord {
   tokenHash: string;
   expiresAt: string;
   createdAt: string;
+  /** Every token issued from one sign-in shares the family (rotation). */
+  familyId: string;
+  /** Absolute end of the family, however often it is refreshed. */
+  familyExpiresAt: string;
+  /** When the user signed in (password, Google) to start the family. */
+  authTime: string;
+  /** Set once the token was exchanged for a new one; using it again is a replay. */
+  rotatedAt: string | null;
 }
 
 export interface RefreshTokenRepository {
   save(record: RefreshTokenRecord): void;
   findByHash(tokenHash: string): RefreshTokenRecord | null;
-  /** Sliding expiration: active sessions stay alive. */
-  extend(tokenHash: string, expiresAt: string): void;
+  markRotated(tokenHash: string, at: string): void;
   deleteByHash(tokenHash: string): void;
+  deleteFamily(familyId: string): void;
   deleteByUser(userId: string): void;
   deleteExpired(now: Date): number;
 }
@@ -336,7 +344,7 @@ export interface InboxRepository {
 }
 
 export interface PushRepository {
-  /** One row per endpoint: subscribing again from the same browser replaces it. */
+  /** One row per endpoint; another user only takes it over with the same keys (same browser). */
   save(subscription: PushSubscriptionRecord, createdAt: string): void;
   remove(userId: string, endpoint: string): void;
   /** Used when the push service says the subscription is gone. */
@@ -500,4 +508,14 @@ export interface HouseholdRepository {
   findInvite(codeHash: string): HouseholdInviteRecord | null;
   pendingInvite(ownerId: string): HouseholdInviteRecord | null;
   deleteInvite(ownerId: string): void;
+}
+
+// ─── Data export ─────────────────────────────────────────────────────────────
+
+/**
+ * Read-only view of the records that have no repository read fit for the GDPR export
+ * (assets, splits, inbox, billing, referrals…). Sections are plain JSON, amounts in euros.
+ */
+export interface PersonalDataReader {
+  sectionsFor(userId: string): Record<string, unknown>;
 }

@@ -141,7 +141,7 @@
 
 .month-nav-badge {
   font-size: 0.72rem;
-  color: var(--accent);
+  color: var(--accent-400);
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -200,12 +200,12 @@
 }
 
 .budget-amount {
-  color: var(--accent);
+  color: var(--accent-400);
   font-weight: 700;
 }
 
 .budget-undefined {
-  color: var(--slate-600);
+  color: var(--slate-500);
 }
 
 .budget-form {
@@ -230,7 +230,7 @@
 }
 
 .btn-save {
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -242,7 +242,7 @@
 }
 
 .btn-save:hover {
-  background: var(--accent-600);
+  background: var(--accent-700);
 }
 
 .btn-cancel {
@@ -257,7 +257,7 @@
 }
 
 .btn-cancel:hover {
-  background: #263347;
+  background: var(--slate-700);
   border-color: var(--slate-500);
 }
 
@@ -370,7 +370,7 @@
 }
 
 .tab-btn.active {
-  color: var(--accent);
+  color: var(--accent-400);
   border-bottom-color: var(--accent);
 }
 
@@ -543,7 +543,7 @@
   font-size: 1.1rem;
   line-height: 1;
   transition: transform 0.2s ease;
-  color: var(--slate-600);
+  color: var(--slate-500);
   display: inline-block;
 }
 
@@ -648,7 +648,7 @@
 
 .avatar-preset-btn.selected {
   border-color: var(--accent);
-  background: #1e1b4b;
+  background: color-mix(in srgb, var(--accent) 22%, var(--slate-900));
 }
 
 .avatar-presets-hint {
@@ -797,4 +797,9 @@
   .btn-logout {
     padding: 0.35rem 0.5rem;
   }
+}
+
+/* The open section takes focus after a menu choice: no ring around the whole page. */
+.dashboard-section:focus {
+  outline: none;
 }

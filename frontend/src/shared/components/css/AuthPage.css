@@ -96,7 +96,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--slate-600);
+  color: var(--slate-500);
   font-size: 0.8rem;
   margin: -0.15rem 0;
 }
@@ -188,6 +188,12 @@
   font-size: 1.1rem;
   line-height: 1;
   padding: 0;
+  /* Big enough to tap (24 × 24 px at least). */
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--slate-500);
   transition: color 0.15s;
 }
@@ -197,7 +203,7 @@
 }
 
 .auth-btn {
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -212,12 +218,13 @@
   margin-top: 0.25rem;
 }
 
-.auth-btn:hover:not(:disabled) {
-  background: var(--accent-600);
+.auth-btn:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--accent-700);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
 }
 
-.auth-btn:disabled {
+.auth-btn:disabled,
+.auth-btn[aria-disabled='true'] {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -237,7 +244,7 @@
 }
 
 .auth-link {
-  color: var(--accent);
+  color: var(--accent-400);
   cursor: pointer;
   font-weight: 600;
 }
@@ -340,12 +347,14 @@ button.auth-link {
 }
 
 .auth-footer-links a {
-  color: var(--accent);
-  text-decoration: none;
+  color: var(--accent-400);
+  /* Links inside a sentence need more than colour to stand out. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .auth-note {
-  color: #6b7280;
+  color: var(--slate-400);
   font-size: 0.875rem;
   text-align: center;
   margin: -8px 0 12px;
@@ -354,4 +363,42 @@ button.auth-link {
 .auth-sub--center {
   text-align: center;
   line-height: 1.6;
+}
+
+/* «Síguenos en», below the form: quiet, so the main button keeps the attention. */
+.auth-socials {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+.auth-socials-title {
+  margin: 0 0 0.4rem;
+}
+
+.auth-socials ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auth-socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.1rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.auth-socials a:hover,
+.auth-socials a:focus-visible {
+  color: var(--accent-400);
 }

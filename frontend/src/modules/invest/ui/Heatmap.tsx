@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { ASSET_CLASSES } from '../domain/content';
 import { IRPF_GLANCE, IVA_GLANCE, SAVINGS_SCALE_SOURCE, type GlanceRow } from '../domain/taxGlance';
@@ -14,7 +15,7 @@ export function Heatmap() {
     <section className="inv-block" aria-label={t('app.invest.heat.title')}>
       <h3>{t('app.invest.heat.title')}</h3>
       <p className="inv-hint-text">{t('app.invest.heat.hint')}</p>
-      <div className="inv-table-wrap">
+      <ScrollRegion className="inv-table-wrap" label={t('app.invest.heat.title')}>
         <table className="inv-table inv-heat">
           <caption className="sr-only">{t('app.invest.heat.title')}</caption>
           <thead>
@@ -44,7 +45,7 @@ export function Heatmap() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <ul className="inv-legend inv-legend--wrap">
         {(['savings', 'general', 'mixed', 'exempt'] as const).map((k) => (
           <li key={k}>
@@ -60,7 +61,7 @@ export function Heatmap() {
 function GlanceTable({ title, rows }: { title: string; rows: GlanceRow[] }) {
   const { t } = useI18n();
   return (
-    <div className="inv-table-wrap">
+    <ScrollRegion className="inv-table-wrap" label={title}>
       <table className="inv-table inv-glance">
         <caption>{title}</caption>
         <thead>
@@ -80,7 +81,7 @@ function GlanceTable({ title, rows }: { title: string; rows: GlanceRow[] }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
   );
 }
 

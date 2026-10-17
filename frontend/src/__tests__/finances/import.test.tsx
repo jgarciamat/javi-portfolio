@@ -134,11 +134,26 @@ describe('ImportModal', () => {
         { date: '2026-03-02', description: 'MERCADONA', amount: -54.3, category: 'Comida' },
         { date: '2026-03-03', description: 'NOMINA', amount: 1800, category: null },
       ],
-      { accountId: 'a1', dryRun: true }
+      { accountId: 'a1', dryRun: true, useAi: false }
     );
 
-    // Back to the mapping and forward again.
+    // Back to the mapping, opt in to the AI (remembered) and forward again.
     fireEvent.click(screen.getByRole('button', { name: tr('app.common.back') }));
+    const ai = screen.getByRole('checkbox', { name: new RegExp(tr('app.import.useAi')) });
+    expect(ai).not.toBeChecked();
+    fireEvent.click(ai);
+    expect(localStorage.getItem('mm_import_ai')).toBe('1');
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
+    await waitFor(() =>
+      expect(api.transactionApi.import).toHaveBeenLastCalledWith(expect.any(Array), {
+        accountId: 'a1',
+        dryRun: true,
+        useAi: true,
+      })
+    );
+    fireEvent.click(screen.getByRole('button', { name: tr('app.common.back') }));
+    fireEvent.click(screen.getByRole('checkbox', { name: new RegExp(tr('app.import.useAi')) }));
+    expect(localStorage.getItem('mm_import_ai')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
     await screen.findByText(
       tr('app.import.previewSummary', { imported: 2, duplicates: 1, invalid: 1 })

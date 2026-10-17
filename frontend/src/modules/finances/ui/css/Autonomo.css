@@ -43,7 +43,7 @@
 }
 .autonomo-boxes td:first-child {
   font-variant-numeric: tabular-nums;
-  color: #c7d2fe;
+  color: var(--accent-200);
 }
 .autonomo-extras {
   margin: 1.25rem 0;
@@ -71,7 +71,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-secondary, #9aa4b8);
+  color: var(--text-secondary);
 }
 .autonomo-grid {
   display: grid;
@@ -133,7 +133,7 @@
   border-radius: 0.8rem;
   border: 1px dashed rgba(129, 140, 248, 0.6);
   background: transparent;
-  color: #c7d2fe;
+  color: var(--accent-200);
   font-weight: 600;
   cursor: pointer;
 }
@@ -153,11 +153,11 @@
 }
 .autonomo-deadlines span {
   margin-left: auto;
-  color: #c7d2fe;
+  color: var(--accent-200);
 }
 .autonomo-note {
   display: block;
-  color: var(--text-secondary, #9aa4b8);
+  color: var(--text-secondary);
 }
 .autonomo-total td {
   font-weight: 700;

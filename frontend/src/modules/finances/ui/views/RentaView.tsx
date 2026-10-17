@@ -3,6 +3,9 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { Icon } from '@shared/components/Icon';
+import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
+import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
+import type { DashboardTab } from '../navigation';
 import { useFinances } from '../../application/FinancesContext';
 import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import '@modules/tools/ui/css/Tools.css';
@@ -12,7 +15,7 @@ const AEAT = 'https://sede.agenciatributaria.gob.es/';
 const CHECKLIST = ['data', 'certificate', 'receipts', 'review'] as const;
 
 /** Income tax return (Renta): the figures of the year, whether to file, and what to gather. */
-export function RentaView() {
+export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => void }) {
   const { t } = useI18n();
   const { money } = useFormat();
   const { currentPeriod } = useFinances();
@@ -67,6 +70,15 @@ export function RentaView() {
         <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
           {t('app.renta.aeat')}
         </a>
+        {onOpenTab && (
+          <HowToFile
+            slugs={['renta-web', 'antes-de-empezar']}
+            onOpen={(slug) => {
+              requestHaciendaGuide(slug);
+              onOpenTab('hacienda');
+            }}
+          />
+        )}
       </div>
     </div>
   );

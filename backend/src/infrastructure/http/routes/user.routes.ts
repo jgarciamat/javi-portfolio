@@ -18,6 +18,7 @@ import {
   adviceBody,
   askBody,
   avatarBody,
+  deleteAccountBody,
   forecastQuery,
   nameBody,
   acquisitionBody,
@@ -79,7 +80,12 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     limiter({ windowMs: 15 * 60 * 1000, limit: 10 }),
     authed(async (req, res) => {
       const { currentPassword, newPassword } = passwordBody.parse(req.body);
-      const tokens = await c.profile.changePassword(req.userId, currentPassword, newPassword);
+      const tokens = await c.profile.changePassword(
+        req.userId,
+        currentPassword,
+        newPassword,
+        req.authTime
+      );
       res.json({ message: 'Contraseña actualizada correctamente', ...tokens });
     })
   );
@@ -91,8 +97,15 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   );
   router.delete(
     '/profile/account',
+    limiter({ windowMs: 15 * 60 * 1000, limit: 10 }),
     authed(async (req, res) => {
-      await c.billing.cancelBeforeAccountDeletion(req.userId);
+      const { password, googleToken, confirmPlayCancelled } = deleteAccountBody.parse(
+        req.body ?? {}
+      );
+      await c.auth.confirmIdentity(req.userId, { password, googleToken, authTime: req.authTime });
+      await c.billing.cancelBeforeAccountDeletion(req.userId, {
+        playCancelled: confirmPlayCancelled,
+      });
       c.profile.deleteAccount(req.userId);
       res.status(204).end();
     })

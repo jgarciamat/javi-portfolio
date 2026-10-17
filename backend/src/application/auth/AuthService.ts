@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { ConflictError, ForbiddenError, UnauthorizedError, ValidationError } from '@domain/errors';
+import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@domain/errors';
 import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
 import { User, normalizeEmail } from '@domain/model/User';
 import { defaultSettings } from '@domain/model/UserSettings';
@@ -24,6 +24,13 @@ import { EntitlementService } from '@application/billing/EntitlementService';
 
 export const VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 export const RESET_TTL_MS = 60 * 60 * 1000;
+/** A sign-in lasts at most this long, however often it is refreshed. */
+export const REFRESH_FAMILY_MAX_MS = 90 * 24 * 60 * 60 * 1000;
+/** The token just exchanged still works this long (two tabs refreshing at once). */
+export const REFRESH_GRACE_MS = 30 * 1000;
+/** Google-only accounts must have signed in this recently for actions that cannot be undone. */
+export const REAUTH_WINDOW_MS = 10 * 60 * 1000;
+const REGISTERED_MESSAGE = 'Registro completado. Revisa tu email para verificar tu cuenta.';
 /** A new reset e-mail is not sent if the previous one is younger than this. */
 export const RESET_RESEND_COOLDOWN_MS = 2 * 60 * 1000;
 
@@ -38,6 +45,7 @@ export interface AuthResult extends SessionTokens {
 
 interface Logger {
   error(message: string, error?: unknown): void;
+  warn(message: string): void;
 }
 
 export class AuthService {
@@ -57,24 +65,34 @@ export class AuthService {
     private readonly entitlements: EntitlementService,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
-    private readonly refreshTtlMs: number,
     private readonly logger: Logger = console
   ) {}
 
   // ─── Registration & verification ──────────────────────────────────────────
 
+  /**
+   * Same answer whether the e-mail is new or not (no account enumeration): an existing
+   * owner gets an e-mail explaining how to sign in instead. `createdUserId` is for the
+   * caller only (referrals, metrics) and must never reach the client.
+   */
   async register(input: {
     email: string;
     password: string;
     name: string;
     locale?: EmailLocale;
-  }): Promise<{ message: string }> {
+  }): Promise<{ message: string; createdUserId: string | null }> {
     assertStrongPassword(input.password);
     const email = normalizeEmail(input.email);
-    if (this.users.findByEmail(email)) {
-      throw new ConflictError('El email ya está registrado', 'EMAIL_TAKEN');
-    }
+    const locale = input.locale ?? 'es';
+    // Hashed in both cases, so the time taken does not tell them apart either.
     const passwordHash = await this.hasher.hash(input.password);
+    const existing = this.users.findByEmail(email);
+    if (existing) {
+      this.sendInBackground(() =>
+        this.email.sendAccountExists(existing.email, existing.name, locale)
+      );
+      return { message: REGISTERED_MESSAGE, createdUserId: null };
+    }
     const verification = this.tokens.issueEmailToken(VERIFICATION_TTL_MS);
     const user = User.register({
       email,
@@ -82,11 +100,11 @@ export class AuthService {
       passwordHash,
       now: this.clock.now(),
     }).withVerificationToken(verification.hash, verification.expiresAt);
-    this.uow.run(() => this.createUserWithDefaults(user, input.locale ?? 'es'));
+    this.uow.run(() => this.createUserWithDefaults(user, locale));
     this.sendInBackground(() =>
-      this.email.sendVerification(user.email, user.name, verification.token, input.locale ?? 'es')
+      this.email.sendVerification(user.email, user.name, verification.token, locale)
     );
-    return { message: 'Registro completado. Revisa tu email para verificar tu cuenta.' };
+    return { message: REGISTERED_MESSAGE, createdUserId: user.id };
   }
 
   /** Marks the e-mail as verified and returns the id of the user. */
@@ -135,30 +153,51 @@ export class AuthService {
     return { ...this.issueSession(user), user: user.toPublic() };
   }
 
-  refresh(refreshToken: string): { accessToken: string } {
+  /**
+   * Exchanges the refresh token for a new pair (rotation). A token that was already
+   * exchanged is a replay, typically a stolen copy: the whole family (that sign-in, on
+   * every copy) is closed. The previous token still works for a few seconds so two
+   * tabs refreshing at the same time do not look like theft.
+   */
+  refresh(refreshToken: string): SessionTokens {
     const hash = this.tokens.hash(refreshToken);
     const record = this.refreshTokens.findByHash(hash);
     const now = this.clock.now();
-    if (!record || new Date(record.expiresAt) < now) {
-      if (record) this.refreshTokens.deleteByHash(hash);
-      throw new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+    const expired = () =>
+      new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+    if (!record) throw expired();
+    if (
+      record.rotatedAt &&
+      now.getTime() - new Date(record.rotatedAt).getTime() > REFRESH_GRACE_MS
+    ) {
+      this.refreshTokens.deleteFamily(record.familyId);
+      this.logger.warn(`[auth] refresh token replayed: session closed for user ${record.userId}`);
+      throw expired();
+    }
+    if (new Date(record.expiresAt) < now || new Date(record.familyExpiresAt) < now) {
+      this.refreshTokens.deleteFamily(record.familyId);
+      throw expired();
     }
     const user = this.users.findById(record.userId);
     if (!user) {
-      this.refreshTokens.deleteByHash(hash);
-      throw new UnauthorizedError('Sesión caducada. Inicia sesión de nuevo.', 'SESSION_EXPIRED');
+      this.refreshTokens.deleteFamily(record.familyId);
+      throw expired();
     }
-    this.refreshTokens.extend(hash, new Date(now.getTime() + this.refreshTtlMs).toISOString());
-    return {
-      accessToken: this.tokens.issueAccessToken({
-        userId: user.id,
-        sessionVersion: user.sessionVersion,
-      }),
-    };
+    return this.uow.run(() => {
+      if (!record.rotatedAt) this.refreshTokens.markRotated(hash, now.toISOString());
+      return this.issueTokens(user, {
+        familyId: record.familyId,
+        familyExpiresAt: record.familyExpiresAt,
+        authTime: record.authTime,
+      });
+    });
   }
 
+  /** Closes this sign-in: the token and every other one of its family. */
   logout(refreshToken: string | undefined): void {
-    if (refreshToken) this.refreshTokens.deleteByHash(this.tokens.hash(refreshToken));
+    if (!refreshToken) return;
+    const record = this.refreshTokens.findByHash(this.tokens.hash(refreshToken));
+    if (record) this.refreshTokens.deleteFamily(record.familyId);
   }
 
   /** Closes every session of the user, on every device. */
@@ -172,13 +211,45 @@ export class AuthService {
   }
 
   /** Used by the auth middleware: the token must match the user's current session version. */
-  authenticate(accessToken: string): { userId: string } {
+  authenticate(accessToken: string): { userId: string; authTime: number | null } {
     const claims = this.tokens.verifyAccessToken(accessToken);
     const user = this.users.findById(claims.userId);
     if (!user || user.sessionVersion !== claims.sessionVersion) {
       throw new UnauthorizedError('Sesión no válida', 'INVALID_TOKEN');
     }
-    return { userId: user.id };
+    return { userId: user.id, authTime: claims.authTime };
+  }
+
+  /**
+   * Proof of identity before something that cannot be undone (deleting the account): the
+   * current password, or for Google-only accounts a fresh Google credential or a sign-in
+   * in the last 10 minutes. Answers 403, never 401, so the client does not sign out.
+   */
+  async confirmIdentity(
+    userId: string,
+    proof: { password?: string; googleToken?: string; authTime: number | null }
+  ): Promise<void> {
+    const user = this.users.findById(userId);
+    if (!user) throw new NotFoundError('Usuario no encontrado', 'USER_NOT_FOUND');
+    if (user.passwordHash) {
+      if (!(await this.hasher.verify(proof.password ?? '', user.passwordHash))) {
+        throw new ForbiddenError('La contraseña no es correcta', 'WRONG_PASSWORD');
+      }
+      return;
+    }
+    if (proof.googleToken) {
+      const identity = await this.google.verify(proof.googleToken).catch(() => null);
+      if (identity && identity.googleId === user.googleId) return;
+    } else if (
+      proof.authTime !== null &&
+      this.clock.now().getTime() - proof.authTime <= REAUTH_WINDOW_MS
+    ) {
+      return;
+    }
+    throw new ForbiddenError(
+      'Por seguridad, vuelve a iniciar sesión con Google y repite la operación.',
+      'REAUTH_REQUIRED'
+    );
   }
 
   // ─── Password reset ───────────────────────────────────────────────────────
@@ -261,19 +332,40 @@ export class AuthService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  issueSession(user: User): SessionTokens {
+  /** Starts a new family of refresh tokens: a sign-in. */
+  issueSession(user: User, authTime: Date = this.clock.now()): SessionTokens {
+    return this.issueTokens(user, {
+      familyId: randomUUID(),
+      familyExpiresAt: new Date(authTime.getTime() + REFRESH_FAMILY_MAX_MS).toISOString(),
+      authTime: authTime.toISOString(),
+    });
+  }
+
+  private issueTokens(
+    user: User,
+    family: { familyId: string; familyExpiresAt: string; authTime: string }
+  ): SessionTokens {
     const refresh = this.tokens.issueRefreshToken();
+    const now = this.clock.now();
+    // Each token lives refreshTtlMs, but never beyond the end of its family.
+    const expiresAt = Math.min(
+      refresh.expiresAt.getTime(),
+      new Date(family.familyExpiresAt).getTime()
+    );
     this.refreshTokens.save({
       id: randomUUID(),
       userId: user.id,
       tokenHash: refresh.hash,
-      expiresAt: refresh.expiresAt.toISOString(),
-      createdAt: this.clock.now().toISOString(),
+      expiresAt: new Date(expiresAt).toISOString(),
+      createdAt: now.toISOString(),
+      rotatedAt: null,
+      ...family,
     });
     return {
       accessToken: this.tokens.issueAccessToken({
         userId: user.id,
         sessionVersion: user.sessionVersion,
+        authTime: new Date(family.authTime).getTime(),
       }),
       refreshToken: refresh.token,
     };

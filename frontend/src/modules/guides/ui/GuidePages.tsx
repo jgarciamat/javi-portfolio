@@ -6,10 +6,15 @@ import { findGuide } from '../domain/guides';
 import { GuideCatalog } from './GuideCatalog';
 import { GuideBody } from './GuideBody';
 import { PublicGuideLink } from './GuideLinks';
+import { HACIENDA_PATH } from '../domain/hacienda';
+import { VIDEOS_PATH } from '../domain/videos';
+import { useI18n } from '@core/i18n/I18nContext';
+import './css/Hacienda.css';
 import '@modules/tools/ui/css/Tools.css';
 import './css/Guides.css';
 
-function GuideCta() {
+/** Invitation to sign up, for people who read the guides without an account. */
+export function GuideCta() {
   const { isAuthenticated } = useAuth();
   if (isAuthenticated) return null;
   return (
@@ -28,6 +33,7 @@ function GuideCta() {
 
 /** Index of the guides. */
 export function GuidesIndexPage() {
+  const { t } = useI18n();
   usePageMeta(
     'Guías de finanzas personales y ahorro | Finanverso',
     'Guías claras y cortas para ordenar tu dinero: presupuesto, ahorro, método 50/30/20, fondo de emergencia, interés compuesto y deudas.',
@@ -40,6 +46,18 @@ export function GuidesIndexPage() {
         <h1 className="pricing-title">Guías de finanzas personales</h1>
         <p className="pricing-subtitle">
           Explicaciones cortas y sin jerga para ahorrar mejor y controlar tus gastos.
+        </p>
+        <p className="hacienda-banner">
+          <span>🏛️ {t('hacienda.banner')}</span>
+          <Link className="btn-secondary" to={HACIENDA_PATH}>
+            {t('hacienda.cta')}
+          </Link>
+        </p>
+        <p className="hacienda-banner">
+          <span>🎬 {t('videos.banner')}</span>
+          <Link className="btn-secondary" to={VIDEOS_PATH}>
+            {t('videos.cta')}
+          </Link>
         </p>
         <GuideCatalog
           renderLink={(g, className, children) => (

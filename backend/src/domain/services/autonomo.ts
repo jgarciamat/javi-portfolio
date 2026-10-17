@@ -11,8 +11,8 @@ import {
 import { ManualData } from './autonomo-expenses';
 import { BusinessMovement, splitVat } from './tax';
 
-const round2 = (n: number) => Math.round(n * 100) / 100;
-const euros = (cents: number) => round2(cents / 100);
+const round2 = (n: number): number => Math.round(n * 100) / 100;
+const euros = (cents: number): number => round2(cents / 100);
 const quarterOf = (date: string): 1 | 2 | 3 | 4 =>
   (Math.floor((Number(date.slice(5, 7)) - 1) / 3) + 1) as 1 | 2 | 3 | 4;
 
@@ -226,7 +226,16 @@ const lowIncomeReduction = (priorYearNet: number | null): number => {
 
 /** Modelo 130 up to a quarter: cumulative figures, with the payments of the earlier quarters. */
 /** Where the cumulative figures start: the first quarter, or the quarter after the filed totals. */
-function windowOf(inputs: DraftInputs, upTo: number) {
+interface CumulativeWindow {
+  prior: NonNullable<DraftInputs['prior']> | null;
+  start: number;
+  income: number;
+  expenses: number;
+  payments: number;
+  withheld: number;
+}
+
+function windowOf(inputs: DraftInputs, upTo: number): CumulativeWindow {
   const prior = inputs.prior && upTo > 1 ? inputs.prior : null;
   return {
     prior,
@@ -341,7 +350,7 @@ function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 
   return retaFor(monthly);
 }
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const iso = (d: Date): string => d.toISOString().slice(0, 10);
 
 /** A deadline date; a weekend moves to the next Monday (public holidays are not known here). */
 export function businessDay(year: number, month: number, day: number): string {

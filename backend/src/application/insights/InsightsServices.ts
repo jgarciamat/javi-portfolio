@@ -193,7 +193,7 @@ export class StatsService {
         savingCents: t?.savingCents ?? 0,
       };
     });
-    const sum = (list: typeof months) => {
+    const sum = (list: typeof months): AnnualReport['totals'] => {
       const incomeCents = list.reduce((s, m) => s + m.incomeCents, 0);
       const expenseCents = list.reduce((s, m) => s + m.expenseCents, 0);
       const savingCents = list.reduce((s, m) => s + m.savingCents, 0);
@@ -204,7 +204,7 @@ export class StatsService {
         balanceCents: incomeCents - expenseCents - savingCents,
       };
     };
-    const byCategory = (type: 'INCOME' | 'EXPENSE') => {
+    const byCategory = (type: 'INCOME' | 'EXPENSE'): AnnualReport['incomeByCategory'] => {
       const totals = new Map<string, Cents>();
       for (const row of this.transactions.categoryTotals(userId, from, to, type)) {
         totals.set(row.categoryName, (totals.get(row.categoryName) ?? 0) + row.cents);

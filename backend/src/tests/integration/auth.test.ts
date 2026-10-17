@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import request from 'supertest';
 import { STRONG_PASSWORD, TestContext, createTestApp, createUser } from '../helpers/testApp';
 
@@ -29,13 +30,43 @@ describe('Auth API', () => {
       expect(accounts.body.accounts[0].isDefault).toBe(true);
     });
 
-    it('rejects a duplicated e-mail with EMAIL_TAKEN', async () => {
-      await createUser(ctx, 'dup@example.com');
+    it('answers a duplicated e-mail like a new one and tells the owner instead', async () => {
+      const owner = await createUser(ctx, 'dup@example.com');
+      const fresh = await request(ctx.app)
+        .post('/api/auth/register')
+        .send({ email: 'brand-new@example.com', password: STRONG_PASSWORD, name: 'N' })
+        .expect(201);
+      const signups = () =>
+        ctx.container.repos.metrics
+          .totals('2026-03-01', '2026-03-31')
+          .find((r) => r.name === 'signup')?.count;
+      expect(signups()).toBe(2);
+      const before = ctx.email.sent.length;
       const res = await request(ctx.app)
         .post('/api/auth/register')
-        .send({ email: 'DUP@example.com', password: STRONG_PASSWORD, name: 'B' })
-        .expect(409);
-      expect(res.body.code).toBe('EMAIL_TAKEN');
+        .send({
+          email: 'DUP@example.com',
+          password: 'An0ther-pass!',
+          name: 'B',
+          locale: 'en',
+          referralCode: 'SOMECODE',
+        })
+        .expect(201);
+      expect(res.body).toEqual(fresh.body);
+      await new Promise((r) => setImmediate(r));
+      expect(ctx.email.sent.slice(before)).toEqual([
+        { kind: 'exists', to: 'dup@example.com', token: '' },
+      ]);
+      // Nothing changes on the existing account: same password, no new sign-up counted.
+      expect(signups()).toBe(2);
+      await request(ctx.app)
+        .post('/api/auth/login')
+        .send({ email: owner.email, password: STRONG_PASSWORD })
+        .expect(200);
+      await request(ctx.app)
+        .post('/api/auth/login')
+        .send({ email: owner.email, password: 'An0ther-pass!' })
+        .expect(401);
     });
   });
 
@@ -133,6 +164,89 @@ describe('Auth API', () => {
       expect(res.body.code).toBe('SESSION_EXPIRED');
     });
 
+    describe('refresh token rotation', () => {
+      const refresh = (refreshToken: string) =>
+        request(ctx.app).post('/api/auth/refresh').send({ refreshToken });
+      const tokenRow = (refreshToken: string) =>
+        ctx.container.repos.refreshTokens.findByHash(
+          createHash('sha256').update(refreshToken).digest('hex')
+        );
+
+      it('hands out a new refresh token every time and keeps the old one for a few seconds', async () => {
+        const user = await createUser(ctx);
+        const first = await refresh(user.refreshToken).expect(200);
+        expect(first.body.refreshToken).toEqual(expect.any(String));
+        expect(first.body.refreshToken).not.toBe(user.refreshToken);
+        await request(ctx.app)
+          .get('/api/categories')
+          .set('Authorization', `Bearer ${first.body.accessToken}`)
+          .expect(200);
+        // Another tab refreshed with the same token at the same moment: still fine.
+        ctx.clock.set('2026-03-15T12:00:25Z');
+        const twin = await refresh(user.refreshToken).expect(200);
+        expect(twin.body.refreshToken).not.toBe(first.body.refreshToken);
+        // Both new tokens belong to the same sign-in.
+        expect(tokenRow(twin.body.refreshToken)!.familyId).toBe(
+          tokenRow(first.body.refreshToken)!.familyId
+        );
+        const next = await refresh(first.body.refreshToken).expect(200);
+        await refresh(next.body.refreshToken).expect(200);
+      });
+
+      it('closes the whole sign-in when a used token comes back later (theft)', async () => {
+        const user = await createUser(ctx);
+        const otherDevice = await request(ctx.app)
+          .post('/api/auth/login')
+          .send({ email: user.email, password: STRONG_PASSWORD })
+          .expect(200);
+        const rotated = await refresh(user.refreshToken).expect(200);
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+        ctx.clock.set('2026-03-15T12:01:00Z');
+        const replay = await refresh(user.refreshToken).expect(401);
+        expect(replay.body.code).toBe('SESSION_EXPIRED');
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('refresh token replayed'));
+        warn.mockRestore();
+        // The legitimate copy is closed too, but not the other device's sign-in.
+        await refresh(rotated.body.refreshToken).expect(401);
+        await refresh(otherDevice.body.refreshToken).expect(200);
+      });
+
+      it('ends a sign-in 90 days after it started, however often it is refreshed', async () => {
+        const user = await createUser(ctx);
+        let token = user.refreshToken;
+        for (const day of ['2026-04-10', '2026-05-05', '2026-06-01']) {
+          ctx.clock.set(`${day}T12:00:00Z`);
+          token = (await refresh(token).expect(200)).body.refreshToken;
+        }
+        // The last token never outlives the sign-in (15 March + 90 days = 13 June).
+        expect(tokenRow(token)!.expiresAt).toBe('2026-06-13T12:00:00.000Z');
+        ctx.clock.set('2026-06-13T12:00:01Z');
+        expect((await refresh(token).expect(401)).body.code).toBe('SESSION_EXPIRED');
+        expect(tokenRow(token)).toBeNull();
+      });
+
+      it('lets an unused token expire 30 days after it was issued', async () => {
+        const user = await createUser(ctx);
+        ctx.clock.set('2026-04-14T12:00:01Z');
+        await refresh(user.refreshToken).expect(401);
+      });
+
+      it('logout closes every token of that sign-in', async () => {
+        const user = await createUser(ctx);
+        const rotated = await refresh(user.refreshToken).expect(200);
+        await request(ctx.app)
+          .post('/api/auth/logout')
+          .send({ refreshToken: rotated.body.refreshToken })
+          .expect(204);
+        await refresh(user.refreshToken).expect(401);
+        await refresh(rotated.body.refreshToken).expect(401);
+        await request(ctx.app)
+          .post('/api/auth/logout')
+          .send({ refreshToken: 'unknown' })
+          .expect(204);
+      });
+    });
+
     it('logout-all invalidates every access and refresh token immediately', async () => {
       const user = await createUser(ctx);
       await request(ctx.app).post('/api/auth/logout-all').set(user.auth).expect(204);
@@ -145,7 +259,11 @@ describe('Auth API', () => {
 
     it('a deleted account cannot keep using its tokens', async () => {
       const user = await createUser(ctx);
-      await request(ctx.app).delete('/api/profile/account').set(user.auth).expect(204);
+      await request(ctx.app)
+        .delete('/api/profile/account')
+        .set(user.auth)
+        .send({ password: STRONG_PASSWORD })
+        .expect(204);
       await request(ctx.app).get('/api/categories').set(user.auth).expect(401);
     });
   });

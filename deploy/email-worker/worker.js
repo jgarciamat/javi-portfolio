@@ -22,7 +22,7 @@ export default {
     });
     if (!response.ok) {
       // Make Cloudflare report the failure instead of swallowing the message silently.
-      throw new Error(`Money Manager answered ${response.status}`);
+      throw new Error(`Finanverso answered ${response.status}`);
     }
   },
 };

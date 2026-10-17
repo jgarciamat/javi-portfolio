@@ -80,7 +80,8 @@ export function yearlyTax(year: number, movements: BusinessMovement[]): YearTax 
     q.irpfAdvanceCents = Math.max(0, Math.round(cumulativeNet * IRPF_ADVANCE_RATE) - advanced);
     advanced += q.irpfAdvanceCents;
   }
-  const sum = (pick: (q: QuarterTax) => number) => quarters.reduce((s, q) => s + pick(q), 0);
+  const sum = (pick: (q: QuarterTax) => number): number =>
+    quarters.reduce((s, q) => s + pick(q), 0);
   return {
     year,
     quarters,

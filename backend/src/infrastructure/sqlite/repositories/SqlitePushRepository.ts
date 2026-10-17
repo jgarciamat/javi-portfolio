@@ -4,13 +4,19 @@ import { Db } from '../database';
 export class SqlitePushRepository implements PushRepository {
   constructor(private readonly db: Db) {}
 
+  /**
+   * An endpoint already saved only changes owner when the keys match too: the same browser
+   * subscribed again by whoever signed in on it. Knowing someone's endpoint is not enough.
+   */
   save(s: PushSubscriptionRecord, createdAt: string): void {
     this.db
       .prepare(
         `INSERT INTO push_subscriptions (id, user_id, endpoint, p256dh, auth, created_at)
          VALUES (@id, @userId, @endpoint, @p256dh, @auth, @createdAt)
          ON CONFLICT(endpoint) DO UPDATE SET user_id = excluded.user_id, p256dh = excluded.p256dh,
-           auth = excluded.auth`
+           auth = excluded.auth
+         WHERE push_subscriptions.user_id = excluded.user_id
+            OR (push_subscriptions.p256dh = excluded.p256dh AND push_subscriptions.auth = excluded.auth)`
       )
       .run({ ...s, createdAt });
   }

@@ -92,7 +92,7 @@ export function RatePrompt({ movements, onInvite }: { movements: number; onInvit
           <div className="button-row">
             <a
               className="btn-secondary"
-              href="mailto:moneymanager@outlook.es?subject=Finanverso%3A%20sugerencias"
+              href="mailto:support@finanverso.app?subject=Finanverso%3A%20sugerencias"
               onClick={() => setStep(null)}
             >
               {t('app.rate.write')}

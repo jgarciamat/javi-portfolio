@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useMemo, useState, type ReactElement, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { priceCurve } from '../../domain/bonds';
@@ -211,7 +212,7 @@ function HorizonChart() {
         yTicks={linearTicks(0, Math.max(...fan.map((f) => f.p95)), 4)}
         yFormat={(y) => String(Math.round(y))}
       />
-      <div className="inv-table-wrap">
+      <ScrollRegion className="inv-table-wrap" label={t('app.invest.chart.hor.title')}>
         <table className="inv-table">
           <caption className="sr-only">{t('app.invest.chart.hor.title')}</caption>
           <thead>
@@ -235,7 +236,7 @@ function HorizonChart() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </ChartFrame>
   );
 }

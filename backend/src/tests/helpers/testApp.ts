@@ -16,6 +16,7 @@ import {
   PaymentGateway,
 } from '@domain/ports/services';
 import { UnauthorizedError, ValidationError } from '@domain/errors';
+import { BcryptPasswordHasher } from '@infrastructure/auth/JwtTokenService';
 import { buildContainer, Container } from '@infrastructure/container';
 import { createApp } from '@infrastructure/http/app';
 import { ConsoleEmailSender } from '@infrastructure/mail/EmailSenders';
@@ -129,6 +130,8 @@ export function createTestApp(
   const push = new FakePushSender();
   push.enabled = options.pushEnabled ?? true;
   const container = buildContainer(db, config, {
+    // Cheap rounds even when a test runs with NODE_ENV=development (live rate limits).
+    hasher: new BcryptPasswordHasher(4),
     pushSender: push,
     clock,
     email,

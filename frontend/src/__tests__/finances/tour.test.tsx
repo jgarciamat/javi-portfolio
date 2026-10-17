@@ -238,7 +238,7 @@ function SignInButton() {
 
 const openSettings = () => {
   fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
-  const menu = screen.getByRole('complementary', { name: tr('app.menu.ariaLabel') });
+  const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
   fireEvent.click(within(menu).getByRole('button', { name: new RegExp(tr('app.tabs.settings')) }));
 };
 

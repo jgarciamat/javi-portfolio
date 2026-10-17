@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { EmailLocale, EmailSender } from '@domain/ports/services';
 import { DigestData } from '@domain/services/digest';
 import {
+  accountExistsEmail,
   passwordResetEmail,
   purchaseEmail,
   verificationEmail,
@@ -33,6 +34,11 @@ export class ResendEmailSender implements EmailSender {
     return this.send(to, passwordResetEmail(locale, name, url));
   }
 
+  sendAccountExists(to: string, name: string, locale: EmailLocale): Promise<void> {
+    const login = `${this.appUrl}/login`;
+    return this.send(to, accountExistsEmail(locale, name, login, `${login}?mode=forgot`));
+  }
+
   sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void> {
     return this.send(to, purchaseEmail(locale, name, `${this.appUrl}/terms`, new Date()));
   }
@@ -51,7 +57,7 @@ export class ResendEmailSender implements EmailSender {
 /** Used when no e-mail provider is configured (local development): prints the links. */
 export class ConsoleEmailSender implements EmailSender {
   readonly sent: {
-    kind: 'verify' | 'reset' | 'purchase' | 'digest';
+    kind: 'verify' | 'reset' | 'exists' | 'purchase' | 'digest';
     to: string;
     token: string;
     digest?: DigestData;
@@ -69,6 +75,11 @@ export class ConsoleEmailSender implements EmailSender {
     this.sent.push({ kind: 'reset', to, token });
     if (!this.silent)
       console.info(`[email] reset ${to}: ${this.appUrl}/reset-password?token=${token}`);
+  }
+
+  async sendAccountExists(to: string): Promise<void> {
+    this.sent.push({ kind: 'exists', to, token: '' });
+    if (!this.silent) console.info(`[email] account already exists ${to}`);
   }
 
   async sendPurchaseConfirmation(to: string): Promise<void> {

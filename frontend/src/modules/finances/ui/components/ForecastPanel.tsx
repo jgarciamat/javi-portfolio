@@ -1,3 +1,4 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
@@ -93,7 +94,7 @@ function Outlook({
           <Icon name="checkCircle" /> {t('app.forecast.noShortfall')}
         </p>
       )}
-      <div className="table-scroll">
+      <ScrollRegion className="table-scroll" label={t('app.forecast.outlook')}>
         <table className="data-table">
           <thead>
             <tr>
@@ -118,7 +119,7 @@ function Outlook({
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       {expenses.length > 0 && (
         <fieldset className="forecast-whatif">
           <legend>{t('app.forecast.whatIf')}</legend>

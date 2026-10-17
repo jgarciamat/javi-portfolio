@@ -42,6 +42,15 @@ const GuidesIndexPage = lazyNamed(
   'GuidesIndexPage'
 );
 const GuidePage = lazyNamed(() => import('./modules/guides/ui/GuidePages'), 'GuidePage');
+const HaciendaIndexPage = lazyNamed(
+  () => import('./modules/guides/ui/HaciendaPages'),
+  'HaciendaIndexPage'
+);
+const HaciendaGuidePage = lazyNamed(
+  () => import('./modules/guides/ui/HaciendaPages'),
+  'HaciendaGuidePage'
+);
+const VideosPage = lazyNamed(() => import('./modules/guides/ui/VideosPage'), 'VideosPage');
 const LoanCalculatorPage = lazyNamed(
   () => import('./modules/tools/ui/CalculatorPages'),
   'LoanCalculatorPage'
@@ -94,6 +103,9 @@ export default function App() {
                       <Route path="/calculadora-renta" element={<RentaCalculatorPage />} />
                       <Route path="/guias" element={<GuidesIndexPage />} />
                       <Route path="/guias/:slug" element={<GuidePage />} />
+                      <Route path="/hacienda-paso-a-paso" element={<HaciendaIndexPage />} />
+                      <Route path="/hacienda-paso-a-paso/:slug" element={<HaciendaGuidePage />} />
+                      <Route path="/videoteca" element={<VideosPage />} />
                       <Route path="/" element={<HomeGate />}>
                         <Route index element={<DashboardPage />} />
                       </Route>

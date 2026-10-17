@@ -38,6 +38,8 @@ async function load(entry) {
 const { GUIDES, inlineParts } = await load('src/modules/guides/domain/guides.ts');
 const { TOOL_PAGES } = await load('src/modules/tools/domain/toolPages.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
+const hacienda = await load('src/modules/guides/domain/hacienda.ts');
+const videos = await load('src/modules/guides/domain/videos.ts');
 
 const template = readFileSync(join(dist, 'index.html'), 'utf8');
 
@@ -75,7 +77,10 @@ const link = (href, text) => `<a href="${href}">${esc(text)}</a>`;
 const nav = `<nav>${link('/', 'Finanverso')} · ${link(
   '/guias',
   t('landing.learn.guides')
-)} · ${link('/pricing', t('pricing.link'))}</nav>`;
+)} · ${link(hacienda.HACIENDA_PATH, t('hacienda.title'))} · ${link(
+  '/pricing',
+  t('pricing.link')
+)}</nav>`;
 
 // Home: the presentation page.
 const features = [
@@ -176,6 +181,92 @@ for (const g of GUIDES) {
   );
 }
 
+// «Hacienda paso a paso»: step-by-step guides for the website of the Agencia Tributaria.
+const { HACIENDA_GUIDES, HACIENDA_PATH, haciendaPath, guideKey, stepKey, upTo, withCampaign } =
+  hacienda;
+const source = t('hacienda.source').replace('{date}', t('hacienda.sourceDate'));
+write(
+  HACIENDA_PATH,
+  render({
+    path: HACIENDA_PATH,
+    title: t('hacienda.metaTitle'),
+    description: t('hacienda.metaDescription'),
+    body: `<main><h1>${esc(t('hacienda.title'))}</h1><p>${esc(
+      t('hacienda.hint')
+    )}</p><ul>${HACIENDA_GUIDES.map(
+      (g) =>
+        `<li>${link(haciendaPath(g), t(guideKey(g, 'title')))}<p>${esc(
+          t(guideKey(g, 'description'))
+        )}</p></li>`
+    ).join('')}</ul>${nav}</main>`,
+  })
+);
+for (const g of HACIENDA_GUIDES) {
+  const title = t(guideKey(g, 'title'));
+  write(
+    haciendaPath(g),
+    render({
+      path: haciendaPath(g),
+      title: `${title} | Finanverso`,
+      description: t(guideKey(g, 'description')),
+      body: `<main><article><h1>${esc(title)}</h1><p>${esc(
+        t(guideKey(g, 'intro'))
+      )}</p><ol>${g.steps
+        .map(
+          (s) =>
+            `<li><h2>${esc(t(stepKey(g, s, 'title')))}</h2>${upTo(s.paragraphs)
+              .map((n) => `<p>${esc(t(stepKey(g, s, `p${n}`)))}</p>`)
+              .join('')}</li>`
+        )
+        .join('')}</ol><h2>${esc(t('hacienda.deadlines'))}</h2><ul>${upTo(g.deadlines)
+        .map((n) => `<li>${esc(withCampaign(t(guideKey(g, `deadline${n}`))))}</li>`)
+        .join('')}</ul><p>${esc(source)}</p><p>${esc(
+        t('hacienda.disclaimer')
+      )}</p></article>${nav}</main>`,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'HowTo',
+          name: title,
+          description: t(guideKey(g, 'description')),
+          inLanguage: 'es',
+          url: `${ORIGIN}${haciendaPath(g)}`,
+          step: g.steps.map((s, i) => ({
+            '@type': 'HowToStep',
+            position: i + 1,
+            name: t(stepKey(g, s, 'title')),
+            text: upTo(s.paragraphs)
+              .map((n) => t(stepKey(g, s, `p${n}`)))
+              .join(' '),
+          })),
+        },
+      ],
+    })
+  );
+}
+
+// «Videoteca»: our YouTube tutorials, by section.
+write(
+  videos.VIDEOS_PATH,
+  render({
+    path: videos.VIDEOS_PATH,
+    title: t('videos.metaTitle'),
+    description: t('videos.metaDescription'),
+    body: `<main><h1>${esc(t('videos.title'))}</h1><p>${esc(t('videos.hint'))}</p><p>${link(
+      videos.YOUTUBE_CHANNEL_URL,
+      t('videos.channel')
+    )}</p>${videos
+      .videoGroups()
+      .map(
+        ({ section, videos: list }) =>
+          `<h2>${esc(t(`videos.section.${section.id}`))}</h2><ul>${list
+            .map((v) => `<li>${link(videos.videoUrl(v), v.title)}</li>`)
+            .join('')}</ul>`
+      )
+      .join('')}${nav}</main>`,
+  })
+);
+
 // Calculators.
 for (const tool of TOOL_PAGES) {
   write(
@@ -202,4 +293,4 @@ for (const tool of TOOL_PAGES) {
   );
 }
 
-console.info(`[prerender] ${2 + GUIDES.length + TOOL_PAGES.length} pages`);
+console.info(`[prerender] ${4 + GUIDES.length + HACIENDA_GUIDES.length + TOOL_PAGES.length} pages`);

@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import { DeleteAccountModal } from '@modules/auth/ui/DeleteAccountModal';
 import { AuthPage } from '@shared/components/AuthPage';
 import { renderWithProviders, tr } from '@test-utils/render';
 
@@ -20,5 +21,23 @@ describe('Google sign-in without a client id', () => {
     unmount();
     renderWithProviders(<AuthPage />, { authenticated: false, route: '/login?mode=register' });
     expect(screen.queryByRole('button', { name: tr('app.auth.register.google') })).toBeNull();
+  });
+
+  it('leaves only the direct confirmation when deleting a Google-only account', () => {
+    renderWithProviders(
+      <DeleteAccountModal
+        loading={false}
+        error={null}
+        hasPassword={false}
+        playActive={false}
+        onConfirm={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+      { finances: false }
+    );
+    expect(screen.getByText(tr('app.profile.deleteAccount.google'))).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: tr('app.profile.deleteAccount.googleConfirm') })
+    ).toBeNull();
   });
 });

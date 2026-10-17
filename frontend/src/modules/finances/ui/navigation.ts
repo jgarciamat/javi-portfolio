@@ -12,8 +12,10 @@ export type DashboardTab =
   | 'assets'
   | 'business'
   | 'renta'
+  | 'hacienda'
   | 'learn'
   | 'invest'
+  | 'videos'
   | 'automations'
   | 'custom-alerts'
   | 'plan'
@@ -44,10 +46,12 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   { id: 'assets', icon: 'wallet', labelKey: 'app.tabs.assets', group: 'planning' },
   { id: 'business', icon: 'briefcase', labelKey: 'app.tabs.business', group: 'planning' },
   { id: 'renta', icon: 'file', labelKey: 'app.tabs.renta', group: 'planning' },
+  { id: 'hacienda', icon: 'compass', labelKey: 'app.tabs.hacienda', group: 'planning' },
   { id: 'automations', icon: 'settings', labelKey: 'app.tabs.automations', group: 'planning' },
   { id: 'custom-alerts', icon: 'bell', labelKey: 'app.tabs.customAlerts', group: 'planning' },
   { id: 'learn', icon: 'book', labelKey: 'app.tabs.learn', group: 'tools' },
   { id: 'invest', icon: 'coins', labelKey: 'app.tabs.invest', group: 'tools' },
+  { id: 'videos', icon: 'video', labelKey: 'app.tabs.videos', group: 'tools' },
   { id: 'plan', icon: 'star', labelKey: 'app.tabs.plan', group: 'tools' },
   { id: 'offers', icon: 'gift', labelKey: 'app.tabs.offers', group: 'tools' },
   { id: 'settings', icon: 'wrench', labelKey: 'app.tabs.settings', group: 'tools' },

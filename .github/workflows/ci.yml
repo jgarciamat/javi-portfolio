@@ -115,7 +115,9 @@ jobs:
       - run: docker build -t money-manager-web:ci frontend
       - name: API container starts and is healthy
         run: |
-          docker run -d --name api -e JWT_SECRET="$(openssl rand -base64 48)" money-manager-api:ci
+          # Production refuses to start without an e-mail provider: a placeholder key is enough here.
+          docker run -d --name api -e JWT_SECRET="$(openssl rand -base64 48)" \
+            -e RESEND_API_KEY=re_ci_placeholder money-manager-api:ci
           for i in $(seq 1 30); do
             status=$(docker inspect --format '{{.State.Health.Status}}' api)
             [ "$status" = healthy ] && exit 0

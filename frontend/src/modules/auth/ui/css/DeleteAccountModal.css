@@ -1,0 +1,42 @@
+/* ─── Delete account: re-authentication and Google Play notice ─── */
+.delete-account-field {
+  margin: 0 0 1.25rem;
+  text-align: left;
+}
+
+.delete-account-field .confirm-delete-message {
+  margin-bottom: 0.75rem;
+}
+
+.delete-account-play {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--red-400);
+  border-radius: 10px;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--slate-100);
+}
+
+.delete-account-play p {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.delete-account-play a {
+  color: var(--accent-300);
+  text-decoration: underline;
+}
+
+.delete-account-check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.6rem;
+  cursor: pointer;
+}
+
+.delete-account-check input {
+  margin-top: 0.2rem;
+}

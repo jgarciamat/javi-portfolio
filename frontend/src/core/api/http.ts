@@ -77,7 +77,9 @@ let refreshInFlight: Promise<string | null> | null = null;
 
 /**
  * Gets a new access token with the refresh token. Concurrent callers share the
- * same request, so ten parallel 401s produce one refresh, not ten.
+ * same request, so ten parallel 401s produce one refresh, not ten: each refresh
+ * token can be used only once (the API keeps the previous one valid for a few
+ * seconds, which covers another tab refreshing at the same moment).
  */
 export function refreshAccessToken(): Promise<string | null> {
   if (refreshInFlight) return refreshInFlight;
@@ -95,8 +97,11 @@ export function refreshAccessToken(): Promise<string | null> {
         if (res.status === 401) tokenStore.clear();
         return null;
       }
-      const data = (await res.json()) as { accessToken: string };
-      tokenStore.setAccess(data.accessToken);
+      // The API rotates the refresh token on every use: keep the new one. (Older APIs
+      // only sent the access token; then the current refresh token stays.)
+      const data = (await res.json()) as { accessToken: string; refreshToken?: string };
+      if (data.refreshToken) tokenStore.setSession(data.accessToken, data.refreshToken);
+      else tokenStore.setAccess(data.accessToken);
       return data.accessToken;
     } catch {
       return null;

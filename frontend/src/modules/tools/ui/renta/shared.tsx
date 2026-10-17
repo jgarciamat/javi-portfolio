@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { Disability } from '../../domain/rentaCalc';
 import type { RentaForm } from '../../domain/rentaForm';
+import { scrollBehavior } from '@shared/utils/motion';
 
 export const DISABILITIES: Disability[] = [0, 33, 65];
 
@@ -127,7 +128,7 @@ export function reveal(row: HTMLElement | null | undefined): void {
   const group = target.closest('details');
   if (group) group.open = true;
   // A deduction is centred; the result is shown from its heading.
-  target.scrollIntoView({ behavior: 'smooth', block: row ? 'center' : 'start' });
+  target.scrollIntoView({ behavior: scrollBehavior(), block: row ? 'center' : 'start' });
   const field = target.querySelector<HTMLElement>('.renta-deduction-fields input');
   target.tabIndex = -1;
   (field ?? target).focus({ preventScroll: true });

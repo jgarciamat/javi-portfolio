@@ -7,6 +7,7 @@ import { isDashboardTab, type DashboardTab } from '../navigation';
 import { GuideBody } from '@modules/guides/ui/GuideBody';
 import { Icon } from '@shared/components/Icon';
 import '@modules/guides/ui/css/Guides.css';
+import '@modules/guides/ui/css/Hacienda.css';
 import '../css/Sections.css';
 
 /** Savings guides, open to every account. */
@@ -59,6 +60,12 @@ export function LearnView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
         </h2>
         <p className="section-hint">{t('app.learn.hint')}</p>
         <p className="section-hint">{t('app.learn.count', { total: GUIDES.length })}</p>
+        <p className="hacienda-banner">
+          <span>🏛️ {t('hacienda.banner')}</span>
+          <button className="btn-secondary" onClick={() => onOpenTab('hacienda')}>
+            {t('hacienda.cta')}
+          </button>
+        </p>
         <GuideCatalog
           renderLink={(g, className, children) => (
             <button className={`${className} guide-link`} onClick={() => setOpen(g.slug)}>

@@ -3,6 +3,7 @@ import os from 'os';
 import path from 'path';
 import { ConfigError, loadConfig } from '@config/env';
 import Stripe from 'stripe';
+import jwt from 'jsonwebtoken';
 import { CloudflareAi } from '@infrastructure/ai/CloudflareAi';
 import { GeminiAdvisor } from '@infrastructure/ai/GeminiAdvisor';
 import {
@@ -18,7 +19,12 @@ import { JsonOfferCatalog } from '@infrastructure/offers/JsonOfferCatalog';
 import { JwtTokenService } from '@infrastructure/auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from '@infrastructure/auth/GoogleIdentityVerifier';
 import { BackupService } from '@infrastructure/backup/BackupService';
-import { escapeHtml, purchaseEmail, verificationEmail } from '@infrastructure/mail/templates';
+import {
+  accountExistsEmail,
+  escapeHtml,
+  purchaseEmail,
+  verificationEmail,
+} from '@infrastructure/mail/templates';
 import { openDatabase } from '@infrastructure/sqlite/database';
 import { AdviceContext } from '@domain/services/rule-based-advisor';
 
@@ -43,6 +49,7 @@ describe('config', () => {
     const config = loadConfig({
       NODE_ENV: 'production',
       JWT_SECRET: 'x'.repeat(48),
+      RESEND_API_KEY: 're_test',
       APP_URL: 'https://finanverso.app/',
       DATABASE_URL: '/data/db.sqlite',
     });
@@ -53,8 +60,20 @@ describe('config', () => {
   });
 
   it('never points email links to localhost in production when APP_URL is missing', () => {
-    const config = loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) });
+    const config = loadConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'x'.repeat(48),
+      RESEND_API_KEY: 're_test',
+    });
     expect(config.appUrl).toBe('https://finanverso.app');
+  });
+
+  it('refuses to start in production without an e-mail provider (links would go to the logs)', () => {
+    expect(() => loadConfig({ NODE_ENV: 'production', JWT_SECRET: 'x'.repeat(48) })).toThrow(
+      /RESEND_API_KEY is required in production/
+    );
+    expect(loadConfig({ NODE_ENV: 'development' }).email.resendApiKey).toBeNull();
+    expect(loadConfig({ NODE_ENV: 'test' }).email.resendApiKey).toBeNull();
   });
 
   it('rejects malformed values', () => {
@@ -109,6 +128,25 @@ describe('e-mail templates', () => {
   it('is localised', () => {
     expect(verificationEmail('en', 'Ann', 'u').subject).toMatch(/Verify/);
     expect(verificationEmail('es', 'Ana', 'u').subject).toMatch(/Verifica/);
+  });
+});
+
+describe('account exists e-mail', () => {
+  it('links to sign in and to the password reset, in both languages, escaping the name', () => {
+    const es = accountExistsEmail(
+      'es',
+      '<b>Ana</b>',
+      'https://app/login',
+      'https://app/login?mode=forgot'
+    );
+    expect(es.subject).toBe('Ya tienes una cuenta en Finanverso');
+    expect(es.html).toContain('&lt;b&gt;Ana&lt;/b&gt;');
+    expect(es.html).toContain('href="https://app/login"');
+    expect(es.html).toContain('href="https://app/login?mode=forgot"');
+    expect(es.text).toContain('Restablécela aquí: https://app/login?mode=forgot');
+    const en = accountExistsEmail('en', 'Ann', 'https://app/login', 'https://app/reset');
+    expect(en.subject).toBe('You already have a Finanverso account');
+    expect(en.text).toContain('Sign in: https://app/login');
   });
 });
 
@@ -768,15 +806,36 @@ describe('JwtTokenService', () => {
   const service = new JwtTokenService('s'.repeat(40), '15m', 1000);
 
   it('round-trips access tokens with the session version', () => {
-    const token = service.issueAccessToken({ userId: 'u1', sessionVersion: 3 });
-    expect(service.verifyAccessToken(token)).toEqual({ userId: 'u1', sessionVersion: 3 });
+    const token = service.issueAccessToken({ userId: 'u1', sessionVersion: 3, authTime: null });
+    expect(service.verifyAccessToken(token)).toEqual({
+      userId: 'u1',
+      sessionVersion: 3,
+      authTime: null,
+    });
+    // The sign-in time travels in seconds (auth_time) and comes back in ms.
+    const signedIn = service.issueAccessToken({
+      userId: 'u1',
+      sessionVersion: 3,
+      authTime: Date.parse('2026-03-15T12:00:00.900Z'),
+    });
+    expect(service.verifyAccessToken(signedIn).authTime).toBe(Date.parse('2026-03-15T12:00:00Z'));
   });
 
   it('rejects tokens signed with another secret or without session version', () => {
     const other = new JwtTokenService('o'.repeat(40), '15m', 1000);
     expect(() =>
-      service.verifyAccessToken(other.issueAccessToken({ userId: 'u', sessionVersion: 0 }))
+      service.verifyAccessToken(
+        other.issueAccessToken({ userId: 'u', sessionVersion: 0, authTime: null })
+      )
     ).toThrow(expect.objectContaining({ code: 'INVALID_TOKEN' }));
+    const secret = 's'.repeat(40);
+    const noVersion = jwt.sign({}, secret, { subject: 'u', algorithm: 'HS256' });
+    const noSubject = jwt.sign({ sv: 1 }, secret, { algorithm: 'HS256' });
+    for (const token of [noVersion, noSubject]) {
+      expect(() => service.verifyAccessToken(token)).toThrow(
+        expect.objectContaining({ code: 'INVALID_TOKEN' })
+      );
+    }
   });
 
   it('issues random opaque tokens and stores only their hash', () => {
@@ -893,6 +952,30 @@ describe('BackupService', () => {
     fs.writeFileSync(old, '');
     fs.utimesSync(old, new Date('2020-01-01'), new Date('2020-01-01'));
     expect(service.prune(new Date())).toEqual([old]);
+    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('prunes pre-migration copies older than 14 days on each run', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mm-backup-'));
+    const live = path.join(dir, 'live.db');
+    const db = openDatabase(live);
+    const old = path.join(dir, 'pre-migration-v3-old.db');
+    const recent = path.join(dir, 'pre-migration-v4-recent.db');
+    fs.writeFileSync(old, '');
+    fs.writeFileSync(recent, '');
+    fs.utimesSync(old, new Date('2026-03-01'), new Date('2026-03-01'));
+    fs.utimesSync(recent, new Date('2026-03-10'), new Date('2026-03-10'));
+    const service = new BackupService(
+      db,
+      path.join(dir, 'backups'),
+      7,
+      { info: () => undefined, error: () => undefined },
+      live
+    );
+    await service.runOnce(new Date('2026-03-20T00:00:00Z'));
+    expect(fs.existsSync(old)).toBe(false);
+    expect(fs.existsSync(recent)).toBe(true);
     db.close();
     fs.rmSync(dir, { recursive: true, force: true });
   });

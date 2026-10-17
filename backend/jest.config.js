@@ -18,7 +18,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   // Floor at the current level: coverage may only go up.
   coverageThreshold: {
-    global: { statements: 96, branches: 85, functions: 97, lines: 97 },
+    global: { statements: 97, branches: 89, functions: 98, lines: 98 },
   },
   moduleNameMapper: {
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',

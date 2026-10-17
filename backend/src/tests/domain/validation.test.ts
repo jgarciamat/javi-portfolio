@@ -238,6 +238,13 @@ describe('CategoryBudget and plans', () => {
 
 describe('password policy', () => {
   it('limits the length', () => {
-    expect(passwordProblems(`Aa1!${long(130)}`)).toEqual(['como máximo 128 caracteres']);
+    const tooLong = [
+      'como máximo 72 bytes (72 caracteres sin tildes ni emojis; cada tilde o emoji ocupa más)',
+    ];
+    expect(passwordProblems(`Aa1!${long(68)}`)).toEqual([]);
+    expect(passwordProblems(`Aa1!${long(69)}`)).toEqual(tooLong);
+    // bcrypt counts UTF-8 bytes: each "ñ" takes two.
+    expect(passwordProblems(`Aa1!${'ñ'.repeat(34)}`)).toEqual([]);
+    expect(passwordProblems(`Aa1!${'ñ'.repeat(35)}`)).toEqual(tooLong);
   });
 });

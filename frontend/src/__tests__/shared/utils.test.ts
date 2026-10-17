@@ -1,4 +1,5 @@
 import { storage } from '@shared/utils/storage';
+import { KEPT_KEYS, REMEMBER_EMAIL_KEY, clearLocalUserData } from '@shared/utils/localData';
 import { errorMessage } from '@shared/utils/errors';
 import { isPositiveAmount, parseDecimal } from '@shared/utils/numbers';
 import { redirectTo, reloadPage } from '@shared/utils/navigation';
@@ -31,6 +32,27 @@ describe('storage', () => {
     });
     expect(storage.get('k')).toBeNull();
     expect(() => storage.set('k', 'v')).not.toThrow();
+  });
+});
+
+describe('clearLocalUserData', () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(() => jest.restoreAllMocks());
+
+  it('removes every mm_ key except the device preferences', () => {
+    for (const key of [...KEPT_KEYS, REMEMBER_EMAIL_KEY, 'mm_ref', 'mm_acq', 'foreign']) {
+      localStorage.setItem(key, '1');
+    }
+    clearLocalUserData({ keepRememberedEmail: false });
+    expect(Object.keys(localStorage).sort()).toEqual([...KEPT_KEYS, 'foreign'].sort());
+  });
+
+  it('never throws when storage is unavailable', () => {
+    jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+      throw new Error('denied');
+    });
+    localStorage.setItem('mm_ref', 'x');
+    expect(() => clearLocalUserData({ keepRememberedEmail: true })).not.toThrow();
   });
 });
 

@@ -12,6 +12,7 @@ import { useTransactionForm } from '../../application/hooks/useTransactionForm';
 import { TransactionFormFields } from './TransactionFormFields';
 import '../css/TransactionForm.css';
 import { Icon } from '@shared/components/Icon';
+import { scrollBehavior } from '@shared/utils/motion';
 
 export interface TransactionFormProps {
   categories: Category[];
@@ -57,7 +58,10 @@ export function TransactionForm({
     if (!quickAdd) return;
     setType(quickAdd);
     setOpen(true);
-    (anchor.current as HTMLDivElement).scrollIntoView({ block: 'start', behavior: 'smooth' });
+    (anchor.current as HTMLDivElement).scrollIntoView({
+      block: 'start',
+      behavior: scrollBehavior(),
+    });
     onQuickAddDone();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quickAdd]);
@@ -88,7 +92,7 @@ export function TransactionForm({
             accounts={accounts}
           />
           {form.error && (
-            <p className="inline-error" role="alert">
+            <p id={form.errorId} className="inline-error" role="alert">
               {form.error}
             </p>
           )}

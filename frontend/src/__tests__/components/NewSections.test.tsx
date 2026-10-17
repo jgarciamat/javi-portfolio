@@ -345,10 +345,10 @@ describe('GoalsView', () => {
   it('creates a goal', async () => {
     render(<GoalsView />);
     await screen.findByText(/Viaje/, { selector: '.goal-name' });
-    fireEvent.change(screen.getByPlaceholderText(t('app.goals.name')), {
+    fireEvent.change(screen.getByLabelText(t('app.goals.name')), {
       target: { value: 'Moto' },
     });
-    fireEvent.change(screen.getByPlaceholderText(t('app.goals.target')), {
+    fireEvent.change(screen.getByLabelText(t('app.goals.target')), {
       target: { value: '2000' },
     });
     fireEvent.click(screen.getByRole('button', { name: t('app.goals.create') }));
@@ -502,7 +502,7 @@ describe('ImportModal', () => {
     await waitFor(() =>
       expect(importFn).toHaveBeenCalledWith(
         [{ date: '2026-03-02', description: 'MERCADONA', amount: -54.3, category: null }],
-        { accountId: 'a1', dryRun: true }
+        { accountId: 'a1', dryRun: true, useAi: false }
       )
     );
     expect(await screen.findByText('Alimentación')).toBeInTheDocument();
@@ -511,6 +511,7 @@ describe('ImportModal', () => {
     expect(importFn).toHaveBeenLastCalledWith(expect.any(Array), {
       accountId: 'a1',
       dryRun: false,
+      useAi: false,
     });
   });
 });

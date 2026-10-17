@@ -53,7 +53,7 @@
 }
 
 .update-prompt__btn--update {
-  background: var(--accent);
+  background: var(--accent-600);
   color: #fff;
 }
 

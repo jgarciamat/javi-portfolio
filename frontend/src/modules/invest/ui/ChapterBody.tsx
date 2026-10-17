@@ -1,8 +1,10 @@
+import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { Block, Chapter } from '../domain/types';
 import { InvestCalc } from './calculators/Calculators';
 import { InvestChart } from './charts/Charts';
 import { MarketsPanel } from './MarketsPanel';
+import { scrollBehavior } from '@shared/utils/motion';
 
 const CALLOUT_ICON = { key: '💡', warn: '⚠️', tip: '✅', ex: '🧮' } as const;
 
@@ -29,7 +31,7 @@ function BlockView({ block, anchor }: { block: Block; anchor: string }) {
       );
     case 'table':
       return (
-        <div className="inv-table-wrap">
+        <ScrollRegion className="inv-table-wrap" label={block.head.join(', ')}>
           <table className="inv-table">
             <thead>
               <tr>
@@ -56,7 +58,7 @@ function BlockView({ block, anchor }: { block: Block; anchor: string }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       );
     case 'chart':
       return (
@@ -96,7 +98,7 @@ export function ChapterBody({ chapter }: { chapter: Chapter }) {
   );
   const jump = (id: string) =>
     (document.getElementById(id) as HTMLElement).scrollIntoView({
-      behavior: 'smooth',
+      behavior: scrollBehavior(),
       block: 'start',
     });
   return (

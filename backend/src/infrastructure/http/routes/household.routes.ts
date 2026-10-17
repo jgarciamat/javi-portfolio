@@ -28,6 +28,13 @@ export function householdRoutes(c: Container, limiter: RateLimiterFactory): Rout
       res.status(204).end();
     })
   );
+  // The code travels in the body so it never ends up in URLs and access logs.
+  router.post(
+    '/household/invite/preview',
+    hourly,
+    authed((req, res) => res.json(c.household.preview(householdJoinBody.parse(req.body).code)))
+  );
+  /** @deprecated Older app versions: the code is in the path. */
   router.get(
     '/household/invite/:code',
     hourly,

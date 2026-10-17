@@ -161,7 +161,7 @@ const PURCHASE_COPY: Record<
     cancel:
       'Si tu plan es mensual o anual, puedes cancelar la renovación cuando quieras desde «Tu plan → Gestionar suscripción» en la web: no se te vuelve a cobrar y conservas Premium hasta el final del periodo ya pagado.',
     terms: 'Condiciones de contratación:',
-    contact: 'Si tienes cualquier duda, responde a este email o escribe a moneymanager@outlook.es.',
+    contact: 'Si tienes cualquier duda, responde a este email o escribe a support@finanverso.app.',
   },
   en: {
     subject: 'Your Finanverso Premium purchase',
@@ -172,7 +172,7 @@ const PURCHASE_COPY: Record<
     cancel:
       'If your plan is monthly or yearly, you can cancel the renewal at any time from "Your plan → Manage subscription" on the web: you are not charged again and you keep Premium until the end of the period already paid.',
     terms: 'Terms of sale:',
-    contact: 'If you have any questions, reply to this e-mail or write to moneymanager@outlook.es.',
+    contact: 'If you have any questions, reply to this e-mail or write to support@finanverso.app.',
   },
 };
 
@@ -201,6 +201,71 @@ export function purchaseEmail(
     ...lines,
     `${c.terms} ${termsUrl}`,
     c.contact,
+  ].join('\n');
+  return { subject: c.subject, html, text };
+}
+
+const EXISTS_COPY: Record<
+  EmailLocale,
+  {
+    subject: string;
+    greeting: (name: string) => string;
+    intro: string;
+    button: string;
+    forgot: string;
+    google: string;
+    ignore: string;
+  }
+> = {
+  es: {
+    subject: 'Ya tienes una cuenta en Finanverso',
+    greeting: (n) => `Hola ${n},`,
+    intro:
+      'Alguien (seguramente tú) ha intentado crear una cuenta en Finanverso con este email, pero ya tienes una. No hemos cambiado nada.',
+    button: 'Iniciar sesión',
+    forgot: '¿No recuerdas la contraseña? Restablécela aquí:',
+    google: 'Si entras con Google, usa «Continuar con Google».',
+    ignore: 'Si no has sido tú, puedes ignorar este email: tu cuenta sigue igual.',
+  },
+  en: {
+    subject: 'You already have a Finanverso account',
+    greeting: (n) => `Hi ${n},`,
+    intro:
+      'Someone (most likely you) tried to create a Finanverso account with this email, but you already have one. Nothing has changed.',
+    button: 'Sign in',
+    forgot: "Don't remember the password? Reset it here:",
+    google: 'If you sign in with Google, use "Continue with Google".',
+    ignore: "If it wasn't you, you can ignore this email: your account stays the same.",
+  },
+};
+
+/** Sent instead of a second sign-up, so the form never reveals which e-mails have an account. */
+export function accountExistsEmail(
+  locale: EmailLocale,
+  name: string,
+  loginUrl: string,
+  resetUrl: string
+): EmailContent {
+  const c = EXISTS_COPY[locale];
+  const login = escapeHtml(loginUrl);
+  const reset = escapeHtml(resetUrl);
+  const html = layout(
+    locale,
+    `      <p>${c.greeting(`<strong>${safeName(name)}</strong>`)}</p>
+      <p>${escapeHtml(c.intro)}</p>
+      <p style="text-align:center"><a class="btn" href="${login}">${c.button}</a></p>
+      <p>${escapeHtml(c.forgot)} <a class="url" href="${reset}">${reset}</a></p>
+      <p>${escapeHtml(c.google)}</p>
+      <p>${escapeHtml(c.ignore)}</p>`
+  );
+  const text = [
+    c.greeting(plainName(name)),
+    '',
+    c.intro,
+    `${c.button}: ${loginUrl}`,
+    `${c.forgot} ${resetUrl}`,
+    c.google,
+    c.ignore,
   ].join('\n');
   return { subject: c.subject, html, text };
 }

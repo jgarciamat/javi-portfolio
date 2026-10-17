@@ -1,9 +1,11 @@
+import { useEffect, useId, useRef } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { DateField } from '@shared/components/DateField';
 import type { Account, Category, TransactionType } from '@modules/finances/domain/types';
 import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
 import {
   MANAGE_CATEGORIES,
+  type CheckedField,
   type UseTransactionFormReturn,
 } from '../../application/hooks/useTransactionForm';
 import { CurrencyConverter } from './CurrencyConverter';
@@ -25,33 +27,62 @@ export function TransactionFormFields({
   accounts,
 }: TransactionFormFieldsProps) {
   const { t, tCategory } = useI18n();
-  const { fields } = form;
+  const { fields, invalid } = form;
   // An archived account stays selectable for the movements that already use it.
   const selectable = accounts.filter((a) => !a.archived || a.id === fields.accountId);
+  const id = useId();
+  const refs = {
+    description: useRef<HTMLInputElement>(null),
+    amount: useRef<HTMLInputElement>(null),
+    category: useRef<HTMLSelectElement>(null),
+  };
+  /** Marks a field the last submit refused and points it at the error text. */
+  const check = (field: CheckedField) =>
+    invalid.includes(field)
+      ? { 'aria-invalid': true, 'aria-describedby': form.errorId }
+      : { 'aria-invalid': undefined, 'aria-describedby': undefined };
+
+  // A refused submit takes focus to the first wrong field.
+  useEffect(() => {
+    if (invalid.length > 0) refs[invalid[0]].current!.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invalid]);
 
   return (
     <div className="tx-form-grid">
-      <input
-        className="tx-input"
-        placeholder={t('app.transaction.form.description')}
-        aria-label={t('app.transaction.form.description')}
-        value={fields.description}
-        onChange={(e) => form.setDescription(e.target.value)}
-        maxLength={200}
-        required
-      />
-      <input
-        className="tx-input"
-        type="number"
-        placeholder={t('app.transaction.form.amount')}
-        aria-label={t('app.transaction.form.amount')}
-        min="0.01"
-        step="0.01"
-        inputMode="decimal"
-        value={fields.amount}
-        onChange={(e) => form.setAmount(e.target.value)}
-        required
-      />
+      <div className="tx-field">
+        <label className="tx-field-label" htmlFor={`${id}-description`}>
+          {t('app.transaction.form.description')}
+        </label>
+        <input
+          ref={refs.description}
+          id={`${id}-description`}
+          className="tx-input"
+          value={fields.description}
+          onChange={(e) => form.setDescription(e.target.value)}
+          maxLength={200}
+          required
+          {...check('description')}
+        />
+      </div>
+      <div className="tx-field">
+        <label className="tx-field-label" htmlFor={`${id}-amount`}>
+          {t('app.transaction.form.amount')}
+        </label>
+        <input
+          ref={refs.amount}
+          id={`${id}-amount`}
+          className="tx-input"
+          type="number"
+          min="0.01"
+          step="0.01"
+          inputMode="decimal"
+          value={fields.amount}
+          onChange={(e) => form.setAmount(e.target.value)}
+          required
+          {...check('amount')}
+        />
+      </div>
       <ReceiptScanner
         onScanned={(r) => {
           if (r.merchant && !fields.description.trim()) form.setDescription(r.merchant);
@@ -73,11 +104,13 @@ export function TransactionFormFields({
         ))}
       </select>
       <select
+        ref={refs.category}
         className="tx-input"
         value={fields.category}
         onChange={(e) => form.handleCategoryChange(e.target.value, onManageCategories)}
         aria-label={t('app.transaction.form.category.placeholder')}
         required
+        {...check('category')}
       >
         <option value="">{t('app.transaction.form.category.placeholder')}</option>
         <option value={MANAGE_CATEGORIES}>⚙ {t('app.transaction.form.category.manage')}</option>
@@ -107,15 +140,19 @@ export function TransactionFormFields({
           ))}
         </select>
       )}
-      <textarea
-        className="tx-input tx-notes-input"
-        placeholder={t('app.transaction.form.notes')}
-        aria-label={t('app.transaction.form.notes')}
-        value={fields.notes}
-        onChange={(e) => form.setNotes(e.target.value)}
-        maxLength={500}
-        rows={2}
-      />
+      <div className="tx-field tx-field--notes">
+        <label className="tx-field-label" htmlFor={`${id}-notes`}>
+          {t('app.transaction.form.notes')}
+        </label>
+        <textarea
+          id={`${id}-notes`}
+          className="tx-input tx-notes-input"
+          value={fields.notes}
+          onChange={(e) => form.setNotes(e.target.value)}
+          maxLength={500}
+          rows={2}
+        />
+      </div>
     </div>
   );
 }

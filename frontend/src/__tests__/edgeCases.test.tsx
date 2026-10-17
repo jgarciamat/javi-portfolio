@@ -450,7 +450,7 @@ describe('dashboard edge cases', () => {
     expect(screen.getByRole('region', { name: tr('app.tabs.plan') })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
     fireEvent.click(
-      within(screen.getByRole('complementary')).getByRole('button', {
+      within(screen.getByRole('dialog')).getByRole('button', {
         name: literal(tr('app.tabs.monthly')),
       })
     );
@@ -460,7 +460,7 @@ describe('dashboard edge cases', () => {
     expect(screen.getByRole('region', { name: tr('app.tabs.budgets') })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
     fireEvent.click(
-      within(screen.getByRole('complementary')).getByRole('button', {
+      within(screen.getByRole('dialog')).getByRole('button', {
         name: literal(tr('app.tabs.monthly')),
       })
     );
@@ -524,9 +524,9 @@ describe('dashboard edge cases', () => {
     fireEvent.click(
       screen.getByRole('button', { name: literal(tr('app.transaction.form.title')) })
     );
-    expect(screen.getByRole('button', { name: tr('app.transaction.form.date') })).toHaveTextContent(
-      '1 feb 2026'
-    );
+    expect(
+      screen.getByRole('button', { name: new RegExp(`^${tr('app.transaction.form.date')}`) })
+    ).toHaveTextContent('1 feb 2026');
   });
 });
 
@@ -680,6 +680,7 @@ describe('more edge cases', () => {
       expect(api.transactionApi.import).toHaveBeenCalledWith(expect.any(Array), {
         accountId: null,
         dryRun: true,
+        useAi: false,
       })
     );
     // A row without category data still renders.
@@ -845,7 +846,7 @@ describe('more edge cases', () => {
     renderWithProviders(<Dashboard />, { api });
     await screen.findByText('Cena');
     fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
-    fireEvent.click(screen.getByRole('menuitem', { name: literal(tr('app.import.open')) }));
+    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     await screen.findByRole('dialog', { name: tr('app.import.title') });
     const bytes = new TextEncoder().encode('Fecha;Concepto;Importe\n01/03/2026;Pan;-1\n');
     const file = Object.assign(new File([bytes as BlobPart], 'x.csv'), {

@@ -87,7 +87,9 @@ describe('Export', () => {
     expect(res.headers['content-disposition']).toMatch(
       /attachment; filename="finanverso-2026-03-15.json"/
     );
-    expect(res.body).toMatchObject({ format: 'money-manager-export', version: 2 });
+    expect(res.body).toMatchObject({ format: 'finanverso-export', version: 3 });
+    expect(res.body).toHaveProperty('subscription.source', 'trial');
+    expect(res.body).toHaveProperty('splitGroups', []);
     expect(res.body.profile.email).toBe(user.email);
     expect(res.body.transactions).toEqual([
       expect.objectContaining({

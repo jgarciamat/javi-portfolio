@@ -31,8 +31,8 @@ const GRANTING = new Set([
 ]);
 const LIVE = new Set(['active', 'trialing', 'past_due']);
 
-const isLifetimeProduct = (productId: string) => productId.includes('lifetime');
-const isRentaPass = (productId: string) => productId.includes('renta');
+const isLifetimeProduct = (productId: string): boolean => productId.includes('lifetime');
+const isRentaPass = (productId: string): boolean => productId.includes('renta');
 
 /**
  * Purchases made inside the Android app. Google Play charges and RevenueCat verifies the

@@ -8,6 +8,6 @@
     "prepare:all": "(cd backend && npm run prepare) && (cd frontend && npm run prepare)"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22 <25"
   }
 }

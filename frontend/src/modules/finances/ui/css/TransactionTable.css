@@ -106,13 +106,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--slate-600);
+  color: var(--slate-500);
 }
 
 .tx-day-chevron {
   display: inline-block;
   font-size: 0.75rem;
-  color: var(--slate-600);
+  color: var(--slate-500);
   transition: transform 0.2s ease;
   transform: rotate(0deg);
   line-height: 1;
@@ -139,7 +139,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--slate-600);
+  color: var(--slate-500);
   padding: 0.9rem 0 0.35rem;
   border-top: 1px solid var(--slate-800);
 }
@@ -183,8 +183,8 @@
 }
 
 .tx-badge-saving {
-  background: #3b0764;
-  color: #c4b5fd;
+  background: color-mix(in srgb, var(--violet-400) 22%, var(--slate-900));
+  color: var(--violet-400);
 }
 
 .tx-cat-badge {
@@ -278,7 +278,7 @@
 }
 
 .tx-notes-placeholder {
-  color: var(--slate-600);
+  color: var(--slate-500);
   font-style: italic;
   font-size: 0.78rem;
 }
@@ -336,6 +336,9 @@
   font-family: inherit;
   text-align: left;
   padding: 0;
+  /* Big enough to tap (24 × 24 px at least). */
+  min-height: 24px;
+  min-width: 24px;
 }
 
 .tx-row-actions {

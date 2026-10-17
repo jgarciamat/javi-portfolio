@@ -34,6 +34,8 @@ export function GettingStarted({
       <div
         className="getting-started-bar"
         role="progressbar"
+        aria-label={t('app.gettingStarted.title')}
+        aria-valuetext={t('app.gettingStarted.progress', { done: completed, total: steps.length })}
         aria-valuemin={0}
         aria-valuemax={steps.length}
         aria-valuenow={completed}

@@ -10,6 +10,7 @@ import type { Asset, AssetKind } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { DebtPlanCard } from './DebtPlanCard';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const KINDS: AssetKind[] = ['investment', 'property', 'vehicle', 'other', 'debt'];
 
@@ -76,6 +77,38 @@ function AssetRow({
   );
 }
 
+/** A new element needs a name and a value of zero or more. */
+const isValidAsset = (name: string, value: string): boolean => {
+  const amount = parseDecimal(value);
+  return name.trim() !== '' && Number.isFinite(amount) && amount >= 0 && value.trim() !== '';
+};
+
+/** Rate and minimum payment of a new debt, when they are filled in. */
+function debtTerms(
+  kind: AssetKind,
+  rate: string,
+  minPayment: string
+): { interestRate?: number; minPayment?: number } {
+  if (kind !== 'debt') return {};
+  return {
+    ...(rate.trim() !== '' ? { interestRate: parseDecimal(rate) } : {}),
+    ...(minPayment.trim() !== '' ? { minPayment: parseDecimal(minPayment) } : {}),
+  };
+}
+
+/** What a free account sees once it has its one element. */
+function LimitGate({ onUpgrade }: { onUpgrade: () => void }) {
+  const { t } = useI18n();
+  return (
+    <PremiumGate>
+      <p className="section-hint">{t('app.assets.usedFree')}</p>
+      <button className="btn-primary" onClick={onUpgrade}>
+        {t('billing.seePlans')}
+      </button>
+    </PremiumGate>
+  );
+}
+
 /** Investments, property and debts valued by hand: they are part of the net worth. */
 export function AssetsCard() {
   const { assetApi } = useApi();
@@ -93,7 +126,7 @@ export function AssetsCard() {
   const [minPayment, setMinPayment] = useState('');
   const amount = parseDecimal(value);
   const debts = assets.filter((a) => a.kind === 'debt' && a.value > 0);
-  const valid = name.trim() !== '' && Number.isFinite(amount) && amount >= 0 && value.trim() !== '';
+  const valid = isValidAsset(name, value);
   // The free plan keeps one element (of any kind); adding more needs Premium.
   const limit = plan?.overview?.limits.resources.assets;
   const locked = limit !== null && limit !== undefined && assets.length >= limit;
@@ -131,17 +164,11 @@ export function AssetsCard() {
           </>
         )}
         {locked ? (
-          <div className="renta-gate">
-            <p className="section-hint">{t('app.assets.usedFree')}</p>
-            <button
-              className="btn-primary"
-              onClick={() =>
-                plan?.openUpgrade({ kind: 'limit', resource: 'assets', limit: limit as number })
-              }
-            >
-              {t('billing.seePlans')}
-            </button>
-          </div>
+          <LimitGate
+            onUpgrade={() =>
+              plan?.openUpgrade({ kind: 'limit', resource: 'assets', limit: limit as number })
+            }
+          />
         ) : (
           <>
             <div className="form-grid">
@@ -210,12 +237,7 @@ export function AssetsCard() {
                       name: name.trim(),
                       kind,
                       value: amount,
-                      ...(kind === 'debt' && rate.trim() !== ''
-                        ? { interestRate: parseDecimal(rate) }
-                        : {}),
-                      ...(kind === 'debt' && minPayment.trim() !== ''
-                        ? { minPayment: parseDecimal(minPayment) }
-                        : {}),
+                      ...debtTerms(kind, rate, minPayment),
                     });
                     setName('');
                     setValue('');

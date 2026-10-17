@@ -53,7 +53,7 @@ export function VerifyEmailPage() {
   return (
     <>
       <PublicHeader />
-      <div className="auth-page-with-header">
+      <main className="auth-page-with-header">
         <div className="auth-card">
           {status === 'loading' && (
             <>
@@ -94,7 +94,7 @@ export function VerifyEmailPage() {
             <>
               <div className="auth-logo">❌</div>
               <h1 className="auth-title">{t('app.auth.verify.error')}</h1>
-              <p className="auth-sub" style={{ textAlign: 'center', color: '#ef4444' }}>
+              <p className="auth-sub" style={{ textAlign: 'center', color: 'var(--red-400)' }}>
                 {message}
               </p>
               {expired && (
@@ -123,7 +123,7 @@ export function VerifyEmailPage() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </>
   );
 }

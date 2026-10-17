@@ -1,17 +1,20 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Transaction, UpdateTransactionDTO } from '@modules/finances/domain/types';
 import { storage } from '@shared/utils/storage';
 import { isDashboardTab, type DashboardTab } from '../../ui/navigation';
 
 const TAB_KEY = 'mm_last_tab';
 
-const loadTab = (): DashboardTab => {
-  // A link to a section (`/?tab=renta`) wins over the remembered one, and is dropped from the address.
+/** The section in a link (`/?tab=renta`), if any. */
+const linkedTab = (): DashboardTab | null => {
   const linked = new URLSearchParams(window.location.search).get('tab');
-  if (isDashboardTab(linked)) {
-    window.history.replaceState(null, '', window.location.pathname);
-    return linked;
-  }
+  return isDashboardTab(linked) ? linked : null;
+};
+
+/** A linked section wins over the remembered one. Pure: StrictMode may call it twice. */
+const loadTab = (): DashboardTab => {
+  const linked = linkedTab();
+  if (linked) return linked;
   const stored = storage.get(TAB_KEY);
   return isDashboardTab(stored) ? stored : 'monthly';
 };
@@ -30,6 +33,11 @@ export function useDashboard({ navigateTo, updateTransaction }: Options) {
   const [showImport, setShowImport] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [editVersion, setEditVersion] = useState(0);
+
+  // Once opened, the link's section is dropped from the address.
+  useEffect(() => {
+    if (linkedTab()) window.history.replaceState(null, '', window.location.pathname);
+  }, []);
 
   /** The last section is remembered on this device. */
   const setTab = useCallback((next: DashboardTab) => {
