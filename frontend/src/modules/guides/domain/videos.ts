@@ -204,6 +204,7 @@ export const VIDEOS: VideoEntry[] = [
     section: 'hacienda',
     title: 'Renta WEB para tontos: revisa y presenta tu borrador paso a paso',
     durationSeconds: 444,
+    youtubeId: 'athcDzLevm4',
     guide: 'renta',
   },
   {
@@ -211,6 +212,7 @@ export const VIDEOS: VideoEntry[] = [
     section: 'hacienda',
     title: 'Modelo 303 para tontos: el IVA trimestral paso a paso',
     durationSeconds: 418,
+    youtubeId: 'qSX-OK9b1AE',
     guide: 'm303',
   },
   {
@@ -218,6 +220,7 @@ export const VIDEOS: VideoEntry[] = [
     section: 'hacienda',
     title: 'Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso',
     durationSeconds: 342,
+    youtubeId: 'n_HiGI6_BL4',
     guide: 'm130',
   },
   {
@@ -225,6 +228,7 @@ export const VIDEOS: VideoEntry[] = [
     section: 'hacienda',
     title: 'Certificado digital FNMT para tontos: cómo conseguirlo paso a paso',
     durationSeconds: 423,
+    youtubeId: 'G6Ag63KCXD4',
     guide: 'start',
   },
   {
@@ -232,36 +236,42 @@ export const VIDEOS: VideoEntry[] = [
     section: 'autonomos',
     title: 'Darse de alta como autónomo para tontos: Hacienda y Seguridad Social',
     durationSeconds: 321,
+    youtubeId: 'Wlo53zACXmI',
   },
   {
     number: 26,
     section: 'autonomos',
     title: 'Autónomos: cambia tu base de cotización (para tontos)',
     durationSeconds: 316,
+    youtubeId: '6hVclBHj34Y',
   },
   {
     number: 27,
     section: 'autonomos',
     title: 'Modelo 390 para tontos: el resumen anual del IVA',
     durationSeconds: 328,
+    youtubeId: 'XMyY6z7269s',
   },
   {
     number: 28,
     section: 'autonomos',
     title: 'Modelo 347 para tontos: operaciones con terceros',
     durationSeconds: 326,
+    youtubeId: '097frSE3Hac',
   },
   {
     number: 29,
     section: 'autonomos',
     title: 'Modelos 111 y 115 para tontos: retenciones de empleados, profesionales',
     durationSeconds: 330,
+    youtubeId: 'xA1dbQuHuSQ',
   },
   {
     number: 30,
     section: 'autonomos',
     title: 'VERI*FACTU para tontos: qué cambia en tus facturas y cuándo',
     durationSeconds: 308,
+    youtubeId: 'iRStIanzkZg',
   },
   {
     number: 31,
