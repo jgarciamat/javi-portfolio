@@ -7,7 +7,13 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { AuthUser } from '@modules/auth/domain/types';
+import {
+  isTwoFactorChallenge,
+  type AuthResult,
+  type AuthUser,
+  type SignInResult,
+  type TwoFactorChallenge,
+} from '@modules/auth/domain/types';
 import { authApi } from '@core/api/authApi';
 import {
   isAccessTokenExpired,
@@ -31,8 +37,14 @@ interface AuthContextValue {
   freshSignIn: boolean;
   /** Marks the fresh sign-in as handled (the welcome tour asks once per sign-in). */
   acknowledgeSignIn: () => void;
-  login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: (token: string, locale?: Locale) => Promise<void>;
+  /** True when signed in; false when the second step (2FA code) is still to come. */
+  login: (email: string, password: string) => Promise<boolean>;
+  loginWithGoogle: (token: string, locale?: Locale) => Promise<boolean>;
+  /** Set between the password (or Google) and the 2FA code. */
+  twoFactorChallenge: TwoFactorChallenge | null;
+  /** Sends the code (of the app or a recovery code) of the pending sign-in. */
+  verifyTwoFactor: (code: string) => Promise<void>;
+  cancelTwoFactor: () => void;
   register: (email: string, password: string, name: string, locale?: Locale) => Promise<string>;
   logout: () => void;
   /**
@@ -69,6 +81,53 @@ function initialState(): { status: AuthStatus; token: string | null; user: AuthU
     token: status === 'authenticated' ? tokenStore.getAccess() : null,
     user: status === 'anonymous' ? null : loadUser(),
   };
+}
+
+/** Password, Google and the 2FA code: what opens a session, handed to `persist`. */
+function useSignIn(persist: (result: AuthResult) => void) {
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState<TwoFactorChallenge | null>(null);
+
+  const open = useCallback(
+    (result: AuthResult) => {
+      setTwoFactorChallenge(null);
+      persist(result);
+    },
+    [persist]
+  );
+
+  /** Opens the session, or keeps the challenge when the account asks for a 2FA code. */
+  const signIn = useCallback(
+    (result: SignInResult): boolean => {
+      if (isTwoFactorChallenge(result)) {
+        setTwoFactorChallenge(result);
+        return false;
+      }
+      open(result);
+      return true;
+    },
+    [open]
+  );
+
+  const login = useCallback(
+    async (email: string, password: string) => signIn(await authApi.login({ email, password })),
+    [signIn]
+  );
+
+  const loginWithGoogle = useCallback(
+    async (googleToken: string, locale?: Locale) =>
+      signIn(await authApi.googleLogin(googleToken, locale)),
+    [signIn]
+  );
+
+  const verifyTwoFactor = useCallback(
+    async (code: string) =>
+      open(await authApi.verifyTwoFactor(twoFactorChallenge!.challengeToken, code)),
+    [open, twoFactorChallenge]
+  );
+
+  const cancelTwoFactor = useCallback(() => setTwoFactorChallenge(null), []);
+
+  return { login, loginWithGoogle, twoFactorChallenge, verifyTwoFactor, cancelTwoFactor };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -114,30 +173,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => registerSessionExpiredHandler(null);
   }, [clearSession]);
 
-  const persist = useCallback(
-    (result: { accessToken: string; refreshToken: string; user: AuthUser }) => {
-      tokenStore.setSession(result.accessToken, result.refreshToken);
-      saveUser(result.user);
-      setToken(result.accessToken);
-      setUser(result.user);
-      setStatus('authenticated');
-      setFreshSignIn(true);
-    },
-    []
-  );
+  const persist = useCallback((result: AuthResult) => {
+    tokenStore.setSession(result.accessToken, result.refreshToken);
+    saveUser(result.user);
+    setToken(result.accessToken);
+    setUser(result.user);
+    setStatus('authenticated');
+    setFreshSignIn(true);
+  }, []);
 
   const acknowledgeSignIn = useCallback(() => setFreshSignIn(false), []);
 
-  const login = useCallback(
-    async (email: string, password: string) => persist(await authApi.login({ email, password })),
-    [persist]
-  );
-
-  const loginWithGoogle = useCallback(
-    async (googleToken: string, locale?: Locale) =>
-      persist(await authApi.googleLogin(googleToken, locale)),
-    [persist]
-  );
+  const { login, loginWithGoogle, twoFactorChallenge, verifyTwoFactor, cancelTwoFactor } =
+    useSignIn(persist);
 
   const register = useCallback(
     async (email: string, password: string, name: string, locale?: Locale): Promise<string> => {
@@ -209,6 +257,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       acknowledgeSignIn,
       login,
       loginWithGoogle,
+      twoFactorChallenge,
+      verifyTwoFactor,
+      cancelTwoFactor,
       register,
       logout,
       endSession,
@@ -225,6 +276,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       acknowledgeSignIn,
       login,
       loginWithGoogle,
+      twoFactorChallenge,
+      verifyTwoFactor,
+      cancelTwoFactor,
       register,
       logout,
       endSession,

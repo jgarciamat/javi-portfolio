@@ -1,5 +1,12 @@
 import { clearReferral, pendingReferral } from '@core/referral';
-import type { AuthResult, RegisterResult } from '@modules/auth/domain/types';
+import type {
+  AuthResult,
+  RegisterResult,
+  SignInResult,
+  TwoFactorProof,
+  TwoFactorSetup,
+  TwoFactorStatus,
+} from '@modules/auth/domain/types';
 import type { Locale } from '@core/i18n/I18nContext';
 import { apiRequest, jsonBody, publicRequest } from './http';
 
@@ -30,11 +37,44 @@ export const authApi = {
     return result;
   },
   login(dto: { email: string; password: string }) {
-    return publicRequest<AuthResult>('/auth/login', { method: 'POST', body: jsonBody(dto) });
+    return publicRequest<SignInResult>('/auth/login', { method: 'POST', body: jsonBody(dto) });
+  },
+  /** Second step of a sign-in with 2FA: a code of the app or a recovery code. */
+  verifyTwoFactor(challengeToken: string, code: string) {
+    return publicRequest<AuthResult>('/auth/2fa/verify', {
+      method: 'POST',
+      body: jsonBody({ challengeToken, code }),
+    });
+  },
+  twoFactorStatus() {
+    return apiRequest<TwoFactorStatus>('/auth/2fa');
+  },
+  /** Needs the password (or, for Google-only accounts, a recent Google sign-in). */
+  twoFactorSetup(proof: { password?: string; googleToken?: string }) {
+    return apiRequest<TwoFactorSetup>('/auth/2fa/setup', {
+      method: 'POST',
+      body: jsonBody(proof),
+    });
+  },
+  /** The recovery codes are returned only this once. */
+  twoFactorEnable(code: string) {
+    return apiRequest<{ recoveryCodes: string[] }>('/auth/2fa/enable', {
+      method: 'POST',
+      body: jsonBody({ code }),
+    });
+  },
+  twoFactorDisable(proof: TwoFactorProof) {
+    return apiRequest<void>('/auth/2fa/disable', { method: 'POST', body: jsonBody(proof) });
+  },
+  twoFactorRecoveryCodes(proof: TwoFactorProof) {
+    return apiRequest<{ recoveryCodes: string[] }>('/auth/2fa/recovery-codes', {
+      method: 'POST',
+      body: jsonBody(proof),
+    });
   },
   /** Google access token (custom button) or ID token: the API verifies its audience. */
   async googleLogin(token: string, locale?: Locale) {
-    const result = await publicRequest<AuthResult>('/auth/google', {
+    const result = await publicRequest<SignInResult>('/auth/google', {
       method: 'POST',
       body: jsonBody({ token, locale, referralCode: pendingReferral() }),
     });
