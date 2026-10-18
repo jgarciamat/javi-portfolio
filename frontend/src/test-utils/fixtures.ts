@@ -460,3 +460,10 @@ export const autonomoDraft = (over: Partial<AutonomoDraft> = {}): AutonomoDraft 
   expenses: null,
   ...over,
 });
+
+/** What the server gives Premium users: fake ids, the real ones are not in the web app. */
+export const premiumVideoIds = (over: Record<number, string> = {}): Record<number, string> => ({
+  17: 'premium17',
+  18: 'premium18',
+  ...over,
+});

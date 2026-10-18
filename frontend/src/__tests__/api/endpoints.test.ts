@@ -1,5 +1,6 @@
 import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
+import { videosApi } from '@core/api/videosApi';
 import {
   accountApi,
   assetApi,
@@ -348,6 +349,7 @@ const cases: Case[] = [
   ],
   ['export', () => dataApi.exportAll(), 'GET', '/export'],
   ['billing', () => billingApi.get(), 'GET', '/billing'],
+  ['premium videos', () => videosApi.premium(), 'GET', '/videos/premium'],
   ['plans', () => billingApi.plans(), 'GET', '/billing/plans'],
   [
     'checkout',

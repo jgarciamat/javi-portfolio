@@ -8,8 +8,13 @@
  *    `youtube/descripciones/NN-*.md`) and duration in seconds.
  * 2. Save its thumbnail as `frontend/public/videos/NN.webp` (480×270, webp quality ~75). Without
  *    one, set `thumbnail: false` and a plain tile is shown instead.
- * 3. Once it is on YouTube, fill `youtubeId` (the `v=` part of the link). Only entries with an id
+ * 3. Once it is on YouTube, fill `youtubeId` (the `v=` part of the link). Only published entries
  *    are shown, and a section with none is hidden.
+ *
+ * Premium videos (`premium: true`) are unlisted on YouTube: their id is NOT written here (this file
+ * ships in the public bundle). It goes in `backend/src/domain/services/premium-videos.ts`, which
+ * hands it to Premium users only; here the entry just gets `published: true` once it is uploaded.
+ * Everybody else sees a locked card that leads to Premium.
  */
 import type { HaciendaGuideId } from './hacienda';
 
@@ -50,8 +55,12 @@ export interface VideoEntry {
   section: VideoSectionId;
   title: string;
   durationSeconds?: number;
-  /** Empty until the video is published on YouTube. */
+  /** Empty until the video is published on YouTube. Never set on a Premium video. */
   youtubeId?: string;
+  /** Only for Premium users: its id comes from the server (`GET /api/videos/premium`). */
+  premium?: true;
+  /** A Premium video already on YouTube (it has no `youtubeId` here). */
+  published?: true;
   /** False when there is no `public/videos/NN.webp`. */
   thumbnail?: boolean;
   /** «Hacienda paso a paso» guide that links to this video. */
@@ -176,28 +185,32 @@ export const VIDEOS: VideoEntry[] = [
     section: 'invest',
     title: 'Cómo invertir: el mapa de las 9 clases de activos y las acciones',
     durationSeconds: 550,
-    youtubeId: 'I6XofjXihyA',
+    premium: true,
+    published: true,
   },
   {
     number: 18,
     section: 'invest',
     title: 'Cómo invertir: fondos indexados, ETF, interés compuesto y bonos',
     durationSeconds: 521,
-    youtubeId: '5D9_c2lZJmo',
+    premium: true,
+    published: true,
   },
   {
     number: 19,
     section: 'invest',
     title: 'Cómo invertir: criptomonedas, apalancamiento y estafas',
     durationSeconds: 490,
-    youtubeId: 'Ke11Uw8OCe4',
+    premium: true,
+    published: true,
   },
   {
     number: 20,
     section: 'invest',
     title: 'Cómo invertir: fiscalidad en España, mercados y riesgo',
     durationSeconds: 492,
-    youtubeId: 'FFNWp0s6SD4',
+    premium: true,
+    published: true,
   },
   {
     number: 21,
@@ -250,21 +263,24 @@ export const VIDEOS: VideoEntry[] = [
     section: 'autonomos',
     title: 'Modelo 390 para tontos: el resumen anual del IVA',
     durationSeconds: 328,
-    youtubeId: 'XMyY6z7269s',
+    premium: true,
+    published: true,
   },
   {
     number: 28,
     section: 'autonomos',
     title: 'Modelo 347 para tontos: operaciones con terceros',
     durationSeconds: 326,
-    youtubeId: '097frSE3Hac',
+    premium: true,
+    published: true,
   },
   {
     number: 29,
     section: 'autonomos',
     title: 'Modelos 111 y 115 para tontos: retenciones de empleados, profesionales',
     durationSeconds: 330,
-    youtubeId: 'xA1dbQuHuSQ',
+    premium: true,
+    published: true,
   },
   {
     number: 30,
@@ -326,36 +342,42 @@ export const VIDEOS: VideoEntry[] = [
     section: 'invest',
     title: 'Letras del Tesoro para tontos: cómpralas directamente al Tesoro',
     durationSeconds: 318,
+    premium: true,
   },
   {
     number: 40,
     section: 'invest',
     title: 'Fondos, acciones y cripto en la Renta para tontos',
     durationSeconds: 311,
+    premium: true,
   },
   {
     number: 41,
     section: 'invest',
     title: 'Modelos 720 y 721 para tontos: tus bienes y cripto en el extranjero',
     durationSeconds: 338,
+    premium: true,
   },
   {
     number: 42,
     section: 'invest',
     title: 'Traspasar un fondo sin pagar impuestos (para tontos)',
     durationSeconds: 307,
+    premium: true,
   },
   {
     number: 43,
     section: 'invest',
     title: 'Dividendos de un bróker extranjero: cómo no pagar dos veces (para tont',
     durationSeconds: 303,
+    premium: true,
   },
   {
     number: 44,
     section: 'invest',
     title: 'Plan de pensiones: cuánto desgrava y cómo sale en la Renta (para tonto',
     durationSeconds: 309,
+    premium: true,
   },
   {
     number: 45,
@@ -383,9 +405,15 @@ export const VIDEOS: VideoEntry[] = [
   },
 ];
 
-/** The videos that are already on YouTube. */
-export const publishedVideos = (videos: VideoEntry[] = VIDEOS) =>
-  videos.filter((v) => Boolean(v.youtubeId));
+/** YouTube ids of the Premium videos by number, as the server gives them to Premium users. */
+export type PremiumVideoIds = Record<number, string>;
+
+/** Already on YouTube: with its id, or a Premium one marked as published. */
+export const isPublished = (v: VideoEntry) =>
+  Boolean(v.youtubeId) || (v.premium === true && v.published === true);
+
+/** The videos that are already on YouTube (Premium ones included, shown locked to the rest). */
+export const publishedVideos = (videos: VideoEntry[] = VIDEOS) => videos.filter(isPublished);
 
 /** The sections with at least one published video, each with its videos. */
 export const videoGroups = (videos: VideoEntry[] = VIDEOS) =>
@@ -394,7 +422,14 @@ export const videoGroups = (videos: VideoEntry[] = VIDEOS) =>
     videos: publishedVideos(videos).filter((v) => v.section === section.id),
   })).filter((g) => g.videos.length > 0);
 
-export const videoUrl = (v: VideoEntry) => `https://www.youtube.com/watch?v=${v.youtubeId}`;
+export const youtubeUrl = (youtubeId: string) => `https://www.youtube.com/watch?v=${youtubeId}`;
+
+/** Link to a public video (Premium ones have no id here: see {@link watchId}). */
+export const videoUrl = (v: VideoEntry) => youtubeUrl(v.youtubeId as string);
+
+/** The id of a video for whoever is watching: its own, or the one the server gave to Premium. */
+export const watchId = (v: VideoEntry, premiumIds: PremiumVideoIds | null) =>
+  v.youtubeId ?? premiumIds?.[v.number];
 
 /**
  * Our own thumbnail. YouTube's (i.ytimg.com) is not used: the Content-Security-Policy only allows
@@ -413,6 +448,7 @@ export function formatDuration(seconds: number): string {
 
 /** Link to our video of a «Hacienda paso a paso» guide, or '' while it is not published. */
 export function guideVideoUrl(guide: HaciendaGuideId, videos: VideoEntry[] = VIDEOS): string {
-  const video = publishedVideos(videos).find((v) => v.guide === guide);
+  // Premium videos are left out: the guides are public.
+  const video = videos.find((v) => v.guide === guide && v.youtubeId);
   return video ? videoUrl(video) : '';
 }

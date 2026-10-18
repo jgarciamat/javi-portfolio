@@ -260,7 +260,12 @@ write(
       .map(
         ({ section, videos: list }) =>
           `<h2>${esc(t(`videos.section.${section.id}`))}</h2><ul>${list
-            .map((v) => `<li>${link(videos.videoUrl(v), v.title)}</li>`)
+            // Premium videos are unlisted on YouTube: no link (the id is not in the web app).
+            .map((v) =>
+              v.youtubeId
+                ? `<li>${link(videos.videoUrl(v), v.title)}</li>`
+                : `<li>${esc(v.title)} (${esc(t('videos.premium.badge'))})</li>`
+            )
             .join('')}</ul>`
       )
       .join('')}${nav}</main>`,

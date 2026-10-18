@@ -197,5 +197,6 @@ export function createFakeApi(): FakeApi {
       remove: ok(undefined),
     },
     offersApi: { list: ok({ enabled: true, offers: [] }), click: ok({ url: 'https://x.test' }) },
+    videosApi: { premium: ok(f.premiumVideoIds()) },
   } as unknown as FakeApi;
 }

@@ -31,7 +31,8 @@
   }
 }
 
-.video-card a {
+.video-card a,
+.video-card-body {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -100,6 +101,37 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--red-400);
+}
+
+/* Premium videos: a badge, and for those without Premium a dimmed thumbnail and a way to Premium. */
+.video-premium {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-600), #7e22ce);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.video-card-locked .video-thumb img {
+  filter: grayscale(0.6) brightness(0.7);
+}
+
+.video-card-locked .video-title {
+  opacity: 0.85;
+}
+
+.video-unlock {
+  width: auto;
+  margin-top: auto;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  text-align: center;
+  text-decoration: none;
 }
 
 /* «Ir a un apartado»: a chip per section, tinted with its colour. */

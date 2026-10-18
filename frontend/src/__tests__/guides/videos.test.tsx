@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import es from '@locales/es.json';
 import en from '@locales/en.json';
@@ -11,10 +11,13 @@ import {
   YOUTUBE_SUBSCRIBE_URL,
   formatDuration,
   guideVideoUrl,
+  isPublished,
   publishedVideos,
   videoGroups,
   videoThumbnail,
   videoUrl,
+  watchId,
+  youtubeUrl,
   type VideoEntry,
 } from '@modules/guides/domain/videos';
 import { VideosView } from '@modules/finances/ui/views/VideosView';
@@ -22,6 +25,8 @@ import { HaciendaView } from '@modules/finances/ui/views/HaciendaView';
 import { VideosPage } from '@modules/guides/ui/VideosPage';
 import { GuidesIndexPage } from '@modules/guides/ui/GuidePages';
 import { HaciendaIndexPage } from '@modules/guides/ui/HaciendaPages';
+import { createFakeApi } from '@test-utils/fakeApi';
+import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 
 const entry = (over: Partial<VideoEntry>): VideoEntry => ({
@@ -54,8 +59,33 @@ describe('Videoteca: catalogue', () => {
     ];
     expect(publishedVideos(list).map((v) => v.number)).toEqual([1]);
     expect(videoGroups(list).map((g) => g.section.id)).toEqual(['start']);
-    expect(publishedVideos().every((v) => v.youtubeId)).toBe(true);
+    expect(publishedVideos().every(isPublished)).toBe(true);
     expect(videoGroups()[0].section.id).toBe('start');
+  });
+
+  it('marks the Premium videos and keeps their YouTube ids out of the web app', () => {
+    const premium = VIDEOS.filter((v) => v.premium);
+    expect(premium.map((v) => v.number)).toEqual([
+      17, 18, 19, 20, 27, 28, 29, 39, 40, 41, 42, 43, 44,
+    ]);
+    expect(premium.every((v) => !v.youtubeId && !v.guide)).toBe(true);
+    // `published` only means something on a Premium video.
+    expect(VIDEOS.filter((v) => v.published).every((v) => v.premium)).toBe(true);
+    expect(premium.filter(isPublished).map((v) => v.number)).toEqual([17, 18, 19, 20, 27, 28, 29]);
+    // Shown (locked) once published, even without an id here.
+    expect(isPublished(entry({ premium: true, published: true }))).toBe(true);
+    expect(isPublished(entry({ premium: true }))).toBe(false);
+    expect(isPublished(entry({ published: true }))).toBe(false);
+    expect(videoGroups([entry({ premium: true, published: true })])).toHaveLength(1);
+  });
+
+  it('takes the id of a Premium video from what the server gave', () => {
+    const premium = entry({ number: 17, premium: true, published: true });
+    expect(watchId(premium, null)).toBeUndefined();
+    expect(watchId(premium, { 18: 'b' })).toBeUndefined();
+    expect(watchId(premium, { 17: 'a' })).toBe('a');
+    expect(watchId(entry({ youtubeId: 'own' }), { 99: 'x' })).toBe('own');
+    expect(youtubeUrl('a')).toBe('https://www.youtube.com/watch?v=a');
   });
 
   it('builds links, thumbnails and durations', () => {
@@ -68,9 +98,15 @@ describe('Videoteca: catalogue', () => {
   });
 
   it('links each Hacienda guide to its video once it is published', () => {
-    const list = [entry({ guide: 'm303', youtubeId: 'm303id' }), entry({ guide: 'm130' })];
+    const list = [
+      entry({ guide: 'm303', youtubeId: 'm303id' }),
+      entry({ guide: 'm130' }),
+      entry({ guide: 'renta', premium: true, published: true }),
+    ];
     expect(guideVideoUrl('m303', list)).toBe('https://www.youtube.com/watch?v=m303id');
     expect(guideVideoUrl('m130', list)).toBe('');
+    // The guides are public: never a Premium video.
+    expect(guideVideoUrl('renta', list)).toBe('');
     expect(VIDEOS.filter((v) => v.guide).map((v) => [v.number, v.guide])).toEqual([
       [21, 'renta'],
       [22, 'm303'],
@@ -104,11 +140,12 @@ describe('Videoteca in the app', () => {
     expect(img).toHaveAttribute('width', '480');
     expect(within(card).getByText(tr('videos.watch'))).toBeInTheDocument();
 
+    // Outside the plan provider the Premium videos are locked.
     expect(screen.getAllByRole('link', { name: literal(tr('videos.opens')) })).toHaveLength(
-      publishedVideos().length
+      VIDEOS.filter((v) => v.youtubeId).length
     );
     // Not on YouTube yet: neither the video nor its section are shown.
-    expect(screen.queryByText(VIDEOS.find((v) => !v.youtubeId)!.title)).not.toBeInTheDocument();
+    expect(screen.queryByText(VIDEOS.find((v) => !isPublished(v))!.title)).not.toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: tr('videos.section.home') })
     ).not.toBeInTheDocument();
@@ -199,5 +236,104 @@ describe('Videoteca on the public site', () => {
       ).toBeInTheDocument();
       unmount();
     }
+  });
+});
+
+describe('Videoteca: Premium videos', () => {
+  const premiumTitle = VIDEOS.find((v) => v.number === 17)!.title;
+  const lockedTitle = VIDEOS.find((v) => v.number === 27)!.title;
+  const unlockName = (title: string) => `${tr('videos.premium.unlock')}: ${title}`;
+  const youtubeLinks = () =>
+    screen
+      .getAllByRole('link')
+      .map((a) => a.getAttribute('href'))
+      .filter((href) => href?.includes('watch?v='));
+
+  it('opens them on YouTube for Premium users, with the ids from the server', async () => {
+    const api = createFakeApi();
+    renderWithProviders(<VideosView />, { api, plan: true });
+    const card = await screen.findByRole('link', { name: literal(premiumTitle) });
+    expect(card).toHaveAttribute('href', 'https://www.youtube.com/watch?v=premium17');
+    expect(card).toHaveAttribute('target', '_blank');
+    expect(within(card).getByText(tr('videos.premium.badge'))).toBeInTheDocument();
+    expect(api.videosApi.premium).toHaveBeenCalledTimes(1);
+    // One the server did not give stays locked, with nothing to buy.
+    expect(screen.queryByRole('link', { name: literal(lockedTitle) })).not.toBeInTheDocument();
+    expect(screen.getByText(lockedTitle)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: unlockName(lockedTitle) })).not.toBeInTheDocument();
+  });
+
+  it('leaves them locked when the server refuses', async () => {
+    const api = createFakeApi();
+    api.videosApi.premium.mockRejectedValue(new Error('403'));
+    renderWithProviders(<VideosView />, { api, plan: true });
+    await act(async () => undefined);
+    expect(api.videosApi.premium).toHaveBeenCalled();
+    expect(screen.queryByRole('link', { name: literal(premiumTitle) })).not.toBeInTheDocument();
+    expect(screen.getByText(premiumTitle)).toBeInTheDocument();
+  });
+
+  it('shows them locked to free users, with a way to Premium and no YouTube link', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free', trialDaysLeft: 0 }));
+    renderWithProviders(<VideosView />, { api, plan: true });
+    const unlock = await screen.findByRole('button', { name: unlockName(premiumTitle) });
+    expect(unlock).toHaveTextContent(tr('videos.premium.unlock'));
+    expect(api.videosApi.premium).not.toHaveBeenCalled();
+    expect(youtubeLinks()).not.toContain('https://www.youtube.com/watch?v=premium17');
+    expect(youtubeLinks()).toHaveLength(VIDEOS.filter((v) => v.youtubeId).length);
+
+    // Locked cards: a text badge (the lock is decoration) and their thumbnail.
+    const card = unlock.closest('li') as HTMLElement;
+    const badge = within(card).getByText(tr('videos.premium.badge'));
+    expect(badge.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(within(card).getByRole('img', { name: premiumTitle })).toBeInTheDocument();
+
+    fireEvent.click(unlock);
+    expect(screen.getByRole('dialog', { name: tr('billing.upgradeTitle') })).toBeInTheDocument();
+  });
+
+  it('waits for the plan before offering anything', () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockReturnValue(new Promise(() => undefined));
+    renderWithProviders(<VideosView />, { api, plan: true });
+    expect(screen.getByText(premiumTitle)).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: unlockName(premiumTitle) })
+    ).not.toBeInTheDocument();
+    expect(api.videosApi.premium).not.toHaveBeenCalled();
+  });
+
+  it('shows a locked video without a thumbnail as a plain tile', () => {
+    VIDEOS.push(entry({ premium: true, published: true, thumbnail: false }));
+    try {
+      renderWithProviders(<VideosView />);
+      const card = screen.getByRole('link', { name: unlockName('Un vídeo') }).closest('li')!;
+      expect(within(card as HTMLElement).queryByRole('img')).not.toBeInTheDocument();
+    } finally {
+      VIDEOS.pop();
+    }
+  });
+
+  it('on the public page, keeps a section of locked videos and leads to the plans', () => {
+    const Where = () => <p data-testid="where">{useLocation().pathname}</p>;
+    renderWithProviders(
+      <Routes>
+        <Route path="/videoteca" element={<VideosPage />} />
+        <Route path="*" element={<Where />} />
+      </Routes>,
+      { authenticated: false, route: '/videoteca' }
+    );
+    // «Inversión» only has Premium videos so far: still there, as a hook.
+    const nav = screen.getByRole('navigation', { name: tr('videos.jump') });
+    expect(
+      within(nav).getByRole('button', { name: literal(tr('videos.section.invest')) })
+    ).toBeInTheDocument();
+    const invest = screen.getByRole('region', { name: tr('videos.section.invest') });
+    expect(within(invest).queryByRole('link', { name: literal(tr('videos.opens')) })).toBeNull();
+    expect(within(invest).getAllByText(tr('videos.premium.badge')).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('link', { name: unlockName(premiumTitle) }));
+    expect(screen.getByTestId('where')).toHaveTextContent('/pricing');
   });
 });
