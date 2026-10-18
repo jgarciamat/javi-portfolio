@@ -44,7 +44,6 @@ const STEPS: TourStep[] = [
   { id: 'plan', tab: 'plan', target: SECTION },
   { id: 'offers', tab: 'offers', target: SECTION },
   { id: 'settings', tab: 'settings', target: SECTION },
-  { id: 'profile', target: '.header-user-btn' },
   { id: 'language', target: '.header-actions .lang-switcher' },
   { id: 'done', tab: 'monthly' },
 ];

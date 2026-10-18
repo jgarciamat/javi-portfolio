@@ -818,6 +818,14 @@
   text-align: center;
 }
 
+.burger-nav-avatar {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--section-color);
+}
+
 .burger-nav-label {
   flex: 0 1 auto;
   overflow-wrap: anywhere;

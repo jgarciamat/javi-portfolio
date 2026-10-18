@@ -461,7 +461,9 @@ describe('dashboard edge cases', () => {
     api.categoryApi.update.mockResolvedValue(f.category({ id: 'c1', name: 'Diversión' }));
     api.billingApi.get.mockResolvedValue(f.billing({ trialDaysLeft: 2, subscription: { ...sub } }));
     renderWithProviders(<Dashboard />, { api, plan: true, user: f.user({ avatarUrl: 'data:x' }) });
-    expect(document.querySelector('img.header-avatar')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    expect(document.querySelector('img.burger-nav-avatar')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.close') }));
 
     // Trial reminder → plan section.
     fireEvent.click(await screen.findByRole('button', { name: tr('billing.seePlans') }));

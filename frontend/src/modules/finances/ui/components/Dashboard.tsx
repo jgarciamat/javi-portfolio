@@ -122,7 +122,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
 
 function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   return (
     <header className="header">
       <div className="header-brand">
@@ -158,26 +158,6 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
         </span>
       </button>
       <div className="header-actions">
-        <button
-          className="header-user header-user-btn"
-          onClick={dash.openProfile}
-          // The name shown on the button is part of its accessible name.
-          aria-label={
-            user?.name
-              ? t('app.header.openProfileOf', { name: user.name })
-              : t('app.header.openProfile')
-          }
-          title={t('app.header.openProfile')}
-        >
-          {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt="" className="header-avatar" />
-          ) : (
-            <span className="header-avatar-placeholder" aria-hidden="true">
-              <Icon name="user" size={20} />
-            </span>
-          )}
-          <span className="header-user-name">{user?.name}</span>
-        </button>
         <LanguageSwitcher />
         <button onClick={logout} className="btn-logout">
           {t('app.header.logout')}
@@ -335,6 +315,7 @@ export function Dashboard() {
         open={dash.menuOpen}
         tab={dash.tab}
         onSelectTab={selectFromMenu}
+        onOpenProfile={dash.openProfile}
         onClose={() => dash.setMenuOpen(false)}
       />
       <Suspense fallback={null}>

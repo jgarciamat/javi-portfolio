@@ -119,12 +119,6 @@
   flex-shrink: 0;
 }
 
-.header-user {
-  font-size: 0.85rem;
-  color: var(--slate-400);
-  white-space: nowrap;
-}
-
 .btn-logout {
   background: transparent;
   border: 1px solid var(--slate-700);
@@ -438,39 +432,6 @@
   border-bottom-color: var(--accent);
 }
 
-/* ─── Header: avatar / profile button ─────────── */
-.header-user-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--slate-400);
-  font-size: 0.875rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
-}
-
-.header-user-btn:hover {
-  background: var(--slate-800);
-  color: var(--slate-100);
-}
-
-.header-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--slate-700);
-}
-
-.header-avatar-placeholder {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
 /* ─── Profile page overlay ─────────────────────── */
 .profile-overlay {
   position: fixed;
@@ -729,14 +690,6 @@
 
 /* ─── Dashboard responsive ───────────────────── */
 @media (max-width: 600px) {
-  .header-user {
-    display: flex;
-  }
-
-  .header-user-name {
-    display: none;
-  }
-
   .header-title {
     font-size: 1rem;
   }

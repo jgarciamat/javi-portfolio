@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { BrandLogo } from '@shared/components/BrandLogo';
 import { Icon } from '@shared/components/Icon';
+import { useAuth } from '@shared/hooks/useAuth';
 import { useDialog } from '@shared/hooks/useDialog';
 import {
   DASHBOARD_SECTIONS,
@@ -12,10 +13,14 @@ import {
 } from '../navigation';
 import '../css/Sections.css';
 
+/** Colour of the profile entry, which opens a dialog rather than a section. */
+const PROFILE_COLOR = '#7c3aed';
+
 interface BurgerMenuProps {
   open: boolean;
   tab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
+  onOpenProfile: () => void;
   onClose: () => void;
 }
 
@@ -38,8 +43,9 @@ function MenuFocus({
 }
 
 /** Side menu with every section; the offers entry hides when the user turned offers off. */
-export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps) {
+export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: BurgerMenuProps) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
   const sections = DASHBOARD_SECTIONS.filter(
     (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
@@ -100,6 +106,30 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
               <h3 className="burger-nav-group-title" aria-hidden="true">
                 {t(`app.menu.group.${group}`)}
               </h3>
+              {group === 'account' && (
+                <button
+                  className="burger-nav-item"
+                  onClick={() => {
+                    onOpenProfile();
+                    onClose();
+                  }}
+                  style={{ '--section-color': PROFILE_COLOR } as CSSProperties}
+                  aria-label={
+                    user?.name
+                      ? t('app.header.openProfileOf', { name: user.name })
+                      : t('app.header.openProfile')
+                  }
+                >
+                  <span className="burger-nav-icon">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="" className="burger-nav-avatar" />
+                    ) : (
+                      <Icon name="user" />
+                    )}
+                  </span>
+                  <span className="burger-nav-label">{t('app.menu.profile')}</span>
+                </button>
+              )}
               {sections
                 .filter((s) => s.group === group)
                 .map(({ id, icon, labelKey, menuKey, color }) => (

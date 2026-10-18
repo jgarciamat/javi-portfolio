@@ -139,9 +139,13 @@ describe('header', () => {
     const user = f.user({ avatarUrl: 'data:x' });
     localStorage.setItem('mm_user', JSON.stringify(user));
     renderWithProviders(<Dashboard />);
-    // The accessible name starts with the name shown on the button.
+    // The profile lives in the menu, under the account group.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
     fireEvent.click(
-      screen.getByRole('button', { name: tr('app.header.openProfileOf', { name: user.name }) })
+      within(menu).getByRole('button', {
+        name: tr('app.header.openProfileOf', { name: user.name }),
+      })
     );
     expect(
       await screen.findByRole('dialog', { name: tr('app.profile.title') })
