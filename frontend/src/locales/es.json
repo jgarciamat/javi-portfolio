@@ -2039,6 +2039,7 @@
   "hacienda.external": "se abre en otra pestaña",
   "hacienda.source": "Fuente: Agencia Tributaria (sede.agenciatributaria.gob.es), consultado el {date}.",
   "hacienda.sourceDate": "17 de octubre de 2026",
+  "hacienda.updated": "Actualizado: {date}",
   "hacienda.disclaimer": "Guía orientativa y simplificada. Los nombres de botones y menús de la sede pueden cambiar, y tu caso puede tener excepciones. No sustituye a la información oficial de la Agencia Tributaria ni al consejo de un asesor fiscal: compruébalo siempre antes de presentar.",
   "hacienda.howToFile": "¿Cómo lo presento en Hacienda?",
   "hacienda.openGuides": "Hacienda paso a paso",

@@ -12,9 +12,10 @@ import {
   haciendaPath,
   type HaciendaTool,
 } from '../domain/hacienda';
-import { VIDEOS_PATH } from '../domain/videos';
+import { VIDEOS_PATH, haciendaVideo } from '../domain/videos';
 import { HaciendaCatalog, HaciendaGuideBody } from './HaciendaGuides';
 import { GuideCta } from './GuidePages';
+import { VideoEmbed } from './VideoEmbed';
 import '@modules/tools/ui/css/Tools.css';
 import './css/Guides.css';
 
@@ -73,6 +74,7 @@ export function HaciendaGuidePage() {
     `${HACIENDA_PATH}/${slug}`
   );
   if (!guide) return <Navigate to={HACIENDA_PATH} replace />;
+  const video = haciendaVideo(guide.id);
 
   return (
     <div className="pricing-page">
@@ -90,6 +92,7 @@ export function HaciendaGuidePage() {
             renderTool={(tool, label) => <PublicTool tool={tool} label={label} />}
           />
         </article>
+        {video && <VideoEmbed video={video} />}
         <GuideCta />
       </main>
     </div>

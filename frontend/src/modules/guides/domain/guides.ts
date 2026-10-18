@@ -1,6 +1,7 @@
 import { GUIDES_AUTONOMOS } from './guidesAutonomos';
 import { GUIDES_RENTA_DEDUCCIONES } from './guidesRentaDeducciones';
 import { GUIDES_RENTA_FAMILIA } from './guidesRentaFamilia';
+import { GUIDES_TRAMITES } from './guidesTramites';
 
 /** Short articles that answer what people search for and lead to the calculators and the app. */
 export interface GuideSection {
@@ -8,8 +9,16 @@ export interface GuideSection {
   paragraphs: string[];
 }
 
+/** An official page a guide is based on. */
+export interface GuideSource {
+  label: string;
+  url: string;
+}
+
 export interface Guide {
   slug: string;
+  /** Day (YYYY-MM-DD) the text last changed in a way that matters: «Actualizado» and `dateModified`. */
+  updated: string;
   title: string;
   /** Meta description (search results snippet). */
   description: string;
@@ -19,11 +28,18 @@ export interface Guide {
   tool?: { to: string; label: string };
   /** Slugs of other guides worth reading next. */
   related: string[];
+  /** Official pages the guide is based on (AEAT, Seguridad Social, BOE…), with `checked`. */
+  sources?: GuideSource[];
+  /** Day (YYYY-MM-DD) the sources were checked. */
+  checked?: string;
+  /** Every section is a step: the page also gets `HowTo` structured data. */
+  howTo?: boolean;
 }
 
 export const GUIDES: Guide[] = [
   {
     slug: 'metodo-50-30-20',
+    updated: '2026-10-11',
     title: 'Método 50/30/20: cómo repartir tu sueldo sin complicarte',
     description:
       'Qué es la regla 50/30/20, cómo aplicarla a tu sueldo neto con un ejemplo real y cuándo conviene adaptarla.',
@@ -58,6 +74,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-ahorrar-el-20-por-ciento',
+    updated: '2026-10-11',
     title: 'Cómo ahorrar el 20 % de tu sueldo (aunque parezca imposible)',
     description:
       'Pasos concretos para llegar a ahorrar el 20 % de tus ingresos: automatizar, recortar gastos invisibles y subir el porcentaje poco a poco.',
@@ -100,6 +117,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'fondo-de-emergencia',
+    updated: '2026-10-11',
     title: 'Fondo de emergencia: cuánto necesitas y dónde guardarlo',
     description:
       'Cuántos meses de gastos debe cubrir tu fondo de emergencia, cómo construirlo paso a paso y dónde tenerlo para poder usarlo cuando haga falta.',
@@ -133,6 +151,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'interes-compuesto',
+    updated: '2026-10-11',
     title: 'Interés compuesto: por qué empezar pronto vale tanto',
     description:
       'Qué es el interés compuesto, con ejemplos en euros de lo que pasa si ahorras cada mes durante 10 y 20 años.',
@@ -165,6 +184,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-hacer-un-presupuesto-mensual',
+    updated: '2026-10-11',
     title: 'Cómo hacer un presupuesto mensual paso a paso',
     description:
       'Guía práctica para hacer tu primer presupuesto mensual: ingresos, gastos fijos y variables, límites por categoría y revisión.',
@@ -207,6 +227,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'gastos-hormiga',
+    updated: '2026-10-11',
     title: 'Gastos hormiga: cómo detectarlos y cuánto te cuestan al año',
     description:
       'Qué son los gastos hormiga, ejemplos habituales, cuánto suman en un año y cómo reducirlos sin amargarte.',
@@ -237,6 +258,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'suscripciones-que-no-usas',
+    updated: '2026-10-11',
     title: 'Suscripciones que no usas: cómo encontrarlas y cancelarlas',
     description:
       'Cómo localizar las suscripciones olvidadas que te cobran cada mes, cuánto pueden costarte al año y cómo cancelarlas.',
@@ -267,6 +289,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-salir-de-deudas',
+    updated: '2026-10-11',
     title: 'Cómo salir de deudas: método avalancha y bola de nieve',
     description:
       'Dos métodos para pagar tus deudas más rápido, la diferencia entre avalancha y bola de nieve y cómo elegir el que mejor te encaja.',
@@ -302,6 +325,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-calcular-la-cuota-de-una-hipoteca',
+    updated: '2026-10-13',
     title: 'Cómo calcular la cuota de una hipoteca y sus intereses',
     description:
       'Qué influye en la cuota de una hipoteca o un préstamo, cómo se calcula con cuota fija y por qué el plazo cambia tanto el total que pagas.',
@@ -334,6 +358,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'inflacion-y-ahorro',
+    updated: '2026-10-13',
     title: 'Inflación y ahorro: por qué el dinero parado pierde valor',
     description:
       'Qué es la inflación, cuánto poder adquisitivo pierde tu dinero con los años con ejemplos y qué opciones existen para protegerlo.',
@@ -366,6 +391,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'iva-para-autonomos-modelo-303',
+    updated: '2026-10-13',
     title: 'IVA para autónomos: cómo se calcula y el modelo 303 trimestral',
     description:
       'Qué es el IVA repercutido y soportado, cómo desglosar una factura, cuándo se presenta el modelo 303 y el pago fraccionado del IRPF (modelo 130).',
@@ -399,10 +425,12 @@ export const GUIDES: Guide[] = [
       'gastos-deducibles-autonomo',
       'como-hacer-un-presupuesto-mensual',
       'metodo-50-30-20',
+      'modelo-303-casillas',
     ],
   },
   {
     slug: 'presupuesto-en-pareja',
+    updated: '2026-10-13',
     title: 'Cómo llevar el dinero en pareja sin discutir',
     description:
       'Tres formas de organizar las finanzas de una pareja (todo junto, separado o proporcional), cómo repartir gastos y consejos para hablar de dinero.',
@@ -435,6 +463,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-ahorrar-para-un-viaje',
+    updated: '2026-10-13',
     title: 'Cómo ahorrar para un viaje: plan paso a paso',
     description:
       'Calcula cuánto cuesta tu viaje, en cuántos meses puedes reunirlo y cómo automatizar el ahorro para llegar a la fecha sin agobios.',
@@ -471,6 +500,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'independencia-financiera-regla-del-4',
+    updated: '2026-10-13',
     title: 'Independencia financiera y la regla del 4 %: qué es y sus límites',
     description:
       'Qué significa la independencia financiera, cómo se calcula el capital necesario con la regla del 4 % y por qué hay que tomarla solo como una referencia.',
@@ -503,6 +533,7 @@ export const GUIDES: Guide[] = [
   ...GUIDES_AUTONOMOS,
   ...GUIDES_RENTA_FAMILIA,
   ...GUIDES_RENTA_DEDUCCIONES,
+  ...GUIDES_TRAMITES,
 ];
 
 export const findGuide = (slug: string | undefined): Guide | undefined =>
@@ -525,3 +556,16 @@ export function inlineParts(text: string): InlinePart[] {
   if (last < text.length) parts.push(text.slice(last));
   return parts;
 }
+
+/** «18 de octubre de 2026» for a day written `2026-10-18`. */
+export const longDate = (day: string): string =>
+  new Date(`${day}T00:00:00Z`).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+
+/** Reminder shown under the sources of a guide. */
+export const GUIDE_NOTICE =
+  'Contenido orientativo: las normas y los plazos cambian y tu caso puede tener excepciones. No sustituye a la información oficial ni al consejo de un asesor; contrástalo siempre en la fuente antes de actuar.';

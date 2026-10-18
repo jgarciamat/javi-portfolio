@@ -2039,6 +2039,7 @@
   "hacienda.external": "opens in a new tab",
   "hacienda.source": "Source: Agencia Tributaria (sede.agenciatributaria.gob.es), checked on {date}.",
   "hacienda.sourceDate": "17 October 2026",
+  "hacienda.updated": "Updated: {date}",
   "hacienda.disclaimer": "A simplified guide for orientation only. Button and menu names on the tax website may change, and your case may have exceptions. It does not replace the official information of the Agencia Tributaria or the advice of a tax adviser: always double-check before filing.",
   "hacienda.howToFile": "How do I file it with the tax office?",
   "hacienda.openGuides": "Tax office step by step",

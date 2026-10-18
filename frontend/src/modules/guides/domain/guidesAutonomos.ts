@@ -7,6 +7,7 @@ const CHECK =
 export const GUIDES_AUTONOMOS: Guide[] = [
   {
     slug: 'modelo-130-paso-a-paso',
+    updated: '2026-10-15',
     title: 'Modelo 130 paso a paso: cálculo del pago fraccionado del IRPF',
     description:
       'Quién debe presentar el modelo 130, qué casillas rellenar, cómo se calcula el 20 % del rendimiento neto y qué pasa si el resultado sale negativo.',
@@ -73,6 +74,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
   },
   {
     slug: 'cuota-autonomos-2026-por-tramos',
+    updated: '2026-10-15',
     title: 'Cuota de autónomos 2026 por tramos: tabla y cómo elegir base',
     description:
       'Los 15 tramos de cotización de autónomos en 2026 según tus rendimientos netos, el tipo del 31,5 %, la cuota mínima y máxima de cada tramo y un ejemplo.',
@@ -131,10 +133,13 @@ export const GUIDES_AUTONOMOS: Guide[] = [
       'gastos-deducibles-autonomo',
       'iva-para-autonomos-modelo-303',
       'fondo-de-emergencia',
+      'tarifa-plana-autonomos-2026',
+      'alta-autonomo-paso-a-paso',
     ],
   },
   {
     slug: 'gastos-deducibles-autonomo',
+    updated: '2026-10-15',
     title: 'Gastos deducibles de un autónomo: qué restar y con qué límites',
     description:
       'Suministros al 30 %, vehículo, comidas con límite de 26,67 € al día, seguro de salud y otros gastos que un autónomo puede deducir, y cuáles no.',
@@ -214,6 +219,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
   },
   {
     slug: 'fechas-modelos-trimestrales-autonomos-2026',
+    updated: '2026-10-15',
     title: 'Calendario fiscal de autónomos 2026: fechas de los modelos',
     description:
       'Fechas de los modelos 303, 130, 111 y 115 en 2026, de los resúmenes 390, 190 y 347 y qué hacer si el plazo cae en fin de semana.',

@@ -6,6 +6,7 @@ import { brandTitle } from '@shared/utils/pageTitle';
 import { findGuide } from '../domain/guides';
 import { GuideCatalog } from './GuideCatalog';
 import { GuideBody } from './GuideBody';
+import { VideoEmbed } from './VideoEmbed';
 import { PublicGuideLink } from './GuideLinks';
 import { HACIENDA_PATH } from '../domain/hacienda';
 import { VIDEOS_PATH, youtubeUrl } from '../domain/videos';
@@ -121,6 +122,7 @@ export function GuidePage() {
             </PublicGuideLink>
           </p>
         )}
+        {video && <VideoEmbed video={video} />}
         {video && (
           <p className="guide-tool">
             <a
@@ -129,7 +131,7 @@ export function GuidePage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              🎬 Vídeo: {video.title}
+              🎬 Ver en YouTube: {video.title}
             </a>
           </p>
         )}

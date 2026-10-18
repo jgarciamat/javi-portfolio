@@ -442,6 +442,13 @@ export const videoGroups = (videos: VideoEntry[] = VIDEOS) =>
 
 export const youtubeUrl = (youtubeId: string) => `https://www.youtube.com/watch?v=${youtubeId}`;
 
+/**
+ * Player address of a video. `youtube-nocookie.com` sets no cookies until the viewer plays it, and
+ * it is only loaded after a click (see `VideoEmbed`). The CSP `frame-src` allows only this origin.
+ */
+export const embedUrl = (youtubeId: string) =>
+  `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`;
+
 /** Link to a public video (Premium ones have no id here: see {@link watchId}). */
 export const videoUrl = (v: VideoEntry) => youtubeUrl(v.youtubeId as string);
 
@@ -470,3 +477,7 @@ export function guideVideoUrl(guide: HaciendaGuideId, videos: VideoEntry[] = VID
   const video = videos.find((v) => v.guide === guide && v.youtubeId);
   return video ? videoUrl(video) : '';
 }
+
+/** Our public video of a «Hacienda paso a paso» guide, if there is one (never a Premium one). */
+export const haciendaVideo = (guide: HaciendaGuideId, videos: VideoEntry[] = VIDEOS) =>
+  videos.find((v) => v.guide === guide && Boolean(v.youtubeId) && !v.premium);

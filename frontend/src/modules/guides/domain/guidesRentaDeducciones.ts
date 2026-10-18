@@ -7,6 +7,7 @@ const CHECK =
 export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   {
     slug: 'deducciones-renta-castilla-y-leon',
+    updated: '2026-10-15',
     title: 'Deducciones de la Renta en Castilla y León: familia y vivienda',
     description:
       'Principales deducciones autonómicas de Castilla y León en el IRPF: nacimiento, familia numerosa, guardería, alquiler joven, vivienda rural y límites.',
@@ -73,6 +74,7 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'deducciones-renta-comunitat-valenciana',
+    updated: '2026-10-15',
     title: 'Deducciones de la Renta en la Comunitat Valenciana: guía',
     description:
       'Deducciones autonómicas de la Comunitat Valenciana en el IRPF: nacimiento, familia numerosa, guardería, salud, alquiler y vivienda, con sus límites.',
@@ -134,6 +136,7 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'deduccion-alquiler-vivienda-habitual-renta',
+    updated: '2026-10-15',
     title: 'Deducción por alquiler de vivienda habitual en la Renta',
     description:
       'Deducción estatal por alquiler (contratos anteriores a 2015), ayudas de Castilla y León y Comunitat Valenciana y reducciones para propietarios.',
@@ -200,6 +203,7 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'planes-de-pensiones-limite-renta',
+    updated: '2026-10-15',
     title: 'Planes de pensiones y Renta: límite de aportación y ahorro',
     description:
       'Cuánto puedes aportar a un plan de pensiones con ventaja fiscal en 2026: 1.500 € de límite general, aumentos de empresa y autónomos y tope del 30 %.',
