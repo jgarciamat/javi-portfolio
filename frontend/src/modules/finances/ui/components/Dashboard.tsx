@@ -328,7 +328,8 @@ export function Dashboard() {
       <Suspense fallback={null}>
         <DashboardModals dash={dash} />
       </Suspense>
-      {tour.open && (
+      {/* The terms dialog cannot be dismissed: the tour waits until they are accepted. */}
+      {tour.open && !plan?.overview?.terms.mustAccept && (
         <GuidedTour
           steps={tour.steps}
           onShowTab={dash.setTab}

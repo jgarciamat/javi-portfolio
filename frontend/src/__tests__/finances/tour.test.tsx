@@ -274,6 +274,33 @@ describe('Welcome tour in the dashboard', () => {
     expect(api.settingsApi.update).not.toHaveBeenCalled();
   });
 
+  it('waits for the updated terms of sale to be accepted before it opens', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(
+      f.billing({
+        terms: {
+          version: '2026-10-18',
+          acceptedVersion: '2026-10-14',
+          acceptedAt: '2026-10-14T10:00:00Z',
+          mustAccept: true,
+        },
+      })
+    );
+    renderWithProviders(
+      <>
+        <SignInButton />
+        <Dashboard />
+      </>,
+      { api, plan: true }
+    );
+    await screen.findByText(tr('app.nav.currentMonth'));
+    signInAgain();
+    expect(
+      await screen.findByRole('dialog', { name: tr('terms.update.title') })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: tr('app.tour.welcome.title') })).toBeNull();
+  });
+
   it('can be turned off from the tour and stays off', async () => {
     const api = createFakeApi();
     renderWithProviders(
