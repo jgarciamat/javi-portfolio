@@ -430,7 +430,7 @@
   "app.menu.group.learn": "Learn",
   "app.menu.group.account": "Account",
   "app.menu.short.hacienda": "Tax office",
-  "app.menu.short.automations": "Automatic",
+  "app.menu.short.automations": "Bills and recurring",
   "app.menu.profile": "Profile",
   "app.accountCards.ariaLabel": "Balance of each account",
   "app.accountCards.add": "Transaction",
