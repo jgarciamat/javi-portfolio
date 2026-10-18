@@ -348,8 +348,10 @@ describe('Auth API', () => {
         .patch('/api/profile/password')
         .set(user.auth)
         .send({ currentPassword: 'nope', newPassword: 'Other-pass9!' })
-        .expect(401);
+        .expect(403);
       expect(res.body.code).toBe('WRONG_PASSWORD');
+      // The session is still valid: a wrong password is not a reason to sign out.
+      await request(ctx.app).get('/api/profile').set(user.auth).expect(200);
     });
   });
 

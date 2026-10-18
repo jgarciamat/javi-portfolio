@@ -151,6 +151,20 @@ describe('what to ask', () => {
     expect(isRelevant(d('x', 'Otra cosa', 'other'), situation)).toBe(false);
   });
 
+  it('asks about a large family only with two children or more, a single-parent one with one', () => {
+    // Ley 40/2003, art. 2: three children in general, two in the special cases; never one.
+    const one = { ...situation, childAges: [6] };
+    const two = { ...situation, childAges: [6, 9] };
+    expect(isRelevant(d('x', 'Por familia numerosa de categoría general'), one)).toBe(false);
+    expect(isRelevant(d('x', 'Por familia numerosa de categoría general'), two)).toBe(true);
+    expect(isRelevant(d('x', 'Por separado o sin matrimonio con dos hijos'), one)).toBe(false);
+    expect(isRelevant(d('x', 'Por separado o sin matrimonio con dos hijos'), two)).toBe(true);
+    expect(isRelevant(d('x', 'Para familias monoparentales'), one)).toBe(true);
+    expect(isRelevant(d('x', 'Para familias monoparentales'), situation)).toBe(false);
+    // «Familia numerosa o monoparental» (Comunitat Valenciana): the single-parent part fits one child.
+    expect(isRelevant(d('x', 'Por familia numerosa o monoparental'), one)).toBe(true);
+  });
+
   it('leaves out the ones the draft already has', () => {
     const list = [d('a', 'Dentista', 'health'), d('b', 'Gafas', 'health')];
     expect(missingDeductions(list, ['a'], situation).map((x) => x.id)).toEqual(['b']);

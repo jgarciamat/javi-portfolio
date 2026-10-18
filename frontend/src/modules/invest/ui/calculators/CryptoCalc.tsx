@@ -232,7 +232,7 @@ function DcaPanel() {
               {
                 id: 'path',
                 label: t('app.invest.calc.crypto.dcaChart'),
-                color: '#f59e0b',
+                color: 'var(--amber-400)',
                 points: prices.map((p, i): [number, number] => [i + 1, p]),
               },
             ]}

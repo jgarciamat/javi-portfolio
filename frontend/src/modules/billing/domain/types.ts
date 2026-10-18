@@ -16,8 +16,16 @@ export type LimitedResource =
   | 'rentaCalculations'
   | 'autonomoDrafts'
   | 'autonomoPdfs'
-  | 'assets';
-export type PremiumFeature = 'import' | 'insights' | 'aiAdvisor' | 'forecast' | 'household';
+  | 'assets'
+  | 'imports';
+export type PremiumFeature =
+  | 'insights'
+  | 'aiAdvisor'
+  | 'forecast'
+  | 'household'
+  | 'inbox'
+  | 'capture'
+  | 'investCourse';
 
 export interface PlanLimits {
   /** null = unlimited */

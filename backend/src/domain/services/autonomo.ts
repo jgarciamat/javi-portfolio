@@ -53,8 +53,6 @@ export interface PriorTotals {
   withheld: number;
 }
 
-export const EMPTY_EXTRAS: QuarterExtras = { withheld: 0, socialSecurity: 0, vatNotDeductible: 0 };
-
 export interface Box {
   /** Box number of the official form ("07", "46"...). */
   box: string;

@@ -2,18 +2,25 @@ import type { ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
 import { useOptionalPlan } from '../application/PlanContext';
+import type { PremiumFeature } from '../domain/types';
 import './css/Billing.css';
 
-/** A Premium section: its content for Premium users, an invitation to upgrade for the rest. */
+/**
+ * A Premium section: its content for Premium users, an invitation to upgrade for the rest
+ * (also when the plan could not be loaded: Premium content fails closed). `feature` is what
+ * the upgrade dialog says is missing.
+ */
 export function PremiumOnly({
   icon,
   titleKey,
   hintKey,
+  feature = 'insights',
   children,
 }: {
   icon: string;
   titleKey: string;
   hintKey: string;
+  feature?: PremiumFeature;
   children: ReactNode;
 }) {
   const plan = useOptionalPlan();
@@ -29,7 +36,7 @@ export function PremiumOnly({
         <p className="section-hint">{t(hintKey)}</p>
         <button
           className="btn-primary"
-          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'insights' })}
+          onClick={() => plan.openUpgrade({ kind: 'feature', feature })}
         >
           {t('billing.seePlans')}
         </button>

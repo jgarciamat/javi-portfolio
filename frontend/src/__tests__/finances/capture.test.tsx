@@ -149,7 +149,7 @@ describe('Detected payments', () => {
             date: '2026-03-15',
           }),
         ],
-        {}
+        { source: 'capture' }
       )
     );
     await waitFor(() => expect(screen.queryByText('MERCADONA')).toBeNull());

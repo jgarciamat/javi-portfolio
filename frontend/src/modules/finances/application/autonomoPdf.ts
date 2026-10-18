@@ -2,6 +2,7 @@ import type {
   AutonomoDraft,
   AutonomoInputs,
   ExpenseLine,
+  ManualData,
   TaxBox,
 } from '@modules/finances/domain/types';
 
@@ -49,6 +50,69 @@ const boxRow = (b: TaxBox): string[] => [
   b.label,
   b.label.startsWith('Tipo') ? `${b.amount} %` : eur(b.amount),
 ];
+
+/** The income and withholdings of each quarter typed by hand (from the previous one when 130s were filed). */
+function dataRows(
+  draft: AutonomoDraft,
+  inputs: AutonomoInputs,
+  manual: ManualData,
+  text: PdfText
+): string[][] {
+  const rows: string[][] = [];
+  const first = inputs.prior && draft.quarter > 1 ? draft.quarter - 1 : 0;
+  manual.quarters.slice(first, draft.quarter).forEach((q, k) => {
+    const i = first + k;
+    const labels = text.incomeLabels;
+    rows.push([
+      `${text.quarter} ${i + 1}`,
+      `${labels.r21}: ${eur(q.income.r21)} · ${labels.r10}: ${eur(q.income.r10)} · ${
+        labels.r4
+      }: ${eur(q.income.r4)} · ${labels.r0}: ${eur(q.income.r0)}`,
+      eur(inputs.quarters[i].withheld),
+    ]);
+  });
+  return rows;
+}
+
+/** The other data the person gave, one short sentence each. */
+function flagsOf(draft: AutonomoDraft, inputs: AutonomoInputs, text: PdfText): string[] {
+  const flags: string[] = [];
+  if (inputs.prior && draft.quarter > 1) {
+    const p = inputs.prior;
+    flags.push(
+      text.prior
+        .replace('{income}', eur(p.income))
+        .replace('{expenses}', eur(p.expenses))
+        .replace('{payments}', eur(p.previousPayments))
+        .replace('{withheld}', eur(p.withheld))
+    );
+  }
+  if (inputs.hardToJustify) flags.push(text.flags.hardToJustify);
+  if (inputs.exempt130) flags.push(text.flags.exempt);
+  if (inputs.priorYearNet !== null) {
+    flags.push(`${text.flags.priorNet}: ${eur(inputs.priorYearNet)}`);
+  }
+  if (inputs.vatToOffset > 0) flags.push(`${text.flags.toOffset}: ${eur(inputs.vatToOffset)}`);
+  return flags;
+}
+
+/** One row per expense plus the totals. */
+function expenseRows(expenses: ExpenseLine[], text: PdfText): string[][] {
+  const sum = (pick: (l: ExpenseLine) => number) => expenses.reduce((s, l) => s + pick(l), 0);
+  const rows = expenses.map((l) => [
+    `${text.kinds[l.kind]}${l.note ? ` (${text.notes[l.note]})` : ''}`,
+    eur(l.amount),
+    eur(l.deductible),
+    eur(l.vatDeductible),
+  ]);
+  rows.push([
+    text.total,
+    eur(sum((l) => l.amount)),
+    eur(sum((l) => l.deductible)),
+    eur(sum((l) => l.vatDeductible)),
+  ]);
+  return rows;
+}
 
 /** The draft as a PDF, organised to send to an adviser. Loaded on demand: the library is large. */
 export async function buildAutonomoPdf(
@@ -108,37 +172,12 @@ export async function buildAutonomoPdf(
 
   if (inputs?.manual) {
     heading(text.data);
-    const rows: string[][] = [];
-    const first = inputs.prior && draft.quarter > 1 ? draft.quarter - 1 : 0;
-    inputs.manual.quarters.slice(first, draft.quarter).forEach((q, k) => {
-      const i = first + k;
-      const labels = text.incomeLabels;
-      rows.push([
-        `${text.quarter} ${i + 1}`,
-        `${labels.r21}: ${eur(q.income.r21)} · ${labels.r10}: ${eur(q.income.r10)} · ${
-          labels.r4
-        }: ${eur(q.income.r4)} · ${labels.r0}: ${eur(q.income.r0)}`,
-        eur(inputs.quarters[i].withheld),
-      ]);
-    });
-    table([text.quarter, text.income, text.withheld], rows, [70, 365, 80]);
-    const flags: string[] = [];
-    if (inputs.prior && draft.quarter > 1) {
-      const p = inputs.prior;
-      flags.push(
-        text.prior
-          .replace('{income}', eur(p.income))
-          .replace('{expenses}', eur(p.expenses))
-          .replace('{payments}', eur(p.previousPayments))
-          .replace('{withheld}', eur(p.withheld))
-      );
-    }
-    if (inputs.hardToJustify) flags.push(text.flags.hardToJustify);
-    if (inputs.exempt130) flags.push(text.flags.exempt);
-    if (inputs.priorYearNet !== null) {
-      flags.push(`${text.flags.priorNet}: ${eur(inputs.priorYearNet)}`);
-    }
-    if (inputs.vatToOffset > 0) flags.push(`${text.flags.toOffset}: ${eur(inputs.vatToOffset)}`);
+    table(
+      [text.quarter, text.income, text.withheld],
+      dataRows(draft, inputs, inputs.manual, text),
+      [70, 365, 80]
+    );
+    const flags = flagsOf(draft, inputs, text);
     if (flags.length > 0) paragraph(`${text.other}: ${flags.join(' · ')}`);
   }
 
@@ -156,23 +195,9 @@ export async function buildAutonomoPdf(
 
   if (draft.expenses && draft.expenses.length > 0) {
     heading(text.expenses);
-    const sum = (pick: (l: ExpenseLine) => number) =>
-      (draft.expenses as ExpenseLine[]).reduce((s, l) => s + pick(l), 0);
-    const rows = draft.expenses.map((l) => [
-      `${text.kinds[l.kind]}${l.note ? ` (${text.notes[l.note]})` : ''}`,
-      eur(l.amount),
-      eur(l.deductible),
-      eur(l.vatDeductible),
-    ]);
-    rows.push([
-      text.total,
-      eur(sum((l) => l.amount)),
-      eur(sum((l) => l.deductible)),
-      eur(sum((l) => l.vatDeductible)),
-    ]);
     table(
       [text.concept, text.paid, text.deductibleIrpf, text.deductibleVat],
-      rows,
+      expenseRows(draft.expenses, text),
       [255, 80, 100, 80]
     );
   }

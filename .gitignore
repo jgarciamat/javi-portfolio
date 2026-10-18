@@ -94,3 +94,7 @@ frontend/dev-dist/
 frontend/test-results/
 frontend/playwright-report/
 .claude/worktrees/
+
+# Local only (public repo): Claude agents and TikTok follow lists with third-party usernames
+.claude/agents/
+docs/marketing/tiktok-seguir/

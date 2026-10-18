@@ -1,7 +1,7 @@
-import type { Chapter } from './types';
+import type { CourseChapter } from '@domain/model/Course';
 
 /** Chapters about index funds, ETFs and compound growth. Educational, not advice. */
-export const CHAPTERS_FUNDS: Chapter[] = [
+export const CHAPTERS_FUNDS: CourseChapter[] = [
   {
     id: 'fondos-indexados',
     emoji: '🧺',

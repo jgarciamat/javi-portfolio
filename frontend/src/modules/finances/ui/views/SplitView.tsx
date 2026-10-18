@@ -245,7 +245,7 @@ function GroupDetail({
           <h2 className="section-title">
             <Icon name="handshake" /> {group.name}
           </h2>
-          <button className="btn-secondary" onClick={onBack}>
+          <button type="button" className="back-btn" onClick={onBack}>
             ← {t('app.split.back')}
           </button>
         </div>

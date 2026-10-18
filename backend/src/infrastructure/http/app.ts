@@ -9,8 +9,10 @@ import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
 import { financeRoutes } from './routes/finance.routes';
 import { householdRoutes } from './routes/household.routes';
+import { learnRoutes } from './routes/learn.routes';
 import { planningRoutes } from './routes/planning.routes';
 import { userRoutes } from './routes/user.routes';
+import { videoRoutes } from './routes/videos.routes';
 
 export function createApp(c: Container): Express {
   const app = express();
@@ -58,6 +60,8 @@ export function createApp(c: Container): Express {
   api.use(financeRoutes(c, limiter));
   api.use(planningRoutes(c));
   api.use(userRoutes(c, limiter));
+  api.use(videoRoutes(c, limiter));
+  api.use(learnRoutes(c, limiter));
   api.use(notFoundHandler);
 
   app.use('/api', api);

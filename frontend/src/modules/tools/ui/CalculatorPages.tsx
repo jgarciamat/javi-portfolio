@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
+import { useGoBack } from '@shared/hooks/useGoBack';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
@@ -42,11 +43,17 @@ function CalculatorLayout({
 }) {
   const { t } = useI18n();
   const { isAuthenticated } = useAuth();
+  const goBack = useGoBack();
   usePageMeta(t(titleKey), t(descriptionKey), path);
   return (
     <div className="pricing-page">
       <PublicHeader />
       <main className="pricing-main tools-main">
+        <p className="tools-back">
+          <button type="button" className="back-btn" onClick={goBack}>
+            ← {t('tools.back')}
+          </button>
+        </p>
         <h1 className="pricing-title">{t(titleKey)}</h1>
         <p className="pricing-subtitle">{t(descriptionKey)}</p>
         {children}

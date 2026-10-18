@@ -5,16 +5,20 @@ import { EntitlementService } from '@application/billing/EntitlementService';
 
 /** Free Premium days of every reward (the invited friend gets one too). */
 export const REFERRAL_REWARD_DAYS = 30;
-/** Extra friends needed for each new reward after the first: 5, then 10, then 15… */
+/** Each of the first friends earns a reward of its own. */
+export const REFERRAL_EACH_FIRST = 3;
+/** Extra friends needed for each new reward after those: 3 more (6), then 10 more (16), 15… */
 export const REFERRAL_STEP = 5;
 
 /**
  * Friends that must have completed the first steps in total to have earned `n` rewards:
- * 1 for the first, then 5 more for the second (6), 10 more for the third (16), 15 more… (31).
+ * one per friend for the first three (1, 2, 3), then the tiers 6, 16, 31… of before.
  */
 export function friendsForReward(n: number): number {
   if (n <= 0) return 0;
-  return 1 + (REFERRAL_STEP * (n - 1) * n) / 2;
+  if (n <= REFERRAL_EACH_FIRST) return n;
+  const tier = n - REFERRAL_EACH_FIRST + 1;
+  return 1 + (REFERRAL_STEP * (tier - 1) * tier) / 2;
 }
 
 /** Rewards earned with this many friends who completed the first steps. */

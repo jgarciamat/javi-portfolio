@@ -6,12 +6,94 @@ import {
   PIN_MIN,
   biometricAvailable,
   isValidPin,
+  type LockConfig,
 } from '@core/security/appLock';
 import { useAppLock } from '@shared/hooks/useAppLock';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 
 type Mode = 'idle' | 'enable' | 'change' | 'disable';
+
+/** A masked field that only takes digits. */
+function PinField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="field">
+      <span className="field-label">{label}</span>
+      <input
+        className="tx-input"
+        type="password"
+        inputMode="numeric"
+        maxLength={PIN_MAX}
+        value={value}
+        onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))}
+      />
+    </label>
+  );
+}
+
+/** The lock is on: the delay, fingerprint / face and the actions. */
+function LockOptions({
+  config,
+  device,
+  onMode,
+}: {
+  config: LockConfig;
+  device: boolean;
+  onMode: (mode: Mode) => void;
+}) {
+  const { t } = useI18n();
+  const lock = useAppLock();
+  return (
+    <>
+      <p className="section-success">
+        <Icon name="checkCircle" /> {t('app.lock.on')}
+      </p>
+      <label className="field">
+        <span className="field-label">{t('app.lock.timeout')}</span>
+        <select
+          className="tx-input"
+          value={config.timeoutSec}
+          onChange={(e) => lock.setOptions({ timeoutSec: Number(e.target.value) })}
+        >
+          {LOCK_TIMEOUTS.map((s) => (
+            <option key={s} value={s}>
+              {t(`app.lock.timeout.${s}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+      {device && (
+        <label className="plan-terms">
+          <input
+            type="checkbox"
+            checked={config.biometric}
+            onChange={(e) => lock.setOptions({ biometric: e.target.checked })}
+          />
+          <span>{t('app.lock.biometric')}</span>
+        </label>
+      )}
+      <div className="button-row">
+        <button className="btn-secondary" onClick={() => onMode('change')}>
+          {t('app.lock.change')}
+        </button>
+        <button className="btn-secondary" onClick={lock.lockNow}>
+          {t('app.lock.now')}
+        </button>
+        <button className="btn-secondary" onClick={() => onMode('disable')}>
+          {t('app.lock.disable')}
+        </button>
+      </div>
+    </>
+  );
+}
 
 /** Settings: turn the PIN lock on or off, change the PIN, fingerprint / face and the delay. */
 export function AppLockCard() {
@@ -67,88 +149,21 @@ export function AppLockCard() {
         </div>
       )}
       {mode === 'idle' && config && (
-        <>
-          <p className="section-success">
-            <Icon name="checkCircle" /> {t('app.lock.on')}
-          </p>
-          <label className="field">
-            <span className="field-label">{t('app.lock.timeout')}</span>
-            <select
-              className="tx-input"
-              value={config.timeoutSec}
-              onChange={(e) => lock.setOptions({ timeoutSec: Number(e.target.value) })}
-            >
-              {LOCK_TIMEOUTS.map((s) => (
-                <option key={s} value={s}>
-                  {t(`app.lock.timeout.${s}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          {device && (
-            <label className="plan-terms">
-              <input
-                type="checkbox"
-                checked={config.biometric}
-                onChange={(e) => lock.setOptions({ biometric: e.target.checked })}
-              />
-              <span>{t('app.lock.biometric')}</span>
-            </label>
-          )}
-          <div className="button-row">
-            <button className="btn-secondary" onClick={() => setMode('change')}>
-              {t('app.lock.change')}
-            </button>
-            <button className="btn-secondary" onClick={lock.lockNow}>
-              {t('app.lock.now')}
-            </button>
-            <button className="btn-secondary" onClick={() => setMode('disable')}>
-              {t('app.lock.disable')}
-            </button>
-          </div>
-        </>
+        <LockOptions config={config} device={device} onMode={setMode} />
       )}
       {mode !== 'idle' && (
         <div className="form-grid">
           {needsCurrent && (
-            <label className="field">
-              <span className="field-label">{t('app.lock.currentPin')}</span>
-              <input
-                className="tx-input"
-                type="password"
-                inputMode="numeric"
-                maxLength={PIN_MAX}
-                value={current}
-                onChange={(e) => setCurrent(e.target.value.replace(/\D/g, ''))}
-              />
-            </label>
+            <PinField label={t('app.lock.currentPin')} value={current} onChange={setCurrent} />
           )}
           {mode !== 'disable' && (
             <>
-              <label className="field">
-                <span className="field-label">
-                  {t('app.lock.newPin', { min: PIN_MIN, max: PIN_MAX })}
-                </span>
-                <input
-                  className="tx-input"
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={PIN_MAX}
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-                />
-              </label>
-              <label className="field">
-                <span className="field-label">{t('app.lock.repeatPin')}</span>
-                <input
-                  className="tx-input"
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={PIN_MAX}
-                  value={repeat}
-                  onChange={(e) => setRepeat(e.target.value.replace(/\D/g, ''))}
-                />
-              </label>
+              <PinField
+                label={t('app.lock.newPin', { min: PIN_MIN, max: PIN_MAX })}
+                value={pin}
+                onChange={setPin}
+              />
+              <PinField label={t('app.lock.repeatPin')} value={repeat} onChange={setRepeat} />
             </>
           )}
           {error && <p className="form-error">{t(error)}</p>}

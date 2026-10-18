@@ -1,7 +1,7 @@
-import type { Chapter } from './types';
+import type { CourseChapter } from '@domain/model/Course';
 
 /** Main coins and the risks around crypto. Descriptions are factual and dated; no price views. */
-export const CHAPTERS_CRYPTO_B: Chapter[] = [
+export const CHAPTERS_CRYPTO_B: CourseChapter[] = [
   {
     id: 'cripto-monedas-y-proyectos',
     emoji: '🧩',

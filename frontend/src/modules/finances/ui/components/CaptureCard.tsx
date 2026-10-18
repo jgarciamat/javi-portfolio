@@ -81,7 +81,12 @@ function CaptureSettings() {
 export function CaptureCard() {
   if (!captureSupported()) return null;
   return (
-    <PremiumOnly icon="bell" titleKey="app.capture.title" hintKey="app.capture.locked">
+    <PremiumOnly
+      icon="bell"
+      titleKey="app.capture.title"
+      hintKey="app.capture.locked"
+      feature="capture"
+    >
       <CaptureSettings />
     </PremiumOnly>
   );

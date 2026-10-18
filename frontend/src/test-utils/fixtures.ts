@@ -311,6 +311,8 @@ export const subscriptions = (over: Partial<SubscriptionReport> = {}): Subscript
       priceIncrease: null,
     },
   ],
+  count: 2,
+  locked: false,
   ...over,
 });
 
@@ -334,22 +336,25 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   limits: {
     free: {
       resources: {
-        accounts: 2,
-        budgets: 3,
-        goals: 1,
-        recurringRules: 3,
+        accounts: 3,
+        budgets: 5,
+        goals: 2,
+        recurringRules: 5,
         customAlerts: 3,
-        rentaCalculations: 1,
+        rentaCalculations: 3,
         autonomoDrafts: 1,
         autonomoPdfs: 1,
-        assets: 1,
+        assets: 3,
+        imports: 1,
       },
       features: {
-        import: false,
         insights: false,
         aiAdvisor: false,
         forecast: false,
         household: false,
+        inbox: false,
+        capture: false,
+        investCourse: false,
       },
       aiMonthlyQuota: 1,
     },
@@ -364,8 +369,17 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
         autonomoDrafts: null,
         autonomoPdfs: null,
         assets: null,
+        imports: null,
       },
-      features: { import: true, insights: true, aiAdvisor: true, forecast: true, household: true },
+      features: {
+        insights: true,
+        aiAdvisor: true,
+        forecast: true,
+        household: true,
+        inbox: true,
+        capture: true,
+        investCourse: true,
+      },
       aiMonthlyQuota: 10,
     },
   },
@@ -406,6 +420,7 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     autonomoDrafts: 0,
     autonomoPdfs: 0,
     assets: 0,
+    imports: 0,
     movements: 5,
   },
   ai: { used: 0, quota: 10 },
@@ -458,5 +473,12 @@ export const autonomoDraft = (over: Partial<AutonomoDraft> = {}): AutonomoDraft 
   },
   deadlines: [{ model: '303', label: 'IVA trimestral', date: '2026-04-20' }],
   expenses: null,
+  ...over,
+});
+
+/** What the server gives Premium users: fake ids, the real ones are not in the web app. */
+export const premiumVideoIds = (over: Record<number, string> = {}): Record<number, string> => ({
+  17: 'premium17',
+  18: 'premium18',
   ...over,
 });

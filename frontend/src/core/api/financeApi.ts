@@ -79,7 +79,13 @@ export const transactionApi = {
   },
   import(
     rows: ImportRowDTO[],
-    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
+    options: {
+      accountId?: string | null;
+      dryRun?: boolean;
+      useAi?: boolean;
+      /** Payments read from bank notifications (Premium) instead of a bank statement. */
+      source?: 'statement' | 'capture';
+    }
   ) {
     return apiRequest<ImportResult>('/transactions/import', {
       method: 'POST',

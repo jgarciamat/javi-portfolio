@@ -25,6 +25,9 @@ import { autonomoDrafts } from './024-autonomo-drafts';
 import { autonomoPdfs } from './025-autonomo-pdfs';
 import { foreignKeyIndexes } from './026-foreign-key-indexes';
 import { refreshRotation } from './027-refresh-rotation';
+import { importUses } from './028-import-uses';
+import { rentaCampaignUses } from './029-renta-campaign-uses';
+import { autonomoQuarterDrafts } from './030-autonomo-quarter-drafts';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -56,4 +59,7 @@ export const migrations: Migration[] = [
   autonomoPdfs,
   foreignKeyIndexes,
   refreshRotation,
+  importUses,
+  rentaCampaignUses,
+  autonomoQuarterDrafts,
 ];

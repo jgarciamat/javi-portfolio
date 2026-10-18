@@ -9,11 +9,11 @@ import { YearTax } from '@domain/services/tax';
 import { AssetView } from '@application/assets/AssetService';
 import { InboxOverview } from '@application/inbox/InboxService';
 import { ProjectedMonth } from '@domain/services/forecast';
-import { SubscriptionReport } from '@domain/services/subscriptions';
 import {
   AnnualReport,
   ForecastResult,
   NetWorthPoint,
+  SubscriptionsView,
 } from '@application/insights/InsightsServices';
 import { AlertView, GoalView } from '@application/planning/PlanningServices';
 import { RuleView } from '@application/recurring/RecurringService';
@@ -270,7 +270,7 @@ export function presentForecast(f: ForecastResult) {
       status: f.safeToSpend.status,
     },
     locked: f.locked,
-    projection: f.projection ? f.projection.map(month) : null,
+    projection: f.projection.map(month),
     firstShortfall: f.firstShortfall,
     rules: f.rules.map((r) => ({
       id: r.id,
@@ -282,10 +282,12 @@ export function presentForecast(f: ForecastResult) {
   };
 }
 
-export function presentSubscriptions(r: SubscriptionReport) {
+export function presentSubscriptions(r: SubscriptionsView) {
   return {
     monthly: m(r.monthlyCents),
     annual: m(r.annualCents),
+    count: r.count,
+    locked: r.locked,
     subscriptions: r.subscriptions.map((s) => ({
       key: s.key,
       description: s.description,

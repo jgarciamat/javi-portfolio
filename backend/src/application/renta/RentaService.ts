@@ -1,28 +1,37 @@
 import { PaymentRequiredError } from '@domain/errors';
 import { RentaAccess } from '@domain/model/Subscription';
 import { RentaUsageRepository } from '@domain/ports/repositories';
+import { Clock } from '@domain/ports/services';
+import { rentaCampaignOf } from '@domain/services/plans';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
 /**
- * The income tax return calculator: one calculation on the free plan, no limit with Premium
- * or with the one-month pass. Reading a draft needs two months of paid Premium or the pass.
+ * The income tax return calculator: three calculations per Renta campaign on the free plan, no
+ * limit with Premium or with the one-month pass. Reading a draft needs two months of paid Premium or the pass.
  */
 export class RentaService {
   constructor(
     private readonly usage: RentaUsageRepository,
-    private readonly entitlements: EntitlementService
+    private readonly entitlements: EntitlementService,
+    private readonly clock: Clock
   ) {}
 
-  /** Counts a calculation; refused (402) when the plan has no more of them. */
-  register(userId: string): { used: number } {
-    if (this.entitlements.rentaAccess(userId).passUntil === null) {
-      this.entitlements.assertCanCreate(userId, 'rentaCalculations', this.usage.count(userId));
-    }
-    return { used: this.usage.increment(userId) };
+  /** Calculations made in the current campaign (what the free plan limits). */
+  usedThisCampaign(userId: string): number {
+    return this.usage.count(userId, rentaCampaignOf(this.clock.now()));
   }
 
-  access(userId: string): RentaAccess {
-    return this.entitlements.rentaAccess(userId);
+  /** Counts a calculation; refused (402) when the plan has no more of them this campaign. */
+  register(userId: string): { used: number } {
+    const campaign = rentaCampaignOf(this.clock.now());
+    if (this.entitlements.rentaAccess(userId).passUntil === null) {
+      this.entitlements.assertCanCreate(
+        userId,
+        'rentaCalculations',
+        this.usage.count(userId, campaign)
+      );
+    }
+    return { used: this.usage.increment(userId, campaign) };
   }
 
   /** Asked before reading a draft: refused (402) with what is missing when it is not included. */

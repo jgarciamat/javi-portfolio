@@ -28,34 +28,34 @@ function CompoundChart({ result: r, start: initialAmount }: { result: FundResult
         {
           id: 'contributed',
           label: t('app.invest.calc.compound.contributed'),
-          color: '#94a3b8',
+          color: 'var(--slate-400)',
           points: line(r.yearly, 'contributed'),
         },
         {
           id: 'central',
           label: t('app.invest.calc.compound.central'),
-          color: '#6366f1',
+          color: 'var(--accent-400)',
           points: line(r.yearly, 'balance'),
         },
         {
           id: 'low',
           label: t('app.invest.calc.compound.low', { spread: BAND_SPREAD_PP }),
-          color: '#f43f5e',
-          dashed: true,
+          color: 'var(--red-400)',
+          dash: 'dashed',
           points: line(r.pessimistic, 'balance'),
         },
         {
           id: 'high',
           label: t('app.invest.calc.compound.high', { spread: BAND_SPREAD_PP }),
-          color: '#22c55e',
-          dashed: true,
+          color: 'var(--green-400)',
+          dash: 'dashed',
           points: line(r.optimistic, 'balance'),
         },
       ]}
       bands={[
         {
           id: 'range',
-          color: '#6366f1',
+          color: 'var(--accent-400)',
           lower: line(r.pessimistic, 'balance'),
           upper: line(r.optimistic, 'balance'),
         },

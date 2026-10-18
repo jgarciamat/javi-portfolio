@@ -17,7 +17,7 @@ export function AskAssistant() {
   const [result, setResult] = useState<AIAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  if (plan && !plan.isPremium) {
+  if (plan?.isFree) {
     return (
       <div className="ai-ask">
         <p className="ai-placeholder">{t('app.ask.locked')}</p>

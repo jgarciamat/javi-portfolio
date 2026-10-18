@@ -59,9 +59,19 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         passEndsAt:
           this.one('SELECT ends_at FROM renta_passes WHERE user_id = ?', userId)?.ends_at ?? null,
         calculations: this.uses('renta_calculations', userId),
+        calculationsByCampaign: this.all(
+          'SELECT campaign, uses FROM renta_campaign_uses WHERE user_id = ? ORDER BY campaign',
+          userId
+        ),
         autonomoDrafts: this.uses('autonomo_drafts', userId),
+        autonomoDraftsByQuarter: this.all(
+          `SELECT year, quarter, uses FROM autonomo_quarter_drafts
+           WHERE user_id = ? ORDER BY year, quarter`,
+          userId
+        ),
         autonomoPdfs: this.uses('autonomo_pdfs', userId),
       },
+      imports: this.uses('import_uses', userId),
       referrals: this.referrals(userId),
       household: this.household(userId),
       pushSubscriptions: this.all(

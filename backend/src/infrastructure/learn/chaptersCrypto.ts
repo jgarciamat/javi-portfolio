@@ -1,7 +1,7 @@
-import type { Chapter } from './types';
+import type { CourseChapter } from '@domain/model/Course';
 
 /** Crypto basics and leverage. Educational, with no price predictions. */
-export const CHAPTERS_CRYPTO_A: Chapter[] = [
+export const CHAPTERS_CRYPTO_A: CourseChapter[] = [
   {
     id: 'cripto-y-blockchain',
     emoji: '⛓️',

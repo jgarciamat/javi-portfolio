@@ -10,6 +10,7 @@ import type {
   NetWorthPoint,
 } from '@modules/finances/domain/types';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
+import { PremiumOnly } from '@modules/billing/ui/PremiumOnly';
 import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
@@ -130,30 +131,30 @@ function NetWorthChart({ points }: { points: NetWorthPoint[] }) {
   );
 }
 
-/** Trends and net worth are part of Premium. */
+/**
+ * The analysis tab: the subscriptions found are for everyone (the free plan sees the most
+ * expensive ones); the trends and the net worth evolution are Premium.
+ */
 export function AnalysisView() {
-  const plan = useOptionalPlan();
-  const { t } = useI18n();
-  // Wait for the plan: a free user would otherwise trigger the paywall on load.
-  if (plan?.loading && !plan.overview) return <div className="card">{t('app.common.loading')}</div>;
-  if (plan && !plan.isPremium) {
-    return (
-      <div className="card premium-locked">
-        <h2 className="section-title">
-          <Icon name="trend" /> {t('app.tabs.analysis')}{' '}
-          <span className="premium-chip">Premium</span>
-        </h2>
-        <p className="section-hint">{t('app.analysis.locked')}</p>
-        <button
-          className="btn-primary"
-          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'insights' })}
-        >
-          {t('billing.seePlans')}
-        </button>
-      </div>
-    );
-  }
-  return <AnalysisContent />;
+  return (
+    <div className="section-view">
+      <SubscriptionsCard />
+      <PremiumOnly
+        icon="trend"
+        titleKey="app.analysis.trendsName"
+        hintKey="app.analysis.trendsLocked"
+      >
+        <TrendsCard />
+      </PremiumOnly>
+      <PremiumOnly
+        icon="briefcase"
+        titleKey="app.analysis.netWorthTitle"
+        hintKey="app.analysis.netWorthLocked"
+      >
+        <NetWorthCard />
+      </PremiumOnly>
+    </div>
+  );
 }
 
 function TrendsCard() {
@@ -309,6 +310,9 @@ function SubscriptionsCard() {
               annual: money(data.annual),
             })}
           </p>
+          {data.locked && (
+            <p className="section-hint">{t('app.subscriptions.found', { count: data.count })}</p>
+          )}
           <ScrollRegion className="table-scroll" label={t('app.subscriptions.title')}>
             <table className="data-table">
               <thead>
@@ -325,18 +329,34 @@ function SubscriptionsCard() {
               </tbody>
             </table>
           </ScrollRegion>
+          {data.locked && <MoreSubscriptions hidden={data.count - data.subscriptions.length} />}
         </>
       )}
     </div>
   );
 }
 
-function AnalysisContent() {
+/** Free plan: the full list is Premium. */
+function MoreSubscriptions({ hidden }: { hidden: number }) {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
   return (
-    <div className="section-view">
-      <SubscriptionsCard />
-      <TrendsCard />
-      <NetWorthCard />
+    <div className="plan-upsell">
+      <p className="section-hint">
+        <Icon name="lock" />{' '}
+        {hidden > 0
+          ? t('app.subscriptions.moreLocked', { count: hidden })
+          : t('app.subscriptions.fullLocked')}{' '}
+        <span className="premium-chip">Premium</span>
+      </p>
+      {plan && (
+        <button
+          className="btn-primary"
+          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'insights' })}
+        >
+          {t('billing.seePlans')}
+        </button>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
+import { ApiError } from '@core/api/http';
 import { errorMessage } from '@shared/utils/errors';
 import { validatePassword } from '@modules/auth/domain/passwordValidation';
 import { AVATAR_MAX_BYTES, emojiAvatar } from '@modules/auth/domain/avatar';
@@ -10,12 +11,18 @@ export interface StatusMsg {
   text: string;
 }
 
-/** Runs a save and turns the outcome into a success / error message. */
+/**
+ * Runs a save and turns the outcome into a success / error message. `handled` lets the
+ * caller show an error elsewhere (e.g. on the field): it returns true to skip the message.
+ */
 function useStatus(okKey: string, errorKey: string) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<StatusMsg | null>(null);
-  const run = async (save: () => Promise<void>): Promise<boolean> => {
+  const run = async (
+    save: () => Promise<void>,
+    handled: (err: unknown) => boolean = () => false
+  ): Promise<boolean> => {
     setLoading(true);
     setMessage(null);
     try {
@@ -23,7 +30,7 @@ function useStatus(okKey: string, errorKey: string) {
       setMessage({ ok: true, text: t(okKey) });
       return true;
     } catch (err) {
-      setMessage({ ok: false, text: errorMessage(err, t(errorKey)) });
+      if (!handled(err)) setMessage({ ok: false, text: errorMessage(err, t(errorKey)) });
       return false;
     } finally {
       setLoading(false);
@@ -58,6 +65,8 @@ export function usePasswordSection() {
   /** Accounts created with Google have no password yet: they can set one directly. */
   const hasPassword = user?.hasPassword !== false;
   const [currentPassword, setCurrentPassword] = useState('');
+  /** The API rejected the current password (403, the session stays open). */
+  const [wrongCurrent, setWrongCurrent] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const status = useStatus('app.profile.password.saved', 'app.profile.password.error');
@@ -74,8 +83,14 @@ export function usePasswordSection() {
       status.setMessage({ ok: false, text: t('app.profile.password.mismatch') });
       return;
     }
-    const saved = await status.run(() =>
-      updatePassword(hasPassword ? currentPassword : undefined, newPassword)
+    setWrongCurrent(false);
+    const saved = await status.run(
+      () => updatePassword(hasPassword ? currentPassword : undefined, newPassword),
+      (err) => {
+        const wrong = err instanceof ApiError && err.code === 'WRONG_PASSWORD';
+        setWrongCurrent(wrong);
+        return wrong;
+      }
     );
     if (saved) {
       setCurrentPassword('');
@@ -87,7 +102,11 @@ export function usePasswordSection() {
   return {
     hasPassword,
     currentPassword,
-    setCurrentPassword,
+    setCurrentPassword: (value: string) => {
+      setCurrentPassword(value);
+      setWrongCurrent(false);
+    },
+    wrongCurrent,
     newPassword,
     setNewPassword,
     confirmNewPassword,

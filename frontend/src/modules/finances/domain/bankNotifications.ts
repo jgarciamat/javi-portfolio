@@ -67,6 +67,29 @@ export function notificationId(postedAt: number, text: string): string {
   return `${postedAt}-${(hash >>> 0).toString(36)}`;
 }
 
+/** Income or expense from the words of the text, or null when it says neither. */
+function paymentType(plain: string): DetectedPayment['type'] | null {
+  const income = INCOME_WORDS.test(plain);
+  const expense = EXPENSE_WORDS.test(plain);
+  // A "Bizum recibido" has both "recibido" and "bizum": income wins; paying has no income words.
+  if (!income && !expense) return null;
+  return income ? 'INCOME' : 'EXPENSE';
+}
+
+/** The counterparty, else the title (when it is not just the amount), else a generic name. */
+function describe(
+  full: string,
+  title: string,
+  found: RegExpExecArray,
+  type: DetectedPayment['type']
+): string {
+  return (
+    counterparty(full, found.index + found[0].length) ??
+    (title.trim().length > 1 && !WITH_CURRENCY.test(title) ? title.trim() : null) ??
+    (type === 'INCOME' ? 'Ingreso' : 'Pago con tarjeta')
+  );
+}
+
 /**
  * Reads a payment out of a bank notification ("Pago con tarjeta de 23,40 € en MERCADONA").
  * Anything that is not clearly a payment or an income (balances, codes, offers) returns null,
@@ -85,16 +108,10 @@ export function parseBankNotification(
   const amount = toNumber(found[1] ?? found[2]);
   if (amount === null) return null;
 
-  const income = INCOME_WORDS.test(plain);
-  const expense = EXPENSE_WORDS.test(plain);
-  // A "Bizum recibido" has both "recibido" and "bizum": income wins; paying has no income words.
-  if (!income && !expense) return null;
-  const type = income ? 'INCOME' : 'EXPENSE';
+  const type = paymentType(plain);
+  if (type === null) return null;
 
-  const description =
-    counterparty(full, found.index + found[0].length) ??
-    (title.trim().length > 1 && !WITH_CURRENCY.test(title) ? title.trim() : null) ??
-    (type === 'INCOME' ? 'Ingreso' : 'Pago con tarjeta');
+  const description = describe(full, title, found, type);
   const when = new Date(postedAt);
   return {
     id: notificationId(postedAt, full),

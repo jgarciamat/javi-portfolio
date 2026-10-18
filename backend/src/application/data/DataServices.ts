@@ -9,6 +9,7 @@ import {
   CategoryRepository,
   CustomAlertRepository,
   GoalRepository,
+  ImportUsageRepository,
   PersonalDataReader,
   RecurringRuleRepository,
   SettingsRepository,
@@ -83,22 +84,48 @@ export class ImportService {
     private readonly categorizer: AiCategorizer,
     private readonly categoryRules: CategoryRuleService,
     private readonly uow: UnitOfWork,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly usage: ImportUsageRepository
   ) {}
 
   /**
-   * Imports bank movements (Premium). Re-importing the same file is safe: every row gets a
-   * fingerprint (date, amount, description and its position among identical rows)
-   * and rows already imported are skipped. Categories come from the file, the
-   * user's own history for the same description, keyword rules, the AI (only when the
-   * user opts in with `useAi`), or "Otros".
+   * Imports a bank statement: the free plan can import one (previews do not count and neither
+   * does a file where nothing new was imported), Premium as many as it wants.
    */
   async import(
     userId: string,
     rows: ImportRow[],
     options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
   ): Promise<ImportResult> {
-    this.entitlements.assertFeature(userId, 'import');
+    this.entitlements.assertCanCreate(userId, 'imports', this.usage.count(userId));
+    const result = await this.importRows(userId, rows, options);
+    if (!result.dryRun && result.imported > 0) this.usage.increment(userId);
+    return result;
+  }
+
+  /** Payments read from the notifications of the bank apps (Premium): not a statement import. */
+  async importCaptured(
+    userId: string,
+    rows: ImportRow[],
+    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
+  ): Promise<ImportResult> {
+    this.entitlements.assertFeature(userId, 'capture');
+    return this.importRows(userId, rows, options);
+  }
+
+  /**
+   * Imports bank movements without counting them as a statement import (the e-mail inbox, which
+   * checks its own plan). Re-importing the same file is safe: every row gets a
+   * fingerprint (date, amount, description and its position among identical rows)
+   * and rows already imported are skipped. Categories come from the file, the
+   * user's own history for the same description, keyword rules, the AI (only when the
+   * user opts in with `useAi`), or "Otros".
+   */
+  async importRows(
+    userId: string,
+    rows: ImportRow[],
+    options: { accountId?: string | null; dryRun?: boolean; useAi?: boolean }
+  ): Promise<ImportResult> {
     if (rows.length > MAX_IMPORT_ROWS) {
       throw new ValidationError(`Máximo ${MAX_IMPORT_ROWS} filas por importación`, 'TOO_MANY_ROWS');
     }

@@ -1,5 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { CHAPTERS } from '@modules/invest/domain/content';
+import { ApiError } from '@core/api/http';
+import { ApiProvider } from '@core/context/ApiContext';
+import { CHAPTERS, FREE_CHAPTERS } from '@modules/invest/domain/content';
 import { InvestView } from '@modules/invest/ui/InvestView';
 import { LearnLocked } from '@modules/invest/ui/LearnLocked';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -7,75 +9,89 @@ import * as f from '@test-utils/fixtures';
 import { literal, renderWithI18n, renderWithProviders, tr } from '@test-utils/render';
 
 const FREE = f.billing({ plan: 'free', trialDaysLeft: 0, limits: f.catalog().limits.free });
+const PREMIUM_CHAPTER = CHAPTERS.find((c) => c.premium)!;
 
 const tab = (id: string) =>
   screen.getByRole('tab', { name: literal(tr(`app.invest.section.${id}`)) });
+const openChapter = (title: string) =>
+  fireEvent.click(screen.getByRole('button', { name: literal(title) }));
 
 function renderInvest(billing: ReturnType<typeof f.billing> | Error) {
   const api = createFakeApi();
   if (billing instanceof Error) api.billingApi.get.mockRejectedValue(billing);
   else api.billingApi.get.mockResolvedValue(billing);
-  return renderWithProviders(<InvestView />, { api, plan: true });
+  return { ...renderWithProviders(<InvestView />, { api, plan: true }), api };
 }
 
+/** The catalogue is shown once the plan is known. */
+const openLearn = async () => {
+  fireEvent.click(tab('learn'));
+  await screen.findByLabelText(tr('app.invest.learn.search'));
+};
+
+describe('Learn to invest: the catalogue', () => {
+  it('has the first two chapters free and the rest Premium, without their text in the app', () => {
+    expect(CHAPTERS.slice(0, 2).map((c) => c.premium)).toEqual([false, false]);
+    expect(CHAPTERS.slice(2).every((c) => c.premium)).toBe(true);
+    expect(FREE_CHAPTERS.map((c) => c.id)).toEqual(CHAPTERS.slice(0, 2).map((c) => c.id));
+    for (const c of CHAPTERS.slice(2)) expect(c).not.toHaveProperty('blocks');
+  });
+});
+
 describe('Learn to invest: free accounts', () => {
-  it('keeps the information tab free, with its disclaimer, and marks the other one Premium', async () => {
+  it('keeps both tabs open, with the disclaimer', async () => {
     renderInvest(FREE);
-    await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
-    expect(tab('map')).toHaveAttribute('aria-selected', 'true');
+    await openLearn();
+    expect(within(tab('learn')).queryByText('Premium')).toBeNull();
+    fireEvent.click(tab('map'));
     expect(
       screen.getByRole('note', { name: tr('app.invest.disclaimer.title') })
     ).toBeInTheDocument();
     expect(screen.getByText(/Las 9 grandes clases/)).toBeInTheDocument();
-    expect(within(tab('map')).queryByText('Premium')).toBeNull();
   });
 
-  it('shows the intro, a translucent preview and an upgrade panel instead of the chapters', async () => {
+  it('marks the Premium chapters and reads the free ones', async () => {
     const { container } = renderInvest(FREE);
-    await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
-    fireEvent.click(tab('learn'));
+    await openLearn();
+    const chips = container.querySelectorAll('.inv-chapter .premium-chip');
+    expect(chips).toHaveLength(CHAPTERS.length - 2);
+    openChapter(CHAPTERS[1].title);
+    expect(container.querySelector('.inv-callout--key')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: tr('app.invest.locked.title') })).toBeNull();
+  });
+
+  it('shows the upgrade panel instead of a Premium chapter and never asks for its text', async () => {
+    const { api } = renderInvest(FREE);
+    await openLearn();
+    openChapter(PREMIUM_CHAPTER.title);
     const panel = screen.getByRole('region', { name: tr('app.invest.locked.title') });
     expect(panel).toHaveTextContent(tr('app.invest.locked.text'));
-    const preview = container.querySelector('.inv-locked-preview') as HTMLElement;
-    expect(preview).toHaveAttribute('aria-hidden', 'true');
-    expect(preview).toHaveAttribute('inert');
-    expect(preview.querySelectorAll('.inv-chapter')).toHaveLength(CHAPTERS.length);
-    expect(preview.querySelector('button, a, input')).toBeNull();
-    expect(screen.queryByLabelText(tr('app.invest.learn.search'))).toBeNull();
-  });
-
-  it('never puts the text of a chapter in the page', async () => {
-    const { container } = renderInvest(FREE);
-    await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
-    fireEvent.click(tab('learn'));
-    const text = container.textContent ?? '';
-    for (const c of CHAPTERS) {
-      expect(text).not.toContain(c.summary);
-      const firstText = c.blocks.find((b) => b.k === 'p' || b.k === 'warn');
-      if (firstText && 't' in firstText) expect(text).not.toContain(firstText.t.slice(0, 60));
-    }
-    expect(text).not.toContain('Mercados bursátiles: horarios, apertura y cierre');
-  });
-
-  it('opens the upgrade dialog from the panel', async () => {
-    renderInvest(FREE);
-    await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
-    fireEvent.click(tab('learn'));
+    expect(api.learnApi.chapter).not.toHaveBeenCalled();
+    expect(api.learnApi.glossary).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: tr('app.invest.locked.cta') }));
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog')).toHaveTextContent(
+      tr('billing.reason.feature', { feature: tr('billing.feature.investCourse') })
+    );
   });
 
-  it('lands on the locked panel from a link in the map, not on the chapter', async () => {
-    const { container } = renderInvest(FREE);
-    await waitFor(() => expect(within(tab('learn')).getByText('Premium')).toBeInTheDocument());
+  it('opens the free Shares chapter from the map', async () => {
+    renderInvest(FREE);
+    await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
     fireEvent.click(screen.getByRole('button', { name: /Renta variable/ }));
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
     );
-    expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
+    expect(
+      await screen.findByRole('heading', { level: 2, name: /Acciones: qué son/ })
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the Premium chapters locked when the plan cannot be read', async () => {
+    const { api } = renderInvest(new Error('offline'));
+    await openLearn();
+    openChapter(PREMIUM_CHAPTER.title);
     expect(screen.getByRole('region', { name: tr('app.invest.locked.title') })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 2, name: /Acciones: qué son/ })).toBeNull();
-    expect(container.textContent).not.toContain('Una acción es una parte del capital');
+    expect(api.learnApi.chapter).not.toHaveBeenCalled();
   });
 });
 
@@ -92,29 +108,32 @@ describe('Learn to invest: Premium accounts', () => {
   it.each([
     ['in the free trial', f.billing()],
     ['with a lifetime plan', lifetime],
-  ])('shows the chapters %s', async (_name, billing) => {
-    renderInvest(billing);
-    fireEvent.click(tab('learn'));
-    await waitFor(() =>
-      expect(screen.getByLabelText(tr('app.invest.learn.search'))).toBeInTheDocument()
-    );
-    expect(within(tab('learn')).queryByText('Premium')).toBeNull();
-    expect(screen.queryByRole('region', { name: tr('app.invest.locked.title') })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: literal(CHAPTERS[0].title) }));
+  ])('reads a Premium chapter from the API %s', async (_name, billing) => {
+    const { api, container } = renderInvest(billing);
+    await openLearn();
+    expect(container.querySelectorAll('.inv-chapter .premium-chip')).toHaveLength(0);
+    openChapter(PREMIUM_CHAPTER.title);
+    expect(screen.getByRole('status')).toHaveTextContent(tr('app.common.loading'));
     expect(
-      screen.getByRole('heading', { level: 2, name: /Acciones: qué son/ })
+      await screen.findByText('Copia un índice entero con comisiones bajas.')
     ).toBeInTheDocument();
+    expect(api.learnApi.chapter).toHaveBeenCalledWith(PREMIUM_CHAPTER.id);
+    expect(screen.queryByRole('region', { name: tr('app.invest.locked.title') })).toBeNull();
   });
 
-  it('lets the map link open the chapter', async () => {
-    renderInvest(f.billing());
-    fireEvent.click(screen.getByRole('button', { name: /Renta variable/ }));
-    fireEvent.click(
-      screen.getByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
-    );
-    expect(
-      await screen.findByRole('heading', { level: 2, name: /Acciones: qué son/ })
-    ).toBeInTheDocument();
+  it('says so when a chapter cannot be loaded', async () => {
+    const { api } = renderInvest(f.billing());
+    api.learnApi.chapter.mockRejectedValue(new ApiError('boom', 500));
+    await openLearn();
+    openChapter(PREMIUM_CHAPTER.title);
+    expect(await screen.findByText(tr('app.invest.learn.loadError'))).toBeInTheDocument();
+  });
+
+  it('adds the glossary of the Premium chapters', async () => {
+    const { api } = renderInvest(f.billing());
+    await openLearn();
+    expect(await screen.findByText('Tracking difference')).toBeInTheDocument();
+    expect(api.learnApi.glossary).toHaveBeenCalled();
   });
 
   it('waits for the plan before deciding', async () => {
@@ -123,23 +142,29 @@ describe('Learn to invest: Premium accounts', () => {
     expect(screen.getByRole('status')).toHaveTextContent(tr('app.common.loading'));
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
   });
+});
 
-  it('does not lock anything when the plan cannot be read', async () => {
-    renderInvest(new Error('offline'));
-    fireEvent.click(tab('learn'));
-    await waitFor(() =>
-      expect(screen.getByLabelText(tr('app.invest.learn.search'))).toBeInTheDocument()
+describe('Outside the plan provider', () => {
+  it('reads every chapter, the Premium ones from the API', async () => {
+    const api = createFakeApi();
+    renderWithI18n(
+      <ApiProvider value={api}>
+        <InvestView />
+      </ApiProvider>
     );
+    fireEvent.click(tab('learn'));
+    openChapter(PREMIUM_CHAPTER.title);
+    expect(
+      await screen.findByText('Copia un índice entero con comisiones bajas.')
+    ).toBeInTheDocument();
   });
 });
 
-describe('Locked preview in English', () => {
-  it('is in English and still has no real text', () => {
+describe('Locked panel in English', () => {
+  it('is in English', () => {
     const upgrade = jest.fn();
-    const { container } = renderWithI18n(<LearnLocked onUpgrade={upgrade} />, 'en');
-    expect(screen.getByText('Go Premium to see the content of the chapters')).toBeInTheDocument();
-    expect(screen.getByText(CHAPTERS[0].titleEn)).toBeInTheDocument();
-    expect(container.textContent).not.toContain(CHAPTERS[0].summaryEn);
+    renderWithI18n(<LearnLocked onUpgrade={upgrade} />, 'en');
+    expect(screen.getByText('This chapter is part of Premium')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'See the Premium plans' }));
     expect(upgrade).toHaveBeenCalled();
   });

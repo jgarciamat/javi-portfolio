@@ -6,6 +6,7 @@ import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { lazyNamed } from '@shared/utils/lazyNamed';
+import { usageLimit } from './AutonomoLimit';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
@@ -135,6 +136,19 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           <p className="header-sub">{sectionLabel}</p>
         </div>
       </div>
+      <button
+        type="button"
+        className="header-learn-btn"
+        onClick={() => dash.setTab('videos')}
+        aria-label={t('app.header.learn')}
+        aria-current={dash.tab === 'videos' ? 'page' : undefined}
+      >
+        <Icon name="video" size={18} />
+        <span className="header-learn-long">{t('app.header.learn')}</span>
+        <span className="header-learn-short" aria-hidden="true">
+          {t('app.header.learnShort')}
+        </span>
+      </button>
       <div className="header-actions">
         <button
           className="header-user header-user-btn"
@@ -257,10 +271,12 @@ export function Dashboard() {
     setMenuPicks((n) => n + 1);
   };
 
-  // Free plan: the import button opens the paywall instead of the importer.
+  // Free plan: one bank statement import; once used, the button opens the paywall instead.
+  const imports = usageLimit(plan, 'imports');
   const openImport =
-    plan && !plan.isPremium
-      ? () => plan.openUpgrade({ kind: 'feature', feature: 'import' })
+    plan && imports.locked
+      ? () =>
+          plan.openUpgrade({ kind: 'limit', resource: 'imports', limit: imports.limit as number })
       : dash.openImport;
 
   return (

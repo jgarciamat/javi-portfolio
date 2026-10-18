@@ -206,6 +206,22 @@ describe('apiRequest', () => {
     expect(tokenStore.getRefresh()).toBeNull();
   });
 
+  test('a wrong current password (403) neither refreshes nor logs the user out', async () => {
+    const onExpired = jest.fn();
+    registerSessionExpiredHandler(onExpired);
+    tokenStore.setSession(VALID, 'refresh-1');
+    mockFetch.mockResolvedValueOnce(
+      makeResponse({ error: 'La contraseña actual es incorrecta', code: 'WRONG_PASSWORD' }, 403)
+    );
+    await expect(authApi.updatePassword('nope', 'Sup3r-secret!')).rejects.toMatchObject({
+      status: 403,
+      code: 'WRONG_PASSWORD',
+    });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(onExpired).not.toHaveBeenCalled();
+    expect(tokenStore.getRefresh()).toBe('refresh-1');
+  });
+
   test('does NOT log the user out when the retried request fails with another error (old bug)', async () => {
     const onExpired = jest.fn();
     registerSessionExpiredHandler(onExpired);

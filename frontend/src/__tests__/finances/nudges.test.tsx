@@ -22,6 +22,7 @@ const NEW_USER = f.billing({
     autonomoDrafts: 0,
     autonomoPdfs: 0,
     assets: 0,
+    imports: 0,
     movements: 1,
   },
 });
@@ -36,6 +37,7 @@ const SETTLED = f.billing({
     autonomoDrafts: 0,
     autonomoPdfs: 0,
     assets: 0,
+    imports: 0,
     movements: 20,
   },
   ai: { used: 2, quota: 10 },
@@ -81,6 +83,7 @@ describe('Getting started', () => {
         autonomoDrafts: 0,
         autonomoPdfs: 0,
         assets: 0,
+        imports: 0,
         movements: 4,
       },
     });
@@ -140,6 +143,7 @@ describe('Getting started progress', () => {
         autonomoDrafts: 0,
         autonomoPdfs: 0,
         assets: 0,
+        imports: 0,
         movements: 1,
         ...over,
       },

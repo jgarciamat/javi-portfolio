@@ -1,6 +1,6 @@
 import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
-import type { Block, Chapter } from '../domain/types';
+import type { Block, ChapterContent } from '../domain/types';
 import { InvestCalc } from './calculators/Calculators';
 import { InvestChart } from './charts/Charts';
 import { MarketsPanel } from './MarketsPanel';
@@ -90,7 +90,7 @@ function BlockView({ block, anchor }: { block: Block; anchor: string }) {
 }
 
 /** The text, tables, charts and calculators of one chapter, and its glossary. */
-export function ChapterBody({ chapter }: { chapter: Chapter }) {
+export function ChapterBody({ chapter }: { chapter: ChapterContent }) {
   const { t } = useI18n();
   const anchors = chapter.blocks.map((_, i) => `${chapter.id}-s${i}`);
   const headings = chapter.blocks.flatMap((b, i) =>

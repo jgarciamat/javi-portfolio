@@ -19,6 +19,7 @@ const RESOURCES: LimitedResource[] = [
   'autonomoDrafts',
   'autonomoPdfs',
   'assets',
+  'imports',
   'accounts',
   'budgets',
   'goals',

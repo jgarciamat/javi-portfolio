@@ -23,7 +23,7 @@ export function LearnView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
     return (
       <div className="section-view">
         <div className="card guide-article">
-          <button className="btn-secondary" onClick={() => setOpen(null)}>
+          <button type="button" className="back-btn" onClick={() => setOpen(null)}>
             ← {t('app.learn.back')}
           </button>
           <h2 className="section-title">{guide.title}</h2>

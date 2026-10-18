@@ -101,11 +101,12 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
     limiter({ windowMs: 60 * 60 * 1000, limit: 30 }),
     authed(async (req, res) => {
       const body = importBody.parse(req.body);
-      const result = await c.importer.import(
-        req.dataUserId,
-        body.rows.map((r) => ({ ...r, amountCents: r.amount })),
-        { accountId: body.accountId, dryRun: body.dryRun, useAi: body.useAi }
-      );
+      const rows = body.rows.map((r) => ({ ...r, amountCents: r.amount }));
+      const options = { accountId: body.accountId, dryRun: body.dryRun, useAi: body.useAi };
+      const result =
+        body.source === 'capture'
+          ? await c.importer.importCaptured(req.dataUserId, rows, options)
+          : await c.importer.import(req.dataUserId, rows, options);
       if (!body.dryRun) c.repos.metrics.record('import_done');
       res.status(body.dryRun ? 200 : 201).json({
         ...result,

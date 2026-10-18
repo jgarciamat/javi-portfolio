@@ -514,6 +514,39 @@ describe('ProfilePage', () => {
     expect(await screen.findByText('Contraseña actual incorrecta')).toBeInTheDocument();
   });
 
+  it('marks the current password field when the API says it is wrong, without signing out', async () => {
+    const update = jest
+      .spyOn(authApi, 'updatePassword')
+      .mockRejectedValueOnce(
+        new ApiError('La contraseña actual es incorrecta.', 403, 'WRONG_PASSWORD')
+      )
+      .mockResolvedValueOnce({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' });
+    setup();
+    openPasswordSection();
+    const current = screen.getByLabelText(tr('app.profile.password.current'));
+    fireEvent.change(current, { target: { value: 'wrong' } });
+    fireEvent.change(screen.getByLabelText(tr('app.profile.password.new')), {
+      target: { value: STRONG },
+    });
+    fireEvent.change(screen.getByLabelText(tr('app.profile.password.confirm')), {
+      target: { value: STRONG },
+    });
+    fireEvent.submit(passwordForm());
+    const error = await screen.findByText(tr('app.profile.password.wrongCurrent'));
+    expect(error).toHaveAttribute('id', 'profile-current-password-error');
+    expect(current).toHaveAttribute('aria-invalid', 'true');
+    expect(current).toHaveAttribute('aria-describedby', 'profile-current-password-error');
+    // Only the field explains the error; the form keeps the user signed in.
+    expect(screen.queryByText(tr('app.profile.password.error'))).toBeNull();
+    expect(screen.queryByText('La contraseña actual es incorrecta.')).toBeNull();
+    fireEvent.change(current, { target: { value: 'right' } });
+    expect(screen.queryByText(tr('app.profile.password.wrongCurrent'))).toBeNull();
+    expect(current).not.toHaveAttribute('aria-invalid');
+    fireEvent.submit(passwordForm());
+    expect(await screen.findByText(tr('app.profile.password.saved'))).toBeInTheDocument();
+    expect(update).toHaveBeenLastCalledWith('right', STRONG);
+  });
+
   it('lets Google accounts set a first password', async () => {
     const update = jest
       .spyOn(authApi, 'updatePassword')

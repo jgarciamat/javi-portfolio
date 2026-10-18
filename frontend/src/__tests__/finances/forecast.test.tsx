@@ -94,11 +94,19 @@ describe('Forecast panel', () => {
     expect(view.getByText(tr('app.forecast.status.over'))).toBeInTheDocument();
   });
 
-  it('keeps the outlook for Premium and opens the plans from the locked preview', async () => {
-    setup(f.forecast({ locked: true, projection: null, rules: [] }), { plan: true });
+  const nextMonthOnly = () => {
+    const full = f.forecast();
+    return f.forecast({ locked: true, projection: full.projection.slice(0, 1) });
+  };
+
+  it('shows the free plan next month only and opens the plans for the rest', async () => {
+    setup(nextMonthOnly(), { plan: true });
     const view = await panel();
     expect(await view.findByText(has('app.forecast.locked'))).toBeInTheDocument();
-    expect(view.queryByRole('table')).toBeNull();
+    expect(view.getByText(tr('app.forecast.nextMonth'))).toBeInTheDocument();
+    expect(view.getAllByRole('row')).toHaveLength(2); // header + next month
+    expect(view.queryByLabelText(tr('app.forecast.range'))).toBeNull();
+    expect(view.queryByRole('group')).toBeNull(); // no «what if…» on the free plan
     fireEvent.click(view.getByRole('button', { name: tr('billing.seePlans') }));
     expect(
       await screen.findByText(
@@ -107,8 +115,8 @@ describe('Forecast panel', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows the locked preview without a plan button when the plan is unknown', async () => {
-    setup(f.forecast({ locked: true, projection: null }));
+  it('shows the locked part without a plan button when the plan is unknown', async () => {
+    setup(nextMonthOnly());
     const view = await panel();
     expect(await view.findByText(has('app.forecast.locked'))).toBeInTheDocument();
     expect(view.queryByRole('button', { name: tr('billing.seePlans') })).toBeNull();

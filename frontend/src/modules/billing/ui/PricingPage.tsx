@@ -3,22 +3,8 @@ import { useResource } from '@shared/hooks/useResource';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
-import type { LimitedResource, PremiumFeature } from '../domain/types';
-import { FEATURE_KEYS, RESOURCE_KEYS, formatPrice, yearlySavingPct } from './pricing';
+import { comparisonRows, formatPrice, yearlySavingPct } from './pricing';
 import './css/Billing.css';
-
-const RESOURCES: LimitedResource[] = [
-  'accounts',
-  'budgets',
-  'goals',
-  'recurringRules',
-  'customAlerts',
-  'rentaCalculations',
-  'autonomoDrafts',
-  'autonomoPdfs',
-  'assets',
-];
-const FEATURES: PremiumFeature[] = ['import', 'insights', 'forecast', 'household', 'aiAdvisor'];
 
 /** Public page with the plans and what each one includes. */
 export function PricingPage() {
@@ -28,7 +14,6 @@ export function PricingPage() {
   const { data: catalog, error } = useResource(() => billingApi.plans(), [billingApi]);
 
   const price = (n: number) => formatPrice(n, locale);
-  const limitText = (n: number | null) => (n === null ? t('pricing.unlimited') : String(n));
 
   return (
     <div className="pricing-page">
@@ -79,22 +64,11 @@ export function PricingPage() {
                 </tr>
               </thead>
               <tbody>
-                {RESOURCES.map((r) => (
-                  <tr key={r}>
-                    <td>{t(RESOURCE_KEYS[r])}</td>
-                    <td>{limitText(catalog.limits.free.resources[r])}</td>
-                    <td>{limitText(catalog.limits.premium.resources[r])}</td>
-                  </tr>
-                ))}
-                {FEATURES.map((f) => (
-                  <tr key={f}>
-                    <td>{t(FEATURE_KEYS[f])}</td>
-                    <td>{catalog.limits.free.features[f] ? '✓' : '—'}</td>
-                    <td>
-                      {f === 'aiAdvisor'
-                        ? t('pricing.aiQuota', { count: catalog.limits.premium.aiMonthlyQuota })
-                        : '✓'}
-                    </td>
+                {comparisonRows(catalog, t).map((row) => (
+                  <tr key={row.key}>
+                    <td>{row.label}</td>
+                    <td>{row.free}</td>
+                    <td>{row.premium}</td>
                   </tr>
                 ))}
               </tbody>

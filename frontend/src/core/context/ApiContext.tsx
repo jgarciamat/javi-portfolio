@@ -23,6 +23,8 @@ import {
 } from '@core/api/financeApi';
 import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
+import { learnApi } from '@core/api/learnApi';
+import { videosApi } from '@core/api/videosApi';
 
 // ─── API shape types ─────────────────────────────────────────────────────────
 
@@ -50,6 +52,8 @@ export interface IApiContext {
   billingApi: typeof billingApi;
   offersApi: typeof offersApi;
   householdApi: typeof householdApi;
+  videosApi: typeof videosApi;
+  learnApi: typeof learnApi;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -80,6 +84,8 @@ const defaultValue: IApiContext = {
   billingApi,
   offersApi,
   householdApi,
+  videosApi,
+  learnApi,
 };
 
 /** Tests (or storybooks) can pass partial fakes through `value`. */

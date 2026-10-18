@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useResource } from '@shared/hooks/useResource';
 import {
   CHAPTERS,
   TOPICS,
   allGlossaryTerms,
-  chapterMinutes,
   findChapter,
+  freeContent,
   matchesQuery,
 } from '../domain/content';
-import type { Chapter, ChapterTopic } from '../domain/types';
+import type { ChapterInfo, ChapterTopic } from '../domain/types';
 import { ChapterBody } from './ChapterBody';
+import { LearnLocked } from './LearnLocked';
 
 const LEVEL_KEY = { 1: 'starter', 2: 'medium', 3: 'advanced' } as const;
 
-function Glossary({ onOpen }: { onOpen: (id: string) => void }) {
+function Glossary({ onOpen, premium }: { onOpen: (id: string) => void; premium: boolean }) {
   const { t } = useI18n();
+  const { learnApi } = useApi();
   const [query, setQuery] = useState('');
-  const terms = allGlossaryTerms().filter((g) => matchesQuery(`${g.term} ${g.def}`, query));
+  // Premium users also get the terms of the Premium chapters (a failure leaves the free ones).
+  const { data: more } = useResource(() => learnApi.glossary(), [learnApi], {
+    enabled: premium,
+  });
+  const terms = allGlossaryTerms(more).filter((g) => matchesQuery(`${g.term} ${g.def}`, query));
   return (
     <section className="inv-block" aria-label={t('app.invest.learn.glossary')}>
       <h3>📖 {t('app.invest.learn.glossary')}</h3>
@@ -46,21 +54,60 @@ function Glossary({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
-/** Educational chapters: a catalogue with search and topics, and a reader for each chapter. */
+/** The text of a Premium chapter, asked to the API (it is not part of the app). */
+function PremiumChapterBody({ id }: { id: string }) {
+  const { t } = useI18n();
+  const { learnApi } = useApi();
+  const { data, error } = useResource(() => learnApi.chapter(id), [learnApi, id]);
+  if (error) return <p className="form-error">{t('app.invest.learn.loadError')}</p>;
+  if (!data) {
+    return (
+      <p className="inv-empty" role="status">
+        {t('app.common.loading')}
+      </p>
+    );
+  }
+  return <ChapterBody chapter={data} />;
+}
+
+/** A chapter's text: free ones ship with the app, Premium ones come from the API. */
+function ChapterText({
+  chapter,
+  premium,
+  onUpgrade,
+}: {
+  chapter: ChapterInfo;
+  premium: boolean;
+  onUpgrade: () => void;
+}) {
+  if (!chapter.premium) return <ChapterBody chapter={freeContent(chapter.id)!} />;
+  if (!premium) return <LearnLocked onUpgrade={onUpgrade} />;
+  return <PremiumChapterBody id={chapter.id} />;
+}
+
+/**
+ * Educational chapters: a catalogue with search and topics, and a reader for each chapter.
+ * The first two are free; the rest need `premium` (a free account gets `onUpgrade` instead).
+ */
 export function Learn({
   openId,
   onOpen,
+  premium,
+  onUpgrade,
 }: {
   openId: string | null;
   onOpen: (id: string | null) => void;
+  premium: boolean;
+  onUpgrade: () => void;
 }) {
   const { t, locale } = useI18n();
   const [query, setQuery] = useState('');
   const [topic, setTopic] = useState<ChapterTopic | null>(null);
   const top = useRef<HTMLDivElement>(null);
   const en = locale === 'en';
-  const title = (c: Chapter) => (en ? c.titleEn : c.title);
-  const summary = (c: Chapter) => (en ? c.summaryEn : c.summary);
+  const title = (c: ChapterInfo) => (en ? c.titleEn : c.title);
+  const summary = (c: ChapterInfo) => (en ? c.summaryEn : c.summary);
+  const locked = (c: ChapterInfo) => c.premium && !premium;
 
   useEffect(() => {
     (top.current as HTMLDivElement).scrollIntoView({ block: 'start' });
@@ -76,21 +123,21 @@ export function Learn({
     return (
       <article className="inv-article" style={{ ['--cat' as string]: chapter.color }}>
         <div ref={top} />
-        <button type="button" className="btn-secondary" onClick={() => onOpen(null)}>
+        <button type="button" className="back-btn" onClick={() => onOpen(null)}>
           ← {t('app.invest.learn.back')}
         </button>
         <p className="inv-kicker">
           <span className="inv-kicker-tag">
             {topicInfo.emoji} {en ? topicInfo.labelEn : topicInfo.label}
           </span>
-          <span>⏱ {t('app.invest.learn.minutes', { min: chapterMinutes(chapter) })}</span>
+          <span>⏱ {t('app.invest.learn.minutes', { min: chapter.minutes })}</span>
           <span>{t(`app.invest.level.${LEVEL_KEY[chapter.level]}`)}</span>
         </p>
         <h2 className="inv-article-title">
           <span aria-hidden="true">{chapter.emoji}</span> {title(chapter)}
         </h2>
         {en && <p className="inv-note">{t('app.invest.learn.spanishOnly')}</p>}
-        <ChapterBody chapter={chapter} />
+        <ChapterText chapter={chapter} premium={premium} onUpgrade={onUpgrade} />
         <nav className="inv-pager" aria-label={t('app.invest.learn.pager')}>
           {prev ? (
             <button type="button" className="btn-secondary" onClick={() => onOpen(prev.id)}>
@@ -164,16 +211,17 @@ export function Learn({
             </button>
             <p>{summary(c)}</p>
             <div className="inv-chapter-meta">
-              <span>⏱ {t('app.invest.learn.minutes', { min: chapterMinutes(c) })}</span>
+              <span>⏱ {t('app.invest.learn.minutes', { min: c.minutes })}</span>
               <span className="inv-chapter-tag">{t(`app.invest.level.${LEVEL_KEY[c.level]}`)}</span>
-              {c.blocks.some((b) => b.k === 'calc') && (
+              {c.withCalc && (
                 <span className="inv-chapter-tag">🧮 {t('app.invest.learn.withCalc')}</span>
               )}
+              {locked(c) && <span className="premium-chip">Premium</span>}
             </div>
           </li>
         ))}
       </ul>
-      <Glossary onOpen={onOpen} />
+      <Glossary onOpen={onOpen} premium={premium} />
     </div>
   );
 }

@@ -5,8 +5,6 @@ import { isHexColor } from '@domain/shared/text';
 export const CATEGORY_NAME_MAX = 50;
 export const DEFAULT_CATEGORY_COLOR = '#6366f1';
 export const DEFAULT_CATEGORY_ICON = '💰';
-/** Category that receives movements when no better one is known. */
-export const FALLBACK_CATEGORY_NAME = 'Otros';
 
 export interface CategoryProps {
   id: string;

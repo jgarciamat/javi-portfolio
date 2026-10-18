@@ -11,19 +11,32 @@ import '../css/Sections.css';
 
 const STRATEGIES: Strategy[] = ['avalanche', 'snowball'];
 
+/** An optional number as the text of its field. */
+const fieldText = (value: number | null): string => (value === null ? '' : String(value));
+
+/** An empty field means "not set". */
+const optionalNumber = (text: string): number | null =>
+  text.trim() === '' ? null : parseDecimal(text);
+
+/** A rate between 0 and 100 % and a non-negative minimum, or left empty. */
+function validTerms(interestRate: number | null, minPayment: number | null): boolean {
+  return (
+    (interestRate === null ||
+      (Number.isFinite(interestRate) && interestRate >= 0 && interestRate <= 100)) &&
+    (minPayment === null || (Number.isFinite(minPayment) && minPayment >= 0))
+  );
+}
+
 /** Interest and minimum payment of one debt. */
 function DebtTerms({ debt, onSaved }: { debt: Asset; onSaved: () => void }) {
   const { assetApi } = useApi();
   const { t } = useI18n();
   const action = useAction();
-  const [rate, setRate] = useState(debt.interestRate === null ? '' : String(debt.interestRate));
-  const [min, setMin] = useState(debt.minPayment === null ? '' : String(debt.minPayment));
-  const interestRate = rate.trim() === '' ? null : parseDecimal(rate);
-  const minPayment = min.trim() === '' ? null : parseDecimal(min);
-  const valid =
-    (interestRate === null ||
-      (Number.isFinite(interestRate) && interestRate >= 0 && interestRate <= 100)) &&
-    (minPayment === null || (Number.isFinite(minPayment) && minPayment >= 0));
+  const [rate, setRate] = useState(fieldText(debt.interestRate));
+  const [min, setMin] = useState(fieldText(debt.minPayment));
+  const interestRate = optionalNumber(rate);
+  const minPayment = optionalNumber(min);
+  const valid = validTerms(interestRate, minPayment);
 
   return (
     <li className="debt-terms">

@@ -2,6 +2,7 @@ import { randomBytes, randomUUID, timingSafeEqual } from 'crypto';
 import { UnauthorizedError } from '@domain/errors';
 import { InboxMessage, InboxRepository, InboxStatus } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
+import { EntitlementService } from '@application/billing/EntitlementService';
 import { inboxTokenOf, parseReceiptEmail } from '@domain/services/receipt-email';
 import { Cents } from '@domain/shared/money';
 import { ImportService } from '@application/data/DataServices';
@@ -29,13 +30,14 @@ export interface InboxOverview {
 
 const RECENT = 10;
 
-/** Receipts forwarded by e-mail become expenses (Premium, like importing a bank file). */
+/** Receipts forwarded by e-mail become expenses (Premium). */
 export class InboxService {
   constructor(
     private readonly repo: InboxRepository,
     private readonly importer: ImportService,
     private readonly config: InboxConfig,
-    private readonly clock: Clock
+    private readonly clock: Clock,
+    private readonly entitlements: EntitlementService
   ) {}
 
   enabled(): boolean {
@@ -43,6 +45,7 @@ export class InboxService {
   }
 
   overview(userId: string): InboxOverview {
+    this.entitlements.assertFeature(userId, 'inbox');
     if (!this.enabled()) return { address: null, recent: [] };
     let token = this.repo.tokenOf(userId);
     if (!token) token = this.newToken(userId);
@@ -54,6 +57,7 @@ export class InboxService {
 
   /** Gives the user a new address (the old one stops working). */
   rotate(userId: string): InboxOverview {
+    this.entitlements.assertFeature(userId, 'inbox');
     if (this.enabled()) this.newToken(userId);
     return this.overview(userId);
   }
@@ -69,10 +73,14 @@ export class InboxService {
     const userId = token ? this.repo.userOf(token) : null;
     if (!userId) return 'ignored';
 
+    // The address outlives Premium: mail that arrives afterwards is logged but not imported.
+    if (!this.entitlements.limits(userId).features.inbox) {
+      return this.record(userId, 'failed', null, null);
+    }
     const parsed = parseReceiptEmail(mail);
     if (!parsed) return this.record(userId, 'unreadable', null, null);
     try {
-      const result = await this.importer.import(
+      const result = await this.importer.importRows(
         userId,
         [
           {

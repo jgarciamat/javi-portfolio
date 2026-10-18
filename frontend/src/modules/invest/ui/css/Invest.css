@@ -532,6 +532,14 @@
   border-radius: 2px;
 }
 
+/* Sample of the line (colour and pattern); more specific than `.inv-chart svg`. */
+.inv-legend .inv-legend-line {
+  display: inline-block;
+  width: 22px;
+  height: 6px;
+  flex: none;
+}
+
 .inv-legend--wrap i {
   height: 10px;
   border-radius: 3px;
@@ -1198,42 +1206,12 @@ textarea.tx-input {
 
 .inv-locked {
   display: grid;
-  min-height: 26rem;
-}
-
-.inv-locked > * {
-  grid-area: 1 / 1;
-}
-
-.inv-locked-preview {
-  max-height: 26rem;
-  overflow: hidden;
-  opacity: 0.4;
-  pointer-events: none;
-  user-select: none;
-}
-
-.inv-locked-preview .inv-chapter:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.inv-skeleton {
-  display: block;
-  height: 0.6rem;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--cat) 45%, transparent);
-}
-
-.inv-skeleton--short {
-  width: 60%;
 }
 
 .inv-locked-panel {
   align-self: start;
   justify-self: center;
-  margin-top: 2.5rem;
-  z-index: 1;
+  margin-top: 1rem;
   display: grid;
   gap: 0.6rem;
   justify-items: center;

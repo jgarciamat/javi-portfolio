@@ -1,6 +1,6 @@
 import { NotFoundError, ValidationError } from '@domain/errors';
 import { Account, DEFAULT_ACCOUNT_NAME } from '@domain/model/Account';
-import { Category, FALLBACK_CATEGORY_NAME } from '@domain/model/Category';
+import { Category } from '@domain/model/Category';
 import {
   AccountRepository,
   CategoryRepository,
@@ -40,10 +40,6 @@ export class CategoryResolver {
     if (!ref.categoryId && !(ref.category && ref.category.trim())) return null;
     return this.resolve(userId, ref);
   }
-
-  fallback(userId: string): Category {
-    return this.findOrCreate(userId, FALLBACK_CATEGORY_NAME);
-  }
 }
 
 export class AccountResolver {
@@ -65,10 +61,22 @@ export class AccountResolver {
       const account = this.accounts.findById(userId, settings.defaultAccountId);
       if (account && !account.archived) return account;
     }
-    const firstActive = this.accounts.listByUser(userId).find((a) => !a.archived);
-    const account = firstActive ?? Account.create(userId, { name: DEFAULT_ACCOUNT_NAME });
-    if (!firstActive) this.accounts.save(account);
+    const all = this.accounts.listByUser(userId);
+    const account = all.find((a) => !a.archived) ?? this.restoreOrCreateDefault(userId, all);
     this.settings.save({ ...settings, defaultAccountId: account.id });
+    return account;
+  }
+
+  /**
+   * Every account is archived (or there is none): the archived one with the default name is
+   * brought back, since creating another with the same name would break the unique name.
+   */
+  private restoreOrCreateDefault(userId: string, all: Account[]): Account {
+    const archived = all.find((a) => a.name === DEFAULT_ACCOUNT_NAME);
+    const account = archived
+      ? archived.update({ archived: false })
+      : Account.create(userId, { name: DEFAULT_ACCOUNT_NAME });
+    this.accounts.save(account);
     return account;
   }
 

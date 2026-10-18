@@ -144,22 +144,28 @@ export function readDraft(
 
 const CHILD = /hij|nacimiento|adopci|guarder|maternidad|descend|menor/;
 
+/** What makes a deduction relevant, by words of its id or title: the first rule that matches decides. */
+const RULES: [RegExp, (s: DraftSituation) => boolean][] = [
+  // A single-parent family has one child or more; a large family (Ley 40/2003, art. 2) at least
+  // two (three in general, two in the special cases), as does the separated parent with two.
+  [/monoparental/, (s) => s.childAges.length > 0],
+  [/numerosa|dos hijos/, (s) => s.childAges.length >= 2],
+  [/maternidad|guarder/, (s) => s.childAges.some((a) => a < 3)],
+  [/nacimiento|adopci/, (s) => s.childAges.some((a) => a < 2)],
+  [CHILD, (s) => s.childAges.length > 0],
+  [/ascend|mayor de 65|mayores/, (s) => s.ascendants > 0],
+  [/discapacid/, (s) => s.disability],
+  [/alquiler|arrendamiento/, (s) => s.rents],
+];
+
+/** Groups worth asking about whatever the situation. */
+const ALWAYS: Deduction['group'][] = ['housing', 'health', 'education', 'donations'];
+
 /** Whether a deduction is worth asking about, given the person's situation. */
 export function isRelevant(d: Deduction, s: DraftSituation): boolean {
   const text = normalize(`${d.id} ${d.title}`);
-  if (/numerosa|monoparental/.test(text)) return s.childAges.length >= 2 || s.childAges.length > 0;
-  if (/maternidad|guarder/.test(text)) return s.childAges.some((a) => a < 3);
-  if (/nacimiento|adopci/.test(text)) return s.childAges.some((a) => a < 2);
-  if (CHILD.test(text)) return s.childAges.length > 0;
-  if (/ascend|mayor de 65|mayores/.test(text)) return s.ascendants > 0;
-  if (/discapacid/.test(text)) return s.disability;
-  if (/alquiler|arrendamiento/.test(text)) return s.rents;
-  return (
-    d.group === 'housing' ||
-    d.group === 'health' ||
-    d.group === 'education' ||
-    d.group === 'donations'
-  );
+  const rule = RULES.find(([words]) => words.test(text));
+  return rule ? rule[1](s) : ALWAYS.includes(d.group);
 }
 
 /** The deductions to ask about: relevant ones that the draft does not seem to include. */

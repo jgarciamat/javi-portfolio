@@ -11,11 +11,125 @@ import type { HouseholdStatus } from '@modules/billing/domain/types';
 import '@modules/billing/ui/css/Billing.css';
 import '../css/Sections.css';
 
+/** A member sees whose household it is and can leave it. */
+function MemberOf({ name, onLeave }: { name: string; onLeave: () => void }) {
+  const { t } = useI18n();
+  return (
+    <>
+      <p>{t('app.household.memberOf', { name })}</p>
+      <p className="plan-note">{t('app.household.memberNote')}</p>
+      <div className="button-row">
+        <button className="btn-secondary" onClick={onLeave}>
+          {t('app.household.leave')}
+        </button>
+      </div>
+    </>
+  );
+}
+
+/** The people the owner shares the data with. */
+function HouseholdMembers({
+  members,
+  onRemove,
+}: {
+  members: HouseholdStatus['members'];
+  onRemove: (id: string) => () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <ul className="household-members">
+      {members.map((m) => (
+        <li key={m.id}>
+          <span>👤 {m.name}</span>
+          <button className="btn-secondary" onClick={onRemove(m.id)}>
+            {t('app.household.remove')}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The link just created, to copy and send. */
+function InviteLink({
+  link,
+  copied,
+  onCopy,
+}: {
+  link: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <>
+      <p className="invite-link">
+        <code>{link}</code>
+      </p>
+      <div className="button-row">
+        <button className="btn-secondary" onClick={onCopy}>
+          {copied ? t('billing.invite.copied') : t('billing.invite.copy')}
+        </button>
+      </div>
+    </>
+  );
+}
+
+interface HouseholdInviteProps {
+  pendingInvite: HouseholdStatus['pendingInvite'];
+  link: string | null;
+  copied: boolean;
+  /** Set when the plan does not include the household: opens the plans instead. */
+  onUpgrade: (() => void) | null;
+  onInvite: () => void;
+  onCancelInvite: () => void;
+  onCopy: () => void;
+}
+
+/** Invite someone while there is room: create, cancel and copy the link. */
+function HouseholdInvite({
+  pendingInvite,
+  link,
+  copied,
+  onUpgrade,
+  onInvite,
+  onCancelInvite,
+  onCopy,
+}: HouseholdInviteProps) {
+  const { t } = useI18n();
+  const { date } = useFormat();
+  return (
+    <>
+      {onUpgrade ? (
+        <button className="btn-primary" onClick={onUpgrade}>
+          {t('billing.seePlans')}
+        </button>
+      ) : (
+        <div className="button-row">
+          <button className="btn-secondary" onClick={onInvite}>
+            {pendingInvite || link ? t('app.household.newInvite') : t('app.household.invite')}
+          </button>
+          {pendingInvite && (
+            <button className="btn-secondary" onClick={onCancelInvite}>
+              {t('app.household.cancelInvite')}
+            </button>
+          )}
+        </div>
+      )}
+      {link && <InviteLink link={link} copied={copied} onCopy={onCopy} />}
+      {pendingInvite && (
+        <p className="plan-note">
+          {t('app.household.pending', { date: date(pendingInvite.expiresAt) })}
+        </p>
+      )}
+    </>
+  );
+}
+
 /** Share the data with a partner: invite, see who is in, remove or leave. */
 export function HouseholdCard() {
   const { householdApi } = useApi();
   const { t } = useI18n();
-  const { date } = useFormat();
   const plan = useOptionalPlan();
   const { data, reload } = useResource<HouseholdStatus | null>(
     () => householdApi.status(),
@@ -26,7 +140,7 @@ export function HouseholdCard() {
   const [copied, setCopied] = useState(false);
   if (!data) return null;
 
-  const locked = plan !== null && !plan.isPremium && data.role === 'none';
+  const locked = plan !== null && plan.isFree && data.role === 'none';
   const refresh = (fn: () => Promise<unknown>) => async () => {
     if (await action.run(fn)) await reload();
   };
@@ -34,6 +148,10 @@ export function HouseholdCard() {
     const created = await householdApi.invite();
     setLink(householdInviteLink(created.code));
     setCopied(false);
+  };
+  const cancelInvite = async () => {
+    await householdApi.cancelInvite();
+    setLink(null);
   };
   const copy = async () => {
     await navigator.clipboard.writeText(link as string);
@@ -52,76 +170,28 @@ export function HouseholdCard() {
       <p className="section-hint">{t('app.household.hint')}</p>
       {action.error && <p className="form-error">{action.error}</p>}
 
-      {data.role === 'member' && data.owner && (
+      {data.role === 'member' ? (
+        data.owner && <MemberOf name={data.owner.name} onLeave={() => action.run(leave)} />
+      ) : (
         <>
-          <p>{t('app.household.memberOf', { name: data.owner.name })}</p>
-          <p className="plan-note">{t('app.household.memberNote')}</p>
-          <div className="button-row">
-            <button className="btn-secondary" onClick={() => action.run(leave)}>
-              {t('app.household.leave')}
-            </button>
-          </div>
-        </>
-      )}
-
-      {data.role !== 'member' && data.members.length > 0 && (
-        <ul className="household-members">
-          {data.members.map((m) => (
-            <li key={m.id}>
-              <span>👤 {m.name}</span>
-              <button className="btn-secondary" onClick={refresh(() => householdApi.remove(m.id))}>
-                {t('app.household.remove')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {data.role !== 'member' && data.members.length < data.maxMembers && (
-        <>
-          {locked ? (
-            <button
-              className="btn-primary"
-              onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'household' })}
-            >
-              {t('billing.seePlans')}
-            </button>
-          ) : (
-            <div className="button-row">
-              <button className="btn-secondary" onClick={refresh(invite)}>
-                {data.pendingInvite || link
-                  ? t('app.household.newInvite')
-                  : t('app.household.invite')}
-              </button>
-              {data.pendingInvite && (
-                <button
-                  className="btn-secondary"
-                  onClick={refresh(async () => {
-                    await householdApi.cancelInvite();
-                    setLink(null);
-                  })}
-                >
-                  {t('app.household.cancelInvite')}
-                </button>
-              )}
-            </div>
+          {data.members.length > 0 && (
+            <HouseholdMembers
+              members={data.members}
+              onRemove={(id) => refresh(() => householdApi.remove(id))}
+            />
           )}
-          {link && (
-            <>
-              <p className="invite-link">
-                <code>{link}</code>
-              </p>
-              <div className="button-row">
-                <button className="btn-secondary" onClick={copy}>
-                  {copied ? t('billing.invite.copied') : t('billing.invite.copy')}
-                </button>
-              </div>
-            </>
-          )}
-          {data.pendingInvite && (
-            <p className="plan-note">
-              {t('app.household.pending', { date: date(data.pendingInvite.expiresAt) })}
-            </p>
+          {data.members.length < data.maxMembers && (
+            <HouseholdInvite
+              pendingInvite={data.pendingInvite}
+              link={link}
+              copied={copied}
+              onUpgrade={
+                locked ? () => plan.openUpgrade({ kind: 'feature', feature: 'household' }) : null
+              }
+              onInvite={refresh(invite)}
+              onCancelInvite={refresh(cancelInvite)}
+              onCopy={copy}
+            />
           )}
         </>
       )}

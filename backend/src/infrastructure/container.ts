@@ -76,6 +76,9 @@ import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository
 import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxRepository';
 import { InboxService } from '@application/inbox/InboxService';
 import { RentaService } from '@application/renta/RentaService';
+import { LearnService } from '@application/learn/LearnService';
+import { PREMIUM_CHAPTERS } from './learn';
+import { SqliteImportUsageRepository } from './sqlite/repositories/SqliteImportUsageRepository';
 import { SqliteAutonomoUsageRepository } from './sqlite/repositories/SqliteAutonomoUsageRepository';
 import { SqliteAutonomoPdfRepository } from './sqlite/repositories/SqliteAutonomoPdfRepository';
 import { SqliteRentaUsageRepository } from './sqlite/repositories/SqliteRentaUsageRepository';
@@ -145,6 +148,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     rentaPasses: new SqliteRentaPassRepository(db),
     autonomoDrafts: new SqliteAutonomoUsageRepository(db),
     autonomoPdfs: new SqliteAutonomoPdfRepository(db),
+    imports: new SqliteImportUsageRepository(db),
     accounts: new SqliteAccountRepository(db),
     transfers: new SqliteTransferRepository(db),
     transactions: new SqliteTransactionRepository(db),
@@ -268,8 +272,19 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     new AiCategorizer(suggester, allowance),
     categoryRules,
     uow,
+    clock,
+    repos.imports
+  );
+  const tax = new TaxService(
+    repos.business,
+    repos.categories,
+    repos.transactions,
+    entitlements,
+    repos.autonomoDrafts,
+    repos.autonomoPdfs,
     clock
   );
+  const renta = new RentaService(repos.renta, entitlements, clock);
 
   return {
     db,
@@ -351,14 +366,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     push: pushService,
     reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
     split: new SplitService(repos.splits, uow, clock),
-    tax: new TaxService(
-      repos.business,
-      repos.categories,
-      repos.transactions,
-      entitlements,
-      repos.autonomoDrafts,
-      repos.autonomoPdfs
-    ),
+    tax,
     assetService: new AssetService(repos.assets, entitlements, uow, clock),
     advice: new AdviceService(
       transactions,
@@ -384,10 +392,11 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         goals: repos.goals.listByUser(userId).length,
         recurringRules: repos.rules.listByUser(userId).length,
         customAlerts: repos.alerts.listByUser(userId).length,
-        rentaCalculations: repos.renta.count(userId),
-        autonomoDrafts: repos.autonomoDrafts.count(userId),
+        rentaCalculations: renta.usedThisCampaign(userId),
+        autonomoDrafts: tax.draftsThisQuarter(userId),
         autonomoPdfs: repos.autonomoPdfs.count(userId),
         assets: repos.assets.listByUser(userId).length,
+        imports: repos.imports.count(userId),
         movements: repos.transactions.count(userId),
       }),
       (userId) => repos.settings.get(userId).locale,
@@ -417,8 +426,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,
-    renta: new RentaService(repos.renta, entitlements),
-    inbox: new InboxService(repos.inbox, importer, config.inbox, clock),
+    renta,
+    learn: new LearnService(PREMIUM_CHAPTERS, entitlements),
+    inbox: new InboxService(repos.inbox, importer, config.inbox, clock, entitlements),
     exporter: new ExportService(
       repos.users,
       repos.settings,

@@ -231,7 +231,7 @@ describe('Renta planner: amounts by child, percentages and relatives', () => {
   });
 });
 
-describe('Renta planner: one calculation for free accounts', () => {
+describe('Renta planner: free calculations', () => {
   it('gives an anonymous visitor one calculation and then asks them to sign up', async () => {
     renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
       authenticated: false,
@@ -290,19 +290,32 @@ describe('Renta planner: one calculation for free accounts', () => {
     expect(api.rentaApi.register).not.toHaveBeenCalled();
   });
 
-  it('counts the free calculation of an account and then opens the plans', async () => {
+  it('gives an account 3 calculations per campaign, then opens the plans', async () => {
     const api = free();
-    renderWithProviders(<RentaPlanner mode="account" initialIncome="30000" />, { api, plan: true });
-    api.billingApi.get.mockResolvedValue(
+    const used = (rentaCalculations: number) =>
       f.billing({
         plan: 'free',
         limits: f.catalog().limits.free,
-        usage: { ...f.billing().usage, rentaCalculations: 1 },
-      })
-    );
-    fireEvent.click(await screen.findByRole('button', { name: tr('tools.renta.calculate') }));
+        usage: { ...f.billing().usage, rentaCalculations },
+      });
+    renderWithProviders(<RentaPlanner mode="account" initialIncome="30000" />, { api, plan: true });
+    expect(
+      await screen.findByText(tr('tools.renta.freeCampaign', { count: 3 }))
+    ).toBeInTheDocument();
+    api.billingApi.get.mockResolvedValue(used(1));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     await waitFor(() => expect(api.rentaApi.register).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
+    // Still two left: the result can be worked out again with other data.
+    expect(await screen.findByText(tr('tools.renta.recalcLeft', { count: 2 }))).toBeInTheDocument();
+    const before = screen.getByText(new RegExp(tr('tools.renta.toPay'))).textContent;
+    fill('tools.renta.gross', '90000');
+    expect(screen.getByText(new RegExp(tr('tools.renta.toPay'))).textContent).toBe(before);
+    api.billingApi.get.mockResolvedValue(used(3));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.recalculate') }));
+    await waitFor(() => expect(api.rentaApi.register).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText(tr('tools.renta.usedFreeCampaign'))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(tr('tools.renta.toPay'))).textContent).not.toBe(before);
     fireEvent.click(
       (await screen.findAllByRole('button', { name: tr('tools.renta.goPremium') }))[0]
     );
@@ -321,17 +334,17 @@ describe('Renta planner: one calculation for free accounts', () => {
     expect(screen.queryByText(new RegExp(tr('tools.renta.toPay')))).toBeNull();
   });
 
-  it('knows an account that already used its calculation', async () => {
+  it('knows an account that already used the calculations of the campaign', async () => {
     const api = createFakeApi();
     api.billingApi.get.mockResolvedValue(
       f.billing({
         plan: 'free',
         limits: f.catalog().limits.free,
-        usage: { ...f.billing().usage, rentaCalculations: 1 },
+        usage: { ...f.billing().usage, rentaCalculations: 3 },
       })
     );
     renderWithProviders(<RentaPlanner mode="account" />, { api, plan: true });
-    expect(await screen.findByText(tr('tools.renta.usedNoSnapshot'))).toBeInTheDocument();
+    expect(await screen.findByText(tr('tools.renta.usedCampaign'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('tools.renta.calculate') })).toBeNull();
     fireEvent.click(screen.getAllByRole('button', { name: tr('tools.renta.goPremium') })[0]);
     expect(await screen.findByRole('dialog')).toBeInTheDocument();

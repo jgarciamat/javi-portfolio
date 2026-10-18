@@ -12,12 +12,21 @@ export function PasswordSection() {
       <span className="profile-label">{t('app.profile.password.label')}</span>
       {/* Google-only accounts have no current password: they set one directly. */}
       {s.hasPassword ? (
-        <AuthPasswordInput
-          value={s.currentPassword}
-          onChange={s.setCurrentPassword}
-          placeholder={t('app.profile.password.current')}
-          autoComplete="current-password"
-        />
+        <>
+          <AuthPasswordInput
+            value={s.currentPassword}
+            onChange={s.setCurrentPassword}
+            placeholder={t('app.profile.password.current')}
+            autoComplete="current-password"
+            invalid={s.wrongCurrent}
+            describedBy={s.wrongCurrent ? 'profile-current-password-error' : undefined}
+          />
+          {s.wrongCurrent && (
+            <p id="profile-current-password-error" className="auth-hint-error" role="alert">
+              {t('app.profile.password.wrongCurrent')}
+            </p>
+          )}
+        </>
       ) : (
         <p className="profile-hint">{t('app.profile.password.setFirst')}</p>
       )}
