@@ -643,6 +643,20 @@
   letter-spacing: 0.05em;
 }
 
+.profile-panel .auth-input {
+  /* The same look as the other fields of the app (the movement form, the filters). */
+  padding: 0.6rem 0.8rem;
+  min-height: 2.75rem;
+  font-size: 0.88rem;
+}
+
+/* The email is shown, not edited: the field looks like one and is read-only. */
+.profile-panel .auth-input[readonly],
+.profile-panel .auth-input:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
 .profile-divider {
   border: none;
   border-top: 1px solid var(--slate-800);

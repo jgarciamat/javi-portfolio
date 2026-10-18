@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './css/AuthFields.css';
 import './css/AuthPage.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@shared/hooks/useAuth';
