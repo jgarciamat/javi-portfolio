@@ -30,6 +30,15 @@ const GUIDE_VIDEOS: Record<string, number> = {
   'deduccion-alquiler-vivienda-habitual-renta': 32,
   'como-leer-borrador-renta': 14,
   'renta-a-pagar-o-a-devolver': 34,
+  'como-hacer-la-renta-2025-paso-a-paso': 13,
+  'plazos-renta-2025': 34,
+  'modelo-303-casillas': 22,
+  'alta-autonomo-paso-a-paso': 25,
+  'tarifa-plana-autonomos-2026': 12,
+  'verifactu-que-es': 30,
+  'ingreso-minimo-vital': 48,
+  'bono-social-electrico': 47,
+  'bono-alquiler-joven': 46,
 };
 
 /** Our public video on the topic of a guide, if there is one. */

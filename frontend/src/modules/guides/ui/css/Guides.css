@@ -239,3 +239,79 @@
   background: color-mix(in srgb, var(--cat, var(--accent)) 20%, transparent);
   white-space: nowrap;
 }
+
+.video-embed {
+  margin: 1.5rem 0;
+}
+
+.video-embed-play,
+.video-embed-frame {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+  background: #0b1020;
+}
+
+.video-embed-play {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.video-embed-play img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-embed-button {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 1.5rem;
+  padding-left: 0.2rem;
+}
+
+.video-embed-play:hover .video-embed-button,
+.video-embed-play:focus-visible .video-embed-button {
+  background: #e11d48;
+}
+
+.video-embed-time {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.video-embed figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.guide-updated,
+.guide-sources {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.guide-sources ul {
+  padding-left: 1.2rem;
+}

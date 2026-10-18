@@ -172,6 +172,105 @@
   color: var(--accent-300);
 }
 
+/* ─── Terms update dialog ─────────────────────── */
+.terms-update {
+  max-width: 480px;
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.terms-update > * {
+  margin: 0;
+}
+
+.terms-update-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(4, 120, 87, 0.25), rgba(29, 78, 216, 0.3));
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  font-size: 1.5rem;
+}
+
+.terms-update .upgrade-title {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.terms-update-body {
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.terms-update .plan-terms {
+  align-items: center;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: var(--slate-800);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.terms-update .plan-terms:has(input:checked) {
+  border-color: var(--accent);
+}
+
+.terms-update .plan-terms input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+}
+
+.terms-update-accept .btn-primary {
+  width: 100%;
+  min-height: 2.9rem;
+  font-size: 1rem;
+}
+
+.terms-update-disagree {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--slate-800);
+}
+
+.terms-update-disagree .plan-note {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.terms-update-disagree .button-row {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.terms-update-disagree .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .terms-update {
+    padding: 1.5rem 1.1rem 1.25rem;
+  }
+}
+
 /* ─── Plan view ───────────────────────────────── */
 .plan-card-head {
   display: flex;

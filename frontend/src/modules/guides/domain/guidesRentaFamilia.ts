@@ -7,7 +7,8 @@ const CHECK =
 export const GUIDES_RENTA_FAMILIA: Guide[] = [
   {
     slug: 'deduccion-maternidad-modelo-140',
-    title: 'Deducción por maternidad y modelo 140: cuánto es y cómo cobrarla cada mes',
+    updated: '2026-10-15',
+    title: 'Deducción por maternidad (modelo 140): cuánto es y cómo cobrarla',
     description:
       'Cuánto se deduce por cada hijo menor de 3 años, quién tiene derecho, cómo se suma la ayuda de guardería y cómo pedir el abono mensual con el modelo 140.',
     intro:
@@ -78,7 +79,8 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
   },
   {
     slug: 'familia-numerosa-deduccion-modelo-143',
-    title: 'Familia numerosa en la Renta: deducción y modelo 143 para cobrarla por adelantado',
+    updated: '2026-10-15',
+    title: 'Familia numerosa en la Renta: deducción y modelo 143',
     description:
       'Cuánto se deduce por familia numerosa general y especial, el incremento por cada hijo de más, otras deducciones del modelo 143 y ayudas de comunidades.',
     intro:
@@ -151,6 +153,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
   },
   {
     slug: 'como-leer-borrador-renta',
+    updated: '2026-10-15',
     title: 'Cómo leer tu borrador de la Renta: qué mirar antes de confirmarlo',
     description:
       'Guía para revisar el borrador del IRPF apartado por apartado: datos personales, rendimientos, mínimos familiares, deducciones y resultado final.',
@@ -224,13 +227,15 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
       'deduccion-alquiler-vivienda-habitual-renta',
       'planes-de-pensiones-limite-renta',
       'deduccion-maternidad-modelo-140',
+      'como-hacer-la-renta-2025-paso-a-paso',
     ],
   },
   {
     slug: 'renta-a-pagar-o-a-devolver',
-    title: '¿Me sale a pagar o a devolver en la Renta? Cómo saberlo antes de presentar',
+    updated: '2026-10-15',
+    title: '¿Renta a pagar o a devolver? Cómo saberlo antes de presentar',
     description:
-      'Cómo se calcula el resultado del IRPF: base, mínimo personal y familiar, escala, deducciones y retenciones. Por qué unos pagan y otros reciben una devolución.',
+      'Cómo se calcula el resultado del IRPF: base, mínimos, escala, deducciones y retenciones, y por qué unos pagan y otros reciben devolución.',
     intro:
       'El resultado de la Renta es una resta: lo que debes de impuesto menos lo que ya te retuvieron durante el año. Si lo retenido supera el impuesto, te devuelven la diferencia; si no, pagas el resto.',
     sections: [
@@ -290,6 +295,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
       'planes-de-pensiones-limite-renta',
       'familia-numerosa-deduccion-modelo-143',
       'deduccion-alquiler-vivienda-habitual-renta',
+      'plazos-renta-2025',
     ],
   },
 ];

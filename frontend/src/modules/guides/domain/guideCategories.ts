@@ -59,6 +59,10 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
       'cuota-autonomos-2026-por-tramos',
       'gastos-deducibles-autonomo',
       'fechas-modelos-trimestrales-autonomos-2026',
+      'modelo-303-casillas',
+      'alta-autonomo-paso-a-paso',
+      'tarifa-plana-autonomos-2026',
+      'verifactu-que-es',
     ],
   },
   {
@@ -68,6 +72,8 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     blurb: 'Deducciones, borrador y comunidades autónomas para pagar lo justo.',
     color: '#0ea5e9',
     slugs: [
+      'como-hacer-la-renta-2025-paso-a-paso',
+      'plazos-renta-2025',
       'como-leer-borrador-renta',
       'renta-a-pagar-o-a-devolver',
       'deduccion-maternidad-modelo-140',
@@ -77,6 +83,14 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
       'deducciones-renta-castilla-y-leon',
       'deducciones-renta-comunitat-valenciana',
     ],
+  },
+  {
+    id: 'ayudas',
+    emoji: '🏠',
+    label: 'Ayudas y vivienda',
+    blurb: 'Ingreso Mínimo Vital, bono social eléctrico y ayudas al alquiler.',
+    color: '#14b8a6',
+    slugs: ['ingreso-minimo-vital', 'bono-social-electrico', 'bono-alquiler-joven'],
   },
 ];
 

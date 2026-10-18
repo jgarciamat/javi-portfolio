@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { inlineParts, type Guide } from '../domain/guides';
+import { GUIDE_NOTICE, inlineParts, longDate, type Guide } from '../domain/guides';
 import { categoryOf, readingMinutes } from '../domain/guideCategories';
 
 const KEY = /(\d[\d.,]*\s?(?:%|€))/g;
@@ -34,6 +34,9 @@ export function GuideBody({
           {categoryOf(guide.slug).emoji} {categoryOf(guide.slug).label}
         </span>
         <span>⏱ {readingMinutes(guide)} min de lectura</span>
+        <span>
+          📅 Actualizado: <time dateTime={guide.updated}>{longDate(guide.updated)}</time>
+        </span>
       </p>
       <p className="guide-intro">{highlight(guide.intro)}</p>
       {guide.sections.map((s) => (
@@ -58,6 +61,22 @@ export function GuideBody({
           ))}
         </section>
       ))}
+      {guide.sources && guide.checked && (
+        <section className="guide-sources">
+          <h2>Fuentes oficiales</h2>
+          <p>Consultadas el {longDate(guide.checked)}.</p>
+          <ul>
+            {guide.sources.map((source) => (
+              <li key={source.url}>
+                <a href={source.url} target="_blank" rel="noopener noreferrer">
+                  {source.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p>{GUIDE_NOTICE}</p>
+        </section>
+      )}
     </div>
   );
 }

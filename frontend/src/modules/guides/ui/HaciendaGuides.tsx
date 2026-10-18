@@ -7,6 +7,7 @@ import {
   HACIENDA_GUIDES,
   OFFICIAL_LINKS,
   OFFICIAL_VIDEOS,
+  SOURCE_CHECKED,
   checkId,
   checkIds,
   findHaciendaGuide,
@@ -225,6 +226,11 @@ export function HaciendaGuideBody({
         </ul>
       </section>
 
+      <p className="hacienda-source">
+        <time dateTime={SOURCE_CHECKED}>
+          {t('hacienda.updated', { date: t('hacienda.sourceDate') })}
+        </time>
+      </p>
       <p className="hacienda-source">{t('hacienda.source', { date: t('hacienda.sourceDate') })}</p>
       <p className="hacienda-disclaimer">{t('hacienda.disclaimer')}</p>
     </div>

@@ -111,10 +111,9 @@ describe('inlineParts', () => {
       'href',
       '/guias/gastos-deducibles-autonomo'
     );
-    expect(screen.getByRole('link', { name: /Vídeo: Modelo 130 para tontos/ })).toHaveAttribute(
-      'href',
-      expect.stringContaining('https://www.youtube.com/watch?v=')
-    );
+    expect(
+      screen.getByRole('link', { name: /Ver en YouTube: Modelo 130 para tontos/ })
+    ).toHaveAttribute('href', expect.stringContaining('https://www.youtube.com/watch?v='));
     expect(screen.getByRole('link', { name: /Videoteca/ })).toHaveAttribute('href', '/videoteca');
   });
 });
@@ -139,7 +138,9 @@ describe('guide pages', () => {
     expect(document.title).toContain(guide.title);
     guide.sections.forEach((s) => expect(screen.getByText(s.heading)).toBeInTheDocument());
     if (guide.tool) {
-      expect(screen.getByRole('link', { name: new RegExp(guide.tool.label) })).toHaveAttribute(
+      expect(
+        screen.getByRole('link', { name: new RegExp(`🧮.*${guide.tool.label}`) })
+      ).toHaveAttribute(
         'href',
         guide.tool.to === '/calculadora-renta' ? '/login?next=%2F%3Ftab%3Drenta' : guide.tool.to
       );

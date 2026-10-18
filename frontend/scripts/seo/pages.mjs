@@ -35,7 +35,9 @@ async function load(entry) {
   return import(pathToFileURL(outfile).href);
 }
 
-const { GUIDES, inlineParts } = await load('src/modules/guides/domain/guides.ts');
+const { GUIDES, GUIDE_NOTICE, inlineParts, longDate } = await load(
+  'src/modules/guides/domain/guides.ts'
+);
 const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts');
 const { guideVideo, guidesForTool } = await load('src/modules/guides/domain/guideLinks.ts');
 const { TOOL_PAGES } = await load('src/modules/tools/domain/toolPages.ts');
@@ -69,8 +71,16 @@ export const pathIn = (path, lang) =>
   lang === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 export const urlOf = (path, lang = 'es') => `${ORIGIN}${pathIn(path, lang)}`;
 
-const { HACIENDA_GUIDES, HACIENDA_PATH, haciendaPath, guideKey, stepKey, upTo, withCampaign } =
-  hacienda;
+const {
+  HACIENDA_GUIDES,
+  HACIENDA_PATH,
+  SOURCE_CHECKED,
+  haciendaPath,
+  guideKey,
+  stepKey,
+  upTo,
+  withCampaign,
+} = hacienda;
 const { VIDEOS_PATH } = videos;
 
 /** The pages translated into English (the guides are only in Spanish). */
@@ -393,14 +403,24 @@ function pagesIn(lang) {
         ogType: 'article',
         body: `<main><p>${link('/guias', '← Todas las guías')}</p><article><h1>${esc(
           g.title
-        )}</h1><p>${esc(g.intro)}</p>${g.sections
+        )}</h1><p>${esc(g.intro)}</p><p>${esc('Actualizado')}: <time datetime="${g.updated}">${esc(
+          longDate(g.updated)
+        )}</time></p>${g.sections
           .map(
             (s) =>
               `<h2>${esc(s.heading)}</h2>${s.paragraphs
                 .map((p) => `<p>${paragraph(p)}</p>`)
                 .join('')}`
           )
-          .join('')}</article>${g.tool ? `<p>${link(g.tool.to, `🧮 ${g.tool.label}`)}</p>` : ''}${
+          .join('')}${
+          g.sources
+            ? `<section><h2>Fuentes oficiales</h2><p>Consultadas el ${esc(
+                longDate(g.checked)
+              )}.</p><ul>${g.sources
+                .map((x) => `<li>${external(x.url, x.label)}</li>`)
+                .join('')}</ul><p>${esc(GUIDE_NOTICE)}</p></section>`
+            : ''
+        }</article>${g.tool ? `<p>${link(g.tool.to, `🧮 ${g.tool.label}`)}</p>` : ''}${
           video ? `<p>${external(videos.videoUrl(video), `🎬 Vídeo: ${video.title}`)}</p>` : ''
         }${guideCta}<section><h2>Sigue leyendo</h2><ul>${related
           .map((r) => `<li>${link(`/guias/${r.slug}`, r.title)}</li>`)
@@ -418,11 +438,37 @@ function pagesIn(lang) {
             url,
             mainEntityOfPage: url,
             articleSection: category.label,
+            dateModified: g.updated,
             image: `${ORIGIN}/og-image.png`,
             author: { '@type': 'Person', name: 'Javi García' },
             publisher: { '@id': `${ORIGIN}/#organization` },
             ...(video && { video: videoObject(video, videoDescription(video)) }),
           },
+          ...(g.howTo
+            ? [
+                {
+                  '@type': 'HowTo',
+                  '@id': `${url}#howto`,
+                  name: g.title,
+                  description: g.description,
+                  inLanguage: 'es',
+                  url,
+                  dateModified: g.updated,
+                  step: g.sections.map((s, i) => ({
+                    '@type': 'HowToStep',
+                    position: i + 1,
+                    name: s.heading.replace(/^\d+\.\s*/, ''),
+                    text: s.paragraphs
+                      .map((p) =>
+                        inlineParts(p)
+                          .map((x) => (typeof x === 'string' ? x : x.label))
+                          .join('')
+                      )
+                      .join(' '),
+                  })),
+                },
+              ]
+            : []),
           breadcrumbs(url, [home, ['Guías', guidesUrl], [g.title, url]]),
         ],
         videos: video ? [video] : [],
@@ -497,7 +543,11 @@ function pagesIn(lang) {
                 `${t('hacienda.videoOwn')}: ${video.title}`
               )}</p>`
             : ''
-        }<p>${esc(source)}</p><p>${esc(t('hacienda.disclaimer'))}</p></article>${nav}</main>`,
+        }<p><time datetime="${SOURCE_CHECKED}">${esc(
+          t('hacienda.updated', { date: t('hacienda.sourceDate') })
+        )}</time></p><p>${esc(source)}</p><p>${esc(
+          t('hacienda.disclaimer')
+        )}</p></article>${nav}</main>`,
         nodes: [
           {
             '@type': 'HowTo',
@@ -506,6 +556,7 @@ function pagesIn(lang) {
             description,
             inLanguage: lang,
             url,
+            dateModified: SOURCE_CHECKED,
             step: g.steps.map((s, i) => ({
               '@type': 'HowToStep',
               position: i + 1,

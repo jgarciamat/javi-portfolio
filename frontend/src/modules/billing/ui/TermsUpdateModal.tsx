@@ -47,10 +47,13 @@ export function TermsUpdateModal({ subscription, onAccepted, openPortal }: Terms
       onClose={onAccepted}
       dismissible={false}
       overlayClassName="upgrade-overlay"
-      className="upgrade-modal"
+      className="upgrade-modal terms-update"
     >
+      <div className="terms-update-icon" aria-hidden="true">
+        📄
+      </div>
       <h2 className="upgrade-title">{t('terms.update.title')}</h2>
-      <p className="upgrade-reason">{t('terms.update.body')}</p>
+      <p className="upgrade-reason terms-update-body">{t('terms.update.body')}</p>
       <label className="plan-terms">
         <input
           type="checkbox"
@@ -66,32 +69,34 @@ export function TermsUpdateModal({ subscription, onAccepted, openPortal }: Terms
           )
         </span>
       </label>
-      <div className="button-row">
+      <div className="button-row terms-update-accept">
         <button className="btn-primary" disabled={!checked || busy} onClick={() => void accept()}>
           {t('terms.update.accept')}
         </button>
       </div>
       {error && <p className="form-error">{error}</p>}
-      <p className="plan-note">{t('terms.update.disagree')}</p>
-      {subscription.canManage && !isNativeApp() && (
-        <div className="button-row">
-          <button className="btn-secondary" onClick={() => void portal()}>
-            {t('billing.manage')}
-          </button>
-        </div>
-      )}
-      {subscription.source === 'google' && !subscription.lifetime && (
-        <div className="button-row">
-          <a
-            className="btn-secondary"
-            href={PLAY_SUBSCRIPTIONS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('billing.manageGoogle')}
-          </a>
-        </div>
-      )}
+      <div className="terms-update-disagree">
+        <p className="plan-note">{t('terms.update.disagree')}</p>
+        {subscription.canManage && !isNativeApp() && (
+          <div className="button-row">
+            <button className="btn-secondary" onClick={() => void portal()}>
+              {t('billing.manage')}
+            </button>
+          </div>
+        )}
+        {subscription.source === 'google' && !subscription.lifetime && (
+          <div className="button-row">
+            <a
+              className="btn-secondary"
+              href={PLAY_SUBSCRIPTIONS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('billing.manageGoogle')}
+            </a>
+          </div>
+        )}
+      </div>
     </Modal>
   );
 }
