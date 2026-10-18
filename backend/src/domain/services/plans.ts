@@ -122,3 +122,21 @@ export function quarterOf(now: Date): { year: number; quarter: 1 | 2 | 3 | 4 } {
     quarter: (Math.floor(now.getUTCMonth() / 3) + 1) as 1 | 2 | 3 | 4,
   };
 }
+
+/** Last day (of the month after a quarter) to file that quarter's forms: 20th, or 30 January. */
+const FILING_LAST_DAY: Record<1 | 2 | 3 | 4, number> = { 1: 20, 2: 20, 3: 20, 4: 30 };
+
+/**
+ * The quarters the free plan can draft on a date: the current one and, while its filing window
+ * is open (1–20 April, July and October; 1–30 January), the one that has just ended.
+ */
+export function freeDraftQuarters(now: Date): { year: number; quarter: 1 | 2 | 3 | 4 }[] {
+  const current = quarterOf(now);
+  const month = now.getUTCMonth();
+  if (month % 3 !== 0) return [current];
+  const ended =
+    current.quarter === 1
+      ? { year: current.year - 1, quarter: 4 as const }
+      : { year: current.year, quarter: (current.quarter - 1) as 1 | 2 | 3 };
+  return now.getUTCDate() <= FILING_LAST_DAY[ended.quarter] ? [current, ended] : [current];
+}

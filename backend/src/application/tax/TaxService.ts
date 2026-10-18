@@ -9,7 +9,7 @@ import {
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { DraftInputs, DraftResult, prepareDraft } from '@domain/services/autonomo';
-import { quarterOf } from '@domain/services/plans';
+import { freeDraftQuarters, quarterOf } from '@domain/services/plans';
 import { ExpenseLine, manualMovements } from '@domain/services/autonomo-expenses';
 import { BusinessMovement, YearTax, yearlyTax } from '@domain/services/tax';
 import { EntitlementService } from '@application/billing/EntitlementService';
@@ -59,7 +59,8 @@ export class TaxService {
 
   /**
    * The draft of a quarter (modelo 303, modelo 130 and the contribution): the free plan can prepare
-   * one per quarter, only of the current one; Premium as many as it wants, of any quarter.
+   * one per quarter, of the current one or of the one just ended while it can be filed; Premium as
+   * many as it wants, of any quarter.
    */
   draft(
     userId: string,
@@ -68,12 +69,12 @@ export class TaxService {
     inputs: DraftInputs
   ): DraftResult & { used: number; expenses: ExpenseLine[] | null } {
     if (!this.entitlements.isPremium(userId)) {
-      const current = quarterOf(this.clock.now());
-      if (current.year !== year || current.quarter !== quarter) {
+      const allowed = freeDraftQuarters(this.clock.now());
+      if (!allowed.some((q) => q.year === year && q.quarter === quarter)) {
         throw new PaymentRequiredError(
           'AUTONOMO_QUARTER_LOCKED',
-          'Con el plan gratuito puedes preparar el borrador del trimestre actual; los demás trimestres son Premium',
-          { year: current.year, quarter: current.quarter }
+          'Con el plan gratuito puedes preparar el borrador del trimestre actual y, mientras está abierto su plazo, el del trimestre que acaba de terminar; los demás son Premium',
+          { ...allowed[0], allowed }
         );
       }
     }

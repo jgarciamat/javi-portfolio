@@ -1085,6 +1085,16 @@ describe('the self-employed draft', () => {
     expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeInTheDocument();
   });
 
+  it('lets the free plan draft the quarter just ended while it can be filed', async () => {
+    freezeTime('2026-04-10T12:00:00');
+    open();
+    expect(await screen.findByText(tr('app.autonomo.freeOne'))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
+    expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '4' } });
+    expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
+  });
+
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {
     localStorage.setItem(
       'mm_autonomo_draft2',
