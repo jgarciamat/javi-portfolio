@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import type { ReactNode } from 'react';
 import {
   type LockConfig,
@@ -33,7 +26,7 @@ interface AppLockValue {
   lockNow: () => void;
 }
 
-const AppLockContext = createContext<AppLockValue | null>(null);
+const AppLockContext = stableContext<AppLockValue | null>('AppLockContext', null);
 
 /**
  * Locks the signed-in app on start and after it stayed in the background longer than the

@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import type { ReactNode } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
@@ -30,7 +23,7 @@ interface SettingsContextValue {
   reload: () => Promise<void>;
 }
 
-const SettingsContext = createContext<SettingsContextValue | null>(null);
+const SettingsContext = stableContext<SettingsContextValue | null>('SettingsContext', null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const { settingsApi } = useApi();

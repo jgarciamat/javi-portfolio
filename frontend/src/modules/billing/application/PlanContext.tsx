@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import type { ReactNode } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { ApiError, registerPaymentRequiredHandler } from '@core/api/http';
@@ -39,7 +40,7 @@ interface PlanContextValue {
   dismissNotice: () => void;
 }
 
-const PlanContext = createContext<PlanContextValue | null>(null);
+const PlanContext = stableContext<PlanContextValue | null>('PlanContext', null);
 
 /** Turns a 402 from the API into the reason shown in the upgrade dialog. */
 export function reasonFromError(error: ApiError): UpgradeReason {
