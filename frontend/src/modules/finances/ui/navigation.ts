@@ -111,7 +111,7 @@ const SECTIONS: Omit<DashboardSection, 'color'>[] = [
     icon: 'settings',
     labelKey: 'app.tabs.automations',
     menuKey: 'app.menu.short.automations',
-    group: 'work',
+    group: 'money',
   },
   {
     id: 'custom-alerts',
