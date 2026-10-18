@@ -77,3 +77,9 @@ Borrador de trabajo del agente `seo` (sin datos personales ni claves). Fecha: 18
    - Que las URL `/en` se indexen con su `hreflang`.
    - Los 404 nuevos de direcciones antiguas.
    - Las impresiones y el CTR de «calculadora renta», «modelo 303 paso a paso», «modelo 130» y «cuota autónomos 2026».
+
+## Segunda ronda (18 de octubre de 2026)
+
+- **Hecho:** títulos (≤ 65) y descripciones (≤ 155) de todas las páginas, con un test que lo vigila; 9 guías nuevas (Renta 2025, plazos, casillas del 303, alta de autónomo, tarifa plana, VERI*FACTU, IMV, bono social, Bono Alquiler Joven) con fuentes oficiales y fecha de consulta; vídeo incrustado (youtube-nocookie, carga al pulsar) en las guías con vídeo público y en las de Hacienda; «Actualizado» visible y `dateModified` en el JSON-LD; `frame-src` de la CSP.
+- **Pendiente:** `/calculadora-sueldo-neto` y `/calculadora-cuota-autonomos` (otro agente); enlazarlas desde las guías cuando existan. VERI*FACTU, tarifa plana y bono social cambian con frecuencia: revisar las guías cuando se publique la norma del nuevo aplazamiento y a final de año (el bono social baja del 42,5/57,5 % al 35/50 % el 1 de enero de 2027 salvo prórroga).
+- **Medir:** impresiones y CTR de las 9 guías nuevas, vídeos detectados en Search Console (Mejoras › Vídeos) y errores de la CSP (está en modo Report-Only).
