@@ -56,15 +56,19 @@ export function TransactionForm({
     t,
   });
 
+  // The anchor has no box of its own (display: contents): the panel inside it is what scrolls into view.
+  const reveal = () =>
+    ((anchor.current as HTMLDivElement).firstElementChild as HTMLElement).scrollIntoView({
+      block: 'start',
+      behavior: scrollBehavior(),
+    });
+
   const { setType } = form;
   useEffect(() => {
     if (!quickAdd) return;
     setType(quickAdd);
     setOpen(true);
-    (anchor.current as HTMLDivElement).scrollIntoView({
-      block: 'start',
-      behavior: scrollBehavior(),
-    });
+    reveal();
     onQuickAddDone();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quickAdd]);
@@ -74,10 +78,7 @@ export function TransactionForm({
     if (!accountRequest) return;
     setAccountId(accountRequest.id);
     setOpen(true);
-    (anchor.current as HTMLDivElement).scrollIntoView({
-      block: 'start',
-      behavior: scrollBehavior(),
-    });
+    reveal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountRequest]);
 

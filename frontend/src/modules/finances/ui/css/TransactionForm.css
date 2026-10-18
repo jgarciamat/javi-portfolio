@@ -14,6 +14,13 @@
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.65rem;
   margin-bottom: 0.65rem;
+  /* A tall cell (the notes) must not stretch the controls beside it. */
+  align-items: start;
+}
+
+/* The notes take their own row. */
+.tx-form-grid .tx-field--notes {
+  grid-column: 1 / -1;
 }
 
 .tx-input {
@@ -129,6 +136,11 @@
 /* Wrapper that only gives the app shortcut something to scroll to. */
 .tx-form-anchor {
   display: contents;
+}
+
+/* Scrolled to from the account cards or the app shortcuts: leave the sticky header uncovered. */
+.tx-form-anchor > .card {
+  scroll-margin-top: 7rem;
 }
 
 /* ─── Movement in another currency ───────────── */
