@@ -39,8 +39,10 @@ const { GUIDES, GUIDE_NOTICE, inlineParts, longDate } = await load(
   'src/modules/guides/domain/guides.ts'
 );
 const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts');
-const { guideVideo, guidesForTool } = await load('src/modules/guides/domain/guideLinks.ts');
-const { TOOL_PAGES } = await load('src/modules/tools/domain/toolPages.ts');
+const { guideVideo } = await load('src/modules/guides/domain/guideLinks.ts');
+const { TOOL_PAGES, faqOf, guidesOfTool } = await load('src/modules/tools/domain/toolPages.ts');
+const payroll = await load('src/modules/tools/data/payroll2026.ts');
+const reta = await load('src/modules/tools/data/reta2026.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
 const { yearlySavingPct } = await load('src/modules/billing/ui/pricing.ts');
 const hacienda = await load('src/modules/guides/domain/hacienda.ts');
@@ -627,22 +629,63 @@ function pagesIn(lang) {
     });
   }
 
-  // Calculators.
+  // Calculators. The tax ones also carry their questions (visible, so also as FAQPage), their
+  // official sources with the day they were checked, and the notice that they are a guide.
+  const SOURCES = {
+    salary: {
+      date: payroll.PAYROLL_SOURCE_DATE,
+      links: [
+        payroll.PAYROLL_ORDER_URL,
+        payroll.WITHHOLDING_ALGORITHM_URL,
+        payroll.SMI_DEDUCTION_URL,
+      ],
+    },
+    reta: {
+      date: reta.RETA_SOURCE_DATE,
+      links: [reta.RETA_ORDER_URL, reta.LGSS_URL, reta.RETA_LAW_URL],
+    },
+  };
+  const dateIn = (iso) =>
+    new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${iso}T00:00:00Z`));
   for (const tool of TOOL_PAGES) {
     const url = urlOf(tool.path, lang);
     const title = t(`tools.${tool.key}.title`);
     const description = t(`tools.${tool.key}.description`);
+    const faq = faqOf(tool).map((n) => ({
+      q: t(`tools.${tool.key}.faq${n}.q`),
+      a: t(`tools.${tool.key}.faq${n}.a`),
+    }));
+    const sources = SOURCES[tool.key];
+    const extra = sources
+      ? `<p>${esc(t(`tools.${tool.key}.disclaimer`))}</p><section><h2>${esc(
+          t('tools.faq.title')
+        )}</h2>${faq
+          .map(({ q, a }) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`)
+          .join('')}</section><section><h2>${esc(t('tools.sources.title'))}</h2><ul>${sources.links
+          .map((to, i) => `<li>${external(to, t(`tools.${tool.key}.source${i + 1}`))}</li>`)
+          .join('')}</ul><p>${esc(
+          t('tools.sources.checked', { date: dateIn(sources.date) })
+        )}</p></section>`
+      : '';
     add({
       path: tool.path,
       title,
       description,
-      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${registerCta(
+      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${extra}${registerCta(
         t('tools.cta.title'),
         t('tools.cta.body'),
         t('tools.cta.button')
-      )}<section><h2>${esc(t('landing.learn.guides'))}</h2><ul>${guidesForTool(tool.path)
+      )}<section><h2>${esc(t('landing.learn.guides'))}</h2><ul>${guidesOfTool(tool.path)
         .map((g) => `<li>${link(`/guias/${g.slug}`, g.title)}</li>`)
-        .join('')}</ul></section>${nav}</main>`,
+        .join('')}</ul><p>${link(VIDEOS_PATH, `🎬 ${t('videos.title')}`)} · ${link(
+        HACIENDA_PATH,
+        `🏛️ ${t('hacienda.title')}`
+      )}</p></section>${nav}</main>`,
       nodes: [
         {
           '@type': 'WebApplication',
@@ -659,6 +702,20 @@ function pagesIn(lang) {
         },
         breadcrumbs(url, [home, [t(`tools.${tool.key}.nav`), url]]),
       ],
+      // Inside the page text, like the FAQ of the home page: the app puts its own copy.
+      bodyLd: faq.length
+        ? [
+            {
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: faq.map(({ q, a }) => ({
+                '@type': 'Question',
+                name: q,
+                acceptedAnswer: { '@type': 'Answer', text: a },
+              })),
+            },
+          ]
+        : [],
     });
   }
 

@@ -102,3 +102,51 @@
   margin: 2rem 0 0.5rem;
   font-size: 1.2rem;
 }
+
+/* ─── Net salary and self-employed calculators ───────────────────────────── */
+
+.tools-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+}
+
+.tools-breakdown th {
+  font-weight: 400;
+  text-align: left;
+}
+
+.tools-breakdown td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tools-breakdown-total th,
+.tools-breakdown-total td {
+  font-weight: 700;
+}
+
+.tools-row-current td {
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.tools-faq details {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--slate-700);
+}
+
+.tools-faq summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tools-sources ul {
+  padding-left: 1.2rem;
+}
+
+.tools-scroll {
+  overflow-x: auto;
+}

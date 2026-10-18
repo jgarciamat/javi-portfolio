@@ -1,7 +1,7 @@
 import { GUIDES } from '@modules/guides/domain/guides';
 import { guideVideo, guidesForTool } from '@modules/guides/domain/guideLinks';
 import { VIDEOS, type VideoEntry } from '@modules/guides/domain/videos';
-import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
+import { TOOL_PAGES, guidesOfTool } from '@modules/tools/domain/toolPages';
 
 describe('links between guides, calculators and videos', () => {
   it('pairs guides with a public video only', () => {
@@ -22,7 +22,7 @@ describe('links between guides, calculators and videos', () => {
   });
 
   it('gives every calculator at least one guide', () => {
-    for (const tool of TOOL_PAGES) expect(guidesForTool(tool.path).length).toBeGreaterThan(0);
+    for (const tool of TOOL_PAGES) expect(guidesOfTool(tool.path).length).toBeGreaterThan(0);
     expect(guidesForTool('/calculadora-iva').map((g) => g.slug)).toContain(
       'iva-para-autonomos-modelo-303'
     );
