@@ -40,6 +40,13 @@ export interface TokenService {
 
 export type EmailLocale = 'es' | 'en';
 
+/** Changes to how the account is protected, told to its owner by e-mail. */
+export type SecurityNotice =
+  | 'two_factor_enabled'
+  | 'two_factor_disabled'
+  | 'recovery_codes_regenerated'
+  | 'recovery_code_used';
+
 export interface EmailSender {
   sendVerification(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
   sendPasswordReset(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
@@ -50,6 +57,13 @@ export interface EmailSender {
    * once and the loss of the right of withdrawal (required for that loss to apply).
    */
   sendPurchaseConfirmation(to: string, name: string, locale: EmailLocale): Promise<void>;
+  /** Security alert: 2FA turned on or off, recovery codes renewed or used. */
+  sendSecurityNotice(
+    to: string,
+    name: string,
+    notice: SecurityNotice,
+    locale: EmailLocale
+  ): Promise<void>;
   /** The optional Monday summary of the week. */
   sendWeeklyDigest(
     to: string,

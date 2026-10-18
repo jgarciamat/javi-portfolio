@@ -98,6 +98,26 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         'SELECT offer_id AS offerId, clicked_at AS clickedAt FROM affiliate_clicks WHERE user_id = ? ORDER BY clicked_at',
         userId
       ),
+      security: this.security(userId),
+    };
+  }
+
+  /** Whether 2FA is on and how many recovery codes are left: never the secret or the codes. */
+  private security(userId: string): Row {
+    const enabledAt =
+      (this.one('SELECT enabled_at FROM user_two_factor WHERE user_id = ?', userId)?.enabled_at as
+        | string
+        | null
+        | undefined) ?? null;
+    return {
+      twoFactorEnabled: enabledAt !== null,
+      twoFactorEnabledAt: enabledAt,
+      recoveryCodesRemaining: enabledAt
+        ? (this.one(
+            'SELECT COUNT(*) AS n FROM two_factor_recovery_codes WHERE user_id = ? AND used_at IS NULL',
+            userId
+          )!.n as number)
+        : 0,
     };
   }
 

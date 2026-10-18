@@ -1,4 +1,4 @@
-import { EmailLocale } from '@domain/ports/services';
+import { EmailLocale, SecurityNotice } from '@domain/ports/services';
 import { DigestData } from '@domain/services/digest';
 
 /** Escapes text before putting it into HTML (user names are user-controlled). */
@@ -268,6 +268,92 @@ export function accountExistsEmail(
     c.ignore,
   ].join('\n');
   return { subject: c.subject, html, text };
+}
+
+const SECURITY_COPY: Record<
+  EmailLocale,
+  {
+    greeting: (name: string) => string;
+    notices: Record<SecurityNotice, { subject: string; body: string }>;
+    check: string;
+    notYou: string;
+  }
+> = {
+  es: {
+    greeting: (n) => `Hola ${n},`,
+    notices: {
+      two_factor_enabled: {
+        subject: 'Verificación en dos pasos activada',
+        body: 'Has activado la verificación en dos pasos en tu cuenta de Finanverso. A partir de ahora, al iniciar sesión te pediremos también el código de tu app de autenticación.',
+      },
+      two_factor_disabled: {
+        subject: 'Verificación en dos pasos desactivada',
+        body: 'Se ha desactivado la verificación en dos pasos de tu cuenta de Finanverso. Para entrar ya solo se pide la contraseña (o Google).',
+      },
+      recovery_codes_regenerated: {
+        subject: 'Nuevos códigos de recuperación',
+        body: 'Se han generado nuevos códigos de recuperación para tu cuenta de Finanverso. Los anteriores ya no sirven.',
+      },
+      recovery_code_used: {
+        subject: 'Se ha usado un código de recuperación',
+        body: 'Se ha iniciado sesión en tu cuenta de Finanverso con uno de tus códigos de recuperación. Ese código ya no se puede volver a usar.',
+      },
+    },
+    check: 'Puedes revisarlo en Ajustes → Seguridad:',
+    notYou:
+      'Si no has sido tú, cambia tu contraseña cuanto antes y cierra la sesión en todos los dispositivos.',
+  },
+  en: {
+    greeting: (n) => `Hi ${n},`,
+    notices: {
+      two_factor_enabled: {
+        subject: 'Two-step verification turned on',
+        body: 'You turned on two-step verification for your Finanverso account. From now on, signing in also asks for the code of your authenticator app.',
+      },
+      two_factor_disabled: {
+        subject: 'Two-step verification turned off',
+        body: 'Two-step verification was turned off for your Finanverso account. Signing in now only asks for the password (or Google).',
+      },
+      recovery_codes_regenerated: {
+        subject: 'New recovery codes',
+        body: 'New recovery codes were generated for your Finanverso account. The previous ones no longer work.',
+      },
+      recovery_code_used: {
+        subject: 'A recovery code was used',
+        body: 'Someone signed in to your Finanverso account with one of your recovery codes. That code cannot be used again.',
+      },
+    },
+    check: 'You can review it in Settings → Security:',
+    notYou:
+      "If it wasn't you, change your password as soon as possible and sign out on every device.",
+  },
+};
+
+/** Security alert after a change in how the account is protected. */
+export function securityNoticeEmail(
+  locale: EmailLocale,
+  name: string,
+  notice: SecurityNotice,
+  settingsUrl: string
+): EmailContent {
+  const c = SECURITY_COPY[locale];
+  const { subject, body } = c.notices[notice];
+  const url = escapeHtml(settingsUrl);
+  const html = layout(
+    locale,
+    [
+      c.greeting(`<strong>${safeName(name)}</strong>`),
+      escapeHtml(body),
+      `${escapeHtml(c.check)} <a class="url" href="${url}">${url}</a>`,
+      escapeHtml(c.notYou),
+    ]
+      .map((p) => `      <p>${p}</p>`)
+      .join('\n')
+  );
+  const text = [c.greeting(plainName(name)), '', body, `${c.check} ${settingsUrl}`, c.notYou].join(
+    '\n'
+  );
+  return { subject: `Finanverso: ${subject}`, html, text };
 }
 
 export const verificationEmail = (locale: EmailLocale, name: string, url: string): EmailContent =>

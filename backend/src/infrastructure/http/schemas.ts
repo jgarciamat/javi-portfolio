@@ -75,6 +75,21 @@ export const deleteAccountBody = z.object({
   googleToken: z.string().min(1).max(5000).optional(),
   confirmPlayCancelled: z.boolean().optional(),
 });
+/** Two-factor authentication. `code`: 6 digits of the app or a recovery code. */
+const twoFactorCode = z.string().trim().min(1).max(32);
+export const twoFactorSetupBody = z.object({
+  password: z.string().max(128).optional(),
+  googleToken: z.string().min(1).max(5000).optional(),
+});
+export const twoFactorCodeBody = z.object({ code: twoFactorCode });
+export const twoFactorProofBody = z.object({
+  password: z.string().max(128).optional(),
+  code: twoFactorCode.optional(),
+});
+export const twoFactorVerifyBody = z.object({
+  challengeToken: z.string().min(1).max(200),
+  code: twoFactorCode,
+});
 export const avatarBody = z.object({ avatarDataUrl: z.string().max(3_000_000).nullable() });
 export const settingsBody = z
   .object({

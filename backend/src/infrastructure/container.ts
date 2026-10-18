@@ -26,6 +26,7 @@ import { TaxService } from '@application/tax/TaxService';
 import { AssetService } from '@application/assets/AssetService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
+import { TwoFactorService } from '@application/auth/TwoFactorService';
 import { CategoryRuleService } from '@application/categories/CategoryRuleService';
 import { CategoryService } from '@application/categories/CategoryService';
 import { ExportService, ImportService } from '@application/data/DataServices';
@@ -51,6 +52,8 @@ import { FrankfurterRates } from './rates/FrankfurterRates';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
+import { AesSecretBox } from './auth/AesSecretBox';
+import { SqliteTwoFactorRepository } from './sqlite/repositories/SqliteTwoFactorRepository';
 import { ConsoleEmailSender, ResendEmailSender } from './mail/EmailSenders';
 import { Db, SqliteUnitOfWork } from './sqlite/database';
 import {
@@ -136,6 +139,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   const repos = {
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
+    twoFactor: new SqliteTwoFactorRepository(db),
     categories: new SqliteCategoryRepository(db),
     categoryRules: new SqliteCategoryRuleRepository(db),
     assets: new SqliteAssetRepository(db),
@@ -235,6 +239,17 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock
   );
 
+  const twoFactor = new TwoFactorService(
+    repos.twoFactor,
+    repos.users,
+    repos.settings,
+    hasher,
+    tokens,
+    new AesSecretBox(config.twoFactor.encryptionKey, 'totp-secret'),
+    email,
+    uow,
+    clock
+  );
   const auth = new AuthService(
     repos.users,
     repos.refreshTokens,
@@ -247,7 +262,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     google,
     entitlements,
     uow,
-    clock
+    clock,
+    twoFactor
   );
   const transactions = new TransactionService(
     repos.transactions,
@@ -294,6 +310,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     email,
     rates: overrides.rates ?? new FrankfurterRates(),
     auth,
+    twoFactor,
     transactions,
     materializer,
     entitlements,

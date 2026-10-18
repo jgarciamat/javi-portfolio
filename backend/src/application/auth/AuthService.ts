@@ -21,6 +21,7 @@ import {
 } from '@domain/ports/services';
 import { assertStrongPassword } from '@domain/shared/password-policy';
 import { EntitlementService } from '@application/billing/EntitlementService';
+import { TwoFactorChallenge, TwoFactorService } from './TwoFactorService';
 
 export const VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 export const RESET_TTL_MS = 60 * 60 * 1000;
@@ -42,6 +43,9 @@ export interface SessionTokens {
 export interface AuthResult extends SessionTokens {
   user: ReturnType<User['toPublic']>;
 }
+
+/** A sign-in either opens the session or, with 2FA on, asks for the code first. */
+export type SignInResult = AuthResult | TwoFactorChallenge;
 
 interface Logger {
   error(message: string, error?: unknown): void;
@@ -65,6 +69,7 @@ export class AuthService {
     private readonly entitlements: EntitlementService,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
+    private readonly twoFactor: TwoFactorService,
     private readonly logger: Logger = console
   ) {}
 
@@ -137,7 +142,7 @@ export class AuthService {
 
   // ─── Sessions ─────────────────────────────────────────────────────────────
 
-  async login(input: { email: string; password: string }): Promise<AuthResult> {
+  async login(input: { email: string; password: string }): Promise<SignInResult> {
     const user = this.users.findByEmail(normalizeEmail(input.email));
     const hash = user?.passwordHash ?? (await this.getDummyHash());
     const valid = await this.hasher.verify(input.password ?? '', hash);
@@ -150,6 +155,14 @@ export class AuthService {
         'EMAIL_NOT_VERIFIED'
       );
     }
+    return this.signIn(user);
+  }
+
+  /** Second step of a sign-in with 2FA: the code (or a recovery code) opens the session. */
+  completeTwoFactorLogin(challengeToken: string, code: string): AuthResult {
+    const userId = this.twoFactor.verifyChallenge(challengeToken, code);
+    const user = this.users.findById(userId);
+    if (!user) throw new UnauthorizedError('Sesión no válida', 'INVALID_TOKEN');
     return { ...this.issueSession(user), user: user.toPublic() };
   }
 
@@ -293,7 +306,7 @@ export class AuthService {
     token: string,
     locale: EmailLocale = 'es',
     onCreated?: (userId: string) => void
-  ): Promise<AuthResult> {
+  ): Promise<SignInResult> {
     const identity = await this.google.verify(token);
     if (!identity.emailVerified) {
       throw new UnauthorizedError(
@@ -327,10 +340,16 @@ export class AuthService {
       return created;
     });
     if (newUserId) onCreated?.(newUserId);
-    return { ...this.issueSession(user), user: user.toPublic() };
+    return this.signIn(user);
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  /** The first factor is proven: the session, or the 2FA challenge when it is on. */
+  private signIn(user: User): SignInResult {
+    if (this.twoFactor.isEnabled(user.id)) return this.twoFactor.createChallenge(user.id);
+    return { ...this.issueSession(user), user: user.toPublic() };
+  }
 
   /** Starts a new family of refresh tokens: a sign-in. */
   issueSession(user: User, authTime: Date = this.clock.now()): SessionTokens {
