@@ -7,14 +7,12 @@ import { useAuth } from '@shared/hooks/useAuth';
 import { useDialog } from '@shared/hooks/useDialog';
 import {
   DASHBOARD_SECTIONS,
+  GROUP_COLORS,
   offersEnabled,
   SECTION_GROUPS,
   type DashboardTab,
 } from '../navigation';
 import '../css/Sections.css';
-
-/** Colour of the profile entry, which opens a dialog rather than a section. */
-const PROFILE_COLOR = '#7c3aed';
 
 interface BurgerMenuProps {
   open: boolean;
@@ -113,7 +111,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: B
                     onOpenProfile();
                     onClose();
                   }}
-                  style={{ '--section-color': PROFILE_COLOR } as CSSProperties}
+                  style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
                   aria-label={
                     user?.name
                       ? t('app.header.openProfileOf', { name: user.name })
