@@ -796,6 +796,14 @@
       <video:duration>316</video:duration>
       <video:publication_date>2026-10-18</video:publication_date>
     </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/50.webp</video:thumbnail_loc>
+      <video:title>Vender o comprar casa: Renta, casillas e impuestos (para tontos)</video:title>
+      <video:description>Vender o comprar casa: Renta, casillas e impuestos (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/RAsGB2CZVzg</video:player_loc>
+      <video:duration>796</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
   </url>
   <url>
     <loc>https://finanverso.app/calculadora-50-30-20</loc>
@@ -1251,6 +1259,14 @@
       <video:description>Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos). Tutorial de Finanverso.</video:description>
       <video:player_loc>https://www.youtube.com/embed/8VF6v1zDsH0</video:player_loc>
       <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/50.webp</video:thumbnail_loc>
+      <video:title>Vender o comprar casa: Renta, casillas e impuestos (para tontos)</video:title>
+      <video:description>Vender o comprar casa: Renta, casillas e impuestos (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/RAsGB2CZVzg</video:player_loc>
+      <video:duration>796</video:duration>
       <video:publication_date>2026-10-18</video:publication_date>
     </video:video>
   </url>

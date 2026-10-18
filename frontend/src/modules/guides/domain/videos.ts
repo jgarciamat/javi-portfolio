@@ -428,6 +428,13 @@ export const VIDEOS: VideoEntry[] = [
     durationSeconds: 316,
     youtubeId: '8VF6v1zDsH0',
   },
+  {
+    number: 50,
+    section: 'renta',
+    title: 'Vender o comprar casa: Renta, casillas e impuestos (para tontos)',
+    durationSeconds: 796,
+    youtubeId: 'RAsGB2CZVzg',
+  },
 ];
 
 /** YouTube ids of the Premium videos by number, as the server gives them to Premium users. */
