@@ -41,9 +41,9 @@ export interface DashboardSection {
 export const GROUP_COLORS: Record<DashboardSection['group'], string> = {
   overview: '#8ec5f5',
   money: '#8fd9a8',
-  work: '#f2d77e',
-  learn: '#c3b1f0',
-  account: '#f4a9c4',
+  work: '#f5b895',
+  learn: '#85d8d2',
+  account: '#f2d77e',
 };
 
 const SECTIONS: Omit<DashboardSection, 'color'>[] = [
