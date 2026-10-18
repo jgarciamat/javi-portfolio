@@ -30,6 +30,8 @@ const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
 type Quarter = 1 | 2 | 3 | 4;
 
+const NO_EXTRAS: Extras = { hardToJustify: false, exempt: false, priorNet: '', toOffset: '' };
+
 const number = (text: string): number => {
   const parsed = parseDecimal(text);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -194,16 +196,23 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
   const action = useAction();
   const [year, setYear] = useState(THIS_YEAR);
   const [quarter, setQuarter] = useState<Quarter>(quarterNow);
-  const [extras, setExtras] = useState<Extras>({
-    hardToJustify: false,
-    exempt: false,
-    priorNet: '',
-    toOffset: '',
-  });
+  const [extras, setExtras] = useState<Extras>(NO_EXTRAS);
+  // Bumped when the data is wiped, so the import panels forget their messages too.
+  const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
+
+  const hasData =
+    JSON.stringify(manual) !== JSON.stringify(emptyManual()) ||
+    JSON.stringify(extras) !== JSON.stringify(NO_EXTRAS);
+  const wipe = () => {
+    if (!window.confirm(t('app.autonomo.wipeConfirm'))) return;
+    changeManual(emptyManual());
+    setExtras(NO_EXTRAS);
+    setWipes((n) => n + 1);
+  };
 
   const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
   const prepare = () =>
@@ -227,7 +236,26 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
 
       <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
 
-      <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} year={year} />
+      {hasData && (
+        <div className="autonomo-wipe">
+          <button type="button" className="btn-secondary" onClick={wipe}>
+            {t('app.autonomo.wipe')}
+          </button>
+        </div>
+      )}
+
+      <AutonomoManual
+        key={wipes}
+        form={manual}
+        onChange={changeManual}
+        upTo={quarter}
+        year={year}
+        years={YEARS}
+        onPeriod={(y, q) => {
+          setYear(y);
+          setQuarter(q);
+        }}
+      />
 
       <ExtrasPanel
         extras={extras}

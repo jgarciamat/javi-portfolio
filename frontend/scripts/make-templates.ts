@@ -6,6 +6,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { buildXlsx, type XlsxCell, type XlsxSheet } from './xlsx';
+import { model130, model303 } from './pdf-templates';
 
 const root = join(__dirname, '..');
 const templates = join(root, 'public', 'plantillas');
@@ -214,4 +215,8 @@ save(examples, 'ejemplo-movimientos-banco-2026.xlsx', [
     ],
   },
 ]);
-console.log('listo');
+void (async () => {
+  writeFileSync(join(templates, 'modelo-130-plantilla.pdf'), await model130());
+  writeFileSync(join(templates, 'modelo-303-plantilla.pdf'), await model303());
+  console.log('listo');
+})();

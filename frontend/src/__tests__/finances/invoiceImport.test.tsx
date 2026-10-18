@@ -15,7 +15,16 @@ let latest: ManualForm = emptyManual();
 function Harness({ year = 2026 }: { year?: number }) {
   const [form, setForm] = useState<ManualForm>(emptyManual());
   latest = form;
-  return <AutonomoManual form={form} onChange={setForm} upTo={4} year={year} />;
+  return (
+    <AutonomoManual
+      form={form}
+      onChange={setForm}
+      upTo={4}
+      year={year}
+      onPeriod={jest.fn()}
+      years={[2025, 2026, 2027]}
+    />
+  );
 }
 
 const show = (year?: number) =>
