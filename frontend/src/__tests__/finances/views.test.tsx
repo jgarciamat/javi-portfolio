@@ -1095,6 +1095,27 @@ describe('the self-employed draft', () => {
     expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
   });
 
+  it('counts the free draft of each quarter on its own', async () => {
+    freezeTime('2026-04-10T12:00:00');
+    const api = createFakeApi();
+    const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
+    api.billingApi.get.mockResolvedValue({
+      ...overview,
+      // The first quarter was drafted in its filing window; the second is still free.
+      autonomoQuarters: [
+        { year: 2026, quarter: 2, used: 0 },
+        { year: 2026, quarter: 1, used: 1 },
+      ],
+    });
+    open(api);
+    expect(await screen.findByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
+    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
+    expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();
+  });
+
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {
     localStorage.setItem(
       'mm_autonomo_draft2',

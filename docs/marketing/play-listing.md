@@ -40,7 +40,7 @@ SEGURIDAD Y COMODIDAD
 • Bloqueo con PIN o huella, resumen semanal y recordatorios
 • Tus datos son tuyos: expórtalos o bórralos cuando quieras
 
-Gratis para empezar. Premium opcional (previsión, importación, plan de deudas, Renta y autónomos sin límite, IA y más): 2,99 €/mes, 24,99 €/año o 49 € de por vida.
+Gratis para empezar. Premium opcional (previsión, importación, plan de deudas, Renta y autónomos sin límite, IA y más): 3,49 €/mes, 29,99 €/año o 59 € de por vida.
 
 Las estimaciones fiscales son orientativas: revísalas con tu gestor antes de presentar.
 

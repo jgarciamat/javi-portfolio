@@ -53,6 +53,35 @@ function StatusLine({ overview }: { overview: BillingOverview }) {
   return <p>{t('billing.status.free')}</p>;
 }
 
+interface UsageRow {
+  key: string;
+  label: string;
+  used: number;
+  max: number | null;
+}
+
+/**
+ * What the user has used of each limit. The self-employed drafts count per quarter: one row for
+ * each quarter that can be drafted today (the current one and the one being filed).
+ */
+function usageRows(
+  overview: BillingOverview,
+  t: (key: string, vars?: Record<string, string | number>) => string
+): UsageRow[] {
+  return RESOURCES.flatMap((r): UsageRow[] => {
+    const max = overview.limits.resources[r];
+    if (r === 'autonomoDrafts' && overview.autonomoQuarters.length > 0) {
+      return overview.autonomoQuarters.map((q) => ({
+        key: `${r}-${q.year}-${q.quarter}`,
+        label: t('billing.resource.autonomoDraftsOf', { n: q.quarter, year: q.year }),
+        used: q.used,
+        max,
+      }));
+    }
+    return [{ key: r, label: t(RESOURCE_KEYS[r]), used: overview.usage[r], max }];
+  });
+}
+
 function UsageCard({ overview }: { overview: BillingOverview }) {
   const { t } = useI18n();
   return (
@@ -61,14 +90,13 @@ function UsageCard({ overview }: { overview: BillingOverview }) {
         <Icon name="chart" /> {t('billing.usage')}
       </h2>
       <ul className="plan-usage">
-        {RESOURCES.map((r) => {
-          const max = overview.limits.resources[r];
-          const full = max !== null && overview.usage[r] >= max;
+        {usageRows(overview, t).map((row) => {
+          const full = row.max !== null && row.used >= row.max;
           return (
-            <li key={r} className={full ? 'plan-usage-full' : undefined}>
-              <span>{t(RESOURCE_KEYS[r])}</span>
+            <li key={row.key} className={full ? 'plan-usage-full' : undefined}>
+              <span>{row.label}</span>
               <strong>
-                {overview.usage[r]} / {max === null ? '∞' : max}
+                {row.used} / {row.max === null ? '∞' : row.max}
               </strong>
             </li>
           );
@@ -231,7 +259,8 @@ export function PlanView() {
   if (!overview) return <div className="card form-error">{t('billing.loadError')}</div>;
 
   const paying = overview.plan === 'premium' && overview.subscription.source !== 'trial';
-  const member = overview.household.role === 'member';
+  // A paused household (the owner has no Premium) leaves the member on their own plan.
+  const member = overview.household.role === 'member' && !overview.household.paused;
 
   return (
     <div className="section-view">

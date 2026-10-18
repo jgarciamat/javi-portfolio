@@ -186,6 +186,7 @@ export function createFakeApi(): FakeApi {
       plans: ok(f.catalog()),
       checkout: ok({ url: 'https://checkout.test' }),
       portal: ok({ url: 'https://portal.test' }),
+      acceptTerms: ok(f.billing().terms),
       referral: ok(f.referral()),
     },
     householdApi: {

@@ -15,6 +15,7 @@ import type {
   UpgradeReason,
 } from '../domain/types';
 import { UpgradeModal } from '../ui/UpgradeModal';
+import { TermsUpdateModal } from '../ui/TermsUpdateModal';
 
 export type BillingNotice = 'success' | 'cancel' | 'portal';
 
@@ -155,6 +156,13 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     <PlanContext.Provider value={value}>
       {children}
       {upgradeReason && <UpgradeModal reason={upgradeReason} />}
+      {overview?.terms.mustAccept && (
+        <TermsUpdateModal
+          subscription={overview.subscription}
+          onAccepted={refresh}
+          openPortal={openPortal}
+        />
+      )}
     </PlanContext.Provider>
   );
 }

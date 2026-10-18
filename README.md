@@ -38,7 +38,7 @@ Producción: <https://finanverso.app>
 | Importar extractos, análisis (tendencias y patrimonio) | — | ✓ |
 | Asesor IA | análisis por reglas | 30 análisis IA al mes |
 
-- Precios (IVA incluido): **2,99 €/mes**, **24,99 €/año** y plan **fundador de 49 €** (pago único, plazas
+- Precios (IVA incluido): **3,49 €/mes**, **29,99 €/año** y plan **fundador de 59 €** (pago único, plazas
   limitadas por `FOUNDER_LIMIT`). Todos los usuarios nuevos tienen **14 días de Premium** sin tarjeta; si
   pagan durante la prueba, Stripe no cobra hasta que termine.
 - La regla de "¿es Premium?" está en un solo sitio (`domain/model/Subscription.ts → planOf`) y los

@@ -7,6 +7,7 @@ import type {
   OffersResponse,
   PlanCatalog,
   ReferralSummary,
+  TermsStatus,
 } from '@modules/billing/domain/types';
 import { apiRequest, jsonBody, publicRequest } from './http';
 
@@ -25,6 +26,10 @@ export const billingApi = {
       method: 'POST',
       body: jsonBody({ kind, ...consent }),
     });
+  },
+  /** Accepts the current terms of sale after they changed. */
+  acceptTerms() {
+    return apiRequest<TermsStatus>('/billing/terms/accept', { method: 'POST' });
   },
   /** The user's invitation code and what the invitations have earned. */
   referral() {

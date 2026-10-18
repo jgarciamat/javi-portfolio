@@ -331,7 +331,9 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
   const { accounts, refresh } = useFinances();
   const action = useAction();
   const [saved, setSaved] = useState(false);
-  const sharedLocked = useOptionalPlan()?.overview?.household.role === 'member';
+  // A paused household shares nothing: the member manages their own settings again.
+  const household = useOptionalPlan()?.overview?.household;
+  const sharedLocked = household?.role === 'member' && !household.paused;
 
   if (!settings) return <div className="card">{t('app.common.loading')}</div>;
 

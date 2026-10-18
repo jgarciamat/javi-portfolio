@@ -59,6 +59,8 @@ export interface HouseholdStatus {
   /** An invitation waiting to be used (its code is only shown when created). */
   pendingInvite: { expiresAt: string } | null;
   maxMembers: number;
+  /** The owner no longer has Premium: nothing is shared until they renew (members see their own data). */
+  paused: boolean;
 }
 
 /** Who can read a tax return draft: paid Premium for over two months, or the one-month pass. */
@@ -68,6 +70,22 @@ export interface RentaAccess {
   eligibleOn: string | null;
   /** Until when the pass lasts. */
   passUntil: string | null;
+}
+
+/** Self-employed drafts prepared for a quarter the free plan can draft today. */
+export interface QuarterDraftUsage {
+  year: number;
+  quarter: 1 | 2 | 3 | 4;
+  used: number;
+}
+
+/** The terms of sale in force and whether the user has to accept them again. */
+export interface TermsStatus {
+  version: string;
+  acceptedVersion: string | null;
+  acceptedAt: string | null;
+  /** Accepted an earlier version: the app asks to accept the current one. */
+  mustAccept: boolean;
 }
 
 export interface BillingOverview {
@@ -88,8 +106,11 @@ export interface BillingOverview {
   renta: RentaAccess;
   /** What the user has created (`movements` is informational, not limited). */
   usage: Record<LimitedResource, number> & { movements: number };
+  /** Drafts of the current quarter and, while it can be filed, of the one just ended. */
+  autonomoQuarters: QuarterDraftUsage[];
   ai: { used: number; quota: number };
   catalog: PlanCatalog;
+  terms: TermsStatus;
 }
 
 /** Invitation code of the user and what their invitations have earned. */

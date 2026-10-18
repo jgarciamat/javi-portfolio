@@ -15,7 +15,7 @@ test('shows the presentation page to visitors without a session, with a way in',
 test('shows the plans to anyone', async ({ page }) => {
   await page.goto('/pricing');
   await expect(page.getByRole('heading', { name: 'Planes' })).toBeVisible();
-  await expect(page.getByText(/2,99/).first()).toBeVisible();
+  await expect(page.getByText(/3,49/).first()).toBeVisible();
 });
 
 test('publishes robots.txt and the sitemap', async ({ request }) => {

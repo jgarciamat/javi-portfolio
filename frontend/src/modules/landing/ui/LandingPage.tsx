@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { useResource } from '@shared/hooks/useResource';
+import { formatPrice } from '@modules/billing/ui/pricing';
 import { Icon } from '@shared/components/Icon';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
@@ -27,7 +30,10 @@ const FEATURES = [
 const SHOTS = ['home', 'budgets', 'forecast', 'subscriptions'] as const;
 /** What visitors without a session see at the home address: what the app does and why to try it. */
 export function LandingPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const { billingApi } = useApi();
+  // The prices come from the API, so the copy never goes out of date.
+  const { data: catalog } = useResource(() => billingApi.plans(), [billingApi]);
   usePageMeta(t('landing.meta.title'), t('landing.meta.description'), '/');
 
   return (
@@ -81,6 +87,14 @@ export function LandingPage() {
         <section className="landing-section landing-plans">
           <h2>{t('landing.plans.title')}</h2>
           <p>{t('landing.plans.body')}</p>
+          {catalog && (
+            <p>
+              {t('landing.plans.price', {
+                monthly: formatPrice(catalog.prices.monthly, locale),
+                yearly: formatPrice(catalog.prices.yearly, locale),
+              })}
+            </p>
+          )}
           <Link className="btn-secondary" to="/pricing">
             {t('landing.plans.link')}
           </Link>
