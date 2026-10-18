@@ -106,11 +106,29 @@ describe('Receipts forwarded by e-mail', () => {
     expect(await movements()).toEqual([]);
   });
 
-  it('reports a failure when the plan does not allow importing', async () => {
+  it('is Premium: the free plan has no address and mail sent to an old one is not imported', async () => {
     const { address } = await inbox();
     expireTrial(ctx, user);
     expect((await mail(address)).body).toEqual({ status: 'failed' });
-    expect((await inbox()).recent[0]).toMatchObject({ status: 'failed', description: 'Mercadona' });
+    expect(await movements()).toEqual([]);
+    const refused = await request(ctx.app).get('/api/inbox').set(user.auth).expect(402);
+    expect(refused.body).toMatchObject({
+      code: 'PREMIUM_REQUIRED',
+      details: { feature: 'inbox' },
+    });
+    await request(ctx.app).post('/api/inbox/rotate').set(user.auth).expect(402);
+    // Back to Premium: the address still works and the refused mail is in the log.
+    ctx.container.entitlements.grantDays(user.id, 30);
+    const back = await inbox();
+    expect(back.address).toBe(address);
+    expect(back.recent[0]).toMatchObject({ status: 'failed', description: null });
+  });
+
+  it('does not use up the free bank statement import', async () => {
+    const { address } = await inbox();
+    await mail(address).expect(200);
+    const overview = (await request(ctx.app).get('/api/billing').set(user.auth)).body;
+    expect(overview.usage.imports).toBe(0);
   });
 
   it('ignores unknown addresses and refuses the wrong secret', async () => {

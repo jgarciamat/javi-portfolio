@@ -4,20 +4,22 @@ import { Db } from '../database';
 export class SqliteAutonomoUsageRepository implements AutonomoUsageRepository {
   constructor(private readonly db: Db) {}
 
-  count(userId: string): number {
+  count(userId: string, year: number, quarter: number): number {
     const row = this.db
-      .prepare('SELECT uses FROM autonomo_drafts WHERE user_id = ?')
-      .get(userId) as { uses: number } | undefined;
+      .prepare(
+        'SELECT uses FROM autonomo_quarter_drafts WHERE user_id = ? AND year = ? AND quarter = ?'
+      )
+      .get(userId, year, quarter) as { uses: number } | undefined;
     return row?.uses ?? 0;
   }
 
-  increment(userId: string): number {
+  increment(userId: string, year: number, quarter: number): number {
     this.db
       .prepare(
-        `INSERT INTO autonomo_drafts (user_id, uses) VALUES (?, 1)
-         ON CONFLICT(user_id) DO UPDATE SET uses = uses + 1`
+        `INSERT INTO autonomo_quarter_drafts (user_id, year, quarter, uses) VALUES (?, ?, ?, 1)
+         ON CONFLICT(user_id, year, quarter) DO UPDATE SET uses = uses + 1`
       )
-      .run(userId);
-    return this.count(userId);
+      .run(userId, year, quarter);
+    return this.count(userId, year, quarter);
   }
 }

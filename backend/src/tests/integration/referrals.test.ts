@@ -16,10 +16,10 @@ import {
 } from '../helpers/testApp';
 
 describe('reward tiers', () => {
-  it('asks for 1 friend, then 5 more, then 10 more, then 15 more…', () => {
-    expect([0, 1, 2, 3, 4, 5].map(friendsForReward)).toEqual([0, 1, 6, 16, 31, 51]);
-    expect([0, 1, 5, 6, 15, 16, 30, 31, 50, 51].map(rewardsEarned)).toEqual([
-      0, 1, 1, 2, 2, 3, 3, 4, 4, 5,
+  it('rewards each of the first 3 friends, then needs 6, 16, 31… in total', () => {
+    expect([0, 1, 2, 3, 4, 5, 6, 7].map(friendsForReward)).toEqual([0, 1, 2, 3, 6, 16, 31, 51]);
+    expect([0, 1, 2, 3, 5, 6, 15, 16, 30, 31, 50, 51].map(rewardsEarned)).toEqual([
+      0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7,
     ]);
   });
 });
@@ -95,7 +95,7 @@ describe('Invite a friend', () => {
       qualified: 1,
       pending: 0,
       rewardsEarned: 1,
-      missing: 5,
+      missing: 1,
     });
     expect(await trialDays(host)).toBe(44);
     expect(ctx.container.repos.metrics.totals('2026-03-01', '2026-03-31')).toContainEqual({
@@ -136,7 +136,7 @@ describe('Invite a friend', () => {
     expect(await trialDays(host)).toBe(30);
   });
 
-  it('asks for 5 more friends for the second month and 10 more for the third', async () => {
+  it('gives a month for each of the first 3 friends, then at 6 and 16 friends', async () => {
     // Same rules, with the first-steps check answered "done" so friends need no data.
     const service = new ReferralService(
       ctx.container.repos.referrals,
@@ -151,18 +151,20 @@ describe('Invite a friend', () => {
     const days = () => trialDays(host);
     const qualify = (count: number) => friends.slice(0, count).forEach((f) => service.reward(f.id));
 
-    qualify(1);
-    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
-    qualify(5); // 5 qualified: the second month needs 6
-    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
-    qualify(6);
-    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
-    qualify(15); // the third needs 16
-    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
-    qualify(16);
+    for (const n of [1, 2, 3]) {
+      qualify(n);
+      expect(await days()).toBe(14 + n * REFERRAL_REWARD_DAYS);
+    }
+    qualify(5); // 5 qualified: the fourth month needs 6
     expect(await days()).toBe(14 + 3 * REFERRAL_REWARD_DAYS);
-    expect(ctx.container.repos.referrals.rewardsGranted(host.id)).toBe(3);
-    expect(await summary()).toMatchObject({ qualified: 16, rewardsEarned: 3, missing: 15 });
+    qualify(6);
+    expect(await days()).toBe(14 + 4 * REFERRAL_REWARD_DAYS);
+    qualify(15); // the fifth needs 16
+    expect(await days()).toBe(14 + 4 * REFERRAL_REWARD_DAYS);
+    qualify(16);
+    expect(await days()).toBe(14 + 5 * REFERRAL_REWARD_DAYS);
+    expect(ctx.container.repos.referrals.rewardsGranted(host.id)).toBe(5);
+    expect(await summary()).toMatchObject({ qualified: 16, rewardsEarned: 5, missing: 15 });
   });
 
   it('skips lifetime users', async () => {

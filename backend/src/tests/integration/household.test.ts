@@ -181,6 +181,33 @@ describe('Shared household', () => {
     await request(ctx.app).get('/api/stats/net-worth').set(partner.auth).expect(402);
   });
 
+  it('refuses to join when the owner is no longer Premium', async () => {
+    const { code } = await invite();
+    expireTrial(ctx, owner);
+    const refused = await join(code).expect(402);
+    expect(refused.body).toMatchObject({
+      code: 'PREMIUM_REQUIRED',
+      details: { feature: 'household' },
+    });
+    expect((await status(partner)).role).toBe('none');
+  });
+
+  it('stops sharing while the owner is not Premium, and shares again when they renew', async () => {
+    await addTransaction(ctx, owner, { description: 'Alquiler', amount: 700 });
+    await addTransaction(ctx, partner, { description: 'Lo mío', amount: 5 });
+    await joined();
+    const seen = async () =>
+      (await month(partner)).transactions.map((t: { description: string }) => t.description);
+    expect(await seen()).toEqual(['Alquiler']);
+    expireTrial(ctx, owner);
+    // The member is back on their own data and plan.
+    expect(await seen()).toEqual(['Lo mío']);
+    const billing = (await request(ctx.app).get('/api/billing').set(partner.auth)).body;
+    expect(billing.usage.movements).toBe(1);
+    ctx.container.entitlements.grantDays(owner.id, 30);
+    expect(await seen()).toEqual(['Alquiler']);
+  });
+
   it('shows the shared currency and month start and keeps them in the owner’s hands', async () => {
     await request(ctx.app)
       .patch('/api/settings')

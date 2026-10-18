@@ -304,9 +304,17 @@ export interface RentaPassRepository {
   remove(userId: string): void;
 }
 
+/** How many self-employed tax drafts a user has prepared for each quarter. */
 export interface AutonomoUsageRepository {
+  count(userId: string, year: number, quarter: number): number;
+  /** One more draft of that quarter; returns how many there are now. */
+  increment(userId: string, year: number, quarter: number): number;
+}
+
+/** How many bank statements a user has imported (previews do not count). */
+export interface ImportUsageRepository {
   count(userId: string): number;
-  /** One more draft; returns how many there are now. */
+  /** One more import; returns how many there are now. */
   increment(userId: string): number;
 }
 
@@ -317,10 +325,11 @@ export interface AutonomoPdfRepository {
   increment(userId: string): number;
 }
 
+/** How many tax return calculations a user has made in each Renta campaign. */
 export interface RentaUsageRepository {
-  count(userId: string): number;
-  /** One more calculation; returns how many there are now. */
-  increment(userId: string): number;
+  count(userId: string, campaign: number): number;
+  /** One more calculation in that campaign; returns how many there are now. */
+  increment(userId: string, campaign: number): number;
 }
 
 export type InboxStatus = 'imported' | 'duplicate' | 'unreadable' | 'failed';

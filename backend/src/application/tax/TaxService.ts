@@ -1,4 +1,4 @@
-import { NotFoundError } from '@domain/errors';
+import { NotFoundError, PaymentRequiredError } from '@domain/errors';
 import {
   AutonomoPdfRepository,
   AutonomoUsageRepository,
@@ -7,7 +7,9 @@ import {
   TransactionRepository,
   VatRate,
 } from '@domain/ports/repositories';
+import { Clock } from '@domain/ports/services';
 import { DraftInputs, DraftResult, prepareDraft } from '@domain/services/autonomo';
+import { quarterOf } from '@domain/services/plans';
 import { ExpenseLine, manualMovements } from '@domain/services/autonomo-expenses';
 import { BusinessMovement, YearTax, yearlyTax } from '@domain/services/tax';
 import { EntitlementService } from '@application/billing/EntitlementService';
@@ -26,7 +28,8 @@ export class TaxService {
     private readonly transactions: TransactionRepository,
     private readonly entitlements: EntitlementService,
     private readonly drafts: AutonomoUsageRepository,
-    private readonly pdfs: AutonomoPdfRepository
+    private readonly pdfs: AutonomoPdfRepository,
+    private readonly clock: Clock
   ) {}
 
   list(userId: string): BusinessCategoryView[] {
@@ -56,7 +59,7 @@ export class TaxService {
 
   /**
    * The draft of a quarter (modelo 303, modelo 130 and the contribution): the free plan can prepare
-   * one, Premium as many as it wants.
+   * one per quarter, only of the current one; Premium as many as it wants, of any quarter.
    */
   draft(
     userId: string,
@@ -64,14 +67,36 @@ export class TaxService {
     quarter: 1 | 2 | 3 | 4,
     inputs: DraftInputs
   ): DraftResult & { used: number; expenses: ExpenseLine[] | null } {
-    this.entitlements.assertCanCreate(userId, 'autonomoDrafts', this.drafts.count(userId));
+    if (!this.entitlements.isPremium(userId)) {
+      const current = quarterOf(this.clock.now());
+      if (current.year !== year || current.quarter !== quarter) {
+        throw new PaymentRequiredError(
+          'AUTONOMO_QUARTER_LOCKED',
+          'Con el plan gratuito puedes preparar el borrador del trimestre actual; los demás trimestres son Premium',
+          { year: current.year, quarter: current.quarter }
+        );
+      }
+    }
+    this.entitlements.assertCanCreate(
+      userId,
+      'autonomoDrafts',
+      this.drafts.count(userId, year, quarter)
+    );
     const manual = inputs.manual ? manualMovements(year, inputs.manual) : null;
     const result = prepareDraft(year, quarter, manual?.movements ?? this.movements(userId), inputs);
     return {
       ...result,
       expenses: manual ? manual.lines.filter((l) => l.quarter <= quarter) : null,
-      used: this.drafts.increment(userId),
+      used: this.drafts.increment(userId, year, quarter),
     };
+  }
+
+  /**
+   * How many drafts the user has prepared this quarter (what the free plan limits).
+   */
+  draftsThisQuarter(userId: string): number {
+    const { year, quarter } = quarterOf(this.clock.now());
+    return this.drafts.count(userId, year, quarter);
   }
 
   /** A draft downloaded as a PDF: the free plan can download one, Premium as many as it wants. */

@@ -61,7 +61,8 @@ describe('EntitlementService', () => {
     expect(service.status('u1')).toEqual(
       expect.objectContaining({ plan: 'free', subscription: null, trialDaysLeft: 0 })
     );
-    expect(service.limits('u1').resources.assets).toBe(1);
+    expect(service.limits('u1').resources.assets).toBe(3);
+    expect(service.limits('u1').resources.imports).toBe(1);
   });
 
   it('blocks Premium features and the creation past the free limit, saying which one', () => {
@@ -70,12 +71,18 @@ describe('EntitlementService', () => {
     expect(thrown(() => service.assertFeature('u1', 'forecast'))).toEqual(
       expect.objectContaining({ code: 'PREMIUM_REQUIRED', details: { feature: 'forecast' } })
     );
-    expect(() => service.assertCanCreate('u1', 'assets', 0)).not.toThrow();
-    expect(() => service.assertCanCreate('u1', 'assets', 1)).toThrow(
-      'Has llegado al máximo del plan gratuito para inversiones y deudas: 1'
+    for (const feature of ['inbox', 'capture', 'investCourse'] as const) {
+      expect(() => service.assertFeature('u1', feature)).toThrow(PaymentRequiredError);
+    }
+    expect(() => service.assertCanCreate('u1', 'assets', 2)).not.toThrow();
+    expect(() => service.assertCanCreate('u1', 'assets', 3)).toThrow(
+      'Has llegado al máximo del plan gratuito para inversiones y deudas: 3'
     );
-    expect(thrown(() => service.assertCanCreate('u1', 'accounts', 2))).toEqual(
-      expect.objectContaining({ code: 'PLAN_LIMIT', details: { resource: 'accounts', limit: 2 } })
+    expect(() => service.assertCanCreate('u1', 'imports', 1)).toThrow(
+      'Has llegado al máximo del plan gratuito para importaciones de extractos: 1'
+    );
+    expect(thrown(() => service.assertCanCreate('u1', 'accounts', 3))).toEqual(
+      expect.objectContaining({ code: 'PLAN_LIMIT', details: { resource: 'accounts', limit: 3 } })
     );
   });
 

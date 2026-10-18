@@ -31,6 +31,7 @@ import {
   generateRuleBasedAdvice,
 } from '@domain/services/rule-based-advisor';
 import { assetTotalsAt } from '@domain/services/net-worth';
+import { FREE_FORECAST_MONTHS, FREE_SUBSCRIPTIONS_SHOWN } from '@domain/services/plans';
 import { savingsRate } from '@domain/services/summary';
 import { CategoryTrend, computeCategoryTrends } from '@domain/services/trends';
 import { Cents, fromCents } from '@domain/shared/money';
@@ -69,12 +70,20 @@ export interface NetWorthPoint {
 
 export interface ForecastResult extends Period {
   safeToSpend: SafeToSpend;
-  /** True when the month-by-month outlook is a Premium feature the user does not have. */
+  /** True on the free plan: only one month is projected and the rest needs Premium. */
   locked: boolean;
-  projection: ProjectedMonth[] | null;
+  projection: ProjectedMonth[];
   firstShortfall: Period | null;
   /** Active recurring rules, so the outlook can be tried without any of them. */
   rules: RecurringRule[];
+}
+
+/** The detected subscriptions; on the free plan only the most expensive ones are listed. */
+export interface SubscriptionsView extends SubscriptionReport {
+  /** How many were detected (also those not listed). */
+  count: number;
+  /** True on the free plan: the list is cut to the first few and the rest needs Premium. */
+  locked: boolean;
 }
 
 /** Past periods used to learn the usual non-recurring spending. */
@@ -110,8 +119,9 @@ export class StatsService {
   ) {}
 
   /**
-   * "Can I reach the end of the month?" for everyone; the month-by-month outlook
-   * (with "what if I cancel…" scenarios) is Premium and comes back locked otherwise.
+   * "Can I reach the end of the month?" and next month's outlook for everyone; the longer
+   * outlook (up to 12 months, with "what if I cancel…" scenarios) is Premium: the free plan gets
+   * one month, without scenarios, and `locked` says the rest needs Premium.
    */
   forecast(userId: string, options: { months: number; exclude: string[] }): ForecastResult {
     const startDay = this.settings.get(userId).monthStartDay;
@@ -131,28 +141,26 @@ export class StatsService {
     });
     const rules = this.rules.listByUser(userId).filter((r) => r.active);
     const locked = !this.entitlements.limits(userId).features.forecast;
-    const projection = locked
-      ? null
-      : projectMonths({
-          from: addMonths(period, 1),
-          months: options.months,
-          startAvailableCents: safe.projectedEndCents,
-          rules,
-          variable,
-          excludedRuleIds: new Set(options.exclude),
-          skipped: new Map(
-            rules.map((r) => [
-              r.id,
-              new Set(this.rules.skippedPeriods(r.id).map((p) => periodOrdinal(p))),
-            ])
-          ),
-        });
+    const projection = projectMonths({
+      from: addMonths(period, 1),
+      months: locked ? FREE_FORECAST_MONTHS : options.months,
+      startAvailableCents: safe.projectedEndCents,
+      rules,
+      variable,
+      excludedRuleIds: new Set(locked ? [] : options.exclude),
+      skipped: new Map(
+        rules.map((r) => [
+          r.id,
+          new Set(this.rules.skippedPeriods(r.id).map((p) => periodOrdinal(p))),
+        ])
+      ),
+    });
     return {
       ...period,
       safeToSpend: safe,
       locked,
       projection,
-      firstShortfall: projection ? firstShortfall(projection) : null,
+      firstShortfall: firstShortfall(projection),
       rules,
     };
   }
@@ -227,9 +235,11 @@ export class StatsService {
     };
   }
 
-  /** Charges that repeat like a subscription, so the user can review what they pay for. */
-  subscriptions(userId: string): SubscriptionReport {
-    this.entitlements.assertFeature(userId, 'insights');
+  /**
+   * Charges that repeat like a subscription, so the user can review what they pay for. The free
+   * plan sees how many there are, what they cost and the most expensive ones; Premium, all.
+   */
+  subscriptions(userId: string): SubscriptionsView {
     const movements = this.transactions.listAllByUser(userId).map((tx) => {
       const { description, amountCents, date, type, recurringRuleId } = tx.toPrimitives();
       return { description, amountCents, date, type, recurringRuleId };
@@ -240,10 +250,19 @@ export class StatsService {
         .filter((r) => r.active)
         .map((r) => subscriptionKey(r.description))
     );
-    return detectSubscriptions(movements, {
+    const report = detectSubscriptions(movements, {
       today: todayDateOnly(this.clock.now()),
       coveredKeys,
     });
+    const locked = !this.entitlements.limits(userId).features.insights;
+    return {
+      ...report,
+      subscriptions: locked
+        ? report.subscriptions.slice(0, FREE_SUBSCRIPTIONS_SHOWN)
+        : report.subscriptions,
+      count: report.subscriptions.length,
+      locked,
+    };
   }
 
   netWorth(userId: string, months: number): NetWorthPoint[] {

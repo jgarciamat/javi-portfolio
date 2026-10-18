@@ -125,7 +125,7 @@ describe('BillingService', () => {
         expect.objectContaining({ status: 'none', canManage: false, lifetime: false })
       );
       expect(overview.usage).toEqual({ accounts: 1, movements: 3 });
-      expect(overview.limits.resources.assets).toBe(1);
+      expect(overview.limits.resources.assets).toBe(3);
     });
 
     it('sells the founder plan and the pass only when payments and prices are set up', () => {

@@ -34,9 +34,14 @@ export class HouseholdService {
     private readonly clock: Clock
   ) {}
 
-  /** Owner of the data the user works on: themselves, or the owner of the household they joined. */
+  /**
+   * Owner of the data the user works on: themselves, or the owner of the household they joined
+   * while that owner is still Premium (otherwise members are back on their own data; the
+   * membership is kept, so sharing comes back when the owner renews).
+   */
   dataOwner(userId: string): string {
-    return this.household.ownerOf(userId) ?? userId;
+    const ownerId = this.household.ownerOf(userId);
+    return ownerId && this.entitlements.isPremium(ownerId) ? ownerId : userId;
   }
 
   private person(userId: string): HouseholdMember {
@@ -123,6 +128,8 @@ export class HouseholdService {
     if (this.household.membersOf(invite.ownerId).length >= HOUSEHOLD_MAX_MEMBERS) {
       throw new ConflictError('Este hogar ya está completo', 'HOUSEHOLD_FULL');
     }
+    // The invitation was made with Premium, which may have ended since.
+    this.entitlements.assertFeature(invite.ownerId, 'household');
     this.household.addMember(userId, invite.ownerId, this.clock.now().toISOString());
     this.household.deleteInvite(invite.ownerId);
   }

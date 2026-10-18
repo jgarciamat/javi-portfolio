@@ -133,6 +133,9 @@ describe('Reading a tax return draft: two months of Premium, or the one-month pa
     goForward(31);
     expect((await billing()).renta.passUntil).toBeNull();
     await draft().expect(402);
+    // Back to the free calculations of the campaign (a new one opened in April).
+    for (let i = 0; i < 3; i++)
+      await request(ctx.app).post('/api/renta/calculation').set(user.auth).expect(201);
     await request(ctx.app).post('/api/renta/calculation').set(user.auth).expect(402);
   });
 

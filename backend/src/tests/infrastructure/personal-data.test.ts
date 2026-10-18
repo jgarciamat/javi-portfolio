@@ -45,6 +45,9 @@ function seed(db: Db): void {
       VALUES ('ana', 'active', 'stripe', 'cus_1', 'sub_secret', '${NOW}', '${NOW}', '2026-10', 1, 0);
     INSERT INTO renta_passes (user_id, ends_at) VALUES ('ana', '2026-07-01T00:00:00.000Z');
     INSERT INTO renta_calculations (user_id, uses) VALUES ('ana', 3);
+    INSERT INTO renta_campaign_uses (user_id, campaign, uses) VALUES ('ana', 2026, 2), ('ana', 2025, 1);
+    INSERT INTO autonomo_quarter_drafts (user_id, year, quarter, uses) VALUES ('ana', 2026, 1, 1);
+    INSERT INTO import_uses (user_id, uses) VALUES ('ana', 2);
     INSERT INTO referral_codes (user_id, code, rewards_granted) VALUES ('ana', 'ANA1', 1);
     INSERT INTO referrals (referred_id, referrer_id, created_at, rewarded_at)
       VALUES ('carl', 'ana', '${NOW}', '${NOW}'), ('ana', 'bea', '${NOW}', NULL);
@@ -118,9 +121,15 @@ describe('SqlitePersonalDataReader', () => {
       renta: {
         passEndsAt: '2026-07-01T00:00:00.000Z',
         calculations: 3,
+        calculationsByCampaign: [
+          { campaign: 2025, uses: 1 },
+          { campaign: 2026, uses: 2 },
+        ],
         autonomoDrafts: 0,
+        autonomoDraftsByQuarter: [{ year: 2026, quarter: 1, uses: 1 }],
         autonomoPdfs: 0,
       },
+      imports: 2,
       referrals: {
         code: 'ANA1',
         rewardsGranted: 1,
@@ -150,7 +159,8 @@ describe('SqlitePersonalDataReader', () => {
       assets: [],
       inbox: { address: null, messages: [] },
       subscription: null,
-      renta: { passEndsAt: null, calculations: 0 },
+      renta: { passEndsAt: null, calculations: 0, calculationsByCampaign: [] },
+      imports: 0,
       referrals: {
         code: null,
         rewardsGranted: 0,

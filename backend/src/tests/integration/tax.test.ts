@@ -444,14 +444,29 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       expect(box(body.irpf.boxes, '01')).toBe(1100);
     });
 
-    it('lets the free plan prepare one draft only, and Premium as many as it wants', async () => {
+    it('lets the free plan prepare one draft of the current quarter, Premium any', async () => {
       expireTrial(ctx, user);
-      expect((await draft(1).expect(201)).body.used).toBe(1);
-      const refused = await draft(1).expect(402);
+      // 10 July 2026: the third quarter is the current one.
+      const past = await draft(2).expect(402);
+      expect(past.body).toMatchObject({
+        code: 'AUTONOMO_QUARTER_LOCKED',
+        details: { year: 2026, quarter: 3 },
+      });
+      await draft(3, {}, 2025).expect(402);
+      expect((await draft(3).expect(201)).body.used).toBe(1);
+      const refused = await draft(3).expect(402);
       expect(refused.body.code).toBe('PLAN_LIMIT');
       expect(refused.body.details).toEqual({ resource: 'autonomoDrafts', limit: 1 });
-      const overview = (await request(ctx.app).get('/api/billing').set(user.auth)).body;
-      expect(overview.usage.autonomoDrafts).toBe(1);
+      const billing = async () => (await request(ctx.app).get('/api/billing').set(user.auth)).body;
+      expect((await billing()).usage.autonomoDrafts).toBe(1);
+      // A new quarter brings a new free draft.
+      ctx.clock.set('2026-10-02T10:00:00Z');
+      expect((await billing()).usage.autonomoDrafts).toBe(0);
+      expect((await draft(4).expect(201)).body.used).toBe(1);
+      await draft(3).expect(402);
+      ctx.container.entitlements.grantDays(user.id, 30);
+      for (let i = 2; i <= 3; i++) expect((await draft(4).expect(201)).body.used).toBe(i);
+      expect((await draft(1).expect(201)).body.used).toBe(1);
     });
 
     it('lets the free plan download one PDF only, and Premium as many as it wants', async () => {

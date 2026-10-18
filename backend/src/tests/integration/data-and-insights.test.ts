@@ -274,10 +274,24 @@ describe('Forecast', () => {
     expect(without.firstShortfall).toBeNull();
   });
 
-  it('keeps the month-by-month outlook for Premium and answers the rest for free', async () => {
+  it('gives the free plan next month only, without leaving rules out', async () => {
+    const rule = await request(ctx.app)
+      .post('/api/recurring-rules')
+      .set(user.auth)
+      .send({
+        description: 'Alquiler',
+        type: 'EXPENSE',
+        category: 'Vivienda',
+        amount: 700,
+        startYear: 2026,
+        startMonth: 5,
+      })
+      .expect(201);
     expireTrial(ctx, user);
-    const res = await forecast().expect(200);
-    expect(res.body).toMatchObject({ locked: true, projection: null, firstShortfall: null });
+    const res = await forecast(`?months=6&exclude=${rule.body.id}`).expect(200);
+    expect(res.body).toMatchObject({ locked: true, firstShortfall: { year: 2026, month: 5 } });
+    expect(res.body.projection).toHaveLength(1);
+    expect(res.body.projection[0]).toMatchObject({ month: 5, fixedExpenses: 700 });
     expect(res.body.safeToSpend.daily).toBe(55);
     await forecast('?months=13').expect(400);
   });
@@ -382,9 +396,32 @@ describe('Subscriptions', () => {
       })
       .expect(201);
     const res = await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200);
-    expect(res.body.subscriptions).toEqual([]);
+    expect(res.body).toMatchObject({ subscriptions: [], count: 0, locked: false });
+  });
+
+  it('shows the free plan how many there are, their cost and the 3 most expensive', async () => {
+    for (const [name, amount] of [
+      ['Spotify', 10.99],
+      ['Gimnasio', 39.9],
+      ['Nube', 2.99],
+      ['Prensa', 7.99],
+    ] as const) {
+      for (const date of ['2026-02-03', '2026-03-03', '2026-04-03']) {
+        await addTransaction(ctx, user, { description: name, amount, date });
+      }
+    }
+    const premium = (await request(ctx.app).get('/api/stats/subscriptions').set(user.auth)).body;
+    expect(premium).toMatchObject({ count: 5, locked: false });
+    expect(premium.subscriptions).toHaveLength(5);
     expireTrial(ctx, user);
-    await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(402);
+    const free = (await request(ctx.app).get('/api/stats/subscriptions').set(user.auth).expect(200))
+      .body;
+    expect(free).toMatchObject({ count: 5, locked: true, annual: premium.annual });
+    expect(free.subscriptions.map((s: { description: string }) => s.description)).toEqual([
+      'Gimnasio',
+      'Netflix',
+      'Spotify',
+    ]);
   });
 });
 

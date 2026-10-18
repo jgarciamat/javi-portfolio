@@ -54,10 +54,25 @@ describe('Plans and limits', () => {
       lifetime: { available: true, remaining: 100 },
       limits: {
         free: {
-          resources: { accounts: 2, budgets: 3 },
-          features: { import: false, forecast: false },
+          resources: {
+            accounts: 3,
+            budgets: 5,
+            goals: 2,
+            recurringRules: 5,
+            customAlerts: 3,
+            rentaCalculations: 3,
+            autonomoDrafts: 1,
+            autonomoPdfs: 1,
+            assets: 3,
+            imports: 1,
+          },
+          features: { forecast: false, inbox: false, capture: false, investCourse: false },
         },
-        premium: { resources: { accounts: null }, aiMonthlyQuota: 10 },
+        premium: {
+          resources: { accounts: null, imports: null },
+          features: { inbox: true, investCourse: true },
+          aiMonthlyQuota: 10,
+        },
       },
     });
   });
@@ -67,14 +82,14 @@ describe('Plans and limits', () => {
       plan: 'premium',
       trialDaysLeft: 14,
       subscription: { status: 'trialing', source: 'trial', canManage: false },
-      usage: { accounts: 1, budgets: 0, movements: 0 },
+      usage: { accounts: 1, budgets: 0, movements: 0, imports: 0 },
       ai: { used: 0, quota: 10 },
     });
     ctx.clock.set(new Date(ctx.clock.now().getTime() + 15 * DAY).toISOString());
     expect(await billing()).toMatchObject({
       plan: 'free',
       trialDaysLeft: 0,
-      limits: { resources: { accounts: 2 } },
+      limits: { resources: { accounts: 3 } },
     });
   });
 
@@ -86,52 +101,56 @@ describe('Plans and limits', () => {
 
   it('answers 402 with the limit when the free plan is full', async () => {
     expireTrial(ctx, user);
-    await request(ctx.app)
-      .post('/api/accounts')
-      .set(user.auth)
-      .send({ name: 'Efectivo', type: 'cash' })
-      .expect(201);
-    const third = await request(ctx.app)
+    for (const name of ['Efectivo', 'Ahorro']) {
+      await request(ctx.app)
+        .post('/api/accounts')
+        .set(user.auth)
+        .send({ name, type: 'cash' })
+        .expect(201);
+    }
+    const fourthAccount = await request(ctx.app)
       .post('/api/accounts')
       .set(user.auth)
       .send({ name: 'Tarjeta', type: 'card' })
       .expect(402);
-    expect(third.body).toMatchObject({
+    expect(fourthAccount.body).toMatchObject({
       code: 'PLAN_LIMIT',
-      details: { resource: 'accounts', limit: 2 },
+      details: { resource: 'accounts', limit: 3 },
     });
 
-    for (const category of ['Ocio', 'Vivienda', 'Alimentación']) {
+    for (const category of ['Ocio', 'Vivienda', 'Alimentación', 'Transporte', 'Salud']) {
       await request(ctx.app)
         .put('/api/budgets')
         .set(user.auth)
         .send({ category, amount: 100 })
         .expect(200);
     }
-    // Changing an existing budget is still allowed; a fourth one is not.
+    // Changing an existing budget is still allowed; a sixth one is not.
     await request(ctx.app)
       .put('/api/budgets')
       .set(user.auth)
       .send({ category: 'Ocio', amount: 150 })
       .expect(200);
-    const fourth = await request(ctx.app)
+    const sixth = await request(ctx.app)
       .put('/api/budgets')
       .set(user.auth)
       .send({ category: 'Salario', amount: 100 })
       .expect(402);
-    expect(fourth.body.details).toEqual({ resource: 'budgets', limit: 3 });
+    expect(sixth.body.details).toEqual({ resource: 'budgets', limit: 5 });
 
-    await request(ctx.app)
-      .post('/api/goals')
-      .set(user.auth)
-      .send({ name: 'Viaje', target: 1000 })
-      .expect(201);
+    for (const name of ['Viaje', 'Colchón']) {
+      await request(ctx.app)
+        .post('/api/goals')
+        .set(user.auth)
+        .send({ name, target: 1000 })
+        .expect(201);
+    }
     const goal = await request(ctx.app)
       .post('/api/goals')
       .set(user.auth)
       .send({ name: 'Coche', target: 1000 })
       .expect(402);
-    expect(goal.body.details.resource).toBe('goals');
+    expect(goal.body.details).toEqual({ resource: 'goals', limit: 2 });
   });
 
   it('keeps what was created during the trial but blocks adding more', async () => {
@@ -146,16 +165,18 @@ describe('Plans and limits', () => {
       .set(user.auth)
       .send({ archived: true })
       .expect(200);
-    await request(ctx.app)
-      .post('/api/accounts')
-      .set(user.auth)
-      .send({ name: 'Tarjeta', type: 'card' })
-      .expect(201);
+    for (const name of ['Tarjeta', 'Hucha']) {
+      await request(ctx.app)
+        .post('/api/accounts')
+        .set(user.auth)
+        .send({ name, type: 'card' })
+        .expect(201);
+    }
     expireTrial(ctx, user);
 
-    // Three accounts were created during the trial; the free plan allows two.
+    // Four accounts were created during the trial; the free plan allows three.
     const list = await request(ctx.app).get('/api/accounts').set(user.auth).expect(200);
-    expect(list.body.accounts).toHaveLength(3);
+    expect(list.body.accounts).toHaveLength(4);
     await request(ctx.app)
       .patch(`/api/accounts/${extra.id}`)
       .set(user.auth)
@@ -183,8 +204,11 @@ describe('Plans and limits', () => {
           startYear: 2026,
           startMonth: 3,
         });
-    for (const n of [1, 2, 3]) await rule(n).expect(201);
-    expect((await rule(4).expect(402)).body.details.resource).toBe('recurringRules');
+    for (const n of [1, 2, 3, 4, 5]) await rule(n).expect(201);
+    expect((await rule(6).expect(402)).body.details).toEqual({
+      resource: 'recurringRules',
+      limit: 5,
+    });
 
     const alert = (n: number) =>
       request(ctx.app)
@@ -195,19 +219,63 @@ describe('Plans and limits', () => {
     expect((await alert(4).expect(402)).body.details.resource).toBe('customAlerts');
   });
 
-  it('keeps import and the analysis view for Premium', async () => {
+  it('lets the free plan import one bank statement; previews and empty files do not count', async () => {
     expireTrial(ctx, user);
-    const imported = await request(ctx.app)
-      .post('/api/transactions/import')
-      .set(user.auth)
-      .send({ rows: [{ date: '2026-03-01', description: 'X', amount: -1 }], dryRun: true })
-      .expect(402);
-    expect(imported.body).toMatchObject({
-      code: 'PREMIUM_REQUIRED',
-      details: { feature: 'import' },
+    const send = (body: Record<string, unknown>) =>
+      request(ctx.app).post('/api/transactions/import').set(user.auth).send(body);
+    const rows = [{ date: '2026-03-01', description: 'Cine', amount: -12 }];
+    await send({ rows, dryRun: true }).expect(200);
+    await send({ rows, dryRun: true }).expect(200);
+    expect((await billing()).usage.imports).toBe(0);
+    // Nothing new imported (only invalid rows): it does not use the free import.
+    await send({ rows: [{ date: 'nope', description: 'X', amount: -1 }] }).expect(201);
+    expect((await billing()).usage.imports).toBe(0);
+    expect((await send({ rows }).expect(201)).body.imported).toBe(1);
+    expect((await billing()).usage.imports).toBe(1);
+    const second = await send({ rows, dryRun: true }).expect(402);
+    expect(second.body).toMatchObject({
+      code: 'PLAN_LIMIT',
+      details: { resource: 'imports', limit: 1 },
     });
+    await send({ rows: [{ date: '2026-03-02', description: 'Bus', amount: -2 }] }).expect(402);
+  });
+
+  it('imports as many statements as wanted with Premium', async () => {
+    const rows = (n: number) => [{ date: '2026-03-01', description: `Gasto ${n}`, amount: -n }];
+    for (const n of [1, 2, 3]) {
+      await request(ctx.app)
+        .post('/api/transactions/import')
+        .set(user.auth)
+        .send({ rows: rows(n) })
+        .expect(201);
+    }
+    expect((await billing()).usage.imports).toBe(3);
+  });
+
+  it('takes payments read from bank notifications with Premium only, not as a statement', async () => {
+    const send = () =>
+      request(ctx.app)
+        .post('/api/transactions/import')
+        .set(user.auth)
+        .send({
+          rows: [{ date: '2026-03-01', description: 'Bizum', amount: -5 }],
+          source: 'capture',
+        });
+    await send().expect(201);
+    expect((await billing()).usage.imports).toBe(0);
+    expireTrial(ctx, user);
+    const refused = await send().expect(402);
+    expect(refused.body).toMatchObject({
+      code: 'PREMIUM_REQUIRED',
+      details: { feature: 'capture' },
+    });
+  });
+
+  it('keeps the analysis view for Premium', async () => {
+    expireTrial(ctx, user);
     await request(ctx.app).get('/api/stats/trends/2026/3').set(user.auth).expect(402);
     await request(ctx.app).get('/api/stats/net-worth').set(user.auth).expect(402);
+    await request(ctx.app).get('/api/stats/report/2026').set(user.auth).expect(402);
   });
 });
 
