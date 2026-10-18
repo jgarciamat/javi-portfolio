@@ -18,10 +18,15 @@
   background: var(--slate-900);
   border-bottom: 1px solid var(--slate-800);
   padding: 0.85rem 1.5rem;
-  display: flex;
+  /* The Videoteca pill sits in the exact middle, on the same axis as the month below. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
+}
+
+.header > .header-actions {
+  justify-self: end;
 }
 
 .header-brand {
@@ -123,6 +128,7 @@
 /* Phones: no room in the row, so it gets its own full-width line under the brand. */
 @media (max-width: 600px) {
   .header {
+    display: flex;
     flex-wrap: wrap;
     row-gap: 0.6rem;
   }
@@ -199,10 +205,19 @@
 
 /* ─── Month navigator ────────────────────────── */
 .month-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
+}
+
+/* Previous and next hug the edges, so the title stays centred whatever their widths. */
+.month-nav > :first-child {
+  justify-self: start;
+}
+
+.month-nav > :last-child {
+  justify-self: end;
 }
 
 .month-nav-center {
