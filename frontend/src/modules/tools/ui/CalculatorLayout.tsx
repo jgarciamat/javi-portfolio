@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@shared/hooks/useAuth';
 import { useGoBack } from '@shared/hooks/useGoBack';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
@@ -9,6 +8,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import { TOOL_PAGES, faqOf, guidesOfTool, toolPage, type ToolPage } from '../domain/toolPages';
 import { VIDEOS_PATH } from '@modules/guides/domain/videos';
 import { HACIENDA_PATH } from '@modules/guides/domain/hacienda';
+import { SignupWall, TeaserOutline, useGate } from '@modules/guides/ui/SignupWall';
 import './css/Tools.css';
 import '@modules/guides/ui/css/Guides.css';
 
@@ -72,11 +72,12 @@ export function CalculatorLayout({
   children: ReactNode;
 }) {
   const { t } = useI18n();
-  const { isAuthenticated } = useAuth();
+  const gate = useGate();
   const goBack = useGoBack();
   usePageMeta(t(titleKey), t(descriptionKey), path);
   const page = toolPage(path);
   const faq = faqOf(page);
+  const faqKey = (n: number, part: 'q' | 'a') => `tools.${(page as ToolPage).key}.faq${n}.${part}`;
   return (
     <div className="pricing-page">
       <PublicHeader />
@@ -88,21 +89,19 @@ export function CalculatorLayout({
         </p>
         <h1 className="pricing-title">{t(titleKey)}</h1>
         <p className="pricing-subtitle">{t(descriptionKey)}</p>
-        {children}
-        {faq.length > 0 && (
-          <Faq
-            keyOf={(n, part) => `tools.${(page as ToolPage).key}.faq${n}.${part}`}
-            numbers={faq}
-          />
-        )}
-        {!isAuthenticated && (
-          <section className="tools-cta">
-            <h2>{t('tools.cta.title')}</h2>
-            <p>{t('tools.cta.body')}</p>
-            <Link className="btn-primary" to="/login?mode=register">
-              {t('tools.cta.button')}
-            </Link>
-          </section>
+        {gate === 'open' ? (
+          <>
+            {children}
+            {faq.length > 0 && <Faq keyOf={faqKey} numbers={faq} />}
+          </>
+        ) : (
+          <>
+            <TeaserOutline
+              title={t('wall.outline.tool')}
+              items={faq.map((n) => t(faqKey(n, 'q')))}
+            />
+            <SignupWall kicker={t('wall.kicker.tool')} />
+          </>
         )}
         <section className="guide-related">
           <h2>{t('landing.learn.guides')}</h2>

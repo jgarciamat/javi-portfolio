@@ -18,7 +18,12 @@ import {
   stepKey,
 } from '@modules/guides/domain/hacienda';
 import { guideVideoUrl } from '@modules/guides/domain/videos';
-import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
+import {
+  loadChecks,
+  requestHaciendaGuide,
+  saveChecks,
+} from '@modules/guides/application/haciendaLink';
+import { translate } from '@core/i18n/I18nContext';
 import { HaciendaGuidePage, HaciendaIndexPage } from '@modules/guides/ui/HaciendaPages';
 import { GuidesIndexPage } from '@modules/guides/ui/GuidePages';
 import { HaciendaView } from '@modules/finances/ui/views/HaciendaView';
@@ -248,7 +253,7 @@ describe('Hacienda paso a paso on the public site', () => {
     );
 
   it('is announced on the guides page and lists every guide', () => {
-    renderAt('/guias');
+    renderAt('/guias', true);
     fireEvent.click(screen.getByRole('link', { name: tr('hacienda.cta') }));
     expect(
       screen.getByRole('heading', { level: 1, name: tr('hacienda.title') })
@@ -257,23 +262,18 @@ describe('Hacienda paso a paso on the public site', () => {
     fireEvent.click(screen.getByRole('link', { name: title() }));
     expect(screen.getByRole('heading', { level: 1, name: title() })).toBeInTheDocument();
     expect(document.title).toBe(`${title()} | Finanverso`);
-    // The self-employed draft is only in the app: through the login page.
+    // The self-employed draft is in the app.
     expect(
       screen.getAllByRole('link', { name: literal(tr('hacienda.m303.numbers.tool')) })[0]
-    ).toHaveAttribute('href', '/login?next=%2F%3Ftab%3Dbusiness');
+    ).toHaveAttribute('href', '/?tab=business');
     fireEvent.click(screen.getByRole('link', { name: literal(`← ${tr('hacienda.back')}`) }));
     expect(
       screen.getByRole('heading', { level: 1, name: tr('hacienda.title') })
     ).toBeInTheDocument();
   });
 
-  it('links the Renta steps to the app, through the login page when signed out', () => {
+  it('links the Renta steps to the app when signed in', () => {
     const renta = guide('renta-web');
-    const { unmount } = renderAt(haciendaPath(renta));
-    expect(
-      screen.getByRole('link', { name: literal(tr('hacienda.renta.prepare.tool')) })
-    ).toHaveAttribute('href', '/login?next=%2F%3Ftab%3Drenta');
-    unmount();
     renderAt(haciendaPath(renta), true);
     expect(
       screen.getByRole('link', { name: literal(tr('hacienda.renta.prepare.tool')) })
@@ -288,12 +288,56 @@ describe('Hacienda paso a paso on the public site', () => {
   });
 
   it('keeps the ticks of people without an account on this device', () => {
-    renderAt(haciendaPath(m303));
-    fireEvent.click(checkbox(m303, 'file', 1));
+    saveChecks(undefined, { 'm303.file.1': true });
     expect(JSON.parse(localStorage.getItem('mm_hacienda_checks:guest')!)).toEqual({
       'm303.file.1': true,
     });
+    expect(loadChecks(undefined)).toEqual({ 'm303.file.1': true });
   });
+
+  it.each(['es', 'en'] as const)(
+    'shows visitors (%s) the first step, the titles of the rest and the wall',
+    (locale) => {
+      localStorage.clear();
+      const t = (key: string, vars?: Record<string, string | number>) =>
+        translate(locale, key, vars);
+      for (const g of HACIENDA_GUIDES) {
+        const { unmount } = renderWithProviders(
+          <Routes>
+            <Route path="/hacienda-paso-a-paso/:slug" element={<HaciendaGuidePage />} />
+          </Routes>,
+          { authenticated: false, route: haciendaPath(g), locale }
+        );
+        const [first, ...rest] = g.steps;
+        expect(
+          screen.getByRole('heading', { level: 1, name: t(guideKey(g, 'title')) })
+        ).toBeVisible();
+        expect(screen.getByText(t(guideKey(g, 'intro')))).toBeInTheDocument();
+        expect(screen.getByText(t(stepKey(g, first, 'p1')))).toBeInTheDocument();
+        for (const step of rest) {
+          expect(screen.getByText(literal(t(stepKey(g, step, 'title'))))).toBeInTheDocument();
+          expect(screen.queryByText(t(stepKey(g, step, 'p1')))).toBeNull();
+        }
+        if (first.paragraphs > 2) expect(screen.queryByText(t(stepKey(g, first, 'p3')))).toBeNull();
+        // No checklist, no deadlines, no tools of the app, no video.
+        expect(screen.queryByRole('checkbox')).toBeNull();
+        expect(screen.queryByRole('progressbar')).toBeNull();
+        expect(screen.queryByText(t(guideKey(g, 'deadline1'), DEADLINE_PARAMS))).toBeNull();
+        expect(screen.queryByText(/🧮/)).toBeNull();
+        expect(
+          screen.queryByRole('button', { name: /Reproducir el vídeo: (?!Finanverso)/ })
+        ).toBeNull();
+        expect(
+          screen.getByText(t('wall.kicker.hacienda', { n: g.steps.length }))
+        ).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: t('wall.login') })).toHaveAttribute(
+          'href',
+          `/login?next=${encodeURIComponent(haciendaPath(g))}`
+        );
+        unmount();
+      }
+    }
+  );
 
   it('sends unknown guides back to the list', () => {
     renderAt('/hacienda-paso-a-paso/no-existe');

@@ -83,21 +83,6 @@
   border-color: var(--green-500);
 }
 
-.tools-cta {
-  padding: 1.2rem;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
-  background: color-mix(in srgb, var(--accent) 16%, var(--slate-900));
-  text-align: center;
-}
-
-.tools-cta .btn-primary {
-  display: inline-block;
-  width: auto;
-  padding: 0.6rem 1.4rem;
-  text-decoration: none;
-}
-
 .tools-subtitle {
   margin: 2rem 0 0.5rem;
   font-size: 1.2rem;

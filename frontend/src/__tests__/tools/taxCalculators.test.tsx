@@ -48,7 +48,7 @@ describe('toolPages helpers', () => {
 
 describe('net salary calculator', () => {
   it('shows the net pay of the example, the breakdown, the questions and the sources', () => {
-    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: true });
     expect(document.title).toBe(tr('tools.salary.title'));
     // 30.000 € in 14 payments, single: see salaryCalc.test.ts for the arithmetic.
     expect(within(card('tools.salary.monthly')).getByText(euros('1.628,50'))).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('net salary calculator', () => {
       expect.stringContaining('agenciatributaria')
     );
     expect(screen.getByText(/18 de octubre de 2026/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: tr('tools.cta.button') })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: tr('wall.title') })).toBeNull();
     expect(
       screen.getByRole('link', {
         name: GUIDES.find((g) => g.slug === 'como-leer-borrador-renta')!.title,
@@ -81,7 +81,7 @@ describe('net salary calculator', () => {
   });
 
   it('recalculates with each field and explains the special cases', () => {
-    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: true });
     change('tools.salary.payments', '12');
     expect(within(card('tools.salary.monthly')).getByText(euros('1.927,00'))).toBeInTheDocument();
     expect(screen.getByText(tr('tools.salary.monthlyHint12'))).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe('net salary calculator', () => {
   });
 
   it('estimates the tax return of the chosen community', async () => {
-    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: true });
     change('tools.salary.ccaa', 'ceuta');
     expect(screen.getByText(tr('tools.salary.renta.loading'))).toBeInTheDocument();
     // Ceuta uses the default regional scale: the return matches the withholding.
@@ -147,7 +147,7 @@ describe('net salary calculator', () => {
 
   it('says so when the community cannot be loaded, and ignores late answers', async () => {
     const spy = jest.spyOn(renta, 'loadCcaa').mockRejectedValueOnce(new Error('offline'));
-    const { unmount } = renderWithProviders(<SalaryCalculatorPage />, { authenticated: false });
+    const { unmount } = renderWithProviders(<SalaryCalculatorPage />, { authenticated: true });
     change('tools.salary.ccaa', 'madrid');
     expect(await screen.findByText(tr('tools.salary.renta.error'))).toBeInTheDocument();
 
@@ -168,7 +168,7 @@ describe('net salary calculator', () => {
   });
 
   it('speaks English on the English page', () => {
-    renderWithProviders(<SalaryCalculatorPage />, { authenticated: false, locale: 'en' });
+    renderWithProviders(<SalaryCalculatorPage />, { authenticated: true, locale: 'en' });
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Spain net salary calculator 2026'
     );
@@ -179,7 +179,7 @@ describe('net salary calculator', () => {
 
 describe('self-employed contribution calculator', () => {
   it('shows the bracket, the bases and the fee of the example', () => {
-    renderWithProviders(<RetaCalculatorPage />, { authenticated: false });
+    renderWithProviders(<RetaCalculatorPage />, { authenticated: true });
     expect(document.title).toBe(tr('tools.reta.title'));
     // 2.000 € − 7 % = 1.860 € → G5: from 380,88 € to 639,45 €.
     expect(within(card('tools.reta.fee')).getByText(euros('380,88'))).toBeInTheDocument();
@@ -202,7 +202,7 @@ describe('self-employed contribution calculator', () => {
   });
 
   it('works from the yearly figures, for company partners and with the flat rate', () => {
-    renderWithProviders(<RetaCalculatorPage />, { authenticated: false });
+    renderWithProviders(<RetaCalculatorPage />, { authenticated: true });
     change('tools.reta.mode', 'yearly');
     change('tools.reta.income', '18000');
     change('tools.reta.expenses', '6000');
@@ -219,8 +219,44 @@ describe('self-employed contribution calculator', () => {
   });
 
   it('speaks English on the English page', () => {
-    renderWithProviders(<RetaCalculatorPage />, { authenticated: false, locale: 'en' });
+    renderWithProviders(<RetaCalculatorPage />, { authenticated: true, locale: 'en' });
     expect(screen.getByText('General 5')).toBeInTheDocument();
     expect(screen.getByText(/= 31.5 %$/)).toBeInTheDocument();
   });
+});
+
+describe('tax calculators for visitors without an account', () => {
+  beforeEach(() => localStorage.clear());
+
+  it.each([
+    [SalaryCalculatorPage, 'salary', 'tools.salary.gross', '/calculadora-sueldo-neto'],
+    [RetaCalculatorPage, 'reta', 'tools.reta.mode', '/calculadora-cuota-autonomos'],
+  ] as const)(
+    '%p lists its questions but not the answers nor the form',
+    (Page, key, field, path) => {
+      renderWithProviders(<Page />, { authenticated: false, route: path });
+      expect(
+        screen.getByRole('heading', { level: 1, name: tr(`tools.${key}.title`) })
+      ).toBeVisible();
+      const outline = screen
+        .getByRole('heading', { name: tr('wall.outline.tool') })
+        .closest('section') as HTMLElement;
+      for (const n of [1, 2, 3, 4]) {
+        expect(within(outline).getByText(tr(`tools.${key}.faq${n}.q`))).toBeInTheDocument();
+        expect(screen.queryByText(tr(`tools.${key}.faq${n}.a`))).toBeNull();
+      }
+      expect(screen.queryByLabelText(tr(field))).toBeNull();
+      expect(screen.queryByText(tr(`tools.${key}.disclaimer`))).toBeNull();
+      // No FAQPage: the answers are not on the page.
+      expect(document.querySelector('script[type="application/ld+json"]')).toBeNull();
+      expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+        'href',
+        `/login?mode=register&next=${encodeURIComponent(path)}`
+      );
+      expect(screen.getByRole('link', { name: tr('wall.login') })).toHaveAttribute(
+        'href',
+        `/login?next=${encodeURIComponent(path)}`
+      );
+    }
+  );
 });

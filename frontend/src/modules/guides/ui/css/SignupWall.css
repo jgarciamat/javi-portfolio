@@ -1,0 +1,292 @@
+/* ─── Teaser and sign-up wall of the guides and calculators ─────────────────── */
+
+:root {
+  /* The logo's green to blue: dark enough for white text (≥ 5.4:1 along the whole gradient). */
+  --brand-gradient: linear-gradient(90deg, #047857 0%, #0e7490 50%, #1d4ed8 100%);
+  /* The same hues, light enough to read as text on the dark theme. */
+  --brand-gradient-text: linear-gradient(90deg, #34d399 0%, #22d3ee 50%, #93c5fd 100%);
+}
+
+:root[data-theme='light'] {
+  --brand-gradient-text: var(--brand-gradient);
+}
+
+/* The last lines of the preview fade into the page: purely decorative, the rest of the text is
+   not in the page at all. */
+.teaser-preview {
+  position: relative;
+  max-height: 22rem;
+  overflow: hidden;
+}
+
+.teaser-preview::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 6rem;
+  background: linear-gradient(to bottom, transparent, var(--slate-950));
+  backdrop-filter: blur(1.5px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  pointer-events: none;
+}
+
+.teaser-outline {
+  margin-top: 0.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px dashed var(--slate-700);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--slate-900) 70%, transparent);
+}
+
+.guide-article .teaser-outline h2,
+.teaser-outline h2 {
+  margin: 0 0 0.6rem;
+  padding: 0;
+  border: 0;
+  font-size: 1rem;
+  color: var(--slate-300);
+}
+
+.teaser-outline ol {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.teaser-outline li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.teaser-outline-lock {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--slate-800);
+  color: var(--slate-400);
+}
+
+.signup-wall {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem;
+  padding: 2.4rem 1.5rem 1.6rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, #0e7490 55%, var(--slate-700));
+  border-radius: 18px;
+  background: radial-gradient(
+      120% 70% at 50% 0%,
+      color-mix(in srgb, #0e7490 22%, transparent),
+      transparent 70%
+    ),
+    var(--slate-900);
+  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.35);
+  text-align: center;
+}
+
+/* The gradient bar along the top, like the «Aprende todo…» button of the header. */
+.signup-wall::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: var(--brand-gradient);
+}
+
+.signup-wall-lock {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(14, 116, 144, 0.45);
+}
+
+.signup-wall-kicker {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.signup-wall .signup-wall-title {
+  max-width: 34rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: clamp(1.3rem, 4.5vw, 1.75rem);
+  line-height: 1.25;
+  color: var(--slate-100);
+  background: var(--brand-gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.signup-wall-lead {
+  max-width: 32rem;
+  margin: 0;
+  color: var(--slate-300);
+}
+
+.signup-wall-body {
+  display: grid;
+  gap: 1.2rem;
+  width: 100%;
+  margin-top: 0.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--slate-800);
+  text-align: left;
+}
+
+.signup-wall-benefits {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.signup-wall-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  line-height: 1.45;
+  color: var(--slate-200);
+}
+
+.signup-wall-check {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--green-500) 22%, transparent);
+  color: var(--green-400);
+}
+
+:root[data-theme='light'] .signup-wall {
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme='light'] .signup-wall-check {
+  color: #047857;
+}
+
+.signup-wall-video-title {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  color: var(--slate-200);
+}
+
+.signup-wall-video .video-embed {
+  margin: 0;
+}
+
+.signup-wall-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
+.signup-wall-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(14, 116, 144, 0.4);
+  transition: filter 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.signup-wall-register:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 6px 20px rgba(14, 116, 144, 0.55);
+  transform: translateY(-1px);
+}
+
+.signup-wall-register:focus-visible,
+.signup-wall-login:focus-visible {
+  outline: 3px solid #22d3ee;
+  outline-offset: 3px;
+}
+
+.signup-wall-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.signup-wall-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.signup-wall-checking {
+  margin: 1rem 0;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* The lists only invite: no lock and no video. */
+.signup-wall--cta {
+  padding-top: 2rem;
+}
+
+@media (min-width: 760px) {
+  .signup-wall--wall .signup-wall-body {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .signup-wall {
+    padding: 2rem 1rem 1.3rem;
+    border-radius: 14px;
+  }
+
+  .signup-wall-actions > a {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signup-wall-register {
+    transition: none;
+  }
+
+  .signup-wall-register:hover {
+    transform: none;
+  }
+}

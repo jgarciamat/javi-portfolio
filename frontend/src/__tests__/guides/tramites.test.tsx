@@ -84,7 +84,7 @@ describe('guide pages with date, sources and video', () => {
       <Routes>
         <Route path="/guias/:slug" element={<GuidePage />} />
       </Routes>,
-      { authenticated: false, route: `/guias/${slug}` }
+      { authenticated: true, route: `/guias/${slug}` }
     );
 
   it('shows when the guide was updated, its sources and the notice', () => {
@@ -125,7 +125,7 @@ describe('guide pages with date, sources and video', () => {
       <Routes>
         <Route path="/hacienda-paso-a-paso/:slug" element={<HaciendaGuidePage />} />
       </Routes>,
-      { authenticated: false, route: '/hacienda-paso-a-paso/modelo-303' }
+      { authenticated: true, route: '/hacienda-paso-a-paso/modelo-303' }
     );
     expect(screen.getByRole('button', { name: /Reproducir el vídeo/ })).toBeInTheDocument();
     expect(

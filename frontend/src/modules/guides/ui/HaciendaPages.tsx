@@ -1,31 +1,73 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
-import { useAuth } from '@shared/hooks/useAuth';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { brandTitle } from '@shared/utils/pageTitle';
-import { appTarget } from '@shared/utils/appLinks';
+import { appTabPath } from '@shared/utils/appLinks';
 import {
   HACIENDA_PATH,
   findHaciendaGuide,
   guideKey,
   haciendaPath,
+  stepKey,
+  type HaciendaGuide,
   type HaciendaTool,
 } from '../domain/hacienda';
 import { VIDEOS_PATH, haciendaVideo } from '../domain/videos';
-import { HaciendaCatalog, HaciendaGuideBody } from './HaciendaGuides';
-import { GuideCta } from './GuidePages';
+import { HACIENDA_COLOR, HaciendaCatalog, HaciendaGuideBody } from './HaciendaGuides';
+import './css/Hacienda.css';
+import { SignupWall, TeaserOutline, TeaserPreview, useGate } from './SignupWall';
+import { haciendaTeaser } from '../domain/signupWall';
 import { VideoEmbed } from './VideoEmbed';
 import '@modules/tools/ui/css/Tools.css';
 import './css/Guides.css';
 
-/** The tools of a step live in the app: straight there when signed in, through the login page if not. */
+/** The tools of a step live in the app (only people with an account see the steps). */
 function PublicTool({ tool, label }: { tool: HaciendaTool; label: string }) {
-  const { isAuthenticated } = useAuth();
   return (
-    <Link className="btn-secondary" to={appTarget(tool, isAuthenticated)}>
+    <Link className="btn-secondary" to={appTabPath(tool)}>
       🧮 {label}
     </Link>
+  );
+}
+
+/** What people without an account read of a guide: the first step and the titles of the rest. */
+function HaciendaTeaserBody({ guide }: { guide: HaciendaGuide }) {
+  const { t } = useI18n();
+  const { preview, outline } = haciendaTeaser(guide);
+  return (
+    <div className="hacienda-guide" style={{ ['--cat' as string]: HACIENDA_COLOR }}>
+      <p className="guide-kicker">
+        <span className="guide-kicker-tag">
+          {guide.emoji} {t('hacienda.title')}
+        </span>
+        <span>{t('hacienda.stepsCount', { n: guide.steps.length })}</span>
+      </p>
+      <p className="guide-intro">{t(guideKey(guide, 'intro'))}</p>
+      <TeaserPreview>
+        <ol className="hacienda-steps">
+          <li className="hacienda-step" aria-label={t('hacienda.step', { n: 1 })}>
+            <h2>
+              <span className="hacienda-step-n" aria-hidden="true">
+                1
+              </span>
+              {t(stepKey(guide, preview.step, 'title'))}
+            </h2>
+            {preview.paragraphs.map((n) => (
+              <p key={n}>{t(stepKey(guide, preview.step, `p${n}`))}</p>
+            ))}
+          </li>
+        </ol>
+      </TeaserPreview>
+      <TeaserOutline
+        title={t('wall.outline.hacienda')}
+        items={[
+          ...outline.map((step, i) => `${i + 2}. ${t(stepKey(guide, step, 'title'))}`),
+          t('hacienda.deadlines'),
+          t('hacienda.links'),
+        ]}
+      />
+    </div>
   );
 }
 
@@ -57,7 +99,7 @@ export function HaciendaIndexPage() {
             </Link>
           )}
         />
-        <GuideCta />
+        <SignupWall variant="cta" />
       </main>
     </div>
   );
@@ -67,6 +109,7 @@ export function HaciendaIndexPage() {
 export function HaciendaGuidePage() {
   const { t } = useI18n();
   const { slug } = useParams();
+  const gate = useGate();
   const guide = findHaciendaGuide(slug);
   usePageMeta(
     guide ? brandTitle(t(guideKey(guide, 'title'))) : t('hacienda.metaTitle'),
@@ -87,13 +130,17 @@ export function HaciendaGuidePage() {
         </p>
         <article className="guide-article">
           <h1 className="pricing-title">{t(guideKey(guide, 'title'))}</h1>
-          <HaciendaGuideBody
-            guide={guide}
-            renderTool={(tool, label) => <PublicTool tool={tool} label={label} />}
-          />
+          {gate === 'open' ? (
+            <HaciendaGuideBody
+              guide={guide}
+              renderTool={(tool, label) => <PublicTool tool={tool} label={label} />}
+            />
+          ) : (
+            <HaciendaTeaserBody guide={guide} />
+          )}
         </article>
-        {video && <VideoEmbed video={video} />}
-        <GuideCta />
+        {gate === 'open' && video && <VideoEmbed video={video} />}
+        <SignupWall kicker={t('wall.kicker.hacienda', { n: guide.steps.length })} />
       </main>
     </div>
   );

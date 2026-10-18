@@ -4,7 +4,7 @@ import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { VIDEOS_PATH } from '../domain/videos';
 import { PUBLIC_PREMIUM_VIDEOS } from '../application/usePremiumVideos';
-import { GuideCta } from './GuidePages';
+import { SignupWall } from './SignupWall';
 import { VideoCatalog, VideoChannelLinks, VideoSectionNav } from './VideoLibrary';
 import '@modules/tools/ui/css/Tools.css';
 
@@ -26,7 +26,7 @@ export function VideosPage() {
         <VideoChannelLinks />
         <VideoSectionNav />
         <VideoCatalog premium={PUBLIC_PREMIUM_VIDEOS} />
-        <GuideCta />
+        <SignupWall variant="cta" />
       </main>
     </div>
   );

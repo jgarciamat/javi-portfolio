@@ -21,7 +21,7 @@ import { loadChecks, saveChecks } from '../application/haciendaLink';
 import './css/Guides.css';
 import './css/Hacienda.css';
 
-const COLOR = '#0ea5e9';
+export const HACIENDA_COLOR = '#0ea5e9';
 
 /** The ticked items of the checklists of the signed-in person (or of this device, signed out). */
 export function useHaciendaChecks() {
@@ -67,7 +67,7 @@ export function HaciendaCatalog({
   const { t } = useI18n();
   const checks = useHaciendaChecks();
   return (
-    <ul className="guide-cards hacienda-cards" style={{ ['--cat' as string]: COLOR }}>
+    <ul className="guide-cards hacienda-cards" style={{ ['--cat' as string]: HACIENDA_COLOR }}>
       {HACIENDA_GUIDES.map((g) => (
         <li key={g.id} className="guide-card">
           <span className="hacienda-card-emoji" aria-hidden="true">
@@ -103,7 +103,7 @@ export function HaciendaGuideBody({
   const own = FINANVERSO_VIDEOS[guide.id];
 
   return (
-    <div className="hacienda-guide" style={{ ['--cat' as string]: COLOR }}>
+    <div className="hacienda-guide" style={{ ['--cat' as string]: HACIENDA_COLOR }}>
       <p className="guide-kicker">
         <span className="guide-kicker-tag">
           {guide.emoji} {t('hacienda.title')}

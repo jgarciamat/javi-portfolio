@@ -364,10 +364,20 @@ const Where = () => {
 };
 
 describe('Renta calculator page', () => {
-  it('shows the planner to visitors', () => {
-    renderWithProviders(<RentaCalculatorPage />, { authenticated: false });
+  it('shows visitors what it does and the wall instead of the planner', () => {
+    renderWithProviders(<RentaCalculatorPage />, {
+      authenticated: false,
+      route: '/calculadora-renta',
+    });
     expect(document.title).toBe(tr('tools.renta.title'));
-    expect(screen.getByText(tr('tools.renta.step1'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.description'))).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.renta.step1'))).toBeNull();
+    expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+      'href',
+      '/login?mode=register&next=%2Fcalculadora-renta'
+    );
+    // The old "one free calculation per browser" is gone with it.
+    expect(localStorage.getItem('mm_renta_uses')).toBeNull();
   });
 
   it('sends people who are signed in to the section of the app', () => {
