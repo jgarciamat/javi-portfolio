@@ -2,5 +2,7 @@ User-agent: *
 Disallow: /api/
 Disallow: /verify-email
 Disallow: /reset-password
+Disallow: /en/verify-email
+Disallow: /en/reset-password
 
 Sitemap: https://finanverso.app/sitemap.xml

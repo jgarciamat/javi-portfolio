@@ -1,7 +1,17 @@
 import { useEffect } from 'react';
+import { localizedPath } from '@core/i18n/localeUrl';
 
-/** Title, description and canonical URL of a public page (search engines render the app). */
-export function usePageMeta(title: string, description: string, path: string): void {
+/**
+ * Title, description and canonical URL of a public page (search engines render the app). On an
+ * English address (`/en/…`) the canonical URL is the English one, unless the page only exists in
+ * Spanish (`localized: false`, the guides).
+ */
+export function usePageMeta(
+  title: string,
+  description: string,
+  path: string,
+  localized = true
+): void {
   useEffect(() => {
     const previousTitle = document.title;
     document.title = title;
@@ -26,7 +36,10 @@ export function usePageMeta(title: string, description: string, path: string): v
     const previousDescription = meta.getAttribute('content');
     const previousHref = link.getAttribute('href');
     meta.setAttribute('content', description);
-    link.setAttribute('href', `${window.location.origin}${path}`);
+    link.setAttribute(
+      'href',
+      `${window.location.origin}${localized ? localizedPath(path, window.location.pathname) : path}`
+    );
 
     return () => {
       document.title = previousTitle;
@@ -35,5 +48,5 @@ export function usePageMeta(title: string, description: string, path: string): v
       restore(meta, 'content', previousDescription);
       restore(link, 'href', previousHref);
     };
-  }, [title, description, path]);
+  }, [title, description, path, localized]);
 }

@@ -1,48 +1,1168 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://finanverso.app/</loc></url>
-  <url><loc>https://finanverso.app/calculadora-50-30-20</loc></url>
-  <url><loc>https://finanverso.app/simulador-ahorro</loc></url>
-  <url><loc>https://finanverso.app/calculadora-hipoteca</loc></url>
-  <url><loc>https://finanverso.app/calculadora-iva</loc></url>
-  <url><loc>https://finanverso.app/calculadora-inflacion</loc></url>
-  <url><loc>https://finanverso.app/calculadora-objetivo-ahorro</loc></url>
-  <url><loc>https://finanverso.app/calculadora-renta</loc></url>
-  <url><loc>https://finanverso.app/guias</loc></url>
-  <url><loc>https://finanverso.app/guias/metodo-50-30-20</loc></url>
-  <url><loc>https://finanverso.app/guias/como-ahorrar-el-20-por-ciento</loc></url>
-  <url><loc>https://finanverso.app/guias/fondo-de-emergencia</loc></url>
-  <url><loc>https://finanverso.app/guias/interes-compuesto</loc></url>
-  <url><loc>https://finanverso.app/guias/como-hacer-un-presupuesto-mensual</loc></url>
-  <url><loc>https://finanverso.app/guias/gastos-hormiga</loc></url>
-  <url><loc>https://finanverso.app/guias/suscripciones-que-no-usas</loc></url>
-  <url><loc>https://finanverso.app/guias/como-salir-de-deudas</loc></url>
-  <url><loc>https://finanverso.app/guias/como-calcular-la-cuota-de-una-hipoteca</loc></url>
-  <url><loc>https://finanverso.app/guias/inflacion-y-ahorro</loc></url>
-  <url><loc>https://finanverso.app/guias/iva-para-autonomos-modelo-303</loc></url>
-  <url><loc>https://finanverso.app/guias/presupuesto-en-pareja</loc></url>
-  <url><loc>https://finanverso.app/guias/como-ahorrar-para-un-viaje</loc></url>
-  <url><loc>https://finanverso.app/guias/independencia-financiera-regla-del-4</loc></url>
-  <url><loc>https://finanverso.app/guias/modelo-130-paso-a-paso</loc></url>
-  <url><loc>https://finanverso.app/guias/cuota-autonomos-2026-por-tramos</loc></url>
-  <url><loc>https://finanverso.app/guias/gastos-deducibles-autonomo</loc></url>
-  <url><loc>https://finanverso.app/guias/fechas-modelos-trimestrales-autonomos-2026</loc></url>
-  <url><loc>https://finanverso.app/guias/deduccion-maternidad-modelo-140</loc></url>
-  <url><loc>https://finanverso.app/guias/familia-numerosa-deduccion-modelo-143</loc></url>
-  <url><loc>https://finanverso.app/guias/deducciones-renta-castilla-y-leon</loc></url>
-  <url><loc>https://finanverso.app/guias/deducciones-renta-comunitat-valenciana</loc></url>
-  <url><loc>https://finanverso.app/guias/como-leer-borrador-renta</loc></url>
-  <url><loc>https://finanverso.app/guias/renta-a-pagar-o-a-devolver</loc></url>
-  <url><loc>https://finanverso.app/guias/deduccion-alquiler-vivienda-habitual-renta</loc></url>
-  <url><loc>https://finanverso.app/guias/planes-de-pensiones-limite-renta</loc></url>
-  <url><loc>https://finanverso.app/pricing</loc></url>
-  <url><loc>https://finanverso.app/login</loc></url>
-  <url><loc>https://finanverso.app/terms</loc></url>
-  <url><loc>https://finanverso.app/privacy</loc></url>
-  <url><loc>https://finanverso.app/hacienda-paso-a-paso</loc></url>
-  <url><loc>https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar</loc></url>
-  <url><loc>https://finanverso.app/hacienda-paso-a-paso/renta-web</loc></url>
-  <url><loc>https://finanverso.app/hacienda-paso-a-paso/modelo-303</loc></url>
-  <url><loc>https://finanverso.app/hacienda-paso-a-paso/modelo-130</loc></url>
-  <url><loc>https://finanverso.app/videoteca</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://finanverso.app/</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/"/>
+    <image:image><image:loc>https://finanverso.app/landing/home.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/budgets.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/forecast.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/subscriptions.webp</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://finanverso.app/pricing</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/pricing"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/pricing"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/pricing"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/privacy</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/privacy"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/terms</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/terms"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/terms"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/metodo-50-30-20</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-ahorrar-el-20-por-ciento</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/fondo-de-emergencia</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/interes-compuesto</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-hacer-un-presupuesto-mensual</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/gastos-hormiga</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/suscripciones-que-no-usas</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/07.webp</video:thumbnail_loc>
+      <video:title>Gastos fijos y suscripciones: operaciones automáticas en Finanverso</video:title>
+      <video:description>Gastos fijos y suscripciones: operaciones automáticas en Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/0XXIVBTQH_o</video:player_loc>
+      <video:duration>416</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-salir-de-deudas</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-calcular-la-cuota-de-una-hipoteca</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/inflacion-y-ahorro</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/iva-para-autonomos-modelo-303</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/22.webp</video:thumbnail_loc>
+      <video:title>Modelo 303 para tontos: el IVA trimestral paso a paso</video:title>
+      <video:description>Modelo 303 para tontos: el IVA trimestral paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qSX-OK9b1AE</video:player_loc>
+      <video:duration>418</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/presupuesto-en-pareja</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-ahorrar-para-un-viaje</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/05.webp</video:thumbnail_loc>
+      <video:title>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia</video:title>
+      <video:description>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/IKRD8s8lyKc</video:player_loc>
+      <video:duration>365</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/independencia-financiera-regla-del-4</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/modelo-130-paso-a-paso</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/23.webp</video:thumbnail_loc>
+      <video:title>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso</video:title>
+      <video:description>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n_HiGI6_BL4</video:player_loc>
+      <video:duration>342</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/cuota-autonomos-2026-por-tramos</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/12.webp</video:thumbnail_loc>
+      <video:title>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF</video:title>
+      <video:description>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/vz25xbjrXdk</video:player_loc>
+      <video:duration>453</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/gastos-deducibles-autonomo</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/12.webp</video:thumbnail_loc>
+      <video:title>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF</video:title>
+      <video:description>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/vz25xbjrXdk</video:player_loc>
+      <video:duration>453</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/fechas-modelos-trimestrales-autonomos-2026</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/12.webp</video:thumbnail_loc>
+      <video:title>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF</video:title>
+      <video:description>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/vz25xbjrXdk</video:player_loc>
+      <video:duration>453</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/deduccion-maternidad-modelo-140</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/38.webp</video:thumbnail_loc>
+      <video:title>100 € al mes por hijo: maternidad y familia numerosa (para tontos)</video:title>
+      <video:description>100 € al mes por hijo: maternidad y familia numerosa (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/JQKnG-6xsOk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/familia-numerosa-deduccion-modelo-143</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/38.webp</video:thumbnail_loc>
+      <video:title>100 € al mes por hijo: maternidad y familia numerosa (para tontos)</video:title>
+      <video:description>100 € al mes por hijo: maternidad y familia numerosa (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/JQKnG-6xsOk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/como-leer-borrador-renta</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/14.webp</video:thumbnail_loc>
+      <video:title>Renta: importa tu borrador y descubre las deducciones que faltan</video:title>
+      <video:description>Renta: importa tu borrador y descubre las deducciones que faltan. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/KnGxQ4yre7E</video:player_loc>
+      <video:duration>486</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/renta-a-pagar-o-a-devolver</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/34.webp</video:thumbnail_loc>
+      <video:title>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos)</video:title>
+      <video:description>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Rn6yY84sNSk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/deducciones-renta-castilla-y-leon</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/32.webp</video:thumbnail_loc>
+      <video:title>Deducciones autonómicas para tontos: las que Hacienda no pone sola</video:title>
+      <video:description>Deducciones autonómicas para tontos: las que Hacienda no pone sola. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/MK5woiLeh7A</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/deducciones-renta-comunitat-valenciana</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/32.webp</video:thumbnail_loc>
+      <video:title>Deducciones autonómicas para tontos: las que Hacienda no pone sola</video:title>
+      <video:description>Deducciones autonómicas para tontos: las que Hacienda no pone sola. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/MK5woiLeh7A</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/deduccion-alquiler-vivienda-habitual-renta</loc>
+    <lastmod>2026-10-18</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/32.webp</video:thumbnail_loc>
+      <video:title>Deducciones autonómicas para tontos: las que Hacienda no pone sola</video:title>
+      <video:description>Deducciones autonómicas para tontos: las que Hacienda no pone sola. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/MK5woiLeh7A</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/guias/planes-de-pensiones-limite-renta</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://finanverso.app/hacienda-paso-a-paso</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/antes-de-empezar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/24.webp</video:thumbnail_loc>
+      <video:title>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso</video:title>
+      <video:description>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/G6Ag63KCXD4</video:player_loc>
+      <video:duration>423</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/hacienda-paso-a-paso/renta-web</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/renta-web"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/renta-web"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/renta-web"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/21.webp</video:thumbnail_loc>
+      <video:title>Renta WEB para tontos: revisa y presenta tu borrador paso a paso</video:title>
+      <video:description>Renta WEB para tontos: revisa y presenta tu borrador paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/athcDzLevm4</video:player_loc>
+      <video:duration>444</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/hacienda-paso-a-paso/modelo-303</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/modelo-303"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/modelo-303"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/modelo-303"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/22.webp</video:thumbnail_loc>
+      <video:title>Modelo 303 para tontos: el IVA trimestral paso a paso</video:title>
+      <video:description>Modelo 303 para tontos: el IVA trimestral paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qSX-OK9b1AE</video:player_loc>
+      <video:duration>418</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/hacienda-paso-a-paso/modelo-130</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/modelo-130"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/modelo-130"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/modelo-130"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/23.webp</video:thumbnail_loc>
+      <video:title>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso</video:title>
+      <video:description>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n_HiGI6_BL4</video:player_loc>
+      <video:duration>342</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/videoteca</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/videoteca"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/videoteca"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/videoteca"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/01.webp</video:thumbnail_loc>
+      <video:title>Finanverso: primeros pasos, registro, planes y tour guiado</video:title>
+      <video:description>Finanverso: primeros pasos, registro, planes y tour guiado. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/9-gprAy-6ss</video:player_loc>
+      <video:duration>303</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/02.webp</video:thumbnail_loc>
+      <video:title>Resumen del mes en Finanverso: gastos, ingresos, notas y búsqueda</video:title>
+      <video:description>Resumen del mes en Finanverso: gastos, ingresos, notas y búsqueda. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/LO41DecZnzo</video:player_loc>
+      <video:duration>524</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/03.webp</video:thumbnail_loc>
+      <video:title>Cuentas, transferencias y gastos en otra moneda en Finanverso</video:title>
+      <video:description>Cuentas, transferencias y gastos en otra moneda en Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qybGobqmJyQ</video:player_loc>
+      <video:duration>404</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/04.webp</video:thumbnail_loc>
+      <video:title>Presupuestos y alertas en Finanverso: controla cada categoría</video:title>
+      <video:description>Presupuestos y alertas en Finanverso: controla cada categoría. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/av-66smMQ-s</video:player_loc>
+      <video:duration>400</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/05.webp</video:thumbnail_loc>
+      <video:title>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia</video:title>
+      <video:description>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/IKRD8s8lyKc</video:player_loc>
+      <video:duration>365</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/06.webp</video:thumbnail_loc>
+      <video:title>¿Llegas a fin de mes? Previsión, análisis y balance anual</video:title>
+      <video:description>¿Llegas a fin de mes? Previsión, análisis y balance anual. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Wsmm6lb-An8</video:player_loc>
+      <video:duration>410</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/07.webp</video:thumbnail_loc>
+      <video:title>Gastos fijos y suscripciones: operaciones automáticas en Finanverso</video:title>
+      <video:description>Gastos fijos y suscripciones: operaciones automáticas en Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/0XXIVBTQH_o</video:player_loc>
+      <video:duration>416</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/08.webp</video:thumbnail_loc>
+      <video:title>Importar el extracto del banco, tickets y reglas de categorías</video:title>
+      <video:description>Importar el extracto del banco, tickets y reglas de categorías. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/sBP9w0n9oEo</video:player_loc>
+      <video:duration>455</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/09.webp</video:thumbnail_loc>
+      <video:title>Gastos compartidos y modo hogar en Finanverso: cuentas claras</video:title>
+      <video:description>Gastos compartidos y modo hogar en Finanverso: cuentas claras. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/tVbq4PkZBHo</video:player_loc>
+      <video:duration>511</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/10.webp</video:thumbnail_loc>
+      <video:title>Patrimonio, deudas, salud financiera, asesor IA y seguridad</video:title>
+      <video:description>Patrimonio, deudas, salud financiera, asesor IA y seguridad. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ZZPqJYdwQhM</video:player_loc>
+      <video:duration>549</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/11.webp</video:thumbnail_loc>
+      <video:title>Autónomos: borrador del modelo 303 y 130 paso a paso con Finanverso</video:title>
+      <video:description>Autónomos: borrador del modelo 303 y 130 paso a paso con Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/-qtXpk0qNuY</video:player_loc>
+      <video:duration>544</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/12.webp</video:thumbnail_loc>
+      <video:title>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF</video:title>
+      <video:description>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/vz25xbjrXdk</video:player_loc>
+      <video:duration>453</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/13.webp</video:thumbnail_loc>
+      <video:title>Calculadora de la Renta paso a paso: ingresos, hijos y deducciones</video:title>
+      <video:description>Calculadora de la Renta paso a paso: ingresos, hijos y deducciones. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/LBGqcIfcuKM</video:player_loc>
+      <video:duration>561</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/14.webp</video:thumbnail_loc>
+      <video:title>Renta: importa tu borrador y descubre las deducciones que faltan</video:title>
+      <video:description>Renta: importa tu borrador y descubre las deducciones que faltan. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/KnGxQ4yre7E</video:player_loc>
+      <video:duration>486</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/21.webp</video:thumbnail_loc>
+      <video:title>Renta WEB para tontos: revisa y presenta tu borrador paso a paso</video:title>
+      <video:description>Renta WEB para tontos: revisa y presenta tu borrador paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/athcDzLevm4</video:player_loc>
+      <video:duration>444</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/22.webp</video:thumbnail_loc>
+      <video:title>Modelo 303 para tontos: el IVA trimestral paso a paso</video:title>
+      <video:description>Modelo 303 para tontos: el IVA trimestral paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qSX-OK9b1AE</video:player_loc>
+      <video:duration>418</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/23.webp</video:thumbnail_loc>
+      <video:title>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso</video:title>
+      <video:description>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n_HiGI6_BL4</video:player_loc>
+      <video:duration>342</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/24.webp</video:thumbnail_loc>
+      <video:title>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso</video:title>
+      <video:description>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/G6Ag63KCXD4</video:player_loc>
+      <video:duration>423</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/25.webp</video:thumbnail_loc>
+      <video:title>Darse de alta como autónomo para tontos: Hacienda y Seguridad Social</video:title>
+      <video:description>Darse de alta como autónomo para tontos: Hacienda y Seguridad Social. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Wlo53zACXmI</video:player_loc>
+      <video:duration>321</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/26.webp</video:thumbnail_loc>
+      <video:title>Autónomos: cambia tu base de cotización (para tontos)</video:title>
+      <video:description>Autónomos: cambia tu base de cotización (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/6hVclBHj34Y</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/30.webp</video:thumbnail_loc>
+      <video:title>VERI*FACTU para tontos: qué cambia en tus facturas y cuándo</video:title>
+      <video:description>VERI*FACTU para tontos: qué cambia en tus facturas y cuándo. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/iRStIanzkZg</video:player_loc>
+      <video:duration>308</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/31.webp</video:thumbnail_loc>
+      <video:title>Darse de baja como autónomo para tontos: Hacienda y Seguridad Social</video:title>
+      <video:description>Darse de baja como autónomo para tontos: Hacienda y Seguridad Social. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/_GLewoY1kBE</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/32.webp</video:thumbnail_loc>
+      <video:title>Deducciones autonómicas para tontos: las que Hacienda no pone sola</video:title>
+      <video:description>Deducciones autonómicas para tontos: las que Hacienda no pone sola. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/MK5woiLeh7A</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/33.webp</video:thumbnail_loc>
+      <video:title>¿Renta conjunta o individual? Cómo comparar (para tontos)</video:title>
+      <video:description>¿Renta conjunta o individual? Cómo comparar (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/REjCqBo4iqs</video:player_loc>
+      <video:duration>317</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/34.webp</video:thumbnail_loc>
+      <video:title>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos)</video:title>
+      <video:description>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Rn6yY84sNSk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/35.webp</video:thumbnail_loc>
+      <video:title>¿Dónde está mi devolución de la Renta? Cómo consultarla (para tontos)</video:title>
+      <video:description>¿Dónde está mi devolución de la Renta? Cómo consultarla (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Rd_X5uCaUTk</video:player_loc>
+      <video:duration>305</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/36.webp</video:thumbnail_loc>
+      <video:title>Me equivoqué en la Renta: cómo rectificarla (para tontos)</video:title>
+      <video:description>Me equivoqué en la Renta: cómo rectificarla (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/VoV55xtyNC4</video:player_loc>
+      <video:duration>308</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/37.webp</video:thumbnail_loc>
+      <video:title>Te ha llegado una carta de Hacienda: qué hacer (para tontos)</video:title>
+      <video:description>Te ha llegado una carta de Hacienda: qué hacer (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/UfhiMklYZtE</video:player_loc>
+      <video:duration>307</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/38.webp</video:thumbnail_loc>
+      <video:title>100 € al mes por hijo: maternidad y familia numerosa (para tontos)</video:title>
+      <video:description>100 € al mes por hijo: maternidad y familia numerosa (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/JQKnG-6xsOk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/45.webp</video:thumbnail_loc>
+      <video:title>Pide tu vida laboral en 2 minutos (para tontos)</video:title>
+      <video:description>Pide tu vida laboral en 2 minutos (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Ipy0tgiMU_w</video:player_loc>
+      <video:duration>309</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/46.webp</video:thumbnail_loc>
+      <video:title>Bono Alquiler Joven y ayudas al alquiler: cómo pedirlas (para tontos)</video:title>
+      <video:description>Bono Alquiler Joven y ayudas al alquiler: cómo pedirlas (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/cTg160wYWIY</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/47.webp</video:thumbnail_loc>
+      <video:title>Bono social eléctrico: quién puede pedirlo y cómo (para tontos)</video:title>
+      <video:description>Bono social eléctrico: quién puede pedirlo y cómo (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n7rQFtCqOFg</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/48.webp</video:thumbnail_loc>
+      <video:title>Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos)</video:title>
+      <video:description>Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/8VF6v1zDsH0</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-50-30-20</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-50-30-20"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-50-30-20"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-50-30-20"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/simulador-ahorro</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/simulador-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/simulador-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/simulador-ahorro"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-hipoteca</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-hipoteca"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-hipoteca"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-hipoteca"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-iva</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-iva"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-iva"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-iva"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-inflacion</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-inflacion"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-inflacion"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-inflacion"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-objetivo-ahorro</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-objetivo-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-objetivo-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-objetivo-ahorro"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/calculadora-renta</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-renta"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-renta"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-renta"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/"/>
+    <image:image><image:loc>https://finanverso.app/landing/home.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/budgets.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/forecast.webp</image:loc></image:image>
+    <image:image><image:loc>https://finanverso.app/landing/subscriptions.webp</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/pricing</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/pricing"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/pricing"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/pricing"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/privacy</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/privacy"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/terms</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/terms"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/terms"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/hacienda-paso-a-paso</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/hacienda-paso-a-paso/antes-de-empezar</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/antes-de-empezar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/antes-de-empezar"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/24.webp</video:thumbnail_loc>
+      <video:title>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso</video:title>
+      <video:description>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/G6Ag63KCXD4</video:player_loc>
+      <video:duration>423</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/hacienda-paso-a-paso/renta-web</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/renta-web"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/renta-web"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/renta-web"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/21.webp</video:thumbnail_loc>
+      <video:title>Renta WEB para tontos: revisa y presenta tu borrador paso a paso</video:title>
+      <video:description>Renta WEB para tontos: revisa y presenta tu borrador paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/athcDzLevm4</video:player_loc>
+      <video:duration>444</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/hacienda-paso-a-paso/modelo-303</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/modelo-303"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/modelo-303"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/modelo-303"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/22.webp</video:thumbnail_loc>
+      <video:title>Modelo 303 para tontos: el IVA trimestral paso a paso</video:title>
+      <video:description>Modelo 303 para tontos: el IVA trimestral paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qSX-OK9b1AE</video:player_loc>
+      <video:duration>418</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/hacienda-paso-a-paso/modelo-130</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/hacienda-paso-a-paso/modelo-130"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/hacienda-paso-a-paso/modelo-130"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/hacienda-paso-a-paso/modelo-130"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/23.webp</video:thumbnail_loc>
+      <video:title>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso</video:title>
+      <video:description>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n_HiGI6_BL4</video:player_loc>
+      <video:duration>342</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/videoteca</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/videoteca"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/videoteca"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/videoteca"/>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/01.webp</video:thumbnail_loc>
+      <video:title>Finanverso: primeros pasos, registro, planes y tour guiado</video:title>
+      <video:description>Finanverso: primeros pasos, registro, planes y tour guiado. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/9-gprAy-6ss</video:player_loc>
+      <video:duration>303</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/02.webp</video:thumbnail_loc>
+      <video:title>Resumen del mes en Finanverso: gastos, ingresos, notas y búsqueda</video:title>
+      <video:description>Resumen del mes en Finanverso: gastos, ingresos, notas y búsqueda. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/LO41DecZnzo</video:player_loc>
+      <video:duration>524</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/03.webp</video:thumbnail_loc>
+      <video:title>Cuentas, transferencias y gastos en otra moneda en Finanverso</video:title>
+      <video:description>Cuentas, transferencias y gastos en otra moneda en Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qybGobqmJyQ</video:player_loc>
+      <video:duration>404</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/04.webp</video:thumbnail_loc>
+      <video:title>Presupuestos y alertas en Finanverso: controla cada categoría</video:title>
+      <video:description>Presupuestos y alertas en Finanverso: controla cada categoría. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/av-66smMQ-s</video:player_loc>
+      <video:duration>400</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/05.webp</video:thumbnail_loc>
+      <video:title>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia</video:title>
+      <video:description>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/IKRD8s8lyKc</video:player_loc>
+      <video:duration>365</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/06.webp</video:thumbnail_loc>
+      <video:title>¿Llegas a fin de mes? Previsión, análisis y balance anual</video:title>
+      <video:description>¿Llegas a fin de mes? Previsión, análisis y balance anual. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Wsmm6lb-An8</video:player_loc>
+      <video:duration>410</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/07.webp</video:thumbnail_loc>
+      <video:title>Gastos fijos y suscripciones: operaciones automáticas en Finanverso</video:title>
+      <video:description>Gastos fijos y suscripciones: operaciones automáticas en Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/0XXIVBTQH_o</video:player_loc>
+      <video:duration>416</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/08.webp</video:thumbnail_loc>
+      <video:title>Importar el extracto del banco, tickets y reglas de categorías</video:title>
+      <video:description>Importar el extracto del banco, tickets y reglas de categorías. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/sBP9w0n9oEo</video:player_loc>
+      <video:duration>455</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/09.webp</video:thumbnail_loc>
+      <video:title>Gastos compartidos y modo hogar en Finanverso: cuentas claras</video:title>
+      <video:description>Gastos compartidos y modo hogar en Finanverso: cuentas claras. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/tVbq4PkZBHo</video:player_loc>
+      <video:duration>511</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/10.webp</video:thumbnail_loc>
+      <video:title>Patrimonio, deudas, salud financiera, asesor IA y seguridad</video:title>
+      <video:description>Patrimonio, deudas, salud financiera, asesor IA y seguridad. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ZZPqJYdwQhM</video:player_loc>
+      <video:duration>549</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/11.webp</video:thumbnail_loc>
+      <video:title>Autónomos: borrador del modelo 303 y 130 paso a paso con Finanverso</video:title>
+      <video:description>Autónomos: borrador del modelo 303 y 130 paso a paso con Finanverso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/-qtXpk0qNuY</video:player_loc>
+      <video:duration>544</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/12.webp</video:thumbnail_loc>
+      <video:title>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF</video:title>
+      <video:description>Autónomos 2026: cuota por tramos, gastos deducibles, plazos y PDF. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/vz25xbjrXdk</video:player_loc>
+      <video:duration>453</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/13.webp</video:thumbnail_loc>
+      <video:title>Calculadora de la Renta paso a paso: ingresos, hijos y deducciones</video:title>
+      <video:description>Calculadora de la Renta paso a paso: ingresos, hijos y deducciones. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/LBGqcIfcuKM</video:player_loc>
+      <video:duration>561</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/14.webp</video:thumbnail_loc>
+      <video:title>Renta: importa tu borrador y descubre las deducciones que faltan</video:title>
+      <video:description>Renta: importa tu borrador y descubre las deducciones que faltan. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/KnGxQ4yre7E</video:player_loc>
+      <video:duration>486</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/15.webp</video:thumbnail_loc>
+      <video:title>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja</video:title>
+      <video:description>Guías de ahorro: 50/30/20, gastos hormiga y dinero en pareja. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/CZfkWUFsdVs</video:player_loc>
+      <video:duration>448</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/16.webp</video:thumbnail_loc>
+      <video:title>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto</video:title>
+      <video:description>Guías: fondo de emergencia, deudas, hipoteca e interés compuesto. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/ICp2TM9wodA</video:player_loc>
+      <video:duration>425</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/21.webp</video:thumbnail_loc>
+      <video:title>Renta WEB para tontos: revisa y presenta tu borrador paso a paso</video:title>
+      <video:description>Renta WEB para tontos: revisa y presenta tu borrador paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/athcDzLevm4</video:player_loc>
+      <video:duration>444</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/22.webp</video:thumbnail_loc>
+      <video:title>Modelo 303 para tontos: el IVA trimestral paso a paso</video:title>
+      <video:description>Modelo 303 para tontos: el IVA trimestral paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/qSX-OK9b1AE</video:player_loc>
+      <video:duration>418</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/23.webp</video:thumbnail_loc>
+      <video:title>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso</video:title>
+      <video:description>Modelo 130 para tontos: el pago fraccionado del IRPF paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n_HiGI6_BL4</video:player_loc>
+      <video:duration>342</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/24.webp</video:thumbnail_loc>
+      <video:title>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso</video:title>
+      <video:description>Certificado digital FNMT para tontos: cómo conseguirlo paso a paso. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/G6Ag63KCXD4</video:player_loc>
+      <video:duration>423</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/25.webp</video:thumbnail_loc>
+      <video:title>Darse de alta como autónomo para tontos: Hacienda y Seguridad Social</video:title>
+      <video:description>Darse de alta como autónomo para tontos: Hacienda y Seguridad Social. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Wlo53zACXmI</video:player_loc>
+      <video:duration>321</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/26.webp</video:thumbnail_loc>
+      <video:title>Autónomos: cambia tu base de cotización (para tontos)</video:title>
+      <video:description>Autónomos: cambia tu base de cotización (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/6hVclBHj34Y</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/30.webp</video:thumbnail_loc>
+      <video:title>VERI*FACTU para tontos: qué cambia en tus facturas y cuándo</video:title>
+      <video:description>VERI*FACTU para tontos: qué cambia en tus facturas y cuándo. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/iRStIanzkZg</video:player_loc>
+      <video:duration>308</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/31.webp</video:thumbnail_loc>
+      <video:title>Darse de baja como autónomo para tontos: Hacienda y Seguridad Social</video:title>
+      <video:description>Darse de baja como autónomo para tontos: Hacienda y Seguridad Social. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/_GLewoY1kBE</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/32.webp</video:thumbnail_loc>
+      <video:title>Deducciones autonómicas para tontos: las que Hacienda no pone sola</video:title>
+      <video:description>Deducciones autonómicas para tontos: las que Hacienda no pone sola. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/MK5woiLeh7A</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/33.webp</video:thumbnail_loc>
+      <video:title>¿Renta conjunta o individual? Cómo comparar (para tontos)</video:title>
+      <video:description>¿Renta conjunta o individual? Cómo comparar (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/REjCqBo4iqs</video:player_loc>
+      <video:duration>317</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/34.webp</video:thumbnail_loc>
+      <video:title>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos)</video:title>
+      <video:description>¿Te sale a pagar la Renta? Dos plazos o aplazamiento (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Rn6yY84sNSk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/35.webp</video:thumbnail_loc>
+      <video:title>¿Dónde está mi devolución de la Renta? Cómo consultarla (para tontos)</video:title>
+      <video:description>¿Dónde está mi devolución de la Renta? Cómo consultarla (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Rd_X5uCaUTk</video:player_loc>
+      <video:duration>305</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/36.webp</video:thumbnail_loc>
+      <video:title>Me equivoqué en la Renta: cómo rectificarla (para tontos)</video:title>
+      <video:description>Me equivoqué en la Renta: cómo rectificarla (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/VoV55xtyNC4</video:player_loc>
+      <video:duration>308</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/37.webp</video:thumbnail_loc>
+      <video:title>Te ha llegado una carta de Hacienda: qué hacer (para tontos)</video:title>
+      <video:description>Te ha llegado una carta de Hacienda: qué hacer (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/UfhiMklYZtE</video:player_loc>
+      <video:duration>307</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/38.webp</video:thumbnail_loc>
+      <video:title>100 € al mes por hijo: maternidad y familia numerosa (para tontos)</video:title>
+      <video:description>100 € al mes por hijo: maternidad y familia numerosa (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/JQKnG-6xsOk</video:player_loc>
+      <video:duration>315</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/45.webp</video:thumbnail_loc>
+      <video:title>Pide tu vida laboral en 2 minutos (para tontos)</video:title>
+      <video:description>Pide tu vida laboral en 2 minutos (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/Ipy0tgiMU_w</video:player_loc>
+      <video:duration>309</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/46.webp</video:thumbnail_loc>
+      <video:title>Bono Alquiler Joven y ayudas al alquiler: cómo pedirlas (para tontos)</video:title>
+      <video:description>Bono Alquiler Joven y ayudas al alquiler: cómo pedirlas (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/cTg160wYWIY</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/47.webp</video:thumbnail_loc>
+      <video:title>Bono social eléctrico: quién puede pedirlo y cómo (para tontos)</video:title>
+      <video:description>Bono social eléctrico: quién puede pedirlo y cómo (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/n7rQFtCqOFg</video:player_loc>
+      <video:duration>314</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/48.webp</video:thumbnail_loc>
+      <video:title>Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos)</video:title>
+      <video:description>Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos). Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/8VF6v1zDsH0</video:player_loc>
+      <video:duration>316</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-50-30-20</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-50-30-20"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-50-30-20"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-50-30-20"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/simulador-ahorro</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/simulador-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/simulador-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/simulador-ahorro"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-hipoteca</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-hipoteca"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-hipoteca"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-hipoteca"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-iva</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-iva"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-iva"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-iva"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-inflacion</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-inflacion"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-inflacion"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-inflacion"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-objetivo-ahorro</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-objetivo-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-objetivo-ahorro"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-objetivo-ahorro"/>
+  </url>
+  <url>
+    <loc>https://finanverso.app/en/calculadora-renta</loc>
+    <lastmod>2026-10-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://finanverso.app/calculadora-renta"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://finanverso.app/en/calculadora-renta"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://finanverso.app/calculadora-renta"/>
+  </url>
 </urlset>

@@ -2,12 +2,14 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { useAuth } from '@shared/hooks/useAuth';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
+import { brandTitle } from '@shared/utils/pageTitle';
 import { findGuide } from '../domain/guides';
 import { GuideCatalog } from './GuideCatalog';
 import { GuideBody } from './GuideBody';
 import { PublicGuideLink } from './GuideLinks';
 import { HACIENDA_PATH } from '../domain/hacienda';
-import { VIDEOS_PATH } from '../domain/videos';
+import { VIDEOS_PATH, youtubeUrl } from '../domain/videos';
+import { guideVideo } from '../domain/guideLinks';
 import { useI18n } from '@core/i18n/I18nContext';
 import './css/Hacienda.css';
 import '@modules/tools/ui/css/Tools.css';
@@ -37,7 +39,8 @@ export function GuidesIndexPage() {
   usePageMeta(
     'Guías de finanzas personales y ahorro | Finanverso',
     'Guías claras y cortas para ordenar tu dinero: presupuesto, ahorro, método 50/30/20, fondo de emergencia, interés compuesto y deudas.',
-    '/guias'
+    '/guias',
+    false
   );
   return (
     <div className="pricing-page">
@@ -76,11 +79,14 @@ export function GuidesIndexPage() {
 export function GuidePage() {
   const { slug } = useParams();
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   const guide = findGuide(slug);
+  const video = guide && guideVideo(guide.slug);
   usePageMeta(
-    guide ? `${guide.title} | Finanverso` : 'Guías | Finanverso',
+    guide ? brandTitle(guide.title) : 'Guías | Finanverso',
     guide ? guide.description : 'Guías de finanzas personales',
-    `/guias/${slug}`
+    `/guias/${slug}`,
+    false
   );
   if (!guide) return <Navigate to="/guias" replace />;
 
@@ -115,6 +121,18 @@ export function GuidePage() {
             </PublicGuideLink>
           </p>
         )}
+        {video && (
+          <p className="guide-tool">
+            <a
+              className="btn-secondary"
+              href={youtubeUrl(video.youtubeId as string)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🎬 Vídeo: {video.title}
+            </a>
+          </p>
+        )}
         <GuideCta />
         <section className="guide-related">
           <h2>Sigue leyendo</h2>
@@ -130,6 +148,10 @@ export function GuidePage() {
               );
             })}
           </ul>
+          <p>
+            <Link to={VIDEOS_PATH}>🎬 {t('videos.title')}</Link> ·{' '}
+            <Link to={HACIENDA_PATH}>🏛️ {t('hacienda.title')}</Link>
+          </p>
         </section>
       </main>
     </div>

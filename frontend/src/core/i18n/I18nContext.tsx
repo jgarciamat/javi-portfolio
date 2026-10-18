@@ -10,6 +10,7 @@ import {
 import esMessages from '@locales/es.json';
 import { storage } from '@shared/utils/storage';
 import { AppSplash } from '@shared/components/AppSplash';
+import { localeFromPath, withoutLocale } from './localeUrl';
 
 export type Locale = 'es' | 'en';
 
@@ -81,7 +82,10 @@ export interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(storedLocale);
+  // An English address (`/en/…`) shows English; otherwise the language chosen on this device.
+  const [locale, setLocaleState] = useState<Locale>(
+    () => localeFromPath(window.location.pathname) ?? storedLocale()
+  );
   // Until the stored language arrives the splash stays: no flash of Spanish for English users.
   const [ready, setReady] = useState(() => isLocaleLoaded(locale));
 
@@ -91,6 +95,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     storage.set(STORAGE_KEY, next);
+    // On an English address, Spanish means the plain address (the router base changes: reload).
+    const { pathname, search, hash } = window.location;
+    if (localeFromPath(pathname) && next !== 'en') {
+      window.location.replace(`${withoutLocale(pathname)}${search}${hash}`);
+      return;
+    }
     if (isLocaleLoaded(next)) setLocaleState(next);
     else void loadLocale(next).then(() => setLocaleState(next));
   }, []);

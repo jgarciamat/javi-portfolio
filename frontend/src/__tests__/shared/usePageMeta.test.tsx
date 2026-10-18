@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 
-function Page({ title }: { title: string }) {
-  usePageMeta(title, 'Descripción', '/ruta');
+function Page({ title, localized }: { title: string; localized?: boolean }) {
+  usePageMeta(title, 'Descripción', '/ruta', localized);
   return null;
 }
 
@@ -38,5 +38,15 @@ describe('usePageMeta', () => {
     unmount();
     expect(meta()).toHaveAttribute('content', 'Original');
     expect(canonical()).toHaveAttribute('href', 'https://x.test/');
+  });
+
+  it('points to the English address on an English page, unless the page is only in Spanish', () => {
+    window.history.pushState(null, '', '/en/ruta');
+    const { unmount } = render(<Page title="Uno" />);
+    expect(canonical()).toHaveAttribute('href', `${window.location.origin}/en/ruta`);
+    unmount();
+    render(<Page title="Uno" localized={false} />);
+    expect(canonical()).toHaveAttribute('href', `${window.location.origin}/ruta`);
+    window.history.pushState(null, '', '/');
   });
 });

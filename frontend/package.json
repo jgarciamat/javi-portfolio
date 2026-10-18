@@ -9,6 +9,7 @@
     "prebuild": "node scripts/copy-ocr.mjs",
     "build": "tsc && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
     "preview": "vite preview",
+    "sitemap": "node scripts/sitemap.mjs",
     "test": "jest --config jest.config.cjs --passWithNoTests",
     "test:watch": "jest --config jest.config.cjs --watch",
     "test:coverage": "jest --config jest.config.cjs --coverage --coverageDirectory=coverage",

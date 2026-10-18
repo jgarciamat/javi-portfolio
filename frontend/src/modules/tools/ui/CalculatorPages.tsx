@@ -16,8 +16,12 @@ import {
   vatBreakdown,
 } from '../domain/calculators';
 import { TOOL_PAGES } from '../domain/toolPages';
+import { guidesForTool } from '@modules/guides/domain/guideLinks';
+import { VIDEOS_PATH } from '@modules/guides/domain/videos';
+import { HACIENDA_PATH } from '@modules/guides/domain/hacienda';
 import { RentaPlanner } from './RentaPlanner';
 import './css/Tools.css';
+import '@modules/guides/ui/css/Guides.css';
 
 function useMoney() {
   const { locale } = useI18n();
@@ -66,6 +70,16 @@ function CalculatorLayout({
             </Link>
           </section>
         )}
+        <section className="guide-related">
+          <h2>{t('landing.learn.guides')}</h2>
+          <ul>
+            {guidesForTool(path).map((g) => (
+              <li key={g.slug}>
+                <Link to={`/guias/${g.slug}`}>{g.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
         <p className="pricing-links">
           {TOOL_PAGES.map((tool) => (
             <span key={tool.key}>
@@ -73,6 +87,8 @@ function CalculatorLayout({
             </span>
           ))}
           <Link to="/guias">{t('tools.guides.nav')}</Link> ·{' '}
+          <Link to={HACIENDA_PATH}>{t('hacienda.title')}</Link> ·{' '}
+          <Link to={VIDEOS_PATH}>{t('videos.title')}</Link> ·{' '}
           <Link to="/pricing">{t('pricing.link')}</Link>
         </p>
       </main>
