@@ -76,6 +76,8 @@ import { SqlitePushRepository } from './sqlite/repositories/SqlitePushRepository
 import { SqliteInboxRepository } from './sqlite/repositories/SqliteInboxRepository';
 import { InboxService } from '@application/inbox/InboxService';
 import { RentaService } from '@application/renta/RentaService';
+import { LearnService } from '@application/learn/LearnService';
+import { PREMIUM_CHAPTERS } from './learn';
 import { SqliteImportUsageRepository } from './sqlite/repositories/SqliteImportUsageRepository';
 import { SqliteAutonomoUsageRepository } from './sqlite/repositories/SqliteAutonomoUsageRepository';
 import { SqliteAutonomoPdfRepository } from './sqlite/repositories/SqliteAutonomoPdfRepository';
@@ -425,6 +427,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,
     renta,
+    learn: new LearnService(PREMIUM_CHAPTERS, entitlements),
     inbox: new InboxService(repos.inbox, importer, config.inbox, clock, entitlements),
     exporter: new ExportService(
       repos.users,
