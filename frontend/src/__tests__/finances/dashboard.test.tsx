@@ -33,7 +33,7 @@ describe('menu and sections', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalled());
     for (const section of DASHBOARD_SECTIONS) {
-      goTo(section.labelKey);
+      goTo(section.menuKey ?? section.labelKey);
       expect(screen.getByRole('region', { name: tr(section.labelKey) })).toBeInTheDocument();
     }
     expect(localStorage.getItem('mm_last_tab')).toBe('settings');

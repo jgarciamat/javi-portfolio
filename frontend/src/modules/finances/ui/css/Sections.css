@@ -763,6 +763,16 @@
   gap: 0.3rem;
 }
 
+.burger-nav-group-title {
+  grid-column: 1 / -1;
+  margin: 0.2rem 0.3rem 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+
 .burger-nav-group + .burger-nav-group {
   border-top: 1px solid var(--slate-800);
   margin-top: 0.4rem;

@@ -91,10 +91,18 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
         </div>
         <nav className="burger-nav">
           {SECTION_GROUPS.map((group) => (
-            <div key={group} className="burger-nav-group">
+            <div
+              key={group}
+              className="burger-nav-group"
+              role="group"
+              aria-label={t(`app.menu.group.${group}`)}
+            >
+              <h3 className="burger-nav-group-title" aria-hidden="true">
+                {t(`app.menu.group.${group}`)}
+              </h3>
               {sections
                 .filter((s) => s.group === group)
-                .map(({ id, icon, labelKey, color }) => (
+                .map(({ id, icon, labelKey, menuKey, color }) => (
                   <button
                     key={id}
                     className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
@@ -108,7 +116,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
                     <span className="burger-nav-icon">
                       <Icon name={icon} />
                     </span>
-                    <span className="burger-nav-label">{t(labelKey)}</span>
+                    <span className="burger-nav-label">{t(menuKey ?? labelKey)}</span>
                     {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
                   </button>
                 ))}

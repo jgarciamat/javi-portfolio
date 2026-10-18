@@ -32,7 +32,9 @@ export interface DashboardSection {
   /** Colour that identifies the section in the menu and in its screen. */
   color: string;
   /** Groups shown as separate blocks in the menu. */
-  group: 'overview' | 'planning' | 'tools';
+  group: 'overview' | 'money' | 'work' | 'learn' | 'account';
+  /** Shorter name for the menu tiles, when the full one wraps. */
+  menuKey?: string;
 }
 
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
@@ -64,70 +66,72 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
     icon: 'bank',
     color: '#3b82f6',
     labelKey: 'app.tabs.accounts',
-    group: 'planning',
+    group: 'money',
   },
   {
     id: 'budgets',
     icon: 'target',
     color: '#f59e0b',
     labelKey: 'app.tabs.budgets',
-    group: 'planning',
+    group: 'money',
   },
-  { id: 'goals', icon: 'flag', color: '#10b981', labelKey: 'app.tabs.goals', group: 'planning' },
+  { id: 'goals', icon: 'flag', color: '#10b981', labelKey: 'app.tabs.goals', group: 'money' },
   {
     id: 'split',
     icon: 'handshake',
     color: '#ec4899',
     labelKey: 'app.tabs.split',
-    group: 'planning',
+    group: 'money',
   },
   {
     id: 'assets',
     icon: 'wallet',
     color: '#14b8a6',
     labelKey: 'app.tabs.assets',
-    group: 'planning',
+    group: 'money',
   },
   {
     id: 'business',
     icon: 'briefcase',
     color: '#f97316',
     labelKey: 'app.tabs.business',
-    group: 'planning',
+    group: 'work',
   },
-  { id: 'renta', icon: 'file', color: '#dc2626', labelKey: 'app.tabs.renta', group: 'planning' },
+  { id: 'renta', icon: 'file', color: '#84cc16', labelKey: 'app.tabs.renta', group: 'work' },
   {
     id: 'hacienda',
     icon: 'compass',
     color: '#06b6d4',
     labelKey: 'app.tabs.hacienda',
-    group: 'planning',
+    menuKey: 'app.menu.short.hacienda',
+    group: 'work',
   },
   {
     id: 'automations',
     icon: 'settings',
     color: '#64748b',
     labelKey: 'app.tabs.automations',
-    group: 'planning',
+    menuKey: 'app.menu.short.automations',
+    group: 'work',
   },
   {
     id: 'custom-alerts',
     icon: 'bell',
     color: '#eab308',
     labelKey: 'app.tabs.customAlerts',
-    group: 'planning',
+    group: 'money',
   },
-  { id: 'learn', icon: 'book', color: '#22c55e', labelKey: 'app.tabs.learn', group: 'tools' },
-  { id: 'invest', icon: 'coins', color: '#d946ef', labelKey: 'app.tabs.invest', group: 'tools' },
-  { id: 'videos', icon: 'video', color: '#ef4444', labelKey: 'app.tabs.videos', group: 'tools' },
-  { id: 'plan', icon: 'star', color: '#facc15', labelKey: 'app.tabs.plan', group: 'tools' },
-  { id: 'offers', icon: 'gift', color: '#fb7185', labelKey: 'app.tabs.offers', group: 'tools' },
+  { id: 'learn', icon: 'book', color: '#22c55e', labelKey: 'app.tabs.learn', group: 'learn' },
+  { id: 'invest', icon: 'coins', color: '#d946ef', labelKey: 'app.tabs.invest', group: 'learn' },
+  { id: 'videos', icon: 'video', color: '#ef4444', labelKey: 'app.tabs.videos', group: 'learn' },
+  { id: 'plan', icon: 'star', color: '#facc15', labelKey: 'app.tabs.plan', group: 'account' },
+  { id: 'offers', icon: 'gift', color: '#fb7185', labelKey: 'app.tabs.offers', group: 'account' },
   {
     id: 'settings',
     icon: 'wrench',
     color: '#94a3b8',
     labelKey: 'app.tabs.settings',
-    group: 'tools',
+    group: 'account',
   },
 ];
 
@@ -136,7 +140,13 @@ export const SECTION_BY_ID = Object.fromEntries(DASHBOARD_SECTIONS.map((s) => [s
   DashboardSection
 >;
 
-export const SECTION_GROUPS: DashboardSection['group'][] = ['overview', 'planning', 'tools'];
+export const SECTION_GROUPS: DashboardSection['group'][] = [
+  'overview',
+  'money',
+  'work',
+  'learn',
+  'account',
+];
 
 export const isDashboardTab = (value: unknown): value is DashboardTab =>
   DASHBOARD_SECTIONS.some((s) => s.id === value);
