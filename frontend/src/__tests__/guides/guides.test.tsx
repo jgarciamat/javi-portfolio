@@ -1,20 +1,22 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
 import { GUIDES, findGuide, inlineParts } from '@modules/guides/domain/guides';
 import { GuidePage, GuidesIndexPage } from '@modules/guides/ui/GuidePages';
-import { renderWithProviders } from '@test-utils/render';
+import { guideTeaser } from '@modules/guides/domain/signupWall';
+import { renderWithProviders, tr } from '@test-utils/render';
 
 const Where = () => <p data-testid="where">{useLocation().pathname}</p>;
 
-const renderAt = (route: string) =>
+/** The guides as people with an account see them (`authenticated`) or without one. */
+const renderAt = (route: string, authenticated = true) =>
   renderWithProviders(
     <Routes>
       <Route path="/guias" element={<GuidesIndexPage />} />
       <Route path="/guias/:slug" element={<GuidePage />} />
       <Route path="*" element={<Where />} />
     </Routes>,
-    { authenticated: false, route }
+    { authenticated, route }
   );
 
 describe('guide content', () => {
@@ -120,7 +122,8 @@ describe('inlineParts', () => {
 
 describe('guide pages', () => {
   it('lists every guide on the index and sets the page title', () => {
-    renderAt('/guias');
+    localStorage.clear();
+    renderAt('/guias', false);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Guías de finanzas');
     for (const g of GUIDES) {
       expect(screen.getByRole('link', { name: g.title })).toHaveAttribute(
@@ -129,7 +132,11 @@ describe('guide pages', () => {
       );
     }
     expect(document.title).toContain('Guías de finanzas personales');
-    expect(screen.getByRole('link', { name: /Crear mi cuenta gratis/ })).toBeInTheDocument();
+    // The list is public; the invitation has no way back (there is nothing to come back to).
+    expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+      'href',
+      '/login?mode=register'
+    );
   });
 
   it.each(GUIDES.map((g) => [g.slug, g] as const))('renders the guide %s', (_slug, guide) => {
@@ -142,7 +149,7 @@ describe('guide pages', () => {
         screen.getByRole('link', { name: new RegExp(`🧮.*${guide.tool.label}`) })
       ).toHaveAttribute(
         'href',
-        guide.tool.to === '/calculadora-renta' ? '/login?next=%2F%3Ftab%3Drenta' : guide.tool.to
+        guide.tool.to === '/calculadora-renta' ? '/?tab=renta' : guide.tool.to
       );
     } else {
       expect(screen.queryByText(/🧮/)).toBeNull();
@@ -167,16 +174,12 @@ describe('guide pages', () => {
   });
 
   it('shows the sign-up panel to visitors but not to people who are signed in', () => {
-    const { unmount } = renderAt('/guias');
-    expect(screen.getByRole('link', { name: /Crear mi cuenta/ })).toBeInTheDocument();
+    localStorage.clear();
+    const { unmount } = renderAt('/guias', false);
+    expect(screen.getByRole('link', { name: tr('wall.register') })).toBeInTheDocument();
     unmount();
-    renderWithProviders(
-      <Routes>
-        <Route path="/guias" element={<GuidesIndexPage />} />
-      </Routes>,
-      { authenticated: true, route: '/guias' }
-    );
-    expect(screen.queryByRole('link', { name: /Crear mi cuenta/ })).toBeNull();
+    renderAt('/guias');
+    expect(screen.queryByRole('link', { name: tr('wall.register') })).toBeNull();
   });
 });
 
@@ -188,21 +191,20 @@ describe('links of the guides to the app', () => {
     g.sections.some((s) => s.paragraphs.some((p) => p.includes('(/calculadora-renta)')))
   )!.slug;
 
-  it('sends visitors through the login to the section of the app', () => {
-    renderAt(`/guias/${toolSlug}`);
-    expect(screen.getByRole('link', { name: /Calculadora de la Renta/ })).toHaveAttribute(
+  it('sends visitors through the login to the section of the app from the preview', () => {
+    const [first] = GUIDES[0].sections;
+    const original = first.paragraphs;
+    first.paragraphs = ['Usa la [calculadora de la Renta](/calculadora-renta).', ...original];
+    renderAt(`/guias/${GUIDES[0].slug}`, false);
+    expect(screen.getByRole('link', { name: 'calculadora de la Renta' })).toHaveAttribute(
       'href',
       '/login?next=%2F%3Ftab%3Drenta'
     );
+    first.paragraphs = original;
   });
 
   it('sends people who are signed in straight to the section of the app', () => {
-    renderWithProviders(
-      <Routes>
-        <Route path="/guias/:slug" element={<GuidePage />} />
-      </Routes>,
-      { authenticated: true, route: `/guias/${toolSlug}` }
-    );
+    renderAt(`/guias/${toolSlug}`);
     expect(screen.getByRole('link', { name: /Calculadora de la Renta/ })).toHaveAttribute(
       'href',
       '/?tab=renta'
@@ -213,11 +215,53 @@ describe('links of the guides to the app', () => {
     renderAt(`/guias/${inlineSlug}`);
     expect(screen.getByRole('link', { name: 'calculadora de la Renta' })).toHaveAttribute(
       'href',
-      '/login?next=%2F%3Ftab%3Drenta'
+      '/?tab=renta'
     );
     expect(screen.getByRole('link', { name: 'si te sale a pagar o a devolver' })).toHaveAttribute(
       'href',
       '/guias/renta-a-pagar-o-a-devolver'
     );
   });
+});
+
+describe('guides for visitors without an account', () => {
+  beforeEach(() => localStorage.clear());
+
+  it.each(GUIDES.map((g) => [g.slug, g] as const))(
+    '%s shows its beginning, what follows and the wall, never the rest',
+    (_slug, guide) => {
+      renderAt(`/guias/${guide.slug}`, false);
+      const teaser = guideTeaser(guide);
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(guide.title);
+      expect(document.title).toContain(guide.title);
+      expect(screen.getByRole('heading', { level: 2, name: teaser.preview.heading })).toBeVisible();
+      const outline = screen
+        .getByRole('heading', { name: tr('wall.outline.guide') })
+        .closest('section') as HTMLElement;
+      for (const heading of teaser.outline) {
+        expect(within(outline).getByText(heading)).toBeInTheDocument();
+        // Only as an item of the outline, never as a section of the text.
+        expect(screen.queryByRole('heading', { name: heading })).toBeNull();
+      }
+      const page = document.body.textContent as string;
+      const shown = teaser.preview.paragraphs;
+      for (const s of guide.sections) {
+        for (const p of s.paragraphs.filter((x) => !shown.includes(x))) {
+          expect(page).not.toContain(p.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').slice(0, 50));
+        }
+      }
+      // No player, no YouTube link, no calculator button: only the wall, with its way back.
+      expect(document.querySelector('iframe')).toBeNull();
+      expect(screen.queryByRole('link', { name: /Ver en YouTube/ })).toBeNull();
+      expect(screen.queryByText(/🧮/)).toBeNull();
+      expect(screen.getByText(tr('wall.kicker.guide'))).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+        'href',
+        `/login?mode=register&next=${encodeURIComponent(`/guias/${guide.slug}`)}`
+      );
+      for (const r of guide.related) {
+        expect(screen.getByRole('link', { name: findGuide(r)!.title })).toBeInTheDocument();
+      }
+    }
+  );
 });

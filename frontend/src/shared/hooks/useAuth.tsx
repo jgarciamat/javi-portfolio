@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import {
   isTwoFactorChallenge,
   type AuthResult,
@@ -58,7 +51,7 @@ interface AuthContextValue {
   updateAvatar: (avatarDataUrl: string | null) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = stableContext<AuthContextValue | null>('AuthContext', null);
 const USER_KEY = 'mm_user';
 
 const loadUser = (): AuthUser | null => storage.getJSON<AuthUser | null>(USER_KEY, null);

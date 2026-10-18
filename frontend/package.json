@@ -1,15 +1,16 @@
 {
   "name": "portfolio-frontend",
-  "version": "1.41.9",
+  "version": "1.41.10",
   "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
     "predev": "node scripts/copy-ocr.mjs",
     "dev": "vite",
     "prebuild": "node scripts/copy-ocr.mjs",
-    "build": "tsc && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
+    "build": "tsc && npm run test:seo && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
     "preview": "vite preview",
     "sitemap": "node scripts/sitemap.mjs",
+    "test:seo": "node --test scripts/seo/pages.test.mjs",
     "test": "jest --config jest.config.cjs --passWithNoTests",
     "test:watch": "jest --config jest.config.cjs --watch",
     "test:coverage": "jest --config jest.config.cjs --coverage --coverageDirectory=coverage",

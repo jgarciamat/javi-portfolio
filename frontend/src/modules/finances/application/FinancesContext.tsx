@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import { useApi } from '@core/context/ApiContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
@@ -67,7 +68,7 @@ interface FinancesActions {
 
 export type FinancesContextValue = FinancesState & FinancesActions;
 
-const FinancesContext = createContext<FinancesContextValue | null>(null);
+const FinancesContext = stableContext<FinancesContextValue | null>('FinancesContext', null);
 
 const EMPTY: never[] = [];
 

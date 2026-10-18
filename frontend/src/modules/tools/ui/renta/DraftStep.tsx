@@ -64,7 +64,7 @@ export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaFor
     age: r.age === null ? form.age : String(r.age),
     ascendants:
       r.ascendantAges.length > 0
-        ? r.ascendantAges.map((age) => ({ over75: age > 75, disability: 0 as const }))
+        ? r.ascendantAges.map((age) => ({ over75: age >= 75, disability: 0 as const }))
         : form.ascendants,
     children:
       r.childAges.length > 0

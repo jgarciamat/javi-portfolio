@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo } from 'react';
+import { useContext, useMemo } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import type { ReactNode } from 'react';
 import {
   accountApi,
@@ -58,7 +59,7 @@ export interface IApiContext {
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
-const ApiContext = createContext<IApiContext | null>(null);
+const ApiContext = stableContext<IApiContext | null>('ApiContext', null);
 
 const defaultValue: IApiContext = {
   authApi,

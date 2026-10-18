@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import esMessages from '@locales/es.json';
 import { storage } from '@shared/utils/storage';
 import { AppSplash } from '@shared/components/AppSplash';
@@ -79,7 +72,7 @@ export interface I18nContextValue {
   tCategory: (name: string) => string;
 }
 
-const I18nContext = createContext<I18nContextValue | null>(null);
+const I18nContext = stableContext<I18nContextValue | null>('I18nContext', null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   // An English address (`/en/…`) shows English; otherwise the language chosen on this device.

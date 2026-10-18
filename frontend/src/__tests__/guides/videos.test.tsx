@@ -215,6 +215,8 @@ describe('Videoteca in the app', () => {
 });
 
 describe('Videoteca on the public site', () => {
+  beforeEach(() => localStorage.clear());
+
   const Where = () => <p data-testid="where">{useLocation().pathname}</p>;
   const renderAt = (route: string) =>
     renderWithProviders(
@@ -232,6 +234,15 @@ describe('Videoteca on the public site', () => {
     expect(screen.getByRole('heading', { name: tr('videos.title'), level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: literal(VIDEOS[0].title) })).toBeInTheDocument();
     expect(document.title).toBe(tr('videos.metaTitle'));
+    // Public, with the invitation to create an account (no lock and no player of its own).
+    expect(screen.getByRole('heading', { name: tr('wall.title') })).toBeInTheDocument();
+    expect(screen.getByText(tr('wall.leadCta'))).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+      'href',
+      '/login?mode=register'
+    );
+    expect(screen.getByRole('link', { name: tr('wall.login') })).toHaveAttribute('href', '/login');
+    expect(screen.queryByRole('button', { name: /Reproducir el vídeo/ })).toBeNull();
   });
 
   it('is linked from the guides and from «Hacienda paso a paso»', () => {

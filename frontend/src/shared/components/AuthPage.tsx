@@ -7,6 +7,7 @@ import { RegisterPage } from '@modules/auth/ui/RegisterPage';
 import { ForgotPasswordPage } from '@modules/auth/ui/ForgotPasswordPage';
 import { TwoFactorLoginStep } from '@modules/auth/ui/TwoFactorLoginStep';
 import { safeNext } from '@shared/utils/appLinks';
+import { rememberReturn, takeReturn } from '@shared/utils/returnTo';
 import { PublicHeader } from './PublicHeader';
 
 export function AuthPage() {
@@ -19,8 +20,13 @@ export function AuthPage() {
   const { isAuthenticated, twoFactorChallenge } = useAuth();
   const navigate = useNavigate();
 
+  // Kept on the device too: the e-mail to verify a new account opens a tab without `?next=`.
+  useEffect(() => rememberReturn(params.get('next')), [params]);
+
   useEffect(() => {
-    if (isAuthenticated) navigate(safeNext(params.get('next')), { replace: true });
+    if (!isAuthenticated) return;
+    const remembered = takeReturn();
+    navigate(safeNext(params.get('next') ?? remembered), { replace: true });
   }, [isAuthenticated, navigate, params]);
 
   return (

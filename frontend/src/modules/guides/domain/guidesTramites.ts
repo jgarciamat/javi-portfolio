@@ -268,6 +268,7 @@ export const GUIDES_TRAMITES: Guide[] = [
         ],
       },
     ],
+    tool: { to: '/calculadora-cuota-autonomos', label: 'Calculadora de cuota de autónomos' },
     related: [
       'tarifa-plana-autonomos-2026',
       'cuota-autonomos-2026-por-tramos',
@@ -335,6 +336,7 @@ export const GUIDES_TRAMITES: Guide[] = [
         ],
       },
     ],
+    tool: { to: '/calculadora-cuota-autonomos', label: 'Calculadora de cuota de autónomos' },
     related: [
       'alta-autonomo-paso-a-paso',
       'cuota-autonomos-2026-por-tramos',

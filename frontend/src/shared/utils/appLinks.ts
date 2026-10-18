@@ -14,6 +14,15 @@ export const appTarget = (tab: string, authenticated: boolean): string =>
 
 const NEXT = /^\/\?tab=[a-z-]+$/;
 
-/** The `next` address of the login page, only when it points to a section of the app. */
+/** The public guides and calculators that only people with an account see in full. */
+const GATED =
+  /^\/(?:(?:guias|hacienda-paso-a-paso)\/[a-z0-9-]+|(?:calculadora|simulador)-[a-z0-9-]+)$/;
+
+export const isGatedPath = (path: string): boolean => GATED.test(path);
+
+/**
+ * The `next` address of the login page, only when it points to a section of the app or to a guide
+ * or calculator (never to another site).
+ */
 export const safeNext = (next: string | null): string =>
-  next !== null && NEXT.test(next) ? next : '/';
+  next !== null && (NEXT.test(next) || GATED.test(next)) ? next : '/';

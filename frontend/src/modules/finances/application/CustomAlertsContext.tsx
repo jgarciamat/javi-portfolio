@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { stableContext } from '@shared/utils/stableContext';
 import { useApi } from '@core/context/ApiContext';
 import { useAuth } from '@shared/hooks/useAuth';
 import type {
@@ -19,7 +20,10 @@ interface CustomAlertsContextValue {
   refresh: () => Promise<void>;
 }
 
-const CustomAlertsContext = createContext<CustomAlertsContextValue | null>(null);
+const CustomAlertsContext = stableContext<CustomAlertsContextValue | null>(
+  'CustomAlertsContext',
+  null
+);
 
 /**
  * The user's custom alerts, loaded once and shared by the month banner and the

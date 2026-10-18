@@ -6,6 +6,7 @@ import {
   LOW_INCOME_REDUCTIONS,
   RETA_BRACKETS_2026,
   RETA_GENERAL_EXPENSES,
+  type RetaBracket,
   RETA_RATE_2026,
 } from './autonomo-data';
 import { ManualData } from './autonomo-expenses';
@@ -309,12 +310,9 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
 
 /** The contribution bracket for a monthly net income (after the 7 % general expenses). */
 export function retaFor(monthlyNet: number): RetaEstimate {
-  const bracket =
-    RETA_BRACKETS_2026.find((b, i) =>
-      i === 0
-        ? monthlyNet <= (b.to as number)
-        : monthlyNet > b.from && (b.to === null || monthlyNet <= b.to)
-    ) ?? RETA_BRACKETS_2026[RETA_BRACKETS_2026.length - 1];
+  const bracket = RETA_BRACKETS_2026.find(
+    (b) => b.to === null || (b.toExclusive ? monthlyNet < b.to : monthlyNet <= b.to)
+  ) as RetaBracket; // the last bracket has no upper limit
   return {
     monthlyNet: round2(monthlyNet),
     bracket: bracket.id,

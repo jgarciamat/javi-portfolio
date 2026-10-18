@@ -104,6 +104,13 @@ export const VIDEOS: VideoEntry[] = [
     youtubeId: 'IKRD8s8lyKc',
   },
   {
+    number: 49,
+    section: 'start',
+    title: 'Ajustes de Finanverso: todo lo que puedes configurar',
+    durationSeconds: 572,
+    youtubeId: 'HT9Q_6Tyzo4',
+  },
+  {
     number: 6,
     section: 'app',
     title: '¿Llegas a fin de mes? Previsión, análisis y balance anual',
@@ -420,6 +427,13 @@ export const VIDEOS: VideoEntry[] = [
     title: 'Ingreso Mínimo Vital: quién puede pedirlo y cómo (para tontos)',
     durationSeconds: 316,
     youtubeId: '8VF6v1zDsH0',
+  },
+  {
+    number: 50,
+    section: 'renta',
+    title: 'Vender o comprar casa: Renta, casillas e impuestos (para tontos)',
+    durationSeconds: 796,
+    youtubeId: 'RAsGB2CZVzg',
   },
 ];
 

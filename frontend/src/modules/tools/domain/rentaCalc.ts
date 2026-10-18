@@ -92,7 +92,10 @@ export function computeMinimum(
 ): { total: number; items: MinimumItem[] } {
   const share = family.sharedChildren ? 0.5 : 1;
   const items: MinimumItem[] = [{ key: 'personal', amount: m.personal }];
-  const ageExtra = family.age > 75 ? m.over65 + m.over75 : family.age > 65 ? m.over65 : 0;
+  // LIRPF art. 57.2 ("edad superior a 65/75 años"), with the age at the accrual date, 31 December
+  // (art. 61.1.ª). The AEAT Manual práctico de Renta 2025 applies it to taxpayers "de edad igual o
+  // superior a 65 años" (and 75): turning 65 (or 75) by 31 December is enough.
+  const ageExtra = family.age >= 75 ? m.over65 + m.over75 : family.age >= 65 ? m.over65 : 0;
   if (ageExtra > 0) items.push({ key: 'age', amount: ageExtra });
 
   const children = family.children.filter(countsAsDescendant).sort((a, b) => b.age - a.age);

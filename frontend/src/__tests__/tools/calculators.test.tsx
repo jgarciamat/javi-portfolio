@@ -72,7 +72,7 @@ describe('calculator pages', () => {
     document.head.querySelector('meta[name="description"]')?.getAttribute('content');
 
   it('splits the income and updates while typing, with the page meta', () => {
-    const { unmount } = renderWithProviders(<BudgetRulePage />, { authenticated: false });
+    const { unmount } = renderWithProviders(<BudgetRulePage />, { authenticated: true });
     expect(document.title).toBe(tr('tools.rule.title'));
     expect(metaDescription()).toBe(tr('tools.rule.description'));
     expect(document.head.querySelector('link[rel="canonical"]')).toHaveAttribute(
@@ -89,10 +89,7 @@ describe('calculator pages', () => {
     expect(within(needs).getByText(/1\.?000/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(tr('tools.rule.income')), { target: { value: 'abc' } });
     expect(within(needs).getByText(/^0\s?€$/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: tr('tools.cta.button') })).toHaveAttribute(
-      'href',
-      '/login?mode=register'
-    );
+    expect(screen.queryByRole('link', { name: tr('wall.register') })).toBeNull();
     // The guides on the same topic, the Videoteca and Hacienda paso a paso.
     expect(
       screen.getByRole('link', { name: 'Método 50/30/20: cómo repartir tu sueldo sin complicarte' })
@@ -110,7 +107,7 @@ describe('calculator pages', () => {
   });
 
   it('simulates the savings and lists every year', () => {
-    renderWithProviders(<SavingsSimulatorPage />, { authenticated: false });
+    renderWithProviders(<SavingsSimulatorPage />, { authenticated: true });
     expect(document.title).toBe(tr('tools.savings.title'));
     expect(screen.getAllByRole('row')).toHaveLength(11); // header + 10 years
     fireEvent.change(screen.getByLabelText(tr('tools.savings.years')), { target: { value: '0' } });
@@ -131,7 +128,7 @@ describe('calculator pages', () => {
   });
 
   it('writes the amounts in the language of the visitor', () => {
-    renderWithProviders(<BudgetRulePage />, { authenticated: false, locale: 'en' });
+    renderWithProviders(<BudgetRulePage />, { authenticated: true, locale: 'en' });
     expect(screen.getByText('€900')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /50\s?% · Needs/ })).toBeInTheDocument();
   });
@@ -229,7 +226,7 @@ describe('the other calculator pages', () => {
     screen.getByRole('heading', { name: tr(key) }).closest('section') as HTMLElement;
 
   it('lists every public calculator in the links, each with its own texts', () => {
-    renderWithProviders(<LoanCalculatorPage />, { authenticated: false });
+    renderWithProviders(<LoanCalculatorPage />, { authenticated: true });
     for (const tool of TOOL_PAGES) {
       expect(screen.getByRole('link', { name: tr(`tools.${tool.key}.nav`) })).toHaveAttribute(
         'href',
@@ -239,7 +236,7 @@ describe('the other calculator pages', () => {
   });
 
   it('calculates the loan instalment while typing', () => {
-    renderWithProviders(<LoanCalculatorPage />, { authenticated: false });
+    renderWithProviders(<LoanCalculatorPage />, { authenticated: true });
     expect(document.title).toBe(tr('tools.loan.title'));
     expect(within(result('tools.loan.payment')).getByText(/711/)).toBeInTheDocument();
     fireEvent.change(field('tools.loan.years'), { target: { value: '0' } });
@@ -248,7 +245,7 @@ describe('the other calculator pages', () => {
   });
 
   it('adds and removes the VAT', () => {
-    renderWithProviders(<VatCalculatorPage />, { authenticated: false });
+    renderWithProviders(<VatCalculatorPage />, { authenticated: true });
     expect(within(result('tools.vat.total')).getByText(/121/)).toBeInTheDocument();
     fireEvent.change(field('tools.vat.mode'), { target: { value: 'with' } });
     fireEvent.change(field('tools.vat.amount'), { target: { value: '121' } });
@@ -260,7 +257,7 @@ describe('the other calculator pages', () => {
   });
 
   it('shows what inflation does to the money', () => {
-    renderWithProviders(<InflationCalculatorPage />, { authenticated: false });
+    renderWithProviders(<InflationCalculatorPage />, { authenticated: true });
     expect(within(result('tools.inflation.worth')).getByText(/7\.?441/)).toBeInTheDocument();
     expect(within(result('tools.inflation.lost')).getByText(/25,6 %|25\.6 %/)).toBeInTheDocument();
     fireEvent.change(field('tools.inflation.years'), { target: { value: '0' } });
@@ -268,7 +265,7 @@ describe('the other calculator pages', () => {
   });
 
   it('tells how long it takes to reach the goal', () => {
-    renderWithProviders(<GoalCalculatorPage />, { authenticated: false });
+    renderWithProviders(<GoalCalculatorPage />, { authenticated: true });
     expect(within(result('tools.goal.time')).getByText(/2 años y \d+ meses/)).toBeInTheDocument();
     fireEvent.change(field('tools.goal.monthly'), { target: { value: '0' } });
     fireEvent.change(field('tools.goal.rate'), { target: { value: '0' } });
@@ -280,10 +277,29 @@ describe('the other calculator pages', () => {
   });
 });
 
-describe('calculator pages for signed-in users', () => {
-  it('do not show the sign-up panel', () => {
-    renderWithProviders(<BudgetRulePage />, { authenticated: true });
-    expect(screen.queryByRole('link', { name: tr('tools.cta.button') })).toBeNull();
+describe('calculator pages for visitors without an account', () => {
+  beforeEach(() => localStorage.clear());
+
+  const PAGES = [
+    [BudgetRulePage, 'rule', 'tools.rule.income'],
+    [SavingsSimulatorPage, 'savings', 'tools.savings.initial'],
+    [LoanCalculatorPage, 'loan', 'tools.loan.principal'],
+    [VatCalculatorPage, 'vat', 'tools.vat.amount'],
+    [InflationCalculatorPage, 'inflation', 'tools.inflation.amount'],
+    [GoalCalculatorPage, 'goal', 'tools.goal.target'],
+  ] as const;
+
+  it.each(PAGES)('%p shows what it does and the wall, not the calculator', (Page, key, field) => {
+    renderWithProviders(<Page />, { authenticated: false });
+    expect(screen.getByRole('heading', { level: 1, name: tr(`tools.${key}.title`) })).toBeVisible();
+    expect(screen.getByText(tr(`tools.${key}.description`))).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: tr('wall.title') })).toBeInTheDocument();
+    expect(screen.getByText(tr('wall.kicker.tool'))).toBeInTheDocument();
+    expect(screen.queryByLabelText(tr(field))).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(document.querySelector('.tools-results')).toBeNull();
+    // Still linked to the guides of the topic and to the other calculators.
+    expect(screen.getByRole('link', { name: tr(`tools.${key}.nav`) })).toBeInTheDocument();
   });
 });
 

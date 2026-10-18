@@ -237,7 +237,7 @@ export const rentaProperty: RentaProperty = {
       summary:
         'Lo que sacas al vender menos lo que te costó comprar (con gastos, impuestos y mejoras). Si es positivo, es ganancia patrimonial; si es negativo, pérdida. Va a la base del ahorro.',
       requirements:
-        'Compra: precio más gastos, impuestos y mejoras (no reparaciones), menos la amortización deducida si lo alquilaste. Venta: precio real (no menor al de mercado) menos gastos e impuestos de la venta. Se declara en el año de la venta.',
+        'Compra: precio más gastos, impuestos y mejoras (no reparaciones), menos la amortización si lo alquilaste (como mínimo, la que podías deducir, aunque no lo hicieras). Venta: precio real (no menor al de mercado) menos gastos e impuestos de la venta. Se declara en el año de la venta.',
       url: `${C11}/determinacion-importe-ganancias-perdidas-patrimon-generales/derivadas-transmisiones-onerosas-lucrativas/reglas-generales-calculo.html`,
     },
     {

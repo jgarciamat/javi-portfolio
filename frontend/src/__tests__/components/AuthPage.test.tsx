@@ -117,4 +117,35 @@ describe('AuthPage', () => {
     );
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
   });
+
+  test('goes back to the guide or calculator the visitor left to sign in', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <MemoryRouter initialEntries={['/login?next=%2Fguias%2Fmetodo-50-30-20']}>
+        <AuthPage />
+      </MemoryRouter>
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/guias/metodo-50-30-20', { replace: true });
+    expect(localStorage.getItem('mm_next')).toBeNull();
+  });
+
+  test('remembers it across the verification e-mail, which opens a tab without `next`', () => {
+    localStorage.clear();
+    const signUp = render(
+      <MemoryRouter initialEntries={['/login?mode=register&next=%2Fcalculadora-sueldo-neto']}>
+        <AuthPage />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(t('app.auth.register.title'))).toBeInTheDocument();
+    signUp.unmount();
+    // Later, in the tab of the e-mail link: /verify-email → /login, signed in there.
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <AuthPage />
+      </MemoryRouter>
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/calculadora-sueldo-neto', { replace: true });
+    expect(localStorage.getItem('mm_next')).toBeNull();
+  });
 });

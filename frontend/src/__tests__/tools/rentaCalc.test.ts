@@ -148,9 +148,14 @@ describe('computeMinimum', () => {
     });
   });
 
-  it('adds the extra for age over 65 and over 75', () => {
-    expect(computeMinimum({ ...alone, age: 66 }, minimums).total).toBe(5550 + 1150);
-    expect(computeMinimum({ ...alone, age: 80 }, minimums).total).toBe(5550 + 1150 + 1400);
+  it('adds the extra for age from 65 and from 75 years turned by 31 December', () => {
+    const total = (age: number) => computeMinimum({ ...alone, age }, minimums).total;
+    expect(total(64)).toBe(5550);
+    expect(total(65)).toBe(5550 + 1150);
+    expect(total(66)).toBe(5550 + 1150);
+    expect(total(74)).toBe(5550 + 1150);
+    expect(total(75)).toBe(5550 + 1150 + 1400);
+    expect(total(80)).toBe(5550 + 1150 + 1400);
   });
 
   it('gives each child its amount by order of birth, the oldest first, with the extra under 3', () => {
