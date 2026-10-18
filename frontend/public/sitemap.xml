@@ -549,6 +549,14 @@
       <video:publication_date>2026-10-18</video:publication_date>
     </video:video>
     <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/49.webp</video:thumbnail_loc>
+      <video:title>Ajustes de Finanverso: todo lo que puedes configurar</video:title>
+      <video:description>Ajustes de Finanverso: todo lo que puedes configurar. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/HT9Q_6Tyzo4</video:player_loc>
+      <video:duration>572</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
       <video:thumbnail_loc>https://finanverso.app/videos/06.webp</video:thumbnail_loc>
       <video:title>¿Llegas a fin de mes? Previsión, análisis y balance anual</video:title>
       <video:description>¿Llegas a fin de mes? Previsión, análisis y balance anual. Tutorial de Finanverso.</video:description>
@@ -995,6 +1003,14 @@
       <video:description>Metas de ahorro en Finanverso: viaje, coche o fondo de emergencia. Tutorial de Finanverso.</video:description>
       <video:player_loc>https://www.youtube.com/embed/IKRD8s8lyKc</video:player_loc>
       <video:duration>365</video:duration>
+      <video:publication_date>2026-10-18</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://finanverso.app/videos/49.webp</video:thumbnail_loc>
+      <video:title>Ajustes de Finanverso: todo lo que puedes configurar</video:title>
+      <video:description>Ajustes de Finanverso: todo lo que puedes configurar. Tutorial de Finanverso.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/HT9Q_6Tyzo4</video:player_loc>
+      <video:duration>572</video:duration>
       <video:publication_date>2026-10-18</video:publication_date>
     </video:video>
     <video:video>

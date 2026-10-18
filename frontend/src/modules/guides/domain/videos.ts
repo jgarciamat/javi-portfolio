@@ -104,6 +104,13 @@ export const VIDEOS: VideoEntry[] = [
     youtubeId: 'IKRD8s8lyKc',
   },
   {
+    number: 49,
+    section: 'start',
+    title: 'Ajustes de Finanverso: todo lo que puedes configurar',
+    durationSeconds: 572,
+    youtubeId: 'HT9Q_6Tyzo4',
+  },
+  {
     number: 6,
     section: 'app',
     title: '¿Llegas a fin de mes? Previsión, análisis y balance anual',
