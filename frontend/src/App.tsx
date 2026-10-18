@@ -12,6 +12,7 @@ import { I18nProvider } from '@core/i18n/I18nContext';
 import { UpdatePrompt } from '@shared/components/UpdatePrompt';
 import { SettingsProvider } from '@core/settings/SettingsContext';
 import { lazyNamed } from '@shared/utils/lazyNamed';
+import { routerBasename } from '@core/i18n/localeUrl';
 
 // Every page is its own chunk: the login screen does not download the dashboard and vice versa.
 const AuthPage = lazyNamed(() => import('@shared/components/AuthPage'), 'AuthPage');
@@ -84,7 +85,7 @@ export default function App() {
           <AppLockProvider>
             <ApiProvider>
               <SettingsProvider>
-                <BrowserRouter>
+                <BrowserRouter basename={routerBasename(window.location.pathname)}>
                   <NativeLinks />
                   <Suspense fallback={<AppSplash />}>
                     <Routes>

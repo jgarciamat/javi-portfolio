@@ -16,6 +16,10 @@ const envSchema = z.object({
   /** Legacy name kept so old deploy files keep working. */
   DATABASE_URL: z.string().optional(),
   JWT_SECRET: z.string().optional(),
+  /** Encrypts the 2FA secrets at rest; without it a key is derived from JWT_SECRET. */
+  TWO_FACTOR_ENCRYPTION_KEY: z
+    .union([z.literal(''), z.string().min(32, 'use at least 32 characters')])
+    .optional(),
   APP_URL: z.string().url().optional(),
   CORS_ORIGINS: z.string().optional(),
   TRUST_PROXY: z.coerce.number().int().min(0).default(1),
@@ -49,9 +53,9 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_SUBJECT: z.string().default('mailto:support@finanverso.app'),
   /** Prices shown in the UI (must match the Stripe prices, VAT included). */
-  PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
-  PRICE_YEARLY: z.coerce.number().positive().default(24.99),
-  PRICE_LIFETIME: z.coerce.number().positive().default(49),
+  PRICE_MONTHLY: z.coerce.number().positive().default(3.49),
+  PRICE_YEARLY: z.coerce.number().positive().default(29.99),
+  PRICE_LIFETIME: z.coerce.number().positive().default(59),
   PRICE_RENTA_PASS: z.coerce.number().positive().default(10),
   FOUNDER_LIMIT: z.coerce.number().int().nonnegative().default(100),
   AFFILIATES_FILE: z.string().optional(),
@@ -77,6 +81,8 @@ export interface AppConfig {
   port: number;
   databasePath: string;
   jwt: { accessSecret: string; accessTtl: string; refreshTtlMs: number };
+  /** Key material for the 2FA secrets (its own key, or the JWT secret as fallback). */
+  twoFactor: { encryptionKey: string };
   appUrl: string;
   corsOrigins: string[];
   trustProxy: number;
@@ -208,6 +214,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       accessTtl: '15m',
       refreshTtlMs: 30 * 24 * 60 * 60 * 1000,
     },
+    twoFactor: { encryptionKey: raw.TWO_FACTOR_ENCRYPTION_KEY || accessSecret },
     appUrl,
     corsOrigins: [...new Set([appUrl, ...NATIVE_APP_ORIGINS, ...devOrigins, ...extraOrigins])],
     trustProxy: raw.TRUST_PROXY,

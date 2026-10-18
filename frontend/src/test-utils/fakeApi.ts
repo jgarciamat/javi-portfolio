@@ -25,6 +25,15 @@ function fakeAuthApi(): FakeApi['authApi'] {
     updatePassword: ok({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' }),
     updateAvatar: ok({ avatarUrl: null }),
     deleteAccount: ok(undefined),
+    verifyTwoFactor: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
+    twoFactorStatus: ok({ enabled: false, enabledAt: null, recoveryCodesRemaining: 0 }),
+    twoFactorSetup: ok({
+      secret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP',
+      otpauthUri: 'otpauth://totp/Finanverso%3Aana%40example.com?secret=JBSWY3DPEHPK3PXP',
+    }),
+    twoFactorEnable: ok({ recoveryCodes: ['aaaa-bbbb-cccc', 'dddd-eeee-ffff'] }),
+    twoFactorDisable: ok(undefined),
+    twoFactorRecoveryCodes: ok({ recoveryCodes: ['gggg-hhhh-jjjj', 'kkkk-mmmm-nnnn'] }),
   };
 }
 
@@ -186,6 +195,7 @@ export function createFakeApi(): FakeApi {
       plans: ok(f.catalog()),
       checkout: ok({ url: 'https://checkout.test' }),
       portal: ok({ url: 'https://portal.test' }),
+      acceptTerms: ok(f.billing().terms),
       referral: ok(f.referral()),
     },
     householdApi: {

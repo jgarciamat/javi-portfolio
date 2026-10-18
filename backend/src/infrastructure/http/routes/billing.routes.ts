@@ -62,6 +62,7 @@ export function billingRoutes(c: Container, limiter: RateLimiterFactory): Router
         trialDaysLeft: shared.trialDaysLeft,
         limits: shared.limits,
         usage: shared.usage,
+        autonomoQuarters: shared.autonomoQuarters,
         ai: shared.ai,
         subscription: { ...shared.subscription, canManage: false },
         household,
@@ -77,6 +78,11 @@ export function billingRoutes(c: Container, limiter: RateLimiterFactory): Router
       c.repos.metrics.record('checkout_started');
       res.json(result);
     })
+  );
+  // The terms of sale changed: someone who accepted an earlier version accepts the current one.
+  router.post(
+    '/billing/terms/accept',
+    authed((req, res) => res.json(c.billing.acceptTerms(req.userId)))
   );
   router.post(
     '/billing/portal',

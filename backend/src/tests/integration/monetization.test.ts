@@ -50,7 +50,7 @@ describe('Plans and limits', () => {
       currency: 'EUR',
       trialDays: 14,
       paymentsEnabled: true,
-      prices: { monthly: 2.99, yearly: 24.99, lifetime: 49 },
+      prices: { monthly: 3.49, yearly: 29.99, lifetime: 59, rentaPass: 10 },
       lifetime: { available: true, remaining: 100 },
       limits: {
         free: {

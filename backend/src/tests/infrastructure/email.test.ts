@@ -48,6 +48,20 @@ describe('ResendEmailSender', () => {
     expect(send.mock.calls[0][0].text).toContain('https://app.test');
   });
 
+  it.each([
+    ['two_factor_enabled', 'es', 'Finanverso: Verificación en dos pasos activada'],
+    ['two_factor_disabled', 'en', 'Finanverso: Two-step verification turned off'],
+    ['recovery_codes_regenerated', 'es', 'Finanverso: Nuevos códigos de recuperación'],
+    ['recovery_code_used', 'en', 'Finanverso: A recovery code was used'],
+  ] as const)('sends the %s security notice in %s', async (notice, locale, subject) => {
+    await sender.sendSecurityNotice('a@b.c', '<Ana>', notice, locale);
+    const mail = send.mock.calls[0][0];
+    expect(mail).toMatchObject({ to: 'a@b.c', subject });
+    expect(mail.html).toContain('&lt;Ana&gt;');
+    expect(mail.html).toContain('href="https://app.test"');
+    expect(mail.text).toContain('https://app.test');
+  });
+
   it("fails with the provider's error", async () => {
     send.mockResolvedValue({ error: { message: 'domain not verified' } });
     await expect(sender.sendVerification('a@b.c', 'Ana', 't', 'es')).rejects.toThrow(
@@ -75,13 +89,16 @@ describe('ConsoleEmailSender', () => {
       upcoming: null,
     };
     await sender.sendWeeklyDigest('a@b.c', 'Ana', 'es', digest);
+    await sender.sendSecurityNotice('a@b.c', 'Ana', 'two_factor_enabled');
     expect(sender.sent).toEqual([
       { kind: 'verify', to: 'a@b.c', token: 'v1' },
       { kind: 'reset', to: 'a@b.c', token: 'r1' },
       { kind: 'purchase', to: 'a@b.c', token: '' },
       { kind: 'exists', to: 'a@b.c', token: '' },
       { kind: 'digest', to: 'a@b.c', token: '', digest },
+      { kind: 'security', to: 'a@b.c', token: '', notice: 'two_factor_enabled' },
     ]);
+    expect(info).toHaveBeenCalledWith('[email] security notice two_factor_enabled a@b.c');
     expect(info).toHaveBeenCalledWith('[email] weekly digest a@b.c');
     expect(info).toHaveBeenCalledWith('[email] purchase confirmation a@b.c');
     expect(info).toHaveBeenCalledWith('[email] account already exists a@b.c');

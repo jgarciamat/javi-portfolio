@@ -47,8 +47,8 @@ export function useLoginForm(onSuccess?: () => void) {
     setError(null);
     setNeedsVerification(false);
     try {
-      await login(email, password);
-      onSuccess?.();
+      // With 2FA on, the auth page asks for the code next.
+      if (await login(email, password)) onSuccess?.();
     } catch (err) {
       setError(messageFor(err));
       setNeedsVerification(errorCode(err) === 'EMAIL_NOT_VERIFIED');
@@ -66,8 +66,7 @@ export function useLoginForm(onSuccess?: () => void) {
   const handleGoogleToken = async (googleToken: string) => {
     setError(null);
     try {
-      await loginWithGoogle(googleToken, locale);
-      onSuccess?.();
+      if (await loginWithGoogle(googleToken, locale)) onSuccess?.();
     } catch (err) {
       setError(messageFor(err));
     }

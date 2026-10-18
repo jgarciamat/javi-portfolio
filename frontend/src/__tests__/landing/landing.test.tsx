@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import { HomeGate } from '@modules/landing/ui/HomeGate';
 import { FAQ, PLAY_URL, faqJsonLd } from '@modules/landing/domain/landing';
 import { LandingPage } from '@modules/landing/ui/LandingPage';
+import { formatPrice } from '@modules/billing/ui/pricing';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 describe('LandingPage', () => {
@@ -38,6 +39,18 @@ describe('LandingPage', () => {
     for (const id of FAQ) expect(screen.getByText(tr(`landing.faq.${id}.q`))).toBeInTheDocument();
     expect(screen.getByRole('link', { name: tr('tools.rule.nav') })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: tr('landing.learn.guides') }).length).toBe(2);
+  });
+
+  it('takes the Premium prices from the API', async () => {
+    renderWithProviders(<LandingPage />, { authenticated: false });
+    const price = tr('landing.plans.price', {
+      monthly: formatPrice(3.49, 'es'),
+      yearly: formatPrice(29.99, 'es'),
+    });
+    // Prices are formatted with non-breaking spaces, which the default matcher would collapse.
+    expect(
+      await screen.findByText((_, el) => el?.tagName === 'P' && el.textContent === price)
+    ).toBeInTheDocument();
   });
 
   it('publishes the questions as structured data for search engines', () => {

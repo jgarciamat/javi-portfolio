@@ -28,6 +28,7 @@ import { refreshRotation } from './027-refresh-rotation';
 import { importUses } from './028-import-uses';
 import { rentaCampaignUses } from './029-renta-campaign-uses';
 import { autonomoQuarterDrafts } from './030-autonomo-quarter-drafts';
+import { twoFactor } from './031-two-factor';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -62,4 +63,5 @@ export const migrations: Migration[] = [
   importUses,
   rentaCampaignUses,
   autonomoQuarterDrafts,
+  twoFactor,
 ];

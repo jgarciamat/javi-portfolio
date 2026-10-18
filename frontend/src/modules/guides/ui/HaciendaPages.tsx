@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { useAuth } from '@shared/hooks/useAuth';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
+import { brandTitle } from '@shared/utils/pageTitle';
 import { appTarget } from '@shared/utils/appLinks';
 import {
   HACIENDA_PATH,
@@ -67,7 +68,7 @@ export function HaciendaGuidePage() {
   const { slug } = useParams();
   const guide = findHaciendaGuide(slug);
   usePageMeta(
-    guide ? `${t(guideKey(guide, 'title'))} | Finanverso` : t('hacienda.metaTitle'),
+    guide ? brandTitle(t(guideKey(guide, 'title'))) : t('hacienda.metaTitle'),
     guide ? t(guideKey(guide, 'description')) : t('hacienda.metaDescription'),
     `${HACIENDA_PATH}/${slug}`
   );

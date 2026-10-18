@@ -59,6 +59,21 @@ describe('config', () => {
     expect(config.demoSeed.enabled).toBe(false);
   });
 
+  it('encrypts the 2FA secrets with their own key, or one derived from the JWT secret', () => {
+    const base = { NODE_ENV: 'development', JWT_SECRET: 'j'.repeat(40) };
+    expect(loadConfig(base).twoFactor.encryptionKey).toBe('j'.repeat(40));
+    // An empty value in the env file is the same as not setting it.
+    expect(loadConfig({ ...base, TWO_FACTOR_ENCRYPTION_KEY: '' }).twoFactor.encryptionKey).toBe(
+      'j'.repeat(40)
+    );
+    expect(
+      loadConfig({ ...base, TWO_FACTOR_ENCRYPTION_KEY: 'k'.repeat(32) }).twoFactor.encryptionKey
+    ).toBe('k'.repeat(32));
+    expect(() => loadConfig({ ...base, TWO_FACTOR_ENCRYPTION_KEY: 'short' })).toThrow(
+      /TWO_FACTOR_ENCRYPTION_KEY/
+    );
+  });
+
   it('never points email links to localhost in production when APP_URL is missing', () => {
     const config = loadConfig({
       NODE_ENV: 'production',
@@ -103,9 +118,9 @@ describe('config', () => {
       rentaPass: null,
     });
     expect(config.billing.displayPrices).toEqual({
-      monthly: 2.99,
-      yearly: 24.99,
-      lifetime: 49,
+      monthly: 3.49,
+      yearly: 29.99,
+      lifetime: 59,
       rentaPass: 10,
     });
   });

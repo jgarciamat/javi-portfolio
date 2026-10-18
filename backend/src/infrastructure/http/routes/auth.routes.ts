@@ -16,6 +16,10 @@ import {
   refreshBody,
   registerBody,
   resetBody,
+  twoFactorCodeBody,
+  twoFactorProofBody,
+  twoFactorSetupBody,
+  twoFactorVerifyBody,
   verifyQuery,
 } from '../schemas';
 
@@ -50,6 +54,9 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
   const emailLimiter = limiter({ windowMs: hour, limit: 5, keyGenerator: emailAndIpKey });
   const tokenLimiter = limiter({ windowMs: fifteenMinutes, limit: 30 });
   const refreshLimiter = limiter({ windowMs: fifteenMinutes, limit: 120 });
+  // The code is guessed, not the password: few tries per network (the account also locks).
+  const twoFactorLimiter = limiter({ windowMs: fifteenMinutes, limit: 20 });
+  const twoFactorSettingsLimiter = limiter({ windowMs: fifteenMinutes, limit: 20 });
 
   router.post(
     '/register',
@@ -114,6 +121,70 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     authed((req, res) => {
       c.auth.logoutEverywhere(req.userId);
       res.status(204).end();
+    })
+  );
+
+  // ─── Two-factor authentication ──────────────────────────────────────────
+
+  router.post(
+    '/2fa/verify',
+    failedLoginsByIp,
+    twoFactorLimiter,
+    asyncHandler((req, res) => {
+      const { challengeToken, code } = twoFactorVerifyBody.parse(req.body);
+      res.json(c.auth.completeTwoFactorLogin(challengeToken, code));
+    })
+  );
+
+  router.get(
+    '/2fa',
+    requireAuth(c.auth),
+    authed((req, res) => res.json(c.twoFactor.status(req.userId)))
+  );
+
+  router.post(
+    '/2fa/setup',
+    twoFactorSettingsLimiter,
+    requireAuth(c.auth),
+    authed(async (req, res) => {
+      const { password, googleToken } = twoFactorSetupBody.parse(req.body ?? {});
+      // A stolen session must not be able to lock the owner out with its own app.
+      await c.auth.confirmIdentity(req.userId, { password, googleToken, authTime: req.authTime });
+      res.json(c.twoFactor.startEnrollment(req.userId));
+    })
+  );
+
+  router.post(
+    '/2fa/enable',
+    twoFactorSettingsLimiter,
+    requireAuth(c.auth),
+    authed((req, res) => {
+      const { code } = twoFactorCodeBody.parse(req.body);
+      res.json(c.twoFactor.confirmEnrollment(req.userId, code));
+    })
+  );
+
+  router.post(
+    '/2fa/disable',
+    twoFactorSettingsLimiter,
+    requireAuth(c.auth),
+    authed(async (req, res) => {
+      await c.twoFactor.disable(req.userId, twoFactorProofBody.parse(req.body ?? {}));
+      res.status(204).end();
+    })
+  );
+
+  router.post(
+    '/2fa/recovery-codes',
+    twoFactorSettingsLimiter,
+    requireAuth(c.auth),
+    authed(async (req, res) => {
+      res.json(
+        await c.twoFactor.regenerateRecoveryCodes(
+          req.userId,
+          twoFactorProofBody.parse(req.body ?? {})
+        )
+      );
     })
   );
 

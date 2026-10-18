@@ -35,6 +35,7 @@ import { errorMessage } from '@shared/utils/errors';
 import { offersEnabled } from '../navigation';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { TwoFactorSection } from '@modules/auth/ui/TwoFactorSection';
 
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'CHF'];
 const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
@@ -321,6 +322,7 @@ function SecurityCard({
           🚪 {t('app.settings.logoutEverywhere')}
         </button>
       </div>
+      <TwoFactorSection />
     </div>
   );
 }
@@ -331,7 +333,9 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
   const { accounts, refresh } = useFinances();
   const action = useAction();
   const [saved, setSaved] = useState(false);
-  const sharedLocked = useOptionalPlan()?.overview?.household.role === 'member';
+  // A paused household shares nothing: the member manages their own settings again.
+  const household = useOptionalPlan()?.overview?.household;
+  const sharedLocked = household?.role === 'member' && !household.paused;
 
   if (!settings) return <div className="card">{t('app.common.loading')}</div>;
 

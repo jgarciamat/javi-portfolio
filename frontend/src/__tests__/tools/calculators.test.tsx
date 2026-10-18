@@ -93,6 +93,18 @@ describe('calculator pages', () => {
       'href',
       '/login?mode=register'
     );
+    // The guides on the same topic, the Videoteca and Hacienda paso a paso.
+    expect(
+      screen.getByRole('link', { name: 'Método 50/30/20: cómo repartir tu sueldo sin complicarte' })
+    ).toHaveAttribute('href', '/guias/metodo-50-30-20');
+    expect(screen.getByRole('link', { name: tr('videos.title') })).toHaveAttribute(
+      'href',
+      '/videoteca'
+    );
+    expect(screen.getByRole('link', { name: tr('hacienda.title') })).toHaveAttribute(
+      'href',
+      '/hacienda-paso-a-paso'
+    );
     unmount();
     expect(document.title).not.toBe(tr('tools.rule.title'));
   });

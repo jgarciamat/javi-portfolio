@@ -8,6 +8,7 @@ import {
   ForbiddenError,
   NotFoundError,
   PaymentRequiredError,
+  TooManyAttemptsError,
   UnauthorizedError,
   ValidationError,
 } from '@domain/errors';
@@ -68,6 +69,7 @@ function statusFor(error: DomainError): number {
   if (error instanceof ForbiddenError) return 403;
   if (error instanceof NotFoundError) return 404;
   if (error instanceof ConflictError) return 409;
+  if (error instanceof TooManyAttemptsError) return 429;
   return 400;
 }
 

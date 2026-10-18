@@ -63,3 +63,10 @@ export class PaymentRequiredError extends DomainError {
     super(code, message, details);
   }
 }
+
+/** Too many attempts at something that is guessed (a 2FA code): locked for a while (HTTP 429). */
+export class TooManyAttemptsError extends DomainError {
+  constructor(message: string, code: string, details?: Record<string, unknown>) {
+    super(code, message, details);
+  }
+}

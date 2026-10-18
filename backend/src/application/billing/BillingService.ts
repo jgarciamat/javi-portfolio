@@ -25,12 +25,25 @@ import {
 } from '@domain/ports/services';
 import { LimitedResource, PLAN_LIMITS, serializableLimits } from '@domain/services/plans';
 import { AiAllowance, AiQuota } from '@application/ai/AiAllowance';
+import type { QuarterDraftUsage } from '@application/tax/TaxService';
 import { EntitlementService } from './EntitlementService';
 
 /** How many of each limited resource a user has (active ones). */
 /** What the user has created so far (`movements` is informational: it is not limited). */
 export type ResourceUsage = Record<LimitedResource, number> & { movements: number };
 export type ResourceCounter = (userId: string) => ResourceUsage;
+/** Self-employed drafts of each quarter the free plan can draft today. */
+export type DraftQuarterCounter = (userId: string) => QuarterDraftUsage[];
+
+/** The terms of sale in force and whether the user must accept them again. */
+export interface TermsStatus {
+  version: string;
+  /** The version the user accepted last (null: never bought anything). */
+  acceptedVersion: string | null;
+  acceptedAt: string | null;
+  /** Accepted an older version: the app asks to accept the current one. */
+  mustAccept: boolean;
+}
 
 /** What the buyer agrees to before paying (both are required). */
 export interface CheckoutConsent {
@@ -86,8 +99,21 @@ export interface BillingOverview {
   limits: ReturnType<typeof serializableLimits>;
   renta: RentaAccess;
   usage: ResourceUsage;
+  /** Drafts per quarter that can be drafted on the free plan (current + the one being filed). */
+  autonomoQuarters: QuarterDraftUsage[];
   ai: AiQuota;
   catalog: PlanCatalog;
+  terms: TermsStatus;
+}
+
+function termsStatus(sub: SubscriptionProps | null): TermsStatus {
+  const acceptedVersion = sub?.termsVersion ?? null;
+  return {
+    version: TERMS_VERSION,
+    acceptedVersion,
+    acceptedAt: sub?.termsAcceptedAt ?? null,
+    mustAccept: acceptedVersion !== null && acceptedVersion !== TERMS_VERSION,
+  };
 }
 
 const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due']);
@@ -105,6 +131,7 @@ export class BillingService {
     private readonly gateway: PaymentGateway,
     private readonly email: EmailSender,
     private readonly countResources: ResourceCounter,
+    private readonly countDraftQuarters: DraftQuarterCounter,
     private readonly localeOf: (userId: string) => EmailLocale,
     private readonly uow: UnitOfWork,
     private readonly clock: Clock,
@@ -149,9 +176,24 @@ export class BillingService {
       limits: serializableLimits(status.limits),
       renta: this.entitlements.rentaAccess(userId),
       usage: this.countResources(userId),
+      autonomoQuarters: this.countDraftQuarters(userId),
       ai: this.allowance.quota(userId),
       catalog: this.catalog(),
+      terms: termsStatus(status.subscription),
     };
+  }
+
+  /**
+   * Accepts the current terms of sale again after they changed. Only someone who had accepted
+   * an earlier version has anything to accept; the date and the version are kept as proof.
+   */
+  acceptTerms(userId: string): TermsStatus {
+    const sub = this.subscriptions.get(userId);
+    if (!sub?.termsVersion) return termsStatus(sub);
+    const now = this.clock.now().toISOString();
+    const accepted = { ...sub, termsAcceptedAt: now, termsVersion: TERMS_VERSION, updatedAt: now };
+    this.subscriptions.save(accepted);
+    return termsStatus(accepted);
   }
 
   /**

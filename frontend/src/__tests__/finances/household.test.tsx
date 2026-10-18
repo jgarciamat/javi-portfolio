@@ -94,6 +94,33 @@ describe('Household card', () => {
     expect(api.householdApi.leave).toHaveBeenCalled();
   });
 
+  it('tells a member that the household is paused while its owner has no Premium', async () => {
+    setup(f.household({ role: 'member', owner: person, paused: true }));
+    expect(
+      await screen.findByText(tr('app.household.pausedMember', { name: 'Marta' }))
+    ).toBeVisible();
+    expect(screen.queryByText(/Compartes los datos de Marta/)).toBeNull();
+    expect(screen.getByRole('button', { name: tr('app.household.leave') })).toBeVisible();
+  });
+
+  it('tells the owner of a paused household to renew, with the plans at hand', async () => {
+    const paused = f.household({ role: 'owner', members: [person], paused: true });
+    setup(paused, { plan: true, billing: FREE });
+    expect(await screen.findByText(tr('app.household.pausedOwner'))).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
+    expect(
+      await screen.findByText(
+        tr('billing.reason.feature', { feature: tr('billing.feature.household') })
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('still says the household is paused where there is no plan to open', async () => {
+    setup(f.household({ role: 'owner', members: [person], paused: true }));
+    expect(await screen.findByText(tr('app.household.pausedOwner'))).toBeVisible();
+    expect(screen.queryByRole('button', { name: tr('billing.seePlans') })).toBeNull();
+  });
+
   it('offers the plans instead of the invitation to users without Premium', async () => {
     setup(f.household(), { plan: true, billing: FREE });
     fireEvent.click(await screen.findByRole('button', { name: tr('billing.seePlans') }));
@@ -174,6 +201,31 @@ describe('Household member in the rest of the app', () => {
     expect(await screen.findByText(/plan del hogar de Marta/)).toBeVisible();
     expect(screen.queryByText(tr('billing.invite.title'))).toBeNull();
     expect(screen.queryByText(tr('billing.upgradeTitle'))).toBeNull();
+  });
+
+  it('is back on their own plan while the household is paused', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(
+      f.billing({ household: f.household({ role: 'member', owner: person, paused: true }) })
+    );
+    renderWithProviders(<PlanView />, { api, plan: true, finances: false });
+    expect(await screen.findByText(tr('billing.invite.title'))).toBeVisible();
+    expect(screen.queryByText(/plan del hogar de Marta/)).toBeNull();
+  });
+
+  it('manages their own settings again while the household is paused', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(
+      f.billing({ household: f.household({ role: 'member', owner: person, paused: true }) })
+    );
+    renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />, {
+      api,
+      plan: true,
+    });
+    expect(
+      await screen.findByRole('combobox', { name: new RegExp(tr('app.settings.currency')) })
+    ).toBeEnabled();
+    expect(screen.queryByText(tr('app.household.sharedSettings'))).toBeNull();
   });
 
   it('leaves currency, month start and default account to the owner', async () => {

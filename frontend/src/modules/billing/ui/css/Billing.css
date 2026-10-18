@@ -486,6 +486,23 @@
   text-decoration: none;
 }
 
+.household-paused {
+  margin: 0.4rem 0 0.8rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--amber-500);
+  border-radius: 8px;
+  color: var(--amber-300);
+  font-size: 0.9rem;
+}
+
+.household-paused p {
+  margin: 0 0 0.6rem;
+}
+
+.household-paused p:last-child {
+  margin: 0;
+}
+
 .invite-link {
   margin: 0.4rem 0 0.8rem;
   word-break: break-all;

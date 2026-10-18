@@ -11,19 +11,58 @@ import type { HouseholdStatus } from '@modules/billing/domain/types';
 import '@modules/billing/ui/css/Billing.css';
 import '../css/Sections.css';
 
-/** A member sees whose household it is and can leave it. */
-function MemberOf({ name, onLeave }: { name: string; onLeave: () => void }) {
+/**
+ * A member sees whose household it is and can leave it. While the owner has no Premium the
+ * household is paused: the member is back on their own data until the owner renews.
+ */
+function MemberOf({
+  name,
+  paused,
+  onLeave,
+}: {
+  name: string;
+  paused: boolean;
+  onLeave: () => void;
+}) {
   const { t } = useI18n();
   return (
     <>
-      <p>{t('app.household.memberOf', { name })}</p>
-      <p className="plan-note">{t('app.household.memberNote')}</p>
+      {paused ? (
+        <p className="household-paused" role="status">
+          {t('app.household.pausedMember', { name })}
+        </p>
+      ) : (
+        <>
+          <p>{t('app.household.memberOf', { name })}</p>
+          <p className="plan-note">{t('app.household.memberNote')}</p>
+        </>
+      )}
       <div className="button-row">
         <button className="btn-secondary" onClick={onLeave}>
           {t('app.household.leave')}
         </button>
       </div>
     </>
+  );
+}
+
+/** The owner has no Premium: nothing is shared until they renew. */
+function PausedOwner({ paused }: { paused: boolean }) {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  if (!paused) return null;
+  return (
+    <div className="household-paused" role="status">
+      <p>{t('app.household.pausedOwner')}</p>
+      {plan && (
+        <button
+          className="btn-primary"
+          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'household' })}
+        >
+          {t('billing.seePlans')}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -171,9 +210,12 @@ export function HouseholdCard() {
       {action.error && <p className="form-error">{action.error}</p>}
 
       {data.role === 'member' ? (
-        data.owner && <MemberOf name={data.owner.name} onLeave={() => action.run(leave)} />
+        data.owner && (
+          <MemberOf name={data.owner.name} paused={data.paused} onLeave={() => action.run(leave)} />
+        )
       ) : (
         <>
+          <PausedOwner paused={data.paused} />
           {data.members.length > 0 && (
             <HouseholdMembers
               members={data.members}

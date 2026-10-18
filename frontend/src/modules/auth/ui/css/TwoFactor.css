@@ -1,0 +1,101 @@
+/* ─── Settings → Security: two-step verification ─── */
+.two-factor {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--slate-800);
+}
+
+/* Each step reads top to bottom: the generic settings grid would spread it across columns. */
+.two-factor .form-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  max-width: 36rem;
+}
+
+.two-factor .form-grid > .button-row {
+  margin-top: 0.25rem;
+}
+
+.two-factor-title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--slate-100);
+}
+
+.two-factor-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--slate-300);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Black on white whatever the theme, so every camera reads it. */
+.two-factor-qr {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.two-factor-qr .qr-code {
+  width: 12rem;
+}
+
+.qr-code {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.qr-code-loading {
+  background: var(--slate-800);
+}
+
+.two-factor-key-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.two-factor-key,
+.two-factor-codes code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--slate-100);
+  overflow-wrap: anywhere;
+}
+
+.two-factor-key {
+  flex: 1 1 12rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  background: var(--slate-800);
+  letter-spacing: 0.05em;
+}
+
+.two-factor-code-input {
+  max-width: 10rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+
+.two-factor-codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0.75rem;
+  list-style: none;
+  border: 1px dashed var(--slate-700);
+  border-radius: 10px;
+}
+
+.auth-code-input {
+  font-size: 1.35rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+}

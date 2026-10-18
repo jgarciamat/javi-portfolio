@@ -65,7 +65,7 @@ describe('Shared household', () => {
 
     // A stranger never sees any of it.
     expect((await month(stranger)).transactions).toEqual([]);
-    expect(await status(stranger)).toMatchObject({ role: 'none', members: [] });
+    expect(await status(stranger)).toMatchObject({ role: 'none', members: [], paused: false });
   });
 
   it('brings the member back to their own data when they leave', async () => {
@@ -199,13 +199,18 @@ describe('Shared household', () => {
     const seen = async () =>
       (await month(partner)).transactions.map((t: { description: string }) => t.description);
     expect(await seen()).toEqual(['Alquiler']);
+    expect(await status(partner)).toMatchObject({ role: 'member', paused: false });
+    expect(await status(owner)).toMatchObject({ role: 'owner', paused: false });
     expireTrial(ctx, owner);
-    // The member is back on their own data and plan.
+    // The member is back on their own data and plan, and both are told the household is paused.
     expect(await seen()).toEqual(['Lo mío']);
     const billing = (await request(ctx.app).get('/api/billing').set(partner.auth)).body;
     expect(billing.usage.movements).toBe(1);
+    expect(billing.household).toMatchObject({ role: 'member', paused: true });
+    expect(await status(owner)).toMatchObject({ role: 'owner', paused: true });
     ctx.container.entitlements.grantDays(owner.id, 30);
     expect(await seen()).toEqual(['Alquiler']);
+    expect(await status(partner)).toMatchObject({ paused: false });
   });
 
   it('shows the shared currency and month start and keeps them in the owner’s hands', async () => {

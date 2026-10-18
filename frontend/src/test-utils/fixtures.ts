@@ -330,7 +330,7 @@ export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
   trialDays: 14,
   paymentsEnabled: true,
-  prices: { monthly: 2.99, yearly: 24.99, lifetime: 49, rentaPass: 10 },
+  prices: { monthly: 3.49, yearly: 29.99, lifetime: 59, rentaPass: 10 },
   rentaPass: { available: true },
   lifetime: { available: true, remaining: 87 },
   limits: {
@@ -392,6 +392,7 @@ export const household = (over: Partial<HouseholdStatus> = {}): HouseholdStatus 
   members: [],
   pendingInvite: null,
   maxMembers: 1,
+  paused: false,
   ...over,
 });
 
@@ -423,8 +424,10 @@ export const billing = (over: Partial<BillingOverview> = {}): BillingOverview =>
     imports: 0,
     movements: 5,
   },
+  autonomoQuarters: [],
   ai: { used: 0, quota: 10 },
   catalog: catalog(),
+  terms: { version: '2026-10-18', acceptedVersion: null, acceptedAt: null, mustAccept: false },
   ...over,
 });
 

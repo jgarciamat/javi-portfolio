@@ -111,6 +111,11 @@ describe('inlineParts', () => {
       'href',
       '/guias/gastos-deducibles-autonomo'
     );
+    expect(screen.getByRole('link', { name: /Vídeo: Modelo 130 para tontos/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('https://www.youtube.com/watch?v=')
+    );
+    expect(screen.getByRole('link', { name: /Videoteca/ })).toHaveAttribute('href', '/videoteca');
   });
 });
 

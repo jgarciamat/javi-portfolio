@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+import { AuthResult } from '@application/auth/AuthService';
 import { TestContext, createTestApp, createUser, STRONG_PASSWORD } from '../helpers/testApp';
 
 const hashOf = (token: string) => createHash('sha256').update(token).digest('hex');
@@ -84,7 +85,7 @@ describe('AuthService', () => {
       emailVerified: true,
       name: null,
     });
-    const result = await auth().loginWithGoogle('t');
+    const result = (await auth().loginWithGoogle('t')) as AuthResult;
     expect(result.user.name).toBe('sin.nombre');
     expect(ctx.container.repos.settings.get(result.user.id).locale).toBe('es');
   });

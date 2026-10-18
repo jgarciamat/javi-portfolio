@@ -66,6 +66,7 @@ describe('billing API', () => {
     await billingApi.plans();
     await billingApi.checkout('yearly', { acceptTerms: true, waiveWithdrawal: true });
     await billingApi.portal();
+    await billingApi.acceptTerms();
     await offersApi.list();
     await offersApi.click('bank a');
     const calls = fetchMock.mock.calls.map(([url, init]) => `${init?.method ?? 'GET'} ${url}`);
@@ -74,6 +75,7 @@ describe('billing API', () => {
       'GET http://localhost:3000/api/billing/plans',
       'POST http://localhost:3000/api/billing/checkout',
       'POST http://localhost:3000/api/billing/portal',
+      'POST http://localhost:3000/api/billing/terms/accept',
       'GET http://localhost:3000/api/offers',
       'POST http://localhost:3000/api/offers/bank%20a/click',
     ]);
@@ -82,8 +84,9 @@ describe('billing API', () => {
 
 describe('pricing helpers', () => {
   it('formats prices and the yearly saving', () => {
-    expect(formatPrice(49, 'en')).toBe('€49');
-    expect(formatPrice(2.99, 'en')).toBe('€2.99');
+    expect(formatPrice(59, 'en')).toBe('€59');
+    expect(formatPrice(3.49, 'en')).toBe('€3.49');
+    expect(yearlySavingPct({ monthly: 3.49, yearly: 29.99 })).toBe(28);
     expect(yearlySavingPct({ monthly: 0, yearly: 10 })).toBe(0);
     expect(yearlySavingPct({ monthly: 1, yearly: 20 })).toBe(0);
   });
@@ -195,6 +198,89 @@ describe('PlanProvider', () => {
     window.history.replaceState(null, '', '/?billing=other');
     withPlan(<PlanBanner onOpenPlan={jest.fn()} />);
     expect(screen.queryByRole('status')).toBeNull();
+  });
+});
+
+describe('Updated terms of sale', () => {
+  const sub = f.billing().subscription;
+  const outdated = (subscription = sub) =>
+    f.billing({
+      subscription,
+      terms: {
+        version: '2026-10-18',
+        acceptedVersion: '2026-10-14',
+        acceptedAt: '2026-10-14T10:00:00Z',
+        mustAccept: true,
+      },
+    });
+  const dialog = () => screen.findByRole('dialog', { name: tr('terms.update.title') });
+  const acceptBox = () =>
+    screen.getByRole('checkbox', { name: new RegExp(tr('billing.acceptTerms')) });
+
+  it('asks nothing of someone up to date', async () => {
+    const api = createFakeApi();
+    withPlan(<p>app</p>, f.billing(), api);
+    await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('blocks the app until the new version is accepted, and records it', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValueOnce(outdated()).mockResolvedValue(f.billing());
+    api.billingApi.acceptTerms
+      .mockRejectedValueOnce(new ApiError('Sin conexión', 500))
+      .mockRejectedValueOnce(new Error(''))
+      .mockResolvedValue(f.billing().terms);
+    renderWithProviders(<p>app</p>, { api, plan: true, finances: false });
+    expect(await dialog()).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: tr('billing.readTerms') })).toHaveAttribute(
+      'href',
+      '/terms'
+    );
+    // It cannot be dismissed, and the button waits for the tick.
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(await dialog()).toBeInTheDocument();
+    const accept = screen.getByRole('button', { name: tr('terms.update.accept') });
+    expect(accept).toBeDisabled();
+    fireEvent.click(acceptBox());
+    fireEvent.click(accept);
+    expect(await screen.findByText('Sin conexión')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('terms.update.accept') }));
+    expect(await screen.findByText(tr('terms.update.error'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('terms.update.accept') }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(api.billingApi.acceptTerms).toHaveBeenCalledTimes(3);
+  });
+
+  it('lets a subscriber who disagrees go to the customer portal', async () => {
+    const api = createFakeApi();
+    api.billingApi.portal
+      .mockRejectedValueOnce(new Error('Portal caído'))
+      .mockResolvedValue({ url: 'https://portal' });
+    withPlan(<p>app</p>, outdated({ ...sub, source: 'stripe', canManage: true }), api);
+    expect(await dialog()).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: tr('billing.manageGoogle') })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.manage') }));
+    expect(await screen.findByText('Portal caído')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('billing.manage') }));
+    await waitFor(() => expect(redirectTo).toHaveBeenCalledWith('https://portal'));
+  });
+
+  it('points Google Play subscribers to Google Play, and hides the web portal in the app', async () => {
+    jest.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    withPlan(<p>app</p>, outdated({ ...sub, source: 'google', canManage: true }));
+    expect(await dialog()).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: tr('billing.manageGoogle') })).toHaveAttribute(
+      'href',
+      'https://play.google.com/store/account/subscriptions'
+    );
+    expect(screen.queryByRole('button', { name: tr('billing.manage') })).toBeNull();
+  });
+
+  it('offers no way out to a founder, who has nothing to cancel', async () => {
+    withPlan(<p>app</p>, outdated({ ...sub, source: 'google', lifetime: true }));
+    expect(await dialog()).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: tr('billing.manageGoogle') })).toBeNull();
   });
 });
 
@@ -316,6 +402,27 @@ describe('PlanView', () => {
     expect(screen.getByText(tr('billing.resource.accounts')).closest('li')).not.toHaveClass(
       'plan-usage-full'
     );
+  });
+
+  it('counts the self-employed drafts of each quarter that can be drafted', async () => {
+    const overview = f.billing({
+      plan: 'free',
+      trialDaysLeft: 0,
+      limits: f.catalog().limits.free,
+      autonomoQuarters: [
+        { year: 2026, quarter: 4, used: 0 },
+        { year: 2026, quarter: 3, used: 1 },
+      ],
+    });
+    withPlan(<PlanView />, overview);
+    const ended = await screen.findByText(
+      tr('billing.resource.autonomoDraftsOf', { n: 3, year: 2026 })
+    );
+    expect(ended.closest('li')).toHaveTextContent('1 / 1');
+    expect(ended.closest('li')).toHaveClass('plan-usage-full');
+    const current = screen.getByText(tr('billing.resource.autonomoDraftsOf', { n: 4, year: 2026 }));
+    expect(current.closest('li')).toHaveTextContent('0 / 1');
+    expect(screen.queryByText(tr('billing.resource.autonomoDrafts'))).toBeNull();
   });
 
   it('opens the payment and the customer portal', async () => {

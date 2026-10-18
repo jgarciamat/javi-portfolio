@@ -11,8 +11,7 @@ import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
-import { UsedFreeGate, usageLimit } from './AutonomoLimit';
-import { freeDraftQuarters } from '@modules/finances/domain/autonomoQuarters';
+import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
 import type { AutonomoDraft, AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
@@ -206,11 +205,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
 
-  const { limit, locked } = usageLimit(plan, 'autonomoDrafts');
-  // The free plan prepares the current quarter, and the one just ended while it can be filed.
-  const otherQuarter =
-    !!plan?.isFree &&
-    !freeDraftQuarters(new Date()).some((q) => q.year === year && q.quarter === quarter);
+  const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
   const prepare = () =>
     action.run(async () => {
       const inputs = buildInputs(manual, extras, quarter);
