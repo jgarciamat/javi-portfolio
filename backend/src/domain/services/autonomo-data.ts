@@ -1,7 +1,9 @@
 /**
  * Rules of the self-employed system used by the tax drafts (Spain, 2026).
- * Sources: Agencia Tributaria (modelos 303 y 130, calendario 2026), Orden PJC/297/2026 and the
- * Seguridad Social tables for the contribution by real net income.
+ * Sources: Agencia Tributaria (modelos 303 y 130, calendario 2026), Orden PJC/297/2026 (BOE-A-2026-7296,
+ * checked on 18 October 2026) and the Seguridad Social tables for the contribution by real net income.
+ * The public calculator repeats the RETA table in frontend/src/modules/tools/data/reta2026.ts; a test
+ * there checks both stay the same.
  */
 
 /** Total contribution rate 2026: 28.30 common + 1.30 professional + 0.90 cessation + 0.10 training + 0.90 MEI. */
@@ -13,8 +15,10 @@ export interface RetaBracket {
   id: string;
   /** Monthly net income the bracket starts at (inclusive for the first, exclusive otherwise). */
   from: number;
-  /** Monthly net income the bracket ends at (inclusive); null = no limit. */
+  /** Monthly net income the bracket ends at (inclusive unless `toExclusive`); null = no limit. */
   to: number | null;
+  /** R3 ends at «less than 1,166.70» and G1 starts at 1,166.70 (Orden PJC/297/2026, art. 15). */
+  toExclusive?: boolean;
   baseMin: number;
   baseMax: number;
 }
@@ -23,7 +27,7 @@ export interface RetaBracket {
 export const RETA_BRACKETS_2026: RetaBracket[] = [
   { id: 'R1', from: 0, to: 670, baseMin: 653.59, baseMax: 718.94 },
   { id: 'R2', from: 670, to: 900, baseMin: 718.95, baseMax: 900 },
-  { id: 'R3', from: 900, to: 1166.7, baseMin: 849.67, baseMax: 1166.7 },
+  { id: 'R3', from: 900, to: 1166.7, toExclusive: true, baseMin: 849.67, baseMax: 1166.7 },
   { id: 'G1', from: 1166.7, to: 1300, baseMin: 950.98, baseMax: 1300 },
   { id: 'G2', from: 1300, to: 1500, baseMin: 960.78, baseMax: 1500 },
   { id: 'G3', from: 1500, to: 1700, baseMin: 960.78, baseMax: 1700 },
