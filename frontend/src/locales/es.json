@@ -64,6 +64,7 @@
   "app.transaction.form.type.expense": "↓ Gasto",
   "app.transaction.form.type.income": "↑ Ingreso",
   "app.transaction.form.type.saving": "↑ Ahorro",
+  "app.transaction.form.category": "Categoría",
   "app.transaction.form.category.placeholder": "Categoría...",
   "app.transaction.form.category.manage": "Crear / Eliminar categoría",
   "app.transaction.form.notes": "Notas (opcional)",
