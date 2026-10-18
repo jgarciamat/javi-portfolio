@@ -1620,6 +1620,8 @@
   "tools.renta.obligation.no": "With this pay and a single payer you do not have to file, but it is worth it if too much was withheld or you have deductions: you may get money back.",
   "billing.resource.rentaCalculations": "tax return calculations this campaign",
   "tools.renta.calculate": "Calculate my tax return",
+  "tools.renta.wipe": "Delete current data",
+  "tools.renta.wipeConfirm": "Everything you entered and the draft you read will be cleared, and all back to zero and unticked. Continue?",
   "tools.renta.freeOne": "Your free account includes 1 calculation. With Premium you calculate without limit and it updates instantly as you change the data.",
   "tools.renta.usedFree": "This is your free calculation. To recalculate with other data or try other situations, go Premium.",
   "tools.renta.usedNoSnapshot": "You have already used your free calculation. With Premium you calculate without limit.",

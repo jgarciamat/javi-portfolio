@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { createFakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -39,8 +39,27 @@ describe('Renta section', () => {
     const api = createFakeApi();
     renderWithProviders(<RentaView />, { api });
     expect(await screen.findByLabelText(tr('tools.renta.gross'))).toHaveValue('');
-    fireEvent.change(screen.getByLabelText(tr('app.renta.year')), { target: { value: '2024' } });
-    await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2024));
+    fireEvent.change(screen.getByLabelText(tr('app.renta.year')), { target: { value: '2026' } });
+    await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2026));
+  });
+
+  it('only offers the last return and the running year', async () => {
+    renderWithProviders(<RentaView />);
+    const years = within(await screen.findByLabelText(tr('app.renta.year'))).getAllByRole('option');
+    expect(years.map((o) => o.textContent)).toEqual(['2026', '2025']);
+  });
+
+  it('wipes everything that was entered once the user confirms', async () => {
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValue(true);
+    renderWithProviders(<RentaView />);
+    const gross = await screen.findByLabelText(tr('tools.renta.gross'));
+    fireEvent.change(gross, { target: { value: '30000' } });
+    expect(gross).toHaveValue('30000');
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
+    expect(gross).toHaveValue('30000');
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
+    expect(confirm).toHaveBeenCalledWith(tr('tools.renta.wipeConfirm'));
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 
   it('does the calculation inside the app, without a link to the public page', async () => {

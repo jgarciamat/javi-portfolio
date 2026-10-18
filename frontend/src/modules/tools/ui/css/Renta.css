@@ -335,3 +335,9 @@
 .renta-buy {
   margin-top: 1.1rem;
 }
+
+.renta-wipe {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}

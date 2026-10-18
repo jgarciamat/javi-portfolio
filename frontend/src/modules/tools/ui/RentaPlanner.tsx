@@ -214,6 +214,7 @@ export function RentaPlanner({
   initialIncome?: string;
   mode: RentaMode;
 }) {
+  const { t } = useI18n();
   const [form, setForm] = useState<RentaForm>(() => emptyForm(initialIncome));
   const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -223,6 +224,8 @@ export function RentaPlanner({
   );
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
+  // Bumped when the data is wiped, so the draft reader forgets its pasted text and messages too.
+  const [wipes, setWipes] = useState(0);
   const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
 
   useEffect(() => {
@@ -266,12 +269,24 @@ export function RentaPlanner({
       setSnapshot(live);
     }
   };
+  const wipe = () => {
+    if (!window.confirm(t('tools.renta.wipeConfirm'))) return;
+    setForm(emptyForm(''));
+    setDraft(NO_DRAFT);
+    setWipes((n) => n + 1);
+  };
   const setChoice = (id: string, choice: Choice) =>
     setForm((f) => ({ ...f, choices: { ...f.choices, [id]: choice } }));
 
   return (
     <div className="renta-planner">
+      <div className="renta-wipe">
+        <button type="button" className="btn-secondary" onClick={wipe}>
+          {t('tools.renta.wipe')}
+        </button>
+      </div>
       <DraftStep
+        key={wipes}
         form={form}
         set={set}
         missing={missing}

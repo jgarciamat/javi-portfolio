@@ -1620,6 +1620,8 @@
   "tools.renta.obligation.no": "Con este sueldo y un solo pagador no estás obligado a declarar, pero te conviene hacerlo si te han retenido de más o tienes deducciones: puede salirte a devolver.",
   "billing.resource.rentaCalculations": "cálculos de la Renta de esta campaña",
   "tools.renta.calculate": "Calcular mi Renta",
+  "tools.renta.wipe": "Eliminar los datos actuales",
+  "tools.renta.wipeConfirm": "Se borrarán todos los datos que has metido y el borrador leído, y todo volverá a cero y desmarcado. ¿Continuar?",
   "tools.renta.freeOne": "Tu cuenta gratuita incluye 1 cálculo. Con Premium calculas sin límite y se actualiza al momento mientras cambias los datos.",
   "tools.renta.usedFree": "Este es tu cálculo gratuito. Para recalcular con otros datos o probar otras situaciones, pásate a Premium.",
   "tools.renta.usedNoSnapshot": "Ya has usado tu cálculo gratuito. Con Premium calculas sin límite.",

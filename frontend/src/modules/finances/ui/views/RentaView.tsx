@@ -25,7 +25,8 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
   const months = Object.values(data?.months ?? {});
   const income = months.reduce((sum, m) => sum + m.income, 0);
   const expenses = months.reduce((sum, m) => sum + m.expenses, 0);
-  const years = [currentPeriod.year, currentPeriod.year - 1, currentPeriod.year - 2];
+  // Only the last return and the one of the running year: older campaigns are closed.
+  const years = [currentPeriod.year, currentPeriod.year - 1];
 
   return (
     <div className="section-view">
