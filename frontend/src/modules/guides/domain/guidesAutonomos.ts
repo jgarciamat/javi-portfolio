@@ -127,7 +127,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         ],
       },
     ],
-    tool: { to: '/calculadora-iva', label: 'Calculadora de IVA' },
+    tool: { to: '/calculadora-cuota-autonomos', label: 'Calculadora de cuota de autónomos' },
     related: [
       'modelo-130-paso-a-paso',
       'gastos-deducibles-autonomo',
