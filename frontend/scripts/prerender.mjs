@@ -10,6 +10,10 @@ import { sitemapProblems } from './sitemap.mjs';
 
 const dist = 'dist';
 const template = readFileSync(join(dist, 'index.html'), 'utf8');
+// The template is the app shell Vite writes; the home page overwrites it.
+if (!template.includes('<div id="root"></div>')) {
+  throw new Error('[prerender] dist/index.html is already prerendered: run `vite build` first');
+}
 
 /** The template without the head tags each page writes itself. */
 const shell = template
