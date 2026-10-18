@@ -456,9 +456,9 @@ export interface Forecast {
   year: number;
   month: number;
   safeToSpend: SafeToSpend;
-  /** The month-by-month outlook is Premium. */
+  /** Free plan: only next month is projected; the longer outlook and «what if…» are Premium. */
   locked: boolean;
-  projection: ProjectedMonth[] | null;
+  projection: ProjectedMonth[];
   firstShortfall: { year: number; month: number } | null;
   rules: ForecastRule[];
 }
@@ -503,7 +503,12 @@ export interface DetectedSubscription {
 export interface SubscriptionReport {
   monthly: number;
   annual: number;
+  /** On the free plan only the most expensive ones (see `locked`). */
   subscriptions: DetectedSubscription[];
+  /** How many were detected, also those not listed. */
+  count: number;
+  /** Free plan: the list is cut to the first few; the full list is Premium. */
+  locked: boolean;
 }
 
 export interface AIAdvice {

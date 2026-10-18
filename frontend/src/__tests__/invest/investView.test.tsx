@@ -1,9 +1,18 @@
-import { act, fireEvent, screen, within } from '@testing-library/react';
-import { CHAPTERS, TOPICS } from '@modules/invest/domain/content';
+import type { ReactElement } from 'react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { ApiProvider } from '@core/context/ApiContext';
+import type { Locale } from '@core/i18n/I18nContext';
+import { CHAPTERS, FREE_CHAPTERS, TOPICS, freeContent } from '@modules/invest/domain/content';
 import { ChapterBody } from '@modules/invest/ui/ChapterBody';
 import { InvestView } from '@modules/invest/ui/InvestView';
 import { mockMatchMedia } from '@test-utils/dom';
+import { createFakeApi } from '@test-utils/fakeApi';
+import { chartsOf, premiumContent } from '@test-utils/learn';
 import { literal, renderWithI18n, tr } from '@test-utils/render';
+
+/** The Premium chapters come from the (fake) API; outside the plan provider nothing is locked. */
+const renderInvest = (ui: ReactElement, locale?: Locale) =>
+  renderWithI18n(<ApiProvider value={createFakeApi()}>{ui}</ApiProvider>, locale);
 
 const tab = (id: string) =>
   screen.getByRole('tab', { name: literal(tr(`app.invest.section.${id}`)) });
@@ -13,7 +22,7 @@ const openChapter = (title: string) =>
 
 describe('Invest tab', () => {
   it('shows the title, the disclaimer and the section menu', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     expect(
       screen.getByRole('heading', { level: 2, name: tr('app.invest.title') })
     ).toBeInTheDocument();
@@ -33,7 +42,7 @@ describe('Invest tab', () => {
   });
 
   it('changes section with the mouse and with the arrow keys', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     fireEvent.keyDown(tab('map'), { key: 'ArrowRight' });
     expect(tab('learn')).toHaveAttribute('aria-selected', 'true');
     fireEvent.keyDown(tab('learn'), { key: 'Enter' });
@@ -53,7 +62,7 @@ describe('Invest tab', () => {
     header.className = 'dashboard-sticky';
     jest.spyOn(header, 'getBoundingClientRect').mockReturnValue({ height: 57 } as DOMRect);
     document.body.appendChild(header);
-    const { container, unmount } = renderWithI18n(<InvestView />);
+    const { container, unmount } = renderInvest(<InvestView />);
     const root = container.querySelector('.invest') as HTMLElement;
     expect(root.style.getPropertyValue('--inv-top')).toBe('57px');
     jest.spyOn(header, 'getBoundingClientRect').mockReturnValue({ height: 80 } as DOMRect);
@@ -64,7 +73,7 @@ describe('Invest tab', () => {
   });
 
   it('works without a header around it', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     expect(
       (container.querySelector('.invest') as HTMLElement).style.getPropertyValue('--inv-top')
     ).toBe('0px');
@@ -73,7 +82,7 @@ describe('Invest tab', () => {
 
 describe('Asset map', () => {
   it('lists the 9 classes collapsed, with risk and liquidity', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     expect(container.querySelectorAll('.inv-asset')).toHaveLength(9);
     expect(screen.getByText(/Las 9 grandes clases/)).toBeInTheDocument();
     expect(container.querySelectorAll('.inv-asset-body')).toHaveLength(0);
@@ -82,7 +91,7 @@ describe('Asset map', () => {
   });
 
   it('opens and closes a card with its sections and Spanish tax', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     const head = screen.getByRole('button', { name: /Renta fija/ });
     expect(head).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(head);
@@ -99,13 +108,13 @@ describe('Asset map', () => {
   });
 
   it('shows the lesson of the classes that have one', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     fireEvent.click(screen.getByRole('button', { name: /Inmuebles/ }));
     expect(screen.getByText('REIT y SOCIMI: ladrillo sin escritura')).toBeInTheDocument();
   });
 
   it('searches and filters by risk', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     const search = screen.getByLabelText(tr('app.invest.map.search'));
     fireEvent.change(search, { target: { value: 'bitcoin' } });
     expect(container.querySelectorAll('.inv-asset')).toHaveLength(1);
@@ -129,7 +138,7 @@ describe('Asset map', () => {
   });
 
   it('compares risk, liquidity and tax in a grid', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     const grid = screen.getByRole('table', { name: tr('app.invest.heat.title') });
     expect(within(grid).getAllByRole('row')).toHaveLength(10);
     expect(
@@ -138,7 +147,7 @@ describe('Asset map', () => {
   });
 
   it('shows IRPF and IVA at a glance with the savings scale of the app data', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     const scale = screen.getByRole('list', { name: tr('app.invest.glance.scale') });
     const steps = within(scale).getAllByRole('listitem');
     expect(steps.map((s) => s.querySelector('strong')?.textContent)).toEqual([
@@ -158,7 +167,7 @@ describe('Asset map', () => {
   });
 
   it('is in English with English names and labels', () => {
-    renderWithI18n(<InvestView />, 'en');
+    renderInvest(<InvestView />, 'en');
     expect(screen.getAllByText('Equities / stocks').length).toBeGreaterThan(0);
     expect(screen.getByRole('tab', { name: /Learn to invest/ })).toBeInTheDocument();
     expect(screen.getAllByText(/Risk 7\/7/).length).toBeGreaterThan(0);
@@ -167,7 +176,7 @@ describe('Asset map', () => {
 
 describe('Learn', () => {
   it('lists every chapter with reading time and level', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     expect(
       screen.getByText(tr('app.invest.learn.lead', { total: CHAPTERS.length }))
@@ -180,7 +189,7 @@ describe('Learn', () => {
   });
 
   it('filters by topic and searches', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     const topic = TOPICS.find((t) => t.id === 'crypto') as (typeof TOPICS)[number];
     const crypto = screen.getByRole('button', { name: `${topic.emoji} ${topic.label}` });
@@ -200,7 +209,7 @@ describe('Learn', () => {
   });
 
   it('opens a chapter, reads it and goes back to the list', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     const chapter = CHAPTERS[1];
     openChapter(chapter.title);
@@ -219,7 +228,7 @@ describe('Learn', () => {
   });
 
   it('walks through the chapters with the previous and next buttons', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     open('learn');
     openChapter(CHAPTERS[0].title);
     const pager = screen.getByRole('navigation', { name: tr('app.invest.learn.pager') });
@@ -243,13 +252,13 @@ describe('Learn', () => {
     expect(within(last).getByRole('button')).toHaveTextContent('←');
   });
 
-  it('shows the glossary of every chapter and jumps to the chapter of a term', () => {
-    renderWithI18n(<InvestView />);
+  it('shows the glossary of every chapter and jumps to the chapter of a term', async () => {
+    renderInvest(<InvestView />);
     open('learn');
     const glossary = screen.getByRole('region', { name: tr('app.invest.learn.glossary') });
     const search = within(glossary).getByLabelText(tr('app.invest.learn.glossarySearch'));
     fireEvent.change(search, { target: { value: 'tracking' } });
-    expect(within(glossary).getByText('Tracking difference')).toBeInTheDocument();
+    expect(await within(glossary).findByText('Tracking difference')).toBeInTheDocument();
     fireEvent.click(
       within(glossary).getByRole('button', { name: tr('app.invest.learn.seeChapter') })
     );
@@ -257,7 +266,7 @@ describe('Learn', () => {
   });
 
   it('says so when no term matches', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     open('learn');
     fireEvent.change(screen.getByLabelText(tr('app.invest.learn.glossarySearch')), {
       target: { value: 'qqqq' },
@@ -265,11 +274,11 @@ describe('Learn', () => {
     expect(screen.getByText(tr('app.invest.learn.glossaryEmpty'))).toBeInTheDocument();
   });
 
-  it('renders chapters with charts, calculators and the market table', () => {
-    const { container } = renderWithI18n(<InvestView />);
+  it('renders chapters with charts, calculators and the market table', async () => {
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     openChapter('Volatilidad y apalancamiento: por qué se pierde dinero tan rápido');
-    expect(container.querySelectorAll('.inv-chart-card').length).toBe(2);
+    await waitFor(() => expect(container.querySelectorAll('.inv-chart-card').length).toBe(2));
     expect(screen.getAllByText(`📈 ${tr('app.invest.embed.chart')}`)).toHaveLength(2);
     expect(screen.getByText(`🧮 ${tr('app.invest.embed.calc')}`)).toBeInTheDocument();
     expect(
@@ -279,11 +288,11 @@ describe('Learn', () => {
       screen.getByRole('button', { name: literal(`← ${tr('app.invest.learn.back')}`) })
     );
     openChapter('Las monedas principales y los proyectos que hay detrás');
-    expect(screen.getAllByText('Bitcoin (BTC): la primera').length).toBeGreaterThan(0);
+    expect((await screen.findAllByText('Bitcoin (BTC): la primera')).length).toBeGreaterThan(0);
   });
 
   it('shows English titles and says the text is in Spanish', () => {
-    renderWithI18n(<InvestView />, 'en');
+    renderInvest(<InvestView />, 'en');
     fireEvent.click(screen.getByRole('tab', { name: /Learn/ }));
     expect(screen.getByRole('button', { name: CHAPTERS[1].titleEn })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: CHAPTERS[1].titleEn }));
@@ -295,7 +304,7 @@ describe('Learn', () => {
 
   it('uses a generic title for a callout without one', () => {
     renderWithI18n(
-      <ChapterBody chapter={{ ...CHAPTERS[0], blocks: [{ k: 'warn', t: 'Cuidado' }] }} />
+      <ChapterBody chapter={{ ...FREE_CHAPTERS[0], blocks: [{ k: 'warn', t: 'Cuidado' }] }} />
     );
     expect(screen.getByText(tr('app.invest.callout.warn'), { exact: false })).toBeInTheDocument();
     expect(screen.getByText('Cuidado')).toBeInTheDocument();
@@ -312,7 +321,7 @@ describe('Stock markets inside the Shares chapter', () => {
   afterEach(() => jest.useRealTimers());
 
   it('shows local and Spanish hours and which markets are open now', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     openStocks();
     expect(
       screen.getByText(tr('app.invest.markets.openCount', { open: 6, total: 14 }))
@@ -341,7 +350,7 @@ describe('Stock markets inside the Shares chapter', () => {
 
   it('shows the lunch break of Asian markets', () => {
     jest.setSystemTime(new Date('2026-10-16T04:00:00Z'));
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     openStocks();
     const table = screen.getByRole('table', { name: tr('app.invest.markets.title') });
     expect(within(table).getByRole('row', { name: /Shanghái/ })).toHaveAttribute(
@@ -352,7 +361,7 @@ describe('Stock markets inside the Shares chapter', () => {
 
   it('is closed at the weekend and has no countdown', () => {
     jest.setSystemTime(new Date('2026-10-17T10:00:00Z'));
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     openStocks();
     expect(
       screen.getByText(tr('app.invest.markets.openCount', { open: 0, total: 14 }))
@@ -361,7 +370,7 @@ describe('Stock markets inside the Shares chapter', () => {
   });
 
   it('refreshes by itself and stops when it closes', () => {
-    const { unmount } = renderWithI18n(<InvestView />);
+    const { unmount } = renderInvest(<InvestView />);
     openStocks();
     expect(screen.getByText(/Viernes/)).toHaveTextContent('10:00');
     act(() => {
@@ -373,7 +382,7 @@ describe('Stock markets inside the Shares chapter', () => {
   });
 
   it('is in English', () => {
-    renderWithI18n(<InvestView />, 'en');
+    renderInvest(<InvestView />, 'en');
     fireEvent.click(screen.getByRole('tab', { name: /Learn to invest/ }));
     fireEvent.click(screen.getByRole('button', { name: CHAPTERS[0].titleEn }));
     expect(screen.getByText(/Friday/)).toBeInTheDocument();
@@ -389,18 +398,21 @@ describe('Charts inside the chapters', () => {
       screen.getByRole('button', { name: literal(`← ${tr('app.invest.learn.back')}`) })
     );
 
-  it('shows every chart in its chapter, marked as a simulation', () => {
-    const { container } = renderWithI18n(<InvestView />);
+  it('shows every chart in its chapter, marked as a simulation', async () => {
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     const seen = new Set<string>();
     for (const chapter of CHAPTERS) {
-      const charts = chapter.blocks.filter((b) => b.k === 'chart');
+      const blocks = (freeContent(chapter.id) ?? premiumContent(chapter.id)).blocks;
+      const charts = chartsOf(blocks);
       if (!charts.length) continue;
       openChapter(chapter.title);
-      expect(container.querySelectorAll('.inv-chart-card')).toHaveLength(charts.length);
+      await waitFor(() =>
+        expect(container.querySelectorAll('.inv-chart-card')).toHaveLength(charts.length)
+      );
       expect(container.querySelectorAll('.inv-sim-badge')).toHaveLength(charts.length);
       expect(screen.getAllByText(tr('app.invest.chart.foot'))).toHaveLength(charts.length);
-      charts.forEach((c) => seen.add(c.k === 'chart' ? c.id : ''));
+      charts.forEach((id) => seen.add(id));
       back();
     }
     expect([...seen].sort()).toEqual(
@@ -408,8 +420,24 @@ describe('Charts inside the chapters', () => {
     );
   });
 
+  it('embeds the calculators of the Premium chapters', async () => {
+    renderInvest(<InvestView />);
+    open('learn');
+    for (const [title, calc] of [
+      ['Renta fija y bonos: precio, rentabilidad y tipos de interés', 'bond'],
+      [CHAPTERS.find((c) => c.id === 'cuanto-tributa')!.title, 'tax'],
+      ['Fondos indexados: qué son y por qué los eligen tantos inversores', 'compound'],
+    ]) {
+      openChapter(title);
+      expect(
+        await screen.findByRole('region', { name: tr(`app.invest.calc.${calc}.title`) })
+      ).toBeInTheDocument();
+      back();
+    }
+  });
+
   it('has no separate charts or calculators section any more', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([
       expect.stringContaining('Información sobre inversión'),
       expect.stringContaining('Aprende a invertir'),
@@ -417,7 +445,7 @@ describe('Charts inside the chapters', () => {
   });
 
   it('draws a new simulation when asked', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     openChapter(RISK);
     const card = container.querySelector('.inv-chart-card') as HTMLElement;
@@ -438,7 +466,7 @@ describe('Charts inside the chapters', () => {
   });
 
   it('describes the largest fall, with and without a recovery', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     open('learn');
     openChapter(RISK);
     const card = screen.getAllByRole('region', { name: tr('app.invest.chart.dd.title') })[0];
@@ -452,7 +480,7 @@ describe('Charts inside the chapters', () => {
   });
 
   it('compares one share with the index and can draw another one', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     open('learn');
     openChapter(CHAPTERS[0].title);
     const card = screen.getByRole('region', { name: tr('app.invest.chart.stk.title') });
@@ -465,7 +493,7 @@ describe('Charts inside the chapters', () => {
 
   it('draws smaller on phones', () => {
     const restore = mockMatchMedia(true);
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     openChapter(RISK);
     expect(container.querySelector('.inv-chart svg')?.getAttribute('viewBox')).toBe('0 0 340 270');
@@ -474,7 +502,7 @@ describe('Charts inside the chapters', () => {
 
   it('draws wide on larger screens', () => {
     const restore = mockMatchMedia(false);
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     openChapter(RISK);
     expect(container.querySelector('.inv-chart svg')?.getAttribute('viewBox')).toBe('0 0 640 300');
@@ -484,7 +512,7 @@ describe('Charts inside the chapters', () => {
 
 describe('Shares chapter', () => {
   it('is the first and a featured chapter of the list', () => {
-    const { container } = renderWithI18n(<InvestView />);
+    const { container } = renderInvest(<InvestView />);
     open('learn');
     const first = container.querySelector('.inv-chapter') as HTMLElement;
     expect(first).toHaveClass('inv-chapter--featured');
@@ -493,7 +521,7 @@ describe('Shares chapter', () => {
   });
 
   it('is reached from the equities card of the map', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     fireEvent.click(screen.getByRole('button', { name: /Renta variable/ }));
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
@@ -505,7 +533,7 @@ describe('Shares chapter', () => {
   });
 
   it('only some classes link to a chapter, and the links all exist', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     fireEvent.click(screen.getByRole('button', { name: /Derivados/ }));
     expect(
       screen.queryByRole('button', { name: new RegExp(tr('app.invest.map.goChapter')) })
@@ -513,7 +541,7 @@ describe('Shares chapter', () => {
   });
 
   it('embeds the share calculator and says it is educational', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     open('learn');
     openChapter(CHAPTERS[0].title);
     expect(
@@ -527,7 +555,7 @@ describe('Shares chapter', () => {
 
 describe('Chapter table of contents', () => {
   it('lists the sections of a long chapter and jumps to one', () => {
-    renderWithI18n(<InvestView />);
+    renderInvest(<InvestView />);
     openStocks();
     const toc = screen.getByRole('navigation', { name: tr('app.invest.learn.toc') });
     const links = within(toc).getAllByRole('button');
@@ -541,10 +569,11 @@ describe('Chapter table of contents', () => {
     scroll.mockRestore();
   });
 
-  it('has no table of contents in a short chapter', () => {
-    renderWithI18n(<InvestView />);
+  it('has no table of contents in a short chapter', async () => {
+    renderInvest(<InvestView />);
     open('learn');
     openChapter('Fondos indexados: qué son y por qué los eligen tantos inversores');
+    await screen.findByText('Copia un índice entero con comisiones bajas.');
     expect(screen.queryByRole('navigation', { name: tr('app.invest.learn.toc') })).toBeNull();
   });
 });

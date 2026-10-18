@@ -62,6 +62,7 @@ export interface GlossaryTerm {
 
 export type ChapterTopic = 'basics' | 'stocks' | 'funds' | 'bonds' | 'crypto' | 'tax';
 
+/** A chapter with its text (the free chapters ship with the app). */
 export interface Chapter {
   id: string;
   emoji: string;
@@ -76,3 +77,20 @@ export interface Chapter {
   blocks: Block[];
   glossary: GlossaryTerm[];
 }
+
+/** What the catalogue shows of a chapter; Premium chapters get their text from the API. */
+export interface ChapterInfo
+  extends Pick<
+    Chapter,
+    'id' | 'emoji' | 'color' | 'title' | 'titleEn' | 'summary' | 'summaryEn' | 'level' | 'topic'
+  > {
+  minutes: number;
+  withCalc: boolean;
+  premium: boolean;
+}
+
+/** The text of a chapter: its blocks and its glossary. */
+export type ChapterContent = Pick<Chapter, 'id' | 'blocks' | 'glossary'>;
+
+/** A glossary term with the chapter that explains it. */
+export type ChapterTerm = GlossaryTerm & { chapterId: string };

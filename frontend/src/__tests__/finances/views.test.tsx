@@ -587,6 +587,36 @@ describe('AnalysisView', () => {
     expect(within(rows[1]).queryByText(/subió/)).toBeNull();
   });
 
+  it('shows the free plan the total and the most expensive ones, and the rest with Premium', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(
+      f.billing({ plan: 'free', trialDaysLeft: 0, limits: f.catalog().limits.free })
+    );
+    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 5 }));
+    renderWithProviders(<AnalysisView />, { api, plan: true });
+    expect(await screen.findByText(/Pagas unos .*18,99.* al mes/)).toBeInTheDocument();
+    expect(screen.getByText(tr('app.subscriptions.found', { count: 5 }))).toBeInTheDocument();
+    expect(
+      screen.getByText(tr('app.subscriptions.moreLocked', { count: 3 }), { exact: false })
+    ).toBeInTheDocument();
+    const buttons = await screen.findAllByRole('button', { name: tr('billing.seePlans') });
+    fireEvent.click(buttons[0]);
+    expect(
+      await screen.findByText(
+        tr('billing.reason.feature', { feature: tr('billing.feature.insights') })
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('says the full list is Premium when every subscription found is shown', async () => {
+    const api = createFakeApi();
+    api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ locked: true, count: 2 }));
+    renderWithProviders(<AnalysisView />, { api });
+    expect(
+      await screen.findByText(tr('app.subscriptions.fullLocked'), { exact: false })
+    ).toBeInTheDocument();
+  });
+
   it('says so when there are no subscriptions or they cannot be loaded', async () => {
     const api = createFakeApi();
     api.insightsApi.subscriptions.mockResolvedValue(f.subscriptions({ subscriptions: [] }));
@@ -629,6 +659,11 @@ describe('the self-employed draft', () => {
       limits: f.catalog().limits.free,
       usage: { ...overview.usage, autonomoDrafts: usage, autonomoPdfs: pdfs },
     });
+    return api;
+  };
+  const premium = () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
     return api;
   };
   const open = (api = free()) => {
@@ -689,7 +724,7 @@ describe('the self-employed draft', () => {
   });
 
   it('sends the income, the expenses and the other data the person types', async () => {
-    const api = open();
+    const api = open(premium());
     api.businessApi.draft.mockResolvedValue(
       f.autonomoDraft({
         expenses: [
@@ -869,7 +904,7 @@ describe('the self-employed draft', () => {
   });
 
   it('uses the totals of the modelo 130 already filed instead of the earlier quarters', async () => {
-    const api = open();
+    const api = open(premium());
     fireEvent.change(await screen.findByLabelText(tr('app.autonomo.quarter')), {
       target: { value: '1' },
     });
@@ -1033,6 +1068,23 @@ describe('the self-employed draft', () => {
     expect(api.businessApi.draft).not.toHaveBeenCalled();
   });
 
+  it('keeps other quarters for Premium on the free plan', async () => {
+    const api = open();
+    expect(await screen.findByText(tr('app.autonomo.freeOne'))).toBeInTheDocument();
+    // 15 March 2026: the first quarter is the current one.
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
+    expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.year')), { target: { value: '2025' } });
+    expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.goPremium') }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(api.businessApi.draft).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.year')), { target: { value: '2026' } });
+    expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeInTheDocument();
+  });
+
   it('shows the draft prepared before, even when the plan is out of drafts', async () => {
     localStorage.setItem(
       'mm_autonomo_draft2',
@@ -1162,9 +1214,21 @@ describe('the investments and debts section', () => {
       expect(screen.queryByText(tr('app.assets.usedFree'))).toBeNull();
     });
 
-    it('asks for Premium to add a second one, and keeps the first usable', async () => {
+    it('lets a free account have three in total', async () => {
       const api = free();
-      api.assetApi.getAll.mockResolvedValue([fund]);
+      api.assetApi.getAll.mockResolvedValue([fund, { ...fund, id: 'a2', name: 'Piso' }]);
+      renderWithProviders(<AssetsView />, { api, plan: true });
+      expect(await screen.findByText('Piso')).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: tr('app.assets.add') })).toBeInTheDocument();
+    });
+
+    it('asks for Premium to add a fourth one, and keeps the others usable', async () => {
+      const api = free();
+      api.assetApi.getAll.mockResolvedValue([
+        fund,
+        { ...fund, id: 'a2', name: 'Piso' },
+        { ...fund, id: 'a3', name: 'Hipoteca', kind: 'debt' as const },
+      ]);
       renderWithProviders(<AssetsView />, { api, plan: true });
       expect(await screen.findByText(tr('app.assets.usedFree'))).toBeInTheDocument();
       expect(screen.getByText('Fondo indexado')).toBeInTheDocument();

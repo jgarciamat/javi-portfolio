@@ -10,6 +10,7 @@ import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
+import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
 import type { AutonomoDraft, AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
 import '../css/Sections.css';
@@ -205,6 +206,8 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
   );
 
   const { limit, locked } = usageLimit(plan, 'autonomoDrafts');
+  // The free plan prepares the current quarter only; other quarters are Premium.
+  const otherQuarter = !!plan?.isFree && (year !== THIS_YEAR || quarter !== quarterNow());
   const prepare = () =>
     action.run(async () => {
       const inputs = buildInputs(manual, extras, quarter);
@@ -233,7 +236,19 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
         onChange={(patch) => setExtras((current) => ({ ...current, ...patch }))}
       />
 
-      {locked ? (
+      {otherQuarter ? (
+        <PremiumGate>
+          <p className="section-hint">{t('app.autonomo.otherQuarterLocked')}</p>
+          <button
+            className="btn-primary"
+            onClick={() =>
+              plan!.openUpgrade({ kind: 'limit', resource: 'autonomoDrafts', limit: 1 })
+            }
+          >
+            {t('app.autonomo.goPremium')}
+          </button>
+        </PremiumGate>
+      ) : locked ? (
         <UsedFreeGate
           text={t('app.autonomo.usedFree')}
           resource="autonomoDrafts"

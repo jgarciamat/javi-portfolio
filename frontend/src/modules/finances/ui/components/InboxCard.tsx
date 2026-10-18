@@ -5,11 +5,12 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { Icon } from '@shared/components/Icon';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
+import { PremiumOnly } from '@modules/billing/ui/PremiumOnly';
 import type { Inbox } from '../../domain/types';
 import '../css/Sections.css';
 
 /** The private address to forward receipts to: they become expenses. Hidden until it is set up. */
-export function InboxCard() {
+function InboxAddress() {
   const { inboxApi } = useApi();
   const { t } = useI18n();
   const { money, date } = useFormat();
@@ -68,5 +69,14 @@ export function InboxCard() {
         </>
       )}
     </div>
+  );
+}
+
+/** Receipts by e-mail are Premium: the free plan sees what it is and the way to upgrade. */
+export function InboxCard() {
+  return (
+    <PremiumOnly icon="mail" titleKey="app.inbox.title" hintKey="app.inbox.locked" feature="inbox">
+      <InboxAddress />
+    </PremiumOnly>
   );
 }

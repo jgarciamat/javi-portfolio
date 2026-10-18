@@ -212,15 +212,16 @@ describe('PlanBanner', () => {
       f.billing({
         trialDaysLeft: 4,
         usage: {
-          accounts: 2,
-          budgets: 5,
-          goals: 1,
-          recurringRules: 4,
+          accounts: 3,
+          budgets: 6,
+          goals: 2,
+          recurringRules: 7,
           customAlerts: 0,
           rentaCalculations: 0,
           autonomoDrafts: 0,
           autonomoPdfs: 0,
           assets: 0,
+          imports: 2,
           movements: 37,
         },
       })
@@ -228,7 +229,7 @@ describe('PlanBanner', () => {
     const banner = await screen.findByRole('status');
     expect(banner).toHaveTextContent(/registrado 37 movimientos/);
     expect(banner).toHaveTextContent(
-      /5 presupuestos \(gratis: 3\), 4 movimientos automáticos \(gratis: 3\)/
+      /6 presupuestos \(gratis: 5\), 7 movimientos automáticos \(gratis: 5\), 2 importaciones de extractos del banco \(gratis: 1\)/
     );
     expect(banner).not.toHaveTextContent(/cuentas \(gratis/);
   });
@@ -299,6 +300,22 @@ describe('PlanView', () => {
   ])('describes the %s status', async (_name, overview, text) => {
     withPlan(<PlanView />, overview);
     expect(await screen.findByText(text)).toBeInTheDocument();
+  });
+
+  it('shows the free usage, the bank statement import included, and marks what is used up', async () => {
+    const overview = f.billing({
+      plan: 'free',
+      trialDaysLeft: 0,
+      limits: f.catalog().limits.free,
+      usage: { ...f.billing().usage, imports: 1 },
+    });
+    withPlan(<PlanView />, overview);
+    const row = (await screen.findByText(tr('billing.resource.imports'))).closest('li');
+    expect(row).toHaveTextContent('1 / 1');
+    expect(row).toHaveClass('plan-usage-full');
+    expect(screen.getByText(tr('billing.resource.accounts')).closest('li')).not.toHaveClass(
+      'plan-usage-full'
+    );
   });
 
   it('opens the payment and the customer portal', async () => {

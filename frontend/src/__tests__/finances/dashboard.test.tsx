@@ -167,17 +167,37 @@ describe('import', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('shows the paywall on the free plan', async () => {
+  const freeBilling = (imports: number) =>
+    f.billing({
+      plan: 'free',
+      trialDaysLeft: 0,
+      limits: f.catalog().limits.free,
+      usage: { ...f.billing().usage, imports },
+    });
+
+  it('lets the free plan open the importer while its import is unused', async () => {
     const api = createFakeApi();
-    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free', trialDaysLeft: 0 }));
+    api.billingApi.get.mockResolvedValue(freeBilling(0));
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
     fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
-    expect(
-      await screen.findByRole('dialog', { name: tr('billing.upgradeTitle') })
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
+  });
+
+  it('shows the paywall once the free import is used', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(freeBilling(1));
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
+    await act(async () => undefined);
+    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
+    fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
+    const dialog = await screen.findByRole('dialog', { name: tr('billing.upgradeTitle') });
+    expect(dialog).toHaveTextContent(
+      tr('billing.reason.limit', { limit: 1, resource: tr('billing.resource.imports') })
+    );
   });
 });
 

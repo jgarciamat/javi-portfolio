@@ -140,7 +140,7 @@ export function HouseholdCard() {
   const [copied, setCopied] = useState(false);
   if (!data) return null;
 
-  const locked = plan !== null && !plan.isPremium && data.role === 'none';
+  const locked = plan !== null && plan.isFree && data.role === 'none';
   const refresh = (fn: () => Promise<unknown>) => async () => {
     if (await action.run(fn)) await reload();
   };

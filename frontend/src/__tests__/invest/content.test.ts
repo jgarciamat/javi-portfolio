@@ -1,11 +1,13 @@
 import {
   ASSET_CLASSES,
   CHAPTERS,
+  FREE_CHAPTERS,
   TOPICS,
   allGlossaryTerms,
   assetSearchText,
   chapterMinutes,
   findChapter,
+  freeContent,
   matchesQuery,
   riskBand,
 } from '@modules/invest/domain/content';
@@ -75,7 +77,7 @@ describe('asset classes', () => {
 });
 
 describe('chapters', () => {
-  it('has unique chapters, in English and Spanish, with a glossary', () => {
+  it('has unique chapters, in English and Spanish, with a reading time', () => {
     expect(new Set(CHAPTERS.map((c) => c.id)).size).toBe(CHAPTERS.length);
     expect(CHAPTERS.length).toBeGreaterThanOrEqual(11);
     const topics = new Set(TOPICS.map((t) => t.id));
@@ -84,13 +86,17 @@ describe('chapters', () => {
       expect(c.titleEn.length).toBeGreaterThan(10);
       expect(c.summaryEn.length).toBeGreaterThan(10);
       expect(topics.has(c.topic)).toBe(true);
+      expect(c.minutes).toBeGreaterThanOrEqual(1);
+    }
+    // Only the free chapters have their text in the app.
+    for (const c of FREE_CHAPTERS) {
       expect(c.glossary.length).toBeGreaterThanOrEqual(4);
       expect(c.blocks.filter((b) => b.k === 'key').length).toBeGreaterThan(0);
-      expect(chapterMinutes(c)).toBeGreaterThanOrEqual(1);
+      expect(findChapter(c.id)).toMatchObject({ premium: false, minutes: chapterMinutes(c) });
     }
   });
 
-  it('covers every topic asked for and uses every chart and calculator', () => {
+  it('covers every topic asked for and uses only charts and calculators the app has', () => {
     const titles = CHAPTERS.map((c) => c.title).join(' | ');
     for (const word of [
       'indexados',
@@ -105,36 +111,37 @@ describe('chapters', () => {
     ]) {
       expect(titles.toLowerCase()).toContain(word.toLowerCase());
     }
-    const blocks = CHAPTERS.flatMap((c) => c.blocks);
-    for (const id of CHART_IDS)
-      expect(blocks.some((b) => b.k === 'chart' && b.id === id)).toBe(true);
-    for (const id of CALC_IDS) expect(blocks.some((b) => b.k === 'calc' && b.id === id)).toBe(true);
+    const blocks = FREE_CHAPTERS.flatMap((c) => c.blocks);
+    for (const b of blocks) {
+      if (b.k === 'chart') expect(CHART_IDS).toContain(b.id);
+      if (b.k === 'calc') expect(CALC_IDS).toContain(b.id);
+    }
     expect(blocks.some((b) => b.k === 'markets')).toBe(true);
   });
 
-  it('describes every project asked for', () => {
-    const text = JSON.stringify(CHAPTERS.find((c) => c.id === 'cripto-monedas-y-proyectos'));
-    for (const name of ['Bitcoin', 'Ethereum', 'BNB', 'Solana', 'XRP', 'Cardano', 'USDT', 'USDC']) {
-      expect(text).toContain(name);
-    }
-    expect(text).toContain('a fecha de redacción');
-  });
-
-  it('finds a chapter by id and lists glossary terms once, alphabetically', () => {
+  it('finds a chapter by id, the text of the free ones, and lists glossary terms once', () => {
     expect(findChapter(CHAPTERS[0].id)).toBe(CHAPTERS[0]);
     expect(findChapter('nope')).toBeUndefined();
+    expect(freeContent(CHAPTERS[0].id)).toBe(FREE_CHAPTERS[0]);
+    expect(freeContent(CHAPTERS[2].id)).toBeUndefined();
     const terms = allGlossaryTerms();
     const keys = terms.map((t) => t.term.toLowerCase());
     expect(new Set(keys).size).toBe(keys.length);
-    expect(keys.length).toBeGreaterThan(40);
+    expect(keys.length).toBeGreaterThan(10);
     expect(terms.map((t) => t.term)).toEqual(
       [...terms.map((t) => t.term)].sort((a, b) => a.localeCompare(b, 'es'))
     );
     expect(CHAPTERS.map((c) => c.id)).toContain(terms[0].chapterId);
+    // The Premium terms are added (once) when the API sends them.
+    const repeated = { ...terms[0], chapterId: CHAPTERS[2].id };
+    const more = { term: 'Zzz', def: 'x', chapterId: CHAPTERS[2].id };
+    const all = allGlossaryTerms([repeated, more]);
+    expect(all).toHaveLength(terms.length + 1);
+    expect(all[all.length - 1]).toBe(more);
   });
 
   it('estimates reading time from the words of a chapter', () => {
-    const base = CHAPTERS[0];
+    const base = FREE_CHAPTERS[0];
     expect(chapterMinutes({ ...base, blocks: [{ k: 'p', t: 'hola' }] })).toBe(1);
     const words = Array.from({ length: 800 }, () => 'palabra').join(' ');
     expect(chapterMinutes({ ...base, blocks: [{ k: 'p', t: words }] })).toBe(4);

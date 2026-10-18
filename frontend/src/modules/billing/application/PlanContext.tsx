@@ -21,8 +21,13 @@ export type BillingNotice = 'success' | 'cancel' | 'portal';
 interface PlanContextValue {
   overview: BillingOverview | null;
   loading: boolean;
-  /** Unknown plan (still loading or failed) counts as Premium: the API enforces the limits anyway. */
+  /** Only a plan known to be Premium unlocks Premium content (fails closed while unknown). */
   isPremium: boolean;
+  /**
+   * Known to be on the free plan: upgrade prompts wait for it, so they never flash while the
+   * plan is loading (or if it could not be loaded).
+   */
+  isFree: boolean;
   refresh: () => Promise<BillingOverview | null>;
   upgradeReason: UpgradeReason | null;
   openUpgrade: (reason?: UpgradeReason) => void;
@@ -132,7 +137,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     () => ({
       overview,
       loading,
-      isPremium: overview?.plan !== 'free',
+      isPremium: overview?.plan === 'premium',
+      isFree: overview?.plan === 'free',
       refresh,
       upgradeReason,
       openUpgrade: (reason = { kind: 'generic' }) => setUpgradeReason(reason),

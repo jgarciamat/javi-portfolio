@@ -34,7 +34,7 @@ function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'
   const plan = useOptionalPlan();
   const reason = advice?.source === 'rules' ? advice.reason : undefined;
   // A free user who spent their one analysis is offered Premium (10 a month).
-  const spentFree = reason === 'quota' && plan !== null && !plan.isPremium;
+  const spentFree = reason === 'quota' && plan !== null && plan.isFree;
   const fallbackKey = spentFree
     ? 'app.ai.fallback.quotaFree'
     : reason

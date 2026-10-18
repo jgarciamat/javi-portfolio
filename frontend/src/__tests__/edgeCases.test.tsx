@@ -218,9 +218,7 @@ describe('billing edge cases', () => {
 
   it('shows the founder plan, free features and starts the trial from the pricing page', async () => {
     const api = createFakeApi();
-    const catalog = f.catalog();
-    catalog.limits.free.features.import = true;
-    api.billingApi.plans.mockResolvedValue(catalog);
+    api.billingApi.plans.mockResolvedValue(f.catalog());
     renderWithProviders(
       <Routes>
         <Route path="/" element={<PricingPage />} />
@@ -229,20 +227,40 @@ describe('billing edge cases', () => {
       { api, authenticated: false }
     );
     expect(await screen.findByText(/quedan 87 plazas/)).toBeInTheDocument();
-    // Import is free in this catalog: five ticks instead of four (import, analysis, forecast, household, advisor).
+    // Premium-only rows: trends, annual report, receipts by e-mail, household and AI questions.
     expect(screen.getAllByText('✓')).toHaveLength(5);
+    const row = (label: string) => screen.getByText(label).closest('tr') as HTMLElement;
+    expect(row(tr('pricing.row.imports'))).toHaveTextContent(`1${tr('pricing.unlimited')}`);
+    expect(row(tr('pricing.row.rentaCalculations'))).toHaveTextContent(
+      tr('pricing.perCampaign', { count: 3 })
+    );
+    expect(row(tr('pricing.row.autonomoDrafts'))).toHaveTextContent(
+      tr('pricing.perQuarter', { count: 1 })
+    );
+    expect(row(tr('pricing.row.course'))).toHaveTextContent(tr('pricing.row.course.free'));
+    expect(row(tr('pricing.row.videos'))).toHaveTextContent(tr('pricing.row.videos.premium'));
+    expect(row(tr('pricing.row.capture'))).toHaveTextContent(
+      `—${tr('pricing.row.capture.premium')}`
+    );
+    expect(row(tr('pricing.row.aiAnalyses'))).toHaveTextContent(
+      tr('pricing.aiQuota', { count: 1 }) + tr('pricing.aiQuota', { count: 10 })
+    );
     fireEvent.click(screen.getByRole('button', { name: tr('pricing.cta', { days: 14 }) }));
     expect(screen.getByText('registro')).toBeInTheDocument();
   });
 
-  it('locks the analysis on the free plan and waits for the plan', async () => {
+  it('locks trends and net worth on the free plan and waits for the plan', async () => {
     const api = createFakeApi();
     let resolve!: (v: ReturnType<typeof f.billing>) => void;
     api.billingApi.get.mockReturnValue(new Promise((r) => (resolve = r)));
     renderWithProviders(<AnalysisView />, { api, plan: true });
-    expect(screen.getByText(tr('app.common.loading'))).toBeInTheDocument();
+    expect(screen.getAllByText(tr('app.common.loading'))).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: tr('billing.seePlans') })).toBeNull();
     await act(async () => resolve(f.billing({ plan: 'free', trialDaysLeft: 0 })));
-    fireEvent.click(screen.getByRole('button', { name: tr('billing.seePlans') }));
+    expect(screen.getByText(tr('app.analysis.trendsLocked'))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.analysis.netWorthLocked'))).toBeInTheDocument();
+    expect(api.insightsApi.netWorth).not.toHaveBeenCalled();
+    fireEvent.click(screen.getAllByRole('button', { name: tr('billing.seePlans') })[0]);
     expect(
       screen.getByText(tr('billing.reason.feature', { feature: tr('billing.feature.insights') }))
     ).toBeInTheDocument();

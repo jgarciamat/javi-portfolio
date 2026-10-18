@@ -46,7 +46,32 @@ function SafeToSpendBlock({ safe }: { safe: SafeToSpend }) {
   );
 }
 
-/** Month-by-month outlook with "what if I cancel…" scenarios (Premium). */
+/** The longer outlook and the scenarios, locked on the free plan. */
+function LockedOutlook() {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  return (
+    <div className="forecast-locked">
+      <p className="section-hint">
+        <Icon name="lock" /> {t('app.forecast.locked')}{' '}
+        <span className="premium-chip">Premium</span>
+      </p>
+      {plan && (
+        <button
+          className="btn-primary"
+          onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'forecast' })}
+        >
+          {t('billing.seePlans')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Month-by-month outlook. Premium chooses up to 12 months and tries "what if I cancel…";
+ * the free plan sees next month only.
+ */
 function Outlook({
   forecast,
   months,
@@ -64,25 +89,28 @@ function Outlook({
   const { money, monthLabel, monthName } = useFormat();
   const expenses = forecast.rules.filter((r) => r.type === 'EXPENSE');
   const shortfall = forecast.firstShortfall;
+  const locked = forecast.locked;
 
   return (
     <div className="forecast-outlook">
       <div className="section-header">
         <h3 className="forecast-subtitle">
-          {t('app.forecast.outlook')} <span className="premium-chip">Premium</span>
+          {locked ? t('app.forecast.nextMonth') : t('app.forecast.outlook')}
         </h3>
-        <select
-          className="tx-input select-compact"
-          value={months}
-          onChange={(e) => onMonths(Number(e.target.value))}
-          aria-label={t('app.forecast.range')}
-        >
-          {RANGES.map((r) => (
-            <option key={r} value={r}>
-              {t('app.forecast.months', { count: r })}
-            </option>
-          ))}
-        </select>
+        {!locked && (
+          <select
+            className="tx-input select-compact"
+            value={months}
+            onChange={(e) => onMonths(Number(e.target.value))}
+            aria-label={t('app.forecast.range')}
+          >
+            {RANGES.map((r) => (
+              <option key={r} value={r}>
+                {t('app.forecast.months', { count: r })}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       {shortfall ? (
         <p className="forecast-warning" role="alert">
@@ -104,7 +132,7 @@ function Outlook({
             </tr>
           </thead>
           <tbody>
-            {forecast.projection?.map((p) => (
+            {forecast.projection.map((p) => (
               <tr key={`${p.year}-${p.month}`}>
                 <td>
                   {monthName(p.month, 'short')} {String(p.year).slice(2)}
@@ -120,7 +148,8 @@ function Outlook({
           </tbody>
         </table>
       </ScrollRegion>
-      {expenses.length > 0 && (
+      {locked && <LockedOutlook />}
+      {!locked && expenses.length > 0 && (
         <fieldset className="forecast-whatif">
           <legend>{t('app.forecast.whatIf')}</legend>
           {expenses.map((rule) => (
@@ -139,11 +168,10 @@ function Outlook({
   );
 }
 
-/** "Do I reach the end of the month?" for everyone; the outlook of the next months is Premium. */
+/** "Do I reach the end of the month?" and next month for everyone; the longer outlook is Premium. */
 export function ForecastPanel() {
   const { insightsApi } = useApi();
   const { t } = useI18n();
-  const plan = useOptionalPlan();
   const { available } = useFinances();
   const [months, setMonths] = useState(6);
   const [excluded, setExcluded] = useState<string[]>([]);
@@ -168,30 +196,13 @@ export function ForecastPanel() {
       {data && (
         <>
           <SafeToSpendBlock safe={data.safeToSpend} />
-          {data.locked ? (
-            <div className="forecast-locked">
-              <p className="section-hint">
-                <Icon name="lock" /> {t('app.forecast.locked')}{' '}
-                <span className="premium-chip">Premium</span>
-              </p>
-              {plan && (
-                <button
-                  className="btn-primary"
-                  onClick={() => plan.openUpgrade({ kind: 'feature', feature: 'forecast' })}
-                >
-                  {t('billing.seePlans')}
-                </button>
-              )}
-            </div>
-          ) : (
-            <Outlook
-              forecast={data}
-              months={months}
-              onMonths={setMonths}
-              excluded={excluded}
-              onToggle={toggle}
-            />
-          )}
+          <Outlook
+            forecast={data}
+            months={months}
+            onMonths={setMonths}
+            excluded={excluded}
+            onToggle={toggle}
+          />
         </>
       )}
     </CollapsiblePanel>

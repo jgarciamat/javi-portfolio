@@ -6,6 +6,7 @@ import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { lazyNamed } from '@shared/utils/lazyNamed';
+import { usageLimit } from './AutonomoLimit';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
@@ -270,10 +271,12 @@ export function Dashboard() {
     setMenuPicks((n) => n + 1);
   };
 
-  // Free plan: the import button opens the paywall instead of the importer.
+  // Free plan: one bank statement import; once used, the button opens the paywall instead.
+  const imports = usageLimit(plan, 'imports');
   const openImport =
-    plan && !plan.isPremium
-      ? () => plan.openUpgrade({ kind: 'feature', feature: 'import' })
+    plan && imports.locked
+      ? () =>
+          plan.openUpgrade({ kind: 'limit', resource: 'imports', limit: imports.limit as number })
       : dash.openImport;
 
   return (

@@ -46,7 +46,7 @@ export function useCapturedPayments() {
           type: p.type,
           notes: 'Detectado en una notificación',
         })),
-        {}
+        { source: 'capture' }
       );
       setPending(removePending(items.map((p) => p.id)));
       await refresh({ invalidate: true });

@@ -239,6 +239,18 @@
   width: auto;
 }
 
+/* ─── Inline upsell under a free preview ─────────────── */
+.plan-upsell {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  margin-top: 0.75rem;
+}
+
+.plan-upsell .btn-primary {
+  width: auto;
+}
+
 /* ─── Inline gate (free try used) ─────────────── */
 .renta-gate {
   display: grid;

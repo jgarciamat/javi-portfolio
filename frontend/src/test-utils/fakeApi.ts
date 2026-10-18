@@ -1,5 +1,6 @@
 import type { IApiContext } from '@core/context/ApiContext';
 import * as f from './fixtures';
+import { PREMIUM_TERMS, premiumContent } from './learn';
 
 type Mocked<T> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R ? jest.Mock<R, A> : T[K];
@@ -198,5 +199,9 @@ export function createFakeApi(): FakeApi {
     },
     offersApi: { list: ok({ enabled: true, offers: [] }), click: ok({ url: 'https://x.test' }) },
     videosApi: { premium: ok(f.premiumVideoIds()) },
+    learnApi: {
+      chapter: jest.fn((id: string) => Promise.resolve(premiumContent(id))),
+      glossary: ok(PREMIUM_TERMS),
+    },
   } as unknown as FakeApi;
 }

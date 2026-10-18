@@ -17,8 +17,10 @@ export interface RentaAccess {
   premium: boolean;
   /** The plan is still loading. */
   loading: boolean;
-  /** The free calculation was already used. */
+  /** The free calculations were all used (in the app: those of this Renta campaign). */
   used: boolean;
+  /** Free calculations still left (0 when used up; not meaningful with `premium`). */
+  left: number;
   /** Counts a calculation; false when it was refused. */
   consume: () => Promise<boolean>;
   /** Opens the way to Premium (the upgrade dialog, or null outside the app). */
@@ -82,6 +84,15 @@ function draftAccess(plan: Plan, rentaApi: IApiContext['rentaApi']): DraftAccess
   };
 }
 
+/** The free calculations of this campaign: whether they are used up and how many are left. */
+function freeCalculations(plan: Plan, max: number): { used: boolean; left: number } {
+  const limit = plan.overview?.limits.resources.rentaCalculations;
+  const count = plan.overview?.usage.rentaCalculations ?? 0;
+  const used =
+    limit !== null && limit !== undefined && count >= limit && !plan.overview?.renta.passUntil;
+  return { used, left: used ? 0 : Math.max(max - count, 0) };
+}
+
 /** Inside the app: the plan's limit of calculations, unless it has none or the pass is on. */
 function accountAccess(
   plan: Plan,
@@ -91,11 +102,12 @@ function accountAccess(
   const renta = plan.overview?.renta;
   const limit = plan.overview?.limits.resources.rentaCalculations;
   const max = limit ?? 1;
-  const count = plan.overview?.usage.rentaCalculations ?? 0;
+  const { used, left } = freeCalculations(plan, max);
   return {
     premium: (plan.isPremium && !!plan.overview && limit === null) || !!renta?.passUntil,
     loading: plan.loading && !plan.overview,
-    used: limit !== null && limit !== undefined && count >= limit && !renta?.passUntil,
+    used,
+    left,
     consume,
     upgrade: () => plan.openUpgrade({ kind: 'limit', resource: 'rentaCalculations', limit: max }),
     draft,
@@ -124,6 +136,7 @@ export function useRentaAccess(mode: RentaMode): RentaAccess {
       premium: false,
       loading: false,
       used: localUsed,
+      left: localUsed ? 0 : 1,
       consume: async () => {
         storage.set(LOCAL_KEY, '1');
         setLocalUsed(true);

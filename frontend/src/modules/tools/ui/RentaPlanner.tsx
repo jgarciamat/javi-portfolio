@@ -112,6 +112,59 @@ function useDeductionHints(
   return { missing, pending, marked, hints };
 }
 
+interface FreeGateProps {
+  access: RentaAccess;
+  busy: boolean;
+  calculate: () => Promise<void>;
+  /** In the app the free calculations are per Renta campaign; the public page has one per browser. */
+  inApp: boolean;
+}
+
+/** Before the first result: the free calculation(s), or the way to Premium when they are used. */
+function BeforeResult({ access, busy, calculate, inApp }: FreeGateProps) {
+  const { t } = useI18n();
+  const free = inApp
+    ? t('tools.renta.freeCampaign', { count: access.left })
+    : t('tools.renta.freeOne');
+  return (
+    <PremiumGate locked={access.used}>
+      <p className="section-hint">
+        {access.used ? t(inApp ? 'tools.renta.usedCampaign' : 'tools.renta.usedNoSnapshot') : free}
+      </p>
+      {access.used ? (
+        <UpgradeCta access={access} />
+      ) : (
+        <button className="btn-primary" disabled={busy} onClick={() => void calculate()}>
+          {busy ? t('tools.renta.calculating') : t('tools.renta.calculate')}
+        </button>
+      )}
+    </PremiumGate>
+  );
+}
+
+/** Under a frozen result: calculate again while free ones are left, then the way to Premium. */
+function AfterFreeResult({ access, busy, calculate, inApp }: FreeGateProps) {
+  const { t } = useI18n();
+  if (access.left > 0) {
+    return (
+      <PremiumGate locked={false}>
+        <p className="section-hint">{t('tools.renta.recalcLeft', { count: access.left })}</p>
+        <button className="btn-primary" disabled={busy} onClick={() => void calculate()}>
+          {busy ? t('tools.renta.calculating') : t('tools.renta.recalculate')}
+        </button>
+      </PremiumGate>
+    );
+  }
+  return (
+    <PremiumGate>
+      <p className="section-hint">
+        {t(inApp ? 'tools.renta.usedFreeCampaign' : 'tools.renta.usedFree')}
+      </p>
+      <UpgradeCta access={access} />
+    </PremiumGate>
+  );
+}
+
 /** The estimated result, or the way to get it. */
 function ResultSection({
   access,
@@ -119,42 +172,31 @@ function ResultSection({
   busy,
   pending,
   calculate,
+  mode,
 }: {
   access: RentaAccess;
   shown: Snapshot | null;
   busy: boolean;
   pending: string[];
   calculate: () => Promise<void>;
+  mode: RentaMode;
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  const inApp = mode === 'account';
   return (
     <Step n={5} titleKey="tools.renta.step4" className="renta-result">
       <div aria-live="polite">
         {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
         {!access.loading && !shown && (
-          <PremiumGate locked={access.used}>
-            <p className="section-hint">
-              {access.used ? t('tools.renta.usedNoSnapshot') : t('tools.renta.freeOne')}
-            </p>
-            {access.used ? (
-              <UpgradeCta access={access} />
-            ) : (
-              <button className="btn-primary" disabled={busy} onClick={() => void calculate()}>
-                {busy ? t('tools.renta.calculating') : t('tools.renta.calculate')}
-              </button>
-            )}
-          </PremiumGate>
+          <BeforeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
         )}
         {shown && (
           <>
             <PendingNotice pending={pending} />
             <ResultCard shown={shown} money={money} />
             {!access.premium && (
-              <PremiumGate>
-                <p className="section-hint">{t('tools.renta.usedFree')}</p>
-                <UpgradeCta access={access} />
-              </PremiumGate>
+              <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
             )}
           </>
         )}
@@ -261,6 +303,7 @@ export function RentaPlanner({
         busy={busy}
         pending={pending}
         calculate={calculate}
+        mode={mode}
       />
     </div>
   );

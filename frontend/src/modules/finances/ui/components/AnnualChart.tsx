@@ -140,9 +140,7 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
   const plan = useOptionalPlan();
   const [reportOpen, setReportOpen] = useState(false);
   const openReport = () =>
-    plan && !plan.isPremium
-      ? plan.openUpgrade({ kind: 'feature', feature: 'insights' })
-      : setReportOpen(true);
+    plan?.isFree ? plan.openUpgrade({ kind: 'feature', feature: 'insights' }) : setReportOpen(true);
 
   return (
     <div className="annual-view">
