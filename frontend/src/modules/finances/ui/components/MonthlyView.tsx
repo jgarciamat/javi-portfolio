@@ -24,6 +24,7 @@ import { GettingStarted } from './GettingStarted';
 import { RatePrompt } from './RatePrompt';
 import { MonthRecap, MonthRecapDialog } from './MonthRecap';
 import { MonthAlerts } from './MonthAlerts';
+import { AccountCards } from './AccountCards';
 import { SummaryCards } from './SummaryCards';
 import { TransactionCalendarView } from './TransactionCalendarView';
 import { TransactionForm } from './TransactionForm';
@@ -119,15 +120,26 @@ const VIEW_MODES: { value: TransactionViewMode; icon: string; labelKey: string }
   { value: 'calendar', icon: '🗓️', labelKey: 'app.transactions.view.calendar' },
 ];
 
-function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
+function MovementsPanel({
+  onEdit,
+  accountId,
+}: {
+  onEdit: (tx: Transaction) => void;
+  accountId: string | null;
+}) {
   const { t, locale } = useI18n();
   const f = useFinances();
+  const showAccount = f.accounts.filter((a) => !a.archived).length > 1;
+  const transactions = useMemo(
+    () => (accountId ? f.transactions.filter((tx) => tx.accountId === accountId) : f.transactions),
+    [f.transactions, accountId]
+  );
   const range = useMemo(
     () => periodRange(f.year, f.month, f.periodStart, f.periodEnd),
     [f.year, f.month, f.periodStart, f.periodEnd]
   );
   const view = useTransactionView({
-    transactions: f.transactions,
+    transactions,
     locale,
     year: f.year,
     month: f.month,
@@ -136,7 +148,7 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
 
   return (
     <>
-      {f.transactions.length > 0 && (
+      {transactions.length > 0 && (
         <div className="tx-tabs" role="tablist" aria-label={t('app.transactions.viewMode')}>
           {VIEW_MODES.map(({ value, icon, labelKey }) => (
             <button
@@ -154,8 +166,7 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
       <CollapsiblePanel
         title={
           <>
-            <Icon name="clipboard" />{' '}
-            {t('app.transactions.title', { count: f.transactions.length })}
+            <Icon name="clipboard" /> {t('app.transactions.title', { count: transactions.length })}
           </>
         }
         className="collapsible-panel--flush"
@@ -163,7 +174,8 @@ function MovementsPanel({ onEdit }: { onEdit: (tx: Transaction) => void }) {
       >
         {view.mode === 'day' && (
           <TransactionTable
-            transactions={f.transactions}
+            transactions={transactions}
+            showAccount={showAccount}
             onDelete={f.removeTransaction}
             onPatch={f.patchTransaction}
             onEdit={onEdit}
@@ -250,6 +262,11 @@ export function MonthlyView({
   const [params, setParams] = useSearchParams();
   const quickAdd = quickAddOf(params.get('add'));
   const defaultDate = defaultDateOf(f);
+  const activeAccounts = f.accounts.filter((a) => !a.archived);
+  const [accountFilter, setAccountFilter] = useState<string | null>(null);
+  const [accountRequest, setAccountRequest] = useState<{ id: string } | null>(null);
+  // An account that was archived or deleted no longer filters anything.
+  const filterId = activeAccounts.some((a) => a.id === accountFilter) ? accountFilter : null;
 
   return (
     <>
@@ -266,6 +283,15 @@ export function MonthlyView({
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
+        {activeAccounts.length > 1 && (
+          <AccountCards
+            accounts={activeAccounts}
+            selectedId={filterId}
+            onSelect={setAccountFilter}
+            onAdd={(id) => setAccountRequest({ id })}
+            onTransfer={() => onOpenTab('accounts')}
+          />
+        )}
         <CurrentPeriodPanels checklist={checklist} onOpenTab={onOpenTab} />
 
         <BudgetProgress budgets={f.budgets} onManage={onManageBudgets} />
@@ -281,8 +307,9 @@ export function MonthlyView({
           availableBalance={f.available}
           quickAdd={quickAdd}
           onQuickAddDone={() => setParams({}, { replace: true })}
+          accountRequest={accountRequest}
         />
-        <MovementsPanel onEdit={onEditTransaction} />
+        <MovementsPanel onEdit={onEditTransaction} accountId={filterId} />
 
         {f.summary && f.transactions.length > 0 && (
           <CollapsiblePanel
