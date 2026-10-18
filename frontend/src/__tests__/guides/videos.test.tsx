@@ -71,7 +71,9 @@ describe('Videoteca: catalogue', () => {
     expect(premium.every((v) => !v.youtubeId && !v.guide)).toBe(true);
     // `published` only means something on a Premium video.
     expect(VIDEOS.filter((v) => v.published).every((v) => v.premium)).toBe(true);
-    expect(premium.filter(isPublished).map((v) => v.number)).toEqual([17, 18, 19, 20, 27, 28, 29]);
+    expect(premium.filter(isPublished).map((v) => v.number)).toEqual([
+      17, 18, 19, 20, 27, 28, 29, 39, 40, 41, 42, 43, 44,
+    ]);
     // Shown (locked) once published, even without an id here.
     expect(isPublished(entry({ premium: true, published: true }))).toBe(true);
     expect(isPublished(entry({ premium: true }))).toBe(false);
@@ -144,11 +146,20 @@ describe('Videoteca in the app', () => {
     expect(screen.getAllByRole('link', { name: literal(tr('videos.opens')) })).toHaveLength(
       VIDEOS.filter((v) => v.youtubeId).length
     );
-    // Not on YouTube yet: neither the video nor its section are shown.
-    expect(screen.queryByText(VIDEOS.find((v) => !isPublished(v))!.title)).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: tr('videos.section.home') })
-    ).not.toBeInTheDocument();
+  });
+
+  it('hides a video that is not on YouTube yet, and a section with none', () => {
+    const saved = VIDEOS.splice(0, VIDEOS.length, entry({}), { ...VIDEOS[0], section: 'start' });
+    try {
+      renderWithProviders(<VideosView />);
+      expect(screen.queryByText('Un vídeo')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: tr('videos.section.home') })
+      ).not.toBeInTheDocument();
+      expect(isPublished(VIDEOS[0])).toBe(false);
+    } finally {
+      VIDEOS.splice(0, VIDEOS.length, ...saved);
+    }
   });
 
   it('shows a plain tile and no badge when a video has no thumbnail or duration', () => {
@@ -172,10 +183,6 @@ describe('Videoteca in the app', () => {
       const nav = screen.getByRole('navigation', { name: tr('videos.jump') });
       const buttons = within(nav).getAllByRole('button');
       expect(buttons).toHaveLength(videoGroups().length);
-      // Sections without published videos get no button.
-      expect(
-        within(nav).queryByRole('button', { name: literal(tr('videos.section.home')) })
-      ).not.toBeInTheDocument();
 
       const { section } = videoGroups()[1];
       fireEvent.click(

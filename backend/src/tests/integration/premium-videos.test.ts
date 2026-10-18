@@ -25,6 +25,12 @@ describe('Premium videos of the Videoteca', () => {
       '27': 'XMyY6z7269s',
       '28': '097frSE3Hac',
       '29': 'xA1dbQuHuSQ',
+      '39': 'LpONlSKhTCA',
+      '40': '9p0NXNZj8C8',
+      '41': 'uebBMXI8-40',
+      '42': 'Ah-CTg4FYG8',
+      '43': 'ajLH0b66HRs',
+      '44': 'Z4tKw-vI7s0',
     });
     expect(res.headers['cache-control']).toBe('private, no-store');
   });
