@@ -150,6 +150,8 @@ export function familyMinimum(
   m: MinimumAmounts = rentaState.minimums
 ): { total: number; parts: MinimumPart[] } {
   const parts: MinimumPart[] = [{ key: 'personal', amount: m.personal }];
+  // Igual que la renta (rentaCalc.computeMinimum): 65 o 75 años cumplidos a 31 de diciembre
+  // (LIRPF arts. 57.2 y 61; Manual práctico de Renta 2025 de la AEAT, «igual o superior a 65»).
   const age = input.age >= 75 ? m.over65 + m.over75 : input.age >= 65 ? m.over65 : 0;
   if (age > 0) parts.push({ key: 'age', amount: age });
   const share = input.sharedChildren ? 0.5 : 1;

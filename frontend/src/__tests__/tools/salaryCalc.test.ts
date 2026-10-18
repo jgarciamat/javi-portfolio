@@ -1,6 +1,6 @@
 import { WITHHOLDING_SCALE } from '@modules/tools/data/payroll2026';
 import { rentaState } from '@modules/tools/data/renta/state';
-import { applyScale } from '@modules/tools/domain/rentaCalc';
+import { applyScale, computeMinimum } from '@modules/tools/domain/rentaCalc';
 import type { RentaCcaa } from '@modules/tools/domain/rentaData';
 import {
   cleanSalaryInput,
@@ -125,6 +125,22 @@ describe('familyMinimum', () => {
     expect(
       familyMinimum({ age: 64, children: 0, under3: 0, sharedChildren: false, disability: 0 })
     ).toEqual({ total: 5550, parts: [{ key: 'personal', amount: 5550 }] });
+  });
+
+  it('uses the same age rule as the renta: 65 or 75 years turned by 31 December', () => {
+    const family = { children: 0, under3: 0, sharedChildren: false, disability: 0 as const };
+    const total = (age: number) => familyMinimum({ ...family, age }).total;
+    expect([64, 65, 66, 74, 75].map(total)).toEqual([5550, 6700, 6700, 6700, 8100]);
+    for (const age of [64, 65, 66, 74, 75, 80]) {
+      const renta = {
+        age,
+        disability: 0 as const,
+        children: [],
+        ascendants: [],
+        sharedChildren: false,
+      };
+      expect(total(age)).toBe(computeMinimum(renta, rentaState.minimums).total);
+    }
   });
 });
 
