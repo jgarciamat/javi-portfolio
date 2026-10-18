@@ -32,6 +32,7 @@
   "app.transactions.calendar.popup.balance": "Balance del día",
   "app.transactions.calendar.popup.close": "Cerrar",
   "app.export.options": "Opciones",
+  "app.monthActions.ariaLabel": "Acciones del mes",
   "app.export.month": "Exportar mes (CSV)",
   "app.export.annual": "Exportar año (CSV)",
   "app.report.open": "Informe anual (PDF)",

@@ -90,7 +90,15 @@ function SectionLoading() {
   );
 }
 
-function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTour: () => void }) {
+function TabContent({
+  dash,
+  onStartTour,
+  onImport,
+}: {
+  dash: UseDashboardReturn;
+  onStartTour: () => void;
+  onImport: () => void;
+}) {
   const { year, categories } = useFinances();
   const simple = SIMPLE_VIEWS[dash.tab];
   if (simple) return simple(dash.setTab);
@@ -116,6 +124,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
           onManageCategories={dash.openCategoryModal}
           onManageBudgets={() => dash.setTab('budgets')}
           onOpenTab={dash.setTab}
+          onImport={onImport}
         />
       );
   }
@@ -286,7 +295,7 @@ export function Dashboard() {
         {dash.tab === 'monthly' && (
           <div className="sticky-nav">
             <div className="sticky-nav-inner">
-              <MonthNavCard onImport={openImport} />
+              <MonthNavCard />
             </div>
           </div>
         )}
@@ -307,7 +316,7 @@ export function Dashboard() {
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
             <Suspense fallback={<SectionLoading />}>
-              <TabContent dash={dash} onStartTour={tour.start} />
+              <TabContent dash={dash} onStartTour={tour.start} onImport={openImport} />
             </Suspense>
           </ErrorBoundary>
         </div>

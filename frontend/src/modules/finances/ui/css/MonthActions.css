@@ -1,0 +1,49 @@
+/* ─── Export, recap and import of the month: three blue buttons above the figures ─── */
+.month-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1.1rem;
+}
+
+.month-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  /* Blue to dark blue, dark enough for white text (≥ 5:1 along the whole gradient). */
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(30, 58, 138, 0.35);
+  transition: filter 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.month-action:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow: 0 3px 14px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+.month-action:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.month-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .month-actions {
+    grid-template-columns: 1fr;
+  }
+}

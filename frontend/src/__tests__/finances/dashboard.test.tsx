@@ -164,7 +164,6 @@ describe('import', () => {
     api.monthApi.get.mockResolvedValue(f.overview({ transactions: [f.transaction()] }));
     renderWithProviders(<Dashboard />, { api, plan: true });
     await screen.findByText('Cena');
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
     fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
@@ -185,7 +184,6 @@ describe('import', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
   });
@@ -196,7 +194,6 @@ describe('import', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     const dialog = await screen.findByRole('dialog', { name: tr('billing.upgradeTitle') });
     expect(dialog).toHaveTextContent(

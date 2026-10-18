@@ -878,7 +878,6 @@ describe('more edge cases', () => {
       .mockResolvedValueOnce({ dryRun: false, imported: 1, duplicates: 0, invalid: 0, rows: [] });
     renderWithProviders(<Dashboard />, { api });
     await screen.findByText('Cena');
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     await screen.findByRole('dialog', { name: tr('app.import.title') });
     const bytes = new TextEncoder().encode('Fecha;Concepto;Importe\n01/03/2026;Pan;-1\n');

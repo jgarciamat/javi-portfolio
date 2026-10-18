@@ -3,11 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
-import { OptionsDropdown, type DropdownOption } from '@shared/components/OptionsDropdown';
 import { todayDateOnly } from '@shared/utils/format';
 import type { Transaction, TransactionType } from '@modules/finances/domain/types';
 import { useFinances } from '../../application/FinancesContext';
-import { useExportCSV } from '../../application/hooks/useExportCSV';
 import {
   useTransactionView,
   type TransactionViewMode,
@@ -22,7 +20,8 @@ import { CustomAlertsBanner } from './CustomAlertsBanner';
 import { ForecastPanel } from './ForecastPanel';
 import { GettingStarted } from './GettingStarted';
 import { RatePrompt } from './RatePrompt';
-import { MonthRecap, MonthRecapDialog } from './MonthRecap';
+import { MonthRecap } from './MonthRecap';
+import { MonthActions } from './MonthActions';
 import { MonthAlerts } from './MonthAlerts';
 import { AccountCards } from './AccountCards';
 import { SummaryCards } from './SummaryCards';
@@ -46,25 +45,11 @@ export function periodRange(
 
 // ─── Month navigator (sticky bar of the dashboard) ───────────────────────────
 
-export function MonthNavCard({ onImport }: { onImport?: () => void }) {
-  const { t } = useI18n();
-  const [recapOpen, setRecapOpen] = useState(false);
+export function MonthNavCard() {
   const format = useFormat();
-  const { exportMonthCSV } = useExportCSV();
+  const { t } = useI18n();
   const f = useFinances();
   const range = periodRange(f.year, f.month, f.periodStart, f.periodEnd);
-  const options: DropdownOption[] = [];
-  if (f.transactions.length > 0) {
-    options.push({
-      icon: '📥',
-      label: t('app.export.month'),
-      onClick: () => exportMonthCSV(f.transactions, f.summary, f.year, f.month),
-    });
-  }
-  if (f.summary && f.summary.transactionCount > 0) {
-    options.push({ icon: '✨', label: t('app.recap.open'), onClick: () => setRecapOpen(true) });
-  }
-  if (onImport) options.push({ icon: '📤', label: t('app.import.open'), onClick: onImport });
 
   return (
     <div className="card" data-tour="month-nav">
@@ -84,9 +69,6 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
                 </button>
               )}
             </span>
-            {options.length > 0 && (
-              <OptionsDropdown ariaLabel={t('app.export.options')} options={options} />
-            )}
           </div>
           {range && <div className="month-nav-range">{format.range(range.start, range.end)}</div>}
         </div>
@@ -94,13 +76,6 @@ export function MonthNavCard({ onImport }: { onImport?: () => void }) {
           {t('app.nav.next')} ›
         </button>
       </nav>
-      {recapOpen && f.summary && (
-        <MonthRecapDialog
-          summary={f.summary}
-          month={format.monthLabel(f.year, f.month)}
-          onClose={() => setRecapOpen(false)}
-        />
-      )}
     </div>
   );
 }
@@ -248,6 +223,8 @@ interface MonthlyViewProps {
   onManageCategories: () => void;
   onManageBudgets: () => void;
   onOpenTab: (tab: DashboardTab) => void;
+  /** Opens the bank statement importer (the free plan's limit is handled by the caller). */
+  onImport?: () => void;
 }
 
 export function MonthlyView({
@@ -255,6 +232,7 @@ export function MonthlyView({
   onManageCategories,
   onManageBudgets,
   onOpenTab,
+  onImport,
 }: MonthlyViewProps) {
   const { t } = useI18n();
   const f = useFinances();
@@ -282,6 +260,7 @@ export function MonthlyView({
         <MonthAlerts alerts={f.alerts} />
         <CustomAlertsBanner summary={f.summary} carryover={f.carryover} />
         {f.isCurrentPeriod && <CapturedPayments />}
+        <MonthActions onImport={onImport} />
         {f.summary && <SummaryCards summary={f.summary} carryover={f.carryover} />}
         {activeAccounts.length > 1 && (
           <AccountCards
