@@ -13,6 +13,16 @@
   flex-wrap: wrap;
 }
 
+/* The colour of the section (set on the screen by the dashboard) marks its title. */
+.dashboard-section .section-title {
+  border-left: 3px solid var(--section-color, transparent);
+  padding-left: 0.6rem;
+}
+
+.section-badge {
+  display: inline-flex;
+}
+
 .section-title {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
@@ -792,6 +802,7 @@
 }
 
 .burger-nav-icon {
+  color: var(--section-color, inherit);
   font-size: 1.2rem;
   width: 1.6rem;
   text-align: center;
