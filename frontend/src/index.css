@@ -370,6 +370,11 @@ input[type='date'] {
   margin-right: 0.15em;
 }
 
+/* TikTok's note is white on dark backgrounds and black on light ones. */
+.social-icon--tiktok {
+  color: var(--slate-100);
+}
+
 button > .icon:only-child,
 .burger-nav-icon > .icon {
   margin-right: 0;

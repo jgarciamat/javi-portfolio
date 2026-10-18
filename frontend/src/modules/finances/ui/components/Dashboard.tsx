@@ -31,6 +31,7 @@ import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
 import { BrandLogo } from '@shared/components/BrandLogo';
+import { SocialIcons } from '@shared/components/SocialLinks';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
 
@@ -143,6 +144,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           <h1 className="header-title">{t('app.header.title')}</h1>
           <p className="header-sub">{sectionLabel}</p>
         </div>
+        <SocialIcons />
       </div>
       <button
         type="button"

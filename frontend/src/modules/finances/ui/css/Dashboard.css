@@ -30,6 +30,33 @@
   gap: 0.75rem;
 }
 
+.header-socials {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+}
+
+.header-socials a {
+  display: inline-flex;
+  padding: 0.3rem;
+  border-radius: 8px;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.header-socials a:hover,
+.header-socials a:focus-visible {
+  background: var(--slate-800);
+  transform: translateY(-1px);
+}
+
+/* The header is crowded on a phone: the links stay in the login and sign-up pages. */
+@media (max-width: 760px) {
+  .header-socials {
+    display: none;
+  }
+}
+
 .header-logo {
   font-size: 1.75rem;
   line-height: 1;
