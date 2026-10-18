@@ -488,7 +488,7 @@
   "app.import.error.read": "No se ha podido leer el fichero. Comprueba que es un CSV o Norma 43.",
   "app.import.error.generic": "Error al importar",
   "app.accounts.title": "Cuentas",
-  "app.accounts.hint": "Saldo de cada cuenta = saldo inicial + movimientos + transferencias. El total suma las cuentas activas.",
+  "app.accounts.hint": "Saldo de cada cuenta = saldo inicial + movimientos + transferencias hasta el final del mes que estás viendo. El total suma las cuentas activas y coincide con el saldo disponible de ese mes.",
   "app.accounts.name": "Nombre de la cuenta",
   "app.accounts.initialBalance": "Saldo inicial",
   "app.accounts.add": "Añadir cuenta",

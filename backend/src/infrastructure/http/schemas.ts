@@ -29,6 +29,10 @@ const locale = z.enum(['es', 'en']).default('es');
 
 export const periodParams = z.object({ year, month });
 export const yearParam = z.object({ year });
+/** Balances of the accounts at the end of this period (both or none). */
+export const accountListQuery = z
+  .object({ year: year.optional(), month: month.optional() })
+  .refine((q) => (q.year === undefined) === (q.month === undefined), 'Indica año y mes');
 export const idParam = z.object({ id });
 
 // ─── Auth ────────────────────────────────────────────────────────────────────

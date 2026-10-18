@@ -488,7 +488,7 @@
   "app.import.error.read": "The file could not be read. Make sure it is a CSV or Norma 43 file.",
   "app.import.error.generic": "Import failed",
   "app.accounts.title": "Accounts",
-  "app.accounts.hint": "Each balance = initial balance + movements + transfers. The total adds up active accounts.",
+  "app.accounts.hint": "Each balance = initial balance + movements + transfers up to the end of the month you are viewing. The total adds up active accounts and matches that month's available balance.",
   "app.accounts.name": "Account name",
   "app.accounts.initialBalance": "Initial balance",
   "app.accounts.add": "Add account",

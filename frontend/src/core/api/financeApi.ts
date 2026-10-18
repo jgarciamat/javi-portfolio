@@ -189,8 +189,10 @@ export const customAlertApi = {
 };
 
 export const accountApi = {
-  getAll() {
-    return apiRequest<{ accounts: Account[]; total: number }>('/accounts');
+  /** With a period, the balances at its end (the same moment as that month's available money). */
+  getAll(period?: { year: number; month: number }) {
+    const query = period ? `?year=${period.year}&month=${period.month}` : '';
+    return apiRequest<{ accounts: Account[]; total: number }>(`/accounts${query}`);
   },
   create(dto: AccountInput) {
     return apiRequest<Account[]>('/accounts', { method: 'POST', body: jsonBody(dto) });

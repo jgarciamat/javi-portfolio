@@ -9,11 +9,15 @@ import { useFinances } from '../FinancesContext';
 export function useAccounts() {
   const { accountApi } = useApi();
   const settings = useOptionalSettings();
-  const { refresh, refreshAccounts } = useFinances();
+  const { refresh, refreshAccounts, year, month } = useFinances();
+  // The balances are those at the end of the month being viewed, as in the month view.
   const resource = useResource(async () => {
-    const [list, transfers] = await Promise.all([accountApi.getAll(), accountApi.transfers()]);
+    const [list, transfers] = await Promise.all([
+      accountApi.getAll({ year, month }),
+      accountApi.transfers(),
+    ]);
     return { ...list, transfers };
-  }, [accountApi]);
+  }, [accountApi, year, month]);
   const action = useAction();
 
   /** Balances and the carry-over of every month may change: refresh everything. */
