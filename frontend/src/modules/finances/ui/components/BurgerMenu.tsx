@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef, type CSSProperties, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { BrandLogo } from '@shared/components/BrandLogo';
@@ -94,7 +94,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
             <div key={group} className="burger-nav-group">
               {sections
                 .filter((s) => s.group === group)
-                .map(({ id, icon, labelKey }) => (
+                .map(({ id, icon, labelKey, color }) => (
                   <button
                     key={id}
                     className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
@@ -103,6 +103,7 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
                       onClose();
                     }}
                     aria-current={tab === id ? 'page' : undefined}
+                    style={{ '--section-color': color } as CSSProperties}
                   >
                     <span className="burger-nav-icon">
                       <Icon name={icon} />

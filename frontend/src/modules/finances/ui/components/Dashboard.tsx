@@ -1,4 +1,12 @@
-import { Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
@@ -286,7 +294,10 @@ export function Dashboard() {
           dash={dash}
           sectionLabel={
             <>
-              <Icon name={section.icon} size={14} /> {sectionLabel}
+              <span className="section-badge" style={{ color: section.color }}>
+                <Icon name={section.icon} size={14} />
+              </span>{' '}
+              {sectionLabel}
             </>
           }
         />
@@ -309,6 +320,7 @@ export function Dashboard() {
           aria-label={sectionLabel}
           tabIndex={-1}
           data-tour="section"
+          style={{ '--section-color': section.color } as CSSProperties}
         >
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
