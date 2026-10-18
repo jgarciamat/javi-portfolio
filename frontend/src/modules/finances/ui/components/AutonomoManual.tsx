@@ -1,4 +1,5 @@
 import { useI18n } from '@core/i18n/I18nContext';
+import { InvoiceImport } from './InvoiceImport';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
   EXPENSE_KINDS,
@@ -356,10 +357,12 @@ export function AutonomoManual({
   form,
   onChange,
   upTo,
+  year,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
   upTo: number;
+  year: number;
 }) {
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
@@ -383,6 +386,8 @@ export function AutonomoManual({
   return (
     <div className="autonomo-manual">
       <p className="section-hint">{t('app.autonomo.manualHint')}</p>
+
+      <InvoiceImport form={form} year={year} onChange={onChange} />
 
       <ProfilePanel profile={form.profile} onChange={setProfile} />
 

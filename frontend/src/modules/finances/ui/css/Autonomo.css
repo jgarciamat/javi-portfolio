@@ -172,3 +172,58 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ─── Importing the invoice books ────────────────────────────────────────── */
+.autonomo-import-books {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.autonomo-import-book {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+}
+
+.autonomo-import-book h4 {
+  margin: 0;
+}
+
+.autonomo-import-book .section-hint {
+  margin: 0;
+}
+
+.autonomo-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: auto;
+}
+
+/* A link that looks like the secondary button. */
+.autonomo-import-actions a.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.9rem;
+  text-decoration: none;
+}
+
+.autonomo-import-result,
+.autonomo-import-skipped {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+}
+
+.autonomo-import-result p {
+  margin: 0 0 0.35rem;
+}
+
+.autonomo-import-skipped {
+  padding-left: 1.1rem;
+  color: var(--slate-400);
+}

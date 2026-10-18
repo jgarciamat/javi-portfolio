@@ -5,6 +5,7 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
+import { buildXlsx } from '../../../scripts/xlsx';
 
 /** jsdom's File has no arrayBuffer(): give it one. */
 function statement(content: string | Uint8Array, name = 'extracto.csv'): File {
@@ -64,6 +65,36 @@ beforeEach(() => {
 afterEach(restoreTime);
 
 describe('ImportModal', () => {
+  it('reads an Excel statement like a CSV: first sheet, dates and amounts as the bank saved them', async () => {
+    const { api, upload } = setup();
+    const workbook = buildXlsx([
+      {
+        name: 'Movimientos',
+        rows: [
+          ['Fecha', 'Concepto', 'Importe'],
+          [{ date: '2026-03-02' }, 'MERCADONA', -54.3],
+          [{ date: '2026-03-03' }, 'NOMINA', 1800],
+        ],
+      },
+    ]);
+    upload(statement(workbook, 'extracto.xlsx'));
+    expect(await screen.findByText(/extracto\.xlsx · CSV/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.import.preview') }));
+    await waitFor(() => expect(api.transactionApi.import).toHaveBeenCalled());
+    expect(api.transactionApi.import.mock.calls[0][0]).toEqual([
+      expect.objectContaining({ date: '2026-03-02', description: 'MERCADONA', amount: -54.3 }),
+      expect.objectContaining({ date: '2026-03-03', description: 'NOMINA', amount: 1800 }),
+    ]);
+  });
+
+  it('refuses an Excel file with no data, and the old .xls format', async () => {
+    const { upload } = setup();
+    upload(statement(buildXlsx([{ name: 'Vacía', rows: [['solo cabecera']] }]), 'vacia.xlsx'));
+    expect(await screen.findByText(tr('app.import.error.read'))).toBeInTheDocument();
+    upload(statement('x', 'viejo.xls'));
+    expect(await screen.findByText(tr('app.import.error.read'))).toBeInTheDocument();
+  });
+
   it('maps CSV columns, previews and imports into the chosen account', async () => {
     const { api, upload, onImported, onClose } = setup();
     upload(statement(csv));

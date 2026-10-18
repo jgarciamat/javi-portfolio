@@ -227,7 +227,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
 
       <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
 
-      <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} />
+      <AutonomoManual form={manual} onChange={changeManual} upTo={quarter} year={year} />
 
       <ExtrasPanel
         extras={extras}

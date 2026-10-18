@@ -50,7 +50,7 @@ function FileStep({ imp }: { imp: ImportState }) {
       <label className="file-drop">
         <input
           type="file"
-          accept=".csv,.txt,.n43,.q43,.aeb,text/csv,text/plain"
+          accept=".csv,.xlsx,.txt,.n43,.q43,.aeb,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) void imp.loadFile(file);
