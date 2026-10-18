@@ -58,7 +58,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-ahorrar-el-20-por-ciento',
-    title: 'Cómo ahorrar el 20 % de tu sueldo (aunque ahora te parezca imposible)',
+    title: 'Cómo ahorrar el 20 % de tu sueldo (aunque parezca imposible)',
     description:
       'Pasos concretos para llegar a ahorrar el 20 % de tus ingresos: automatizar, recortar gastos invisibles y subir el porcentaje poco a poco.',
     intro:
@@ -302,7 +302,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'como-calcular-la-cuota-de-una-hipoteca',
-    title: 'Cómo calcular la cuota de una hipoteca y cuánto pagarás en intereses',
+    title: 'Cómo calcular la cuota de una hipoteca y sus intereses',
     description:
       'Qué influye en la cuota de una hipoteca o un préstamo, cómo se calcula con cuota fija y por qué el plazo cambia tanto el total que pagas.',
     intro:

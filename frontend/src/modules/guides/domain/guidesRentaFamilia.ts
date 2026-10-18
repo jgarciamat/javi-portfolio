@@ -7,7 +7,7 @@ const CHECK =
 export const GUIDES_RENTA_FAMILIA: Guide[] = [
   {
     slug: 'deduccion-maternidad-modelo-140',
-    title: 'Deducción por maternidad y modelo 140: cuánto es y cómo cobrarla cada mes',
+    title: 'Deducción por maternidad (modelo 140): cuánto es y cómo cobrarla',
     description:
       'Cuánto se deduce por cada hijo menor de 3 años, quién tiene derecho, cómo se suma la ayuda de guardería y cómo pedir el abono mensual con el modelo 140.',
     intro:
@@ -78,7 +78,7 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
   },
   {
     slug: 'familia-numerosa-deduccion-modelo-143',
-    title: 'Familia numerosa en la Renta: deducción y modelo 143 para cobrarla por adelantado',
+    title: 'Familia numerosa en la Renta: deducción y modelo 143',
     description:
       'Cuánto se deduce por familia numerosa general y especial, el incremento por cada hijo de más, otras deducciones del modelo 143 y ayudas de comunidades.',
     intro:
@@ -228,9 +228,9 @@ export const GUIDES_RENTA_FAMILIA: Guide[] = [
   },
   {
     slug: 'renta-a-pagar-o-a-devolver',
-    title: '¿Me sale a pagar o a devolver en la Renta? Cómo saberlo antes de presentar',
+    title: '¿Renta a pagar o a devolver? Cómo saberlo antes de presentar',
     description:
-      'Cómo se calcula el resultado del IRPF: base, mínimo personal y familiar, escala, deducciones y retenciones. Por qué unos pagan y otros reciben una devolución.',
+      'Cómo se calcula el resultado del IRPF: base, mínimos, escala, deducciones y retenciones, y por qué unos pagan y otros reciben devolución.',
     intro:
       'El resultado de la Renta es una resta: lo que debes de impuesto menos lo que ya te retuvieron durante el año. Si lo retenido supera el impuesto, te devuelven la diferencia; si no, pagas el resto.',
     sections: [

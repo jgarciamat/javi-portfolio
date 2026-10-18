@@ -7,9 +7,9 @@ const CHECK =
 export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   {
     slug: 'deducciones-renta-castilla-y-leon',
-    title: 'Deducciones de la Renta en Castilla y León: familia, vivienda y más',
+    title: 'Deducciones de la Renta en Castilla y León: familia y vivienda',
     description:
-      'Las principales deducciones autonómicas de Castilla y León en el IRPF: nacimiento, familia numerosa, guardería, alquiler joven, vivienda rural y límites de renta.',
+      'Principales deducciones autonómicas de Castilla y León en el IRPF: nacimiento, familia numerosa, guardería, alquiler joven, vivienda rural y límites.',
     intro:
       'Si vives en Castilla y León puedes aplicar deducciones propias de la comunidad, además de las estatales. Muchas no aparecen en el borrador de Hacienda, así que hay que pedirlas a mano.',
     sections: [
@@ -73,9 +73,9 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'deducciones-renta-comunitat-valenciana',
-    title: 'Deducciones de la Renta en la Comunitat Valenciana: guía por tipo de gasto',
+    title: 'Deducciones de la Renta en la Comunitat Valenciana: guía',
     description:
-      'Deducciones autonómicas de la Comunitat Valenciana en el IRPF: nacimiento, familia numerosa, guardería, salud, deporte, alquiler y vivienda, con sus límites de renta.',
+      'Deducciones autonómicas de la Comunitat Valenciana en el IRPF: nacimiento, familia numerosa, guardería, salud, alquiler y vivienda, con sus límites.',
     intro:
       'La Comunitat Valenciana tiene un amplio catálogo de deducciones propias, desde el nacimiento de un hijo hasta el dentista o el gimnasio. Para casi todas hay un límite de renta que conviene mirar primero.',
     sections: [
@@ -134,9 +134,9 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'deduccion-alquiler-vivienda-habitual-renta',
-    title: 'Deducción por alquiler de vivienda habitual en la Renta: quién puede aplicarla',
+    title: 'Deducción por alquiler de vivienda habitual en la Renta',
     description:
-      'Qué hay de la deducción estatal por alquiler (contratos anteriores a 2015), ayudas de comunidades como Castilla y León y la Comunitat Valenciana y reducciones para propietarios.',
+      'Deducción estatal por alquiler (contratos anteriores a 2015), ayudas de Castilla y León y Comunitat Valenciana y reducciones para propietarios.',
     intro:
       'Si pagas alquiler, quizá puedas recuperar una parte en la Renta. La deducción estatal solo vale para contratos antiguos, pero muchas comunidades autónomas tienen ayudas propias.',
     sections: [
@@ -200,9 +200,9 @@ export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [
   },
   {
     slug: 'planes-de-pensiones-limite-renta',
-    title: 'Planes de pensiones y Renta: límite de aportación y cuánto te ahorras',
+    title: 'Planes de pensiones y Renta: límite de aportación y ahorro',
     description:
-      'Cuánto puedes aportar a un plan de pensiones con ventaja fiscal en 2026: 1.500 € de límite general, aumentos de empresa y autónomos, 30 % de tus rendimientos.',
+      'Cuánto puedes aportar a un plan de pensiones con ventaja fiscal en 2026: 1.500 € de límite general, aumentos de empresa y autónomos y tope del 30 %.',
     intro:
       'Las aportaciones a un plan de pensiones reducen la base de tu declaración de la Renta, y por tanto el impuesto que pagas. Pero tienen límites, y pasarse no sirve de nada.',
     sections: [

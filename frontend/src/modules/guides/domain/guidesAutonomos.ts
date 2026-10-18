@@ -7,7 +7,7 @@ const CHECK =
 export const GUIDES_AUTONOMOS: Guide[] = [
   {
     slug: 'modelo-130-paso-a-paso',
-    title: 'Modelo 130 paso a paso: cómo se calcula el pago fraccionado del IRPF',
+    title: 'Modelo 130 paso a paso: cálculo del pago fraccionado del IRPF',
     description:
       'Quién debe presentar el modelo 130, qué casillas rellenar, cómo se calcula el 20 % del rendimiento neto y qué pasa si el resultado sale negativo.',
     intro:
@@ -73,7 +73,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
   },
   {
     slug: 'cuota-autonomos-2026-por-tramos',
-    title: 'Cuota de autónomos 2026 por tramos de ingresos: tabla y cómo elegir tu base',
+    title: 'Cuota de autónomos 2026 por tramos: tabla y cómo elegir base',
     description:
       'Los 15 tramos de cotización de autónomos en 2026 según tus rendimientos netos, el tipo del 31,5 %, la cuota mínima y máxima de cada tramo y un ejemplo.',
     intro:
@@ -135,7 +135,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
   },
   {
     slug: 'gastos-deducibles-autonomo',
-    title: 'Gastos deducibles de un autónomo: qué puedes restar y con qué límites',
+    title: 'Gastos deducibles de un autónomo: qué restar y con qué límites',
     description:
       'Suministros al 30 %, vehículo, comidas con límite de 26,67 € al día, seguro de salud y otros gastos que un autónomo puede deducir, y cuáles no.',
     intro:
@@ -214,9 +214,9 @@ export const GUIDES_AUTONOMOS: Guide[] = [
   },
   {
     slug: 'fechas-modelos-trimestrales-autonomos-2026',
-    title: 'Calendario fiscal de autónomos 2026: fechas de los modelos trimestrales',
+    title: 'Calendario fiscal de autónomos 2026: fechas de los modelos',
     description:
-      'Fechas de presentación de los modelos 303, 130, 111 y 115 en 2026, además de los resúmenes anuales 390, 190 y 347, y qué hacer si el plazo cae en fin de semana.',
+      'Fechas de los modelos 303, 130, 111 y 115 en 2026, de los resúmenes 390, 190 y 347 y qué hacer si el plazo cae en fin de semana.',
     intro:
       'Presentar a tiempo evita recargos y sanciones. Este es el calendario de 2026 para los modelos trimestrales de un autónomo y los resúmenes anuales que llegan después.',
     sections: [
