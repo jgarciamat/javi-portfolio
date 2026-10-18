@@ -468,8 +468,13 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       await draft(2).expect(402);
       const billing = async () => (await request(ctx.app).get('/api/billing').set(user.auth)).body;
       expect((await billing()).usage.autonomoDrafts).toBe(1);
+      expect((await billing()).autonomoQuarters).toEqual([
+        { year: 2026, quarter: 3, used: 1 },
+        { year: 2026, quarter: 2, used: 1 },
+      ]);
       // The filing window of the second quarter closes on 20 July.
       ctx.clock.set('2026-07-21T10:00:00Z');
+      expect((await billing()).autonomoQuarters).toEqual([{ year: 2026, quarter: 3, used: 1 }]);
       expect((await draft(2).expect(402)).body.code).toBe('AUTONOMO_QUARTER_LOCKED');
       // A new quarter brings a new free draft.
       ctx.clock.set('2026-10-02T10:00:00Z');

@@ -1,5 +1,10 @@
 import { ConflictError } from '@domain/errors';
-import { SubscriptionProps, emptySubscription, newTrial } from '@domain/model/Subscription';
+import {
+  SubscriptionProps,
+  TERMS_VERSION,
+  emptySubscription,
+  newTrial,
+} from '@domain/model/Subscription';
 import { User } from '@domain/model/User';
 import {
   BillingEventRepository,
@@ -84,12 +89,13 @@ function setup(options: Partial<BillingOptions> = {}) {
     gateway,
     email,
     () => usage,
+    () => [{ year: 2026, quarter: 1, used: 1 }],
     () => 'es',
     { run: (work) => work() },
     clock,
     {
       appUrl: 'https://app.test',
-      displayPrices: { monthly: 2.99, yearly: 29.99, lifetime: 49, rentaPass: 10 },
+      displayPrices: { monthly: 3.49, yearly: 29.99, lifetime: 59, rentaPass: 10 },
       founderLimit: 1,
       lifetimeConfigured: true,
       rentaPassConfigured: true,
@@ -116,7 +122,52 @@ const live = (extra: Partial<SubscriptionProps> = {}): SubscriptionProps => ({
 });
 
 describe('BillingService', () => {
+  describe('terms of sale', () => {
+    it('asks nothing of someone who never accepted them, and records nothing', () => {
+      const { service, subs } = setup();
+      expect(service.overview('u1').terms).toEqual({
+        version: TERMS_VERSION,
+        acceptedVersion: null,
+        acceptedAt: null,
+        mustAccept: false,
+      });
+      expect(service.acceptTerms('u1').mustAccept).toBe(false);
+      expect(subs.has('u1')).toBe(false);
+    });
+
+    it('asks whoever accepted an earlier version to accept the current one, and keeps the proof', () => {
+      const { service, subs } = setup();
+      subs.set(
+        'u1',
+        live({ termsVersion: '2026-01-01', termsAcceptedAt: '2026-01-01T00:00:00.000Z' })
+      );
+      expect(service.overview('u1').terms).toMatchObject({
+        acceptedVersion: '2026-01-01',
+        mustAccept: true,
+      });
+      expect(service.acceptTerms('u1')).toEqual({
+        version: TERMS_VERSION,
+        acceptedVersion: TERMS_VERSION,
+        acceptedAt: NOW.toISOString(),
+        mustAccept: false,
+      });
+      expect(subs.get('u1')).toMatchObject({
+        termsVersion: TERMS_VERSION,
+        termsAcceptedAt: NOW.toISOString(),
+        status: 'active',
+        stripeSubscriptionId: 'sub_1',
+      });
+      expect(service.overview('u1').terms.mustAccept).toBe(false);
+    });
+  });
+
   describe('catalog and overview', () => {
+    it('includes the self-employed drafts of each quarter that can be drafted', () => {
+      expect(setup().service.overview('u1').autonomoQuarters).toEqual([
+        { year: 2026, quarter: 1, used: 1 },
+      ]);
+    });
+
     it('shows a user without subscription as free, with an empty subscription', () => {
       const { service } = setup();
       const overview = service.overview('u1');

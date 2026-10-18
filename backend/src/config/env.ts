@@ -49,9 +49,9 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_SUBJECT: z.string().default('mailto:support@finanverso.app'),
   /** Prices shown in the UI (must match the Stripe prices, VAT included). */
-  PRICE_MONTHLY: z.coerce.number().positive().default(2.99),
-  PRICE_YEARLY: z.coerce.number().positive().default(24.99),
-  PRICE_LIFETIME: z.coerce.number().positive().default(49),
+  PRICE_MONTHLY: z.coerce.number().positive().default(3.49),
+  PRICE_YEARLY: z.coerce.number().positive().default(29.99),
+  PRICE_LIFETIME: z.coerce.number().positive().default(59),
   PRICE_RENTA_PASS: z.coerce.number().positive().default(10),
   FOUNDER_LIMIT: z.coerce.number().int().nonnegative().default(100),
   AFFILIATES_FILE: z.string().optional(),

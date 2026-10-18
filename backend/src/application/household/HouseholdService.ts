@@ -23,6 +23,11 @@ export interface HouseholdStatus {
   /** Invitation waiting to be used (the code itself is only shown when it is created). */
   pendingInvite: { expiresAt: string } | null;
   maxMembers: number;
+  /**
+   * The owner no longer has Premium: nothing is shared (the member sees their own data) until
+   * the owner renews; the membership is kept.
+   */
+  paused: boolean;
 }
 
 /** Lets two people work on the same data without ever mixing it up with anyone else's. */
@@ -57,6 +62,7 @@ export class HouseholdService {
         members: [],
         pendingInvite: null,
         maxMembers: HOUSEHOLD_MAX_MEMBERS,
+        paused: !this.entitlements.isPremium(ownerId),
       };
     }
     const members = this.household.membersOf(userId).map((m) => this.person(m.memberId));
@@ -68,6 +74,7 @@ export class HouseholdService {
       members,
       pendingInvite: valid ? { expiresAt: valid.expiresAt } : null,
       maxMembers: HOUSEHOLD_MAX_MEMBERS,
+      paused: members.length > 0 && !this.entitlements.isPremium(userId),
     };
   }
 

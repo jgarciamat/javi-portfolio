@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { TERMS_VERSION } from '@domain/model/Subscription';
 import { TestContext, TestUser, createTestApp, createUser } from '../helpers/testApp';
 
 describe('Buying Premium: consent, confirmation and refunds', () => {
@@ -35,9 +36,35 @@ describe('Buying Premium: consent, confirmation and refunds', () => {
     await checkout({ acceptTerms: true, waiveWithdrawal: true }).expect(200);
     expect(ctx.container.repos.subscriptions.get(user.id)).toMatchObject({
       termsAcceptedAt: '2026-03-15T12:00:00.000Z',
-      termsVersion: '2026-10-14',
+      termsVersion: TERMS_VERSION,
       withdrawalWaivedAt: '2026-03-15T12:00:00.000Z',
     });
+  });
+
+  it('asks a buyer who accepted earlier terms to accept the current ones, and records it', async () => {
+    expect((await billing()).terms).toMatchObject({ version: TERMS_VERSION, mustAccept: false });
+    const subs = ctx.container.repos.subscriptions;
+    subs.save({
+      ...subs.get(user.id)!,
+      termsVersion: '2026-10-14',
+      termsAcceptedAt: '2026-01-01T00:00:00.000Z',
+    });
+    expect((await billing()).terms).toMatchObject({
+      acceptedVersion: '2026-10-14',
+      mustAccept: true,
+    });
+    const accepted = await request(ctx.app)
+      .post('/api/billing/terms/accept')
+      .set(user.auth)
+      .expect(200);
+    expect(accepted.body).toEqual({
+      version: TERMS_VERSION,
+      acceptedVersion: TERMS_VERSION,
+      acceptedAt: '2026-03-15T12:00:00.000Z',
+      mustAccept: false,
+    });
+    expect((await billing()).terms.mustAccept).toBe(false);
+    await request(ctx.app).post('/api/billing/terms/accept').expect(401);
   });
 
   it('confirms every purchase by e-mail, once', async () => {

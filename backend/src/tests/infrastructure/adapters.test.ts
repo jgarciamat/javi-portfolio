@@ -103,9 +103,9 @@ describe('config', () => {
       rentaPass: null,
     });
     expect(config.billing.displayPrices).toEqual({
-      monthly: 2.99,
-      yearly: 24.99,
-      lifetime: 49,
+      monthly: 3.49,
+      yearly: 29.99,
+      lifetime: 59,
       rentaPass: 10,
     });
   });

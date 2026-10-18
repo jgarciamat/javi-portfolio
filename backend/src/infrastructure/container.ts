@@ -399,6 +399,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
         imports: repos.imports.count(userId),
         movements: repos.transactions.count(userId),
       }),
+      (userId) => tax.draftQuarters(userId),
       (userId) => repos.settings.get(userId).locale,
       uow,
       clock,

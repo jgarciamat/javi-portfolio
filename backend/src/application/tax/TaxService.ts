@@ -14,6 +14,13 @@ import { ExpenseLine, manualMovements } from '@domain/services/autonomo-expenses
 import { BusinessMovement, YearTax, yearlyTax } from '@domain/services/tax';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
+/** Drafts prepared for one quarter. */
+export interface QuarterDraftUsage {
+  year: number;
+  quarter: 1 | 2 | 3 | 4;
+  used: number;
+}
+
 export interface BusinessCategoryView {
   categoryId: string;
   categoryName: string;
@@ -98,6 +105,17 @@ export class TaxService {
   draftsThisQuarter(userId: string): number {
     const { year, quarter } = quarterOf(this.clock.now());
     return this.drafts.count(userId, year, quarter);
+  }
+
+  /**
+   * Drafts prepared for each quarter the free plan can draft today (the current one and, while
+   * it can be filed, the one just ended), so the plan screen knows which of them is used up.
+   */
+  draftQuarters(userId: string): QuarterDraftUsage[] {
+    return freeDraftQuarters(this.clock.now()).map((q) => ({
+      ...q,
+      used: this.drafts.count(userId, q.year, q.quarter),
+    }));
   }
 
   /** A draft downloaded as a PDF: the free plan can download one, Premium as many as it wants. */
