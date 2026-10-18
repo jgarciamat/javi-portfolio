@@ -31,7 +31,22 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
           value={form.withheld}
           onChange={(v) => set({ withheld: v })}
         />
+        <Field
+          id="renta-non-salary"
+          label={t('tools.renta.nonSalary')}
+          hint={t('tools.renta.nonSalaryHint')}
+          value={form.nonSalary}
+          onChange={(v) => set({ nonSalary: v })}
+        />
       </div>
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={form.retired}
+          onChange={(e) => set({ retired: e.target.checked })}
+        />
+        <span>{t('tools.renta.retired')}</span>
+      </label>
       <p className="section-hint">{t('tools.renta.incomeHint')}</p>
       {gross > 0 && (
         <p className="renta-obligation" role="status">

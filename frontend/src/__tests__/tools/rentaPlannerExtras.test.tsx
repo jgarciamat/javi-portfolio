@@ -38,6 +38,16 @@ describe('Renta planner: work, contributions and savings', () => {
     expect(resultText()).not.toBe(afterMobility);
   });
 
+  it('takes pensions out of the low-pay deduction and drops the disability expenses of a pensioner', async () => {
+    render('18500');
+    await screen.findByText(new RegExp(tr('tools.renta.toPay')));
+    const before = resultText();
+    fill('tools.renta.nonSalary', '2000');
+    expect(resultText()).not.toBe(before);
+    fireEvent.click(screen.getByLabelText(tr('tools.renta.retired')));
+    expect(screen.getByLabelText(tr('tools.renta.retired'))).toBeChecked();
+  });
+
   it('adds savings to the result', async () => {
     render();
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));

@@ -234,6 +234,10 @@ export interface RentaInput {
   socialSecurity: number;
   /** Income tax already withheld by the payer. */
   withheld: number;
+  /** Part of the gross that is a pension or a benefit, not pay from a job: it does not count for the low-pay deduction. */
+  nonSalaryIncome?: number;
+  /** Pensioner: the extra expenses for a disability are only for people who work. */
+  retired?: boolean;
   /** Union fees, professional association and legal defence (already within their limits). */
   workExpensesExtra: number;
   /** Change of residence for work reasons. */
@@ -325,16 +329,23 @@ export function rentalNet(rental: RentalInput | null): number {
 
 /** Deductible expenses of work: the general amount, more with a disability or a move, plus the extra ones. */
 function workExpenses(input: RentaInput): number {
+  return generalExpenses(input) + positive(input.workExpensesExtra);
+}
+
+/** The "other expenses" of art. 19.2.f: 2,000 euros, more for a worker with a disability or who moved. */
+function generalExpenses(input: RentaInput): number {
   const { state, family } = input;
+  const disability = input.retired
+    ? 0
+    : family.disability >= 65
+    ? state.workExpenses.disability65
+    : family.disability >= 33
+    ? state.workExpenses.disability33
+    : 0;
   return (
     state.workExpenses.general +
-    (family.disability >= 65
-      ? state.workExpenses.disability65
-      : family.disability >= 33
-      ? state.workExpenses.disability33
-      : 0) +
-    (input.geographicMobility ? input.extras.geographicMobilityExtra : 0) +
-    positive(input.workExpensesExtra)
+    disability +
+    (input.geographicMobility ? input.extras.geographicMobilityExtra : 0)
   );
 }
 
@@ -344,6 +355,14 @@ export function computeRenta(input: RentaInput): RentaResult {
   const expenses = workExpenses(input);
   const netIncome = round2(
     Math.max(0, positive(input.gross) - positive(input.socialSecurity) - expenses)
+  );
+
+  // The Tax Agency measures the reduction on the net pay before the "other expenses" of art. 19.2.f.
+  const reductionBase = round2(
+    Math.max(
+      0,
+      positive(input.gross) - positive(input.socialSecurity) - positive(input.workExpensesExtra)
+    )
   );
 
   const rentNet = rentalNet(input.rental);
@@ -358,7 +377,7 @@ export function computeRenta(input: RentaInput): RentaResult {
   const reduction = round2(
     otherIncome > OTHER_INCOME_LIMIT
       ? 0
-      : Math.min(netIncome, positive(input.workReduction(netIncome)))
+      : Math.min(netIncome, positive(input.workReduction(reductionBase)))
   );
 
   const beforeReductions = netIncome - reduction + rentNet + imputed;
@@ -441,7 +460,10 @@ export function computeRenta(input: RentaInput): RentaResult {
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
   const lowPay = Math.min(
     quotaLeft,
-    lowPayDeduction(input.gross, Math.max(0, rentNet) + imputed + positive(input.savings))
+    lowPayDeduction(
+      Math.max(0, positive(input.gross) - positive(input.nonSalaryIncome ?? 0)),
+      Math.max(0, rentNet) + imputed + positive(input.savings)
+    )
   );
   if (lowPay > 0) {
     lines.push({

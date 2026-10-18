@@ -44,6 +44,10 @@ export interface RentaForm {
   gross: string;
   socialSecurity: string;
   withheld: string;
+  /** Pensions and benefits inside the gross: they are not pay from a job. */
+  nonSalary: string;
+  /** The income is a pension: no extra expenses for a disability. */
+  retired: boolean;
   /** Amount per work expense (union fees, legal defence...), by id. */
   workExpenses: Record<string, string>;
   mobility: boolean;
@@ -79,6 +83,8 @@ export const emptyForm = (initialIncome: string): RentaForm => ({
   gross: initialIncome,
   socialSecurity: '',
   withheld: '',
+  nonSalary: '',
+  retired: false,
   workExpenses: {},
   mobility: false,
   pension: '',
@@ -190,6 +196,8 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     gross: number(form.gross),
     socialSecurity: socialSecurityOf(form),
     withheld: number(form.withheld),
+    nonSalaryIncome: number(form.nonSalary),
+    retired: form.retired,
     workExpensesExtra: workExpensesOf(form, data.extras),
     geographicMobility: form.mobility,
     pensionPlan: number(form.pension),

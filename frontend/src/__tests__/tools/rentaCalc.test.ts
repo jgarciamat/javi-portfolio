@@ -549,6 +549,51 @@ describe('computeRenta with the real data', () => {
     expect(mother.refundable).toBe(1200);
   });
 
+  it('measures the work reduction on the net pay before the 2,000 € of other expenses', async () => {
+    const { loadCcaa } = await import('@modules/tools/data/renta');
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    const { rentaWorkExtras } = await import('@modules/tools/data/renta/estado-extra');
+    const { workReductionOf } = await import('@modules/tools/domain/rentaWork');
+    const base = {
+      gross: 17000,
+      socialSecurity: 1000,
+      state: rentaState,
+      ccaa: await loadCcaa('castilla-y-leon'),
+      extras: rentaWorkExtras,
+      workReduction: workReductionOf(rentaState),
+    };
+    const worker = computeRenta(input({ ...base, family: { ...alone, disability: 33 } }));
+    // 16,000 of net pay: 7,302 - 1.75 x (16,000 - 14,852); the 2,000 and the 3,500 come off after.
+    expect(worker.workReduction).toBe(5293);
+    expect(worker.netIncome).toBe(16000 - 2000 - 3500);
+    const pensioner = computeRenta(
+      input({ ...base, retired: true, family: { ...alone, disability: 33 } })
+    );
+    expect(pensioner.netIncome).toBe(16000 - 2000);
+    expect(pensioner.workReduction).toBe(5293);
+  });
+
+  it('leaves pensions and benefits out of the 340 € deduction for low pay', async () => {
+    const { loadCcaa } = await import('@modules/tools/data/renta');
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    const { rentaWorkExtras } = await import('@modules/tools/data/renta/estado-extra');
+    const { workReductionOf } = await import('@modules/tools/domain/rentaWork');
+    const base = {
+      gross: 18500,
+      socialSecurity: 1200,
+      state: rentaState,
+      ccaa: await loadCcaa('castilla-y-leon'),
+      extras: rentaWorkExtras,
+      workReduction: workReductionOf(rentaState),
+    };
+    const lowPayLine = (nonSalaryIncome?: number) =>
+      computeRenta(input({ ...base, nonSalaryIncome })).lines.find(
+        (l) => l.id === 'estado-rendimientos-trabajo-bajos'
+      );
+    expect(lowPayLine()).toBeUndefined();
+    expect(lowPayLine(1900)?.amount).toBe(lowPayDeduction(16600, 0));
+  });
+
   it('uses the disability amounts of La Rioja only for the descendants', async () => {
     const { loadCcaa } = await import('@modules/tools/data/renta');
     const { rentaState } = await import('@modules/tools/data/renta/state');
