@@ -19,7 +19,7 @@ import {
 } from './site.mjs';
 
 /** The TypeScript data of the app (guides, calculators), bundled once to read it from here. */
-async function load(entry) {
+export async function load(entry) {
   const outfile = join(
     tmpdir(),
     `prerender-${Date.now()}-${Math.random().toString(36).slice(2)}.mjs`
@@ -35,14 +35,10 @@ async function load(entry) {
   return import(pathToFileURL(outfile).href);
 }
 
-const { GUIDES, GUIDE_NOTICE, inlineParts, longDate } = await load(
-  'src/modules/guides/domain/guides.ts'
-);
+const { GUIDES, inlineParts, longDate } = await load('src/modules/guides/domain/guides.ts');
 const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts');
-const { guideVideo } = await load('src/modules/guides/domain/guideLinks.ts');
 const { TOOL_PAGES, faqOf, guidesOfTool } = await load('src/modules/tools/domain/toolPages.ts');
-const payroll = await load('src/modules/tools/data/payroll2026.ts');
-const reta = await load('src/modules/tools/data/reta2026.ts');
+const wall = await load('src/modules/guides/domain/signupWall.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
 const { yearlySavingPct } = await load('src/modules/billing/ui/pricing.ts');
 const hacienda = await load('src/modules/guides/domain/hacienda.ts');
@@ -50,7 +46,7 @@ const videos = await load('src/modules/guides/domain/videos.ts');
 const { SOCIAL_LINKS } = await load('src/core/config/socials.ts');
 const { brandTitle } = await load('src/shared/utils/pageTitle.ts');
 
-const MESSAGES = {
+export const MESSAGES = {
   es: JSON.parse(readFileSync('src/locales/es.json', 'utf8')),
   en: JSON.parse(readFileSync('src/locales/en.json', 'utf8')),
 };
@@ -73,16 +69,8 @@ export const pathIn = (path, lang) =>
   lang === 'en' ? (path === '/' ? '/en' : `/en${path}`) : path;
 export const urlOf = (path, lang = 'es') => `${ORIGIN}${pathIn(path, lang)}`;
 
-const {
-  HACIENDA_GUIDES,
-  HACIENDA_PATH,
-  SOURCE_CHECKED,
-  haciendaPath,
-  guideKey,
-  stepKey,
-  upTo,
-  withCampaign,
-} = hacienda;
+const { HACIENDA_GUIDES, HACIENDA_PATH, SOURCE_CHECKED, haciendaPath, guideKey, stepKey } =
+  hacienda;
 const { VIDEOS_PATH } = videos;
 
 /** The pages translated into English (the guides are only in Spanish). */
@@ -136,17 +124,41 @@ function pagesIn(lang) {
   ]
     .map(([to, text]) => `<li>${link(to, text)}</li>`)
     .join('')}</ul></nav>`;
-  const registerCta = (title, body, button) =>
-    `<section><h2>${esc(title)}</h2><p>${esc(body)}</p>${link(
-      '/login?mode=register',
-      button
-    )}</section>`;
-  // The invitation of the guides and the Videoteca (only in Spanish in the app).
-  const guideCta = registerCta(
-    'Controla tu dinero con Finanverso',
-    'Registra tus gastos, pon presupuestos y metas de ahorro y mira cómo evolucionas cada mes. Gratis para empezar, con 14 días de Premium de regalo.',
-    'Crear mi cuenta gratis'
-  );
+  // The invitation to create an account, as the app shows it to people without one (SignupWall):
+  // `wall` in place of a guide or a calculator, with the welcome video; `cta` under the lists.
+  const numbers = wall.wallNumbers();
+  const signupWall = (path, { kicker, variant = 'wall' } = {}) => {
+    const back = wall.isGatedPath(path);
+    const video = variant === 'wall' ? wall.welcomeVideo(videos.VIDEOS) : undefined;
+    const thumbnail = video && videos.videoThumbnail(video);
+    return `<section aria-labelledby="signup-wall-title">${
+      kicker ? `<p>${esc(kicker)}</p>` : ''
+    }<h2 id="signup-wall-title">${esc(t('wall.title'))}</h2><p>${esc(
+      t(variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
+    )}</p><p>${link(
+      back ? wall.registerHref(path) : '/login?mode=register',
+      t('wall.register')
+    )} ${link(back ? wall.loginHref(path) : '/login', t('wall.login'))}</p><p>${esc(
+      t('wall.note')
+    )}</p><ul aria-label="${esc(t('wall.benefitsLabel'))}">${wall.WALL_BENEFITS.map(
+      (id) => `<li>${esc(t(`wall.benefit.${id}`, { n: numbers[id] ?? '' }))}</li>`
+    ).join('')}</ul>${
+      video
+        ? `<p>${esc(t('wall.video', { min: wall.minutesOf(video) }))}</p><figure>${
+            thumbnail
+              ? `<img src="${esc(thumbnail)}" alt="" width="480" height="270" loading="lazy" />`
+              : ''
+          }<figcaption>🎬 ${esc(video.title)}</figcaption></figure>`
+        : ''
+    }</section>`;
+  };
+  /** What follows, by title only (the text is only for people with an account). */
+  const outline = (title, items) =>
+    items.length
+      ? `<section><h2>${esc(title)}</h2><ol>${items
+          .map((item) => `<li>${esc(item)}</li>`)
+          .join('')}</ol></section>`
+      : '';
 
   const appFeatures = [
     'overview',
@@ -376,7 +388,7 @@ function pagesIn(lang) {
         t('videos.cta')
       )}</p><ul>${GUIDES.map(
         (g) => `<li>${link(`/guias/${g.slug}`, g.title)}<p>${esc(g.description)}</p></li>`
-      ).join('')}</ul>${guideCta}${nav}</main>`,
+      ).join('')}</ul>${signupWall('/guias', { variant: 'cta' })}${nav}</main>`,
       nodes: [
         webPage({
           url: guidesUrl,
@@ -392,11 +404,12 @@ function pagesIn(lang) {
       inlineParts(text)
         .map((part) => (typeof part === 'string' ? esc(part) : link(part.to, part.label)))
         .join('');
+    // Without an account: the beginning of the guide and the titles of the rest (signupWall.ts).
     for (const g of GUIDES) {
       const path = `/guias/${g.slug}`;
       const url = urlOf(path);
-      const video = guideVideo(g.slug);
       const category = categoryOf(g.slug);
+      const teaser = wall.guideTeaser(g);
       const related = g.related.map((slug) => GUIDES.find((r) => r.slug === slug)).filter(Boolean);
       add({
         path,
@@ -407,29 +420,20 @@ function pagesIn(lang) {
           g.title
         )}</h1><p>${esc(g.intro)}</p><p>${esc('Actualizado')}: <time datetime="${g.updated}">${esc(
           longDate(g.updated)
-        )}</time></p>${g.sections
-          .map(
-            (s) =>
-              `<h2>${esc(s.heading)}</h2>${s.paragraphs
-                .map((p) => `<p>${paragraph(p)}</p>`)
-                .join('')}`
-          )
-          .join('')}${
-          g.sources
-            ? `<section><h2>Fuentes oficiales</h2><p>Consultadas el ${esc(
-                longDate(g.checked)
-              )}.</p><ul>${g.sources
-                .map((x) => `<li>${external(x.url, x.label)}</li>`)
-                .join('')}</ul><p>${esc(GUIDE_NOTICE)}</p></section>`
-            : ''
-        }</article>${g.tool ? `<p>${link(g.tool.to, `🧮 ${g.tool.label}`)}</p>` : ''}${
-          video ? `<p>${external(videos.videoUrl(video), `🎬 Vídeo: ${video.title}`)}</p>` : ''
-        }${guideCta}<section><h2>Sigue leyendo</h2><ul>${related
+        )}</time></p><h2>${esc(teaser.preview.heading)}</h2>${teaser.preview.paragraphs
+          .map((p) => `<p>${paragraph(p)}</p>`)
+          .join('')}${outline(t('wall.outline.guide'), teaser.outline)}</article>${signupWall(
+          path,
+          {
+            kicker: t('wall.kicker.guide'),
+          }
+        )}<section><h2>Sigue leyendo</h2><ul>${related
           .map((r) => `<li>${link(`/guias/${r.slug}`, r.title)}</li>`)
           .join('')}</ul><p>${link(VIDEOS_PATH, `🎬 ${t('videos.title')}`)} · ${link(
           HACIENDA_PATH,
           `🏛️ ${t('hacienda.title')}`
         )}</p></section>${nav}</main>`,
+        // No HowTo nor VideoObject: the steps and the video are not in what the page shows.
         nodes: [
           {
             '@type': 'Article',
@@ -444,36 +448,9 @@ function pagesIn(lang) {
             image: `${ORIGIN}/og-image.png`,
             author: { '@type': 'Person', name: 'Javi García' },
             publisher: { '@id': `${ORIGIN}/#organization` },
-            ...(video && { video: videoObject(video, videoDescription(video)) }),
           },
-          ...(g.howTo
-            ? [
-                {
-                  '@type': 'HowTo',
-                  '@id': `${url}#howto`,
-                  name: g.title,
-                  description: g.description,
-                  inLanguage: 'es',
-                  url,
-                  dateModified: g.updated,
-                  step: g.sections.map((s, i) => ({
-                    '@type': 'HowToStep',
-                    position: i + 1,
-                    name: s.heading.replace(/^\d+\.\s*/, ''),
-                    text: s.paragraphs
-                      .map((p) =>
-                        inlineParts(p)
-                          .map((x) => (typeof x === 'string' ? x : x.label))
-                          .join('')
-                      )
-                      .join(' '),
-                  })),
-                },
-              ]
-            : []),
           breadcrumbs(url, [home, ['Guías', guidesUrl], [g.title, url]]),
         ],
-        videos: video ? [video] : [],
       });
     }
   }
@@ -496,7 +473,7 @@ function pagesIn(lang) {
           `<li>${link(haciendaPath(g), t(guideKey(g, 'title')))}<p>${esc(
             t(guideKey(g, 'description'))
           )}</p></li>`
-      ).join('')}</ul>${nav}</main>`,
+      ).join('')}</ul>${signupWall(HACIENDA_PATH, { variant: 'cta' })}${nav}</main>`,
       nodes: [
         webPage({
           url: indexUrl,
@@ -513,7 +490,7 @@ function pagesIn(lang) {
       const url = urlOf(path, lang);
       const title = t(guideKey(g, 'title'));
       const description = t(guideKey(g, 'description'));
-      const video = videos.VIDEOS.find((v) => v.guide === g.id && v.youtubeId && !v.premium);
+      const { preview, outline: rest } = wall.haciendaTeaser(g);
       add({
         path,
         title: brandTitle(title),
@@ -521,57 +498,35 @@ function pagesIn(lang) {
         ogType: 'article',
         body: `<main><p>${link(HACIENDA_PATH, `← ${t('hacienda.back')}`)}</p><article><h1>${esc(
           title
-        )}</h1><p>${esc(t(guideKey(g, 'intro')))}</p><ol>${g.steps
-          .map(
-            (s) =>
-              `<li><h2>${esc(t(stepKey(g, s, 'title')))}</h2>${upTo(s.paragraphs)
-                .map((n) => `<p>${esc(t(stepKey(g, s, `p${n}`)))}</p>`)
-                .join('')}${
-                s.tip
-                  ? `<p>💡 ${esc(t('hacienda.tipLabel'))}: ${esc(t(stepKey(g, s, 'tip')))}</p>`
-                  : ''
-              }${
-                s.warn
-                  ? `<p>⚠️ ${esc(t('hacienda.warnLabel'))}: ${esc(t(stepKey(g, s, 'warn')))}</p>`
-                  : ''
-              }</li>`
-          )
-          .join('')}</ol><h2>${esc(t('hacienda.deadlines'))}</h2><ul>${upTo(g.deadlines)
-          .map((n) => `<li>${esc(withCampaign(t(guideKey(g, `deadline${n}`))))}</li>`)
-          .join('')}</ul>${
-          video
-            ? `<h2>${esc(t('hacienda.videos'))}</h2><p>${external(
-                videos.videoUrl(video),
-                `${t('hacienda.videoOwn')}: ${video.title}`
-              )}</p>`
-            : ''
-        }<p><time datetime="${SOURCE_CHECKED}">${esc(
-          t('hacienda.updated', { date: t('hacienda.sourceDate') })
-        )}</time></p><p>${esc(source)}</p><p>${esc(
-          t('hacienda.disclaimer')
-        )}</p></article>${nav}</main>`,
+        )}</h1><p>${esc(t(guideKey(g, 'intro')))}</p><ol><li><h2>${esc(
+          t(stepKey(g, preview.step, 'title'))
+        )}</h2>${preview.paragraphs
+          .map((n) => `<p>${esc(t(stepKey(g, preview.step, `p${n}`)))}</p>`)
+          .join('')}</li></ol>${outline(t('wall.outline.hacienda'), [
+          ...rest.map((step, i) => `${i + 2}. ${t(stepKey(g, step, 'title'))}`),
+          t('hacienda.deadlines'),
+          t('hacienda.links'),
+        ])}</article>${signupWall(path, {
+          kicker: t('wall.kicker.hacienda', { n: g.steps.length }),
+        })}${nav}</main>`,
+        // No HowTo nor VideoObject: the steps and the video are only for people with an account.
         nodes: [
           {
-            '@type': 'HowTo',
-            '@id': `${url}#howto`,
-            name: title,
+            '@type': 'Article',
+            '@id': `${url}#article`,
+            headline: title,
             description,
             inLanguage: lang,
             url,
+            mainEntityOfPage: url,
+            articleSection: t('hacienda.title'),
             dateModified: SOURCE_CHECKED,
-            step: g.steps.map((s, i) => ({
-              '@type': 'HowToStep',
-              position: i + 1,
-              name: t(stepKey(g, s, 'title')),
-              text: upTo(s.paragraphs)
-                .map((n) => t(stepKey(g, s, `p${n}`)))
-                .join(' '),
-            })),
-            ...(video && { video: videoObject(video, videoDescription(video)) }),
+            image: `${ORIGIN}/og-image.png`,
+            author: { '@type': 'Person', name: 'Javi García' },
+            publisher: { '@id': `${ORIGIN}/#organization` },
           },
           breadcrumbs(url, [home, [t('hacienda.title'), indexUrl], [title, url]]),
         ],
-        videos: video ? [video] : [],
       });
     }
   }
@@ -604,7 +559,7 @@ function pagesIn(lang) {
               )
               .join('')}</ul>`
         )
-        .join('')}${guideCta}${nav}</main>`,
+        .join('')}${signupWall(VIDEOS_PATH, { variant: 'cta' })}${nav}</main>`,
       nodes: [
         webPage({
           url,
@@ -629,63 +584,29 @@ function pagesIn(lang) {
     });
   }
 
-  // Calculators. The tax ones also carry their questions (visible, so also as FAQPage), their
-  // official sources with the day they were checked, and the notice that they are a guide.
-  const SOURCES = {
-    salary: {
-      date: payroll.PAYROLL_SOURCE_DATE,
-      links: [
-        payroll.PAYROLL_ORDER_URL,
-        payroll.WITHHOLDING_ALGORITHM_URL,
-        payroll.SMI_DEDUCTION_URL,
-      ],
-    },
-    reta: {
-      date: reta.RETA_SOURCE_DATE,
-      links: [reta.RETA_ORDER_URL, reta.LGSS_URL, reta.RETA_LAW_URL],
-    },
-  };
-  const dateIn = (iso) =>
-    new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'UTC',
-    }).format(new Date(`${iso}T00:00:00Z`));
+  // Calculators: without an account, what each one does and the questions it answers (by title
+  // only), then the invitation; the form, the results and the answers are for people with one.
   for (const tool of TOOL_PAGES) {
     const url = urlOf(tool.path, lang);
     const title = t(`tools.${tool.key}.title`);
     const description = t(`tools.${tool.key}.description`);
-    const faq = faqOf(tool).map((n) => ({
-      q: t(`tools.${tool.key}.faq${n}.q`),
-      a: t(`tools.${tool.key}.faq${n}.a`),
-    }));
-    const sources = SOURCES[tool.key];
-    const extra = sources
-      ? `<p>${esc(t(`tools.${tool.key}.disclaimer`))}</p><section><h2>${esc(
-          t('tools.faq.title')
-        )}</h2>${faq
-          .map(({ q, a }) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`)
-          .join('')}</section><section><h2>${esc(t('tools.sources.title'))}</h2><ul>${sources.links
-          .map((to, i) => `<li>${external(to, t(`tools.${tool.key}.source${i + 1}`))}</li>`)
-          .join('')}</ul><p>${esc(
-          t('tools.sources.checked', { date: dateIn(sources.date) })
-        )}</p></section>`
-      : '';
+    const questions = faqOf(tool).map((n) => t(`tools.${tool.key}.faq${n}.q`));
     add({
       path: tool.path,
       title,
       description,
-      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${extra}${registerCta(
-        t('tools.cta.title'),
-        t('tools.cta.body'),
-        t('tools.cta.button')
-      )}<section><h2>${esc(t('landing.learn.guides'))}</h2><ul>${guidesOfTool(tool.path)
+      body: `<main><h1>${esc(title)}</h1><p>${esc(description)}</p>${outline(
+        t('wall.outline.tool'),
+        questions
+      )}${signupWall(tool.path, { kicker: t('wall.kicker.tool') })}<section><h2>${esc(
+        t('landing.learn.guides')
+      )}</h2><ul>${guidesOfTool(tool.path)
         .map((g) => `<li>${link(`/guias/${g.slug}`, g.title)}</li>`)
         .join('')}</ul><p>${link(VIDEOS_PATH, `🎬 ${t('videos.title')}`)} · ${link(
         HACIENDA_PATH,
         `🏛️ ${t('hacienda.title')}`
       )}</p></section>${nav}</main>`,
+      // No FAQPage: the answers are not in what the page shows.
       nodes: [
         {
           '@type': 'WebApplication',
@@ -702,20 +623,6 @@ function pagesIn(lang) {
         },
         breadcrumbs(url, [home, [t(`tools.${tool.key}.nav`), url]]),
       ],
-      // Inside the page text, like the FAQ of the home page: the app puts its own copy.
-      bodyLd: faq.length
-        ? [
-            {
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: faq.map(({ q, a }) => ({
-                '@type': 'Question',
-                name: q,
-                acceptedAnswer: { '@type': 'Answer', text: a },
-              })),
-            },
-          ]
-        : [],
     });
   }
 
