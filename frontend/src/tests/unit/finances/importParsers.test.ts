@@ -59,6 +59,7 @@ describe('detectColumns + rowsFromCSV', () => {
     const mapping = detectColumns(table[0]);
     expect(mapping).toMatchObject({ date: 0, description: 2, amount: 3 });
     expect(rowsFromCSV(table, mapping)).toEqual({
+      review: [],
       rows: [
         { date: '2026-03-02', description: 'MERCADONA', amount: -54.3, category: null },
         { date: '2026-03-03', description: 'NOMINA', amount: 1800, category: null },
@@ -121,6 +122,7 @@ describe('Norma 43', () => {
 
   it('reads dates, signs, amounts and concepts', () => {
     expect(parseNorma43(file)).toEqual({
+      review: [],
       rows: [
         { date: '2026-03-02', description: 'COMPRA TARJETA MERCADONA VALENCIA', amount: -54.3 },
         { date: '2026-03-03', description: 'NOMINA MARZO', amount: 1800 },

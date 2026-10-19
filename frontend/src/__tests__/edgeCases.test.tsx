@@ -774,6 +774,7 @@ describe('more edge cases', () => {
       line('88'),
     ].join('\n');
     expect(parseNorma43(text)).toEqual({
+      review: [],
       rows: [
         { date: '2026-03-03', description: 'REFERENCIA', amount: 10 },
         { date: '2026-03-03', description: 'Movimiento', amount: 20 },
