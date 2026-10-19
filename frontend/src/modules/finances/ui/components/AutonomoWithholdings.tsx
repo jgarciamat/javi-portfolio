@@ -8,6 +8,7 @@ import {
 } from '../../domain/withholdings';
 import { Boxes } from './AutonomoDraftResult';
 import { WithholdingFormPreviews } from '@modules/taxforms/ui/FormPreviews';
+import { SedeFiles, sedeSourcesOfWithholdings } from './SedeFiles';
 import {
   emptyWithholding,
   withWithholding,
@@ -382,6 +383,7 @@ export function WithholdingsPanel({
         <Boxes title={t('app.autonomo.model', { model: '115' })} boxes={result.m115.boxes} />
       )}
       <WithholdingFormPreviews result={result} year={year} />
+      <SedeFiles sources={sedeSourcesOfWithholdings(result, year)} />
       <p className="section-hint">{t(key('note'))}</p>
     </section>
   );

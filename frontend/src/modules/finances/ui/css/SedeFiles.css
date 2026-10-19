@@ -1,0 +1,61 @@
+/* ─── Files for the sede of the AEAT ─────────────────────── */
+.sede-files {
+  margin-top: 1.25rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+
+.sede-files h4 {
+  margin: 0 0 0.4rem;
+}
+
+.sede-files > div > .autonomo-grid {
+  margin: 0.75rem 0;
+  /* Hints under some fields: line the inputs up from the top, not from the bottom. */
+  align-items: start;
+}
+
+.sede-files .autonomo-grid .field {
+  align-content: start;
+}
+
+.sede-files .renta-check {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.sede-files .field input {
+  min-width: 0;
+}
+
+.sede-file {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--slate-800);
+}
+
+.sede-file h5 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.sede-file .autonomo-checks-list {
+  margin-bottom: 0.6rem;
+}
+
+.sede-file .taxform-btn {
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+/* Errors stop the file: a red edge, as the form errors of the app. */
+.autonomo-check.sede-check--error {
+  border-left-color: rgba(248, 113, 113, 0.9);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.autonomo-check.sede-check--warn {
+  border-left-color: rgba(251, 191, 36, 0.85);
+  background: rgba(251, 191, 36, 0.08);
+}

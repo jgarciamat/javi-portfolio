@@ -218,3 +218,26 @@ Fuentes: páginas de ayuda técnica de la AEAT de cada predeclaración y de «Co
    - para el 303, citar el ejemplo oficial del Manual de IVA 2026 con sus cifras;
    - para el 130 y el 111, reproducir la geometría de los AcroForm medidos.
 5. Las vistas previas idénticas del 111, 115 y 130 serán exactas cuando el dueño genere una predeclaración vigente (§4.2) y se mida en local.
+
+## 7. Ficheros para importar en la sede (19-10-2026)
+
+La app escribe, en el dispositivo, el fichero de cada modelo según su diseño de registro para que el usuario lo importe en la sede, se identifique y lo presente él mismo. **Finanverso no presenta ni firma nada.** Código: `frontend/src/modules/finances/application/aeatFiles/` (tablas generadas con `frontend/scripts/aeatfiles/extract-designs.py`; escritor y lector de ida y vuelta comparten la misma tabla). Pantalla: «Descargar fichero para la sede», junto a las vistas previas de Autónomos (303, 130, 349, 390) y de las retenciones (111, 115).
+
+| Modelo | Diseño usado | ¿La sede admite el fichero? (ayuda técnica) | Nombre del fichero |
+|---|---|---|---|
+| 111 | `dr111e16v18.xls` (página 01, 1.000 posiciones) | Sí: botón «Importar», fichero de texto que se ajuste al diseño lógico vigente (`…/ayuda-tecnica/modelo-111.html`) | NIF + ejercicio + periodo + `.111` |
+| 115 | `DR115e15v13.xls` (página 01, 500) | Sí: «Importar», fichero «formato BOE» exportado o de programa externo (`modelo-115.html`); el formulario exporta «NIF, ejercicio, periodo y extensión .115» | `.115` |
+| 130 | `DR130e15v12.xls` (página 01, 600) | Sí: «Importar» (`modelo-130.html`) | `.130` |
+| 303 | `DR303e26v101.xlsx` (páginas 01, 03 y DID; 2026 y siguientes) | Sí: «Importar» en la ventana inicial del formulario 2026 (`modelo-303.html`) | `.303` |
+| 349 | `DR_Anexo_349.pdf` (registros tipo 1 y 2 de 500) | Sí: «Importar» del formulario, fichero «formato BOE» (`declaraciones-informativas-ayuda-tecnica/modelos-349-720.html`); más de 40.000 registros, TGVI online | `.349` |
+| 390 | `dr390e2025.xlsx` (páginas 1, 2, 2 bis, 3, 4, 6 y, con contenido, 7) | Sí, pero como **«Presentación (con fichero)» → «Leer declaración»**, con los campos **no editables** (`modelo-390/modelo-390-presentacion-mediante-fichero.html`) | `.390` |
+
+**NO CONFIRMADO (hay que probarlo importando un fichero en la sede):**
+- Codificación ISO-8859-1 en los ficheros `<T…>` (solo la fijan expresamente los diseños del 349, 347 y 190) y ausencia de salto de línea final.
+- 349: separación de registros con CR LF (el diseño no lo dice).
+- Campos «Versión del programa» y «NIF empresa desarrollo» del bloque `<AUX>` en blanco (son para entidades desarrolladoras registradas).
+- 390 de 2026: el diseño publicado es el de 2025; la app avisa.
+- Que la sede acepte la extensión `.111`/`.130`/`.303`/`.390` (la ayuda del 111 habla de «texto plano (.txt)»): si el selector no la admite, basta renombrar.
+- Clave de actividad del 390 (letra y dos cifras) y CNAE de 3 caracteres con prorrata: formato comprobado solo contra el diseño.
+
+**Fuera por ahora:** página 2 (régimen simplificado) y 5 (prorratas y sectores diferenciados) del 303; páginas 5 y 8 del 390; 303 de exonerados del 390 (página 4); autoliquidaciones complementarias o rectificativas; modelos 131, 180, 190 y 347 (aún no están en `develop`).
