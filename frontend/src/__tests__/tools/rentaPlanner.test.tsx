@@ -288,6 +288,25 @@ describe('Renta planner: free calculations', () => {
     expect(screen.getByText(tr('tools.renta.minimum.personal'))).toBeInTheDocument();
   });
 
+  it('shows the State and the regional half of the home bought before 2013 apart', async () => {
+    renderWithProviders(<RentaPlanner mode="local" initialIncome="42000" />, {
+      authenticated: false,
+    });
+    await choose('madrid');
+    const home = (await screen.findByText(/Vivienda habitual comprada antes de 2013/)).closest(
+      'li'
+    ) as HTMLElement;
+    fireEvent.click(within(home).getByRole('checkbox'));
+    fireEvent.change(within(home).getByRole('textbox'), { target: { value: '10000' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    // 7.5 % + 7.5 % of 9,040 (DT 18.ª LIRPF): 678 € in each quota.
+    for (const part of ['state', 'regional']) {
+      const label = new RegExp(`\\(${tr(`tools.renta.part.${part}`)}\\)`);
+      const line = (await screen.findByText(label)).closest('li') as HTMLElement;
+      expect(within(line).getByText(/678,00/)).toBeInTheDocument();
+    }
+  });
+
   it('is live and unlimited with Premium', async () => {
     const api = createFakeApi();
     api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));

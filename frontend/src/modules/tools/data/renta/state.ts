@@ -282,13 +282,17 @@ const deductions: Deduction[] = [
     group: 'housing',
     title: 'Vivienda habitual comprada antes de 2013 (régimen transitorio)',
     summary:
-      'Parte estatal: 7,5 % de lo que pagues al año por tu vivienda (capital, intereses y gastos), con una base máxima de 9.040 euros. Sale hasta 678 euros. Tu comunidad añade su propia parte.',
+      'El 15 % de lo que pagues al año por tu vivienda (capital, intereses y gastos), con una base máxima de 9.040 euros: hasta 1.356 euros, mitad en la parte estatal (7,5 %) y mitad en la autonómica (7,5 %).',
     kind: 'percent',
-    percent: 7.5,
+    // DT 18.ª LIRPF: 7.5 % State and, in the regional part, the community's own rate or else 7.5 %.
+    // Only Cataluña has its own (7.5 %, or 9 % with conditions, not computed here). AEAT, Manual de
+    // ayuda Renta 2025, 9.1.2 "Base de deducción y porcentajes", checked 19-10-2026.
+    percent: 15,
     baseLimit: 9040,
-    limit: 678,
+    limit: 1356,
+    regionalShare: 0.5,
     requirements:
-      'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. No se puede empezar hoy. Tu patrimonio debe subir al menos lo invertido y debes presentar declaración. El exceso sobre 9.040 no se traslada.',
+      'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. Tu patrimonio debe subir al menos lo invertido. En Cataluña el tramo autonómico puede ser del 9 % (compras antes del 30-7-2011 y otros requisitos): aquí se cuenta el 7,5 %.',
     url: `${VIVIENDA}/regimen-transitorio.html`,
   },
   {

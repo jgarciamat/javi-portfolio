@@ -1782,6 +1782,8 @@
   "tools.renta.line.imputed": "Renta imputada de inmuebles",
   "tools.renta.line.savingsBase": "Base del ahorro",
   "tools.renta.yourDeductions": "Lo que te da cada deducción",
+  "tools.renta.part.state": "parte estatal",
+  "tools.renta.part.regional": "parte autonómica",
   "tools.renta.childAids": "Ayudas por hijos: todas juntas",
   "tools.renta.childAidsHint": "Son tres capas distintas que se suman pero no se repiten.",
   "tools.renta.childAids.minimum": "1. Mínimo por descendientes (automático):",

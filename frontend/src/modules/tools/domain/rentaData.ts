@@ -61,6 +61,12 @@ export interface Deduction {
   baseLimit?: number;
   /** Limit on the taxpayer's base to apply it (the checker warns when the person is over it). */
   incomeLimit?: IncomeLimit;
+  /**
+   * A State deduction that is split between the two quotas: the share (0 to 1) that lowers the
+   * regional one (LIRPF arts. 67.1.b and 77.1.b: half of those of art. 68.2 to 68.5; DT 15.ª and
+   * 18.ª: the regional half of the rent and the home of the transitional regime). Unset: all State.
+   */
+  regionalShare?: number;
   /** Can be paid monthly in advance with a model (maternity: 140; large family and disability: 143). */
   advance?: AdvancePayment;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */

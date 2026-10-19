@@ -42,58 +42,6 @@
       "origenEsperado": "calculo-a-mano"
     },
     {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": "boxes.0595",
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 6541.08,
-      "obtenido": 7219.08,
-      "severidad": "alta",
-      "causa": "La deducción por inversión en vivienda habitual (régimen transitorio) solo tiene el tramo estatal del 7,5 % (estado-vivienda-habitual-transitorio); falta el tramo autonómico del 7,5 % en las comunidades sin porcentaje propio (Madrid y la mayoría): la deducción sale a la mitad (678 en vez de 1.356).",
-      "fuente": "DT 18.ª LIRPF y art. 78 (redacción a 31-12-2012); Manual práctico Renta 2025, cap. 16",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": "boxes.0610",
-      "concepto": "Cuota diferencial",
-      "esperado": -1058.92,
-      "obtenido": -380.92,
-      "severidad": "alta",
-      "causa": "La deducción por inversión en vivienda habitual (régimen transitorio) solo tiene el tramo estatal del 7,5 % (estado-vivienda-habitual-transitorio); falta el tramo autonómico del 7,5 % en las comunidades sin porcentaje propio (Madrid y la mayoría): la deducción sale a la mitad (678 en vez de 1.356).",
-      "fuente": "DT 18.ª LIRPF y art. 78 (redacción a 31-12-2012); Manual práctico Renta 2025, cap. 16",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": "boxes.0670",
-      "concepto": "Resultado de la declaración",
-      "esperado": -1058.92,
-      "obtenido": -380.92,
-      "severidad": "alta",
-      "causa": "La deducción por inversión en vivienda habitual (régimen transitorio) solo tiene el tramo estatal del 7,5 % (estado-vivienda-habitual-transitorio); falta el tramo autonómico del 7,5 % en las comunidades sin porcentaje propio (Madrid y la mayoría): la deducción sale a la mitad (678 en vez de 1.356).",
-      "fuente": "DT 18.ª LIRPF y art. 78 (redacción a 31-12-2012); Manual práctico Renta 2025, cap. 16",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.regionalDeductions",
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 678,
-      "obtenido": 0,
-      "severidad": "alta",
-      "causa": "La deducción por inversión en vivienda habitual (régimen transitorio) solo tiene el tramo estatal del 7,5 % (estado-vivienda-habitual-transitorio); falta el tramo autonómico del 7,5 % en las comunidades sin porcentaje propio (Madrid y la mayoría): la deducción sale a la mitad (678 en vez de 1.356).",
-      "fuente": "DT 18.ª LIRPF y art. 78 (redacción a 31-12-2012); Manual práctico Renta 2025, cap. 16",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
       "caso": "14-plan-pensiones-empresa-cataluna",
       "declaracion": "individual",
       "casilla": "0500",

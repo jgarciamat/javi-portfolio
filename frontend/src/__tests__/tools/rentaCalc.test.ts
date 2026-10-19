@@ -10,6 +10,7 @@ import {
   incomeFactor,
   isRefundable,
   rentalNet,
+  splitDeduction,
   mergeMinimums,
   type Family,
   type RentaInput,
@@ -534,6 +535,19 @@ describe('computeRenta with the real data', () => {
     );
   };
 
+  it('splits the home bought before 2013 in a State and a regional half (case 13 of the bank)', async () => {
+    // DT 18.ª LIRPF: 7.5 % State + 7.5 % regional of up to 9,040 €. Before: only the 678 € of the State.
+    const r = await run('madrid', 42000, alone, {
+      'estado-vivienda-habitual-transitorio': { on: true, amount: 10000 },
+    });
+    expect(r.stateDeductions).toBe(678);
+    expect(r.regionalDeductions).toBe(678);
+    expect(r.lines.filter((l) => l.id === 'estado-vivienda-habitual-transitorio')).toEqual([
+      expect.objectContaining({ scope: 'state', amount: 678 }),
+      expect.objectContaining({ scope: 'regional', amount: 678 }),
+    ]);
+  });
+
   it('puts a 30,000 € salary in a believable tax range in Madrid and Cataluña', async () => {
     for (const id of ['madrid', 'cataluna']) {
       const r = await run(id, 30000, alone);
@@ -649,5 +663,14 @@ describe('deduction for low pay', () => {
     );
     const rich = computeRenta(input({ gross: 30000, socialSecurity: 0 }));
     expect(rich.lines.some((l) => l.id === 'estado-rendimientos-trabajo-bajos')).toBe(false);
+  });
+});
+
+describe('splitDeduction', () => {
+  it('rounds the regional part and leaves the rest to the State, so both add up', () => {
+    // AEAT Manual 2025, c16 (renta-c16-03): 284.93 in two boxes of 50 %.
+    expect(splitDeduction(284.93, 0.5)).toEqual({ state: 142.46, regional: 142.47 });
+    expect(splitDeduction(1356, 0.5)).toEqual({ state: 678, regional: 678 });
+    expect(splitDeduction(300, 0)).toEqual({ state: 300, regional: 0 });
   });
 });

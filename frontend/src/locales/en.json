@@ -1782,6 +1782,8 @@
   "tools.renta.line.imputed": "Imputed income from properties",
   "tools.renta.line.savingsBase": "Savings base",
   "tools.renta.yourDeductions": "What each deduction gives you",
+  "tools.renta.part.state": "State part",
+  "tools.renta.part.regional": "regional part",
   "tools.renta.childAids": "Help for children: all together",
   "tools.renta.childAidsHint": "They are three different layers that add up but are never repeated.",
   "tools.renta.childAids.minimum": "1. Minimum for descendants (automatic):",

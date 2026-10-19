@@ -255,6 +255,18 @@ export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 
   return round2(Math.min(spentValue(d, choice), d.limit ?? Infinity) * factor);
 }
 
+/**
+ * The State and regional parts of a deduction with a regional `share`. The regional part is rounded
+ * and the State one is the rest, so the two always add up to the deduction (the AEAT Manual práctico
+ * de Renta 2025, c16, example of the rent of before 2015, checked 19-10-2026, puts "el 50 por 100
+ * del total de la deducción" in each box; it prints 142.46 twice for 284.93, we keep the odd cent
+ * in one part so the boxes add up to the deduction).
+ */
+export function splitDeduction(amount: number, share: number): { state: number; regional: number } {
+  const regional = round2(amount * share);
+  return { state: round2(amount - regional), regional };
+}
+
 /** The deductions that are paid out even when there is no tax to pay (maternity, large family, disability). */
 export const isRefundable = (d: Deduction): boolean =>
   /maternidad|familia-numerosa|discapacidad/.test(d.id);
@@ -577,6 +589,43 @@ function lowPayOf(input: RentaInput, otherIncome: number, quotaLeft: number) {
   return { amount, clear };
 }
 
+/** The chosen deductions: what each one gives, split by quota, and those the income rules out. */
+function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
+  const blocked: string[] = [];
+  const lines: DeductionLine[] = [];
+  const amountOf = (d: Deduction) => {
+    const choice = input.choices[d.id] ?? { on: false };
+    const factor = incomeFactor(d, limitBase(d), input.joint !== undefined);
+    if (choice.on && factor === 0) blocked.push(d.id);
+    return { on: choice.on, amount: deductionAmount(d, choice, factor) };
+  };
+  const line = (d: Deduction, scope: DeductionLine['scope'], amount: number) =>
+    lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });
+  let stateDeductions = 0;
+  let regionalDeductions = 0;
+  let refundable = 0;
+  for (const d of input.state.deductions) {
+    const { on, amount } = amountOf(d);
+    if (isRefundable(d)) {
+      refundable += amount;
+      if (on) line(d, 'state', amount);
+      continue;
+    }
+    // A State deduction with a regional part lowers each quota by its share, each up to its quota.
+    const parts = splitDeduction(amount, d.regionalShare ?? 0);
+    stateDeductions += parts.state;
+    regionalDeductions += parts.regional;
+    if (on) line(d, 'state', parts.state);
+    if (on && parts.regional > 0) line(d, 'regional', parts.regional);
+  }
+  for (const d of input.ccaa.deductions) {
+    const { on, amount } = amountOf(d);
+    regionalDeductions += amount;
+    if (on) line(d, 'regional', amount);
+  }
+  return { blocked, lines, stateDeductions, regionalDeductions, refundable };
+}
+
 /** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
 export function computeRenta(input: RentaInput): RentaResult {
   const { state, ccaa, family } = input;
@@ -631,29 +680,10 @@ export function computeRenta(input: RentaInput): RentaResult {
       (stateQuota + regionalQuota);
     minimumSavings[item.key] = round2(Math.max(0, saved));
   }
-  const blocked: string[] = [];
-  const lines: DeductionLine[] = [];
-  const amountOf = (d: Deduction, scope: DeductionLine['scope']): number => {
-    const choice = input.choices[d.id] ?? { on: false };
-    const factor = incomeFactor(
-      d,
-      limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }),
-      input.joint !== undefined
-    );
-    if (choice.on && factor === 0) blocked.push(d.id);
-    const amount = deductionAmount(d, choice, factor);
-    if (choice.on) lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });
-    return amount;
-  };
-  let stateDeductions = 0;
-  let regionalDeductions = 0;
-  let refundable = 0;
-  for (const d of state.deductions) {
-    const value = amountOf(d, 'state');
-    if (isRefundable(d)) refundable += value;
-    else stateDeductions += value;
-  }
-  for (const d of ccaa.deductions) regionalDeductions += amountOf(d, 'regional');
+  const { blocked, lines, stateDeductions, regionalDeductions, refundable } = deductionsOf(
+    input,
+    (d) => limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
+  );
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);

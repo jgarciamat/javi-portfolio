@@ -142,7 +142,12 @@ export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: numbe
           <ul className="renta-minimum">
             {result.lines.map((l) => (
               <li key={`${l.scope}-${l.id}`}>
-                <span>{l.title}</span>
+                <span>
+                  {l.title}
+                  {/* A State deduction with a regional half shows each part on its own line. */}
+                  {result.lines.filter((o) => o.id === l.id).length > 1 &&
+                    ` (${t(`tools.renta.part.${l.scope}`)})`}
+                </span>
                 <strong>{money(l.amount)}</strong>
               </li>
             ))}
