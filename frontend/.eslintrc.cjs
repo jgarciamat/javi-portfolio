@@ -1,4 +1,6 @@
 module.exports = {
+  // Tooling scripts (case bank, tax-form extractors, validators) are not part of the app project.
+  ignorePatterns: ['scripts/**'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2022,

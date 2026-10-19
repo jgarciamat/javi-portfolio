@@ -7,7 +7,7 @@
     "predev": "node scripts/copy-ocr.mjs",
     "dev": "vite",
     "prebuild": "node scripts/copy-ocr.mjs",
-    "build": "tsc && npm run test:seo && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
+    "build": "tsc -p tsconfig.build.json && npm run test:seo && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
     "preview": "vite preview",
     "sitemap": "node scripts/sitemap.mjs",
     "test:seo": "node --test scripts/seo/pages.test.mjs",
