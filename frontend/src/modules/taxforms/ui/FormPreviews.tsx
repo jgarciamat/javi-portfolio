@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { AutonomoDraft } from '@modules/finances/domain/types';
 import type { WithholdingResult } from '@modules/finances/domain/withholdings';
-import type { RentaInput, RentaResult } from '@modules/tools/domain/rentaCalc';
-import { form100, form130, form303, formWithholding, type FilledForm } from '../domain/values';
+import { form130, form303, formWithholding, type FilledForm } from '../domain/values';
 import { FormPreview } from './FormPreview';
 
 /** The previews of a screen, under a heading and the warning that they are not the official forms. */
@@ -52,27 +51,4 @@ export function WithholdingFormPreviews({
   );
   if (forms.length === 0) return null;
   return <Previews forms={forms} title={t('taxforms.title.withholdings')} />;
-}
-
-/** The draft of the Renta (modelo 100) with the boxes the planner works out. */
-export function RentaFormPreview({
-  result,
-  input,
-  year,
-}: {
-  result: RentaResult;
-  input: RentaInput;
-  year: number;
-}) {
-  const { t } = useI18n();
-  const forms = useMemo(() => {
-    try {
-      return [form100(result, input, year)];
-    } catch {
-      // A result saved on the device by an older version lacks parts of today's: no preview then.
-      return [];
-    }
-  }, [result, input, year]);
-  if (forms.length === 0) return null;
-  return <Previews forms={forms} title={t('taxforms.title.renta')} />;
 }

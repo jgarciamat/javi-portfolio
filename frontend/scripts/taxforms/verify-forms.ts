@@ -29,7 +29,7 @@ const TEXT: PreviewText = {
   title: 'Vista previa',
 };
 
-const MODELS: FormModel[] = ['130', '303', '111', '115', '100'];
+const MODELS: FormModel[] = ['130', '303', '111', '115'];
 
 void (async () => {
   const require = createRequire(join(frontend, 'package.json'));
@@ -58,9 +58,7 @@ void (async () => {
       }
     }
     const wanted = Object.keys(form.values);
-    // The reader takes the four-digit boxes of the Renta; the two-digit ones of its header (dates,
-    // codes, the rows of the family) are not amounts it reads.
-    const readable = model === '100' ? wanted.filter((id) => /^\d{4}$/.test(id)) : wanted;
+    const readable = wanted;
     const fieldMisses = wanted.filter((id) => !(`casilla.${id}` in typed));
     let line = `${model}: ${pdf.numPages} págs., ${wanted.length} casillas rellenadas, ${
       wanted.length - fieldMisses.length
@@ -70,17 +68,15 @@ void (async () => {
       line += ` · FALTAN ${fieldMisses.join(' ')}`;
     }
     const pages = await tokensFromPdf(pdf as unknown as PdfDocument);
-    // The Renta is too large for a fixture (25 pages): its round trip is checked here only.
-    if (model !== '100')
-      fixtures[model] = pages.map((tokens) =>
-        tokens.map((t) => ({
-          ...t,
-          x: Math.round(t.x * 10) / 10,
-          y: Math.round(t.y * 10) / 10,
-          ...(t.w !== undefined ? { w: Math.round(t.w * 10) / 10 } : {}),
-          ...(t.h !== undefined ? { h: Math.round(t.h * 10) / 10 } : {}),
-        }))
-      );
+    fixtures[model] = pages.map((tokens) =>
+      tokens.map((t) => ({
+        ...t,
+        x: Math.round(t.x * 10) / 10,
+        y: Math.round(t.y * 10) / 10,
+        ...(t.w !== undefined ? { w: Math.round(t.w * 10) / 10 } : {}),
+        ...(t.h !== undefined ? { h: Math.round(t.h * 10) / 10 } : {}),
+      }))
+    );
     const read = parseTaxModelTokens(pages);
     if (!read.ok) {
       failures++;
@@ -100,8 +96,7 @@ void (async () => {
         wrong.length ||
         extra.length ||
         read.data.model !== model ||
-        // The Renta prints its year on the layout (2025); the quarterly forms type it in.
-        (model !== '100' && year !== form.year)
+        year !== form.year
       ) {
         failures++;
         line += ` · MAL ${wrong.join(' ')} · DE MÁS ${extra.join(' ')}`;

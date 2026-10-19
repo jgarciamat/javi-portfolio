@@ -1,15 +1,6 @@
-import { computeRenta } from '@modules/tools/domain/rentaCalc';
-import { emptyForm, toInput, type RentaForm } from '@modules/tools/domain/rentaForm';
-import { workReductionOf } from '@modules/tools/domain/rentaWork';
-import { loadCcaa } from '@modules/tools/data/renta';
-import { rentaWorkExtras } from '@modules/tools/data/renta/estado-extra';
-import { rentaProperty } from '@modules/tools/data/renta/inmuebles';
-import { rentaState } from '@modules/tools/data/renta/state';
 import type { Result111, Result115 } from '@modules/finances/domain/withholdings';
 import { autonomoDraft } from '@test-utils/fixtures';
 import {
-  RENTA_PENDING,
-  form100,
   form130,
   form303,
   formWithholding,
@@ -41,7 +32,6 @@ describe('Writing a box as the form expects it', () => {
     expect(kindOf('303', '08')).toBe('percent');
     expect(kindOf('303', '65')).toBe('percent');
     expect(kindOf('130', '01')).toBe('amount');
-    expect(kindOf('100', '0003')).toBe('amount');
   });
 
   it('keeps the first value of a box', () => {
@@ -96,49 +86,5 @@ describe('The self-employed forms of a quarter', () => {
     });
     const m111 = { boxes: [{ box: '28', label: 'Suma', amount: 150 }] } as Result111;
     expect(formWithholding('111', m111, 2026, 4).values).toEqual({ '28': 150 });
-  });
-});
-
-/** A made-up return: pay, a rented flat, a pension plan, a child and a mother over 75. */
-async function renta(patch: Partial<RentaForm>) {
-  const form: RentaForm = { ...emptyForm('30000'), ccaaId: 'castilla-y-leon', ...patch };
-  const input = toInput(form, {
-    state: rentaState,
-    ccaa: await loadCcaa('castilla-y-leon'),
-    extras: rentaWorkExtras,
-    property: rentaProperty,
-    workReduction: workReductionOf(rentaState),
-  });
-  return { input, result: computeRenta(input) };
-}
-
-describe('The Renta (modelo 100)', () => {
-  it('fills the boxes the planner works out and marks the rest of the main ones', async () => {
-    const { input, result } = await renta({ socialSecurity: '1950', withheld: '4200' });
-    const form = form100(result, input, 2025);
-    expect(form.model).toBe('100');
-    expect(form.period).toBeNull();
-    expect(form.values['0003']).toBe(30000);
-    expect(form.values['0013']).toBe(1950);
-    expect(form.values['0609']).toBe(4200);
-    // Rents, plan and family are not in this return: their boxes stay empty, not zero.
-    for (const box of ['0156', '0492', '0513', '0515']) expect(form.values).not.toHaveProperty(box);
-    expect(form.pending).toContain('0596');
-    expect(form.pending.every((b) => RENTA_PENDING.includes(b) && !(b in form.values))).toBe(true);
-  });
-
-  it('adds the rents, the pension plan and the family minimums when there are', async () => {
-    const { input, result } = await renta({
-      rentalOn: true,
-      rentalIncome: '6000',
-      pension: '1500',
-      children: [{ age: '8', disability: 0 }],
-      ascendants: [{ over75: true, disability: 0 }],
-    });
-    const form = form100(result, input, 2025);
-    expect(form.values['0156']).toBe(result.rentalNet);
-    expect(form.values['0492']).toBe(result.pensionReduction);
-    expect(form.values['0513']).toBeGreaterThan(0);
-    expect(form.values['0515']).toBeGreaterThan(0);
   });
 });

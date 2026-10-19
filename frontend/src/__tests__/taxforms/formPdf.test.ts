@@ -44,15 +44,10 @@ describe('The layouts measured on the BOE', () => {
     const m303 = await loadLayout('303');
     expect(m303.pages).toHaveLength(6);
     expect(boxesOf(m303)).toEqual(expect.arrayContaining(['01', '27', '46', '71', '112', '73']));
-    const m100 = await loadLayout('100');
-    expect(m100.pages).toHaveLength(25);
-    expect(boxesOf(m100)).toEqual(expect.arrayContaining(['0003', '0435', '0595', '0670']));
-    // The made-up Renta of the round trip has no period: its year is printed on the form.
-    expect(sampleForm('100', m100).period).toBeNull();
   });
 
   it('keeps none of the Tax Agency branding', async () => {
-    for (const model of ['130', '111', '115', '303', '100'] as const) {
+    for (const model of ['130', '111', '115', '303'] as const) {
       const texts = (await loadLayout(model)).pages.flatMap((p) => p.t.map((t) => t[4]));
       expect(
         texts.filter((t) => /^Agencia Tributaria$|agenciatributaria|^MINISTERIO/.test(t))
@@ -120,8 +115,9 @@ describe('The PDF of a preview', () => {
         },
       ],
     };
+    // A yearly form (no period) with a box that repeats.
     const form: FilledForm = {
-      model: '100',
+      model: '130',
       year: 2025,
       period: null,
       values: { '0154': 10 },
@@ -135,19 +131,4 @@ describe('The PDF of a preview', () => {
       'casilla.0151': '',
     });
   });
-
-  it('builds the 25 pages of the Renta', async () => {
-    const layout = await loadLayout('100');
-    const form: FilledForm = {
-      model: '100',
-      year: 2025,
-      period: null,
-      values: { '0003': 30000 },
-      pending: ['0012'],
-    };
-    const doc = await PDFDocument.load(await buildFormPdf(layout, form, TEXT));
-    expect(doc.getPageCount()).toBe(25);
-    expect(doc.getForm().getTextField('casilla.0003').getText()).toBe('30.000,00');
-    expect(doc.getTitle()).toBe('Modelo 130 · 2026 3T');
-  }, 30000);
 });

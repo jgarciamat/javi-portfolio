@@ -2,20 +2,9 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithI18n } from '@test-utils/render';
 import { autonomoDraft } from '@test-utils/fixtures';
 import { FormPreview, fileName, previewText } from '@modules/taxforms/ui/FormPreview';
-import {
-  AutonomoFormPreviews,
-  RentaFormPreview,
-  WithholdingFormPreviews,
-} from '@modules/taxforms/ui/FormPreviews';
+import { AutonomoFormPreviews, WithholdingFormPreviews } from '@modules/taxforms/ui/FormPreviews';
 import type { FilledForm } from '@modules/taxforms/domain/values';
 import type { WithholdingResult } from '@modules/finances/domain/withholdings';
-import { computeRenta, type RentaInput, type RentaResult } from '@modules/tools/domain/rentaCalc';
-import { emptyForm, toInput } from '@modules/tools/domain/rentaForm';
-import { workReductionOf } from '@modules/tools/domain/rentaWork';
-import { loadCcaa } from '@modules/tools/data/renta';
-import { rentaWorkExtras } from '@modules/tools/data/renta/estado-extra';
-import { rentaProperty } from '@modules/tools/data/renta/inmuebles';
-import { rentaState } from '@modules/tools/data/renta/state';
 
 const draw = jest.fn(async (..._args: unknown[]) => undefined);
 /** Page and width of each drawing (the canvas itself is left out of the messages). */
@@ -55,16 +44,14 @@ describe('The words and the files of a preview', () => {
   it('names the files by model, year, period and page', () => {
     expect(fileName(form130, 'pdf')).toBe('modelo-130-2026-3T-vista-previa.pdf');
     expect(fileName(form130, 'png', 2)).toBe('modelo-130-2026-3T-vista-previa-pag2.png');
-    const renta = { ...form130, model: '100' as const, year: 2025, period: null };
-    expect(fileName(renta, 'pdf')).toBe('modelo-100-2025-vista-previa.pdf');
+    const yearly = { ...form130, year: 2025, period: null };
+    expect(fileName(yearly, 'pdf')).toBe('modelo-130-2025-vista-previa.pdf');
   });
 
-  it('uses the legend of the Renta only for the Renta', () => {
+  it('writes the legend and the title with the period, or only the year', () => {
     expect(previewText(t, form130).legend).toBe('taxforms.mark.legend');
     expect(previewText(t, form130).title).toContain('"period":"2026 3T"');
-    const renta = previewText(t, { ...form130, model: '100', period: null });
-    expect(renta.legend).toBe('taxforms.mark.legend100');
-    expect(renta.title).toContain('"period":"2025"'.replace('2025', '2026'));
+    expect(previewText(t, { ...form130, period: null }).title).toContain('"period":"2026"');
   });
 });
 
@@ -133,18 +120,18 @@ describe('A preview on the screen', () => {
 
   it('lists the boxes left for the draft and starts again with new figures', async () => {
     const renta: FilledForm = {
-      model: '100',
+      model: '130',
       year: 2025,
       period: null,
-      values: { '0003': 30000 },
-      pending: ['0596', '0604'],
+      values: { '01': 30000 },
+      pending: ['05', '07'],
     };
     const { rerender } = renderWithI18n(<FormPreview form={renta} label="Renta" />);
-    expect(screen.getByText(/0596, 0604/)).toBeInTheDocument();
+    expect(screen.getByText(/05, 07/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
     await screen.findByRole('button', { name: 'Ocultar vista previa' }, { timeout: 15000 });
     await act(async () => {
-      rerender(<FormPreview form={{ ...renta, values: { '0003': 31000 } }} label="Renta" />);
+      rerender(<FormPreview form={{ ...renta, values: { '01': 31000 } }} label="Renta" />);
     });
     expect(screen.getByRole('button', { name: 'Ver vista previa' })).toBeInTheDocument();
   }, 30000);
@@ -186,29 +173,6 @@ describe('The previews of each screen', () => {
     unmount();
     const { container } = renderWithI18n(
       <WithholdingFormPreviews result={result('none', 'none')} year={2026} />
-    );
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('shows the Renta, and nothing for a result saved by an older version', async () => {
-    const input = toInput(
-      { ...emptyForm('30000'), ccaaId: 'castilla-y-leon' },
-      {
-        state: rentaState,
-        ccaa: await loadCcaa('castilla-y-leon'),
-        extras: rentaWorkExtras,
-        property: rentaProperty,
-        workReduction: workReductionOf(rentaState),
-      }
-    );
-    const { unmount } = renderWithI18n(
-      <RentaFormPreview result={computeRenta(input)} input={input} year={2025} />
-    );
-    expect(screen.getByRole('heading', { name: /Modelo 100/ })).toBeInTheDocument();
-    unmount();
-    const broken = { minimum: {} } as unknown as RentaResult;
-    const { container } = renderWithI18n(
-      <RentaFormPreview result={broken} input={{} as RentaInput} year={2025} />
     );
     expect(container).toBeEmptyDOMElement();
   });

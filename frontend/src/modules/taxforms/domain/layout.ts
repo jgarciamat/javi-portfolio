@@ -4,7 +4,8 @@
  * rules, and the cell of each numbered box. Only texts and lines: no logos, emblems or barcodes.
  */
 
-export type FormModel = '130' | '303' | '111' | '115' | '100';
+// The Renta (modelo 100) has no preview: the owner removed it on 19-10-2026 (the planner works it out).
+export type FormModel = '130' | '303' | '111' | '115';
 
 /** x, y (baseline), size, flags (1 bold, 2 turned 90°), text, width it takes on the facsimile. */
 export type LayoutText = [number, number, number, number, string, number | null];
@@ -33,13 +34,12 @@ export interface FormLayout {
 export const BOLD = 1;
 export const TURNED = 2;
 
-/** The layouts are large (the Renta has 25 pages): each one is loaded only when it is shown. */
+/** The layouts are large: each one is loaded only when it is shown. */
 const LOADERS: Record<FormModel, () => Promise<{ default: unknown }>> = {
   '130': () => import('../data/130.json'),
   '303': () => import('../data/303.json'),
   '111': () => import('../data/111.json'),
   '115': () => import('../data/115.json'),
-  '100': () => import('../data/100.json'),
 };
 
 export async function loadLayout(model: FormModel): Promise<FormLayout> {

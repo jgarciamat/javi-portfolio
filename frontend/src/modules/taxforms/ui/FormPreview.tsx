@@ -19,7 +19,7 @@ export function previewText(t: Translate, form: FilledForm): PreviewText {
   return {
     banner: t('taxforms.mark.banner'),
     notice: t('taxforms.mark.notice'),
-    legend: t(form.model === '100' ? 'taxforms.mark.legend100' : 'taxforms.mark.legend'),
+    legend: t('taxforms.mark.legend'),
     pending: t('taxforms.mark.pending'),
     page: t('taxforms.mark.page', { n: '{n}', total: '{total}' }),
     title: t('taxforms.preview.docTitle', { model: form.model, period: `${form.year}${period}` }),

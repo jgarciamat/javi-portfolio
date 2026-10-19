@@ -19,5 +19,5 @@ export function sampleForm(model: FormModel, layout: FormLayout): FilledForm {
       else values[id] = Math.round(n * 1234.57 * (n % 7 === 0 ? -1 : 1) * 100) / 100;
     }
   }
-  return { model, year: 2026, period: model === '100' ? null : '3T', values, pending: [] };
+  return { model, year: 2026, period: '3T', values, pending: [] };
 }
