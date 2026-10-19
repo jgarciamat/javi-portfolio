@@ -1,0 +1,51 @@
+[
+  {
+    "slug": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+    "titulo": "Dos pisos alquilados: uno con beneficio y otro, a medias con su hermana, con pérdidas",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "alquileres inmueble a inmueble",
+      "cotitularidad 50 %",
+      "gastos anuales por días",
+      "amortización del mayor entre coste y valor catastral",
+      "reducción 60 % de contrato anterior al 26-5-2023",
+      "rendimiento negativo sin reducción",
+      "imputación por días a disposición"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p5-121-apartamento-temporada-y-garaje-malaga",
+    "titulo": "Apartamento de temporada y una plaza de garaje alquilada a una empresa vecina",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "alquiler de temporada sin reducción",
+      "local/garaje sin reducción",
+      "pendiente de años anteriores (0103-0104)",
+      "imputación por días a disposición",
+      "valor catastral revisado (1,1 %)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+    "titulo": "Dos viviendas en zona tensionada: bajada de renta (90 %) y primer alquiler a un joven (70 %)",
+    "comunidad": "cataluna",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "reducción 90 % (zona tensionada, bajada > 5 %)",
+      "reducción 70 % (primer alquiler a joven de 18 a 35)",
+      "límite de intereses y reparaciones por inmueble",
+      "exceso para 4 años (0108)"
+    ],
+    "alcance": "dentro"
+  }
+]

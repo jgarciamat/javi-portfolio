@@ -1,0 +1,164 @@
+{
+  "slug": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+  "banco": "p5",
+  "nombre": "Persona Ficticia 120",
+  "nif": "00000120M",
+  "domicilio": "Calle Ficticia 120, 47001 Valladolid (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "castilla-y-leon",
+  "titulo": "Dos pisos alquilados: uno con beneficio y otro, a medias con su hermana, con pérdidas",
+  "descripcion": "Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición: da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.",
+  "prueba": [
+    "alquileres inmueble a inmueble",
+    "cotitularidad 50 %",
+    "gastos anuales por días",
+    "amortización del mayor entre coste y valor catastral",
+    "reducción 60 % de contrato anterior al 26-5-2023",
+    "rendimiento negativo sin reducción",
+    "imputación por días a disposición"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "castilla-y-leon",
+          "age": "46",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "34000.0",
+          "socialSecurity": "2203.2",
+          "withheld": "5200.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "rentalOn": true,
+          "properties": [
+            {
+              "label": "Piso Delicias",
+              "share": "",
+              "rentedDays": "",
+              "otherDays": "",
+              "cadastral": "60000",
+              "cadastralBuilding": "36000",
+              "revised": false,
+              "cost": "95000",
+              "income": "8400",
+              "expenses": {
+                "intereses-financiacion": "900",
+                "reparacion-conservacion": "350",
+                "tributos-tasas": "380",
+                "comunidad-servicios-personales": "600",
+                "seguros": "190"
+              },
+              "pendingExcess": "",
+              "withheld": "",
+              "use": "home",
+              "contract": "before",
+              "tensioned": false,
+              "rentDrop": false,
+              "young": false,
+              "social": false,
+              "rehabilitated": false,
+              "irregular": false,
+              "relative": false
+            },
+            {
+              "label": "Piso heredado",
+              "share": "50",
+              "rentedDays": "181",
+              "otherDays": "",
+              "cadastral": "80000",
+              "cadastralBuilding": "48000",
+              "revised": false,
+              "cost": "70000",
+              "income": "3600",
+              "expenses": {
+                "intereses-financiacion": "0",
+                "reparacion-conservacion": "2400",
+                "tributos-tasas": "520",
+                "comunidad-servicios-personales": "720",
+                "seguros": "240"
+              },
+              "pendingExcess": "",
+              "withheld": "",
+              "use": "home",
+              "contract": "after",
+              "tensioned": false,
+              "rentDrop": false,
+              "young": false,
+              "social": false,
+              "rehabilitated": false,
+              "irregular": false,
+              "relative": false
+            }
+          ],
+          "unrented": []
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 34000,
+        "withheld": 5200,
+        "ss": 2203.2
+      }
+    ],
+    "inmuebles": [
+      {
+        "label": "Piso Delicias",
+        "income": 8400,
+        "expenses": {
+          "intereses-financiacion": 900,
+          "reparacion-conservacion": 350,
+          "tributos-tasas": 380,
+          "comunidad-servicios-personales": 600,
+          "seguros": 190
+        },
+        "cost": 95000,
+        "cadastral": 60000,
+        "building": 36000,
+        "use": "home",
+        "contract": "before"
+      },
+      {
+        "label": "Piso heredado",
+        "share": 50,
+        "rentedDays": 181,
+        "income": 3600,
+        "expenses": {
+          "intereses-financiacion": 0,
+          "reparacion-conservacion": 2400,
+          "tributos-tasas": 520,
+          "comunidad-servicios-personales": 720,
+          "seguros": 240
+        },
+        "cost": 70000,
+        "cadastral": 80000,
+        "building": 48000,
+        "use": "home",
+        "contract": "after"
+      }
+    ]
+  }
+}

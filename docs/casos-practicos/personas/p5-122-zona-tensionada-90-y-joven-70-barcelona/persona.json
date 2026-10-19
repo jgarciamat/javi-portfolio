@@ -1,0 +1,164 @@
+{
+  "slug": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+  "banco": "p5",
+  "nombre": "Persona Ficticia 122",
+  "nif": "00000122F",
+  "domicilio": "Calle Ficticia 122, 08001 Barcelona (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "cataluna",
+  "titulo": "Dos viviendas en zona tensionada: bajada de renta (90 %) y primer alquiler a un joven (70 %)",
+  "descripcion": "Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: 70 %. En el piso B, intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.",
+  "prueba": [
+    "reducción 90 % (zona tensionada, bajada > 5 %)",
+    "reducción 70 % (primer alquiler a joven de 18 a 35)",
+    "límite de intereses y reparaciones por inmueble",
+    "exceso para 4 años (0108)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "cataluna",
+          "age": "52",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "48000.0",
+          "socialSecurity": "3110.4",
+          "withheld": "9800.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "rentalOn": true,
+          "properties": [
+            {
+              "label": "Piso A",
+              "share": "",
+              "rentedDays": "",
+              "otherDays": "",
+              "cadastral": "110000",
+              "cadastralBuilding": "55000",
+              "revised": false,
+              "cost": "210000",
+              "income": "13200",
+              "expenses": {
+                "intereses-financiacion": "1500",
+                "reparacion-conservacion": "400",
+                "tributos-tasas": "620",
+                "comunidad-servicios-personales": "900",
+                "seguros": "260"
+              },
+              "pendingExcess": "",
+              "withheld": "",
+              "use": "home",
+              "contract": "after",
+              "tensioned": true,
+              "rentDrop": true,
+              "young": false,
+              "social": false,
+              "rehabilitated": false,
+              "irregular": false,
+              "relative": false
+            },
+            {
+              "label": "Piso B",
+              "share": "",
+              "rentedDays": "214",
+              "otherDays": "151",
+              "cadastral": "90000",
+              "cadastralBuilding": "50000",
+              "revised": false,
+              "cost": "180000",
+              "income": "6300",
+              "expenses": {
+                "intereses-financiacion": "5400",
+                "reparacion-conservacion": "3900",
+                "tributos-tasas": "540",
+                "comunidad-servicios-personales": "840",
+                "seguros": "220"
+              },
+              "pendingExcess": "",
+              "withheld": "",
+              "use": "home",
+              "contract": "after",
+              "tensioned": true,
+              "rentDrop": false,
+              "young": true,
+              "social": false,
+              "rehabilitated": false,
+              "irregular": false,
+              "relative": false
+            }
+          ]
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 48000,
+        "withheld": 9800,
+        "ss": 3110.4
+      }
+    ],
+    "inmuebles": [
+      {
+        "label": "Piso A",
+        "income": 13200,
+        "expenses": {
+          "intereses-financiacion": 1500,
+          "reparacion-conservacion": 400,
+          "tributos-tasas": 620,
+          "comunidad-servicios-personales": 900,
+          "seguros": 260
+        },
+        "cost": 210000,
+        "cadastral": 110000,
+        "building": 55000,
+        "use": "home",
+        "contract": "after",
+        "tensioned": true,
+        "rentDrop": true
+      },
+      {
+        "label": "Piso B",
+        "rentedDays": 214,
+        "otherDays": 151,
+        "income": 6300,
+        "expenses": {
+          "intereses-financiacion": 5400,
+          "reparacion-conservacion": 3900,
+          "tributos-tasas": 540,
+          "comunidad-servicios-personales": 840,
+          "seguros": 220
+        },
+        "cost": 180000,
+        "cadastral": 90000,
+        "building": 50000,
+        "use": "home",
+        "contract": "after",
+        "tensioned": true,
+        "young": true
+      }
+    ]
+  }
+}

@@ -29356,6 +29356,1546 @@
       "esperado": -500,
       "obtenido": -500,
       "estado": "coincide"
+    },
+    {
+      "caso": "p4-109-cripto-binance-ledger-staking-madrid",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "campo": "savings.0027",
+      "concepto": "Intereses (recompensas de staking)",
+      "esperado": 10,
+      "obtenido": 10,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-109-cripto-binance-ledger-staking-madrid",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "campo": "savings.0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "esperado": 10,
+      "obtenido": 10,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-109-cripto-binance-ledger-staking-madrid",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 23000,
+      "obtenido": 23000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-109-cripto-binance-ledger-staking-madrid",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 23010,
+      "obtenido": 23010,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-109-cripto-binance-ledger-staking-madrid",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "esperado": 4960,
+      "obtenido": 4960,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "esperado": 1575,
+      "obtenido": 1575,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 3385,
+      "obtenido": 3385,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 3385,
+      "obtenido": 3385,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0420",
+      "campo": "savings.0420",
+      "concepto": "Saldo positivo de ganancias de la base general",
+      "esperado": 2,
+      "obtenido": 2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 1495,
+      "obtenido": 1495,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0439",
+      "campo": "savings.pendingGainsOnGains",
+      "concepto": "Pérdidas de años anteriores compensadas con las ganancias",
+      "esperado": 1495,
+      "obtenido": 1495,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "savings.carry.gains",
+      "concepto": "Pérdidas que quedan para los años siguientes",
+      "esperado": 505,
+      "obtenido": 505,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "campo": "savings.0029",
+      "concepto": "Dividendos",
+      "esperado": 20,
+      "obtenido": 20,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0037",
+      "campo": "savings.0037",
+      "concepto": "Gastos de administración y custodia",
+      "esperado": 1,
+      "obtenido": 1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "campo": "savings.0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "esperado": 19,
+      "obtenido": 19,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 119,
+      "obtenido": 119,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "campo": "result.doubleTaxation",
+      "concepto": "Deducción por doble imposición internacional",
+      "esperado": 3,
+      "obtenido": 3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "campo": "savings.0029",
+      "concepto": "Dividendos",
+      "esperado": 30,
+      "obtenido": 30,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 1196,
+      "obtenido": 1196,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 1226,
+      "obtenido": 1226,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "campo": "result.doubleTaxation",
+      "concepto": "Deducción por doble imposición internacional",
+      "esperado": 4.5,
+      "obtenido": 4.5,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4652,
+      "obtenido": 4652,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "esperado": 300,
+      "obtenido": 300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 300,
+      "obtenido": 300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 300,
+      "obtenido": 300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4557,
+      "obtenido": 4557,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-115-derivados-quantfury-apalancado-baleares",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "esperado": 300,
+      "obtenido": 300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-115-derivados-quantfury-apalancado-baleares",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "esperado": 50,
+      "obtenido": 50,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-115-derivados-quantfury-apalancado-baleares",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 250,
+      "obtenido": 250,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-115-derivados-quantfury-apalancado-baleares",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 250,
+      "obtenido": 250,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-115-derivados-quantfury-apalancado-baleares",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "campo": "savings.0029",
+      "concepto": "Dividendos",
+      "esperado": 20,
+      "obtenido": 20,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "esperado": 230,
+      "obtenido": 230,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 130,
+      "obtenido": 130,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 150,
+      "obtenido": 150,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "campo": "result.doubleTaxation",
+      "concepto": "Deducción por doble imposición internacional",
+      "esperado": 3,
+      "obtenido": 3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "campo": "savings.0027",
+      "concepto": "Intereses (staking y Crypto Earn)",
+      "esperado": 80,
+      "obtenido": 80,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "campo": "savings.0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "esperado": 80,
+      "obtenido": 80,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 500,
+      "obtenido": 500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 580,
+      "obtenido": 580,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0420",
+      "campo": "savings.0420",
+      "concepto": "Saldo positivo de ganancias de la base general",
+      "esperado": 1,
+      "obtenido": 1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "campo": "savings.0027",
+      "concepto": "Intereses",
+      "esperado": 2,
+      "obtenido": 2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "campo": "savings.0029",
+      "concepto": "Dividendos",
+      "esperado": 400,
+      "obtenido": 400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "campo": "savings.0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "esperado": 402,
+      "obtenido": 402,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "esperado": 989,
+      "obtenido": 989,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "esperado": 50,
+      "obtenido": 50,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "esperado": 939,
+      "obtenido": 939,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "savings.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 1341,
+      "obtenido": 1341,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "campo": "result.doubleTaxation",
+      "concepto": "Deducción por doble imposición internacional",
+      "esperado": 60,
+      "obtenido": 60,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 4500,
+      "obtenido": 4500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 34000,
+      "obtenido": 34000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 34000,
+      "obtenido": 34000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 2203.2,
+      "obtenido": 2203.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 31796.8,
+      "obtenido": 31796.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 29796.8,
+      "obtenido": 29796.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 29796.8,
+      "obtenido": 29796.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0155",
+      "campo": "boxes.0155",
+      "concepto": "Suma de imputaciones de rentas inmobiliarias",
+      "esperado": 403.29,
+      "obtenido": 403.29,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 31784.09,
+      "obtenido": 31784.09,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 31784.09,
+      "obtenido": 31784.09,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 3323.11,
+      "obtenido": 3323.11,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 3172.77,
+      "obtenido": 3172.77,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 3323.11,
+      "obtenido": 3323.11,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 3172.77,
+      "obtenido": 3172.77,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 6495.88,
+      "obtenido": 6495.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 6495.88,
+      "obtenido": 6495.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 5200,
+      "obtenido": 5200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": 1295.88,
+      "obtenido": 1295.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": 1295.88,
+      "obtenido": 1295.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.rentalNet",
+      "concepto": "Rendimiento neto reducido del inmueble alquilado",
+      "esperado": 1584,
+      "obtenido": 1584,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.imputedIncome",
+      "concepto": "Imputación de rentas inmobiliarias",
+      "esperado": 403.29,
+      "obtenido": 403.29,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-120-dos-pisos-uno-con-perdidas-valladolid",
+      "declaracion": "individual",
+      "casilla": "0108",
+      "campo": "rental.excess",
+      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 19000,
+      "obtenido": 19000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 19000,
+      "obtenido": 19000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 1231.2,
+      "obtenido": 1231.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 17768.8,
+      "obtenido": 17768.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 15768.8,
+      "obtenido": 15768.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 2255.72,
+      "obtenido": 2255.72,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 13513.08,
+      "obtenido": 13513.08,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0155",
+      "campo": "boxes.0155",
+      "concepto": "Suma de imputaciones de rentas inmobiliarias",
+      "esperado": 516.85,
+      "obtenido": 516.85,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 18354.17,
+      "obtenido": 18354.17,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 18354.17,
+      "obtenido": 18354.17,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 6700,
+      "obtenido": 6700,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6990,
+      "obtenido": 6990,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 6700,
+      "obtenido": 6700,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 6990,
+      "obtenido": 6990,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 1254.75,
+      "obtenido": 1254.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 1213.45,
+      "obtenido": 1213.45,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1254.75,
+      "obtenido": 1254.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1213.45,
+      "obtenido": 1213.45,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2468.2,
+      "obtenido": 2468.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 2468.2,
+      "obtenido": 2468.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 900,
+      "obtenido": 900,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": 1568.2,
+      "obtenido": 1568.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": 1568.2,
+      "obtenido": 1568.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.rentalNet",
+      "concepto": "Rendimiento neto reducido del inmueble alquilado",
+      "esperado": 4324.24,
+      "obtenido": 4324.24,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.imputedIncome",
+      "concepto": "Imputación de rentas inmobiliarias",
+      "esperado": 516.85,
+      "obtenido": 516.85,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-121-apartamento-temporada-y-garaje-malaga",
+      "declaracion": "individual",
+      "casilla": "0108",
+      "campo": "rental.excess",
+      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 48000,
+      "obtenido": 48000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 48000,
+      "obtenido": 48000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 3110.4,
+      "obtenido": 3110.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 44889.6,
+      "obtenido": 44889.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 42889.6,
+      "obtenido": 42889.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 42889.6,
+      "obtenido": 42889.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 40829.62,
+      "obtenido": 40829.62,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 40829.62,
+      "obtenido": 40829.62,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 4876.98,
+      "obtenido": 4876.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 5095.38,
+      "obtenido": 5095.38,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 4876.98,
+      "obtenido": 4876.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 5095.38,
+      "obtenido": 5095.38,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 9972.36,
+      "obtenido": 9972.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 9972.36,
+      "obtenido": 9972.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 9800,
+      "obtenido": 9800,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": 172.36,
+      "obtenido": 172.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": 172.36,
+      "obtenido": 172.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.rentalNet",
+      "concepto": "Rendimiento neto reducido del inmueble alquilado",
+      "esperado": -2059.98,
+      "obtenido": -2059.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-122-zona-tensionada-90-y-joven-70-barcelona",
+      "declaracion": "individual",
+      "casilla": "0108",
+      "campo": "rental.excess",
+      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes",
+      "esperado": 766.03,
+      "obtenido": 766.03,
+      "estado": "coincide"
     }
   ]
 }

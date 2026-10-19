@@ -36,7 +36,7 @@ Medición del 19-10-2026 por la tarde; la de la mañana, entre paréntesis.
   - Ya calcula el capital mobiliario del ahorro, las ganancias de fondos, acciones, cripto e inmuebles, la integración y compensación, la estimación directa que viene de Autónomos, las agrarias en módulos y las reducciones del art. 32.
   - No trata regímenes especiales, exit tax ni anexos informativos. Los módulos no agrarios tienen motor, pero no pantalla.
 - **Autónomo:** 303 al 100 % de lo aplicable al régimen general; 130 al 89 %; 111 al 40 %; 115 al 100 %; 390, 349, 190, 180 y 347 calculados, con fichero para la sede; 131 sin pantalla; 720, 721 y 714 como avisos.
-- **Discrepancias:** las 7 «bug probable» están corregidas. De las 24, 13 siguen abiertas y 2 lo están en parte. Las que más pesan ahora son los alquileres agregados (D10), las cifras de 2026 y 2027 sin versionar (D22-D24) y los donativos sin el límite del 10 % (D17).
+- **Discrepancias:** las 7 «bug probable» están corregidas. De las 24, 13 siguen abiertas y 2 lo están en parte. Los alquileres agregados (D10) ya van inmueble a inmueble. Las que más pesan ahora son las cifras de 2026 y 2027 sin versionar (D22-D24) y los donativos sin el límite del 10 % (D17).
 
 ## Cómo actualizar cada año
 

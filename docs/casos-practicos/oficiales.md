@@ -685,8 +685,15 @@ Mismo fabricante, 2T: ventas con descuento, anticipos de clientes, compra de bie
 | 60 | Exportaciones | 9.000,00 |
 | 71 | Resultado | -2.106,00 |
 | 72 | A compensar | 2.106,00 |
+| 28 | Base soportado interior corriente | 57.000,00 |
+| 30 | Base soportado interior bienes de inversión | 5.000,00 |
+| 32 | Base importaciones corrientes | 36.000,00 |
+| 36 | Base adquisiciones intracomunitarias corrientes | 21.000,00 |
+| 40 | Rectificación de deducciones: base | -6.000,00 |
+| 110 | Cuotas a compensar pendientes de periodos anteriores | 0,00 |
+| 87 | Cuotas pendientes para periodos posteriores | 0,00 |
 
-Notas: Caso útil de trimestre negativo que pasa a compensar (casilla 72). Las bases interiores 57.000/5.000/36.000 son las del formulario relleno.
+Notas: Caso útil de trimestre negativo que pasa a compensar (casilla 72). Las bases interiores 57.000/5.000/36.000 son las del formulario relleno. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto).
 
 ### 303-03 · modelo 303 · IVA régimen general (3T, a ingresar sin aplicar compensación) (2025)
 
@@ -708,8 +715,17 @@ Oficial: [Manual práctico IVA 2025, formulario 303 relleno del supuesto prácti
 | 110 | Cuotas a compensar pendientes de periodos anteriores | 2.106,00 |
 | 87 | Cuotas pendientes para periodos posteriores | 2.106,00 |
 | 71 | Resultado a ingresar | 18.258,00 |
+| 10 | Base adquisiciones intracomunitarias | 12.000,00 |
+| 22 | Base recargo de equivalencia 5,2 % | 24.000,00 |
+| 28 | Base soportado interior corriente | 1.200,00 |
+| 29 | Cuota soportado interior corriente | 252,00 |
+| 32 | Base importaciones corrientes | 6.000,00 |
+| 33 | Cuota importaciones corrientes | 1.260,00 |
+| 36 | Base adquisiciones intracomunitarias corrientes | 12.000,00 |
+| 37 | Cuota adquisiciones intracomunitarias corrientes | 2.520,00 |
+| 78 | Cuotas a compensar aplicadas en este periodo | 0,00 |
 
-Notas: Muestra que la compensación es opcional: 110 = 87 sin rellenar 78.
+Notas: Muestra que la compensación es opcional: 110 = 87 sin rellenar 78. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto).
 
 ### 303-04 · modelo 303 · IVA régimen general (4T, a compensar) (2025)
 
@@ -736,8 +752,10 @@ Oficial: [Manual práctico IVA 2025, formulario 303 relleno del supuesto prácti
 | 87 | Pendientes para periodos posteriores | 2.106,00 |
 | 71 | Resultado | -2.226,00 |
 | 72 | A compensar | 2.226,00 |
+| 22 | Base recargo de equivalencia 5,2 % | 12.000,00 |
+| 78 | Cuotas a compensar aplicadas en este periodo | 0,00 |
 
-Notas: Casilla 28 mezcla bases al 10 % y 21 % (60.000 + 84.000 + 18.000). En 4T puede optarse por devolución (73) en vez de compensar.
+Notas: Casilla 28 mezcla bases al 10 % y 21 % (60.000 + 84.000 + 18.000). En 4T puede optarse por devolución (73) en vez de compensar. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto).
 
 ### 303-05 · modelo 303 · IVA régimen simplificado (módulos), 1T (2025)
 
@@ -793,10 +811,10 @@ Resumen anual de los cuatro 303 del fabricante (303-01 a 303-04): suma de bases 
 | Casilla | Concepto | Importe |
 |---|---|---:|
 | 05 | Base régimen ordinario 21 % | 370.200,00 |
-| 07 | Cuota régimen ordinario 21 % | 77.742,00 |
+| 06 | Cuota régimen ordinario 21 % | 77.742,00 |
 | 25 | Base adquisiciones intracomunitarias de bienes 21 % | 48.000,00 |
 | 26 | Cuota AIB 21 % | 10.080,00 |
-| — | Adquisiciones intracomunitarias de servicios: base / cuota | 6.000,00 |
+| 551 | Base adquisiciones intracomunitarias de servicios 21 % | 6.000,00 |
 | 33 | Total bases IVA | 403.200,00 |
 | 34 | Total cuotas IVA | 84.672,00 |
 | 601 | Base recargo de equivalencia 5,2 % | 72.000,00 |
@@ -809,9 +827,28 @@ Resumen anual de los cuatro 303 del fabricante (303-01 a 303-04): suma de bases 
 | 86 | Resultado liquidación anual | 17.214,00 |
 | 95 | Total resultados a ingresar en autoliquidaciones | 21.546,00 |
 | 97 | Resultado último periodo a compensar | 2.226,00 |
-| 98 | Cuotas pendientes de compensación generadas en el ejercicio distintas de 97 | 2.106,00 |
+| 662 | Cuotas pendientes de compensación generadas en el ejercicio distintas de las de la 97 | 2.106,00 |
+| 552 | Cuota adquisiciones intracomunitarias de servicios 21 % | 1.260,00 |
+| 29 | Modificación de bases | -21.000,00 |
+| 30 | Modificación de cuotas | -4.410,00 |
+| 603 | Base IVA deducible interior corriente 10 % | 60.000,00 |
+| 604 | Cuota IVA deducible interior corriente 10 % | 6.000,00 |
+| 605 | Base IVA deducible interior corriente 21 % | 207.200,00 |
+| 606 | Cuota IVA deducible interior corriente 21 % | 43.512,00 |
+| 48 | Total base interior corriente | 267.200,00 |
+| 49 | Total cuota interior corriente | 49.512,00 |
+| 613 | Base interior bienes de inversión 21 % | 5.000,00 |
+| 614 | Cuota interior bienes de inversión 21 % | 1.050,00 |
+| 52 | Total base importaciones corrientes | 54.000,00 |
+| 53 | Total cuota importaciones corrientes | 11.340,00 |
+| 56 | Total base adquisiciones intracomunitarias de bienes corrientes | 42.000,00 |
+| 57 | Total cuota adquisiciones intracomunitarias de bienes corrientes | 8.820,00 |
+| 597 | Total base adquisiciones intracomunitarias de servicios | 6.000,00 |
+| 598 | Total cuota adquisiciones intracomunitarias de servicios | 1.260,00 |
+| 639 | Rectificación de deducciones: base | -18.000,00 |
+| 62 | Rectificación de deducciones: cuota | -3.780,00 |
 
-Notas: Las casillas 64/65 se asignan por el orden del formulario (texto extraído); verificar visualmente. Base AI servicios 6.000/cuota 1.260: número de casilla no legible con seguridad en el texto extraído (posibles 545/546), por eso casilla=null. Comprobación: 95 (3.288+18.258) - 97 - 98 = 17.214 = 86.
+Notas: Comprobación: 95 (3.288+18.258) − 97 − 662 = 17.214 = 86. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: la cuota al 21 % es la casilla 06 (no la 07), las cuotas pendientes generadas en el ejercicio van a la 662 (la 98 es «a devolver») y las adquisiciones intracomunitarias de servicios al 21 % son la 551/552. La devolución de compras al proveedor holandés (2T, 41 = −1.260) aparece en el 390 restada de las adquisiciones intracomunitarias corrientes (56/57 = 42.000/8.820), no en la 639/62. La 232 (1.200) y la 230 (500) dependen de detalles del enunciado que la app no recoge.
 
 ### 390-02 · modelo 390 · Resumen anual IVA – volumen de operaciones (2025)
 
@@ -822,13 +859,14 @@ Volumen anual: operaciones en régimen general (83.000+91.000+88.200+99.000), en
 | Casilla | Concepto | Importe |
 |---|---|---:|
 | 99 | Operaciones en régimen general | 361.200,00 |
-| 100 | Operaciones en régimen especial agricultura, ganadería y pesca | 64.176,00 |
+| 101 | Operaciones en régimen especial agricultura, ganadería y pesca | 64.176,00 |
 | 103 | Entregas intracomunitarias exentas | 12.000,00 |
 | 104 | Exportaciones y otras exentas con derecho a deducción | 33.000,00 |
-| — | Venta inmobiliaria exenta (se incluye y se resta como entrega de inmueble) | 72.000,00 |
+| 106 | Entregas de bienes inmuebles y operaciones financieras no habituales | 72.000,00 |
 | 108 | Total volumen de operaciones | 470.376,00 |
+| 105 | Operaciones exentas sin derecho a deducción (venta del inmueble) | 72.000,00 |
 
-Notas: Casilla 99 excluye AIB recibidas y no duplica la base del RE. Los 72.000 aparecen como (72.000) en el resumen del manual; casillas 105/107 probables pero no verificadas, por eso null. Licencia a empresa portuguesa no sujeta iría en casilla 110 (sin importe en el supuesto).
+Notas: Casilla 99 excluye AIB recibidas y no duplica la base del RE ni resta la resolución de la venta de 2024. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: el régimen especial de agricultura es la casilla 101 (la 100 es el régimen simplificado) y la venta exenta del inmueble va a la 105 y se resta en la 106. La 105 no figura legible en el texto extraído: se deduce de la fórmula de la 108. Licencia a empresa portuguesa no sujeta iría en casilla 110 (sin importe en el supuesto).
 
 ### 349-01 · modelo 349 · Operaciones intracomunitarias – declaración trimestral (2025)
 

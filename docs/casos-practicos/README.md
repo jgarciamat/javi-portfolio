@@ -17,6 +17,7 @@ La verdad de referencia y las pruebas de regresión de la Renta (modelo 100) y d
 
 ```sh
 python3 -I frontend/scripts/casos/construir_casos.py   # personas, esperado y cálculo a mano
+python3 -I frontend/scripts/casos/construir_personas5.py  # p5: riesgos P0 (alquileres por inmueble, residencia, donativos)
 cd frontend && npm run casos                           # documentos, copia en ~/Downloads y 130/303 contra el backend
 CASOS_INFORME=1 npx jest src/__tests__/casos            # Renta contra el motor del frontend
 python3 -I scripts/casos/informe.py                    # oficiales.md y resultados.md

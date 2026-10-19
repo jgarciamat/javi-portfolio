@@ -4,7 +4,7 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 | Parte | Coinciden | Discrepancias | Pendientes o no soportadas |
 |---|---:|---:|---:|
-| Renta (modelo 100, motor del frontend) | 2918 | 0 | 16 |
+| Renta (modelo 100, motor del frontend) | 3072 | 0 | 16 |
 | Autónomos 130 y 303 (motor del backend, `npm run casos`) | 320 | 0 | 0 |
 | Casos oficiales reproducidos por el motor (`casosOficiales.test.ts`) | 9 | 0 | resto del catálogo |
 

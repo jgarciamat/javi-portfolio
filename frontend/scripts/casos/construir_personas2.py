@@ -124,6 +124,71 @@ def minimum_of(m, fam, steps, label, joint_partner=None, desc_dis=None):
     return total, items
 
 
+YEARLY = ('intereses-financiacion', 'tributos-tasas', 'comunidad-servicios-personales', 'seguros')
+CAPPED = ('intereses-financiacion', 'reparacion-conservacion')
+
+
+def reduction_of(pr):
+    """Reducción del art. 23.2 LIRPF (redacción de la Ley 12/2023; DT 31.ª para contratos anteriores)."""
+    if pr.get('use', 'home') != 'home' or not pr.get('contract'):
+        return 0, 'sin reducción (no es vivienda permanente del inquilino o falta el contrato)'
+    if pr['contract'] == 'before':
+        return 60, '60 % (contrato anterior al 26-5-2023, DT 31.ª LIRPF)'
+    if pr.get('tensioned') and pr.get('rentDrop'):
+        return 90, '90 % (zona tensionada y bajada de más del 5 %, art. 23.2.a)'
+    if pr.get('tensioned') and pr.get('young'):
+        return 70, '70 % (zona tensionada, primer alquiler a joven de 18 a 35, art. 23.2.b)'
+    if pr.get('social'):
+        return 70, '70 % (Administración o entidad sin ánimo de lucro, art. 23.2.b)'
+    if pr.get('rehabilitated'):
+        return 60, '60 % (rehabilitación en los 2 años anteriores, art. 23.2.c)'
+    return 50, '50 % (general, art. 23.2.d)'
+
+
+def properties_calc(p, steps):
+    """Alquileres inmueble a inmueble (LIRPF arts. 23, 24 y 85; Manual 2025, c04). Añade a
+    p['unrented'] la imputación de los días a disposición de cada inmueble. Devuelve la suma de 0154."""
+    steps.h('2. Inmuebles alquilados, uno a uno (LIRPF arts. 22-24 y 85; Manual práctico 2025, c04)')
+    total = 0.0
+    for pr in p['properties']:
+        share = pr.get('share', 100) / 100
+        rented = pr.get('rentedDays', 365)
+        other = pr.get('otherDays', 0)
+        disposal = 365 - rented - other
+        days = rented / 365
+        income = r2(pr['income'] * share)
+        capped = r2(sum(v * share * (days if k in YEARLY else 1) for k, v in pr['expenses'].items() if k in CAPPED))
+        others = r2(sum(v * share * (days if k in YEARLY else 1) for k, v in pr['expenses'].items() if k not in CAPPED))
+        pending = pr.get('pending', 0)
+        pending_applied = min(pending, income)
+        applied = r2(min(capped, income - pending_applied))
+        excess = r2(capped - applied)
+        cad, bld = pr.get('cadastral', 0), pr.get('building', 0)
+        ratio = bld / cad if cad and bld else 1
+        base = r2(max(pr.get('cost', 0) * ratio, bld) * share)
+        amort = r2(base * 3 * days / 100)
+        net = r2(income - pending_applied - applied - others - amort)
+        pct, why = reduction_of(pr)
+        red = r2(net * pct / 100) if net > 0 else 0.0
+        reduced = r2(net - red)
+        steps.s(f'**{pr["label"]}** ({pr.get("share", 100)} % tuyo, {rented} días alquilado'
+                + (f', {disposal} a tu disposición' if disposal else '') + ')')
+        steps.s(f'Ingresos íntegros (0102) = {eur(pr["income"])} × {pr.get("share", 100)} % = {eur(income)}')
+        steps.s(f'Intereses y reparaciones (0105+0106) = {eur(capped)}'
+                + (f'; pendiente de años anteriores aplicado (0104) {eur(pending_applied)}' if pending else '')
+                + f'; aplicado (0107) {eur(applied)} (límite: los ingresos de este inmueble)'
+                + (f'; exceso para 4 años (0108) **{eur(excess)}**' if excess else ''))
+        steps.s(f'Otros gastos (0109-0117, los anuales por {rented}/365 días) = {eur(others)}')
+        steps.s(f'Amortización (0131): base = mayor de coste × construcción/catastral ({eur(pr.get("cost", 0))} × {round(ratio, 4)}) '
+                f'y valor catastral de la construcción ({eur(bld)}), × {pr.get("share", 100)} % = {eur(base)}; 3 % × {rented}/365 = {eur(amort)}')
+        steps.s(f'Rendimiento neto (0149) = **{eur(net)}**; reducción {why} = {eur(red)} → neto reducido (0154) **{eur(reduced)}**')
+        total = r2(total + reduced)
+        if disposal > 0 and cad:
+            p.setdefault('unrented', []).append(dict(value=r2(cad * share), revised=pr.get('revised', False), days=disposal, fromProperty=True))
+    steps.s(f'Suma de rendimientos netos reducidos (0156) = **{eur(total)}**')
+    return total
+
+
 def renta2(p, steps, joint=None):
     """Modelo 100 de una declaración (Renta 2025). Devuelve las casillas y los campos del resultado."""
     c = CCAA[p['ccaa']]
@@ -182,6 +247,9 @@ def renta2(p, steps, joint=None):
         red = r2(net * rt['reduction'] / 100) if net > 0 else 0.0
         rental_net = r2(net - red)
         steps.s(rt['why'] + f' → reducción {eur(red)} → rendimiento neto reducido **{eur(rental_net)}**')
+        b['rentalNet'] = rental_net
+    if p.get('properties'):
+        rental_net = properties_calc(p, steps)
         b['rentalNet'] = rental_net
     imputed = 0.0
     if p.get('unrented'):
@@ -1001,6 +1069,18 @@ def build_autonomo2(a):
 
 # ─── Formularios, cifras y escritura ──────────────────────────────────────────
 
+def property_form(pr):
+    """Un inmueble como lo escribe la persona (PropertyForm de rentaRentals.ts): importes del inmueble entero."""
+    t = lambda v: '' if v is None else str(v)  # noqa: E731
+    return dict(label=pr['label'], share=t(pr.get('share')), rentedDays='' if pr.get('rentedDays', 365) == 365 else str(pr['rentedDays']),
+                otherDays=t(pr.get('otherDays') or None), cadastral=t(pr.get('cadastral')), cadastralBuilding=t(pr.get('building')),
+                revised=bool(pr.get('revised')), cost=t(pr.get('cost')), income=str(pr['income']),
+                expenses={k: str(v) for k, v in pr['expenses'].items()}, pendingExcess=t(pr.get('pending') or None), withheld='',
+                use=pr.get('use', 'home'), contract=pr.get('contract', ''), tensioned=bool(pr.get('tensioned')), rentDrop=bool(pr.get('rentDrop')),
+                young=bool(pr.get('young')), social=bool(pr.get('social')), rehabilitated=bool(pr.get('rehabilitated')),
+                irregular=False, relative=False)
+
+
 def form2(p):
     f = {
         'ccaaId': p['ccaa'], 'age': str(p['age']), 'disability': p.get('disability', 0),
@@ -1029,8 +1109,12 @@ def form2(p):
     if p.get('rental'):
         rt = p['rental']
         f.update(rentalOn=True, rentalIncome=str(rt['income']), rentalExpenses=rt['expenses'], construction=str(rt['construction']), rentalReduction=rt['reductionId'])
+    if p.get('properties'):
+        f['rentalOn'] = True
+        f['properties'] = [property_form(pr) for pr in p['properties']]
     if p.get('unrented'):
-        f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], days='' if u['days'] == 365 else str(u['days'])) for u in p['unrented']]
+        f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], days='' if u['days'] == 365 else str(u['days']))
+                         for u in p['unrented'] if not u.get('fromProperty')]
     for d in p.get('deductions', []):
         f['choices'][d['id']] = dict(on=True, amount=d.get('choice_amount', ''), units=d.get('units', ''))
         if d.get('months'):
