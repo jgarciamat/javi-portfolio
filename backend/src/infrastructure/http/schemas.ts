@@ -366,6 +366,20 @@ export const autonomoDraftBody = z.object({
 const formText = z.string().max(24);
 const quarterValue = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]);
 const invoiceAmount = z.number().finite().min(-100_000_000).max(100_000_000);
+const PDF_REVIEW_CODES = [
+  'date',
+  'dateFormat',
+  'amount',
+  'rate',
+  'mismatch',
+  'noTotal',
+  'surcharge',
+  'split',
+  'reverse',
+  'currency',
+  'several',
+  'issuer',
+] as const;
 const savedExpense = z
   .object({ kind: z.enum(EXPENSE_KINDS), amount: formText, vatRate: vatRateValue, days: formText })
   .strict();
@@ -391,6 +405,37 @@ const savedInvoice = z
     withheld: invoiceAmount,
     concept: z.string().max(200),
     period: quarterValue.nullish(),
+    /** Withholding of a received invoice (modelos 111 and 115), its correction and the payee's tax id. */
+    retention: invoiceAmount.optional(),
+    retentionFix: invoiceAmount.optional(),
+    nif: z.string().max(40).optional(),
+    withholding: z.enum(['none', 'professional', 'rent']).optional(),
+    /** Read from a PDF: what is still to check and what the reading did not give. */
+    source: z.literal('pdf').optional(),
+    review: z.array(z.enum(PDF_REVIEW_CODES)).max(20).optional(),
+    missing: z
+      .array(z.enum(['date', 'base', 'rate']))
+      .max(3)
+      .optional(),
+  })
+  .strict();
+const savedPayees = z.object({ people: formText, paid: formText, withheld: formText }).strict();
+const savedWithholding = z
+  .object({
+    staff: z
+      .object({
+        people: formText,
+        paid: formText,
+        withheld: formText,
+        kindPeople: formText,
+        kindPaid: formText,
+        kindWithheld: formText,
+      })
+      .strict(),
+    pros: savedPayees,
+    rent: savedPayees,
+    filed111: z.boolean(),
+    filed115: z.boolean(),
   })
   .strict();
 const autonomoSaved = z
@@ -426,6 +471,12 @@ const autonomoSaved = z
           })
           .strict()
           .nullable(),
+        withholdings: z.tuple([
+          savedWithholding,
+          savedWithholding,
+          savedWithholding,
+          savedWithholding,
+        ]),
       })
       .strict(),
     extras: z

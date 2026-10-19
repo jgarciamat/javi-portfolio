@@ -50,11 +50,49 @@ const form = (concept = 'Cliente Secreto SL') => ({
         concept,
         period: null,
       },
+      {
+        id: 'pdf001',
+        book: 'received',
+        kind: 'rent',
+        excluded: false,
+        date: '2026-02-11',
+        quarter: 1,
+        base: 800,
+        vatRate: 21,
+        vat: 168,
+        total: 848,
+        withheld: 0,
+        concept,
+        period: null,
+        retention: 152,
+        retentionFix: 150,
+        nif: 'B00000000',
+        withholding: 'rent',
+        source: 'pdf',
+        review: ['rate', 'issuer'],
+        missing: ['date'],
+      },
     ],
+    withholdings: [withholding(), withholding(), withholding(), withholding()],
     model130: { year: 2026, quarter: 1, income: 4321.5, expenses: 100 },
   },
   extras: { hardToJustify: true, exempt: false, priorNet: '', toOffset: '' },
   kinds: { 'proveedor x': 'software' },
+});
+
+const withholding = () => ({
+  staff: {
+    people: '2',
+    paid: '3000',
+    withheld: '450',
+    kindPeople: '',
+    kindPaid: '',
+    kindWithheld: '',
+  },
+  pros: { people: '1', paid: '500', withheld: '75' },
+  rent: { people: '', paid: '', withheld: '' },
+  filed111: false,
+  filed115: true,
 });
 
 describe('The self-employed form saved in the account', () => {
@@ -171,6 +209,20 @@ describe('The self-employed form saved in the account', () => {
       { data: base, baseVersion: null, extra: true },
       { data: { ...base, notes: 'x' }, baseVersion: null },
       { data: { ...base, manual: { ...base.manual, html: '<b>' } }, baseVersion: null },
+      {
+        data: {
+          ...base,
+          manual: { ...base.manual, invoices: [{ ...base.manual.invoices[1], review: ['nope'] }] },
+        },
+        baseVersion: null,
+      },
+      {
+        data: {
+          ...base,
+          manual: { ...base.manual, withholdings: base.manual.withholdings.slice(0, 3) },
+        },
+        baseVersion: null,
+      },
       {
         data: { ...base, kinds: { x: 'jewels' } },
         baseVersion: null,
