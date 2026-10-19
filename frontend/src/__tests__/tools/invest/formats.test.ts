@@ -193,6 +193,11 @@ default,2,BTC-EUR,SELL,2025-02-05T10:00:00.000Z,0.01,BTC,45000,2,448,EUR`);
       ])
     );
     expect(ops).toHaveLength(3);
+    expect(ops.find((o) => o.kind === 'buy')).toMatchObject({ fee: 1, feeCurrency: 'EUR' });
+    expect(ops.find((o) => o.kind === 'transferOut')).toMatchObject({
+      fee: 0.0001,
+      feeCurrency: 'BTC',
+    });
   });
 
   it('Kraken trades: against money and against another coin', () => {

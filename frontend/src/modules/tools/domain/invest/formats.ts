@@ -214,6 +214,7 @@ const krakenLedgers: FormatSpec = {
     type: ['type'],
     asset: ['asset'],
     units: ['amount'],
+    fee: ['fee'],
     group: ['refid'],
   },
   types: KRAKEN_TYPES,

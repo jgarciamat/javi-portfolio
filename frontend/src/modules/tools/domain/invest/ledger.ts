@@ -520,7 +520,6 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
         break;
       }
       case 'realized': {
-        once(warnings, { code: 'realizedMatching', asset: op.format });
         const acquired = op.acquired ?? op.date;
         const cost = euros(op.cost ?? 0, op.currency, acquired);
         if (op.assetClass === 'derivative') {
@@ -539,6 +538,7 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
             });
           break;
         }
+        once(warnings, { code: 'realizedMatching', asset: op.format });
         book.buy(op, op.asset, op.units, cost, acquired);
         book.sell(op, op.units, value);
         break;

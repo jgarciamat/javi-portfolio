@@ -339,7 +339,8 @@ export function legsToOps(legs: Leg[]): InvestOp[] {
     const [kind, reward] = leg.rule ?? ['swap'];
     const units = Math.abs(leg.change);
     if (kind === 'ignore' || units === 0) continue;
-    const op = { ...leg.base, units };
+    // A fee written on a leg is paid in that leg's asset.
+    const op = { ...leg.base, units, feeCurrency: leg.base.feeCurrency ?? leg.base.asset };
     if (kind === 'reward') out.push({ ...op, kind, reward, amount: op.amount, eur: op.eur });
     else if (kind === 'transferIn' || kind === 'transferOut') {
       const dir = leg.change > 0 ? 'transferIn' : 'transferOut';
@@ -366,9 +367,12 @@ function tradeOps(legs: Leg[]): InvestOp[] {
   };
   const given = total(moves.filter((l) => l.change < 0));
   const got = total(moves.filter((l) => l.change > 0));
-  const first = legs[0].base;
-  const fee = fees[0]?.base;
-  const feeOf = { fee: fee?.units ?? first.fee, feeCurrency: fee?.asset ?? first.feeCurrency };
+  // A fee leg (Binance), or the fee written on a leg in that leg's asset (Kraken).
+  const feeLeg = fees[0]?.base;
+  const onLeg = legs.find((l) => l.base.fee > 0)?.base;
+  const feeOf = feeLeg
+    ? { fee: feeLeg.units, feeCurrency: feeLeg.asset }
+    : { fee: onLeg?.fee ?? 0, feeCurrency: onLeg?.asset ?? null };
   // One thing given for one received; a dust conversion (many for one) is split evenly.
   if (given.length === 0 || got.length === 0) {
     // One side is not in the file (paid by card, spent on something): the price is asked for.
