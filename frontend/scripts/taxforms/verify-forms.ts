@@ -32,7 +32,7 @@ const TEXT: PreviewText = {
 
 const MODELS: FormModel[] = [
   ...['130', '303', '111', '115', '131', '390', '349', '190', '180', '347'],
-  ...['309', '123'],
+  ...['309', '123', '100'],
 ] as FormModel[];
 
 void (async () => {
@@ -72,8 +72,14 @@ void (async () => {
       line += ` · FALTAN ${fieldMisses.join(' ')}`;
     }
     const pages = await tokensFromPdf(pdf as unknown as PdfDocument);
-    fixtures[model] = pages.map((tokens) =>
-      tokens.map((t) => ({
+    // The Renta has 25 pages: its fixture keeps its first page (the title the reader knows it by)
+    // and, on every page, the typed fields and the numbers of the boxes, all its reading needs.
+    const kept = (tokens: PdfToken[], page: number) =>
+      model === '100' && page > 0
+        ? tokens.filter((t) => t.field || /^\d{4}$/.test(t.text.trim()))
+        : tokens;
+    fixtures[model] = pages.map((tokens, page) =>
+      kept(tokens, page).map((t) => ({
         ...t,
         x: Math.round(t.x * 10) / 10,
         y: Math.round(t.y * 10) / 10,
@@ -118,6 +124,10 @@ void (async () => {
     }
     console.log(line);
   }
-  if (process.env.FIXTURES) writeFileSync(FIXTURE, `${JSON.stringify(fixtures)}\n`);
+  if (process.env.FIXTURES) {
+    const { '100': renta, ...rest } = fixtures;
+    writeFileSync(FIXTURE, `${JSON.stringify(rest)}\n`);
+    writeFileSync(FIXTURE.replace('.json', '100.json'), `${JSON.stringify(renta)}\n`);
+  }
   process.exit(failures > 0 ? 1 : 0);
 })();

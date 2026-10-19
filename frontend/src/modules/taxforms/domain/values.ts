@@ -6,6 +6,9 @@ import type {
 import type { Result131 } from '@modules/finances/domain/module131';
 import type { AutonomoDraft, TaxBox } from '@modules/finances/domain/types';
 import type { Result111, Result115 } from '@modules/finances/domain/withholdings';
+import type { RentaInput, RentaResult } from '@modules/tools/domain/rentaCalc';
+import type { DirectResult } from '@modules/tools/domain/rentaActivity';
+import { ourBoxes } from '@modules/tools/domain/rentaCompare';
 import {
   sheetTotalOf,
   slotOf,
@@ -317,4 +320,110 @@ export function boxValue(form: FilledForm, id: string): string | null {
   if (id === 'periodo') return form.period;
   if (form.texts && id in form.texts) return form.texts[id];
   return id in form.values ? formatBox(form.values[id], kindOf(form.model, id)) : null;
+}
+
+// ─── The Renta (modelo 100) ───────────────────────────────────────────────────
+
+/**
+ * Main boxes of the Renta that every return goes through: when the planner does not give one, it is
+ * marked «no calculada» so that it is copied from the draft of the Tax Agency. Work (A), capital (B),
+ * activities (D), gains (G), the bases (H, J), the quotas, the payments on account and the
+ * deductions after the quota (M).
+ */
+export const RENTA_PENDING = [
+  ...['0007', '0014', '0015', '0016', '0018'],
+  ...['0027', '0029', '0036', '0041'],
+  '0235',
+  ...['0420', '0424'],
+  '0432',
+  ...['0505', '0510'],
+  ...['0532', '0533', '0570', '0571', '0587'],
+  ...['0596', '0597', '0599', '0604', '0611'],
+];
+
+/** The figures of the savings worked out in detail (the investment files and the sales typed in). */
+function savingsBoxes(result: RentaResult): Record<string, number> {
+  const detail = result.savingsDetail;
+  if (!detail) return {};
+  // Its box 0460 is the planner's own (ourBoxes), and the rest of its keys are not boxes.
+  const boxes = Object.fromEntries(
+    Object.entries(detail.boxes).filter(([id]) => /^\d{4}$/.test(id) && id !== '0460')
+  );
+  return { ...boxes, '0597': detail.withheld.capital, '0603': detail.withheld.gains };
+}
+
+/** The economic activities: the totals of each kind, the reductions of art. 32 and the payments. */
+function activityBoxes(result: RentaResult): Record<string, number> {
+  const a = result.activities;
+  if (!a) return {};
+  const boxes: Record<string, number> = {
+    '0231': a.direct,
+    '0232': a.dependentReduction,
+    '0233': a.smallIncomeReduction,
+    '0234': a.startReduction,
+    '0235': a.directTotal,
+    '1484': a.modules,
+    '1560': a.agrarian,
+    '0599': a.withheld,
+    '0604': a.payments,
+  };
+  // The form has one block per activity: the detail goes in it when there is only one, in direct estimation.
+  const only = a.each.length === 1 ? a.each[0].detail : null;
+  if (only && 'difference' in only) {
+    const direct = only as DirectResult;
+    Object.assign(boxes, { '0180': direct.income, '0218': direct.expenses, '0224': direct.net });
+  }
+  return boxes;
+}
+
+/** Boxes worked out from the result that only make sense when they are not zero. */
+function optionalBoxes(result: RentaResult): Record<string, number> {
+  const minimum = (key: RentaResult['minimum']['items'][number]['key']) =>
+    result.minimum.items.filter((i) => i.key === key).reduce((sum, i) => sum + i.amount, 0);
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const savingsHeld = result.savingsDetail
+    ? result.savingsDetail.withheld.capital + result.savingsDetail.withheld.gains
+    : 0;
+  const activitiesHeld = result.activities
+    ? result.activities.withheld + result.activities.payments
+    : 0;
+  const gains = result.generalGains;
+  const all: Record<string, number> = {
+    // A: reductions of the gross pay; the withholdings of the pay (all of them but those of the
+    // savings and the activities, which have their own boxes).
+    '0011': result.workReductions,
+    '0596': round(result.withheld - savingsHeld - activitiesHeld),
+    // C: the net reduced rents.
+    '0156': result.rentalNet,
+    ...savingsBoxes(result),
+    ...activityBoxes(result),
+    // H: earlier negative gains and the current ones of the general base.
+    ...(gains ? { '0431': gains['0431'], '0433': gains['0433'], '0434': gains['0434'] } : {}),
+    // I and J: the pension plan and what the compensatory pension takes off the savings base.
+    '0492': result.pensionReduction,
+    '0507': result.savingsReduction,
+    // K: the minimums for descendants and ascendants.
+    '0513': minimum('descendants'),
+    '0515': minimum('ascendants'),
+    // M: double taxation of the income taxed abroad.
+    '0588': result.doubleTaxation,
+  };
+  return Object.fromEntries(Object.entries(all).filter(([, v]) => v !== 0));
+}
+
+/**
+ * The Renta (modelo 100) as the planner works it out: the boxes it compares with the draft of the
+ * Tax Agency (always, even at zero) and every other one its result gives. The rest of the main boxes
+ * are left to be copied from the draft. No personal data (tax id, name, address) is written.
+ */
+export function form100(result: RentaResult, input: RentaInput, year: number): FilledForm {
+  // The boxes compared with the draft come last: they are the reference.
+  const values: Record<string, number> = { ...optionalBoxes(result), ...ourBoxes(result, input) };
+  return {
+    model: '100',
+    year,
+    period: null,
+    values,
+    pending: RENTA_PENDING.filter((b) => !(b in values)),
+  };
 }

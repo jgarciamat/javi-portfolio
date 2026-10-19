@@ -4,7 +4,6 @@
  * rules, and the cell of each numbered box. Only texts and lines: no logos, emblems or barcodes.
  */
 
-// The Renta (modelo 100) has no preview: the owner removed it on 19-10-2026 (the planner works it out).
 export type FormModel =
   | '130'
   | '303'
@@ -17,7 +16,8 @@ export type FormModel =
   | '180'
   | '347'
   | '309'
-  | '123';
+  | '123'
+  | '100';
 
 /** x, y (baseline), size, flags (1 bold, 2 turned 90°), text, width it takes on the facsimile. */
 export type LayoutText = [number, number, number, number, string, number | null];
@@ -67,6 +67,8 @@ const LOADERS: Record<FormModel, () => Promise<{ default: unknown }>> = {
   '347': () => import('../data/347.json'),
   '309': () => import('../data/309.json'),
   '123': () => import('../data/123.json'),
+  // The Renta has 25 pages: its layout is kept out of the offline precache (see vite.config.ts).
+  '100': () => import('../data/100.json'),
 };
 
 export async function loadLayout(model: FormModel): Promise<FormLayout> {

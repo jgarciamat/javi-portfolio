@@ -3,14 +3,20 @@ import type { FormModel } from './layout';
 import type { FilledForm } from './values';
 
 /** Forms of a whole year: they print the year, no quarter. */
-export const YEARLY: FormModel[] = ['390', '190', '180', '347'];
+export const YEARLY: FormModel[] = ['390', '190', '180', '347', '100'];
 
 /**
  * The boxes the app's reader of filed forms gives back from a preview: the numbered ones (the fields
  * of the records, «3.nif», are not boxes). The 349 is read by its operators, not by its boxes.
  */
 export const readableBoxes = (form: FilledForm): string[] =>
-  form.model === '349' ? [] : Object.keys(form.values).filter((id) => /^\d+$/.test(id));
+  form.model === '349'
+    ? []
+    : // The Renta numbers its boxes with four digits; the two-digit ones of its first page (dates,
+      // codes, the rows of the family) are not amounts the reader takes.
+      Object.keys(form.values).filter((id) =>
+        (form.model === '100' ? /^\d{4}$/ : /^\d+$/).test(id)
+      );
 
 /** The operators and corrections a 349 preview lists, as the reader gives them back. */
 export function expected349(form: FilledForm): IntraOp[] {

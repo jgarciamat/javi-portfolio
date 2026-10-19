@@ -60,6 +60,10 @@ function sampleBox(sample: Sample, id: string) {
   else sample.values[id] = Math.round(n * 1234.57 * (n % 7 === 0 ? -1 : 1) * 100) / 100;
 }
 
+/** The Renta prints its year (2025) on every page and has no quarter; the rest are of 2026 3T. */
+const whenOf = (model: FormModel) =>
+  model === '100' ? { year: 2025, period: null } : { year: 2026, period: '3T' };
+
 const SKIPPED = (id: string) => id === 'ejercicio' || id === 'periodo' || id.startsWith('hoja.');
 
 /**
@@ -83,8 +87,7 @@ export function sampleForm(model: FormModel, layout: FormLayout): FilledForm {
   const { values, texts } = sample;
   return {
     model,
-    year: 2026,
-    period: '3T',
+    ...whenOf(model),
     values,
     pending: [],
     ...(Object.keys(texts).length > 0 ? { texts } : {}),

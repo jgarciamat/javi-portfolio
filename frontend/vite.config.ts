@@ -88,6 +88,8 @@ export default defineConfig({
           'logo-512.png',
           'icon-512.png',
           'logo-mark.png',
+          // The layout of the Renta (25 pages): loaded when its preview is opened.
+          '**/form-layout-100-*.js',
         ],
         // Shows the push notifications and opens the app when one is tapped.
         importScripts: ['push-sw.js'],
@@ -106,6 +108,8 @@ export default defineConfig({
       output: {
         // Libraries change less often than the app: their own chunk survives deploys in the cache.
         manualChunks(id) {
+          // Its own named chunk, so the offline precache can leave it out (globIgnores above).
+          if (/taxforms\/data\/100\.json/.test(id)) return 'form-layout-100';
           if (
             /node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)
           ) {
