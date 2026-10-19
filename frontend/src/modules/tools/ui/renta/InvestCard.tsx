@@ -16,6 +16,7 @@ import { lossesToRecover, recoverOptions } from '../../domain/invest/recover';
 import type { PendingBalance } from '../../domain/rentaGains';
 import type { RentaInput } from '../../domain/rentaCalc';
 import { InvestSummary, today } from './invest/InvestSummary';
+import { RentaWebPanel } from './invest/RentaWebPanel';
 import { InvestImport } from './invest/InvestImport';
 import { useMoney, type StepProps } from './shared';
 
@@ -138,6 +139,7 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
           </button>
         </div>
       )}
+      {!open && ledger && <RentaWebPanel ledger={ledger} />}
       {!open && ledger && (
         <InvestSummary
           summary={importSummary(ledger, rentaState.year)}

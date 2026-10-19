@@ -8,7 +8,7 @@ import { withheldInOf } from '../../../domain/invest/formats';
 import { withTyped, type RateTable } from '../../../domain/invest/fx';
 import { buildLedger, inEuros, type ValuedOp } from '../../../domain/invest/ledger';
 import { headerKey, readMapped, type Mapping } from '../../../domain/invest/mapping';
-import { declarationRows, reportTables } from '../../../domain/invest/report';
+import { declarationRows } from '../../../domain/invest/report';
 import { importedFrom } from '../../../domain/invest/sources';
 import {
   importSummary,
@@ -19,16 +19,12 @@ import type { RecoverYear } from '../../../domain/invest/recover';
 import type { PendingBalance } from '../../../domain/rentaGains';
 import type { InvestOp } from '../../../domain/invest/types';
 import {
-  download,
   loadBundledRates,
   readEcbFile,
   readInvestFile,
   rememberMapping,
-  reportPdf,
   saveRates,
   savedRates,
-  xlsxBlob,
-  xlsxOf,
   type BundledRates,
   type FileReading,
 } from '../../../application/investImport';
@@ -36,6 +32,7 @@ import { useMoney } from '../shared';
 import { InvestGuide } from './InvestGuide';
 import { InvestMapping } from './InvestMapping';
 import { InvestSummary } from './InvestSummary';
+import { RentaWebPanel } from './RentaWebPanel';
 import { DeclarationTable, OpsTable, WarningsList, type OpEdit } from './InvestTables';
 
 const WITHHELD_IN = withheldInOf();
@@ -333,9 +330,6 @@ export function InvestImport({
     (op) => byId.get(op.id) ?? { ...op, value: op.eur, feeEur: 0 }
   );
 
-  const report = () => reportTables(ledger);
-  const title = t(`${k}.reportTitle`, { year });
-
   return (
     <section className="renta-block invest-import" aria-labelledby="invest-title">
       <h3 id="invest-title">{t(`${k}.title`)}</h3>
@@ -475,21 +469,8 @@ export function InvestImport({
           <WarningsList warnings={ledger.warnings} />
           <h4>{t(`${k}.decl.title`, { year })}</h4>
           <DeclarationTable ledger={ledger} rows={rows} />
+          <RentaWebPanel ledger={ledger} />
           <div className="button-row">
-            <button
-              className="btn-secondary"
-              onClick={() => download(`inversiones-${year}.xlsx`, xlsxBlob(xlsxOf(report())))}
-            >
-              {t(`${k}.xlsx`)}
-            </button>
-            <button
-              className="btn-secondary"
-              onClick={async () =>
-                download(`inversiones-${year}.pdf`, await reportPdf(title, report()))
-              }
-            >
-              {t(`${k}.pdf`)}
-            </button>
             <button
               className="btn-primary"
               onClick={() => {

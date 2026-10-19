@@ -1025,3 +1025,27 @@ html.wiz-contrast .renta-new-return:focus-visible {
   justify-content: space-between;
   gap: 0.5rem;
 }
+.invest-copy progress {
+  width: 100%;
+  height: 0.75rem;
+}
+.invest-copy-field {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+}
+.invest-copy-value {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 600px) {
+  .invest-copy-field {
+    grid-template-columns: 1fr auto;
+  }
+  .invest-copy-label {
+    grid-column: 1 / -1;
+  }
+}

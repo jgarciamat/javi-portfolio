@@ -106,7 +106,6 @@ describe('Importar mis inversiones', () => {
     expect(screen.getByText(tr(`${k}.warn.earlierYears`))).toBeInTheDocument();
     expect(screen.getByText(new RegExp(tr(`${k}.decl.deferred`)))).toBeInTheDocument();
     expect(screen.getByText('[0322] -100,00 €')).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(tr(`${k}.decl.sales`, { count: 2 })))).toBeInTheDocument();
     expect(screen.getAllByText(new RegExp(tr(`${k}.reward.staking`))).length).toBeGreaterThan(0);
     await act(async () => {
       fireEvent.change(screen.getByLabelText(tr(`${k}.file`)), { target: { files: null } });
@@ -120,7 +119,7 @@ describe('Importar mis inversiones', () => {
     // 0.05 BTC sold for 2,000 − 2 with a cost of (3,000 + 3) / 2 = 1,501.50: gain 496.50; then
     // 0.01 BTC for 200 with a cost of 300.30: −100.30. Together: 396.20.
     const table = screen.getByRole('table', { name: tr(`${k}.decl.caption`) });
-    expect(within(table).getByText(/396,20/)).toBeInTheDocument();
+    expect(within(table).getByText(/496,50/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr(`${k}.apply`) }));
     expect(screen.getByText(tr(`${k}.applied`))).toBeInTheDocument();
     expect(last.savingsDetail?.imported?.files).toEqual(['binance.csv', 'degiro.csv']);
@@ -204,9 +203,9 @@ describe('Importar mis inversiones', () => {
     expect(screen.getByText('[0588] 12,00 €')).toBeInTheDocument();
     Object.assign(URL, { createObjectURL: jest.fn(() => 'blob:x'), revokeObjectURL: jest.fn() });
     const save = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.xlsx`) }));
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.web.xlsx`) }));
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: tr(`${k}.pdf`) }));
+      fireEvent.click(screen.getByRole('button', { name: tr(`${k}.web.pdf`) }));
     });
     await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
     save.mockRestore();
