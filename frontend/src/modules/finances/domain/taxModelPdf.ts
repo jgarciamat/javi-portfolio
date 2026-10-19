@@ -110,8 +110,9 @@ function modelOf(tokens: PdfToken[]): TaxModel | null {
     .map((t) => t.text)
     .join(' ')
     .toLowerCase()
-    // The 303 asks whether one is exempt from the 390: that mention is not its title.
-    .replace(/exonerad[oa] de la declaraci[oó]n-? ?resumen anual/g, '');
+    // The 303 asks whether one is exempt from the 390 (page 1, «exonerado», and page 4 of the 2026
+    // design, «exonerados»): that mention is not its title.
+    .replace(/exonerad[oa]s? de la declaraci[oó]n-? ?resumen anual/g, '');
   // The withholding forms first: their titles say «retenciones e ingresos a cuenta», as the box 06
   // of the 130 does, so the 130 is told apart by what only the 111 and the 115 have.
   if (/retenciones e ingresos a cuenta/.test(text)) {

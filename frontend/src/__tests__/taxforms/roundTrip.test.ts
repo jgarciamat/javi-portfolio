@@ -25,9 +25,9 @@ describe.each(['130', '111', '115', '303'] as FormModel[])(
         expect(form.values[id]).toBe(value);
       const read303 = Object.keys(read.data.boxes).length;
       if (model === '303') {
-        // The reader knows the boxes of the main pages; the simplified regime, the yearly page and
-        // the prorrata are not in its list yet.
-        expect(read303).toBe(94);
+        // The reader knows every box but those of the page of the prorrata (500-524, 700-735).
+        // Page 4 says «exonerados de la Declaración-resumen anual»: it is still read as a 303.
+        expect(read303).toBe(124);
         expect(read.data.boxes['71']).toBe(form.values['71']);
       } else expect(read303).toBe(Object.keys(form.values).length);
     });

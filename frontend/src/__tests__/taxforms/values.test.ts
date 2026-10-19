@@ -66,6 +66,12 @@ describe('The self-employed forms of a quarter', () => {
     });
   });
 
+  it('adds the «información adicional» of the drafts that have it', () => {
+    const draft = autonomoDraft();
+    draft.vat = { ...draft.vat, info: [{ box: '59', label: 'Entregas UE', amount: 500 }] };
+    expect(form303(draft).values['59']).toBe(500);
+  });
+
   it('gives the 130 only when it is filed', () => {
     expect(form130(autonomoDraft())?.values).toEqual({ '04': 180 });
     const exempt = autonomoDraft();

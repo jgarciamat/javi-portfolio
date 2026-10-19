@@ -59,14 +59,14 @@ export function valuesOf(boxes: TaxBox[]): Record<string, number> {
 
 const quarter = (n: number) => `${n}T`;
 
-/** The modelo 303 of the quarter: every box the draft gives (accrued, deductible, the result). */
+/** The modelo 303 of the quarter: every box the draft gives (accrued, deductible, information, result). */
 export function form303(draft: AutonomoDraft): FilledForm {
-  const { accrued, deductible, settlement } = draft.vat;
+  const { accrued, deductible, settlement, info = [] } = draft.vat;
   return {
     model: '303',
     year: draft.year,
     period: quarter(draft.quarter),
-    values: valuesOf([...accrued, ...deductible, ...settlement]),
+    values: valuesOf([...accrued, ...deductible, ...info, ...settlement]),
     pending: [],
   };
 }
