@@ -1,5 +1,6 @@
 import { computeRenta } from '@modules/tools/domain/rentaCalc';
 import { emptyForm, toInput, type RentaForm } from '@modules/tools/domain/rentaForm';
+import { emptyProperty } from '@modules/tools/domain/rentaRentals';
 import { optimize, type OptimizerData } from '@modules/tools/domain/rentaOptimizer';
 import { workReductionOf } from '@modules/tools/domain/rentaWork';
 import { loadCcaa } from '@modules/tools/data/renta';
@@ -98,10 +99,28 @@ describe('the reviewer of the return', () => {
       data,
       none
     );
-    expect(r.items.find((i) => i.id === 'rentalReduction')?.patch).toEqual({
-      rentalReduction: 'general-50',
+    // Property by property: the home without a contract date gets the general 50 % (after 26-5-2023).
+    expect(r.items.find((i) => i.id === 'rentalReduction')?.patch).toMatchObject({
+      properties: [{ income: '9000', contract: 'after' }],
     });
-    expect(r.items.find((i) => i.id === 'rentalDepreciation')).toMatchObject({ example: 60000 });
+    expect(r.items.find((i) => i.id === 'rentalDepreciation')).toMatchObject({
+      example: 60000,
+      patch: { properties: [{ cost: '60000' }] },
+    });
+    // With the cadastral value of the building there is something to depreciate.
+    const valued = optimize(
+      worker({
+        rentalOn: true,
+        properties: [
+          { ...emptyProperty(1), income: '9000', cadastralBuilding: '40000', contract: 'before' },
+        ],
+        joint: 'none',
+      }),
+      data,
+      none
+    );
+    expect(valued.items.map((i) => i.id)).not.toContain('rentalDepreciation');
+    expect(valued.items.map((i) => i.id)).not.toContain('rentalReduction');
     expect(r.items.find((i) => i.id === 'earlierLosses')).toMatchObject({
       example: 1000,
       patch: { savings: '2000' },

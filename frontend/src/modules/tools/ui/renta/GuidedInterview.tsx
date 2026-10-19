@@ -34,6 +34,8 @@ export interface GuideProps extends StepProps {
   reading: DraftReading | null;
   /** Goes on to the review of the deductions that could apply. */
   onReview: () => void;
+  /** The assistant: the rented properties go on screens of their own. */
+  onePerScreen?: boolean;
 }
 
 const TOTAL = QUESTIONS.length;
@@ -208,11 +210,12 @@ function JointBody({ form, set, answer }: BodyProps) {
   return null;
 }
 
-function PropertyBody({ form, set, property }: BodyProps) {
+function PropertyBody({ form, set, property, onePerScreen }: BodyProps) {
   return (
     <>
-      {form.rentalOn && (
-        <RentalSection form={form} set={set} rental={property.rental} toggle={false} />
+      {/* The assistant asks each property on a screen of its own. */}
+      {form.rentalOn && !onePerScreen && (
+        <RentalSection form={form} set={set} rental={property} toggle={false} />
       )}
       {form.unrented.length > 0 && (
         <UnrentedSection form={form} set={set} imputation={property.imputation} />

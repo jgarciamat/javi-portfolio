@@ -9,7 +9,8 @@ import { rentaProperty } from '../../data/renta/inmuebles';
 import { rentaState } from '../../data/renta/state';
 import { COMPARED_BOXES, ourBoxes } from '../../domain/rentaCompare';
 import { answerOf, choose, OPTIONS, type QuestionId } from '../../domain/rentaGuide';
-import { number } from '../../domain/rentaForm';
+import { number, propertiesOf } from '../../domain/rentaForm';
+import { reductionMissing } from '../../domain/rentaRentals';
 import { queueOf } from '../../domain/rentaReview';
 import { RentaPlanner, ResultSection, UpgradeCta } from '../RentaPlanner';
 import { ActivitiesList } from './ActivitiesList';
@@ -20,6 +21,7 @@ import { QuestionBody, ready as guidedReady } from './GuidedInterview';
 import { InvestCard, InvestLink } from './InvestCard';
 import { NewReturn } from './NewReturn';
 import { Optimizer } from './Optimizer';
+import { AddProperty, PropertyCard } from './PropertyCard';
 import { SavingsDetailSection } from './SavingsDetail';
 import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
 import { Field, RadioOptions, useMoney } from './shared';
@@ -111,10 +113,38 @@ function guided(ctx: Ctx, q: QuestionId, extra?: Partial<WizardScreen>): WizardS
         property={rentaProperty}
         reading={p.draft.reading}
         onReview={p.startReview}
+        onePerScreen
       />
     ),
     ...extra,
   };
+}
+
+/** Each rented property on a screen of its own, the last one with «add another property». */
+function propertyScreens(ctx: Ctx): WizardScreen[] {
+  const { p, t } = ctx;
+  const list = propertiesOf(p.form);
+  return list.map((prop, i) => ({
+    id: `property-${i + 1}`,
+    title: t(w('q.propertyN'), { n: i + 1, total: list.length, label: prop.label }),
+    hint: t(w('hint.propertyN')),
+    help: t(w('help.propertyN')),
+    // A home let out needs the date of the contract to know its reduction.
+    ready: !reductionMissing(prop),
+    missing: t(w('missing.propertyN')),
+    body: (
+      <>
+        <PropertyCard
+          form={p.form}
+          set={p.set}
+          index={i}
+          property={rentaProperty}
+          year={rentaState.year}
+        />
+        {i === list.length - 1 && <AddProperty form={p.form} set={p.set} />}
+      </>
+    ),
+  }));
 }
 
 /** A question of the assistant only (not of the planner): yes or no, kept in its progress. */
@@ -505,7 +535,7 @@ export function rentaSteps(ctx: Ctx): WizardStepView[] {
     you: youStep(ctx),
     family: [guided(ctx, 'disability'), guided(ctx, 'family'), guided(ctx, 'joint')],
     work: workStep(ctx),
-    home: [guided(ctx, 'housing'), guided(ctx, 'property')],
+    home: [guided(ctx, 'housing'), guided(ctx, 'property'), ...propertyScreens(ctx)],
     invest: [importScreen(ctx), investScreen(ctx)],
     activity: [activityScreen(ctx)],
     deductions: deductionScreens(ctx),

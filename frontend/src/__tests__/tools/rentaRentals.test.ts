@@ -1,7 +1,10 @@
 import {
+  addProperty,
   emptyForm,
   propertiesOf,
+  removeProperty,
   rentalOf,
+  setProperty,
   toInput,
   unrentedOf,
 } from '@modules/tools/domain/rentaForm';
@@ -190,7 +193,10 @@ describe('the rental of the form', () => {
       use: 'home',
       contract: 'after',
     });
-    expect(fromLegacy({ ...legacy, rentalReduction: '' }).use).toBe('other');
+    expect(fromLegacy({ ...legacy, rentalReduction: '' })).toMatchObject({
+      use: 'home',
+      contract: '',
+    });
     expect(fromLegacy({ ...legacy, rentalPendingExcess: '7' }).pendingExcess).toBe('7');
   });
 
@@ -222,5 +228,24 @@ describe('the rental of the form', () => {
     const result = computeRenta(input);
     expect(result.rentalNet).toBe(2.06);
     expect(result.imputedIncome).toBe(504.11);
+  });
+
+  it('adds, changes and removes properties: with none left there is no rental', () => {
+    expect(addProperty({ ...base, rentalOn: false })).toEqual({
+      rentalOn: true,
+      properties: [emptyProperty(1)],
+    });
+    const one = { ...base, ...addProperty(base) };
+    expect(one.properties).toEqual([emptyProperty(1), emptyProperty(2)]);
+    const changed = { ...one, ...setProperty(one, 1, { income: '5' }) };
+    expect(changed.properties?.[1].income).toBe('5');
+    expect(removeProperty(changed, 0)).toEqual({
+      properties: [changed.properties?.[1]],
+      rentalOn: true,
+    });
+    expect(removeProperty({ ...base, properties: [flat] }, 0)).toEqual({
+      properties: [],
+      rentalOn: false,
+    });
   });
 });

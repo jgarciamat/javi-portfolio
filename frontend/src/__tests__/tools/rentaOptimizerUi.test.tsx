@@ -86,15 +86,13 @@ describe('Renta: the reviewer on screen', () => {
     expect(last.ascendants).toEqual([]);
   });
 
-  it('asks the value of the building of a rented flat and says what is missing', () => {
+  it('says where to type the value of a rented flat and what is missing', () => {
     renderWithProviders(
       <Harness start={{ ...worker, joint: '', age: '', rentalOn: true, rentalIncome: '9000' }} />
     );
     expect(screen.getByText(tr(`${k}.missing.jointKind`))).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(tr(`${k}.rentalDepreciation.amount`)), {
-      target: { value: '50000' },
-    });
-    expect(last.construction).toBe('50000');
+    // Typed in the property itself (its cost or the cadastral value of the building).
+    expect(screen.getByText(tr(`${k}.rentalDepreciation.how`))).toBeInTheDocument();
   });
 
   it('says when there is nothing more to look at', () => {

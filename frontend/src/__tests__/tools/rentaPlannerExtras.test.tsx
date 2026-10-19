@@ -81,31 +81,55 @@ describe('Renta planner: work, contributions and savings', () => {
 });
 
 describe('Renta planner: property', () => {
-  it('rents out a property with expenses, depreciation and a reduction', async () => {
+  it('rents out properties one by one, with their reduction, days and share', async () => {
     render();
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));
     fireEvent.click(screen.getByLabelText(tr('tools.renta.rentalOn')));
-    fill('tools.renta.rentalIncome', '9000');
-    fill('tools.renta.construction', '100000');
-    const interest = screen.getByLabelText(/Intereses y gastos de financiación/);
-    fireEvent.change(interest, { target: { value: '1000' } });
+    const p = (key: string) => `tools.renta.property.${key}`;
+    // The first property: let all year as a home, with no contract date yet.
+    expect(screen.getByText(tr(p('reductionMissing')))).toBeInTheDocument();
+    fill(p('field.income'), '9000');
+    fill(p('field.cost'), '100000');
+    fireEvent.change(screen.getByLabelText(/Intereses y gastos de financiación/), {
+      target: { value: '1000' },
+    });
     fireEvent.change(screen.getByLabelText(/IBI, tasas/), { target: { value: '400' } });
+    fireEvent.change(screen.getByLabelText(tr(p('furniture'))), { target: { value: '100' } });
     expect(screen.getByText(tr('tools.renta.line.rental'))).toBeInTheDocument();
-    // What was left of earlier years' interest and repairs lowers the rent too.
     const beforeExcess = resultText();
-    fill('tools.renta.rentalPendingExcess', '500');
+    fill(p('field.pendingExcess'), '500');
     expect(resultText()).not.toBe(beforeExcess);
-    const select = screen.getByLabelText(tr('tools.renta.rentalReduction'));
+    // The contract date gives the reduction; the flags of a stressed area raise it.
     const before = resultText();
-    fireEvent.change(select, { target: { value: (select as HTMLSelectElement).options[1].value } });
-    expect(
-      screen.getAllByRole('link', { name: tr('tools.renta.official') }).length
-    ).toBeGreaterThan(0);
-    fill('tools.renta.rentalIncome', '12000');
+    fireEvent.click(screen.getByLabelText(tr(p('contractOpt.after'))));
+    expect(screen.getByText(tr(p('reductionIs'), { percent: 50 }))).toBeInTheDocument();
     expect(resultText()).not.toBe(before);
-    fireEvent.change(select, { target: { value: '' } });
+    expect(screen.queryByLabelText(tr(p('flag.rentDrop')))).toBeNull();
+    fireEvent.click(screen.getByLabelText(tr(p('flag.tensioned'))));
+    fireEvent.click(screen.getByLabelText(tr(p('flag.rentDrop'))));
+    expect(screen.getByText(tr(p('reductionIs'), { percent: 90 }))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr(p('use'))), { target: { value: 'season' } });
+    expect(screen.getByText(tr(p('reductionNone')))).toBeInTheDocument();
+    for (const box of ['usufruct', 'irregular', 'relative'])
+      fireEvent.click(screen.getByLabelText(tr(p(box))));
+    fireEvent.click(screen.getAllByLabelText(tr('tools.renta.revised', { rate: 1.1 }))[0]);
+    fill(p('field.label'), 'Piso centro');
+    expect(screen.getByText(tr(p('legend'), { n: 1, label: 'Piso centro' }))).toBeInTheDocument();
+    // Interest and repairs over the rent are carried; days not let impute rent.
+    fireEvent.change(screen.getByLabelText(/Reparación y conservación/), {
+      target: { value: '20000' },
+    });
+    expect(screen.getByText(tr(p('excess')))).toBeInTheDocument();
+    fill(p('field.rentedDays'), '200');
+    fill(p('field.cadastral'), '50000');
+    expect(screen.getByText(tr(p('imputed'), { days: 165 }))).toBeInTheDocument();
+    // A second property, then taken out again.
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr(p('add'))) }));
+    expect(screen.getByText(tr(p('legend'), { n: 2, label: 'Inmueble 2' }))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr(p('remove'), { label: 'Inmueble 2' }) }));
+    expect(screen.queryByText(tr(p('legend'), { n: 2, label: 'Inmueble 2' }))).toBeNull();
     fireEvent.click(screen.getByLabelText(tr('tools.renta.rentalOn')));
-    expect(screen.queryByLabelText(tr('tools.renta.rentalIncome'))).toBeNull();
+    expect(screen.queryByLabelText(tr(p('field.income')))).toBeNull();
   });
 
   it('imputes income to properties that are not rented, and removes them', async () => {

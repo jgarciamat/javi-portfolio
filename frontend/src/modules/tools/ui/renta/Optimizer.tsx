@@ -16,19 +16,16 @@ const AMOUNTS: Record<string, (form: RentaForm, v: string) => Partial<RentaForm>
   pensionPlan: (_, v) => ({ pension: v }),
   spousePlan: (_, v) => ({ spousePlan: v }),
   unionFees: (form, v) => ({ workExpenses: { ...form.workExpenses, 'cuotas-sindicales': v } }),
-  rentalDepreciation: (_, v) => ({ construction: v }),
 };
 const amountOf = (form: RentaForm, id: string): string =>
   id === 'pensionPlan'
     ? form.pension
     : id === 'spousePlan'
     ? form.spousePlan
-    : id === 'unionFees'
-    ? form.workExpenses['cuotas-sindicales'] ?? ''
-    : form.construction;
+    : form.workExpenses['cuotas-sindicales'] ?? '';
 
 /** Items that only explain what to do: the joint return and the losses of earlier years. */
-const INFO = ['joint', 'earlierLosses', 'deductions'];
+const INFO = ['joint', 'earlierLosses', 'deductions', 'rentalDepreciation'];
 
 function Item({
   item,

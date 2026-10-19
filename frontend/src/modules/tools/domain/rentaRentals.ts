@@ -271,7 +271,7 @@ export function fromLegacy(r: LegacyRental): PropertyForm {
     expenses: { ...r.rentalExpenses },
     cost: r.construction,
     pendingExcess: r.rentalPendingExcess ?? '',
-    use: 'other',
+    // No reduction picked: a home whose contract date is still to be given (no reduction meanwhile).
     ...(LEGACY_REDUCTION[r.rentalReduction] ?? {}),
   };
 }

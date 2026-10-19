@@ -227,10 +227,11 @@ describe('guided questions: family, joint return, property, savings, plan and ho
   it('property: the rent without a second check box, and the properties at disposal', () => {
     at('property');
     pick('property', 'rented');
-    expect(screen.getByLabelText(tr('tools.renta.rentalIncome'))).toBeInTheDocument();
+    const income = tr('tools.renta.property.field.income');
+    expect(screen.getByLabelText(income)).toBeInTheDocument();
     expect(screen.queryByLabelText(tr('tools.renta.rentalOn'))).toBeNull();
     pick('property', 'other');
-    expect(screen.queryByLabelText(tr('tools.renta.rentalIncome'))).toBeNull();
+    expect(screen.queryByLabelText(income)).toBeNull();
     expect(screen.getByText(tr('tools.renta.cadastral', { n: 1 }))).toBeInTheDocument();
     pick('property', 'no');
     expect(screen.queryByText(tr('tools.renta.cadastral', { n: 1 }))).toBeNull();

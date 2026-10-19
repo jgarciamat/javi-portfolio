@@ -498,3 +498,37 @@ describe('the Renta step by step: persona 02 (couple with two children, one pay,
     expect(screen.getByText('0670').closest('li')).toHaveTextContent('342,42');
   });
 });
+
+describe('the Renta step by step: rented properties one per screen', () => {
+  it('asks each property on its own screen and adds another one', () => {
+    saved({
+      ccaaId: 'madrid',
+      gross: '30000',
+      rentalOn: true,
+      answers: { housing: 'no', property: 'rented' },
+    });
+    at(3);
+    local();
+    expect(heading(tr('tools.renta.guide.q.housing'))).toBeInTheDocument();
+    next();
+    expect(heading(tr('tools.renta.guide.q.property'))).toBeInTheDocument();
+    // The property question does not repeat the property itself: it has its own screen.
+    expect(screen.queryByLabelText(tr('tools.renta.property.field.income'))).toBeNull();
+    next();
+    const title = (n: number, total: number, label: string) =>
+      heading(tr('wizard.renta.q.propertyN', { n, total, label }));
+    expect(title(1, 1, 'Inmueble 1')).toBeInTheDocument();
+    // A home needs the date of its contract.
+    expect(screen.getByText(tr('wizard.renta.missing.propertyN'))).toBeInTheDocument();
+    pick(tr('tools.renta.property.contractOpt.before'));
+    expect(screen.queryByText(tr('wizard.renta.missing.propertyN'))).toBeNull();
+    fireEvent.click(
+      screen.getByRole('button', { name: new RegExp(tr('tools.renta.property.add')) })
+    );
+    expect(
+      screen.getByText(tr('wizard.screenN', { n: 3, total: 4 }), { exact: false })
+    ).toBeInTheDocument();
+    next();
+    expect(title(2, 2, 'Inmueble 2')).toBeInTheDocument();
+  });
+});

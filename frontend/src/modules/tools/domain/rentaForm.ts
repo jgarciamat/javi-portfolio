@@ -252,6 +252,27 @@ export function propertiesOf(form: RentaForm): PropertyForm[] {
   return [typed ? fromLegacy(form) : emptyProperty(1)];
 }
 
+/** One property changed: the list is written whole (a return typed before becomes a list). */
+export function setProperty(
+  form: RentaForm,
+  i: number,
+  patch: Partial<PropertyForm>
+): Partial<RentaForm> {
+  return { properties: propertiesOf(form).map((p, j) => (j === i ? { ...p, ...patch } : p)) };
+}
+
+/** Another rented property, at the end of the list. */
+export function addProperty(form: RentaForm): Partial<RentaForm> {
+  const list = propertiesOf(form);
+  return { rentalOn: true, properties: [...list, emptyProperty(list.length + 1)] };
+}
+
+/** A property taken out: with none left there is no rental. */
+export function removeProperty(form: RentaForm, i: number): Partial<RentaForm> {
+  const properties = propertiesOf(form).filter((_, j) => j !== i);
+  return { properties, rentalOn: properties.length > 0 };
+}
+
 /**
  * The rental figures, property by property (rentaRentals.ts): each one with its own limit of
  * interest and repairs, reduction and depreciation (LIRPF art. 23, BOE-A-2006-20764, checked

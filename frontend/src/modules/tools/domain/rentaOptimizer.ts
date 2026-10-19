@@ -1,7 +1,16 @@
 import { computeRenta } from './rentaCalc';
 import type { Deduction } from './rentaData';
 import { compareJoint, type JointRules } from './rentaJoint';
-import { number, partnerOf, toInput, type RentaData, type RentaForm } from './rentaForm';
+import {
+  number,
+  partnerOf,
+  propertiesOf,
+  setProperty,
+  toInput,
+  type RentaData,
+  type RentaForm,
+} from './rentaForm';
+import { reductionMissing } from './rentaRentals';
 import type { DeductionSaving } from './rentaSavings';
 import { round2 } from './round';
 
@@ -73,6 +82,10 @@ const PLAN_LIMIT = 1500;
 const SPOUSE_PLAN_LIMIT = 1000;
 const LOSS_EXAMPLE = 1000;
 const CONSTRUCTION_EXAMPLE = 60000;
+
+/** The first rented property with no cost nor cadastral value of the building (-1: none). */
+export const depreciationMissing = (form: RentaForm): number =>
+  propertiesOf(form).findIndex((p) => number(p.cost) <= 0 && number(p.cadastralBuilding) <= 0);
 
 const works = (form: RentaForm) => number(form.gross) > number(form.nonSalary) && !form.retired;
 
@@ -165,25 +178,27 @@ function personalCandidates(form: RentaForm): Candidate[] {
 }
 
 /** The property and savings items: reductions of the rent, depreciation, earlier losses. */
-function assetCandidates(form: RentaForm, data: RentaData): Candidate[] {
+function assetCandidates(form: RentaForm): Candidate[] {
   const list: Candidate[] = [];
-  // The reduction of a home rented out as a dwelling that any contract can have: the general 50 %
-  // (art. 23.2.1.º a); the higher ones need more conditions and are left to the person.
-  const lowest = data.property.rental.reductions.find((r) => r.id === 'general-50');
-  if (form.rentalOn && !form.rentalReduction && lowest)
+  // The reduction of a home let out as a dwelling that any contract can have: the general 50 %
+  // (art. 23.2.1.º a), for a home whose contract date is not given; the higher ones need more
+  // conditions and are left to the person. Property by property (rentaRentals.ts).
+  const noDate = propertiesOf(form).findIndex(reductionMissing);
+  if (noDate >= 0)
     list.push({
       id: 'rentalReduction',
       group: 'property',
-      patch: { rentalReduction: lowest.id },
+      patch: setProperty(form, noDate, { contract: 'after' }),
       example: null,
       draftKnows: 'no',
       source: `${LIRPF}#a23`,
     });
-  if (form.rentalOn && number(form.construction) <= 0)
+  const noCost = depreciationMissing(form);
+  if (noCost >= 0)
     list.push({
       id: 'rentalDepreciation',
       group: 'property',
-      patch: { construction: String(CONSTRUCTION_EXAMPLE) },
+      patch: setProperty(form, noCost, { cost: String(CONSTRUCTION_EXAMPLE) }),
       example: CONSTRUCTION_EXAMPLE,
       draftKnows: 'no',
       source: `${LIRPF}#a23`,
@@ -246,7 +261,7 @@ export function optimize(
 ): Optimization {
   const base = computeRenta(toInput(form, data));
   const items: Opportunity[] = [];
-  for (const c of [...personalCandidates(form), ...assetCandidates(form, data)]) {
+  for (const c of [...personalCandidates(form), ...assetCandidates(form)]) {
     const after = computeRenta(toInput({ ...form, ...c.patch }, data));
     const saving = round2(base.result - after.result);
     if (saving > 0) items.push({ ...c, saving });
