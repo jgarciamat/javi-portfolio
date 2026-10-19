@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { rentaState } from '@modules/tools/data/renta/state';
 import type { Deduction } from '@modules/tools/domain/rentaData';
 import { emptyForm, familyOf, type Choice } from '@modules/tools/domain/rentaForm';
@@ -62,6 +62,41 @@ describe('Renta deductions: a fixed amount', () => {
     const fields = document.querySelector('.renta-deduction-fields') as HTMLElement;
     expect(fields.querySelector('input')).toBeNull();
     expect(screen.getByText(new RegExp(tr('tools.renta.gives')))).toBeInTheDocument();
+  });
+});
+
+describe('Renta deductions: collected in advance', () => {
+  it('asks what was collected with the modelo 140 or 143 only for those that have one', () => {
+    const advance = other('adv', { advance: { model: '143', url: 'https://example.org/143' } });
+    const onChange = jest.fn();
+    renderWithProviders(
+      <DeductionsStep
+        state={{ ...rentaState, deductions: [advance, flat] }}
+        ccaa={null}
+        loadError={false}
+        choices={{
+          adv: { on: true, amount: '', units: '' },
+          [flat.id]: { on: true, amount: '', units: '' },
+        }}
+        family={familyOf(emptyForm(''))}
+        blocked={[]}
+        hints={{}}
+        savings={{}}
+        markedSaving={0}
+        onChange={onChange}
+      />
+    );
+    const field = screen.getByLabelText(tr('tools.renta.advanceReceived', { model: '143' }));
+    expect(field).toHaveValue('');
+    fireEvent.change(field, { target: { value: '600' } });
+    expect(onChange).toHaveBeenCalledWith('adv', {
+      on: true,
+      amount: '',
+      units: '',
+      advance: '600',
+    });
+    // The flat deduction, without an advance payment, asks for nothing more.
+    expect(screen.getAllByPlaceholderText('0')).toHaveLength(1);
   });
 });
 

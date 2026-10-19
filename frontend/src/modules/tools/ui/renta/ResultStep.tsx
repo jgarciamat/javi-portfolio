@@ -133,6 +133,12 @@ export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: numbe
         <dd>{money(result.netQuota)}</dd>
         <dt>{t('tools.renta.line.withheld')}</dt>
         <dd>{minus(result.withheld, money)}</dd>
+        {result.advanceReceived > 0 && (
+          <>
+            <dt>{t('tools.renta.line.advanceReceived')}</dt>
+            <dd>+{money(result.advanceReceived)}</dd>
+          </>
+        )}
       </dl>
       <ChildAids shown={shown} money={money} />
       {shown.joint && <JointTable joint={shown.joint} money={money} />}

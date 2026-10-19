@@ -51,6 +51,8 @@ export interface Choice {
   on: boolean;
   amount: string;
   units: string;
+  /** Collected in advance in the year with the modelo 140 or 143 (refundable deductions only). */
+  advance?: string;
 }
 
 /** Everything the person types, as text, in the order of the steps. */
@@ -261,6 +263,7 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         on: c.on,
         amount: number(c.amount),
         units: c.units === '' ? Math.max(1, form.children.length) : number(c.units),
+        advance: number(c.advance),
       },
     ])
   );

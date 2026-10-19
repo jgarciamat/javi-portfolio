@@ -280,6 +280,18 @@ function DeductionRow({
             childCount={childCount}
             onChange={onChange}
           />
+          {deduction.advance && (
+            <label className="tools-field">
+              <span>{t('tools.renta.advanceReceived', { model: deduction.advance.model })}</span>
+              <input
+                className="tx-input"
+                inputMode="decimal"
+                value={choice.advance ?? ''}
+                placeholder="0"
+                onChange={(e) => onChange({ ...choice, advance: e.target.value })}
+              />
+            </label>
+          )}
           {!blocked && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>

@@ -144,7 +144,9 @@ describe('Renta planner: deductions', () => {
   });
 
   it('suggests the maternity deduction when there is a child under three', async () => {
-    renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
+    renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
+      authenticated: false,
+    });
     expect(screen.queryByText(tr('tools.renta.suggested'))).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('tools.renta.addChild')) }));
     fireEvent.change(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 })), {
@@ -153,10 +155,14 @@ describe('Renta planner: deductions', () => {
     expect(await screen.findByText(tr('tools.renta.suggested'))).toBeInTheDocument();
     const row = screen.getByText(/Por maternidad/).closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
-    fireEvent.change(within(row).getByRole('textbox'), { target: { value: '2' } });
+    // The first field is the number of children; the second, what was collected with the modelo 140.
+    fireEvent.change(within(row).getAllByRole('textbox')[0], { target: { value: '2' } });
     expect(
       within(row.querySelector('.renta-gives') as HTMLElement).getByText(/2\.400|2400/)
     ).toBeInTheDocument();
+    fireEvent.change(within(row).getAllByRole('textbox')[1], { target: { value: '1200' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    expect(await screen.findByText(tr('tools.renta.line.advanceReceived'))).toBeInTheDocument();
     expect(within(row).getByRole('link', { name: tr('tools.renta.official') })).toHaveAttribute(
       'href',
       expect.stringContaining('agenciatributaria')

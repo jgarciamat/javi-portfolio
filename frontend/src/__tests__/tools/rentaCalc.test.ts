@@ -489,6 +489,38 @@ describe('computeRenta', () => {
     expect(r.result).toBe(-1200);
   });
 
+  it('adds back what was collected in advance with the modelo 140 (box 0612)', () => {
+    const withAdvance: RentaState = {
+      ...state,
+      deductions: state.deductions.map((d) =>
+        d.id === 'estado-maternidad'
+          ? { ...d, advance: { model: '140', url: 'https://example.test' } }
+          : d
+      ),
+    };
+    const run = (choice: { on: boolean; units: number; advance?: number }) =>
+      computeRenta(
+        input({
+          gross: 9000,
+          socialSecurity: 0,
+          withheld: 0,
+          state: withAdvance,
+          family: { ...alone, children: [{ age: 1, disability: 0 }] },
+          choices: { 'estado-maternidad': choice },
+        })
+      );
+    // 1,200 € of deduction, 1,200 € already collected 100 € a month: nothing more to refund.
+    const all = run({ on: true, units: 1, advance: 1200 });
+    expect(all.refundable).toBe(1200);
+    expect(all.advanceReceived).toBe(1200);
+    expect(all.result).toBe(0);
+    // Six months collected: the other 600 € come with the return.
+    expect(run({ on: true, units: 1, advance: 600 }).result).toBe(-600);
+    expect(run({ on: true, units: 1 }).advanceReceived).toBe(0);
+    // Not marked: nothing is added back.
+    expect(run({ on: false, units: 1, advance: 600 }).advanceReceived).toBe(0);
+  });
+
   it('blocks a deduction when the base is over its limit and reduces it gradually', () => {
     const limited: RentaState = {
       ...state,

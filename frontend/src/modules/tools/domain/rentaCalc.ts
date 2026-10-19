@@ -201,6 +201,8 @@ export interface DeductionChoice {
   amount?: number;
   /** fixed: how many times (children, people...); defaults to 1, or to the children for `perChild`. */
   units?: number;
+  /** A refundable deduction collected in advance in the year (modelos 140 and 143), in euros. */
+  advance?: number;
 }
 
 /** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
@@ -420,6 +422,11 @@ export interface RentaResult {
   stateDeductions: number;
   regionalDeductions: number;
   refundable: number;
+  /**
+   * The refundable deductions already collected in advance in the year (modelos 140 and 143): they
+   * are added back to the result, boxes 0612, 0624, 0637, 0249, 0661 and 0663.
+   */
+  advanceReceived: number;
   /** Deduction for low pay from work (box 0414), already inside `stateDeductions`. */
   lowPay: number;
   /** Deductions that were chosen but cannot be used because of the income limit. */
@@ -664,11 +671,14 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   let stateDeductions = 0;
   let regionalDeductions = 0;
   let refundable = 0;
+  let advanceReceived = 0;
   for (const d of input.state.deductions) {
     const { on, amount } = amountOf(d);
     if (isRefundable(d)) {
       refundable += amount;
       if (on) line(d, 'state', amount);
+      // What was already collected each month is given back in the return (see computeRenta).
+      if (on && d.advance) advanceReceived += positive(input.choices[d.id].advance ?? 0);
       continue;
     }
     // A State deduction with a regional part lowers each quota by its share, each up to its quota.
@@ -683,7 +693,7 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
     regionalDeductions += amount;
     if (on) line(d, 'regional', amount);
   }
-  return { blocked, lines, stateDeductions, regionalDeductions, refundable };
+  return { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived };
 }
 
 /** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
@@ -742,10 +752,8 @@ export function computeRenta(input: RentaInput): RentaResult {
       (stateQuota + regionalQuota);
     minimumSavings[item.key] = round2(Math.max(0, saved));
   }
-  const { blocked, lines, stateDeductions, regionalDeductions, refundable } = deductionsOf(
-    input,
-    (d) => limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
-  );
+  const { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived } =
+    deductionsOf(input, (d) => limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }));
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
@@ -792,11 +800,15 @@ export function computeRenta(input: RentaInput): RentaResult {
     stateDeductions: round2(appliedState + lowPay),
     regionalDeductions: round2(appliedRegional),
     refundable: round2(refundable),
+    advanceReceived: round2(advanceReceived),
     lowPay: round2(lowPay),
     blocked,
     lines,
     netQuota,
     withheld,
-    result: round2(netQuota - withheld),
+    // Orden HAC/277/2026 (modelo 100 de 2025, BOE-A-2026-7041, page 25): [0670] = [0610] − [0611]
+    // + [0612] − [0613] − [0623] + [0624] − [0636] + [0637] − [0248] + [0249] − [0660] + [0661]
+    // − [0662] + [0663] ...: each deduction is taken off and its advance payment added back.
+    result: round2(netQuota - withheld + advanceReceived),
   };
 }
