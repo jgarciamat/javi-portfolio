@@ -1,4 +1,5 @@
 import { supplierKey, type ImportedInvoice } from './invoiceLedger';
+import { FIGURE_YEARS, figuresFor, type FiscalFigures } from './fiscalFigures';
 import type { TaxBox } from './types';
 
 /**
@@ -95,14 +96,18 @@ export interface WithholdingResult {
 }
 
 /**
- * RIRPF art. 95.1: 15 % for professional activities; 7 % in the year they start and the two after
- * (when none was carried on the year before, told to the payer) and for a few listed activities.
+ * The rates and the rent exemption of a year (fiscalFigures.ts): RIRPF art. 95.1 (15 % for
+ * professional activities; 7 % in the year they start and the two after, and for a few listed
+ * activities), art. 100 and LIRPF art. 101.8 (19 % of the rent, VAT aside) and art. 75.3.g) 2.º (no
+ * withholding when the year's rent to one landlord is 900 € or less). A year without figures takes
+ * those of the latest one.
  */
-export const PROFESSIONAL_RATES = [15, 7];
-/** RIRPF art. 100 and LIRPF art. 101.8: 19 % of everything paid to the landlord, VAT aside. */
-export const RENT_RATE = 19;
-/** RIRPF art. 75.3.g) 2.º: no withholding when the year's rent to one landlord is 900 € or less. */
-export const RENT_EXEMPT_UP_TO = 900;
+function ratesOf(year: number) {
+  const w = (
+    figuresFor(year) ?? (figuresFor(FIGURE_YEARS[FIGURE_YEARS.length - 1]) as FiscalFigures)
+  ).withholding;
+  return { professional: [w.professional, w.starting], rent: w.rent, exemptUpTo: w.rentExemptUpTo };
+}
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -120,7 +125,7 @@ export function roleOf(i: ImportedInvoice): WithholdingRole {
  * Each payee once: by tax id when the book has it (an invoice without it borrows the one of the same
  * name), otherwise by the normalised name. An invoice without either is a payee of its own.
  */
-function payeeKeys(invoices: ImportedInvoice[]): (i: ImportedInvoice) => string {
+export function payeeKeys(invoices: ImportedInvoice[]): (i: ImportedInvoice) => string {
   const nifOfName = new Map<string, string>();
   for (const i of invoices) {
     const name = supplierKey(i.concept);
@@ -208,6 +213,7 @@ function invoiceWarnings(
   all: ImportedInvoice[],
   key: (i: ImportedInvoice) => string
 ): WithholdingWarning[] {
+  const rates = ratesOf(year);
   // The rent of each landlord over the whole year: the exemption is per year and landlord.
   const yearly = new Map<string, number>();
   for (const i of all.filter(isRent))
@@ -218,11 +224,11 @@ function invoiceWarnings(
     const who = i.concept;
     if (held === 0) {
       if (role === 'professional') return [{ code: 'proNoRetention', invoice: i.id, who }];
-      return isRent(i) && (yearly.get(key(i)) as number) > RENT_EXEMPT_UP_TO
+      return isRent(i) && (yearly.get(key(i)) as number) > rates.exemptUpTo
         ? [{ code: 'rentNoRetention', invoice: i.id, who, year }]
         : [];
     }
-    const expected = role === 'rent' ? [RENT_RATE] : PROFESSIONAL_RATES;
+    const expected = role === 'rent' ? [rates.rent] : rates.professional;
     if (role === 'none' || i.base === 0 || fits(i.base, held, expected)) return [];
     return [{ code: 'rate', invoice: i.id, who, rate: rateOfInvoice(i.base, held), expected }];
   });
