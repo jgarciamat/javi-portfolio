@@ -7,6 +7,7 @@ import { openDatabase, Db } from '@infrastructure/sqlite/database';
 import { migrate, prunePreMigrationCopies } from '@infrastructure/sqlite/migrator';
 import { migrations } from '@infrastructure/sqlite/migrations';
 import { baseline } from '@infrastructure/sqlite/migrations/001-baseline';
+import { dropUploadedPictures } from '@infrastructure/sqlite/migrations/033-drop-uploaded-pictures';
 
 /** Builds a database exactly as v1.10 left it, with representative data. */
 function legacyDatabase(file = ':memory:'): Db {
@@ -214,6 +215,46 @@ describe('migrations', () => {
     expect(prunePreMigrationCopies(':memory:')).toEqual([]);
     expect(prunePreMigrationCopies(path.join(dir, 'missing', 'x.db'))).toEqual([]);
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('erases uploaded profile pictures and keeps chosen emoji (033, idempotent)', () => {
+    const db = openDatabase(':memory:');
+    migrate(
+      db,
+      migrations.filter((m) => m.version < dropUploadedPictures.version)
+    );
+    const insert = db.prepare(
+      `INSERT INTO users (id, email, name, password_hash, created_at, avatar_url)
+       VALUES (?, ?, 'U', NULL, '2026-01-01T00:00:00Z', ?)`
+    );
+    const avatars: Record<string, string | null> = {
+      png: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB',
+      jpeg: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ',
+      link: 'https://example.com/me.webp',
+      emoji: '🦊',
+      joined: '👩🏽‍💻',
+      flag: '🇪🇸',
+      none: null,
+    };
+    for (const [id, avatar] of Object.entries(avatars)) insert.run(id, `${id}@x.es`, avatar);
+    const read = (): Record<string, string | null> =>
+      Object.fromEntries(
+        (
+          db.prepare('SELECT id, avatar_url FROM users ORDER BY id').all() as {
+            id: string;
+            avatar_url: string | null;
+          }[]
+        ).map((r) => [r.id, r.avatar_url])
+      );
+    const expected = { ...avatars, png: null, jpeg: null, link: null };
+
+    migrate(db, migrations);
+    expect(db.pragma('user_version', { simple: true })).toBe(dropUploadedPictures.version);
+    expect(read()).toEqual(expected);
+
+    dropUploadedPictures.up(db);
+    expect(read()).toEqual(expected);
+    db.close();
   });
 
   it('turns on secure_delete so deleted rows are overwritten', () => {

@@ -13,8 +13,8 @@ export interface UserProps {
   verificationTokenHash: string | null;
   verificationTokenExpiresAt: string | null;
   /**
-   * Stored in the `avatar_url` column: an emoji avatar, or, for accounts from before pictures
-   * were dropped, an uploaded image (a data URL) that is kept but never served again.
+   * Stored in the `avatar_url` column: an emoji avatar. Pictures uploaded before were erased by
+   * migration 033; anything that is not an emoji is still never served.
    */
   avatar: string | null;
   /** SHA-256 of the password reset token. */
