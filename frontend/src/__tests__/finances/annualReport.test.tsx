@@ -22,7 +22,6 @@ const openReport = async (api = createFakeApi(), options: { plan?: boolean } = {
   });
   renderWithProviders(<AnnualChart initialYear={2026} />, { api, ...options });
   await screen.findByRole('table');
-  fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
   fireEvent.click(screen.getByRole('button', { name: literal(tr('app.report.open')) }));
 };
 
@@ -70,7 +69,6 @@ describe('Annual report', () => {
     await screen.findAllByRole('table');
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.close') }));
     expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.report.open')) }));
     await screen.findByRole('dialog');
     fireEvent.keyDown(document, { key: 'Escape' });

@@ -4,7 +4,6 @@ import { Capacitor } from '@capacitor/core';
 import { Modal } from '@shared/components/Modal';
 import { EmptyState } from '@shared/components/EmptyState';
 import { DateField } from '@shared/components/DateField';
-import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { CollapsiblePanel } from '@shared/components/CollapsiblePanel';
 import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
@@ -172,43 +171,6 @@ describe('DateField', () => {
     // An empty date shows the calendar icon instead of a date.
     expect(screen.getByRole('button', { name: 'Fecha' })).toHaveTextContent(/^$/);
     expect(screen.getByRole('button', { name: 'Fecha' }).querySelector('svg')).not.toBeNull();
-  });
-});
-
-describe('OptionsDropdown', () => {
-  it('opens, runs an option and closes on outside click or Escape', () => {
-    const onClick = jest.fn();
-    renderWithI18n(
-      <div>
-        <OptionsDropdown
-          ariaLabel="Opciones"
-          options={[
-            { icon: '📥', label: 'Exportar', onClick },
-            { label: 'Otra', onClick: jest.fn() },
-          ]}
-        />
-        <span>fuera</span>
-      </div>
-    );
-    const toggle = screen.getByRole('button', { name: 'Opciones' });
-    // A disclosure with plain buttons: no menu roles that would promise arrow keys.
-    expect(toggle).not.toHaveAttribute('aria-haspopup');
-    fireEvent.click(toggle);
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.queryByRole('menu')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /Exportar/ }));
-    expect(onClick).toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
-    // The list is gone: focus goes back to the toggle instead of the page.
-    expect(toggle).toHaveFocus();
-    fireEvent.click(toggle);
-    fireEvent.mouseDown(screen.getByText('fuera'));
-    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
-    fireEvent.click(toggle);
-    screen.getByRole('button', { name: 'Otra' }).focus();
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('button', { name: /Exportar/ })).toBeNull();
-    expect(toggle).toHaveFocus();
   });
 });
 

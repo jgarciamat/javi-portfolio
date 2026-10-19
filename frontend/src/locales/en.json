@@ -31,7 +31,7 @@
   "app.transactions.calendar.popup.saving": "Saved",
   "app.transactions.calendar.popup.balance": "Day balance",
   "app.transactions.calendar.popup.close": "Close",
-  "app.export.options": "Options",
+  "app.export.options": "Year actions",
   "app.monthActions.ariaLabel": "Month actions",
   "app.export.month": "Export month (CSV)",
   "app.export.annual": "Export year (CSV)",
