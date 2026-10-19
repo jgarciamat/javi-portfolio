@@ -15,6 +15,7 @@ import type { ActivityInput } from './rentaActivity';
 import { farm2025 } from '../data/renta/agrario-2025';
 import { modules2025 } from '../data/renta/modulos-2025';
 import { round2 } from './round';
+import type { ResidenceForm } from './rentaResidence';
 import { emptyProperty, fromLegacy, propertyResult, type PropertyForm } from './rentaRentals';
 
 export interface ChildForm {
@@ -66,6 +67,8 @@ export interface Choice {
 /** Everything the person types, as text, in the order of the steps. */
 export interface RentaForm {
   ccaaId: string;
+  /** Tax residence (rentaResidence.ts): a non-resident or a foral one is not worked out here. */
+  residence?: ResidenceForm;
   age: string;
   disability: Disability;
   /** Needs the help of third parties or has reduced mobility (3,000 € more below 65 %). */

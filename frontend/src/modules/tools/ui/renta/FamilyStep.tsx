@@ -3,6 +3,7 @@ import { CCAA_OPTIONS } from '../../data/renta';
 import type { RentaCcaa } from '../../domain/rentaData';
 import { DisabilitySelect, Field, Step, type StepProps } from './shared';
 import { JointSection } from './JointStep';
+import { ResidenceQuestions } from './Residence';
 
 /** The children of the person, and whether the minimum is shared with the other parent. */
 export function ChildrenSection({ form, set }: StepProps) {
@@ -202,6 +203,9 @@ export function FamilyStep({
           </a>
         </p>
       )}
+
+      <h3>{t('tools.renta.residence.title')}</h3>
+      <ResidenceQuestions form={form} set={set} />
 
       <ChildrenSection form={form} set={set} />
 

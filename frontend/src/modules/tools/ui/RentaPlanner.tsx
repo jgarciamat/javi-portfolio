@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { NewReturn, UnderYear } from './renta/NewReturn';
+import { OutOfScope, scopeOf } from './renta/Residence';
+import type { ResidenceScope } from '../domain/rentaResidence';
 import { storage } from '@shared/utils/storage';
 import type { RentaAccess, RentaMode } from '../application/useRentaAccess';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
@@ -113,8 +115,11 @@ export function ResultSection({
   invest,
   imported,
   input,
+  scope,
 }: {
   n: number;
+  /** Residence: a return filed elsewhere shows where instead of a result (rentaResidence.ts). */
+  scope?: ResidenceScope;
   input?: RentaInput;
   /** What came from the investment files, for the losses of earlier years found in them. */
   imported?: ImportedSavings;
@@ -128,28 +133,78 @@ export function ResultSection({
   mode: RentaMode;
 }) {
   const { t } = useI18n();
-  const money = useMoney();
   const inApp = mode === 'account';
   return (
     <Step n={n} titleKey="tools.renta.step4" className="renta-result">
-      <div aria-live="polite">
-        {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
-        {!access.loading && !shown && (
-          <BeforeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
-        )}
-        {shown && (
-          <>
-            <PendingNotice pending={pending} />
-            <ResultCard shown={shown} money={money} imported={imported} input={input} />
-            {!access.premium && (
-              <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
-            )}
-          </>
-        )}
-        {invest}
-        <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
-      </div>
+      {scope?.kind === 'out' ? (
+        <OutOfScope scope={scope} />
+      ) : (
+        <ResultBody
+          access={access}
+          shown={shown}
+          busy={busy}
+          pending={pending}
+          calculate={calculate}
+          inApp={inApp}
+          imported={imported}
+          input={input}
+          invest={invest}
+          residencePending={scope?.kind === 'pending'}
+        />
+      )}
+      <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
     </Step>
+  );
+}
+
+/** The result, or what to do to get it. */
+function ResultBody({
+  access,
+  shown,
+  busy,
+  pending,
+  calculate,
+  inApp,
+  imported,
+  input,
+  invest,
+  residencePending,
+}: {
+  access: RentaAccess;
+  shown: Snapshot | null;
+  busy: boolean;
+  pending: string[];
+  calculate: () => Promise<void>;
+  inApp: boolean;
+  imported?: ImportedSavings;
+  input?: RentaInput;
+  invest?: React.ReactNode;
+  residencePending: boolean;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  return (
+    <div aria-live="polite">
+      {residencePending && (
+        <p className="section-hint" role="note">
+          {t('tools.renta.residence.pendingNote')}
+        </p>
+      )}
+      {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
+      {!access.loading && !shown && (
+        <BeforeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
+      )}
+      {shown && (
+        <>
+          <PendingNotice pending={pending} />
+          <ResultCard shown={shown} money={money} imported={imported} input={input} />
+          {!access.premium && (
+            <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
+          )}
+        </>
+      )}
+      {invest}
+    </div>
   );
 }
 
@@ -231,6 +286,7 @@ export function RentaPlanner({
   } = useRentaPlanner({ initialIncome, mode, year });
   const { t } = useI18n();
   const [expert, switchView] = useExpertView();
+  const scope = scopeOf(form);
 
   return (
     <div className="renta-planner">
@@ -327,8 +383,11 @@ export function RentaPlanner({
         invest={<InvestLink form={form} />}
         imported={form.savingsDetail?.imported}
         input={input}
+        scope={scope}
       />
-      {shown && <RentaFormPreview result={shown.result} input={input} year={year} />}
+      {shown && scope.kind !== 'out' && (
+        <RentaFormPreview result={shown.result} input={input} year={year} />
+      )}
     </div>
   );
 }

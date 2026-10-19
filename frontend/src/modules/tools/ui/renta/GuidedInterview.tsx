@@ -24,6 +24,7 @@ import {
 import { AscendantsSection, ChildrenSection } from './FamilyStep';
 import { PartnerFields, SingleParentFields } from './JointStep';
 import { RentalSection, UnrentedSection } from './PropertyStep';
+import { ResidenceQuestions } from './Residence';
 import { Field, RadioOptions, Step, useMoney, type StepProps } from './shared';
 
 export interface GuideProps extends StepProps {
@@ -173,7 +174,7 @@ function HousingPart({
 type BodyProps = GuideProps & { answer: string | null };
 
 /** The community: a list, with what a foral one or a failed load means. */
-function CcaaBody({ form, set, ccaa, loadError }: BodyProps) {
+function CcaaBody({ form, set, ccaa, loadError, onePerScreen }: BodyProps) {
   const { t } = useI18n();
   return (
     <>
@@ -196,6 +197,13 @@ function CcaaBody({ form, set, ccaa, loadError }: BodyProps) {
         <p className="renta-foral" role="note">
           {t('tools.renta.foral', { name: ccaa.name })}
         </p>
+      )}
+      {/* The assistant asks the residence on a screen of its own. */}
+      {!onePerScreen && form.ccaaId !== '' && (
+        <>
+          <h3>{t('tools.renta.residence.title')}</h3>
+          <ResidenceQuestions form={form} set={set} />
+        </>
       )}
     </>
   );

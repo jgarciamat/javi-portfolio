@@ -91,6 +91,12 @@ describe('the Renta step by step: persona 01 (single employee in Madrid)', () =>
     // The data of the region is loaded on demand.
     await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
     next();
+    // Residence: asked always, it cannot be skipped by going on.
+    expect(heading(tr('wizard.renta.q.residence'))).toBeInTheDocument();
+    expect(screen.getByText(tr('wizard.renta.missing.residence'))).toBeInTheDocument();
+    pick(tr('tools.renta.residence.opt.days.more'));
+    pick(tr('tools.renta.residence.opt.special.none'));
+    next();
     type(tr('tools.renta.age'), form.age);
     finish(1);
     expect(

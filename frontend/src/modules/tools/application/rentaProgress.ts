@@ -5,6 +5,7 @@ import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 import type { ActivityInput } from '../domain/rentaActivity';
 import type { SavingsDetail } from '../domain/rentaGains';
 import { emptyProperty } from '../domain/rentaRentals';
+import { emptyResidence } from '../domain/rentaResidence';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -93,6 +94,7 @@ function withOptional(form: RentaForm, saved: Record<string, unknown>): RentaFor
   if (saved.assistance === true) form.assistance = true;
   if (isDetail(saved.savingsDetail)) form.savingsDetail = saved.savingsDetail;
   if (Array.isArray(saved.activities)) form.activities = saved.activities.filter(isActivity);
+  if (isObject(saved.residence)) form.residence = over(emptyResidence(), saved.residence);
   // Each rented property over an empty one: a field of the wrong kind is left empty.
   if (Array.isArray(saved.properties))
     form.properties = saved.properties

@@ -940,3 +940,30 @@ html.wiz-contrast .renta-new-return:focus-visible {
 .renta-year-actions:empty {
   display: none;
 }
+
+/* Residence: the questions one under the other, and a return filed elsewhere. */
+.renta-residence-q {
+  border: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.renta-residence-q > legend {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.renta-out {
+  border-left: 3px solid var(--amber-400, #fbbf24);
+  padding-left: 0.85rem;
+}
+
+.renta-out > h3,
+.renta-out > p {
+  margin: 0 0 0.6rem;
+}
+
+.renta-out-links {
+  margin: 0 0 0.6rem;
+  padding-left: 1.2rem;
+}

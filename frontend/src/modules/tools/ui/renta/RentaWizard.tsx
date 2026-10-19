@@ -22,6 +22,7 @@ import { QuestionBody, ready as guidedReady } from './GuidedInterview';
 import { InvestCard, InvestLink } from './InvestCard';
 import { NewReturn } from './NewReturn';
 import { Optimizer } from './Optimizer';
+import { ResidenceQuestions, scopeOf } from './Residence';
 import { AddProperty, PropertyCard } from './PropertyCard';
 import { SavingsDetailSection } from './SavingsDetail';
 import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
@@ -205,6 +206,16 @@ function youStep(ctx: Ctx): WizardScreen[] {
       ),
     },
     guided(ctx, 'ccaa', { missing: t(w('missing.ccaa')) }),
+    {
+      id: 'residence',
+      title: t(w('q.residence')),
+      hint: t(w('hint.residence')),
+      help: t(w('help.residence')),
+      // Asked always: a non-resident or a foral one is not worked out with the State's rules.
+      ready: scopeOf(p.form).kind !== 'pending',
+      missing: t(w('missing.residence')),
+      body: <ResidenceQuestions form={p.form} set={p.set} />,
+    },
     guided(ctx, 'age', { missing: t(w('missing.age')) }),
   ];
 }
@@ -422,6 +433,8 @@ function BoxesToCopy({ p }: { p: RentaPlannerState }) {
   const { t } = useI18n();
   const money = useMoney();
   const [copied, setCopied] = useState<string | null>(null);
+  // Filed elsewhere (not resident, foral...): no boxes of the State's return to copy.
+  if (scopeOf(p.form).kind === 'out') return <p className="section-hint">{t(w('boxesOut'))}</p>;
   if (!p.shown) return <p className="section-hint">{t(w('boxesFirst'))}</p>;
   const boxes = ourBoxes(p.shown.result, p.input);
   const copy = (box: string, value: number) => {
@@ -493,7 +506,8 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
       title: t(w('q.result')),
       hint: t(w('hint.result')),
       help: t(w('help.result')),
-      ready: p.shown !== null,
+      // Filed elsewhere: nothing to work out here, the official links are the answer.
+      ready: p.shown !== null || scopeOf(p.form).kind === 'out',
       skipLabel: t(w('skip.result')),
       body: (
         <ResultSection
@@ -507,6 +521,7 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
           invest={<InvestLink form={p.form} onGo={() => ctx.goStep(INVEST_STEP)} />}
           imported={p.form.savingsDetail?.imported}
           input={p.input}
+          scope={scopeOf(p.form)}
         />
       ),
     },
@@ -566,7 +581,7 @@ function Finale({ p, money }: { p: RentaPlannerState; money: (n: number) => stri
       {p.saved > 0 && (
         <p className="wiz-saving">{t(w('finaleSaved'), { amount: money(p.saved) })}</p>
       )}
-      {p.shown && (
+      {p.shown && scopeOf(p.form).kind !== 'out' && (
         <p className="wiz-saving">
           {t(p.shown.result.result >= 0 ? 'tools.renta.toPay' : 'tools.renta.refund')}:{' '}
           <strong>{money(Math.abs(p.shown.result.result))}</strong>
