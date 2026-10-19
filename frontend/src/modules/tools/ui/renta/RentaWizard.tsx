@@ -53,6 +53,16 @@ const ICONS: Record<string, string> = {
 export const ASSISTANT_KEY = 'mm_renta_assistant';
 export const wizardKey = (year: number) => `mm_renta_wizard_${year}`;
 const DONATIONS = 'estado-donativos-ley-49-2002';
+
+/**
+ * The deduction of what was donated (the planner takes the deduction itself, in euros): 80 % of
+ * the first 250 € and 40 % of the rest (Ley 49/2002, art. 19.1, as in the State's data). The 45 %
+ * for giving to the same body three years running is left out: it is asked in the full list.
+ */
+export function donationDeduction(given: number): number {
+  const first = Math.min(given, 250);
+  return Math.round((first * 0.8 + Math.max(0, given - 250) * 0.4) * 100) / 100;
+}
 const AEAT = 'https://sede.agenciatributaria.gob.es/';
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -152,7 +162,7 @@ function youStep(ctx: Ctx): WizardScreen[] {
           upgrade={<UpgradeCta access={p.access} />}
           draft={p.draft}
           onDraft={p.setDraft}
-          accept={(id) => p.setChoice(id, { on: true, amount: '', units: '' })}
+          accept={p.accept}
           comparison={p.comparison}
         />
       ),
@@ -275,6 +285,7 @@ function activityScreen(ctx: Ctx): WizardScreen {
 function deductionScreens(ctx: Ctx): WizardScreen[] {
   const { p, t } = ctx;
   const donation = p.form.choices[DONATIONS];
+  const given = ctx.answers.donationsGiven ?? '';
   return [
     guided(ctx, 'plan'),
     yesNo(
@@ -285,10 +296,17 @@ function deductionScreens(ctx: Ctx): WizardScreen[] {
           id="renta-wiz-donations"
           label={t(w('donationsAmount'))}
           hint={t(w('donationsAmountHint'))}
-          value={donation?.amount ?? ''}
-          onChange={(amount) =>
-            p.setChoice(DONATIONS, { ...donation, units: '', on: amount.trim() !== '', amount })
-          }
+          value={given}
+          onChange={(typed) => {
+            ctx.answer('donationsGiven', typed);
+            const deduction = donationDeduction(number(typed));
+            p.setChoice(DONATIONS, {
+              ...donation,
+              units: '',
+              on: deduction > 0,
+              amount: deduction > 0 ? String(deduction) : '',
+            });
+          }}
         />
       </div>
     ),

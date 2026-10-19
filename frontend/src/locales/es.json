@@ -4123,7 +4123,7 @@
   "wizard.renta.q.draft": "¿Tienes el borrador de la Renta en PDF?",
   "wizard.renta.skip.draft": "No lo tengo, sigo sin él",
   "wizard.renta.q.review": "Vamos a buscar deducciones para ti",
-  "wizard.renta.q.result": "Tu resultado estimado",
+  "wizard.renta.q.result": "¿Te sale a pagar o a devolver?",
   "wizard.renta.skip.result": "Ahora no",
   "wizard.renta.q.boxes": "Las casillas para copiar",
   "wizard.renta.q.file": "Cómo presentarla en Renta WEB",

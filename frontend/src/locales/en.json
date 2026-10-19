@@ -4123,7 +4123,7 @@
   "wizard.renta.q.draft": "Do you have the draft of your return as a PDF?",
   "wizard.renta.skip.draft": "I don't have it, go on",
   "wizard.renta.q.review": "Let's look for deductions for you",
-  "wizard.renta.q.result": "Your estimated result",
+  "wizard.renta.q.result": "Do you pay or get money back?",
   "wizard.renta.skip.result": "Not now",
   "wizard.renta.q.boxes": "The boxes to copy",
   "wizard.renta.q.file": "How to file it in Renta WEB",

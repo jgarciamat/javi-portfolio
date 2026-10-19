@@ -83,3 +83,25 @@ describe('Renta section', () => {
     );
   });
 });
+
+describe('Renta section, step by step', () => {
+  it('opens the self-employed screen to bring the activity', () => {
+    localStorage.removeItem('mm_renta_assistant');
+    localStorage.setItem(
+      'mm_renta_wizard_2025',
+      JSON.stringify({
+        at: 5,
+        screen: 0,
+        done: ['you', 'family', 'work', 'home', 'invest'],
+        answers: {},
+        streak: 1,
+        lastDay: '2026-03-14',
+      })
+    );
+    const onOpenTab = jest.fn();
+    renderWithProviders(<RentaView onOpenTab={onOpenTab} />);
+    fireEvent.click(screen.getByRole('radio', { name: tr('wizard.renta.opt.activity.yes') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('wizard.renta.openAutonomo') }));
+    expect(onOpenTab).toHaveBeenCalledWith('business');
+  });
+});

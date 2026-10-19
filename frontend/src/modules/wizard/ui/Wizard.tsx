@@ -275,6 +275,9 @@ function ScreenNav({
   );
 }
 
+/** The voice of each language of the app. */
+const VOICES = { es: 'es-ES', en: 'en-GB' } as const;
+
 /** «What is this?» and «Read aloud», over the help of the screen. */
 function HelpRow({ flow, screen }: { flow: string; screen: WizardScreen }) {
   const { t, locale } = useI18n();
@@ -282,7 +285,7 @@ function HelpRow({ flow, screen }: { flow: string; screen: WizardScreen }) {
   const read = () =>
     speak(
       [screen.title, screen.hint, open ? screen.help : null].filter(Boolean).join('. '),
-      locale === 'en' ? 'en-GB' : 'es-ES'
+      VOICES[locale]
     );
   return (
     <>
@@ -307,6 +310,55 @@ function HelpRow({ flow, screen }: { flow: string; screen: WizardScreen }) {
       {screen.help && open && (
         <p id={`${flow}-help`} className="wiz-help">
           {screen.help}
+        </p>
+      )}
+    </>
+  );
+}
+
+/** «Step 2 of 9 · Your family · question 1 of 3». */
+function Kicker({
+  step,
+  n,
+  total,
+  index,
+}: {
+  step: WizardStepView;
+  n: number;
+  total: number;
+  index: number;
+}) {
+  const { t } = useI18n();
+  return (
+    <p className="wiz-kicker">
+      <Icon name={step.icon} /> {t('wizard.kicker', { n, total, title: step.title })}
+      {step.screens.length > 1 &&
+        ` · ${t('wizard.screenN', { n: index + 1, total: step.screens.length })}`}
+    </p>
+  );
+}
+
+/** The main button: on, the end of the step, or the end of everything. */
+const nextLabel = (
+  t: ReturnType<typeof useI18n>['t'],
+  last: boolean,
+  lastStep: boolean,
+  n: number
+): string => {
+  if (!last) return `${t('wizard.next')} →`;
+  return lastStep ? t('wizard.finishAll') : t('wizard.finishStep', { n });
+};
+
+/** Under the answer: a soft warning, the «I don't know» note and what is still missing. */
+function Notes({ screen, unknown, ok }: { screen: WizardScreen; unknown: boolean; ok: boolean }) {
+  const { t } = useI18n();
+  return (
+    <>
+      {screen.warning && <p className="wiz-missing">{screen.warning}</p>}
+      {unknown && !screen.ready && <p className="wiz-note">{t('wizard.unknownNote')}</p>}
+      {!ok && screen.missing && (
+        <p className="wiz-missing" role="status">
+          {screen.missing}
         </p>
       )}
     </>
@@ -352,36 +404,20 @@ function ScreenCard({
   const titleId = `${flow}-screen-title`;
   return (
     <section className="wiz-step" aria-labelledby={titleId}>
-      <p className="wiz-kicker">
-        <Icon name={step.icon} /> {t('wizard.kicker', { n, total, title: step.title })}
-        {step.screens.length > 1 &&
-          ` · ${t('wizard.screenN', { n: index + 1, total: step.screens.length })}`}
-      </p>
+      <Kicker step={step} n={n} total={total} index={index} />
       <h2 id={titleId} ref={headingRef} tabIndex={-1} className="wiz-title">
         {screen.title}
       </h2>
       {screen.hint && <p className="wiz-hint">{screen.hint}</p>}
       <HelpRow flow={flow} screen={screen} />
       <div className="wiz-body">{screen.body}</div>
-      {screen.warning && <p className="wiz-missing">{screen.warning}</p>}
-      {unknown && !screen.ready && <p className="wiz-note">{t('wizard.unknownNote')}</p>}
-      {!ok && screen.missing && (
-        <p className="wiz-missing" role="status">
-          {screen.missing}
-        </p>
-      )}
+      <Notes screen={screen} unknown={unknown} ok={ok} />
       <ScreenNav
         canBack={n > 1 || index > 0}
         skip={!screen.noSkip && !screen.ready ? screen.skipLabel ?? t('wizard.skip') : null}
         ok={ok}
         missing={Boolean(screen.missing)}
-        label={
-          last
-            ? lastStep
-              ? t('wizard.finishAll')
-              : t('wizard.finishStep', { n })
-            : `${t('wizard.next')} →`
-        }
+        label={nextLabel(t, last, lastStep, n)}
         onBack={() => controls.back(0)}
         onSkip={skip}
         onNext={next}
@@ -408,9 +444,10 @@ export function Wizard({ flow, defs, steps, controls, onExpert, onRestart, final
   const step = steps[at];
   const screen = Math.min(progress.screen, step.screens.length - 1);
 
+  const showFinale = finished && !revisit;
   useEffect(() => {
     if (moved.current) heading.current?.focus();
-  }, [at, screen, revisit]);
+  }, [at, screen, revisit, showFinale]);
 
   const back = () => {
     moved.current = true;
@@ -439,7 +476,6 @@ export function Wizard({ flow, defs, steps, controls, onExpert, onRestart, final
     controls.go(i);
   };
 
-  const showFinale = finished && !revisit;
   return (
     <div className={`wiz wiz--${flow}`}>
       <Toolbar onExpert={onExpert} onRestart={onRestart} />

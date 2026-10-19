@@ -333,6 +333,8 @@ export function useRentaPlanner({
     calculate,
     reviewStart,
     startReview: () => setReviewStart((n) => n + 1),
+    /** «It applies» from the draft's questions: marked, its amount to fill in. */
+    accept: (id: string) => setChoice(id, { on: true, amount: '', units: '' }),
   };
 }
 

@@ -106,7 +106,7 @@ export function ResultSection({
   calculate,
   mode,
   n,
-  invest = null,
+  invest,
 }: {
   n: number;
   /** «Have you invested in crypto or funds?»: the way to import them. */
@@ -217,6 +217,7 @@ export function RentaPlanner({
     calculate,
     reviewStart,
     startReview,
+    accept,
   } = useRentaPlanner({ initialIncome, mode, year });
   const { t } = useI18n();
   const [expert, switchView] = useExpertView();
@@ -245,7 +246,7 @@ export function RentaPlanner({
         upgrade={<UpgradeCta access={access} />}
         draft={draft}
         onDraft={setDraft}
-        accept={(id) => setChoice(id, { on: true, amount: '', units: '' })}
+        accept={accept}
         comparison={comparison}
       />
       {expert ? (
