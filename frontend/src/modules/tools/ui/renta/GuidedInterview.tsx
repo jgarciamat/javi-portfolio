@@ -32,6 +32,8 @@ interface GuideProps extends StepProps {
   deductions: Deduction[];
   property: RentaProperty;
   reading: DraftReading | null;
+  /** Goes on to the review of the deductions that could apply. */
+  onReview: () => void;
 }
 
 const TOTAL = QUESTIONS.length;
@@ -355,11 +357,13 @@ function Summary({
   reading,
   go,
   heading,
+  onReview,
 }: {
   form: RentaForm;
   reading: DraftReading | null;
   go: (index: number) => void;
   heading: React.RefObject<HTMLHeadingElement | null>;
+  onReview: () => void;
 }) {
   const { t } = useI18n();
   const describe = useDescribe(form);
@@ -395,6 +399,11 @@ function Summary({
           );
         })}
       </ul>
+      <div className="button-row renta-guide-nav">
+        <button type="button" className="btn-primary" onClick={onReview}>
+          {t('tools.renta.review.start')}
+        </button>
+      </div>
     </div>
   );
 }
@@ -479,6 +488,7 @@ export function GuidedInterview(props: GuideProps) {
             go(index);
           }}
           heading={heading}
+          onReview={props.onReview}
         />
       )}
     </Step>

@@ -9,6 +9,7 @@ import {
 } from '@modules/tools/application/rentaProgress';
 import { NO_DRAFT, readDraft } from '@modules/tools/domain/rentaDraft';
 import { emptyForm } from '@modules/tools/domain/rentaForm';
+import { NO_REVIEW } from '@modules/tools/domain/rentaReview';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -31,11 +32,24 @@ describe('saving the planner on the device', () => {
   it('saves and loads the form, the year and the draft read, with its version', () => {
     const form = { ...emptyForm('20000'), ccaaId: 'madrid' };
     const draft = { ...NO_DRAFT, reading, rents: true, dismissed: ['a'] };
-    saveProgress({ year: 2025, form, draft });
+    const review = { dismissed: ['b'], later: ['c'] };
+    saveProgress({ year: 2025, form, draft, review });
     expect(stored().version).toBe(PROGRESS_VERSION);
-    expect(loadProgress()).toEqual({ year: 2025, form, draft });
+    expect(loadProgress()).toEqual({ year: 2025, form, draft, review });
     clearProgress();
     expect(loadProgress()).toBeNull();
+  });
+
+  it('keeps only the strings of a saved review, and none when it is broken', () => {
+    raw({
+      version: PROGRESS_VERSION,
+      year: 2025,
+      form: {},
+      review: { dismissed: ['a', 1], later: 'x' },
+    });
+    expect(loadProgress()?.review).toEqual({ dismissed: ['a'], later: [] });
+    raw({ version: PROGRESS_VERSION, year: 2025, form: {}, review: 'x' });
+    expect(loadProgress()?.review).toEqual(NO_REVIEW);
   });
 
   it('ignores what is broken, of another version or without a year', () => {
@@ -130,14 +144,24 @@ describe('the planner picks up where it was left', () => {
   });
 
   it('does not mix the data of another year', () => {
-    saveProgress({ year: 2026, form: { ...emptyForm(''), gross: '1' }, draft: NO_DRAFT });
+    saveProgress({
+      year: 2026,
+      form: { ...emptyForm(''), gross: '1' },
+      draft: NO_DRAFT,
+      review: NO_REVIEW,
+    });
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 
   it('deletes what was saved with the data', () => {
     jest.spyOn(window, 'confirm').mockReturnValue(true);
-    saveProgress({ year: 2025, form: { ...emptyForm(''), gross: '1' }, draft: NO_DRAFT });
+    saveProgress({
+      year: 2025,
+      form: { ...emptyForm(''), gross: '1' },
+      draft: NO_DRAFT,
+      review: NO_REVIEW,
+    });
     renderWithProviders(<RentaPlanner mode="local" initialIncome="5" />, { authenticated: false });
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
@@ -151,14 +175,19 @@ describe('the Renta section picks up the year that was left half done', () => {
   afterEach(restoreTime);
 
   it('opens the year of the saved data, when it is one of the years offered', async () => {
-    saveProgress({ year: 2026, form: { ...emptyForm(''), gross: '7' }, draft: NO_DRAFT });
+    saveProgress({
+      year: 2026,
+      form: { ...emptyForm(''), gross: '7' },
+      draft: NO_DRAFT,
+      review: NO_REVIEW,
+    });
     renderWithProviders(<RentaView />);
     await waitFor(() => expect(screen.getByLabelText(tr('app.renta.year'))).toHaveValue('2026'));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('7');
   });
 
   it('opens the last return otherwise', async () => {
-    saveProgress({ year: 2019, form: emptyForm(''), draft: NO_DRAFT });
+    saveProgress({ year: 2019, form: emptyForm(''), draft: NO_DRAFT, review: NO_REVIEW });
     renderWithProviders(<RentaView />);
     expect(await screen.findByLabelText(tr('app.renta.year'))).toHaveValue('2025');
   });

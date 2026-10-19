@@ -5,8 +5,6 @@ import { storage } from '@shared/utils/storage';
 import {
   computeRenta,
   descendantBreakdown,
-  incomeFactor,
-  limitBaseFor,
   type RentaInput,
   type RentaResult,
 } from '../domain/rentaCalc';
@@ -28,10 +26,20 @@ import { loadCcaa } from '../data/renta';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
-import { mentionedIn, missingDeductions, NO_DRAFT, type DraftState } from '../domain/rentaDraft';
+import { mentionedIn, NO_DRAFT, type DraftState } from '../domain/rentaDraft';
+import {
+  decide,
+  NO_REVIEW,
+  reviewOf,
+  situationOf,
+  type Decision,
+  type ReviewState,
+} from '../domain/rentaReview';
+import type { DeductionSaving } from '../domain/rentaSavings';
 import { compareBoxes, ourBoxes } from '../domain/rentaCompare';
 import { deductionSavings, markedSaving } from '../domain/rentaSavings';
 import { clearProgress, loadProgress, saveProgress } from '../application/rentaProgress';
+import { DeductionReview } from './renta/DeductionReview';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
@@ -67,44 +75,41 @@ function UpgradeCta({ access }: { access: RentaAccess }) {
   );
 }
 
-/** What the draft says about the deductions: what is missing, pending an amount or already in it. */
+/**
+ * The deductions that could apply with what the person said (and what the draft has): the ones to
+ * go through, the ones the income leaves out, and the ones pending an amount.
+ */
 function useDeductionHints(
   form: RentaForm,
   ccaa: RentaCcaa | null,
   draft: DraftState,
-  family: ReturnType<typeof familyOf>,
-  live: Snapshot
+  review: ReviewState,
+  live: Snapshot,
+  savings: Record<string, DeductionSaving>
 ) {
   const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
   const mentioned = useMemo(
     () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
     [all, draft]
   );
-  // With the person's income some deductions cannot be claimed: asking about them would be pointless.
-  const missing = useMemo(
+  // The draft's "it does not apply" and the review's are the same: nothing is asked twice.
+  const dismissed = useMemo(
+    () => [...new Set([...draft.dismissed, ...review.dismissed])],
+    [draft.dismissed, review.dismissed]
+  );
+  const found = useMemo(
     () =>
-      draft.reading
-        ? missingDeductions(
-            all.filter(
-              (d) =>
-                !draft.dismissed.includes(d.id) &&
-                !form.choices[d.id]?.on &&
-                incomeFactor(d, limitBaseFor(d, live.result)) > 0
-            ),
-            mentioned,
-            {
-              childAges: family.children.map((c) => c.age),
-              ascendants: form.ascendants.length,
-              disability: [
-                form.disability,
-                ...form.children.map((c) => c.disability),
-                ...form.ascendants.map((a) => a.disability),
-              ].some((level) => level > 0),
-              rents: draft.rents,
-            }
-          )
-        : [],
-    [all, draft, form, family, mentioned, live.result]
+      reviewOf(all, situationOf(form, draft), {
+        result: live.result,
+        savings,
+        choices: form.choices,
+        mentioned,
+      }),
+    [all, form, draft, live.result, savings, mentioned]
+  );
+  const missing = useMemo(
+    () => found.candidates.filter((d) => !dismissed.includes(d.id)),
+    [found, dismissed]
   );
   const pending = useMemo(
     () =>
@@ -125,7 +130,7 @@ function useDeductionHints(
     return map;
   }, [mentioned, missing]);
 
-  return { missing, pending, marked, hints };
+  return { all, found, dismissed, missing, pending, marked, hints };
 }
 
 interface FreeGateProps {
@@ -235,13 +240,14 @@ function useSavedPlanner(year: number, initialIncome: string) {
   const [restored] = useState(() => restoredFor(year));
   const [form, setForm] = useState<RentaForm>(() => restored?.form ?? emptyForm(initialIncome));
   const [draft, setDraftState] = useState<DraftState>(() => restored?.draft ?? NO_DRAFT);
+  const [review, setReviewState] = useState<ReviewState>(() => restored?.review ?? NO_REVIEW);
   const [recovered, setRecovered] = useState(restored !== null);
   // Only what the person changes is saved: an untouched planner keeps the income of the year.
   const dirty = useRef(restored !== null);
 
   useEffect(() => {
-    if (dirty.current) saveProgress({ year, form, draft });
-  }, [year, form, draft]);
+    if (dirty.current) saveProgress({ year, form, draft, review });
+  }, [year, form, draft, review]);
 
   const set = (patch: Partial<RentaForm>) => {
     dirty.current = true;
@@ -255,14 +261,28 @@ function useSavedPlanner(year: number, initialIncome: string) {
     dirty.current = true;
     setDraftState(next);
   };
+  /** A decision of the review: "it applies" marks it (with its amount), the rest are kept apart. */
+  const decideOn = (id: string, decision: Decision, choice?: Choice) => {
+    dirty.current = true;
+    setReviewState((r) => decide(r, id, decision));
+    // The review's lists hold the decision from now on: the draft's list forgets it.
+    setDraftState((d) => ({ ...d, dismissed: d.dismissed.filter((x) => x !== id) }));
+    setForm((f) => {
+      const current = f.choices[id];
+      if (choice) return { ...f, choices: { ...f.choices, [id]: choice } };
+      if (!current?.on) return f;
+      return { ...f, choices: { ...f.choices, [id]: { ...current, on: false } } };
+    });
+  };
   const reset = () => {
     dirty.current = false;
     clearProgress();
     setForm(emptyForm(''));
     setDraftState(NO_DRAFT);
+    setReviewState(NO_REVIEW);
     setRecovered(false);
   };
-  return { form, set, setChoice, draft, setDraft, recovered, reset };
+  return { form, set, setChoice, draft, setDraft, review, decideOn, recovered, reset };
 }
 
 /** What each deduction saves with the data as it is, and the draft's boxes next to ours. */
@@ -318,6 +338,25 @@ function useLive(
   );
 }
 
+/** The community's data, loaded when it is chosen. */
+function useCcaa(id: string) {
+  const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    setCcaa(null);
+    setLoadError(false);
+    if (!id) return undefined;
+    loadCcaa(id)
+      .then((data) => !cancelled && setCcaa(data))
+      .catch(() => !cancelled && setLoadError(true));
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+  return { ccaa, loadError };
+}
+
 /** Guided questions or the full form: remembered on this device. */
 function useExpertView(): [boolean, (on: boolean) => void] {
   const [expert, setExpert] = useState(() => storage.get(VIEW_KEY) === 'expert');
@@ -361,12 +400,11 @@ export function RentaPlanner({
   year?: number;
 }) {
   const { t } = useI18n();
-  const { form, set, setChoice, draft, setDraft, recovered, reset } = useSavedPlanner(
-    year,
-    initialIncome
-  );
-  const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
-  const [loadError, setLoadError] = useState(false);
+  const { form, set, setChoice, draft, setDraft, review, decideOn, recovered, reset } =
+    useSavedPlanner(year, initialIncome);
+  // Bumped from the guided summary: the review of the deductions starts.
+  const [reviewStart, setReviewStart] = useState(0);
+  const { ccaa, loadError } = useCcaa(form.ccaaId);
   const access = useRentaAccess(mode);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
@@ -375,20 +413,6 @@ export function RentaPlanner({
   // Bumped when the data is wiped, so the draft reader forgets its pasted text and messages too.
   const [wipes, setWipes] = useState(0);
   const [expert, switchView] = useExpertView();
-  const deductions = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setCcaa(null);
-    setLoadError(false);
-    if (!form.ccaaId) return undefined;
-    loadCcaa(form.ccaaId)
-      .then((data) => !cancelled && setCcaa(data))
-      .catch(() => !cancelled && setLoadError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [form.ccaaId]);
 
   const reduction = useMemo(() => workReductionOf(rentaState), []);
   const family = useMemo(() => familyOf(form), [form]);
@@ -406,7 +430,14 @@ export function RentaPlanner({
   const live = useLive(input, family, form);
   const { savings, saved, comparison } = useInsights(input, live.result, ccaa, form, draft.reading);
 
-  const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
+  const { all, found, dismissed, missing, pending, marked, hints } = useDeductionHints(
+    form,
+    ccaa,
+    draft,
+    review,
+    live,
+    savings
+  );
 
   const shown = access.premium ? live : snapshot;
   const calculate = async () => {
@@ -464,11 +495,28 @@ export function RentaPlanner({
           set={set}
           ccaa={ccaa}
           loadError={loadError}
-          deductions={deductions}
+          deductions={all}
           property={rentaProperty}
           reading={draft.reading}
+          onReview={() => setReviewStart((n) => n + 1)}
         />
       )}
+      <DeductionReview
+        // A new community is a new list: the review starts again.
+        key={ccaa?.id ?? ''}
+        n={expert ? 4 : 2}
+        ccaa={ccaa}
+        deductions={all}
+        candidates={found.candidates}
+        outOfReach={found.outOfReach}
+        dismissed={dismissed}
+        review={review}
+        choices={form.choices}
+        savings={savings}
+        markedSaving={saved}
+        onDecide={decideOn}
+        startSignal={reviewStart}
+      />
       <DeductionsStep
         state={rentaState}
         ccaa={ccaa}
@@ -480,7 +528,7 @@ export function RentaPlanner({
         savings={savings}
         markedSaving={saved}
         onChange={setChoice}
-        n={expert ? 4 : 2}
+        n={expert ? 5 : 3}
       />
 
       <ResultSection
@@ -490,7 +538,7 @@ export function RentaPlanner({
         pending={pending}
         calculate={calculate}
         mode={mode}
-        n={expert ? 5 : 3}
+        n={expert ? 6 : 4}
       />
     </div>
   );

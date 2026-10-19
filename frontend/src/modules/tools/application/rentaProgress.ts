@@ -1,6 +1,7 @@
 import { storage } from '@shared/utils/storage';
 import { NO_DRAFT, type DraftReading, type DraftState } from '../domain/rentaDraft';
 import { emptyForm, emptyPartner, type RentaForm } from '../domain/rentaForm';
+import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -13,6 +14,8 @@ export interface RentaProgress {
   form: RentaForm;
   /** The draft as it was read: amounts and ages only, never the text, names or ids. */
   draft: DraftState;
+  /** The review of the deductions that could apply: the dismissed ones and the ones left for later. */
+  review: ReviewState;
 }
 
 const isObject = (v: unknown): v is Record<string, unknown> =>
@@ -54,14 +57,16 @@ const isReading = (r: unknown): r is DraftReading =>
   Array.isArray(r.ascendantAges) &&
   Array.isArray(r.unrented);
 
+/** The strings of a saved list (anything else is left out). */
+const strings = (list: unknown): string[] =>
+  Array.isArray(list) ? list.filter((d): d is string => typeof d === 'string') : [];
+
 function reviveDraft(saved: unknown): DraftState {
   if (!isObject(saved) || !isReading(saved.reading)) return NO_DRAFT;
   return {
     reading: saved.reading,
     rents: saved.rents === true,
-    dismissed: Array.isArray(saved.dismissed)
-      ? saved.dismissed.filter((d) => typeof d === 'string')
-      : [],
+    dismissed: strings(saved.dismissed),
     scenario:
       isObject(saved.scenario) && isReading(saved.scenario.reading)
         ? { form: reviveForm(saved.scenario.form), reading: saved.scenario.reading }
@@ -75,7 +80,15 @@ export function loadProgress(): RentaProgress | null {
   if (!isObject(saved) || saved.version !== PROGRESS_VERSION || typeof saved.year !== 'number') {
     return null;
   }
-  return { year: saved.year, form: reviveForm(saved.form), draft: reviveDraft(saved.draft) };
+  const review = isObject(saved.review)
+    ? { dismissed: strings(saved.review.dismissed), later: strings(saved.review.later) }
+    : NO_REVIEW;
+  return {
+    year: saved.year,
+    form: reviveForm(saved.form),
+    draft: reviveDraft(saved.draft),
+    review,
+  };
 }
 
 export function saveProgress(progress: RentaProgress): void {
