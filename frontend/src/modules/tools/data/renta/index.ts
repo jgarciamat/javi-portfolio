@@ -50,10 +50,23 @@ export const CCAA_OPTIONS: { id: string; name: string }[] = [
 /** The requirements, box and rule of each deduction, checked community by community (requisitos/). */
 const REQUIREMENTS: Record<string, () => Promise<RequirementOverlay>> = {
   andalucia: () => import('./requisitos/andalucia').then((m) => m.andaluciaRequirements),
+  aragon: () => import('./requisitos/aragon').then((m) => m.aragonRequirements),
+  asturias: () => import('./requisitos/asturias').then((m) => m.asturiasRequirements),
+  baleares: () => import('./requisitos/baleares').then((m) => m.balearesRequirements),
+  canarias: () => import('./requisitos/canarias').then((m) => m.canariasRequirements),
+  cantabria: () => import('./requisitos/cantabria').then((m) => m.cantabriaRequirements),
+  'castilla-la-mancha': () =>
+    import('./requisitos/castilla-la-mancha').then((m) => m.castillaLaManchaRequirements),
   'castilla-y-leon': () =>
     import('./requisitos/castilla-y-leon').then((m) => m.castillaYLeonRequirements),
+  cataluna: () => import('./requisitos/cataluna').then((m) => m.catalunaRequirements),
   'comunitat-valenciana': () =>
     import('./requisitos/comunitat-valenciana').then((m) => m.comunitatValencianaRequirements),
+  extremadura: () => import('./requisitos/extremadura').then((m) => m.extremaduraRequirements),
+  galicia: () => import('./requisitos/galicia').then((m) => m.galiciaRequirements),
+  'la-rioja': () => import('./requisitos/la-rioja').then((m) => m.laRiojaRequirements),
+  madrid: () => import('./requisitos/madrid').then((m) => m.madridRequirements),
+  murcia: () => import('./requisitos/murcia').then((m) => m.murciaRequirements),
 };
 
 /** The community's deductions with their requirements. */

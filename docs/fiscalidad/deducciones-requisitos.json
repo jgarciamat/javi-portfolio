@@ -214,6 +214,2057 @@
         }
       ]
     },
+    "aragon-nacimiento-tercer-hijo": {
+      "titulo": "Por nacimiento o adopción del tercer hijo y siguientes",
+      "casilla": "0866",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "tercero",
+          "q": "¿Es tu tercer hijo o siguiente y convives con él?"
+        }
+      ]
+    },
+    "aragon-nacimiento-hijo-discapacidad": {
+      "titulo": "Por nacimiento o adopción de un hijo con discapacidad",
+      "casilla": "0867",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "discapacidad",
+          "q": "¿Los servicios sociales le reconocieron la discapacidad antes de fin de año?"
+        }
+      ]
+    },
+    "aragon-adopcion-internacional": {
+      "titulo": "Por adopción internacional de niños",
+      "casilla": "0868",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "adopcion",
+          "q": "¿La resolución judicial de la adopción internacional es de 2025?"
+        }
+      ]
+    },
+    "aragon-cuidado-dependientes": {
+      "titulo": "Por cuidado de personas dependientes",
+      "casilla": "0869",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿La persona dependiente convive contigo al menos medio año y gana menos de 8.000 €?"
+        }
+      ]
+    },
+    "aragon-mayores-70": {
+      "titulo": "Para mayores de 70 años",
+      "casilla": "0878",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "minAge",
+          "age": 70
+        },
+        {
+          "kind": "ask",
+          "id": "rendimientos",
+          "q": "¿Tuviste algún rendimiento del trabajo o de una actividad económica?"
+        }
+      ]
+    },
+    "aragon-nacimiento-primer-segundo-hijo-pueblos": {
+      "titulo": "Por primer o segundo hijo en pueblos de menos de 10.000 habitantes",
+      "casilla": "0880",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Viviste este año y el anterior en un municipio aragonés de menos de 10.000 habitantes?"
+        }
+      ]
+    },
+    "aragon-guarderia-menores-3": {
+      "titulo": "Por gastos de guardería de hijos menores de 3 años",
+      "casilla": "0881",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 3
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        },
+        {
+          "kind": "ask",
+          "id": "pago",
+          "q": "¿Tienes factura y pagaste por banco o con tarjeta?"
+        }
+      ]
+    },
+    "aragon-libros-texto-material-escolar": {
+      "titulo": "Por libros de texto y material escolar",
+      "casilla": "0875",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "gasto",
+          "q": "¿Son libros de texto o material escolar de tus hijos (no equipos informáticos)?"
+        }
+      ]
+    },
+    "aragon-clases-apoyo-refuerzo": {
+      "titulo": "Por clases de apoyo o refuerzo de los hijos",
+      "casilla": "0885",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "pago",
+          "q": "¿Tienes factura y pagaste por banco o con tarjeta?"
+        }
+      ]
+    },
+    "aragon-formacion-autonomia-discapacidad": {
+      "titulo": "Por formación para la autonomía de menores con discapacidad",
+      "casilla": "0888",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "menor",
+          "q": "¿Es formación para la autonomía de un hijo menor con discapacidad?"
+        },
+        {
+          "kind": "ask",
+          "id": "pago",
+          "q": "¿Tienes factura y pagaste por banco o con tarjeta?"
+        }
+      ]
+    },
+    "aragon-vivienda-victimas-terrorismo": {
+      "titulo": "Vivienda habitual de víctimas del terrorismo",
+      "casilla": "0871",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Eres víctima del terrorismo y es tu primera vivienda habitual, nueva, protegida y en Aragón?"
+        }
+      ]
+    },
+    "aragon-vivienda-nucleos-rurales": {
+      "titulo": "Compra o rehabilitación de vivienda en núcleos rurales",
+      "casilla": "0874",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Es tu primera vivienda, comprada o rehabilitada desde 2012 en un municipio de menos de 3.000 habitantes o entidad local menor?"
+        }
+      ]
+    },
+    "aragon-alquiler-dacion-en-pago": {
+      "titulo": "Alquiler de vivienda habitual tras una dación en pago",
+      "casilla": "0876",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "dacion",
+          "q": "¿Entregaste tu vivienda en dación en pago de toda la hipoteca y la alquilas con opción de compra?"
+        },
+        {
+          "kind": "ask",
+          "id": "fianza",
+          "q": "¿La fianza está depositada en el órgano de vivienda de Aragón?"
+        }
+      ]
+    },
+    "aragon-residencia-municipios": {
+      "titulo": "Por residir en municipios en riesgo extremo de despoblación",
+      "casilla": "1850",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "residencia",
+          "q": "¿Vives en un asentamiento de rango X y seguirás allí los cuatro años siguientes?"
+        }
+      ]
+    },
+    "aragon-donaciones-ecologicas-id": {
+      "titulo": "Donaciones ecológicas y de investigación",
+      "casilla": "0870",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Donaste dinero a una entidad inscrita en los registros de Aragón con fines ecológicos o de investigación?"
+        }
+      ]
+    },
+    "aragon-arrendamiento-vivienda-social": {
+      "titulo": "Para arrendadores de vivienda social",
+      "casilla": "0877",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Pusiste la vivienda a disposición del Gobierno de Aragón o de la gestora del Plan de Vivienda Social?"
+        }
+      ]
+    },
+    "aragon-acciones-mab": {
+      "titulo": "Inversión en empresas del Mercado Alternativo Bursátil",
+      "casilla": "0872",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿No superas el 10 % del capital, mantendrás las acciones dos años y la sociedad tiene domicilio en Aragón?"
+        }
+      ]
+    },
+    "aragon-acciones-entidades-nuevas": {
+      "titulo": "Inversión en entidades nuevas o de reciente creación",
+      "casilla": "0873",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La sociedad tiene domicilio en Aragón, cumple los requisitos de la deducción estatal y no tienes en ella funciones ejecutivas ni relación laboral?"
+        }
+      ]
+    },
+    "aragon-entidades-economia-social": {
+      "titulo": "Inversión en entidades de economía social",
+      "casilla": "0879",
+      "norma": "Decreto Legislativo 1/2005 de Aragón (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Tienes como mucho el 40 % (con familiares), la entidad tiene un empleado a jornada completa y mantendrás la aportación cinco años?"
+        }
+      ]
+    },
+    "asturias-acogimiento-mayores-65": {
+      "titulo": "Por acoger sin remuneración a mayores de 65 años",
+      "casilla": "0883",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogido",
+          "q": "¿Acoges sin cobrar a una persona de 65 años o más que no es familiar tuyo hasta el tercer grado?"
+        },
+        {
+          "kind": "ask",
+          "id": "documento",
+          "q": "¿Tienes el documento de la Consejería de servicios sociales y no recibes ayudas del Principado por ese acogimiento?"
+        }
+      ]
+    },
+    "asturias-adopcion-internacional": {
+      "titulo": "Por adopción internacional de menores",
+      "casilla": "0889",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "registro",
+          "q": "¿Es una adopción internacional inscrita en el Registro Civil en 2025?"
+        }
+      ]
+    },
+    "asturias-partos-multiples": {
+      "titulo": "Por partos múltiples o adopciones múltiples",
+      "casilla": "0890",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "multiple",
+          "q": "¿Fue un parto múltiple, o dos o más adopciones en la misma fecha, en 2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Los menores conviven contigo a 31 de diciembre?"
+        }
+      ]
+    },
+    "asturias-familia-numerosa": {
+      "titulo": "Para familias numerosas",
+      "casilla": "0891",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        },
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convives con la familia a 31 de diciembre?"
+        }
+      ]
+    },
+    "asturias-familia-monoparental": {
+      "titulo": "Para familias monoparentales",
+      "casilla": "0892",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Vives solo con tus hijos menores (o mayores con discapacidad) más de 183 días, sin custodia compartida?"
+        },
+        {
+          "kind": "ask",
+          "id": "rentas-hijos",
+          "q": "¿Cada uno de esos hijos gana menos de 8.000 € al año?"
+        }
+      ]
+    },
+    "asturias-acogimiento-familiar-menores": {
+      "titulo": "Por acogimiento familiar de menores",
+      "casilla": "0893",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tienes a un menor en acogimiento familiar de urgencia, temporal o permanente (no preadoptivo)?"
+        }
+      ]
+    },
+    "asturias-gastos-centros-0-3": {
+      "titulo": "Por gastos en centros de 0 a 3 años",
+      "casilla": "0895",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "centro",
+          "q": "¿Pagaste la guardería o el centro de 0 a 3 años de ese hijo?"
+        }
+      ]
+    },
+    "asturias-nacimiento-segundo-hijo-despoblamiento": {
+      "titulo": "Por segundo hijo y siguientes en concejos en riesgo demográfico",
+      "casilla": "0803",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "segundo",
+          "q": "¿Es tu segundo hijo o siguiente y convive contigo a 31 de diciembre?"
+        },
+        {
+          "kind": "ask",
+          "id": "concejo",
+          "q": "¿Vives en un concejo en riesgo de despoblamiento o en crisis demográfica (Decreto 83/2025)?"
+        }
+      ]
+    },
+    "asturias-cuidado-descendientes-25": {
+      "titulo": "Por cuidado de hijos y descendientes hasta 25 años",
+      "casilla": "1848",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convives a 31 de diciembre con los hijos o descendientes de hasta 25 años por los que la aplicas?"
+        }
+      ]
+    },
+    "asturias-ayudas-ela": {
+      "titulo": "Por ayudas del Principado a enfermos de ELA",
+      "casilla": "0819",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Cobraste una ayuda del Principado de Asturias para enfermos de ELA que declaras en la base imponible general?"
+        }
+      ]
+    },
+    "asturias-hijos-fallecimiento-accidente-laboral": {
+      "titulo": "Por hijos tras la muerte de un progenitor en accidente laboral",
+      "casilla": "1643",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "accidente",
+          "q": "¿El otro progenitor de tus hijos falleció en un accidente laboral?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos comunes con el fallecido te dan derecho al mínimo por descendientes?"
+        }
+      ]
+    },
+    "asturias-enfermedad-celiaca": {
+      "titulo": "Por gastos de enfermedad celíaca",
+      "casilla": null,
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "diagnostico",
+          "q": "¿La enfermedad celíaca está diagnosticada con un informe médico oficial y pagaste tú los gastos?"
+        }
+      ]
+    },
+    "asturias-vivienda-discapacidad": {
+      "titulo": "Compra o adecuación de vivienda por discapacidad",
+      "casilla": "0884",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "discapacidad",
+          "q": "¿Tú, tu cónyuge o un familiar que convive contigo tiene discapacidad y la compra u obra es necesaria para su accesibilidad?"
+        },
+        {
+          "kind": "ask",
+          "id": "certificado",
+          "q": "¿Tienes el certificado de la Consejería que lo acredita?"
+        }
+      ]
+    },
+    "asturias-vivienda-protegida": {
+      "titulo": "Por vivienda habitual protegida",
+      "casilla": "0886",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "protegida",
+          "q": "¿Tu vivienda habitual es una vivienda protegida y tienes las facturas o el préstamo que lo justifican?"
+        }
+      ]
+    },
+    "asturias-alquiler-vivienda-habitual": {
+      "titulo": "Por alquiler de la vivienda habitual",
+      "casilla": "0887",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titular",
+          "q": "¿Eres titular del contrato de alquiler de tu vivienda habitual?"
+        }
+      ]
+    },
+    "asturias-vivienda-colectivos-despoblamiento": {
+      "titulo": "Compra o rehabilitación de vivienda en concejos en riesgo",
+      "casilla": "1556",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "concejo",
+          "q": "¿Compraste o rehabilitaste tu vivienda habitual en un concejo en riesgo de despoblamiento (Decreto 83/2025)?"
+        },
+        {
+          "kind": "ask",
+          "id": "permanencia",
+          "q": "¿Mantendrás tu domicilio fiscal en ese concejo al menos tres años?"
+        }
+      ]
+    },
+    "asturias-gastos-arrendamiento-viviendas": {
+      "titulo": "Gastos de propietarios que alquilan a precio asequible",
+      "casilla": "1628",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alquiler",
+          "q": "¿Alquilas una vivienda que es la vivienda habitual del inquilino, con una renta que no pasa del índice estatal de referencia?"
+        }
+      ]
+    },
+    "asturias-gestion-forestal-sostenible": {
+      "titulo": "Por certificación de gestión forestal sostenible",
+      "casilla": "0894",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificacion",
+          "q": "¿Eres propietario de montes en Asturias y obtuviste en 2025 la certificación de gestión forestal sostenible?"
+        }
+      ]
+    },
+    "asturias-libros-texto-material-escolar": {
+      "titulo": "Por libros de texto y material escolar",
+      "casilla": "0896",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "hijos",
+          "q": "¿Compraste los libros o el material escolar para hijos por los que tienes el mínimo por descendientes?"
+        }
+      ]
+    },
+    "asturias-autonomos-despoblamiento": {
+      "titulo": "Para quien se hace autónomo en concejos en riesgo",
+      "casilla": "0812",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Te diste de alta como autónomo en 2025 en un concejo en riesgo de despoblamiento y mantendrás el alta al menos un año?"
+        },
+        {
+          "kind": "ask",
+          "id": "actividad",
+          "q": "¿No cesaste en esa actividad en los 6 meses anteriores y no eres autónomo colaborador ni socio de una sociedad de capital?"
+        }
+      ]
+    },
+    "asturias-transporte-publico-despoblamiento": {
+      "titulo": "Por abonos de transporte público en concejos en riesgo",
+      "casilla": "0813",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "concejo",
+          "q": "¿Vives en un concejo en riesgo de despoblamiento o en crisis demográfica (Decreto 83/2025)?"
+        }
+      ]
+    },
+    "asturias-formacion-id-cientifica": {
+      "titulo": "Gastos de formación de investigadores y técnicos",
+      "casilla": "1557",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "puesto",
+          "q": "¿Trabajas en I+D en un puesto del grupo de cotización 1, con contrato o con un año de alta como autónomo?"
+        },
+        {
+          "kind": "ask",
+          "id": "plazo",
+          "q": "¿Acabaste la formación hace tres años o menos y residirás en Asturias al menos tres años?"
+        }
+      ]
+    },
+    "asturias-traslado-domicilio-laboral": {
+      "titulo": "Por trasladar tu domicilio fiscal a Asturias por trabajo",
+      "casilla": "0689",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Trasladaste tu domicilio fiscal a Asturias por un trabajo (contrato o alta como autónomo) sin haber vivido allí los 4 años anteriores?"
+        },
+        {
+          "kind": "ask",
+          "id": "permanencia",
+          "q": "¿Mantendrás la residencia en Asturias al menos 3 años?"
+        }
+      ]
+    },
+    "asturias-vehiculos-electricos": {
+      "titulo": "Por comprar un vehículo eléctrico",
+      "casilla": "0811",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vehiculo",
+          "q": "¿Compraste a tu nombre un vehículo eléctrico de las categorías del programa MOVES III que no usas en una actividad económica?"
+        }
+      ]
+    },
+    "asturias-emancipacion-jovenes": {
+      "titulo": "Por emancipación de jóvenes hasta 35 años",
+      "casilla": "1849",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "emancipacion",
+          "q": "¿Dejaste de vivir con tus padres o abuelos y te fuiste a una vivienda habitual en Asturias?"
+        }
+      ]
+    },
+    "asturias-gastos-vitales-jovenes": {
+      "titulo": "Gastos vitales de jóvenes hasta 35 años",
+      "casilla": "1630",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes factura de los gastos por los que la aplicas?"
+        }
+      ]
+    },
+    "asturias-acciones-entidades-nuevas": {
+      "titulo": "Inversión en sociedades nuevas o de reciente creación",
+      "casilla": "1683",
+      "norma": "Decreto Legislativo 2/2014 del Principado de Asturias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿Es una sociedad nueva o reciente con domicilio social y fiscal en Asturias, con actividad económica y que crea empleo?"
+        },
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Tu participación, con la de tu familia, no pasa del 40 % del capital y la mantendrás al menos 3 años?"
+        }
+      ]
+    },
+    "baleares-nacimiento": {
+      "titulo": "Por nacimiento de hijos",
+      "casilla": "1718",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació en 2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "residente",
+          "q": "¿Ya vivías en Baleares en 2024?"
+        }
+      ]
+    },
+    "baleares-adopcion": {
+      "titulo": "Por adopción de hijos",
+      "casilla": "1721",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "adopcion",
+          "q": "¿Adoptaste en 2025 (inscrito en el Registro Civil) a un hijo que no es de tu cónyuge o pareja?"
+        },
+        {
+          "kind": "ask",
+          "id": "ayudas",
+          "q": "¿No cobraste ayudas autonómicas por nacimiento por ese hijo?"
+        }
+      ]
+    },
+    "baleares-discapacidad-contribuyente-descendientes": {
+      "titulo": "Por discapacidad del declarante o de sus familiares",
+      "casilla": "0906",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "discapacidad",
+          "q": "¿Tú o alguien de tu unidad familiar tiene una discapacidad reconocida del 33 % o más?"
+        }
+      ]
+    },
+    "baleares-gastos-mayores-discapacidad": {
+      "titulo": "Gastos de mayores de 65 años o personas con discapacidad",
+      "casilla": "1698",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "persona",
+          "q": "¿Pagaste residencia, centro de día o cuidador para alguien de tu familia mayor de 65 años o con discapacidad?"
+        },
+        {
+          "kind": "ask",
+          "id": "pago",
+          "q": "¿Pagaste por banco (no en efectivo) y, si es un cuidador, está de alta en la Seguridad Social?"
+        }
+      ]
+    },
+    "baleares-conciliacion-menores-seis": {
+      "titulo": "Conciliación: gastos de hijos menores de 6 años",
+      "casilla": "0914",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 6
+        },
+        {
+          "kind": "ask",
+          "id": "trabajo",
+          "q": "¿Trabajas por cuenta ajena o propia y pagaste por banco, no en efectivo?"
+        }
+      ]
+    },
+    "baleares-libros-texto": {
+      "titulo": "Libros de texto",
+      "casilla": "0899",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "baleares-idiomas-extraescolar": {
+      "titulo": "Idiomas extranjeros extraescolares",
+      "casilla": "0900",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        },
+        {
+          "kind": "ask",
+          "id": "clases",
+          "q": "¿Son clases extraescolares de idiomas en España, no estancias en el extranjero ni campamentos?"
+        }
+      ]
+    },
+    "baleares-estudios-superiores-fuera-isla": {
+      "titulo": "Estudios superiores fuera de tu isla",
+      "casilla": "0908",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "estudios",
+          "q": "¿Tu hijo, que te da derecho al mínimo y gana hasta 8.000 €, estudia fuera de tu isla un curso completo o al menos 30 créditos?"
+        }
+      ]
+    },
+    "baleares-ela": {
+      "titulo": "Gastos por esclerosis lateral amiotrófica (ELA)",
+      "casilla": "0770",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ela",
+          "q": "¿Son gastos por la ELA tuya o de un hijo o ascendiente que te da derecho al mínimo?"
+        }
+      ]
+    },
+    "baleares-alquiler-vivienda-habitual": {
+      "titulo": "Alquiler de la vivienda habitual",
+      "casilla": "0907",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "situacion",
+          "q": "¿Tienes menos de 36 años, más de 65 sin trabajar, una discapacidad o eres familia numerosa o monoparental?"
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es de un año o más y ni tú ni tu familia tenéis otra vivienda a menos de 70 km en la misma isla?"
+        }
+      ]
+    },
+    "baleares-arrendador-primas-seguros": {
+      "titulo": "Arrendador: seguros de impago de alquiler",
+      "casilla": "0909",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es de un año o más, con la fianza depositada en el IBAVI y las rentas declaradas como capital inmobiliario?"
+        }
+      ]
+    },
+    "baleares-arrendador-otros-gastos": {
+      "titulo": "Arrendador: gastos de la vivienda alquilada",
+      "casilla": "1720",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es de un año o más, con la fianza depositada en el IBAVI y las rentas declaradas como capital inmobiliario?"
+        },
+        {
+          "kind": "ask",
+          "id": "primera",
+          "q": "¿La vivienda no se alquiló en los 2 años anteriores, la renta no pasa de 15 €/m² al mes y es la primera vez que aplicas esta deducción?"
+        }
+      ]
+    },
+    "baleares-alquiler-traslado-laboral": {
+      "titulo": "Alquiler por traslado laboral a otra isla",
+      "casilla": "0910",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Tu empresa te trasladó a otra isla balear por un máximo de 3 años, con la fianza depositada en el IBAVI?"
+        }
+      ]
+    },
+    "baleares-sostenibilidad-vivienda": {
+      "titulo": "Obras de sostenibilidad en la vivienda habitual",
+      "casilla": "0898",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificados",
+          "q": "¿La obra sube al menos un nivel la calificación energética, con certificados registrados antes y después?"
+        }
+      ]
+    },
+    "baleares-vivienda-ocupada-ilegalmente": {
+      "titulo": "Vivienda ocupada ilegalmente o con desahucio suspendido",
+      "casilla": "2237",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ocupada",
+          "q": "¿La vivienda es tuya y está ocupada ilegalmente o con el desahucio suspendido por vulnerabilidad del inquilino?"
+        }
+      ]
+    },
+    "baleares-plazas-dificil-cobertura": {
+      "titulo": "Plazas de difícil cobertura (vivienda y transporte)",
+      "casilla": "1763",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "plaza",
+          "q": "¿Cobraste más de medio año el complemento de plaza de difícil cobertura, o eres policía nacional o guardia civil destinado en Baleares?"
+        }
+      ]
+    },
+    "baleares-donaciones-cultural": {
+      "titulo": "Mecenazgo cultural, científico y consumo cultural",
+      "casilla": "0902",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "baleares-donaciones-deportivo": {
+      "titulo": "Mecenazgo deportivo",
+      "casilla": "0904",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "baleares-donaciones-investigacion": {
+      "titulo": "Donaciones a investigación e innovación",
+      "casilla": "0901",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "baleares-donaciones-lengua-catalana": {
+      "titulo": "Donaciones para el fomento del catalán",
+      "casilla": "0905",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "baleares-donaciones-tercer-sector": {
+      "titulo": "Donaciones al tercer sector de acción social",
+      "casilla": "0913",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        },
+        {
+          "kind": "ask",
+          "id": "registro",
+          "q": "¿La entidad está inscrita en el registro de la Consejería de Familias de Baleares?"
+        }
+      ]
+    },
+    "baleares-autoocupacion": {
+      "titulo": "Fomento de la autoocupación",
+      "casilla": "1716",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Te diste de alta por primera vez en el censo de empresarios para una actividad en Baleares y la mantendrás un año?"
+        }
+      ]
+    },
+    "baleares-inversion-nuevas-empresas": {
+      "titulo": "Inversión en empresas nuevas",
+      "casilla": "0903",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "empresa",
+          "q": "¿La empresa tiene domicilio en Baleares, actividad, un empleado y factura menos de 2 M€, y tu familia no pasa del 40 %?"
+        },
+        {
+          "kind": "ask",
+          "id": "mantener",
+          "q": "¿La inversión consta en escritura pública y la mantendrás 4 años?"
+        }
+      ]
+    },
+    "baleares-ayudas-emergencia-proteccion-civil": {
+      "titulo": "Ayudas por zona afectada por una emergencia",
+      "casilla": "0915",
+      "norma": "Decreto Legislativo 1/2014 de las Illes Balears (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Declaras ayudas del Govern por daños en una zona declarada gravemente afectada por una emergencia?"
+        }
+      ]
+    },
+    "canarias-nacimiento-adopcion": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "0922",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "convive",
+          "q": "¿El hijo convive contigo?"
+        }
+      ]
+    },
+    "canarias-familia-numerosa": {
+      "titulo": "Por familia numerosa",
+      "casilla": "0925",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        }
+      ]
+    },
+    "canarias-familias-monoparentales": {
+      "titulo": "Por familias monoparentales",
+      "casilla": "0938",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Vives solo con tus hijos menores (o mayores con discapacidad) que ganan hasta 8.000 €, sin otra persona salvo ascendientes a tu cargo?"
+        }
+      ]
+    },
+    "canarias-acogimiento-menores": {
+      "titulo": "Por acogimiento de menores",
+      "casilla": "0937",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tienes un menor en acogimiento familiar que convive contigo y no lo adoptaste en 2025?"
+        }
+      ]
+    },
+    "canarias-discapacidad-mayores-65": {
+      "titulo": "Contribuyentes con discapacidad y mayores de 65",
+      "casilla": "0923",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "situacion",
+          "q": "¿A 31 de diciembre tenías una discapacidad del 33 % o más o más de 65 años?"
+        }
+      ]
+    },
+    "canarias-familiares-dependientes-discapacidad": {
+      "titulo": "Familiares dependientes con discapacidad",
+      "casilla": "0941",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "familiar",
+          "q": "¿Tienes un ascendiente o descendiente con discapacidad del 65 % o más que te da derecho al mínimo?"
+        }
+      ]
+    },
+    "canarias-desempleados": {
+      "titulo": "Contribuyentes desempleados",
+      "casilla": "0933",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "paro",
+          "q": "¿Cobraste prestación por desempleo más de seis meses de 2025?"
+        }
+      ]
+    },
+    "canarias-empleados-hogar": {
+      "titulo": "Cuotas de Seguridad Social de empleados del hogar",
+      "casilla": "2051",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "situacion",
+          "q": "¿Tienes hijos que te dan el mínimo y trabajas, o tienes 75 años o más, o más de 65 con discapacidad?"
+        },
+        {
+          "kind": "ask",
+          "id": "empleado",
+          "q": "¿Pagaste cuotas de un empleado del hogar dado de alta y tienes su NIF?"
+        }
+      ]
+    },
+    "canarias-gasto-enfermedad": {
+      "titulo": "Gastos de enfermedad",
+      "casilla": "0940",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes factura del médico o sanitario y no es un seguro médico?"
+        }
+      ]
+    },
+    "canarias-guarderias": {
+      "titulo": "Gastos de custodia en guarderías",
+      "casilla": "0924",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 3
+        },
+        {
+          "kind": "ask",
+          "id": "guarderia",
+          "q": "¿El menor convive contigo y tienes factura de una guardería autorizada con su NIF?"
+        }
+      ]
+    },
+    "canarias-estudios-superiores": {
+      "titulo": "Gastos de estudios de educación superior",
+      "casilla": "0919",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 25
+        },
+        {
+          "kind": "ask",
+          "id": "hijo",
+          "q": "¿Tu hijo, soltero, a tu cargo y con rentas hasta 8.000 €, estudia fuera de tu isla o de tu municipio?"
+        }
+      ]
+    },
+    "canarias-estudios-no-superiores": {
+      "titulo": "Gastos de estudios no superiores",
+      "casilla": "0936",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes factura de los gastos escolares (infantil, básica o secundaria postobligatoria)?"
+        }
+      ]
+    },
+    "canarias-alquiler-vivienda-habitual": {
+      "titulo": "Alquiler de la vivienda habitual",
+      "casilla": "0928",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es de un año o más y tienes el NIF del arrendador y la referencia catastral?"
+        },
+        {
+          "kind": "ask",
+          "id": "diez",
+          "q": "¿El alquiler anual supera el 10 % de tu base imponible?"
+        }
+      ]
+    },
+    "canarias-alquiler-dacion-en-pago": {
+      "titulo": "Alquiler tras dación en pago de tu vivienda",
+      "casilla": "0942",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "dacion",
+          "q": "¿Entregaste tu vivienda al banco y ahora la alquilas con opción de compra a esa entidad?"
+        }
+      ]
+    },
+    "canarias-inversion-vivienda-habitual": {
+      "titulo": "Inversión en vivienda habitual",
+      "casilla": "0926",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Compraste tu vivienda habitual antes de 2013 (o caso equivalente) y aplicas el régimen transitorio?"
+        }
+      ]
+    },
+    "canarias-obras-adecuacion-discapacidad": {
+      "titulo": "Obras de adecuación de la vivienda por discapacidad",
+      "casilla": "0927",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "discapacidad",
+          "q": "¿Tú o un familiar conviviente tenéis discapacidad del 65 % o más y tienes el certificado de necesidad de la Consejería?"
+        }
+      ]
+    },
+    "canarias-rehabilitacion-energetica": {
+      "titulo": "Rehabilitación energética de la vivienda habitual",
+      "casilla": "0939",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificados",
+          "q": "¿Pagaste por banco y tienes los certificados energéticos registrados de antes y después?"
+        }
+      ]
+    },
+    "canarias-restauracion-bienes-interes-cultural": {
+      "titulo": "Restauración de inmuebles de interés cultural",
+      "casilla": "0918",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "autorizacion",
+          "q": "¿El inmueble es Bien de Interés Cultural y las obras están autorizadas por la administración?"
+        }
+      ]
+    },
+    "canarias-puesta-viviendas-alquiler": {
+      "titulo": "Poner viviendas en alquiler",
+      "casilla": "2050",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿La vivienda está en Canarias, no se alquilaba en 2024 y el contrato es de 3 años o más?"
+        },
+        {
+          "kind": "ask",
+          "id": "familia",
+          "q": "¿El inquilino no es tu cónyuge ni pariente hasta el tercer grado?"
+        }
+      ]
+    },
+    "canarias-adecuacion-inmueble-arrendamiento": {
+      "titulo": "Arrendador: gastos de preparar el inmueble",
+      "casilla": "2049",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Es un alquiler de vivienda de la LAU y tienes factura de los gastos?"
+        }
+      ]
+    },
+    "canarias-seguros-credito-impago": {
+      "titulo": "Arrendador: seguros de crédito por impago",
+      "casilla": "0944",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es de un año o más, con fianza depositada, renta de hasta 800 € al mes y rentas declaradas como capital inmobiliario?"
+        }
+      ]
+    },
+    "canarias-donaciones-entidades-sin-lucro": {
+      "titulo": "Donaciones a entidades sin ánimo de lucro",
+      "casilla": "0935",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "canarias-donaciones-ecologicas": {
+      "titulo": "Donaciones con finalidad ecológica",
+      "casilla": "0916",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "canarias-donaciones-culturales-deportivas": {
+      "titulo": "Donaciones culturales, deportivas, de investigación o docencia",
+      "casilla": "0934",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "canarias-donaciones-patrimonio-historico": {
+      "titulo": "Donaciones para el patrimonio histórico canario",
+      "casilla": "0917",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "canarias-inversion-nuevas-empresas": {
+      "titulo": "Inversión en empresas nuevas o de reciente creación",
+      "casilla": "2246",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "empresa",
+          "q": "¿La empresa tiene domicilio en Canarias y actividad económica, la mantendrás 3 años y no tienes funciones ejecutivas?"
+        }
+      ]
+    },
+    "canarias-traslado-otra-isla": {
+      "titulo": "Traslado de residencia a otra isla por trabajo",
+      "casilla": "0920",
+      "norma": "Decreto Legislativo 1/2009 de Canarias (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Te trasladaste a otra isla por trabajo y seguirás allí el año del traslado y los tres siguientes?"
+        }
+      ]
+    },
+    "cantabria-nacimiento-adopcion": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "0774",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        }
+      ]
+    },
+    "cantabria-cuidado-familiares": {
+      "titulo": "Por cuidado de familiares",
+      "casilla": "0947",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "familiar",
+          "q": "¿Cuidas de un hijo menor de 3 años, un ascendiente mayor de 70 o un familiar con discapacidad del 65 % o más que convive contigo más de 183 días?"
+        },
+        {
+          "kind": "ask",
+          "id": "rentas",
+          "q": "¿Ese familiar tiene rentas de hasta 6.000 € (12.600 € si tiene discapacidad)?"
+        }
+      ]
+    },
+    "cantabria-acogimiento-familiar": {
+      "titulo": "Por acogimiento familiar de menores",
+      "casilla": "0952",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tienes un menor en acogimiento familiar como acogedor seleccionado por una entidad pública, sin ser familiar suyo ni haberlo adoptado en 2025?"
+        }
+      ]
+    },
+    "cantabria-familias-monoparentales": {
+      "titulo": "Para familias monoparentales",
+      "casilla": "0775",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Vives solo con tus hijos menores (o mayores incapacitados o con curatela representativa)?"
+        }
+      ]
+    },
+    "cantabria-gastos-guarderia": {
+      "titulo": "Por gastos de guardería",
+      "casilla": "0772",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 3
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿La factura de la guardería está a tu nombre y la pagaste con tarjeta, transferencia o cheque?"
+        }
+      ]
+    },
+    "cantabria-gastos-guarderia-despoblamiento": {
+      "titulo": "Guardería en municipios en riesgo de despoblamiento",
+      "casilla": "0820",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 3
+        },
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Tu residencia habitual está en un municipio en riesgo de despoblamiento de la Orden PRE/1/2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿La factura de la guardería está a tu nombre y la pagaste con tarjeta, transferencia o cheque?"
+        }
+      ]
+    },
+    "cantabria-ayuda-domestica": {
+      "titulo": "Por ayuda doméstica",
+      "casilla": "1711",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "empleador",
+          "q": "¿Eres el empleador de una persona que trabaja en tu vivienda habitual y está afiliada en Cantabria?"
+        },
+        {
+          "kind": "ask",
+          "id": "situacion",
+          "q": "¿Tienes hijos menores y trabajáis los dos progenitores, eres familia monoparental con ingresos del trabajo o tienes 75 años o más?"
+        }
+      ]
+    },
+    "cantabria-gastos-educacion": {
+      "titulo": "Por gastos de educación",
+      "casilla": "1710",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes factura de los gastos de educación y la pagaste con tarjeta, transferencia o cheque?"
+        }
+      ]
+    },
+    "cantabria-gastos-enfermedad": {
+      "titulo": "Por gastos de enfermedad",
+      "casilla": "0954",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "pago",
+          "q": "¿Lo pagaste con tarjeta, transferencia o cheque, no en efectivo?"
+        }
+      ]
+    },
+    "cantabria-gastos-traslado-estudios-despoblamiento": {
+      "titulo": "Traslado por estudios desde municipios en riesgo de despoblamiento",
+      "casilla": "1707",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Tu residencia habitual está en un municipio en riesgo de despoblamiento de la Orden PRE/1/2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "hijo",
+          "q": "¿Tu hijo se traslada a estudiar fuera del municipio y tiene rentas de hasta 8.000 €?"
+        }
+      ]
+    },
+    "cantabria-alquiler-vivienda-habitual": {
+      "titulo": "Alquiler de la vivienda habitual (jóvenes, mayores, discapacidad)",
+      "casilla": "0946",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "colectivo",
+          "q": "¿Tienes menos de 36 años, 65 o más, o una discapacidad del 65 % o más?"
+        },
+        {
+          "kind": "ask",
+          "id": "alquiler",
+          "q": "¿Firmaste tú el contrato, el alquiler supera el 10 % de tu renta y lo pagas por banco, no en efectivo?"
+        }
+      ]
+    },
+    "cantabria-alquiler-despoblamiento-arrendatario": {
+      "titulo": "Alquiler en municipios en riesgo de despoblamiento",
+      "casilla": "0818",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Tu residencia habitual está en un municipio en riesgo de despoblamiento de la Orden PRE/1/2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "alquiler",
+          "q": "¿Es tu vivienda habitual alquilada y pagas el alquiler por banco, no en efectivo?"
+        }
+      ]
+    },
+    "cantabria-obras-mejora-vivienda": {
+      "titulo": "Obras de mejora en la vivienda",
+      "casilla": "0948",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "obras",
+          "q": "¿Las obras son en una vivienda no afecta a una actividad (ni garaje ni piscina) y las pagaste por banco, no en efectivo?"
+        }
+      ]
+    },
+    "cantabria-arrendamiento-viviendas-vacias": {
+      "titulo": "Arrendar viviendas vacías",
+      "casilla": "1706",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vacia",
+          "q": "¿La vivienda estuvo vacía al menos un año y la alquilas 3 años o más por hasta 1.000 € al mes a quien no es familiar tuyo hasta el tercer grado?"
+        },
+        {
+          "kind": "ask",
+          "id": "viviendas",
+          "q": "¿Eres titular de 3 viviendas como mucho?"
+        }
+      ]
+    },
+    "cantabria-residencia-despoblamiento": {
+      "titulo": "Residir en un municipio en riesgo de despoblamiento",
+      "casilla": "1701",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 39
+        },
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Viviste todo 2025 en un municipio en riesgo de despoblamiento de la Orden PRE/1/2025?"
+        }
+      ]
+    },
+    "cantabria-traslado-municipio-despoblamiento": {
+      "titulo": "Traslado laboral a un municipio en riesgo de despoblamiento",
+      "casilla": "0821",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Trasladaste en 2025 tu residencia a un municipio en riesgo de despoblamiento por un trabajo por cuenta ajena?"
+        },
+        {
+          "kind": "ask",
+          "id": "permanencia",
+          "q": "¿Seguirás viviendo allí los tres años siguientes?"
+        }
+      ]
+    },
+    "cantabria-donativos-fundaciones-discapacidad": {
+      "titulo": "Donativos a fundaciones, Cantabria Coopera y discapacidad",
+      "casilla": "0951",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Donaste a una fundación inscrita que rinde cuentas, al Fondo Cantabria Coopera o a una asociación de apoyo a personas con discapacidad?"
+        }
+      ]
+    },
+    "cantabria-economia-social": {
+      "titulo": "Inversiones o donaciones a la economía social",
+      "casilla": "0823",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Es una entidad de economía social establecida en Cantabria?"
+        },
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Tu participación, con la de tu familia, no pasa del 40 % y la mantendrás el plazo exigido (5 años como socio)?"
+        }
+      ]
+    },
+    "cantabria-inversion-empresas-nuevas": {
+      "titulo": "Inversión en empresas nuevas o de reciente creación",
+      "casilla": "0953",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿Es una pyme (SA, SL o laboral) con domicilio en Cantabria, con actividad económica y al menos un empleado a jornada completa?"
+        },
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Tu participación, con la de tu familia, no pasa del 40 % y la mantendrás el plazo exigido (3 años)?"
+        }
+      ]
+    },
+    "cantabria-inversiones-nuevos-contribuyentes-extranjero": {
+      "titulo": "Inversiones de nuevos residentes llegados del extranjero",
+      "casilla": "1708",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "residencia",
+          "q": "¿Te mudaste a Cantabria desde el extranjero y eres contribuyente aquí desde el 1-1-2025?"
+        },
+        {
+          "kind": "ask",
+          "id": "inversion",
+          "q": "¿Invertiste en inmuebles no residenciales (ni afectos a una actividad), deuda o participaciones, y los mantendrás 6 años?"
+        }
+      ]
+    },
+    "cantabria-nuevos-residentes-desplazamiento": {
+      "titulo": "Gastos de traslado de nuevos residentes en Cantabria",
+      "casilla": "0773",
+      "norma": "Decreto Legislativo 62/2008 de Cantabria (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Llegaste a Cantabria desde otra comunidad (o Ceuta o Melilla) sin haber vivido aquí los 4 años anteriores?"
+        },
+        {
+          "kind": "ask",
+          "id": "permanencia",
+          "q": "¿Mantendrás la residencia en Cantabria al menos 3 años?"
+        }
+      ]
+    },
+    "castilla-la-mancha-nacimiento-adopcion-hijos": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "0957",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "castilla-la-mancha-familia-numerosa": {
+      "titulo": "Por familia numerosa",
+      "casilla": "0963",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        }
+      ]
+    },
+    "castilla-la-mancha-familia-monoparental": {
+      "titulo": "Por familia monoparental",
+      "casilla": "0209",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Eres padre o madre separado o sin pareja, tus hijos dependen solo de ti y no recibes pensión de alimentos por ellos?"
+        }
+      ]
+    },
+    "castilla-la-mancha-libros-texto-idiomas-educacion": {
+      "titulo": "Libros de texto, idiomas y otros gastos de educación",
+      "casilla": "0965",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "escolarizados",
+          "q": "¿Los gastos son de hijos escolarizados que te dan derecho al mínimo por descendientes?"
+        }
+      ]
+    },
+    "castilla-la-mancha-guarderia": {
+      "titulo": "Por gastos de guardería",
+      "casilla": "0211",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "centro",
+          "q": "¿Es un centro autorizado y pagaste meses completos?"
+        }
+      ]
+    },
+    "castilla-la-mancha-discapacidad-contribuyente": {
+      "titulo": "Por discapacidad del contribuyente",
+      "casilla": "0958",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "disability",
+          "min": 65
+        }
+      ]
+    },
+    "castilla-la-mancha-discapacidad-ascendientes-descendientes": {
+      "titulo": "Por discapacidad de ascendientes o descendientes",
+      "casilla": "0959",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "familiar",
+          "q": "¿Tienes a tu cargo un ascendiente o descendiente con discapacidad que te da derecho al mínimo por discapacidad?"
+        }
+      ]
+    },
+    "castilla-la-mancha-mayores-75": {
+      "titulo": "Contribuyentes mayores de 75 años",
+      "casilla": "0960",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "minAge",
+          "age": 75
+        },
+        {
+          "kind": "ask",
+          "id": "residencia",
+          "q": "¿No pasó más de 30 días en residencias de la Junta ni en plazas concertadas?"
+        }
+      ]
+    },
+    "castilla-la-mancha-cuidado-ascendientes-75": {
+      "titulo": "Cuidado de ascendientes mayores de 75 años",
+      "casilla": "0961",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ascendiente",
+          "q": "¿Cuidas a un ascendiente mayor de 75 años que te da derecho al mínimo por ascendientes?"
+        },
+        {
+          "kind": "ask",
+          "id": "residencia",
+          "q": "¿No pasó más de 30 días en residencias de la Junta ni en plazas concertadas?"
+        }
+      ]
+    },
+    "castilla-la-mancha-acogimiento-menores": {
+      "titulo": "Por acogimiento familiar no remunerado de menores",
+      "casilla": "0966",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tienes un menor en acogimiento familiar no remunerado, acreditado por la Consejería, más de 183 días?"
+        },
+        {
+          "kind": "ask",
+          "id": "ayudas",
+          "q": "¿No cobras ayudas de la Junta por ese acogimiento?"
+        }
+      ]
+    },
+    "castilla-la-mancha-acogimiento-mayores-discapacidad": {
+      "titulo": "Acogimiento de mayores de 65 o personas con discapacidad",
+      "casilla": "0967",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Acoges sin cobrar más de 183 días a una persona mayor de 65 (no familiar hasta 4.º grado) o con discapacidad?"
+        },
+        {
+          "kind": "ask",
+          "id": "ayudas",
+          "q": "¿No cobras ayudas de la Junta por ese acogimiento?"
+        }
+      ]
+    },
+    "castilla-la-mancha-alquiler-menores-36": {
+      "titulo": "Alquiler de vivienda habitual para menores de 36 años",
+      "casilla": "0968",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        }
+      ]
+    },
+    "castilla-la-mancha-alquiler-dacion-en-pago": {
+      "titulo": "Alquiler tras entregar tu casa en dación en pago",
+      "casilla": "0212",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "dacion",
+          "q": "¿El alquiler va ligado a la entrega de tu vivienda habitual al banco por toda la deuda hipotecaria?"
+        }
+      ]
+    },
+    "castilla-la-mancha-alquiler-familias-numerosas": {
+      "titulo": "Alquiler de vivienda habitual para familias numerosas",
+      "casilla": "0213",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        }
+      ]
+    },
+    "castilla-la-mancha-alquiler-familias-monoparentales": {
+      "titulo": "Alquiler de vivienda habitual para familias monoparentales",
+      "casilla": "0228",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Eres padre o madre separado o sin pareja, tus hijos dependen solo de ti y no recibes pensión de alimentos por ellos?"
+        }
+      ]
+    },
+    "castilla-la-mancha-alquiler-discapacidad": {
+      "titulo": "Alquiler de vivienda habitual para personas con discapacidad",
+      "casilla": "0229",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "disability",
+          "min": 65
+        }
+      ]
+    },
+    "castilla-la-mancha-donaciones-cooperacion-pobreza": {
+      "titulo": "Donaciones a cooperación, lucha contra la pobreza y discapacidad",
+      "casilla": "0962",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        },
+        {
+          "kind": "ask",
+          "id": "registro",
+          "q": "¿La entidad está inscrita en los registros de Castilla-La Mancha?"
+        }
+      ]
+    },
+    "castilla-la-mancha-donaciones-investigacion": {
+      "titulo": "Donaciones para investigación e innovación",
+      "casilla": "0964",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        },
+        {
+          "kind": "ask",
+          "id": "registro",
+          "q": "¿La entidad está inscrita en los registros de Castilla-La Mancha?"
+        }
+      ]
+    },
+    "castilla-la-mancha-donaciones-patrimonio-cultural": {
+      "titulo": "Donaciones y gastos en patrimonio cultural",
+      "casilla": "0201",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "inventario",
+          "q": "¿Son bienes del Inventario del Patrimonio Cultural de Castilla-La Mancha o donas a entidades de la región?"
+        }
+      ]
+    },
+    "castilla-la-mancha-intereses-primera-vivienda-menores-40": {
+      "titulo": "Intereses de la primera vivienda para menores de 40 años",
+      "casilla": "1906",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 39
+        },
+        {
+          "kind": "ask",
+          "id": "prestamo",
+          "q": "¿Es el préstamo a interés variable de tu primera vivienda habitual?"
+        }
+      ]
+    },
+    "castilla-la-mancha-residencia-zonas-rurales": {
+      "titulo": "Por residir en zonas rurales despobladas",
+      "casilla": "0204",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Vives de verdad en un municipio de las zonas rurales despobladas de la Ley 2/2021?"
+        }
+      ]
+    },
+    "castilla-la-mancha-compra-rehabilitacion-vivienda-rural": {
+      "titulo": "Compra o rehabilitación de vivienda habitual en zona rural",
+      "casilla": null,
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Compraste o rehabilitaste desde 2021 tu vivienda habitual en un municipio de menos de 5.000 habitantes de zona despoblada?"
+        }
+      ]
+    },
+    "castilla-la-mancha-traslado-vivienda-habitual": {
+      "titulo": "Por traslado de vivienda habitual a zona despoblada",
+      "casilla": "0207",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Te trasladaste por trabajo a una zona despoblada y seguirás allí el año del traslado y los tres siguientes?"
+        }
+      ]
+    },
+    "castilla-la-mancha-inversion-acciones-nuevas-sociedades": {
+      "titulo": "Inversión en acciones de sociedades nuevas",
+      "casilla": "1908",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La sociedad tiene domicilio en Castilla-La Mancha y actividad económica, tienes hasta el 40 %, la mantendrás 3 años y no la diriges?"
+        }
+      ]
+    },
+    "castilla-la-mancha-inversion-economia-social": {
+      "titulo": "Inversión en entidades de la economía social",
+      "casilla": "1909",
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿La entidad tiene domicilio en la región y un empleado a jornada completa, tienes hasta el 40 % y la mantendrás 5 años?"
+        }
+      ]
+    },
+    "castilla-la-mancha-ahorro-primera-vivienda": {
+      "titulo": "Ahorro para comprar o construir la primera vivienda",
+      "casilla": null,
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "cuenta",
+          "q": "¿Es tu única cuenta vivienda y usarás el dinero en tu primera vivienda antes de 6 años?"
+        }
+      ]
+    },
+    "castilla-la-mancha-perros-asistencia": {
+      "titulo": "Gastos veterinarios de perros de asistencia",
+      "casilla": null,
+      "norma": "Ley 8/2013 de Castilla-La Mancha (tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "perro",
+          "q": "¿La Consejería reconoce tu vínculo con el perro de asistencia y tienes facturas del veterinario sin subvención?"
+        }
+      ]
+    },
     "castilla-y-leon-familia-numerosa": {
       "titulo": "Por familia numerosa",
       "casilla": "0985",
@@ -637,6 +2688,192 @@
           "kind": "ask",
           "id": "sociedad",
           "q": "¿Es una sociedad con domicilio en Castilla y León que crea empleo, tienes entre el 0,5 % y el 45 % y la mantendrás 3 años, con certificado?"
+        }
+      ]
+    },
+    "cataluna-nacimiento-adopcion-acogimiento": {
+      "titulo": "Por nacimiento, adopción o acogimiento de un hijo",
+      "casilla": "1000",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        }
+      ]
+    },
+    "cataluna-viudedad": {
+      "titulo": "Para contribuyentes que se han quedado viudos",
+      "casilla": null,
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "viudedad",
+          "q": "¿Te quedaste viudo o viuda en 2023, 2024 o 2025?"
+        }
+      ]
+    },
+    "cataluna-alquiler-vivienda-habitual": {
+      "titulo": "Alquiler de la vivienda habitual",
+      "casilla": "1003",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "situacion",
+          "q": "¿Tienes 35 años o menos, estuviste 183 días o más en paro, tienes discapacidad del 65 % o más, eres viudo/a de 65 o más o eres familia numerosa o monoparental?"
+        },
+        {
+          "kind": "ask",
+          "id": "arrendador",
+          "q": "¿Conoces el NIF del arrendador para ponerlo en la declaración?"
+        }
+      ]
+    },
+    "cataluna-rehabilitacion-vivienda-habitual": {
+      "titulo": "Rehabilitación de la vivienda habitual",
+      "casilla": "1006",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "rehabilitacion",
+          "q": "¿La obra es una rehabilitación (según el IRPF) de tu vivienda habitual o de la que va a serlo?"
+        }
+      ]
+    },
+    "cataluna-intereses-prestamos-master-doctorado": {
+      "titulo": "Intereses de préstamos para máster y doctorado",
+      "casilla": "1005",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "agaur",
+          "q": "¿El préstamo te lo concedió la AGAUR y tienes su número de identificación?"
+        }
+      ]
+    },
+    "cataluna-donativos-lengua-catalana-occitana": {
+      "titulo": "Donativos para el catalán y el occitano",
+      "casilla": "1001",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        },
+        {
+          "kind": "ask",
+          "id": "censo",
+          "q": "¿La entidad figura en el censo de entidades de política lingüística de la Generalitat?"
+        }
+      ]
+    },
+    "cataluna-donativos-investigacion-innovacion": {
+      "titulo": "Donativos para investigación e innovación",
+      "casilla": "1002",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "cataluna-donaciones-medio-ambiente": {
+      "titulo": "Donaciones para medio ambiente y patrimonio natural",
+      "casilla": "1007",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado-donacion",
+          "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        },
+        {
+          "kind": "ask",
+          "id": "censo",
+          "q": "¿La entidad figura en el censo de entidades ambientales de la Generalitat?"
+        }
+      ]
+    },
+    "cataluna-angel-inversor": {
+      "titulo": "Inversión como ángel inversor",
+      "casilla": "1008",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La sociedad tiene sede en Cataluña, factura hasta 1 millón de euros y tiene al menos un empleado a jornada completa?"
+        },
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Tu participación no pasa del 35 %, la mantendrás 3 años y no tienes funciones directivas en ella?"
+        }
+      ]
+    },
+    "cataluna-mas-de-un-pagador": {
+      "titulo": "Por tener que declarar al tener más de un pagador",
+      "casilla": "0824",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "pagadores",
+          "q": "¿Declaras solo por tener más de un pagador (el segundo y siguientes, más de 1.500 €) con un sueldo total de 15.876 € a 22.000 €?"
+        }
+      ]
+    },
+    "cataluna-alquiler-victimas-violencia-machista": {
+      "titulo": "Alquiler para víctimas de violencia machista",
+      "casilla": "2002",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "victima",
+          "q": "¿Tienes acreditada la condición de víctima de violencia machista y eres titular del contrato de alquiler?"
+        },
+        {
+          "kind": "ask",
+          "id": "anos",
+          "q": "¿Es como mucho el tercer año seguido que aplicas esta deducción?"
+        }
+      ]
+    },
+    "cataluna-cooperativas-agrarias-vivienda": {
+      "titulo": "Inversión en cooperativas agrarias y de vivienda",
+      "casilla": "2003",
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "socio",
+          "q": "¿Eres socio no temporal, con hasta el 25 % de los votos, de una cooperativa agraria o de vivienda (no turística) inscrita en Cataluña, con su certificado?"
+        },
+        {
+          "kind": "ask",
+          "id": "mantener",
+          "q": "¿Mantendrás la aportación al menos 5 años?"
+        }
+      ]
+    },
+    "cataluna-tramo-autonomico-vivienda-habitual": {
+      "titulo": "Tramo autonómico de la deducción antigua por vivienda habitual",
+      "casilla": null,
+      "norma": "Ley 31/2002 y normas posteriores de Cataluña sobre el tramo autonómico del IRPF",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Compraste tu vivienda habitual antes de 2013 y ya aplicabas la deducción por ella?"
         }
       ]
     },
@@ -1246,6 +3483,1698 @@
           "kind": "ask",
           "id": "certificado-donacion",
           "q": "¿Tienes el certificado de la entidad y pagaste sin efectivo?"
+        }
+      ]
+    },
+    "extremadura-acogimiento-menores": {
+      "titulo": "Por acogimiento de menores",
+      "casilla": "1013",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convives con el menor acogido más de 90 días en el año?"
+        }
+      ]
+    },
+    "extremadura-partos-multiples": {
+      "titulo": "Por partos múltiples",
+      "casilla": "1014",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "multiple",
+          "q": "¿Tuviste un parto múltiple en 2025?"
+        }
+      ]
+    },
+    "extremadura-cuidado-familiares-discapacidad": {
+      "titulo": "Por cuidado de familiares con discapacidad",
+      "casilla": "1012",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convive contigo al menos medio año un familiar con discapacidad, acreditado por los servicios sociales?"
+        },
+        {
+          "kind": "ask",
+          "id": "rentas",
+          "q": "¿Las rentas de ese familiar no pasan de 16.800 €?"
+        }
+      ]
+    },
+    "extremadura-cuidado-hijos-hasta-14": {
+      "titulo": "Por cuidado de hijos de hasta 14 años",
+      "casilla": "1017",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 15
+        },
+        {
+          "kind": "ask",
+          "id": "trabajo",
+          "q": "¿Trabajáis los dos progenitores y estáis de alta en la Seguridad Social?"
+        },
+        {
+          "kind": "ask",
+          "id": "justificante",
+          "q": "¿Tienes factura del cuidado o una empleada del hogar dada de alta?"
+        }
+      ]
+    },
+    "extremadura-contribuyentes-viudos": {
+      "titulo": "Para contribuyentes viudos",
+      "casilla": "1018",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "viudo",
+          "q": "¿Eres viudo o viuda?"
+        }
+      ]
+    },
+    "extremadura-ayudas-ela": {
+      "titulo": "Por ayudas de Extremadura a personas con ELA",
+      "casilla": "2010",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Cobraste una ayuda de la Junta de Extremadura para personas con ELA que declaras en la base imponible general?"
+        }
+      ]
+    },
+    "extremadura-enfermos-ela-familiares": {
+      "titulo": "Para enfermos de ELA y sus familiares",
+      "casilla": "2011",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ela",
+          "q": "¿Tienes ELA, o eres el cónyuge, descendiente o ascendiente de un enfermo de ELA que convive contigo o te da derecho al mínimo?"
+        }
+      ]
+    },
+    "extremadura-vivienda-jovenes-victimas-terrorismo": {
+      "titulo": "Compra o rehabilitación de vivienda para jóvenes",
+      "casilla": "1010",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "colectivo",
+          "q": "¿Tienes menos de 36 años, o eres víctima del terrorismo, y resides en Extremadura?"
+        },
+        {
+          "kind": "ask",
+          "id": "protegida",
+          "q": "¿Es una vivienda nueva protegida?"
+        }
+      ]
+    },
+    "extremadura-alquiler-vivienda-habitual": {
+      "titulo": "Por alquiler de vivienda habitual",
+      "casilla": "1019",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "colectivo",
+          "q": "¿Tienes menos de 36 años, familia numerosa, eres ascendiente con dos hijos sin pensión de alimentos o tienes una discapacidad del 65 % o más?"
+        },
+        {
+          "kind": "ask",
+          "id": "otra-vivienda",
+          "q": "¿No tienes otra vivienda a menos de 75 km de la alquilada?"
+        }
+      ]
+    },
+    "extremadura-vivienda-zonas-rurales": {
+      "titulo": "Compra o rehabilitación de vivienda en zonas rurales",
+      "casilla": "1091",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "rural",
+          "q": "¿Compraste o rehabilitaste desde el 1-1-2022 tu vivienda habitual en un municipio o entidad local menor de menos de 3.000 habitantes?"
+        }
+      ]
+    },
+    "extremadura-residir-municipios-pequenos": {
+      "titulo": "Por residir en municipios de menos de 3.000 habitantes",
+      "casilla": "1105",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Vives habitualmente (tú o tu cónyuge) en un municipio o entidad local menor de Extremadura de menos de 3.000 habitantes?"
+        }
+      ]
+    },
+    "extremadura-intereses-vivienda-jovenes": {
+      "titulo": "Por intereses de la hipoteca de jóvenes",
+      "casilla": "1910",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "primera",
+          "q": "¿Es tu primera vivienda habitual, en Extremadura, comprada con un préstamo?"
+        }
+      ]
+    },
+    "extremadura-traslado-residencia": {
+      "titulo": "Por trasladar tu residencia a Extremadura",
+      "casilla": "2009",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Trasladaste tu residencia habitual a Extremadura desde el 1-1-2025 y la mantendrás al menos tres años seguidos?"
+        }
+      ]
+    },
+    "extremadura-donaciones-cultura-deportistas": {
+      "titulo": "Donaciones a entidades culturales y deportistas",
+      "casilla": "2008",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿La entidad o el deportista tiene domicilio fiscal en Extremadura y la actividad está en el listado de la norma?"
+        }
+      ]
+    },
+    "extremadura-trabajo-dependiente": {
+      "titulo": "Por rendimientos del trabajo bajos",
+      "casilla": "1011",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": []
+    },
+    "extremadura-material-escolar": {
+      "titulo": "Por compra de material escolar",
+      "casilla": "1015",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "hijos",
+          "q": "¿Tienes hijos de 6 a 15 años por los que te corresponde el mínimo por descendientes?"
+        }
+      ]
+    },
+    "extremadura-inversion-acciones-participaciones": {
+      "titulo": "Por invertir en empresas extremeñas nuevas",
+      "casilla": "1016",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La empresa tiene sede social y fiscal en Extremadura y actividad económica?"
+        },
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Tu participación, con la de tu familia, no pasa del 40 %, la mantendrás 3 años y no tienes funciones ejecutivas?"
+        }
+      ]
+    },
+    "extremadura-arrendadores-viviendas-vacias": {
+      "titulo": "Para arrendadores de viviendas vacías",
+      "casilla": "2006",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vacia",
+          "q": "¿La vivienda está en Extremadura, estuvo vacía al menos un año y la alquilas como vivienda habitual con contrato de al menos 3 años?"
+        }
+      ]
+    },
+    "extremadura-rehabilitacion-rural-alquiler": {
+      "titulo": "Rehabilitar viviendas rurales para alquilarlas",
+      "casilla": "2007",
+      "norma": "Decreto Legislativo 1/2018 de Extremadura (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "obras",
+          "q": "¿Rehabilitaste una vivienda en zona rural para alquilarla, con obras de rehabilitación según la ley del IVA?"
+        }
+      ]
+    },
+    "galicia-nacimiento-adopcion": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "1021",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "galicia-familias-dos-hijos": {
+      "titulo": "Para familias con dos hijos",
+      "casilla": "0822",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "children",
+          "min": 2
+        },
+        {
+          "kind": "ask",
+          "id": "incompatible",
+          "q": "¿No aplicas la deducción por familia numerosa?"
+        }
+      ]
+    },
+    "galicia-familia-numerosa": {
+      "titulo": "Por familia numerosa",
+      "casilla": "1022",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        }
+      ]
+    },
+    "galicia-acogimiento-menores": {
+      "titulo": "Por acogimiento familiar de menores",
+      "casilla": "1027",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿El acogimiento lo formalizó la Xunta y no adoptaste al menor este año?"
+        }
+      ]
+    },
+    "galicia-cuidado-hijos-menores": {
+      "titulo": "Por cuidado de hijos menores de 3 años",
+      "casilla": "1023",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "trabajo",
+          "q": "¿Los dos progenitores trabajáis y estáis de alta en la Seguridad Social?"
+        }
+      ]
+    },
+    "galicia-discapacidad-65-ayuda-terceros": {
+      "titulo": "Mayores de 65 con discapacidad que necesitan ayuda",
+      "casilla": "1024",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "minAge",
+          "age": 65
+        },
+        {
+          "kind": "disability",
+          "min": 65
+        },
+        {
+          "kind": "ask",
+          "id": "terceros",
+          "q": "¿Puedes acreditar que necesitas la ayuda de otra persona?"
+        }
+      ]
+    },
+    "galicia-ayudas-ela": {
+      "titulo": "Por ayudas y subvenciones a personas con ELA",
+      "casilla": "2239",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Incluiste en tu base imponible general una ayuda pública para personas con ELA o sus fenotipos?"
+        }
+      ]
+    },
+    "galicia-ayudas-talidomida": {
+      "titulo": "Por ayudas a afectados por la talidomida",
+      "casilla": "2241",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Incluiste en tu base imponible general una ayuda por estar afectado por la talidomida?"
+        }
+      ]
+    },
+    "galicia-alquiler-vivienda-habitual": {
+      "titulo": "Por alquiler de la vivienda habitual",
+      "casilla": "1026",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "edad",
+          "q": "¿Tienes 35 años o menos (en conjunta, basta con uno de los cónyuges)?"
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿El contrato es posterior a 2003 y la fianza está depositada en el Instituto Galego da Vivenda e Solo?"
+        }
+      ]
+    },
+    "galicia-climatizacion-renovables": {
+      "titulo": "Climatización o agua caliente con energías renovables",
+      "casilla": "1032",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "instalacion",
+          "q": "¿La instalación con energías renovables está en tu vivienda habitual y es solo para autoconsumo?"
+        }
+      ]
+    },
+    "galicia-eficiencia-energetica": {
+      "titulo": "Obras de eficiencia energética en viviendas",
+      "casilla": "0825",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado",
+          "q": "¿Las obras mejoran al menos una letra el certificado energético inscrito en el registro gallego?"
+        }
+      ]
+    },
+    "galicia-aldeas-modelo": {
+      "titulo": "Vivienda en proyectos de aldeas modelo",
+      "casilla": "0230",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "aldea",
+          "q": "¿Compraste o empezaste a rehabilitar desde 2021 una vivienda de un proyecto de aldeas modelo para vivir en ella?"
+        }
+      ]
+    },
+    "galicia-rehabilitacion-centros-historicos": {
+      "titulo": "Rehabilitar inmuebles en centros históricos",
+      "casilla": "1034",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "obras",
+          "q": "¿Son obras de reconstrucción en un centro histórico que cuestan más del 25 % del valor del inmueble?"
+        }
+      ]
+    },
+    "galicia-adecuacion-inmueble-vacio": {
+      "titulo": "Arreglar un inmueble vacío para alquilarlo",
+      "casilla": "1078",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alquiler",
+          "q": "¿El inmueble vale hasta 250.000 €, las obras acaban en dos años y lo alquilarás al menos tres años?"
+        }
+      ]
+    },
+    "galicia-arrendamiento-viviendas-vacias": {
+      "titulo": "Por alquilar viviendas vacías",
+      "casilla": "1036",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vacia",
+          "q": "¿La vivienda en Galicia estuvo vacía al menos un año y el contrato es de tres años o más por hasta 700 € al mes?"
+        },
+        {
+          "kind": "ask",
+          "id": "inquilino",
+          "q": "¿El inquilino no es tu cónyuge ni pariente hasta el tercer grado?"
+        }
+      ]
+    },
+    "galicia-donaciones-investigacion": {
+      "titulo": "Donativos para investigación e innovación",
+      "casilla": "1031",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Donaste dinero a un centro de investigación gallego o a una entidad de la Ley 49/2002 y tienes el justificante?"
+        }
+      ]
+    },
+    "galicia-nuevas-tecnologias-hogares": {
+      "titulo": "Por internet de alta velocidad en casa",
+      "casilla": "1025",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "internet",
+          "q": "¿Pagaste una conexión a internet de alta velocidad en tu casa?"
+        }
+      ]
+    },
+    "galicia-inversion-entidades-nuevas": {
+      "titulo": "Invertir en empresas nuevas o de reciente creación",
+      "casilla": "1028",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La sociedad tiene domicilio en Galicia, actividad económica y al menos un empleado a jornada completa, y tu participación (con familiares) está entre el 1 % y el 40 %?"
+        },
+        {
+          "kind": "ask",
+          "id": "plazo",
+          "q": "¿Mantendrás la participación al menos tres años?"
+        }
+      ]
+    },
+    "galicia-inversion-entidades-nuevas-financiacion": {
+      "titulo": "Invertir y financiar empresas nuevas",
+      "casilla": "1029",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿La sociedad tiene domicilio en Galicia, actividad económica y al menos un empleado a jornada completa, y tu participación (con familiares) está entre el 1 % y el 40 %?"
+        }
+      ]
+    },
+    "galicia-inversion-mercado-alternativo": {
+      "titulo": "Acciones del mercado alternativo bursátil",
+      "casilla": "1030",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿No superas el 10 % del capital y mantendrás las acciones al menos tres años?"
+        }
+      ]
+    },
+    "galicia-inversion-actividades-agrarias": {
+      "titulo": "Invertir en empresas agrarias",
+      "casilla": "1035",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "inversion",
+          "q": "¿Mantendrás la inversión cinco años sin funciones ejecutivas ni relación laboral con la empresa durante diez?"
+        }
+      ]
+    },
+    "galicia-ayudas-deportistas-alto-nivel": {
+      "titulo": "Ayudas a deportistas de alto nivel de Galicia",
+      "casilla": "0828",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "deportista",
+          "q": "¿Eres deportista de alto nivel reconocido por la Xunta y tu deporte no te da rendimientos de actividad económica?"
+        },
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Incluiste esa ayuda en tu base imponible general de este año?"
+        }
+      ]
+    },
+    "galicia-inversion-proyectos-interes-publico": {
+      "titulo": "Invertir en proyectos de especial interés",
+      "casilla": "1077",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿La entidad se dedica solo a proyectos declarados de especial interés público, social o económico?"
+        }
+      ]
+    },
+    "galicia-incendios-forestales-2025": {
+      "titulo": "Ayudas por los incendios forestales de 2025",
+      "casilla": "2238",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayuda",
+          "q": "¿Incluiste en tu base imponible general una ayuda de la Xunta del Decreto 76/2025 por los incendios de 2025?"
+        }
+      ]
+    },
+    "galicia-libros-texto-material-escolar": {
+      "titulo": "Libros de texto y material escolar",
+      "casilla": "2240",
+      "norma": "Decreto Legislativo 1/2011 de Galicia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes facturas de libros de texto o material escolar emitidas entre el 1 de julio y el 31 de diciembre de 2025?"
+        }
+      ]
+    },
+    "la-rioja-nacimiento-adopcion": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "1061",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿El hijo convive contigo a 31 de diciembre?"
+        }
+      ]
+    },
+    "la-rioja-gastos-escuelas-infantiles-pequenos-municipios": {
+      "titulo": "Escuela infantil 0-3 años en pequeño municipio",
+      "casilla": "1069",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Vives a 31 de diciembre en un pequeño municipio de la lista oficial de La Rioja?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "la-rioja-acogimiento-menores": {
+      "titulo": "Por acoger a un menor",
+      "casilla": "1072",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tienes un menor en acogimiento familiar (o guarda con fines de adopción) formalizado por el órgano competente de La Rioja?"
+        }
+      ]
+    },
+    "la-rioja-hijo-0-3-residentes-pequenos-municipios": {
+      "titulo": "Hijos de 0-3 años en pequeño municipio",
+      "casilla": "1163",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "municipio",
+          "q": "¿Vives a 31 de diciembre en un pequeño municipio de la lista oficial de La Rioja?"
+        },
+        {
+          "kind": "ask",
+          "id": "permanencia",
+          "q": "¿El hijo te da derecho al mínimo por descendientes y mantendrás la residencia en el municipio al menos 3 años?"
+        }
+      ]
+    },
+    "la-rioja-hijo-0-3-escuelas-infantiles": {
+      "titulo": "Escuela infantil 0-3 años (toda La Rioja)",
+      "casilla": "1075",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "childUnder",
+          "age": 4
+        },
+        {
+          "kind": "ask",
+          "id": "matricula",
+          "q": "¿Tu hijo está matriculado en una escuela infantil de La Rioja?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "la-rioja-enfermos-ela": {
+      "titulo": "Por gastos de ELA",
+      "casilla": "1785",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ela",
+          "q": "¿Son servicios o tratamientos por ELA prestados por profesionales sanitarios o para paliar sus síntomas?"
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Es para ti, tu cónyuge o alguien que te da derecho a un mínimo, con factura completa (no simplificada)?"
+        }
+      ]
+    },
+    "la-rioja-enfermedad-celiaca": {
+      "titulo": "Por enfermedad celíaca",
+      "casilla": "2248",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado",
+          "q": "¿Tienes un certificado con el diagnóstico definitivo de enfermedad celíaca, de un médico en activo con número de colegiado?"
+        }
+      ]
+    },
+    "la-rioja-fomento-ejercicio-fisico": {
+      "titulo": "Por deporte y ejercicio físico",
+      "casilla": "1168",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "rioja",
+          "q": "¿Son servicios deportivos prestados en La Rioja?"
+        },
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Es para ti, tu cónyuge o alguien que te da derecho a un mínimo, con factura completa (no simplificada)?"
+        }
+      ]
+    },
+    "la-rioja-acceso-internet-jovenes": {
+      "titulo": "Internet para jóvenes emancipados",
+      "casilla": "1080",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿Diste de alta a tu nombre un contrato nuevo de internet en tu vivienda habitual hace al menos 6 meses y lo mantienes?"
+        }
+      ]
+    },
+    "la-rioja-suministro-luz-gas-jovenes": {
+      "titulo": "Luz y gas para jóvenes emancipados",
+      "casilla": "1205",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿Tienes a tu nombre el contrato de luz o gas de tu vivienda habitual?"
+        }
+      ]
+    },
+    "la-rioja-fijacion-poblacion-medio-rural": {
+      "titulo": "Por iniciar actividad agraria en el medio rural",
+      "casilla": "2057",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Te diste de alta como autónomo agrario en 2025 y mantienes la residencia y la actividad?"
+        },
+        {
+          "kind": "ask",
+          "id": "excluidos",
+          "q": "¿No eres autónomo colaborador ni socio de una sociedad de capital, ni cesaste otra actividad agraria en los 2 años anteriores?"
+        }
+      ]
+    },
+    "la-rioja-cuotas-organizaciones-agrarias": {
+      "titulo": "Cuotas de organizaciones agrarias",
+      "casilla": "2056",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "certificado",
+          "q": "¿Tienes el certificado de la organización profesional agraria con las cuotas pagadas en 2025?"
+        }
+      ]
+    },
+    "la-rioja-vehiculos-electricos-nuevos": {
+      "titulo": "Por comprar un vehículo eléctrico nuevo",
+      "casilla": "1079",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vehiculo",
+          "q": "¿Es un vehículo eléctrico nuevo de hasta 50.000 €, matriculado en 2025, con la factura a tu nombre y sin uso profesional?"
+        }
+      ]
+    },
+    "la-rioja-bicicletas-pedaleo-no-asistido": {
+      "titulo": "Por comprar una bicicleta",
+      "casilla": "1166",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿La factura de la bicicleta está a tu nombre?"
+        }
+      ]
+    },
+    "la-rioja-inversion-vivienda-jovenes": {
+      "titulo": "Por vivienda habitual (menores de 36 años)",
+      "casilla": "1165",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "fecha",
+          "q": "¿Compraste tu vivienda habitual, o empezaste a rehabilitarla, desde el 1-1-2013?"
+        }
+      ]
+    },
+    "la-rioja-arrendamiento-menores-36": {
+      "titulo": "Alquiler de vivienda habitual (menores de 36)",
+      "casilla": "1164",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿Alquilas tu vivienda habitual en La Rioja y se presentó el impuesto de transmisiones del contrato?"
+        },
+        {
+          "kind": "ask",
+          "id": "sin-inversion",
+          "q": "¿No aplicas ninguna deducción por inversión en vivienda?"
+        }
+      ]
+    },
+    "la-rioja-vivienda-pequenos-municipios": {
+      "titulo": "Vivienda habitual en pequeño municipio",
+      "casilla": "1068",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Compraste, rehabilitaste o empezaste a construir desde el 1-1-2017 tu vivienda habitual en un pequeño municipio de la lista oficial?"
+        },
+        {
+          "kind": "ask",
+          "id": "patrimonio",
+          "q": "¿Tu patrimonio aumentó en 2025 al menos lo que invertiste?"
+        }
+      ]
+    },
+    "la-rioja-segunda-vivienda-medio-rural": {
+      "titulo": "Segunda vivienda en el medio rural",
+      "casilla": "1065",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Compraste la segunda vivienda en un municipio rural de la lista antes del 1-1-2013 (o pagaste antes las obras y terminaron antes de 2017)?"
+        }
+      ]
+    },
+    "la-rioja-intereses-prestamos-vivienda": {
+      "titulo": "Por subida de intereses de la hipoteca",
+      "casilla": "1167",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Tu vivienda habitual está en La Rioja y la compraste con hipoteca desde el 1-1-2013?"
+        },
+        {
+          "kind": "ask",
+          "id": "incompatible",
+          "q": "¿No aplicas la deducción estatal por vivienda ni las riojanas de vivienda para jóvenes o en pequeños municipios?"
+        }
+      ]
+    },
+    "la-rioja-adquisicion-vivienda-jovenes": {
+      "titulo": "Compra de vivienda (jóvenes, régimen antiguo)",
+      "casilla": "1063",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 35
+        },
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Compraste la vivienda (o pagaste su construcción) antes del 1-1-2013?"
+        }
+      ]
+    },
+    "la-rioja-obras-rehabilitacion-vivienda": {
+      "titulo": "Obras de rehabilitación de vivienda habitual",
+      "casilla": "1062",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Pagaste las obras antes del 1-1-2013, las terminaste antes de 2017 y ya aplicabas la deducción de vivienda antes de 2013?"
+        }
+      ]
+    },
+    "la-rioja-obras-adecuacion-discapacidad": {
+      "titulo": "Obras de adecuación por discapacidad",
+      "casilla": "1066",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "transitorio",
+          "q": "¿Pagaste las obras antes del 1-1-2013, las terminaste antes de 2017 y ya aplicabas la deducción de vivienda antes de 2013?"
+        },
+        {
+          "kind": "ask",
+          "id": "informe",
+          "q": "¿Tienes el informe técnico que certifica las obras en tu vivienda de La Rioja?"
+        }
+      ]
+    },
+    "la-rioja-donaciones-fomento-mecenazgo": {
+      "titulo": "Donaciones de mecenazgo (actividades de interés)",
+      "casilla": "0250",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": []
+    },
+    "la-rioja-donaciones-bienes-interes-cultural": {
+      "titulo": "Donaciones a bienes de interés cultural",
+      "casilla": "0251",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "bien",
+          "q": "¿Son bienes en La Rioja de la Administración regional o declarados de interés cultural?"
+        }
+      ]
+    },
+    "la-rioja-donaciones-empresas-culturales": {
+      "titulo": "Donaciones a empresas culturales",
+      "casilla": "0252",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "empresa",
+          "q": "¿La empresa cultural tiene domicilio fiscal en La Rioja y fondos propios de menos de 300.000 €?"
+        }
+      ]
+    },
+    "la-rioja-donacion-bienes-culturales-autores": {
+      "titulo": "Donación de obras por sus autores",
+      "casilla": "0253",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "aceptacion",
+          "q": "¿Eres el autor (o su heredero) y la Consejería de Cultura aceptó la donación del bien?"
+        }
+      ]
+    },
+    "la-rioja-patrimonio-historico-titulares": {
+      "titulo": "Conservar bienes del patrimonio histórico",
+      "casilla": "0254",
+      "norma": "Ley 10/2017 de La Rioja (disposiciones legales en materia de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "registro",
+          "q": "¿Los bienes son tuyos (o en usufructo), están en el Registro del Patrimonio Cultural de La Rioja y no son una inversión empresarial?"
+        }
+      ]
+    },
+    "madrid-nacimiento-adopcion-hijos": {
+      "titulo": "Por nacimiento o adopción de hijos",
+      "casilla": "1039",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        }
+      ]
+    },
+    "madrid-adopcion-internacional": {
+      "titulo": "Por adopción internacional de niños",
+      "casilla": "1040",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "adopcion",
+          "q": "¿Adoptaste en el ámbito internacional en 2025?"
+        }
+      ]
+    },
+    "madrid-acogimiento-familiar-menores": {
+      "titulo": "Por acogimiento familiar de menores",
+      "casilla": "1041",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "acogimiento",
+          "q": "¿Tuviste acogido a un menor más de 183 días del año?"
+        }
+      ]
+    },
+    "madrid-acogimiento-no-remunerado-mayores": {
+      "titulo": "Acogimiento sin pago de mayores de 65 o con discapacidad",
+      "casilla": "1042",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ayudas",
+          "q": "¿Acogiste sin cobrar a un mayor de 65 o a una persona con discapacidad, sin ayudas de la Comunidad de Madrid por ello?"
+        },
+        {
+          "kind": "ask",
+          "id": "parentesco",
+          "q": "¿Si es mayor de 65, no es pariente tuyo hasta el cuarto grado?"
+        }
+      ]
+    },
+    "madrid-cuidado-ascendientes": {
+      "titulo": "Por cuidado de ascendientes",
+      "casilla": "1115",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "ascendiente",
+          "q": "¿Tienes un ascendiente que te da derecho al mínimo por ascendientes?"
+        }
+      ]
+    },
+    "madrid-cuidado-hijos-dependientes-discapacidad": {
+      "titulo": "Cuidado de menores de 3 años, dependientes o discapacitados",
+      "casilla": "1050",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convives con un hijo menor de 3 años o con un familiar mayor de 65 con dependencia o discapacidad del 33 % o más?"
+        },
+        {
+          "kind": "ask",
+          "id": "empleador",
+          "q": "¿Estás de alta como empleador de una persona empleada del hogar en la Seguridad Social?"
+        }
+      ]
+    },
+    "madrid-familias-dos-descendientes-ingresos-reducidos": {
+      "titulo": "Familias con dos o más hijos e ingresos reducidos",
+      "casilla": "1045",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "children",
+          "min": 2
+        }
+      ]
+    },
+    "madrid-obtencion-familia-numerosa": {
+      "titulo": "Por obtener el título de familia numerosa",
+      "casilla": "1120",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Obtuviste la condición de titular de familia numerosa en 2025 (o en 2023-2024 si es de categoría especial)?"
+        }
+      ]
+    },
+    "madrid-arrendamiento-vivienda-habitual": {
+      "titulo": "Por alquiler de la vivienda habitual",
+      "casilla": "1043",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 39
+        },
+        {
+          "kind": "ask",
+          "id": "titular",
+          "q": "¿Eres titular del contrato de alquiler de tu vivienda habitual?"
+        }
+      ]
+    },
+    "madrid-gastos-arrendamiento-viviendas": {
+      "titulo": "Gastos de tener viviendas alquiladas",
+      "casilla": "1116",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "gastos",
+          "q": "¿Pagaste gastos de viviendas que tienes alquiladas, como seguros de daños o de impago?"
+        }
+      ]
+    },
+    "madrid-arrendamiento-viviendas-vacias": {
+      "titulo": "Por alquilar viviendas vacías",
+      "casilla": "2021",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vacia",
+          "q": "¿La vivienda estuvo vacía al menos un año, el contrato es de tres años o más y la fianza está depositada?"
+        },
+        {
+          "kind": "ask",
+          "id": "inquilino",
+          "q": "¿El inquilino no es tu cónyuge ni pariente hasta el tercer grado y tienes como mucho cinco viviendas?"
+        }
+      ]
+    },
+    "madrid-donativos-fundaciones-clubes": {
+      "titulo": "Donativos a fundaciones y clubes deportivos",
+      "casilla": "1049",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Donaste a una fundación de la Ley 1/1998 de Fundaciones de Madrid o a un club deportivo?"
+        }
+      ]
+    },
+    "madrid-incremento-costes-financiacion": {
+      "titulo": "Subida de intereses de la hipoteca",
+      "casilla": "2020",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Tu vivienda habitual costó 390.000 € o menos y no aplicas la deducción de intereses de menores de 30 años?"
+        }
+      ]
+    },
+    "madrid-cambio-residencia-despoblacion": {
+      "titulo": "Cambiar de residencia a un municipio en riesgo de despoblación",
+      "casilla": "2026",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 34
+        },
+        {
+          "kind": "ask",
+          "id": "traslado",
+          "q": "¿Te mudaste a un municipio en riesgo de despoblación, comprando o alquilando allí tu vivienda habitual, y vivirás en él tres años más?"
+        }
+      ]
+    },
+    "madrid-adquisicion-vivienda-despoblacion": {
+      "titulo": "Comprar vivienda en un municipio en riesgo de despoblación",
+      "casilla": "2027",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "compra",
+          "q": "¿Compraste desde 2024 tu vivienda habitual en un municipio en riesgo de despoblación teniendo menos de 35 años?"
+        }
+      ]
+    },
+    "madrid-vivienda-nacimiento-adopcion": {
+      "titulo": "Comprar vivienda habitual por nacimiento o adopción de un hijo",
+      "casilla": "1119",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "compra",
+          "q": "¿Compraste tu vivienda habitual desde 2023 por el nacimiento o la adopción de un hijo?"
+        }
+      ]
+    },
+    "madrid-intereses-vivienda-jovenes": {
+      "titulo": "Intereses de la hipoteca de menores de 30 años",
+      "casilla": "1117",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 30
+        },
+        {
+          "kind": "ask",
+          "id": "intereses",
+          "q": "¿Pagaste intereses del préstamo de tu vivienda habitual antes de cumplir 30 años?"
+        }
+      ]
+    },
+    "madrid-gastos-educativos": {
+      "titulo": "Por gastos educativos",
+      "casilla": "1044",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "estudios",
+          "q": "¿Tus hijos cursan 2.º ciclo de Infantil, enseñanza obligatoria o FP Básica en España?"
+        }
+      ]
+    },
+    "madrid-intereses-prestamos-estudios": {
+      "titulo": "Intereses de préstamos para estudios universitarios",
+      "casilla": "1118",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "prestamo",
+          "q": "¿Es un préstamo de un banco para estudios de Grado, Máster o Doctorado tuyos, de tu cónyuge o de tus hijos con derecho al mínimo?"
+        }
+      ]
+    },
+    "madrid-inversion-acciones-nuevas-entidades": {
+      "titulo": "Invertir en empresas nuevas o de reciente creación",
+      "casilla": "1046",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Mantendrás la participación al menos tres años y la empresa cumple los requisitos de sede, actividad y empleo?"
+        }
+      ]
+    },
+    "madrid-fomento-autoempleo-jovenes": {
+      "titulo": "Autoempleo de jóvenes menores de 35 años",
+      "casilla": "1047",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Te diste de alta en el censo de autónomos con menos de 35 años, trabajas sobre todo en Madrid y seguirás de alta al menos un año?"
+        }
+      ]
+    },
+    "madrid-inversion-mercado-alternativo-bursatil": {
+      "titulo": "Acciones del mercado alternativo bursátil",
+      "casilla": "1048",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿Mantendrás las acciones dos años, no superas el 10 % del capital y la sociedad tiene domicilio en Madrid?"
+        }
+      ]
+    },
+    "madrid-inversion-nuevos-contribuyentes-extranjero": {
+      "titulo": "Inversiones de nuevos residentes llegados del extranjero",
+      "casilla": "2030",
+      "norma": "Decreto Legislativo 1/2010 de la Comunidad de Madrid (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "residencia",
+          "q": "¿No fuiste residente en España en los cinco años anteriores y pasaste a serlo desde 2024?"
+        },
+        {
+          "kind": "ask",
+          "id": "inversion",
+          "q": "¿Mantendrás la inversión al menos seis años?"
+        }
+      ]
+    },
+    "murcia-gastos-guarderia": {
+      "titulo": "Por gastos de guardería",
+      "casilla": "1054",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "centro",
+          "q": "¿Pagaste un centro autorizado de primer ciclo de educación infantil para un hijo que convive contigo a fin de año?"
+        }
+      ]
+    },
+    "murcia-nacimiento-adopcion": {
+      "titulo": "Por nacimiento o adopción",
+      "casilla": "1073",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "nacimiento",
+          "q": "¿El hijo nació o lo adoptaste en 2025 (o lo acogiste ese año)?"
+        },
+        {
+          "kind": "ask",
+          "id": "minimo",
+          "q": "¿Los hijos por los que la aplicas te dan derecho al mínimo por descendientes y conviven contigo?"
+        }
+      ]
+    },
+    "murcia-contribuyentes-discapacidad": {
+      "titulo": "Para contribuyentes con discapacidad",
+      "casilla": "1157",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "disability",
+          "min": 33
+        },
+        {
+          "kind": "ask",
+          "id": "certificado",
+          "q": "¿Tienes el certificado oficial de la discapacidad?"
+        }
+      ]
+    },
+    "murcia-conciliacion": {
+      "titulo": "Por conciliación (empleados de hogar)",
+      "casilla": null,
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "empleador",
+          "q": "¿Estás de alta como empleador de una persona empleada del hogar en la Seguridad Social?"
+        },
+        {
+          "kind": "ask",
+          "id": "rentas",
+          "q": "¿Tú y tu pareja tenéis rentas del trabajo o de una actividad económica?"
+        }
+      ]
+    },
+    "murcia-acogimiento-no-remunerado": {
+      "titulo": "Por acoger a mayores de 65 o personas con discapacidad",
+      "casilla": "1161",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "convivencia",
+          "q": "¿Convivió contigo más de 183 días, empadronado, con certificado oficial y sin ayudas regionales por el acogimiento?"
+        },
+        {
+          "kind": "ask",
+          "id": "parentesco",
+          "q": "¿Si es mayor de 65, no es pariente tuyo hasta el cuarto grado?"
+        }
+      ]
+    },
+    "murcia-familia-monoparental": {
+      "titulo": "Por familia monoparental",
+      "casilla": "2035",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "monoparental",
+          "q": "¿Vives solo con tus hijos menores (o mayores con discapacidad) y ganan menos de 8.000 € al año?"
+        }
+      ]
+    },
+    "murcia-enfermedades-raras": {
+      "titulo": "Por gastos de enfermedades raras",
+      "casilla": "2151",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "gasto",
+          "q": "¿Es un gasto por una enfermedad rara tuya, de tu cónyuge o de alguien que te da derecho al mínimo familiar, con factura?"
+        }
+      ]
+    },
+    "murcia-material-escolar": {
+      "titulo": "Por material escolar y libros de texto",
+      "casilla": "1059",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "gasto",
+          "q": "¿Compraste material escolar o libros de texto para tus hijos?"
+        }
+      ]
+    },
+    "murcia-mujeres-trabajadoras": {
+      "titulo": "Para mujeres trabajadoras",
+      "casilla": "1171",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Eres mujer y estuviste de alta en la Seguridad Social por trabajo propio o ajeno?"
+        }
+      ]
+    },
+    "murcia-idiomas": {
+      "titulo": "Por clases extraescolares de idiomas",
+      "casilla": "2036",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "estudios",
+          "q": "¿Son clases extraescolares de idiomas de hijos con derecho al mínimo que cursan infantil (2.º ciclo), primaria, ESO, bachillerato o FP?"
+        }
+      ]
+    },
+    "murcia-internet": {
+      "titulo": "Por conexión a Internet de alta velocidad",
+      "casilla": "2037",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "alta",
+          "q": "¿Vives en un municipio murciano de menos de 15.000 habitantes y contrataste la línea este año, sin uso profesional ni simple cambio de compañía?"
+        }
+      ]
+    },
+    "murcia-cristales-lentes": {
+      "titulo": "Por gafas y lentillas de menores",
+      "casilla": "2149",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "menor",
+          "q": "¿Son gafas o lentillas de un hijo con derecho al mínimo que tenía menos de 12 años al pagarlas?"
+        }
+      ]
+    },
+    "murcia-deporte": {
+      "titulo": "Por deporte y actividades saludables",
+      "casilla": "2150",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "gasto",
+          "q": "¿Son gastos de deporte tuyos, de tu cónyuge o de familiares con derecho al mínimo, con factura y sin cuotas de clubes sociales?"
+        }
+      ]
+    },
+    "murcia-veterinarios": {
+      "titulo": "Por gastos veterinarios",
+      "casilla": "2153",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "factura",
+          "q": "¿Tienes factura del gasto?"
+        }
+      ]
+    },
+    "murcia-vehiculos-electricos": {
+      "titulo": "Por comprar un vehículo eléctrico",
+      "casilla": "2155",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "vehiculo",
+          "q": "¿Es el único vehículo eléctrico que compraste este año?"
+        }
+      ]
+    },
+    "murcia-recarga-vehiculos-electricos": {
+      "titulo": "Por punto de recarga de vehículo eléctrico",
+      "casilla": "2157",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "instalacion",
+          "q": "¿Es tu única instalación del año, en una finca tuya o garaje comunitario, para uso particular, con factura, y la mantendrás dos años?"
+        }
+      ]
+    },
+    "murcia-acciones-entidades-nuevas": {
+      "titulo": "Por invertir en empresas nuevas",
+      "casilla": "1057",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "sociedad",
+          "q": "¿Tienes como mucho el 40 % (con familiares), la empresa tiene sede en Murcia y un empleado a jornada completa?"
+        },
+        {
+          "kind": "ask",
+          "id": "plazo",
+          "q": "¿Mantendrás las acciones diez años sin cargo ejecutivo ni relación laboral en la empresa?"
+        }
+      ]
+    },
+    "murcia-acciones-mab": {
+      "titulo": "Por invertir en empresas del segmento MAB",
+      "casilla": "1058",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "participacion",
+          "q": "¿No superas el 10 % del capital, mantendrás las acciones dos años y la empresa tiene domicilio en Murcia y no gestiona patrimonio?"
+        }
+      ]
+    },
+    "murcia-economia-social": {
+      "titulo": "Por invertir en economía social",
+      "casilla": "2152",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Tienes como mucho el 40 % (con familiares), la entidad tiene sede en Murcia y un empleado a jornada completa, y mantendrás la aportación cinco años?"
+        }
+      ]
+    },
+    "murcia-vivienda-jovenes": {
+      "titulo": "Por comprar vivienda habitual (jóvenes)",
+      "casilla": "1052",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "maxAge",
+          "age": 40
+        },
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿Es tu vivienda habitual en Murcia, de nueva construcción o con rehabilitación protegida?"
+        }
+      ]
+    },
+    "murcia-ahorro-agua": {
+      "titulo": "Por dispositivos de ahorro de agua",
+      "casilla": "1056",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "reconocimiento",
+          "q": "¿Es en tu vivienda habitual y tienes el reconocimiento previo de la Administración regional?"
+        }
+      ]
+    },
+    "murcia-energias-renovables": {
+      "titulo": "Por instalar energías renovables en casa",
+      "casilla": "1055",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "instalacion",
+          "q": "¿La vivienda está en Murcia, tienes factura del instalador y no pagaste en efectivo?"
+        }
+      ]
+    },
+    "murcia-arrendamiento-vivienda-habitual": {
+      "titulo": "Por alquiler de vivienda habitual",
+      "casilla": "0991",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "condicion",
+          "q": "¿Tienes 40 años o menos, eres familia numerosa o tienes una discapacidad del 65 % o más?"
+        },
+        {
+          "kind": "ask",
+          "id": "contrato",
+          "q": "¿Presentaste el ITP del contrato y pagaste el alquiler sin efectivo?"
+        }
+      ]
+    },
+    "murcia-vivienda-familias-numerosas": {
+      "titulo": "Por comprar vivienda (familias numerosas)",
+      "casilla": "0847",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "titulo",
+          "q": "¿Tienes el título de familia numerosa en vigor a 31 de diciembre?"
+        },
+        {
+          "kind": "ask",
+          "id": "vivienda",
+          "q": "¿La compraste en 5 años desde que sois numerosa o desde el nacimiento de un hijo, es un 10 % más grande y venderás la anterior en 5 años?"
+        }
+      ]
+    },
+    "murcia-regimen-transitorio-vivienda": {
+      "titulo": "Régimen transitorio de vivienda habitual",
+      "casilla": "1052",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "anterior",
+          "q": "¿Aplicaste la deducción por esta vivienda en 1998, 1999 o 2000?"
+        }
+      ]
+    },
+    "murcia-donativos-cultura-y-sociales": {
+      "titulo": "Donativos a proyectos de mecenazgo",
+      "casilla": "1053",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "proyecto",
+          "q": "¿Donaste a un proyecto de la ley de mecenazgo de la Región de Murcia?"
+        },
+        {
+          "kind": "ask",
+          "id": "credito",
+          "q": "¿Tienes el certificado y no aplicas por esa donación el crédito fiscal de la ley de mecenazgo regional?"
+        }
+      ]
+    },
+    "murcia-donativos-investigacion-biosanitaria": {
+      "titulo": "Donativos para investigación biosanitaria",
+      "casilla": "1060",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "entidad",
+          "q": "¿Donaste por transferencia a la Comunidad, a una universidad pública o a una entidad sin lucro inscrita?"
+        },
+        {
+          "kind": "ask",
+          "id": "credito",
+          "q": "¿Tienes el certificado y no aplicas por esa donación el crédito fiscal de la ley de mecenazgo regional?"
+        }
+      ]
+    },
+    "murcia-donaciones-bienes-patrimonio-cultural": {
+      "titulo": "Donación de bienes del patrimonio cultural",
+      "casilla": "0846",
+      "norma": "Decreto Legislativo 1/2010 de la Región de Murcia (texto refundido de tributos cedidos)",
+      "requisitos": [
+        {
+          "kind": "ask",
+          "id": "credito",
+          "q": "¿Tienes el certificado y no aplicas por esa donación el crédito fiscal de la ley de mecenazgo regional?"
         }
       ]
     }
