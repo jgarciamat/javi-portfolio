@@ -1,4 +1,11 @@
 import type { RentaWorkExtras } from './rentaExtras';
+import {
+  activitiesOf,
+  type ActivitiesResult,
+  type ActivityInput,
+  type FarmIndex,
+  type ModuleActivity,
+} from './rentaActivity';
 import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 import { round2 } from './round';
@@ -388,6 +395,8 @@ export interface RentaInput {
    * transmission go to the general base.
    */
   savingsDetail?: SavingsDetail;
+  /** Economic activities, with the tables of the módulos of the year (see rentaActivity.ts). */
+  activities?: { list: ActivityInput[]; modules: ModuleActivity[]; farm: FarmIndex[] };
   family: Family;
   state: RentaState;
   ccaa: RentaCcaa;
@@ -434,6 +443,8 @@ export interface RentaResult {
   pensionReduction: number;
   /** Other reductions of the general base: spouse plan and compensatory pension. */
   otherReductions: number;
+  /** The economic activities and the reductions of art. 32 (null when there are none). */
+  activities: ActivitiesResult | null;
   /** The savings income worked out in detail (null when only the net amount was given). */
   savingsDetail: SavingsBreakdown | null;
   /** The general base with the gains that do not come from a transmission (boxes 0431-0434). */
@@ -618,6 +629,41 @@ function workIncome(input: RentaInput, earners: Earner[]) {
   };
 }
 
+/** The savings base, worked out from the detail when there is one, and the general gains. */
+function savingsPart(input: RentaInput, partner: JointMember | null) {
+  const detail = input.savingsDetail ? savingsOf(input.savingsDetail, input.state.year) : null;
+  const ownSavings = detail ? detail.boxes['0460'] : positive(input.savings);
+  return {
+    detail,
+    ownSavings,
+    savingsTotal: round2(ownSavings + positive(partner?.savings ?? 0)),
+    generalGains: detail?.general.positive ?? 0,
+  };
+}
+
+/** The activities worked out for a given reduction of art. 20 (for the joint limit of 3,700 €). */
+function activityRunner(input: RentaInput, otherIncome: number) {
+  const activities = input.activities;
+  const ctx = {
+    otherIncome,
+    // Art. 32.2.2.º.e: no pay from work, except unemployment or pensions up to 4,000 € a year.
+    hasWork:
+      positive(input.gross) > 0 &&
+      !(positive(input.gross) <= 4000 && positive(input.nonSalaryIncome ?? 0) >= input.gross),
+    disability: input.family.disability,
+    assistance: input.family.assistance === true,
+  };
+  return (workReduction: number) =>
+    activities
+      ? activitiesOf(
+          activities.list,
+          { ...ctx, workReduction },
+          activities.modules,
+          activities.farm
+        )
+      : null;
+}
+
 /** From the net pay to the general and savings bases: other income, the reductions of the base. */
 function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof workIncome>) {
   const { state } = input;
@@ -628,14 +674,16 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
       positive(input.imputedValues.revised) * input.imputationRates.revised) /
       100
   );
-  const detail = input.savingsDetail ? savingsOf(input.savingsDetail, state.year) : null;
-  const ownSavings = detail ? detail.boxes['0460'] : positive(input.savings);
-  const savingsTotal = round2(ownSavings + positive(partner?.savings ?? 0));
-  const generalGains = detail?.general.positive ?? 0;
+  const { detail, ownSavings, savingsTotal, generalGains } = savingsPart(input, partner);
   // The reduction for low pay only applies when the other income does not pass 6,500 euros; in a
   // joint return it is one, on the net pay and the other income of the whole unit (AEAT Manual
   // práctico de Renta 2025, "Fase 3.ª: rendimiento neto reducido", checked 19-10-2026).
-  const otherIncome = Math.max(0, rentNet) + imputed + savingsTotal + generalGains;
+  const nonWork = Math.max(0, rentNet) + imputed + savingsTotal + generalGains;
+  const activityOf = activityRunner(input, work.netIncome + nonWork);
+  // The net income of the activities, before the reductions of art. 32, is other income for art. 20.
+  const raw = activityOf(0);
+  const activityNet = raw ? raw.each.reduce((sum, a) => sum + a.net, 0) : 0;
+  const otherIncome = nonWork + Math.max(0, activityNet);
   const reduction = round2(
     otherIncome > OTHER_INCOME_LIMIT
       ? 0
@@ -644,7 +692,9 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
 
   // Box 0432 (work, capital and property income and imputations), and the gains that do not come
   // from a transmission on top of it (LIRPF art. 48).
-  const income = work.netIncome - reduction + rentNet + imputed;
+  // The reductions of art. 32.2.3.º and art. 20 together up to 3,700 €.
+  const act = activityOf(reduction);
+  const income = work.netIncome - reduction + rentNet + imputed + (act?.total ?? 0);
   const general = detail ? generalBaseOf(income, detail.general, state.year) : null;
   const beforeReductions = general ? general.base : income;
   // Joint return (LIRPF art. 84.2.4.º; AEAT Manual 2025, "Reducción por tributación conjunta" and the
@@ -694,6 +744,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
+    activities: act,
     ownSavings,
     detail,
     general,
@@ -786,6 +837,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherReductions,
     taxBase,
     savingsIncome,
+    activities,
     ownSavings,
     detail,
     general,
@@ -836,7 +888,11 @@ export function computeRenta(input: RentaInput): RentaResult {
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
   const low = lowPayOf(
     input,
-    Math.max(0, rentNet) + imputed + ownSavings + (detail?.general.positive ?? 0),
+    Math.max(0, rentNet) +
+      imputed +
+      ownSavings +
+      (detail?.general.positive ?? 0) +
+      Math.max(0, activities?.total ?? 0),
     quotaLeft
   );
   const lowPay = low.amount;
@@ -850,7 +906,12 @@ export function computeRenta(input: RentaInput): RentaResult {
     });
   }
   const netQuota = round2(quotaLeft - lowPay - refundable);
-  const withheld = round2(positive(input.withheld) + positive(partner?.withheld ?? 0));
+  // Box 0609: also the withholdings of the activities (0599) and the quarterly payments (0604).
+  const withheld = round2(
+    positive(input.withheld) +
+      positive(partner?.withheld ?? 0) +
+      (activities ? activities.withheld + activities.payments : 0)
+  );
   return {
     otherExpenses,
     netIncome,
@@ -863,6 +924,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     pensionReduction,
     otherReductions,
     savingsReduction,
+    activities,
     savingsDetail: detail,
     generalGains: general,
     jointReduction,

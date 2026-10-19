@@ -412,6 +412,67 @@ describe('computeRenta', () => {
     expect(computeRenta(input()).workReductions).toBe(0);
   });
 
+  it('adds the economic activities to the general base and their payments to box 0609', () => {
+    const shop = (dependent: boolean) => ({
+      kind: 'direct' as const,
+      name: 'Tienda',
+      dependent,
+      newActivity: false,
+      withheld: 3000,
+      payments: 600,
+      data: {
+        method: 'simplified' as const,
+        income: { sales: 20000, grants: 0, ownUse: 0, other: 0 },
+        expenses: {
+          purchases: 0,
+          staff: 0,
+          staffSocialSecurity: 0,
+          ownSocialSecurity: 0,
+          rent: 0,
+          repairs: 0,
+          supplies: 0,
+          services: 0,
+          insurance: 0,
+          taxes: 0,
+          financial: 0,
+          meals: 0,
+          other: 0,
+          depreciation: 0,
+        },
+        assets: [],
+        lowValue: [],
+        health: { premiums: 0, people: 0, withDisability: 0 },
+        home: { supplies: 0, usedPercent: 0 },
+        provisions: 0,
+      },
+    });
+    const activities = (dependent: boolean) => ({ list: [shop(dependent)], modules: [], farm: [] });
+    // 20,000 − 5 % = 19,000 of activity and no pay from work.
+    const r = computeRenta(
+      input({ gross: 0, socialSecurity: 0, withheld: 0, activities: activities(false) })
+    );
+    expect(r.activities?.total).toBe(19000);
+    expect(r.generalBase).toBe(19000);
+    expect(r.withheld).toBe(3600);
+    // A single client: no 5 %, 2,000 € off (art. 32.2.1.º); only with no pay from work (a pension
+    // of up to 4,000 € does not count).
+    const alone = computeRenta(
+      input({
+        gross: 3000,
+        socialSecurity: 0,
+        nonSalaryIncome: 3000,
+        withheld: 0,
+        activities: activities(true),
+      })
+    );
+    expect(alone.activities?.dependentReduction).toBe(2000);
+    const worker = computeRenta(input({ activities: activities(true) }));
+    expect(worker.activities?.dependentReduction).toBe(0);
+    // More than 6,500 € from the activity: no reduction of art. 20 for the pay.
+    expect(worker.workReduction).toBe(0);
+    expect(computeRenta(input()).activities).toBeNull();
+  });
+
   it('works the savings out of the detail and puts the other gains in the general base', () => {
     const savingsDetail = {
       ...emptySavingsDetail(),
