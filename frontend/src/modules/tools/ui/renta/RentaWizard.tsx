@@ -325,7 +325,7 @@ function activityScreen(ctx: Ctx): WizardScreen {
       <>
         {screen.body}
         {/* Always in the same place: what it says stays once the activity is there. */}
-        {(answers.activity === 'yes' || list.length > 0) && bring}
+        {(answers.activity !== 'no' || list.length > 0) && bring}
         <ActivitiesList form={p.form} set={p.set} result={p.live.result.activities} />
       </>
     ),

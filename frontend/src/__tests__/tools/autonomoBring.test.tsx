@@ -3,6 +3,7 @@ import { annualActivity, NO_ACTIVITY } from '@modules/finances/domain/annualActi
 import type { AutonomoInputs } from '@modules/finances/domain/types';
 import type { ActivitiesResult } from '@modules/tools/domain/rentaActivity';
 import { emptyForm } from '@modules/tools/domain/rentaForm';
+import { ActivitiesList } from '@modules/tools/ui/renta/ActivitiesList';
 import { ActivityBoxes } from '@modules/tools/ui/renta/ActivityBoxes';
 import { AnnualFigures, BringActivity, bringOutcome } from '@modules/tools/ui/renta/AutonomoBring';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -38,7 +39,9 @@ describe('bringing the self-employed year to the Renta', () => {
   it('in módulos shows only what it knows, and says the activity cannot be brought yet', () => {
     renderWithProviders(<AnnualFigures annual={modules} />);
     expect(screen.queryByText(tr('tools.renta.bring.fig.income'))).toBeNull();
-    expect(screen.getByText(tr('tools.renta.bring.fig.payments'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.bring.fig.payments131'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.bring.fig.source', { year: 2025 }))).toBeVisible();
+    expect(screen.queryByText(tr('tools.renta.bring.fig.noReta'))).toBeNull();
     expect(screen.queryByText(tr('tools.renta.bring.fig.net'))).toBeNull();
   });
 
@@ -99,5 +102,46 @@ describe('the boxes to copy', () => {
       screen.getByRole('button', { name: tr('tools.renta.activities.copyBox', { box: '0599' }) })
     );
     expect(await screen.findByText(tr('wizard.renta.copyFailed'))).toBeInTheDocument();
+  });
+});
+
+describe('taking an activity out of the Renta', () => {
+  const given = (name: string) =>
+    ({
+      kind: 'given',
+      name,
+      data: { area: 'direct', net: 100 },
+      withheld: 0,
+      payments: 0,
+    } as const);
+  const result: ActivitiesResult = {
+    direct: 200,
+    dependentReduction: 0,
+    smallIncomeReduction: 0,
+    startReduction: 0,
+    directTotal: 200,
+    modules: 0,
+    agrarian: 0,
+    total: 200,
+    withheld: 0,
+    payments: 0,
+    each: [
+      { name: 'Diseño', net: 100, detail: { net: 100 } },
+      { name: 'Autónomos', net: 100, detail: { net: 100 } },
+    ],
+  };
+
+  it('takes out another activity at once, and the one of Autónomos after asking (Escape: no)', () => {
+    const set = jest.fn();
+    const form = { ...emptyForm(''), activities: [given('Diseño'), given('Autónomos')] };
+    renderWithProviders(<ActivitiesList form={form} set={set} result={result} />);
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.renta.activities.remove', { name: 'Diseño' }) })
+    );
+    expect(set).toHaveBeenCalledWith({ activities: [given('Autónomos')] });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.button') }));
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(set).toHaveBeenCalledTimes(1);
   });
 });

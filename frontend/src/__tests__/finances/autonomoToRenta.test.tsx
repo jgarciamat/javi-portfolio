@@ -228,3 +228,51 @@ describe('Autónomos 2025 → Renta 2025', () => {
     expect(screen.getByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeVisible();
   });
 });
+
+describe('the activity brought, without contradictory figures, and taken out again', () => {
+  it('says where each figure comes from, apart from the movements of the accounts', async () => {
+    freezeTime('2026-10-19T12:00:00');
+    store(2026);
+    rentaAt(2026, 5);
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
+    // The movements of the accounts of 2026: another source, said as such.
+    api.transactionApi.getAnnual.mockResolvedValue({
+      year: 2026,
+      months: { 1: { income: 3505, expenses: 1090, saving: 0, balance: 2415 } },
+    });
+    renderWithProviders(<App start="renta" />, { api, plan: true });
+    fireEvent.change(await screen.findByLabelText(tr('app.renta.year')), {
+      target: { value: '2026' },
+    });
+    expect(
+      await screen.findByText(/en 2026 entraron .*3505,00.* y salieron .*1090,00/)
+    ).toBeVisible();
+    fireEvent.click(
+      await screen.findByRole('button', { name: tr('tools.renta.bring.button', { year: 2026 }) })
+    );
+    // From Autónomos, said so; no RETA there; the payments of the 130 are the app's estimate.
+    expect(
+      screen.getAllByText(tr('tools.renta.bring.fig.source', { year: 2026 }))[0]
+    ).toBeVisible();
+    expect(screen.getAllByText(tr('tools.renta.bring.fig.noReta'))[0]).toBeVisible();
+    expect(
+      screen.getAllByText(
+        `${tr('tools.renta.bring.fig.payments')} (${tr('tools.renta.bring.fig.estimated')})`
+      )[0]
+    ).toBeVisible();
+    // The banner on top follows what the planner saves.
+    expect(await screen.findByText(tr('app.renta.brought', { year: 2026 }))).toBeVisible();
+
+    fireEvent.click(button(tr('tools.renta.removeActivity.button')));
+    fireEvent.click(button(tr('tools.renta.removeActivity.confirm')));
+    expect(loadProgress()?.form.activities).toEqual([]);
+    expect(screen.queryByText(tr('app.renta.brought', { year: 2026 }))).toBeNull();
+    expect(screen.queryByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeNull();
+    expect(screen.queryByText(tr('tools.renta.activities.boxes'))).toBeNull();
+    // The data of Autónomos is still there: it can be brought again.
+    expect(autonomoOnDevice(2026).annual?.net).toBe(15200);
+    fireEvent.click(button(tr('tools.renta.bring.button', { year: 2026 })));
+    expect(screen.getByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeVisible();
+  });
+});

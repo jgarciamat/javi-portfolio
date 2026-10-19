@@ -30,9 +30,7 @@ describe('Renta section', () => {
     });
     renderWithProviders(<RentaView />, { api });
     expect(
-      await screen.findByText(
-        /En 2025 registraste .*25\.?000.* de ingresos y .*1\.?500.* de gastos/
-      )
+      await screen.findByText(/en 2025 entraron .*25\.?000.* y salieron .*1\.?500.*/)
     ).toBeInTheDocument();
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenCalledWith(2025));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('25000');

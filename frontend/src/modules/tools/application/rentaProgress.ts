@@ -156,8 +156,12 @@ export function loadProgress(): RentaProgress | null {
   };
 }
 
+/** Fired on `window` when the saved data changes, for what shows it outside the planner. */
+export const PROGRESS_EVENT = 'mm-renta-progress';
+
 export function saveProgress(progress: RentaProgress): void {
   storage.setJSON(PROGRESS_KEY, { version: PROGRESS_VERSION, ...progress });
+  window.dispatchEvent(new Event(PROGRESS_EVENT));
 }
 
 export function clearProgress(): void {

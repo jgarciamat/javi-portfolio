@@ -153,11 +153,17 @@ describe('«Preparar mi declaración de la renta»', () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     expect(await screen.findByText(tr('tools.renta.line.activities'))).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: tr('tools.renta.activities.remove', { name: 'Autónomos' }),
-      })
-    );
+    // The activity of Autónomos goes only after confirming, in the app's delete dialog.
+    const remove = () =>
+      fireEvent.click(
+        screen.getByRole('button', { name: tr('tools.renta.removeActivity.button') })
+      );
+    remove();
+    expect(screen.getByText(tr('tools.renta.removeActivity.message'))).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.cancel') }));
+    expect(screen.queryByText(tr('tools.renta.removeActivity.message'))).toBeNull();
+    remove();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.confirm') }));
     expect(screen.queryByRole('region', { name: tr('tools.renta.activities.title') })).toBeNull();
   });
 });

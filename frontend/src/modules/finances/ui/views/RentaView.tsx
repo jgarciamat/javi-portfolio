@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { YEAR_ACTIONS_ID } from '@modules/tools/ui/renta/NewReturn';
-import { loadProgress } from '@modules/tools/application/rentaProgress';
+import { loadProgress, PROGRESS_EVENT } from '@modules/tools/application/rentaProgress';
 import { rentaState } from '@modules/tools/data/renta/state';
 import { AUTONOMO_ACTIVITY } from '@modules/tools/domain/rentaFromAutonomo';
 import { AnnualFigures } from '@modules/tools/ui/renta/AutonomoBring';
@@ -28,10 +28,13 @@ const CHECKLIST = ['data', 'certificate', 'receipts', 'review'] as const;
  */
 function BroughtActivity({ year }: { year: number }) {
   const { t } = useI18n();
-  const saved = loadProgress();
-  const brought =
-    saved?.year === year && (saved.form.activities ?? []).some((a) => a.name === AUTONOMO_ACTIVITY);
-  const annual = brought ? autonomoOnDevice(year).annual : null;
+  // Read again whenever the planner saves (the activity can be taken out there).
+  const [, refresh] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => {
+    window.addEventListener(PROGRESS_EVENT, refresh);
+    return () => window.removeEventListener(PROGRESS_EVENT, refresh);
+  }, []);
+  const annual = broughtActivity(year);
   if (!annual) return null;
   return (
     <div className="renta-recovered renta-brought" role="status">
@@ -39,6 +42,14 @@ function BroughtActivity({ year }: { year: number }) {
       <AnnualFigures annual={annual} />
     </div>
   );
+}
+
+/** The self-employed year of the device, when the saved Renta of `year` has it. */
+function broughtActivity(year: number) {
+  const saved = loadProgress();
+  const brought =
+    saved?.year === year && (saved.form.activities ?? []).some((a) => a.name === AUTONOMO_ACTIVITY);
+  return brought ? autonomoOnDevice(year).annual : null;
 }
 
 /** Income tax return (Renta): the figures of the year, whether to file, and what to gather. */
@@ -103,7 +114,8 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             key={`${year}-${Math.round(income)}`}
             mode="account"
             year={year}
-            initialIncome={income > 0 ? String(Math.round(income)) : ''}
+            // The money that came into the accounts is not a salary of a self-employed person.
+            initialIncome={income > 0 && !broughtActivity(year) ? String(Math.round(income)) : ''}
             onOpenAutonomo={onOpenTab && (() => onOpenTab('business'))}
             onYear={(y) => years.includes(y) && setYear(y)}
             onHowToFile={onOpenTab && howToFile}
