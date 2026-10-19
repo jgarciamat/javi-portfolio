@@ -384,8 +384,10 @@ export interface RentaResult {
   rentalNet: number;
   imputedIncome: number;
   pensionReduction: number;
-  /** Other reductions: spouse plan and compensatory pension. */
+  /** Other reductions of the general base: spouse plan and compensatory pension. */
   otherReductions: number;
+  /** The part of the compensatory pension that did not fit in the general base: off the savings one. */
+  savingsReduction: number;
   /** Reduction for the joint return (0 in an individual one). */
   jointReduction: number;
   /** Joint return: the 340 € deduction was left out because its joint rules are not clear. */
@@ -599,12 +601,18 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
       Math.max(0, afterJoint)
     )
   );
-  const otherReductions = round2(
-    Math.min(
-      Math.min(positive(input.spousePlan), 1000) + positive(input.compensatoryPension),
-      Math.max(0, afterJoint - pensionReduction)
-    )
+  // The spouse's plan (art. 51.7) goes with the pension plans, before the compensatory pension.
+  const leftAfterPlans = Math.max(0, afterJoint - pensionReduction);
+  const spouse = Math.min(Math.min(positive(input.spousePlan), 1000), leftAfterPlans);
+  const compensatory = positive(input.compensatoryPension);
+  const compensatoryGeneral = Math.min(compensatory, leftAfterPlans - spouse);
+  // What is left of the compensatory pension (art. 55) lowers the savings base, never below zero:
+  // LIRPF art. 50.2 (BOE-A-2006-20764, consolidated text, checked 19-10-2026): "disminuir la base
+  // imponible del ahorro en el remanente, si lo hubiera, de la reducción prevista en el artículo 55".
+  const compensatorySavings = round2(
+    Math.min(compensatory - compensatoryGeneral, savingsTotal - jointSavings)
   );
+  const otherReductions = round2(spouse + compensatoryGeneral);
   return {
     rentNet,
     imputed,
@@ -615,7 +623,8 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
-    savingsBase: round2(savingsTotal - jointSavings),
+    savingsReduction: compensatorySavings,
+    savingsBase: round2(savingsTotal - jointSavings - compensatorySavings),
   };
 }
 
@@ -694,6 +703,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherReductions,
     taxBase,
     savingsIncome,
+    savingsReduction,
     savingsBase,
   } = basesOf(input, earners, work);
 
@@ -762,6 +772,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     imputedIncome: imputed,
     pensionReduction,
     otherReductions,
+    savingsReduction,
     jointReduction,
     lowPayLeftOut: !low.clear,
     generalBase: round2(Math.max(0, beforeReductions)),

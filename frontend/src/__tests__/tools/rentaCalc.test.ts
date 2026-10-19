@@ -379,6 +379,37 @@ describe('computeRenta', () => {
     expect(computeRenta(input({ gross: 3000, compensatoryPension: 9999 })).taxBase).toBe(0);
   });
 
+  it('takes what is left of the compensatory pension off the savings base (LIRPF art. 50.2)', () => {
+    // 12,000 − 2,000 of other expenses = 10,000 of general base; 12,000 of pension: 10,000 there,
+    // the other 2,000 off the 5,000 of savings.
+    const r = computeRenta(
+      input({ gross: 12000, socialSecurity: 0, savings: 5000, compensatoryPension: 12000 })
+    );
+    expect(r.otherReductions).toBe(10000);
+    expect(r.taxBase).toBe(0);
+    expect(r.savingsIncome).toBe(5000);
+    expect(r.savingsReduction).toBe(2000);
+    expect(r.savingsBase).toBe(3000);
+    // Never below zero: the rest of a bigger pension is lost.
+    const big = computeRenta(
+      input({ gross: 12000, socialSecurity: 0, savings: 5000, compensatoryPension: 20000 })
+    );
+    expect(big.savingsReduction).toBe(5000);
+    expect(big.savingsBase).toBe(0);
+    // The spouse's plan (art. 51.7) goes first, and only the pension reaches the savings base.
+    const spouse = computeRenta(
+      input({
+        gross: 12000,
+        socialSecurity: 0,
+        savings: 5000,
+        spousePlan: 1000,
+        compensatoryPension: 9500,
+      })
+    );
+    expect(spouse.otherReductions).toBe(10000);
+    expect(spouse.savingsReduction).toBe(500);
+  });
+
   it('adds the net rent of properties after expenses, depreciation and the reduction', () => {
     expect(rentalNet(null)).toBe(0);
     const rental = { income: 12000, expenses: 3000, amortization: 1000, reductionPercent: 50 };
