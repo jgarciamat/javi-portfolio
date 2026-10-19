@@ -15,7 +15,7 @@ import {
 } from './AutonomoManual';
 import { vatExtrasOf } from './vatForm';
 import { buildInputs } from './autonomoInputs';
-import { EXTRAS_KEY, MANUAL_KEY, preferredYear } from './autonomoForRenta';
+import { EXTRAS_KEY, MANUAL_KEY, openingPeriod } from './autonomoForRenta';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
 import type { KindPreferences } from '../../domain/invoiceLedger';
@@ -37,8 +37,6 @@ const THIS_YEAR = new Date().getFullYear();
 export const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
 export type Quarter = 1 | 2 | 3 | 4;
-
-const quarterNow = (): Quarter => (Math.floor(new Date().getMonth() / 3) + 1) as Quarter;
 
 /** What the 390 of last year hands to this one: the VAT to offset and the provisional prorrata. */
 export const withCarry = (
@@ -120,10 +118,11 @@ export function useAutonomoDraft() {
   // Bumped when the data is wiped, so the import panels forget their messages too.
   const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
-  // The year of the invoices on the device (the 4T of last year is done in January): its last
-  // quarter when it is a past year.
-  const [year, setYear] = useState(() => preferredYear(manual, YEARS, THIS_YEAR));
-  const [quarter, setQuarter] = useState<Quarter>(() => (year < THIS_YEAR ? 4 : quarterNow()));
+  // The quarter to file (the last one ended: the 3T in October, the 4T of last year in January), or
+  // the year of the invoices on the device and its last quarter with invoices.
+  const [opening] = useState(() => openingPeriod(manual, YEARS, new Date()));
+  const [year, setYear] = useState(opening.year);
+  const [quarter, setQuarter] = useState<Quarter>(opening.quarter);
   const [focus, setFocus] = useState<ReviewFocus | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)

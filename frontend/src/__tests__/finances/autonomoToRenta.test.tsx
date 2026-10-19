@@ -7,6 +7,7 @@ import { emptyActivity, emptyObjective } from '@modules/finances/ui/components/a
 import {
   autonomoOnDevice,
   invoiceYears,
+  openingPeriod,
   preferredYear,
   yearCheck,
 } from '@modules/finances/ui/components/autonomoForRenta';
@@ -104,6 +105,29 @@ describe('which year the self-employed data is of', () => {
     expect(yearCheck(manual, 2025)).toEqual({ matches: true, years: [2026, 2025] });
     expect(yearCheck({ invoices: [] }, 2025)).toEqual({ matches: true, years: [] });
     expect(yearCheck(manual, 2024).matches).toBe(false);
+  });
+
+  it('opens on the quarter to file, or on the last quarter with invoices of their year', () => {
+    const years = [2025, 2026, 2027];
+    const oct = new Date(2026, 9, 9);
+    // No invoices: the quarter to file (the 3T in October; the 4T of last year in February).
+    expect(openingPeriod({ invoices: [] }, years, oct)).toEqual({ year: 2026, quarter: 3 });
+    expect(openingPeriod({ invoices: [] }, years, new Date(2026, 1, 3))).toEqual({
+      year: 2025,
+      quarter: 4,
+    });
+    // Invoices of the year to file: still its quarter to file, even with invoices of a later one.
+    const now = { invoices: [invoice(2026, 1), { ...invoice(2026, 1), date: '2026-11-02' }] };
+    expect(openingPeriod(now, years, oct)).toEqual({ year: 2026, quarter: 3 });
+    // Invoices of another year: that year and its last quarter with invoices (the 4T without one).
+    const past = { invoices: [invoice(2025, 1), invoice(2025, 5)] };
+    expect(openingPeriod(past, years, oct)).toEqual({ year: 2025, quarter: 2 });
+    const odd = { invoices: [{ ...invoice(2025, 1), date: '2025-00-01' }] };
+    expect(openingPeriod(odd, years, oct)).toEqual({ year: 2025, quarter: 4 });
+    expect(openingPeriod({ invoices: [invoice(2026, 2)] }, years, new Date(2026, 0, 20))).toEqual({
+      year: 2026,
+      quarter: 1,
+    });
   });
 
   it('gives the year of the device for the Renta, or nothing when nothing was typed', () => {

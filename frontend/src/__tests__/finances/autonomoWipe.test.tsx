@@ -23,7 +23,7 @@ beforeEach(() => {
   localStorage.clear();
   // Everything together (the assistant has its own suite).
   localStorage.setItem('mm_autonomo_assistant', 'expert');
-  freezeTime('2026-10-18T12:00:00');
+  freezeTime('2027-01-18T12:00:00');
   read.mockReset();
 });
 afterEach(restoreTime);

@@ -425,7 +425,7 @@ describe('módulos in the self-employed screen', () => {
   it('prepares the 131 in the assistant and in the screen with everything together', () => {
     // The screen opens on this year (no invoices) and, in October, on the 4th quarter.
     const year = YEARS[1];
-    freezeTime(`${year}-10-19T12:00:00`);
+    freezeTime(`${year + 1}-01-19T12:00:00`);
     store(manualOf(taxiForm()));
     localStorage.setItem(
       AUTONOMO_WIZARD_KEY,

@@ -18,3 +18,14 @@ export function freeDraftQuarters(now: Date): { year: number; quarter: Quarter }
       : { year, quarter: (current.quarter - 1) as Quarter };
   return now.getDate() <= FILING_LAST_DAY[ended.quarter] ? [current, ended] : [current];
 }
+
+/**
+ * The quarter to file on a date: the last one already ended (1–3 → 4T of last year, 4–6 → 1T,
+ * 7–9 → 2T, 10–12 → 3T). The quarterly forms are filed in the month after the quarter ends.
+ */
+export function filingQuarter(now: Date): { year: number; quarter: Quarter } {
+  const ended = Math.floor(now.getMonth() / 3);
+  return ended === 0
+    ? { year: now.getFullYear() - 1, quarter: 4 }
+    : { year: now.getFullYear(), quarter: ended as Quarter };
+}
