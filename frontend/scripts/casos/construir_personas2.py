@@ -701,8 +701,10 @@ FUERA = [
     dict(n=44, slug=f'{PREFIX}-44-taxista-modulos-extremadura', ccaa='extremadura', title='Taxista en estimación objetiva (módulos) en Mérida',
          story='Taxista (epígrafe 721.2) en módulos con IVA simplificado: modelos 131 y 303 simplificado, sin libro de facturas de ventas. Segundo caso de módulos del banco (el 25 es de Andalucía) con otros signos: un conductor asalariado a media jornada y 45.000 km al año.',
          tests=['estimación objetiva', 'IVA simplificado', 'personal asalariado en módulos'], models=['131', '303 (simplificado)', '390', '100'],
-         reason='El motor no calcula la estimación objetiva (módulos) ni el IVA simplificado: los módulos de 2026 (Orden de módulos del año) no están en la app ni se han confirmado aquí.',
-         datos=dict(epigrafe='721.2', personalNoAsalariado=1, personalAsalariadoHoras=900, distanciaKm=45000, asientos=5)),
+         reason='El modelo 390 (exonerado en régimen simplificado) y el resto de la Renta (mínimos, cuota) no se comparan aquí: solo el 131, el 303 simplificado y la actividad.',
+         datos=dict(epigrafe='721.2', personalNoAsalariado=1, personalAsalariadoHoras=900, distanciaKm=45000, asientos=5,
+                    personalAsalariadoAnterior=0.5, poblacion='De 50.001 a 100.000 habitantes (Mérida)', rendimientoAnterior=8799.08,
+                    ivaSoportadoAnual=1100)),
     dict(n=55, slug=f'{PREFIX}-55-ganadero-leche-modulos-reagp-galicia', ccaa='galicia', title='Ganadero de vacuno de leche en módulos y en el REAGP',
          story='Vende toda la leche a una cooperativa que le retiene el 2 % y le paga la compensación del REAGP (10,5 % en ganadería, art. 130 LIVA). Más del 70 % de sus ingresos tiene retención: no presenta el 131. No presenta 303 (REAGP). La Renta va por módulos agrarios (índice de rendimiento de la Orden del año).',
          tests=['estimación objetiva agraria', 'REAGP: compensación del 10,5 %', 'exención del 131 por retenciones ≥ 70 %', 'retención del 2 % a actividades agrícolas y ganaderas'], models=['100 (módulos agrarios)'],
@@ -716,6 +718,84 @@ FUERA = [
          tests=['territorio foral: Gipuzkoa', 'autónomo foral'], models=['109 foral', '130 foral', '303 foral'],
          reason='Territorio foral de Gipuzkoa: normativa, escalas y modelos propios (TicketBAI y modelos forales), no los de la AEAT.'),
 ]
+
+
+# Orden HAC/1425/2025 (BOE-A-2025-25272), anexo II, 721.2 (los mismos importes que la HAC/1347/2024).
+TAXI = dict(irpf=[('Personal asalariado', 1346.27), ('Personal no asalariado', 7656.89), ('Distancia recorrida (1.000 km)', 45.08)],
+            iva=[('Personal empleado', 903.46), ('Distancia recorrida (1.000 km)', 8.78)], minimum=10, quarterly=5)
+ORDEN_2026 = 'https://www.boe.es/boe/dias/2025/12/11/pdfs/BOE-A-2025-25272.pdf'
+I131 = f'{SEDE}/impuestos-tasas/impuesto-sobre-renta-personas-fisicas/modelo-131-irpf______sionales-estimacion-objetiva-fraccionado_/instrucciones.html'
+
+
+def build_taxi44(d):
+    """131, 303 simplificado y casillas de la actividad del taxista 44, a mano con la orden de 2026."""
+    steps = Steps()
+    dec = lambda x: f'{x:g}'.replace('.', ',')  # noqa: E731
+    figs = []
+    staff = r2(d['personalAsalariadoHoras'] / 1800)
+    units = [staff, d['personalNoAsalariado'], d['distanciaKm'] / 1000]
+    steps.h('IRPF: rendimiento neto por módulos')
+    steps.s(f'Unidades (instrucción 2.1 del anexo II, [Orden HAC/1425/2025]({ORDEN_2026})): personal asalariado {d["personalAsalariadoHoras"]} h / 1.800 = '
+            f'**{dec(staff)}**; personal no asalariado (el titular) **1**; distancia **{dec(units[2])}** miles de km. Los asientos no son módulo del taxi.')
+    previous = r2(sum(a * u for (_, a), u in zip(TAXI['irpf'], units)))
+    steps.s(f'Rendimiento neto previo (1465) = {dec(staff)} × 1.346,27 + 1 × 7.656,89 + {dec(units[2])} × 45,08 = **{eur(previous)}**')
+    employment = r2(0.10 * staff * 1346.27)
+    steps.s(f'Minoración por empleo (1466): sin aumento de plantilla ({dec(d["personalAsalariadoAnterior"])} el año pasado), tramo hasta 1,00 → 0,10 × {dec(staff)} × 1.346,27 = **{eur(employment)}**')
+    reduced = r2(previous - employment)
+    modules = r2(reduced * 0.90)
+    general = r2(modules * 0.05)
+    net = r2(modules - general)
+    steps.s(f'Rendimiento minorado (1468) = **{eur(reduced)}**; índice del taxi en un municipio de 50.001 a 100.000 habitantes (2.3.a.2) 0,90: '
+            f'rendimiento neto de módulos (1474) = **{eur(modules)}**; reducción general del 5 % (DA 1.ª, 1475) = **{eur(general)}**; '
+            f'rendimiento neto de la actividad (1479) = **{eur(net)}**')
+    for box, concept, amount in [('1465', 'Rendimiento neto previo', previous), ('1466', 'Minoración por incentivos al empleo', employment),
+                                 ('1468', 'Rendimiento neto minorado', reduced), ('1474', 'Rendimiento neto de módulos', modules),
+                                 ('1475', 'Reducción de carácter general', general), ('1479', 'Rendimiento neto de la actividad', net)]:
+        figs.append(dict(modelo='100', casilla=box, concepto=concept, importe=amount, origen='calculo-a-mano',
+                         ref='calculo.md#irpf-rendimiento-neto-por-modulos', campo=f'renta.{box}'))
+    steps.h('Modelo 131')
+    pay = r2(net * 3 / 100)
+    cut = 100 if d['rendimientoAnterior'] <= 9000 else 0
+    due = r2(pay - cut)
+    steps.s(f'Con los mismos datos a 1 de enero (instrucción 3), casilla 01 = **{eur(net)}**; con {dec(staff)} personas asalariadas (no más de una) el 3 % '
+            f'(instrucción 4): casilla 02 = **{eur(pay)}**. Sin retenciones (08). Rendimiento de 2025 {eur(d["rendimientoAnterior"])} ≤ 9.000 €: '
+            f'minoración de 100 € (casilla 09, art. 110.3.c RIRPF). Resultado (15) = **{eur(due)}** cada trimestre ([instrucciones del 131]({I131})).')
+    for q in range(1, 5):
+        for box, concept, amount in [('01', 'Rendimiento neto', net), ('02', 'Pago fraccionado previo', pay), ('09', 'Minoración', cut),
+                                     ('15', 'Resultado de la autoliquidación', due)]:
+            figs.append(dict(modelo='131', periodo=f'{q}T', casilla=box, concepto=concept, importe=amount, origen='calculo-a-mano',
+                             ref='calculo.md#modelo-131', campo=f'm131.{box}'))
+    figs.append(dict(modelo='100', casilla='0604', concepto='Pagos fraccionados ingresados', importe=r2(4 * due), origen='calculo-a-mano',
+                     ref='calculo.md#modelo-131', campo='renta.0604'))
+    steps.h('Modelo 303 en régimen simplificado')
+    vat_units = [r2(staff + 1), units[2]]
+    c = r2(sum(a * u for (_, a), u in zip(TAXI['iva'], vat_units)))
+    f = r2(c * TAXI['quarterly'] / 100)
+    steps.s(f'Personal empleado = asalariados + no asalariados = **{dec(vat_units[0])}** (instrucción 2.1 del IVA); cuota devengada C = {dec(vat_units[0])} × 903,46 + '
+            f'{dec(units[2])} × 8,78 = **{eur(c)}**; 1T-3T: ingreso a cuenta del {TAXI["quarterly"]} % (instrucción 3) = **{eur(f)}** (casillas 47 y 71).')
+    hard = r2(c * 0.01)
+    g = r2(d['ivaSoportadoAnual'] + hard)
+    i = r2(c - g)
+    lmin = r2(c * TAXI['minimum'] / 100)
+    m = max(i, lmin)
+    paid = r2(3 * f)
+    q4 = r2(m - paid)
+    steps.s(f'4T: IVA soportado del año {eur(d["ivaSoportadoAnual"])} + 1 % de difícil justificación {eur(hard)} = G **{eur(g)}**; I = C − G = **{eur(i)}**; '
+            f'cuota mínima del {TAXI["minimum"]} % = **{eur(lmin)}**; M = **{eur(m)}** (casilla 48); ingresos a cuenta del año (49) **{eur(paid)}**; '
+            f'resultado (50 y 71) = **{eur(q4)}**.')
+    for q in range(1, 4):
+        for box in ('47', '71'):
+            figs.append(dict(modelo='303', periodo=f'{q}T', casilla=box, concepto='Ingreso a cuenta' if box == '47' else 'Resultado de la liquidación',
+                             importe=f, origen='calculo-a-mano', ref='calculo.md#modelo-303-en-regimen-simplificado', campo=f'm303s.{box}'))
+    for box, concept, amount in [('48', 'Cuota anual derivada del régimen simplificado', m), ('49', 'Ingresos a cuenta del ejercicio', paid),
+                                 ('50', 'Resultado', q4), ('71', 'Resultado de la liquidación', q4)]:
+        figs.append(dict(modelo='303', periodo='4T', casilla=box, concepto=concept, importe=amount, origen='calculo-a-mano',
+                         ref='calculo.md#modelo-303-en-regimen-simplificado', campo=f'm303s.{box}'))
+    modulos = dict(ejercicio=2026, actividad='m59',
+                   form=dict(activityId='m59', unitsStart=[dec(u) for u in units], staffLastYear=dec(d['personalAsalariadoAnterior']),
+                             special='upTo100000', vatSupported=str(d['ivaSoportadoAnual'])),
+                   rendimientoAnterior=d['rendimientoAnterior'], regimenIva='simplified')
+    return figs, steps, modulos
 
 
 def months_of(q, start=1):
@@ -1276,6 +1356,12 @@ def main():
         steps = Steps()
         steps.s(f'Fuera de alcance: {o["reason"]}')
         figs = [dict(modelo=o['models'][0], casilla=None, concepto='Resultado del modelo', importe=None, origen='pendiente', motivo=o['reason'], campo=None)]
+        if o['n'] == 44:
+            figs, steps, modulos = build_taxi44(o['datos'])
+            persona['alcance'] = 'parcial'
+            persona['modulos'] = modulos
+            persona.pop('motivoFueraDeAlcance')
+            figs.insert(0, dict(modelo='390', casilla=None, concepto='Resumen anual', importe=None, origen='pendiente', motivo=o['reason'], campo=None))
         if o['n'] == 55:
             steps.h('Lo que fija la ley')
             for q, v in enumerate(o['datos']['ventasLeche'], start=1):
@@ -1291,7 +1377,7 @@ def main():
                     'de la Orden de módulos (NO CONFIRMADO aquí); la compensación del REAGP es ingreso en directa (Manual 2025, «IVA devengado») y queda fuera del volumen de ingresos en módulos.')
         esperado = dict(slug=o['slug'], ejercicio=persona['ejercicio'], comprobado=CHECKED, cifras=figs)
         write(os.path.join(OUT, o['slug']), persona, esperado, o['title'], o['story'], steps)
-        index.append(dict(slug=o['slug'], titulo=o['title'], comunidad=o['ccaa'], modelos=o['models'], prueba=o['tests'], alcance='fuera'))
+        index.append(dict(slug=o['slug'], titulo=o['title'], comunidad=o['ccaa'], modelos=o['models'], prueba=o['tests'], alcance=persona['alcance']))
     index.sort(key=lambda x: x['slug'])
     with open(os.path.join(OUT, f'{PREFIX}-indice.json'), 'w', encoding='utf-8') as fh:
         json.dump(index, fh, ensure_ascii=False, indent=2)
