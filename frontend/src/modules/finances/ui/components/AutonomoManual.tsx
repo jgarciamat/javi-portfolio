@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { AutonomoImport } from './AutonomoImport';
 import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
 import { StepSection } from './AutonomoSteps';
+import { emptyWithholdings, type WithholdingForm } from './withholdingForm';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
@@ -33,6 +34,8 @@ export interface ManualForm {
   invoices: ImportedInvoice[];
   /** The figures of the last modelo 130 imported, to check them against the invoices. */
   model130: Model130Figures | null;
+  /** Employees, professionals and rent of each quarter, for the modelos 111 and 115 (older data has none). */
+  withholdings?: WithholdingForm[];
 }
 
 /** Accumulated income and expenses (boxes 01 and 02) of a filed modelo 130. */
@@ -77,6 +80,7 @@ export const emptyManual = (): ManualForm => ({
   })),
   invoices: [],
   model130: null,
+  withholdings: emptyWithholdings(),
 });
 
 const num = (text: string): number => {

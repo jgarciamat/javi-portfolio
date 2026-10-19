@@ -7,11 +7,18 @@ import type { TaxBox } from './types';
  * received invoices with a withholding and the totals typed by hand, so it needs no draft of the plan.
  *
  * Sources (checked on 19 October 2026):
- * - Modelo 111, boxes and instructions: https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GH01.shtml
- * - Modelo 115, boxes and instructions: https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GH02.shtml
- * - Withholding rates: Ley 35/2006 (LIRPF) art. 101 and Real Decreto 439/2007 (RIRPF) arts. 75,
- *   95, 100 and 101, https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820
- * - Deadlines: RIRPF art. 108 (the first twenty days of April, July, October and January).
+ * - Modelo 111, boxes 01-30 and who counts as a payee: AEAT instructions,
+ *   https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/pagos-cuenta/modelo-111-reten_____moniales-imputaciones-renta-autoliquidacion_/instrucciones.html
+ *   and its record layout (v1.8), .../static_files/Sede/Disenyo_registro/DR_100_199/archivos/dr111e16v18.xls
+ * - Modelo 115, boxes 01-05: record layout .../Disenyo_registro/DR_100_199/archivos/DR115e15v13.xls
+ *   and the order that approved it, https://www.boe.es/boe/dias/2000/11/28/pdfs/A41078-41132.pdf
+ * - Rates and exemptions: RIRPF (Real Decreto 439/2007) arts. 75.3.g, 95.1, 100 and 101,
+ *   https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820, and LIRPF art. 101.
+ * - Deadlines and the «negativa»: RIRPF art. 108.1 and the 2026 calendar of the AEAT,
+ *   https://sede.agenciatributaria.gob.es/Sede/ayuda/calendario-contribuyente/calendario-contribuyente-2026/plazos-presentacion-autoliquidaciones-domiciliacion-bancaria.html
+ *
+ * Not modelled: prizes (13-18), forestry gains (19-24), image rights (25-27), activities paid in kind
+ * (10-12) and the monthly filing of large companies.
  */
 
 /** Which form the withholding of a received invoice goes to. */
@@ -63,7 +70,10 @@ export interface ModelResult {
   boxes: TaxBox[];
   /** The result of the form: what is paid to the Tax Agency. */
   due: number;
-  /** «Sin actividad» (nothing paid that carries withholding), «negativa» (paid, nothing withheld) or to pay. */
+  /**
+   * `none`: nothing paid that carries withholding, the form is not filed (RIRPF art. 108.1);
+   * `zero`: paid but nothing withheld, a «negativa» is filed; `pay`: there is something to pay.
+   */
   result: 'none' | 'zero' | 'pay';
 }
 
@@ -84,9 +94,12 @@ export interface WithholdingResult {
   warnings: WithholdingWarning[];
 }
 
-/** RIRPF art. 101.2: 15 % for professional activities, 7 % in the year they start and the two after. */
+/**
+ * RIRPF art. 95.1: 15 % for professional activities; 7 % in the year they start and the two after
+ * (when none was carried on the year before, told to the payer) and for a few listed activities.
+ */
 export const PROFESSIONAL_RATES = [15, 7];
-/** RIRPF art. 101.1 (with LIRPF art. 101.8): 19 % for the rent of urban property. */
+/** RIRPF art. 100 and LIRPF art. 101.8: 19 % of everything paid to the landlord, VAT aside. */
 export const RENT_RATE = 19;
 /** RIRPF art. 75.3.g) 2.º: no withholding when the year's rent to one landlord is 900 € or less. */
 export const RENT_EXEMPT_UP_TO = 900;
@@ -139,29 +152,25 @@ const resultOf = (payees: number, due: number): ModelResult['result'] =>
 function form111(staff: StaffFigures, pros: Result111['pros']): Result111 {
   const total = round2(staff.withheld + staff.kindWithheld + pros.withheld);
   const boxes = [
-    box('01', 'Nº de perceptores · Rendimientos del trabajo dinerarios', staff.people),
-    box('02', 'Importe de las percepciones · Rendimientos del trabajo dinerarios', staff.paid),
-    box('03', 'Importe de las retenciones · Rendimientos del trabajo dinerarios', staff.withheld),
-    box('04', 'Nº de perceptores · Rendimientos del trabajo en especie', staff.kindPeople),
-    box('05', 'Valor de las percepciones · Rendimientos del trabajo en especie', staff.kindPaid),
+    box('01', 'Rendimientos del trabajo dinerarios · N.º perceptores', staff.people),
+    box('02', 'Rendimientos del trabajo dinerarios · Importe de las percepciones', staff.paid),
+    box('03', 'Rendimientos del trabajo dinerarios · Importe de las retenciones', staff.withheld),
+    box('04', 'Rendimientos del trabajo en especie · N.º perceptores', staff.kindPeople),
+    box(
+      '05',
+      'Rendimientos del trabajo en especie · Valor percepciones en especie',
+      staff.kindPaid
+    ),
     box(
       '06',
-      'Importe de los ingresos a cuenta · Rendimientos del trabajo en especie',
+      'Rendimientos del trabajo en especie · Importe de los ingresos a cuenta',
       staff.kindWithheld
     ),
-    box('07', 'Nº de perceptores · Rendimientos de actividades económicas dinerarios', pros.people),
-    box(
-      '08',
-      'Importe de las percepciones · Rendimientos de actividades económicas dinerarios',
-      pros.base
-    ),
-    box(
-      '09',
-      'Importe de las retenciones · Rendimientos de actividades económicas dinerarios',
-      pros.withheld
-    ),
-    box('28', 'Total liquidación: suma de retenciones e ingresos a cuenta', total),
-    box('29', 'A deducir (solo complementaria): resultados a ingresar anteriores', 0),
+    box('07', 'Actividades económicas dinerarios · N.º perceptores', pros.people),
+    box('08', 'Actividades económicas dinerarios · Importe de las percepciones', pros.base),
+    box('09', 'Actividades económicas dinerarios · Importe de las retenciones', pros.withheld),
+    box('28', 'Suma retenciones e ingresos a cuenta', total),
+    box('29', 'Resultado de anteriores declaraciones (complementaria)', 0),
     box('30', 'Resultado a ingresar (28 - 29)', total),
   ];
   return {
@@ -179,10 +188,10 @@ function form111(staff: StaffFigures, pros: Result111['pros']): Result111 {
 /** The modelo 115 of the quarter: the landlords, the base, the withholdings and the result. */
 function form115(people: number, base: number, withheld: number): Result115 {
   const boxes = [
-    box('01', 'Nº de perceptores', people),
-    box('02', 'Base de las retenciones e ingresos a cuenta', base),
+    box('01', 'Número perceptores', people),
+    box('02', 'Base retenciones e ingresos a cuenta', base),
     box('03', 'Retenciones e ingresos a cuenta', withheld),
-    box('04', 'A deducir (solo complementaria): resultados a ingresar anteriores', 0),
+    box('04', 'Resultado de anteriores declaraciones (complementaria)', 0),
     box('05', 'Resultado a ingresar (03 - 04)', withheld),
   ];
   return { boxes, due: withheld, result: resultOf(people, withheld), people, base };

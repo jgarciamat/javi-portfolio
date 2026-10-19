@@ -5,6 +5,7 @@ import { storage } from '@shared/utils/storage';
 import type { AutonomoCloudCopy, ExpenseKind } from '@modules/finances/domain/types';
 import type { KindPreferences } from '../../domain/invoiceLedger';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
+import { withholdingsOf } from './withholdingForm';
 
 /**
  * «Save in my account too»: the self-employed form copied to the account, encrypted on the server,
@@ -147,6 +148,11 @@ export function toSaved(
         withheld: i.withheld,
         concept: i.concept,
         period: i.period ?? null,
+        // The withholding of a received invoice and its corrections (modelos 111 and 115).
+        ...(i.retention !== undefined ? { retention: i.retention } : {}),
+        ...(i.nif ? { nif: i.nif } : {}),
+        ...(i.retentionFix !== undefined ? { retentionFix: i.retentionFix } : {}),
+        ...(i.withholding ? { withholding: i.withholding } : {}),
       })),
       model130: model130
         ? {
@@ -156,6 +162,7 @@ export function toSaved(
             expenses: model130.expenses,
           }
         : null,
+      withholdings: withholdingsOf(manual as Pick<ManualForm, 'withholdings'>),
     },
     extras: {
       hardToJustify: options.hardToJustify,
