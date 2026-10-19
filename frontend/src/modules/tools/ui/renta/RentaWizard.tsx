@@ -469,6 +469,7 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
           mode={mode}
           invest={<InvestLink form={p.form} onGo={() => ctx.goStep(INVEST_STEP)} />}
           imported={p.form.savingsDetail?.imported}
+          input={p.input}
         />
       ),
     },

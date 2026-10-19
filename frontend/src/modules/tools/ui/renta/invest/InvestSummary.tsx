@@ -6,7 +6,74 @@ import {
   type InvestType,
   type RentaEffect,
 } from '../../../domain/invest/summary';
+import { lossesToRecover, recoverOptions, type RecoverYear } from '../../../domain/invest/recover';
+import type { RentaInput } from '../../../domain/rentaCalc';
+import type { PendingBalance } from '../../../domain/rentaGains';
 import { useMoney } from '../shared';
+
+const LGT = 'https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186';
+const LIRPF = 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764';
+const date = (iso: string) => iso.split('-').reverse().join('/');
+/** Today on this device, as YYYY-MM-DD. */
+export const today = () => new Date().toISOString().slice(0, 10);
+
+/**
+ * «¿Puedo recuperar ese dinero?»: for each year with losses, until which Renta it can be offset,
+ * until when its own Renta can be corrected, and what each way could give.
+ */
+export function RecoverPanel({ list }: { list: RecoverYear[] }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  const k = 'tools.invest.recover';
+  if (list.length === 0) return null;
+  return (
+    <section className="renta-block invest-recover" aria-labelledby="invest-recover-title">
+      <h4 id="invest-recover-title">{t(`${k}.title`)}</h4>
+      {list.map((r) => (
+        <div key={r.year} className="invest-recover-year">
+          <p>
+            <strong>{t(`${k}.year`, { year: r.year, amount: money(r.loss) })}</strong>
+          </p>
+          <p>
+            {r.offsettable
+              ? t(`${k}.offset`, { until: r.offsetUntil, filed: r.offsetUntil + 1 })
+              : t(`${k}.offsetGone`, { until: r.offsetUntil })}
+            {r.offsettable &&
+              r.now !== null &&
+              ` ${t(r.now > 0 ? `${k}.now` : `${k}.nowNothing`, { amount: money(r.now) })}`}
+          </p>
+          {r.correctable ? (
+            <>
+              <p>
+                {t(`${k}.correct`, {
+                  year: r.year,
+                  date: date(r.correctUntil),
+                  amount: money(r.correctUpTo),
+                })}
+              </p>
+              <p className="section-hint">{t(`${k}.notFiled`, { year: r.year })}</p>
+            </>
+          ) : (
+            <p className="invest-loss-note">
+              {t(`${k}.gone`, { year: r.year, date: date(r.correctUntil) })}
+            </p>
+          )}
+        </div>
+      ))}
+      <p className="section-hint">{t(`${k}.nobody`)}</p>
+      <p className="tools-sources">
+        {t('tools.invest.guide.source')}{' '}
+        <a href={LIRPF} target="_blank" rel="noopener noreferrer">
+          {t(`${k}.lirpf`)}
+        </a>{' '}
+        ·{' '}
+        <a href={LGT} target="_blank" rel="noopener noreferrer">
+          {t(`${k}.lgt`)}
+        </a>
+      </p>
+    </section>
+  );
+}
 
 const TYPES: InvestType[] = ['crypto', 'sharesEtf', 'funds', 'derivatives', 'other', 'income'];
 const tone = (n: number) => (n < 0 ? 'invest-loss' : n > 0 ? 'invest-gain' : undefined);
@@ -55,10 +122,16 @@ export function InvestSummary({
   summary,
   year,
   effect,
+  recover = [],
+  onPending,
 }: {
   summary: ImportSummary;
   year: number;
   effect: RentaEffect | null;
+  /** «¿Puedo recuperar ese dinero?» for the losses of earlier years. */
+  recover?: RecoverYear[];
+  /** Takes the losses of earlier years still in time to the planner's pending balances. */
+  onPending?: (losses: PendingBalance[]) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -127,6 +200,20 @@ export function InvestSummary({
           ))}
         </>
       )}
+      {onPending && recover.some((r) => r.offsettable) && (
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() =>
+            onPending(
+              recover.filter((r) => r.offsettable).map((r) => ({ year: r.year, amount: r.loss }))
+            )
+          }
+        >
+          {t(`${k}.toPending`)}
+        </button>
+      )}
+      <RecoverPanel list={recover} />
       <WhatHappened />
     </section>
   );
@@ -137,10 +224,13 @@ export function InvestInResult({
   breakdown,
   imported,
   year,
+  input,
 }: {
   breakdown: SavingsBreakdown;
   imported?: ImportedSavings;
   year: number;
+  /** The data of the return, to work out what the losses of earlier years can still give. */
+  input?: RentaInput;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -167,6 +257,13 @@ export function InvestInResult({
       </ul>
       {gains < 0 && <LossNote amount={-gains} year={year} />}
       <EarlierLosses years={earlier} />
+      <RecoverPanel
+        list={recoverOptions(
+          lossesToRecover(earlier, input?.savingsDetail?.pending.gains ?? [], year),
+          input ?? null,
+          today()
+        )}
+      />
       <WhatHappened />
     </section>
   );

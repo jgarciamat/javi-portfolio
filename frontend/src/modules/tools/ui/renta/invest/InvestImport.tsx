@@ -9,7 +9,13 @@ import { buildLedger, inEuros, type ValuedOp } from '../../../domain/invest/ledg
 import { headerKey, readMapped, type Mapping } from '../../../domain/invest/mapping';
 import { declarationRows, reportTables } from '../../../domain/invest/report';
 import { importedFrom } from '../../../domain/invest/sources';
-import { importSummary, type RentaEffect } from '../../../domain/invest/summary';
+import {
+  importSummary,
+  type ImportSummary,
+  type RentaEffect,
+} from '../../../domain/invest/summary';
+import type { RecoverYear } from '../../../domain/invest/recover';
+import type { PendingBalance } from '../../../domain/rentaGains';
 import type { InvestOp } from '../../../domain/invest/types';
 import {
   download,
@@ -168,6 +174,8 @@ export function InvestImport({
   onApply,
   effectOf,
   autoApply = false,
+  recoverOf,
+  onPending,
 }: {
   year: number;
   /** null: every file was taken out after it had been taken to the Renta. */
@@ -176,6 +184,10 @@ export function InvestImport({
   effectOf?: (imported: ImportedSavings) => RentaEffect;
   /** Takes every change to the Renta at once (the person does not have to press the button). */
   autoApply?: boolean;
+  /** «¿Puedo recuperar ese dinero?» for the summary of the files. */
+  recoverOf?: (summary: ImportSummary) => RecoverYear[];
+  /** Takes the losses of earlier years to the pending balances of the planner. */
+  onPending?: (losses: PendingBalance[]) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -246,6 +258,7 @@ export function InvestImport({
     [ops, year, allRates, professional]
   );
   const rows = useMemo(() => declarationRows(ledger), [ledger]);
+  const summary = importSummary(ledger, year);
   const certificate = files.flatMap((f) =>
     f.certificate.map((line, i) => ({ key: `${f.file}|${i}`, line }))
   );
@@ -495,9 +508,11 @@ export function InvestImport({
           )}
           <InvestGuide ledger={ledger} rows={rows} open />
           <InvestSummary
-            summary={importSummary(ledger, year)}
+            summary={summary}
             year={year}
             effect={effectOf ? effectOf(imported) : null}
+            recover={recoverOf ? recoverOf(summary) : []}
+            onPending={onPending}
           />
         </>
       )}

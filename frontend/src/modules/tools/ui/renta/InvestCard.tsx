@@ -6,9 +6,16 @@ import { rentaState } from '../../data/renta/state';
 import { emptySavingsDetail, fifo, type ImportedSavings } from '../../domain/rentaGains';
 import { choose } from '../../domain/rentaGuide';
 import { withoutFile } from '../../domain/invest/sources';
-import { importSummary, ledgerOf, rentaEffect } from '../../domain/invest/summary';
+import {
+  importSummary,
+  ledgerOf,
+  rentaEffect,
+  type ImportSummary,
+} from '../../domain/invest/summary';
+import { lossesToRecover, recoverOptions } from '../../domain/invest/recover';
+import type { PendingBalance } from '../../domain/rentaGains';
 import type { RentaInput } from '../../domain/rentaCalc';
-import { InvestSummary } from './invest/InvestSummary';
+import { InvestSummary, today } from './invest/InvestSummary';
 import { InvestImport } from './invest/InvestImport';
 import { useMoney, type StepProps } from './shared';
 
@@ -50,6 +57,24 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
       return;
     }
     set({ savingsDetail: { ...emptySavingsDetail(), ...detail, imported: next ?? undefined } });
+  };
+  /** What the losses of earlier years found in the files can still give. */
+  const recoverOf = (sum: ImportSummary) =>
+    recoverOptions(
+      lossesToRecover(sum.years, detail?.pending.gains ?? [], rentaState.year),
+      input ?? null,
+      today()
+    );
+  /** Takes them to the planner's earlier losses, once the person says they were declared. */
+  const toPending = (losses: PendingBalance[]) => {
+    const list = losses.map((l) => l.year).join(', ');
+    if (!window.confirm(t('tools.invest.sum.pendingConfirm', { list }))) return;
+    const base = detail ?? emptySavingsDetail();
+    const gains = [
+      ...base.pending.gains.filter((p) => !losses.some((l) => l.year === p.year)),
+      ...losses,
+    ].sort((a, b) => a.year - b.year);
+    set({ savingsDetail: { ...base, pending: { ...base.pending, gains } } });
   };
   const k = 'tools.renta.investCard';
   const summary = imported ? importedSummary(imported) : null;
@@ -118,6 +143,8 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
           summary={importSummary(ledger, rentaState.year)}
           year={rentaState.year}
           effect={input && imported ? rentaEffect(input, imported) : null}
+          recover={recoverOf(importSummary(ledger, rentaState.year))}
+          onPending={toPending}
         />
       )}
       {!open && (
@@ -134,6 +161,8 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
           year={rentaState.year}
           autoApply
           effectOf={input && ((next) => rentaEffect(input, next))}
+          recoverOf={recoverOf}
+          onPending={toPending}
           onApply={(next) =>
             set({
               ...choose(form, 'savings', 'yes'),

@@ -261,7 +261,7 @@ describe('the summary panel and the result', () => {
     expect(
       screen.getByText(new RegExp(tr(`${k}.loss`, { amount: '.*', until: YEAR + 4 }).slice(0, 25)))
     ).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`${YEAR - 2}: `))).toBeInTheDocument();
+    expect(screen.getAllByText(new RegExp(`${YEAR - 2}: `)).length).toBeGreaterThan(0);
     rerender(<InvestInResult breakdown={savingsOf(emptySavingsDetail(), YEAR)} year={YEAR} />);
     expect(screen.queryByText(new RegExp(`${YEAR - 2}: `))).toBeNull();
     rerender(

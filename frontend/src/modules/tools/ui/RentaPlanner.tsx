@@ -18,6 +18,7 @@ import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
 import type { ImportedSavings } from '../domain/rentaGains';
+import type { RentaInput } from '../domain/rentaCalc';
 import { Step, useMoney } from './renta/shared';
 import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
 import { useRentaPlanner } from './renta/useRentaPlanner';
@@ -110,8 +111,10 @@ export function ResultSection({
   n,
   invest,
   imported,
+  input,
 }: {
   n: number;
+  input?: RentaInput;
   /** What came from the investment files, for the losses of earlier years found in them. */
   imported?: ImportedSavings;
   /** «Have you invested in crypto or funds?»: the way to import them. */
@@ -136,7 +139,7 @@ export function ResultSection({
         {shown && (
           <>
             <PendingNotice pending={pending} />
-            <ResultCard shown={shown} money={money} imported={imported} />
+            <ResultCard shown={shown} money={money} imported={imported} input={input} />
             {!access.premium && (
               <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
             )}
@@ -318,6 +321,7 @@ export function RentaPlanner({
         n={expert ? 6 : 4}
         invest={<InvestLink form={form} />}
         imported={form.savingsDetail?.imported}
+        input={input}
       />
       {shown && <RentaFormPreview result={shown.result} input={input} year={year} />}
     </div>

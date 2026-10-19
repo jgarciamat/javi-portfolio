@@ -128,6 +128,14 @@ Pasos (solo los que aplican a lo importado; todos si no hay nada): papeles; borr
 9. **Trading profesional**: hoy solo aparta recompensas y derivados del ahorro; falta llevarlo como actividad económica al motor de Autónomos.
 10. **Modelo 100 «informativo» de monedas virtuales**: no se encontró en el impreso de 2025 un apartado informativo de saldos distinto de las casillas 1800-1814 (NO CONFIRMADO).
 
+## 6 bis. Resumen, pérdidas de otros años y validación local (19-10-2026)
+
+- **Panel de resumen** al final de «Mis inversiones»: resultado por año (el de esta Renta destacado; los demás «es de otro año»), por tipo y «Lo que supone en tu Renta» (el motor con y sin lo importado). En el resultado (paso 9 y modo experto): sueldo bruto como en Renta WEB (0003, 0012, 0013, 0019), ganancias y pérdidas de inversiones, intereses y dividendos, y explicación de las pérdidas del año.
+- **«Pasar a pérdidas pendientes de compensar»**: lleva las pérdidas de años anteriores halladas en los archivos (las que aún están en plazo) a las pérdidas pendientes del planificador, solo tras confirmar la persona que las incluyó en la declaración de ese año.
+- **«¿Puedo recuperar ese dinero?»** (`domain/invest/recover.ts`): por cada año con pérdidas, compensación hasta la Renta del año + 4 (LIRPF art. 49) con lo que mejora esta Renta según el motor; autoliquidación rectificativa de ese año (LGT art. 120.3) hasta cuatro años después del fin de su plazo de presentación (LGT arts. 66 y 67; fecha de `rentaCampaign.ts`), con el máximo que podría devolver (escala del ahorro de esta Renta sobre la pérdida: es un tope, depende de las ganancias que hubiera aquel año); si prescribió, se dice. Si no estaba obligado a declarar: declaración fuera de plazo (LGT art. 122); no se encontró consulta de la DGT ni resolución del TEAC para ese caso, y así se dice al usuario recomendando hablarlo con un gestor (seguimiento interno: NO CONFIRMADO).
+- **Posicionamiento**: los textos dicen que Finanverso prepara datos y cálculos y no presenta ni representa; la revisión por un gestor colegiado se recomienda.
+- **Validación con archivos reales** (sin subir nada): `cd frontend && npm run validar-archivo -- <ruta>`. Lee CSV, XLSX, JSON o PDF con el mismo importador (y los tipos del BCE de `public/ecb-rates.json`) y muestra solo el formato detectado, operaciones por tipo y clase, resultado por año, avisos y las columnas de lo no reconocido. Nunca imprime nombres, identificadores ni filas. Lógica en `domain/invest/validate.ts`.
+
 ## 7. Pruebas
 
 - `frontend/src/__tests__/tools/invest/`: un archivo inventado por plataforma (`formats.test.ts`), el motor con cifras a mano (`ledger.test.ts`), lectores, mapeo, PDF, informe y guía (`readers.test.ts`), lectura de archivos y descargas (`investImport.test.ts`) y la pantalla (`investImportUi.test.tsx`).

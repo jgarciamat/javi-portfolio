@@ -1,5 +1,5 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import type { DeductionLine, RentaResult } from '../../domain/rentaCalc';
+import type { DeductionLine, RentaInput, RentaResult } from '../../domain/rentaCalc';
 import { descendantBreakdown } from '../../domain/rentaCalc';
 import type { JointComparison } from '../../domain/rentaJoint';
 import { JointTable } from './JointResult';
@@ -90,12 +90,31 @@ function Line({ show, label, value }: { show: boolean; label: string; value: str
   );
 }
 
+/**
+ * The pay as Renta WEB shows it before the net: box 0003 (dinerarias), 0012 (total), 0013 (social
+ * security) and 0019 (other expenses). A result saved before these fields existed skips them.
+ */
+function WorkLines({ result, money }: { result: RentaResult; money: (n: number) => string }) {
+  const { t } = useI18n();
+  if (typeof result.workPay !== 'number' || result.workGross <= 0) return null;
+  const line = (key: string) => t(`tools.renta.line.${key}`);
+  return (
+    <>
+      <Line show label={line('pay0003')} value={money(result.workPay)} />
+      <Line show label={line('pay0012')} value={money(result.workGross)} />
+      <Line show label={line('pay0013')} value={minus(result.workSocialSecurity, money)} />
+      <Line show label={line('pay0019')} value={minus(result.otherExpenses, money)} />
+    </>
+  );
+}
+
 /** The lines of the calculation, from the net income to the withholdings. */
 function ResultLines({ result, money }: { result: RentaResult; money: (n: number) => string }) {
   const { t } = useI18n();
   const line = (key: string) => t(`tools.renta.line.${key}`);
   return (
     <dl className="renta-lines">
+      <WorkLines result={result} money={money} />
       <Line show label={line('netIncome')} value={money(result.netIncome)} />
       <Line show={result.rentalNet !== 0} label={line('rental')} value={money(result.rentalNet)} />
       <Line
@@ -146,10 +165,12 @@ export function ResultCard({
   shown,
   money,
   imported,
+  input,
 }: {
   shown: Snapshot;
   money: (n: number) => string;
   imported?: ImportedSavings;
+  input?: RentaInput;
 }) {
   const { t } = useI18n();
   const { result, kids } = shown;
@@ -171,6 +192,7 @@ export function ResultCard({
           breakdown={result.savingsDetail}
           imported={imported}
           year={rentaState.year}
+          input={input}
         />
       )}
       <ChildAids shown={shown} money={money} />

@@ -468,6 +468,9 @@ export interface RentaResult {
   lowPayLeftOut: boolean;
   /** Gross pay from work of the return (box 0012; in a joint one, of the whole unit). */
   workGross: number;
+  /** The person's own pay (box 0003) and social security (box 0013), as Renta WEB prints them. */
+  workPay: number;
+  workSocialSecurity: number;
   /** The reductions of the gross pay (box 0011: the 40 % of the DT 12.ª). */
   workReductions: number;
   /** Net pay before the "other expenses" of art. 19.2.f (box 0017). */
@@ -1009,6 +1012,8 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherExpenses,
     netIncome,
     workGross: work.gross,
+    workPay: round2(positive(input.gross)),
+    workSocialSecurity: round2(positive(input.socialSecurity)),
     workReductions: transitionalReduction(input),
     workPrevious: work.reductionBase,
     workReduction: reduction,

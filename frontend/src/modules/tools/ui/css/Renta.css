@@ -875,3 +875,8 @@
   border-left: 3px solid var(--red-500, #b91c1c);
   padding-left: 0.75rem;
 }
+.invest-recover-year + .invest-recover-year {
+  border-top: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
