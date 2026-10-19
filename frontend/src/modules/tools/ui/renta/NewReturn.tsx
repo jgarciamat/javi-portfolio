@@ -43,11 +43,7 @@ export function NewReturn({
   };
   return (
     <>
-      <button
-        type="button"
-        className="btn-secondary renta-new-return"
-        onClick={() => setOpen(true)}
-      >
+      <button type="button" className="btn-danger renta-new-return" onClick={() => setOpen(true)}>
         <Icon name="repeat" /> {t(k('button'))}
       </button>
       {open && (
