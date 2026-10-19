@@ -35,16 +35,8 @@ function useRecapData(summary: FinancialSummary, month: string, amounts: boolean
   };
 }
 
-/** Shares a picture of the month; with `preview` the picture is shown before sharing it. */
-export function RecapShare({
-  summary,
-  month,
-  preview = false,
-}: {
-  summary: FinancialSummary;
-  month: string;
-  preview?: boolean;
-}) {
+/** Shows a preview of the picture of the month and shares it. */
+export function RecapShare({ summary, month }: { summary: FinancialSummary; month: string }) {
   const { t } = useI18n();
   const [amounts, setAmounts] = useState(false);
   const [status, setStatus] = useState<'idle' | 'working' | 'saved' | 'error'>('idle');
@@ -53,7 +45,6 @@ export function RecapShare({
   const key = JSON.stringify(data);
 
   useEffect(() => {
-    if (!preview) return undefined;
     let url: string | null = null;
     let cancelled = false;
     recapImage(JSON.parse(key) as RecapImageData)
@@ -67,7 +58,7 @@ export function RecapShare({
       cancelled = true;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [preview, key]);
+  }, [key]);
 
   const share = async () => {
     setStatus('working');
