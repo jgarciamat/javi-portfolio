@@ -1,0 +1,16 @@
+{
+  "slug": "25-autonomo-modulos-andalucia",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "131",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El motor no calcula la estimación objetiva (módulos) ni el IVA simplificado: los signos y módulos de la Orden de módulos de cada año no están en la app.",
+      "campo": null
+    }
+  ]
+}

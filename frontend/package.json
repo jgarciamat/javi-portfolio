@@ -23,6 +23,7 @@
     "build:ios": "npm run build && npx cap sync ios && npx cap open ios",
     "cap:sync": "npm run build && npx cap sync",
     "cap:copy": "npx cap copy",
+    "casos": "node scripts/casos/run.mjs",
     "templates": "esbuild scripts/make-templates.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-templates.cjs --log-level=warning && node scripts/.make-templates.cjs; rm -f scripts/.make-templates.cjs"
   },
   "dependencies": {

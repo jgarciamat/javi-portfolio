@@ -1,0 +1,17 @@
+{
+  "slug": "26-no-residente-fuera-de-alcance",
+  "nombre": "Persona Ficticia 26",
+  "nif": "00000026A",
+  "domicilio": "Calle Ficticia 26, 00000 Lyon (Francia) (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "extranjero",
+  "titulo": "Residente en Francia con un piso alquilado en España",
+  "descripcion": "No residente fiscal en España: tributa por el Impuesto sobre la Renta de no Residentes (modelo 210), no por el IRPF. Fuera del alcance de Finanverso.",
+  "modelos": [
+    "210"
+  ],
+  "alcance": "fuera",
+  "motivoFueraDeAlcance": "No residentes: IRNR (modelo 210), otro impuesto; Finanverso solo cubre el IRPF de residentes.",
+  "datosFicticios": true,
+  "documentos": {}
+}

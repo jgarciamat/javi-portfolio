@@ -1,0 +1,2128 @@
+{
+  "slug": "22-autonomo-ed-empleado-local-madrid",
+  "nombre": "Persona Ficticia 22",
+  "nif": "00000022E",
+  "domicilio": "Calle Ficticia 22, 28001 Madrid (dirección inventada)",
+  "ejercicio": 2026,
+  "comunidad": "madrid",
+  "titulo": "Autónomo en estimación directa simplificada con empleado, gestor y local alquilado",
+  "descripcion": "Taller (actividad empresarial, sin retenciones en sus ventas) en un local alquilado. Un empleado (1.800 €/mes, retención del 10 %, 566,67 €/mes de Seguridad Social a cargo de la empresa), gestoría con retención del 15 %, suministros. Modelos 130, 303, 111, 115, 180, 190, 390, 347 y RETA en 2026.",
+  "modelos": [
+    "130",
+    "303",
+    "111",
+    "115",
+    "180",
+    "190",
+    "390",
+    "347",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomo": {
+    "ejercicio": 2026,
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 508200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 435600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 290400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 435600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 290400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 435600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 290400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 580800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 387200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 580800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 387200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 580800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 387200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 181500,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 12100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 24200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 180000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 56667,
+        "vatRate": 0
+      }
+    ],
+    "inputs": {
+      "quarters": [
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1281.63,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1281.63,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1281.63,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1281.63,
+          "vatNotDeductible": 0
+        }
+      ],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    },
+    "retenciones": [
+      {
+        "staff": {
+          "people": 1,
+          "paid": 5400,
+          "withheld": 540.0
+        },
+        "pros": {
+          "people": 1,
+          "paid": 300.0,
+          "withheld": 45.0
+        },
+        "rent": {
+          "people": 1,
+          "paid": 4500.0,
+          "withheld": 855.0
+        },
+        "income": 21000
+      },
+      {
+        "staff": {
+          "people": 1,
+          "paid": 5400,
+          "withheld": 540.0
+        },
+        "pros": {
+          "people": 1,
+          "paid": 300.0,
+          "withheld": 45.0
+        },
+        "rent": {
+          "people": 1,
+          "paid": 4500.0,
+          "withheld": 855.0
+        },
+        "income": 21000
+      },
+      {
+        "staff": {
+          "people": 1,
+          "paid": 5400,
+          "withheld": 540.0
+        },
+        "pros": {
+          "people": 1,
+          "paid": 300.0,
+          "withheld": 45.0
+        },
+        "rent": {
+          "people": 1,
+          "paid": 4500.0,
+          "withheld": 855.0
+        },
+        "income": 18000
+      },
+      {
+        "staff": {
+          "people": 1,
+          "paid": 5400,
+          "withheld": 540.0
+        },
+        "pros": {
+          "people": 1,
+          "paid": 300.0,
+          "withheld": 45.0
+        },
+        "rent": {
+          "people": 1,
+          "paid": 4500.0,
+          "withheld": 855.0
+        },
+        "income": 24000
+      }
+    ]
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-002",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-003",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-004",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-005",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-006",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-007",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-008",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-009",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-010",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-011",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-013",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 3600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-014",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-015",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 3600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-016",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-017",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 3600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-018",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 2400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-019",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-020",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 3200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-021",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-022",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 3200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-023",
+        "client": "Cliente Ficticio A, S.L.",
+        "nif": "B00000011",
+        "base": 4800.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-024",
+        "client": "Cliente Ficticio B, S.L.",
+        "nif": "B00000022",
+        "base": 3200.0,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-15",
+        "number": "F-01-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "F-01-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "F-01-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "F-02-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "F-02-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "F-02-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "F-03-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "F-03-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "F-03-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "F-04-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "F-04-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "F-04-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "F-05-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "F-05-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "F-05-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "F-06-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "F-06-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "F-06-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "F-07-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "F-07-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "F-07-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "F-08-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "F-08-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "F-08-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "F-09-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "F-09-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "F-09-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "F-10-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "F-10-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "F-10-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "F-11-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "F-11-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "F-11-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "F-12-REN",
+        "supplier": "Arrendador Ficticio (alquiler del local)",
+        "nif": "00000501W",
+        "base": 1500,
+        "rate": 21,
+        "retention": 285.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "F-12-MAN",
+        "supplier": "Gestoría Ficticia (asesoría)",
+        "nif": "00000502A",
+        "base": 100,
+        "rate": 21,
+        "retention": 15.0,
+        "kind": "management"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "F-12-SUP",
+        "supplier": "Suministros Ficticios (luz e internet)",
+        "nif": "A00000033",
+        "base": 200,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-001 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-002 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-003 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-004 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-005 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-006 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-01-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-02-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-03-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-007 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-008 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-009 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-010 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-011 Cliente Ficticio A, S.L.",
+        "amount": 5082.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-012 Cliente Ficticio B, S.L.",
+        "amount": 3388.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-04-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-05-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-06-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-013 Cliente Ficticio A, S.L.",
+        "amount": 4356.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-014 Cliente Ficticio B, S.L.",
+        "amount": 2904.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-015 Cliente Ficticio A, S.L.",
+        "amount": 4356.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-016 Cliente Ficticio B, S.L.",
+        "amount": 2904.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-017 Cliente Ficticio A, S.L.",
+        "amount": 4356.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-018 Cliente Ficticio B, S.L.",
+        "amount": 2904.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-07-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-08-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-09-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-019 Cliente Ficticio A, S.L.",
+        "amount": 5808.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-020 Cliente Ficticio B, S.L.",
+        "amount": 3872.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-021 Cliente Ficticio A, S.L.",
+        "amount": 5808.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-022 Cliente Ficticio B, S.L.",
+        "amount": 3872.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-023 Cliente Ficticio A, S.L.",
+        "amount": 5808.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-024 Cliente Ficticio B, S.L.",
+        "amount": 3872.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Arrendador Ficticio (alquiler del local)",
+        "amount": -1530.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Gestoría Ficticia (asesoría)",
+        "amount": -106.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Suministros Ficticios (luz e internet)",
+        "amount": -242.0
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-10-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-11-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-12-30",
+        "concept": "Nómina del empleado",
+        "amount": -1620.0
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          21000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          4410.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          4410.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          5400.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1134.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          1134.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          3276.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          3276.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          3276.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          3276.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          3276.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          21000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          4410.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          4410.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          5400.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1134.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          1134.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          3276.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          3276.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          3276.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          3276.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          3276.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          18000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          3780.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          3780.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          5400.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1134.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          1134.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          2646.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          2646.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          2646.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          2646.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          2646.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          24000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          5040.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          5040.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          5400.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1134.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          1134.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          3906.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          3906.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          3906.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          3906.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          3906.0
+        ]
+      ]
+    ],
+    "m111": [
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          5400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          540.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          300.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          45.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          585.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          585.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          5400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          540.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          300.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          45.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          585.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          585.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          5400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          540.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          300.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          45.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          585.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          585.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          5400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          540.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          300.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          45.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          585.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          585.0
+        ]
+      ]
+    ],
+    "m115": [
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          4500.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          855.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          855.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          4500.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          855.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          855.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          4500.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          855.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          855.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          4500.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          855.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          855.0
+        ]
+      ]
+    ]
+  }
+}

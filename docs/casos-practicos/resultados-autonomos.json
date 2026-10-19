@@ -1,0 +1,3170 @@
+{
+  "motor": "backend/src/domain/services/autonomo.ts (prepareDraft)",
+  "resumen": {
+    "coincide": 272,
+    "discrepancia": 20,
+    "noSoportado": 24
+  },
+  "filas": [
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 21000,
+      "obtenido": 21000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 4410,
+      "obtenido": 4410,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 4410,
+      "obtenido": 4410,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 5400,
+      "obtenido": 12500.01,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 21000,
+      "obtenido": 21000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 14142.56,
+      "obtenido": 14142.56,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 6857.44,
+      "obtenido": 6857.44,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 21000,
+      "obtenido": 21000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 4410,
+      "obtenido": 4410,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 4410,
+      "obtenido": 4410,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 5400,
+      "obtenido": 12500.01,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 3276,
+      "obtenido": 3276,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 42000,
+      "obtenido": 42000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 28285.12,
+      "obtenido": 28285.12,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 13714.88,
+      "obtenido": 13714.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 2742.98,
+      "obtenido": 2742.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1371.49,
+      "obtenido": 1371.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 18000,
+      "obtenido": 18000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 3780,
+      "obtenido": 3780,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 3780,
+      "obtenido": 3780,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 5400,
+      "obtenido": 12500.01,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 2646,
+      "obtenido": 2646,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 2646,
+      "obtenido": 2646,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 2646,
+      "obtenido": 2646,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 2646,
+      "obtenido": 2646,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 2646,
+      "obtenido": 2646,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 60000,
+      "obtenido": 60000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 42277.67,
+      "obtenido": 42277.67,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 17722.33,
+      "obtenido": 17722.33,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 3544.47,
+      "obtenido": 3544.47,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 2742.98,
+      "obtenido": 2742.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 801.49,
+      "obtenido": 801.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 801.49,
+      "obtenido": 801.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 801.49,
+      "obtenido": 801.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 801.49,
+      "obtenido": 801.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 801.49,
+      "obtenido": 801.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 24000,
+      "obtenido": 24000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 5040,
+      "obtenido": 5040,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 5040,
+      "obtenido": 5040,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 5400,
+      "obtenido": 12500.01,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 3906,
+      "obtenido": 3906,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 3906,
+      "obtenido": 3906,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 3906,
+      "obtenido": 3906,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 3906,
+      "obtenido": 3906,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 3906,
+      "obtenido": 3906,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 84000,
+      "obtenido": 84000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 56570.23,
+      "obtenido": 56570.23,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 27429.77,
+      "obtenido": 27429.77,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 5485.95,
+      "obtenido": 5485.95,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 3544.47,
+      "obtenido": 3544.47,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1941.48,
+      "obtenido": 1941.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1941.48,
+      "obtenido": 1941.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1941.48,
+      "obtenido": 1941.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1941.48,
+      "obtenido": 1941.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "22-autonomo-ed-empleado-local-madrid",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1941.48,
+      "obtenido": 1941.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 9000,
+      "obtenido": 9000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "10",
+      "concepto": "Adquisiciones intracomunitarias: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "11",
+      "concepto": "Adquisiciones intracomunitarias: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 9000,
+      "obtenido": 12000,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "36",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "37",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "esperado": 8100,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "60",
+      "concepto": "Exportaciones y operaciones asimiladas",
+      "esperado": 5100,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 22200,
+      "obtenido": 22200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 13874.24,
+      "obtenido": 13874.24,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 8325.76,
+      "obtenido": 8325.76,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "150",
+      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
+      "esperado": 0,
+      "obtenido": 13200,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 12000,
+      "obtenido": 12000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 2520,
+      "obtenido": 2520,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "10",
+      "concepto": "Adquisiciones intracomunitarias: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "11",
+      "concepto": "Adquisiciones intracomunitarias: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 3150,
+      "obtenido": 2520,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 9000,
+      "obtenido": 12000,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "36",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "37",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "esperado": 6000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "60",
+      "concepto": "Exportaciones y operaciones asimiladas",
+      "esperado": 5100,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 45300,
+      "obtenido": 45300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 27793.48,
+      "obtenido": 27793.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 17506.52,
+      "obtenido": 17506.52,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 3501.3,
+      "obtenido": 3501.3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 1665.15,
+      "obtenido": 1665.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1836.15,
+      "obtenido": 1836.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1836.15,
+      "obtenido": 1836.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1836.15,
+      "obtenido": 1836.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1836.15,
+      "obtenido": 1836.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1836.15,
+      "obtenido": 1836.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "150",
+      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
+      "esperado": 0,
+      "obtenido": 11100,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 9000,
+      "obtenido": 9000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "10",
+      "concepto": "Adquisiciones intracomunitarias: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "11",
+      "concepto": "Adquisiciones intracomunitarias: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 9000,
+      "obtenido": 12000,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "36",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "37",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "esperado": 7200,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "60",
+      "concepto": "Exportaciones y operaciones asimiladas",
+      "esperado": 3900,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 65400,
+      "obtenido": 65400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 41562.71,
+      "obtenido": 41562.71,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 23837.29,
+      "obtenido": 23837.29,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 4767.46,
+      "obtenido": 4767.46,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 3501.3,
+      "obtenido": 3501.3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 1266.16,
+      "obtenido": 1266.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 1266.16,
+      "obtenido": 1266.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 1266.16,
+      "obtenido": 1266.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 1266.16,
+      "obtenido": 1266.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1266.16,
+      "obtenido": 1266.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "150",
+      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
+      "esperado": 0,
+      "obtenido": 11100,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 12000,
+      "obtenido": 12000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 2520,
+      "obtenido": 2520,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "10",
+      "concepto": "Adquisiciones intracomunitarias: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "11",
+      "concepto": "Adquisiciones intracomunitarias: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 3150,
+      "obtenido": 2520,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 9000,
+      "obtenido": 12000,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 1890,
+      "obtenido": 1890,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "36",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
+      "esperado": 3000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "37",
+      "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+      "esperado": 630,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 2520,
+      "obtenido": 1890,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "esperado": 9000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "60",
+      "concepto": "Exportaciones y operaciones asimiladas",
+      "esperado": 6000,
+      "obtenido": null,
+      "estado": "no-soportado"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 630,
+      "obtenido": 630,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 92400,
+      "obtenido": 92400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 55676.95,
+      "obtenido": 55676.95,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 36723.05,
+      "obtenido": 36723.05,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 7344.61,
+      "obtenido": 7344.61,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 4767.46,
+      "obtenido": 4767.46,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 2577.15,
+      "obtenido": 2577.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 2577.15,
+      "obtenido": 2577.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 2577.15,
+      "obtenido": 2577.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 2577.15,
+      "obtenido": 2577.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 2577.15,
+      "obtenido": 2577.15,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "150",
+      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
+      "esperado": 0,
+      "obtenido": 15000,
+      "estado": "discrepancia"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 6000,
+      "obtenido": 6000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 600,
+      "obtenido": 600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 1134,
+      "obtenido": 1134,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 6000,
+      "obtenido": 6000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 1098,
+      "obtenido": 1098,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 4902,
+      "obtenido": 4902,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 980.4,
+      "obtenido": 980.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 210,
+      "obtenido": 210,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 770.4,
+      "obtenido": 770.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 770.4,
+      "obtenido": 770.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 670.4,
+      "obtenido": 670.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 670.4,
+      "obtenido": 670.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 670.4,
+      "obtenido": 670.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 7200,
+      "obtenido": 7200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1512,
+      "obtenido": 1512,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 1512,
+      "obtenido": 1512,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 600,
+      "obtenido": 600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 13200,
+      "obtenido": 13200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 2256,
+      "obtenido": 2256,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 10944,
+      "obtenido": 10944,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 2188.8,
+      "obtenido": 2188.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 770.4,
+      "obtenido": 770.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 462,
+      "obtenido": 462,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 956.4,
+      "obtenido": 956.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 956.4,
+      "obtenido": 956.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 856.4,
+      "obtenido": 856.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 856.4,
+      "obtenido": 856.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 856.4,
+      "obtenido": 856.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 6600,
+      "obtenido": 6600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 1386,
+      "obtenido": 1386,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 600,
+      "obtenido": 600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 1260,
+      "obtenido": 1260,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 19800,
+      "obtenido": 19800,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 4241.51,
+      "obtenido": 4241.51,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 15558.49,
+      "obtenido": 15558.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 3111.7,
+      "obtenido": 3111.7,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 1726.8,
+      "obtenido": 1726.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 693,
+      "obtenido": 693,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 691.9,
+      "obtenido": 691.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 691.9,
+      "obtenido": 691.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 591.9,
+      "obtenido": 591.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 591.9,
+      "obtenido": 591.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 591.9,
+      "obtenido": 591.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Base imponible al 21 %",
+      "esperado": 8400,
+      "obtenido": 8400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Cuota al 21 %",
+      "esperado": 1764,
+      "obtenido": 1764,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "esperado": 1764,
+      "obtenido": 1764,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 600,
+      "obtenido": 600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "esperado": 126,
+      "obtenido": 126,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "esperado": 1638,
+      "obtenido": 1638,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "esperado": 1638,
+      "obtenido": 1638,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "esperado": 1638,
+      "obtenido": 1638,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 1638,
+      "obtenido": 1638,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "esperado": 1638,
+      "obtenido": 1638,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "esperado": 28200,
+      "obtenido": 28200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "esperado": 6317.02,
+      "obtenido": 6317.02,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "esperado": 21882.98,
+      "obtenido": 21882.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "esperado": 4376.6,
+      "obtenido": 4376.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "esperado": 2418.7,
+      "obtenido": 2418.7,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "esperado": 987,
+      "obtenido": 987,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "esperado": 970.9,
+      "obtenido": 970.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "esperado": 970.9,
+      "obtenido": 970.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "13",
+      "concepto": "Minoración por rentas bajas del año anterior (art. 110.3.c RIRPF)",
+      "esperado": 100,
+      "obtenido": 100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "esperado": 870.9,
+      "obtenido": 870.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "esperado": 870.9,
+      "obtenido": 870.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "esperado": 870.9,
+      "obtenido": 870.9,
+      "estado": "coincide"
+    }
+  ]
+}
