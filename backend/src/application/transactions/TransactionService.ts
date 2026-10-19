@@ -272,9 +272,11 @@ export class TransactionService {
         : undefined;
       return this.bulk(ids, (id) => {
         let notes = changes.notes;
-        if (changes.notesMode === 'append' && changes.notes) {
+        if (changes.notesMode === 'append') {
+          // Appending nothing leaves the notes as they are.
+          const extra = (changes.notes ?? '').trim();
           const current = this.require(userId, id).notes;
-          notes = current ? `${current} ${changes.notes.trim()}` : changes.notes;
+          notes = extra ? (current ? `${current} ${extra}` : extra) : undefined;
         }
         this.update(userId, id, {
           categoryId,

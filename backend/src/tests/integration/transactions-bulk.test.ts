@@ -92,6 +92,13 @@ describe('Bulk transactions API', () => {
     }).expect(200);
     const notes = (await month()).transactions.map((t: { notes: string }) => t.notes).sort();
     expect(notes).toEqual(['extra', 'previa extra']);
+    await bulkPatch({
+      ids: [a.id],
+      changes: { notes: '  ', notesMode: 'append', type: 'INCOME' },
+    }).expect(200);
+    const kept = (await month()).transactions.find((t: { id: string }) => t.id === a.id);
+    expect(kept).toMatchObject({ notes: 'previa extra', type: 'INCOME' });
+    await bulkPatch({ ids: [a.id], changes: { notes: null, notesMode: 'append' } }).expect(200);
     await bulkPatch({ ids: [a.id, b.id], changes: { notes: null } }).expect(200);
     expect((await month()).transactions.every((t: { notes: null }) => t.notes === null)).toBe(true);
   });
