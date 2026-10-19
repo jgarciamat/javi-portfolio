@@ -5,7 +5,8 @@
 
 /**
  * crypto: virtual currencies; shares: listed shares; etf: listed funds (ETF); fund: investment fund
- * units; bond: Treasury bills and bonds (capital mobiliario); derivative: CFDs, options, futures;
+ * units; bill: Spanish Treasury bills (Letras del Tesoro, capital mobiliario of box 0030); bond: bonds,
+ * debentures and other fixed income (capital mobiliario of box 0031); derivative: CFDs, options, futures;
  * commodity: gold or silver of an app; fiat: euros, dollars... (never taxed as an asset).
  */
 export type AssetClass =
@@ -13,6 +14,7 @@ export type AssetClass =
   | 'shares'
   | 'etf'
   | 'fund'
+  | 'bill'
   | 'bond'
   | 'derivative'
   | 'commodity'

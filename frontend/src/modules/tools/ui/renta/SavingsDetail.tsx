@@ -21,6 +21,7 @@ const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvest
 const CAPITAL: (keyof CapitalIncome)[] = [
   'interest',
   'dividends',
+  'bills',
   'assets',
   'insurance',
   'expenses',

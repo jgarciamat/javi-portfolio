@@ -68,7 +68,7 @@ describe('Renta: the savings in detail', () => {
 
   it('shows a deferred loss and a repurchase to check', () => {
     const detail: SavingsDetail = {
-      capital: { interest: 0, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+      capital: { interest: 0, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
       assets: [
         {
           name: 'Cotizada',

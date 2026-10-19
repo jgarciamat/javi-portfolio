@@ -196,6 +196,7 @@ export function DeclarationTable({
     [
       ['0027', sum.capital['0027']],
       ['0029', sum.capital['0029']],
+      ['0030', sum.capital['0030']],
       ['0031', sum.capital['0031']],
       ['0037', sum.capital['0037']],
       ['0597', sum.capital['0597']],

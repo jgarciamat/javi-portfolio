@@ -98,7 +98,12 @@ export interface CapitalIncome {
   interest: number;
   /** Dividends and other shares in the profits of companies (box 0029). */
   dividends: number;
-  /** Transmission, amortization or repayment of other financial assets, can be negative (box 0031). */
+  /** Transmission or amortization of Letras del Tesoro, can be negative (box 0030). */
+  bills: number;
+  /**
+   * Transmission, amortization or repayment of other financial assets (bonds, debentures...), can be
+   * negative (box 0031).
+   */
   assets: number;
   /** Life or disability insurance and capitalization operations (box 0032). */
   insurance: number;
@@ -165,6 +170,7 @@ export interface ImportedSavings {
 export const emptyCapital = (): CapitalIncome => ({
   interest: 0,
   dividends: 0,
+  bills: 0,
   assets: 0,
   insurance: 0,
   expenses: 0,
@@ -373,6 +379,7 @@ export interface SavingsBreakdown {
   boxes: {
     '0027': number;
     '0029': number;
+    '0030': number;
     '0031': number;
     '0032': number;
     '0036': number;
@@ -412,7 +419,11 @@ export interface SavingsBreakdown {
 /** Capital mobiliario of the savings base: gross amounts less the deductible expenses (box 0041). */
 function capitalOf(c: CapitalIncome) {
   const gross = round2(
-    positive(c.interest) + positive(c.dividends) + finite(c.assets) + positive(c.insurance)
+    positive(c.interest) +
+      positive(c.dividends) +
+      finite(c.bills) +
+      finite(c.assets) +
+      positive(c.insurance)
   );
   const expenses = round2(positive(c.expenses));
   return { gross, expenses, net: round2(gross - expenses) };
@@ -448,7 +459,8 @@ function sectionsOf(sales: SaleResult[]): Record<GainSection, SectionTotals> {
 function withImported(detail: SavingsDetail): SavingsDetail {
   const extra = detail.imported;
   if (!extra) return detail;
-  const capital = { ...detail.capital };
+  // Over an empty one: a detail saved before a box was added (box 0030) has no field for it.
+  const capital = { ...emptyCapital(), ...detail.capital };
   for (const key of Object.keys(capital) as (keyof CapitalIncome)[])
     capital[key] = round2(finite(capital[key]) + finite(extra.capital[key]));
   return {
@@ -526,6 +538,7 @@ export function savingsOf(typed: SavingsDetail, year: number): SavingsBreakdown 
     boxes: {
       '0027': round2(positive(detail.capital.interest)),
       '0029': round2(positive(detail.capital.dividends)),
+      '0030': round2(finite(detail.capital.bills)),
       '0031': round2(finite(detail.capital.assets)),
       '0032': round2(positive(detail.capital.insurance)),
       '0036': capital.gross,

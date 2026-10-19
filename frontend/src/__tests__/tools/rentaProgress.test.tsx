@@ -9,6 +9,7 @@ import {
 } from '@modules/tools/application/rentaProgress';
 import { NO_DRAFT, readDraft } from '@modules/tools/domain/rentaDraft';
 import { emptyForm } from '@modules/tools/domain/rentaForm';
+import { emptyCapital } from '@modules/tools/domain/rentaGains';
 import { NO_REVIEW } from '@modules/tools/domain/rentaReview';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
@@ -143,12 +144,71 @@ describe('saving the planner on the device', () => {
     });
     expect(good).toMatchObject({ childSupport: '100', assistance: true, activities: [activity] });
     expect(good.secondPayers).toBeUndefined();
-    expect(good.savingsDetail).toEqual(detail);
+    expect(good.savingsDetail).toEqual({ ...detail, capital: emptyCapital() });
     const bad = reviveForm({ savingsDetail: { capital: {} }, activities: 'x', assistance: 'yes' });
     expect(bad.savingsDetail).toBeUndefined();
     expect(bad.activities).toBeUndefined();
     expect(bad.assistance).toBeUndefined();
     expect(reviveForm(null).childSupport).toBeUndefined();
+  });
+
+  it('gives the Letras del Tesoro their box (0030) in a detail saved before it existed', () => {
+    const old = { interest: 0, dividends: 0, assets: 30, insurance: 0, expenses: 0 };
+    const base = { pending: {}, assets: [], properties: [], otherGains: [], generalGains: [] };
+    const imported = {
+      files: ['letras.csv'],
+      capital: old,
+      assets: [],
+      generalGains: [],
+      otherGains: [],
+      withheld: { capital: 0, gains: 0 },
+      foreignTax: [],
+    };
+    const letra = (kind: 'buy' | 'sell', date: string, amount: number) => ({
+      id: `l:${kind}`,
+      format: 'test',
+      account: 'Tesoro Público',
+      date,
+      at: `${date}T12:00:00`,
+      kind,
+      asset: 'ES0L02601161',
+      assetClass: 'bond',
+      units: 1,
+      amount,
+      currency: 'EUR',
+      eur: amount,
+      fee: 0,
+      feeCurrency: null,
+    });
+    // With its files: worked out again, the 30 € of the Letra go from 0031 to 0030.
+    const withFiles = reviveForm({
+      savingsDetail: {
+        ...base,
+        capital: old,
+        imported: {
+          ...imported,
+          sources: [
+            {
+              file: 'letras.csv',
+              ops: [letra('buy', '2025-01-14', 970), letra('sell', '2025-07-15', 1000)],
+              certificate: [],
+            },
+          ],
+          options: { year: 2025, professional: false },
+        },
+      },
+    }).savingsDetail;
+    expect(withFiles?.capital).toEqual({ ...old, bills: 0 });
+    expect(withFiles?.imported?.capital).toMatchObject({ bills: 30, assets: 0 });
+    // Without them it cannot be split: the new box at 0.
+    const without = reviveForm({
+      savingsDetail: { ...base, capital: old, imported },
+    }).savingsDetail;
+    expect(without?.imported?.capital).toEqual({ ...old, bills: 0 });
+    // Saved with the box: as it was.
+    const current = { ...imported, capital: { ...old, bills: 5 } };
+    const kept = reviveForm({ savingsDetail: { ...base, capital: old, imported: current } });
+    expect(kept.savingsDetail?.imported).toEqual(current);
   });
 
   it('drops a draft that does not have the shape of this version', () => {

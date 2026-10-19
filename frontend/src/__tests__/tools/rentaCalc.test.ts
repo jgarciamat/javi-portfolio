@@ -486,7 +486,7 @@ describe('computeRenta', () => {
   it('works the savings out of the detail and puts the other gains in the general base', () => {
     const savingsDetail = {
       ...emptySavingsDetail(),
-      capital: { interest: 1000, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+      capital: { interest: 1000, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
       otherGains: [-1050],
       generalGains: [500],
     };

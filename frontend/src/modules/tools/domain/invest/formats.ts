@@ -1178,6 +1178,7 @@ const IBKR_CLASS: Record<string, InvestOp['assetClass']> = {
   crypto: 'crypto',
   bonds: 'bond',
   bond: 'bond',
+  // US Treasury bills: other financial assets (box 0031), not Letras del Tesoro (box 0030).
   bill: 'bond',
   'equity and index options': 'derivative',
   opt: 'derivative',

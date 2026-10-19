@@ -450,6 +450,11 @@ export function rentaWebKit(
       amount: c.dividends,
     },
     {
+      box: '0030',
+      label: 'Rendimientos procedentes de la transmisión o amortización de Letras del Tesoro',
+      amount: c.bills,
+    },
+    {
       box: '0031',
       label:
         'Rendimientos de la transmisión, amortización o reembolso de otros activos financieros',

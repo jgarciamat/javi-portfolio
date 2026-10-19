@@ -733,47 +733,74 @@ describe('securities and funds', () => {
     expect(r.years[2025].savings).toBe(0);
   });
 
-  it('Treasury bills and bonds give capital income (box 0031), not a gain', () => {
+  it('Letras del Tesoro (box 0030) and bonds (box 0031) give capital income, not a gain', () => {
+    const fixed = (o: Partial<InvestOp> & Pick<InvestOp, 'kind' | 'date' | 'asset'>) =>
+      op({ account: 'Tesoro Público', assetClass: 'bond', ...o });
     const r = buildLedger(
       [
-        op({
+        // A Letra bought at 970 € and amortized at 1,000 €: 30 € in box 0030 (no withholding).
+        fixed({ kind: 'buy', date: '2025-01-14', asset: 'ES0L02601161', amount: 970 }),
+        fixed({ kind: 'sell', date: '2025-07-15', asset: 'ES0L02601161', amount: 1000 }),
+        // Told by its name, with the class of a bill or of a bond.
+        fixed({
           kind: 'buy',
-          date: '2025-01-10',
-          asset: 'LETRA',
-          assetClass: 'bond',
-          units: 1,
-          amount: 990,
+          date: '2025-02-10',
+          asset: 'LT6M',
+          name: 'Letras del Tesoro 6 meses',
+          amount: 985,
         }),
-        op({
+        fixed({
           kind: 'sell',
-          date: '2025-07-10',
-          asset: 'LETRA',
-          assetClass: 'bond',
-          units: 1,
+          date: '2025-08-08',
+          asset: 'LT6M',
+          name: 'Letras del Tesoro 6 meses',
           amount: 1000,
         }),
-        op({
+        fixed({ kind: 'buy', date: '2025-03-10', asset: 'L12', assetClass: 'bill', amount: 980 }),
+        fixed({ kind: 'sell', date: '2025-04-10', asset: 'L12', assetClass: 'bill', amount: 975 }),
+        // A bond: its 25 € coupon is interest (box 0027, 19 % withheld) and its sale, box 0031.
+        fixed({
           kind: 'buy',
-          date: '2024-01-10',
-          asset: 'BONO',
-          assetClass: 'bond',
-          units: 1,
+          date: '2025-01-20',
+          asset: 'ES0000012L78',
+          name: 'Bono del Estado 3 %',
           amount: 1000,
         }),
-        op({
-          kind: 'sell',
-          date: '2024-07-10',
-          asset: 'BONO',
-          assetClass: 'bond',
-          units: 1,
-          amount: 1020,
+        fixed({
+          kind: 'interest',
+          date: '2025-06-20',
+          asset: 'ES0000012L78',
+          name: 'Bono del Estado 3 %',
+          units: 0,
+          amount: 25,
+          withholding: 4.75,
+          withheldIn: 'spain',
         }),
+        fixed({
+          kind: 'sell',
+          date: '2025-10-20',
+          asset: 'ES0000012L78',
+          name: 'Bono del Estado 3 %',
+          amount: 1012,
+          withholding: 2,
+        }),
+        // Last year's bond: neither a box of this year nor a gain.
+        fixed({ kind: 'buy', date: '2024-01-10', asset: 'BONO', amount: 1000 }),
+        fixed({ kind: 'sell', date: '2024-07-10', asset: 'BONO', amount: 1020 }),
       ],
       { year: 2025, rates: {} }
     );
-    expect(r.imported.capital.assets).toBe(10);
+    // 0030: 30 + 15 − 5 = 40; 0031: 1,012 − 1,000 = 12; 0027: 25; 0597: 4.75 + 2.
+    expect(r.imported.capital).toMatchObject({ bills: 40, assets: 12, interest: 25 });
+    expect(r.imported.withheld).toEqual({ capital: 6.75, gains: 0 });
+    expect(r.income).toEqual([
+      expect.objectContaining({ what: 'interest', box: '0027', eur: 25, withheld: 4.75 }),
+    ]);
     expect(r.sales).toEqual([]);
     expect(r.imported.assets).toEqual([]);
+    expect(r.years[2024].savings).toBe(20);
+    // The year's result: 40 + 12 of the sales and 25 of the coupon.
+    expect(r.years[2025].savings).toBe(77);
   });
 
   it('closed positions: derivatives as a result of their own, the rest with their purchase', () => {

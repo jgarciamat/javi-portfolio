@@ -145,6 +145,7 @@ export function summaryOf(ledger: LedgerResult) {
     capital: {
       '0027': c.interest,
       '0029': c.dividends,
+      '0030': c.bills,
       '0031': c.assets,
       '0037': c.expenses,
       '0597': ledger.imported.withheld.capital,

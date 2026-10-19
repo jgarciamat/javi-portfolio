@@ -691,6 +691,7 @@ describe('what to copy and the report', () => {
     expect(mine.find((s) => s.id === 'capital')?.params).toEqual({
       interest: 0,
       dividends: 10,
+      bills: 0,
       assets: 0,
     });
     expect(mine.find((s) => s.id === 'crypto')?.unconfirmed).toBe(true);

@@ -525,3 +525,37 @@ describe('texts cut to the length of the field', () => {
     expect(cut('Sin límite')).toBe('Sin límite');
   });
 });
+
+describe('Letras del Tesoro and bonds in «Copiar a Renta WEB»', () => {
+  it('a Letra goes to box 0030, a bond to 0031 and its coupon to 0027', () => {
+    const l = ledgerOf([
+      op({ kind: 'buy', date: '2025-01-14', asset: 'ES0L02601161', assetClass: 'bond', eur: 970 }),
+      op({
+        kind: 'sell',
+        date: '2025-07-15',
+        asset: 'ES0L02601161',
+        assetClass: 'bond',
+        eur: 1000,
+      }),
+      op({ kind: 'buy', date: '2025-01-20', asset: 'ES0000012L78', assetClass: 'bond', eur: 1000 }),
+      op({
+        kind: 'interest',
+        date: '2025-06-20',
+        asset: 'ES0000012L78',
+        assetClass: 'bond',
+        units: 0,
+        eur: 25,
+      }),
+      op({
+        kind: 'sell',
+        date: '2025-10-20',
+        asset: 'ES0000012L78',
+        assetClass: 'bond',
+        eur: 1012,
+      }),
+    ]);
+    const box = (b: string) => rentaWebKit(l).totals.find((t) => t.box === b)?.amount;
+    expect([box('0027'), box('0030'), box('0031')]).toEqual([25, 30, 12]);
+    expect(summaryOf(l).capital).toMatchObject({ '0027': 25, '0030': 30, '0031': 12 });
+  });
+});

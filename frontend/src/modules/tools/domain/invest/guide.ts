@@ -80,11 +80,16 @@ export function guideSteps(ledger: LedgerResult | null, rows: DeclarationRow[]):
       unconfirmed: true,
     },
     (all || has('other')) && { id: 'other', sources: [MODEL, LAW], unconfirmed: true },
-    (all || !!(c && (c.interest || c.dividends || c.assets || c.expenses))) && {
+    (all || !!(c && (c.interest || c.dividends || c.bills || c.assets || c.expenses))) && {
       id: 'capital',
       sources: [MODEL, LAW],
       params: c
-        ? { interest: money(c.interest), dividends: money(c.dividends), assets: money(c.assets) }
+        ? {
+            interest: money(c.interest),
+            dividends: money(c.dividends),
+            bills: money(c.bills),
+            assets: money(c.assets),
+          }
         : undefined,
     },
     (all || imported.generalGains.length > 0) && {

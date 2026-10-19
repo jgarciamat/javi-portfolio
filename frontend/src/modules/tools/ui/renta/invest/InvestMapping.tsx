@@ -15,6 +15,7 @@ export const CLASSES: AssetClass[] = [
   'shares',
   'etf',
   'fund',
+  'bill',
   'bond',
   'derivative',
   'commodity',
