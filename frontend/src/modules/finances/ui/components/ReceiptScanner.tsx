@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { useRef, useState } from 'react';
 import { isNativeApp } from '@shared/utils/platform';
 import { CameraCapture, liveCameraAvailable } from './CameraCapture';
@@ -57,7 +58,12 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
   };
 
   return (
-    <div className="tx-receipt">
+    <FileDropZone
+      className="tx-receipt"
+      accept="image/*"
+      disabled={busy}
+      onFiles={(list) => void scan(list[0])}
+    >
       <input
         ref={input}
         type="file"
@@ -99,6 +105,6 @@ export function ReceiptScanner({ onScanned }: { onScanned: (receipt: ScannedRece
         />
       )}
       {error && <p className="form-error">{t(error)}</p>}
-    </div>
+    </FileDropZone>
   );
 }

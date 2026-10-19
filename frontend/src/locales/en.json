@@ -4488,5 +4488,7 @@
   "wizard.autonomo.notFiled": "This is guidance only: Finanverso does not file anything with the Tax Agency. If in doubt, have it checked by a registered tax adviser.",
   "app.renta.fold": "Campaign dates and how it works",
   "tools.renta.campaign.fold": "Dates of the income tax campaign",
-  "wizard.autonomo.hint.amountsNext": "Now quarter {n}. If it is the same as the one before, press “Copy quarter {prev}”."
+  "wizard.autonomo.hint.amountsNext": "Now quarter {n}. If it is the same as the one before, press “Copy quarter {prev}”.",
+  "app.drop.here": "Drop the file here",
+  "app.drop.rejected": "We can't use \"{files}\". Try another type of file."
 }

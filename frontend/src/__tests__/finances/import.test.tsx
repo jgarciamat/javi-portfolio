@@ -289,3 +289,12 @@ describe('without accounts', () => {
     );
   });
 });
+
+describe('ImportModal: dropping a statement', () => {
+  it('reads a statement dropped on the body of the modal', async () => {
+    setup();
+    const zone = document.querySelector('.modal-body') as HTMLElement;
+    fireEvent.drop(zone, { dataTransfer: { types: ['Files'], files: [statement(csv)] } });
+    expect(await screen.findByText(/extracto\.csv · CSV/)).toBeInTheDocument();
+  });
+});

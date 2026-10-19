@@ -1,4 +1,5 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { FileDropZone } from '@shared/components/FileDropZone';
+import { useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { storage } from '@shared/utils/storage';
@@ -241,36 +242,22 @@ function KnownMe({ me, onForget }: { me: Me; onForget: () => void }) {
   );
 }
 
+const IMPORT_ACCEPT =
+  '.xlsx,.xlsm,.csv,.txt,.pdf,text/csv,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
 /** The zone where files are dropped, with the button to choose them. */
 function DropZone({ busy, onFiles }: { busy: boolean; onFiles: (files: File[]) => void }) {
   const { t } = useI18n();
-  const [dragging, setDragging] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const drop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(false);
-    onFiles(Array.from(e.dataTransfer.files));
-  };
   return (
-    <div
-      className={`autonomo-drop${dragging ? ' is-dragging' : ''}`}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setDragging(true);
-      }}
-      onDragLeave={(e) => {
-        // Moving over a child of the zone is not leaving it.
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragging(false);
-      }}
-      onDrop={drop}
-    >
+    <FileDropZone className="autonomo-drop" multiple accept={IMPORT_ACCEPT} onFiles={onFiles}>
       <p className="autonomo-drop-text">{t('app.autonomo.import.drop')}</p>
       <input
         ref={input}
         type="file"
         hidden
         multiple
-        accept=".xlsx,.xlsm,.csv,.txt,.pdf,text/csv,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept={IMPORT_ACCEPT}
         aria-label={t('app.autonomo.import.files')}
         onChange={(e) => {
           const picked = Array.from(e.target.files ?? []);
@@ -287,7 +274,7 @@ function DropZone({ busy, onFiles }: { busy: boolean; onFiles: (files: File[]) =
         {busy ? t('app.autonomo.import.reading') : t('app.autonomo.import.choose')}
       </button>
       <small className="section-hint">{t('app.autonomo.import.accepts')}</small>
-    </div>
+    </FileDropZone>
   );
 }
 

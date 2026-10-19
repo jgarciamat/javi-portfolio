@@ -77,10 +77,10 @@ describe('Importar mis inversiones', () => {
     expect(click).toHaveBeenCalled();
     click.mockRestore();
     const zone = screen.getByText(tr(`${k}.drop`)).parentElement as HTMLElement;
-    fireEvent.dragOver(zone);
-    expect(zone.className).toContain('invest-drop-over');
-    fireEvent.dragLeave(zone);
-    expect(zone.className).not.toContain('invest-drop-over');
+    fireEvent.dragEnter(zone, { dataTransfer: { types: ['Files'] } });
+    expect(zone.className).toContain('is-over');
+    fireEvent.dragLeave(zone, { dataTransfer: { types: ['Files'] } });
+    expect(zone.className).not.toContain('is-over');
     await act(async () => {
       fireEvent.drop(zone, {
         dataTransfer: {
@@ -471,5 +471,27 @@ describe('the guide from the draft reviewer', () => {
     expect(screen.getByText(tr(`${k}.guide.m721.title`))).toBeInTheDocument();
     expect(document.body.textContent).not.toMatch(/confirmad|confirmed/i);
     expect(screen.getAllByRole('link').length).toBeGreaterThan(10);
+  });
+});
+
+describe('Importar mis inversiones: dropping the ECB file', () => {
+  it('takes the rates file dropped on its block', async () => {
+    open();
+    await upload(fileOf('ibkr.csv', IBKR_DIV));
+    await screen.findByText('ibkr.csv');
+    const zone = screen
+      .getByRole('button', { name: tr(`${k}.rates.load`) })
+      .closest('.file-drop-zone') as HTMLElement;
+    await act(async () => {
+      fireEvent.drop(zone, {
+        dataTransfer: {
+          types: ['Files'],
+          files: [fileOf('eurofxref-hist.csv', 'Date,USD,\n2025-02-05,1.25,\n')],
+        },
+      });
+    });
+    await waitFor(() =>
+      expect(screen.getByText(tr(`${k}.rates.loaded`, { count: 1 }))).toBeInTheDocument()
+    );
   });
 });

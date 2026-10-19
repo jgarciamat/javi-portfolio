@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { useRef } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { PRESET_AVATARS, emojiAvatar } from '../domain/avatar';
@@ -12,7 +13,11 @@ export function AvatarSection() {
   return (
     <div className="profile-section">
       <span className="profile-label">{t('app.profile.avatar.label')}</span>
-      <div className="profile-avatar-row">
+      <FileDropZone
+        className="profile-avatar-row"
+        accept="image/*"
+        onFiles={(list) => s.pickFile(list[0])}
+      >
         <div className="profile-avatar-preview">
           {s.preview ? (
             <img src={s.preview} alt="" className="profile-avatar-img" />
@@ -44,7 +49,7 @@ export function AvatarSection() {
             </button>
           )}
         </div>
-      </div>
+      </FileDropZone>
       <div className="avatar-presets">
         {PRESET_AVATARS.map((emoji) => (
           <button

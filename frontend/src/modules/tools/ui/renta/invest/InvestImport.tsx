@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
@@ -112,6 +113,9 @@ function AddOperation({ onAdd }: { onAdd: (op: InvestOp) => void }) {
   );
 }
 
+const INVEST_ACCEPT = '.csv,.txt,.xlsx,.xlsm,.json,.pdf';
+const ECB_ACCEPT = '.csv,.zip';
+
 /** Exchange rates: the ECB file the person downloads, or a rate typed for a currency. */
 function Rates({
   missing,
@@ -128,40 +132,43 @@ function Rates({
   const k = 'tools.invest.rates';
   const input = useRef<HTMLInputElement>(null);
   const loaded = Object.keys(rates).length;
+  const load = async (file: File) => onChange({ ...rates, ...(await readEcbFile(file)) });
   return (
-    <fieldset className="renta-block">
-      <legend>{t(`${k}.title`)}</legend>
-      <p className="section-hint">{t(`${k}.hint`)}</p>
-      {until && <p className="section-hint">{t(`${k}.bundled`, { date: until })}</p>}
-      {loaded > 0 && <p className="section-hint">{t(`${k}.loaded`, { count: loaded })}</p>}
-      <input
-        ref={input}
-        type="file"
-        accept=".csv,.zip"
-        hidden
-        aria-label={t(`${k}.file`)}
-        onChange={async (e) => {
-          const file = e.target.files?.[0];
-          if (file) onChange({ ...rates, ...(await readEcbFile(file)) });
-        }}
-      />
-      <button className="btn-secondary" onClick={() => input.current?.click()}>
-        {t(`${k}.load`)}
-      </button>
-      {missing.map((currency) => (
-        <label key={currency} className="tools-field">
-          <span>{t(`${k}.typed`, { currency })}</span>
-          <input
-            className="tx-input"
-            inputMode="decimal"
-            onBlur={(e) => {
-              const n = parseDecimal(e.target.value);
-              if (n > 0) onChange(withTyped(rates, currency, n));
-            }}
-          />
-        </label>
-      ))}
-    </fieldset>
+    <FileDropZone accept={ECB_ACCEPT} onFiles={(list) => void load(list[0])}>
+      <fieldset className="renta-block">
+        <legend>{t(`${k}.title`)}</legend>
+        <p className="section-hint">{t(`${k}.hint`)}</p>
+        {until && <p className="section-hint">{t(`${k}.bundled`, { date: until })}</p>}
+        {loaded > 0 && <p className="section-hint">{t(`${k}.loaded`, { count: loaded })}</p>}
+        <input
+          ref={input}
+          type="file"
+          accept={ECB_ACCEPT}
+          hidden
+          aria-label={t(`${k}.file`)}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void load(file);
+          }}
+        />
+        <button className="btn-secondary" onClick={() => input.current?.click()}>
+          {t(`${k}.load`)}
+        </button>
+        {missing.map((currency) => (
+          <label key={currency} className="tools-field">
+            <span>{t(`${k}.typed`, { currency })}</span>
+            <input
+              className="tx-input"
+              inputMode="decimal"
+              onBlur={(e) => {
+                const n = parseDecimal(e.target.value);
+                if (n > 0) onChange(withTyped(rates, currency, n));
+              }}
+            />
+          </label>
+        ))}
+      </fieldset>
+    </FileDropZone>
   );
 }
 
@@ -202,7 +209,6 @@ export function InvestImport({
   const [professional, setProfessional] = useState(false);
   const [busy, setBusy] = useState(false);
   const [applied, setApplied] = useState(false);
-  const [dragging, setDragging] = useState(false);
   // A file taken out after «Llevar a mi Renta»: the Renta is worked out again with the rest.
   const [reapply, setReapply] = useState(false);
   const [removed, setRemoved] = useState<string | null>(null);
@@ -336,18 +342,11 @@ export function InvestImport({
       <p className="renta-privacy" role="note">
         {t(`${k}.privacy`)}
       </p>
-      <div
-        className={`invest-drop${dragging ? ' invest-drop-over' : ''}`}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragging(false);
-          void add(Array.from(e.dataTransfer.files));
-        }}
+      <FileDropZone
+        className="invest-drop"
+        multiple
+        accept={INVEST_ACCEPT}
+        onFiles={(list) => void add(list)}
       >
         <p>{t(`${k}.drop`)}</p>
         <input
@@ -355,7 +354,7 @@ export function InvestImport({
           type="file"
           multiple
           hidden
-          accept=".csv,.txt,.xlsx,.xlsm,.json,.pdf"
+          accept={INVEST_ACCEPT}
           aria-label={t(`${k}.file`)}
           onChange={(e) => void add(Array.from(e.target.files ?? []))}
         />
@@ -363,7 +362,7 @@ export function InvestImport({
           {busy ? t(`${k}.reading`) : t(`${k}.choose`)}
         </button>
         <p className="section-hint">{t(`${k}.formats`)}</p>
-      </div>
+      </FileDropZone>
 
       {removed && (
         <p className="section-hint" role="status">

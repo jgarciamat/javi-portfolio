@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import {
   AutonomoManual,
   emptyManual,
@@ -266,23 +266,13 @@ describe('One place to import invoice books', () => {
   it('takes files dropped on the zone, several at a time', async () => {
     show();
     const zone = screen.getByText(tr('app.autonomo.import.drop')).parentElement as HTMLElement;
-    fireEvent.dragOver(zone);
-    expect(zone).toHaveClass('is-dragging');
-    // Moving over a child of the zone keeps it lit; leaving it does not.
-    // jsdom has no DragEvent: a mouse event carries where the pointer went.
-    const leave = (to: Element) =>
-      act(() => {
-        zone.dispatchEvent(new MouseEvent('dragleave', { bubbles: true, relatedTarget: to }));
-      });
-    leave(screen.getByText(tr('app.autonomo.import.drop')));
-    expect(zone).toHaveClass('is-dragging');
-    leave(document.body);
-    expect(zone).not.toHaveClass('is-dragging');
+    fireEvent.dragEnter(zone, { dataTransfer: { types: ['Files'] } });
+    expect(zone).toHaveClass('is-over');
     fireEvent.dragOver(zone);
     fireEvent.drop(zone, {
       dataTransfer: { files: [workbook('e.xlsx', ISSUED), workbook('r.xlsx', RECEIVED)] },
     });
-    expect(zone).not.toHaveClass('is-dragging');
+    expect(zone).not.toHaveClass('is-over');
     await screen.findByText(tr('app.autonomo.import.review'));
     expect(screen.getAllByRole('status')).toHaveLength(2);
     expect(latest.invoices).toHaveLength(9);

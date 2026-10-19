@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { ConsentBoxes } from '@modules/billing/ui/PlanOptions';
@@ -375,25 +376,27 @@ function DraftReader({
           })}
         </p>
       )}
-      <p className="renta-privacy" role="note">
-        {t('tools.renta.draft.privacy')}
-      </p>
-      <div className="button-row">
-        <input
-          ref={input}
-          type="file"
-          accept="application/pdf"
-          hidden
-          aria-label={t('tools.renta.draft.file')}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void fromFile(file);
-          }}
-        />
-        <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
-          {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
-        </button>
-      </div>
+      <FileDropZone accept=".pdf,application/pdf" onFiles={(list) => void fromFile(list[0])}>
+        <p className="renta-privacy" role="note">
+          {t('tools.renta.draft.privacy')}
+        </p>
+        <div className="button-row">
+          <input
+            ref={input}
+            type="file"
+            accept="application/pdf"
+            hidden
+            aria-label={t('tools.renta.draft.file')}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void fromFile(file);
+            }}
+          />
+          <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
+            {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
+          </button>
+        </div>
+      </FileDropZone>
       {error && (
         <p className="form-error">
           {error === 'locked' ? t('tools.renta.draft.refused') : t('tools.renta.draft.error')}

@@ -1,0 +1,39 @@
+.file-drop-zone {
+  position: relative;
+}
+.file-drop-zone.is-over {
+  outline: 2px dashed var(--accent-200, #a5b4fc);
+  outline-offset: 2px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.1);
+}
+.file-drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}
+.file-drop-status:empty {
+  display: none;
+}
+.file-drop-status .form-error {
+  margin: 0.4rem 0 0;
+}
+html.wiz-contrast .file-drop-zone.is-over {
+  outline: 3px dashed #ffe600;
+  background: #000;
+}
+html.wiz-contrast .file-drop-overlay {
+  background: #000;
+  color: #ffe600;
+  border: 2px dashed #ffe600;
+}

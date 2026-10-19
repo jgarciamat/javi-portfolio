@@ -417,3 +417,31 @@ describe('Renta planner: none of them interest me, and next year', () => {
     expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
   });
 });
+
+describe('Renta planner: dropping the draft', () => {
+  it('reads a PDF dropped on the upload block, and refuses other files', async () => {
+    read.mockResolvedValue({ text: DRAFT, lines: DRAFT.split('\n') });
+    render();
+    const button = await screen.findByRole('button', { name: tr('tools.renta.draft.upload') });
+    const zone = button.closest('.file-drop-zone') as HTMLElement;
+    fireEvent.dragEnter(zone, { dataTransfer: { types: ['Files'] } });
+    expect(within(zone).getAllByText(tr('app.drop.here')).length).toBeGreaterThan(0);
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['x'], 'foto.png', { type: 'image/png' })],
+      },
+    });
+    expect(read).not.toHaveBeenCalled();
+    expect(screen.getByText(tr('app.drop.rejected', { files: 'foto.png' }))).toBeInTheDocument();
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['x'], 'borrador.pdf', { type: 'application/pdf' })],
+      },
+    });
+    await waitFor(() =>
+      expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('30000')
+    );
+  });
+});

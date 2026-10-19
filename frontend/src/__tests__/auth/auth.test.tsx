@@ -604,6 +604,22 @@ describe('ProfilePage', () => {
     expect(click).toHaveBeenCalled();
   });
 
+  it('takes a picture dropped on the avatar box', async () => {
+    setup();
+    const zone = screen
+      .getByRole('button', { name: new RegExp(tr('app.profile.avatar.upload')) })
+      .closest('.file-drop-zone') as HTMLElement;
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['png'], 'a.png', { type: 'image/png' })],
+      },
+    });
+    expect(
+      await screen.findByRole('button', { name: tr('app.profile.avatar.save') })
+    ).toBeInTheDocument();
+  });
+
   it('reports unreadable pictures and failed saves', async () => {
     jest.spyOn(authApi, 'updateAvatar').mockRejectedValue(new Error('Imagen enorme'));
     const reader = jest
