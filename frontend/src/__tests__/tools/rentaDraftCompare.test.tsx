@@ -165,7 +165,17 @@ describe('Renta planner: the draft next to the planner', () => {
     );
     await table();
     expect(screen.getByText(tr('tools.renta.unrented'), { selector: 'span' })).toBeInTheDocument();
-    expect(screen.getByLabelText(tr('tools.renta.months', { n: 1 }))).toHaveValue('6');
+    // The days of box 0085 as they are (they used to become 6 months).
+    expect(screen.getByLabelText(tr('tools.renta.days', { n: 1 }))).toHaveValue('183');
+  });
+
+  it('leaves the days empty (the whole year) when the draft does not give them', async () => {
+    render();
+    await paste(
+      'Valor catastral del inmueble 10.000,00 0083\nRenta inmobiliaria imputada. 110,00 0089'
+    );
+    await table();
+    expect(screen.getByLabelText(tr('tools.renta.days', { n: 1 }))).toHaveValue('');
   });
 
   it('hides the comparison while trying next year with the same data', async () => {

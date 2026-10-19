@@ -96,7 +96,7 @@ describe('the answer of each question', () => {
     expect(answerOf(form({ ascendants: [{ over75: true, disability: 0 }] }), 'family')).toBe('yes');
     expect(answerOf(form(), 'joint')).toBeNull();
     expect(answerOf(form({ joint: 'couple' }), 'joint')).toBe('couple');
-    const row = { value: '1', revised: false, months: '' };
+    const row = { value: '1', revised: false, days: '' };
     expect(answerOf(form(), 'property')).toBeNull();
     expect(answerOf(form({ answers: { property: 'rented' } }), 'property')).toBe('no');
     expect(answerOf(form({ rentalOn: true }), 'property')).toBe('rented');
@@ -192,11 +192,11 @@ describe('what each answer changes in the form', () => {
   });
 
   it('property: turns the rent on and adds a property to fill in, or clears them', () => {
-    const row = { value: '1000', revised: true, months: '6' };
+    const row = { value: '1000', revised: true, days: '181' };
     expect(choose(form(), 'property', 'rented')).toMatchObject({ rentalOn: true, unrented: [] });
     expect(choose(form(), 'property', 'other')).toMatchObject({
       rentalOn: false,
-      unrented: [{ value: '', revised: false, months: '' }],
+      unrented: [{ value: '', revised: false, days: '' }],
     });
     expect(choose(form({ unrented: [row] }), 'property', 'both')).toMatchObject({
       rentalOn: true,
@@ -307,7 +307,7 @@ describe('the questions a draft answers', () => {
           disability: 0,
           childAges: [4],
           rentalIncome: 6000,
-          unrented: [{ value: 1000, revised: true, months: 12 }],
+          unrented: [{ value: 1000, revised: true, days: null }],
           savings: 20,
           pension: 500,
           gross: 30000,
@@ -324,7 +324,7 @@ describe('the questions a draft answers', () => {
     });
     expect(draftAnswers(reading({ rentalIncome: 1 })).property).toBe('rented');
     expect(
-      draftAnswers(reading({ unrented: [{ value: 1, revised: false, months: 3 }] })).property
+      draftAnswers(reading({ unrented: [{ value: 1, revised: false, days: 90 }] })).property
     ).toBe('other');
     expect(draftAnswers(reading({ ascendantAges: [80] })).family).toBe('yes');
   });

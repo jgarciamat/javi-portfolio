@@ -78,10 +78,32 @@ describe('saving the planner on the device', () => {
       ...emptyForm(''),
       gross: '30000',
       children: [{ age: '3', disability: 0 }],
-      unrented: [{ value: '100' }],
+      unrented: [{ value: '100', revised: false, days: '' }],
       retired: true,
     });
     expect(reviveForm(null)).toEqual(emptyForm(''));
+  });
+
+  it('turns the months of a property saved by an older version into days', () => {
+    const form = reviveForm({
+      unrented: [
+        { value: '50000', revised: true, months: '6' },
+        { value: '100', revised: false, months: '' },
+        { value: '100', revised: false, months: '40' },
+        { value: '100', revised: false, months: 'x', days: '181' },
+      ],
+    });
+    // 6 of 12 months: 183 of 365 days, which the person sees in the field and can correct.
+    expect(form.unrented).toEqual([
+      { value: '50000', revised: true, days: '183' },
+      { value: '100', revised: false, days: '' },
+      { value: '100', revised: false, days: '365' },
+      { value: '100', revised: false, days: '181' },
+    ]);
+    // A month that is not a number counts as none.
+    expect(reviveForm({ unrented: [{ months: 'x' }] }).unrented).toEqual([
+      { value: '', revised: false, days: '0' },
+    ]);
   });
 
   it('keeps the spouse and the guided answers field by field', () => {
@@ -100,6 +122,19 @@ describe('saving the planner on the device', () => {
     const base = { version: PROGRESS_VERSION, year: 2025, form: {} };
     raw({ ...base, draft: { reading: { boxes: {} } } });
     expect(loadProgress()?.draft).toEqual(NO_DRAFT);
+    // A reading of an older version, with months instead of the days of box 0085: read it again.
+    const old = { ...reading, unrented: [{ value: 1000, revised: false, months: 6 }] };
+    raw({ ...base, draft: { ...NO_DRAFT, reading: old } });
+    expect(loadProgress()?.draft).toEqual(NO_DRAFT);
+    const days = {
+      ...reading,
+      unrented: [
+        { value: 1000, revised: false, days: 181 },
+        { value: 1, revised: false, days: null },
+      ],
+    };
+    raw({ ...base, draft: { ...NO_DRAFT, reading: days } });
+    expect(loadProgress()?.draft.reading).toEqual(days);
     raw({ ...base, draft: null });
     expect(loadProgress()?.draft).toEqual(NO_DRAFT);
     raw({

@@ -60,8 +60,7 @@ describe('what the form says about the person', () => {
     expect(situationOf(form(), { reading, rents: true }).rents).toBe(true);
     expect(situationOf(form({ rentalOn: true }), NO_DRAFT).landlord).toBe(true);
     expect(
-      situationOf(form({ unrented: [{ value: '1', revised: false, months: '' }] }), NO_DRAFT)
-        .landlord
+      situationOf(form({ unrented: [{ value: '1', revised: false, days: '' }] }), NO_DRAFT).landlord
     ).toBe(true);
   });
 

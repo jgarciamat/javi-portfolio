@@ -192,7 +192,7 @@ const PATCH: Partial<Record<QuestionId | 'active', Patch>> = {
   property: (form, option) => {
     const others = option === 'other' || option === 'both';
     const rows =
-      form.unrented.length > 0 ? form.unrented : [{ value: '', revised: false, months: '' }];
+      form.unrented.length > 0 ? form.unrented : [{ value: '', revised: false, days: '' }];
     return { rentalOn: option === 'rented' || option === 'both', unrented: others ? rows : [] };
   },
   savings: (_form, option) => (option === 'no' ? { savings: '' } : {}),

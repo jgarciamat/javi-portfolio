@@ -113,13 +113,13 @@ export function UnrentedSection({
               />
             </label>
             <label className="tools-field">
-              <span>{t('tools.renta.months', { n: i + 1 })}</span>
+              <span>{t('tools.renta.days', { n: i + 1 })}</span>
               <input
                 className="tx-input"
                 inputMode="numeric"
-                placeholder="12"
-                value={p.months}
-                onChange={(e) => setUnrented(i, { months: e.target.value })}
+                placeholder="365"
+                value={p.days}
+                onChange={(e) => setUnrented(i, { days: e.target.value })}
               />
             </label>
             <label className="renta-check">
@@ -146,7 +146,7 @@ export function UnrentedSection({
           type="button"
           className="btn-secondary"
           onClick={() =>
-            set({ unrented: [...form.unrented, { value: '', revised: false, months: '' }] })
+            set({ unrented: [...form.unrented, { value: '', revised: false, days: '' }] })
           }
         >
           + {t('tools.renta.addUnrented')}

@@ -1765,7 +1765,7 @@
   "tools.renta.noReduction": "None",
   "tools.renta.unrented": "Properties that are not your main home and not rented",
   "tools.renta.cadastral": "Cadastral value of property {n}",
-  "tools.renta.months": "Months of the year property {n} was available",
+  "tools.renta.days": "Days of the year property {n} was available (box 0085)",
   "tools.renta.revised": "Revised cadastral value ({rate} %)",
   "tools.renta.removeUnrented": "Remove property {n}",
   "tools.renta.addUnrented": "Add a property",

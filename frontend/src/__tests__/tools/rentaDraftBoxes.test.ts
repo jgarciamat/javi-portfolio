@@ -41,11 +41,11 @@ describe('reading the boxes of a draft', () => {
     expect(r.exercise).toBe(2025);
     expect(r.disability).toBe(33);
     expect(r.age).toBe(65);
-    // 40 of 2,000 is 2 % (not revised); 55 of 10,000 is 0.55 % (revised, half the year);
-    // the last one has no imputed income: it is not at the owner's disposal.
+    // 40 of 2,000 is 2 % (not revised); 55 of 10,000 is 0.55 % (revised, 183 days, kept as days:
+    // they used to become 6 months); the last one has no imputed income: not at the owner's disposal.
     expect(r.unrented).toEqual([
-      { value: 2000, revised: false, months: 12 },
-      { value: 10000, revised: true, months: 6 },
+      { value: 2000, revised: false, days: 365 },
+      { value: 10000, revised: true, days: 183 },
     ]);
   });
 
@@ -63,7 +63,7 @@ describe('reading the boxes of a draft', () => {
       year: 2025,
       communities: [],
     });
-    expect(year.unrented).toEqual([{ value: 1000, revised: false, months: 12 }]);
+    expect(year.unrented).toEqual([{ value: 1000, revised: false, days: null }]);
   });
 
   it('reads the degree of disability from its words', () => {

@@ -480,7 +480,7 @@ PEOPLE = [
     person(20, 'herencia-venta-segunda-vivienda-galicia', 'galicia', 'Hereda un piso en 2020 y lo vende en 2025',
            'Piso heredado (valor en el Impuesto sobre Sucesiones 100.000 € + 1.500 € de impuesto y gastos) que vende el 30 de junio por 130.000 € con 4.000 € de gastos. Hasta la venta estuvo vacío (181 días).',
            age=44, gross=33000, ss=2096, withheld=5200, savings=24500,
-           unrented=[dict(value=50000, revised=False, days=181, months='6')],
+           unrented=[dict(value=50000, revised=False, days=181)],
            savings_steps=['Valor de adquisición (art. 36: el del Impuesto sobre Sucesiones + gastos y tributos) = 100.000 + 1.500 = 101.500,00',
                           'Valor de transmisión = 130.000 − 4.000 = 126.000,00 → ganancia **24.500,00** (base del ahorro)',
                           'La herencia no tributa en el IRPF (sí en Sucesiones); la plusvalía del fallecido no se grava ("plusvalía del muerto")']),
@@ -553,7 +553,8 @@ def form_of(p, spouse=None):
             rt = p['rental']
             f.update(rentalOn=True, rentalIncome=str(rt['income']), rentalExpenses=rt['expenses'], construction=str(rt['construction']), rentalReduction=rt['reductionId'])
         if p.get('unrented'):
-            f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], months=u.get('months', '12')) for u in p['unrented']]
+            # The planner asks the days of box 0085 (empty: the whole year).
+            f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], days='' if u['days'] == 365 else str(u['days'])) for u in p['unrented']]
         for d in p.get('deductions', []):
             f['choices'][d['id']] = dict(on=True, amount=d.get('choice_amount', ''), units=d.get('units', ''))
         j = p.get('joint')

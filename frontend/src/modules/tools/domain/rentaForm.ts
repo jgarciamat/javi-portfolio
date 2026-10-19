@@ -21,11 +21,12 @@ export interface AscendantForm {
   disability: Disability;
 }
 
-/** A property that is not rented: its cadastral value and the months it was available. */
+/** A property that is not rented: its cadastral value and the days it was available (box 0085). */
 export interface UnrentedForm {
   value: string;
   revised: boolean;
-  months: string;
+  /** Days of the year at the owner's disposal; empty: the whole year. */
+  days: string;
 }
 
 /** The other person of a joint return: their pay, age and basic income. */
@@ -232,12 +233,22 @@ export function rentalOf(form: RentaForm, property: RentaProperty): RentaInput['
   };
 }
 
-/** Cadastral values of the properties that are not rented, by how they were valued, for the months owned. */
-export function unrentedOf(form: RentaForm): { standard: number; revised: number } {
+/** The days of a tax year (366 in a leap year). */
+export const daysInYear = (year: number): number =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+
+/**
+ * Cadastral values of the properties that are not rented, by how they were valued, for the days
+ * they were available: LIRPF art. 85.1 and AEAT Manual práctico de Renta 2025, c10 (checked
+ * 19-10-2026): "la que proporcionalmente corresponda al número de días comprendidos en dicho
+ * período" (181 of 365 days, not 6 of 12 months).
+ */
+export function unrentedOf(form: RentaForm, year: number): { standard: number; revised: number } {
   const totals = { standard: 0, revised: 0 };
+  const full = daysInYear(year);
   for (const p of form.unrented) {
-    const months = Math.min(12, Math.max(0, p.months.trim() === '' ? 12 : number(p.months)));
-    totals[p.revised ? 'revised' : 'standard'] += (number(p.value) * months) / 12;
+    const days = Math.min(full, Math.max(0, p.days.trim() === '' ? full : number(p.days)));
+    totals[p.revised ? 'revised' : 'standard'] += (number(p.value) * days) / full;
   }
   return totals;
 }
@@ -270,7 +281,7 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     spousePlan: number(form.spousePlan),
     compensatoryPension: number(form.compensatory),
     rental: rentalOf(form, data.property),
-    imputedValues: unrentedOf(form),
+    imputedValues: unrentedOf(form, data.state.year),
     savings: number(form.savings),
     family: familyOf(form),
     state: data.state,

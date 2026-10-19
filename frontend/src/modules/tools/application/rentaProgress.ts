@@ -1,6 +1,6 @@
 import { storage } from '@shared/utils/storage';
 import { NO_DRAFT, type DraftReading, type DraftState } from '../domain/rentaDraft';
-import { emptyForm, emptyPartner, type RentaForm } from '../domain/rentaForm';
+import { emptyForm, emptyPartner, type RentaForm, type UnrentedForm } from '../domain/rentaForm';
 import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
@@ -34,6 +34,23 @@ function over<T extends object>(empty: T, saved: unknown): T {
   return empty;
 }
 
+/**
+ * A property row as saved: the planner asked for months before it asked for days (box 0085), so a
+ * row with months and no days gets the same share of the year in days (6 months: 183 days), which
+ * the person sees and can correct. Anything else that is not text is left empty.
+ */
+function unrentedRow(row: Record<string, unknown>): UnrentedForm {
+  const text = (v: unknown) => (typeof v === 'string' ? v : '');
+  const months = text(row.months).trim();
+  const days =
+    typeof row.days === 'string'
+      ? row.days
+      : months === ''
+      ? ''
+      : String(Math.round((Math.min(12, Math.max(0, Number(months) || 0)) * 365) / 12));
+  return { value: text(row.value), revised: row.revised === true, days };
+}
+
 /** A saved form over an empty one: every field of the wrong kind (old or broken data) is left empty. */
 export function reviveForm(saved: unknown): RentaForm {
   const form = over(emptyForm(''), saved);
@@ -44,7 +61,7 @@ export function reviveForm(saved: unknown): RentaForm {
   // Lists of rows: only rows that are objects (a row with a missing field still reads as empty).
   form.children = form.children.filter(isObject);
   form.ascendants = form.ascendants.filter(isObject);
-  form.unrented = form.unrented.filter(isObject);
+  form.unrented = (form.unrented as unknown[]).filter(isObject).map(unrentedRow);
   return form;
 }
 
@@ -55,7 +72,9 @@ const isReading = (r: unknown): r is DraftReading =>
   Array.isArray(r.applied) &&
   Array.isArray(r.childAges) &&
   Array.isArray(r.ascendantAges) &&
-  Array.isArray(r.unrented);
+  Array.isArray(r.unrented) &&
+  // Readings saved when the planner kept months instead of the days of box 0085 are read again.
+  r.unrented.every((u) => isObject(u) && (u.days === null || typeof u.days === 'number'));
 
 /** The strings of a saved list (anything else is left out). */
 const strings = (list: unknown): string[] =>

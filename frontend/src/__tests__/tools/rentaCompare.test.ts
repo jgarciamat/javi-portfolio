@@ -24,7 +24,7 @@ const PENSIONER: Partial<RentaForm> = {
   withheld: '1182.42',
   nonSalary: '1630.99',
   retired: true,
-  unrented: [{ value: '2455.85', revised: false, months: '' }],
+  unrented: [{ value: '2455.85', revised: false, days: '' }],
   choices: { 'estado-donativos-ley-49-2002': { on: true, amount: '36', units: '' } },
 };
 

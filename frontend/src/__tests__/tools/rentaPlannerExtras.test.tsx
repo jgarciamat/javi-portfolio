@@ -94,8 +94,8 @@ describe('Renta planner: property', () => {
     fireEvent.change(screen.getByLabelText(tr('tools.renta.cadastral', { n: 1 })), {
       target: { value: '50000' },
     });
-    fireEvent.change(screen.getByLabelText(tr('tools.renta.months', { n: 1 })), {
-      target: { value: '6' },
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.days', { n: 1 })), {
+      target: { value: '181' },
     });
     expect(screen.getByText(tr('tools.renta.line.imputed'))).toBeInTheDocument();
     fireEvent.click(

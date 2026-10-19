@@ -63,7 +63,7 @@ export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaFor
         ? r.unrented.map((p) => ({
             value: String(p.value),
             revised: p.revised,
-            months: p.months === 12 ? '' : String(p.months),
+            days: p.days === null ? '' : String(p.days),
           }))
         : form.unrented,
     ascendants:

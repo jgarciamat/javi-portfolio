@@ -28,8 +28,8 @@ export interface DraftReading {
   exercise: number | null;
   /** The person's own degree of disability (box 0011); null when the draft does not say. */
   disability: Disability | null;
-  /** Properties at the owner's disposal: their cadastral value, how it was valued and the months. */
-  unrented: { value: number; revised: boolean; months: number }[];
+  /** Properties at the owner's disposal: their cadastral value, how it was valued and the days (null: not read, the whole year). */
+  unrented: { value: number; revised: boolean; days: number | null }[];
   /** The amount of each box, the first time it appears (only amounts: no names or ids). */
   boxes: Record<string, number>;
 }
@@ -106,7 +106,7 @@ function unrentedIn(boxes: Record<string, number[]>, lines: string[]): DraftRead
     .map((p) => ({
       value: p.value,
       revised: p.imputed / p.value < REVISED_RATE,
-      months: p.days === undefined ? 12 : Math.min(12, Math.round((p.days / 365) * 12)),
+      days: p.days ?? null,
     }));
 }
 

@@ -1765,7 +1765,7 @@
   "tools.renta.noReduction": "Ninguna",
   "tools.renta.unrented": "Inmuebles que no son tu vivienda habitual ni están alquilados",
   "tools.renta.cadastral": "Valor catastral del inmueble {n}",
-  "tools.renta.months": "Meses del año a tu disposición del inmueble {n}",
+  "tools.renta.days": "Días del año a tu disposición del inmueble {n} (casilla 0085)",
   "tools.renta.revised": "Valor catastral revisado ({rate} %)",
   "tools.renta.removeUnrented": "Quitar el inmueble {n}",
   "tools.renta.addUnrented": "Añadir un inmueble",
