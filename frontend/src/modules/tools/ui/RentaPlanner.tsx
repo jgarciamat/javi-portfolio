@@ -224,7 +224,6 @@ export function RentaPlanner({
     reviewStart,
     startReview,
     accept,
-    input,
   } = useRentaPlanner({ initialIncome, mode, year });
   const { t } = useI18n();
   const [expert, switchView] = useExpertView();
