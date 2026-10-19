@@ -98,6 +98,7 @@ Hashtags: #finanzaspersonales #ahorro #presupuesto #educacionfinanciera
 
 ## 6. Capturas de Play ya generadas
 
-`docs/marketing/play-screenshots/`: 6 capturas 1080×1920 con el beneficio escrito encima (datos de demostración, no reales)
-y el gráfico de funciones 1024×500. Para regenerarlas: `docs/marketing/tools/capture.mjs` (captura con Playwright) y
-`compose.mjs` (añade el texto). Hay que lanzar el backend con `SEED_DEMO_USER=true` y datos de ejemplo.
+`docs/marketing/play-screenshots/`: 8 capturas 1080×1920 (y 8 de tablet 1600×2560 en `tablet/`) con el beneficio escrito
+encima (datos de demostración, no reales) y el gráfico de funciones 1024×500. Para regenerarlas: `scripts/playshots.mjs`
+(captura con Playwright; falla si la página dice «Money Manager») y `scripts/playcompose.py` (añade el texto y el marco).
+Hay que lanzar el backend con `SEED_DEMO_USER=true` y datos de ejemplo (ver play-listing.md).
