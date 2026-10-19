@@ -113,6 +113,66 @@ describe('«My investments»: a card of its own', () => {
     expect(screen.getByTestId('assets')).toHaveTextContent('none');
   });
 
+  it('takes one file out of the Renta and works the rest out again', async () => {
+    const confirm = jest.spyOn(window, 'confirm');
+    renderWithProviders(<Harness initial={{}} />, { authenticated: false });
+    const input = screen.getByLabelText(tr('tools.invest.file')) as HTMLInputElement;
+    await act(async () => {
+      fireEvent.change(input, {
+        target: {
+          files: [
+            fileOf('binance.csv', BINANCE),
+            fileOf('otro.csv', BINANCE.replace(/BTC/g, 'ETH')),
+          ],
+        },
+      });
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.invest.apply') }));
+    expect(screen.getByTestId('assets')).toHaveTextContent('2');
+    const remove = (file: string) =>
+      screen.getAllByRole('button', { name: tr('tools.invest.removeFileOf', { file }) })[0];
+    confirm.mockReturnValueOnce(false);
+    fireEvent.click(remove('otro.csv'));
+    expect(screen.getByTestId('assets')).toHaveTextContent('2');
+    confirm.mockReturnValueOnce(true);
+    fireEvent.click(remove('otro.csv'));
+    expect(screen.getByTestId('assets')).toHaveTextContent('1');
+    confirm.mockReturnValueOnce(true);
+    fireEvent.click(remove('binance.csv'));
+    expect(screen.getByTestId('assets')).toHaveTextContent('none');
+    confirm.mockRestore();
+  });
+
+  it('taking the last file out from the importer leaves nothing in the Renta', async () => {
+    renderWithProviders(<Harness initial={{}} />, { authenticated: false });
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(tr('tools.invest.file')), {
+        target: { files: [fileOf('binance.csv', BINANCE)] },
+      });
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.invest.apply') }));
+    const buttons = screen.getAllByRole('button', {
+      name: tr('tools.invest.removeFileOf', { file: 'binance.csv' }),
+    });
+    await act(async () => {
+      fireEvent.click(buttons[buttons.length - 1]);
+    });
+    expect(screen.getByTestId('assets')).toHaveTextContent('none');
+  });
+
+  it('says that an import saved before cannot be split by file', () => {
+    jest.spyOn(window, 'confirm').mockReturnValueOnce(true);
+    renderWithProviders(
+      <Harness initial={{ savingsDetail: { ...emptySavingsDetail(), imported: IMPORTED } }} />,
+      { authenticated: false }
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.invest.removeFileOf', { file: 'broker.csv' }) })
+    );
+    expect(screen.getByText(tr('tools.invest.cantSplit'))).toBeInTheDocument();
+    expect(screen.getByTestId('assets')).toHaveTextContent('1');
+  });
+
   it('lists no years when nothing was sold', () => {
     renderWithProviders(
       <Harness

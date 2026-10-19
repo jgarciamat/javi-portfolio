@@ -1,7 +1,7 @@
 import { strToU8, zipSync } from 'fflate';
 import { readSpreadsheet, SpreadsheetError } from '@modules/finances/application/spreadsheet';
 import { storage } from '@shared/utils/storage';
-import { readTables, jsonTables, type TableReading } from '../domain/invest/detect';
+import { readTables, jsonTables, withInfoSheets, type TableReading } from '../domain/invest/detect';
 import { parseEcb, type RateTable } from '../domain/invest/fx';
 import type { Mapping } from '../domain/invest/mapping';
 import {
@@ -47,7 +47,10 @@ export async function readInvestFile(file: File): Promise<FileReading> {
     const tables: Table[] = lower.endsWith('.json')
       ? jsonTables(name, await file.text())
       : await readSpreadsheet(file);
-    return { ...empty, tables, readings: readTables(tables, name) };
+    const readings = withInfoSheets(readTables(tables, name));
+    // Only the tables still to map are kept: an informative sheet may hold personal data.
+    const toMap = new Set(readings.filter((r) => !r.format && !r.info).map((r) => r.table));
+    return { ...empty, tables: tables.filter((tb) => toMap.has(tb.name)), readings };
   } catch (e) {
     const code = e instanceof SpreadsheetError ? e.code : 'unreadable';
     return { ...empty, error: code };

@@ -5,6 +5,7 @@ import { scrollBehavior } from '@shared/utils/motion';
 import { rentaState } from '../../data/renta/state';
 import { emptySavingsDetail, fifo, type ImportedSavings } from '../../domain/rentaGains';
 import { choose } from '../../domain/rentaGuide';
+import { withoutFile } from '../../domain/invest/sources';
 import { InvestImport } from './invest/InvestImport';
 import { useMoney, type StepProps } from './shared';
 
@@ -36,6 +37,17 @@ export function InvestCard({ form, set }: StepProps) {
   const detail = form.savingsDetail;
   const imported = detail?.imported;
   const [open, setOpen] = useState(!imported);
+  const [cantSplit, setCantSplit] = useState(false);
+  /** Takes one file out of what is in the Renta: the rest is worked out again. */
+  const removeFile = (file: string) => {
+    if (!imported || !window.confirm(t('tools.invest.removeFromRenta', { file }))) return;
+    const next = withoutFile(imported, file);
+    if (next === 'unknown') {
+      setCantSplit(true);
+      return;
+    }
+    set({ savingsDetail: { ...emptySavingsDetail(), ...detail, imported: next ?? undefined } });
+  };
   const k = 'tools.renta.investCard';
   const summary = imported ? importedSummary(imported) : null;
   return (
@@ -60,6 +72,22 @@ export function InvestCard({ form, set }: StepProps) {
               })}
             </strong>
           </p>
+          <ul className="invest-files">
+            {summary.files.map((file) => (
+              <li key={file}>
+                <span>{file}</span>{' '}
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  aria-label={t('tools.invest.removeFileOf', { file })}
+                  onClick={() => removeFile(file)}
+                >
+                  <Icon name="trash" /> {t('tools.invest.removeFile')}
+                </button>
+              </li>
+            ))}
+          </ul>
+          {cantSplit && <p className="form-error">{t('tools.invest.cantSplit')}</p>}
           {summary.years.length > 0 && (
             <ul className="renta-minimum">
               {summary.years.map((y) => (
@@ -96,7 +124,7 @@ export function InvestCard({ form, set }: StepProps) {
           onApply={(next) =>
             set({
               ...choose(form, 'savings', 'yes'),
-              savingsDetail: { ...(detail ?? emptySavingsDetail()), imported: next },
+              savingsDetail: { ...(detail ?? emptySavingsDetail()), imported: next ?? undefined },
             })
           }
         />

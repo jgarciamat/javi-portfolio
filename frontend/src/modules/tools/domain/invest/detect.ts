@@ -12,6 +12,29 @@ export interface TableReading {
   /** The header row when no format was recognised (for the guided mapping). */
   header: string[];
   headerRow: number;
+  /**
+   * A sheet with no operations (customer data, summary, instructions): it is not shown nor kept,
+   * and the mapping is not asked for it.
+   */
+  info?: boolean;
+}
+
+/** Names of the sheets of a report that hold no operations (NO CONFIRMADO for each platform). */
+const INFO_SHEET =
+  /customer|client|cliente|information|informaci[oó]n|summary|resumen|instruc|disclaimer|aviso|readme|cover|portada|glossary|glosario|overview|notes|notas|legal/i;
+
+/**
+ * The readings of a file, with its unknown tables marked as informative when another table of the
+ * same file was recognised or when they look like one; their header is dropped (it may hold the
+ * name or the id of the customer).
+ */
+export function withInfoSheets(readings: TableReading[]): TableReading[] {
+  const recognised = readings.some((r) => r.format);
+  return readings.map((r) =>
+    !r.format && (recognised || INFO_SHEET.test(r.table) || r.header.length < 3)
+      ? { ...r, info: true, header: [] }
+      : r
+  );
 }
 
 /**

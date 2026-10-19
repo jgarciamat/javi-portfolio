@@ -1588,6 +1588,12 @@ export const SPANISH_ENTITIES = [
   'Inversis',
 ];
 
+/** Where the withholding of each format's dividends is paid, for the ledger. */
+export const withheldInOf = (): Record<string, 'origin' | 'spain'> =>
+  Object.fromEntries(
+    FORMATS.filter((f) => f.withheldIn).map((f) => [f.id, f.withheldIn as 'origin' | 'spain'])
+  );
+
 export const FORMATS: FormatSpec[] = [
   binanceHistory,
   binanceTrades,

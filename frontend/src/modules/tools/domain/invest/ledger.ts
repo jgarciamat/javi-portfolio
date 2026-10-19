@@ -355,6 +355,30 @@ const REWARD_BOX: Record<string, Pick<IncomeLine, 'what' | 'box' | 'base'>> = {
   mining: { what: 'activity', box: '—', base: 'activity' },
 };
 
+/**
+ * The operations with every amount already in euros (value, fee, withholding, cost), so that they
+ * can be kept and worked out again later without the exchange rates (taking one file out).
+ */
+export function inEuros(input: InvestOp[], rates: RateTable): InvestOp[] {
+  const warnings: InvestWarning[] = [];
+  const valued = inferPrices(
+    swapsOnChain(input).map((op) => valueOf(op, rates, warnings)),
+    warnings
+  );
+  const euros = (amount: number, currency: string | null, date: string) =>
+    toEur(amount, currency, date, rates, FIAT).eur ?? 0;
+  return valued.map(({ value, feeEur, ...op }) => ({
+    ...op,
+    eur: value,
+    amount: value,
+    currency: 'EUR',
+    fee: feeEur > 0 ? feeEur : op.fee,
+    feeCurrency: feeEur > 0 ? 'EUR' : op.feeCurrency ?? op.currency,
+    withholding: op.withholding && euros(op.withholding, op.currency, op.date),
+    cost: op.cost === undefined ? undefined : euros(op.cost, op.currency, op.acquired ?? op.date),
+  }));
+}
+
 /** Works out the figures of `year` from every operation of every year. */
 export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerResult {
   const warnings: InvestWarning[] = [];

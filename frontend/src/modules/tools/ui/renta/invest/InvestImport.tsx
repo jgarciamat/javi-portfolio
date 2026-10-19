@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { ImportedSavings } from '../../../domain/rentaGains';
-import { FORMATS } from '../../../domain/invest/formats';
+import { withheldInOf } from '../../../domain/invest/formats';
 import { withTyped, type RateTable } from '../../../domain/invest/fx';
-import { buildLedger, type ValuedOp } from '../../../domain/invest/ledger';
+import { buildLedger, inEuros, type ValuedOp } from '../../../domain/invest/ledger';
 import { headerKey, readMapped, type Mapping } from '../../../domain/invest/mapping';
-import type { CertificateLine } from '../../../domain/invest/pdfReports';
 import { declarationRows, reportTables } from '../../../domain/invest/report';
+import { importedFrom } from '../../../domain/invest/sources';
 import type { InvestOp } from '../../../domain/invest/types';
 import {
   download,
@@ -28,28 +29,7 @@ import { InvestGuide } from './InvestGuide';
 import { InvestMapping } from './InvestMapping';
 import { DeclarationTable, OpsTable, WarningsList, type OpEdit } from './InvestTables';
 
-const WITHHELD_IN = Object.fromEntries(
-  FORMATS.filter((f) => f.withheldIn).map((f) => [f.id, f.withheldIn as 'origin' | 'spain'])
-);
-
-/** The certificate lines the person ticked, added to what the files gave. */
-function withCertificate(base: ImportedSavings, lines: CertificateLine[]): ImportedSavings {
-  const out: ImportedSavings = {
-    ...base,
-    capital: { ...base.capital },
-    otherGains: [...base.otherGains],
-    withheld: { ...base.withheld },
-  };
-  for (const l of lines) {
-    if (l.field === 'interest') out.capital.interest += l.amount;
-    if (l.field === 'dividends') out.capital.dividends += l.amount;
-    if (l.field === 'expenses') out.capital.expenses += l.amount;
-    if (l.field === 'withheld') out.withheld.capital += l.amount;
-    if (l.field === 'gains') out.otherGains.push(l.amount);
-    if (l.field === 'losses') out.otherGains.push(-l.amount);
-  }
-  return out;
-}
+const WITHHELD_IN = withheldInOf();
 
 /** A purchase (or sale) the files do not have, typed by the person: an earlier year, another bank. */
 function AddOperation({ onAdd }: { onAdd: (op: InvestOp) => void }) {
@@ -186,7 +166,8 @@ export function InvestImport({
   onApply,
 }: {
   year: number;
-  onApply: (imported: ImportedSavings) => void;
+  /** null: every file was taken out after it had been taken to the Renta. */
+  onApply: (imported: ImportedSavings | null) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -202,6 +183,9 @@ export function InvestImport({
   const [busy, setBusy] = useState(false);
   const [applied, setApplied] = useState(false);
   const [dragging, setDragging] = useState(false);
+  // A file taken out after «Llevar a mi Renta»: the Renta is worked out again with the rest.
+  const [reapply, setReapply] = useState(false);
+  const [removed, setRemoved] = useState<string | null>(null);
 
   const [bundled, setBundled] = useState<BundledRates | null>(null);
   useEffect(() => {
@@ -257,10 +241,54 @@ export function InvestImport({
   const certificate = files.flatMap((f) =>
     f.certificate.map((line, i) => ({ key: `${f.file}|${i}`, line }))
   );
-  const imported = withCertificate(
-    { ...ledger.imported, files: files.map((f) => f.file) },
-    certificate.filter((c) => ticked[c.key]).map((c) => c.line)
-  );
+  // What goes to the Renta, kept file by file in euros so that one can be taken out later.
+  const imported = useMemo(() => {
+    const euros = new Map(inEuros(ops, allRates).map((o) => [o.id, o]));
+    const own = (list: InvestOp[]) => list.flatMap((o) => euros.get(o.id) ?? []);
+    const sources = [
+      ...files.map((f) => ({
+        file: f.file,
+        ops: own([
+          ...f.readings.flatMap((r) => r.ops),
+          ...Object.entries(mapped)
+            .filter(([key]) => key.startsWith(`${f.file}|`))
+            .flatMap(([, list]) => list),
+        ]),
+        certificate: f.certificate.filter((_, i) => ticked[`${f.file}|${i}`]),
+      })),
+      { file: '', ops: own(manual), certificate: [] },
+    ];
+    return importedFrom(
+      sources,
+      { year, professional },
+      files.map((f) => f.file)
+    );
+  }, [ops, allRates, files, mapped, manual, ticked, year, professional]);
+  useEffect(() => {
+    if (!reapply) return;
+    setReapply(false);
+    onApply(files.length > 0 || manual.length > 0 ? imported : null);
+  }, [reapply, imported, files, manual, onApply]);
+
+  /** Takes a file out with all that came from it: its rows, mapping, edits and ticked lines. */
+  const removeFile = (f: FileReading) => {
+    const keys = Object.keys(mapped).filter((key) => key.startsWith(`${f.file}|`));
+    const ids = new Set(
+      [...f.readings.flatMap((r) => r.ops), ...keys.flatMap((key) => mapped[key])].map((o) => o.id)
+    );
+    const tickedHere = Object.keys(ticked).filter((key) => key.startsWith(`${f.file}|`));
+    const touched =
+      [...ids].some((id) => edits[id]) || tickedHere.some((key) => ticked[key]) || keys.length > 0;
+    if (touched && !window.confirm(t(`${k}.removeConfirm`, { file: f.file }))) return;
+    const drop = <T,>(record: Record<string, T>, gone: (key: string) => boolean) =>
+      Object.fromEntries(Object.entries(record).filter(([key]) => !gone(key)));
+    setFiles((list) => list.filter((x) => x !== f));
+    setMapped((m) => drop(m, (key) => keys.includes(key)));
+    setEdits((e) => drop(e, (id) => ids.has(id)));
+    setTicked((tk) => drop(tk, (key) => tickedHere.includes(key)));
+    setRemoved(f.file);
+    if (applied) setReapply(true);
+  };
   const missingRates = ledger.warnings
     .filter((w) => w.code === 'missingRate')
     .map((w) => w.asset as string);
@@ -308,12 +336,31 @@ export function InvestImport({
         <p className="section-hint">{t(`${k}.formats`)}</p>
       </div>
 
+      {removed && (
+        <p className="section-hint" role="status">
+          {t(applied ? `${k}.removedApplied` : `${k}.removed`, { file: removed })}
+        </p>
+      )}
       {files.map((f) => (
         <div key={f.file} className="renta-block">
-          <h4>{f.file}</h4>
+          <div className="invest-file">
+            <h4>{f.file}</h4>
+            <button
+              type="button"
+              className="btn-secondary"
+              aria-label={t(`${k}.removeFileOf`, { file: f.file })}
+              onClick={() => removeFile(f)}
+            >
+              <Icon name="trash" /> {t(`${k}.removeFile`)}
+            </button>
+          </div>
           {f.error && <p className="form-error">{t(`${k}.error.${f.error}`)}</p>}
           {f.readings.map((r, i) =>
-            r.format ? (
+            r.info ? (
+              <p key={i} className="section-hint">
+                {t(`${k}.info`, { table: r.table })}
+              </p>
+            ) : r.format ? (
               <p key={i} className="section-hint">
                 {t(`${k}.recognised`, {
                   platform: r.format.platform,
@@ -321,7 +368,7 @@ export function InvestImport({
                   count: r.ops.length,
                 })}
                 {r.skipped > 0 && ` ${t(`${k}.skipped`, { count: r.skipped })}`}
-                {r.format.confirmed === null && ` ${t(`${k}.unconfirmedFormat`)}`}
+                {r.format.confirmed === null && ` ${t(`${k}.formatCheck`)}`}
               </p>
             ) : (
               <div key={i}>
@@ -380,6 +427,7 @@ export function InvestImport({
           ) : null}
           <OpsTable
             ops={valued}
+            resetKey={files.map((f) => f.file).join('|')}
             edits={edits}
             onEdit={(id, edit) => {
               setEdits({ ...edits, [id]: edit });

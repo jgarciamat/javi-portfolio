@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { LedgerResult, ValuedOp } from '../../../domain/invest/ledger';
@@ -21,16 +22,29 @@ export function OpsTable({
   ops,
   edits,
   onEdit,
+  resetKey,
 }: {
   ops: ValuedOp[];
   edits: Record<string, OpEdit>;
   onEdit: (id: string, edit: OpEdit) => void;
+  /** Changes when files come or go: the table goes back to its first page. */
+  resetKey: string;
 }) {
   const { t } = useI18n();
   const money = useMoney();
   const k = 'tools.invest.ops';
+  const [page, setPage] = useState(1);
+  useEffect(() => setPage(1), [resetKey]);
+  // Twenty rows a page; the totals are always worked out on every operation, not on the page.
+  const pages = Math.max(1, Math.ceil(ops.length / PAGE));
+  const current = Math.min(page, pages);
+  const from = (current - 1) * PAGE;
+  const shown = ops.slice(from, from + PAGE);
   return (
     <div className="renta-compare-scroll">
+      {pages > 1 && (
+        <Pager current={current} pages={pages} from={from} count={ops.length} go={setPage} />
+      )}
       <table className="renta-compare-table invest-ops">
         <caption>{t(`${k}.caption`, { count: ops.length })}</caption>
         <thead>
@@ -46,7 +60,7 @@ export function OpsTable({
           </tr>
         </thead>
         <tbody>
-          {ops.map((op) => {
+          {shown.map((op) => {
             const edit = edits[op.id] ?? {};
             const label = `${op.asset} ${date(op.date)}`;
             return (
@@ -103,6 +117,43 @@ export function OpsTable({
         </tbody>
       </table>
     </div>
+  );
+}
+
+const PAGE = 20;
+
+/** «Página X de Y» with first, previous, next and last, and which rows are shown. */
+function Pager({
+  current,
+  pages,
+  from,
+  count,
+  go,
+}: {
+  current: number;
+  pages: number;
+  from: number;
+  count: number;
+  go: (page: number) => void;
+}) {
+  const { t } = useI18n();
+  const k = 'tools.invest.pages';
+  const button = (label: string, page: number, disabled: boolean) => (
+    <button type="button" className="btn-secondary" disabled={disabled} onClick={() => go(page)}>
+      {t(`${k}.${label}`)}
+    </button>
+  );
+  return (
+    <nav className="invest-pager" aria-label={t(`${k}.label`)}>
+      {button('first', 1, current === 1)}
+      {button('previous', current - 1, current === 1)}
+      <span aria-live="polite">
+        {t(`${k}.page`, { current, pages })} ·{' '}
+        {t(`${k}.showing`, { from: from + 1, to: Math.min(from + PAGE, count), count })}
+      </span>
+      {button('next', current + 1, current === pages)}
+      {button('last', pages, current === pages)}
+    </nav>
   );
 }
 

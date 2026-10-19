@@ -16,7 +16,7 @@ export interface GuideStep {
   id: string;
   params?: Record<string, string | number>;
   sources: Source[];
-  /** The step rests on something not confirmed in an official source. */
+  /** For our own follow-up (docs/fiscalidad/inversiones.md): never shown to the person. */
   unconfirmed?: boolean;
 }
 

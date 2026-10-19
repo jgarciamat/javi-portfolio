@@ -1,6 +1,6 @@
 import { parseCSV } from '@modules/finances/domain/importParsers';
 import { readTables } from '@modules/tools/domain/invest/detect';
-import { FORMATS } from '@modules/tools/domain/invest/formats';
+import { withheldInOf } from '@modules/tools/domain/invest/formats';
 import type { RateTable } from '@modules/tools/domain/invest/fx';
 import { buildLedger } from '@modules/tools/domain/invest/ledger';
 import { readQuantfury } from '@modules/tools/domain/invest/pdfReports';
@@ -19,10 +19,6 @@ export interface CaseFile {
   lines?: string[];
 }
 
-const WITHHELD_IN = Object.fromEntries(
-  FORMATS.filter((f) => f.withheldIn).map((f) => [f.id, f.withheldIn as 'origin' | 'spain'])
-);
-
 export function investCase(
   files: CaseFile[],
   usd?: number
@@ -33,7 +29,7 @@ export function investCase(
     return readTables(tables, f.name).flatMap((r) => r.ops);
   });
   const rates: RateTable = usd ? { USD: [['2020-01-01', usd]] } : {};
-  const ledger = buildLedger(ops, { year: 2025, rates, withheldIn: WITHHELD_IN });
+  const ledger = buildLedger(ops, { year: 2025, rates, withheldIn: withheldInOf() });
   return {
     imported: { ...ledger.imported, files: files.map((f) => f.name) },
     warnings: ledger.warnings.map((w) => w.code),

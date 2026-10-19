@@ -24,9 +24,6 @@ export function InvestGuide({
           <li key={step.id}>
             <h4>{t(`tools.invest.guide.${step.id}.title`)}</h4>
             <p>{t(`tools.invest.guide.${step.id}.body`, step.params)}</p>
-            {step.unconfirmed && (
-              <p className="renta-badge">{t('tools.invest.guide.unconfirmed')}</p>
-            )}
             {step.sources.length > 0 && (
               <p className="tools-sources">
                 {t('tools.invest.guide.source')}{' '}

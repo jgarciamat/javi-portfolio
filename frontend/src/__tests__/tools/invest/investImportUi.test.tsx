@@ -295,11 +295,141 @@ describe('Importar mis inversiones', () => {
   });
 });
 
+describe('taking a file out, and the pages of the table', () => {
+  const many = Array.from(
+    { length: 45 },
+    (_, i) =>
+      `2025-01-${String((i % 28) + 1).padStart(2, '0')} 10:00:00,BTCEUR,BUY,1,0.001BTC,1EUR,0EUR`
+  ).join('\n');
+  const MANY = `Date(UTC),Pair,Side,Price,Executed,Amount,Fee\n${many}`;
+  const removeButton = (file: string) =>
+    screen.getByRole('button', { name: tr(`${k}.removeFileOf`, { file }) });
+
+  it('takes out a file without asking when nothing of it was changed', async () => {
+    open();
+    await upload(fileOf('binance.csv', BINANCE), fileOf('degiro.csv', DEGIRO));
+    await screen.findByText('degiro.csv');
+    fireEvent.click(removeButton('degiro.csv'));
+    expect(screen.queryByText('degiro.csv')).not.toBeInTheDocument();
+    expect(screen.getByText(tr(`${k}.removed`, { file: 'degiro.csv' }))).toBeInTheDocument();
+  });
+
+  it('asks first when its rows or columns were changed, and works the Renta out again', async () => {
+    const confirm = jest.spyOn(window, 'confirm');
+    open();
+    await upload(
+      fileOf('binance.csv', BINANCE),
+      fileOf('degiro.csv', DEGIRO),
+      fileOf('mio.csv', UNKNOWN)
+    );
+    await screen.findByText('mio.csv');
+    // Map the unknown file and change a row of Degiro.
+    fireEvent.change(screen.getAllByLabelText(tr(`${k}.map.field.date`))[0], {
+      target: { value: '0' },
+    });
+    fireEvent.change(screen.getAllByLabelText(tr(`${k}.map.field.asset`))[0], {
+      target: { value: '1' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.map.read`) }));
+    const what = 'ES0000000001 05/01/2025';
+    fireEvent.click(screen.getByLabelText(tr(`${k}.ops.countsOf`, { what })));
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.apply`) }));
+    expect(last.savingsDetail?.imported?.files).toEqual(['binance.csv', 'degiro.csv', 'mio.csv']);
+    confirm.mockReturnValueOnce(false);
+    fireEvent.click(removeButton('degiro.csv'));
+    expect(screen.getByText('degiro.csv')).toBeInTheDocument();
+    confirm.mockReturnValueOnce(true);
+    fireEvent.click(removeButton('degiro.csv'));
+    await waitFor(() =>
+      expect(last.savingsDetail?.imported?.files).toEqual(['binance.csv', 'mio.csv'])
+    );
+    expect(screen.getByText(tr(`${k}.removedApplied`, { file: 'degiro.csv' }))).toBeInTheDocument();
+    confirm.mockReturnValueOnce(true);
+    fireEvent.click(removeButton('mio.csv'));
+    fireEvent.click(removeButton('binance.csv'));
+    await waitFor(() => expect(last.savingsDetail?.imported).toBeUndefined());
+    confirm.mockRestore();
+  });
+
+  it('a certificate with ticked lines asks before going', async () => {
+    pdf.mockResolvedValue({ text: '', lines: ['Información fiscal 2025', 'Intereses   100,00'] });
+    const confirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
+    open();
+    await upload(fileOf('cert.pdf', ''));
+    fireEvent.click(await screen.findByRole('checkbox', { name: /100,00/ }));
+    fireEvent.click(removeButton('cert.pdf'));
+    expect(confirm).toHaveBeenCalled();
+    expect(screen.queryByText('cert.pdf')).not.toBeInTheDocument();
+    confirm.mockRestore();
+  });
+
+  it('says which sheets of a workbook are only information', async () => {
+    const { xlsxOf } = await import('@modules/tools/application/investImport');
+    const book = xlsxOf([
+      {
+        name: 'Customer Information',
+        rows: [
+          ['Name', 'User ID', 'Email'],
+          ['X', '1', 'x@example.com'],
+        ],
+      },
+      { name: 'Trades', rows: BINANCE.split('\n').map((l) => l.split(',')) },
+    ]);
+    const data = book.slice().buffer as ArrayBuffer;
+    const file = Object.assign(new File([data], 'Binance- informe.xlsx'), {
+      arrayBuffer: async () => data,
+    });
+    open();
+    await upload(file);
+    expect(
+      await screen.findByText(tr(`${k}.info`, { table: 'Customer Information' }))
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/x@example\.com/)).not.toBeInTheDocument();
+  });
+
+  it('shows twenty operations a page and goes back to the first one when files change', async () => {
+    open();
+    await upload(fileOf('muchas.csv', MANY), fileOf('degiro.csv', DEGIRO));
+    await screen.findByText('degiro.csv');
+    const status = () =>
+      screen.getByText(new RegExp(tr(`${k}.pages.page`, { current: '\\d', pages: 3 })));
+    expect(status().textContent).toContain(
+      tr(`${k}.pages.showing`, { from: 1, to: 20, count: 46 })
+    );
+    const go = (label: string) =>
+      fireEvent.click(screen.getByRole('button', { name: tr(`${k}.pages.${label}`) }));
+    expect(screen.getByRole('button', { name: tr(`${k}.pages.previous`) })).toBeDisabled();
+    go('next');
+    expect(status().textContent).toContain(
+      tr(`${k}.pages.showing`, { from: 21, to: 40, count: 46 })
+    );
+    go('last');
+    expect(status().textContent).toContain(
+      tr(`${k}.pages.showing`, { from: 41, to: 46, count: 46 })
+    );
+    expect(screen.getByRole('button', { name: tr(`${k}.pages.next`) })).toBeDisabled();
+    go('previous');
+    go('first');
+    expect(status().textContent).toContain(
+      tr(`${k}.pages.showing`, { from: 1, to: 20, count: 46 })
+    );
+    go('last');
+    fireEvent.click(removeButton('degiro.csv'));
+    expect(status().textContent).toContain(
+      tr(`${k}.pages.showing`, { from: 1, to: 20, count: 45 })
+    );
+    fireEvent.click(removeButton('muchas.csv'));
+    expect(
+      screen.queryByRole('navigation', { name: tr(`${k}.pages.label`) })
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe('the guide from the draft reviewer', () => {
-  it('lists every step with its sources and the not confirmed ones marked', () => {
+  it('lists every step with its sources, without any "not confirmed" label', () => {
     renderWithProviders(<InvestGuide />);
     expect(screen.getByText(tr(`${k}.guide.m721.title`))).toBeInTheDocument();
-    expect(screen.getAllByText(tr(`${k}.guide.unconfirmed`)).length).toBeGreaterThan(1);
+    expect(document.body.textContent).not.toMatch(/confirmad|confirmed/i);
     expect(screen.getAllByRole('link').length).toBeGreaterThan(10);
   });
 });

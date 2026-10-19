@@ -833,3 +833,27 @@
   border: 1px dashed var(--accent-600);
   border-radius: 12px;
 }
+.invest-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.invest-files {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.invest-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.invest-pager span {
+  flex: 1 1 12rem;
+  text-align: center;
+}

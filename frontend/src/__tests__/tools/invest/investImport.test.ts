@@ -61,6 +61,44 @@ describe('reading the files on the device', () => {
     expect(json.readings[0].format?.id).toBe('revolut-crypto');
   });
 
+  it('a Binance workbook: the information sheet is left out (and its data not kept)', async () => {
+    const book = xlsxOf([
+      {
+        name: 'Customer Information',
+        rows: [
+          ['Name', 'User ID', 'Email'],
+          ['PERSONA FICTICIA', '00000000', 'ficticia@example.com'],
+        ],
+      },
+      {
+        name: 'Transaction History',
+        rows: [
+          ['User_ID', 'UTC_Time', 'Account', 'Operation', 'Coin', 'Change', 'Remark'],
+          ['1', '2025-01-05 10:00:00', 'Spot', 'Deposit', 'BTC', 0.1, ''],
+        ],
+      },
+    ]);
+    const read = await readInvestFile(fileOf('Binance- informe.xlsx', book));
+    expect(read.readings.map((r) => [r.table, r.format?.id ?? null, !!r.info, r.header])).toEqual([
+      ['Customer Information', null, true, []],
+      ['Transaction History', 'binance-history', false, []],
+    ]);
+    expect(read.tables).toEqual([]);
+    const alone = xlsxOf([
+      {
+        name: 'Hoja1',
+        rows: [
+          ['Día', 'Cosa', 'Cuánto'],
+          ['01/01/2025', 'BTC', 1],
+        ],
+      },
+      { name: 'Customer Information', rows: [['Name', 'User ID', 'Email']] },
+    ]);
+    const unknown = await readInvestFile(fileOf('otro.xlsx', alone));
+    expect(unknown.readings.map((r) => !!r.info)).toEqual([false, true]);
+    expect(unknown.tables.map((t) => t.name)).toEqual(['Hoja1']);
+  });
+
   it('PDF: the Quantfury report, a fiscal certificate, or nothing found', async () => {
     pdf.mockResolvedValueOnce({
       text: '',

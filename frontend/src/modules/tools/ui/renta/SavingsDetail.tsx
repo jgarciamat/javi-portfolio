@@ -410,7 +410,12 @@ export function SavingsDetailSection({
         <InvestImport
           year={rentaState.year}
           onApply={(imported) =>
-            set({ savingsDetail: { ...(detail ?? emptySavingsDetail()), imported } })
+            set({
+              savingsDetail: {
+                ...(detail ?? emptySavingsDetail()),
+                imported: imported ?? undefined,
+              },
+            })
           }
         />
       )}

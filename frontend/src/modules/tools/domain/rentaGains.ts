@@ -1,3 +1,5 @@
+import type { CertificateLine } from './invest/pdfReports';
+import type { InvestOp } from './invest/types';
 import { round2 } from './round';
 
 /**
@@ -118,6 +120,14 @@ export interface SavingsDetail {
   imported?: ImportedSavings;
 }
 
+/** What one imported file gave: its operations in euros and the certificate lines ticked. */
+export interface ImportSource {
+  /** The file's name; '' for the operations typed by hand. */
+  file: string;
+  ops: InvestOp[];
+  certificate: CertificateLine[];
+}
+
 /** Tax paid abroad on income taxed here too (LIRPF art. 80): for the deduction of box 0588. */
 export interface ForeignTax {
   /** Gross income obtained abroad, in euros. */
@@ -129,6 +139,12 @@ export interface ForeignTax {
 /** The savings read from investment files, kept apart so a new import replaces them. */
 export interface ImportedSavings {
   files: string[];
+  /**
+   * The operations of each file already in euros, and the options of the import: with them one
+   * file can be taken out later and the rest worked out again (invest/sources.ts).
+   */
+  sources?: ImportSource[];
+  options?: { year: number; professional: boolean };
   capital: CapitalIncome;
   assets: AssetOps[];
   /** Gains and losses that do not come from a transmission (airdrops, rewards): general base. */
