@@ -90,6 +90,34 @@ export const disabilityAmount = (
   return 0;
 };
 
+/** The extra of the minimum for age: from 65, and more from 75. */
+const ageAmount = (age: number, m: FullMinimums): number =>
+  age >= 75 ? m.over65 + m.over75 : age >= 65 ? m.over65 : 0;
+
+/**
+ * The minimum of a couple's joint return: one minimum of the taxpayer (5,550 €), with the age and
+ * disability of each spouse (LIRPF art. 84.2; AEAT Manual práctico de Renta 2025, "Mínimo del
+ * contribuyente", checked 19-10-2026: "se tendrán en cuenta las circunstancias personales de cada
+ * uno de los cónyuges").
+ */
+function withPartner(
+  min: { total: number; items: MinimumItem[] },
+  partner: JointMember | null,
+  m: FullMinimums
+): { total: number; items: MinimumItem[] } {
+  if (!partner) return min;
+  const items = min.items.map((i) => ({ ...i }));
+  const add = (key: MinimumItem['key'], amount: number) => {
+    if (amount <= 0) return;
+    const item = items.find((i) => i.key === key);
+    if (item) item.amount = round2(item.amount + amount);
+    else items.push({ key, amount });
+  };
+  add('age', ageAmount(partner.age, m));
+  add('disability', disabilityAmount(partner.disability, m));
+  return { total: round2(items.reduce((sum, i) => sum + i.amount, 0)), items };
+}
+
 /** The personal and family minimum, item by item (it lowers the tax, see {@link applyMinimum}). */
 export function computeMinimum(
   family: Family,
@@ -100,7 +128,7 @@ export function computeMinimum(
   // LIRPF art. 57.2 ("edad superior a 65/75 años"), with the age at the accrual date, 31 December
   // (art. 61.1.ª). The AEAT Manual práctico de Renta 2025 applies it to taxpayers "de edad igual o
   // superior a 65 años" (and 75): turning 65 (or 75) by 31 December is enough.
-  const ageExtra = family.age >= 75 ? m.over65 + m.over75 : family.age >= 65 ? m.over65 : 0;
+  const ageExtra = ageAmount(family.age, m);
   if (ageExtra > 0) items.push({ key: 'age', amount: ageExtra });
 
   const children = family.children.filter(countsAsDescendant).sort((a, b) => b.age - a.age);
@@ -270,6 +298,30 @@ export interface RentaInput {
   choices: Record<string, DeductionChoice>;
   /** Reduction of the net income from work for low incomes (see the State's rules). */
   workReduction: (netIncome: number) => number;
+  /** A joint return: the person files together with their family unit (see {@link JointInput}). */
+  joint?: JointInput;
+}
+
+/** The spouse in a joint return: their own pay, age, disability and basic income. */
+export interface JointMember {
+  gross: number;
+  socialSecurity: number;
+  withheld: number;
+  nonSalaryIncome?: number;
+  retired?: boolean;
+  age: number;
+  disability: Disability;
+  savings: number;
+  pensionPlan: number;
+}
+
+export interface JointInput {
+  /** The spouse (couple); null for one parent with the children, who are taken to have no income. */
+  partner: JointMember | null;
+  /** Reduction of the base for the family unit (3,400 or 2,150 euros, or 0). */
+  reduction: number;
+  /** Only one 2,000 € of "other expenses" for the whole unit (to show what that reading would cost). */
+  oneGeneralExpense?: boolean;
 }
 
 export interface RentaResult {
@@ -282,6 +334,10 @@ export interface RentaResult {
   pensionReduction: number;
   /** Other reductions: spouse plan and compensatory pension. */
   otherReductions: number;
+  /** Reduction for the joint return (0 in an individual one). */
+  jointReduction: number;
+  /** Joint return: the 340 € deduction was left out because its joint rules are not clear. */
+  lowPayLeftOut: boolean;
   /** General taxable base, before the reductions of the base (box 0435). */
   generalBase: number;
   /** General tax base, after them (box 0500). */
@@ -338,79 +394,199 @@ export function rentalNet(rental: RentalInput | null): number {
   return round2(net > 0 ? net * (1 - percent / 100) : net);
 }
 
-/** The "other expenses" of art. 19.2.f: 2,000 euros, more for a worker with a disability or who moved. */
-function generalExpenses(input: RentaInput): number {
-  const { state, family } = input;
-  const disability = input.retired
-    ? 0
-    : family.disability >= 65
-    ? state.workExpenses.disability65
-    : family.disability >= 33
-    ? state.workExpenses.disability33
-    : 0;
-  return (
-    state.workExpenses.general +
-    disability +
-    (input.geographicMobility ? input.extras.geographicMobilityExtra : 0)
-  );
+/** One earner of the return: the person, or the spouse in a joint one. */
+interface Earner {
+  gross: number;
+  socialSecurity: number;
+  /** Union fees, professional association and legal defence (only the person's are asked). */
+  extra: number;
+  /** Works in a job: the extra expenses for a disability are only for active workers. */
+  active: boolean;
+  disability: Disability;
+  /** Own and employer's contributions to pension plans. */
+  pensionPlan: number;
+  /** The person: their 2,000 € always count, as in an individual return. */
+  main: boolean;
 }
 
-/** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
-export function computeRenta(input: RentaInput): RentaResult {
-  const { state, ccaa, family } = input;
-  const otherExpenses = generalExpenses(input);
-  const expenses = otherExpenses + positive(input.workExpensesExtra);
-  const netIncome = round2(
-    Math.max(0, positive(input.gross) - positive(input.socialSecurity) - expenses)
-  );
+function earnersOf(input: RentaInput): Earner[] {
+  const main: Earner = {
+    gross: positive(input.gross),
+    socialSecurity: positive(input.socialSecurity),
+    extra: positive(input.workExpensesExtra),
+    active: !input.retired,
+    disability: input.family.disability,
+    pensionPlan: positive(input.pensionPlan) + positive(input.pensionPlanEmployer),
+    main: true,
+  };
+  const partner = input.joint?.partner;
+  if (!partner) return [main];
+  return [
+    main,
+    {
+      gross: positive(partner.gross),
+      socialSecurity: positive(partner.socialSecurity),
+      extra: 0,
+      active: !partner.retired,
+      disability: partner.disability,
+      pensionPlan: positive(partner.pensionPlan),
+      main: false,
+    },
+  ];
+}
 
-  // The Tax Agency measures the reduction on the net pay before the "other expenses" of art. 19.2.f.
-  const reductionBase = round2(
-    Math.max(
-      0,
-      positive(input.gross) - positive(input.socialSecurity) - positive(input.workExpensesExtra)
-    )
-  );
+const disabilityExpense = (state: RentaState, level: Disability): number =>
+  level >= 65 ? state.workExpenses.disability65 : level >= 33 ? state.workExpenses.disability33 : 0;
 
+/**
+ * Net pay from work after the "other expenses" of art. 19.2.f (2,000 euros, more for an active
+ * worker with a disability or who moved), for one earner or for a family unit.
+ *
+ * Joint return, AEAT Manual práctico de Renta 2025, "En particular, análisis de los gastos del artículo
+ * 19.2.f)" (checked 19-10-2026, page of 17-03-2026): the increase for disability is a single one, the
+ * one of the active worker with the highest degree, and the increase for mobility is 2,000 € in all.
+ * The manual gives the 2,000 € "a todos los contribuyentes que obtengan rendimientos del trabajo" but
+ * also says these expenses "se aplican por unidad familiar" without spelling out this amount: we give
+ * 2,000 € to each earner and `oneGeneralExpense` shows what the other reading would cost.
+ */
+function workIncome(input: RentaInput, earners: Earner[]) {
+  const { state } = input;
+  // Net pay before the "other expenses": the reduction of art. 20 is measured on it.
+  const before = earners.map((e) => Math.max(0, e.gross - e.socialSecurity - e.extra));
+  let shares = earners.map((e) => (e.main || e.gross > 0 ? state.workExpenses.general : 0));
+  if (input.joint?.oneGeneralExpense) {
+    const top = before.indexOf(Math.max(...before));
+    shares = shares.map((_, i) => (i === top ? state.workExpenses.general : 0));
+  }
+  const increments = earners.map(() => 0);
+  const workers = earners.filter((e) => e.active && (e.main || e.gross > 0));
+  const disabled = workers.reduce<Earner | null>(
+    (best, e) =>
+      disabilityExpense(state, e.disability) >
+      (best ? disabilityExpense(state, best.disability) : 0)
+        ? e
+        : best,
+    null
+  );
+  if (disabled)
+    increments[earners.indexOf(disabled)] = disabilityExpense(state, disabled.disability);
+  if (input.geographicMobility) increments[0] += input.extras.geographicMobilityExtra;
+
+  const sum = (list: number[]) => list.reduce((a, b) => a + b, 0);
+  const afterShares = sum(before.map((b, i) => Math.max(0, b - shares[i])));
+  return {
+    otherExpenses: sum(shares) + sum(increments),
+    netIncome: round2(Math.max(0, afterShares - sum(increments))),
+    reductionBase: round2(sum(before)),
+    /** Each earner's own net pay: the 30 % limit of the pension plans is per member (art. 84.2.1.º). */
+    each: before.map((b, i) => Math.max(0, b - shares[i] - increments[i])),
+  };
+}
+
+/** From the net pay to the general and savings bases: other income, the reductions of the base. */
+function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof workIncome>) {
+  const { state } = input;
+  const partner = input.joint?.partner ?? null;
   const rentNet = rentalNet(input.rental);
   const imputed = round2(
     (positive(input.imputedValues.standard) * input.imputationRates.standard +
       positive(input.imputedValues.revised) * input.imputationRates.revised) /
       100
   );
-  const savingsBase = round2(positive(input.savings));
-  // The reduction for low pay only applies when the other income does not pass 6,500 euros.
-  const otherIncome = Math.max(0, rentNet) + imputed + savingsBase;
+  const savingsTotal = round2(positive(input.savings) + positive(partner?.savings ?? 0));
+  // The reduction for low pay only applies when the other income does not pass 6,500 euros; in a
+  // joint return it is one, on the net pay and the other income of the whole unit (AEAT Manual
+  // práctico de Renta 2025, "Fase 3.ª: rendimiento neto reducido", checked 19-10-2026).
+  const otherIncome = Math.max(0, rentNet) + imputed + savingsTotal;
   const reduction = round2(
     otherIncome > OTHER_INCOME_LIMIT
       ? 0
-      : Math.min(netIncome, positive(input.workReduction(reductionBase)))
+      : Math.min(work.netIncome, positive(input.workReduction(work.reductionBase)))
   );
 
-  const beforeReductions = netIncome - reduction + rentNet + imputed;
-  // Pension plans: own and employer's together up to the limit, and up to 30 % of the net work income.
-  const pensionCap = Math.min(
-    state.baseReductions.pensionPlanLimit + state.baseReductions.pensionPlanEmployerLimit,
-    netIncome * 0.3
-  );
+  const beforeReductions = work.netIncome - reduction + rentNet + imputed;
+  // Joint return (LIRPF art. 84.2.4.º; AEAT Manual 2025, "Reducción por tributación conjunta" and the
+  // order of the reductions of the general base, checked 19-10-2026): it goes first, lowers the
+  // general base down to zero and what is left lowers the savings base, also down to zero.
+  const jointAmount = positive(input.joint?.reduction ?? 0);
+  const jointGeneral = Math.min(jointAmount, Math.max(0, beforeReductions));
+  const jointSavings = Math.min(jointAmount - jointGeneral, savingsTotal);
+  const afterJoint = beforeReductions - jointGeneral;
+  // Pension plans: own and employer's together up to the limit, and up to 30 % of the net work
+  // income, for each member of the unit on their own (art. 84.2.1.º).
+  const pensionLimit =
+    state.baseReductions.pensionPlanLimit + state.baseReductions.pensionPlanEmployerLimit;
   const pensionReduction = round2(
     Math.min(
-      positive(input.pensionPlan) + positive(input.pensionPlanEmployer),
-      pensionCap,
-      Math.max(0, beforeReductions)
+      earners.reduce(
+        (sum, e, i) => sum + Math.min(e.pensionPlan, pensionLimit, work.each[i] * 0.3),
+        0
+      ),
+      Math.max(0, afterJoint)
     )
   );
   const otherReductions = round2(
     Math.min(
       Math.min(positive(input.spousePlan), 1000) + positive(input.compensatoryPension),
-      Math.max(0, beforeReductions - pensionReduction)
+      Math.max(0, afterJoint - pensionReduction)
     )
   );
-  const taxBase = round2(Math.max(0, beforeReductions - pensionReduction - otherReductions));
+  return {
+    rentNet,
+    imputed,
+    reduction,
+    beforeReductions,
+    jointReduction: round2(jointGeneral + jointSavings),
+    pensionReduction,
+    otherReductions,
+    taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
+    savingsBase: round2(savingsTotal - jointSavings),
+  };
+}
 
-  const stateMin = computeMinimum(family, state.minimums);
+/**
+ * The 340 € deduction for low pay (Renta 2025), held to the tax that is left. The AEAT Manual 2025
+ * (c18, "Deducción por obtención de rendimientos del trabajo", checked 19-10-2026) says nothing of
+ * joint returns: when all the pay and other income belong to one member every reading gives the
+ * same; otherwise it is left out (`clear` false) and the result says so.
+ */
+function lowPayOf(input: RentaInput, otherIncome: number, quotaLeft: number) {
+  const partner = input.joint?.partner ?? null;
+  // Pay from a job (not pensions or benefits) and the other income of each one.
+  const pay = (gross: number, nonSalary = 0) => Math.max(0, positive(gross) - positive(nonSalary));
+  const ownPay = pay(input.gross, input.nonSalaryIncome);
+  const partnerPay = partner ? pay(partner.gross, partner.nonSalaryIncome) : 0;
+  const partnerOther = positive(partner?.savings ?? 0);
+  const clear =
+    !partner || (partnerPay === 0 && partnerOther === 0) || (ownPay === 0 && otherIncome === 0);
+  const amount = clear
+    ? Math.min(quotaLeft, lowPayDeduction(ownPay + partnerPay, otherIncome + partnerOther))
+    : 0;
+  return { amount, clear };
+}
+
+/** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
+export function computeRenta(input: RentaInput): RentaResult {
+  const { state, ccaa, family } = input;
+  const partner = input.joint?.partner ?? null;
+  const earners = earnersOf(input);
+  const work = workIncome(input, earners);
+  const { otherExpenses, netIncome } = work;
+  const {
+    rentNet,
+    imputed,
+    reduction,
+    beforeReductions,
+    jointReduction,
+    pensionReduction,
+    otherReductions,
+    taxBase,
+    savingsBase,
+  } = basesOf(input, earners, work);
+
+  const stateMin = withPartner(computeMinimum(family, state.minimums), partner, state.minimums);
   const regionMinimums = mergeMinimums(state.minimums, ccaa.minimums);
-  const regionMin = computeMinimum(family, regionMinimums);
+  const regionMin = withPartner(computeMinimum(family, regionMinimums), partner, regionMinimums);
   const regionScale = ccaa.scale ?? state.defaultRegionalScale;
   const { savingsScale } = input.extras;
 
@@ -447,7 +623,11 @@ export function computeRenta(input: RentaInput): RentaResult {
   const lines: DeductionLine[] = [];
   const amountOf = (d: Deduction, scope: DeductionLine['scope']): number => {
     const choice = input.choices[d.id] ?? { on: false };
-    const factor = incomeFactor(d, limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }));
+    const factor = incomeFactor(
+      d,
+      limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }),
+      input.joint !== undefined
+    );
     if (choice.on && factor === 0) blocked.push(d.id);
     const amount = deductionAmount(d, choice, factor);
     if (choice.on) lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });
@@ -465,13 +645,8 @@ export function computeRenta(input: RentaInput): RentaResult {
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
-  const lowPay = Math.min(
-    quotaLeft,
-    lowPayDeduction(
-      Math.max(0, positive(input.gross) - positive(input.nonSalaryIncome ?? 0)),
-      Math.max(0, rentNet) + imputed + positive(input.savings)
-    )
-  );
+  const low = lowPayOf(input, Math.max(0, rentNet) + imputed + positive(input.savings), quotaLeft);
+  const lowPay = low.amount;
   if (lowPay > 0) {
     lines.push({
       id: 'estado-rendimientos-trabajo-bajos',
@@ -482,6 +657,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     });
   }
   const netQuota = round2(quotaLeft - lowPay - refundable);
+  const withheld = round2(positive(input.withheld) + positive(partner?.withheld ?? 0));
   return {
     otherExpenses,
     netIncome,
@@ -490,6 +666,8 @@ export function computeRenta(input: RentaInput): RentaResult {
     imputedIncome: imputed,
     pensionReduction,
     otherReductions,
+    jointReduction,
+    lowPayLeftOut: !low.clear,
     generalBase: round2(Math.max(0, beforeReductions)),
     taxBase,
     savingsBase,
@@ -505,7 +683,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     blocked,
     lines,
     netQuota,
-    withheld: round2(positive(input.withheld)),
-    result: round2(netQuota - positive(input.withheld)),
+    withheld,
+    result: round2(netQuota - withheld),
   };
 }
