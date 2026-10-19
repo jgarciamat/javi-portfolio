@@ -10,6 +10,7 @@ import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } f
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 import { round2 } from './round';
 import type { PropertyResult } from './rentaRentals';
+import { donationChoices, type DonationInput } from './rentaDonations';
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
@@ -416,6 +417,8 @@ export interface RentaInput {
   imputationRates: { standard: number; revised: number };
   /** The deductions chosen, by id. */
   choices: Record<string, DeductionChoice>;
+  /** What was given to NGOs and foundations: it replaces the choices of the donations (rentaDonations.ts). */
+  donations?: DonationInput;
   /** Reduction of the net income from work for low incomes (see the State's rules). */
   workReduction: (netIncome: number) => number;
   /** A joint return: the person files together with their family unit (see {@link JointInput}). */
@@ -968,8 +971,13 @@ export function computeRenta(input: RentaInput): RentaResult {
       (stateQuota + regionalQuota);
     minimumSavings[item.key] = round2(Math.max(0, saved));
   }
+  // What was given (not the deduction) is turned into the deductions with the limit of the base.
+  const donated = donationChoices(input.donations, taxBase + savingsBase);
+  const withDonations = donated ? { ...input, choices: { ...input.choices, ...donated } } : input;
   const { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived } =
-    deductionsOf(input, (d) => limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }));
+    deductionsOf(withDonations, (d) =>
+      limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
+    );
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);

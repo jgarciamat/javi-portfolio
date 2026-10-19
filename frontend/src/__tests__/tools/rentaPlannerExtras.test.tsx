@@ -230,7 +230,7 @@ describe('Renta planner: the model that asks for the advance payment', () => {
       .closest('.renta-deduction') as HTMLElement;
     expect(within(large).getByText('Modelo 143')).toBeInTheDocument();
     const donations = screen
-      .getByText(/Donativos a ONG/, { selector: 'strong' })
+      .getByText(/Cuotas y aportaciones a partidos/, { selector: 'strong' })
       .closest('.renta-deduction') as HTMLElement;
     expect(within(donations).queryByText(/Modelo/)).toBeNull();
   });

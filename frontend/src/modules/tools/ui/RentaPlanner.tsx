@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { NewReturn, UnderYear } from './renta/NewReturn';
+import { DonationsFields } from './renta/DonationsFields';
 import { OutOfScope, scopeOf } from './renta/Residence';
 import type { ResidenceScope } from '../domain/rentaResidence';
 import { storage } from '@shared/utils/storage';
@@ -369,7 +370,17 @@ export function RentaPlanner({
         markedSaving={saved}
         onChange={setChoice}
         n={expert ? 5 : 3}
-        lead={<InvestCard form={form} set={set} input={input} />}
+        lead={
+          <>
+            <InvestCard form={form} set={set} input={input} />
+            <h3>{t('tools.renta.donations.title')}</h3>
+            <DonationsFields
+              form={form}
+              set={set}
+              taxBase={live.result.taxBase + live.result.savingsBase}
+            />
+          </>
+        }
       />
 
       <ResultSection

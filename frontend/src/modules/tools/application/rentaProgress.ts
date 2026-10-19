@@ -1,6 +1,12 @@
 import { storage } from '@shared/utils/storage';
 import { NO_DRAFT, type DraftReading, type DraftState } from '../domain/rentaDraft';
-import { emptyForm, emptyPartner, type RentaForm, type UnrentedForm } from '../domain/rentaForm';
+import {
+  emptyDonations,
+  emptyForm,
+  emptyPartner,
+  type RentaForm,
+  type UnrentedForm,
+} from '../domain/rentaForm';
 import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 import type { ActivityInput } from '../domain/rentaActivity';
 import type { SavingsDetail } from '../domain/rentaGains';
@@ -95,6 +101,7 @@ function withOptional(form: RentaForm, saved: Record<string, unknown>): RentaFor
   if (isDetail(saved.savingsDetail)) form.savingsDetail = saved.savingsDetail;
   if (Array.isArray(saved.activities)) form.activities = saved.activities.filter(isActivity);
   if (isObject(saved.residence)) form.residence = over(emptyResidence(), saved.residence);
+  if (isObject(saved.donations)) form.donations = over(emptyDonations(), saved.donations);
   // Each rented property over an empty one: a field of the wrong kind is left empty.
   if (Array.isArray(saved.properties))
     form.properties = saved.properties

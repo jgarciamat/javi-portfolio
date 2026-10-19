@@ -12,6 +12,7 @@ import type { Choice } from '../../domain/rentaForm';
 import { number } from '../../domain/rentaForm';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
+import { DONATION_IDS } from '../../domain/rentaDonations';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
@@ -445,6 +446,8 @@ export function PendingNotice({ pending }: { pending: string[] }) {
   );
 }
 
+const DONATIONS: string[] = Object.values(DONATION_IDS);
+
 /** Step 4: the deductions of the State and of the community, by group. */
 export function DeductionsStep({
   state,
@@ -494,7 +497,8 @@ export function DeductionsStep({
       <DeductionList
         title={t('tools.renta.stateDeductions')}
         hint={t('tools.renta.stateHint')}
-        deductions={state.deductions}
+        // The donations are asked by what was given, in their own fields (DonationsFields).
+        deductions={state.deductions.filter((d) => !DONATIONS.includes(d.id))}
         choices={choices}
         family={family}
         blocked={blocked}

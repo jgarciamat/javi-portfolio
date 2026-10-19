@@ -102,9 +102,10 @@ describe('Renta planner: the draft next to the planner', () => {
     expect(within(row('0414')).getByText('=')).toBeInTheDocument();
     expect(within(row('0595')).getByText(why('deductions'))).toBeInTheDocument();
 
-    const gift = document.getElementById('renta-ded-estado-donativos-ley-49-2002') as HTMLElement;
-    fireEvent.click(within(gift).getByRole('checkbox'));
-    fireEvent.change(within(gift).getByRole('textbox'), { target: { value: '36' } });
+    // What was given (45 €), not the deduction: 80 % = 36 €, half of it in the State part (0552).
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.donations.general')), {
+      target: { value: '45' },
+    });
     expect(
       await screen.findByText(tr('tools.renta.compare.allMatch'), { exact: false })
     ).toBeInTheDocument();

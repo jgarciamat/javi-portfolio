@@ -21,6 +21,7 @@ import { DraftStep } from './DraftStep';
 import { QuestionBody, ready as guidedReady } from './GuidedInterview';
 import { InvestCard, InvestLink } from './InvestCard';
 import { NewReturn } from './NewReturn';
+import { DonationsFields } from './DonationsFields';
 import { Optimizer } from './Optimizer';
 import { ResidenceQuestions, scopeOf } from './Residence';
 import { AddProperty, PropertyCard } from './PropertyCard';
@@ -58,17 +59,7 @@ const ICONS: Record<string, string> = {
 /** Step by step or everything together: remembered on this device. */
 export const ASSISTANT_KEY = 'mm_renta_assistant';
 export const wizardKey = (year: number) => `mm_renta_wizard_${year}`;
-const DONATIONS = 'estado-donativos-ley-49-2002';
 
-/**
- * The deduction of what was donated (the planner takes the deduction itself, in euros): 80 % of
- * the first 250 € and 40 % of the rest (Ley 49/2002, art. 19.1, as in the State's data). The 45 %
- * for giving to the same body three years running is left out: it is asked in the full list.
- */
-export function donationDeduction(given: number): number {
-  const first = Math.min(given, 250);
-  return Math.round((first * 0.8 + Math.max(0, given - 250) * 0.4) * 100) / 100;
-}
 const AEAT = 'https://sede.agenciatributaria.gob.es/';
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -334,32 +325,17 @@ function activityScreen(ctx: Ctx): WizardScreen {
 }
 
 function deductionScreens(ctx: Ctx): WizardScreen[] {
-  const { p, t } = ctx;
-  const donation = p.form.choices[DONATIONS];
-  const given = ctx.answers.donationsGiven ?? '';
+  const { p } = ctx;
   return [
     guided(ctx, 'plan'),
     yesNo(
       ctx,
       'donations',
-      <div className="tools-form">
-        <Field
-          id="renta-wiz-donations"
-          label={t(w('donationsAmount'))}
-          hint={t(w('donationsAmountHint'))}
-          value={given}
-          onChange={(typed) => {
-            ctx.answer('donationsGiven', typed);
-            const deduction = donationDeduction(number(typed));
-            p.setChoice(DONATIONS, {
-              ...donation,
-              units: '',
-              on: deduction > 0,
-              amount: deduction > 0 ? String(deduction) : '',
-            });
-          }}
-        />
-      </div>
+      <DonationsFields
+        form={p.form}
+        set={p.set}
+        taxBase={p.live.result.taxBase + p.live.result.savingsBase}
+      />
     ),
     yesNo(
       ctx,

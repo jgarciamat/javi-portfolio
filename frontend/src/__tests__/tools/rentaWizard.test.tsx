@@ -199,9 +199,14 @@ describe('the Renta step by step: the other paths', () => {
     type(tr('tools.renta.pension'), '1000');
     next();
     own('donations', 'yes');
-    type(tr('wizard.renta.donationsAmount'), '150');
-    type(tr('wizard.renta.donationsAmount'), '');
-    type(tr('wizard.renta.donationsAmount'), '300');
+    // What was given, not the deduction; and whether it was the same entity three years running.
+    type(tr('tools.renta.donations.general'), '300');
+    pick(tr('tools.renta.donations.recurrentOpt.yes'));
+    type(tr('tools.renta.donations.recurrent'), '300');
+    // 80 % of 250 and 45 % of 50 (recurrent) = 222.50.
+    expect(screen.getByText(/te deducen 222,50/)).toBeInTheDocument();
+    pick(tr('tools.renta.donations.recurrentOpt.no'));
+    expect(screen.queryByLabelText(tr('tools.renta.donations.recurrent'))).toBeNull();
     next();
     own('others', 'yes');
     expect(screen.getByText(tr('tools.renta.stateDeductions'))).toBeInTheDocument();

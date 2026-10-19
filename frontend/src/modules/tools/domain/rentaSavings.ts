@@ -1,6 +1,14 @@
 import { computeRenta, type DeductionChoice, type RentaInput, type RentaResult } from './rentaCalc';
 import type { Deduction } from './rentaData';
 import { round2 } from './round';
+import { DONATION_IDS, type DonationInput } from './rentaDonations';
+
+/** What each donation deduction is made of: taken out to know what it saves. */
+const DONATION_KINDS: Record<string, Partial<DonationInput>> = {
+  [DONATION_IDS.general]: { general: 0, recurrent: 0 },
+  [DONATION_IDS.priority]: { priority: 0, priorityRecurrent: 0 },
+  [DONATION_IDS.other]: { other: 0 },
+};
 
 /** Amounts used when the person has not typed one, always shown as an example. */
 export const EXAMPLE_SPENT = 1000;
@@ -37,6 +45,17 @@ export function deductionSavings(
 ): Record<string, DeductionSaving> {
   const savings: Record<string, DeductionSaving> = {};
   for (const d of deductions) {
+    // The donations typed as what was given: their saving is the result without that kind.
+    const kind = DONATION_KINDS[d.id];
+    if (input.donations && kind) {
+      const without = computeRenta({ ...input, donations: { ...input.donations, ...kind } });
+      savings[d.id] = {
+        saving: round2(Math.max(0, without.result - current.result)),
+        blocked: false,
+        example: null,
+      };
+      continue;
+    }
     const chosen = input.choices[d.id];
     const typed = (chosen?.amount ?? 0) > 0;
     const example = d.kind !== 'fixed' && !typed ? exampleAmount(d) : null;
@@ -64,5 +83,6 @@ export function deductionSavings(
 /** What all the marked deductions save together (less than the sum when the tax runs out). */
 export function markedSaving(input: RentaInput, current: RentaResult): number {
   const none = Object.fromEntries(Object.keys(input.choices).map((id) => [id, { on: false }]));
-  return round2(Math.max(0, computeRenta({ ...input, choices: none }).result - current.result));
+  const without = computeRenta({ ...input, choices: none, donations: undefined });
+  return round2(Math.max(0, without.result - current.result));
 }

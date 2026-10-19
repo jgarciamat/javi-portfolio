@@ -51,6 +51,23 @@ export interface PartnerForm {
   pension: string;
 }
 
+/** What was given in the year, as typed (see `DonationInput`). */
+export interface DonationForm {
+  general: string;
+  recurrent: string;
+  priority: string;
+  priorityRecurrent: string;
+  other: string;
+}
+
+export const emptyDonations = (): DonationForm => ({
+  general: '',
+  recurrent: '',
+  priority: '',
+  priorityRecurrent: '',
+  other: '',
+});
+
 /** Whether the person can file with a family unit: '' not answered yet. */
 export type JointChoice = '' | 'none' | 'couple' | 'single';
 
@@ -122,6 +139,8 @@ export interface RentaForm {
   partner: PartnerForm;
   /** Single parent: lives with the father or mother of one of the children (no joint reduction). */
   otherParent: boolean;
+  /** What was given to NGOs and foundations (rentaDonations.ts): the deduction is worked out from it. */
+  donations?: DonationForm;
   /** The option picked in each guided question, by question id. */
   answers: Record<string, string>;
   /** Rent of the home paid in the year, and mortgage paid for a home bought before 2013 (guided). */
@@ -387,6 +406,17 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
       revised: data.property.imputation.revisedRate,
     },
     choices: choicesOf(form),
+    ...(form.donations
+      ? {
+          donations: {
+            general: number(form.donations.general),
+            recurrent: number(form.donations.recurrent),
+            priority: number(form.donations.priority),
+            priorityRecurrent: number(form.donations.priorityRecurrent),
+            other: number(form.donations.other),
+          },
+        }
+      : {}),
     workReduction: data.workReduction,
   };
 }

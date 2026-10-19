@@ -137,7 +137,7 @@ describe('Renta planner: deductions', () => {
 
   it('marks a deduction, asks for the amount and says what it gives', async () => {
     await open();
-    const donations = screen.getByText(/Donativos a ONG y entidades/);
+    const donations = screen.getByText(/Cuotas y aportaciones a partidos/);
     const row = donations.closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
     expect(within(row).getByText(tr('tools.renta.gives'), { exact: false })).toBeInTheDocument();
