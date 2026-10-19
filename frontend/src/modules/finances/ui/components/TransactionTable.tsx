@@ -5,6 +5,9 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
 import { EmptyState } from '@shared/components/EmptyState';
 import { useMediaQuery } from '@shared/hooks/useMediaQuery';
+import type { RowSelection } from '@shared/hooks/useRowSelection';
+import { SelectAllBar, SelectCheckbox } from '@shared/components/BulkSelection';
+import { DayCheckbox, RowCheckbox, selectableRow } from './TransactionSelect';
 import type { Transaction } from '@modules/finances/domain/types';
 import { useTransactionTable } from '../../application/hooks/useTransactionTable';
 import { SignedAmount, TypeBadge } from './TransactionBits';
@@ -21,6 +24,8 @@ export interface TransactionTableProps {
   onEdit: (tx: Transaction) => void;
   /** With two or more accounts: each movement says which one it belongs to. */
   showAccount?: boolean;
+  /** Multiple selection shared with the other views of the month. */
+  selection: RowSelection;
 }
 
 type TableState = ReturnType<typeof useTransactionTable>;
@@ -110,15 +115,14 @@ function DayToggle({
   );
 }
 
-function DesktopTable({
-  table,
-  onEdit,
-  showAccount,
-}: {
+interface ListProps {
   table: TableState;
   onEdit: RowProps['onEdit'];
   showAccount?: boolean;
-}) {
+  selection: RowSelection;
+}
+
+function DesktopTable({ table, onEdit, showAccount, selection }: ListProps) {
   const { t, tCategory } = useI18n();
   const { date } = useFormat();
   const headers = [
@@ -136,6 +140,13 @@ function DesktopTable({
         <caption className="sr-only">{t('app.transaction.table.caption')}</caption>
         <thead>
           <tr>
+            <th scope="col" className="tx-cell-select">
+              <SelectCheckbox
+                state={selection.header}
+                label={t('app.bulk.selectAll')}
+                onToggle={selection.toggleAll}
+              />
+            </th>
             {headers.map((h) => (
               <th key={h} scope="col">
                 {t(`app.transaction.table.${h}`)}
@@ -152,6 +163,9 @@ function DesktopTable({
             return (
               <Fragment key={dayKey}>
                 <tr className="tx-day-separator">
+                  <td className="tx-cell-select">
+                    <DayCheckbox label={label} items={items} selection={selection} />
+                  </td>
                   <td colSpan={headers.length + 1}>
                     <DayToggle
                       className="tx-day-label tx-day-toggle"
@@ -164,7 +178,10 @@ function DesktopTable({
                 </tr>
                 {!collapsed &&
                   items.map((tx) => (
-                    <tr key={tx.id}>
+                    <tr key={tx.id} {...selectableRow(tx, selection)}>
+                      <td className="tx-cell-select">
+                        <RowCheckbox tx={tx} selection={selection} />
+                      </td>
                       <td className="tx-cell-date">{date(tx.date)}</td>
                       <td className="tx-cell-description">{tx.description}</td>
                       {showAccount && <td className="tx-cell-account">{tx.accountName}</td>}
@@ -194,33 +211,30 @@ function DesktopTable({
   );
 }
 
-function MobileCardList({
-  table,
-  onEdit,
-  showAccount,
-}: {
-  table: TableState;
-  onEdit: RowProps['onEdit'];
-  showAccount?: boolean;
-}) {
+function MobileCardList({ table, onEdit, showAccount, selection }: ListProps) {
   const { tCategory } = useI18n();
   const { date } = useFormat();
   return (
     <div className="tx-card-list tx-card-list--visible">
+      <SelectAllBar selection={selection} />
       {table.groups.map(({ dayKey, label, items }) => {
         const collapsed = table.isCollapsed(dayKey);
         return (
           <div key={dayKey}>
-            <DayToggle
-              className="tx-day-header tx-day-toggle"
-              label={label}
-              count={items.length}
-              collapsed={collapsed}
-              onToggle={() => table.toggleDay(dayKey)}
-            />
+            <div className="tx-day-select">
+              <DayCheckbox label={label} items={items} selection={selection} />
+              <DayToggle
+                className="tx-day-header tx-day-toggle"
+                label={label}
+                count={items.length}
+                collapsed={collapsed}
+                onToggle={() => table.toggleDay(dayKey)}
+              />
+            </div>
             {!collapsed &&
               items.map((tx) => (
-                <div key={tx.id} className="tx-card">
+                <div key={tx.id} {...selectableRow(tx, selection, 'tx-card')}>
+                  <RowCheckbox tx={tx} selection={selection} />
                   <div className="tx-card-left">
                     <div className="tx-card-desc">{tx.description}</div>
                     <div className="tx-card-meta">
@@ -249,6 +263,7 @@ export function TransactionTable({
   onPatch,
   onEdit,
   showAccount,
+  selection,
 }: TransactionTableProps) {
   const { t, locale } = useI18n();
   const mobile = useMediaQuery(MOBILE_QUERY);
@@ -266,9 +281,19 @@ export function TransactionTable({
         </p>
       )}
       {mobile ? (
-        <MobileCardList table={table} onEdit={onEdit} showAccount={showAccount} />
+        <MobileCardList
+          table={table}
+          onEdit={onEdit}
+          showAccount={showAccount}
+          selection={selection}
+        />
       ) : (
-        <DesktopTable table={table} onEdit={onEdit} showAccount={showAccount} />
+        <DesktopTable
+          table={table}
+          onEdit={onEdit}
+          showAccount={showAccount}
+          selection={selection}
+        />
       )}
       {table.pendingDeleteId !== null && (
         <ConfirmDeleteModal onConfirm={table.confirmDelete} onCancel={table.cancelDelete} />

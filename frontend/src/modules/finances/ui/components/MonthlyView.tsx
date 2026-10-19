@@ -11,6 +11,9 @@ import {
   type TransactionViewMode,
 } from '../../application/hooks/useTransactionView';
 import { useGettingStarted } from '../../application/hooks/useGettingStarted';
+import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
+import { useRowSelection } from '@shared/hooks/useRowSelection';
+import { TransactionBulkActions } from './TransactionBulkActions';
 import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
@@ -105,10 +108,13 @@ function MovementsPanel({
   const { t, locale } = useI18n();
   const f = useFinances();
   const showAccount = f.accounts.filter((a) => !a.archived).length > 1;
-  const transactions = useMemo(
-    () => (accountId ? f.transactions.filter((tx) => tx.accountId === accountId) : f.transactions),
-    [f.transactions, accountId]
-  );
+  const bulk = useTransactionBulk();
+  const transactions = useMemo(() => {
+    const hidden = new Set(bulk.hidden);
+    return f.transactions.filter(
+      (tx) => !hidden.has(tx.id) && (!accountId || tx.accountId === accountId)
+    );
+  }, [f.transactions, accountId, bulk.hidden]);
   const range = useMemo(
     () => periodRange(f.year, f.month, f.periodStart, f.periodEnd),
     [f.year, f.month, f.periodStart, f.periodEnd]
@@ -120,6 +126,15 @@ function MovementsPanel({
     month: f.month,
     range,
   });
+  // Rows in the order of the view on screen, so Shift ranges follow what the user sees.
+  const order = useMemo(
+    () =>
+      (view.mode === 'week' ? view.weekGroups.flatMap((w) => w.days) : view.dayGroups).flatMap(
+        (d) => d.items.map((tx) => tx.id)
+      ),
+    [view.mode, view.weekGroups, view.dayGroups]
+  );
+  const selection = useRowSelection(order);
 
   return (
     <>
@@ -154,9 +169,12 @@ function MovementsPanel({
             onDelete={f.removeTransaction}
             onPatch={f.patchTransaction}
             onEdit={onEdit}
+            selection={selection}
           />
         )}
-        {view.mode === 'week' && <TransactionWeekView weekGroups={view.weekGroups} />}
+        {view.mode === 'week' && (
+          <TransactionWeekView weekGroups={view.weekGroups} selection={selection} />
+        )}
         {view.mode === 'calendar' && (
           <TransactionCalendarView
             calendarRows={view.calendarRows}
@@ -165,6 +183,7 @@ function MovementsPanel({
             range={range}
           />
         )}
+        <TransactionBulkActions selection={selection} transactions={transactions} bulk={bulk} />
       </CollapsiblePanel>
     </>
   );

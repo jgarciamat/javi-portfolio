@@ -2,17 +2,31 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { EmptyState } from '@shared/components/EmptyState';
 import { useToggleSet } from '@shared/hooks/useToggleSet';
+import type { RowSelection } from '@shared/hooks/useRowSelection';
+import { SelectAllBar } from '@shared/components/BulkSelection';
 import type { WeekGroup } from '@modules/finances/domain/transactionGrouping';
 import type { Transaction } from '@modules/finances/domain/types';
 import { SignedAmount, TypeBadge } from './TransactionBits';
+import { DayCheckbox, RowCheckbox, selectableRow } from './TransactionSelect';
 import '../css/TransactionViews.css';
 import { Icon } from '@shared/components/Icon';
 
 /** Compact movement row shared by the week view and the calendar day popup. */
-export function MovementItem({ tx, prefix }: { tx: Transaction; prefix: 'tx-week' | 'cal-modal' }) {
+export function MovementItem({
+  tx,
+  prefix,
+  selection,
+}: {
+  tx: Transaction;
+  prefix: 'tx-week' | 'cal-modal';
+  /** The week view lets movements be selected; the calendar popup does not. */
+  selection?: RowSelection;
+}) {
   const { tCategory } = useI18n();
+  const base = `${prefix}-item ${prefix}-item--${tx.type.toLowerCase()}`;
   return (
-    <div className={`${prefix}-item ${prefix}-item--${tx.type.toLowerCase()}`}>
+    <div {...(selection ? selectableRow(tx, selection, base) : { className: base })}>
+      {selection && <RowCheckbox tx={tx} selection={selection} />}
       <div className={`${prefix}-item-accent`} />
       <div className={`${prefix}-item-body`}>
         <span className={`${prefix}-item-desc`}>{tx.description}</span>
@@ -55,7 +69,13 @@ function WeekTotals({ totals }: { totals: WeekGroup['totals'] }) {
 }
 
 /** Movements grouped by week; weeks start collapsed and show their totals. */
-export function TransactionWeekView({ weekGroups }: { weekGroups: WeekGroup[] }) {
+export function TransactionWeekView({
+  weekGroups,
+  selection,
+}: {
+  weekGroups: WeekGroup[];
+  selection: RowSelection;
+}) {
   const { t } = useI18n();
   const expanded = useToggleSet();
 
@@ -65,6 +85,7 @@ export function TransactionWeekView({ weekGroups }: { weekGroups: WeekGroup[] })
 
   return (
     <div className="tx-week-list">
+      <SelectAllBar selection={selection} />
       {weekGroups.map(({ weekKey, label, days, totals }) => {
         const open = expanded.has(weekKey);
         return (
@@ -97,12 +118,13 @@ export function TransactionWeekView({ weekGroups }: { weekGroups: WeekGroup[] })
               days.map(({ dayKey, label: dayLabel, items }) => (
                 <div key={dayKey} className="tx-week-day">
                   <div className="tx-day-header">
+                    <DayCheckbox label={dayLabel} items={items} selection={selection} />
                     <span>{dayLabel}</span>
                     <span className="tx-day-count">({items.length})</span>
                   </div>
                   <div className="tx-week-items">
                     {items.map((tx) => (
-                      <MovementItem key={tx.id} tx={tx} prefix="tx-week" />
+                      <MovementItem key={tx.id} tx={tx} prefix="tx-week" selection={selection} />
                     ))}
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 /**
  * Less common paths: failures, empty data, unusual data and race conditions.
  */
+import type { RowSelection } from '@shared/hooks/useRowSelection';
 import { StrictMode } from 'react';
 import {
   act,
@@ -409,7 +410,8 @@ describe('finances edge cases', () => {
   });
 
   it('renders the empty week view and category charts without totals', () => {
-    renderWithI18n(<TransactionWeekView weekGroups={[]} />);
+    // Nothing to select in an empty week view.
+    renderWithI18n(<TransactionWeekView weekGroups={[]} selection={{} as RowSelection} />);
     expect(screen.getByText(tr('app.transaction.table.empty'))).toBeInTheDocument();
     renderWithI18n(
       <CategoryChart

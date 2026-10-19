@@ -61,6 +61,20 @@ const cases: Case[] = [
   ],
   ['delete movement', () => transactionApi.delete('t1'), 'DELETE', '/transactions/t1'],
   [
+    'bulk delete',
+    () => transactionApi.bulkDelete(['t1', 't2']),
+    'POST',
+    '/transactions/bulk-delete',
+    { ids: ['t1', 't2'] },
+  ],
+  [
+    'bulk update',
+    () => transactionApi.bulkUpdate(['t1'], { notes: 'n', notesMode: 'append' }),
+    'PATCH',
+    '/transactions/bulk',
+    { ids: ['t1'], changes: { notes: 'n', notesMode: 'append' } },
+  ],
+  [
     'search',
     () => transactionApi.search({ q: 'cine', categoryIds: ['a', 'b'], sort: 'date_desc' }),
     'GET',

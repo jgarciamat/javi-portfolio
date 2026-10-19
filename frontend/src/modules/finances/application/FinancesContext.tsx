@@ -7,6 +7,8 @@ import { useResource } from '@shared/hooks/useResource';
 import type {
   Account,
   BudgetLine,
+  BulkResult,
+  BulkTransactionChanges,
   Category,
   CreateCategoryDTO,
   CreateTransactionDTO,
@@ -20,6 +22,7 @@ import type { YearMonth } from '@modules/finances/domain/nextMonthLogic';
 import { useMonthNavigation } from './hooks/useMonthNavigation';
 import { useMonthData } from './hooks/useMonthData';
 import { useCategoryActions } from './hooks/useCategoryActions';
+import { useBulkTransactions } from './hooks/useBulkTransactions';
 import { CustomAlertsProvider } from './CustomAlertsContext';
 
 // ─── State & Actions ──────────────────────────────────────────────────────────
@@ -56,6 +59,9 @@ interface FinancesActions {
   removeTransaction: (id: string) => Promise<void>;
   patchTransaction: (id: string, changes: { notes?: string | null }) => Promise<void>;
   updateTransaction: (id: string, dto: UpdateTransactionDTO) => Promise<void>;
+  /** Bulk actions: the month shows the change at once, then figures and balances reload. */
+  bulkDeleteTransactions: (ids: string[]) => Promise<BulkResult>;
+  bulkUpdateTransactions: (ids: string[], changes: BulkTransactionChanges) => Promise<BulkResult>;
   addCategory: (dto: CreateCategoryDTO) => Promise<Category>;
   updateCategory: (id: string, dto: Partial<CreateCategoryDTO>) => Promise<Category>;
   removeCategory: (id: string, reassignTo?: string) => Promise<void>;
@@ -167,6 +173,14 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     [dropCategory, afterMutation]
   );
 
+  const { bulkDeleteTransactions, bulkUpdateTransactions } = useBulkTransactions({
+    transactionApi,
+    setOverview,
+    afterMutation,
+    categories,
+    accounts: accounts.data,
+  });
+
   const value = useMemo<FinancesContextValue>(
     () => ({
       ...nav,
@@ -186,6 +200,8 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       removeTransaction,
       patchTransaction,
       updateTransaction,
+      bulkDeleteTransactions,
+      bulkUpdateTransactions,
       addCategory,
       updateCategory,
       removeCategory,
@@ -204,6 +220,8 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
       removeTransaction,
       patchTransaction,
       updateTransaction,
+      bulkDeleteTransactions,
+      bulkUpdateTransactions,
       addCategory,
       updateCategory,
       removeCategory,

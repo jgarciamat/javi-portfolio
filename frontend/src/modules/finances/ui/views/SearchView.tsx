@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -13,12 +13,25 @@ import type {
 } from '@modules/finances/domain/types';
 import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
+import { useRowSelection, type RowSelection } from '@shared/hooks/useRowSelection';
+import {
+  SelectAllBar,
+  handleRowGesture,
+  preventShiftTextSelection,
+} from '@shared/components/BulkSelection';
+import { BULK_MAX } from '@modules/finances/domain/transactionBulk';
 import { useFinances } from '../../application/FinancesContext';
+import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
 import { SignedAmount } from '../components/TransactionBits';
+import { TransactionBulkActions } from '../components/TransactionBulkActions';
+import { RowCheckbox } from '../components/TransactionSelect';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 
 const PAGE = 50;
+const NONE: Transaction[] = [];
+/** Biggest page the server serves, used to bring every match for "select all". */
+const FULL_PAGE = 200;
 
 interface SearchViewProps {
   onEdit: (tx: Transaction) => void;
@@ -157,12 +170,14 @@ function SearchResults({
   showAccount,
   onEdit,
   onMore,
+  selection,
 }: {
   result: TransactionSearchResult;
   loading: boolean;
   showAccount: boolean;
   onEdit: (tx: Transaction) => void;
   onMore: () => void;
+  selection: RowSelection;
 }) {
   const { t, tCategory } = useI18n();
   const { money, date } = useFormat();
@@ -176,14 +191,26 @@ function SearchResults({
           <span className="amount-saving">🐷 {money(result.totals.saving)}</span>
         )}
       </div>
-      {result.items.length === 0 && <p className="empty-state">{t('app.search.empty')}</p>}
+      {result.items.length === 0 ? (
+        <p className="empty-state">{t('app.search.empty')}</p>
+      ) : (
+        <SelectAllBar selection={selection} />
+      )}
       <ul className="entity-list">
         {result.items.map((tx) => (
-          <li key={tx.id}>
+          <li
+            key={tx.id}
+            className={`search-row${selection.isSelected(tx.id) ? ' is-selected' : ''}`}
+          >
+            <RowCheckbox tx={tx} selection={selection} />
             <button
               type="button"
               className="entity-item entity-item--clickable"
-              onClick={() => onEdit(tx)}
+              onMouseDown={preventShiftTextSelection}
+              onClick={(e) => {
+                // Shift / Ctrl / Cmd click selects; a plain click still opens the movement.
+                if (!handleRowGesture(e, tx.id, selection)) onEdit(tx);
+              }}
             >
               <span className="entity-icon">{tx.categoryIcon ?? '•'}</span>
               <span className="entity-main">
@@ -225,17 +252,48 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
     return () => clearTimeout(id);
   }, [text]);
 
+  const [reloads, setReloads] = useState(0);
   const firstPage = useResource(
     () => transactionApi.search({ ...filters, limit: PAGE, offset: 0 }),
-    [transactionApi, filters, refreshKey]
+    [transactionApi, filters, refreshKey, reloads]
   );
+  // After a bulk action the results are read again from the first page.
+  const bulk = useTransactionBulk(() => {
+    setMore({ for: filters, items: [] });
+    setReloads((n) => n + 1);
+  });
 
   // Pages loaded with "more" only belong to the filters they were loaded for.
-  const extra = more.for === filters ? more.items : [];
+  const extra = more.for === filters ? more.items : NONE;
+  const items = useMemo(() => {
+    const hidden = new Set(bulk.hidden);
+    return [...(firstPage.data?.items ?? NONE), ...extra].filter((tx) => !hidden.has(tx.id));
+  }, [firstPage.data, extra, bulk.hidden]);
   const result: TransactionSearchResult | undefined = firstPage.data && {
     ...firstPage.data,
-    items: [...firstPage.data.items, ...extra],
+    // Movements waiting for the undo of a delete are already out of the list.
+    total: firstPage.data.total - bulk.hidden.length,
+    items,
   };
+  const ids = useMemo(() => items.map((tx) => tx.id), [items]);
+  const selection = useRowSelection(ids);
+
+  /** Brings every match (up to the bulk limit) and selects them all. */
+  const selectMatching = () =>
+    loadingMore.run(async () => {
+      const total = Math.min(result!.total, BULK_MAX);
+      const loaded = [...extra];
+      const first = firstPage.data!.items;
+      for (let offset = first.length + loaded.length; offset < total; offset += FULL_PAGE) {
+        const page = await transactionApi.search({ ...filters, limit: FULL_PAGE, offset });
+        loaded.push(...page.items);
+      }
+      setMore({ for: filters, items: loaded });
+      selection.setMany(
+        [...first, ...loaded].map((tx) => tx.id),
+        true
+      );
+    });
 
   const loadMore = (offset: number) =>
     loadingMore.run(async () => {
@@ -271,7 +329,16 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
           loading={firstPage.loading || loadingMore.pending}
           showAccount={accounts.length > 1}
           onEdit={onEdit}
-          onMore={() => loadMore(result.items.length)}
+          onMore={() => loadMore(firstPage.data!.items.length + extra.length)}
+          selection={selection}
+        />
+      )}
+      {result && (
+        <TransactionBulkActions
+          selection={selection}
+          transactions={result.items}
+          bulk={bulk}
+          matching={{ total: result.total, onSelect: () => void selectMatching() }}
         />
       )}
     </div>

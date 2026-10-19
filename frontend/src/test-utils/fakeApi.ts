@@ -84,6 +84,8 @@ export function createFakeApi(): FakeApi {
       update: ok(f.transaction()),
       patch: ok(f.transaction()),
       delete: ok(undefined),
+      bulkDelete: ok({ applied: [], skipped: [] }),
+      bulkUpdate: ok({ applied: [], skipped: [] }),
       search: ok({ items: [], total: 0, totals: { income: 0, expenses: 0, saving: 0 } }),
       getAnnual: ok({ year: 2026, months: {} }),
       import: ok({ dryRun: true, imported: 0, duplicates: 0, invalid: 0, rows: [] }),

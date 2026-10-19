@@ -1289,3 +1289,16 @@ button.entity-item {
 .import-review {
   color: var(--amber-400, #fbbf24);
 }
+
+/* Search results with a checkbox before each movement. */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 10px;
+}
+
+.search-row > .entity-item {
+  flex: 1;
+  min-width: 0;
+}

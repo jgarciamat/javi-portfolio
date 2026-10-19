@@ -25,6 +25,8 @@ import type {
   CreateCategoryDTO,
   CreateCustomAlertDTO,
   CreateRecurringRuleDTO,
+  BulkResult,
+  BulkTransactionChanges,
   CreateTransactionDTO,
   CustomAlert,
   Goal,
@@ -69,6 +71,18 @@ export const transactionApi = {
   },
   delete(id: string) {
     return apiRequest<void>(`/transactions/${id}`, { method: 'DELETE' });
+  },
+  bulkDelete(ids: string[]) {
+    return apiRequest<BulkResult>('/transactions/bulk-delete', {
+      method: 'POST',
+      body: jsonBody({ ids }),
+    });
+  },
+  bulkUpdate(ids: string[], changes: BulkTransactionChanges) {
+    return apiRequest<BulkResult>('/transactions/bulk', {
+      method: 'PATCH',
+      body: jsonBody({ ids, changes }),
+    });
   },
   search(filters: TransactionSearchFilters) {
     return apiRequest<TransactionSearchResult>(
