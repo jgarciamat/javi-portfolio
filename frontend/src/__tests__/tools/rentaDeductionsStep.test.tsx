@@ -1,8 +1,9 @@
 import { screen } from '@testing-library/react';
 import { rentaState } from '@modules/tools/data/renta/state';
 import type { Deduction } from '@modules/tools/domain/rentaData';
-import { emptyForm, familyOf } from '@modules/tools/domain/rentaForm';
-import { DeductionsStep } from '@modules/tools/ui/renta/DeductionsStep';
+import { emptyForm, familyOf, type Choice } from '@modules/tools/domain/rentaForm';
+import type { DeductionSaving } from '@modules/tools/domain/rentaSavings';
+import { DeductionsStep, bySaving } from '@modules/tools/ui/renta/DeductionsStep';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 const flat: Deduction = {
@@ -15,23 +16,118 @@ const flat: Deduction = {
   requirements: 'None.',
   url: 'https://example.org',
 };
+const other = (id: string, over: Partial<Deduction> = {}): Deduction => ({
+  ...flat,
+  id,
+  title: `Deduction ${id}`,
+  ...over,
+});
+
+const step = (
+  deductions: Deduction[],
+  choices: Record<string, Choice>,
+  savings: Record<string, DeductionSaving> = {},
+  markedSaving = 0
+) =>
+  renderWithProviders(
+    <DeductionsStep
+      state={{ ...rentaState, deductions }}
+      ccaa={null}
+      loadError={false}
+      choices={choices}
+      family={familyOf(emptyForm(''))}
+      blocked={[]}
+      hints={{}}
+      savings={savings}
+      markedSaving={markedSaving}
+      onChange={jest.fn()}
+    />
+  );
+
+// The text queries collapse the narrow spaces of the currency format into plain ones.
+const money = (n: number) =>
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' })
+    .format(n)
+    .replace(/\s/g, ' ');
+const saving = (saving: number, over: Partial<DeductionSaving> = {}): DeductionSaving => ({
+  saving,
+  blocked: false,
+  example: null,
+  ...over,
+});
 
 describe('Renta deductions: a fixed amount', () => {
   it('asks for no units when the amount is neither per child nor per unit', () => {
-    renderWithProviders(
-      <DeductionsStep
-        state={{ ...rentaState, deductions: [flat] }}
-        ccaa={null}
-        loadError={false}
-        choices={{ [flat.id]: { on: true, amount: '', units: '' } }}
-        family={familyOf(emptyForm(''))}
-        blocked={[]}
-        hints={{}}
-        onChange={jest.fn()}
-      />
-    );
+    step([flat], { [flat.id]: { on: true, amount: '', units: '' } });
     const fields = document.querySelector('.renta-deduction-fields') as HTMLElement;
     expect(fields.querySelector('input')).toBeNull();
     expect(screen.getByText(new RegExp(tr('tools.renta.gives')))).toBeInTheDocument();
+  });
+});
+
+describe('Renta deductions: what each one saves', () => {
+  it('orders them by saving, with the ones the income does not allow at the end', () => {
+    const list = [
+      other('a'),
+      other('b', { incomeLimit: { individual: 30000 } }),
+      other('c'),
+      other('d', { incomeLimit: { individual: 1000, note: 'Up to 1,000 € of base.' } }),
+      other('e'),
+    ];
+    step(
+      list,
+      { c: { on: true, amount: '', units: '' } },
+      {
+        a: saving(50),
+        b: saving(0, { blocked: true }),
+        c: saving(300),
+        d: saving(0, { blocked: true }),
+      },
+      300
+    );
+    const titles = [...document.querySelectorAll('.renta-deduction strong')]
+      .map((n) => n.textContent)
+      .filter((text) => text?.startsWith('Deduction'));
+    expect(titles).toEqual([
+      'Deduction c',
+      'Deduction a',
+      'Deduction e',
+      'Deduction b',
+      'Deduction d',
+    ]);
+    expect(
+      screen.getByText(tr('tools.renta.saving.on', { amount: money(300) }))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(tr('tools.renta.saving.off', { amount: money(50) }))
+    ).toBeInTheDocument();
+    // No saving known (e): nothing to lower.
+    expect(screen.getByText(tr('tools.renta.saving.none'))).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `${tr('tools.renta.saving.blocked')} ${tr('tools.renta.saving.limit', {
+          limit: money(30000),
+        })}`
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`${tr('tools.renta.saving.blocked')} Up to 1,000 € of base.`)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(money(300));
+  });
+
+  it('says when a saving is worked out with an example amount', () => {
+    step([other('p', { kind: 'percent', percent: 15 })], {}, { p: saving(150, { example: 1000 }) });
+    expect(
+      screen.getByText(tr('tools.renta.saving.example', { amount: money(1000) }).trim())
+    ).toBeInTheDocument();
+    expect(screen.queryByText(tr('tools.renta.saving.total'))).toBeNull();
+  });
+
+  it('keeps the order of deductions that save the same', () => {
+    const sort = bySaving({ x: saving(10), y: saving(10, { blocked: true }) });
+    expect(sort(other('x'), other('z'))).toBeLessThan(0);
+    expect(sort(other('y'), other('z'))).toBeGreaterThan(0);
+    expect(sort(other('z'), other('w'))).toBe(0);
   });
 });

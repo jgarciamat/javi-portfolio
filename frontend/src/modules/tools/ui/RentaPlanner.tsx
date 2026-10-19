@@ -27,6 +27,7 @@ import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
 import { mentionedIn, missingDeductions, NO_DRAFT, type DraftState } from '../domain/rentaDraft';
 import { compareBoxes, ourBoxes } from '../domain/rentaCompare';
+import { deductionSavings, markedSaving } from '../domain/rentaSavings';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
@@ -214,13 +215,19 @@ function ResultSection({
   );
 }
 
-/** The draft's boxes next to ours. */
+/** What each deduction saves with the data as it is, and the draft's boxes next to ours. */
 function useInsights(
   input: RentaInput,
   result: RentaResult,
+  ccaa: RentaCcaa | null,
   form: RentaForm,
   reading: DraftState['reading']
 ) {
+  const savings = useMemo(
+    () => deductionSavings(input, [...rentaState.deductions, ...(ccaa?.deductions ?? [])], result),
+    [input, ccaa, result]
+  );
+  const saved = useMemo(() => markedSaving(input, result), [input, result]);
   const comparison = useMemo(
     () => ({
       rows: reading
@@ -236,7 +243,7 @@ function useInsights(
     }),
     [reading, result, input, form]
   );
-  return { comparison };
+  return { savings, saved, comparison };
 }
 
 /** Step by step: your situation, your income, property, the deductions and the estimated result. */
@@ -294,7 +301,7 @@ export function RentaPlanner({
     }),
     [input, family]
   );
-  const { comparison } = useInsights(input, live.result, form, draft.reading);
+  const { savings, saved, comparison } = useInsights(input, live.result, ccaa, form, draft.reading);
 
   const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
 
@@ -349,6 +356,8 @@ export function RentaPlanner({
         family={family}
         blocked={live.result.blocked}
         hints={hints}
+        savings={savings}
+        markedSaving={saved}
         onChange={setChoice}
       />
 

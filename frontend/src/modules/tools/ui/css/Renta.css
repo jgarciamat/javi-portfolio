@@ -406,6 +406,28 @@
   line-height: 1.45;
 }
 
+.renta-saving {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--green-300);
+  font-weight: 600;
+}
+.renta-saving em {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.renta-saving--blocked {
+  color: var(--amber-300);
+  font-weight: 500;
+}
+.renta-saving-total {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid var(--green-500, #22c55e);
+}
+
 /* On a phone each box is a small card: its name, then the three figures side by side. */
 @media (max-width: 600px) {
   .renta-compare-table {

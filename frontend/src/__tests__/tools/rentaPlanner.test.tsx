@@ -150,7 +150,9 @@ describe('Renta planner: deductions', () => {
     const row = screen.getByText(/Por maternidad/).closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
     fireEvent.change(within(row).getByRole('textbox'), { target: { value: '2' } });
-    expect(within(row).getByText(/2\.400|2400/)).toBeInTheDocument();
+    expect(
+      within(row.querySelector('.renta-gives') as HTMLElement).getByText(/2\.400|2400/)
+    ).toBeInTheDocument();
     expect(within(row).getByRole('link', { name: tr('tools.renta.official') })).toHaveAttribute(
       'href',
       expect.stringContaining('agenciatributaria')
@@ -179,7 +181,9 @@ describe('Renta planner: fields', () => {
     const row = (await screen.findByText(/Gastos de guardería/)).closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
     fireEvent.change(within(row).getAllByRole('textbox')[0], { target: { value: '800' } });
-    expect(within(row).getByText(/800/)).toBeInTheDocument();
+    expect(
+      within(row.querySelector('.renta-gives') as HTMLElement).getByText(/800/)
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));
     expect(screen.getByText(tr('tools.renta.kidLine', { n: 1, age: 5 }))).toBeInTheDocument();
@@ -202,7 +206,9 @@ describe('Renta planner: amounts by child, percentages and relatives', () => {
     const party = screen.getByText(/Cuotas y aportaciones a partidos/).closest('li') as HTMLElement;
     fireEvent.click(within(party).getByRole('checkbox'));
     fireEvent.change(within(party).getByRole('textbox'), { target: { value: '100' } });
-    expect(within(party).getByText(/20,00/)).toBeInTheDocument();
+    expect(
+      within(party.querySelector('.renta-gives') as HTMLElement).getByText(/20,00/)
+    ).toBeInTheDocument();
   });
 
   it('changes one of several relatives without touching the others', () => {

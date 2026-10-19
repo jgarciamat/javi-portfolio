@@ -1,14 +1,68 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { deductionAmount, type Family } from '../../domain/rentaCalc';
-import type { Deduction, DeductionGroup, RentaCcaa, RentaState } from '../../domain/rentaData';
+import type {
+  Deduction,
+  DeductionGroup,
+  IncomeLimit,
+  RentaCcaa,
+  RentaState,
+} from '../../domain/rentaData';
 import type { Choice } from '../../domain/rentaForm';
 import { number } from '../../domain/rentaForm';
+import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
 const EMPTY: Choice = { on: false, amount: '', units: '' };
+const NO_SAVING: DeductionSaving = { saving: 0, blocked: false, example: null };
+
+/** Highest saving first; the ones the income does not allow, at the end (the sort keeps ties in order). */
+export const bySaving =
+  (savings: Record<string, DeductionSaving>) => (a: Deduction, b: Deduction) => {
+    const x = savings[a.id] ?? NO_SAVING;
+    const y = savings[b.id] ?? NO_SAVING;
+    if (x.blocked !== y.blocked) return x.blocked ? 1 : -1;
+    return y.saving - x.saving;
+  };
+
+/** What a deduction saves with the data as it is, or why it cannot be used. */
+function SavingLine({
+  deduction,
+  on,
+  saving,
+}: {
+  deduction: Deduction;
+  on: boolean;
+  saving: DeductionSaving;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  if (saving.blocked) {
+    // Only an income limit blocks a deduction.
+    const limit = deduction.incomeLimit as IncomeLimit;
+    return (
+      <small className="renta-saving renta-saving--blocked">
+        {t('tools.renta.saving.blocked')}{' '}
+        {limit.note ?? t('tools.renta.saving.limit', { limit: money(limit.individual) })}
+      </small>
+    );
+  }
+  const amount = money(saving.saving);
+  return (
+    <small className="renta-saving">
+      {saving.saving <= 0
+        ? t('tools.renta.saving.none')
+        : on
+        ? t('tools.renta.saving.on', { amount })
+        : t('tools.renta.saving.off', { amount })}
+      {saving.example !== null && (
+        <em> {t('tools.renta.saving.example', { amount: money(saving.example) })}</em>
+      )}
+    </small>
+  );
+}
 
 /** The checkbox of a deduction, its title and its badges. */
 function DeductionHead({
@@ -16,12 +70,14 @@ function DeductionHead({
   choice,
   suggested,
   hint,
+  saving,
   onChange,
 }: {
   deduction: Deduction;
   choice: Choice;
   suggested: boolean;
   hint?: Hint;
+  saving: DeductionSaving;
   onChange: (choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -44,6 +100,7 @@ function DeductionHead({
           <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
         )}
         <small>{deduction.summary}</small>
+        <SavingLine deduction={deduction} on={choice.on} saving={saving} />
       </span>
     </label>
   );
@@ -170,6 +227,7 @@ function DeductionRow({
   suggested,
   blocked,
   hint,
+  saving,
   onChange,
 }: {
   deduction: Deduction;
@@ -178,6 +236,7 @@ function DeductionRow({
   suggested: boolean;
   blocked: boolean;
   hint?: Hint;
+  saving: DeductionSaving;
   onChange: (choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -204,6 +263,7 @@ function DeductionRow({
         choice={choice}
         suggested={suggested}
         hint={hint}
+        saving={saving}
         onChange={onChange}
       />
       <DeductionInfo deduction={deduction} />
@@ -240,6 +300,7 @@ function DeductionList({
   family,
   blocked,
   hints,
+  savings,
   openGroups,
   onChange,
 }: {
@@ -250,6 +311,7 @@ function DeductionList({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
+  savings: Record<string, DeductionSaving>;
   openGroups: DeductionGroup[];
   onChange: (id: string, choice: Choice) => void;
 }) {
@@ -276,7 +338,7 @@ function DeductionList({
       />
       {visible.length === 0 && <p className="section-hint">{t('tools.renta.noMatch')}</p>}
       {GROUPS.map((group) => {
-        const items = visible.filter((d) => d.group === group);
+        const items = visible.filter((d) => d.group === group).sort(bySaving(savings));
         if (items.length === 0) return null;
         return (
           <details
@@ -297,6 +359,7 @@ function DeductionList({
                   suggested={isSuggested(d)}
                   blocked={blocked.includes(d.id)}
                   hint={hints[d.id]}
+                  saving={savings[d.id] ?? NO_SAVING}
                   onChange={(c) => onChange(d.id, c)}
                 />
               ))}
@@ -337,6 +400,8 @@ export function DeductionsStep({
   family,
   blocked,
   hints,
+  savings,
+  markedSaving,
   onChange,
 }: {
   state: RentaState;
@@ -346,13 +411,25 @@ export function DeductionsStep({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
+  /** What each deduction saves with the data as it is, by id. */
+  savings: Record<string, DeductionSaving>;
+  /** What the marked ones save together. */
+  markedSaving: number;
   onChange: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
+  const money = useMoney();
   const foral = ccaa?.regime === 'foral';
+  const marked = Object.values(choices).some((c) => c.on);
   return (
     <Step n={4} titleKey="tools.renta.step3">
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
+      <p className="section-hint">{t('tools.renta.saving.hint')}</p>
+      {marked && (
+        <p className="renta-saving-total" role="status">
+          {t('tools.renta.saving.total')} <strong>{money(markedSaving)}</strong>
+        </p>
+      )}
       <DeductionList
         title={t('tools.renta.stateDeductions')}
         hint={t('tools.renta.stateHint')}
@@ -361,6 +438,7 @@ export function DeductionsStep({
         family={family}
         blocked={blocked}
         hints={hints}
+        savings={savings}
         openGroups={['family', 'housing']}
         onChange={onChange}
       />
@@ -373,6 +451,7 @@ export function DeductionsStep({
           family={family}
           blocked={blocked}
           hints={hints}
+          savings={savings}
           openGroups={['family', 'health', 'education']}
           onChange={onChange}
         />
