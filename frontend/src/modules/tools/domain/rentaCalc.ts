@@ -448,8 +448,9 @@ interface Earner {
   /** Works in a job: the extra expenses for a disability are only for active workers. */
   active: boolean;
   disability: Disability;
-  /** Own and employer's contributions to pension plans. */
+  /** Own contributions to pension plans, and the employer's. */
   pensionPlan: number;
+  pensionEmployer: number;
   /** The person: their 2,000 € always count, as in an individual return. */
   main: boolean;
 }
@@ -461,7 +462,8 @@ function earnersOf(input: RentaInput): Earner[] {
     extra: positive(input.workExpensesExtra),
     active: !input.retired,
     disability: input.family.disability,
-    pensionPlan: positive(input.pensionPlan) + positive(input.pensionPlanEmployer),
+    pensionPlan: positive(input.pensionPlan),
+    pensionEmployer: positive(input.pensionPlanEmployer),
     main: true,
   };
   const partner = input.joint?.partner;
@@ -475,6 +477,7 @@ function earnersOf(input: RentaInput): Earner[] {
       active: !partner.retired,
       disability: partner.disability,
       pensionPlan: positive(partner.pensionPlan),
+      pensionEmployer: 0,
       main: false,
     },
   ];
@@ -557,16 +560,21 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   const jointGeneral = Math.min(jointAmount, Math.max(0, beforeReductions));
   const jointSavings = Math.min(jointAmount - jointGeneral, savingsTotal);
   const afterJoint = beforeReductions - jointGeneral;
-  // Pension plans: own and employer's together up to the limit, and up to 30 % of the net work
-  // income, for each member of the unit on their own (art. 84.2.1.º).
-  const pensionLimit =
-    state.baseReductions.pensionPlanLimit + state.baseReductions.pensionPlanEmployerLimit;
+  // Pension plans (LIRPF art. 52.1.b; AEAT Manual práctico de Renta 2025, c13, checked 19-10-2026):
+  // own contributions up to 1,500 €, and the employer's up to 8,500 € more, so 10,000 € in all; and
+  // up to 30 % of the net work income, for each member of the unit on their own (art. 84.2.1.º).
+  // Own contributions to the employer's plan that can also use the 8,500 € (the table of art. 52)
+  // are not asked: all own contributions are held to 1,500 €.
+  const { pensionPlanLimit, pensionPlanEmployerLimit } = state.baseReductions;
+  const pensionOf = (e: Earner, i: number) =>
+    Math.min(
+      Math.min(e.pensionPlan, pensionPlanLimit) +
+        Math.min(e.pensionEmployer, pensionPlanEmployerLimit),
+      work.each[i] * 0.3
+    );
   const pensionReduction = round2(
     Math.min(
-      earners.reduce(
-        (sum, e, i) => sum + Math.min(e.pensionPlan, pensionLimit, work.each[i] * 0.3),
-        0
-      ),
+      earners.reduce((sum, e, i) => sum + pensionOf(e, i), 0),
       Math.max(0, afterJoint)
     )
   );

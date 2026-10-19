@@ -314,14 +314,28 @@ describe('computeRenta', () => {
   });
 
   it('lowers the base with the work reduction and the pension plan, within their limits', () => {
+    // LIRPF art. 52.1.b: own contributions up to 1,500 € (the test said 3,000: it held own and the
+    // employer's together to 10,000 €, the error of case 14 of the bank).
     const r = computeRenta(input({ workReduction: () => 1000, pensionPlan: 3000 }));
     expect(r.workReduction).toBe(1000);
-    expect(r.pensionReduction).toBe(3000);
-    expect(r.taxBase).toBe(28000 - 1000 - 3000);
-    // Pension plan: up to 10,000 together with the employer's, and up to 30 % of the net pay.
+    expect(r.pensionReduction).toBe(1500);
+    expect(r.taxBase).toBe(28000 - 1000 - 1500);
+    // The employer's up to 8,500 € more (10,000 € in all), and up to 30 % of the net pay.
     expect(
       computeRenta(input({ pensionPlan: 9000, pensionPlanEmployer: 5000 })).pensionReduction
-    ).toBe(8400);
+    ).toBe(1500 + 5000);
+    expect(
+      computeRenta(input({ gross: 60000, pensionPlan: 2000, pensionPlanEmployer: 9000 }))
+        .pensionReduction
+    ).toBe(1500 + 8500);
+    expect(
+      computeRenta(input({ pensionPlan: 9000, pensionPlanEmployer: 8000 })).pensionReduction
+    ).toBe(0.3 * 28000);
+    // Case 14: 2,000 € own to a personal plan + 1,500 € of the employer: 3,000 € (was 3,500).
+    expect(
+      computeRenta(input({ gross: 52000, pensionPlan: 2000, pensionPlanEmployer: 1500 }))
+        .pensionReduction
+    ).toBe(3000);
     expect(computeRenta(input({ gross: 100, workReduction: () => 5000 })).netIncome).toBe(0);
     expect(computeRenta(input({ gross: 2500, pensionPlan: 900 })).pensionReduction).toBe(0);
   });
