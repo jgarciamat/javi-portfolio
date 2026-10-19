@@ -12,6 +12,7 @@
 | [renta-casillas.md](renta-casillas.md) · [renta-casillas.json](renta-casillas.json) | Catálogo de las **2.205 casillas** de 4 cifras y las **70 de identificación** del modelo 100 de Renta 2025, sacado del impreso oficial del BOE: apartado, página, tipo, fórmula impresa, normas, dependencia autonómica y confianza de la etiqueta. |
 | [cobertura.md](cobertura.md) · [cobertura.json](cobertura.json) | Mapa entre ese catálogo y el código de la app: qué casillas calcula, lee, cubre en parte o no soporta, con porcentajes por apartado y por modelo; **24 discrepancias** con la norma ordenadas por gravedad, y las cifras fijas comprobadas. |
 | [documentos-oficiales.md](documentos-oficiales.md) · [documentos-oficiales.json](documentos-oficiales.json) | Qué documento oficial existe de cada modelo (rellenable, facsímil, diseño de registro), la mejor fuente para las vistas previas, fallos del lector de PDF y qué PDF puede generar el dueño identificándose. |
+| [contrato-actividad-anual.md](contrato-actividad-anual.md) | Contrato anual de la actividad económica del autónomo para la Renta: qué entrega `annualActivity.ts` (ingresos, gastos, amortización, subvenciones, rendimiento neto, 0599, 0604, módulos agrarios), sus casillas, avisos, fuentes y NO CONFIRMADOS. |
 | [hoja-de-ruta.md](hoja-de-ruta.md) | Propuesta priorizada (14 bloques con esfuerzo S/M/L/XL) para llegar a una Renta y unos modelos de autónomo lo más completos posible, cómo validarlos y qué textos usar para no prometer de más. |
 
 ## Metodología

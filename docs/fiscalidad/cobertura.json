@@ -810,8 +810,8 @@
   },
   {
    "modelo": "130",
-   "estado": "CALCULADO (sección I)",
-   "donde": "backend/src/domain/services/autonomo.ts draft130",
+   "estado": "CALCULADO (secciones I y II)",
+   "donde": "backend/src/domain/services/autonomo.ts draft130; amortizaciones y subvenciones en frontend/src/modules/finances/domain/depreciation.ts y subsidies.ts",
    "casillas_calculadas": [
     "01",
     "02",
@@ -820,6 +820,10 @@
     "05",
     "06",
     "07",
+    "08",
+    "09",
+    "10",
+    "11",
     "12",
     "13",
     "14",
@@ -828,8 +832,8 @@
     "19"
    ],
    "casillas_del_modelo": 19,
-   "cobertura_pct": 68.4,
-   "no_soportado": "Sección II agraria (08-11), deducción de vivienda (16: 2 %, máx. 660,14 €/año), complementarias (18), porcentaje del 8 % de Ceuta, Melilla y La Palma, reducción por rendimientos irregulares del art. 32.1 en la 03.",
+   "cobertura_pct": 89.5,
+   "no_soportado": "Deducción de vivienda (16), complementarias (18), 0,8 % de Ceuta, Melilla y La Palma, reducción del art. 32.1 en la 03. NO CONFIRMADO si la compensación del REAGP entra en la 08 (se deja fuera).",
    "fuente": "https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/impuesto-sobre-renta-personas-fisicas/modelo-130-irpf______esionales-estimacion-directa-fraccionado_/instrucciones.html"
   },
   {
@@ -874,7 +878,7 @@
    "estado": "CALCULADO (estimación)",
    "donde": "backend/src/domain/services/autonomo.ts retaFor/retaEstimate; frontend/src/modules/tools/domain/retaCalc.ts; data/reta2026.ts",
    "resumen": "Tramo, bases mínima y máxima, cuotas al 31,50 %, 7 % (3 % societarios) de gastos genéricos y tarifa plana con prórroga por debajo del SMI.",
-   "no_soportado": "Regularización anual de la TGSS (casillas 0196/0197 de la Renta), pluriactividad (reintegro del 50 % del exceso), coeficiente 0,055 sin IT, bases de colaboradores y societarios (1.424,40 €).",
+   "no_soportado": "Cálculo de la regularización anual de la TGSS (el importe se escribe a mano y va a las casillas 0196/0197 por el contrato anual), pluriactividad (reintegro del 50 % del exceso), coeficiente 0,055 sin IT, bases de colaboradores y societarios (1.424,40 €).",
    "fuente": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-7296"
   },
   {

@@ -55,6 +55,8 @@ Esfuerzo: **S** (≤ 2 días), **M** (≤ 1 semana), **L** (2-4 semanas), **XL**
 
 ## Bloque 1 · Actividades económicas en la Renta, enlazadas con 130 y 303 (L)
 
+> **Estado (19-10-2026):** hecho el lado de Autónomos. Incluye amortizaciones (tablas simplificada, del art. 12.1.a LIS y de módulos agrarios, libertad y acelerada), provisiones y difícil justificación, subvenciones, REAGP, sección II del 130, módulos agrarios y el contrato anual [contrato-actividad-anual.md](contrato-actividad-anual.md). Falta el lado de la Renta: consumir el contrato y calcular las reducciones del art. 32 (0225-0237).
+
 **Por qué primero:** la obligación de declarar es **universal** para quien estuvo de alta en el RETA ([Orden HAC/277/2026, art. 1.2](https://www.boe.es/boe/dias/2026/03/27/pdfs/BOE-A-2026-7041.pdf)). La app ya tiene ingresos, gastos, cuotas y retenciones por trimestre (backend `autonomo.ts`, libros de facturas `invoiceBook.ts`), pero la Renta no los usa.
 
 **Casillas:** 0165-0237 (estimación directa: ingresos 0171-0180; gastos 0181-0217; provisiones y difícil justificación 0219-0223; rendimiento neto 0224-0226; reducciones del art. 32: 0232-0234), 0186 (Seguridad Social del titular), 0196/0197 (regularización de cuotas del RETA), **0599** (retenciones de actividades), **0604** (pagos fraccionados del 130).
