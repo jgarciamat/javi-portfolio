@@ -13,6 +13,11 @@ LEGACY_DB_DIR="$REPO_DIR/backend/data"
 echo "==> Using repo: $REPO_DIR, branch: $BRANCH"
 cd "$REPO_DIR"
 git fetch origin "$BRANCH"
+# The case bank (docs/casos-practicos: made-up personas, PDFs and workbooks for the tests) is not
+# needed on the server: keep it out of the checkout. Without sparse-checkout (git < 2.25) it stays
+# on disk, but it is never in an image nor served (the images build from frontend/ and backend/).
+git sparse-checkout set --no-cone '/*' '!/docs/casos-practicos/' 2>/dev/null \
+  || echo "!! git sparse-checkout no disponible: docs/casos-practicos se queda en el disco (no se sirve)"
 git reset --hard "origin/$BRANCH"
 
 cd "$DEPLOY_DIR"

@@ -10,3 +10,5 @@ test-results
 playwright-report
 .env
 .env.local
+# Case bank generators (they read ../docs/casos-practicos, which is not in this context)
+scripts/casos
