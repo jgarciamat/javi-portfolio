@@ -118,8 +118,8 @@ export function useAutonomoDraft() {
   // Bumped when the data is wiped, so the import panels forget their messages too.
   const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
-  // The quarter to file (the last one ended: the 3T in October, the 4T of last year in January), or
-  // the year of the invoices on the device and its last quarter with invoices.
+  // The quarter just ended while it can be filed (the 3T until 20 October, the 4T of last year until
+  // 30 January), else the current one; or the year of the invoices and its last quarter with them.
   const [opening] = useState(() => openingPeriod(manual, YEARS, new Date()));
   const [year, setYear] = useState(opening.year);
   const [quarter, setQuarter] = useState<Quarter>(opening.quarter);

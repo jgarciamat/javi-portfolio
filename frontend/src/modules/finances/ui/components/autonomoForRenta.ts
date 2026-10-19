@@ -34,8 +34,9 @@ export function preferredYear(
 }
 
 /**
- * The year and quarter to open the screen with on `now`: the quarter to file (the last one ended),
- * or, when the invoices are of another year, that year and its last quarter with invoices.
+ * The year and quarter to open the screen with on `now`: the quarter just ended during its filing
+ * window, else the current one (`filingQuarter`); or, when the invoices are of another year, that
+ * year and its last quarter with invoices.
  */
 export function openingPeriod(
   manual: Pick<ManualForm, 'invoices'>,

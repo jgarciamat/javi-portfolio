@@ -20,12 +20,11 @@ export function freeDraftQuarters(now: Date): { year: number; quarter: Quarter }
 }
 
 /**
- * The quarter to file on a date: the last one already ended (1–3 → 4T of last year, 4–6 → 1T,
- * 7–9 → 2T, 10–12 → 3T). The quarterly forms are filed in the month after the quarter ends.
+ * The quarter to open the self-employed draft on, a date: during the filing window of the quarter
+ * just ended (1–20 April, July and October; 1–30 January) that one, the one to file; outside it,
+ * the current one. Always one of `freeDraftQuarters`, so the free plan never opens on a locked one.
  */
 export function filingQuarter(now: Date): { year: number; quarter: Quarter } {
-  const ended = Math.floor(now.getMonth() / 3);
-  return ended === 0
-    ? { year: now.getFullYear() - 1, quarter: 4 }
-    : { year: now.getFullYear(), quarter: ended as Quarter };
+  const [current, ended] = freeDraftQuarters(now);
+  return ended ?? current;
 }

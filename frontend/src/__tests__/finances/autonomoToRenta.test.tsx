@@ -110,9 +110,13 @@ describe('which year the self-employed data is of', () => {
   it('opens on the quarter to file, or on the last quarter with invoices of their year', () => {
     const years = [2025, 2026, 2027];
     const oct = new Date(2026, 9, 9);
-    // No invoices: the quarter to file (the 3T in October; the 4T of last year in February).
+    // No invoices: the 3T while it is filed (to 20 October), then the current one.
     expect(openingPeriod({ invoices: [] }, years, oct)).toEqual({ year: 2026, quarter: 3 });
-    expect(openingPeriod({ invoices: [] }, years, new Date(2026, 1, 3))).toEqual({
+    expect(openingPeriod({ invoices: [] }, years, new Date(2026, 9, 21))).toEqual({
+      year: 2026,
+      quarter: 4,
+    });
+    expect(openingPeriod({ invoices: [] }, years, new Date(2026, 0, 30))).toEqual({
       year: 2025,
       quarter: 4,
     });
