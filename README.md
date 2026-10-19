@@ -137,6 +137,10 @@ para la IA: `CLOUDFLARE_ACCOUNT_ID` y `CLOUDFLARE_AI_TOKEN`.
 - Antes de aplicar migraciones guarda además `pre-migration-v<N>-<fecha>.db` junto a la BD.
 - **Copia `api_backups` fuera del servidor** (rclone, restic…): un volumen en la misma máquina no protege de perder la máquina.
 
+## Calidad
+
+- [Informe de calidad de la app](docs/informe-calidad-app.md): rendimiento, arquitectura, tests, seguridad y hoja de ruta (20-10-2026).
+
 ## Seguridad
 
 - Contraseñas con bcrypt y política común (8+ caracteres, mayúscula, número y símbolo) en registro, reset y cambio.
