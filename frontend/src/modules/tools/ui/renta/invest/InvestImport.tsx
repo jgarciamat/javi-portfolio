@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { ImportedSavings } from '../../../domain/rentaGains';
@@ -11,6 +11,7 @@ import { declarationRows, reportTables } from '../../../domain/invest/report';
 import type { InvestOp } from '../../../domain/invest/types';
 import {
   download,
+  loadBundledRates,
   readEcbFile,
   readInvestFile,
   rememberMapping,
@@ -19,6 +20,7 @@ import {
   savedRates,
   xlsxBlob,
   xlsxOf,
+  type BundledRates,
   type FileReading,
 } from '../../../application/investImport';
 import { useMoney } from '../shared';
@@ -126,10 +128,12 @@ function AddOperation({ onAdd }: { onAdd: (op: InvestOp) => void }) {
 function Rates({
   missing,
   rates,
+  until,
   onChange,
 }: {
   missing: string[];
   rates: RateTable;
+  until?: string;
   onChange: (rates: RateTable) => void;
 }) {
   const { t } = useI18n();
@@ -140,6 +144,7 @@ function Rates({
     <fieldset className="renta-block">
       <legend>{t(`${k}.title`)}</legend>
       <p className="section-hint">{t(`${k}.hint`)}</p>
+      {until && <p className="section-hint">{t(`${k}.bundled`, { date: until })}</p>}
       {loaded > 0 && <p className="section-hint">{t(`${k}.loaded`, { count: loaded })}</p>}
       <input
         ref={input}
@@ -198,6 +203,15 @@ export function InvestImport({
   const [applied, setApplied] = useState(false);
   const [dragging, setDragging] = useState(false);
 
+  const [bundled, setBundled] = useState<BundledRates | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadBundledRates().then((b) => live && setBundled(b));
+    return () => {
+      live = false;
+    };
+  }, []);
+
   const setRates = (next: RateTable) => {
     setRatesState(next);
     saveRates(next);
@@ -233,9 +247,11 @@ export function InvestImport({
       });
   }, [raw, edits]);
 
+  // What the person loaded or typed wins over the rates that come with the app.
+  const allRates = useMemo(() => ({ ...bundled?.rates, ...rates }), [bundled, rates]);
   const ledger = useMemo(
-    () => buildLedger(ops, { year, rates, professional, withheldIn: WITHHELD_IN }),
-    [ops, year, rates, professional]
+    () => buildLedger(ops, { year, rates: allRates, professional, withheldIn: WITHHELD_IN }),
+    [ops, year, allRates, professional]
   );
   const rows = useMemo(() => declarationRows(ledger), [ledger]);
   const certificate = files.flatMap((f) =>
@@ -354,8 +370,13 @@ export function InvestImport({
 
       {(ops.length > 0 || certificate.length > 0) && (
         <>
-          {missingRates.length > 0 || Object.keys(rates).length > 0 ? (
-            <Rates missing={missingRates} rates={rates} onChange={setRates} />
+          {missingRates.length > 0 || Object.keys(rates).length > 0 || bundled ? (
+            <Rates
+              missing={missingRates}
+              rates={rates}
+              until={bundled?.until}
+              onChange={setRates}
+            />
           ) : null}
           <OpsTable
             ops={valued}

@@ -2046,6 +2046,7 @@
   "tools.invest.add.button": "Añadir",
   "tools.invest.rates.title": "Tipos de cambio",
   "tools.invest.rates.hint": "Lo que no está en euros se pasa a euros con el tipo del Banco Central Europeo del día de cada operación. Descarga «eurofxref-hist» de ecb.europa.eu (Statistics → Euro foreign exchange reference rates) y cárgalo aquí, o escribe un tipo (cuántas unidades de la moneda vale 1 euro).",
+  "tools.invest.rates.bundled": "Incluimos los tipos del Banco Central Europeo hasta el {date}; lo que cargues o escribas tú tiene preferencia.",
   "tools.invest.rates.loaded": "Tipos cargados para {count} monedas.",
   "tools.invest.rates.file": "Archivo de tipos del BCE",
   "tools.invest.rates.load": "Cargar el archivo del BCE",

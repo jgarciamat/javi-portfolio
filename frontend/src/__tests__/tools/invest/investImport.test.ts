@@ -4,10 +4,12 @@ const strToU8 = (s: string) => new Uint8Array(rawU8(s));
 import { readXlsx } from '@modules/finances/application/spreadsheet';
 import {
   download,
+  loadBundledRates,
   readEcbFile,
   readInvestFile,
   rememberMapping,
   reportPdf,
+  resetBundledRates,
   saveRates,
   savedMappings,
   savedRates,
@@ -153,5 +155,42 @@ describe('downloads', () => {
     expect(click).toHaveBeenCalled();
     expect(revoke).toHaveBeenCalledWith('blob:x');
     click.mockRestore();
+  });
+});
+
+describe('the ECB rates that come with the app', () => {
+  const original = global.fetch;
+  const answer = (value: unknown) => {
+    resetBundledRates();
+    global.fetch = jest.fn(async () => value) as unknown as typeof fetch;
+  };
+  afterEach(() => {
+    global.fetch = original;
+    resetBundledRates();
+  });
+
+  it('are read once from the app and kept', async () => {
+    answer({
+      ok: true,
+      json: async () => ({ until: '2026-10-16', rates: { USD: [['2025-01-01', 1.1]] } }),
+    });
+    expect(await loadBundledRates()).toEqual({
+      until: '2026-10-16',
+      rates: { USD: [['2025-01-01', 1.1]] },
+    });
+    await loadBundledRates();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('are null when the file is missing, wrong or the request fails', async () => {
+    answer({ ok: false });
+    expect(await loadBundledRates()).toBeNull();
+    answer({ ok: true, json: async () => ({ until: '2026-10-16' }) });
+    expect(await loadBundledRates()).toBeNull();
+    resetBundledRates();
+    global.fetch = jest.fn(async () => {
+      throw new Error('offline');
+    }) as unknown as typeof fetch;
+    expect(await loadBundledRates()).toBeNull();
   });
 });

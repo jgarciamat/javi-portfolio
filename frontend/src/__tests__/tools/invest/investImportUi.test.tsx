@@ -5,6 +5,7 @@ import { emptyForm, type RentaForm } from '@modules/tools/domain/rentaForm';
 import { SavingsDetailSection } from '@modules/tools/ui/renta/SavingsDetail';
 import { InvestGuide } from '@modules/tools/ui/renta/invest/InvestGuide';
 import { readPdf } from '@modules/tools/application/readPdf';
+import { resetBundledRates } from '@modules/tools/application/investImport';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 jest.mock('@modules/tools/application/readPdf', () => ({ readPdf: jest.fn() }));
@@ -156,6 +157,27 @@ describe('Importar mis inversiones', () => {
     expect(JSON.parse(localStorage.getItem('renta.invest.rates') as string)).toEqual({
       USD: [['0000-01-01', 1.25]],
     });
+  });
+
+  it('uses the ECB rates that come with the app, and says up to which day', async () => {
+    resetBundledRates();
+    const original = global.fetch;
+    global.fetch = jest.fn(async () => ({
+      ok: true,
+      json: async () => ({ until: '2026-10-16', rates: { USD: [['2025-01-01', 1.25]] } }),
+    })) as unknown as typeof fetch;
+    try {
+      open();
+      await upload(fileOf('ibkr.csv', IBKR_DIV));
+      await screen.findByText('ibkr.csv');
+      expect(await screen.findByText('[0029] 80,00 €')).toBeInTheDocument();
+      expect(
+        screen.getByText(tr(`${k}.rates.bundled`, { date: '2026-10-16' }))
+      ).toBeInTheDocument();
+    } finally {
+      global.fetch = original;
+      resetBundledRates();
+    }
   });
 
   it('dividends with tax abroad, the ECB file and the downloads', async () => {

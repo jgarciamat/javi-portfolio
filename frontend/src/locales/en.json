@@ -2046,6 +2046,7 @@
   "tools.invest.add.button": "Add",
   "tools.invest.rates.title": "Exchange rates",
   "tools.invest.rates.hint": "What is not in euros is taken to euros with the European Central Bank rate of the day of each operation. Download «eurofxref-hist» from ecb.europa.eu (Statistics → Euro foreign exchange reference rates) and load it here, or type a rate (how many units of the currency 1 euro is worth).",
+  "tools.invest.rates.bundled": "The European Central Bank rates are included up to {date}; anything you load or type takes precedence.",
   "tools.invest.rates.loaded": "Rates loaded for {count} currencies.",
   "tools.invest.rates.file": "ECB rates file",
   "tools.invest.rates.load": "Load the ECB file",

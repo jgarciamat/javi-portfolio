@@ -91,6 +91,34 @@ export function saveRates(rates: RateTable): void {
   storage.setJSON(RATES_KEY, rates);
 }
 
+/** The ECB rates that come with the app (public/ecb-rates.json, updated with `npm run ecb:update`). */
+export interface BundledRates {
+  rates: RateTable;
+  /** The last day the file has a rate for (YYYY-MM-DD). */
+  until: string;
+}
+
+/** Loads them from the app's own origin, once; null when the file is missing or unreadable. */
+let bundled: Promise<BundledRates | null> | null = null;
+export function loadBundledRates(): Promise<BundledRates | null> {
+  bundled ??= (async () => {
+    try {
+      const res = await fetch('/ecb-rates.json');
+      if (!res.ok) return null;
+      const data = (await res.json()) as { rates?: RateTable; until?: string };
+      return data.rates && data.until ? { rates: data.rates, until: data.until } : null;
+    } catch {
+      return null;
+    }
+  })();
+  return bundled;
+}
+
+/** Forget what was loaded (tests). */
+export const resetBundledRates = () => {
+  bundled = null;
+};
+
 /** Reads the ECB's eurofxref-hist file (CSV, or the ZIP as the ECB gives it). */
 export async function readEcbFile(file: File, keep?: Set<string>): Promise<RateTable> {
   if (file.name.toLowerCase().endsWith('.zip')) {
