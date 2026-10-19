@@ -331,12 +331,13 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       entitlements,
       repos.metrics,
       clock,
-      // First steps: 3 movements, a budget, a goal and an automation.
-      (userId) =>
-        repos.transactions.count(userId) >= 3 &&
-        repos.budgets.listByUser(userId).length > 0 &&
-        repos.goals.listByUser(userId).length > 0 &&
-        repos.rules.listByUser(userId).length > 0
+      // First steps: 3 movements, a budget, a goal and an automation (FIRST_STEPS_GOALS).
+      (userId) => ({
+        movements: repos.transactions.count(userId),
+        budgets: repos.budgets.listByUser(userId).length,
+        goals: repos.goals.listByUser(userId).length,
+        automations: repos.rules.listByUser(userId).length,
+      })
     ),
     household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
