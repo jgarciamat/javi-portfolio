@@ -158,6 +158,20 @@ describe('header', () => {
   });
 });
 
+describe('invite from the menu', () => {
+  it('opens the invitation link in a dialog, with its subtitle, and closes it', async () => {
+    renderWithProviders(<Dashboard />);
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
+    expect(within(menu).getByText(tr('app.menu.inviteSub'))).toBeInTheDocument();
+    fireEvent.click(within(menu).getByTestId('menu-invite'));
+    const dialog = await screen.findByRole('dialog', { name: tr('billing.invite.title') });
+    expect(await within(dialog).findByText('https://finanverso.app/?ref=ABCD2345')).toBeVisible();
+    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.common.close') }));
+    expect(screen.queryByRole('dialog', { name: tr('billing.invite.title') })).toBeNull();
+  });
+});
+
 describe('import', () => {
   it('opens the importer for Premium and reloads after importing', async () => {
     const api = createFakeApi();

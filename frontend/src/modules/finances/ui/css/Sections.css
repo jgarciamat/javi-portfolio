@@ -811,6 +811,27 @@
   font-weight: 600;
 }
 
+.burger-nav-item--wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+}
+
+.burger-nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.burger-nav-sub {
+  font-size: 0.68rem;
+  color: var(--slate-500);
+}
+
 .burger-nav-icon {
   color: var(--section-color, inherit);
   font-size: 1.2rem;

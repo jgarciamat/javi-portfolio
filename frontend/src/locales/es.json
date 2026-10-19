@@ -433,6 +433,8 @@
   "app.menu.short.hacienda": "Hacienda",
   "app.menu.short.automations": "Gastos fijos y recibos",
   "app.menu.profile": "Perfil",
+  "app.menu.invite": "Invita a un amigo",
+  "app.menu.inviteSub": "Consigue 1 mes de Premium gratis",
   "app.accountCards.ariaLabel": "Saldo de cada cuenta",
   "app.accountCards.add": "Movimiento",
   "app.accountCards.transfer": "Transferir",

@@ -27,6 +27,7 @@ import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
 import { BurgerMenu } from './BurgerMenu';
+import { InviteDialog } from './InviteDialog';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
@@ -265,6 +266,7 @@ export function Dashboard() {
   useEffect(() => {
     if (menuPicks > 0) sectionRef.current!.focus();
   }, [menuPicks]);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const selectFromMenu = (next: DashboardTab) => {
     dash.setTab(next);
     setMenuPicks((n) => n + 1);
@@ -327,8 +329,10 @@ export function Dashboard() {
         tab={dash.tab}
         onSelectTab={selectFromMenu}
         onOpenProfile={dash.openProfile}
+        onOpenInvite={() => setInviteOpen(true)}
         onClose={() => dash.setMenuOpen(false)}
       />
+      {inviteOpen && <InviteDialog onClose={() => setInviteOpen(false)} />}
       <Suspense fallback={null}>
         <DashboardModals dash={dash} />
       </Suspense>
