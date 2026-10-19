@@ -493,7 +493,12 @@ describe('Saving in the account', () => {
     renderWithProviders(<BusinessView />, { api, plan: true, locale: 'en' });
     await waitFor(() =>
       expect(sync()).toHaveTextContent(
-        translate('en', 'app.autonomo.cloud.status.savedAt', { time: '13:00' })
+        translate('en', 'app.autonomo.cloud.status.savedAt', {
+          // The device's own time zone, as the app shows it (the CI runs in UTC).
+          time: new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(
+            new Date('2026-10-18T11:00:00.000Z')
+          ),
+        })
       )
     );
   });
