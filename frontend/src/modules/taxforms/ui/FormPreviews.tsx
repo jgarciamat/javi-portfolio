@@ -4,8 +4,10 @@ import type { Summary347, YearSummary } from '@modules/finances/domain/annualSum
 import type { Result131 } from '@modules/finances/domain/module131';
 import type { AutonomoDraft } from '@modules/finances/domain/types';
 import type { WithholdingResult } from '@modules/finances/domain/withholdings';
+import type { RentaInput, RentaResult } from '@modules/tools/domain/rentaCalc';
 import {
   form130,
+  form100,
   form131,
   form180,
   form190,
@@ -113,4 +115,30 @@ export function Model131FormPreview({
   const { t } = useI18n();
   const forms = useMemo(() => [form131(result, year, quarter)], [result, year, quarter]);
   return <Previews forms={forms} title={t('taxforms.title.modules')} />;
+}
+
+/**
+ * The return (modelo 100) as the official form, filled with the figures of the planner: at the end of
+ * the assistant and under the result of the expert mode.
+ */
+export function RentaFormPreview({
+  result,
+  input,
+  year,
+}: {
+  result: RentaResult;
+  input: RentaInput;
+  year: number;
+}) {
+  const { t } = useI18n();
+  const forms = useMemo(() => {
+    try {
+      return [form100(result, input, year)];
+    } catch {
+      // A result saved on the device by an older version lacks parts of today's: no preview then.
+      return [];
+    }
+  }, [result, input, year]);
+  if (forms.length === 0) return null;
+  return <Previews forms={forms} title={t('taxforms.title.renta')} />;
 }

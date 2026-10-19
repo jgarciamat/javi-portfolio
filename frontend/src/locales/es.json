@@ -2462,6 +2462,8 @@
   "aeatFiles.records.noNif": "sin NIF",
   "taxforms.title.autonomo": "Vistas previas de los modelos del trimestre",
   "taxforms.title.withholdings": "Vistas previas de los modelos 111 y 115",
+  "taxforms.title.renta": "Tu declaración en el modelo oficial (vista previa)",
+  "taxforms.mark.legend100": "«No calculada»: cópiala de tu borrador. Casillas vacías: no te afectan o la app no las calcula. No se incluyen tus datos personales.",
   "taxforms.disclaimer": "Simulación orientativa, no oficial: mismas páginas, secciones y casillas que el impreso de la Agencia Tributaria, con las cifras que calcula la app para que las copies. Finanverso no presenta ni firma nada. Revísala con un gestor colegiado antes de presentar.",
   "taxforms.model.303": "Modelo 303 · IVA",
   "taxforms.model.130": "Modelo 130 · Pago fraccionado del IRPF",

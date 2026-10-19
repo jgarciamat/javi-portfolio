@@ -19,6 +19,7 @@ import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
 import type { ImportedSavings } from '../domain/rentaGains';
 import { Step, useMoney } from './renta/shared';
+import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
 import { useRentaPlanner } from './renta/useRentaPlanner';
 import './css/Renta.css';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
@@ -223,6 +224,7 @@ export function RentaPlanner({
     reviewStart,
     startReview,
     accept,
+    input,
   } = useRentaPlanner({ initialIncome, mode, year });
   const { t } = useI18n();
   const [expert, switchView] = useExpertView();
@@ -318,6 +320,7 @@ export function RentaPlanner({
         invest={<InvestLink form={form} />}
         imported={form.savingsDetail?.imported}
       />
+      {shown && <RentaFormPreview result={shown.result} input={input} year={year} />}
     </div>
   );
 }

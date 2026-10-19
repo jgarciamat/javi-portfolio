@@ -20,6 +20,7 @@ import { QuestionBody, ready as guidedReady } from './GuidedInterview';
 import { InvestCard, InvestLink } from './InvestCard';
 import { Optimizer } from './Optimizer';
 import { SavingsDetailSection } from './SavingsDetail';
+import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
 import { Field, RadioOptions, useMoney } from './shared';
 import { useRentaPlanner, type RentaPlannerState } from './useRentaPlanner';
 import '../css/Renta.css';
@@ -78,6 +79,8 @@ interface Ctx {
   onHowToFile?: (slug: string) => void;
   /** Opens a step that is already open (the investments, from the review or the result). */
   goStep: (index: number) => void;
+  /** The year of the return. */
+  year: number;
 }
 
 const INVEST_STEP = RENTA_STEPS.findIndex((s) => s.id === 'invest');
@@ -484,7 +487,12 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
       hint: t(w('hint.file')),
       ready: true,
       noSkip: true,
-      body: <HowToPresent onHowToFile={ctx.onHowToFile} />,
+      body: (
+        <>
+          <HowToPresent onHowToFile={ctx.onHowToFile} />
+          {p.shown && <RentaFormPreview result={p.shown.result} input={p.input} year={ctx.year} />}
+        </>
+      ),
     },
   ];
 }
@@ -565,6 +573,7 @@ export function RentaWizard({
     onOpenAutonomo,
     onHowToFile,
     goStep: controls.go,
+    year,
   };
   return (
     <Wizard
