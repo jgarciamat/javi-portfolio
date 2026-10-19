@@ -129,6 +129,8 @@ Pasos (solo los que aplican a lo importado; todos si no hay nada): papeles; borr
 9. **Trading profesional**: hoy solo aparta recompensas y derivados del ahorro; falta llevarlo como actividad económica al motor de Autónomos.
 10. **Modelo 100 «informativo» de monedas virtuales**: no se encontró en el impreso de 2025 un apartado informativo de saldos distinto de las casillas 1800-1814 (NO CONFIRMADO).
 
+11. **Tabla para copiar en Renta WEB (19-10-2026):** agrupa en la misma fila ventas con ganancia y con pérdida (Renta WEB calcularía el neto, no las columnas mostradas) y manda los ETF a 0310-0325, cuando en 2025 tienen su propio subapartado (2225-2236). Corrección propuesta, campos exactos de cada ventana y límites en [como-declarar-cripto-y-fondos.md](como-declarar-cripto-y-fondos.md) §5-§7. La clave 1803 queda confirmada por el esquema oficial: F, N, O y B.
+
 ## 6 bis. Resumen, pérdidas de otros años y validación local (19-10-2026)
 
 - **Panel de resumen** al final de «Mis inversiones»: resultado por año (el de esta Renta destacado; los demás «es de otro año»), por tipo y «Lo que supone en tu Renta» (el motor con y sin lo importado). En el resultado (paso 9 y modo experto): sueldo bruto como en Renta WEB (0003, 0012, 0013, 0019), ganancias y pérdidas de inversiones, intereses y dividendos, y explicación de las pérdidas del año.
