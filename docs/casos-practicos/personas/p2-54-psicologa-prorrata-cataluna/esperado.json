@@ -919,7 +919,7 @@
       "periodo": "4T",
       "casilla": "02",
       "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
-      "importe": 13974.08,
+      "importe": 13974.09,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.02"
@@ -929,7 +929,7 @@
       "periodo": "4T",
       "casilla": "03",
       "concepto": "Rendimiento neto (01 − 02)",
-      "importe": 33625.92,
+      "importe": 33625.91,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#4º-trimestre-de-2026",
       "campo": "m130.03"
@@ -1104,7 +1104,7 @@
       "periodo": "2026",
       "casilla": null,
       "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 5 %)",
-      "importe": 33625.92,
+      "importe": 33625.91,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#resúmenes-anuales",
       "campo": null,

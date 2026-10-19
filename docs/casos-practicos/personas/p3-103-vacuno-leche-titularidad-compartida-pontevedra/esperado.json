@@ -51,12 +51,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0019",
-        "obtenido": 2000
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.000,00. El motor muestra 2.000 € en la casilla 0019 sin rendimientos del trabajo; el gasto del art. 19.2.f no puede superar el rendimiento previo (0 €). Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0019"
     },
     {
       "modelo": "100",
@@ -96,12 +91,7 @@
       "importe": 18838.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0435",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0435"
     },
     {
       "modelo": "100",
@@ -121,12 +111,7 @@
       "importe": 18838.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0500",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0500"
     },
     {
       "modelo": "100",
@@ -206,12 +191,7 @@
       "importe": 1422.12,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0545",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0545"
     },
     {
       "modelo": "100",
@@ -221,12 +201,7 @@
       "importe": 1329.56,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0546",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0546"
     },
     {
       "modelo": "100",
@@ -236,12 +211,7 @@
       "importe": 1422.12,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0570",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -251,12 +221,7 @@
       "importe": 1329.56,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0571",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -266,12 +231,7 @@
       "importe": 2751.68,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0587",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -291,12 +251,7 @@
       "importe": 2751.68,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -316,12 +271,7 @@
       "importe": 831.68,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": -1920
-      },
-      "motivo": "Discrepancia propuesta: el motor da -1.920,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -331,12 +281,7 @@
       "importe": 831.68,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -1920
-      },
-      "motivo": "Discrepancia propuesta: el motor da -1.920,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -357,8 +302,7 @@
       "importe": 222160.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
-      "campo": null,
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+      "campo": "activity.0.income"
     },
     {
       "modelo": "100",
@@ -368,8 +312,7 @@
       "importe": 182500.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
-      "campo": null,
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+      "campo": "activity.0.expenses"
     },
     {
       "modelo": "100",
@@ -379,8 +322,7 @@
       "importe": 1983.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
-      "campo": null,
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+      "campo": "activity.0.provisions"
     },
     {
       "modelo": "100",
@@ -390,8 +332,7 @@
       "importe": 18838.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
-      "campo": null,
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+      "campo": "activity.0.net"
     },
     {
       "modelo": "130",

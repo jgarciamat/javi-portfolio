@@ -30,7 +30,7 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 
 - Prorrata definitiva de 2026 (art. 104 LIVA, redondeada a la unidad superior): 13.000,00 / (13.000,00 + exentas 34.600,00) = **28 %**. Regularización (casilla 44) = 28 % de 1.234,80 − deducido en el año 308,72 = **37,02** (también ajusta el gasto del IRPF)
 - 303: devengado 21 % de 4.000,00 = 840,00; deducible 114,20 (IVA soportado 308,70 × prorrata provisional 25 % + regularización 37,02); operaciones exentas del art. 20 (9.600,00) sin casilla en el 303 trimestral → resultado (71) **725,80**
-- 130 (acumulado): ingresos 47.600,00 − gastos 12.204,30 (incluye la cuota de autónomo 1.358,82 del trimestre, el IVA no deducible por la prorrata) − 5 % de difícil justificación 1.769,78 = 33.625,92; 20 % = 6.725,18 − pagos anteriores 3.365,61 − retenciones 1.950,00 → **1.409,57**
+- 130 (acumulado): ingresos 47.600,00 − gastos 12.204,30 (incluye la cuota de autónomo 1.358,82 del trimestre, el IVA no deducible por la prorrata) − 5 % de difícil justificación 1.769,79 = 33.625,91; 20 % = 6.725,18 − pagos anteriores 3.365,61 − retenciones 1.950,00 → **1.409,57**
 
 ### RETA
 

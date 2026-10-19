@@ -412,6 +412,16 @@ describe('computeRenta', () => {
     expect(computeRenta(input()).workReductions).toBe(0);
   });
 
+  it('holds the other expenses of work to the pay (box 0019: 0 without pay)', () => {
+    expect(computeRenta(input({ gross: 0, socialSecurity: 0 })).otherExpenses).toBe(0);
+    expect(computeRenta(input({ gross: 1500, socialSecurity: 0 })).otherExpenses).toBe(1500);
+    // 7,750 € with 33 % and the help of third people (art. 19.2.f).
+    const help = computeRenta(
+      input({ family: { ...alone, disability: 33, assistance: true } })
+    ).otherExpenses;
+    expect(help).toBe(2000 + 7750);
+  });
+
   it('adds the economic activities to the general base and their payments to box 0609', () => {
     const shop = (dependent: boolean) => ({
       kind: 'direct' as const,

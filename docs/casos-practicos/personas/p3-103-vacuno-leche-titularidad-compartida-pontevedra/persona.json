@@ -34,7 +34,7 @@
           "shared": false,
           "gross": "0.0",
           "socialSecurity": "0.0",
-          "withheld": "1920.0",
+          "withheld": "0.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -45,7 +45,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "direct",
               "name": "Vacuno de leche (50 %)",
@@ -53,6 +53,7 @@
               "newActivity": false,
               "withheld": 1920,
               "payments": 0,
+              "share": 0.5,
               "data": {
                 "method": "simplified",
                 "income": {
@@ -302,6 +303,7 @@
       "newActivity": false,
       "withheld": 1920,
       "payments": 0,
+      "share": 0.5,
       "data": {
         "method": "simplified",
         "income": {

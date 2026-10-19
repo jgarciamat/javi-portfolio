@@ -37,7 +37,7 @@
           "shared": false,
           "gross": "0.0",
           "socialSecurity": "0.0",
-          "withheld": "2000.0",
+          "withheld": "0.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -48,7 +48,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "direct",
               "name": "Hortalizas de invernadero",

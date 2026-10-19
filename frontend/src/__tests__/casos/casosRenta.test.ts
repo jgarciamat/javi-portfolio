@@ -140,6 +140,14 @@ function engineValue(campo: string, c: Computed): number {
   if (kind === 'result') return c.result[key as keyof RentaResult] as number;
   // 1: has to file the return (LIRPF art. 96), 0: does not.
   if (kind === 'obligation') return rentaObligation(obligationIncome(c.form)).required ? 1 : 0;
+  if (kind === 'activity') {
+    // activity.<n>.<field>: a figure of one activity worked out (rentaActivity.ts).
+    const [, n, field] = campo.split('.');
+    const each = c.result.activities?.each[Number(n)];
+    if (!each) return Number.NaN;
+    // The net income is the taxpayer's share; the rest of the figures, the whole activity's.
+    return field === 'net' ? each.net : (each.detail as unknown as Record<string, number>)[field];
+  }
   if (kind === 'rental') return c.input.rental?.excessCarry ?? Number.NaN;
   if (kind === 'savings') return savingsValue(c.result, campo.slice('savings.'.length));
   const boxes = ourBoxes(c.result, c.input);

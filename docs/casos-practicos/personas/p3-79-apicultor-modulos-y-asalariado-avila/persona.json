@@ -34,7 +34,7 @@
           "shared": false,
           "gross": "30000.0",
           "socialSecurity": "1944.0",
-          "withheld": "5020.0",
+          "withheld": "4700.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -45,7 +45,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "agrarian",
               "name": "Apicultura",

@@ -440,6 +440,32 @@ export interface FarmResult {
 const staffIndexOf = (percent: number) =>
   percent > 40 ? 0.75 : percent > 30 ? 0.8 : percent > 20 ? 0.85 : percent > 10 ? 0.9 : 1;
 
+/** The correcting indices of farming (instrucción 2.3 of annex I), in their order. */
+function farmCorrected(
+  a: FarmActivity,
+  reduced: number,
+  bases: number[],
+  forestry: boolean
+): number {
+  if (forestry || a.forestPlan) return a.forestPlan ? reduced * 0.8 : reduced;
+  const total = sum(bases);
+  let value =
+    total > 0
+      ? a.lines.reduce((acc, l, i) => {
+          // One product takes all of it (no rounding noise from the split).
+          const share = a.lines.length === 1 ? reduced : (reduced * bases[i]) / total;
+          const rented = 1 - Math.min(1, positive(l.rentedShare)) * 0.1;
+          const electric = 1 - Math.min(1, positive(l.electricShare)) * 0.25;
+          return (
+            acc + share * rented * electric * (l.boughtFeed ? 0.5 : 1) * (l.organic ? 0.95 : 1)
+          );
+        }, 0)
+      : reduced;
+  value *= a.externalMeans ? 0.75 : staffIndexOf(a.staffPercent);
+  if (reduced <= 9447.91 && !a.young) value *= 0.9;
+  return value;
+}
+
 /**
  * Net income of farming by módulos (annex I of the Orden HAC/1347/2024, instrucciones 2 and 3, and
  * its disposición adicional primera, 5 %). The indices of one product (rented land, electric
@@ -455,21 +481,13 @@ export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
   });
   const income = round2(sum(a.lines.map((l) => positive(l.income))));
   const previous = round2(sum(bases));
-  const dep = round2(depreciation('agrarian', a.assets) + positive(a.extraDepreciation));
+  // Forestry: no depreciation (instrucción 2.2) and only the index h (instrucción 2.3, last lines).
+  const forestry = a.lines.length > 0 && a.lines.every((l) => l.indexId.startsWith('forest'));
+  const dep = forestry
+    ? 0
+    : round2(depreciation('agrarian', a.assets) + positive(a.extraDepreciation));
   const reduced = round2(previous - dep);
-  const total = sum(bases);
-  let value = a.lines.reduce((acc, l, i) => {
-    const share = total > 0 ? (reduced * bases[i]) / total : 0;
-    const rented = 1 - Math.min(1, positive(l.rentedShare)) * 0.1;
-    const electric = 1 - Math.min(1, positive(l.electricShare)) * 0.25;
-    return acc + share * rented * electric * (l.boughtFeed ? 0.5 : 1) * (l.organic ? 0.95 : 1);
-  }, 0);
-  if (total <= 0) value = reduced;
-  if (a.forestPlan) value = reduced * 0.8;
-  else {
-    value *= a.externalMeans ? 0.75 : staffIndexOf(a.staffPercent);
-    if (reduced <= 9447.91 && !a.young) value *= 0.9;
-  }
+  const value = farmCorrected(a, reduced, bases, forestry);
   const modules = round2(value);
   const general = modules > 0 ? round2(modules * 0.05) : 0;
   const young = a.young ? round2((modules - general) * 0.25) : 0;
@@ -487,7 +505,7 @@ export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
 
 // ─── The activities of the return and the reductions of art. 32 ──────────────
 
-export type ActivityInput =
+export type ActivityInput = (
   | {
       kind: 'direct';
       name: string;
@@ -498,7 +516,14 @@ export type ActivityInput =
       payments: number;
     }
   | { kind: 'modules'; name: string; data: ModulesActivity; withheld: number; payments: number }
-  | { kind: 'agrarian'; name: string; data: FarmActivity; withheld: number; payments: number };
+  | { kind: 'agrarian'; name: string; data: FarmActivity; withheld: number; payments: number }
+) & {
+  /**
+   * The share (0-1) of the net income that is the taxpayer's: 0.5 in a farm of shared ownership
+   * (Ley 35/2011, art. 5: the income is split in equal parts between the two owners). 1 if unset.
+   */
+  share?: number;
+};
 
 export interface ActivitiesResult {
   /** Box 0231: sum of the net incomes in direct estimation. */
@@ -562,6 +587,9 @@ export interface ActivityContext {
 }
 
 /** The net income of each activity, by kind, and whether the single-client reduction applies. */
+const shareOf = (a: ActivityInput, net: number) =>
+  a.share === undefined ? net : round2(net * Math.min(1, positive(a.share)));
+
 function netsOf(
   list: ActivityInput[],
   ctx: ActivityContext,
@@ -576,13 +604,15 @@ function netsOf(
       const useDependent = a.dependent && !ctx.hasWork;
       dependent ||= useDependent;
       const r = directNet(a.data, useDependent && a.data.method === 'simplified');
-      totals.direct += r.net;
-      if (a.newActivity && r.net > 0) totals.start += r.net;
-      each.push({ name: a.name, net: r.net, detail: r });
+      const net = shareOf(a, r.net);
+      totals.direct += net;
+      if (a.newActivity && net > 0) totals.start += net;
+      each.push({ name: a.name, net, detail: r });
     } else {
       const r = a.kind === 'modules' ? modulesNet(a.data, table) : farmNet(a.data, indices);
-      totals[a.kind] += r.net;
-      each.push({ name: a.name, net: r.net, detail: r });
+      const net = shareOf(a, r.net);
+      totals[a.kind] += net;
+      each.push({ name: a.name, net, detail: r });
     }
   }
   return { each, totals, dependent };

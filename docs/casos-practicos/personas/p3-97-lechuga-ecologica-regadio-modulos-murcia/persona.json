@@ -34,7 +34,7 @@
           "shared": false,
           "gross": "0.0",
           "socialSecurity": "0.0",
-          "withheld": "1400.0",
+          "withheld": "0.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -45,7 +45,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "agrarian",
               "name": "Lechuga ecológica",
@@ -175,12 +175,12 @@
           "lines": [
             {
               "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
-              "amount": 4901.01,
+              "amount": 4901.02,
               "box": "0435"
             },
             {
               "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
-              "amount": 4901.01,
+              "amount": 4901.02,
               "box": "0500"
             },
             {

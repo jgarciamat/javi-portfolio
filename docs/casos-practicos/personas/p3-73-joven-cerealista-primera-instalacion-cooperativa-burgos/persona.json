@@ -34,7 +34,7 @@
           "shared": false,
           "gross": "0.0",
           "socialSecurity": "0.0",
-          "withheld": "1116.0",
+          "withheld": "76.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -45,7 +45,7 @@
           "compensatory": "",
           "savings": "400",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "direct",
               "name": "Cereal de secano",

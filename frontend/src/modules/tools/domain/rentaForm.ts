@@ -11,6 +11,9 @@ import type {
 import type { RentaCcaa, RentaState } from './rentaData';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
+import type { ActivityInput } from './rentaActivity';
+import { farm2025 } from '../data/renta/agrario-2025';
+import { modules2025 } from '../data/renta/modulos-2025';
 
 export interface ChildForm {
   age: string;
@@ -98,6 +101,8 @@ export interface RentaForm {
   rentalPendingExcess?: string;
   unrented: UnrentedForm[];
   savings: string;
+  /** Economic activities (direct, módulos or farming), as the engine takes them (rentaActivity.ts). */
+  activities?: ActivityInput[];
   /** The savings in detail (interest, sales lot by lot, properties, earlier losses): replaces `savings`. */
   savingsDetail?: SavingsDetail;
   choices: Record<string, Choice>;
@@ -322,6 +327,10 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     imputedValues: unrentedOf(form, data.state.year),
     savings: number(form.savings),
     savingsDetail: form.savingsDetail,
+    // The tables of the módulos of 2025 (Orden HAC/1347/2024): the year of the return.
+    activities: form.activities?.length
+      ? { list: form.activities, modules: modules2025, farm: farm2025 }
+      : undefined,
     family: familyOf(form),
     state: data.state,
     ccaa: data.ccaa,

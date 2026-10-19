@@ -34,7 +34,7 @@
           "shared": false,
           "gross": "16000.0",
           "socialSecurity": "0.0",
-          "withheld": "1380.0",
+          "withheld": "900.0",
           "nonSalary": "16000",
           "retired": true,
           "workExpenses": {},
@@ -45,7 +45,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "agrarian",
               "name": "Chopera",

@@ -173,6 +173,7 @@ def direct_activity(f, lines_out):
     if f.get('share'):
         net = r2(net * f['share'])
     proposal = dict(kind='direct', name=f['name'], dependent=False, newActivity=False, withheld=f.get('withheld', 0), payments=f.get('payments', 0),
+                    **({'share': f['share']} if f.get('share') else {}),
                     data=dict(method=f.get('method', 'simplified'), income=dict(sales=total_in, grants=0, ownUse=0, other=0),
                               expenses=dict(other=r2(sum(v for _, v in exp)), depreciation=r2(sum(d for _, d in deps))),
                               assets=[], lowValue=[], health=dict(premiums=0, people=0, withDisability=0), home=dict(supplies=0, usedPercent=0), provisions=0))
@@ -699,7 +700,11 @@ def form3(p):
                                   pending=dict(gains=[], capital=[], general=[]))
         f['savings'] = ''
     if p.get('actividadPropuesta'):
-        f['activitiesProposed'] = p['actividadPropuesta']
+        # The engine takes the activities (rentaActivity.ts) and adds their withholdings and
+        # quarterly payments to box 0609 itself: they leave the plain withholdings of the form.
+        f['activities'] = p['actividadPropuesta']
+        own = sum(a.get('withheld', 0) + a.get('payments', 0) for a in p['actividadPropuesta'])
+        f['withheld'] = str(r2(float(f['withheld'] or 0) - own))
     return f
 
 
@@ -748,14 +753,15 @@ def agro_person(item):
         for k, label in (('volume', 'Volumen de ingresos de la actividad agraria'), ('previous', 'Rendimiento neto previo'), ('depreciation', 'Amortizaciones'),
                          ('reduced', 'Rendimiento neto minorado'), ('modules', 'Rendimiento neto de módulos'), ('general', 'Reducción general del 5 %'), ('net', 'Rendimiento neto de la actividad')):
             act_figs.append(dict(modelo='100', declaracion='individual', casilla=None, concepto=f'Módulos agrarios: {label}', importe=det[k], origen='calculo-a-mano',
-                                 ref='calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32', campo=None, motivo=ACT_GAP))
+                                 ref='calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32',
+                                 campo=f'activity.0.{"income" if k == "volume" else k}'))
         withheld = f.get('withheld', 0)
         payments = f.get('payments', 0)
     elif item.get('direct'):
         net, det, proposal = direct_activity(item['direct'], lines)
         for k, label in (('income', 'Ingresos'), ('expenses', 'Gastos con amortizaciones'), ('provisions', 'Difícil justificación (5 %)'), ('net', 'Rendimiento neto')):
             act_figs.append(dict(modelo='100', declaracion='individual', casilla=None, concepto=f'Estimación directa: {label}', importe=det[k], origen='calculo-a-mano',
-                                 ref='calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32', campo=None, motivo=ACT_GAP))
+                                 ref='calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32', campo=f'activity.0.{k}'))
         withheld = item['direct'].get('withheld', 0)
         payments = item['direct'].get('payments', 0)
     else:

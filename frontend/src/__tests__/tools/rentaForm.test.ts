@@ -80,3 +80,38 @@ describe('the obligation to file (LIRPF art. 96)', () => {
     expect(obligationIncome(emptyForm('100'))).toEqual({ mainIncome: 100, otherIncome: 0 });
   });
 });
+
+describe('the activities of the form', () => {
+  it('go to the engine with the tables of the módulos of the year', async () => {
+    const { toInput } = await import('@modules/tools/domain/rentaForm');
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    const { rentaWorkExtras } = await import('@modules/tools/data/renta/estado-extra');
+    const { loadCcaa } = await import('@modules/tools/data/renta');
+    const data = {
+      state: rentaState,
+      ccaa: await loadCcaa('madrid'),
+      extras: rentaWorkExtras,
+      property: rentaProperty,
+      workReduction: () => 0,
+    };
+    const farm = {
+      kind: 'agrarian' as const,
+      name: 'Olivar',
+      withheld: 0,
+      payments: 0,
+      data: {
+        lines: [],
+        assets: [],
+        externalMeans: false,
+        staffPercent: 0,
+        forestPlan: false,
+        young: false,
+        extraordinary: 0,
+      },
+    };
+    const input = toInput({ ...emptyForm(''), activities: [farm] }, data);
+    expect(input.activities?.modules.length).toBe(70);
+    expect(input.activities?.farm.length).toBeGreaterThan(0);
+    expect(toInput({ ...emptyForm(''), activities: [] }, data).activities).toBeUndefined();
+  });
+});

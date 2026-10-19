@@ -28,25 +28,25 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 - Amortización sistema de riego y nave: 40.000,00 × 5 % = 2.000,00
 - Amortización tractor: 35.000,00 × 25 % = 8.750,00
 - Rendimiento neto previo 20.384,00 − amortizaciones 10.750,00 = rendimiento neto minorado **9.634,00**
-- Índices correctores: f) regadío con energía eléctrica × 0,75; e) agricultura ecológica × 0,95 → rendimiento neto de módulos **6.864,22**
-- Reducción general del 5 % (DA 1.ª de la Orden HAC/1347/2024) 343,21 → rendimiento neto de la actividad **6.521,01**
+- Índices correctores: f) regadío con energía eléctrica × 0,75; e) agricultura ecológica × 0,95 → rendimiento neto de módulos **6.864,23**
+- Reducción general del 5 % (DA 1.ª de la Orden HAC/1347/2024) 343,21 → rendimiento neto de la actividad **6.521,02**
 - Se supone que el término municipal no figura en la orden de reducción de índices de 2025 por circunstancias excepcionales (dato del caso).
 - Retenciones de la actividad (cooperativa, almacén o integradora) 1.400,00 y pagos fraccionados 0,00: van a los pagos a cuenta (0599 y 0604)
-- Rendimiento neto de actividades que va a la base general = **6.521,01**
+- Rendimiento neto de actividades que va a la base general = **6.521,02**
 
 ### 4. Reducción por obtención de rendimientos del trabajo (art. 20)
 
-- Otras rentas 6.521,01 > 6.500: no hay reducción.
-- Reducción del art. 32.2.3.º LIRPF: rentas no exentas 6.521,01 < 12.000 € → **1.620,00** (con la del art. 20, máximo 3.700 €)
+- Otras rentas 6.521,02 > 6.500: no hay reducción.
+- Reducción del art. 32.2.3.º LIRPF: rentas no exentas 6.521,02 < 12.000 € → **1.620,00** (con la del art. 20, máximo 3.700 €)
 - Rendimiento neto reducido (0025) = **0,00**
 
 ### 5. Bases imponibles (LIRPF arts. 45-49)
 
-- Base imponible general (0435) = 0,00 + 4.901,01 (actividades) = **4.901,01**
+- Base imponible general (0435) = 0,00 + 4.901,02 (actividades) = **4.901,02**
 
 ### 6. Reducciones de la base y bases liquidables (arts. 50-55 y 84)
 
-- Base liquidable general (0500) = 4.901,01 = **4.901,01**
+- Base liquidable general (0500) = 4.901,02 = **4.901,02**
 - Base liquidable del ahorro (0510) = **0,00**
 
 ### 7. Mínimo personal y familiar (arts. 56-61)
@@ -56,8 +56,8 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 
 ### 8. Cuotas íntegras (arts. 63-66 y 74-76)
 
-- General estatal: escala(4.901,01) 465,60 − escala(mínimo 4.901,01) 465,60 = 0,00
-- General autonómica (Región de Murcia): escala(4.901,01) 465,60 − escala(mínimo 4.901,01) 465,60 = 0,00
+- General estatal: escala(4.901,02) 465,60 − escala(mínimo 4.901,02) 465,60 = 0,00
+- General autonómica (Región de Murcia): escala(4.901,02) 465,60 − escala(mínimo 4.901,02) 465,60 = 0,00
 - Cuota íntegra estatal (0545) = **0,00**; autonómica (0546) = **0,00**
 
 ### 9. Deducciones, cuota resultante y resultado

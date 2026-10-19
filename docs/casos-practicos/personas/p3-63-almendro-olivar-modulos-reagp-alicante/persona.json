@@ -35,7 +35,7 @@
           "shared": false,
           "gross": "0.0",
           "socialSecurity": "0.0",
-          "withheld": "640.0",
+          "withheld": "0.0",
           "nonSalary": "",
           "retired": false,
           "workExpenses": {},
@@ -46,7 +46,7 @@
           "compensatory": "",
           "savings": "",
           "choices": {},
-          "activitiesProposed": [
+          "activities": [
             {
               "kind": "agrarian",
               "name": "Almendro y olivar",

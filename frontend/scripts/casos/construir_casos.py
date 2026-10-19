@@ -26,7 +26,9 @@ MANUAL = 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folle
 
 
 def r2(x):
-    return float(Decimal(repr(x)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
+    # As the engine's round2 (round.ts): first to 15 significant digits, which takes away the noise
+    # of binary floats (9.634 × 0.75 × 0.95 = 6.864,225, not 6.864,2249999…), then half up.
+    return float(Decimal(f'{x:.15g}').quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
 
 
 def eur(x):

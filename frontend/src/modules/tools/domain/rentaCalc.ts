@@ -539,6 +539,8 @@ interface Earner {
   /** Works in a job: the extra expenses for a disability are only for active workers. */
   active: boolean;
   disability: Disability;
+  /** Needs help of third people or has reduced mobility (only the person's is asked). */
+  assistance: boolean;
   /** Own contributions to pension plans, and the employer's. */
   pensionPlan: number;
   pensionEmployer: number;
@@ -558,6 +560,7 @@ function earnersOf(input: RentaInput): Earner[] {
     extra: positive(input.workExpensesExtra),
     active: !input.retired,
     disability: input.family.disability,
+    assistance: input.family.assistance === true,
     pensionPlan: positive(input.pensionPlan),
     pensionEmployer: positive(input.pensionPlanEmployer),
     main: true,
@@ -572,6 +575,7 @@ function earnersOf(input: RentaInput): Earner[] {
       extra: 0,
       active: !partner.retired,
       disability: partner.disability,
+      assistance: false,
       pensionPlan: positive(partner.pensionPlan),
       pensionEmployer: 0,
       main: false,
@@ -579,8 +583,19 @@ function earnersOf(input: RentaInput): Earner[] {
   ];
 }
 
-const disabilityExpense = (state: RentaState, level: Disability): number =>
-  level >= 65 ? state.workExpenses.disability65 : level >= 33 ? state.workExpenses.disability33 : 0;
+/**
+ * The increase of art. 19.2.f for an active worker with a disability: 3,500 €, or 7,750 € from 65 %
+ * or when they "acrediten necesitar ayuda de terceras personas o movilidad reducida".
+ */
+const disabilityExpense = (
+  state: RentaState,
+  e: Pick<Earner, 'disability' | 'assistance'>
+): number =>
+  e.disability >= 65 || (e.disability >= 33 && e.assistance)
+    ? state.workExpenses.disability65
+    : e.disability >= 33
+    ? state.workExpenses.disability33
+    : 0;
 
 /**
  * Net pay from work after the "other expenses" of art. 19.2.f (2,000 euros, more for an active
@@ -606,20 +621,18 @@ function workIncome(input: RentaInput, earners: Earner[]) {
   const workers = earners.filter((e) => e.active && (e.main || e.gross > 0));
   const disabled = workers.reduce<Earner | null>(
     (best, e) =>
-      disabilityExpense(state, e.disability) >
-      (best ? disabilityExpense(state, best.disability) : 0)
-        ? e
-        : best,
+      disabilityExpense(state, e) > (best ? disabilityExpense(state, best) : 0) ? e : best,
     null
   );
-  if (disabled)
-    increments[earners.indexOf(disabled)] = disabilityExpense(state, disabled.disability);
+  if (disabled) increments[earners.indexOf(disabled)] = disabilityExpense(state, disabled);
   if (input.geographicMobility) increments[0] += input.extras.geographicMobilityExtra;
 
   const sum = (list: number[]) => list.reduce((a, b) => a + b, 0);
   const afterShares = sum(before.map((b, i) => Math.max(0, b - shares[i])));
   return {
-    otherExpenses: sum(shares) + sum(increments),
+    // Box 0019: art. 19.2.f, "tendrán como límite el rendimiento íntegro del trabajo una vez minorado
+    // por el resto de gastos deducibles" (BOE-A-2006-20764, checked 19-10-2026): 0 without pay.
+    otherExpenses: round2(sum(before.map((b, i) => Math.min(b, shares[i] + increments[i])))),
     netIncome: round2(Math.max(0, afterShares - sum(increments))),
     reductionBase: round2(sum(before)),
     /** The gross pay of the return (box 0012), and the net before the "other expenses" (box 0017). */

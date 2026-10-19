@@ -276,6 +276,57 @@ describe('farming by módulos (annex I)', () => {
     });
   });
 
+  it('takes no depreciation and only the index h for forestry', () => {
+    const forest = (forestPlan: boolean) =>
+      farmNet(
+        farm({
+          lines: [
+            {
+              indexId: 'forestShort',
+              income: 26880,
+              transformed: false,
+              rentedShare: 0,
+              electricShare: 0,
+              boughtFeed: false,
+              organic: false,
+            },
+          ],
+          staffPercent: 50,
+          forestPlan,
+        }),
+        farm2025
+      );
+    // 26,880 × 0.26 = 6,988.80, under 9,447.91 but no index g for forestry (case p3-82).
+    expect(forest(false)).toMatchObject({ depreciation: 0, modules: 6988.8, net: 6639.36 });
+    expect(forest(true).modules).toBe(5591.04);
+  });
+
+  it('splits two products in proportion to their base', () => {
+    const line = (income: number, organic: boolean) => ({
+      indexId: 'crops',
+      income,
+      transformed: false,
+      rentedShare: 0,
+      electricShare: 0,
+      boughtFeed: false,
+      organic,
+    });
+    // 10,000 and 30,000 × 0.26 = 2,600 + 7,800 = 10,400 > 9,447.91; the organic part 7,800 × 0.95.
+    expect(
+      farmNet(
+        farm({ lines: [line(10000, false), line(30000, true)], assets: [], staffPercent: 0 }),
+        farm2025
+      ).modules
+    ).toBe(10010);
+    // Nothing to split: the bases are zero.
+    expect(
+      farmNet(
+        farm({ lines: [line(0, false), line(0, true)], assets: [], staffPercent: 0 }),
+        farm2025
+      ).modules
+    ).toBe(0);
+  });
+
   it('applies the indices of land, irrigation, organic, staff and small farms', () => {
     const crops = (
       over: Partial<FarmActivity['lines'][number]>,
@@ -386,6 +437,22 @@ describe('the reductions of art. 32', () => {
       activitiesOf([{ ...one, dependent: true }], ctx({ hasWork: true }), modules2025, farm2025)
         .dependentReduction
     ).toBe(0);
+  });
+
+  it('takes the share of a farm of shared ownership (Ley 35/2011)', () => {
+    const one = {
+      kind: 'direct' as const,
+      name: 'Vacuno',
+      data: designer(),
+      dependent: false,
+      newActivity: false,
+      withheld: 0,
+      payments: 0,
+    };
+    const r = activitiesOf([{ ...one, share: 0.5 }], ctx(), modules2025, farm2025);
+    expect(r.each[0]).toMatchObject({ net: 13323.75 });
+    expect(r.direct).toBe(13323.75);
+    expect(activitiesOf([{ ...one, share: 3 }], ctx(), modules2025, farm2025).direct).toBe(26647.5);
   });
 
   it('spreads the small-income reduction over direct, módulos and farming', () => {
