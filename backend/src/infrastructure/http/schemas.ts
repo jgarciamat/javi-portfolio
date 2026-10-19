@@ -319,6 +319,11 @@ const quarterExtras = z.object({
   withheld: euroAmount.default(0),
   socialSecurity: euroAmount.default(0),
   vatNotDeductible: euroAmount.default(0),
+  depreciation: euroAmount.optional(),
+  provisions: euroAmount.optional(),
+  subsidies: euroAmount.optional(),
+  capitalSubsidies: euroAmount.optional(),
+  compensations: euroAmount.optional(),
 });
 const vatRateValue = z.union([z.literal(21), z.literal(10), z.literal(4), z.literal(0)]);
 const manualExpense = z.object({
@@ -443,6 +448,8 @@ export const autonomoDraftBody = z.object({
   inputs: z.object({
     quarters: z.tuple([quarterExtras, quarterExtras, quarterExtras, quarterExtras]),
     hardToJustify: z.boolean().default(false),
+    modality: z.enum(['simplified', 'normal']).optional(),
+    agrarian: z.boolean().optional(),
     priorYearNet: z.number().finite().min(-100_000_000).max(100_000_000).nullable().default(null),
     exempt130: z.boolean().default(false),
     vatToOffset: euroAmount.default(0),

@@ -1,6 +1,7 @@
 import {
   HARD_TO_JUSTIFY_MAX,
   HARD_TO_JUSTIFY_RATE,
+  AGRARIAN_ADVANCE,
   IRPF_ADVANCE,
   LOW_INCOME_REDUCTIONS,
   RETA_BRACKETS_2026,
@@ -35,6 +36,17 @@ export interface QuarterExtras {
   socialSecurity: number;
   /** VAT paid on expenses that cannot be deducted (meals, gifts, mixed-use car...). */
   vatNotDeductible: number;
+  /**
+   * Worked out by the app from the assets and grants of the activity (frontend depreciation.ts and
+   * subsidies.ts): depreciation of the quarter (art. 30.1.ª RIRPF), provisions (normal modality),
+   * current grants, capital grants imputed by depreciation and REAGP compensations received (art.
+   * 130 LIVA), all income or expenses of box 01 or 02.
+   */
+  depreciation?: number;
+  provisions?: number;
+  subsidies?: number;
+  capitalSubsidies?: number;
+  compensations?: number;
 }
 
 export interface DraftInputs {
@@ -42,6 +54,10 @@ export interface DraftInputs {
   quarters: [QuarterExtras, QuarterExtras, QuarterExtras, QuarterExtras];
   /** Simplified direct estimation: 5 % of hard-to-justify expenses (up to 2,000 euros a year). */
   hardToJustify: boolean;
+  /** The normal modality has no hard-to-justify expenses (art. 30.2.4.ª RIRPF is for the simplified). */
+  modality?: 'simplified' | 'normal';
+  /** Farming, livestock, forestry or fishing: section II of the 130 (2 % of the quarter's income). */
+  agrarian?: boolean;
   /** Net income of last year, for the low-income reduction (null: unknown, none applied). */
   priorYearNet: number | null;
   /** Professional whose clients withheld at least 70 % of last year's income: no modelo 130. */
@@ -181,6 +197,60 @@ function windowOf(inputs: DraftInputs, upTo: number): CumulativeWindow {
   };
 }
 
+const cents = (amount: number): number => Math.round(amount * 100);
+/** What the activity adds to the income of a quarter beyond the invoices (euros). */
+const extraIncome = (e: QuarterExtras): number =>
+  (e.subsidies ?? 0) + (e.capitalSubsidies ?? 0) + (e.compensations ?? 0);
+/** What it adds to the expenses: the fees, the VAT not deducted, depreciation and provisions. */
+const extraExpenses = (e: QuarterExtras): number =>
+  e.socialSecurity + e.vatNotDeductible + (e.depreciation ?? 0) + (e.provisions ?? 0);
+
+/** Section I of the 130 (boxes 01-07), cumulative from January; amounts in cents but 04-07. */
+function section1Of(s: {
+  income: number;
+  expenses: number;
+  net: number;
+  fourth: number;
+  previousPayments: number;
+  withheld: number;
+  box07: number;
+}): Box[] {
+  return [
+    { box: '01', label: 'Ingresos íntegros acumulados', amount: euros(s.income) },
+    { box: '02', label: 'Gastos fiscalmente deducibles acumulados', amount: euros(s.expenses) },
+    { box: '03', label: 'Rendimiento neto (01 − 02)', amount: euros(s.net) },
+    { box: '04', label: '20 % del rendimiento neto', amount: round2(s.fourth) },
+    { box: '05', label: 'Pagos de trimestres anteriores', amount: round2(s.previousPayments) },
+    { box: '06', label: 'Retenciones soportadas acumuladas', amount: round2(s.withheld) },
+    { box: '07', label: 'Resultado (04 − 05 − 06)', amount: s.box07 },
+  ];
+}
+
+/**
+ * Section II of the 130 (boxes 08-11): 2 % of the income of the quarter alone, with the current
+ * grants and without the capital ones and compensations for damage, less the withholdings of the
+ * quarter (art. 110.1.c and 110.3.b RIRPF; instructions of the modelo 130, box 08).
+ */
+function agrarianSection(q: Quarter, e: QuarterExtras): { box11: number; boxes: Box[] } {
+  // Whether the REAGP compensations go here is NOT CONFIRMED (the instructions do not say): left out.
+  const volume = euros(q.incomeBase + cents(e.subsidies ?? 0));
+  const box09 = round2(volume * AGRARIAN_ADVANCE);
+  const box11 = round2(box09 - e.withheld);
+  return {
+    box11,
+    boxes: [
+      { box: '08', label: 'Volumen de ingresos del trimestre', amount: volume },
+      { box: '09', label: '2 % del volumen de ingresos', amount: box09 },
+      {
+        box: '10',
+        label: 'Retenciones e ingresos a cuenta del trimestre',
+        amount: round2(e.withheld),
+      },
+      { box: '11', label: 'Resultado (09 − 10)', amount: box11 },
+    ],
+  };
+}
+
 function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): Draft130 {
   if (inputs.exempt130) return { required: false, result: 'notRequired', amountDue: 0, boxes: [] };
   const reduction = lowIncomeReduction(inputs.priorYearNet);
@@ -192,15 +262,18 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
   for (let n = window.start + 1; n <= upTo; n++) {
     const sel = quarters.slice(window.start, n);
     const extras = inputs.quarters.slice(window.start, n);
-    const income = window.income + sel.reduce((s, q) => s + q.incomeBase, 0);
+    const income =
+      window.income +
+      sel.reduce((s, q) => s + q.incomeBase, 0) +
+      extras.reduce((s, e) => s + cents(extraIncome(e)), 0);
     const baseExpenses =
       window.expenses +
       sel.reduce((s, q) => s + q.expenseIrpf, 0) +
-      extras.reduce((s, e) => s + Math.round((e.socialSecurity + e.vatNotDeductible) * 100), 0);
+      extras.reduce((s, e) => s + cents(extraExpenses(e)), 0);
     const preNet = income - baseExpenses;
     // The filed total of box 02 already counts the hard-to-justify expenses of the earlier quarters.
     const hard =
-      inputs.hardToJustify && !window.prior
+      inputs.hardToJustify && inputs.modality !== 'normal' && !window.prior
         ? Math.min(
             Math.round(Math.max(0, preNet) * HARD_TO_JUSTIFY_RATE),
             HARD_TO_JUSTIFY_MAX * 100
@@ -210,19 +283,21 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
     const net = income - expenses;
     const fourth = Math.max(0, euros(net)) * IRPF_ADVANCE;
     const withheld = window.withheld + extras.reduce((s, e) => s + e.withheld, 0);
-    const box07 = round2(round2(fourth) - previousPayments - withheld);
-    const box12 = Math.max(0, box07);
+    // A farming activity fills in section II only: 2 % of the income of the quarter.
+    const agrarian = Boolean(inputs.agrarian);
+    const box07 = agrarian ? 0 : round2(round2(fourth) - previousPayments - withheld);
+    const section2 = agrarian
+      ? agrarianSection(quarters[n - 1], inputs.quarters[n - 1])
+      : { box11: 0, boxes: [] };
+    const box12 = Math.max(0, round2(box07 + section2.box11));
     const box14 = round2(box12 - reduction);
     const box15 = round2(box14 > 0 ? Math.min(box14, carriedNegative) : 0);
     const box17 = round2(box14 - box15);
     last = [
-      { box: '01', label: 'Ingresos íntegros acumulados', amount: euros(income) },
-      { box: '02', label: 'Gastos fiscalmente deducibles acumulados', amount: euros(expenses) },
-      { box: '03', label: 'Rendimiento neto (01 − 02)', amount: euros(net) },
-      { box: '04', label: '20 % del rendimiento neto', amount: round2(fourth) },
-      { box: '05', label: 'Pagos de trimestres anteriores', amount: round2(previousPayments) },
-      { box: '06', label: 'Retenciones soportadas acumuladas', amount: round2(withheld) },
-      { box: '07', label: 'Resultado (04 − 05 − 06)', amount: box07 },
+      ...(agrarian
+        ? []
+        : section1Of({ income, expenses, net, fourth, previousPayments, withheld, box07 })),
+      ...section2.boxes,
       { box: '12', label: 'Suma de 07 y 11 (si es negativa, 0)', amount: round2(box12) },
       { box: '13', label: 'Minoración por rentas bajas del ejercicio anterior', amount: reduction },
       { box: '14', label: 'Resultado tras la minoración (12 − 13)', amount: box14 },
@@ -258,13 +333,15 @@ export function retaFor(monthlyNet: number): RetaEstimate {
 function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): RetaEstimate {
   const window = windowOf(inputs, upTo);
   const sel = quarters.slice(window.start, upTo);
-  const income = window.income + sel.reduce((s, q) => s + q.incomeBase, 0);
+  const extras = inputs.quarters.slice(window.start, upTo);
+  const income =
+    window.income +
+    sel.reduce((s, q) => s + q.incomeBase, 0) +
+    extras.reduce((s, e) => s + cents(extraIncome(e)), 0);
   const expenses =
     window.expenses +
     sel.reduce((s, q) => s + q.expenseIrpf, 0) +
-    inputs.quarters
-      .slice(window.start, upTo)
-      .reduce((s, e) => s + Math.round(e.vatNotDeductible * 100), 0);
+    extras.reduce((s, e) => s + cents(extraExpenses(e) - e.socialSecurity), 0);
   // The fees paid are added back: the contribution is worked out on the net income before them.
   const net = euros(income - expenses);
   const monthly = (Math.max(0, net) / (upTo * 3)) * (1 - RETA_GENERAL_EXPENSES);

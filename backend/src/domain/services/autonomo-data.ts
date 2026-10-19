@@ -52,6 +52,8 @@ export const LOW_INCOME_REDUCTIONS: { upTo: number; amount: number }[] = [
 
 /** Pay-in-advance rate of the income tax (modelo 130, box 04). */
 export const IRPF_ADVANCE = 0.2;
+/** Section II of the 130, farming, livestock, forestry and fishing: 2 % of the quarter's income (art. 110.1.c RIRPF). */
+export const AGRARIAN_ADVANCE = 0.02;
 /** Hard-to-justify expenses of the simplified direct estimation: 5 % of the net income, up to 2,000 euros a year. */
 export const HARD_TO_JUSTIFY_RATE = 0.05;
 export const HARD_TO_JUSTIFY_MAX = 2000;
