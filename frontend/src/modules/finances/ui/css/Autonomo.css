@@ -173,27 +173,29 @@
   }
 }
 
-/* ─── Importing the invoice books ────────────────────────────────────────── */
-.autonomo-import-books {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
-.autonomo-import-book {
+/* ─── Importing: one drop zone for books and forms ───────────────────────── */
+.autonomo-drop {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--slate-700);
-  border-radius: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.9rem;
+  padding: 1.25rem 1rem;
+  border: 2px dashed rgba(129, 140, 248, 0.45);
+  border-radius: 12px;
+  text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
-
-.autonomo-import-book h4 {
+.autonomo-drop.is-dragging {
+  border-color: var(--accent-200);
+  background: rgba(99, 102, 241, 0.12);
+}
+.autonomo-drop-text {
   margin: 0;
+  font-weight: 600;
 }
-
-.autonomo-import-book .section-hint {
+.autonomo-drop .section-hint {
+  flex-basis: 100%;
   margin: 0;
 }
 
@@ -202,30 +204,171 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  margin-top: auto;
 }
 
-/* A link that looks like the secondary button. */
-.autonomo-import-actions a.btn-secondary {
+.autonomo-templates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  margin-top: 0.9rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+/* Links that look like small secondary buttons. */
+.autonomo-templates a.btn-secondary {
   display: inline-flex;
   align-items: center;
-  padding: 0.55rem 0.9rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
   text-decoration: none;
 }
 
-.autonomo-import-result,
-.autonomo-import-skipped {
-  margin: 0.75rem 0 0;
+.autonomo-import-files {
+  list-style: none;
+  padding: 0;
+  margin: 0.9rem 0 0;
+  display: grid;
+  gap: 0.5rem;
   font-size: 0.88rem;
 }
-
-.autonomo-import-result p {
-  margin: 0 0 0.35rem;
+.autonomo-import-file {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.autonomo-import-file p {
+  margin: 0.3rem 0 0;
 }
 
-.autonomo-import-skipped {
-  padding-left: 1.1rem;
-  color: var(--slate-400);
+/* ─── Reviewing the imported invoices ────────────────────────────────────── */
+.autonomo-review-scroll {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+.autonomo-review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.autonomo-review-table caption {
+  text-align: left;
+  font-weight: 700;
+  padding: 0.25rem 0 0.5rem;
+}
+.autonomo-review-table th,
+.autonomo-review-table td {
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  vertical-align: middle;
+}
+.autonomo-review-table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.autonomo-review-date {
+  white-space: nowrap;
+}
+.autonomo-review-table .num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.autonomo-review-table select.tx-input {
+  min-width: 11rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.autonomo-review-table input[type='checkbox'] {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.autonomo-review-table tr.is-excluded td:not(:first-child) {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.autonomo-review-table tr.is-negative .num {
+  color: var(--red-300, #fca5a5);
+}
+.autonomo-review-table tr.is-highlighted td {
+  background: rgba(99, 102, 241, 0.16);
+}
+.autonomo-review-offer td {
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-review-offer td span {
+  display: inline-block;
+  margin: 0.2rem 0.6rem 0.2rem 0;
+}
+
+/* On a phone each invoice is a card: the headings go next to each value. */
+@media (max-width: 640px) {
+  .autonomo-review-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .autonomo-review-table,
+  .autonomo-review-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .autonomo-review-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.8rem;
+    background: rgba(0, 0, 0, 0.18);
+  }
+  .autonomo-review-table td {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    border: none;
+    padding: 0;
+    text-align: left;
+  }
+  .autonomo-review-table td.num {
+    text-align: left;
+  }
+  .autonomo-review-table td::before {
+    content: attr(data-label);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  /* Who and the kind of expense take the whole width of the card. */
+  .autonomo-review-table td.autonomo-review-who,
+  .autonomo-review-table td.autonomo-review-kind {
+    grid-column: 1 / -1;
+  }
+  .autonomo-review-table td.autonomo-review-who {
+    font-weight: 600;
+  }
+  .autonomo-review-table select.tx-input {
+    min-width: 0;
+    width: 100%;
+  }
+  .autonomo-review-table tr.autonomo-review-offer,
+  .autonomo-review-table tr.autonomo-review-offer td {
+    display: block;
+  }
+  .autonomo-review-offer td::before {
+    content: none;
+  }
 }
 
 .autonomo-wipe {

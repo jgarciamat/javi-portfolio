@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import {
   AutonomoManual,
   emptyManual,
   type ManualForm,
 } from '@modules/finances/ui/components/AutonomoManual';
-import { applyBook } from '@modules/finances/ui/components/InvoiceImport';
 import { I18nProvider } from '@core/i18n/I18nContext';
 import { tr } from '@test-utils/render';
 import { buildXlsx, type XlsxCell, type XlsxSheet } from '../../../scripts/xlsx';
@@ -46,8 +45,8 @@ const file = (name: string, content: Uint8Array | string): File => {
 const workbook = (name: string, rows: XlsxCell[][], sheet = 'Hoja') =>
   file(name, buildXlsx([{ name: sheet, rows } as XlsxSheet], { sharedStrings: true }));
 
-const upload = (label: string, f: File) =>
-  fireEvent.change(screen.getByLabelText(tr(label)), { target: { files: [f] } });
+const input = () => screen.getByLabelText(tr('app.autonomo.import.files'));
+const upload = (...files: File[]) => fireEvent.change(input(), { target: { files } });
 
 const ISSUED: XlsxCell[][] = [
   ['Fecha expedición', 'Cliente', 'Base imponible', 'Tipo de IVA', 'Importe retenido del IRPF'],
@@ -71,41 +70,39 @@ const RECEIVED: XlsxCell[][] = [
 const value = (label: string) => (screen.getByLabelText(label) as HTMLInputElement).value;
 const incomeLabel = (rate: string, q: number) => `${tr(`app.autonomo.income.${rate}`)} ${q}`;
 const withheldLabel = (q: number) => `${tr('app.autonomo.withheld')} ${q}`;
+const issuedDone = tr('app.autonomo.import.done.issued', {
+  count: 5,
+  year: 2026,
+  quarters: 'T1, T2, T3',
+});
 
-describe('Importing the invoice books of the self-employed', () => {
-  it('offers a button and a template for each book', () => {
-    show();
-    for (const [kind, file] of [
-      ['issued', 'facturas-emitidas.xlsx'],
-      ['received', 'facturas-recibidas.xlsx'],
-    ]) {
-      expect(
-        screen.getByRole('button', { name: tr(`app.autonomo.import.${kind}Button`) })
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText(tr(`app.autonomo.import.${kind}File`))).toBeInTheDocument();
-      expect(
-        screen
-          .getAllByRole('link', { name: tr('app.autonomo.import.template') })
-          .map((a) => a.getAttribute('href'))
-      ).toContain(`/plantillas/${file}`);
-    }
-  });
+beforeEach(() => localStorage.clear());
 
-  it('opens the file chooser from the button', () => {
+describe('One place to import invoice books', () => {
+  it('has one button, one file input for several files and the four templates', () => {
     show();
-    const input = screen.getByLabelText(tr('app.autonomo.import.issuedFile')) as HTMLInputElement;
-    const click = jest.spyOn(input, 'click');
-    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.import.issuedButton') }));
+    expect(screen.getAllByRole('button', { name: tr('app.autonomo.import.choose') })).toHaveLength(
+      1
+    );
+    expect(input()).toHaveAttribute('multiple');
+    const templates = screen
+      .getAllByRole('link', { name: new RegExp(tr('app.autonomo.import.template')) })
+      .map((a) => a.getAttribute('href'));
+    expect(templates).toEqual([
+      '/plantillas/facturas-emitidas.xlsx',
+      '/plantillas/facturas-recibidas.xlsx',
+      '/plantillas/modelo-130-plantilla.pdf',
+      '/plantillas/modelo-303-plantilla.pdf',
+    ]);
+    const click = jest.spyOn(input(), 'click');
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.import.choose') }));
     expect(click).toHaveBeenCalled();
   });
 
-  it('fills the income of each quarter by VAT rate with the withholdings, and says what it did', async () => {
+  it('knows an issued book by its columns, fills the income by VAT rate and says what it did', async () => {
     show();
-    upload('app.autonomo.import.issuedFile', workbook('emitidas.xlsx', ISSUED));
-    const done = await screen.findByRole('status');
-    expect(done).toHaveTextContent(
-      tr('app.autonomo.import.done.issued', { count: 5, year: 2026, quarters: 'T1, T2, T3' })
-    );
+    upload(workbook('libro.xlsx', ISSUED));
+    expect(await screen.findByRole('status')).toHaveTextContent(issuedDone);
     expect(value(incomeLabel('r21', 1))).toBe('4500');
     expect(value(withheldLabel(1))).toBe('675');
     expect(value(incomeLabel('r10', 2))).toBe('1000');
@@ -116,11 +113,13 @@ describe('Importing the invoice books of the self-employed', () => {
     expect(
       screen.getByText(tr('app.autonomo.import.skipped.year', { n: 1, year: 2026 }))
     ).toBeInTheDocument();
+    expect(screen.getByText('libro.xlsx')).toBeInTheDocument();
+    expect(latest.invoices).toHaveLength(5);
   });
 
-  it('fills the expenses with VAT included, adds up the repeated ones and asks to check their kind', async () => {
+  it('knows a received book by its supplier column, groups the expenses and asks to check their kind', async () => {
     show();
-    upload('app.autonomo.import.receivedFile', workbook('recibidas.xlsx', RECEIVED));
+    upload(workbook('libro.xlsx', RECEIVED));
     expect(await screen.findByText(tr('app.autonomo.import.review'))).toBeInTheDocument();
     const kind = (id: string) => value(`${tr('app.autonomo.expenseKind')} ${id}`);
     const amount = (id: string) => value(`${tr('app.autonomo.expenseAmount')} ${id}`);
@@ -138,24 +137,21 @@ describe('Importing the invoice books of the self-employed', () => {
     ).toBeInTheDocument();
   });
 
-  it('does not duplicate anything when the same book is imported again', async () => {
+  it('does not duplicate anything when the same books are imported again', async () => {
     show();
     for (let i = 0; i < 2; i++) {
-      upload('app.autonomo.import.issuedFile', workbook('emitidas.xlsx', ISSUED));
-      await screen.findByText(
-        tr('app.autonomo.import.done.issued', { count: 5, year: 2026, quarters: 'T1, T2, T3' })
-      );
-      upload('app.autonomo.import.receivedFile', workbook('recibidas.xlsx', RECEIVED));
+      upload(workbook('emitidas.xlsx', ISSUED), workbook('recibidas.xlsx', RECEIVED));
       await screen.findByText(tr('app.autonomo.import.review'));
     }
     expect(value(incomeLabel('r21', 1))).toBe('4500');
     expect(latest.quarters[0].expenses).toHaveLength(2);
+    expect(latest.invoices).toHaveLength(9);
   });
 
   it('keeps what was typed in the quarters the file does not have', async () => {
     show();
     fireEvent.change(screen.getByLabelText(incomeLabel('r21', 4)), { target: { value: '777' } });
-    upload('app.autonomo.import.issuedFile', workbook('emitidas.xlsx', ISSUED));
+    upload(workbook('emitidas.xlsx', ISSUED));
     await screen.findByRole('status');
     expect(value(incomeLabel('r21', 4))).toBe('777');
   });
@@ -163,9 +159,8 @@ describe('Importing the invoice books of the self-employed', () => {
   it('reads a CSV with Spanish numbers', async () => {
     show();
     upload(
-      'app.autonomo.import.issuedFile',
       file(
-        'emitidas.csv',
+        'ventas.csv',
         'Fecha;Base imponible;Tipo IVA;Retención IRPF %\n15/03/2026;"1.234,50";21;15\n'
       )
     );
@@ -174,45 +169,79 @@ describe('Importing the invoice books of the self-employed', () => {
     expect(value(withheldLabel(1))).toBe('185.18');
   });
 
+  it('imports both books of a workbook that has a sheet for each', async () => {
+    show();
+    upload(
+      file(
+        'contabilidad.xlsx',
+        buildXlsx(
+          [
+            { name: 'Ingresos', rows: ISSUED },
+            { name: 'Gastos', rows: RECEIVED },
+            { name: 'Notas', rows: [['Nada que ver aquí']] },
+          ] as XlsxSheet[],
+          { sharedStrings: true }
+        )
+      )
+    );
+    await screen.findByText(tr('app.autonomo.import.review'));
+    expect(screen.getByText(issuedDone)).toBeInTheDocument();
+    expect(latest.invoices.filter((i) => i.book === 'received')).toHaveLength(4);
+  });
+
+  it('asks whether a book says nothing of itself, and imports it as the person says', async () => {
+    show();
+    const rows = 'Fecha;Base imponible;Tipo IVA\n15/03/2026;100;21\n';
+    upload(file('libro.csv', rows), file('otro.csv', rows));
+    const groups = await screen.findAllByRole('group', {
+      name: /libro\.csv|otro\.csv/,
+    });
+    expect(groups).toHaveLength(2);
+    expect(within(groups[0]).getByText(tr('app.autonomo.import.ask'))).toBeInTheDocument();
+    fireEvent.click(
+      within(groups[0]).getByRole('button', { name: tr('app.autonomo.import.are.received') })
+    );
+    expect(await screen.findByText(tr('app.autonomo.import.review'))).toBeInTheDocument();
+    expect(latest.quarters[0].expenses).toEqual([
+      { kind: 'other', amount: '121', vatRate: 21, days: '' },
+    ]);
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.import.are.issued') }));
+    await waitFor(() => expect(latest.quarters[0].income.r21).toBe('100'));
+    expect(screen.queryByRole('group')).toBeNull();
+  });
+
+  it('uses the name of the file when the sheet does not say which book it is', async () => {
+    show();
+    upload(file('facturas-recibidas.csv', 'Fecha;Base imponible;Tipo IVA\n15/03/2026;100;21\n'));
+    await screen.findByText(tr('app.autonomo.import.review'));
+  });
+
   it('says why a file cannot be used', async () => {
     show();
-    const error = async (key: string) =>
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        tr(`app.autonomo.import.error.${key}`, { year: 2026 })
+    const alert = (key: string) =>
+      waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          tr(`app.autonomo.import.error.${key}`, { year: 2026 })
+        )
       );
-    upload('app.autonomo.import.issuedFile', file('nada.csv', 'Hola\nMundo\n'));
-    await error('noHeader');
+    upload(file('nada.csv', 'Hola\nMundo\n'));
+    await alert('noHeader');
+    upload(file('poco.csv', 'Fecha;Base imponible\n01/01/2026;100\n'));
+    fireEvent.click(
+      await screen.findByRole('button', { name: tr('app.autonomo.import.are.issued') })
+    );
+    await alert('noColumns');
+    upload(file('viejo.xls', 'x'));
+    await alert('unsupported');
+    upload(file('roto.xlsx', 'no es un zip'));
+    await alert('unreadable');
     upload(
-      'app.autonomo.import.issuedFile',
-      file('poco.csv', 'Fecha;Base imponible\n01/01/2026;100\n')
-    );
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(tr('app.autonomo.import.error.noColumns'))
-    );
-    upload('app.autonomo.import.issuedFile', file('viejo.xls', 'x'));
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        tr('app.autonomo.import.error.unsupported')
-      )
-    );
-    upload('app.autonomo.import.issuedFile', file('roto.xlsx', 'no es un zip'));
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        tr('app.autonomo.import.error.unreadable')
-      )
-    );
-    upload(
-      'app.autonomo.import.issuedFile',
-      workbook('otro-año.xlsx', [
-        ['Fecha', 'Base imponible', 'Tipo IVA'],
-        [{ date: '2024-01-01' }, 100, 21],
+      workbook('emitidas-viejas.xlsx', [
+        ['Fecha', 'Cliente', 'Base imponible', 'Tipo IVA'],
+        [{ date: '2024-01-01' }, 'Cliente', 100, 21],
       ])
     );
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        tr('app.autonomo.import.error.empty', { year: 2026 })
-      )
-    );
+    await alert('empty');
     expect(
       screen.getByText(tr('app.autonomo.import.skipped.year', { n: 1, year: 2026 }))
     ).toBeInTheDocument();
@@ -222,37 +251,44 @@ describe('Importing the invoice books of the self-employed', () => {
         throw new Error('disco');
       },
     });
-    upload('app.autonomo.import.issuedFile', unreadable);
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        tr('app.autonomo.import.error.unreadable')
-      )
-    );
-    // Choosing nothing in the dialog does nothing.
-    fireEvent.change(screen.getByLabelText(tr('app.autonomo.import.issuedFile')), {
-      target: { files: [] },
-    });
+    upload(unreadable);
+    await alert('unreadable');
+    // Choosing nothing in the dialog does nothing: the last result stays.
+    fireEvent.change(input(), { target: { files: [] } });
+    fireEvent.change(input(), { target: { files: null } });
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  it('applyBook leaves the other quarters and the other book alone', () => {
-    const form = emptyManual();
-    form.quarters[1].income.r21 = '10';
-    const next = applyBook(form, 'received', [
-      {
-        date: '2026-01-05',
-        quarter: 1,
-        base: 100,
-        vatRate: 21,
-        vat: 21,
-        total: 121,
-        withheld: 0,
-        concept: 'Alquiler',
-      },
-    ]);
-    expect(next.quarters[0].expenses).toEqual([
-      { kind: 'rent', amount: '121', vatRate: 21, days: '' },
-    ]);
-    expect(next.quarters[1].income.r21).toBe('10');
-    expect(within(document.body).queryByRole('alert')).toBeNull();
+  it('takes files dropped on the zone, several at a time', async () => {
+    show();
+    const zone = screen.getByText(tr('app.autonomo.import.drop')).parentElement as HTMLElement;
+    fireEvent.dragOver(zone);
+    expect(zone).toHaveClass('is-dragging');
+    // Moving over a child of the zone keeps it lit; leaving it does not.
+    // jsdom has no DragEvent: a mouse event carries where the pointer went.
+    const leave = (to: Element) =>
+      act(() => {
+        zone.dispatchEvent(new MouseEvent('dragleave', { bubbles: true, relatedTarget: to }));
+      });
+    leave(screen.getByText(tr('app.autonomo.import.drop')));
+    expect(zone).toHaveClass('is-dragging');
+    leave(document.body);
+    expect(zone).not.toHaveClass('is-dragging');
+    fireEvent.dragOver(zone);
+    fireEvent.drop(zone, {
+      dataTransfer: { files: [workbook('e.xlsx', ISSUED), workbook('r.xlsx', RECEIVED)] },
+    });
+    expect(zone).not.toHaveClass('is-dragging');
+    await screen.findByText(tr('app.autonomo.import.review'));
+    expect(screen.getAllByRole('status')).toHaveLength(2);
+    expect(latest.invoices).toHaveLength(9);
+  });
+
+  it('starts from the kind the person chose for a supplier before', async () => {
+    localStorage.setItem('mm_autonomo_kinds', JSON.stringify({ 'gestoria perez': 'training' }));
+    show();
+    upload(workbook('r.xlsx', RECEIVED));
+    await screen.findByText(tr('app.autonomo.import.review'));
+    expect(latest.quarters[0].expenses.map((e) => e.kind)).toEqual(['rent', 'training']);
   });
 });

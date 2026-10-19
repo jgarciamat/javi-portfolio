@@ -70,7 +70,7 @@ describe('Deleting the data of the self-employed draft', () => {
       },
     });
     open();
-    fireEvent.change(await screen.findByLabelText(tr('app.autonomo.model.130File')), {
+    fireEvent.change(await screen.findByLabelText(tr('app.autonomo.import.files')), {
       target: { files: [new File(['%PDF'], 'modelo-130.pdf')] },
     });
     expect(await screen.findByRole('status')).toHaveTextContent(

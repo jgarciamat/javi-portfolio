@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import { InvoiceImport } from './InvoiceImport';
-import { ModelImport } from './ModelImport';
+import { AutonomoImport } from './AutonomoImport';
+import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
+import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
   EXPENSE_KINDS,
@@ -26,6 +27,18 @@ export interface ManualForm {
     withheld: string;
     expenses: { kind: ExpenseKind; amount: string; vatRate: VatRate; days: string }[];
   }[];
+  /** The invoices imported from the books: the quarters they bring are worked out from them. */
+  invoices: ImportedInvoice[];
+  /** The figures of the last modelo 130 imported, to check them against the invoices. */
+  model130: Model130Figures | null;
+}
+
+/** Accumulated income and expenses (boxes 01 and 02) of a filed modelo 130. */
+export interface Model130Figures {
+  year: number;
+  quarter: 1 | 2 | 3;
+  income: number;
+  expenses: number;
 }
 
 type QuarterForm = ManualForm['quarters'][number];
@@ -45,6 +58,8 @@ export const emptyManual = (): ManualForm => ({
     withheld: '',
     expenses: [],
   })),
+  invoices: [],
+  model130: null,
 });
 
 const num = (text: string): number => {
@@ -291,9 +306,9 @@ function QuarterPanel({
   const setExpense = (e: number, patch: Partial<ExpenseForm>) =>
     onChange({ expenses: quarter.expenses.map((x, i) => (i === e ? { ...x, ...patch } : x)) });
   return (
-    <section className="autonomo-panel">
+    <section className="autonomo-panel" id={`autonomo-quarter-${q + 1}`}>
       <div className="autonomo-panel-head">
-        <h3>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
+        <h3 tabIndex={-1}>{t('app.autonomo.quarterN', { n: q + 1 })}</h3>
         {q > 0 && (
           <button type="button" className="btn-secondary" onClick={onCopyPrevious}>
             {t('app.autonomo.copyPrevious', { n: q })}
@@ -361,6 +376,7 @@ export function AutonomoManual({
   year,
   years,
   onPeriod,
+  focus = null,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
@@ -368,6 +384,8 @@ export function AutonomoManual({
   year: number;
   years: readonly number[];
   onPeriod: (year: number, quarter: 1 | 2 | 3 | 4) => void;
+  /** An imported invoice to show in the review (a warning asked for it). */
+  focus?: ReviewFocus | null;
 }) {
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
@@ -392,9 +410,15 @@ export function AutonomoManual({
     <div className="autonomo-manual">
       <p className="section-hint">{t('app.autonomo.manualHint')}</p>
 
-      <InvoiceImport form={form} year={year} onChange={onChange} />
+      <AutonomoImport
+        form={form}
+        year={year}
+        years={years}
+        onChange={onChange}
+        onPeriod={onPeriod}
+      />
 
-      <ModelImport form={form} year={year} years={years} onChange={onChange} onPeriod={onPeriod} />
+      <InvoiceReview form={form} onChange={onChange} focus={focus} />
 
       <ProfilePanel profile={form.profile} onChange={setProfile} />
 

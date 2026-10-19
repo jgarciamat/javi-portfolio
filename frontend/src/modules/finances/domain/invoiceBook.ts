@@ -23,6 +23,8 @@ export interface BookEntry {
   withheld: number;
   /** Who or what: the client, the supplier or the concept. */
   concept: string;
+  /** The quarter a «Periodo/Trimestre» column says it belongs to (only when the book has one). */
+  period?: 1 | 2 | 3 | 4 | null;
 }
 
 /** Rows that did not make it into the result, and why. */
@@ -85,6 +87,7 @@ interface Columns {
   retention: number;
   total: number;
   concept: number;
+  period: number;
 }
 
 type Matcher = { include: RegExp[]; exclude?: RegExp };
@@ -147,6 +150,7 @@ const MATCHERS: Record<keyof Columns, Matcher[]> = {
     },
     { include: [/concepto/] },
   ],
+  period: [{ include: [/trimestre/, /periodo/], exclude: /fecha|ejercicio/ }],
 };
 
 function pick(headers: string[], matchers: Matcher[]): number {
@@ -178,7 +182,7 @@ function headerRowOf(rows: BookCell[][]): number {
   return -1;
 }
 
-function columnsOf(rows: BookCell[][], headerRow: number): Columns {
+function headersOf(rows: BookCell[][], headerRow: number): string[] {
   const width = Math.max(...rows.slice(headerRow, headerRow + 2).map((r) => r.length), 0);
   const second = rows[headerRow + 1] ?? [];
   // The second heading line only counts when it is text (the first data row is numbers and dates).
@@ -189,9 +193,13 @@ function columnsOf(rows: BookCell[][], headerRow: number): Columns {
       parseBookDate(c) === null &&
       Number.isNaN(bookNumber(c))
   );
-  const headers = Array.from({ length: width }, (_, c) =>
+  return Array.from({ length: width }, (_, c) =>
     [norm(rows[headerRow][c]), secondIsHeading ? norm(second[c]) : ''].filter(Boolean).join(' ')
   );
+}
+
+function columnsOf(rows: BookCell[][], headerRow: number): Columns {
+  const headers = headersOf(rows, headerRow);
   const found = {} as Columns;
   for (const key of Object.keys(MATCHERS) as (keyof Columns)[])
     found[key] = pick(headers, MATCHERS[key]);
@@ -223,6 +231,20 @@ function withheldOf(
   const rate = retentionRate > 0 && retentionRate < 1 ? retentionRate * 100 : retentionRate;
   return Number.isFinite(rate) ? round2((base * rate) / 100) : 0;
 }
+
+/** «1T», «T1», «2.º trimestre», «Q3» or a bare «4» as a quarter; anything else (a month) is null. */
+export function quarterOfPeriod(value: BookCell): 1 | 2 | 3 | 4 | null {
+  const text = norm(value);
+  const found =
+    /^([1-4])$/.exec(text) ??
+    /\b([1-4])\s*(?:o|º|\.º|er|o\.)?\s*(?:t|q|trim|trimestre)\b/.exec(text) ??
+    /\b(?:t|q|trimestre)\s*([1-4])\b/.exec(text);
+  return found ? (Number(found[1]) as 1 | 2 | 3 | 4) : null;
+}
+
+/** The declared quarter of a row, only when the book has a «Periodo/Trimestre» column. */
+const periodOf = (row: BookCell[], col: Columns): Pick<BookEntry, 'period'> =>
+  col.period >= 0 ? { period: quarterOfPeriod(row[col.period]) } : {};
 
 type Skip = keyof BookSkipped;
 
@@ -261,6 +283,7 @@ function entryOf(
       bookNumber(at(col.retentionRate))
     ),
     concept: String(at(col.concept) ?? '').trim(),
+    ...periodOf(row, col),
   };
 }
 
@@ -302,6 +325,58 @@ export function parseWorkbook(
     if (last.ok) return last;
   }
   return last;
+}
+
+const ISSUED_NAME = /ingres|emitid|venta|expedid/;
+const RECEIVED_NAME = /gast|recibid|compra|soportad/;
+
+/** What a name (of a sheet or a file) says the book is, when it says one thing only. */
+function kindOfName(name: string): BookKind | null {
+  const text = norm(name);
+  const issued = ISSUED_NAME.test(text);
+  if (issued === RECEIVED_NAME.test(text)) return null;
+  return issued ? 'issued' : 'received';
+}
+
+/**
+ * What the headings say: withholdings and clients belong to what is billed, suppliers to what is
+ * paid. «Fecha expedición» is in both books, so only «expedidor» (who issued it to us) counts.
+ */
+function kindOfHeaders(headers: string[]): BookKind | null {
+  const text = headers.join(' | ');
+  const issued = /retencion|retenido|irpf|cliente|destinatario|repercutid/.test(text);
+  if (issued === /proveedor|expedidor|acreedor|soportad/.test(text)) return null;
+  return issued ? 'issued' : 'received';
+}
+
+export interface BookDetection {
+  /** The sheets of each book that the workbook has. */
+  books: Partial<Record<BookKind, { name: string; rows: BookCell[][] }[]>>;
+  /** Sheets that are invoice books but say nothing of which one: the person is asked. */
+  unknown: { name: string; rows: BookCell[][] }[];
+}
+
+/**
+ * Which book each sheet of a workbook is: by the name of the sheet, by its headings and, for a
+ * sheet that says nothing, by the name of the file. Sheets without a «Base imponible» heading
+ * (instructions, totals) are not books.
+ */
+export function detectBooks(
+  sheets: { name: string; rows: BookCell[][] }[],
+  fileName: string
+): BookDetection {
+  const out: BookDetection = { books: {}, unknown: [] };
+  for (const sheet of sheets) {
+    const headerRow = headerRowOf(sheet.rows);
+    if (headerRow < 0) continue;
+    const kind =
+      kindOfName(sheet.name) ??
+      kindOfHeaders(headersOf(sheet.rows, headerRow)) ??
+      kindOfName(fileName);
+    if (kind) (out.books[kind] ??= []).push(sheet);
+    else out.unknown.push(sheet);
+  }
+  return out;
 }
 
 export interface QuarterIncome {
@@ -368,13 +443,14 @@ export interface ExpenseLineData {
 }
 
 /** Expense lines per quarter: invoices of the same kind and VAT rate are added up, meals stay one each. */
-export function expensesByQuarter(
-  entries: BookEntry[]
+export function expensesByQuarter<E extends BookEntry>(
+  entries: E[],
+  kindOf: (entry: E) => ExpenseKind = (e) => guessExpenseKind(e.concept)
 ): Partial<Record<1 | 2 | 3 | 4, ExpenseLineData[]>> {
   const out: Partial<Record<1 | 2 | 3 | 4, ExpenseLineData[]>> = {};
   for (const e of entries) {
     const lines = (out[e.quarter] ??= []);
-    const kind = guessExpenseKind(e.concept);
+    const kind = kindOf(e);
     const same =
       kind === 'meals' ? undefined : lines.find((l) => l.kind === kind && l.vatRate === e.vatRate);
     if (same) same.amount = round2(same.amount + e.total);
