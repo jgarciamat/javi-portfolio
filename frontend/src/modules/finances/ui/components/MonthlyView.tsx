@@ -183,8 +183,9 @@ function MovementsPanel({
             range={range}
           />
         )}
-        <TransactionBulkActions selection={selection} transactions={transactions} bulk={bulk} />
       </CollapsiblePanel>
+      {/* Outside the panel: its clipping would keep the bar from sticking to the screen. */}
+      <TransactionBulkActions selection={selection} transactions={transactions} bulk={bulk} />
     </>
   );
 }

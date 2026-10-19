@@ -28,10 +28,12 @@ export function SelectionTotals({ items }: { items: Transaction[] }) {
   return (
     <p className="bulk-totals">
       <span className="amount-pos">
-        {t('app.bulk.income')} +{money(totals.income)}
+        {t('app.bulk.income')} {totals.income > 0 && '+'}
+        {money(totals.income)}
       </span>
       <span className="amount-neg">
-        {t('app.bulk.expenses')} −{money(totals.expenses)}
+        {t('app.bulk.expenses')} {totals.expenses > 0 && '−'}
+        {money(totals.expenses)}
       </span>
       {totals.saving > 0 && (
         <span className="amount-saving">

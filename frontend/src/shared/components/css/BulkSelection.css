@@ -167,10 +167,18 @@
     padding: 0.65rem;
   }
 
+  .bulk-bar-actions {
+    gap: 0.35rem;
+  }
+
+  /* Three per row keeps the bar short on a phone; Delete takes the last row. */
   .bulk-btn {
-    flex: 1 1 calc(50% - 0.45rem);
+    flex: 1 1 calc(33.333% - 0.35rem);
     justify-content: center;
+    gap: 0.25rem;
     min-width: 0;
+    padding: 0.4rem 0.3rem;
+    font-size: 0.8rem;
   }
 
   .bulk-bar-clear-text {
@@ -335,4 +343,22 @@ html.wiz-contrast .bulk-note {
   background: #000;
   color: #fff;
   border-left-color: #ffe600;
+}
+
+html.wiz-contrast .bulk-bar-clear {
+  color: #fff;
+  border-color: #fff;
+}
+
+html.wiz-contrast .bulk-bar .amount-pos,
+html.wiz-contrast .bulk-undo .amount-pos {
+  color: #4ade80;
+}
+
+html.wiz-contrast .bulk-bar .amount-neg {
+  color: #ff8a8a;
+}
+
+html.wiz-contrast .bulk-bar .amount-saving {
+  color: #c4b5fd;
 }

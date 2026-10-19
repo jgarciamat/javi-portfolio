@@ -89,6 +89,8 @@ describe('selecting movements of the month', () => {
     expect(screen.queryByRole('region', { name: tr('app.bulk.region') })).toBeNull();
 
     fireEvent.click(box('Nómina'));
+    expect(within(bar()).getByText(/Gastos 0,00/)).toBeInTheDocument();
+    expect(within(bar()).getByText(/Ingresos \+2000,00|Ingresos \+2.000,00/)).toBeInTheDocument();
     fireEvent.click(within(bar()).getByRole('button', { name: tr('app.bulk.clear') }));
     expect(box('Nómina')).not.toBeChecked();
   });
