@@ -163,17 +163,27 @@ type SheetRow = (string | number)[];
  */
 export type Zone = 'copy' | 'check' | 'done' | 'plain';
 
+/** Where a section goes in the PDF: the first page, a window of Renta WEB, the totals or the annex. */
+export type SheetKind = 'start' | 'window' | 'totals' | 'annex';
+
 /**
- * One tab of the file (one section of the PDF): some lines of text first, then a table whose first
- * row is the header. `zones` colours each column (copy / check / done); `money` marks the columns
- * of euros, written with two decimals.
+ * One section of the PDF: a heading, some lines of text (and numbered steps on the first page),
+ * then a table whose first row is the header. `zones` colours each column (copy / check / done);
+ * `money` marks the columns of euros, written with two decimals.
  */
 export interface ReportSheet {
   name: string;
   rows: SheetRow[];
+  kind?: SheetKind;
+  title?: string;
   intro?: string[];
+  steps?: string[];
+  /** The line right over the table. */
+  caption?: string;
   zones?: Zone[];
   money?: boolean[];
+  /** A window: its rows and the totals Renta WEB must show when it is done. */
+  window?: PlanWindow;
 }
 
 export const TAB: Record<GainSection, string> = {
@@ -183,9 +193,6 @@ export const TAB: Record<GainSection, string> = {
   crypto: '4 Monedas virtuales (1800)',
   other: '5 Otros elementos (1624)',
 };
-
-/** Amounts as in Renta WEB: decimal comma, no thousands separator (docs/fiscalidad §6.3). */
-const euros = (n: number) => `${webValue(n)} €`;
 
 const MONEY_FIELDS = new Set([
   'proceeds',
@@ -261,26 +268,22 @@ const linesOf = (w: WebWindow): Line[] =>
 const fieldValue = (l: Line, key: string) =>
   (l.line.values[key] ?? l.alta.values[key]) as string | number;
 
-/** «Copia estas N filas en Renta WEB → ventana X»: the header of a window's tab. */
-function windowIntro(w: WebWindow): string[] {
+/** «Copia estas N filas en la ventana “X”», where it is and how to read the table. */
+const windowTitle = (w: WebWindow) => {
   const rows = linesOf(w).length;
-  return [
-    `Copia estas ${rows} ${rows === 1 ? 'fila' : 'filas'} en Renta WEB, en la ventana «${
-      w.def.title
-    }»`,
-    `Dónde: Renta WEB > abre tu declaración > «Apartados de la declaración» > ${APARTADO} > «${w.def.title}» > botón «Alta» (una vez por fila).`,
-    'COPIAR (columnas amarillas): cada una es un campo de la ventana, con el mismo nombre y en el mismo orden. Los importes llevan coma decimal y sin punto de miles, como los pide Renta WEB.',
-    'COMPROBAR (columnas grises): no se copian; es lo que Renta WEB debe mostrarte al pulsar «Aceptar». «Hecho»: márcalo al terminar cada fila.',
-    `Al terminar esta ventana, Renta WEB debe mostrar: casilla ${
-      w.def.totals.gains
-    } (ganancias) ${euros(w.totals.gains)}; casilla ${w.def.totals.losses} (pérdidas) ${euros(
-      w.totals.losses
-    )}.`,
-  ];
-}
+  return `${rows === 1 ? 'Copia esta fila' : `Copia estas ${rows} filas`} en la ventana “${
+    w.def.title
+  }”`;
+};
 
-/** The tab of one window: its fields with the labels and order of Renta WEB, then what to check. */
-function windowSheet(w: WebWindow): ReportSheet {
+const windowIntro = (w: WebWindow): string[] => [
+  `Dónde: Renta WEB > abre tu declaración > «Apartados de la declaración» > ${APARTADO} > «${w.def.title}» > botón «Alta» (una vez por fila).`,
+  'Columnas amarillas «Copiar»: cada una es un campo de la ventana, con el mismo nombre y en el mismo orden. Los importes llevan coma decimal y sin punto de miles, como los pide Renta WEB.',
+  'Columnas grises «No copiar»: es lo que Renta WEB debe mostrarte al pulsar «Aceptar». Marca «Hecho» al terminar cada fila.',
+];
+
+/** The section of one window: its fields with the labels and order of Renta WEB, then what to check. */
+function windowSheet(w: WebWindow, plan: PlanWindow): ReportSheet {
   const fields = w.def.fields;
   const extras: Extra[] = [
     ...checksOf(w),
@@ -288,7 +291,10 @@ function windowSheet(w: WebWindow): ReportSheet {
   ];
   return {
     name: TAB[w.section],
+    kind: 'window',
+    title: windowTitle(w),
     intro: windowIntro(w),
+    window: plan,
     zones: ['plain', ...fields.map((): Zone => 'copy'), ...extras.map((e) => e.zone)],
     money: [false, ...fields.map((f) => MONEY_FIELDS.has(f.key)), ...extras.map((e) => e.money)],
     rows: [
@@ -358,15 +364,18 @@ export function copyPlan(kit: RentaWebKit): CopyPlan {
 
 /** «Empieza aquí»: how many rows, where, what totals, the three steps and one row worked out. */
 function startSheet(year: number, kit: RentaWebKit, plan: CopyPlan): ReportSheet {
-  const totals = kit.totals.map((t) => `• Casilla ${t.box} · ${t.label}: ${euros(t.amount)}`);
-  const intro = [
-    `Empieza aquí: qué copiar en Renta WEB (Renta ${year})`,
-    'Finanverso prepara los datos; no presenta nada: tú los copias en Renta WEB, una fila cada vez.',
-  ];
+  const start = {
+    name: '0 Empieza aquí',
+    kind: 'start' as const,
+    title: `Empieza aquí: qué copiar en Renta WEB (Renta ${year})`,
+  };
+  const lead =
+    'Finanverso prepara los datos; no presenta nada: tú los copias en Renta WEB, una fila cada vez.';
   if (plan.windows.length === 0)
     return {
-      name: '0 Empieza aquí',
-      intro: [...intro, 'Escribe estos importes en Renta WEB, cada uno en su casilla:'],
+      ...start,
+      intro: [lead, 'No hay ventas que copiar: solo importes que van en sus casillas.'],
+      caption: 'Escribe estos importes en Renta WEB, cada uno en su casilla:',
       zones: ['plain', 'plain', 'copy'],
       money: [false, false, true],
       rows: [
@@ -376,27 +385,14 @@ function startSheet(year: number, kit: RentaWebKit, plan: CopyPlan): ReportSheet
     };
   const example = plan.example as NonNullable<CopyPlan['example']>;
   return {
-    name: '0 Empieza aquí',
-    intro: [
-      ...intro,
-      `Tienes que copiar ${plan.rows} ${
-        plan.rows === 1 ? 'fila' : 'filas'
-      }. Tiempo estimado: unos ${plan.minutes} minutos.`,
-      ...plan.windows.map(
-        (w) =>
-          `• Ventana «${w.title}»: ${w.rows} ${w.rows === 1 ? 'fila' : 'filas'} (pestaña «${
-            w.tab
-          }»).`
-      ),
-      '',
-      'Paso 1. Abre Renta WEB con tu Cl@ve, certificado o referencia y entra en tu declaración. En «Apartados de la declaración», ve a ' +
-        `${APARTADO} y abre la ventana de la pestaña.`,
-      'Paso 2. Pulsa «Alta» y copia una fila de la pestaña: cada columna amarilla es un campo de la ventana, con su mismo nombre y en su orden. Pulsa «Aceptar» y marca «Hecho». Repite con cada fila.',
-      'Paso 3. Al terminar, comprueba que Renta WEB muestra estos totales:',
-      ...totals,
-      '',
-      `Ejemplo resuelto: la fila ${example.alta} de la pestaña «${example.tab}» se escribe así en la ventana «${example.title}»:`,
+    ...start,
+    intro: [lead],
+    steps: [
+      `Abre Renta WEB con tu Cl@ve, certificado o referencia y entra en tu declaración. En «Apartados de la declaración», ve a ${APARTADO} y abre la ventana de cada sección de este PDF.`,
+      'Pulsa «Alta» y copia una fila: cada columna amarilla «Copiar» es un campo de la ventana, con su mismo nombre y en su orden. Pulsa «Aceptar» y marca «Hecho». Repite con cada fila.',
+      'Al terminar, comprueba que Renta WEB muestra los totales de cada casilla: los tienes en esta página, al final de cada sección y en la página «Totales que debes ver en Renta WEB».',
     ],
+    caption: `Ejemplo resuelto: la fila ${example.alta} de la sección «${example.tab}» se escribe así en la ventana «${example.title}»:`,
     zones: ['plain', 'copy'],
     rows: [
       ['Campo de la ventana en Renta WEB', 'Qué escribes'],
@@ -406,9 +402,10 @@ function startSheet(year: number, kit: RentaWebKit, plan: CopyPlan): ReportSheet
 }
 
 /**
- * `Finanverso-Renta-<año>-copiar-en-Renta-WEB`: «Empieza aquí», a tab per window of Renta WEB (one
- * row per alta, with the window's labels in its order and what Renta WEB will show), the totals by
- * box, every sale with its FIFO purchases and its alta (the proof to keep), the income and the years.
+ * The sections of `Finanverso-Renta-<año>-copiar-en-Renta-WEB.pdf`: «Empieza aquí», one per window
+ * of Renta WEB (one row per alta, with the window's labels in its order and what Renta WEB will
+ * show), the totals by box and, as the annex, every sale with its FIFO purchases and its alta (the
+ * proof to keep), the income and the years.
  */
 export function reportTables(
   ledger: LedgerResult,
@@ -416,6 +413,8 @@ export function reportTables(
 ): ReportSheet[] {
   const totals: ReportSheet = {
     name: '6 Totales por casilla',
+    kind: 'totals',
+    title: 'Totales que debes ver en Renta WEB',
     intro: ['Lo que Renta WEB debe mostrar al terminar (no se copia: es para comprobar).'],
     zones: ['plain', 'plain', 'check'],
     money: [false, false, true],
@@ -426,8 +425,10 @@ export function reportTables(
   };
   const sales: ReportSheet = {
     name: '7 Detalle por operación',
+    kind: 'annex',
+    title: 'Anexo: detalle por operación (FIFO)',
     intro: [
-      'El justificante de cada venta (no se copia en Renta WEB). Guarda este archivo al menos 4 años (art. 66 de la Ley General Tributaria).',
+      'El justificante de cada venta, con las compras que se usaron (las primeras que entraron son las primeras que salen). No se copia en Renta WEB: guárdalo.',
     ],
     money: [false, false, false, false, false, false, true, true, true, true, false],
     rows: [
@@ -481,6 +482,8 @@ export function reportTables(
   };
   const income: ReportSheet = {
     name: '8 Rendimientos',
+    kind: 'annex',
+    title: 'Anexo: rendimientos del capital',
     money: [false, false, false, false, true, true, false, false],
     rows: [
       ['Fecha', 'Plataforma', 'Activo', 'Tipo', 'Importe (€)', 'Retención (€)', 'Dónde', 'Casilla'],
@@ -498,15 +501,18 @@ export function reportTables(
   };
   const years: ReportSheet = {
     name: '9 Por año',
+    kind: 'annex',
+    title: 'Anexo: resultado por año',
     money: [false, true, true],
     rows: [
       ['Año', 'Resultado base del ahorro (€)', 'Resultado base general (€)'],
       ...Object.entries(ledger.years).map(([y, v]) => [Number(y), v.savings, v.general]),
     ],
   };
+  const plan = copyPlan(kit);
   return [
-    startSheet(ledger.year, kit, copyPlan(kit)),
-    ...kit.windows.map(windowSheet),
+    startSheet(ledger.year, kit, plan),
+    ...kit.windows.map((w, i) => windowSheet(w, plan.windows[i])),
     totals,
     sales,
     income,
@@ -514,6 +520,5 @@ export function reportTables(
   ].filter((sheet) => sheet.rows.length > 1);
 }
 
-/** The name of the files to download. */
-export const copyFileName = (year: number, ext: 'xlsx' | 'pdf') =>
-  `Finanverso-Renta-${year}-copiar-en-Renta-WEB.${ext}`;
+/** The name of the PDF to download. */
+export const copyFileName = (year: number) => `Finanverso-Renta-${year}-copiar-en-Renta-WEB.pdf`;

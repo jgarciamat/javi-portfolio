@@ -1,16 +1,14 @@
 /**
  * «Qué tienes que copiar en Renta WEB»: the block after importing (how many rows in each window,
  * the totals to see, the three steps, the way to the window and one row worked out), the grouping
- * of «otros elementos», and the Excel and the PDF with their «Empieza aquí» tab and coloured zones.
+ * of «otros elementos», and the PDF with its «Empieza aquí» page and coloured zones.
  */
 import { act, fireEvent, screen } from '@testing-library/react';
-import { strFromU8, unzipSync } from 'fflate';
-import { readXlsx } from '@modules/finances/application/spreadsheet';
 import { buildLedger } from '@modules/tools/domain/invest/ledger';
 import type { InvestOp } from '@modules/tools/domain/invest/types';
 import { copyPlan, reportTables } from '@modules/tools/domain/invest/report';
 import { rentaWebKit, WINDOWS } from '@modules/tools/domain/invest/rentaWeb';
-import { reportPdf, xlsxOf, ZONE_BAND } from '@modules/tools/application/investImport';
+import { reportPdfBytes } from '@modules/tools/application/reportPdf';
 import { hasRentaWebCopy, RentaWebPanel } from '@modules/tools/ui/renta/invest/RentaWebPanel';
 import { ResultAmount, resultLabel, resultTone } from '@modules/tools/ui/renta/shared';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -123,22 +121,20 @@ describe('what there is to copy, in a few numbers', () => {
   });
 });
 
-describe('the file to copy: «Empieza aquí» and a tab per window with its zones', () => {
+describe('the file to copy: «Empieza aquí» and a section per window with its zones', () => {
   it('starts with how many rows, where, the totals, the three steps and one row worked out', () => {
     const [start, window] = reportTables(positions);
-    expect(start.name).toBe('0 Empieza aquí');
-    const intro = (start.intro as string[]).join('\n');
-    expect(intro).toMatch(/Tienes que copiar 5 filas\. Tiempo estimado: unos 13 minutos/);
-    expect(intro).toMatch(/: 5 filas \(pestaña «5 Otros elementos \(1624\)»\)/);
-    expect(intro).toMatch(/Paso 1\. .*Paso 2\. .*Paso 3\./s);
-    expect(intro).toMatch(/Casilla 0386 · Ganancias .*: 6,00 €/);
-    expect(intro).toMatch(/Casilla 0385 · Pérdidas .*: 5,00 €/);
+    expect(start).toMatchObject({ name: '0 Empieza aquí', kind: 'start' });
+    expect(start.title).toBe('Empieza aquí: qué copiar en Renta WEB (Renta 2025)');
+    expect(start.steps).toHaveLength(3);
+    expect(start.steps?.[1]).toMatch(/columna amarilla «Copiar»/);
+    expect(start.caption).toMatch(/la fila 1 de la sección «5 Otros elementos \(1624\)»/);
     expect(start.zones).toEqual(['plain', 'copy']);
     expect(start.rows[1]).toEqual(['Tipo de elemento patrimonial', WINDOWS.other.typeValue]);
     // The window: what to copy (yellow), what to check (grey) and «Hecho».
-    expect(window.intro?.[0]).toBe(
-      `Copia estas 5 filas en Renta WEB, en la ventana «${WINDOWS.other.title}»`
-    );
+    expect(window.title).toBe(`Copia estas 5 filas en la ventana “${WINDOWS.other.title}”`);
+    expect(window.intro?.[0]).toMatch(/^Dónde: Renta WEB > /);
+    expect(window.window).toMatchObject({ rows: 5, gains: { box: '0386', amount: 6 } });
     expect(window.zones).toEqual([
       'plain',
       ...WINDOWS.other.fields.map(() => 'copy'),
@@ -171,45 +167,24 @@ describe('the file to copy: «Empieza aquí» and a tab per window with its zone
       op({ kind: 'sell', date: '2025-02-01', asset: 'BTC', eur: 150 }),
     ]);
     const [start, window] = reportTables(one);
-    expect(start.intro?.join('\n')).toMatch(/Tienes que copiar 1 fila\..*: 1 fila \(pestaña/s);
-    expect(window.intro?.[0]).toMatch(/^Copia estas 1 fila en Renta WEB/);
+    expect(start.kind).toBe('start');
+    expect(window.title).toMatch(/^Copia esta fila en la ventana “/);
     const income = reportTables(
       ledgerOf([op({ kind: 'interest', date: '2025-01-01', asset: 'C', units: 0, eur: 5 })])
     )[0];
     expect(income.zones).toEqual(['plain', 'plain', 'copy']);
+    expect(income.caption).toMatch(/cada uno en su casilla/);
     expect(income.rows[1]).toEqual(['0027', expect.stringContaining('Intereses'), 5]);
-  });
-
-  it('writes the zones in the workbook: a band over the header, colours and two decimals', () => {
-    const bytes = xlsxOf(reportTables(positions));
-    const files = unzipSync(bytes);
-    expect(strFromU8(files['xl/styles.xml'])).toContain('formatCode="0.00"');
-    const sheet = strFromU8(files['xl/worksheets/sheet2.xml']);
-    expect(sheet).toContain('<mergeCell ref="B7:J7"/>');
-    expect(sheet).toContain('<mergeCell ref="K7:M7"/>');
-    // An amount to copy: yellow and in euros with two decimals (style 12).
-    expect(sheet).toMatch(/<c r="F9" s="12"><v>3<\/v><\/c>/);
-    const read = readXlsx(bytes.slice().buffer as ArrayBuffer);
-    expect(read[1].rows[0][0]).toBe(
-      `Copia estas 5 filas en Renta WEB, en la ventana «${WINDOWS.other.title}»`
-    );
-    expect(read[1].rows[6].slice(0, 2)).toEqual(['', ZONE_BAND.copy]);
-    expect(read[1].rows[6][10]).toBe(ZONE_BAND.check);
-    expect(read[1].rows[6][13]).toBe(ZONE_BAND.done);
-    expect(read[1].rows[7][1]).toBe('Tipo de elemento patrimonial');
-    // A table without zones nor euros stays plain, as before.
-    const plain = strFromU8(
-      unzipSync(xlsxOf([{ name: 'A', rows: [['x'], [1]] }]))['xl/worksheets/sheet1.xml']
-    );
-    expect(plain).toContain('<c r="A2"><v>1</v></c>');
-    expect(plain).not.toContain('mergeCells');
   });
 
   it('makes a PDF with each window on its own page, also with a very long text', async () => {
     const sheets = reportTables(positions);
     sheets[0] = { ...sheets[0], intro: Array.from({ length: 60 }, (_, i) => `Línea ${i}`) };
-    const blob = await reportPdf('Renta 2025', sheets);
-    expect(blob.size).toBeGreaterThan(1000);
+    const bytes = await reportPdfBytes(
+      { title: 'Renta 2025', year: 2025, plan: copyPlan(rentaWebKit(positions)), sheets },
+      { compress: false }
+    );
+    expect(bytes.byteLength).toBeGreaterThan(1000);
   });
 });
 
@@ -233,7 +208,8 @@ describe('the block in the app', () => {
       )
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: tr(`${k}.start`) })).toHaveClass('btn-primary');
-    expect(screen.getByRole('button', { name: tr(`${k}.xlsx`) })).toHaveClass('btn-secondary');
+    expect(screen.getByRole('button', { name: tr(`${k}.pdf`) })).toHaveClass('btn-primary');
+    expect(screen.getByText(tr(`${k}.filesHint`))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.step3`))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.route.title`))).toBeInTheDocument();
     expect(screen.getByRole('table')).toHaveTextContent('Fecha de transmisión10/01/2025');
@@ -259,7 +235,7 @@ describe('the block in the app', () => {
     ]);
   });
 
-  it('at the end of the assistant: the numbers and the buttons, with the Excel first', async () => {
+  it('at the end of the assistant: the numbers and the two buttons', async () => {
     const one = ledgerOf([
       op({ kind: 'buy', date: '2024-01-01', asset: 'BTC', eur: 100 }),
       op({ kind: 'sell', date: '2025-02-01', asset: 'BTC', eur: 150 }),
@@ -269,7 +245,9 @@ describe('the block in the app', () => {
     expect(
       screen.getByText(tr(`${k}.windowOne`, { title: WINDOWS.crypto.title }))
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: tr(`${k}.xlsx`) })).toHaveClass('btn-primary');
+    expect(screen.getByRole('button', { name: tr(`${k}.pdf`) })).toHaveClass('btn-primary');
+    expect(screen.getByRole('button', { name: tr(`${k}.start`) })).toBeInTheDocument();
+    expect(screen.queryByText(tr(`${k}.filesHint`))).toBeNull();
     expect(screen.queryByText(tr(`${k}.stepsTitle`))).toBeNull();
     expect(screen.queryByRole('radio')).toBeNull();
     await act(async () => undefined);

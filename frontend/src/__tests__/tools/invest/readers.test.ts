@@ -645,7 +645,7 @@ describe('what to copy and the report', () => {
       '9 Por año',
     ]);
     expect(t[2].rows[1][6]).toBe('España');
-    expect(copyFileName(2025, 'xlsx')).toBe('Finanverso-Renta-2025-copiar-en-Renta-WEB.xlsx');
+    expect(copyFileName(2025)).toBe('Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf');
   });
 
   it('the guide shows the steps that apply, all of them when nothing was imported', () => {
