@@ -24,6 +24,7 @@ import { StepBar, StepSection, goToStep, useCurrentStep, type Step } from './Aut
 import { AutonomoSummary, summarize } from './AutonomoSummary';
 import { AutonomoCloudPanel } from './AutonomoCloud';
 import { WithholdingsPanel } from './AutonomoWithholdings';
+import { AnnualPanel } from './AutonomoAnnual';
 import { VatYearPanel } from './AutonomoVatYear';
 import { toVatOptions, vatExtrasOf } from './vatForm';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
@@ -442,6 +443,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           </>
         )}
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
+        <AnnualPanel form={manual} year={year} />
         {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
       </StepSection>
     </div>

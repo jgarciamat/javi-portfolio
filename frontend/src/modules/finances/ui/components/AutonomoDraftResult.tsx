@@ -43,7 +43,7 @@ export function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
             <tr key={`${b.box}-${b.label}`}>
               <td>{b.box}</td>
               <td>{b.label}</td>
-              <td>{/perceptores$/.test(b.label) ? b.amount : money(b.amount)}</td>
+              <td>{/perceptores$|^Número total/.test(b.label) ? b.amount : money(b.amount)}</td>
             </tr>
           ))}
         </tbody>
