@@ -1,4 +1,4 @@
-import type { ImportRowDTO } from './types';
+import type { ImportRowDTO, TransactionType } from './types';
 
 /**
  * Parsers for bank statements: generic CSV exports (any delimiter, Spanish or
@@ -152,6 +152,9 @@ export interface ColumnMapping {
   debit: number;
   credit: number;
   category: number;
+  /** Column saying whether the row is an expense, an income or a saving (-1 when absent). */
+  type: number;
+  notes: number;
 }
 
 const HEADER_HINTS: Record<keyof ColumnMapping, string[]> = {
@@ -169,6 +172,8 @@ const HEADER_HINTS: Record<keyof ColumnMapping, string[]> = {
   debit: ['cargo', 'debe', 'debit', 'gasto'],
   credit: ['abono', 'haber', 'credit', 'ingreso'],
   category: ['categoria', 'category'],
+  type: ['tipo', 'type', 'clase', 'naturaleza', 'movimiento'],
+  notes: ['notas', 'nota', 'notes', 'note', 'observaciones'],
 };
 
 const normalize = (s: string): string =>
@@ -190,16 +195,47 @@ export function detectColumns(headers: string[]): ColumnMapping {
   const debit = amount >= 0 ? -1 : find('debit', [date, description]);
   const credit = amount >= 0 ? -1 : find('credit', [date, description, debit]);
   const category = find('category', [date, description, amount]);
-  return { date, description, amount, debit, credit, category };
+  const taken = [date, description, amount, debit, credit, category];
+  const type = find('type', taken);
+  const notes = find('notes', [...taken, type]);
+  return { date, description, amount, debit, credit, category, type, notes };
 }
 
 export interface ParsedRows {
   rows: ImportRowDTO[];
   /** Line numbers (1-based, header included) that could not be read. */
   skipped: number[];
+  /** Indexes in `rows` whose «Tipo» value was not recognised (type guessed from the sign). */
+  review: number[];
 }
 
 const cellAt = (cells: string[], index: number): string => (index >= 0 ? cells[index] ?? '' : '');
+
+const TYPE_WORDS: Record<TransactionType, string[]> = {
+  EXPENSE: ['gasto', 'gastos', 'expense', 'expenses', 'cargo', 'debito', 'debit'],
+  INCOME: ['ingreso', 'ingresos', 'income', 'abono', 'credito', 'credit'],
+  SAVING: ['ahorro', 'ahorros', 'saving', 'savings'],
+};
+
+/** «Gasto», «Income», «Ahorro»… → the movement type; null when not recognised. */
+export function parseTypeValue(raw: string): TransactionType | null {
+  const word = normalize(raw);
+  const found = (Object.keys(TYPE_WORDS) as TransactionType[]).find((t) =>
+    TYPE_WORDS[t].includes(word)
+  );
+  return found ?? null;
+}
+
+/** Same row as the given type: expenses carry a negative amount, the rest a positive one. */
+export function withType(row: ImportRowDTO, type: TransactionType): ImportRowDTO {
+  const abs = Math.abs(row.amount);
+  return { ...row, type, amount: type === 'EXPENSE' ? -abs : abs };
+}
+
+/** The type of a row: the explicit one, else the sign of the amount. */
+export function rowType(row: ImportRowDTO): TransactionType {
+  return row.type ?? (row.amount < 0 ? 'EXPENSE' : 'INCOME');
+}
 
 /** Signed amount from a single column or from debit / credit columns. */
 function amountFromCells(cells: string[], mapping: ColumnMapping): number | null {
@@ -210,24 +246,67 @@ function amountFromCells(cells: string[], mapping: ColumnMapping): number | null
   return debit ? -Math.abs(debit) : null;
 }
 
-function rowFromCells(cells: string[], mapping: ColumnMapping): ImportRowDTO | null {
+interface ReadRow {
+  row: ImportRowDTO;
+  review: boolean;
+}
+
+function rowFromCells(cells: string[], mapping: ColumnMapping): ReadRow | null {
   const date = parseDate(cellAt(cells, mapping.date));
   const description = cellAt(cells, mapping.description).trim();
   const amount = amountFromCells(cells, mapping);
   if (!date || !description || !amount) return null;
-  return { date, description, amount, category: cellAt(cells, mapping.category).trim() || null };
+  const rawType = cellAt(cells, mapping.type).trim();
+  const type = parseTypeValue(rawType);
+  const base: ImportRowDTO = {
+    date,
+    description,
+    amount,
+    category: cellAt(cells, mapping.category).trim() || null,
+  };
+  const notes = cellAt(cells, mapping.notes).trim();
+  if (notes) base.notes = notes;
+  // The «Tipo» column wins over the sign; the amount is then always its absolute value.
+  return { row: type ? withType(base, type) : base, review: rawType !== '' && !type };
+}
+
+const SUMMARY_LABELS = [
+  'resumen',
+  'summary',
+  'total',
+  'balance',
+  'ingreso',
+  'ingresos',
+  'gasto',
+  'gastos',
+  'ahorro',
+  'ahorros',
+  'income',
+  'expenses',
+  'savings',
+];
+
+/** The totals block our own export appends: its label sits in the first cell, no valid date. */
+function isSummaryRow(cells: string[], mapping: ColumnMapping): boolean {
+  return (
+    SUMMARY_LABELS.includes(normalize(cells[0] ?? '')) &&
+    parseDate(cellAt(cells, mapping.date)) === null
+  );
 }
 
 /** Rows of a CSV table whose first row is the header. */
 export function rowsFromCSV(table: string[][], mapping: ColumnMapping): ParsedRows {
   const rows: ImportRowDTO[] = [];
   const skipped: number[] = [];
+  const review: number[] = [];
   table.slice(1).forEach((cells, i) => {
-    const row = rowFromCells(cells, mapping);
-    if (row) rows.push(row);
-    else skipped.push(i + 2); // 1-based line number, header included
+    const read = rowFromCells(cells, mapping);
+    if (read) {
+      if (read.review) review.push(rows.length);
+      rows.push(read.row);
+    } else if (!isSummaryRow(cells, mapping)) skipped.push(i + 2); // 1-based line, header included
   });
-  return { rows, skipped };
+  return { rows, skipped, review };
 }
 
 // ─── Norma 43 (AEB Cuaderno 43) ──────────────────────────────────────────────
@@ -288,5 +367,5 @@ export function parseNorma43(text: string): ParsedRows {
     }
   });
   flush();
-  return { rows, skipped };
+  return { rows, skipped, review: [] };
 }

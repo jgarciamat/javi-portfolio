@@ -3,9 +3,10 @@ import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { Modal } from '@shared/components/Modal';
-import type { Account, ImportResult } from '@modules/finances/domain/types';
+import type { Account, ImportResult, TransactionType } from '@modules/finances/domain/types';
 import type { BankId } from '@modules/finances/domain/bankFormats';
-import type { ColumnMapping } from '@modules/finances/domain/importParsers';
+import { type ColumnMapping, rowType } from '@modules/finances/domain/importParsers';
+import { TRANSACTION_TYPES, TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
 import { useImport } from '../../application/hooks/useImport';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
@@ -26,7 +27,24 @@ const MAPPING_FIELDS: { key: keyof ColumnMapping; labelKey: string; optional?: b
   { key: 'debit', labelKey: 'app.import.col.debit', optional: true },
   { key: 'credit', labelKey: 'app.import.col.credit', optional: true },
   { key: 'category', labelKey: 'app.import.col.category', optional: true },
+  { key: 'type', labelKey: 'app.import.col.type', optional: true },
+  { key: 'notes', labelKey: 'app.import.col.notes', optional: true },
 ];
+
+/** Gasto red, Ingreso green, Ahorro blue. */
+const TYPE_BADGE: Record<TransactionType, string> = {
+  EXPENSE: 'tx-badge tx-badge-expense',
+  INCOME: 'tx-badge tx-badge-income',
+  SAVING: 'tx-badge import-badge-saving',
+};
+
+const typeName = (t: (key: string) => string, type: TransactionType): string =>
+  t(TYPE_LABEL_KEYS[type]).replace(/^[↑↓]\s*/, '');
+
+function TypeBadge({ type }: { type: TransactionType }) {
+  const { t } = useI18n();
+  return <span className={TYPE_BADGE[type]}>{typeName(t, type)}</span>;
+}
 
 const BANK_NAMES: Record<BankId, string> = {
   caixabank: 'CaixaBank',
@@ -141,17 +159,43 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           onChange={(e) => imp.setUseAi(e.target.checked)}
         />
       </label>
-      <table className="data-table">
-        <tbody>
-          {imp.rows.slice(0, 5).map((r, i) => (
-            <tr key={i}>
-              <td>{date(r.date)}</td>
-              <td>{r.description}</td>
-              <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ScrollRegion className="table-scroll import-rows-scroll" label={t('app.import.rowsList')}>
+        <table className="data-table">
+          <tbody>
+            {imp.rows.map((r, i) => (
+              <tr key={i}>
+                <td>{date(r.date)}</td>
+                <td>{r.description}</td>
+                <td>
+                  <select
+                    className="tx-input import-type-select"
+                    aria-label={`${t('app.import.col.type')} ${r.description}`}
+                    value={rowType(r)}
+                    onChange={(e) => imp.setRowType(i, e.target.value as TransactionType)}
+                  >
+                    {TRANSACTION_TYPES.map((ty) => (
+                      <option key={ty} value={ty}>
+                        {typeName(t, ty)}
+                      </option>
+                    ))}
+                  </select>
+                  {imp.review.includes(i) && (
+                    <small className="import-review"> {t('app.import.typeReview')}</small>
+                  )}
+                </td>
+                <td className={r.amount < 0 ? 'amount-neg' : 'amount-pos'}>{money(r.amount)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </ScrollRegion>
+      {imp.skipped.length > 0 && (
+        <ScrollRegion className="import-skipped-scroll" label={t('app.import.skippedLines')}>
+          <small>
+            {t('app.import.skippedLines')}: {imp.skipped.join(', ')}
+          </small>
+        </ScrollRegion>
+      )}
     </div>
   );
 }
@@ -164,7 +208,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
       ? `${tCategory(r.categoryName ?? '')}${SOURCE_MARK[r.categorySource ?? 'file'] ?? ''}`
       : t(`app.import.status.${r.status}`);
   const amount = (r: ImportedRow): string =>
-    r.amount === undefined ? '—' : money(r.type === 'INCOME' ? r.amount : -r.amount);
+    r.amount === undefined ? '—' : money(r.type === 'EXPENSE' ? -r.amount : r.amount);
 
   return (
     <div className="modal-body">
@@ -181,6 +225,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
             <tr>
               <th>{t('app.import.col.date')}</th>
               <th>{t('app.import.col.description')}</th>
+              <th>{t('app.import.col.type')}</th>
               <th>{t('app.import.col.amount')}</th>
               <th>{t('app.import.col.category')}</th>
             </tr>
@@ -190,6 +235,7 @@ function PreviewStep({ imp, preview }: { imp: ImportState; preview: ImportResult
               <tr key={r.index} className={r.status !== 'imported' ? 'row-muted' : undefined}>
                 <td>{r.date ? date(r.date) : '—'}</td>
                 <td>{r.description ?? r.error}</td>
+                <td>{r.type ? <TypeBadge type={r.type} /> : '—'}</td>
                 <td>{amount(r)}</td>
                 <td>{category(r)}</td>
               </tr>

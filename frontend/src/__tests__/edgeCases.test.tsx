@@ -738,7 +738,16 @@ describe('more edge cases', () => {
 
   it('reads short CSV rows and odd Norma 43 movements', async () => {
     const { rowsFromCSV, parseNorma43 } = await import('@modules/finances/domain/importParsers');
-    const mapping = { date: 0, description: 1, amount: 2, debit: -1, credit: -1, category: 5 };
+    const mapping = {
+      date: 0,
+      description: 1,
+      amount: 2,
+      debit: -1,
+      credit: -1,
+      category: 5,
+      type: -1,
+      notes: -1,
+    };
     expect(rowsFromCSV([['h'], ['01/03/2026', 'Pan', '-1']], mapping).rows).toEqual([
       { date: '2026-03-01', description: 'Pan', amount: -1, category: null },
     ]);
