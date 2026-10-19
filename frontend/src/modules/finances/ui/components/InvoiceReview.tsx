@@ -26,11 +26,7 @@ export interface ReviewFocus {
 export const invoiceRowId = (id: string) => `autonomo-invoice-${id}`;
 
 /** The invoices with a change, and the quarters it touches worked out again. */
-function withChange(
-  form: ManualForm,
-  ids: string[],
-  patch: InvoicePatch
-): ManualForm {
+function withChange(form: ManualForm, ids: string[], patch: InvoicePatch): ManualForm {
   const { list, quarters } = updateInvoices(form.invoices, ids, patch);
   let next: ManualForm = { ...form, invoices: list };
   for (const book of ['issued', 'received'] as const) {
@@ -165,14 +161,7 @@ function BookTable({
                     {money(i.withheld)}
                   </td>
                 )}
-                {received && (
-                  <RetentionCell
-                    invoice={i}
-                    name={name}
-                    label={label('retention')}
-                    onChange={(patch) => onRetention(i, patch)}
-                  />
-                )}
+                {received && <RetentionCell invoice={i} name={name} onChange={onRetention} />}
               </tr>
             );
             if (offer?.id !== i.id) return [row];

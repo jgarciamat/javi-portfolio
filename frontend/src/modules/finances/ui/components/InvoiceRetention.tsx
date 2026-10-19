@@ -16,15 +16,12 @@ const shown = (n: number) => String(Math.abs(n)).replace('.', ',');
 export function RetentionCell({
   invoice,
   name,
-  label,
   onChange,
 }: {
   invoice: ImportedInvoice;
   /** The invoice in words, for the names of the controls. */
   name: string;
-  /** The heading of the column, shown on a phone. */
-  label: string;
-  onChange: (patch: InvoicePatch) => void;
+  onChange: (invoice: ImportedInvoice, patch: InvoicePatch) => void;
 }) {
   const { t } = useI18n();
   const held = retentionOf(invoice);
@@ -46,11 +43,11 @@ export function RetentionCell({
     setInvalid(!ok);
     if (!ok) return;
     const signed = invoice.base < 0 ? -value : value;
-    if (signed !== held) onChange({ retentionFix: signed });
+    if (signed !== held) onChange(invoice, { retentionFix: signed });
   };
 
   return (
-    <td data-label={label} className="autonomo-review-retention">
+    <td data-label={t('app.autonomo.review.col.retention')} className="autonomo-review-retention">
       <input
         className="tx-input"
         inputMode="decimal"
@@ -70,7 +67,7 @@ export function RetentionCell({
         aria-label={t('app.autonomo.wh.roleOf', { invoice: name })}
         value={roleOf(invoice)}
         disabled={invoice.excluded}
-        onChange={(e) => onChange({ withholding: e.target.value as WithholdingRole })}
+        onChange={(e) => onChange(invoice, { withholding: e.target.value as WithholdingRole })}
       >
         {ROLES.map((role) => (
           <option key={role} value={role}>
