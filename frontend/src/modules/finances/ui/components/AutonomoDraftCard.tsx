@@ -9,12 +9,23 @@ import { parseDecimal } from '@shared/utils/numbers';
 import { useHeaderOffset } from '@shared/hooks/useHeaderOffset';
 import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
-import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
+import {
+  AutonomoManual,
+  NO_EXTRAS,
+  emptyManual,
+  toManualData,
+  type Extras,
+  type ManualForm,
+} from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
 import { ImportChecks } from './ImportChecks';
 import { bringIntoView } from './bringIntoView';
 import { StepBar, StepSection, goToStep, useCurrentStep, type Step } from './AutonomoSteps';
 import { AutonomoSummary, summarize } from './AutonomoSummary';
+import { AutonomoCloudPanel } from './AutonomoCloud';
+import { toSaved, useAutonomoCloud } from './autonomoSync';
+import { KIND_PREFERENCES_KEY } from './importForm';
+import type { KindPreferences } from '../../domain/invoiceLedger';
 import type { ReviewFocus } from './InvoiceReview';
 import { checkImport } from '../../domain/importChecks';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
@@ -31,27 +42,18 @@ interface Snapshot {
   inputs: AutonomoInputs | null;
 }
 const MANUAL_KEY = 'mm_autonomo_manual2';
+const EXTRAS_KEY = 'mm_autonomo_extras';
 const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
 const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
 type Quarter = 1 | 2 | 3 | 4;
 
-const NO_EXTRAS: Extras = { hardToJustify: false, exempt: false, priorNet: '', toOffset: '' };
-
 const number = (text: string): number => {
   const parsed = parseDecimal(text);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 };
 const quarterNow = (): Quarter => (Math.floor(new Date().getMonth() / 3) + 1) as Quarter;
-
-/** The options typed outside the manual form. */
-interface Extras {
-  hardToJustify: boolean;
-  exempt: boolean;
-  priorNet: string;
-  toOffset: string;
-}
 
 /** What the server takes to prepare the draft of a quarter. */
 function buildInputs(manual: ManualForm, extras: Extras, quarter: Quarter): AutonomoInputs {
@@ -214,6 +216,19 @@ function useStoredManual() {
   return [manual, changeManual] as const;
 }
 
+/** The other options, kept on the device too (and in the account with the rest). */
+function useStoredExtras() {
+  const [extras, setExtras] = useState<Extras>(() => ({
+    ...NO_EXTRAS,
+    ...storage.getJSON<Partial<Extras>>(EXTRAS_KEY, {}),
+  }));
+  const changeExtras = (next: Extras) => {
+    storage.setJSON(EXTRAS_KEY, next);
+    setExtras(next);
+  };
+  return [extras, changeExtras] as const;
+}
+
 /**
  * Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution.
  * `onHowToFile` opens the step-by-step guide to file a form on the Agencia Tributaria website.
@@ -225,7 +240,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
   const action = useAction();
   const [year, setYear] = useState(THIS_YEAR);
   const [quarter, setQuarter] = useState<Quarter>(quarterNow);
-  const [extras, setExtras] = useState<Extras>(NO_EXTRAS);
+  const [extras, setExtras] = useStoredExtras();
   // Bumped when the data is wiped, so the import panels forget their messages too.
   const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
@@ -234,13 +249,22 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
 
+  const kinds = storage.getJSON<KindPreferences>(KIND_PREFERENCES_KEY, {});
+  const cloud = useAutonomoCloud(toSaved(manual, extras, kinds), (data) => {
+    storage.setJSON(KIND_PREFERENCES_KEY, data.kinds);
+    changeManual(data.manual);
+    setExtras(data.extras);
+  });
+
   const hasManual = JSON.stringify(manual) !== JSON.stringify(emptyManual());
   const hasData = hasManual || JSON.stringify(extras) !== JSON.stringify(NO_EXTRAS);
   const wipe = () => {
-    if (!window.confirm(t('app.autonomo.wipeConfirm'))) return;
+    if (!window.confirm(t(cloud.on ? 'app.autonomo.wipeConfirmCloud' : 'app.autonomo.wipeConfirm')))
+      return;
     changeManual(emptyManual());
     setExtras(NO_EXTRAS);
     setWipes((n) => n + 1);
+    void cloud.wipe(toSaved(emptyManual(), NO_EXTRAS, kinds));
   };
 
   const checks = checksFor(manual, extras, year, quarter);
@@ -286,13 +310,16 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
       />
       <StepBar current={step} done={{ bring: hasManual, result: snapshot !== null }} onGo={go} />
 
-      {hasData && (
-        <div className="autonomo-wipe">
-          <button type="button" className="btn-secondary" onClick={wipe}>
-            {t('app.autonomo.wipe')}
-          </button>
-        </div>
-      )}
+      <AutonomoCloudPanel
+        cloud={cloud}
+        wipe={
+          hasData && (
+            <button type="button" className="btn-secondary" onClick={wipe}>
+              {t('app.autonomo.wipe')}
+            </button>
+          )
+        }
+      />
 
       <AutonomoManual
         key={wipes}
@@ -315,10 +342,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           />
         }
         extras={
-          <ExtrasPanel
-            extras={extras}
-            onChange={(patch) => setExtras((current) => ({ ...current, ...patch }))}
-          />
+          <ExtrasPanel extras={extras} onChange={(patch) => setExtras({ ...extras, ...patch })} />
         }
       />
 

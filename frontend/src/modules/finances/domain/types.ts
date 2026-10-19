@@ -671,6 +671,16 @@ export interface AutonomoInputs {
   prior?: { income: number; expenses: number; previousPayments: number; withheld: number } | null;
 }
 
+/** The self-employed form saved in the account (the app checks its shape when it reads it). */
+export interface AutonomoCloudCopy {
+  /** Null when the server cannot decrypt it any more. */
+  data: unknown;
+  unreadable: boolean;
+  updatedAt: string;
+  /** Goes up by one on every save: a save says which one it was based on. */
+  version: number;
+}
+
 export interface AutonomoDraft {
   year: number;
   quarter: 1 | 2 | 3 | 4;

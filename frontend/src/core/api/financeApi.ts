@@ -13,6 +13,7 @@ import type {
   SplitGroup,
   SplitGroupSummary,
   VatRate,
+  AutonomoCloudCopy,
   AutonomoDraft,
   AutonomoInputs,
   YearTax,
@@ -339,6 +340,20 @@ export const businessApi = {
   /** Counts a draft downloaded as a PDF (the free plan has one; a 402 opens the plans). */
   recordPdf() {
     return apiRequest<{ used: number }>('/business/draft/pdf', { method: 'POST' });
+  },
+  /** The form saved in the account (null when there is none). */
+  data() {
+    return apiRequest<AutonomoCloudCopy | null>('/business/data');
+  },
+  /** Saves the form; a 409 says the account has a newer copy than `baseVersion`. */
+  saveData(data: unknown, baseVersion: number | null) {
+    return apiRequest<{ version: number; updatedAt: string }>('/business/data', {
+      method: 'PUT',
+      body: jsonBody({ data, baseVersion }),
+    });
+  },
+  deleteData() {
+    return apiRequest<void>('/business/data', { method: 'DELETE' });
   },
 };
 

@@ -43,6 +43,21 @@ export interface Model130Figures {
   expenses: number;
 }
 
+/** The options of the draft typed outside the quarters. */
+export interface Extras {
+  hardToJustify: boolean;
+  exempt: boolean;
+  priorNet: string;
+  toOffset: string;
+}
+
+export const NO_EXTRAS: Extras = {
+  hardToJustify: false,
+  exempt: false,
+  priorNet: '',
+  toOffset: '',
+};
+
 type QuarterForm = ManualForm['quarters'][number];
 type ExpenseForm = QuarterForm['expenses'][number];
 

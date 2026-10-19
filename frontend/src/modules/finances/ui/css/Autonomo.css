@@ -420,12 +420,6 @@
   line-height: 1.5;
 }
 
-.autonomo-wipe {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.75rem;
-}
-
 /* ─── Steps and the summary ──────────────────── */
 /* Always in sight, right under the app's sticky header (its height comes from useHeaderOffset). */
 .autonomo-sum {
@@ -621,4 +615,83 @@ button.autonomo-sum-warn {
   .autonomo-step {
     scroll-margin-top: calc(var(--autonomo-top, 0px) + 3rem);
   }
+}
+
+/* ─── Where the data is kept ─────────────────── */
+.autonomo-storage {
+  margin: 0 0 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--slate-800);
+  background: rgba(255, 255, 255, 0.025);
+}
+.autonomo-storage > .section-hint {
+  margin: 0 0 0.5rem;
+}
+.autonomo-storage-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.autonomo-switch span {
+  font-weight: 600;
+}
+.autonomo-sync {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--green-300);
+}
+.autonomo-sync--checking,
+.autonomo-sync--saving {
+  color: var(--text-secondary);
+}
+.autonomo-sync--offline,
+.autonomo-sync--conflict,
+.autonomo-sync--tooLarge,
+.autonomo-sync--unavailable {
+  color: var(--amber-300);
+}
+.autonomo-sync--error,
+.autonomo-sync--deleteFailed {
+  color: var(--red-300);
+}
+.autonomo-previous {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-previous p {
+  margin: 0 0 0.4rem;
+}
+.autonomo-copies {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+}
+.autonomo-copy {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--slate-700);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.autonomo-copy:hover,
+.autonomo-copy:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-copy span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.autonomo-off-actions {
+  flex-wrap: wrap;
 }
