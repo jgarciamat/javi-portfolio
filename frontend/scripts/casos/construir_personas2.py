@@ -1198,7 +1198,8 @@ def form2(p):
     for d in p.get('deductions', []):
         f['choices'][d['id']] = dict(on=True, amount=d.get('choice_amount', ''), units=d.get('units', ''))
         if cc.checks_for(d['id']):
-            f['choices'][d['id']]['checks'] = cc.checks_for(d['id'])
+            # The persona's own answers when given (a requirement not met), else «yes» to all.
+            f['choices'][d['id']]['checks'] = {**cc.checks_for(d['id']), **d.get('checks', {})}
         if d.get('months'):
             f['choices'][d['id']]['months'] = d['months']
     j = p.get('joint')

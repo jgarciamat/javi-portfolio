@@ -30896,6 +30896,886 @@
       "esperado": 766.03,
       "obtenido": 766.03,
       "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 26000,
+      "obtenido": 26000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 26000,
+      "obtenido": 26000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 1684.8,
+      "obtenido": 1684.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 24315.2,
+      "obtenido": 24315.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 22315.2,
+      "obtenido": 22315.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 22315.2,
+      "obtenido": 22315.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 22315.2,
+      "obtenido": 22315.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 22315.2,
+      "obtenido": 22315.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6105,
+      "obtenido": 6105,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 13450,
+      "obtenido": 13450,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 14795,
+      "obtenido": 14795,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 1127.28,
+      "obtenido": 1127.28,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 911.88,
+      "obtenido": 911.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1016.03,
+      "obtenido": 1016.03,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 383.63,
+      "obtenido": 383.63,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1399.66,
+      "obtenido": 1399.66,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 1399.66,
+      "obtenido": 1399.66,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 2900,
+      "obtenido": 2900,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -1500.34,
+      "obtenido": -1500.34,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -1500.34,
+      "obtenido": -1500.34,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.stateDeductions",
+      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
+      "esperado": 111.25,
+      "obtenido": 111.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-123-familia-deporte-guarderia-donativos-valencia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 528.25,
+      "obtenido": 528.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 22000,
+      "obtenido": 22000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 22000,
+      "obtenido": 22000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 1425.6,
+      "obtenido": 1425.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 20574.4,
+      "obtenido": 20574.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 18574.4,
+      "obtenido": 18574.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 18574.4,
+      "obtenido": 18574.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 18574.4,
+      "obtenido": 18574.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 18574.4,
+      "obtenido": 18574.4,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 1390.43,
+      "obtenido": 1390.43,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 1355.93,
+      "obtenido": 1355.93,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1390.43,
+      "obtenido": 1390.43,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 866.93,
+      "obtenido": 866.93,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2257.36,
+      "obtenido": 2257.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 2257.36,
+      "obtenido": 2257.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 2300,
+      "obtenido": 2300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -42.64,
+      "obtenido": -42.64,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -42.64,
+      "obtenido": -42.64,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 489,
+      "obtenido": 489,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "campo": "boxes.0003",
+      "concepto": "Retribuciones dinerarias",
+      "esperado": 24000,
+      "obtenido": 24000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 24000,
+      "obtenido": 24000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "campo": "boxes.0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "esperado": 1555.2,
+      "obtenido": 1555.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 22444.8,
+      "obtenido": 22444.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "campo": "boxes.0019",
+      "concepto": "Otros gastos deducibles",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "campo": "boxes.0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "esperado": 20444.8,
+      "obtenido": 20444.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "campo": "boxes.0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "campo": "boxes.0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "esperado": 20444.8,
+      "obtenido": 20444.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "campo": "boxes.0435",
+      "concepto": "Base imponible general",
+      "esperado": 20444.8,
+      "obtenido": 20444.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "campo": "boxes.0500",
+      "concepto": "Base liquidable general",
+      "esperado": 20444.8,
+      "obtenido": 20444.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "campo": "boxes.0510",
+      "concepto": "Base liquidable del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "campo": "boxes.0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5790,
+      "obtenido": 5790,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "campo": "boxes.0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "campo": "boxes.0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "campo": "boxes.0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "esperado": 5790,
+      "obtenido": 5790,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "campo": "boxes.0545",
+      "concepto": "Cuota íntegra estatal",
+      "esperado": 1622.22,
+      "obtenido": 1622.22,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "campo": "boxes.0546",
+      "concepto": "Cuota íntegra autonómica",
+      "esperado": 1578.33,
+      "obtenido": 1578.33,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1622.22,
+      "obtenido": 1622.22,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1533.33,
+      "obtenido": 1533.33,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 3155.55,
+      "obtenido": 3155.55,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "campo": "boxes.0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 3155.55,
+      "obtenido": 3155.55,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "campo": "boxes.0609",
+      "concepto": "Total pagos a cuenta",
+      "esperado": 3000,
+      "obtenido": 3000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": 155.55,
+      "obtenido": 155.55,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": 155.55,
+      "obtenido": 155.55,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p5-125-alquiler-sin-perfil-deporte-malaga",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 45,
+      "obtenido": 45,
+      "estado": "coincide"
     }
   ]
 }

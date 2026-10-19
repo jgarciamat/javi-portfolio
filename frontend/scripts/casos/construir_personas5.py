@@ -4,6 +4,8 @@
 - Alquileres inmueble a inmueble (P0-2): titularidad, días, límites por inmueble, amortización del
   mayor entre coste y valor catastral sin suelo, reducción del art. 23.2 según el contrato, pérdidas e
   imputación de los días a disposición.
+- Deducciones autonómicas con requisitos y donativos por lo donado (P0-4): Comunitat Valenciana,
+  Castilla y León y Andalucía, con un requisito no cumplido.
 
 Todos los datos son INVENTADOS. El cálculo a mano usa las fórmulas de construir_personas2.renta2
 (LIRPF y Manual práctico de Renta 2025), con los alquileres de properties_calc. Comprobado el 19-10-2026.
@@ -89,6 +91,71 @@ RENTA = [
 ]
 
 
+DONATIONS_ID = 'estado-donativos-ley-49-2002'
+
+
+def donation(given, recurrent=0.0):
+    """Ley 49/2002 art. 19: 80 % de los primeros 250 € (primero lo no recurrente), 40 % del resto y 45 % lo recurrente."""
+    once = given - recurrent
+    first = min(once, 250)
+    first_rec = min(recurrent, 250 - first)
+    total = cc.r2(0.8 * (first + first_rec) + 0.4 * (once - first) + 0.45 * (recurrent - first_rec))
+    half = cc.r2(total / 2)
+    how = (f'Ley 49/2002 art. 19: 80 % de {cc.eur(first + first_rec)} + 40 % de {cc.eur(once - first)} + 45 % (misma entidad tres años) de '
+           f'{cc.eur(recurrent - first_rec)} = {cc.eur(total)}; la mitad en cada cuota (art. 68.3 LIRPF); dentro del 10 % de la base liquidable (art. 69.1)')
+    return dict(id=DONATIONS_ID, label='Donativos a entidades de la Ley 49/2002', how=how, state=cc.r2(total - half), regional=half,
+                donations=dict(general=str(given), recurrent=str(recurrent) if recurrent else '', priority='', priorityRecurrent='', other=''))
+
+
+def ded(id_, label, how, regional, choice=None, units=None, checks=None):
+    d = dict(id=id_, label=label, how=how, state=0.0, regional=regional)
+    if choice is not None:
+        d['choice_amount'] = str(choice)
+    if units is not None:
+        d['units'] = str(units)
+    if checks:
+        d['checks'] = checks
+    return d
+
+
+RENTA += [
+    P(123, 'familia-deporte-guarderia-donativos-valencia', 'comunitat-valenciana',
+      'Familia en València con gimnasio, guardería y donativos a la misma ONG tres años',
+      'Asalariada de 32 años con dos hijos (5 y 2 años). Paga 400 € de gimnasio y fisioterapia con tarjeta y 2.000 € de guardería del pequeño. '
+      'Dona 300 € a una ONG a la que ya donó en 2023 y 2024 la misma cantidad: el 45 % por fidelidad. Responde «sí» a los requisitos de cada deducción.',
+      ['requisitos de deducciones autonómicas (CV)', 'deporte y actividades saludables (CV, 30 %)', 'guardería de menor de 3 años (CV, 15 % con tope de 297 €)',
+       'donativos por lo donado con recurrencia (45 %)', 'casillas 1960 y 1087 del anexo B'],
+      age=32, children=[dict(age=5), dict(age=2)], **p2.worker(26000, 2900),
+      deductions=[ded('comunitat-valenciana-practica-deporte', 'Deporte y actividades saludables (Ley 13/1997 CV, art. 4.Uno; casilla 1960)',
+                      '30 % de 400 = 120 € (tope 150 €; base imponible por debajo de 54.000 €)', 120, choice=400),
+                  ded('comunitat-valenciana-custodia-guarderias', 'Guardería de menores de 3 años (Ley 13/1997 CV, art. 4.Uno; casilla 1087)',
+                      '15 % de 2.000 = 300, tope 297 € por menor (base imponible por debajo de 27.000 €: tope completo)', 297, choice=2000),
+                  donation(300, 300)]),
+    P(124, 'alquiler-joven-donacion-fundacion-valladolid', 'castilla-y-leon',
+      'Joven de 29 años de alquiler en Valladolid que dona a una fundación de la región',
+      'Trabaja en Valladolid (22.000 € brutos), vive de alquiler (500 € al mes, titular del contrato) y dona 200 € a una fundación de Castilla y León con certificado. '
+      'Las dos deducciones de Castilla y León miden su tope de renta después del mínimo personal (18.900 €).',
+      ['alquiler de vivienda para jóvenes (CyL, 20 % con tope de 459 €)', 'edad comprobada sola (menor de 36)', 'donación a fundaciones (CyL, 15 %)',
+       'casillas 0975 y 0972 del anexo B'],
+      age=29, **p2.worker(22000, 2300),
+      deductions=[ded('castilla-y-leon-alquiler-jovenes', 'Alquiler de vivienda habitual para jóvenes (D. Leg. 1/2013 CyL; casilla 0975)',
+                      '20 % de 6.000 = 1.200, tope 459 € (base menos mínimo por debajo de 18.900 €)', 459, choice=6000),
+                  ded('castilla-y-leon-donaciones-fundaciones-patrimonio', 'Donaciones a fundaciones de Castilla y León (casilla 0972)',
+                      '15 % de 200 = 30 €', 30, choice=200)]),
+    P(125, 'alquiler-sin-perfil-deporte-malaga', 'andalucia',
+      'Asalariado de 40 años en Málaga: la deducción de alquiler no le corresponde y la de deporte sí',
+      'Vive de alquiler, pero tiene 40 años, sin discapacidad ni otro perfil de la deducción andaluza por alquiler: contesta «no» a su requisito '
+      'y no se aplica. Paga 300 € de cuotas de su club deportivo: 15 % = 45 €.',
+      ['requisito no cumplido: la deducción no se aplica', 'deporte (Andalucía, 15 % con tope de 100 €)', 'casillas 0853 y 0921 del anexo B'],
+      age=40, **p2.worker(24000, 3000),
+      deductions=[ded('andalucia-alquiler-vivienda-habitual', 'Alquiler de vivienda habitual (Ley 5/2021 de Andalucía; casilla 0853)',
+                      'No se aplica: no tiene menos de 35 años, ni más de 65, ni discapacidad, ni es víctima de violencia o terrorismo', 0,
+                      choice=7200, checks={'perfil': 'no'}),
+                  ded('andalucia-ejercicio-fisico-deporte', 'Ejercicio físico y deporte (Ley 5/2021 de Andalucía; casilla 0921)',
+                      '15 % de 300 = 45 € (tope 100 €)', 45, choice=300)]),
+]
+
+
 def excess_of(p):
     """Exceso de intereses y reparaciones de todos los inmuebles (0108), para la cifra rental.excess."""
     total = 0.0
@@ -105,13 +172,19 @@ def excess_of(p):
 def main():
     index = []
     for p in RENTA:
-        p['excess'] = excess_of(p)
+        if p.get('properties'):
+            p['excess'] = excess_of(p)
         decls, figures, steps, _b = p2.build_renta2(p)
+        for d in p.get('deductions', []):
+            if d.get('donations'):
+                # What was given, not the deduction: the engine works it out (rentaDonations.ts).
+                decls[0]['form']['choices'].pop(d['id'], None)
+                decls[0]['form']['donations'] = d['donations']
         persona = dict(slug=p['slug'], banco=PREFIX, nombre=f'Persona Ficticia {p["n"]:03d}', nif=nif(p['n']), domicilio=home(p['n'], p['ccaa']),
                        iban='ES00 0000 0000 0000 0000 0000', ejercicio=2025, comunidad=p['ccaa'], titulo=p['title'], descripcion=p['story'],
                        prueba=p['tests'], modelos=['100'], alcance='dentro', datosFicticios=True)
         persona['renta'] = dict(declaraciones=decls, conjunta=None)
-        persona['documentos'] = dict(pagadores=p['payers'], inmuebles=p['properties'])
+        persona['documentos'] = dict(pagadores=p['payers'], inmuebles=p.get('properties', []))
         esperado = dict(slug=p['slug'], ejercicio=2025, comprobado=CHECKED, cifras=figures)
         p2.write(os.path.join(OUT, p['slug']), persona, esperado, p['title'], p['story'], steps, SOURCES)
         index.append(dict(slug=p['slug'], titulo=p['title'], comunidad=p['ccaa'], modelos=['100'], prueba=p['tests'], alcance='dentro'))

@@ -1,0 +1,100 @@
+{
+  "slug": "p5-123-familia-deporte-guarderia-donativos-valencia",
+  "banco": "p5",
+  "nombre": "Persona Ficticia 123",
+  "nif": "00000123P",
+  "domicilio": "Calle Ficticia 123, 46001 València (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Familia en València con gimnasio, guardería y donativos a la misma ONG tres años",
+  "descripcion": "Asalariada de 32 años con dos hijos (5 y 2 años). Paga 400 € de gimnasio y fisioterapia con tarjeta y 2.000 € de guardería del pequeño. Dona 300 € a una ONG a la que ya donó en 2023 y 2024 la misma cantidad: el 45 % por fidelidad. Responde «sí» a los requisitos de cada deducción.",
+  "prueba": [
+    "requisitos de deducciones autonómicas (CV)",
+    "deporte y actividades saludables (CV, 30 %)",
+    "guardería de menor de 3 años (CV, 15 % con tope de 297 €)",
+    "donativos por lo donado con recurrencia (45 %)",
+    "casillas 1960 y 1087 del anexo B"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "comunitat-valenciana",
+          "age": "32",
+          "disability": 0,
+          "children": [
+            {
+              "age": "5",
+              "disability": 0
+            },
+            {
+              "age": "2",
+              "disability": 0
+            }
+          ],
+          "ascendants": [],
+          "shared": false,
+          "gross": "26000.0",
+          "socialSecurity": "1684.8",
+          "withheld": "2900.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "comunitat-valenciana-practica-deporte": {
+              "on": true,
+              "amount": "400",
+              "units": "",
+              "checks": {
+                "deporte": "yes",
+                "factura": "yes"
+              }
+            },
+            "comunitat-valenciana-custodia-guarderias": {
+              "on": true,
+              "amount": "2000",
+              "units": "",
+              "checks": {
+                "trabajo": "yes",
+                "factura": "yes"
+              }
+            }
+          },
+          "donations": {
+            "general": "300",
+            "recurrent": "300",
+            "priority": "",
+            "priorityRecurrent": "",
+            "other": ""
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 26000,
+        "withheld": 2900,
+        "ss": 1684.8
+      }
+    ],
+    "inmuebles": []
+  }
+}

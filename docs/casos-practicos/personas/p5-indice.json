@@ -47,5 +47,50 @@
       "exceso para 4 años (0108)"
     ],
     "alcance": "dentro"
+  },
+  {
+    "slug": "p5-123-familia-deporte-guarderia-donativos-valencia",
+    "titulo": "Familia en València con gimnasio, guardería y donativos a la misma ONG tres años",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "requisitos de deducciones autonómicas (CV)",
+      "deporte y actividades saludables (CV, 30 %)",
+      "guardería de menor de 3 años (CV, 15 % con tope de 297 €)",
+      "donativos por lo donado con recurrencia (45 %)",
+      "casillas 1960 y 1087 del anexo B"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+    "titulo": "Joven de 29 años de alquiler en Valladolid que dona a una fundación de la región",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "alquiler de vivienda para jóvenes (CyL, 20 % con tope de 459 €)",
+      "edad comprobada sola (menor de 36)",
+      "donación a fundaciones (CyL, 15 %)",
+      "casillas 0975 y 0972 del anexo B"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p5-125-alquiler-sin-perfil-deporte-malaga",
+    "titulo": "Asalariado de 40 años en Málaga: la deducción de alquiler no le corresponde y la de deporte sí",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "requisito no cumplido: la deducción no se aplica",
+      "deporte (Andalucía, 15 % con tope de 100 €)",
+      "casillas 0853 y 0921 del anexo B"
+    ],
+    "alcance": "dentro"
   }
 ]
