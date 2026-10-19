@@ -83,6 +83,7 @@ describe('the PDF', () => {
       'Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf',
       `de ${total})`,
       '50,00',
+      'F - Moneda de curso legal',
     ])
       expect(pdf).toContain(text);
     expect(pdf).not.toMatch(/Excel/);

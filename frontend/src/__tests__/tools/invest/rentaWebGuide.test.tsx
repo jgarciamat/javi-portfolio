@@ -169,6 +169,27 @@ describe('the file to copy: «Empieza aquí» and a section per window with its 
     const [start, window] = reportTables(one);
     expect(start.kind).toBe('start');
     expect(window.title).toMatch(/^Copia esta fila en la ventana “/);
+    // The worked row: the key as a text, only the amounts with a decimal comma.
+    expect(start.rows.slice(1)).toEqual([
+      ['Denominación de la moneda virtual', 'BTC'],
+      ['Indique el tipo de contraprestación recibida a cambio', 'F - Moneda de curso legal'],
+      ['Importe de la transmisión', '150,00'],
+      ['Gastos de la transmisión', '0,00'],
+      ['Importe de la adquisición', '100,00'],
+      ['Gastos de la adquisición', '0,00'],
+    ]);
+    // Shares: the transaction is a number of order («1»), the mark a «No».
+    const shares = ledgerOf([
+      op({ kind: 'buy', date: '2024-01-01', asset: 'FICT', assetClass: 'shares', eur: 1000 }),
+      op({ kind: 'sell', date: '2025-02-01', asset: 'FICT', assetClass: 'shares', eur: 1200 }),
+    ]);
+    expect(copyPlan(rentaWebKit(shares)).example?.fields.map((f) => f.value)).toEqual([
+      'FICT',
+      '1',
+      '1200,00',
+      '1000,00',
+      'No',
+    ]);
     const income = reportTables(
       ledgerOf([op({ kind: 'interest', date: '2025-01-01', asset: 'C', units: 0, eur: 5 })])
     )[0];

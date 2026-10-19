@@ -4,6 +4,8 @@ import type { LedgerResult } from './ledger';
 import {
   APARTADO,
   rentaWebKit,
+  fieldText,
+  MONEY_FIELDS,
   webValue,
   type Alta,
   type RentaWebKit,
@@ -194,15 +196,6 @@ export const TAB: Record<GainSection, string> = {
   other: '5 Otros elementos (1624)',
 };
 
-const MONEY_FIELDS = new Set([
-  'proceeds',
-  'proceedsCosts',
-  'cost',
-  'costCosts',
-  'amortization',
-  'withheld',
-]);
-
 type Line = { alta: Alta; line: Alta };
 
 /** A column of the tab that is not a field of the window. */
@@ -355,7 +348,7 @@ export function copyPlan(kit: RentaWebKit): CopyPlan {
           alta: line.alta.n,
           fields: first.def.fields.map((f) => ({
             label: f.label,
-            value: String(webValue(fieldValue(line, f.key)) || '(vacío)'),
+            value: fieldText(f.key, fieldValue(line, f.key)) || '(vacío)',
           })),
         }
       : null,

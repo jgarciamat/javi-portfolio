@@ -8,7 +8,7 @@ import {
   APARTADO,
   OTHER_GROUPINGS,
   rentaWebKit,
-  webValue,
+  fieldText,
   WINDOWS,
   type Alta,
   type KitWarning,
@@ -18,9 +18,6 @@ import {
 import { download } from '../../../application/investImport';
 import { reportPdf } from '../../../application/reportPdf';
 import { useMoney } from '../shared';
-
-/** What is copied into Renta WEB: an amount with a decimal comma and no thousands separator. */
-export const forRentaWeb = webValue;
 
 /** The id of the panel in the result, for the link under the amount. */
 export const RENTA_WEB_RESULT_ID = 'invest-web-result';
@@ -47,16 +44,18 @@ const stepsOf = (kit: RentaWebKit): Step[] =>
 
 /** One field of the window: its official label, the value and a button to copy it. */
 function Field({
+  field,
   label,
   value,
   onCopied,
 }: {
+  field: string;
   label: string;
   value: string | number;
   onCopied: () => void;
 }) {
   const { t } = useI18n();
-  const text = forRentaWeb(value);
+  const text = fieldText(field, value);
   return (
     <div className="invest-copy-field">
       <span className="invest-copy-label">{label}</span>
@@ -133,6 +132,7 @@ export function CopyMode({ kit, grouping }: { kit: RentaWebKit; grouping: OtherG
             <div key={i} className="invest-copy-alta">
               {step.alta.transactions && i === 0 && (
                 <Field
+                  field="entity"
                   label={fields[0].label}
                   value={step.alta.values.entity}
                   onCopied={() => setCopied(fields[0].label)}
@@ -143,6 +143,7 @@ export function CopyMode({ kit, grouping }: { kit: RentaWebKit; grouping: OtherG
                 .map((f) => (
                   <Field
                     key={f.key}
+                    field={f.key}
                     label={f.label}
                     value={line.values[f.key]}
                     onCopied={() => setCopied(f.label)}
