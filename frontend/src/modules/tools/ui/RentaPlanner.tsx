@@ -45,6 +45,7 @@ import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
+import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
 import { Step, useMoney } from './renta/shared';
@@ -517,6 +518,7 @@ export function RentaPlanner({
         onDecide={decideOn}
         startSignal={reviewStart}
       />
+      <Optimizer form={form} set={set} ccaa={ccaa} found={found.candidates} savings={savings} />
       <DeductionsStep
         state={rentaState}
         ccaa={ccaa}
