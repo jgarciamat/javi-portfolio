@@ -206,6 +206,8 @@ const deductions: Deduction[] = [
   // ---------------------------------------------------------------- Donativos
   {
     id: 'estado-donativos-ley-49-2002',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a ONG y entidades acogidas al mecenazgo',
     summary:
@@ -219,6 +221,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-donativos-actividades-prioritarias',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a actividades prioritarias de mecenazgo',
     summary:
@@ -232,6 +236,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-donativos-otras-entidades',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a fundaciones y asociaciones no acogidas al mecenazgo',
     summary:
@@ -244,6 +250,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-partidos-politicos',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Cuotas y aportaciones a partidos políticos',
     summary:
@@ -274,6 +282,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-patrimonio-historico',
+    // Art. 68.5 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Protección del patrimonio histórico y Patrimonio Mundial',
     summary:
@@ -415,6 +425,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ceuta-melilla',
+    // Art. 68.4 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Rentas obtenidas en Ceuta o Melilla',
     summary:
@@ -450,6 +462,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-actividades-economicas',
+    // Art. 68.2 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Incentivos a la inversión en actividades económicas',
     summary:

@@ -632,6 +632,15 @@ describe('computeRenta with the real data', () => {
     expect(poor.result).toBe(-2200);
   });
 
+  it('takes half of the donations from each quota (case 15 of the bank)', async () => {
+    // LIRPF arts. 67.1.b and 77.1.b: 50 % of art. 68.3 in each. Before: all 300 € from the State's.
+    const r = await run('castilla-y-leon', 30000, alone, {
+      'estado-donativos-ley-49-2002': { on: true, amount: 300 },
+    });
+    expect(r.stateDeductions).toBe(150);
+    expect(r.regionalDeductions).toBe(150);
+  });
+
   it('splits the home bought before 2013 in a State and a regional half (case 13 of the bank)', async () => {
     // DT 18.ª LIRPF: 7.5 % State + 7.5 % regional of up to 9,040 €. Before: only the 678 € of the State.
     const r = await run('madrid', 42000, alone, {

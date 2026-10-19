@@ -3,32 +3,6 @@
   "comprobado": "2026-10-19",
   "renta": [
     {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.stateDeductions",
-      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
-      "esperado": 150,
-      "obtenido": 300,
-      "severidad": "baja",
-      "causa": "Los donativos se restan enteros de la cuota estatal; la AEAT los reparte al 50 % entre la estatal (0552) y la autonómica (0553). El total coincide; solo cambia el reparto (y, con poca cuota estatal, podría perderse parte).",
-      "fuente": "Art. 68.3 y 77 LIRPF; borrador AEAT (casillas 0552/0553)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.regionalDeductions",
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 150,
-      "obtenido": 0,
-      "severidad": "baja",
-      "causa": "Los donativos se restan enteros de la cuota estatal; la AEAT los reparte al 50 % entre la estatal (0552) y la autonómica (0553). El total coincide; solo cambia el reparto (y, con poca cuota estatal, podría perderse parte).",
-      "fuente": "Art. 68.3 y 77 LIRPF; borrador AEAT (casillas 0552/0553)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
       "declaracion": "individual",
       "casilla": "0435",
