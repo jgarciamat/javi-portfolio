@@ -70,6 +70,88 @@ export const PREMIUM_CHAPTERS: ChapterInfo[] = [
     premium: true,
   },
   {
+    id: 'letras-del-tesoro',
+    emoji: '💶',
+    color: '#0369a1',
+    title: 'Letras del Tesoro: qué son y cómo funcionan',
+    titleEn: 'Spanish Treasury bills (Letras): what they are and how they work',
+    summary:
+      'Deuda del Estado a 3, 6, 9 y 12 meses: compras por menos de 1.000 € y te devuelven 1.000 €. Cómo se calcula su rentabilidad, con calculadora.',
+    summaryEn:
+      'Spanish government debt at 3, 6, 9 and 12 months: you pay less than €1,000 and get €1,000 back. How the yield is worked out, with a calculator.',
+    level: 1,
+    topic: 'bonds',
+    minutes: 4,
+    withCalc: true,
+    premium: true,
+    videos: [39],
+  },
+  {
+    id: 'bonos-obligaciones-estado',
+    emoji: '📜',
+    color: '#1d4ed8',
+    title: 'Bonos y Obligaciones del Estado: cupones, precio y vencimiento',
+    titleEn: 'Spanish government bonds (Bonos and Obligaciones): coupons, price and maturity',
+    summary:
+      'Deuda del Estado a 3, 5, 10, 15, 30 y 50 años que paga un cupón cada año. Qué cobras, por qué cambia su precio y qué son los bonos indexados y los verdes.',
+    summaryEn:
+      'Spanish government debt at 3, 5, 10, 15, 30 and 50 years paying a yearly coupon. What you get, why the price moves, and what inflation-linked and green bonds are.',
+    level: 2,
+    topic: 'bonds',
+    minutes: 4,
+    withCalc: true,
+    premium: true,
+  },
+  {
+    id: 'comprar-deuda-publica',
+    emoji: '🛒',
+    color: '#0891b2',
+    title: 'Cómo comprar deuda pública paso a paso: Tesoro, banco y mercado secundario',
+    titleEn: 'How to buy Spanish government debt step by step: Treasury, bank and secondary market',
+    summary:
+      'Los tres caminos para comprar Letras, Bonos y Obligaciones: la web del Tesoro, el Banco de España y tu banco o bróker, con plazos, comisiones y cómo vender o reinvertir.',
+    summaryEn:
+      'The three ways to buy Spanish bills and bonds: the Treasury website, the Bank of Spain and your bank or broker, with deadlines, fees and how to sell or roll over.',
+    level: 1,
+    topic: 'bonds',
+    minutes: 5,
+    withCalc: false,
+    premium: true,
+    videos: [39],
+  },
+  {
+    id: 'deuda-publica-renta',
+    emoji: '📑',
+    color: '#475569',
+    title: 'Deuda pública y Renta: cómo tributa y cómo se declara',
+    titleEn: 'Government debt and your tax return: how it is taxed and declared',
+    summary:
+      'Letras, cupones y ventas: qué es rendimiento del capital mobiliario, qué lleva retención, en qué casillas va y cómo se compensan las pérdidas.',
+    summaryEn:
+      'Bills, coupons and sales: what counts as investment income, what has withholding, which boxes they go in and how losses offset.',
+    level: 2,
+    topic: 'bonds',
+    minutes: 4,
+    withCalc: true,
+    premium: true,
+  },
+  {
+    id: 'letras-depositos-monetarios',
+    emoji: '🆚',
+    color: '#0d9488',
+    title: 'Letras, depósitos y fondos monetarios: diferencias para elegir',
+    titleEn: 'Treasury bills, deposits and money market funds: the differences',
+    summary:
+      'Tres formas de rentabilizar el dinero a corto plazo. Quién te lo garantiza, cuándo puedes sacarlo, qué cuesta y cómo tributa cada una.',
+    summaryEn:
+      'Three ways to earn on short-term cash: who backs it, when you can take it out, what it costs and how each one is taxed.',
+    level: 1,
+    topic: 'bonds',
+    minutes: 3,
+    withCalc: true,
+    premium: true,
+  },
+  {
     id: 'cuanto-tributa',
     emoji: '🧾',
     color: '#64748b',
