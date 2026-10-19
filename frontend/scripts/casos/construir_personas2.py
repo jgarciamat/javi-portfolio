@@ -419,12 +419,14 @@ RENTA = [
       'Vende el 30-9-2025 un piso vacío comprado en 2008 (con una mejora en 2015): ganancia en la base del ahorro e imputación de renta hasta la venta. Su madre le dona 20.000 € en dinero: no tributa en el IRPF (Impuesto sobre Donaciones de Castilla-La Mancha).',
       ['ganancia por venta de inmueble (art. 34-35)', 'mejoras en el valor de adquisición', 'plusvalía municipal como gasto de venta', 'imputación de renta por días', 'donación recibida (ISD, no IRPF)', 'tramos altos de la base del ahorro'],
       age=55, savings=40300, unrented=[dict(value=70000, revised=True, days=273)], **worker(39000, 6900),
+      detail=dict(properties=[dict(name='Piso comprado en 2008', proceeds=177900, cost=137600, amortization=0, exemption='none')],
+                  figures=[('0422', 'Suma de ganancias patrimoniales del ahorro (piso)', 40300), ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 40300)]),
       savings_steps=['Valor de adquisición (art. 35.1): precio 120.000 + gastos e impuestos de la compra 9.600 + mejora de 2015 8.000 = 137.600,00',
                      'Valor de transmisión (art. 35.2): 185.000 − plusvalía municipal 2.100 − agencia 5.000 = 177.900,00',
                      'Ganancia = 177.900 − 137.600 = **40.300,00** (base del ahorro). Comprado en 2008: no hay coeficientes de abatimiento (DT 9.ª, solo antes de 1995)',
                      'Donación de 20.000 € de su madre: no es renta del IRPF para quien la recibe (art. 6.4 LIRPF); tributa en el Impuesto sobre Sucesiones y Donaciones'],
       pending=[('Donación recibida (20.000 €)', 'No tributa en el IRPF del donatario (art. 6.4 LIRPF): se declara en el Impuesto sobre Donaciones de Castilla-La Mancha, fuera de Finanverso.'),
-               ('Ganancia de la venta del piso (40.300,00)', 'El motor recibe la base del ahorro ya calculada: no calcula la ganancia de un inmueble.')]),
+               ]),
     P(39, 'dos-pagadores-no-obligado-devolucion-castilla-la-mancha', 'castilla-la-mancha', 'Dos pagadores por debajo de 15.876 €: no está obligado, pero le devuelven',
       'Dos empleos (10.000 y 5.000 €), 15.000 € en total: no llega a 15.876 €, así que no está obligado a declarar; aun así declara para recuperar los 100 € retenidos. Base liquidable por debajo del mínimo: cuota cero.',
       ['varios pagadores sin obligación de declarar', 'reducción art. 20 máxima (7.302)', 'base inferior al mínimo', 'devolución de retenciones'],
@@ -445,22 +447,32 @@ RENTA = [
       'Intereses, dividendos y gastos de custodia; reembolsa un fondo heredado en 2023 (valor de adquisición: el del Impuesto sobre Sucesiones) con ganancia y vende acciones con pérdida; compensa 2.000 € de pérdidas patrimoniales de 2022.',
       ['rendimientos del capital mobiliario y gastos de custodia', 'fondo heredado: valor del ISD', 'integración y compensación de ganancias y pérdidas (art. 49)', 'pérdidas de años anteriores (4 años)', 'retenciones del capital'],
       age=60, savings=6640, otherWithheld=1938, **worker(52000, 10200),
+      detail=dict(capital=dict(interest=1200, dividends=2500, expenses=60), pendingGains=[dict(year=2022, amount=2000)], assets=[
+          dict(name='Fondo heredado', kind='fund', buys=[dict(date='2023-04-12', units=1000, cost=30000)], sells=[dict(date='2025-05-20', units=1000, proceeds=36500)]),
+          dict(name='Acciones Ficticias', kind='listed', buys=[dict(date='2021-02-01', units=300, cost=9000)], sells=[dict(date='2025-10-15', units=300, proceeds=7500)])],
+          figures=[('0041', 'Rendimiento neto del capital mobiliario (con gastos de custodia)', 3640), ('0422', 'Suma de ganancias patrimoniales del ahorro (fondo)', 6500),
+                   ('0423', 'Suma de pérdidas patrimoniales del ahorro (acciones)', 1500), ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 5000),
+                   ('pendingGainsOnGains', 'Pérdidas de 2022 compensadas (casilla 0440)', 2000)]),
       savings_steps=['Capital mobiliario: intereses 1.200 + dividendos 2.500 − custodia y administración 60 (art. 26.1.a) = **3.640,00**',
                      'Fondo heredado en 2023: valor de adquisición el declarado en Sucesiones, 30.000; reembolso 36.500 → ganancia **6.500,00**',
                      'Acciones compradas en 2021 por 9.000 y vendidas por 7.500 → pérdida **−1.500,00**',
                      'Ganancias y pérdidas entre sí: 6.500 − 1.500 = 5.000; menos pérdidas pendientes de 2022 (−2.000, art. 49.1.b, dentro de los 4 años) = **3.000,00**',
                      'Base del ahorro = 3.640 + 3.000 = **6.640,00**; retenciones del capital 228 (intereses) + 475 (dividendos) + 1.235 (fondo) = 1.938,00'],
-      pending=[('Compensación de pérdidas de 2022 (−2.000,00)', 'El motor no guarda saldos de años anteriores: recibe la base del ahorro ya compensada.'),
-               ('Ganancia del fondo heredado y pérdida de las acciones', 'El motor recibe la base del ahorro ya neta.')]),
+      ),
     P(43, 'cripto-permuta-extremadura', 'extremadura', 'Criptomonedas: permuta de BTC por ETH y venta con pérdida',
       'Cambia 0,2 BTC (comprados en 2022 por 4.000 €) por ETH valorado en 12.000 € con 20 € de comisión: la permuta es una transmisión (ganancia). Después vende la mitad del ETH por 5.000 € (pérdida).',
       ['permuta entre criptomonedas (art. 37.1.h)', 'valor de adquisición del ETH recibido', 'ganancia y pérdida en el mismo año', 'modelo 721 (no obligado)'],
       age=33, savings=6980, **worker(29000, 4100),
+      detail=dict(assets=[
+          dict(name='BTC', kind='crypto', buys=[dict(date='2022-06-01', units=0.2, cost=4000)], sells=[dict(date='2025-03-10', units=0.2, proceeds=11980)]),
+          dict(name='ETH', kind='crypto', buys=[dict(date='2025-03-10', units=4, cost=12000)], sells=[dict(date='2025-08-01', units=2, proceeds=5000)])],
+          figures=[('0422', 'Suma de ganancias patrimoniales del ahorro (permuta de BTC)', 7980), ('0423', 'Suma de pérdidas patrimoniales del ahorro (venta de ETH)', 1000),
+                   ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 6980)]),
       savings_steps=['Permuta (art. 37.1.h): valor de transmisión el mayor de lo entregado o lo recibido, 12.000 − comisión 20 = 11.980; coste 4.000 → ganancia **7.980,00**',
                      'El ETH recibido entra con un valor de adquisición de 12.000 (el de mercado del BTC entregado)',
                      'Vende la mitad del ETH por 5.000; coste 6.000 → pérdida **−1.000,00**',
                      'Saldo: 7.980 − 1.000 = **6.980,00** (base del ahorro). El 721 solo obliga con más de 50.000 € en el extranjero a 31-12'],
-      pending=[('Ganancia de la permuta y pérdida de la venta de criptomonedas', 'El motor recibe la base del ahorro ya neta: no calcula permutas ni FIFO.')]),
+      ),
     P(45, 'padre-solo-hijo-discapacidad-65-la-rioja', 'la-rioja', 'Padre solo con un hijo con discapacidad del 65 %: mínimo propio de La Rioja',
       'Custodia exclusiva de un hijo de 10 años con discapacidad del 65 %, sin convivir con la madre. La Rioja eleva el mínimo por discapacidad de los descendientes (9.900 €) pero no el resto. Individual frente a conjunta monoparental.',
       ['mínimo autonómico por discapacidad de descendientes (La Rioja)', 'asistencia por discapacidad ≥ 65 %', 'monoparental conjunta (2.150)', 'deducción por descendiente con discapacidad'],
@@ -973,6 +985,9 @@ def form2(p):
         f['childSupport'] = str(p['alimentos'])
     if p.get('dt12'):
         f['pensionCapital2006'] = str(r2(p['dt12'] / 0.4))
+    if p.get('detail'):
+        f['savingsDetail'] = cc.savings_detail_of(p['detail'])
+        f['savings'] = ''
     if p.get('rental'):
         rt = p['rental']
         f.update(rentalOn=True, rentalIncome=str(rt['income']), rentalExpenses=rt['expenses'], construction=str(rt['construction']), rentalReduction=rt['reductionId'])
@@ -1048,6 +1063,9 @@ def build_renta2(p):
         bj = renta2(dict(p), steps, joint=p['joint'])
         figures += figures2(p, bj, 'conjunta', 'calculo.md#declaración-conjunta')
         steps.s(f'Comparación: individual {eur(b["0670"])} frente a conjunta {eur(bj["0670"])} → {"mejor la individual" if b["0670"] <= bj["0670"] else "mejor la conjunta"}')
+    for key, concept, amount in p.get('detail', {}).get('figures', []):
+        figures.append(dict(modelo='100', declaracion='individual', casilla=key if key[0].isdigit() else None, concepto=concept, importe=float(amount),
+                            origen='calculo-a-mano', ref='calculo.md#0-rentas-del-ahorro', campo=f'savings.{key}'))
     for concept, why in p.get('pending', []):
         figures.append(dict(modelo='100', declaracion='individual', casilla=None, concepto=concept, importe=None, origen='pendiente', motivo=why, campo=None))
     return decls, figures, steps, b

@@ -286,12 +286,42 @@
     {
       "modelo": "100",
       "declaracion": "individual",
-      "casilla": null,
-      "concepto": "Ganancia de las acciones por FIFO (2.470,00) y pérdida del fondo (−1.000,00)",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta: no calcula ganancias por lotes.",
-      "campo": null
+      "casilla": "0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (acciones por FIFO)",
+      "importe": 2470.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0422"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (fondo)",
+      "importe": 1000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0423"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "importe": 1470.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0429",
+      "concepto": "Saldo neto positivo del capital mobiliario",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0429"
     },
     {
       "modelo": "100",

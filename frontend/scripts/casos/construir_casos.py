@@ -461,6 +461,12 @@ PEOPLE = [
     person(17, 'venta-acciones-fondos-720-aragon', 'aragon', 'Venta de acciones (FIFO), reembolso de un fondo con pérdida y cuenta en el extranjero',
            'Vende 150 de 200 acciones compradas en dos lotes; reembolsa un fondo con pérdidas; tiene 62.000 € en un bróker extranjero (modelo 720 informativo).',
            age=47, gross=45000, ss=2858, withheld=8257, savings=1770,
+           detail=dict(capital=dict(interest=300), assets=[
+               dict(name='Acciones Ficticias SA', kind='listed', buys=[dict(date='2019-03-01', units=100, cost=2010), dict(date='2021-05-04', units=100, cost=3010)],
+                    sells=[dict(date='2025-06-10', units=150, proceeds=5985)]),
+               dict(name='Fondo Ficticio FI', kind='fund', buys=[dict(date='2020-01-15', units=50, cost=9000)], sells=[dict(date='2025-09-01', units=50, proceeds=8000)])],
+               figures=[('0422', 'Suma de ganancias patrimoniales del ahorro (acciones por FIFO)', 2470), ('0423', 'Suma de pérdidas patrimoniales del ahorro (fondo)', 1000),
+                        ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 1470), ('0429', 'Saldo neto positivo del capital mobiliario', 300)]),
            savings_steps=['Acciones (FIFO, art. 37.2 LIRPF): vende 150 a 40 € = 6.000 − 15 de gastos = 5.985,00. Coste: 100 del lote de 2019 (2.010,00 con gastos) + 50 del lote de 2021 (3.010 × 50/100 = 1.505,00) = 3.515,00 → ganancia **2.470,00**',
                           'Fondo: reembolso 8.000,00 − coste 9.000,00 → pérdida **−1.000,00**',
                           'Integración (art. 49): ganancias y pérdidas entre sí: 2.470 − 1.000 = 1.470,00; intereses 300,00 → base del ahorro **1.770,00**',
@@ -469,6 +475,14 @@ PEOPLE = [
     person(18, 'criptomonedas-fifo-compensacion-murcia', 'murcia', 'Criptomonedas: ganancia FIFO en una, pérdida en otra y compensación del 25 %',
            'Vende 0,6 BTC de dos compras (FIFO) con ganancia y todo su ETH con pérdida; la pérdida neta se compensa con el 25 % de los intereses.',
            age=36, gross=33000, ss=2096, withheld=5490, savings=750,
+           detail=dict(capital=dict(interest=1000), assets=[
+               dict(name='BTC', kind='crypto', buys=[dict(date='2023-01-01', units=0.5, cost=10000), dict(date='2024-01-01', units=0.5, cost=20000)],
+                    sells=[dict(date='2025-04-01', units=0.6, proceeds=17950)]),
+               dict(name='ETH', kind='crypto', buys=[dict(date='2024-02-01', units=3, cost=9000)], sells=[dict(date='2025-05-01', units=3, proceeds=4000)])],
+               figures=[('0422', 'Suma de ganancias patrimoniales del ahorro (BTC por FIFO)', 3950), ('0423', 'Suma de pérdidas patrimoniales del ahorro (ETH)', 5000),
+                        ('0425', 'Saldo neto negativo de ganancias y pérdidas del ahorro', 1050), ('0429', 'Saldo neto positivo del capital mobiliario', 1000),
+                        ('0446', 'Pérdidas del año compensadas con el 25 % del capital mobiliario', 250),
+                        ('carry.gains', 'Pérdidas pendientes para los 4 años siguientes', 800)]),
            savings_steps=['BTC (FIFO): compras 0,5 a 20.000 € (10.000) y 0,5 a 40.000 € (20.000); vende 0,6 a 30.000 € = 18.000 − 50 de comisión = 17.950,00. Coste 10.000 + 0,1 × 40.000 = 14.000,00 → ganancia **3.950,00**',
                           'ETH: compra 3 a 3.000 € (9.000) y vende las 3 a 1.000 € (3.000) − 50 de comisión = 2.950,00 → pérdida **−6.050,00** (redondeo de ejemplo)'.replace('−6.050,00', '−5.000,00').replace('3 a 1.000 € (3.000) − 50 de comisión = 2.950,00', '3 por 4.000,00 (comisión incluida)'),
                           'Saldo de ganancias y pérdidas: 3.950 − 5.000 = −1.050,00 (art. 49.1.b)',
@@ -477,11 +491,16 @@ PEOPLE = [
     person(19, 'venta-vivienda-habitual-mayor-65-baleares', 'baleares', 'Jubilada de 68 años que vende su vivienda habitual',
            'Vende su vivienda habitual con una ganancia de 80.000 €: exenta por ser mayor de 65 años (art. 33.4.b). Tiene 400 € de intereses.',
            age=68, gross=22000, nonSalary=22000, ss=0, withheld=2976, retired=True, savings=400,
+           detail=dict(capital=dict(interest=400), properties=[dict(name='Vivienda habitual', proceeds=180000, cost=100000, amortization=0, exemption='homeOver65')],
+                       figures=[('exempt', 'Ganancia exenta de la vivienda habitual por mayor de 65 años (art. 33.4.b)', 80000),
+                                ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 0), ('0429', 'Saldo neto positivo del capital mobiliario', 400)]),
            savings_steps=['Ganancia de la vivienda habitual 80.000,00: exenta (art. 33.4.b, mayor de 65); se declara pero no se integra',
                           'Intereses 400,00 (retención 76,00; 2.900,00 + 76,00 = 2.976,00) → base del ahorro **400,00**']),
     person(20, 'herencia-venta-segunda-vivienda-galicia', 'galicia', 'Hereda un piso en 2020 y lo vende en 2025',
            'Piso heredado (valor en el Impuesto sobre Sucesiones 100.000 € + 1.500 € de impuesto y gastos) que vende el 30 de junio por 130.000 € con 4.000 € de gastos. Hasta la venta estuvo vacío (181 días).',
            age=44, gross=33000, ss=2096, withheld=5200, savings=24500,
+           detail=dict(properties=[dict(name='Piso heredado', proceeds=126000, cost=101500, amortization=0, exemption='none')],
+                       figures=[('0422', 'Suma de ganancias patrimoniales del ahorro (piso heredado)', 24500), ('0424', 'Saldo neto positivo de ganancias y pérdidas del ahorro', 24500)]),
            unrented=[dict(value=50000, revised=False, days=181)],
            savings_steps=['Valor de adquisición (art. 36: el del Impuesto sobre Sucesiones + gastos y tributos) = 100.000 + 1.500 = 101.500,00',
                           'Valor de transmisión = 130.000 − 4.000 = 126.000,00 → ganancia **24.500,00** (base del ahorro)',
@@ -535,6 +554,14 @@ OUT_OF_SCOPE = [
 
 # ─── Renta: persona → form, cálculo y esperado ────────────────────────────────
 
+def savings_detail_of(d):
+    """The savings in detail as the engine takes them (rentaGains.ts SavingsDetail)."""
+    cap = dict(interest=0, dividends=0, assets=0, insurance=0, expenses=0)
+    cap.update(d.get('capital', {}))
+    return dict(capital=cap, assets=d.get('assets', []), properties=d.get('properties', []), otherGains=[], generalGains=[],
+                pending=dict(gains=d.get('pendingGains', []), capital=[], general=[]))
+
+
 def form_of(p, spouse=None):
     q = spouse or p
     f = {
@@ -550,6 +577,9 @@ def form_of(p, spouse=None):
         'savings': str(q.get('savings', '')) if q.get('savings') else '',
         'choices': {},
     }
+    if spouse is None and p.get('detail'):
+        f['savingsDetail'] = savings_detail_of(p['detail'])
+        f['savings'] = ''
     if spouse is None:
         if p.get('rental'):
             rt = p['rental']
@@ -1050,18 +1080,17 @@ PENDING_100 = {
     4: [('Deducción autonómica de Castilla y León por familia numerosa', 'Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial.')],
     7: [('Deducción autonómica de Murcia por gastos de guardería', 'Límites de renta y requisitos 2025 no confirmados con un caso oficial.')],
     10: [('Obligación de declarar con dos pagadores', 'Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula.')],
-    17: [('Ganancia de las acciones por FIFO (2.470,00) y pérdida del fondo (−1.000,00)', 'El motor recibe la base del ahorro ya neta: no calcula ganancias por lotes.'),
-         ('Modelo 720 (bienes en el extranjero)', 'Declaración informativa, sin cuota: fuera del motor.')],
-    18: [('Ganancias y pérdidas de criptomonedas por FIFO y compensación del 25 %', 'El motor recibe la base del ahorro ya neta: no calcula FIFO ni la compensación del art. 49.'),
-         ('Pérdidas pendientes para los 4 años siguientes (−800,00)', 'El motor no guarda saldos de años anteriores ni posteriores.')],
-    19: [('Exención de la ganancia de la vivienda habitual por mayor de 65 años', 'El motor no recibe ganancias exentas: se comprueba solo que la base del ahorro no la incluye.')],
-    20: [('Ganancia de la venta del piso heredado (24.500,00)', 'El motor recibe la base del ahorro ya calculada.')],
+    17: [('Modelo 720 (bienes en el extranjero)', 'Declaración informativa, sin cuota: fuera del motor.')],
     21: [('Deducción de Canarias por discapacidad', 'Requisitos 2025 no confirmados con un caso oficial.')],
 }
 
 
 def add_pending(p, figures):
     out = list(figures)
+    # The savings in detail (FIFO, exemptions, art. 49): the hand figures of the savings steps above.
+    for key, concept, amount in p.get('detail', {}).get('figures', []):
+        out.append(dict(modelo='100', declaracion='individual', casilla=None if '.' in key or not key[0].isdigit() else key, concepto=concept,
+                        importe=float(amount), origen='calculo-a-mano', ref='calculo.md#0-rentas-del-ahorro', campo=f'savings.{key}'))
     for concept, why in PENDING_100.get(p['n'], []):
         out.append(dict(modelo='100', declaracion='individual', casilla=None, concepto=concept, importe=None, origen='pendiente', motivo=why, campo=None))
     return out

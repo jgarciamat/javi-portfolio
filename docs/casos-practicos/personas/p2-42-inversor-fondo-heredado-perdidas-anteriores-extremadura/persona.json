@@ -43,8 +43,68 @@
           "pensionEmployer": "",
           "spousePlan": "",
           "compensatory": "",
-          "savings": "6640",
-          "choices": {}
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 1200,
+              "dividends": 2500,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 60
+            },
+            "assets": [
+              {
+                "name": "Fondo heredado",
+                "kind": "fund",
+                "buys": [
+                  {
+                    "date": "2023-04-12",
+                    "units": 1000,
+                    "cost": 30000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-05-20",
+                    "units": 1000,
+                    "proceeds": 36500
+                  }
+                ]
+              },
+              {
+                "name": "Acciones Ficticias",
+                "kind": "listed",
+                "buys": [
+                  {
+                    "date": "2021-02-01",
+                    "units": 300,
+                    "cost": 9000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-10-15",
+                    "units": 300,
+                    "proceeds": 7500
+                  }
+                ]
+              }
+            ],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [
+                {
+                  "year": 2022,
+                  "amount": 2000
+                }
+              ],
+              "capital": [],
+              "general": []
+            }
+          }
         }
       }
     ],

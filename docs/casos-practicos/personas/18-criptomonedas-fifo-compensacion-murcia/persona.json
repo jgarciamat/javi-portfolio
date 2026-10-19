@@ -32,8 +32,68 @@
           "mobility": false,
           "pension": "",
           "pensionEmployer": "",
-          "savings": "750",
-          "choices": {}
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 1000,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [
+              {
+                "name": "BTC",
+                "kind": "crypto",
+                "buys": [
+                  {
+                    "date": "2023-01-01",
+                    "units": 0.5,
+                    "cost": 10000
+                  },
+                  {
+                    "date": "2024-01-01",
+                    "units": 0.5,
+                    "cost": 20000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-04-01",
+                    "units": 0.6,
+                    "proceeds": 17950
+                  }
+                ]
+              },
+              {
+                "name": "ETH",
+                "kind": "crypto",
+                "buys": [
+                  {
+                    "date": "2024-02-01",
+                    "units": 3,
+                    "cost": 9000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-05-01",
+                    "units": 3,
+                    "proceeds": 4000
+                  }
+                ]
+              }
+            ],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          }
         }
       }
     ],

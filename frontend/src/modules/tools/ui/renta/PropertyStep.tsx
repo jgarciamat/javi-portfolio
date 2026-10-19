@@ -1,5 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { RentaProperty } from '../../domain/rentaExtras';
+import { SavingsDetailSection } from './SavingsDetail';
 import { Field, Step, type StepProps } from './shared';
 
 /** Rented properties: the income, the expenses and the reduction that applies. */
@@ -174,15 +175,19 @@ export function PropertyStep({ form, set, property }: StepProps & { property: Re
       <UnrentedSection form={form} set={set} imputation={property.imputation} />
 
       <h3>{t('tools.renta.savingsTitle')}</h3>
-      <div className="tools-form">
-        <Field
-          id="renta-savings"
-          label={t('tools.renta.savings')}
-          hint={t('tools.renta.savingsHint')}
-          value={form.savings}
-          onChange={(v) => set({ savings: v })}
-        />
-      </div>
+      {/* With the detail the savings base is worked out from it: the net amount is not asked. */}
+      {!form.savingsDetail && (
+        <div className="tools-form">
+          <Field
+            id="renta-savings"
+            label={t('tools.renta.savings')}
+            hint={t('tools.renta.savingsHint')}
+            value={form.savings}
+            onChange={(v) => set({ savings: v })}
+          />
+        </div>
+      )}
+      <SavingsDetailSection form={form} set={set} />
 
       <h3>{t('tools.renta.propertyNotes')}</h3>
       <ul className="renta-notes">

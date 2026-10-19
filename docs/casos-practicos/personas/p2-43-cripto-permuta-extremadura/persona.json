@@ -42,8 +42,63 @@
           "pensionEmployer": "",
           "spousePlan": "",
           "compensatory": "",
-          "savings": "6980",
-          "choices": {}
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [
+              {
+                "name": "BTC",
+                "kind": "crypto",
+                "buys": [
+                  {
+                    "date": "2022-06-01",
+                    "units": 0.2,
+                    "cost": 4000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-03-10",
+                    "units": 0.2,
+                    "proceeds": 11980
+                  }
+                ]
+              },
+              {
+                "name": "ETH",
+                "kind": "crypto",
+                "buys": [
+                  {
+                    "date": "2025-03-10",
+                    "units": 4,
+                    "cost": 12000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-08-01",
+                    "units": 2,
+                    "proceeds": 5000
+                  }
+                ]
+              }
+            ],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          }
         }
       }
     ],

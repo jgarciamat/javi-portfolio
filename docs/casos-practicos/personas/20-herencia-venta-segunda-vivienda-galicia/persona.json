@@ -32,8 +32,34 @@
           "mobility": false,
           "pension": "",
           "pensionEmployer": "",
-          "savings": "24500",
+          "savings": "",
           "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [
+              {
+                "name": "Piso heredado",
+                "proceeds": 126000,
+                "cost": 101500,
+                "amortization": 0,
+                "exemption": "none"
+              }
+            ],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          },
           "unrented": [
             {
               "value": "50000",

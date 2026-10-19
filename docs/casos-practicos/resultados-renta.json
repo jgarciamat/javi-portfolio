@@ -39,66 +39,11 @@
       "declaracion": "individual",
       "casilla": null,
       "campo": null,
-      "concepto": "Ganancia de las acciones por FIFO (2.470,00) y pérdida del fondo (−1.000,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta: no calcula ganancias por lotes."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
       "concepto": "Modelo 720 (bienes en el extranjero)",
       "esperado": null,
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Declaración informativa, sin cuota: fuera del motor."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Ganancias y pérdidas de criptomonedas por FIFO y compensación del 25 %",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta: no calcula FIFO ni la compensación del art. 49."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Pérdidas pendientes para los 4 años siguientes (−800,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no guarda saldos de años anteriores ni posteriores."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Exención de la ganancia de la vivienda habitual por mayor de 65 años",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no recibe ganancias exentas: se comprueba solo que la base del ahorro no la incluye."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Ganancia de la venta del piso heredado (24.500,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya calculada."
     },
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
@@ -134,17 +79,6 @@
       "motivo": "No tributa en el IRPF del donatario (art. 6.4 LIRPF): se declara en el Impuesto sobre Donaciones de Castilla-La Mancha, fuera de Finanverso."
     },
     {
-      "caso": "p2-38-venta-segunda-vivienda-donacion-castilla-la-mancha",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Ganancia de la venta del piso (40.300,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya calculada: no calcula la ganancia de un inmueble."
-    },
-    {
       "caso": "p2-39-dos-pagadores-no-obligado-devolucion-castilla-la-mancha",
       "declaracion": "individual",
       "casilla": null,
@@ -154,39 +88,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "No: total 15.000 € ≤ 15.876 € aunque el segundo pagador pase de 1.500 € (art. 96.3 LIRPF); le conviene declarar para que le devuelvan. El motor no lo calcula."
-    },
-    {
-      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Compensación de pérdidas de 2022 (−2.000,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no guarda saldos de años anteriores: recibe la base del ahorro ya compensada."
-    },
-    {
-      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Ganancia del fondo heredado y pérdida de las acciones",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta."
-    },
-    {
-      "caso": "p2-43-cripto-permuta-extremadura",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Ganancia de la permuta y pérdida de la venta de criptomonedas",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta: no calcula permutas ni FIFO."
     },
     {
       "caso": "p2-46-alquiler-rendimiento-negativo-la-rioja",
@@ -6241,6 +6142,46 @@
       "estado": "coincide"
     },
     {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (acciones por FIFO)",
+      "esperado": 2470,
+      "obtenido": 2470,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (fondo)",
+      "esperado": 1000,
+      "obtenido": 1000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 1470,
+      "obtenido": 1470,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0429",
+      "campo": "savings.0429",
+      "concepto": "Saldo neto positivo del capital mobiliario",
+      "esperado": 300,
+      "obtenido": 300,
+      "estado": "coincide"
+    },
+    {
       "caso": "18-criptomonedas-fifo-compensacion-murcia",
       "declaracion": "individual",
       "casilla": "0003",
@@ -6521,6 +6462,66 @@
       "estado": "coincide"
     },
     {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (BTC por FIFO)",
+      "esperado": 3950,
+      "obtenido": 3950,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (ETH)",
+      "esperado": 5000,
+      "obtenido": 5000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0425",
+      "campo": "savings.0425",
+      "concepto": "Saldo neto negativo de ganancias y pérdidas del ahorro",
+      "esperado": 1050,
+      "obtenido": 1050,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0429",
+      "campo": "savings.0429",
+      "concepto": "Saldo neto positivo del capital mobiliario",
+      "esperado": 1000,
+      "obtenido": 1000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0446",
+      "campo": "savings.0446",
+      "concepto": "Pérdidas del año compensadas con el 25 % del capital mobiliario",
+      "esperado": 250,
+      "obtenido": 250,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "savings.carry.gains",
+      "concepto": "Pérdidas pendientes para los 4 años siguientes",
+      "esperado": 800,
+      "obtenido": 800,
+      "estado": "coincide"
+    },
+    {
       "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
       "declaracion": "individual",
       "casilla": "0003",
@@ -6798,6 +6799,36 @@
       "concepto": "Resultado de la declaración",
       "esperado": -26.05,
       "obtenido": -26.05,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "savings.exempt",
+      "concepto": "Ganancia exenta de la vivienda habitual por mayor de 65 años (art. 33.4.b)",
+      "esperado": 80000,
+      "obtenido": 80000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0429",
+      "campo": "savings.0429",
+      "concepto": "Saldo neto positivo del capital mobiliario",
+      "esperado": 400,
+      "obtenido": 400,
       "estado": "coincide"
     },
     {
@@ -7098,6 +7129,26 @@
       "concepto": "Imputación de rentas inmobiliarias",
       "esperado": 495.89,
       "obtenido": 495.89,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (piso heredado)",
+      "esperado": 24500,
+      "obtenido": 24500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 24500,
+      "obtenido": 24500,
       "estado": "coincide"
     },
     {
@@ -10601,6 +10652,26 @@
       "estado": "coincide"
     },
     {
+      "caso": "p2-38-venta-segunda-vivienda-donacion-castilla-la-mancha",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (piso)",
+      "esperado": 40300,
+      "obtenido": 40300,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-38-venta-segunda-vivienda-donacion-castilla-la-mancha",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 40300,
+      "obtenido": 40300,
+      "estado": "coincide"
+    },
+    {
       "caso": "p2-39-dos-pagadores-no-obligado-devolucion-castilla-la-mancha",
       "declaracion": "individual",
       "casilla": "0003",
@@ -11731,6 +11802,56 @@
       "estado": "coincide"
     },
     {
+      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "campo": "savings.0041",
+      "concepto": "Rendimiento neto del capital mobiliario (con gastos de custodia)",
+      "esperado": 3640,
+      "obtenido": 3640,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (fondo)",
+      "esperado": 6500,
+      "obtenido": 6500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (acciones)",
+      "esperado": 1500,
+      "obtenido": 1500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 5000,
+      "obtenido": 5000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "savings.pendingGainsOnGains",
+      "concepto": "Pérdidas de 2022 compensadas (casilla 0440)",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
       "caso": "p2-43-cripto-permuta-extremadura",
       "declaracion": "individual",
       "casilla": "0003",
@@ -12008,6 +12129,36 @@
       "concepto": "Resultado de la declaración",
       "esperado": 1697.56,
       "obtenido": 1697.56,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-43-cripto-permuta-extremadura",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "campo": "savings.0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (permuta de BTC)",
+      "esperado": 7980,
+      "obtenido": 7980,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-43-cripto-permuta-extremadura",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "campo": "savings.0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (venta de ETH)",
+      "esperado": 1000,
+      "obtenido": 1000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-43-cripto-permuta-extremadura",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "campo": "savings.0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "esperado": 6980,
+      "obtenido": 6980,
       "estado": "coincide"
     },
     {

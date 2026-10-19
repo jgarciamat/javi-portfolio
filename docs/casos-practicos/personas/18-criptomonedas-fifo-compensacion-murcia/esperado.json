@@ -286,22 +286,62 @@
     {
       "modelo": "100",
       "declaracion": "individual",
-      "casilla": null,
-      "concepto": "Ganancias y pérdidas de criptomonedas por FIFO y compensación del 25 %",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya neta: no calcula FIFO ni la compensación del art. 49.",
-      "campo": null
+      "casilla": "0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (BTC por FIFO)",
+      "importe": 3950.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0422"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "concepto": "Suma de pérdidas patrimoniales del ahorro (ETH)",
+      "importe": 5000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0423"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0425",
+      "concepto": "Saldo neto negativo de ganancias y pérdidas del ahorro",
+      "importe": 1050.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0425"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0429",
+      "concepto": "Saldo neto positivo del capital mobiliario",
+      "importe": 1000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0429"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0446",
+      "concepto": "Pérdidas del año compensadas con el 25 % del capital mobiliario",
+      "importe": 250.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0446"
     },
     {
       "modelo": "100",
       "declaracion": "individual",
       "casilla": null,
-      "concepto": "Pérdidas pendientes para los 4 años siguientes (−800,00)",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "El motor no guarda saldos de años anteriores ni posteriores.",
-      "campo": null
+      "concepto": "Pérdidas pendientes para los 4 años siguientes",
+      "importe": 800.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.carry.gains"
     }
   ]
 }

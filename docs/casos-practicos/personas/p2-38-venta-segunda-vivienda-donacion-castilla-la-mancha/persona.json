@@ -44,8 +44,34 @@
           "pensionEmployer": "",
           "spousePlan": "",
           "compensatory": "",
-          "savings": "40300",
+          "savings": "",
           "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [
+              {
+                "name": "Piso comprado en 2008",
+                "proceeds": 177900,
+                "cost": 137600,
+                "amortization": 0,
+                "exemption": "none"
+              }
+            ],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          },
           "unrented": [
             {
               "value": "70000",

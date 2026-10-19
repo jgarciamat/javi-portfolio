@@ -306,12 +306,22 @@
     {
       "modelo": "100",
       "declaracion": "individual",
-      "casilla": null,
-      "concepto": "Ganancia de la venta del piso heredado (24.500,00)",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "El motor recibe la base del ahorro ya calculada.",
-      "campo": null
+      "casilla": "0422",
+      "concepto": "Suma de ganancias patrimoniales del ahorro (piso heredado)",
+      "importe": 24500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0422"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias y pérdidas del ahorro",
+      "importe": 24500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#0-rentas-del-ahorro",
+      "campo": "savings.0424"
     }
   ]
 }

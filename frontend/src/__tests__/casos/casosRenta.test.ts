@@ -118,10 +118,22 @@ beforeAll(async () => {
   }
 });
 
+/** A figure of the savings in detail (rentaGains.ts): a box, the exempt gains or what is carried. */
+function savingsValue(result: RentaResult, key: string): number {
+  const detail = result.savingsDetail;
+  if (!detail) return Number.NaN;
+  const sum = (list: { amount: number }[]) => list.reduce((s, p) => s + p.amount, 0);
+  if (key === 'carry.gains') return sum(detail.carryForward.gains);
+  if (key === 'carry.capital') return sum(detail.carryForward.capital);
+  if (key === 'exempt') return detail.properties.reduce((s, p) => s + p.exempt, 0);
+  return detail.boxes[key as keyof typeof detail.boxes];
+}
+
 /** What the engine gives for a figure: a box of the planner or a field of the result. */
 function engineValue(campo: string, c: Computed): number {
   const [kind, key] = campo.split('.');
   if (kind === 'result') return c.result[key as keyof RentaResult] as number;
+  if (kind === 'savings') return savingsValue(c.result, campo.slice('savings.'.length));
   const boxes = ourBoxes(c.result, c.input);
   const extra = key === '0003' ? c.partner.gross : key === '0013' ? c.partner.socialSecurity : 0;
   expect(COMPARED_BOXES).toContain(key);

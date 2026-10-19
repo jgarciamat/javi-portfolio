@@ -32,8 +32,34 @@
           "mobility": false,
           "pension": "",
           "pensionEmployer": "",
-          "savings": "400",
-          "choices": {}
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 400,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [
+              {
+                "name": "Vivienda habitual",
+                "proceeds": 180000,
+                "cost": 100000,
+                "amortization": 0,
+                "exemption": "homeOver65"
+              }
+            ],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          }
         }
       }
     ],

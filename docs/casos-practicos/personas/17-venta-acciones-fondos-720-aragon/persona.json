@@ -32,8 +32,68 @@
           "mobility": false,
           "pension": "",
           "pensionEmployer": "",
-          "savings": "1770",
-          "choices": {}
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 300,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [
+              {
+                "name": "Acciones Ficticias SA",
+                "kind": "listed",
+                "buys": [
+                  {
+                    "date": "2019-03-01",
+                    "units": 100,
+                    "cost": 2010
+                  },
+                  {
+                    "date": "2021-05-04",
+                    "units": 100,
+                    "cost": 3010
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-06-10",
+                    "units": 150,
+                    "proceeds": 5985
+                  }
+                ]
+              },
+              {
+                "name": "Fondo Ficticio FI",
+                "kind": "fund",
+                "buys": [
+                  {
+                    "date": "2020-01-15",
+                    "units": 50,
+                    "cost": 9000
+                  }
+                ],
+                "sells": [
+                  {
+                    "date": "2025-09-01",
+                    "units": 50,
+                    "proceeds": 8000
+                  }
+                ]
+              }
+            ],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            }
+          }
         }
       }
     ],

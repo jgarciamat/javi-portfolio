@@ -10,6 +10,7 @@ import type {
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
+import type { SavingsDetail } from './rentaGains';
 
 export interface ChildForm {
   age: string;
@@ -93,6 +94,8 @@ export interface RentaForm {
   rentalReduction: string;
   unrented: UnrentedForm[];
   savings: string;
+  /** The savings in detail (interest, sales lot by lot, properties, earlier losses): replaces `savings`. */
+  savingsDetail?: SavingsDetail;
   choices: Record<string, Choice>;
   joint: JointChoice;
   partner: PartnerForm;
@@ -295,6 +298,7 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     rental: rentalOf(form, data.property),
     imputedValues: unrentedOf(form, data.state.year),
     savings: number(form.savings),
+    savingsDetail: form.savingsDetail,
     family: familyOf(form),
     state: data.state,
     ccaa: data.ccaa,
