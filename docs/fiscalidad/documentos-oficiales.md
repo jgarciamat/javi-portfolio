@@ -144,9 +144,9 @@ Todos los fallos de la tabla anterior están corregidos en `frontend/src/modules
 | Renta WEB (casilla a la derecha) | Lectura del modelo 100: casillas de 4 cifras, y el lado (derecha o izquierda) se decide por mayoría de líneas. |
 | Etiqueta encima (030, 840) | Un campo sin número en su línea se empareja con el número justo encima (máx. 16 pt). El 030 y el 840 no se importan en la app: solo se ha generalizado el emparejamiento. |
 | 115 antiguo | Título con espacios y saltos normalizados y casillas de 1 dígito («1»…«5»). |
-| Ida y vuelta de las vistas previas | `npm run taxforms:verify`: 130 19/19, 111 30/30, 115 5/5, 303 **185/185** y, nuevo, 100 **838/838** casillas de 4 cifras. |
+| Ida y vuelta de las vistas previas | `npm run taxforms:verify`: 130 19/19, 111 30/30, 115 5/5 y 303 **185/185**. (El 100 llegó a leer 838/838; su vista previa se retiró después por decisión del dueño.) |
 
-La maquetación del 100 tenía un «0543» fantasma del facsímil (BOE-A-2026-7041, pág. 32) encima de las casillas 1608, 0592, 0593, 0594 y 0600; se ha quitado (y `extract-layout.mjs` lo descarta con `GHOSTS`). La entrada 0543 de [renta-casillas.json](renta-casillas.json) arrastra el mismo error: su etiqueta real es el tipo medio de gravamen autonómico (pág. 42 del BOE).
+El facsímil del 100 (BOE-A-2026-7041, pág. 32) imprime un «0543» fantasma encima de las casillas 1608, 0592, 0593, 0594 y 0600; `extract-layout.mjs` lo descarta con `GHOSTS` si se vuelve a medir. La entrada 0543 de [renta-casillas.json](renta-casillas.json) arrastra el mismo error: su etiqueta real es el tipo medio de gravamen autonómico (pág. 42 del BOE).
 
 ## 3. Plan para las vistas previas idénticas
 
