@@ -857,3 +857,21 @@
   flex: 1 1 12rem;
   text-align: center;
 }
+.invest-gain {
+  color: var(--green-500, #15803d);
+}
+.invest-loss {
+  color: var(--red-500, #b91c1c);
+}
+.invest-year-total {
+  font-size: 1.15rem;
+}
+.invest-other-years {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0;
+}
+.invest-loss-note {
+  border-left: 3px solid var(--red-500, #b91c1c);
+  padding-left: 0.75rem;
+}

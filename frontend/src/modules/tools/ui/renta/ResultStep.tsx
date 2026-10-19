@@ -3,6 +3,9 @@ import type { DeductionLine, RentaResult } from '../../domain/rentaCalc';
 import { descendantBreakdown } from '../../domain/rentaCalc';
 import type { JointComparison } from '../../domain/rentaJoint';
 import { JointTable } from './JointResult';
+import { InvestInResult } from './invest/InvestSummary';
+import { rentaState } from '../../data/renta/state';
+import type { ImportedSavings } from '../../domain/rentaGains';
 
 export interface Snapshot {
   result: RentaResult;
@@ -139,7 +142,15 @@ function ResultLines({ result, money }: { result: RentaResult; money: (n: number
 }
 
 /** The estimated result: how much to pay or get back, line by line, and what the family minimum saves. */
-export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: number) => string }) {
+export function ResultCard({
+  shown,
+  money,
+  imported,
+}: {
+  shown: Snapshot;
+  money: (n: number) => string;
+  imported?: ImportedSavings;
+}) {
   const { t } = useI18n();
   const { result, kids } = shown;
   const toPay = result.result >= 0;
@@ -155,6 +166,13 @@ export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: numbe
         </p>
       )}
       <ResultLines result={result} money={money} />
+      {result.savingsDetail && (
+        <InvestInResult
+          breakdown={result.savingsDetail}
+          imported={imported}
+          year={rentaState.year}
+        />
+      )}
       <ChildAids shown={shown} money={money} />
       {shown.joint && <JointTable joint={shown.joint} money={money} />}
       {result.lines.length > 0 && (

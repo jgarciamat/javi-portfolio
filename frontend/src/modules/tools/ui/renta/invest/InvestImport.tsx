@@ -9,6 +9,7 @@ import { buildLedger, inEuros, type ValuedOp } from '../../../domain/invest/ledg
 import { headerKey, readMapped, type Mapping } from '../../../domain/invest/mapping';
 import { declarationRows, reportTables } from '../../../domain/invest/report';
 import { importedFrom } from '../../../domain/invest/sources';
+import { importSummary, type RentaEffect } from '../../../domain/invest/summary';
 import type { InvestOp } from '../../../domain/invest/types';
 import {
   download,
@@ -27,6 +28,7 @@ import {
 import { useMoney } from '../shared';
 import { InvestGuide } from './InvestGuide';
 import { InvestMapping } from './InvestMapping';
+import { InvestSummary } from './InvestSummary';
 import { DeclarationTable, OpsTable, WarningsList, type OpEdit } from './InvestTables';
 
 const WITHHELD_IN = withheldInOf();
@@ -164,10 +166,16 @@ function Rates({
 export function InvestImport({
   year,
   onApply,
+  effectOf,
+  autoApply = false,
 }: {
   year: number;
   /** null: every file was taken out after it had been taken to the Renta. */
   onApply: (imported: ImportedSavings | null) => void;
+  /** What the import means for the Renta (the engine with and without it), when it can be known. */
+  effectOf?: (imported: ImportedSavings) => RentaEffect;
+  /** Takes every change to the Renta at once (the person does not have to press the button). */
+  autoApply?: boolean;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -264,6 +272,14 @@ export function InvestImport({
       files.map((f) => f.file)
     );
   }, [ops, allRates, files, mapped, manual, ticked, year, professional]);
+  const hasData = files.length > 0 || manual.length > 0;
+  const sent = useRef<ImportedSavings | null>(null);
+  useEffect(() => {
+    if (!autoApply || !hasData || sent.current === imported) return;
+    sent.current = imported;
+    onApply(imported);
+    setApplied(true);
+  }, [autoApply, hasData, imported, onApply]);
   useEffect(() => {
     if (!reapply) return;
     setReapply(false);
@@ -478,6 +494,11 @@ export function InvestImport({
             </p>
           )}
           <InvestGuide ledger={ledger} rows={rows} open />
+          <InvestSummary
+            summary={importSummary(ledger, year)}
+            year={year}
+            effect={effectOf ? effectOf(imported) : null}
+          />
         </>
       )}
       {ops.length === 0 && certificate.length === 0 && <InvestGuide />}

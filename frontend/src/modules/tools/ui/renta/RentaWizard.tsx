@@ -248,7 +248,7 @@ function importScreen(ctx: Ctx): WizardScreen {
     help: t(w('help.investImport')),
     ready: p.form.savingsDetail?.imported !== undefined,
     skipLabel: t(w('skip.investImport')),
-    body: <InvestCard form={p.form} set={p.set} />,
+    body: <InvestCard form={p.form} set={p.set} input={p.input} />,
   };
 }
 
@@ -465,6 +465,7 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
           calculate={p.calculate}
           mode={mode}
           invest={<InvestLink form={p.form} onGo={() => ctx.goStep(INVEST_STEP)} />}
+          imported={p.form.savingsDetail?.imported}
         />
       ),
     },

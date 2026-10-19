@@ -6,6 +6,9 @@ import { rentaState } from '../../data/renta/state';
 import { emptySavingsDetail, fifo, type ImportedSavings } from '../../domain/rentaGains';
 import { choose } from '../../domain/rentaGuide';
 import { withoutFile } from '../../domain/invest/sources';
+import { importSummary, ledgerOf, rentaEffect } from '../../domain/invest/summary';
+import type { RentaInput } from '../../domain/rentaCalc';
+import { InvestSummary } from './invest/InvestSummary';
 import { InvestImport } from './invest/InvestImport';
 import { useMoney, type StepProps } from './shared';
 
@@ -31,7 +34,7 @@ export function importedSummary(imported: ImportedSavings) {
  * «My investments (crypto, funds, shares)»: a card of its own, with the big button and the drop
  * area in view (no box to tick first), and what was imported in a few numbers once it is there.
  */
-export function InvestCard({ form, set }: StepProps) {
+export function InvestCard({ form, set, input }: StepProps & { input?: RentaInput }) {
   const { t } = useI18n();
   const money = useMoney();
   const detail = form.savingsDetail;
@@ -50,6 +53,7 @@ export function InvestCard({ form, set }: StepProps) {
   };
   const k = 'tools.renta.investCard';
   const summary = imported ? importedSummary(imported) : null;
+  const ledger = imported ? ledgerOf(imported) : null;
   return (
     <section
       id={INVEST_CARD_ID}
@@ -109,6 +113,13 @@ export function InvestCard({ form, set }: StepProps) {
           </button>
         </div>
       )}
+      {!open && ledger && (
+        <InvestSummary
+          summary={importSummary(ledger, rentaState.year)}
+          year={rentaState.year}
+          effect={input && imported ? rentaEffect(input, imported) : null}
+        />
+      )}
       {!open && (
         <button
           type="button"
@@ -121,6 +132,8 @@ export function InvestCard({ form, set }: StepProps) {
       {open && (
         <InvestImport
           year={rentaState.year}
+          autoApply
+          effectOf={input && ((next) => rentaEffect(input, next))}
           onApply={(next) =>
             set({
               ...choose(form, 'savings', 'yes'),

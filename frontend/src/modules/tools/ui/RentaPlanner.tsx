@@ -17,6 +17,7 @@ import { ActivitiesList } from './renta/ActivitiesList';
 import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
+import type { ImportedSavings } from '../domain/rentaGains';
 import { Step, useMoney } from './renta/shared';
 import { useRentaPlanner } from './renta/useRentaPlanner';
 import './css/Renta.css';
@@ -107,8 +108,11 @@ export function ResultSection({
   mode,
   n,
   invest,
+  imported,
 }: {
   n: number;
+  /** What came from the investment files, for the losses of earlier years found in them. */
+  imported?: ImportedSavings;
   /** «Have you invested in crypto or funds?»: the way to import them. */
   invest?: React.ReactNode;
   access: RentaAccess;
@@ -131,7 +135,7 @@ export function ResultSection({
         {shown && (
           <>
             <PendingNotice pending={pending} />
-            <ResultCard shown={shown} money={money} />
+            <ResultCard shown={shown} money={money} imported={imported} />
             {!access.premium && (
               <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
             )}
@@ -202,6 +206,7 @@ export function RentaPlanner({
     wipes,
     wipe,
     family,
+    input,
     live,
     savings,
     saved,
@@ -299,7 +304,7 @@ export function RentaPlanner({
         markedSaving={saved}
         onChange={setChoice}
         n={expert ? 5 : 3}
-        lead={<InvestCard form={form} set={set} />}
+        lead={<InvestCard form={form} set={set} input={input} />}
       />
 
       <ResultSection
@@ -311,6 +316,7 @@ export function RentaPlanner({
         mode={mode}
         n={expert ? 6 : 4}
         invest={<InvestLink form={form} />}
+        imported={form.savingsDetail?.imported}
       />
     </div>
   );
