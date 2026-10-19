@@ -54,7 +54,10 @@ describe('Deleting the data of the self-employed draft', () => {
     fireEvent.click(checkbox);
     expect(wipeButton()).toBeInTheDocument();
     fireEvent.click(wipeButton() as HTMLElement);
-    expect(checkbox.checked).toBe(false);
+    // The steps are drawn again after a wipe: look the box up again.
+    expect(
+      (screen.getByLabelText(tr('app.autonomo.hardToJustify')) as HTMLInputElement).checked
+    ).toBe(false);
     expect(wipeButton()).toBeNull();
   });
 

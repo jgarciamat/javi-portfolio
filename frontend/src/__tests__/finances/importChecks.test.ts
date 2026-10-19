@@ -1,6 +1,7 @@
 import {
   checkImport,
   irpfDeductible,
+  missingQuarters,
   type CheckInput,
 } from '@modules/finances/domain/importChecks';
 import type { BookEntry, BookKind } from '@modules/finances/domain/invoiceBook';
@@ -282,5 +283,31 @@ describe('Checks of the imported invoices before the draft', () => {
     ]);
     expect(checks[0].values).toEqual({ years: '2025, 2026', year: 2026 });
     expect(checks[3].amounts).toEqual({ total: -12.1 });
+  });
+});
+
+describe('missingQuarters', () => {
+  const empty = (code: 'emptyIncome' | 'emptyExpenses', quarter: number) => ({
+    code,
+    level: 'info' as const,
+    values: { q: quarter },
+    amounts: {},
+    invoices: [],
+    quarter,
+  });
+
+  it('joins the empty income and expenses of each quarter, in order', () => {
+    expect(
+      missingQuarters([
+        empty('emptyExpenses', 3),
+        { ...empty('emptyIncome', 1), code: 'duplicate' as const, level: 'warn' as const },
+        empty('emptyIncome', 3),
+        empty('emptyIncome', 2),
+      ])
+    ).toEqual([
+      { quarter: 2, income: true, expenses: false },
+      { quarter: 3, income: true, expenses: true },
+    ]);
+    expect(missingQuarters([])).toEqual([]);
   });
 });

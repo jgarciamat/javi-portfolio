@@ -425,3 +425,200 @@
   justify-content: flex-end;
   margin-bottom: 0.75rem;
 }
+
+/* ─── Steps and the summary ──────────────────── */
+/* Always in sight, right under the app's sticky header (its height comes from useHeaderOffset). */
+.autonomo-sum {
+  position: sticky;
+  top: var(--autonomo-top, 0px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0.75rem -0.25rem 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.8rem;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
+  box-shadow: 0 6px 14px -10px rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+}
+.autonomo-sum-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+}
+button.autonomo-sum-item {
+  cursor: pointer;
+  border-color: var(--slate-700);
+}
+button.autonomo-sum-item:hover,
+button.autonomo-sum-item:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-sum-period {
+  font-weight: 600;
+}
+.autonomo-sum-key {
+  color: var(--text-secondary);
+}
+.autonomo-sum-sign,
+.autonomo-sum-short {
+  display: none;
+}
+button.autonomo-sum-missing,
+button.autonomo-sum-warn {
+  border-color: rgba(251, 191, 36, 0.55);
+  color: var(--amber-300);
+}
+.autonomo-sum-ok {
+  color: var(--green-300);
+}
+
+.autonomo-stepbar ol {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  padding: 0;
+  counter-reset: none;
+}
+.autonomo-stepbar li {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.autonomo-stepbar button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--slate-800);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.autonomo-stepbar button:hover,
+.autonomo-stepbar button:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-stepbar li.is-current button {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.14);
+}
+.autonomo-stepbar-n,
+.autonomo-step-n {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--slate-800);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.autonomo-stepbar li.is-current .autonomo-stepbar-n,
+.autonomo-step-n {
+  background: var(--accent);
+  color: #fff;
+}
+.autonomo-stepbar-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.autonomo-step {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--slate-800);
+  /* Scrolled to from the bar: clear the app's header and the summary. */
+  scroll-margin-top: calc(var(--autonomo-top, 0px) + 4.5rem);
+}
+.autonomo-step-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+.autonomo-step-title:focus {
+  outline: none;
+}
+.autonomo-step-title:focus-visible {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 4px;
+}
+.autonomo-step-hint {
+  margin: 0 0 0.75rem;
+}
+.autonomo-step .autonomo-panel[id],
+#autonomo-period {
+  scroll-margin-top: calc(var(--autonomo-top, 0px) + 4.5rem);
+}
+
+/* A phone: the summary is one compact line that scrolls sideways, the bar shows short names. */
+@media (max-width: 640px) {
+  .autonomo-sum {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0.5rem -0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.6rem;
+    font-size: 0.78rem;
+  }
+  .autonomo-sum::-webkit-scrollbar {
+    display: none;
+  }
+  .autonomo-sum-item {
+    padding: 0.15rem 0.45rem;
+    gap: 0.15rem;
+  }
+  .autonomo-sum-long {
+    display: none;
+  }
+  .autonomo-sum-short,
+  .autonomo-sum-sign {
+    display: inline;
+  }
+  /* The words stay for screen readers; the + and − say it on screen. */
+  .autonomo-sum-key {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .autonomo-stepbar ol {
+    gap: 0.35rem;
+  }
+  .autonomo-stepbar button {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.45rem 0.3rem;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .autonomo-stepbar-name {
+    white-space: normal;
+  }
+  .autonomo-step {
+    scroll-margin-top: calc(var(--autonomo-top, 0px) + 3rem);
+  }
+}

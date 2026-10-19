@@ -247,3 +247,24 @@ export function checkImport(input: CheckInput): ImportCheck[] {
   ];
   return [...all.filter((c) => c.level === 'warn'), ...all.filter((c) => c.level === 'info')];
 }
+
+/** A quarter that has begun with no income or no expenses although its book was imported. */
+export interface MissingQuarter {
+  quarter: number;
+  income: boolean;
+  expenses: boolean;
+}
+
+/** The empty quarters among the checks, one entry per quarter, in order. */
+export function missingQuarters(checks: ImportCheck[]): MissingQuarter[] {
+  const byQuarter = new Map<number, MissingQuarter>();
+  for (const c of checks) {
+    if (c.code !== 'emptyIncome' && c.code !== 'emptyExpenses') continue;
+    const q = c.quarter as number;
+    const entry = byQuarter.get(q) ?? { quarter: q, income: false, expenses: false };
+    if (c.code === 'emptyIncome') entry.income = true;
+    else entry.expenses = true;
+    byQuarter.set(q, entry);
+  }
+  return Array.from(byQuarter.values()).sort((a, b) => a.quarter - b.quarter);
+}

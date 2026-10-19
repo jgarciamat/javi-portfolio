@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
+import { useHeaderOffset } from '@shared/hooks/useHeaderOffset';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { AssetMap } from './AssetMap';
 import { Learn } from './Learn';
@@ -37,20 +38,6 @@ function Disclaimer() {
       </details>
     </aside>
   );
-}
-
-/** Keeps the section menu under the header of the app, whatever its height is. */
-function useHeaderOffset(ref: RefObject<HTMLDivElement | null>) {
-  useEffect(() => {
-    const update = () => {
-      const header = document.querySelector('.dashboard-sticky');
-      const height = header ? header.getBoundingClientRect().height : 0;
-      (ref.current as HTMLDivElement).style.setProperty('--inv-top', `${height}px`);
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [ref]);
 }
 
 /**
@@ -91,7 +78,8 @@ export function InvestView() {
   const [section, setSection] = useState<SectionId>('map');
   const [chapter, setChapter] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
-  useHeaderOffset(root);
+  // The section menu stays under the header of the app.
+  useHeaderOffset(root, '--inv-top');
 
   const onKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;

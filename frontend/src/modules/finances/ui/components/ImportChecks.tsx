@@ -27,9 +27,12 @@ export function ImportChecks({
   return (
     <section
       className="autonomo-panel autonomo-checks-panel"
+      id="autonomo-checks"
       aria-labelledby="autonomo-checks-title"
     >
-      <h3 id="autonomo-checks-title">{t('app.autonomo.checks.title')}</h3>
+      <h3 id="autonomo-checks-title" tabIndex={-1}>
+        {t('app.autonomo.checks.title')}
+      </h3>
       <p className="section-hint">{t('app.autonomo.checks.hint')}</p>
       <ul className="autonomo-checks-list">
         {checks.map((c, n) => {

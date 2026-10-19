@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { recordPositiveMoment } from '@core/review/review';
@@ -6,12 +6,15 @@ import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
 import { parseDecimal } from '@shared/utils/numbers';
+import { useHeaderOffset } from '@shared/hooks/useHeaderOffset';
 import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
 import { ImportChecks } from './ImportChecks';
 import { bringIntoView } from './bringIntoView';
+import { StepBar, StepSection, goToStep, useCurrentStep, type Step } from './AutonomoSteps';
+import { AutonomoSummary, summarize } from './AutonomoSummary';
 import type { ReviewFocus } from './InvoiceReview';
 import { checkImport } from '../../domain/importChecks';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
@@ -91,7 +94,7 @@ function PeriodPicker({
 }) {
   const { t } = useI18n();
   return (
-    <div className="form-grid">
+    <div className="form-grid" id="autonomo-period">
       <label className="field">
         <span className="field-label">{t('app.autonomo.year')}</span>
         <select className="tx-input" value={year} onChange={(e) => onYear(Number(e.target.value))}>
@@ -231,9 +234,8 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
 
-  const hasData =
-    JSON.stringify(manual) !== JSON.stringify(emptyManual()) ||
-    JSON.stringify(extras) !== JSON.stringify(NO_EXTRAS);
+  const hasManual = JSON.stringify(manual) !== JSON.stringify(emptyManual());
+  const hasData = hasManual || JSON.stringify(extras) !== JSON.stringify(NO_EXTRAS);
   const wipe = () => {
     if (!window.confirm(t('app.autonomo.wipeConfirm'))) return;
     changeManual(emptyManual());
@@ -254,15 +256,35 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
       await plan?.refresh();
     });
 
+  const root = useRef<HTMLDivElement>(null);
+  // The summary stays right under the header of the app.
+  useHeaderOffset(root, '--autonomo-top');
+  const [step, setStep] = useCurrentStep();
+  const go = (to: Step) => {
+    setStep(to);
+    goToStep(to);
+  };
+  const toQuarter = (q: number) => bringIntoView(`autonomo-quarter-${q}`, ['h3']);
+
   return (
-    <div className="card autonomo-card">
+    <div className="card autonomo-card" ref={root}>
       <h2 className="section-title">
         <Icon name="receipt" /> {t('app.autonomo.title')}
       </h2>
       <p className="section-hint">{t('app.autonomo.hint')}</p>
-      {action.error && <p className="form-error">{action.error}</p>}
 
-      <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
+      <AutonomoSummary
+        year={year}
+        quarter={quarter}
+        summary={summarize(manual, quarter, checks, !hasData)}
+        onPeriod={() => {
+          setStep('result');
+          bringIntoView('autonomo-period', ['select']);
+        }}
+        onQuarter={toQuarter}
+        onChecks={() => bringIntoView('autonomo-checks', ['h3'])}
+      />
+      <StepBar current={step} done={{ bring: hasManual, result: snapshot !== null }} onGo={go} />
 
       {hasData && (
         <div className="autonomo-wipe">
@@ -284,56 +306,67 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           setQuarter(q);
         }}
         focus={focus}
+        checks={
+          <ImportChecks
+            checks={checks}
+            invoices={manual.invoices}
+            onInvoice={(id) => setFocus((f) => ({ id, n: (f?.n ?? 0) + 1 }))}
+            onQuarter={toQuarter}
+          />
+        }
+        extras={
+          <ExtrasPanel
+            extras={extras}
+            onChange={(patch) => setExtras((current) => ({ ...current, ...patch }))}
+          />
+        }
       />
 
-      <ExtrasPanel
-        extras={extras}
-        onChange={(patch) => setExtras((current) => ({ ...current, ...patch }))}
-      />
+      <StepSection step="result">
+        <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
+        {action.error && <p className="form-error">{action.error}</p>}
 
-      <ImportChecks
-        checks={checks}
-        invoices={manual.invoices}
-        onInvoice={(id) => setFocus((f) => ({ id, n: (f?.n ?? 0) + 1 }))}
-        onQuarter={(q) => bringIntoView(`autonomo-quarter-${q}`, ['h3'])}
-      />
+        {otherQuarter ? (
+          <PremiumGate>
+            <p className="section-hint">{t('app.autonomo.otherQuarterLocked')}</p>
+            <button
+              className="btn-primary"
+              onClick={() =>
+                plan!.openUpgrade({ kind: 'limit', resource: 'autonomoDrafts', limit: 1 })
+              }
+            >
+              {t('app.autonomo.goPremium')}
+            </button>
+          </PremiumGate>
+        ) : locked ? (
+          <UsedFreeGate
+            text={t('app.autonomo.usedFree')}
+            resource="autonomoDrafts"
+            limit={limit as number}
+          />
+        ) : (
+          <div className="button-row">
+            <button
+              className="btn-primary"
+              disabled={action.pending}
+              onClick={() => void prepare()}
+            >
+              {action.pending ? t('app.autonomo.preparing') : t('app.autonomo.prepare')}
+            </button>
+            {limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>}
+          </div>
+        )}
 
-      {otherQuarter ? (
-        <PremiumGate>
-          <p className="section-hint">{t('app.autonomo.otherQuarterLocked')}</p>
-          <button
-            className="btn-primary"
-            onClick={() =>
-              plan!.openUpgrade({ kind: 'limit', resource: 'autonomoDrafts', limit: 1 })
-            }
-          >
-            {t('app.autonomo.goPremium')}
-          </button>
-        </PremiumGate>
-      ) : locked ? (
-        <UsedFreeGate
-          text={t('app.autonomo.usedFree')}
-          resource="autonomoDrafts"
-          limit={limit as number}
-        />
-      ) : (
-        <div className="button-row">
-          <button className="btn-primary" disabled={action.pending} onClick={() => void prepare()}>
-            {action.pending ? t('app.autonomo.preparing') : t('app.autonomo.prepare')}
-          </button>
-          {limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>}
-        </div>
-      )}
-
-      {snapshot && (
-        <>
-          <h3 className="subsection-title">
-            {t('app.autonomo.draftOf', { year: snapshot.draft.year, n: snapshot.draft.quarter })}
-          </h3>
-          <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
-        </>
-      )}
-      {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
+        {snapshot && (
+          <>
+            <h3 className="subsection-title">
+              {t('app.autonomo.draftOf', { year: snapshot.draft.year, n: snapshot.draft.quarter })}
+            </h3>
+            <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
+          </>
+        )}
+        {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
+      </StepSection>
     </div>
   );
 }

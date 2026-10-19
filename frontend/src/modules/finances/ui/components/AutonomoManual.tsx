@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { AutonomoImport } from './AutonomoImport';
 import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
+import { StepSection } from './AutonomoSteps';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
@@ -368,7 +370,11 @@ function QuarterPanel({
   );
 }
 
-/** Income and expenses typed once by hand, with what each kind of expense needs to be deducted. */
+/**
+ * Steps 1 and 2 of the screen: bringing the data in (the import, the person's situation and the
+ * filed modelo 130) and reviewing it (the imported invoices, the warnings, the quarters typed by
+ * hand or worked out from the invoices, and the other options).
+ */
 export function AutonomoManual({
   form,
   onChange,
@@ -377,6 +383,8 @@ export function AutonomoManual({
   years,
   onPeriod,
   focus = null,
+  checks = null,
+  extras = null,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
@@ -386,6 +394,10 @@ export function AutonomoManual({
   onPeriod: (year: number, quarter: 1 | 2 | 3 | 4) => void;
   /** An imported invoice to show in the review (a warning asked for it). */
   focus?: ReviewFocus | null;
+  /** «Before you calculate», between the invoices and the quarters. */
+  checks?: ReactNode;
+  /** The other options of the draft, after the quarters. */
+  extras?: ReactNode;
 }) {
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
@@ -407,36 +419,38 @@ export function AutonomoManual({
     onChange({ ...form, prior: { ...form.prior, ...patch } });
 
   return (
-    <div className="autonomo-manual">
-      <p className="section-hint">{t('app.autonomo.manualHint')}</p>
+    <>
+      <StepSection step="bring">
+        <AutonomoImport
+          form={form}
+          year={year}
+          years={years}
+          onChange={onChange}
+          onPeriod={onPeriod}
+        />
+        <ProfilePanel profile={form.profile} onChange={setProfile} />
+        {upTo > 1 && <PriorPanel prior={form.prior} onChange={setPrior} />}
+      </StepSection>
 
-      <AutonomoImport
-        form={form}
-        year={year}
-        years={years}
-        onChange={onChange}
-        onPeriod={onPeriod}
-      />
-
-      <InvoiceReview form={form} onChange={onChange} focus={focus} />
-
-      <ProfilePanel profile={form.profile} onChange={setProfile} />
-
-      {upTo > 1 && <PriorPanel prior={form.prior} onChange={setPrior} />}
-
-      {form.quarters
-        .slice(0, upTo)
-        .map((quarter, q) =>
-          q < from ? null : (
-            <QuarterPanel
-              key={q}
-              quarter={quarter}
-              q={q}
-              onChange={(patch) => setQuarter(q, patch)}
-              onCopyPrevious={() => copyPrevious(q)}
-            />
-          )
-        )}
-    </div>
+      <StepSection step="review">
+        <InvoiceReview form={form} onChange={onChange} focus={focus} />
+        {checks}
+        <p className="section-hint">{t('app.autonomo.manualHint')}</p>
+        {form.quarters
+          .slice(0, upTo)
+          .map((quarter, q) =>
+            q < from ? null : (
+              <QuarterPanel
+                key={q}
+                quarter={quarter}
+                q={q}
+                onChange={(patch) => setQuarter(q, patch)}
+                onCopyPrevious={() => copyPrevious(q)}
+              />
+            )
+          )}
+        {extras}
+      </StepSection>
+    </>
   );
 }
