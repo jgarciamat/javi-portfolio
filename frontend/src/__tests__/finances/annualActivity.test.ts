@@ -9,6 +9,7 @@ import {
   indexOf,
   type AgrarianModulesInput,
 } from '@modules/finances/domain/agrarianModules';
+import { NO_OBJECTIVE } from '@modules/finances/domain/objectiveModules';
 import type {
   ActivityInputs,
   AutonomoInputs,
@@ -89,7 +90,7 @@ describe('Annual activity: the official case of the Manual de Renta 2025 (capít
             name: 'Equipamiento',
             group: 's2',
             cost: 79000,
-            start: '2020-01-01',
+            start: '2024-01-01',
             use: 100,
             method: 'table',
           },
@@ -532,5 +533,96 @@ describe('Farming in modules (Orden HAC/1425/2025, anexo I)', () => {
     );
     expect([r.boxes['1548'], r.boxes['1549'], r.net]).toEqual([-90, 0, -90]);
     expect(agrarianModules({ ...base, refunds: 50 }, 2026).net).toBe(-50);
+  });
+});
+
+describe('Annual activity: other activities in modules (annex II)', () => {
+  const four = (q: ManualData['quarters'][number]): ManualData['quarters'] => [q, q, q, q];
+  // The official case of the Manual de Renta 2025, cap. 8 (bar 673.1): net income 41,173.16.
+  const bar = {
+    ...NO_OBJECTIVE,
+    activityId: 'm45',
+    unitsStart: [3, 1, 35, 8, 10, 0, 1],
+    unitsYear: [3.66, null, null, null, null, null, null],
+    staffLastYear: 3,
+    extraordinary: 1200,
+  };
+  // The 6,050 € of depreciation of the case, as one asset of the transport and other group (25 %).
+  const asset = {
+    name: 'Equipos',
+    group: 'm3',
+    cost: 24200,
+    start: '2024-01-01',
+    use: 100,
+    method: 'table' as const,
+  };
+
+  it('gives the net income, its boxes and the instalments of the 131 for the 0604', () => {
+    const year = annualActivity(
+      2025,
+      inputsOf(
+        four(quarter()),
+        { method: 'objective', objective: bar, assets: [asset] },
+        {
+          priorYearNet: 41173.16,
+        }
+      )
+    );
+    expect(year.regime).toBe('objective');
+    expect(year.net).toBe(41173.16);
+    expect(year.boxes).toMatchObject({
+      '1465': 50111.95,
+      '1466': 2693.38,
+      '1467': 6050,
+      '1474': 44603.33,
+      '1475': 2230.17,
+      '1477': 1200,
+      '1479': 41173.16,
+    });
+    expect(year.objective?.input).toMatchObject({ activityId: 'm45', extraDepreciation: 6050 });
+    // 131 with the data at 1 January (3 salaried, no increase): see objectiveModules.test.ts;
+    // here the depreciation at 1 January is the same 6,050: 47,434.79 − 1,622.52 − 6,050 =
+    // 39,762.27 → 30,586.03 + 1.30 × 9,176.24 = 42,515.14; 5 % = 2,125.76; 40,389.38 × 4 % = 1,615.58.
+    expect(year.payments130.quarters).toEqual([1615.58, 1615.58, 1615.58, 1615.58]);
+    expect(year.payments130.source).toEqual(['estimated', 'estimated', 'estimated', 'estimated']);
+    expect(year.warnings).toEqual(expect.arrayContaining(['payments131', 'payments130Estimated']));
+    expect(year.warnings).not.toContain('objective');
+  });
+
+  it('takes the 131 filed, says when the activity is missing and when the year has no order', () => {
+    const filed = annualActivity(
+      2026,
+      inputsOf(four(quarter()), {
+        method: 'objective',
+        objective: bar,
+        paid130: [100, 100, 100, 100],
+      })
+    );
+    expect(filed.payments130.total).toBe(400);
+    const none = annualActivity(2026, inputsOf(four(quarter()), { method: 'objective' }));
+    expect(none.net).toBeNull();
+    expect(none.warnings).toContain('objective');
+    expect(none.payments130.total).toBe(0);
+    const farm = annualActivity(
+      2026,
+      inputsOf(four(quarter()), { method: 'objective', agrarian: true, modules: null })
+    );
+    expect(farm.warnings).toContain('objective');
+    const unknown = annualActivity(
+      2026,
+      inputsOf(four(quarter()), { method: 'objective', objective: { ...bar, activityId: 'zz' } })
+    );
+    expect(unknown.warnings).toContain('objective');
+    const later = annualActivity(
+      2027,
+      inputsOf(four(quarter()), { method: 'objective', objective: bar })
+    );
+    expect(later.warnings).toContain('modules');
+    // Without the figures of the year (2024) the 131 is not estimated.
+    const old = annualActivity(
+      2024,
+      inputsOf(four(quarter()), { method: 'objective', objective: bar })
+    );
+    expect(old.payments130.total).toBe(0);
   });
 });

@@ -1,6 +1,13 @@
 import { agrarianModules, type AgrarianModulesResult } from './agrarianModules';
 import { depreciationYear, type DepreciationYear, type Modality } from './depreciation';
 import { incomeOf, irpfDeductible } from './importChecks';
+import {
+  instalments131,
+  moduleTableOf,
+  objectiveEngineInput,
+  objectiveYear,
+} from './objectiveModules';
+import type { ModulesActivity, ModulesResult } from '@modules/tools/domain/rentaActivity';
 import { subsidyYear, type SubsidyYear } from './subsidies';
 import {
   EXPENSE_KINDS,
@@ -24,7 +31,8 @@ import {
  *   art. 130 LIVA) and the RETA fees of the owner (box 0186; regularisation 0196/0197).
  * - Withholdings suffered (box 0599) and payments of the modelo 130 (box 0604): the results of the
  *   filed 130 when given; otherwise the app's own estimate, said in a warning.
- * - Farming in modules (agrarianModules.ts). Other activities in modules are not worked out here.
+ * - Farming in modules (agrarianModules.ts) and the other activities in modules
+ *   (objectiveModules.ts: annex II of the order of the year; boxes 1465-1479, payments of the 131).
  */
 
 export const CONTRACT_VERSION = 1;
@@ -106,11 +114,11 @@ export interface AnnualActivity {
     total: number;
   };
   subsidies: { current: number; capital: number; exempt: number; unassigned: number };
-  /** Box 0224 (or 1553 in modules): the net yield before the reductions of art. 32 LIRPF. */
+  /** Box 0224 (1479 or 1553 in modules): the net yield before the reductions of art. 32 LIRPF. */
   net: number | null;
   /** Box 0599. */
   withholdings: number;
-  /** Box 0604 and where each quarter comes from. */
+  /** Box 0604 and where each quarter comes from (the 131 in non-farming modules). */
   payments130: {
     quarters: number[];
     source: ('filed' | 'estimated' | 'none')[];
@@ -120,6 +128,8 @@ export interface AnnualActivity {
   boxes: Record<string, number>;
   depreciation: DepreciationYear;
   modules: AgrarianModulesResult | null;
+  /** Non-farming modules: the net income worked out (boxes 1465-1479) and the engine's input. */
+  objective: { result: ModulesResult; input: ModulesActivity } | null;
   warnings: AnnualWarning[];
 }
 
@@ -351,16 +361,40 @@ function expensesOfYear(
 type Income = ReturnType<typeof incomeOfYear>;
 type Expenses = ReturnType<typeof expensesOfYear>;
 
-/** The payments of the 130: those filed, or the app's estimate. */
+/** The four modelos 131 of the year as the app works them out (box 15 of each, 0 if negative). */
+function estimate131(
+  year: number,
+  inputs: AutonomoInputs,
+  activity: ActivityInputs,
+  figures: QuarterFigures[]
+): number[] {
+  const objective = activity.objective as NonNullable<ActivityInputs['objective']>;
+  const atStart = activity.assets.filter((a) => a.start < `${year}-01-01`);
+  const r = instalments131(objective, {
+    year,
+    quarter: 4,
+    withheld: figures.map((q) => q.withheld),
+    income: figures.map((q) => q.income),
+    lastYearNet: inputs.priorYearNet,
+    depreciationAtStart: depreciationYear(atStart, year, 'modules').total,
+  });
+  return r ? r.quarters.map((q) => q.result.due) : [0, 0, 0, 0];
+}
+
+/** The payments of the 130 (or the 131): those filed, or the app's estimate. */
 function paymentsOf(
   year: number,
   inputs: AutonomoInputs,
   activity: ActivityInputs,
   figures: QuarterFigures[]
 ): AnnualActivity['payments130'] {
+  const objective = activity.method === 'objective';
+  const with131 = objective && !activity.agrarian && Boolean(activity.objective);
   // No 130 in modules (131) or with 70 % of the income withheld.
-  const none = activity.method === 'objective' || inputs.exempt130;
-  const estimated = none
+  const none = (objective && !with131) || (!objective && inputs.exempt130);
+  const estimated = with131
+    ? estimate131(year, inputs, activity, figures)
+    : none
     ? [0, 0, 0, 0]
     : estimate130(figures, {
         hardRate: activity.method === 'simplified' && inputs.hardToJustify ? hardRateOf(year) : 0,
@@ -417,21 +451,57 @@ function directBoxes(
 const modalityOf = (a: ActivityInputs): Modality =>
   a.method === 'objective' ? 'modules' : a.method;
 
-/** Modules: farming is worked out with the order of the year; the rest is not. */
+/** Boxes 1465-1479 of a non-farming activity in modules (zero boxes left out by the reader). */
+const objectiveBoxes = (r: ModulesResult, input: ModulesActivity): Record<string, number> => ({
+  '1465': r.previous,
+  '1466': r.employment,
+  '1467': r.investment,
+  '1468': r.reduced,
+  '1474': r.modules,
+  '1475': r.general,
+  '1477': input.extraordinary,
+  '1478': input.otherIncome,
+  '1479': r.net,
+});
+
+interface ModulesOutcome {
+  modules: AgrarianModulesResult | null;
+  objective: AnnualActivity['objective'];
+  net: number | null;
+  boxes: Record<string, number>;
+}
+
+/** Modules: farming (annex I) and the other activities (annex II), with the order of the year. */
 function modulesOf(
   year: number,
   activity: ActivityInputs,
   dep: DepreciationYear,
   warnings: Set<AnnualWarning>
-): { modules: AgrarianModulesResult | null; net: number | null } {
+): ModulesOutcome {
   warnings.add('payments131');
-  if (!activity.agrarian || !activity.modules) {
+  if (!activity.agrarian) {
+    const chosen = activity.objective;
+    if (!chosen || !moduleTableOf(year).table.some((a) => a.id === chosen.activityId)) {
+      warnings.add('objective');
+      return { modules: null, objective: null, net: null, boxes: {} };
+    }
+    if (!moduleTableOf(year).known) warnings.add('modules');
+    const result = objectiveYear(chosen, year, dep.total);
+    const input = objectiveEngineInput(chosen, year, dep.total);
+    return {
+      modules: null,
+      objective: { result, input },
+      net: result.net,
+      boxes: objectiveBoxes(result, input),
+    };
+  }
+  if (!activity.modules) {
     warnings.add('objective');
-    return { modules: null, net: null };
+    return { modules: null, objective: null, net: null, boxes: {} };
   }
   const modules = agrarianModules({ ...activity.modules, depreciation: dep.total }, year);
   if (modules.warnings.length > 0) warnings.add('modules');
-  return { modules, net: modules.net };
+  return { modules, objective: null, net: modules.net, boxes: modules.boxes };
 }
 
 /** The year of the activity as the Renta takes it. */
@@ -444,9 +514,10 @@ export function annualActivity(year: number, inputs: AutonomoInputs): AnnualActi
   const income = incomeOfYear(inputs, activity, subs);
   const expenses = expensesOfYear(year, inputs, activity, dep, income.total);
 
-  const { modules, net } = objective
+  const outcome: ModulesOutcome = objective
     ? modulesOf(year, activity, dep, warnings)
-    : { modules: null, net: round2(income.total - expenses.total) };
+    : { modules: null, objective: null, net: round2(income.total - expenses.total), boxes: {} };
+  const { modules, net } = outcome;
 
   const figures = quarterFigures(inputs, activity, dep, subs, expenses.provisions);
   const payments130 = paymentsOf(year, inputs, activity, figures);
@@ -455,7 +526,7 @@ export function annualActivity(year: number, inputs: AutonomoInputs): AnnualActi
   // Always: art. 32 reductions, irregular income and other boxes are for the Renta itself.
   warnings.add('notWorkedOut');
   const section = objective
-    ? modules?.boxes ?? {}
+    ? outcome.boxes
     : directBoxes(activity, income, expenses, net as number);
   const { box0218: _sum, difference: _difference, ...shown } = expenses;
 
@@ -478,6 +549,7 @@ export function annualActivity(year: number, inputs: AutonomoInputs): AnnualActi
     boxes: { ...section, '0599': withholdings, '0604': payments130.total },
     depreciation: dep,
     modules,
+    objective: outcome.objective,
     warnings: [...warnings],
   };
 }

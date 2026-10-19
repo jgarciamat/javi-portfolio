@@ -7,7 +7,7 @@ import { round2 } from './round';
  * The year of the self-employed screen as an activity of the Renta: the annual contract
  * (docs/fiscalidad/contrato-actividad-anual.md, section 9) mapped field by field to the engine
  * (rentaActivity.ts). Each expense comes already in its deductible amount, so the engine does not
- * apply the limits twice. Non-agricultural módulos are not worked out by the contract: null.
+ * apply the limits twice. Non-farming módulos go with the engine's own input (boxes 1465-1479).
  */
 
 /** The name of the activity the planner shows for the one that comes from the self-employed screen. */
@@ -19,7 +19,9 @@ export function activityFromAnnual(annual: AnnualActivity): ActivityInput | null
     withheld: annual.withholdings,
     payments: annual.payments130.total,
   };
-  if (annual.regime === 'objective' || annual.net === null) return null;
+  if (annual.regime === 'objective')
+    return annual.objective ? { ...common, kind: 'modules', data: annual.objective.input } : null;
+  if (annual.net === null) return null;
   if (annual.regime === 'objectiveAgrarian')
     return { ...common, kind: 'given', data: { area: 'agrarian', net: annual.net } };
   const { income, expenses } = annual;

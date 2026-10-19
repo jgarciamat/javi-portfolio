@@ -2,6 +2,7 @@
 import type { Asset as FixedAsset } from './depreciation';
 import type { Subsidy } from './subsidies';
 import type { AgrarianModulesInput } from './agrarianModules';
+import type { ObjectiveInput } from './objectiveModules';
 
 export type TransactionType = 'INCOME' | 'EXPENSE' | 'SAVING';
 
@@ -790,6 +791,11 @@ export interface ActivityInputs {
   stockChange?: number;
   /** Farming in modules: products, CAP aid and correctors (the depreciation comes from the assets). */
   modules?: Omit<AgrarianModulesInput, 'depreciation'> | null;
+  /**
+   * Other activities in modules (annex II): the activity, its units and indices. Its quarterly
+   * payments are those of the modelo 131, kept in `paid130` (box 15 of each 131 filed).
+   */
+  objective?: ObjectiveInput | null;
 }
 
 export interface AutonomoInputs {

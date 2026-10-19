@@ -18,6 +18,12 @@ export interface Activity131 {
   staffUnits: number;
   /** Entitled to the deduction for income obtained in Ceuta or Melilla. */
   ceutaMelilla?: boolean;
+  /**
+   * The part of a whole quarter the instalment is for (1 when unset): days in the quarter of an
+   * activity started or ceased during it, or the days of the season over last year's (instructions
+   * 5 and 6 of the annex II of the order of modules).
+   */
+  share?: number;
 }
 
 export interface Input131 {
@@ -54,7 +60,7 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 const box = (id: string, label: string, amount: number): TaxBox => ({ box: id, label, amount });
 
 /** 2 % without employees, 3 % with up to one unit, 4 % above [I131, box 02]. */
-function staffRate(units: number, m: FiscalFigures['m131']): number {
+export function staffRate(units: number, m: FiscalFigures['m131']): number {
   if (units <= 0) return m.noStaff;
   return units <= 1 ? m.upToOne : m.more;
 }
@@ -92,7 +98,9 @@ function instalments(input: Input131, m: FiscalFigures['m131']) {
   const b01 = round2(input.activities.reduce((s, a) => s + a.net, 0));
   const b02 = round2(
     input.activities.reduce(
-      (s, a) => s + round2((a.net * staffRate(a.staffUnits, m) * cm(a.ceutaMelilla)) / 100),
+      (s, a) =>
+        s +
+        round2((a.net * (a.share ?? 1) * staffRate(a.staffUnits, m) * cm(a.ceutaMelilla)) / 100),
       0
     )
   );

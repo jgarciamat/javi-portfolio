@@ -6,6 +6,7 @@ The designs are not kept in the repository. Download them into a folder of your 
   https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/dr111e16v18.xls
   https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/DR115e15v13.xls
   https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos/DR130e15v12.xls
+  https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_100_199/archivos_26/DR131_2026.xlsx
   https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_300_399/archivos_26/DR303e26v101.xlsx
   https://sede.agenciatributaria.gob.es/static_files/Sede/Disenyo_registro/DR_300_399/archivos_25/dr390e2025.xlsx
 
@@ -21,8 +22,11 @@ SOURCES = {
     "111": ("dr111e16v18.xls", ["dr M11101"]),
     "115": ("DR115e15v13.xls", ["DR 11501"]),
     "130": ("DR130e15v12.xls", ["DR 13001"]),
-    # Page 2 (simplified regime) and 5 (prorratas, sectors) hold boxes the app does not work out.
-    "303": ("DR303e26v101.xlsx", ["DP30301", "DP30303", "DP30304", "DP303DID"]),
+    # Page 1, the page of each activity in modules (DPA) and the account (DID).
+    "131": ("DR131_2026.xlsx", ["Pág. 1", "DPA", "DID"]),
+    # Page 5 (prorratas, sectors) holds boxes the app does not work out; page 2 is the simplified
+    # regime (módulos).
+    "303": ("DR303e26v101.xlsx", ["DP30301", "DP30302", "DP30303", "DP30304", "DP303DID"]),
     # Page 5 (simplified regime) and 8 (differentiated sectors) are left out for the same reason.
     "390": ("dr390e2025.xlsx", ["Pág. 1", "Pág. 2", "Pág. 2 bis", "Pág. 3", "Pág. 4", "Pág. 6", "Pág. 7"]),
 }

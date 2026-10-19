@@ -1,4 +1,5 @@
 import { annualActivity, NO_ACTIVITY } from '@modules/finances/domain/annualActivity';
+import { NO_OBJECTIVE } from '@modules/finances/domain/objectiveModules';
 import type {
   ActivityInputs,
   AutonomoInputs,
@@ -122,6 +123,53 @@ describe('the year of the self-employed screen in the Renta', () => {
     expect(r).toMatchObject({ smallIncomeReduction: 1620, agrarian: 4380, total: 4380 });
     expect(activityFromAnnual({ ...annual, regime: 'objective', net: null })).toBeNull();
     expect(activityFromAnnual({ ...annual, net: null })).toBeNull();
+  });
+
+  it('passes the other módulos with their own data, and the Renta gives the same net income', () => {
+    // The official case of the Manual de Renta 2025, cap. 8 (bar 673.1): 41,173.16.
+    const annual = annualActivity(2025, {
+      quarters: [0, 0, 0, 0].map(() => ({
+        withheld: 0,
+        socialSecurity: 0,
+        vatNotDeductible: 0,
+      })) as AutonomoInputs['quarters'],
+      hardToJustify: false,
+      priorYearNet: 41173.16,
+      exempt130: false,
+      vatToOffset: 0,
+      activity: {
+        ...NO_ACTIVITY,
+        method: 'objective',
+        paid130: [1000, 1000, 1000, 1000],
+        objective: {
+          ...NO_OBJECTIVE,
+          activityId: 'm45',
+          unitsStart: [3.66, 1, 35, 8, 10, 0, 1],
+          unitsYear: [],
+          staffLastYear: 3,
+          extraordinary: 1200,
+        },
+        assets: [
+          {
+            name: 'Equipos',
+            group: 'm3',
+            cost: 24200,
+            start: '2024-01-01',
+            use: 100,
+            method: 'table',
+          },
+        ],
+      },
+    });
+    const activity = activityFromAnnual(annual);
+    expect(activity).toMatchObject({ kind: 'modules', payments: 4000 });
+    const r = activitiesOf(
+      [activity as NonNullable<typeof activity>],
+      { otherIncome: 0, hasWork: false, workReduction: 0, disability: 0, assistance: false },
+      modules2025,
+      farm2025
+    );
+    expect(r).toMatchObject({ modules: 41173.16, total: 41173.16, payments: 4000 });
   });
 
   it('puts the activity in the planner in place of the one it brought before', () => {
