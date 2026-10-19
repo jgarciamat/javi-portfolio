@@ -79,7 +79,21 @@ export interface RentaWebKit {
   warnings: KitWarning[];
   /** The alta of each sale (by sale index in ledger.sales) or position (by direct index). */
   altaOfSale: Map<SaleResult, number>;
+  /** The alta of each position of `ledger.direct`, by its index. */
+  altaOfDirect: number[];
 }
+
+/**
+ * How the positions of «otros elementos» go into altas: one per position (the default), one per
+ * instrument, month of closing and sign, or one per instrument and sign (gains and losses). The
+ * totals 0385/0386 are the same with any of them: only the number of altas changes.
+ */
+export type OtherGrouping = 'position' | 'month' | 'sign';
+export const OTHER_GROUPINGS: OtherGrouping[] = ['position', 'month', 'sign'];
+
+/** What is copied into Renta WEB: an amount with a decimal comma and no thousands separator. */
+export const webValue = (value: string | number) =>
+  typeof value === 'number' ? value.toFixed(2).replace('.', ',') : value;
 
 /** Cut a text to a field's length without cutting a word in two when it can. */
 export function cut(text: string, max?: number): string {
@@ -256,7 +270,9 @@ const date = (iso: string) => iso.split('-').reverse().join('/');
 function othersOf(
   ledger: LedgerResult,
   warnings: KitWarning[],
-  altaOfSale: Map<SaleResult, number>
+  altaOfSale: Map<SaleResult, number>,
+  altaOfDirect: number[],
+  grouping: OtherGrouping
 ): Alta[] {
   const def = WINDOWS.other;
   interface Pos {
@@ -266,6 +282,7 @@ function othersOf(
     proceeds: number;
     cost: number;
     sale?: SaleResult;
+    direct?: number;
   }
   const positions: Pos[] = [
     ...ledger.sales
@@ -278,17 +295,23 @@ function othersOf(
         cost: s.cost,
         sale: s,
       })),
-    ...ledger.direct.map((d) => ({
+    ...ledger.direct.map((d, direct) => ({
       name: d.asset,
       opened: d.acquired,
       closed: d.date,
       proceeds: d.proceeds,
       cost: d.cost,
+      direct,
     })),
   ];
   const sign = (p: Pos) => (p.proceeds >= p.cost ? 'gain' : 'loss');
+  const first: Record<OtherGrouping, (p: Pos, i: number) => string> = {
+    position: (_p, i) => String(i),
+    month: (p) => `${p.name}|${p.closed.slice(0, 7)}|${sign(p)}`,
+    sign: (p) => `${p.name}|${sign(p)}`,
+  };
   const steps: ((p: Pos, i: number) => string)[] = [
-    (_p, i) => String(i),
+    first[grouping],
     (p) => `${p.name}|${sign(p)}`,
     (p) => p.name,
   ];
@@ -307,7 +330,10 @@ function othersOf(
   return groups.map((list, i) => {
     const proceeds = round2(list.reduce((s, p) => s + p.proceeds, 0));
     const cost = round2(list.reduce((s, p) => s + p.cost, 0));
-    for (const p of list) if (p.sale) altaOfSale.set(p.sale, i + 1);
+    for (const p of list) {
+      if (p.sale) altaOfSale.set(p.sale, i + 1);
+      else altaOfDirect[p.direct as number] = i + 1;
+    }
     return {
       n: i + 1,
       values: {
@@ -358,16 +384,20 @@ function withheldOf(ledger: LedgerResult): Map<string, number> {
 const ORDER: WebSection[] = ['iic', 'etf', 'shares', 'crypto', 'other'];
 
 /** Every window with its altas, the totals by box and the warnings that go with the file. */
-export function rentaWebKit(ledger: LedgerResult): RentaWebKit {
+export function rentaWebKit(
+  ledger: LedgerResult,
+  { other = 'position' }: { other?: OtherGrouping } = {}
+): RentaWebKit {
   const warnings: KitWarning[] = [];
   const altaOfSale = new Map<SaleResult, number>();
+  const altaOfDirect: number[] = [];
   const pieces = ledger.sales.flatMap(piecesOf);
   const windows: WebWindow[] = [];
   for (const section of ORDER) {
     const own = pieces.filter((p) => p.sale.section === section);
     const altas =
       section === 'other'
-        ? othersOf(ledger, warnings, altaOfSale)
+        ? othersOf(ledger, warnings, altaOfSale, altaOfDirect, other)
         : section === 'shares'
         ? sharesOf(own, ledger, altaOfSale)
         : altasOf(section, own, ledger, warnings, altaOfSale);
@@ -437,7 +467,7 @@ export function rentaWebKit(ledger: LedgerResult): RentaWebKit {
     ]),
     ...income,
   ];
-  return { year: ledger.year, windows, totals, warnings, altaOfSale };
+  return { year: ledger.year, windows, totals, warnings, altaOfSale, altaOfDirect };
 }
 
 export type { Counterpart };

@@ -513,7 +513,7 @@ describe('what to copy and the report', () => {
   it('the file to copy: one tab per window, totals, the FIFO detail, the income and the years', () => {
     const tables = reportTables(ledger);
     expect(tables.map((t) => t.name)).toEqual([
-      '0 Cómo usar',
+      '0 Empieza aquí',
       '1 Fondos (0310)',
       '3 Acciones (0326)',
       '4 Monedas virtuales (1800)',
@@ -608,7 +608,7 @@ describe('what to copy and the report', () => {
       20000,
       10000,
       0,
-      '01/01/2024: 1 por 20000 €',
+      '01/01/2024: 1 por 20000,00 €',
     ]);
     expect(tab('7 Detalle por operación').at(-1)?.[10]).toBe('Abierta el 01/04/2025');
     expect(tab('8 Rendimientos')[1]).toEqual([
@@ -639,7 +639,7 @@ describe('what to copy and the report', () => {
     );
     const t = reportTables(spanish);
     expect(t.map((x) => x.name)).toEqual([
-      '0 Cómo usar',
+      '0 Empieza aquí',
       '6 Totales por casilla',
       '8 Rendimientos',
       '9 Por año',

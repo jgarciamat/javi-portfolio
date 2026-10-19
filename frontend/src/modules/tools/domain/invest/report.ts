@@ -1,7 +1,14 @@
 import { round2 } from '../round';
 import type { Counterpart, GainSection } from '../rentaGains';
 import type { LedgerResult } from './ledger';
-import { APARTADO, rentaWebKit, type RentaWebKit } from './rentaWeb';
+import {
+  APARTADO,
+  rentaWebKit,
+  webValue,
+  type Alta,
+  type RentaWebKit,
+  type WebWindow,
+} from './rentaWeb';
 
 /**
  * What to copy into the modelo 100 of 2025 (Orden HAC/277/2026, BOE-A-2026-7041), as Renta WEB
@@ -150,82 +157,26 @@ const date = (iso: string) => iso.split('-').reverse().join('/');
 
 type SheetRow = (string | number)[];
 
-/** The tab of one window: its fields with the labels and order of Renta WEB, then what to check. */
-function windowSheet(w: RentaWebKit['windows'][number]): SheetRow[] {
-  const b = SECTION_BOXES[w.section];
-  const fields = w.def.fields;
-  const lines = w.altas.flatMap((a) => (a.transactions ?? [a]).map((line) => ({ alta: a, line })));
-  const check: Record<typeof w.section, string[]> = {
-    iic: [
-      'Nombre del fondo (solo para ti)',
-      `Ganancia [${b.gain}]`,
-      `Pérdida [${b.loss}]`,
-      `Pérdida que cuenta [${b.counted}]`,
-      'Reembolsos incluidos',
-      '¿Puede venir ya en tus datos fiscales?',
-      'Hecho',
-    ],
-    etf: [
-      `Ganancia [${b.gain}]`,
-      `Pérdida [${b.loss}]`,
-      `Pérdida que cuenta [${b.counted}]`,
-      'Ventas incluidas',
-      'Hecho',
-    ],
-    shares: [
-      `Ganancia [${b.gain}]`,
-      `Pérdida [${b.loss}]`,
-      `Pérdida que cuenta [${b.counted}]`,
-      'Ventas incluidas',
-      '¿Puede venir ya en tus datos fiscales?',
-      'Hecho',
-    ],
-    crypto: [
-      `Valor de transmisión [${b.proceeds}]`,
-      `Valor de adquisición [${b.cost}]`,
-      `Pérdida [${b.loss}]`,
-      `Ganancia [${b.gain}]`,
-      'Operaciones incluidas',
-      'Hecho',
-    ],
-    other: [`Pérdida [${b.loss}]`, `Ganancia [${b.gain}]`, 'Posiciones incluidas', 'Hecho'],
-  };
-  const yesNo = (v: boolean) => (v ? 'Sí' : 'No');
-  const checks = ({ alta, line }: (typeof lines)[number]): SheetRow => {
-    const values = line.values;
-    switch (w.section) {
-      case 'iic':
-        return [
-          alta.name,
-          line.gain,
-          line.loss,
-          line.counted,
-          line.sales,
-          yesNo(alta.fiscalData),
-          '',
-        ];
-      case 'shares':
-        return [line.gain, line.loss, line.counted, line.sales, yesNo(alta.fiscalData), ''];
-      case 'crypto':
-        return [Number(values.proceeds), Number(values.cost), line.loss, line.gain, line.sales, ''];
-      case 'other':
-        return [line.loss, line.gain, line.sales, ''];
-      default:
-        return [line.gain, line.loss, line.counted, line.sales, ''];
-    }
-  };
-  return [
-    ['Nº de alta', ...fields.map((f) => f.label), ...check[w.section]],
-    ...lines.map((l) => [
-      l.alta.n,
-      // Every field of the window has its value (a share's issuer is on the alta).
-      ...fields.map((f) => (l.line.values[f.key] ?? l.alta.values[f.key]) as string | number),
-      ...checks(l),
-    ]),
-  ];
+/**
+ * What a column is for: a field to copy into Renta WEB, what Renta WEB must show afterwards (to
+ * check, not to copy), the «Hecho» mark, or plain information.
+ */
+export type Zone = 'copy' | 'check' | 'done' | 'plain';
+
+/**
+ * One tab of the file (one section of the PDF): some lines of text first, then a table whose first
+ * row is the header. `zones` colours each column (copy / check / done); `money` marks the columns
+ * of euros, written with two decimals.
+ */
+export interface ReportSheet {
+  name: string;
+  rows: SheetRow[];
+  intro?: string[];
+  zones?: Zone[];
+  money?: boolean[];
 }
 
-const TAB: Record<GainSection, string> = {
+export const TAB: Record<GainSection, string> = {
   iic: '1 Fondos (0310)',
   etf: '2 ETF (2225)',
   shares: '3 Acciones (0326)',
@@ -233,102 +184,333 @@ const TAB: Record<GainSection, string> = {
   other: '5 Otros elementos (1624)',
 };
 
+/** Amounts as in Renta WEB: decimal comma, no thousands separator (docs/fiscalidad §6.3). */
+const euros = (n: number) => `${webValue(n)} €`;
+
+const MONEY_FIELDS = new Set([
+  'proceeds',
+  'proceedsCosts',
+  'cost',
+  'costCosts',
+  'amortization',
+  'withheld',
+]);
+
+type Line = { alta: Alta; line: Alta };
+
+/** A column of the tab that is not a field of the window. */
+interface Extra {
+  label: string;
+  zone: Zone;
+  money: boolean;
+  of: (l: Line) => string | number;
+}
+
+const yesNo = (v: boolean) => (v ? 'Sí' : 'No');
+
+/** What Renta WEB shows after «Aceptar», to check each row (not to copy). */
+function checksOf(w: WebWindow): Extra[] {
+  const b = SECTION_BOXES[w.section];
+  const check = (label: string, of: Extra['of'], money = true): Extra => ({
+    label,
+    zone: 'check',
+    money,
+    of,
+  });
+  const gain = check(`Ganancia [${b.gain}]`, (l) => l.line.gain);
+  const loss = check(`Pérdida [${b.loss}]`, (l) => l.line.loss);
+  const counted = check(`Pérdida que cuenta [${b.counted}]`, (l) => l.line.counted);
+  const count = (label: string) => check(label, (l) => l.line.sales, false);
+  const fiscal = check(
+    '¿Puede venir ya en tus datos fiscales?',
+    (l) => yesNo(l.alta.fiscalData),
+    false
+  );
+  switch (w.section) {
+    case 'iic':
+      return [
+        check('Nombre del fondo (solo para ti)', (l) => l.alta.name, false),
+        gain,
+        loss,
+        counted,
+        count('Reembolsos incluidos'),
+        fiscal,
+      ];
+    case 'shares':
+      return [gain, loss, counted, count('Ventas incluidas'), fiscal];
+    case 'crypto':
+      return [
+        check(`Valor de transmisión [${b.proceeds}]`, (l) => Number(l.line.values.proceeds)),
+        check(`Valor de adquisición [${b.cost}]`, (l) => Number(l.line.values.cost)),
+        loss,
+        gain,
+        count('Operaciones incluidas'),
+      ];
+    case 'other':
+      return [loss, gain, count('Posiciones incluidas')];
+    default:
+      return [gain, loss, counted, count('Ventas incluidas')];
+  }
+}
+
+/** The rows to copy of a window: one per alta (one per transaction for shares). */
+const linesOf = (w: WebWindow): Line[] =>
+  w.altas.flatMap((a) => (a.transactions ?? [a]).map((line) => ({ alta: a, line })));
+
+/** The value of a field of the window for a row (a share's issuer is on the alta). */
+const fieldValue = (l: Line, key: string) =>
+  (l.line.values[key] ?? l.alta.values[key]) as string | number;
+
+/** «Copia estas N filas en Renta WEB → ventana X»: the header of a window's tab. */
+function windowIntro(w: WebWindow): string[] {
+  const rows = linesOf(w).length;
+  return [
+    `Copia estas ${rows} ${rows === 1 ? 'fila' : 'filas'} en Renta WEB, en la ventana «${
+      w.def.title
+    }»`,
+    `Dónde: Renta WEB > abre tu declaración > «Apartados de la declaración» > ${APARTADO} > «${w.def.title}» > botón «Alta» (una vez por fila).`,
+    'COPIAR (columnas amarillas): cada una es un campo de la ventana, con el mismo nombre y en el mismo orden. Los importes llevan coma decimal y sin punto de miles, como los pide Renta WEB.',
+    'COMPROBAR (columnas grises): no se copian; es lo que Renta WEB debe mostrarte al pulsar «Aceptar». «Hecho»: márcalo al terminar cada fila.',
+    `Al terminar esta ventana, Renta WEB debe mostrar: casilla ${
+      w.def.totals.gains
+    } (ganancias) ${euros(w.totals.gains)}; casilla ${w.def.totals.losses} (pérdidas) ${euros(
+      w.totals.losses
+    )}.`,
+  ];
+}
+
+/** The tab of one window: its fields with the labels and order of Renta WEB, then what to check. */
+function windowSheet(w: WebWindow): ReportSheet {
+  const fields = w.def.fields;
+  const extras: Extra[] = [
+    ...checksOf(w),
+    { label: 'Hecho', zone: 'done', money: false, of: () => '' },
+  ];
+  return {
+    name: TAB[w.section],
+    intro: windowIntro(w),
+    zones: ['plain', ...fields.map((): Zone => 'copy'), ...extras.map((e) => e.zone)],
+    money: [false, ...fields.map((f) => MONEY_FIELDS.has(f.key)), ...extras.map((e) => e.money)],
+    rows: [
+      ['Nº de alta', ...fields.map((f) => f.label), ...extras.map((e) => e.label)],
+      ...linesOf(w).map((l) => [
+        l.alta.n,
+        ...fields.map((f) => fieldValue(l, f.key)),
+        ...extras.map((e) => e.of(l)),
+      ]),
+    ],
+  };
+}
+
+/** One window in a few numbers: how many rows to copy and the totals Renta WEB must show. */
+export interface PlanWindow {
+  section: GainSection;
+  title: string;
+  tab: string;
+  rows: number;
+  gains: { box: string; amount: number };
+  losses: { box: string; amount: number };
+}
+
+/** What there is to copy, in a few numbers, and one row worked out field by field. */
+export interface CopyPlan {
+  windows: PlanWindow[];
+  rows: number;
+  /** About a minute and a half per row, plus five to open Renta WEB and check the totals. */
+  minutes: number;
+  example: {
+    title: string;
+    tab: string;
+    alta: number;
+    fields: { label: string; value: string }[];
+  } | null;
+}
+
+export function copyPlan(kit: RentaWebKit): CopyPlan {
+  const windows = kit.windows.map((w) => ({
+    section: w.section,
+    title: w.def.title,
+    tab: TAB[w.section],
+    rows: linesOf(w).length,
+    gains: { box: w.def.totals.gains, amount: w.totals.gains },
+    losses: { box: w.def.totals.losses, amount: w.totals.losses },
+  }));
+  const rows = windows.reduce((s, w) => s + w.rows, 0);
+  const first = kit.windows[0];
+  const line = first && linesOf(first)[0];
+  return {
+    windows,
+    rows,
+    minutes: rows === 0 ? 0 : Math.ceil(rows * 1.5) + 5,
+    example: line
+      ? {
+          title: first.def.title,
+          tab: TAB[first.section],
+          alta: line.alta.n,
+          fields: first.def.fields.map((f) => ({
+            label: f.label,
+            value: String(webValue(fieldValue(line, f.key)) || '(vacío)'),
+          })),
+        }
+      : null,
+  };
+}
+
+/** «Empieza aquí»: how many rows, where, what totals, the three steps and one row worked out. */
+function startSheet(year: number, kit: RentaWebKit, plan: CopyPlan): ReportSheet {
+  const totals = kit.totals.map((t) => `• Casilla ${t.box} · ${t.label}: ${euros(t.amount)}`);
+  const intro = [
+    `Empieza aquí: qué copiar en Renta WEB (Renta ${year})`,
+    'Finanverso prepara los datos; no presenta nada: tú los copias en Renta WEB, una fila cada vez.',
+  ];
+  if (plan.windows.length === 0)
+    return {
+      name: '0 Empieza aquí',
+      intro: [...intro, 'Escribe estos importes en Renta WEB, cada uno en su casilla:'],
+      zones: ['plain', 'plain', 'copy'],
+      money: [false, false, true],
+      rows: [
+        ['Casilla', 'Concepto', 'Importe (€)'],
+        ...kit.totals.map((t) => [t.box, t.label, t.amount]),
+      ],
+    };
+  const example = plan.example as NonNullable<CopyPlan['example']>;
+  return {
+    name: '0 Empieza aquí',
+    intro: [
+      ...intro,
+      `Tienes que copiar ${plan.rows} ${
+        plan.rows === 1 ? 'fila' : 'filas'
+      }. Tiempo estimado: unos ${plan.minutes} minutos.`,
+      ...plan.windows.map(
+        (w) =>
+          `• Ventana «${w.title}»: ${w.rows} ${w.rows === 1 ? 'fila' : 'filas'} (pestaña «${
+            w.tab
+          }»).`
+      ),
+      '',
+      'Paso 1. Abre Renta WEB con tu Cl@ve, certificado o referencia y entra en tu declaración. En «Apartados de la declaración», ve a ' +
+        `${APARTADO} y abre la ventana de la pestaña.`,
+      'Paso 2. Pulsa «Alta» y copia una fila de la pestaña: cada columna amarilla es un campo de la ventana, con su mismo nombre y en su orden. Pulsa «Aceptar» y marca «Hecho». Repite con cada fila.',
+      'Paso 3. Al terminar, comprueba que Renta WEB muestra estos totales:',
+      ...totals,
+      '',
+      `Ejemplo resuelto: la fila ${example.alta} de la pestaña «${example.tab}» se escribe así en la ventana «${example.title}»:`,
+    ],
+    zones: ['plain', 'copy'],
+    rows: [
+      ['Campo de la ventana en Renta WEB', 'Qué escribes'],
+      ...example.fields.map((f) => [f.label, f.value]),
+    ],
+  };
+}
+
 /**
- * `Finanverso-Renta-<año>-copiar-en-Renta-WEB`: a tab per window of Renta WEB (one row per alta,
- * with the window's labels in its order and what Renta WEB will show), the totals by box, every
- * sale with its FIFO purchases and its alta (the proof to keep), the income and the years.
+ * `Finanverso-Renta-<año>-copiar-en-Renta-WEB`: «Empieza aquí», a tab per window of Renta WEB (one
+ * row per alta, with the window's labels in its order and what Renta WEB will show), the totals by
+ * box, every sale with its FIFO purchases and its alta (the proof to keep), the income and the years.
  */
 export function reportTables(
   ledger: LedgerResult,
   kit: RentaWebKit = rentaWebKit(ledger)
-): { name: string; rows: SheetRow[] }[] {
-  const how: SheetRow[] = [
-    ['Cómo usar este archivo'],
-    [
-      `Renta ${ledger.year}. Finanverso prepara los datos; no presenta nada: tú los copias en Renta WEB.`,
+): ReportSheet[] {
+  const totals: ReportSheet = {
+    name: '6 Totales por casilla',
+    intro: ['Lo que Renta WEB debe mostrar al terminar (no se copia: es para comprobar).'],
+    zones: ['plain', 'plain', 'check'],
+    money: [false, false, true],
+    rows: [
+      ['Casilla', 'Concepto', 'Importe (€)'],
+      ...kit.totals.map((t) => [t.box, t.label, t.amount]),
     ],
-    ['1. Entra en Renta WEB con tu Cl@ve, certificado o referencia y abre tu declaración.'],
-    [`2. Ve al apartado ${APARTADO}.`],
-    [
-      '3. En cada ventana de este archivo (una pestaña cada una) pulsa «Alta» y copia una fila: cada columna es un campo de la ventana, en el mismo orden.',
+  };
+  const sales: ReportSheet = {
+    name: '7 Detalle por operación',
+    intro: [
+      'El justificante de cada venta (no se copia en Renta WEB). Guarda este archivo al menos 4 años (art. 66 de la Ley General Tributaria).',
     ],
-    [
-      '4. Pulsa «Aceptar» y comprueba que Renta WEB muestra lo de las columnas de comprobación; marca «Hecho».',
+    money: [false, false, false, false, false, false, true, true, true, true, false],
+    rows: [
+      [
+        'Fecha de venta',
+        'Activo',
+        'Código',
+        'Apartado',
+        'Nº de alta',
+        'Unidades',
+        'Valor de transmisión (€)',
+        'Valor de adquisición (€)',
+        'Ganancia o pérdida (€)',
+        'Pérdida que no cuenta este año (€)',
+        'Compras usadas (FIFO)',
+      ],
+      ...ledger.sales.map((s) => [
+        date(s.date),
+        s.name,
+        s.code,
+        TAB[s.section],
+        kit.altaOfSale.get(s) as number,
+        s.units,
+        s.proceeds,
+        s.cost,
+        s.gain,
+        s.deferred,
+        s.lots
+          .map(
+            (l) =>
+              `${date(l.date)}: ${String(l.units).replace('.', ',')} por ${webValue(
+                round2(l.cost)
+              )} €`
+          )
+          .join(' | '),
+      ]),
+      ...ledger.direct.map((d, i) => [
+        date(d.date),
+        d.asset,
+        '',
+        TAB.other,
+        kit.altaOfDirect[i],
+        '',
+        d.proceeds,
+        d.cost,
+        d.gain,
+        0,
+        `Abierta el ${date(d.acquired)}`,
+      ]),
     ],
-    ['5. Al final, compara los totales de Renta WEB con la pestaña «6 Totales por casilla».'],
-    [
-      'Guarda este archivo y la pestaña «7 Detalle por operación» al menos 4 años (art. 66 de la Ley General Tributaria).',
+  };
+  const income: ReportSheet = {
+    name: '8 Rendimientos',
+    money: [false, false, false, false, true, true, false, false],
+    rows: [
+      ['Fecha', 'Plataforma', 'Activo', 'Tipo', 'Importe (€)', 'Retención (€)', 'Dónde', 'Casilla'],
+      ...ledger.income.map((i) => [
+        date(i.date),
+        i.account,
+        i.asset,
+        i.what,
+        i.eur,
+        i.withheld,
+        i.withheldIn === 'spain' ? 'España' : 'Extranjero',
+        i.box,
+      ]),
     ],
-  ];
-  const totals: SheetRow[] = [
-    ['Casilla', 'Concepto', 'Importe (€)'],
-    ...kit.totals.map((t) => [t.box, t.label, t.amount]),
-  ];
-  const sales: SheetRow[] = [
-    [
-      'Fecha de venta',
-      'Activo',
-      'Código',
-      'Apartado',
-      'Nº de alta',
-      'Unidades',
-      'Valor de transmisión (€)',
-      'Valor de adquisición (€)',
-      'Ganancia o pérdida (€)',
-      'Pérdida que no cuenta este año (€)',
-      'Compras usadas (FIFO)',
+  };
+  const years: ReportSheet = {
+    name: '9 Por año',
+    money: [false, true, true],
+    rows: [
+      ['Año', 'Resultado base del ahorro (€)', 'Resultado base general (€)'],
+      ...Object.entries(ledger.years).map(([y, v]) => [Number(y), v.savings, v.general]),
     ],
-    ...ledger.sales.map((s) => [
-      date(s.date),
-      s.name,
-      s.code,
-      TAB[s.section],
-      kit.altaOfSale.get(s) as number,
-      s.units,
-      s.proceeds,
-      s.cost,
-      s.gain,
-      s.deferred,
-      s.lots.map((l) => `${date(l.date)}: ${l.units} por ${round2(l.cost)} €`).join(' | '),
-    ]),
-    ...ledger.direct.map((d) => [
-      date(d.date),
-      d.asset,
-      '',
-      TAB.other,
-      '',
-      '',
-      d.proceeds,
-      d.cost,
-      d.gain,
-      0,
-      `Abierta el ${date(d.acquired)}`,
-    ]),
-  ];
-  const income: SheetRow[] = [
-    ['Fecha', 'Plataforma', 'Activo', 'Tipo', 'Importe (€)', 'Retención (€)', 'Dónde', 'Casilla'],
-    ...ledger.income.map((i) => [
-      date(i.date),
-      i.account,
-      i.asset,
-      i.what,
-      i.eur,
-      i.withheld,
-      i.withheldIn === 'spain' ? 'España' : 'Extranjero',
-      i.box,
-    ]),
-  ];
-  const years: SheetRow[] = [
-    ['Año', 'Resultado base del ahorro (€)', 'Resultado base general (€)'],
-    ...Object.entries(ledger.years).map(([y, v]) => [Number(y), v.savings, v.general]),
-  ];
+  };
   return [
-    { name: '0 Cómo usar', rows: how },
-    ...kit.windows.map((w) => ({ name: TAB[w.section], rows: windowSheet(w) })),
-    { name: '6 Totales por casilla', rows: totals },
-    { name: '7 Detalle por operación', rows: sales },
-    { name: '8 Rendimientos', rows: income },
-    { name: '9 Por año', rows: years },
+    startSheet(ledger.year, kit, copyPlan(kit)),
+    ...kit.windows.map(windowSheet),
+    totals,
+    sales,
+    income,
+    years,
   ].filter((sheet) => sheet.rows.length > 1);
 }
 
