@@ -6,7 +6,7 @@
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { buildXlsx, type XlsxCell, type XlsxSheet } from './xlsx';
-import { model130, model303 } from './pdf-templates';
+import { model111, model115, model130, model303 } from './pdf-templates';
 
 const root = join(__dirname, '..');
 const templates = join(root, 'public', 'plantillas');
@@ -41,6 +41,9 @@ const RECEIVED_HEAD: XlsxCell[] = [
   'Base imponible',
   'Tipo de IVA (%)',
   'Cuota IVA soportada',
+  // What the person withholds from professionals and the landlord (modelos 111 and 115).
+  'Tipo retención IRPF (%)',
+  'Importe retenido IRPF',
   'Total factura',
 ];
 
@@ -148,20 +151,37 @@ interface Received {
   supplier: string;
   base: number;
   rate: 0 | 4 | 10 | 21;
+  /** Tax id and IRPF withheld (%) of the professionals and the landlord. */
+  nif?: string;
+  retention?: number;
 }
+// Every quarter: the rent of the premises (19 % withheld, modelo 115), the gestoría (15 %) and a
+// designer who started last year (7 %), both in the modelo 111.
 const received: Received[] = [
   ...[1, 2, 3].flatMap((q) => [
     {
       date: `2026-0${q * 3 - 2}-05`,
-      supplier: 'Alquiler oficina coworking',
+      supplier: 'Inmuebles Ribera SL alquiler del local',
       base: 400,
       rate: 21 as const,
+      nif: 'B00000001',
+      retention: 19,
     },
     {
       date: `2026-0${q * 3 - 1}-10`,
       supplier: 'Gestoría Pérez asesoría fiscal',
       base: 150,
       rate: 21 as const,
+      nif: '00000001R',
+      retention: 15,
+    },
+    {
+      date: `2026-0${q * 3 - 1}-20`,
+      supplier: 'Marta Ejemplo diseño gráfico',
+      base: 50,
+      rate: 21 as const,
+      nif: '00000002W',
+      retention: 7,
     },
   ]),
   { date: '2026-01-20', supplier: 'Adobe licencia software', base: 60, rate: 21 },
@@ -192,10 +212,24 @@ save(examples, 'ejemplo-facturas-recibidas-2026.xlsx', [
         'Base Imponible (Gasto Deducible)',
         'Tipo de IVA',
         'Cuota IVA Soportado',
+        'NIF Expedidor',
+        'Tipo Retención IRPF',
+        'Importe Retenido IRPF',
       ],
       ...received.map((r): XlsxCell[] => {
         const vat = round2((r.base * r.rate) / 100);
-        return [{ date: r.date }, r.supplier, round2(r.base + vat), r.base, r.rate, vat];
+        const held = round2((r.base * (r.retention ?? 0)) / 100);
+        return [
+          { date: r.date },
+          r.supplier,
+          round2(r.base + vat - held),
+          r.base,
+          r.rate,
+          vat,
+          r.nif ?? null,
+          r.retention ?? null,
+          r.retention ? held : null,
+        ];
       }),
     ],
   },
@@ -215,8 +249,65 @@ save(examples, 'ejemplo-movimientos-banco-2026.xlsx', [
     ],
   },
 ]);
+// The employees of the example (from their payslips), typed in «Retenciones que practicas».
+const EMPLOYEES = [
+  { quarter: 1, people: 2, paid: 7500, withheld: 750 },
+  { quarter: 2, people: 2, paid: 7500, withheld: 750 },
+  { quarter: 3, people: 3, paid: 10500, withheld: 1050 },
+];
+writeFileSync(
+  join(examples, 'ejemplo-empleados-2026.txt'),
+  [
+    'Empleados del ejemplo (datos inventados), para escribirlos en Autónomos → paso 2 →',
+    '«Retenciones que practicas (modelos 111 y 115)» → Empleados (modelo 111).',
+    'Salen de las nóminas del trimestre: sueldos brutos y retenciones de IRPF.',
+    '',
+    'Trimestre  Nº de empleados  Sueldos brutos  Retenciones',
+    ...EMPLOYEES.map(
+      (e) =>
+        `T${e.quarter}`.padEnd(11) +
+        String(e.people).padEnd(17) +
+        `${e.paid} €`.padEnd(16) +
+        `${e.withheld} €`
+    ),
+    '',
+    'Con las facturas recibidas de ejemplo (gestoría 15 %, diseñadora 7 % y alquiler del local 19 %):',
+    '  Modelo 111: T1 776,00 € · T2 776,00 € · T3 1.076,00 €  (2 profesionales: 26,00 € al trimestre)',
+    '  Modelo 115: T1, T2 y T3 76,00 € (19 % de 400,00 € a 1 arrendador)',
+    '',
+  ].join('\n')
+);
+
 void (async () => {
   writeFileSync(join(templates, 'modelo-130-plantilla.pdf'), await model130());
   writeFileSync(join(templates, 'modelo-303-plantilla.pdf'), await model303());
+  writeFileSync(join(templates, 'modelo-111-plantilla.pdf'), await model111());
+  writeFileSync(join(templates, 'modelo-115-plantilla.pdf'), await model115());
+  // The 111 and the 115 of the second quarter of the example, filed: to try importing them.
+  const period = { 'dato.ejercicio': '2026', 'dato.periodo': '2T' };
+  writeFileSync(
+    join(examples, 'ejemplo-modelo-111-2T-2026.pdf'),
+    await model111({
+      ...period,
+      'dato.01': '2',
+      'dato.02': '7.500,00',
+      'dato.03': '750,00',
+      'dato.07': '2',
+      'dato.08': '200,00',
+      'dato.09': '26,00',
+      'dato.28': '776,00',
+      'dato.30': '776,00',
+    })
+  );
+  writeFileSync(
+    join(examples, 'ejemplo-modelo-115-2T-2026.pdf'),
+    await model115({
+      ...period,
+      'dato.01': '1',
+      'dato.02': '400,00',
+      'dato.03': '76,00',
+      'dato.05': '76,00',
+    })
+  );
   console.log('listo');
 })();

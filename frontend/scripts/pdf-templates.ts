@@ -1,7 +1,7 @@
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
 
 /**
- * The fillable PDFs of the modelos 130 and 303 that the app offers as templates. They follow the layout
+ * The fillable PDFs of the modelos 130, 303, 111 and 115 that the app offers as templates. They follow the layout
  * of the official forms where it matters to the reader: the box number printed first and, to its right,
  * the field for its amount, one box per line. Fill them in any PDF viewer and upload them in Autónomos.
  */
@@ -68,10 +68,14 @@ function drawRow(
   field.setFontSize(9);
 }
 
+/** What to write in the fields (`dato.01`, `dato.ejercicio`…), to make the filled examples. */
+export type Filled = Record<string, string>;
+
 async function build(
   headTitle: string[],
   intro: string[],
-  rows: (Row | string)[]
+  rows: (Row | string)[],
+  filled: Filled = {}
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -140,6 +144,7 @@ async function build(
       color: GREY,
     }
   );
+  for (const [name, value] of Object.entries(filled)) form.getTextField(name).setText(value);
   return doc.save();
 }
 
@@ -216,4 +221,60 @@ export const model303 = () =>
       { box: '60', label: 'Exportaciones y operaciones asimiladas (base)' },
       { box: '71', label: 'Resultado de la autoliquidación' },
     ]
+  );
+
+// Boxes and labels of the 111 and the 115 as the AEAT instructions and record layouts give them
+// (checked on 19 October 2026; sources in src/modules/finances/domain/withholdings.ts).
+export const model111 = (filled?: Filled) =>
+  build(
+    [
+      'Modelo 111 · plantilla de Finanverso',
+      'Retenciones e ingresos a cuenta. Rendimientos del trabajo y de actividades económicas,',
+      'premios y determinadas ganancias patrimoniales e imputaciones de renta · Autoliquidación',
+    ],
+    [
+      'Escribe los importes del trimestre en euros (7500 o 7.500,00) y el número de perceptores sin decimales.',
+      'Finanverso lee los empleados (01-06) y los profesionales (07-09); el resto es para que cuadre el modelo.',
+    ],
+    [
+      'I. Rendimientos del trabajo · dinerarios',
+      { box: '01', label: 'N.º perceptores' },
+      { box: '02', label: 'Importe de las percepciones' },
+      { box: '03', label: 'Importe de las retenciones' },
+      'Rendimientos del trabajo · en especie',
+      { box: '04', label: 'N.º perceptores' },
+      { box: '05', label: 'Valor percepciones en especie' },
+      { box: '06', label: 'Importe de los ingresos a cuenta' },
+      'II. Rendimientos de actividades económicas · dinerarios',
+      { box: '07', label: 'N.º perceptores' },
+      { box: '08', label: 'Importe de las percepciones' },
+      { box: '09', label: 'Importe de las retenciones' },
+      'Total liquidación',
+      { box: '28', label: 'Suma de retenciones e ingresos a cuenta' },
+      { box: '29', label: 'Resultado de anteriores declaraciones (solo complementaria)' },
+      { box: '30', label: 'Resultado a ingresar (28 - 29)' },
+    ],
+    filled
+  );
+
+export const model115 = (filled?: Filled) =>
+  build(
+    [
+      'Modelo 115 · plantilla de Finanverso',
+      'Retenciones e ingresos a cuenta. Rentas o rendimientos procedentes del',
+      'arrendamiento o subarrendamiento de inmuebles urbanos · Autoliquidación',
+    ],
+    [
+      'Escribe los importes del trimestre en euros y el número de arrendadores sin decimales.',
+      'La base es todo lo pagado al arrendador sin el IVA; la retención general es el 19 %.',
+    ],
+    [
+      'Liquidación',
+      { box: '01', label: 'Número de perceptores' },
+      { box: '02', label: 'Base de las retenciones e ingresos a cuenta' },
+      { box: '03', label: 'Retenciones e ingresos a cuenta' },
+      { box: '04', label: 'Resultado de anteriores declaraciones (solo complementaria)' },
+      { box: '05', label: 'Resultado a ingresar (03 - 04)' },
+    ],
+    filled
   );

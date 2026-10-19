@@ -25,6 +25,7 @@ const data: ManualData = {
       expenses: [
         { kind: 'rent', amount: 484, vatRate: 21 },
         { kind: 'management', amount: 181.5, vatRate: 21 },
+        { kind: 'other', amount: 60.5, vatRate: 21 },
         { kind: 'software', amount: 72.6, vatRate: 21 },
         { kind: 'supplies', amount: 96.8, vatRate: 21 },
         { kind: 'quota', amount: 882, vatRate: 0 },
@@ -35,6 +36,7 @@ const data: ManualData = {
       expenses: [
         { kind: 'rent', amount: 484, vatRate: 21 },
         { kind: 'management', amount: 181.5, vatRate: 21 },
+        { kind: 'other', amount: 60.5, vatRate: 21 },
         { kind: 'vehicle', amount: 145.2, vatRate: 21 },
         { kind: 'meals', amount: 60.5, vatRate: 10, days: 1 },
         { kind: 'quota', amount: 882, vatRate: 0 },
@@ -45,6 +47,7 @@ const data: ManualData = {
       expenses: [
         { kind: 'rent', amount: 484, vatRate: 21 },
         { kind: 'management', amount: 181.5, vatRate: 21 },
+        { kind: 'other', amount: 60.5, vatRate: 21 },
         { kind: 'advertising', amount: 363, vatRate: 21 },
         { kind: 'material', amount: 108.9, vatRate: 21 },
         { kind: 'quota', amount: 882, vatRate: 0 },
@@ -76,20 +79,20 @@ const box = (quarter: 1 | 2 | 3, id: string) =>
 
 describe('The example invoice books give the right modelos', () => {
   it('modelo 303: the VAT charged minus the VAT that can be deducted, quarter by quarter', () => {
-    // Q1: 5,300 × 21 % = 1,113 − (84 + 31.50 + 12.60) = 984.90
-    expect(draft(1).vat.amountDue).toBe(984.9);
-    // Q2: 5,000 × 21 % + 1,000 × 10 % = 1,150 − (84 + 31.50 + 12.60 car half + 2.42 meal) = 1,019.48
-    expect(draft(2).vat.amountDue).toBe(1019.48);
-    // Q3: 5,200 × 21 % + 600 × 4 % = 1,116 − (84 + 31.50 + 63 + 18.90) = 918.60
-    expect(draft(3).vat.amountDue).toBe(918.6);
+    // Q1: 5,300 × 21 % = 1,113 − (84 + 31.50 + 10.50 + 12.60) = 974.40
+    expect(draft(1).vat.amountDue).toBe(974.4);
+    // Q2: 5,000 × 21 % + 1,000 × 10 % = 1,150 − (84 + 31.50 + 10.50 + 12.60 car half + 2.42 meal) = 1,008.98
+    expect(draft(2).vat.amountDue).toBe(1008.98);
+    // Q3: 5,200 × 21 % + 600 × 4 % = 1,116 − (84 + 31.50 + 10.50 + 63 + 18.90) = 908.10
+    expect(draft(3).vat.amountDue).toBe(908.1);
   });
 
   it('modelo 130: accumulated income and expenses, previous payments and withholdings', () => {
-    // Q1: (5,300 − 1,492) × 20 % = 761.60 − 675 withheld = 86.60
+    // Q1: (5,300 − 1,542) × 20 % = 751.60 − 675 withheld = 76.60
     expect([box(1, '01'), box(1, '02'), box(1, '04'), box(1, '06'), box(1, '07')]).toEqual([
-      5300, 1492, 761.6, 675, 86.6,
+      5300, 1542, 751.6, 675, 76.6,
     ]);
-    // Q2: (11,300 − 2,948.25) × 20 % = 1,670.35 − 86.60 paid − 1,425 withheld = 158.75
+    // Q2: (11,300 − 3,048.25) × 20 % = 1,650.35 − 76.60 paid − 1,425 withheld = 148.75
     expect([
       box(2, '01'),
       box(2, '02'),
@@ -97,8 +100,8 @@ describe('The example invoice books give the right modelos', () => {
       box(2, '05'),
       box(2, '06'),
       box(2, '07'),
-    ]).toEqual([11300, 2948.25, 1670.35, 86.6, 1425, 158.75]);
-    // Q3: (17,100 − 4,770.25) × 20 % = 2,465.95 − 245.35 paid − 2,205 withheld = 15.60
+    ]).toEqual([11300, 3048.25, 1650.35, 76.6, 1425, 148.75]);
+    // Q3: (17,100 − 4,920.25) × 20 % = 2,435.95 − 225.35 paid − 2,205 withheld = 5.60
     expect([
       box(3, '01'),
       box(3, '02'),
@@ -106,6 +109,6 @@ describe('The example invoice books give the right modelos', () => {
       box(3, '05'),
       box(3, '06'),
       box(3, '07'),
-    ]).toEqual([17100, 4770.25, 2465.95, 245.35, 2205, 15.6]);
+    ]).toEqual([17100, 4920.25, 2435.95, 225.35, 2205, 5.6]);
   });
 });

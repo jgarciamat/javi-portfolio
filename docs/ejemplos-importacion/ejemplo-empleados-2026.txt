@@ -1,0 +1,12 @@
+Empleados del ejemplo (datos inventados), para escribirlos en Autónomos → paso 2 →
+«Retenciones que practicas (modelos 111 y 115)» → Empleados (modelo 111).
+Salen de las nóminas del trimestre: sueldos brutos y retenciones de IRPF.
+
+Trimestre  Nº de empleados  Sueldos brutos  Retenciones
+T1         2                7500 €          750 €
+T2         2                7500 €          750 €
+T3         3                10500 €         1050 €
+
+Con las facturas recibidas de ejemplo (gestoría 15 %, diseñadora 7 % y alquiler del local 19 %):
+  Modelo 111: T1 776,00 € · T2 776,00 € · T3 1.076,00 €  (2 profesionales: 26,00 € al trimestre)
+  Modelo 115: T1, T2 y T3 76,00 € (19 % de 400,00 € a 1 arrendador)

@@ -1,7 +1,7 @@
 import type { VatRate } from './types';
 
 /**
- * Reading the modelos 130 and 303 from a PDF, without knowing which version of the form it is.
+ * Reading the modelos 130, 303, 111 and 115 from a PDF, without knowing which version of the form it is.
  *
  * Every box of these forms is printed with its number, and its amount sits on the same line to the
  * right of it. That holds for the official fillable form (the number and the field are both widgets),
@@ -10,7 +10,7 @@ import type { VatRate } from './types';
  * amount with the box number that is nearest to its left on the same line.
  */
 
-export type TaxModel = '130' | '303';
+export type TaxModel = '130' | '303' | '111' | '115';
 
 /** A piece of the page: text or a form field, where it is (PDF points) and whether it is an amount. */
 export interface PdfToken {
@@ -34,8 +34,15 @@ export type TaxModelParse =
   | { ok: true; data: TaxModelPdf }
   | { ok: false; reason: 'unknownModel' | 'noBoxes' };
 
+const boxRange = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, i) => String(from + i).padStart(2, '0'));
+
 /** Boxes that exist on each form: a number outside them is a page number, a year or a percentage. */
 const BOXES: Record<TaxModel, Set<string>> = {
+  // Boxes 01-30 of the 111 and 01-05 of the 115, as the AEAT instructions and record layouts number
+  // them (checked on 19 October 2026; see domain/withholdings.ts).
+  '111': new Set(boxRange(1, 30)),
+  '115': new Set(boxRange(1, 5)),
   '130': new Set(Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(2, '0'))),
   '303': new Set([
     ...Array.from({ length: 46 }, (_, i) => String(i + 1).padStart(2, '0')),
@@ -132,6 +139,12 @@ function modelOf(tokens: PdfToken[]): TaxModel | null {
     .map((t) => t.text)
     .join(' ')
     .toLowerCase();
+  // The withholding forms first: their titles say «retenciones e ingresos a cuenta», as the box 06
+  // of the 130 does, so the 130 is told apart by what only the 111 and the 115 have.
+  if (/retenciones e ingresos a cuenta/.test(text)) {
+    if (/arrendamiento o subarrendamiento de inmuebles urbanos/.test(text)) return '115';
+    if (/rendimientos del trabajo/.test(text) && !/pago fraccionado/.test(text)) return '111';
+  }
   if (/impuesto sobre el valor a[ñn]adido/.test(text) && /autoliquidaci[oó]n/.test(text))
     return '303';
   if (
@@ -272,3 +285,42 @@ export function quarterFrom303(boxes: Record<string, number>): Quarter303 {
     ignored,
   };
 }
+
+/** What a filed modelo 111 says about the payees of its quarter. */
+export interface Quarter111 {
+  staff: {
+    people: number;
+    paid: number;
+    withheld: number;
+    kindPeople: number;
+    kindPaid: number;
+    kindWithheld: number;
+  };
+  pros: { people: number; paid: number; withheld: number };
+  /** Boxes the draft does not model (activities in kind, prizes, forestry gains, image rights). */
+  ignored: string[];
+}
+
+/** The employees (01-06) and professionals (07-09) of a filed modelo 111. */
+export function quarterFrom111(boxes: Record<string, number>): Quarter111 {
+  const b = (id: string) => box(boxes, id);
+  return {
+    staff: {
+      people: b('01'),
+      paid: b('02'),
+      withheld: b('03'),
+      kindPeople: b('04'),
+      kindPaid: b('05'),
+      kindWithheld: b('06'),
+    },
+    pros: { people: b('07'), paid: b('08'), withheld: b('09') },
+    ignored: boxRange(10, 27).filter((id) => b(id) !== 0),
+  };
+}
+
+/** The landlords, the base and the withholdings (01-03) of a filed modelo 115. */
+export const quarterFrom115 = (boxes: Record<string, number>) => ({
+  people: box(boxes, '01'),
+  paid: box(boxes, '02'),
+  withheld: box(boxes, '03'),
+});

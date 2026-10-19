@@ -1,10 +1,14 @@
 import { parseDecimal } from '@shared/utils/numbers';
 import {
+  retentionOf,
+  roleOf,
   withholdingsFor,
   type WithholdingQuarter,
   type WithholdingResult,
 } from '../../domain/withholdings';
+import { quarterFrom111, quarterFrom115, type TaxModelPdf } from '../../domain/taxModelPdf';
 import type { ManualForm } from './AutonomoManual';
+import type { Applied, Line } from './importFiles';
 
 /** The withholdings of a quarter typed by hand, as text so the fields can be edited freely. */
 export interface WithholdingForm {
@@ -119,4 +123,79 @@ export function withWithholding(
       i === quarter - 1 ? { ...w, ...patch } : w
     ),
   };
+}
+
+/** Money and counts as the form's text fields take them: nothing for a zero. */
+const text = (n: number): string => (n === 0 ? '' : String(n));
+
+/**
+ * A filed modelo 111 or 115 fills the withholdings of its quarter, marked as imported: the received
+ * invoices of that quarter no longer add to that form (the one filed stands), and the lines say so.
+ */
+export function importWithholdingModel(
+  form: ManualForm,
+  data: TaxModelPdf,
+  year: number,
+  quarter: 1 | 2 | 3 | 4
+): Applied {
+  const m111 = data.model === '111';
+  let patch: Partial<WithholdingForm>;
+  let ignored: string[] = [];
+  if (m111) {
+    const found = quarterFrom111(data.boxes);
+    const s = found.staff;
+    patch = {
+      staff: {
+        people: text(s.people),
+        paid: text(s.paid),
+        withheld: text(s.withheld),
+        kindPeople: text(s.kindPeople),
+        kindPaid: text(s.kindPaid),
+        kindWithheld: text(s.kindWithheld),
+      },
+      pros: {
+        people: text(found.pros.people),
+        paid: text(found.pros.paid),
+        withheld: text(found.pros.withheld),
+      },
+      filed111: true,
+    };
+    ignored = found.ignored;
+  } else {
+    const found = quarterFrom115(data.boxes);
+    patch = {
+      rent: { people: text(found.people), paid: text(found.paid), withheld: text(found.withheld) },
+      filed115: true,
+    };
+  }
+  // The invoices of the quarter whose withholdings this form now stands for.
+  const role = m111 ? 'professional' : 'rent';
+  const replaced = form.invoices.some(
+    (i) =>
+      i.book === 'received' &&
+      !i.excluded &&
+      i.quarter === quarter &&
+      roleOf(i) === role &&
+      retentionOf(i) !== 0
+  );
+  const lines: Line[] = [
+    {
+      tone: 'done',
+      key: `app.autonomo.model.done.${data.model}`,
+      values: { year, quarter },
+    },
+    ...(replaced
+      ? [{ tone: 'note' as const, key: 'app.autonomo.model.note.filed', values: { quarter } }]
+      : []),
+    ...(ignored.length > 0
+      ? [
+          {
+            tone: 'note' as const,
+            key: 'app.autonomo.model.note.ignored111',
+            values: { boxes: ignored.join(', ') },
+          },
+        ]
+      : []),
+  ];
+  return { form: withWithholding(form, quarter, patch), period: { year, quarter }, lines };
 }

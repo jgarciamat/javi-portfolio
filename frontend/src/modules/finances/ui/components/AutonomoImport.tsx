@@ -25,11 +25,13 @@ const TEMPLATES = [
   ['received', '/plantillas/facturas-recibidas.xlsx'],
   ['130', '/plantillas/modelo-130-plantilla.pdf'],
   ['303', '/plantillas/modelo-303-plantilla.pdf'],
+  ['111', '/plantillas/modelo-111-plantilla.pdf'],
+  ['115', '/plantillas/modelo-115-plantilla.pdf'],
 ] as const;
 
 const isPdf = (file: File) => /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
 
-/** The four templates, each a download link. */
+/** The templates, each a download link. */
 function TemplateLinks() {
   const { t } = useI18n();
   return (

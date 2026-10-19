@@ -8,6 +8,7 @@ import { mergeInvoices, toInvoices, type KindPreferences } from '../../domain/in
 import type { TaxModelParse } from '../../domain/taxModelPdf';
 import { applyInvoices, applyModel130, applyModel303 } from './importForm';
 import type { ManualForm } from './AutonomoManual';
+import { importWithholdingModel } from './withholdingForm';
 
 export type Sheets = { name: string; rows: BookCell[][] }[];
 
@@ -134,6 +135,8 @@ export function importModel(
   const { data } = parsed as Extract<TaxModelParse, { ok: true }>;
   const quarter = data.quarter as 1 | 2 | 3 | 4;
   const at = data.year ?? year;
+  if (data.model === '111' || data.model === '115')
+    return importWithholdingModel(form, data, at, quarter);
   if (data.model === '130') {
     return {
       form: applyModel130(form, data, at, quarter as 1 | 2 | 3),
