@@ -60,8 +60,9 @@ Notas:
 - No se dan tipos actuales: los ejemplos usan tipos redondos (2 %, 3 %) y se remite a
   «Resultado últimas subastas» de tesoro.es.
 
-## Pendiente fuera de este trabajo
+## En la Renta de la app
 
-- `frontend/src/modules/tools/domain/invest/ledger.ts` y `rentaGains.ts` (Renta, de otro agente)
-  llevan las Letras a la casilla 0031; el esquema oficial de 2025 tiene la 0030 para Letras. Y
-  `docs/fiscalidad/inversiones.md` (línea de «Letras del Tesoro y bonos») dice 0031.
+- El importador de inversiones y el planificador llevan las Letras del Tesoro a la casilla 0030,
+  la venta o amortización de bonos y obligaciones a la 0031 y los cupones a la 0027
+  (`frontend/src/modules/tools/domain/invest/ledger.ts`, `rentaGains.ts`;
+  `docs/fiscalidad/inversiones.md`).

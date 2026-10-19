@@ -84,7 +84,8 @@ Código:
 | Plataforma quebrada o monedas perdidas | Manual Renta 2025 (art. 14.2.k): no es pérdida automática | Aviso; la pérdida va a la base general solo en los supuestos de la ley |
 | **Traspasos entre fondos** | Art. 94.1.a | Sin tributar; las nuevas participaciones conservan coste y fechas; no vale para ETF (aviso) |
 | **Regla antiaplicación de pérdidas** | Art. 33.5.f (dos meses, valores cotizados) y 33.5.g (un año, no cotizados) | Acciones y ETF: 2 meses; **fondos: 1 año** (participaciones no admitidas a negociación); cripto: solo aviso (NO CONFIRMADO) |
-| Letras del Tesoro y bonos | Art. 25.2.b | Rendimiento del capital (casilla 0031) con FIFO |
+| Letras del Tesoro | Art. 25.2.b; RIRPF art. 75.3.b (sin retención) | Rendimiento del capital mobiliario (no ganancia) con FIFO, casilla 0030, también la venta antes del vencimiento. Se reconocen por la clase «Letra del Tesoro», por el ISIN de las Letras (`ES0L…`) o por el nombre («Letra», «Letras del Tesoro») en la clase de bono |
+| Bonos, obligaciones y otra renta fija | Art. 25.2.b; RIRPF art. 75.3.e | Venta o amortización: rendimiento del capital mobiliario con FIFO, casilla 0031 (los T-Bills de EE. UU. de IBKR también: no son Letras del Tesoro); cupones: intereses, casilla 0027 con retención del 19 % (0597). Una retención que traiga el archivo en la venta va a la 0597, no a la 0603 |
 | Derivados, CFD, posiciones apalancadas | Arts. 46.b y 49 (NO CONFIRMADO) | Una ganancia o pérdida por posición, del año del cierre, en la base del ahorro |
 | Dividendos e intereses | Casillas 0029 y 0027; retenciones españolas 0597; de fondos 0603 | Retención en origen como impuesto extranjero |
 | Doble imposición internacional | Art. 80; casilla 0588 | La menor de lo pagado fuera y el tipo medio efectivo del ahorro sobre esa renta (la cuota líquida del ahorro en la parte que dejan las deducciones). El límite del convenio (a menudo el 15 %) se avisa, no se aplica por país |
