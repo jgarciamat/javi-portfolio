@@ -139,6 +139,31 @@ Pasos (solo los que aplican a lo importado; todos si no hay nada): papeles; borr
 - **Posicionamiento**: los textos dicen que Finanverso prepara datos y cálculos y no presenta ni representa; la revisión por un gestor colegiado se recomienda.
 - **Validación con archivos reales** (sin subir nada): `cd frontend && npm run validar-archivo -- <ruta>`. Lee CSV, XLSX, JSON o PDF con el mismo importador (y los tipos del BCE de `public/ecb-rates.json`) y muestra solo el formato detectado, operaciones por tipo y clase, resultado por año, avisos y las columnas de lo no reconocido. Nunca imprime nombres, identificadores ni filas. Lógica en `domain/invest/validate.ts`.
 
+## 6 ter. Cómo se pasa a Renta WEB (19-10-2026)
+
+Renta WEB **no importa** ganancias ni pérdidas: se teclean en las ventanas del apartado F2, una «alta» cada vez (investigación completa en [como-declarar-cripto-y-fondos.md](como-declarar-cripto-y-fondos.md)). Lo que hace la app (`domain/invest/rentaWeb.ts`, etiquetas en `data/renta/web/ventanas-2025.json`):
+
+- **Una alta por activo × clave × signo** (E1 corregido): las ventas con ganancia y con pérdida van en altas distintas, así los totales 1813/1814, 0324/0325, 2235/2236, 0339/0340 y 0385/0386 coinciden con declarar venta a venta (lo comprueba un test contra `summaryOf` en todos los casos inventados). Una pérdida que espera por recompra va en su propia alta con la marca; si espera solo en parte, se divide.
+- **ETF y SICAV índice** en su propio subapartado desde 2025 (2225-2236, con NIF, denominación de 40 caracteres e ISIN) (E2 corregido).
+- **Cripto:** denominación (25), tipo de contraprestación con las cuatro claves F, N, O y B, importe y gastos de la transmisión y de la adquisición (la app pone el neto en «Importe» y 0 en «Gastos»: el resultado es el mismo).
+- **Límites** de `Renta2025.xsd` (cripto 300, fondos 60, ETF 200, acciones 200 emisores, otros elementos 80): si no caben se unen signos del mismo activo y, después, se agrupa por activo; en otros elementos, por instrumento con la primera apertura y el último cierre. Cada paso se avisa.
+- **Avisos:** «puede venir ya en tus datos fiscales» (fondos de entidad española o ISIN ES), Cartera de Valores incompatible con el relleno a mano, ETF en su apartado, ventas agrupadas.
+- **Entregables:** `Finanverso-Renta-<año>-copiar-en-Renta-WEB.xlsx` (pestañas 0 Cómo usar, 1 Fondos, 2 ETF, 3 Acciones, 4 Monedas virtuales, 5 Otros elementos, 6 Totales por casilla, 7 Detalle por operación, 8 Rendimientos, 9 Por año; solo las que tienen datos) y el mismo contenido en PDF. Se descargan desde «Mis inversiones» y desde el resultado.
+- **Modo «Copiar a Renta WEB»:** alta por alta, cada campo con su etiqueta oficial y botón «Copiar» (importes con coma decimal y sin separador de miles: `1234,56`), progreso, marca de hecho (se recuerda en el dispositivo), vuelta atrás, cómo abrir cada ventana y enlace a la ayuda de la sede; al final, los totales que debe mostrar Renta WEB.
+
+**Pruebas que debe hacer el dueño** en Renta WEB Open 2025 (no pide identificarse ni presenta nada):
+
+1. F2 → monedas virtuales → «Alta»: comprobar que etiquetas y orden coinciden con la pestaña «4 Monedas virtuales» y anotar las cuatro opciones del desplegable tal como se leen.
+2. Pegar `1234,56`, `1.234,56` y `1234.56` en «Importe de la transmisión» y anotar cuáles acepta (el botón «Copiar» usa `1234,56`).
+3. Dos altas de BTC (una con ganancia y otra con pérdida): comprobar que 1813 y 1814 muestran cada una lo suyo.
+4. Comprobar que existe el subapartado de ETF (2225-2236) y qué deja poner en el NIF de un ETF extranjero (vacío, ISIN, NIF extranjero). Hoy la app lo deja vacío.
+5. Acciones: marcar y desmarcar «Cartera de Valores» y ver cuántas transacciones admite una entidad y si pide el nombre o deja buscar por ISIN.
+6. Fondos: ver si el NIF es obligatorio para un fondo extranjero sin NIF español.
+7. Otros elementos: crear una alta con la opción 4 y comprobar qué fechas exige.
+8. Límite: con el botón de copiar alta (si aparece), duplicar altas de cripto hasta comprobar si se para en 300.
+9. En su Renta WEB real (sin presentar): ver cómo aparecen sus fondos y el aviso CR2 en los datos fiscales, y si se incorporan con valor de adquisición.
+10. Guardar en Renta WEB Open, cerrar y «Cargar» el .ses para ver que se recupera. No subir ese fichero al repositorio: lleva datos personales.
+
 ## 7. Pruebas
 
 - `frontend/src/__tests__/tools/invest/`: un archivo inventado por plataforma (`formats.test.ts`), el motor con cifras a mano (`ledger.test.ts`), lectores, mapeo, PDF, informe y guía (`readers.test.ts`), lectura de archivos y descargas (`investImport.test.ts`) y la pantalla (`investImportUi.test.tsx`).
