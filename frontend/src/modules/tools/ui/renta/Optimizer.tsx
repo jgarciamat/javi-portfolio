@@ -235,7 +235,7 @@ export function Optimizer({
             {archived.map((id) => (
               <li key={id}>
                 <span className="renta-review-out-title">{t(`${k(id)}.title`)}</span>{' '}
-                <button type="button" className="btn-link" onClick={() => ask(id)}>
+                <button type="button" className="btn-secondary" onClick={() => ask(id)}>
                   {t('tools.renta.opt.askAgain')}
                 </button>
               </li>
