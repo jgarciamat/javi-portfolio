@@ -35,7 +35,7 @@ export const user = (over: Partial<AuthUser> = {}): AuthUser => ({
   id: 'u1',
   email: 'ana@example.com',
   name: 'Ana',
-  avatarUrl: null,
+  avatar: null,
   hasPassword: true,
   ...over,
 });

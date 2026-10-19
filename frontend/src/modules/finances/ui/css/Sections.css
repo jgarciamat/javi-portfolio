@@ -860,12 +860,18 @@
   text-align: center;
 }
 
+/* The emoji avatar of the user, in a thin ring like the profile one. */
 .burger-nav-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--section-color);
+  border: 1px solid var(--slate-700);
+  background: var(--slate-800);
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .burger-nav-label {

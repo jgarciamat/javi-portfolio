@@ -163,7 +163,7 @@ describe('auth edge cases', () => {
       authenticated: false,
       finances: false,
     });
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.profile.name.label')) }));
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.edit') }));
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.profile.name.label') }), {
       target: { value: 'Ana' },
     });
@@ -462,9 +462,9 @@ describe('dashboard edge cases', () => {
     api.categoryApi.create.mockResolvedValue(f.category({ id: 'c2', name: 'Viajes' }));
     api.categoryApi.update.mockResolvedValue(f.category({ id: 'c1', name: 'Diversión' }));
     api.billingApi.get.mockResolvedValue(f.billing({ trialDaysLeft: 2, subscription: { ...sub } }));
-    renderWithProviders(<Dashboard />, { api, plan: true, user: f.user({ avatarUrl: 'data:x' }) });
+    renderWithProviders(<Dashboard />, { api, plan: true, user: f.user({ avatar: '🦊' }) });
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
-    expect(document.querySelector('img.burger-nav-avatar')).not.toBeNull();
+    expect(document.querySelector('.burger-nav-avatar')).toHaveTextContent('🦊');
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.close') }));
 
     // Trial reminder → plan section.

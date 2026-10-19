@@ -48,7 +48,7 @@ interface AuthContextValue {
   logoutEverywhere: () => Promise<void>;
   updateName: (name: string) => Promise<void>;
   updatePassword: (currentPassword: string | undefined, newPassword: string) => Promise<void>;
-  updateAvatar: (avatarDataUrl: string | null) => Promise<void>;
+  updateAvatar: (avatar: string | null) => Promise<void>;
 }
 
 const AuthContext = stableContext<AuthContextValue | null>('AuthContext', null);
@@ -235,8 +235,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const updateAvatar = useCallback(
-    async (avatarDataUrl: string | null) =>
-      updateUser({ avatarUrl: (await authApi.updateAvatar(avatarDataUrl)).avatarUrl }),
+    async (avatar: string | null) =>
+      updateUser({ avatar: (await authApi.updateAvatar(avatar)).avatar }),
     [updateUser]
   );
 

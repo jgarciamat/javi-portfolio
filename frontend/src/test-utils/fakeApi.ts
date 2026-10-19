@@ -23,7 +23,7 @@ function fakeAuthApi(): FakeApi['authApi'] {
     resetPassword: ok({ message: 'ok' }),
     updateName: ok({ name: 'Ana' }),
     updatePassword: ok({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' }),
-    updateAvatar: ok({ avatarUrl: null }),
+    updateAvatar: ok({ avatar: null }),
     deleteAccount: ok(undefined),
     verifyTwoFactor: ok({ accessToken: 'a', refreshToken: 'r', user: f.user() }),
     twoFactorStatus: ok({ enabled: false, enabledAt: null, recoveryCodesRemaining: 0 }),

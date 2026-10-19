@@ -200,7 +200,19 @@ function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
           onDelete={finances.removeCategory}
         />
       )}
-      {dash.showProfile && <ProfilePage onClose={dash.closeProfile} />}
+      {dash.showProfile && (
+        <ProfilePage
+          onClose={dash.closeProfile}
+          onOpenSettings={() => {
+            dash.closeProfile();
+            dash.setTab('settings');
+          }}
+          onOpenPlan={() => {
+            dash.closeProfile();
+            dash.setTab('plan');
+          }}
+        />
+      )}
       {dash.showImport && (
         <ImportModal
           accounts={finances.accounts}

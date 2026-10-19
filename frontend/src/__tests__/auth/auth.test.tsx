@@ -12,7 +12,7 @@ import { ResetPasswordPage } from '@modules/auth/ui/ResetPasswordPage';
 import { VerifyEmailPage } from '@modules/auth/ui/VerifyEmailPage';
 import { TermsPage } from '@modules/billing/ui/TermsPage';
 import { AuthPage } from '@shared/components/AuthPage';
-import { emojiAvatar } from '@modules/auth/domain/avatar';
+import { AVATAR_CHOICES, DEFAULT_AVATAR } from '@modules/auth/domain/avatar';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -413,18 +413,15 @@ describe('static pages', () => {
 describe('ProfilePage', () => {
   function setup(user = f.user(), api = createFakeApi(), plan = false) {
     const onClose = jest.fn();
-    const view = renderWithProviders(<ProfilePage onClose={onClose} />, {
-      api,
-      finances: false,
-      user,
-      plan,
-    });
-    return { ...view, onClose };
+    const onOpenSettings = jest.fn();
+    const onOpenPlan = jest.fn();
+    const view = renderWithProviders(
+      <ProfilePage onClose={onClose} onOpenSettings={onOpenSettings} onOpenPlan={onOpenPlan} />,
+      { api, finances: false, user, plan }
+    );
+    return { ...view, onClose, onOpenSettings, onOpenPlan };
   }
   const openDeletion = () => {
-    fireEvent.click(
-      screen.getByRole('button', { name: new RegExp(tr('app.profile.settings.title')) })
-    );
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.profile.deleteAccount.button')) })
     );
@@ -432,44 +429,70 @@ describe('ProfilePage', () => {
   };
   const confirmButton = (dialog: HTMLElement) =>
     within(dialog).getByRole('button', { name: tr('app.profile.deleteAccount.modal.confirm') });
-  const openPasswordSection = () =>
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: new RegExp(tr('app.profile.password.label')),
-        expanded: false,
-      })
-    );
+  const openPasswordSection = (label = tr('app.profile.password.change')) =>
+    fireEvent.click(screen.getByRole('button', { name: label, expanded: false }));
+  const avatarButton = (emoji: string) =>
+    screen.getByRole('button', { name: tr('app.profile.avatar.preset', { emoji }) });
   const passwordForm = () => document.querySelector('form.profile-password-form')!;
 
-  it('opens one section at a time and closes', () => {
-    const { onClose } = setup();
-    const avatar = screen.getByRole('button', { name: new RegExp(tr('app.profile.avatar.label')) });
-    expect(avatar).toHaveAttribute('aria-expanded', 'true');
-    fireEvent.click(avatar);
-    expect(avatar).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.profile.name.label')) }));
-    expect(screen.getByRole('textbox', { name: tr('app.profile.name.label') })).toBeInTheDocument();
+  it('shows the identity with the email locked, and no picture upload or code', () => {
+    const { onClose } = setup(f.user({ name: 'Ana', email: 'ana@example.com' }));
+    const panel = screen.getByRole('dialog', { name: tr('app.profile.title') });
+    expect(within(panel).getAllByText('Ana')).toHaveLength(2);
+    expect(within(panel).getByText('ana@example.com')).toBeInTheDocument();
+    expect(within(panel).getByTitle(tr('app.profile.email.locked'))).toBeInTheDocument();
+    // No avatar saved: the default emoji, and none of the choices is marked.
+    expect(panel.querySelector('.profile-avatar-lg')).toHaveTextContent(DEFAULT_AVATAR);
+    expect(panel.querySelector('input[type="file"]')).toBeNull();
+    expect(panel.querySelector('img')).toBeNull();
+    expect(within(panel).queryByRole('textbox')).toBeNull();
+    for (const emoji of AVATAR_CHOICES) {
+      expect(avatarButton(emoji)).toHaveAttribute('aria-pressed', 'false');
+    }
+    // Without a known plan there is no plan row.
+    expect(screen.queryByText(tr('app.profile.plan.label'))).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('app.common.close') }));
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('renames the user', async () => {
+  it('renames the user in place', async () => {
     const update = jest
       .spyOn(authApi, 'updateName')
       .mockResolvedValueOnce({ name: 'Ana María' })
       .mockRejectedValueOnce('x');
     setup();
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.profile.name.label')) }));
+    const edit = screen.getByRole('button', { name: tr('app.profile.name.edit') });
+    fireEvent.click(edit);
     const input = screen.getByRole('textbox', { name: tr('app.profile.name.label') });
+    expect(input).toHaveFocus();
     const save = screen.getByRole('button', { name: tr('app.profile.name.save') });
     expect(save).toBeDisabled();
-    fireEvent.change(input, { target: { value: ' Ana María ' } });
-    fireEvent.click(save);
+    // Cancelling drops the change and gives the focus back to the pencil.
+    fireEvent.change(input, { target: { value: 'Borrador' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.common.cancel') }));
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('button', { name: tr('app.profile.name.edit') })).toHaveFocus();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.edit') }));
+    expect(screen.getByRole('textbox', { name: tr('app.profile.name.label') })).toHaveValue(
+      f.user().name
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.profile.name.label') }), {
+      target: { value: ' Ana María ' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.save') }));
     expect(await screen.findByText(tr('app.profile.name.saved'))).toBeInTheDocument();
     expect(update).toHaveBeenCalledWith('Ana María');
-    fireEvent.change(input, { target: { value: 'Otra' } });
-    fireEvent.click(save);
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getAllByText('Ana María')).toHaveLength(2);
+    // A failed save keeps the form open with the error.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.edit') }));
+    expect(screen.queryByText(tr('app.profile.name.saved'))).toBeNull();
+    fireEvent.change(screen.getByRole('textbox', { name: tr('app.profile.name.label') }), {
+      target: { value: 'Otra' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.save') }));
     expect(await screen.findByText(tr('app.profile.name.error'))).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: tr('app.profile.name.label') })).toBeInTheDocument();
   });
 
   it('changes the password after validating it', async () => {
@@ -552,7 +575,8 @@ describe('ProfilePage', () => {
       .spyOn(authApi, 'updatePassword')
       .mockResolvedValue({ message: 'ok', accessToken: 'a2', refreshToken: 'r2' });
     setup(f.user({ hasPassword: false }));
-    openPasswordSection();
+    expect(screen.getByText(tr('app.profile.password.none'))).toBeInTheDocument();
+    openPasswordSection(tr('app.profile.password.create'));
     expect(screen.getByText(tr('app.profile.password.setFirst'))).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(tr('app.profile.password.new')), {
       target: { value: STRONG },
@@ -564,92 +588,114 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(update).toHaveBeenCalledWith(undefined, STRONG));
   });
 
-  it('changes the avatar with a preset or a picture', async () => {
-    const update = jest
-      .spyOn(authApi, 'updateAvatar')
-      .mockImplementation(async (url) => ({ avatarUrl: url }));
+  it('saves the avatar as soon as it is picked', async () => {
+    let answer: (value: { avatar: string | null }) => void = () => undefined;
+    const update = jest.spyOn(authApi, 'updateAvatar').mockImplementation(
+      (avatar) =>
+        new Promise((resolve) => {
+          answer = resolve;
+          void avatar;
+        })
+    );
     setup();
-    fireEvent.click(
-      screen.getByRole('button', { name: tr('app.profile.avatar.preset', { emoji: '🦊' }) })
-    );
-    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.avatar.save') }));
-    expect(await screen.findByText(tr('app.profile.avatar.saved'))).toBeInTheDocument();
-    expect(update).toHaveBeenCalledWith(emojiAvatar('🦊'));
-    expect(screen.queryByRole('button', { name: tr('app.profile.avatar.save') })).toBeNull();
-
-    const input = screen.getByLabelText(tr('app.profile.avatar.upload'), { selector: 'input' });
-    fireEvent.change(input, {
-      target: { files: [new File(['x'], 'a.txt', { type: 'text/plain' })] },
-    });
-    expect(await screen.findByText(tr('app.profile.avatar.errorType'))).toBeInTheDocument();
-    const big = new File(['x'], 'a.png', { type: 'image/png' });
-    Object.defineProperty(big, 'size', { value: 3_000_000 });
-    fireEvent.change(input, { target: { files: [big] } });
-    expect(await screen.findByText(tr('app.profile.avatar.errorSize'))).toBeInTheDocument();
-    fireEvent.change(input, {
-      target: { files: [new File(['png'], 'a.png', { type: 'image/png' })] },
-    });
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: tr('app.profile.avatar.save') })
-      ).toBeInTheDocument()
-    );
-    fireEvent.change(input, { target: { files: [] } });
-    const click = jest
-      .spyOn(HTMLInputElement.prototype, 'click')
-      .mockImplementation(() => undefined);
-    fireEvent.click(
-      screen.getByRole('button', { name: new RegExp(tr('app.profile.avatar.upload')) })
-    );
-    expect(click).toHaveBeenCalled();
+    fireEvent.click(avatarButton('🦊'));
+    expect(update).toHaveBeenCalledWith('🦊');
+    // Shown as chosen while it saves; another click waits for the answer.
+    expect(avatarButton('🦊')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(avatarButton('🐼'));
+    expect(update).toHaveBeenCalledTimes(1);
+    await act(async () => answer({ avatar: '🦊' }));
+    expect(await screen.findByRole('status')).toHaveTextContent(tr('app.profile.avatar.saved'));
+    expect(document.querySelector('.profile-avatar-lg')).toHaveTextContent('🦊');
+    // The one already saved is not sent again.
+    fireEvent.click(avatarButton('🦊'));
+    expect(update).toHaveBeenCalledTimes(1);
   });
 
-  it('takes a picture dropped on the avatar box', async () => {
-    setup();
-    const zone = screen
-      .getByRole('button', { name: new RegExp(tr('app.profile.avatar.upload')) })
-      .closest('.file-drop-zone') as HTMLElement;
-    fireEvent.drop(zone, {
-      dataTransfer: {
-        types: ['Files'],
-        files: [new File(['png'], 'a.png', { type: 'image/png' })],
-      },
-    });
-    expect(
-      await screen.findByRole('button', { name: tr('app.profile.avatar.save') })
-    ).toBeInTheDocument();
+  it('reports a failed save and goes back to the saved avatar', async () => {
+    jest.spyOn(authApi, 'updateAvatar').mockRejectedValue(new Error('Sin conexión'));
+    setup(f.user({ avatar: '🦉' }));
+    fireEvent.click(avatarButton('🐼'));
+    expect(await screen.findByText('Sin conexión')).toBeInTheDocument();
+    expect(avatarButton('🐼')).toHaveAttribute('aria-pressed', 'false');
+    expect(avatarButton('🦉')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('reports unreadable pictures and failed saves', async () => {
-    jest.spyOn(authApi, 'updateAvatar').mockRejectedValue(new Error('Imagen enorme'));
-    const reader = jest
-      .spyOn(FileReader.prototype, 'readAsDataURL')
-      .mockImplementationOnce(function (this: FileReader) {
-        Object.defineProperty(this, 'error', { value: new Error('broken') });
-        this.onerror?.(new ProgressEvent('error') as ProgressEvent<FileReader>);
-      });
+  it('keeps showing a saved avatar that is no longer offered', () => {
+    setup(f.user({ avatar: '🤖' }));
+    const saved = avatarButton('🤖');
+    expect(saved).toHaveAttribute('aria-pressed', 'true');
+    expect(saved).toHaveAttribute('tabindex', '0');
+    expect(document.querySelector('.profile-avatar-lg')).toHaveTextContent('🤖');
+  });
+
+  it('moves through the avatar grid with the arrows, Home and End', () => {
     setup();
-    const input = screen.getByLabelText(tr('app.profile.avatar.upload'), { selector: 'input' });
-    fireEvent.change(input, {
-      target: { files: [new File(['png'], 'a.png', { type: 'image/png' })] },
-    });
-    expect(await screen.findByText(tr('app.profile.avatar.errorType'))).toBeInTheDocument();
-    reader.mockRestore();
-    fireEvent.click(
-      screen.getByRole('button', { name: tr('app.profile.avatar.preset', { emoji: '🐼' }) })
-    );
-    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.avatar.save') }));
-    expect(await screen.findByText('Imagen enorme')).toBeInTheDocument();
+    const all = () =>
+      within(screen.getByRole('group', { name: tr('app.profile.avatar.label') })).getAllByRole(
+        'button'
+      );
+    const [first] = all();
+    // One Tab stop: the first one while none is chosen.
+    expect(all().filter((b) => b.tabIndex === 0)).toEqual([first]);
+    first.focus();
+    fireEvent.keyDown(first, { key: 'ArrowRight' });
+    expect(all()[1]).toHaveFocus();
+    expect(all()[1]).toHaveAttribute('tabindex', '0');
+    fireEvent.keyDown(all()[1], { key: 'ArrowDown' });
+    expect(all()[9]).toHaveFocus();
+    fireEvent.keyDown(all()[9], { key: 'ArrowUp' });
+    expect(all()[1]).toHaveFocus();
+    fireEvent.keyDown(all()[1], { key: 'ArrowLeft' });
+    fireEvent.keyDown(all()[0], { key: 'ArrowLeft' });
+    expect(all()[0]).toHaveFocus();
+    fireEvent.keyDown(all()[0], { key: 'End' });
+    expect(all()[AVATAR_CHOICES.length - 1]).toHaveFocus();
+    fireEvent.keyDown(all()[AVATAR_CHOICES.length - 1], { key: 'ArrowDown' });
+    expect(all()[AVATAR_CHOICES.length - 1]).toHaveFocus();
+    fireEvent.keyDown(all()[AVATAR_CHOICES.length - 1], { key: 'Home' });
+    expect(all()[0]).toHaveFocus();
+    // Other keys are left to the button (Enter and Space pick it).
+    fireEvent.keyDown(all()[0], { key: 'a' });
+    expect(all()[0]).toHaveFocus();
+  });
+
+  it('shows the plan and links to the plan, the settings and signing out', async () => {
+    const api = createFakeApi();
+    const { onOpenPlan, onOpenSettings } = setup(f.user(), api, true);
+    expect(await screen.findByText(tr('app.profile.plan.label'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.plan.open') }));
+    expect(onOpenPlan).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.settings.title') }));
+    expect(onOpenSettings).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.logout') }));
+    await waitFor(() => expect(localStorage.getItem('mm_token')).toBeNull());
+  });
+
+  it('shows the free plan', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'free' }));
+    setup(f.user(), api, true);
+    expect(await screen.findByText(tr('billing.free'))).toBeInTheDocument();
+  });
+
+  it('folds the password form in and out', () => {
+    setup();
+    expect(passwordForm()).toBeNull();
+    openPasswordSection();
+    const toggle = screen.getByRole('button', { name: tr('app.profile.password.change') });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(passwordForm()).not.toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(passwordForm()).toBeNull();
   });
 
   it('deletes the account after confirming', async () => {
-    const { api, onClose } = setup(f.user({ avatarUrl: 'data:image/png;base64,x' }));
+    const { api, onClose } = setup(f.user({ avatar: '🦊' }));
     api.authApi.deleteAccount
       .mockRejectedValueOnce(new Error('No se pudo borrar'))
       .mockRejectedValueOnce('x');
-    fireEvent.click(
-      screen.getByRole('button', { name: new RegExp(tr('app.profile.settings.title')) })
-    );
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.profile.deleteAccount.button')) })
     );
@@ -772,9 +818,6 @@ describe('ProfilePage', () => {
 
   it('cancels the account deletion', () => {
     setup();
-    fireEvent.click(
-      screen.getByRole('button', { name: new RegExp(tr('app.profile.settings.title')) })
-    );
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(tr('app.profile.deleteAccount.button')) })
     );

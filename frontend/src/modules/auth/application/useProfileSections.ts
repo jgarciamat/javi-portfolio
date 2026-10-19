@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@shared/hooks/useAuth';
 import { useI18n } from '@core/i18n/I18nContext';
 import { ApiError } from '@core/api/http';
 import { errorMessage } from '@shared/utils/errors';
 import { validatePassword } from '@modules/auth/domain/passwordValidation';
-import { AVATAR_MAX_BYTES, emojiAvatar } from '@modules/auth/domain/avatar';
+import { avatarChoices } from '@modules/auth/domain/avatar';
 
 export interface StatusMsg {
   ok: boolean;
@@ -39,19 +39,25 @@ function useStatus(okKey: string, errorKey: string) {
   return { loading, message, setMessage, run };
 }
 
-export function useNameSection() {
+/** The name, edited in place: `onSaved` runs once the new one is stored. */
+export function useNameSection(onSaved: () => void) {
   const { user, updateName } = useAuth();
   const [name, setName] = useState(user?.name ?? '');
   const status = useStatus('app.profile.name.saved', 'app.profile.name.error');
 
   const handleNameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await status.run(() => updateName(name.trim()));
+    if (await status.run(() => updateName(name.trim()))) onSaved();
   };
 
   return {
     name,
     setName,
+    /** Starts editing again from the saved name, with no message left. */
+    reset: () => {
+      setName(user?.name ?? '');
+      status.setMessage(null);
+    },
     unchanged: name.trim() === (user?.name ?? '') || !name.trim(),
     loading: status.loading,
     message: status.message,
@@ -118,59 +124,26 @@ export function usePasswordSection() {
   };
 }
 
-/** Reads a picture as a data URL. */
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
-
+/** The emoji avatar: picking one saves it at once. */
 export function useAvatarSection() {
   const { user, updateAvatar } = useAuth();
-  const { t } = useI18n();
-  const saved = user?.avatarUrl ?? null;
-  const [preview, setPreview] = useState<string | null>(saved);
+  const saved = user?.avatar ?? null;
+  /** The one being saved: shown as selected until the API answers. */
+  const [pending, setPending] = useState<string | null>(null);
   const status = useStatus('app.profile.avatar.saved', 'app.profile.avatar.error');
 
-  useEffect(() => setPreview(saved), [saved]);
-
-  const pickPreset = (emoji: string) => {
-    setPreview(emojiAvatar(emoji));
-    status.setMessage(null);
-  };
-
-  const pickFile = async (file: File | undefined) => {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      status.setMessage({ ok: false, text: t('app.profile.avatar.errorType') });
-      return;
-    }
-    if (file.size > AVATAR_MAX_BYTES) {
-      status.setMessage({ ok: false, text: t('app.profile.avatar.errorSize') });
-      return;
-    }
-    try {
-      setPreview(await readAsDataUrl(file));
-      status.setMessage(null);
-    } catch {
-      status.setMessage({ ok: false, text: t('app.profile.avatar.errorType') });
-    }
-  };
-
-  const save = async () => {
-    if (preview && preview !== saved) await status.run(() => updateAvatar(preview));
+  const choose = async (emoji: string) => {
+    if (emoji === saved || pending) return;
+    setPending(emoji);
+    await status.run(() => updateAvatar(emoji));
+    setPending(null);
   };
 
   return {
-    preview,
-    dirty: !!preview && preview !== saved,
+    choices: avatarChoices(saved),
+    selected: pending ?? saved,
     loading: status.loading,
     message: status.message,
-    pickPreset,
-    pickFile,
-    save,
+    choose,
   };
 }

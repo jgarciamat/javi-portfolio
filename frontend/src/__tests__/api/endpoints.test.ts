@@ -463,7 +463,7 @@ const cases: Case[] = [
     '/profile/password',
     { newPassword: 'N' },
   ],
-  ['avatar', () => authApi.updateAvatar(null), 'PATCH', '/profile/avatar', { avatarDataUrl: null }],
+  ['avatar', () => authApi.updateAvatar('🦊'), 'PATCH', '/profile/avatar', { avatar: '🦊' }],
   ['delete account', () => authApi.deleteAccount(), 'DELETE', '/profile/account', {}],
   [
     'delete account with proof',

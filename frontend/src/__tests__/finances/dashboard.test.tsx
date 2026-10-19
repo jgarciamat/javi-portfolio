@@ -136,7 +136,7 @@ describe('header', () => {
   it('shows the user, opens the profile and logs out', async () => {
     const { authApi } = jest.requireActual('@core/api/authApi');
     const logout = jest.spyOn(authApi, 'logout').mockResolvedValue(undefined);
-    const user = f.user({ avatarUrl: 'data:x' });
+    const user = f.user({ avatar: '🦊' });
     localStorage.setItem('mm_user', JSON.stringify(user));
     renderWithProviders(<Dashboard />);
     // The profile lives in the menu, under the account group.
@@ -155,6 +155,27 @@ describe('header', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('app.header.logout') }));
     expect(logout).toHaveBeenCalledWith('refresh-token');
     expect(localStorage.getItem('mm_token')).toBeNull();
+  });
+
+  it('goes from the profile to the settings and the plan sections, closing it', async () => {
+    const user = f.user();
+    renderWithProviders(<Dashboard />, { plan: true, user });
+    const openProfile = () => {
+      fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+      fireEvent.click(
+        within(screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') })).getByRole('button', {
+          name: tr('app.header.openProfileOf', { name: user.name }),
+        })
+      );
+    };
+    openProfile();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.profile.settings.title') }));
+    expect(screen.queryByRole('dialog', { name: tr('app.profile.title') })).toBeNull();
+    expect(screen.getByRole('region', { name: tr('app.tabs.settings') })).toBeInTheDocument();
+    openProfile();
+    fireEvent.click(await screen.findByRole('button', { name: tr('app.profile.plan.open') }));
+    expect(screen.queryByRole('dialog', { name: tr('app.profile.title') })).toBeNull();
+    expect(screen.getByRole('region', { name: tr('app.tabs.plan') })).toBeInTheDocument();
   });
 });
 

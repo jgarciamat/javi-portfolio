@@ -4,7 +4,8 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  avatarUrl?: string | null;
+  /** The emoji the user picked; null or missing: the default one. */
+  avatar?: string | null;
   /** False for accounts that only sign in with Google. */
   hasPassword?: boolean;
 }

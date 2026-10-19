@@ -127,8 +127,10 @@ export function BurgerMenu({
                   }
                 >
                   <span className="burger-nav-icon">
-                    {user?.avatarUrl ? (
-                      <img src={user.avatarUrl} alt="" className="burger-nav-avatar" />
+                    {user?.avatar ? (
+                      <span className="burger-nav-avatar" aria-hidden="true">
+                        {user.avatar}
+                      </span>
                     ) : (
                       <Icon name="user" />
                     )}
