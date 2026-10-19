@@ -2155,10 +2155,45 @@
      "casilla": "72",
      "concepto": "A compensar",
      "importe": 2106.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base soportado interior corriente",
+     "importe": 57000.0
+    },
+    {
+     "casilla": "30",
+     "concepto": "Base soportado interior bienes de inversión",
+     "importe": 5000.0
+    },
+    {
+     "casilla": "32",
+     "concepto": "Base importaciones corrientes",
+     "importe": 36000.0
+    },
+    {
+     "casilla": "36",
+     "concepto": "Base adquisiciones intracomunitarias corrientes",
+     "importe": 21000.0
+    },
+    {
+     "casilla": "40",
+     "concepto": "Rectificación de deducciones: base",
+     "importe": -6000.0
+    },
+    {
+     "casilla": "110",
+     "concepto": "Cuotas a compensar pendientes de periodos anteriores",
+     "importe": 0.0
+    },
+    {
+     "casilla": "87",
+     "concepto": "Cuotas pendientes para periodos posteriores",
+     "importe": 0.0
     }
    ],
    "reutilizable": "tal-cual",
-   "notas": "Caso útil de trimestre negativo que pasa a compensar (casilla 72). Las bases interiores 57.000/5.000/36.000 son las del formulario relleno."
+   "notas": "Caso útil de trimestre negativo que pasa a compensar (casilla 72). Las bases interiores 57.000/5.000/36.000 son las del formulario relleno. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
   },
   {
    "id": "303-03",
@@ -2238,10 +2273,55 @@
      "casilla": "71",
      "concepto": "Resultado a ingresar",
      "importe": 18258.0
+    },
+    {
+     "casilla": "10",
+     "concepto": "Base adquisiciones intracomunitarias",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "22",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 24000.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base soportado interior corriente",
+     "importe": 1200.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Cuota soportado interior corriente",
+     "importe": 252.0
+    },
+    {
+     "casilla": "32",
+     "concepto": "Base importaciones corrientes",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "33",
+     "concepto": "Cuota importaciones corrientes",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "36",
+     "concepto": "Base adquisiciones intracomunitarias corrientes",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "37",
+     "concepto": "Cuota adquisiciones intracomunitarias corrientes",
+     "importe": 2520.0
+    },
+    {
+     "casilla": "78",
+     "concepto": "Cuotas a compensar aplicadas en este periodo",
+     "importe": 0.0
     }
    ],
    "reutilizable": "tal-cual",
-   "notas": "Muestra que la compensación es opcional: 110 = 87 sin rellenar 78."
+   "notas": "Muestra que la compensación es opcional: 110 = 87 sin rellenar 78. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
   },
   {
    "id": "303-04",
@@ -2345,10 +2425,20 @@
      "casilla": "72",
      "concepto": "A compensar",
      "importe": 2226.0
+    },
+    {
+     "casilla": "22",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "78",
+     "concepto": "Cuotas a compensar aplicadas en este periodo",
+     "importe": 0.0
     }
    ],
    "reutilizable": "tal-cual",
-   "notas": "Casilla 28 mezcla bases al 10 % y 21 % (60.000 + 84.000 + 18.000). En 4T puede optarse por devolución (73) en vez de compensar."
+   "notas": "Casilla 28 mezcla bases al 10 % y 21 % (60.000 + 84.000 + 18.000). En 4T puede optarse por devolución (73) en vez de compensar. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
   },
   {
    "id": "303-05",
@@ -2542,7 +2632,7 @@
      "importe": 370200.0
     },
     {
-     "casilla": "07",
+     "casilla": "06",
      "concepto": "Cuota régimen ordinario 21 %",
      "importe": 77742.0
     },
@@ -2557,8 +2647,8 @@
      "importe": 10080.0
     },
     {
-     "casilla": null,
-     "concepto": "Adquisiciones intracomunitarias de servicios: base / cuota",
+     "casilla": "551",
+     "concepto": "Base adquisiciones intracomunitarias de servicios 21 %",
      "importe": 6000.0
     },
     {
@@ -2622,13 +2712,108 @@
      "importe": 2226.0
     },
     {
-     "casilla": "98",
-     "concepto": "Cuotas pendientes de compensación generadas en el ejercicio distintas de 97",
+     "casilla": "662",
+     "concepto": "Cuotas pendientes de compensación generadas en el ejercicio distintas de las de la 97",
      "importe": 2106.0
+    },
+    {
+     "casilla": "552",
+     "concepto": "Cuota adquisiciones intracomunitarias de servicios 21 %",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Modificación de bases",
+     "importe": -21000.0
+    },
+    {
+     "casilla": "30",
+     "concepto": "Modificación de cuotas",
+     "importe": -4410.0
+    },
+    {
+     "casilla": "603",
+     "concepto": "Base IVA deducible interior corriente 10 %",
+     "importe": 60000.0
+    },
+    {
+     "casilla": "604",
+     "concepto": "Cuota IVA deducible interior corriente 10 %",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "605",
+     "concepto": "Base IVA deducible interior corriente 21 %",
+     "importe": 207200.0
+    },
+    {
+     "casilla": "606",
+     "concepto": "Cuota IVA deducible interior corriente 21 %",
+     "importe": 43512.0
+    },
+    {
+     "casilla": "48",
+     "concepto": "Total base interior corriente",
+     "importe": 267200.0
+    },
+    {
+     "casilla": "49",
+     "concepto": "Total cuota interior corriente",
+     "importe": 49512.0
+    },
+    {
+     "casilla": "613",
+     "concepto": "Base interior bienes de inversión 21 %",
+     "importe": 5000.0
+    },
+    {
+     "casilla": "614",
+     "concepto": "Cuota interior bienes de inversión 21 %",
+     "importe": 1050.0
+    },
+    {
+     "casilla": "52",
+     "concepto": "Total base importaciones corrientes",
+     "importe": 54000.0
+    },
+    {
+     "casilla": "53",
+     "concepto": "Total cuota importaciones corrientes",
+     "importe": 11340.0
+    },
+    {
+     "casilla": "56",
+     "concepto": "Total base adquisiciones intracomunitarias de bienes corrientes",
+     "importe": 42000.0
+    },
+    {
+     "casilla": "57",
+     "concepto": "Total cuota adquisiciones intracomunitarias de bienes corrientes",
+     "importe": 8820.0
+    },
+    {
+     "casilla": "597",
+     "concepto": "Total base adquisiciones intracomunitarias de servicios",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "598",
+     "concepto": "Total cuota adquisiciones intracomunitarias de servicios",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "639",
+     "concepto": "Rectificación de deducciones: base",
+     "importe": -18000.0
+    },
+    {
+     "casilla": "62",
+     "concepto": "Rectificación de deducciones: cuota",
+     "importe": -3780.0
     }
    ],
    "reutilizable": "tal-cual",
-   "notas": "Las casillas 64/65 se asignan por el orden del formulario (texto extraído); verificar visualmente. Base AI servicios 6.000/cuota 1.260: número de casilla no legible con seguridad en el texto extraído (posibles 545/546), por eso casilla=null. Comprobación: 95 (3.288+18.258) - 97 - 98 = 17.214 = 86."
+   "notas": "Comprobación: 95 (3.288+18.258) − 97 − 662 = 17.214 = 86. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: la cuota al 21 % es la casilla 06 (no la 07), las cuotas pendientes generadas en el ejercicio van a la 662 (la 98 es «a devolver») y las adquisiciones intracomunitarias de servicios al 21 % son la 551/552. La devolución de compras al proveedor holandés (2T, 41 = −1.260) aparece en el 390 restada de las adquisiciones intracomunitarias corrientes (56/57 = 42.000/8.820), no en la 639/62. La 232 (1.200) y la 230 (500) dependen de detalles del enunciado que la app no recoge."
   },
   {
    "id": "390-02",
@@ -2664,7 +2849,7 @@
      "importe": 361200.0
     },
     {
-     "casilla": "100",
+     "casilla": "101",
      "concepto": "Operaciones en régimen especial agricultura, ganadería y pesca",
      "importe": 64176.0
     },
@@ -2679,18 +2864,23 @@
      "importe": 33000.0
     },
     {
-     "casilla": null,
-     "concepto": "Venta inmobiliaria exenta (se incluye y se resta como entrega de inmueble)",
+     "casilla": "106",
+     "concepto": "Entregas de bienes inmuebles y operaciones financieras no habituales",
      "importe": 72000.0
     },
     {
      "casilla": "108",
      "concepto": "Total volumen de operaciones",
      "importe": 470376.0
+    },
+    {
+     "casilla": "105",
+     "concepto": "Operaciones exentas sin derecho a deducción (venta del inmueble)",
+     "importe": 72000.0
     }
    ],
    "reutilizable": "tal-cual",
-   "notas": "Casilla 99 excluye AIB recibidas y no duplica la base del RE. Los 72.000 aparecen como (72.000) en el resumen del manual; casillas 105/107 probables pero no verificadas, por eso null. Licencia a empresa portuguesa no sujeta iría en casilla 110 (sin importe en el supuesto)."
+   "notas": "Casilla 99 excluye AIB recibidas y no duplica la base del RE ni resta la resolución de la venta de 2024. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: el régimen especial de agricultura es la casilla 101 (la 100 es el régimen simplificado) y la venta exenta del inmueble va a la 105 y se resta en la 106. La 105 no figura legible en el texto extraído: se deduce de la fórmula de la 108. Licencia a empresa portuguesa no sujeta iría en casilla 110 (sin importe en el supuesto)."
   },
   {
    "id": "349-01",

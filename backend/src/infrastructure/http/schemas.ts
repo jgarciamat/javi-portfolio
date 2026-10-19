@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
+import { DEDUCTION_USES, KEYS_349, PURCHASE_OPS } from '@domain/services/autonomo-vat-data';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 
@@ -320,6 +321,96 @@ const manualExpense = z.object({
   amount: euroAmount,
   vatRate: vatRateValue,
   days: z.number().int().min(0).max(366).optional(),
+  op: z.enum(PURCHASE_OPS).optional(),
+  investment: z.boolean().optional(),
+  use: z.enum(DEDUCTION_USES).optional(),
+});
+// Corrections and regularisations can be negative.
+const signedAmount = z.number().finite().min(-100_000_000).max(100_000_000);
+const baseVat = z.object({ base: signedAmount.default(0), vat: signedAmount.default(0) });
+const cashRates = z.object({
+  r21: euroAmount.default(0),
+  r10: euroAmount.default(0),
+  r4: euroAmount.default(0),
+});
+const quarterNumber = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]);
+const intraOp = z.object({
+  key: z.enum(KEYS_349),
+  vatId: z.string().trim().max(20).default(''),
+  name: z.string().trim().max(120).default(''),
+  base: signedAmount,
+  rectifies: z
+    .object({
+      year: z.number().int().min(1970).max(9999),
+      quarter: quarterNumber,
+      previous: signedAmount,
+    })
+    .nullish(),
+});
+/** The VAT of a quarter beyond the invoices with VAT (autonomo-vat-data.ts, QuarterVat). */
+const manualVat = z.object({
+  sales: z
+    .object({
+      intraEU: euroAmount.optional(),
+      exports: euroAmount.optional(),
+      notSubject: euroAmount.optional(),
+      oss: euroAmount.optional(),
+      ossSubject: euroAmount.optional(),
+      reverse: euroAmount.optional(),
+      exempt: euroAmount.optional(),
+      exemptOccasional: euroAmount.optional(),
+      nonVat: euroAmount.optional(),
+    })
+    .nullish(),
+  re: z
+    .object({
+      r21: euroAmount.optional(),
+      r10: euroAmount.optional(),
+      r4: euroAmount.optional(),
+      tobacco: euroAmount.optional(),
+    })
+    .nullish(),
+  salesFix: baseVat.extend({ priorYear: signedAmount.optional() }).nullish(),
+  reFix: z.object({ base: signedAmount.default(0), fee: signedAmount.default(0) }).nullish(),
+  deductionFix: baseVat.nullish(),
+  intraFix: baseVat.nullish(),
+  reagp: euroAmount.optional(),
+  investmentAdjust: signedAmount.optional(),
+  art80: euroAmount.optional(),
+  importDeferred: euroAmount.optional(),
+  cash: z
+    .object({
+      invoiced: cashRates,
+      collected: cashRates,
+      purchasesInvoiced: cashRates,
+      purchasesPaid: cashRates,
+    })
+    .nullish(),
+  intra: z.array(intraOp).max(500).optional(),
+});
+const percent = z.number().finite().min(0).max(100);
+/** The options of the VAT of the year (autonomo-vat-data.ts, VatOptions). */
+const vatOptions = z.object({
+  prorrata: z
+    .object({ provisional: percent.nullable().default(null), special: z.boolean().default(false) })
+    .nullish(),
+  investments: z
+    .array(
+      z.object({
+        year: z.number().int().min(1970).max(9999),
+        vat: euroAmount,
+        pct: percent,
+        realEstate: z.boolean().default(false),
+      })
+    )
+    .max(100)
+    .optional(),
+  offsetStart: euroAmount.nullish(),
+  skipOffset: z.array(z.number().int().min(0).max(3)).max(4).optional(),
+  refund: z.boolean().optional(),
+  filed: z.array(signedAmount.nullable()).max(4).optional(),
+  reagpVolume: euroAmount.optional(),
+  regime: z.enum(['general', 'simplified', 'reagp']).optional(),
 });
 const manualQuarter = z.object({
   income: z.object({
@@ -329,6 +420,7 @@ const manualQuarter = z.object({
     r0: euroAmount.default(0),
   }),
   expenses: z.array(manualExpense).max(200).default([]),
+  vat: manualVat.nullish(),
 });
 const manualData = z.object({
   quarters: z.tuple([manualQuarter, manualQuarter, manualQuarter, manualQuarter]),
@@ -351,6 +443,7 @@ export const autonomoDraftBody = z.object({
     vatToOffset: euroAmount.default(0),
     /** Income and expenses typed by hand instead of the movements. */
     manual: manualData.nullish(),
+    vat: vatOptions.nullish(),
     prior: z
       .object({
         income: euroAmount.default(0),

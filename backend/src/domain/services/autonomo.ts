@@ -1,4 +1,3 @@
-import { VatRate } from '@domain/ports/repositories';
 import {
   HARD_TO_JUSTIFY_MAX,
   HARD_TO_JUSTIFY_RATE,
@@ -10,7 +9,18 @@ import {
   RETA_RATE_2026,
 } from './autonomo-data';
 import { ManualData } from './autonomo-expenses';
-import { BusinessMovement, splitVat } from './tax';
+import { draft349, type Draft349 } from './autonomo-349';
+import { draft390, type Draft390 } from './autonomo-390';
+import {
+  addMovement,
+  type Box,
+  type Draft303,
+  emptyBucket,
+  type VatBucket,
+  type VatMovement,
+  vatYear,
+} from './autonomo-vat';
+import type { QuarterVat, VatOptions } from './autonomo-vat-data';
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 const euros = (cents: number): number => round2(cents / 100);
@@ -36,8 +46,13 @@ export interface DraftInputs {
   priorYearNet: number | null;
   /** Professional whose clients withheld at least 70 % of last year's income: no modelo 130. */
   exempt130: boolean;
-  /** VAT to offset from earlier periods that is still pending (modelo 303, box 110). */
+  /**
+   * VAT to offset from earlier periods (modelo 303, box 110) of the viewed quarter, as older data
+   * gives it; `vat.offsetStart` (the amount left at the start of the year) replaces it.
+   */
   vatToOffset: number;
+  /** The VAT of the year: prorrata, investment goods, what is left to offset, refund. */
+  vat?: VatOptions | null;
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
   /**
@@ -54,21 +69,7 @@ export interface PriorTotals {
   withheld: number;
 }
 
-export interface Box {
-  /** Box number of the official form ("07", "46"...). */
-  box: string;
-  label: string;
-  amount: number;
-}
-
-export interface Draft303 {
-  /** To pay, to offset, zero or no activity. */
-  result: 'pay' | 'offset' | 'zero' | 'noActivity';
-  amountDue: number;
-  accrued: Box[];
-  deductible: Box[];
-  settlement: Box[];
-}
+export type { Box, Draft303 };
 
 export interface Draft130 {
   /** Not required of whoever is a professional with 70 % of income withheld. */
@@ -100,122 +101,56 @@ export interface DraftResult {
   year: number;
   quarter: 1 | 2 | 3 | 4;
   vat: Draft303;
+  /** Intra-EU operations of the quarter (null when there are none). */
+  m349: Draft349 | null;
+  /** The annual summary, with the fourth quarter (null for the others). */
+  m390: Draft390 | null;
   irpf: Draft130;
   reta: RetaEstimate;
   deadlines: Deadline[];
 }
 
 interface Quarter {
-  income: Record<VatRate, { base: number; vat: number }>;
-  /** Base of the expenses whose VAT can be deducted. */
-  expenseBase: number;
-  /** VAT of the expenses that can be deducted. */
-  expenseVat: number;
+  /** Income base for the income tax (every sale, with VAT or without), cents. */
+  incomeBase: number;
   /** What the expenses count for the income tax (base plus the VAT that cannot be deducted, by share). */
   expenseIrpf: number;
+  vat: VatBucket;
 }
 
-const emptyRates = (): Quarter['income'] => ({
-  0: { base: 0, vat: 0 },
-  4: { base: 0, vat: 0 },
-  10: { base: 0, vat: 0 },
-  21: { base: 0, vat: 0 },
-});
-
-function bucket(year: number, movements: BusinessMovement[]): Quarter[] {
+function bucket(year: number, movements: VatMovement[]): Quarter[] {
   const quarters: Quarter[] = [0, 1, 2, 3].map(() => ({
-    income: emptyRates(),
-    expenseBase: 0,
-    expenseVat: 0,
+    incomeBase: 0,
     expenseIrpf: 0,
+    vat: emptyBucket(),
   }));
   for (const m of movements) {
     if (!m.date.startsWith(`${year}-`)) continue;
     const q = quarters[quarterOf(m.date) - 1];
-    const { baseCents, vatCents } = splitVat(m.amountCents, m.vatRate);
-    if (m.type === 'INCOME') {
-      q.income[m.vatRate].base += baseCents;
-      q.income[m.vatRate].vat += vatCents;
-    } else {
-      const vatShare = m.vatShare ?? 1;
-      const deductibleVat = Math.round(vatCents * vatShare);
-      q.expenseBase += Math.round(baseCents * vatShare);
-      q.expenseVat += deductibleVat;
-      // The VAT that cannot be deducted is part of the expense for the share that does count.
-      const irpf = m.irpfShare ?? 1;
-      q.expenseIrpf += Math.round(baseCents * irpf + vatCents * Math.max(0, irpf - vatShare));
-    }
+    const counted = addMovement(q.vat, m);
+    q.incomeBase += counted.income;
+    q.expenseIrpf += counted.expense;
   }
   return quarters;
 }
 
-/** Modelo 303 of a quarter: boxes of the 2026 design of the official form. */
-function draft303(q: Quarter, extras: QuarterExtras, offsetPending: number): Draft303 {
-  const rate = (r: 4 | 10 | 21, base: string, rateBox: string, fee: string): Box[] => [
-    { box: base, label: `Base imponible al ${r} %`, amount: euros(q.income[r].base) },
-    { box: rateBox, label: `Tipo ${r} %`, amount: r },
-    { box: fee, label: `Cuota al ${r} %`, amount: euros(q.income[r].vat) },
-  ];
-  const accrued: Box[] = [
-    { box: '150', label: 'Base de operaciones a tipo 0 %', amount: euros(q.income[0].base) },
-    ...rate(4, '01', '02', '03'),
-    ...rate(10, '04', '05', '06'),
-    ...rate(21, '07', '08', '09'),
-  ];
-  const totalAccrued = [4, 10, 21].reduce((s, r) => s + q.income[r as VatRate].vat, 0);
-  accrued.push({ box: '27', label: 'Total cuota devengada', amount: euros(totalAccrued) });
-
-  const notDeductible = Math.min(q.expenseVat, Math.round(extras.vatNotDeductible * 100));
-  const deductibleVat = q.expenseVat - notDeductible;
-  // The base follows the share of VAT that can be deducted.
-  const deductibleBase =
-    q.expenseVat > 0 ? q.expenseBase * (deductibleVat / q.expenseVat) : q.expenseBase;
-  const deductible: Box[] = [
-    {
-      box: '28',
-      label: 'Base de cuotas soportadas en operaciones interiores corrientes',
-      amount: euros(deductibleBase),
-    },
-    {
-      box: '29',
-      label: 'Cuotas soportadas en operaciones interiores corrientes',
-      amount: euros(deductibleVat),
-    },
-    { box: '45', label: 'Total a deducir', amount: euros(deductibleVat) },
-  ];
-
-  const result46 = euros(totalAccrued - deductibleVat);
-  const pending = round2(Math.max(0, offsetPending));
-  const applied = round2(Math.min(pending, Math.max(0, result46)));
-  const settlement: Box[] = [
-    { box: '46', label: 'Resultado régimen general (27 − 45)', amount: result46 },
-    { box: '64', label: 'Suma de resultados', amount: result46 },
-    { box: '66', label: 'Atribuible a la Administración del Estado (100 %)', amount: result46 },
-    { box: '110', label: 'Cuotas a compensar pendientes de periodos anteriores', amount: pending },
-    { box: '78', label: 'Cuotas a compensar aplicadas en este periodo', amount: applied },
-    {
-      box: '87',
-      label: 'Cuotas a compensar pendientes para periodos posteriores',
-      amount: round2(pending - applied),
-    },
-    { box: '69', label: 'Resultado de la autoliquidación', amount: round2(result46 - applied) },
-    { box: '71', label: 'Resultado de la liquidación', amount: round2(result46 - applied) },
-  ];
-  const amountDue = round2(result46 - applied);
-  const noActivity =
-    totalAccrued === 0 &&
-    q.expenseVat === 0 &&
-    q.expenseBase === 0 &&
-    q.expenseIrpf === 0 &&
-    q.income[0].base === 0;
-  const result: Draft303['result'] = noActivity
-    ? 'noActivity'
-    : amountDue > 0
-    ? 'pay'
-    : amountDue < 0
-    ? 'offset'
-    : 'zero';
-  return { result, amountDue, accrued, deductible, settlement };
+/** The VAT that the person says cannot be deducted, taken off the domestic purchases (older field). */
+function withoutNotDeductible(q: Quarter, extras: QuarterExtras): VatBucket {
+  const cap = Math.round(extras.vatNotDeductible * 100);
+  if (cap <= 0) return q.vat;
+  let left = cap;
+  const items = q.vat.items.map((item) => {
+    if (item.channel !== 'interior' || left <= 0) return item;
+    const taken = Math.min(left, item.vat);
+    left -= taken;
+    // The base follows the share of VAT that can be deducted.
+    return {
+      ...item,
+      base: Math.round(item.base * ((item.vat - taken) / item.vat)),
+      vat: item.vat - taken,
+    };
+  });
+  return { ...q.vat, items: items.filter((i) => i.vat > 0) };
 }
 
 const lowIncomeReduction = (priorYearNet: number | null): number => {
@@ -257,12 +192,7 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
   for (let n = window.start + 1; n <= upTo; n++) {
     const sel = quarters.slice(window.start, n);
     const extras = inputs.quarters.slice(window.start, n);
-    const income =
-      window.income +
-      sel.reduce(
-        (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
-        0
-      );
+    const income = window.income + sel.reduce((s, q) => s + q.incomeBase, 0);
     const baseExpenses =
       window.expenses +
       sel.reduce((s, q) => s + q.expenseIrpf, 0) +
@@ -328,12 +258,7 @@ export function retaFor(monthlyNet: number): RetaEstimate {
 function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): RetaEstimate {
   const window = windowOf(inputs, upTo);
   const sel = quarters.slice(window.start, upTo);
-  const income =
-    window.income +
-    sel.reduce(
-      (s, q) => s + [0, 4, 10, 21].reduce((t, r) => t + q.income[r as VatRate].base, 0),
-      0
-    );
+  const income = window.income + sel.reduce((s, q) => s + q.incomeBase, 0);
   const expenses =
     window.expenses +
     sel.reduce((s, q) => s + q.expenseIrpf, 0) +
@@ -356,7 +281,7 @@ export function businessDay(year: number, month: number, day: number): string {
 }
 
 /** The deadlines of the quarter and, at the year end, the annual summaries. */
-export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4): Deadline[] {
+export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4, intraEU = false): Deadline[] {
   const [y, month, day] = quarter === 4 ? [year + 1, 1, 30] : [year, quarter * 3 + 1, 20];
   const retention =
     quarter === 4 ? businessDay(year + 1, 1, 20) : businessDay(year, quarter * 3 + 1, 20);
@@ -370,6 +295,14 @@ export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4): Deadline[] {
     },
     { model: '115', label: 'Retenciones de alquiler del local (si lo alquilas)', date: retention },
   ];
+  // Quarterly 349: the first 20 days of the next month; the fourth quarter, until 30 January [I349].
+  if (intraEU) {
+    list.push({
+      model: '349',
+      label: 'Operaciones intracomunitarias',
+      date: businessDay(y, month, day),
+    });
+  }
   if (quarter === 4) {
     list.push(
       { model: '390', label: 'Resumen anual de IVA', date: businessDay(year + 1, 1, 30) },
@@ -384,20 +317,40 @@ export function deadlinesFor(year: number, quarter: 1 | 2 | 3 | 4): Deadline[] {
   return list;
 }
 
+/** The VAT extras of each quarter typed by hand (none with the movements). */
+const vatExtras = (inputs: DraftInputs): QuarterVat[] =>
+  [0, 1, 2, 3].map((i) => inputs.manual?.quarters[i]?.vat ?? {});
+
 /** Everything the draft of a quarter shows. */
 export function prepareDraft(
   year: number,
   quarter: 1 | 2 | 3 | 4,
-  movements: BusinessMovement[],
+  movements: VatMovement[],
   inputs: DraftInputs
 ): DraftResult {
   const quarters = bucket(year, movements);
+  const options = inputs.vat ?? {};
+  const extras = vatExtras(inputs);
+  // Older data said what was left to offset in the viewed quarter, not at the start of the year.
+  const legacy =
+    options.offsetStart === undefined || options.offsetStart === null
+      ? { quarter: quarter - 1, pending: inputs.vatToOffset }
+      : null;
+  const buckets = quarters.map((q, i) => withoutNotDeductible(q, inputs.quarters[i]));
+  const year303 = vatYear(year, buckets, extras, options, legacy);
+  const viewed = year303.quarters[quarter - 1];
+  const amountOf = (code: string): number =>
+    [...viewed.draft.info, ...viewed.draft.accrued].find((b) => b.box === code)?.amount ?? 0;
+  const intra = [...buckets[quarter - 1].intra, ...(extras[quarter - 1].intra ?? [])];
+  const m349 = intra.length > 0 ? draft349(intra, amountOf('59'), amountOf('10')) : null;
   return {
     year,
     quarter,
-    vat: draft303(quarters[quarter - 1], inputs.quarters[quarter - 1], inputs.vatToOffset),
+    vat: viewed.draft,
+    m349,
+    m390: quarter === 4 ? draft390(year303, options) : null,
     irpf: draft130(quarters, inputs, quarter),
     reta: retaEstimate(quarters, inputs, quarter),
-    deadlines: deadlinesFor(year, quarter),
+    deadlines: deadlinesFor(year, quarter, m349 !== null),
   };
 }

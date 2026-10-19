@@ -437,6 +437,86 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       expect(body.reta.monthlyNet).toBe(255.75);
     });
 
+    it('drafts the whole VAT family: sales without VAT, intra-EU purchases, the 349 and the 390', async () => {
+      const empty = { income: { r21: 0, r10: 0, r4: 0, r0: 0 }, expenses: [] };
+      const { body } = await draft(4, {
+        vat: { offsetStart: 0, refund: true },
+        manual: {
+          quarters: [
+            empty,
+            empty,
+            empty,
+            {
+              income: { r21: 1000, r10: 0, r4: 0, r0: 0 },
+              expenses: [
+                // An intra-EU purchase and an imported machine: their amounts are the bases.
+                { kind: 'material', amount: 500, vatRate: 21, op: 'intraGoods' },
+                { kind: 'material', amount: 4000, vatRate: 21, op: 'import', investment: true },
+              ],
+              vat: {
+                sales: { intraEU: 2000, exports: 1000 },
+                intra: [
+                  { key: 'E', vatId: 'FR00000000001', name: 'Client fictif', base: 2000 },
+                  { key: 'A', vatId: 'DE000000001', name: 'Lieferant', base: 500 },
+                ],
+              },
+            },
+          ],
+          profile: {
+            workArea: 0,
+            homeArea: 0,
+            vehicleExclusive: false,
+            healthPeople: 0,
+            healthDisability: false,
+          },
+        },
+      }).expect(201);
+      // 27 = 210 + 105 (self-assessed); 45 = 105 + 840; the −630 is refunded in the fourth quarter.
+      expect(box(body.vat.accrued, '27')).toBe(315);
+      expect(box(body.vat.deductible, '35')).toBe(840);
+      expect(box(body.vat.deductible, '45')).toBe(945);
+      expect(box(body.vat.info, '59')).toBe(2000);
+      expect(box(body.vat.info, '60')).toBe(1000);
+      expect(box(body.vat.settlement, '73')).toBe(630);
+      expect(body.vat.result).toBe('refund');
+      expect(body.m349.boxes.map((b: { amount: number }) => b.amount)).toEqual([2, 2500, 0, 0]);
+      expect(body.m349.warnings).toEqual([]);
+      const m390 = Object.fromEntries(
+        body.m390.sections.flatMap((s: { boxes: { box: string; amount: number }[] }) =>
+          s.boxes.map((b) => [b.box, b.amount])
+        )
+      );
+      expect(m390).toMatchObject({ '99': 1000, '103': 2000, '104': 1000, '108': 4000, '98': 630 });
+      // The machine is depreciated, not deducted at once in the 130.
+      expect(box(body.irpf.boxes, '01')).toBe(4000);
+      expect(box(body.irpf.boxes, '02')).toBe(500);
+      expect(body.expenses.map((l: { note: string }) => l.note)).toEqual(['', 'investment']);
+      expect(body.deadlines.map((d: { model: string }) => d.model)).toContain('349');
+    });
+
+    it('rejects an unknown VAT operation, key of the 349 or percentage', async () => {
+      const q = (vat: unknown, expenses: unknown[] = []) => ({
+        income: { r21: 0, r10: 0, r4: 0, r0: 0 },
+        expenses,
+        vat,
+      });
+      const profile = {
+        workArea: 0,
+        homeArea: 0,
+        vehicleExclusive: false,
+        healthPeople: 0,
+        healthDisability: false,
+      };
+      const with4 = (first: unknown) => ({ quarters: [first, q(null), q(null), q(null)], profile });
+      await draft(1, {
+        manual: with4(q(null, [{ kind: 'other', amount: 1, vatRate: 21, op: 'smuggling' }])),
+      }).expect(400);
+      await draft(1, {
+        manual: with4(q({ intra: [{ key: 'Z', vatId: 'FR1', name: '', base: 1 }] })),
+      }).expect(400);
+      await draft(1, { vat: { prorrata: { provisional: 120, special: false } } }).expect(400);
+    });
+
     it('ignores the filed totals in the first quarter', async () => {
       const { body } = await draft(1, {
         prior: { income: 9999, expenses: 0, previousPayments: 0, withheld: 0 },
