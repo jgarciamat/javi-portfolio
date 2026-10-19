@@ -692,6 +692,40 @@ button.autonomo-sum-warn {
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
-.autonomo-off-actions {
-  flex-wrap: wrap;
+/* The two cloud dialogs wear the look of the app's confirmations (see ConfirmDeleteModal.css). */
+.autonomo-dialog {
+  max-width: 420px;
+}
+
+.autonomo-dialog--wide {
+  max-width: 560px;
+}
+
+.autonomo-dialog .confirm-delete-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-400) 16%, transparent);
+  color: var(--accent-400);
+  font-size: 1.6rem;
+}
+
+/* One action per line, the main one first and full width: easy to hit on a phone. */
+.autonomo-dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.autonomo-dialog-actions > button {
+  width: 100%;
+  padding: 0.7rem 1rem;
+}
+
+.autonomo-dialog--wide .autonomo-copies {
+  text-align: left;
+  margin: 0 0 1rem;
 }

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { Icon } from '@shared/components/Icon';
 import { Modal } from '@shared/components/Modal';
 import { toManualData } from './AutonomoManual';
 import { MOMENT, type AutonomoCloud, type AutonomoSaved, type CloudStatus } from './autonomoSync';
@@ -51,9 +52,17 @@ function ConflictDialog({ cloud, onClose }: { cloud: AutonomoCloud; onClose: () 
   const { dateTime } = useDateTime();
   const c = cloud.conflict as NonNullable<AutonomoCloud['conflict']>;
   return (
-    <Modal label={t('app.autonomo.cloud.conflict.title')} onClose={onClose}>
-      <h2 className="modal-title">{t('app.autonomo.cloud.conflict.title')}</h2>
-      <p>{t('app.autonomo.cloud.conflict.text')}</p>
+    <Modal
+      label={t('app.autonomo.cloud.conflict.title')}
+      onClose={onClose}
+      overlayClassName="confirm-delete-overlay"
+      className="confirm-delete-modal autonomo-dialog autonomo-dialog--wide"
+    >
+      <div className="confirm-delete-icon" aria-hidden="true">
+        <Icon name="alert" />
+      </div>
+      <h2 className="confirm-delete-title">{t('app.autonomo.cloud.conflict.title')}</h2>
+      <p className="confirm-delete-message">{t('app.autonomo.cloud.conflict.text')}</p>
       <div className="autonomo-copies">
         <button type="button" className="autonomo-copy" onClick={() => cloud.resolve('local')}>
           <strong>{t('app.autonomo.cloud.conflict.local')}</strong>
@@ -70,8 +79,8 @@ function ConflictDialog({ cloud, onClose }: { cloud: AutonomoCloud; onClose: () 
           <CopyFacts copy={c.remote} />
         </button>
       </div>
-      <p className="section-hint">{t('app.autonomo.cloud.conflict.kept')}</p>
-      <div className="button-row">
+      <p className="confirm-delete-message">{t('app.autonomo.cloud.conflict.kept')}</p>
+      <div className="autonomo-dialog-actions">
         <button type="button" className="btn-secondary" onClick={onClose}>
           {t('app.autonomo.cloud.conflict.later')}
         </button>
@@ -90,10 +99,19 @@ function TurnOffDialog({ cloud, onClose }: { cloud: AutonomoCloud; onClose: () =
     onClose();
   };
   return (
-    <Modal label={t('app.autonomo.cloud.off.title')} onClose={onClose} dismissible={!busy}>
-      <h2 className="modal-title">{t('app.autonomo.cloud.off.title')}</h2>
-      <p>{t('app.autonomo.cloud.off.text')}</p>
-      <div className="button-row autonomo-off-actions">
+    <Modal
+      label={t('app.autonomo.cloud.off.title')}
+      onClose={onClose}
+      dismissible={!busy}
+      overlayClassName="confirm-delete-overlay"
+      className="confirm-delete-modal autonomo-dialog"
+    >
+      <div className="confirm-delete-icon" aria-hidden="true">
+        <Icon name="shield" />
+      </div>
+      <h2 className="confirm-delete-title">{t('app.autonomo.cloud.off.title')}</h2>
+      <p className="confirm-delete-message">{t('app.autonomo.cloud.off.text')}</p>
+      <div className="autonomo-dialog-actions">
         <button type="button" className="btn-danger" disabled={busy} onClick={() => void off(true)}>
           {t('app.autonomo.cloud.off.delete')}
         </button>
