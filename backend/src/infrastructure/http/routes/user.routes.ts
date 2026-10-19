@@ -93,7 +93,7 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
   router.patch(
     '/profile/avatar',
     authed((req, res) =>
-      res.json(c.profile.updateAvatar(req.userId, avatarBody.parse(req.body).avatarDataUrl))
+      res.json(c.profile.updateAvatar(req.userId, avatarBody.parse(req.body).avatar))
     )
   );
   router.delete(

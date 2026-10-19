@@ -100,7 +100,7 @@ export const twoFactorVerifyBody = z.object({
   challengeToken: z.string().min(1).max(200),
   code: twoFactorCode,
 });
-export const avatarBody = z.object({ avatarDataUrl: z.string().max(3_000_000).nullable() });
+export const avatarBody = z.object({ avatar: z.string().max(16).nullable() });
 export const settingsBody = z
   .object({
     currency: z.string().length(3).toUpperCase(),
