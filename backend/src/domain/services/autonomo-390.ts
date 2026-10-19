@@ -76,7 +76,8 @@ function byRateLines(
     all = add(all, m);
     out.push(...pair(boxes[r][0], boxes[r][1], `${label} al ${r} %`, m));
   }
-  if (totals) out.push(...pair(totals[0], totals[1], `Total ${label}`, all));
+  const lower = label[0].toLowerCase() + label.slice(1);
+  if (totals) out.push(...pair(totals[0], totals[1], `Total de ${lower}`, all));
   return { boxes: out, total: all };
 }
 

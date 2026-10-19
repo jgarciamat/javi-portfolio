@@ -1891,7 +1891,7 @@
   "app.autonomo.retaText": "Con lo que llevas este año, tu rendimiento neto mensual sería de unos {net} (ya descontado el 7 % de gastos genéricos). Te corresponde el tramo {bracket}: base de cotización entre {baseMin} y {baseMax}.",
   "app.autonomo.retaNote": "La cuota es el {rate} % de la base. Es una previsión: la Seguridad Social regulariza al año siguiente con tus rendimientos reales. Si estás en tarifa plana, pagas la cuota reducida de tu alta.",
   "app.autonomo.deadlines": "Fechas límite",
-  "app.autonomo.disclaimer": "Borrador orientativo con las reglas de 2026: no incluye bienes de inversión, prorrata, regímenes especiales ni operaciones intracomunitarias, y los festivos no se tienen en cuenta en las fechas. Revísalo con tu gestor antes de presentar nada.",
+  "app.autonomo.disclaimer": "Borrador orientativo con las reglas de 2026: no calcula el régimen simplificado (módulos) ni la agricultura (REAGP), y los festivos no se tienen en cuenta en las fechas. Revísalo con tu gestor antes de presentar nada.",
   "app.autonomo.import.title": "Importar",
   "app.autonomo.import.hint": "Sube a la vez tus libros de facturas de {year} (Excel .xlsx o CSV: emitidas, recibidas o las dos), tus facturas en PDF (las que te llegan por correo) y los modelos 130, 303, 111 y 115 que ya presentaste (PDF). Reconozco cada archivo y relleno los trimestres por ti. Todo se lee en tu dispositivo: los archivos no salen de él. Si subes otra vez el mismo archivo, no se duplica nada.",
   "app.autonomo.import.template": "Descargar plantilla",

@@ -1891,7 +1891,7 @@
   "app.autonomo.retaText": "With what you have this year, your monthly net income would be about {net} (after the 7 % general expenses). You fall in bracket {bracket}: contribution base between {baseMin} and {baseMax}.",
   "app.autonomo.retaNote": "The contribution is {rate} % of the base. It is a forecast: Social Security settles the next year with your real income. If you are on the flat rate, you pay the reduced fee of your sign-up.",
   "app.autonomo.deadlines": "Deadlines",
-  "app.autonomo.disclaimer": "Indicative draft with the 2026 rules: it does not include investment goods, pro rata, special regimes or intra-EU operations, and public holidays are not taken into account in the dates. Check it with your adviser before filing anything.",
+  "app.autonomo.disclaimer": "Indicative draft with the 2026 rules: it does not work out the simplified regime (módulos) nor the agricultural one (REAGP), and public holidays are not taken into account in the dates. Check it with your adviser before filing anything.",
   "app.autonomo.import.title": "Import",
   "app.autonomo.import.hint": "Upload your {year} invoice books (Excel .xlsx or CSV: issued, received or both), your invoices in PDF (the ones that arrive by email) and the modelos 130, 303, 111 and 115 you already filed (PDF), all at once. I recognise each file and fill in the quarters for you. Everything is read on your device: the files never leave it. Uploading the same file again adds nothing twice.",
   "app.autonomo.import.template": "Download template",
