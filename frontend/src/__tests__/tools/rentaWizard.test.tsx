@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { saveProgress } from '@modules/tools/application/rentaProgress';
 import { rentaState } from '@modules/tools/data/renta/state';
@@ -9,6 +11,8 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import persona from '../../../../docs/casos-practicos/personas/01-asalariado-soltero-madrid/persona.json';
+import couple from '../../../../docs/casos-practicos/personas/02-pareja-un-sueldo-conjunta-andalucia/persona.json';
+import investor from '../../../../docs/casos-practicos/personas/p4-109-cripto-binance-ledger-staking-madrid/persona.json';
 
 beforeEach(() => localStorage.clear());
 
@@ -379,5 +383,116 @@ describe('step by step or everything together', () => {
     );
     skip(tr('wizard.renta.skip.draft'));
     expect(screen.getByLabelText(tr('tools.renta.ccaa'))).toHaveValue('');
+  });
+});
+
+describe('the Renta step by step: persona p4-109 (crypto investor in Madrid)', () => {
+  const dir = join(
+    __dirname,
+    '../../../../docs/casos-practicos/personas/p4-109-cripto-binance-ledger-staking-madrid/archivos'
+  );
+  const fileOf = (name: string): File => {
+    const text = readFileSync(join(dir, name), 'utf8');
+    const bytes = new TextEncoder().encode(text);
+    const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    return Object.assign(new File([data], name), {
+      arrayBuffer: async () => data,
+      text: async () => text,
+    });
+  };
+
+  it('imports the files of the exchange in its own step and gives the savings base of the persona', async () => {
+    const { savingsDetail: _detail, ...form } = investor.renta.declaraciones[0].form;
+    saved({ ...(form as Partial<RentaForm>), answers: { income: 'work' } });
+    at(4);
+    premium();
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+    const input = screen.getByLabelText(tr('tools.invest.file')) as HTMLInputElement;
+    await act(async () => {
+      fireEvent.change(input, {
+        target: {
+          files: [
+            fileOf('binance-historial-transacciones.csv'),
+            fileOf('ledger-live-operaciones.csv'),
+          ],
+        },
+      });
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.invest.apply') }));
+    expect(screen.getByText(/Importado: binance-historial-transacciones.csv/)).toBeInTheDocument();
+    // Importing answers the savings question: the step can be finished.
+    next();
+    finish(5);
+    own('activity', 'no');
+    finish(6);
+    guided('plan', 'no');
+    next();
+    own('donations', 'no');
+    next();
+    own('others', 'no');
+    finish(7);
+    skip();
+    expect(await screen.findByText(tr('tools.renta.toPay'), { exact: false })).toBeInTheDocument();
+    next();
+    // Box 0460 of the persona (calculo.md): 23,000 € of gains and 10 € of staking.
+    expect(screen.getByText('0460').closest('li')).toHaveTextContent('23.010,00');
+  });
+});
+
+describe('the Renta step by step: persona 02 (couple with two children, one pay, Andalucía)', () => {
+  const form = couple.renta.declaraciones[0].form;
+
+  it('asks the children and the partner, and says the joint return pays off', async () => {
+    saved({ ccaaId: form.ccaaId, age: form.age, answers: { ccaa: form.ccaaId, age: form.age } });
+    at(1);
+    premium();
+    await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+    next(); // no disability
+    guided('family', 'yes');
+    fireEvent.click(screen.getByRole('button', { name: `+ ${tr('tools.renta.addChild')}` }));
+    fireEvent.click(screen.getByRole('button', { name: `+ ${tr('tools.renta.addChild')}` }));
+    type(tr('tools.renta.childAge', { n: 1 }), form.children[0].age);
+    type(tr('tools.renta.childAge', { n: 2 }), form.children[1].age);
+    // Both parents live with them: the minimum is shared.
+    fireEvent.click(screen.getByLabelText(tr('tools.renta.shared')));
+    next();
+    guided('joint', 'couple');
+    type(tr('tools.renta.joint.age'), form.partner.age);
+    type(tr('tools.renta.joint.socialSecurity'), form.partner.socialSecurity);
+    finish(2);
+    guided('income', 'work');
+    type(tr('tools.renta.gross'), form.gross);
+    type(tr('tools.renta.socialSecurity'), form.socialSecurity);
+    type(tr('tools.renta.withheld'), form.withheld);
+    next();
+    own('payers', 'no');
+    finish(3);
+    guided('housing', 'no');
+    next();
+    guided('property', 'no');
+    finish(4);
+    skip(tr('wizard.renta.skip.investImport'));
+    guided('savings', 'no');
+    finish(5);
+    own('activity', 'no');
+    finish(6);
+    guided('plan', 'no');
+    next();
+    own('donations', 'no');
+    next();
+    own('others', 'no');
+    finish(7);
+    skip();
+    // calculo.md of the persona: 342,42 € to pay alone, 1.173 € back together.
+    expect(
+      await screen.findByText(
+        tr('tools.renta.joint.best.joint', { amount: '1515,42 €' }).replace(/\s/g, ' '),
+        {
+          normalizer: (text) => text.replace(/\s/g, ' '),
+        }
+      )
+    ).toBeInTheDocument();
+    next();
+    expect(screen.getByText('0670').closest('li')).toHaveTextContent('342,42');
   });
 });
