@@ -381,6 +381,10 @@ describe('static pages', () => {
     unmount();
     legalApp('/privacy');
     expect(screen.getByText(tr('app.privacy.title'))).toBeInTheDocument();
+    // Every item of the lists is rendered, the last ones included.
+    for (const key of ['s2.item17', 's5.item9', 's6.item9', 's8.item6'])
+      expect(screen.getByText(tr(`app.privacy.${key}`))).toBeInTheDocument();
+    expect(screen.getByText(tr('app.privacy.updated'))).toHaveTextContent('20 de octubre de 2026');
     back();
     expect(screen.getByText('inicio')).toBeInTheDocument();
   });

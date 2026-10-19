@@ -16,7 +16,7 @@ function Items({ section, count }: { section: string; count: number }) {
 }
 
 // Revisar con un abogado: los textos (app.privacy.* en es.json/en.json) describen lo que hace
-// el código a 17/10/2026; las dudas abiertas están en docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md.
+// el código a 20/10/2026; las dudas abiertas están en docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md.
 export function PrivacyPolicyPage() {
   const { t } = useI18n();
   const goBack = useGoBack();
@@ -44,7 +44,7 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s2.title')}</h2>
           <p>{t('app.privacy.s2.intro')}</p>
-          <Items section="s2" count={15} />
+          <Items section="s2" count={17} />
         </section>
 
         {/* Section 3 */}
@@ -70,14 +70,14 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s5.title')}</h2>
           <p>{t('app.privacy.s5.p1')}</p>
-          <Items section="s5" count={8} />
+          <Items section="s5" count={9} />
         </section>
 
         {/* Section 6 */}
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s6.title')}</h2>
           <p>{t('app.privacy.s6.p1')}</p>
-          <Items section="s6" count={7} />
+          <Items section="s6" count={9} />
         </section>
 
         {/* Section 7 */}
