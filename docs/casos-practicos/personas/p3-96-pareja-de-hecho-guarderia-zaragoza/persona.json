@@ -51,7 +51,8 @@
             "estado-maternidad": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "months": "12"
             },
             "estado-guarderia": {
               "on": true,

@@ -211,12 +211,7 @@
       "importe": 912.68,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0570",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -226,12 +221,7 @@
       "importe": 781.53,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0571",
-        "obtenido": 2052.19
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -241,12 +231,7 @@
       "importe": 1694.21,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0587",
-        "obtenido": 2052.19
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -266,12 +251,7 @@
       "importe": 1694.21,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 2052.19
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -291,12 +271,7 @@
       "importe": -105.79,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": 252.19
-      },
-      "motivo": "Discrepancia propuesta: el motor da 252,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -306,12 +281,7 @@
       "importe": -105.79,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": 252.19
-      },
-      "motivo": "Discrepancia propuesta: el motor da 252,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -321,12 +291,7 @@
       "importe": 1270.66,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.stateDeductions",
-        "obtenido": 2183.34
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.183,34. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "result.stateDeductions"
     },
     {
       "modelo": "100",
@@ -336,12 +301,7 @@
       "importe": 1270.66,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.regionalDeductions",
-        "obtenido": 0
-      },
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
+      "campo": "result.regionalDeductions"
     },
     {
       "modelo": "100",

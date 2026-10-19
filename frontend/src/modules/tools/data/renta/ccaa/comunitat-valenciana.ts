@@ -72,6 +72,7 @@ export const comunitatValenciana: RentaCcaa = {
     // ---------------------------------------------------------------- FAMILIA
     {
       id: 'comunitat-valenciana-nacimiento-adopcion-acogimiento',
+      splitBetweenParents: true,
       group: 'family',
       title: 'Por nacimiento, adopción o acogimiento',
       summary:
@@ -85,6 +86,7 @@ export const comunitatValenciana: RentaCcaa = {
     },
     {
       id: 'comunitat-valenciana-nacimiento-adopcion-multiples',
+      splitBetweenParents: true,
       group: 'family',
       title: 'Por parto o adopción múltiples',
       summary:
@@ -461,6 +463,8 @@ export const comunitatValenciana: RentaCcaa = {
         'Devuelve el 20 % del alquiler (hasta 800 euros); 25 % hasta 950 euros con una condición (35 años o menos, discapacidad, violencia de género); 30 % hasta 1.100 euros con dos o más.',
       kind: 'special',
       limit: 800,
+      // Ley 13/1997, art. 4.Uno.n: 950 € with 35 years or less (the other conditions are not asked).
+      ageLimit: { maxAge: 35, limit: 950 },
       incomeLimit: LIMIT_30K,
       requirements:
         'Contrato posterior al 23-4-1998 y de al menos un año. Sin otra vivienda a menos de 50 km durante más de medio año. Sin deducción estatal por vivienda. Pago no en efectivo. Compatible con la de alquiler por trabajo en otro municipio.',

@@ -115,3 +115,16 @@ describe('the activities of the form', () => {
     expect(toInput({ ...emptyForm(''), activities: [] }, data).activities).toBeUndefined();
   });
 });
+
+describe('the months of a deduction', () => {
+  it('go to the engine only when typed', async () => {
+    const { choicesOf } = await import('@modules/tools/domain/rentaForm');
+    const form = (months?: string) => ({
+      ...emptyForm(''),
+      choices: { mat: { on: true, amount: '', units: '1', months } },
+    });
+    expect(choicesOf(form('10')).mat.months).toBe(10);
+    expect(choicesOf(form(' ')).mat.months).toBeUndefined();
+    expect(choicesOf(form()).mat.months).toBeUndefined();
+  });
+});

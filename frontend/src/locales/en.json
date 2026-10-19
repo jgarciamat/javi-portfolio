@@ -1968,6 +1968,7 @@
   "tools.renta.advance": "You can collect it every month, without waiting for the return, by asking for the advance payment with form {model}.",
   "tools.renta.advanceLink": "How to file form {model}",
   "tools.renta.advanceReceived": "Already collected in advance this year (modelo {model})",
+  "tools.renta.months": "Months with the right to it this year (all the children; empty: the whole year)",
   "tools.renta.draft.immediate": "I want the pass to start now and accept that I therefore lose the 14-day right of withdrawal",
   "billing.resource.autonomoDrafts": "self-employed tax drafts this quarter",
   "billing.resource.autonomoDraftsOf": "self-employed tax drafts for Q{n} {year}",

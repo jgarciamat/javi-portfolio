@@ -290,7 +290,7 @@ def ded(id_, label, how, state=0.0, regional=0.0, refundable=False, amount=0.0, 
 
 MATERNIDAD = lambda months, extra=0: ded('estado-maternidad', 'Maternidad (art. 81 LIRPF)', f'100 € × {months} meses' + (f' + {extra} € del mes de los 30 días cotizados' if extra else '')  # noqa: E731
                                          + f' = {eur(100 * months + extra)} (desde 2023 sin tope de cotizaciones; caso oficial renta-c18-01)', refundable=True,
-                                         amount=100 * months + extra, units=1)
+                                         amount=100 * months + extra, units=1) | {'months': str(months)}
 
 RENTA = [
     # ── Comunitat Valenciana ──

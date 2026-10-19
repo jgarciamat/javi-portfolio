@@ -1033,6 +1033,8 @@ def form2(p):
         f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], days='' if u['days'] == 365 else str(u['days'])) for u in p['unrented']]
     for d in p.get('deductions', []):
         f['choices'][d['id']] = dict(on=True, amount=d.get('choice_amount', ''), units=d.get('units', ''))
+        if d.get('months'):
+            f['choices'][d['id']]['months'] = d['months']
     j = p.get('joint')
     if j:
         f['joint'] = j['kind']

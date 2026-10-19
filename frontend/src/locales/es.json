@@ -1968,6 +1968,7 @@
   "tools.renta.advance": "La puedes cobrar cada mes, sin esperar a la declaración, pidiendo el abono anticipado con el modelo {model}.",
   "tools.renta.advanceLink": "Cómo pedir el modelo {model}",
   "tools.renta.advanceReceived": "Cobrado ya por adelantado en el año (modelo {model})",
+  "tools.renta.months": "Meses con derecho a la deducción en el año (todos los hijos; vacío: el año entero)",
   "tools.renta.draft.immediate": "Quiero que el pase empiece ahora y acepto que, por ello, pierdo el derecho de desistimiento de 14 días",
   "billing.resource.autonomoDrafts": "borradores de autónomo de este trimestre",
   "billing.resource.autonomoDraftsOf": "borradores de autónomo del {n}T {year}",

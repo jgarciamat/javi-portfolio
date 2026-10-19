@@ -613,6 +613,118 @@ describe('computeRenta', () => {
     expect(r.result).toBe(-1200);
   });
 
+  it('counts maternity by months and holds art. 81 bis to the contributions (art. 81.3, 81 bis.2)', () => {
+    const rules: RentaState = {
+      ...state,
+      deductions: [
+        deduction({ id: 'mat', kind: 'fixed', amount: 1200, refundable: true, monthly: 100 }),
+        deduction({
+          id: 'dis',
+          kind: 'fixed',
+          amount: 1200,
+          refundable: true,
+          contributionCap: 'each',
+        }),
+        deduction({
+          id: 'esp',
+          kind: 'fixed',
+          amount: 2400,
+          refundable: true,
+          contributionCap: 'base',
+        }),
+        deduction({ id: 'birth', kind: 'fixed', amount: 600, splitBetweenParents: true }),
+        deduction({
+          id: 'rent',
+          kind: 'special',
+          limit: 800,
+          ageLimit: { maxAge: 35, limit: 950 },
+        }),
+      ],
+    };
+    const run = (over: Partial<RentaInput>, choices: RentaInput['choices']) =>
+      computeRenta(input({ state: rules, choices, ...over }));
+    // Ten months of maternity: 1,000 €; no months typed: the whole year.
+    expect(run({}, { mat: { on: true, units: 1, months: 10 } }).refundable).toBe(1000);
+    expect(run({}, { mat: { on: true, units: 1, months: 30 } }).refundable).toBe(1200);
+    expect(run({}, { mat: { on: true, units: 1 } }).refundable).toBe(1200);
+    // 1,198.80 € of contributions: each relative and each deduction up to them; the special
+    // increase of a large family is not held.
+    expect(run({ socialSecurity: 1198.8 }, { dis: { on: true, units: 2 } }).refundable).toBe(
+      2397.6
+    );
+    expect(run({ socialSecurity: 1198.8 }, { esp: { on: true, units: 1 } }).refundable).toBe(
+      2398.8
+    );
+    expect(run({ socialSecurity: 5000 }, { dis: { on: true, units: 1 } }).refundable).toBe(1200);
+    expect(run({ socialSecurity: 1198.8 }, { dis: { on: true } }).refundable).toBe(1198.8);
+    // A pensioner has no limit.
+    expect(
+      run({ socialSecurity: 0, retired: true }, { dis: { on: true, units: 1 } }).refundable
+    ).toBe(1200);
+    // The owner's RETA of an activity counts as contributions.
+    const reta = {
+      list: [
+        {
+          kind: 'direct' as const,
+          name: 'A',
+          dependent: false,
+          newActivity: false,
+          withheld: 0,
+          payments: 0,
+          data: {
+            method: 'simplified' as const,
+            income: { sales: 10000, grants: 0, ownUse: 0, other: 0 },
+            expenses: {
+              purchases: 0,
+              staff: 0,
+              staffSocialSecurity: 0,
+              ownSocialSecurity: 900,
+              rent: 0,
+              repairs: 0,
+              supplies: 0,
+              services: 0,
+              insurance: 0,
+              taxes: 0,
+              financial: 0,
+              meals: 0,
+              other: 0,
+              depreciation: 0,
+            },
+            assets: [],
+            lowValue: [],
+            health: { premiums: 0, people: 0, withDisability: 0 },
+            home: { supplies: 0, usedPercent: 0 },
+            provisions: 0,
+          },
+        },
+        {
+          kind: 'given' as const,
+          name: 'B',
+          withheld: 0,
+          payments: 0,
+          data: { area: 'modules' as const, net: 0 },
+        },
+      ],
+      modules: [],
+      farm: [],
+    };
+    expect(
+      run({ gross: 0, socialSecurity: 0, activities: reta }, { dis: { on: true, units: 1 } })
+        .refundable
+    ).toBe(900);
+    // A birth split between parents who file on their own; the rent with a higher maximum to 35.
+    const family = { ...alone, children: [{ age: 0, disability: 0 as const }] };
+    const birth = (shared: boolean) =>
+      run({ family: { ...family, sharedChildren: shared } }, { birth: { on: true, units: 1 } })
+        .stateDeductions;
+    expect(birth(true)).toBe(300);
+    expect(birth(false)).toBe(600);
+    const rent = (age: number) =>
+      run({ family: { ...alone, age } }, { rent: { on: true, amount: 2000 } }).stateDeductions;
+    expect(rent(30)).toBe(950);
+    expect(rent(40)).toBe(800);
+  });
+
   it('adds back what was collected in advance with the modelo 140 (box 0612)', () => {
     const withAdvance: RentaState = {
       ...state,

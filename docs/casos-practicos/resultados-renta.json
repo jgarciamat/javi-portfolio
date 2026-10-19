@@ -92,94 +92,6 @@
     {
       "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
       "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 912.68,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 781.53,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 1694.21,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": null,
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 1694.21,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.052,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": null,
-      "concepto": "Cuota diferencial",
-      "esperado": -105.79,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 252,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -105.79,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 252,19. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
-      "esperado": 1270.66,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.183,34. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 1270.66,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Bug probable: la deducción de La Palma (DA 57.ª LIRPF, «en los mismos términos» que la de Ceuta y Melilla del art. 68.4) va por mitades a las cuotas estatal y autonómica; el motor la resta entera de la estatal (estado-la-palma no tiene regionalShare)."
-    },
-    {
-      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
-      "declaracion": "individual",
       "casilla": null,
       "campo": null,
       "concepto": "Ayuda pública por la vivienda destruida (30.000 €)",
@@ -222,72 +134,6 @@
       "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
     },
     {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 62,44. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 1263.39,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.325,83. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": null,
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 1263.39,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.325,83. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": null,
-      "concepto": "Cuota diferencial",
-      "esperado": -636.61,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -574,17. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -636.61,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -574,17. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
-      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 1192.44,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.130,00. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
-    },
-    {
       "caso": "p3-62-afectado-dana-ayudas-valencia",
       "declaracion": "individual",
       "casilla": null,
@@ -319,83 +165,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 986.53,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 686,53. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 2361.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.061,75. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": null,
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 2361.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.061,75. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": null,
-      "concepto": "Cuota diferencial",
-      "esperado": -638.25,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -938,25. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -1638.25,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -2.138,25. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
-      "esperado": 1000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.200,00. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
-    },
-    {
-      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 300,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 600,00. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
     },
     {
       "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
@@ -475,72 +244,6 @@
       "motivo": "Exenta (art. 7.h LIRPF, menor de 22 años): no se declara como rendimiento."
     },
     {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 29.27,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 0,00. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 1404.49,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.375,22. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": null,
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 1404.49,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.375,22. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": null,
-      "concepto": "Cuota diferencial",
-      "esperado": -1395.51,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -1.424,78. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -1395.51,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -1.424,78. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
-      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 1322,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 1.351,27. Mejora: la deducción de Castilla y León por nacimiento en el medio rural se reparte entre los dos progenitores en individual (710 € cada uno); el motor da los 1.420 enteros."
-    },
-    {
       "caso": "p3-79-apicultor-modulos-y-asalariado-avila",
       "declaracion": "individual",
       "casilla": null,
@@ -594,50 +297,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-86-monoparental-especial-fresa-huelva",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -3497.6,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -3.500,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
-    },
-    {
-      "caso": "p3-86-monoparental-especial-fresa-huelva",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
-      "esperado": 2397.6,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.400,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
-    },
-    {
-      "caso": "p3-86-monoparental-especial-fresa-huelva",
-      "declaracion": "conjunta",
-      "casilla": "0670",
-      "campo": null,
-      "concepto": "Resultado de la declaración",
-      "esperado": -3497.6,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da -3.500,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
-    },
-    {
-      "caso": "p3-86-monoparental-especial-fresa-huelva",
-      "declaracion": "conjunta",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
-      "esperado": 2397.6,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Discrepancia propuesta: el motor da 2.400,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
     },
     {
       "caso": "p3-89-bono-alquiler-joven-malaga",
@@ -15998,6 +15657,36 @@
     {
       "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
       "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 912.68,
+      "obtenido": 912.68,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 781.53,
+      "obtenido": 781.53,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1694.21,
+      "obtenido": 1694.21,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
       "casilla": "0414",
       "campo": "boxes.0414",
       "concepto": "Deducción por obtención de rendimientos del trabajo",
@@ -16008,11 +15697,61 @@
     {
       "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
       "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 1694.21,
+      "obtenido": 1694.21,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
       "casilla": "0609",
       "campo": "boxes.0609",
       "concepto": "Total pagos a cuenta",
       "esperado": 1800,
       "obtenido": 1800,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -105.79,
+      "obtenido": -105.79,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -105.79,
+      "obtenido": -105.79,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.stateDeductions",
+      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
+      "esperado": 1270.66,
+      "obtenido": 1270.66,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 1270.66,
+      "obtenido": 1270.66,
       "estado": "coincide"
     },
     {
@@ -18128,6 +17867,26 @@
     {
       "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
       "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1263.39,
+      "obtenido": 1263.39,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
       "casilla": "0414",
       "campo": "boxes.0414",
       "concepto": "Deducción por obtención de rendimientos del trabajo",
@@ -18138,11 +17897,51 @@
     {
       "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
       "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 1263.39,
+      "obtenido": 1263.39,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
       "casilla": "0609",
       "campo": "boxes.0609",
       "concepto": "Total pagos a cuenta",
       "esperado": 1900,
       "obtenido": 1900,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -636.61,
+      "obtenido": -636.61,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -636.61,
+      "obtenido": -636.61,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-61-joven-alquiler-despoblamiento-castellon",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 1192.44,
+      "obtenido": 1192.44,
       "estado": "coincide"
     },
     {
@@ -19318,6 +19117,26 @@
     {
       "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
       "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 986.53,
+      "obtenido": 986.53,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2361.75,
+      "obtenido": 2361.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
       "casilla": "0414",
       "campo": "boxes.0414",
       "concepto": "Deducción por obtención de rendimientos del trabajo",
@@ -19328,11 +19147,61 @@
     {
       "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
       "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 2361.75,
+      "obtenido": 2361.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
       "casilla": "0609",
       "campo": "boxes.0609",
       "concepto": "Total pagos a cuenta",
       "esperado": 3000,
       "obtenido": 3000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -638.25,
+      "obtenido": -638.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -1638.25,
+      "obtenido": -1638.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.refundable",
+      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
+      "esperado": 1000,
+      "obtenido": 1000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 300,
+      "obtenido": 300,
       "estado": "coincide"
     },
     {
@@ -22618,6 +22487,26 @@
     {
       "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
       "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 29.27,
+      "obtenido": 29.27,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1404.49,
+      "obtenido": 1404.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
       "casilla": "0414",
       "campo": "boxes.0414",
       "concepto": "Deducción por obtención de rendimientos del trabajo",
@@ -22628,11 +22517,51 @@
     {
       "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
       "declaracion": "individual",
+      "casilla": "0595",
+      "campo": "boxes.0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "esperado": 1404.49,
+      "obtenido": 1404.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
       "casilla": "0609",
       "campo": "boxes.0609",
       "concepto": "Total pagos a cuenta",
       "esperado": 2800,
       "obtenido": 2800,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "campo": "boxes.0610",
+      "concepto": "Cuota diferencial",
+      "esperado": -1395.51,
+      "obtenido": -1395.51,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -1395.51,
+      "obtenido": -1395.51,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-77-nacimiento-rural-alquiler-joven-soria",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.regionalDeductions",
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "esperado": 1322,
+      "obtenido": 1322,
       "estado": "coincide"
     },
     {
@@ -25817,6 +25746,26 @@
     },
     {
       "caso": "p3-86-monoparental-especial-fresa-huelva",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -3497.6,
+      "obtenido": -3497.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-86-monoparental-especial-fresa-huelva",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "result.refundable",
+      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
+      "esperado": 2397.6,
+      "obtenido": 2397.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-86-monoparental-especial-fresa-huelva",
       "declaracion": "conjunta",
       "casilla": "0003",
       "campo": "boxes.0003",
@@ -26088,11 +26037,31 @@
     {
       "caso": "p3-86-monoparental-especial-fresa-huelva",
       "declaracion": "conjunta",
+      "casilla": "0670",
+      "campo": "boxes.0670",
+      "concepto": "Resultado de la declaración",
+      "esperado": -3497.6,
+      "obtenido": -3497.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-86-monoparental-especial-fresa-huelva",
+      "declaracion": "conjunta",
       "casilla": null,
       "campo": "result.jointReduction",
       "concepto": "Reducción por tributación conjunta",
       "esperado": 2150,
       "obtenido": 2150,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-86-monoparental-especial-fresa-huelva",
+      "declaracion": "conjunta",
+      "casilla": null,
+      "campo": "result.refundable",
+      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
+      "esperado": 2397.6,
+      "obtenido": 2397.6,
       "estado": "coincide"
     },
     {

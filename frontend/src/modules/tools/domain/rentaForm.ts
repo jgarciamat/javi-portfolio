@@ -57,6 +57,8 @@ export interface Choice {
   units: string;
   /** Collected in advance in the year with the modelo 140 or 143 (refundable deductions only). */
   advance?: string;
+  /** Months with the right to a deduction by months (maternity), of all the children. */
+  months?: string;
 }
 
 /** Everything the person types, as text, in the order of the steps. */
@@ -295,6 +297,7 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         amount: number(c.amount),
         units: c.units === '' ? Math.max(1, form.children.length) : number(c.units),
         advance: number(c.advance),
+        ...(c.months !== undefined && c.months.trim() !== '' ? { months: number(c.months) } : {}),
       },
     ])
   );

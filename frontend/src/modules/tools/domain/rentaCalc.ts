@@ -238,6 +238,8 @@ export interface DeductionChoice {
   units?: number;
   /** A refundable deduction collected in advance in the year (modelos 140 and 143), in euros. */
   advance?: number;
+  /** For a deduction by months (maternity): the months with the right to it, of all the children. */
+  months?: number;
 }
 
 /** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
@@ -297,7 +299,13 @@ export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 
   if (!choice.on) return 0;
   if (d.kind === 'fixed') {
     const units = Math.max(1, Math.floor(choice.units ?? 1));
-    return round2(fixedValue(d, units) * factor);
+    const full = fixedValue(d, units);
+    // By months (art. 81.3): what the months give, never more than the whole year of each child.
+    const value =
+      d.monthly && choice.months !== undefined
+        ? Math.min(d.monthly * Math.max(0, choice.months), full)
+        : full;
+    return round2(value * factor);
   }
   return round2(loweredValue(d, choice, factor));
 }
@@ -794,15 +802,49 @@ function advanceOf(input: RentaInput): number {
     .reduce((sum, d) => sum + positive(input.choices[d.id].advance ?? 0), 0);
 }
 
+/** A deduction with what the person's age changes in it (a higher maximum while young). */
+function adapted(d: Deduction, input: RentaInput): Deduction {
+  return d.ageLimit && input.family.age <= d.ageLimit.maxAge
+    ? { ...d, limit: d.ageLimit.limit }
+    : d;
+}
+
+/** The social security of the year of an active person (art. 81 bis.2), or null when not held. */
+function contributionsOf(input: RentaInput): number | null {
+  // Only "los contribuyentes a que se refiere el primer párrafo": those who work, on their own or
+  // for others; pensioners and the unemployed have no limit.
+  const works = !input.retired && positive(input.gross) > positive(input.nonSalaryIncome ?? 0);
+  const own = (input.activities?.list ?? []).reduce(
+    (sum, a) => sum + (a.kind === 'direct' ? positive(a.data.expenses.ownSocialSecurity) : 0),
+    0
+  );
+  if (!works && own <= 0) return null;
+  return positive(input.socialSecurity) + own;
+}
+
+/** A deduction of art. 81 bis held to the contributions: each one, and for each relative on its own. */
+function capped(d: Deduction, choice: DeductionChoice, amount: number, input: RentaInput): number {
+  const cap = d.contributionCap ? contributionsOf(input) : null;
+  if (cap === null || !choice.on) return amount;
+  if (d.contributionCap === 'base') return round2(Math.min(1200, cap) + Math.max(0, amount - 1200));
+  const units = Math.max(1, Math.floor(choice.units ?? 1));
+  return round2(Math.min(amount, Math.min(amount / units, cap) * units));
+}
+
 /** The chosen deductions: what each one gives, split by quota, and those the income rules out. */
 function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   const blocked: string[] = [];
   const lines: DeductionLine[] = [];
-  const amountOf = (d: Deduction) => {
+  const amountOf = (data: Deduction) => {
+    const d = adapted(data, input);
     const choice = input.choices[d.id] ?? { on: false };
     const factor = incomeFactor(d, limitBase(d), input.joint !== undefined);
     if (choice.on && factor === 0) blocked.push(d.id);
-    return { on: choice.on, amount: deductionAmount(d, choice, factor) };
+    const amount = capped(d, choice, deductionAmount(d, choice, factor), input);
+    return {
+      on: choice.on,
+      amount: d.splitBetweenParents && input.family.sharedChildren ? round2(amount / 2) : amount,
+    };
   };
   const line = (d: Deduction, scope: DeductionLine['scope'], amount: number) =>
     lines.push({ id: d.id, title: d.title, group: d.group, scope, amount });

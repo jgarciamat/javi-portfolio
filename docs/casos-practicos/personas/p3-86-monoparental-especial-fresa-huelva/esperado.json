@@ -281,12 +281,7 @@
       "importe": -3497.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -3500
-      },
-      "motivo": "Discrepancia propuesta: el motor da -3.500,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -296,12 +291,7 @@
       "importe": 2397.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.refundable",
-        "obtenido": 2400
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.400,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
+      "campo": "result.refundable"
     },
     {
       "modelo": "100",
@@ -581,12 +571,7 @@
       "importe": -3497.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -3500
-      },
-      "motivo": "Discrepancia propuesta: el motor da -3.500,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -606,12 +591,7 @@
       "importe": 2397.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.refundable",
-        "obtenido": 2400
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.400,00. Duda: cada deducción del art. 81 bis tiene como tope las cotizaciones a la Seguridad Social del contribuyente (art. 81 bis.2): 1.198,80 € en este caso; el motor no aplica el tope."
+      "campo": "result.refundable"
     }
   ]
 }

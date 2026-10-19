@@ -182,6 +182,32 @@ function DeductionInput({
   );
 }
 
+/** The months with the right to a deduction by months (maternity: 100 € each). */
+function MonthsInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  if (!deduction.monthly) return null;
+  return (
+    <label className="tools-field">
+      <span>{t('tools.renta.months')}</span>
+      <input
+        className="tx-input"
+        inputMode="numeric"
+        value={choice.months ?? ''}
+        placeholder="12"
+        onChange={(e) => onChange({ ...choice, months: e.target.value })}
+      />
+    </label>
+  );
+}
+
 /** What was already collected in advance with the modelo 140 or 143, for those that have one. */
 function AdvanceInput({
   deduction,
@@ -307,6 +333,7 @@ function DeductionRow({
             onChange={onChange}
           />
           <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
+          <MonthsInput deduction={deduction} choice={choice} onChange={onChange} />
           {!blocked && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>

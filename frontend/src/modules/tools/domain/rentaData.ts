@@ -82,6 +82,18 @@ export interface Deduction {
   refundable?: boolean;
   /** Can be paid monthly in advance with a model (maternity: 140; large family and disability: 143). */
   advance?: AdvancePayment;
+  /** Euros per month with the right to it (maternity: 100 €, LIRPF art. 81.3): the months are asked. */
+  monthly?: number;
+  /**
+   * Held to the person's social security contributions of the year (LIRPF art. 81 bis.2): `each`
+   * deduction (and each relative) on its own, or only its first 1,200 € (`base`: the increase of a
+   * large family of the special category is not held, art. 81 bis.1.c).
+   */
+  contributionCap?: 'each' | 'base';
+  /** A higher maximum up to an age (the Valencian rent: 950 € up to 35 years). */
+  ageLimit?: { maxAge: number; limit: number };
+  /** Split in halves between the two parents when each files on their own (births, adoptions). */
+  splitBetweenParents?: boolean;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */
   requirements: string;
   /** The Tax Agency page that explains it. */

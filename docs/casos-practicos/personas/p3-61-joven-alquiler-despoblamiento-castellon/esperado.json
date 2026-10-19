@@ -221,12 +221,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0571",
-        "obtenido": 62.44
-      },
-      "motivo": "Discrepancia propuesta: el motor da 62,44. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -236,12 +231,7 @@
       "importe": 1263.39,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0587",
-        "obtenido": 1325.83
-      },
-      "motivo": "Discrepancia propuesta: el motor da 1.325,83. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -261,12 +251,7 @@
       "importe": 1263.39,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 1325.83
-      },
-      "motivo": "Discrepancia propuesta: el motor da 1.325,83. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -286,12 +271,7 @@
       "importe": -636.61,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": -574.17
-      },
-      "motivo": "Discrepancia propuesta: el motor da -574,17. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -301,12 +281,7 @@
       "importe": -636.61,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -574.17
-      },
-      "motivo": "Discrepancia propuesta: el motor da -574,17. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -316,12 +291,7 @@
       "importe": 1192.44,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.regionalDeductions",
-        "obtenido": 1130
-      },
-      "motivo": "Discrepancia propuesta: el motor da 1.130,00. Bug probable: la deducción valenciana por alquiler sube al 25 % y 950 € con 35 años o menos (Ley 13/1997 CV, art. 4.Uno.n); el motor la limita siempre a 800 €."
+      "campo": "result.regionalDeductions"
     }
   ]
 }

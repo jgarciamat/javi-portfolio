@@ -60,6 +60,8 @@ const deductions: Deduction[] = [
     amount: 1200,
     unit: 'hijo menor de 3 años',
     limit: 1350,
+    // LIRPF art. 81.3: "de forma proporcional al número de meses" (100 € each).
+    monthly: 100,
     requirements:
       'Madre con derecho al mínimo por descendientes que cobre paro o esté de alta en la Seguridad Social al nacer el hijo, o después con 30 días cotizados. No cuentan los meses con complemento de ayuda a la infancia. Solo la madre (salvo fallecimiento o custodia del padre).',
     url: `${MATERNIDAD}/deduccion-maternidad/cuantia-limite-deduccion.html`,
@@ -81,6 +83,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-descendiente-discapacidad',
+    contributionCap: 'each',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -97,6 +100,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-discapacidad',
+    contributionCap: 'each',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -113,6 +117,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-conyuge-discapacidad',
+    contributionCap: 'each',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -129,6 +134,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa',
+    contributionCap: 'each',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -145,6 +151,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-especial',
+    contributionCap: 'base',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -177,6 +184,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-separado-dos-hijos',
+    contributionCap: 'each',
     refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
@@ -439,6 +447,9 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-la-palma',
+    // LIRPF DA 57.ª: the deduction of art. 68.4.1.º "en los mismos términos y condiciones", so half
+    // lowers the regional quota as in Ceuta and Melilla (art. 77.1.a).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Residentes en la isla de La Palma',
     summary:

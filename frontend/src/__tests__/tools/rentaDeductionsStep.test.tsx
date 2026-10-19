@@ -100,6 +100,29 @@ describe('Renta deductions: collected in advance', () => {
   });
 });
 
+describe('Renta deductions: by months', () => {
+  it('asks the months of a deduction by months', () => {
+    const monthly = other('mat', { monthly: 100 });
+    const onChange = jest.fn();
+    renderWithProviders(
+      <DeductionsStep
+        state={{ ...rentaState, deductions: [monthly] }}
+        ccaa={null}
+        loadError={false}
+        choices={{ mat: { on: true, amount: '', units: '' } }}
+        family={familyOf(emptyForm(''))}
+        blocked={[]}
+        hints={{}}
+        savings={{}}
+        markedSaving={0}
+        onChange={onChange}
+      />
+    );
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.months')), { target: { value: '10' } });
+    expect(onChange).toHaveBeenCalledWith('mat', { on: true, amount: '', units: '', months: '10' });
+  });
+});
+
 describe('Renta deductions: what each one saves', () => {
   it('orders them by saving, with the ones the income does not allow at the end', () => {
     const list = [

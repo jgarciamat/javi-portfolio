@@ -221,12 +221,7 @@
       "importe": 986.53,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0571",
-        "obtenido": 686.53
-      },
-      "motivo": "Discrepancia propuesta: el motor da 686,53. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -236,12 +231,7 @@
       "importe": 2361.75,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0587",
-        "obtenido": 2061.75
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.061,75. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -261,12 +251,7 @@
       "importe": 2361.75,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 2061.75
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.061,75. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -286,12 +271,7 @@
       "importe": -638.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": -938.25
-      },
-      "motivo": "Discrepancia propuesta: el motor da -938,25. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -301,12 +281,7 @@
       "importe": -1638.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -2138.25
-      },
-      "motivo": "Discrepancia propuesta: el motor da -2.138,25. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",
@@ -316,12 +291,7 @@
       "importe": 1000.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.refundable",
-        "obtenido": 1200
-      },
-      "motivo": "Discrepancia propuesta: el motor da 1.200,00. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "result.refundable"
     },
     {
       "modelo": "100",
@@ -331,12 +301,7 @@
       "importe": 300.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "result.regionalDeductions",
-        "obtenido": 600
-      },
-      "motivo": "Discrepancia propuesta: el motor da 600,00. Duda/mejora: la maternidad va por meses desde el nacimiento (10 × 100 €, art. 81.1) y la deducción valenciana por nacimiento se reparte entre los dos progenitores en individual (300 € cada uno); el motor da 1.200 y 600."
+      "campo": "result.regionalDeductions"
     },
     {
       "modelo": "100",
