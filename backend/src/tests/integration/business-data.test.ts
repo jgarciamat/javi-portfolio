@@ -146,6 +146,59 @@ describe('The self-employed form saved in the account', () => {
     expect((await get(ana).expect(200)).body).toMatchObject({ data: next, version: 2 });
   });
 
+  it('keeps the activity of the year: assets, grants and farming modules', async () => {
+    const activity = {
+      method: 'objective',
+      agrarian: true,
+      assets: [
+        {
+          name: 'Tractor',
+          group: 'm3',
+          cost: '30000',
+          land: '',
+          start: '2026-03-01',
+          use: '100',
+          method: 'table',
+          rate: '',
+          life: '',
+          used: false,
+          accumulated: '',
+          vat: '6300',
+          vatPct: '',
+        },
+      ],
+      subsidies: [
+        { name: 'Ayuda', kind: 'capital', amount: '6000', year: '2026', quarter: '2', asset: '0' },
+      ],
+      provisions: '',
+      retaFix: '-120',
+      selfConsumption: '',
+      stockChange: '',
+      compensations: ['', '', '', ''],
+      paid130: ['', '', '', ''],
+      modules: {
+        rows: [{ product: 'cereals', income: '40000', transformed: false, reduced: '' }],
+        pacAid: '5000',
+        staffShare: '',
+        rentedShare: '',
+        irrigatedShare: '',
+        externalMeans: false,
+        boughtFeed: false,
+        organic: true,
+        forestPlan: false,
+        youngFarmer: false,
+        refunds: '',
+        extraordinary: '',
+      },
+    };
+    const base = form();
+    const data = { ...base, manual: { ...base.manual, activity } };
+    await put(ana, { data, baseVersion: null }).expect(200);
+    expect((await get(ana).expect(200)).body.data.manual.activity).toEqual(activity);
+    const wrong = { ...data, manual: { ...data.manual, activity: { ...activity, extra: 1 } } };
+    await put(ana, { data: wrong, baseVersion: 1 }).expect(400);
+  });
+
   it('keeps the VAT of the quarters, of the invoices and of the year (older copies have none)', async () => {
     const vat = {
       sales: {

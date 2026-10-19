@@ -6,6 +6,7 @@ import type { AutonomoCloudCopy, ExpenseKind } from '@modules/finances/domain/ty
 import { missingOf, reviewOf, type KindPreferences } from '../../domain/invoiceLedger';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
 import { withholdingsOf } from './withholdingForm';
+import { activityOf, isEmptyActivity, type ActivityForm } from './activityForm';
 import { NO_VAT_EXTRAS, isEmptyVat, vatExtrasOf, vatOfForm } from './vatForm';
 
 /**
@@ -177,6 +178,10 @@ export function toSaved(
       ...(manual.filed303?.some((f) => f !== null)
         ? { filed303: [0, 1, 2, 3].map((i) => manual.filed303?.[i] ?? null) }
         : {}),
+      // The activity of the year (assets, grants…), only when something was typed.
+      ...(isEmptyActivity(manual.activity as ActivityForm | undefined)
+        ? {}
+        : { activity: activityOf(manual.activity as ActivityForm) }),
     },
     extras: {
       hardToJustify: options.hardToJustify,

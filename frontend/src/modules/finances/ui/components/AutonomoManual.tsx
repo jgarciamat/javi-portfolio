@@ -9,6 +9,7 @@ import { QuarterVatPanel } from './AutonomoVatQuarter';
 import { toQuarterVat, vatOfForm, type VatExtras, type VatForm } from './vatForm';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
+import type { ActivityForm } from './activityForm';
 import {
   EXPENSE_KINDS,
   PURCHASE_OPS,
@@ -56,6 +57,8 @@ export interface ManualForm {
   withholdings?: WithholdingForm[];
   /** Results (box 71) of the modelos 303 imported, by quarter: the 390 is reconciled with them. */
   filed303?: (number | null)[];
+  /** Assets, grants and the other annual figures of the activity (older data has none). */
+  activity?: ActivityForm;
 }
 
 /** Accumulated income and expenses (boxes 01 and 02) of a filed modelo 130. */

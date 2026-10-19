@@ -615,6 +615,77 @@ const savedWithholding = z
     filed115: z.boolean(),
   })
   .strict();
+// The activity of the year as typed (frontend activityForm.ts): assets, grants, modules.
+const nameText = z.string().max(80);
+const savedAsset = z
+  .object({
+    name: nameText,
+    group: formText,
+    cost: formText,
+    land: formText,
+    start: formText,
+    use: formText,
+    method: z.enum(['table', 'free300', 'accelerated']),
+    rate: formText,
+    life: formText,
+    used: z.boolean(),
+    accumulated: formText,
+    vat: formText,
+    vatPct: formText,
+  })
+  .strict();
+const savedSubsidy = z
+  .object({
+    name: nameText,
+    kind: z.enum(['current', 'capital', 'youngFarmer', 'exempt']),
+    amount: formText,
+    year: formText,
+    quarter: formText,
+    asset: formText,
+  })
+  .strict();
+const savedModules = z
+  .object({
+    rows: z
+      .array(
+        z
+          .object({
+            product: formText,
+            income: formText,
+            transformed: z.boolean(),
+            reduced: formText,
+          })
+          .strict()
+      )
+      .max(60),
+    pacAid: formText,
+    staffShare: formText,
+    rentedShare: formText,
+    irrigatedShare: formText,
+    externalMeans: z.boolean(),
+    boughtFeed: z.boolean(),
+    organic: z.boolean(),
+    forestPlan: z.boolean(),
+    youngFarmer: z.boolean(),
+    refunds: formText,
+    extraordinary: formText,
+  })
+  .strict();
+const savedActivity = z
+  .object({
+    method: z.enum(['simplified', 'normal', 'objective']),
+    agrarian: z.boolean(),
+    assets: z.array(savedAsset).max(200),
+    subsidies: z.array(savedSubsidy).max(100),
+    provisions: formText,
+    retaFix: formText,
+    selfConsumption: formText,
+    stockChange: formText,
+    compensations: z.array(formText).max(4),
+    paid130: z.array(formText).max(4),
+    modules: savedModules,
+  })
+  .strict();
 const autonomoSaved = z
   .object({
     manual: z
@@ -656,6 +727,8 @@ const autonomoSaved = z
         ]),
         /** Results (box 71) of the 303 imported, by quarter. */
         filed303: z.tuple([filedResult, filedResult, filedResult, filedResult]).optional(),
+        /** Assets, grants and the annual figures of the activity. */
+        activity: savedActivity.optional(),
       })
       .strict(),
     extras: z

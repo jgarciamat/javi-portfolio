@@ -5,7 +5,6 @@ import { recordPositiveMoment } from '@core/review/review';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
-import { parseDecimal } from '@shared/utils/numbers';
 import { useHeaderOffset } from '@shared/hooks/useHeaderOffset';
 import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
@@ -26,7 +25,9 @@ import { AutonomoCloudPanel } from './AutonomoCloud';
 import { WithholdingsPanel } from './AutonomoWithholdings';
 import { AnnualPanel } from './AutonomoAnnual';
 import { VatYearPanel } from './AutonomoVatYear';
-import { toVatOptions, vatExtrasOf } from './vatForm';
+import { vatExtrasOf } from './vatForm';
+import { annualOf, buildInputs } from './autonomoInputs';
+import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
 import type { KindPreferences } from '../../domain/invoiceLedger';
@@ -34,7 +35,7 @@ import type { ReviewFocus } from './InvoiceReview';
 import { checkImport } from '../../domain/importChecks';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
-import type { AutonomoDraft, AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
+import type { AutonomoDraft, AutonomoInputs } from '@modules/finances/domain/types';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
@@ -53,40 +54,7 @@ const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
 
 type Quarter = 1 | 2 | 3 | 4;
 
-const number = (text: string): number => {
-  const parsed = parseDecimal(text);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-};
 const quarterNow = (): Quarter => (Math.floor(new Date().getMonth() / 3) + 1) as Quarter;
-
-/** What the server takes to prepare the draft of a quarter. */
-function buildInputs(manual: ManualForm, extras: Extras, quarter: Quarter): AutonomoInputs {
-  return {
-    quarters: manual.quarters.map(
-      (q): QuarterExtras => ({
-        withheld: number(q.withheld),
-        socialSecurity: 0,
-        vatNotDeductible: 0,
-      })
-    ) as AutonomoInputs['quarters'],
-    hardToJustify: extras.hardToJustify,
-    priorYearNet: extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet),
-    exempt130: extras.exempt,
-    // The VAT left to offset is the one at the start of the year: the quarters carry it on.
-    vatToOffset: 0,
-    vat: toVatOptions(extras.vat, number(extras.toOffset), manual.filed303 ?? []),
-    manual: toManualData(manual),
-    prior:
-      manual.prior.on && quarter > 1
-        ? {
-            income: number(manual.prior.income),
-            expenses: number(manual.prior.expenses),
-            previousPayments: number(manual.prior.payments),
-            withheld: number(manual.prior.withheld),
-          }
-        : null,
-  };
-}
 
 /** The year and the quarter of the draft. */
 function PeriodPicker({
@@ -342,7 +310,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
   const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
   const prepare = () =>
     action.run(async () => {
-      const inputs = buildInputs(manual, extras, quarter);
+      const inputs = buildInputs(manual, extras, year, quarter);
       const result = await businessApi.draft(year, quarter, inputs);
       const next: Snapshot = { draft: result, inputs };
       storage.setJSON(SNAPSHOT_KEY, next);
@@ -414,11 +382,19 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           />
         }
         extras={
-          <ExtrasPanel
-            extras={extras}
-            quarter={quarter}
-            onChange={(patch) => setExtras({ ...extras, ...patch })}
-          />
+          <>
+            <ActivityPanel
+              value={manual.activity}
+              year={year}
+              reagp={vatExtrasOf(extras.vat).regime === 'reagp'}
+              onChange={(activity) => changeManual({ ...manual, activity })}
+            />
+            <ExtrasPanel
+              extras={extras}
+              quarter={quarter}
+              onChange={(patch) => setExtras({ ...extras, ...patch })}
+            />
+          </>
         }
         vatExtras={extras.vat}
         onCarry={(carry) => setExtras(withCarry(extras, carry))}
@@ -444,6 +420,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
         )}
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
         <AnnualPanel form={manual} year={year} />
+        {hasManual && <ActivitySummaryPanel annual={annualOf(manual, extras, year)} />}
         {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
       </StepSection>
     </div>
