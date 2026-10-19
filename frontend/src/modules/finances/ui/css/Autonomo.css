@@ -778,3 +778,25 @@ button.autonomo-sum-warn {
 .autonomo-review-retention select {
   margin-top: 0.3rem;
 }
+
+/* The options of «Otros datos para los modelos»: one checkbox per line, the text beside it. */
+.autonomo-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0.9rem;
+}
+
+.autonomo-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.autonomo-option input[type='checkbox'] {
+  flex: none;
+  margin-top: 0.2rem;
+}
