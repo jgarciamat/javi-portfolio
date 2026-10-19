@@ -194,7 +194,7 @@ export function PropertyStep({ form, set, property }: StepProps & { property: Re
           />
         </div>
       )}
-      <SavingsDetailSection form={form} set={set} />
+      <SavingsDetailSection form={form} set={set} importer={false} />
 
       <h3>{t('tools.renta.propertyNotes')}</h3>
       <ul className="renta-notes">

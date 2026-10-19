@@ -154,7 +154,9 @@ export function markedAfter(id: string | null): HTMLElement | undefined {
 /** Scrolls to a deduction (opening its group) and puts the focus on the amount to fill in. */
 export function reveal(row: HTMLElement | null | undefined): void {
   // Without a row, the end of the list: the result.
-  const target = row ?? (document.querySelector('.renta-result') as HTMLElement);
+  const target = row ?? document.querySelector<HTMLElement>('.renta-result');
+  // The assistant shows one step at a time: the result may not be on the page.
+  if (!target) return;
   const group = target.closest('details');
   if (group) group.open = true;
   // A deduction is centred; the result is shown from its heading.

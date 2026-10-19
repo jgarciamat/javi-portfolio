@@ -458,6 +458,7 @@ export function DeductionsStep({
   markedSaving,
   onChange,
   n = 4,
+  lead = null,
 }: {
   state: RentaState;
   ccaa: RentaCcaa | null;
@@ -473,6 +474,8 @@ export function DeductionsStep({
   onChange: (id: string, choice: Choice) => void;
   /** The number of the step (the guided mode has fewer before it). */
   n?: number;
+  /** A card shown first (the expert screen: «My investments»). */
+  lead?: React.ReactNode;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -480,6 +483,7 @@ export function DeductionsStep({
   const marked = Object.values(choices).some((c) => c.on);
   return (
     <Step n={n} titleKey="tools.renta.step3">
+      {lead}
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
       <p className="section-hint">{t('tools.renta.saving.hint')}</p>
       {marked && (

@@ -1,0 +1,534 @@
+/* The step-by-step assistant of the Renta and the self-employed screen. Mobile first. */
+
+/* «A+»: the whole page a size bigger while the assistant is open (rem units follow). */
+html.wiz-big-text {
+  font-size: 118%;
+}
+
+.wiz {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Reading tools ───────────────────────────── */
+.wiz-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.wiz-tool {
+  display: inline-flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.wiz-tool[aria-pressed='true'] {
+  border-color: var(--accent-600);
+  background: rgba(99, 102, 241, 0.14);
+  font-weight: 700;
+}
+.wiz-tool:focus-visible,
+.wiz-route button:focus-visible,
+.wiz-link:focus-visible,
+.wiz-choice:has(input:focus-visible) {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+.wiz-tool-icon {
+  font-weight: 800;
+}
+
+.wiz-resume {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid var(--green-500);
+}
+
+/* ── Progress ────────────────────────────────── */
+.wiz-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.wiz-progress-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.3rem 0.8rem;
+}
+.wiz-progress-meta {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.wiz-bar {
+  height: 0.75rem;
+  border-radius: 999px;
+  background: var(--slate-800);
+  overflow: hidden;
+}
+.wiz-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb 0%, #6366f1 60%, #22c55e 100%);
+  transition: width 0.5s ease;
+}
+.wiz-streak {
+  font-weight: 700;
+  color: var(--amber-400);
+}
+
+/* ── Route of steps ──────────────────────────── */
+.wiz-route {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+@media (min-width: 720px) {
+  .wiz-route {
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  }
+}
+.wiz-route button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wiz-route-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--slate-800);
+  font-weight: 800;
+}
+.wiz-route-name {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+.wiz-route-item.is-done .wiz-route-n {
+  background: var(--green-500);
+  color: #fff;
+}
+.wiz-route-item.is-current button {
+  border-color: var(--accent-600);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  font-weight: 700;
+}
+.wiz-route-item.is-current .wiz-route-n {
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  color: #fff;
+}
+.wiz-route-item.is-locked button {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* On a phone the route is a row of numbered circles: the name of the step is in the card below
+   (and read by screen readers here). */
+@media (max-width: 719px) {
+  .wiz-route {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .wiz-route button {
+    width: auto;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.2rem;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .wiz-route-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+.wiz-refused {
+  margin: 0.4rem 0 0;
+  color: var(--amber-400);
+}
+
+/* ── Badge ───────────────────────────────────── */
+.wiz-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--amber-500);
+  background: rgba(245, 158, 11, 0.12);
+  animation: wiz-pop 0.45s ease-out;
+}
+.wiz-badge-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #422006;
+  flex-shrink: 0;
+}
+
+/* ── Screen ──────────────────────────────────── */
+.wiz-step {
+  position: relative;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--slate-800);
+  background: var(--slate-900);
+  animation: wiz-in 0.3s ease-out;
+  overflow: hidden;
+}
+@media (min-width: 720px) {
+  .wiz-step {
+    padding: 1.4rem 1.6rem;
+  }
+}
+.wiz-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.wiz-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+.wiz-title:focus {
+  outline: none;
+}
+.wiz-hint {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.wiz-help-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.6rem;
+}
+.wiz-link {
+  width: auto;
+  min-height: 2.75rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-400);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.wiz-help {
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 4px solid var(--accent-600);
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.08);
+  line-height: 1.5;
+}
+.wiz-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+/* The pieces of the expert screen inside a step: no numbers of their own. */
+.wiz-body .renta-number,
+.wiz-body .autonomo-step-n {
+  display: none;
+}
+.wiz-body .renta-step {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+.wiz-note,
+.wiz-missing,
+.wiz-why-locked {
+  margin: 0.7rem 0 0;
+  color: var(--text-secondary);
+}
+.wiz-missing {
+  color: var(--amber-400);
+}
+
+/* ── Choices: big cards, one tap ─────────────── */
+.wiz-choices {
+  display: grid;
+  gap: 0.5rem;
+}
+@media (min-width: 720px) {
+  .wiz-choices {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+}
+.wiz-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-height: 3.4rem;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid var(--slate-800);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.wiz-choice:has(input:checked) {
+  border-color: var(--accent-600);
+  background: rgba(99, 102, 241, 0.12);
+}
+.wiz-choice input {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+.wiz-choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.wiz-choice-text strong {
+  font-size: 1rem;
+}
+.wiz-choice-text small {
+  color: var(--text-secondary);
+}
+/* The guided questions of the Renta inside the assistant, as big as the choices. */
+.wiz .renta-option {
+  min-height: 3.4rem;
+  border-width: 2px;
+  font-size: 1rem;
+}
+
+/* ── Way on ──────────────────────────────────── */
+.wiz-nav {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+}
+@media (min-width: 720px) {
+  .wiz-nav {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .wiz-nav > button {
+    width: auto;
+  }
+  .wiz-back {
+    margin-right: auto;
+  }
+}
+.wiz-nav > button {
+  min-height: 3.1rem;
+  font-size: 1rem;
+}
+.wiz-next {
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+}
+.wiz-next:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #172554 100%);
+}
+.wiz-next:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── The end ─────────────────────────────────── */
+.wiz-finale {
+  text-align: left;
+}
+.wiz-badges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.4rem 0 1rem;
+  padding: 0;
+}
+.wiz-badges li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--amber-500);
+  background: rgba(245, 158, 11, 0.1);
+  font-size: 0.85rem;
+}
+.wiz-saving {
+  margin: 0.4rem 0;
+  font-size: 1.15rem;
+}
+.wiz-saving strong {
+  color: var(--green-400);
+}
+.wiz-boxes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.wiz-boxes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.8rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 10px;
+}
+.wiz-boxes .btn-secondary {
+  width: auto;
+}
+.wiz-box-n {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.wiz-steps-list {
+  margin: 0;
+  padding-left: 1.3rem;
+  line-height: 1.6;
+}
+.wiz-confetti {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 0;
+  pointer-events: none;
+}
+.wiz-confetti span {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: #6366f1;
+  opacity: 0;
+  animation: wiz-fall 1.8s ease-in 1 forwards;
+}
+.wiz-confetti span:nth-child(3n) {
+  background: #22c55e;
+}
+.wiz-confetti span:nth-child(3n + 1) {
+  background: #f59e0b;
+}
+
+/* ── High contrast ───────────────────────────── */
+html.wiz-contrast .wiz {
+  --text-secondary: var(--slate-200);
+}
+html.wiz-contrast .wiz-step,
+html.wiz-contrast .wiz-choice,
+html.wiz-contrast .wiz-route button,
+html.wiz-contrast .wiz-tool,
+html.wiz-contrast .wiz input,
+html.wiz-contrast .wiz select {
+  border-color: var(--slate-200);
+  border-width: 2px;
+}
+html.wiz-contrast .wiz-link {
+  color: var(--slate-50);
+}
+html.wiz-contrast .wiz-route-item.is-locked button {
+  opacity: 1;
+}
+
+@keyframes wiz-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes wiz-pop {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes wiz-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(260px) rotate(320deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiz-step,
+  .wiz-badge,
+  .wiz-bar > span,
+  .wiz-choice {
+    animation: none;
+    transition: none;
+  }
+  .wiz-confetti {
+    display: none;
+  }
+}
+
+/* The result inside its own screen: the title of the screen already says it. */
+.wiz-body .renta-result > h2 {
+  display: none;
+}

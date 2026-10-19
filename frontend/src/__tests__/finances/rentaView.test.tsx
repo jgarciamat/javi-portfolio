@@ -8,6 +8,8 @@ import { freezeTime, restoreTime } from '@test-utils/time';
 beforeEach(() => {
   localStorage.clear();
   localStorage.setItem('mm_renta_view', 'expert');
+  // Everything together, not the step-by-step assistant (it has its own suite).
+  localStorage.setItem('mm_renta_assistant', 'expert');
   freezeTime('2026-03-15T12:00:00');
 });
 afterEach(restoreTime);

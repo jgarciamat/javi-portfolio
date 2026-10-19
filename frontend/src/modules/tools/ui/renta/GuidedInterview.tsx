@@ -25,7 +25,7 @@ import { PartnerFields, SingleParentFields } from './JointStep';
 import { RentalSection, UnrentedSection } from './PropertyStep';
 import { Field, RadioOptions, Step, useMoney, type StepProps } from './shared';
 
-interface GuideProps extends StepProps {
+export interface GuideProps extends StepProps {
   ccaa: RentaCcaa | null;
   loadError: boolean;
   /** The State's deductions and the community's: the housing question ticks some of them. */
@@ -286,7 +286,7 @@ const BODIES: Record<QuestionId, (props: BodyProps) => React.ReactNode> = {
 };
 
 /** What a question asks for, besides the question itself: the options and their follow-up questions. */
-function QuestionBody({ q, ...props }: GuideProps & { q: QuestionId }) {
+export function QuestionBody({ q, ...props }: GuideProps & { q: QuestionId }) {
   const { t } = useI18n();
   const { form, set, deductions } = props;
   const answer = answerOf(form, q);
@@ -307,7 +307,7 @@ function QuestionBody({ q, ...props }: GuideProps & { q: QuestionId }) {
 }
 
 /** Whether "Next" can be pressed: a community, a believable age, an option (and the follow-up that needs one). */
-function ready(form: RentaForm, q: QuestionId): boolean {
+export function ready(form: RentaForm, q: QuestionId): boolean {
   if (q === 'age') {
     const age = number(form.age);
     return form.age.trim() !== '' && age >= 0 && age <= 120;

@@ -12,6 +12,7 @@ import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
+import { InvestCard, InvestLink } from './renta/InvestCard';
 import { ActivitiesList } from './renta/ActivitiesList';
 import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
@@ -42,7 +43,6 @@ export function UpgradeCta({ access }: { access: RentaAccess }) {
     </p>
   );
 }
-
 
 interface FreeGateProps {
   access: RentaAccess;
@@ -106,8 +106,11 @@ export function ResultSection({
   calculate,
   mode,
   n,
+  invest = null,
 }: {
   n: number;
+  /** «Have you invested in crypto or funds?»: the way to import them. */
+  invest?: React.ReactNode;
   access: RentaAccess;
   shown: Snapshot | null;
   busy: boolean;
@@ -134,12 +137,12 @@ export function ResultSection({
             )}
           </>
         )}
+        {invest}
         <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
       </div>
     </Step>
   );
 }
-
 
 /** Guided questions or the full form: remembered on this device. */
 function useExpertView(): [boolean, (on: boolean) => void] {
@@ -280,6 +283,7 @@ export function RentaPlanner({
         markedSaving={saved}
         onDecide={decideOn}
         startSignal={reviewStart}
+        invest={<InvestLink form={form} />}
       />
       <Optimizer form={form} set={set} ccaa={ccaa} found={found.candidates} savings={savings} />
       <DeductionsStep
@@ -294,6 +298,7 @@ export function RentaPlanner({
         markedSaving={saved}
         onChange={setChoice}
         n={expert ? 5 : 3}
+        lead={<InvestCard form={form} set={set} />}
       />
 
       <ResultSection
@@ -304,6 +309,7 @@ export function RentaPlanner({
         calculate={calculate}
         mode={mode}
         n={expert ? 6 : 4}
+        invest={<InvestLink form={form} />}
       />
     </div>
   );

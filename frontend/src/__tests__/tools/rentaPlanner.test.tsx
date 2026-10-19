@@ -53,7 +53,9 @@ describe('Renta planner: the steps', () => {
   it('explains that the foral communities file elsewhere', async () => {
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     await choose('navarra');
-    expect(await screen.findByRole('note')).toHaveTextContent(/régimen foral/);
+    expect(
+      await screen.findByText(/régimen foral/, { selector: '.renta-foral' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: tr('tools.renta.officialSite') })).toBeInTheDocument();
     expect(screen.queryByText(/Deducciones de Navarra/)).toBeNull();
   });

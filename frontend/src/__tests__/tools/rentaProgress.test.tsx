@@ -249,6 +249,8 @@ describe('the Renta section picks up the year that was left half done', () => {
       draft: NO_DRAFT,
       review: NO_REVIEW,
     });
+    localStorage.setItem('mm_renta_assistant', 'expert');
+    localStorage.setItem('mm_renta_view', 'expert');
     renderWithProviders(<RentaView />);
     await waitFor(() => expect(screen.getByLabelText(tr('app.renta.year'))).toHaveValue('2026'));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('7');

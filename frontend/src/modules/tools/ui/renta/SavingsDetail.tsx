@@ -13,6 +13,7 @@ import {
   type SavingsDetail,
 } from '../../domain/rentaGains';
 import { useMoney, type StepProps } from './shared';
+import { InvestLink } from './InvestCard';
 import { InvestImport } from './invest/InvestImport';
 
 const KINDS: AssetKind[] = ['listed', 'fund', 'crypto', 'unlisted', 'other'];
@@ -365,7 +366,17 @@ function Summary({ detail }: { detail: SavingsDetail }) {
 }
 
 /** The savings in detail: interest and dividends, sales lot by lot, properties and earlier losses. */
-export function SavingsDetailSection({ form, set }: StepProps) {
+export function SavingsDetailSection({
+  form,
+  set,
+  importer = true,
+  onImport,
+}: StepProps & {
+  /** The importer here; without it, a way to the card «My investments» of the screen. */
+  importer?: boolean;
+  /** Goes to that card (the assistant opens its step); else the page scrolls to it. */
+  onImport?: () => void;
+}) {
   const { t } = useI18n();
   const [importing, setImporting] = useState(false);
   const detail = form.savingsDetail;
@@ -384,13 +395,17 @@ export function SavingsDetailSection({ form, set }: StepProps) {
         />
         <span>{t(`${k}.on`)}</span>
       </label>
-      <button
-        className="btn-secondary"
-        aria-expanded={importing}
-        onClick={() => setImporting(!importing)}
-      >
-        {t('tools.invest.open')}
-      </button>
+      {importer ? (
+        <button
+          className="btn-secondary"
+          aria-expanded={importing}
+          onClick={() => setImporting(!importing)}
+        >
+          {t('tools.invest.open')}
+        </button>
+      ) : (
+        <InvestLink form={form} onGo={onImport} />
+      )}
       {importing && (
         <InvestImport
           year={rentaState.year}

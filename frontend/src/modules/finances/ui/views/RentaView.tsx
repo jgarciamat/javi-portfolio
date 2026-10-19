@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
-import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
+import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { Icon } from '@shared/components/Icon';
@@ -32,6 +32,11 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
   const months = Object.values(data?.months ?? {});
   const income = months.reduce((sum, m) => sum + m.income, 0);
   const expenses = months.reduce((sum, m) => sum + m.expenses, 0);
+  const howToFile = (slug: string) => {
+    requestHaciendaGuide(slug);
+    // Only offered with a way to open the tab.
+    (onOpenTab as (tab: DashboardTab) => void)('hacienda');
+  };
 
   return (
     <div className="section-view">
@@ -57,11 +62,13 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
         <CampaignDates exercise={year} />
         <p>{t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}</p>
         <div className="tools-main renta-tools">
-          <RentaPlanner
+          <RentaAssistant
             key={`${year}-${Math.round(income)}`}
             mode="account"
             year={year}
             initialIncome={income > 0 ? String(Math.round(income)) : ''}
+            onOpenAutonomo={onOpenTab && (() => onOpenTab('business'))}
+            onHowToFile={onOpenTab && howToFile}
           />
         </div>
       </div>
@@ -78,15 +85,7 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
         <a className="btn-secondary" href={AEAT} target="_blank" rel="noopener noreferrer">
           {t('app.renta.aeat')}
         </a>
-        {onOpenTab && (
-          <HowToFile
-            slugs={['renta-web', 'antes-de-empezar']}
-            onOpen={(slug) => {
-              requestHaciendaGuide(slug);
-              onOpenTab('hacienda');
-            }}
-          />
-        )}
+        {onOpenTab && <HowToFile slugs={['renta-web', 'antes-de-empezar']} onOpen={howToFile} />}
       </div>
     </div>
   );

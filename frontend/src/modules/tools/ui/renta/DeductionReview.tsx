@@ -23,6 +23,12 @@ export interface ReviewProps {
   onDecide: (id: string, decision: Decision, choice?: Choice) => void;
   /** Bumped from the guided summary: the review starts. */
   startSignal: number;
+  /** Every deduction of the review has an answer (the assistant then lets the person go on). */
+  onDone?: () => void;
+  /** «Have you invested in crypto or funds?»: the way to import them. */
+  invest?: React.ReactNode;
+  /** «See my result» (false in the assistant: its own button goes on). */
+  resultLink?: boolean;
 }
 
 type Phase =
@@ -278,9 +284,11 @@ function ReviewDone({
         {t('tools.renta.review.saves')} <strong>{money(props.markedSaving)}</strong>
       </p>
       <div className="button-row renta-review-nav">
-        <button type="button" className="btn-primary" onClick={() => reveal(null)}>
-          {t('tools.renta.review.toResult')}
-        </button>
+        {props.resultLink !== false && (
+          <button type="button" className="btn-primary" onClick={() => reveal(null)}>
+            {t('tools.renta.review.toResult')}
+          </button>
+        )}
         {left.length > 0 && (
           <button type="button" className="btn-secondary" onClick={() => restart(left)}>
             {t('tools.renta.review.reviewPending', { count: left.length })}
@@ -395,6 +403,7 @@ export function DeductionReview(props: ReviewProps) {
   const show = (next: Phase) => {
     moved.current = true;
     setPhase(next);
+    if (next.name === 'done') props.onDone?.();
   };
   const start = (queue: string[]) =>
     show(queue.length > 0 ? { name: 'walk', queue, at: 0 } : { name: 'done', queue });
@@ -431,6 +440,7 @@ export function DeductionReview(props: ReviewProps) {
       ) : (
         <ReviewIntro props={props} start={start} />
       )}
+      {!walk && props.invest}
       {!walk && <OutOfReach list={outOfReach} />}
     </Step>
   );
