@@ -58,5 +58,5 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 - Rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 60 % de la suma de las cuotas íntegras (3.045,84 + 3.045,84) (todas las rentas se obtienen allí, art. 68.4.3.º) = 3.655,01: la mitad en cada cuota (1.827,50 estatal y 1.827,51 autonómica)
 - Cuota líquida (0587) = 3.045,84 − 1.827,50 + 3.045,84 − 1.827,51 = 2.436,67
 - Deducción por rendimientos del trabajo (0414) = 0,00 (DA 61.ª: 340 € hasta 16.576 € de íntegros, otras rentas ≤ 6.500; límite: la cuota)
-- Cuota resultante (0595) = **2.436,67**; pagos a cuenta (0609) = 3.424,00 (incluye 1.824,00 de retenciones del capital o del alquiler); cuota diferencial (0610) = **-987,33**
+- Cuota resultante (0595) = **2.436,67**; pagos a cuenta (0609) = 3.424,00 (incluye 1.824,00 de otros pagos a cuenta: capital, alquiler o actividades); cuota diferencial (0610) = **-987,33**
 - Resultado (0670) = **-987,33** (a devolver)

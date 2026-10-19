@@ -77,7 +77,7 @@ describe('banco de casos prácticos', () => {
     for (const slug of slugs) {
       const p = JSON.parse(readFileSync(join(PEOPLE, slug, 'persona.json'), 'utf8'));
       expect(p.datosFicticios).toBe(true);
-      expect(p.nombre).toMatch(/^Persona Ficticia \d{2}$/);
+      expect(p.nombre).toMatch(/^Persona Ficticia \d{2,3}$/);
       expect(p.domicilio).toMatch(/^Calle Ficticia \d+, .*\(dirección inventada\)$/);
       const n = Number(p.nif.slice(0, 8));
       expect(p.nif).toMatch(/^000\d{5}[A-Z]$/);

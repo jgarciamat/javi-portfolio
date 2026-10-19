@@ -1,0 +1,22 @@
+{
+  "slug": "p3-108-agricultor-navarra-foral-fuera-de-alcance",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 108",
+  "nif": "00000108Q",
+  "domicilio": "Calle Ficticia 108, 31001 Pamplona (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "navarra",
+  "titulo": "Agricultor de la Ribera de Navarra (régimen foral)",
+  "descripcion": "Agricultor de espárrago y pimiento en Tudela: su IRPF (modelo F-90), sus módulos agrarios y sus pagos fraccionados van ante la Hacienda Foral de Navarra.",
+  "prueba": [
+    "territorio foral: Navarra (agrario)"
+  ],
+  "modelos": [
+    "F-90 (Navarra)"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "Territorio foral de Navarra: normativa, módulos y modelos propios.",
+  "documentos": {}
+}

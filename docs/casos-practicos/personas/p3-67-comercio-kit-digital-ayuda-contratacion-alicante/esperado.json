@@ -1,0 +1,1644 @@
+{
+  "slug": "p3-67-comercio-kit-digital-ayuda-contratacion-alicante",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 30000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 6300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 6300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 22350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 4693.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 4693.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 1606.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 1606.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 1606.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 1606.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 1606.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "importe": 30000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.01"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "importe": 29238.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.02"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "importe": 761.95,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.03"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.04"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.05"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.06"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.07"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "13",
+      "concepto": "Minoración (art. 110.3.c RIRPF)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.13"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.15"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 4500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "115",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Nº de perceptores",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m115.01"
+    },
+    {
+      "modelo": "115",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Base de las retenciones",
+      "importe": 3600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m115.02"
+    },
+    {
+      "modelo": "115",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Retenciones",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m115.03"
+    },
+    {
+      "modelo": "115",
+      "periodo": "1T",
+      "casilla": "05",
+      "concepto": "Resultado a ingresar",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m115.05"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 302.65,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 1695.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Tramo de cotización (rendimiento computable 1.576,35 €/mes)",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#reta",
+      "campo": "reta.bracket",
+      "valor": "G3",
+      "retaInput": {
+        "monthlyNet": 1695.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 32000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 6720.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 6720.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 23350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 4903.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 4903.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 1816.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 1816.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 1816.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 1816.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 1816.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "importe": 65000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.01"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "importe": 59676.11,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.02"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "importe": 5323.89,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.03"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "importe": 1064.78,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.04"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "importe": 152.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.05"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.06"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "importe": 912.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.07"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "importe": 912.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "13",
+      "concepto": "Minoración (art. 110.3.c RIRPF)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.13"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 912.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.15"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "importe": 912.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 912.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 4500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "115",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Nº de perceptores",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m115.01"
+    },
+    {
+      "modelo": "115",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Base de las retenciones",
+      "importe": 3600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m115.02"
+    },
+    {
+      "modelo": "115",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Retenciones",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m115.03"
+    },
+    {
+      "modelo": "115",
+      "periodo": "2T",
+      "casilla": "05",
+      "concepto": "Resultado a ingresar",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m115.05"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 302.65,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 1695.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 28000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 5880.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 5880.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 21350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 4483.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 4483.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 1396.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 1396.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 1396.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 1396.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 1396.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "importe": 97500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.01"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "importe": 88089.16,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.02"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "importe": 9410.84,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.03"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "importe": 1882.17,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.04"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "importe": 1064.78,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.05"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.06"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "importe": 817.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.07"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "importe": 817.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "13",
+      "concepto": "Minoración (art. 110.3.c RIRPF)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.13"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 817.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.15"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "importe": 817.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 817.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 4500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "115",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Nº de perceptores",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m115.01"
+    },
+    {
+      "modelo": "115",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Base de las retenciones",
+      "importe": 3600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m115.02"
+    },
+    {
+      "modelo": "115",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Retenciones",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m115.03"
+    },
+    {
+      "modelo": "115",
+      "periodo": "3T",
+      "casilla": "05",
+      "concepto": "Resultado a ingresar",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m115.05"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 302.65,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 1695.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 45000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 9450.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 9450.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 31350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 6583.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 6583.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 2866.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 2866.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 2866.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 2866.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 2866.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Ingresos computables acumulados",
+      "importe": 142500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.01"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+      "importe": 126627.21,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.02"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Rendimiento neto (01 − 02)",
+      "importe": 15872.79,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.03"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "04",
+      "concepto": "20 % de la casilla 03",
+      "importe": 3174.56,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.04"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "05",
+      "concepto": "Pagos fraccionados de trimestres anteriores",
+      "importe": 1882.17,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.05"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "06",
+      "concepto": "Retenciones soportadas acumuladas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.06"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Pago fraccionado previo (04 − 05 − 06)",
+      "importe": 1292.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.07"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "12",
+      "concepto": "Suma (07 + 11), mínimo 0",
+      "importe": 1292.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "13",
+      "concepto": "Minoración (art. 110.3.c RIRPF)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.13"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 1292.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "15",
+      "concepto": "Resultados negativos de trimestres anteriores",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.15"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "17",
+      "concepto": "Total (14 − 15 − 16)",
+      "importe": 1292.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 1292.39,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 4500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 180.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "115",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Nº de perceptores",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m115.01"
+    },
+    {
+      "modelo": "115",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Base de las retenciones",
+      "importe": 3600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m115.02"
+    },
+    {
+      "modelo": "115",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Retenciones",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m115.03"
+    },
+    {
+      "modelo": "115",
+      "periodo": "4T",
+      "casilla": "05",
+      "concepto": "Resultado a ingresar",
+      "importe": 684.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m115.05"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 302.65,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 1695.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total bases imponibles al 21 % del año",
+      "importe": 135000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total cuotas devengadas al 21 % del año",
+      "importe": 28350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total IVA deducible del año (incluida la regularización de la prorrata)",
+      "importe": 20664.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "190",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Perceptores clave A (trabajo): percepciones",
+      "importe": 18000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "190",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Perceptores clave A (trabajo): retenciones",
+      "importe": 720.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "180",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Arrendador del local: base anual",
+      "importe": 14400.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "180",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Arrendador del local: retenciones anuales",
+      "importe": 2736.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Arrendador Ficticio del local (00000671G): importe anual con impuestos",
+      "importe": 17424.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Eléctrica Ficticia, S.A. (A00000672): importe anual con impuestos",
+      "importe": 3630.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Distribuidor Ficticio de Electrodomésticos, S.A. (A00000673): importe anual con impuestos",
+      "importe": 98010.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 5 %)",
+      "importe": 15872.79,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null,
+      "motivo": "Cifra de la Renta 2026: el motor de la Renta no calcula actividades económicas."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Renta 2026 completa del autónomo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.",
+      "campo": null
+    }
+  ]
+}

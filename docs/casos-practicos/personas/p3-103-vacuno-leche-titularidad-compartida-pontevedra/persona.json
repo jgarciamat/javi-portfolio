@@ -1,0 +1,332 @@
+{
+  "slug": "p3-103-vacuno-leche-titularidad-compartida-pontevedra",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 103",
+  "nif": "00000103B",
+  "domicilio": "Calle Ficticia 103, 27001 Lugo (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "galicia",
+  "titulo": "Ganadera de vacuno de leche en titularidad compartida",
+  "descripcion": "Explotación de vacuno de leche inscrita en titularidad compartida con su marido (Ley 35/2011): cada uno declara el 50 % del rendimiento. Estimación directa y REAGP (10,5 %); la cooperativa retiene el 2 % (repartido al 50 %).",
+  "prueba": [
+    "titularidad compartida (50 % cada cónyuge)",
+    "vacuno de leche en directa",
+    "REAGP 10,5 %",
+    "exención del 130"
+  ],
+  "modelos": [
+    "100",
+    "130"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "galicia",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "0.0",
+          "socialSecurity": "0.0",
+          "withheld": "1920.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "activitiesProposed": [
+            {
+              "kind": "direct",
+              "name": "Vacuno de leche (50 %)",
+              "dependent": false,
+              "newActivity": false,
+              "withheld": 1920,
+              "payments": 0,
+              "data": {
+                "method": "simplified",
+                "income": {
+                  "sales": 222160.0,
+                  "grants": 0,
+                  "ownUse": 0,
+                  "other": 0
+                },
+                "expenses": {
+                  "other": 149700.0,
+                  "depreciation": 32800.0
+                },
+                "assets": [],
+                "lowValue": [],
+                "health": {
+                  "premiums": 0,
+                  "people": 0,
+                  "withDisability": 0
+                },
+                "home": {
+                  "supplies": 0,
+                  "usedPercent": 0
+                },
+                "provisions": 0
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000103B",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 103 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1980",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "GALICIA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 0.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 0.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 0.0,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 0.0,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 0.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 0.0,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 0.0,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 18838.5,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 18838.5,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5789.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 5550.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 5789.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 1422.12,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 1329.56,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 1422.12,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 1329.56,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 2751.68,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 2751.68,
+              "box": "0595"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 1920.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 831.68,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 831.68,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [],
+    "ahorro": [],
+    "alquiler": null,
+    "actividad": [
+      "Ingreso: Venta de leche 180.000,00",
+      "Ingreso: Venta de terneros 12.000,00",
+      "Ingreso: Compensación REAGP 10,5 % 20.160,00",
+      "Ingreso: Ayuda básica de la PAC 10.000,00",
+      "Gasto: Piensos 90.000,00",
+      "Gasto: Veterinario 8.000,00",
+      "Gasto: Seguros sociales de un trabajador y su sueldo 30.000,00",
+      "Gasto: Luz y gasóleo 12.000,00",
+      "Gasto: Cuotas de autónomos de los dos titulares 7.200,00",
+      "Gasto: Seguro agrario y de retirada 2.500,00",
+      "Inmovilizado: vacas, coste 100.000,00",
+      "Inmovilizado: robot de ordeño, coste 90.000,00",
+      "Inmovilizado: establo, coste 200.000,00",
+      "Retenciones practicadas por los compradores (certificado) 1.920,00; pagos fraccionados ingresados 0,00"
+    ],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  },
+  "actividadPropuesta": [
+    {
+      "kind": "direct",
+      "name": "Vacuno de leche (50 %)",
+      "dependent": false,
+      "newActivity": false,
+      "withheld": 1920,
+      "payments": 0,
+      "data": {
+        "method": "simplified",
+        "income": {
+          "sales": 222160.0,
+          "grants": 0,
+          "ownUse": 0,
+          "other": 0
+        },
+        "expenses": {
+          "other": 149700.0,
+          "depreciation": 32800.0
+        },
+        "assets": [],
+        "lowValue": [],
+        "health": {
+          "premiums": 0,
+          "people": 0,
+          "withDisability": 0
+        },
+        "home": {
+          "supplies": 0,
+          "usedPercent": 0
+        },
+        "provisions": 0
+      }
+    }
+  ]
+}

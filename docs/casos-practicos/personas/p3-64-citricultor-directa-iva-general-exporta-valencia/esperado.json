@@ -1,0 +1,1237 @@
+{
+  "slug": "p3-64-citricultor-directa-iva-general-exporta-valencia",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "concepto": "Retribuciones dinerarias",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0003"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0012"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0013"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "concepto": "Rendimiento neto previo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0017"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "concepto": "Otros gastos deducibles",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0019",
+        "obtenido": 2000
+      },
+      "motivo": "Discrepancia propuesta: el motor da 2.000,00. El motor muestra 2.000 € en la casilla 0019 sin rendimientos del trabajo; el gasto del art. 19.2.f no puede superar el rendimiento previo (0 €). Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0022"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0023"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0025"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "concepto": "Base imponible general",
+      "importe": 25650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0435",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "concepto": "Base liquidable general",
+      "importe": 25650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0500",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "concepto": "Base liquidable del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0510"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0511"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "importe": 6105.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0512"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0517"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0518"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0519"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "importe": 6105.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0520"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "concepto": "Cuota íntegra estatal",
+      "importe": 2403.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0545",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "concepto": "Cuota íntegra autonómica",
+      "importe": 2278.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0546",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "concepto": "Cuota líquida estatal",
+      "importe": 2403.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0570",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "concepto": "Cuota líquida autonómica",
+      "importe": 2278.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0571",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "concepto": "Cuota líquida incrementada total",
+      "importe": 4681.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0587",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0414"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "importe": 4681.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0595",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 1250.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0609"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "concepto": "Cuota diferencial",
+      "importe": 3431.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0610",
+        "obtenido": -1250
+      },
+      "motivo": "Discrepancia propuesta: el motor da -1.250,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "concepto": "Resultado de la declaración",
+      "importe": 3431.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0670",
+        "obtenido": -1250
+      },
+      "motivo": "Discrepancia propuesta: el motor da -1.250,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "importe": 25650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Estimación directa: Ingresos",
+      "importe": 62500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Estimación directa: Gastos con amortizaciones",
+      "importe": 35500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Estimación directa: Difícil justificación (5 %)",
+      "importe": 1350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Estimación directa: Rendimiento neto",
+      "importe": 25650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "08",
+      "concepto": "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.08"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "2 % de la casilla 08",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.09"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "10",
+      "concepto": "Retenciones e ingresos a cuenta del trimestre",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.10"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "11",
+      "concepto": "Pago fraccionado previo (09 − 10)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.11"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "12",
+      "concepto": "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "17",
+      "concepto": "Total",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "08",
+      "concepto": "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.08"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "2 % de la casilla 08",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.09"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "10",
+      "concepto": "Retenciones e ingresos a cuenta del trimestre",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.10"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "11",
+      "concepto": "Pago fraccionado previo (09 − 10)",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.11"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "12",
+      "concepto": "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "17",
+      "concepto": "Total",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "08",
+      "concepto": "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.08"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "2 % de la casilla 08",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.09"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "10",
+      "concepto": "Retenciones e ingresos a cuenta del trimestre",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.10"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "11",
+      "concepto": "Pago fraccionado previo (09 − 10)",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.11"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "12",
+      "concepto": "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "17",
+      "concepto": "Total",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "08",
+      "concepto": "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+      "importe": 17500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.08"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "2 % de la casilla 08",
+      "importe": 350.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.09"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "10",
+      "concepto": "Retenciones e ingresos a cuenta del trimestre",
+      "importe": 300.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.10"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "11",
+      "concepto": "Pago fraccionado previo (09 − 10)",
+      "importe": 50.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.11"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "12",
+      "concepto": "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+      "importe": 50.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.12"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "14",
+      "concepto": "Diferencia (12 − 13)",
+      "importe": 50.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.14"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "17",
+      "concepto": "Total",
+      "importe": 50.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.17"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": "19",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 50.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": "m130.19"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Régimen general 4 %: base",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.01"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Régimen general 4 %: cuota",
+      "importe": 600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.03"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "importe": 3200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "importe": 452.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 452.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general",
+      "importe": 148.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 148.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado",
+      "importe": 148.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 148.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 148.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "importe": 4000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "importe": 510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general",
+      "importe": -510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.59"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": -510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado",
+      "importe": -510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": -510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": -510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "72",
+      "concepto": "A compensar",
+      "importe": 510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.72"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "importe": 3000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "importe": 355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general",
+      "importe": -355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "59",
+      "concepto": "Entregas intracomunitarias de bienes",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.59"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": -355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado",
+      "importe": -355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "110",
+      "concepto": "Cuotas a compensar de periodos anteriores",
+      "importe": 510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.110"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "78",
+      "concepto": "Cuotas a compensar aplicadas en este periodo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.78"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "87",
+      "concepto": "Cuotas a compensar pendientes para periodos posteriores",
+      "importe": 510.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.87"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": -355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": -355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "72",
+      "concepto": "A compensar",
+      "importe": 355.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.72"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Régimen general 4 %: base",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.01"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Régimen general 4 %: cuota",
+      "importe": 600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.03"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 600.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
+      "importe": 2000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes",
+      "importe": 255.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 255.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general",
+      "importe": 345.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 345.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado",
+      "importe": 345.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "110",
+      "concepto": "Cuotas a compensar de periodos anteriores",
+      "importe": 865.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.110"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "78",
+      "concepto": "Cuotas a compensar aplicadas en este periodo",
+      "importe": 345.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.78"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "87",
+      "concepto": "Cuotas a compensar pendientes para periodos posteriores",
+      "importe": 520.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.87"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "349",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Clave E, entregas intracomunitarias de bienes",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": null
+    },
+    {
+      "modelo": "349",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Clave E, entregas intracomunitarias de bienes",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#iva-de-2026",
+      "campo": null
+    }
+  ]
+}

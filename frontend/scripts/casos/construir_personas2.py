@@ -195,7 +195,22 @@ def renta2(p, steps, joint=None):
         b['0155'] = imputed
         b['imputedIncome'] = imputed
     savings = r2(p.get('savings', 0))
-    other_income = max(0.0, rental_net) + imputed + savings
+    # Third batch (p3): net income of economic activities (already reduced) and gains of the general base.
+    activity = r2(p.get('activityNet', 0))
+    gains_general = r2(p.get('gainsGeneral', 0))
+    if activity:
+        steps.h('3 bis. Rendimientos de actividades económicas (LIRPF arts. 27-32)')
+        for line in p.get('activitySteps', []):
+            steps.s(line)
+        steps.s(f'Rendimiento neto de actividades que va a la base general = **{eur(activity)}**')
+        b['activityNet'] = activity
+    if gains_general:
+        steps.h('3 ter. Ganancias patrimoniales de la base general (arts. 33, 45 y 48)')
+        for line in p.get('gainsSteps', []):
+            steps.s(line)
+        steps.s(f'Ganancias que no derivan de una transmisión (base general) = **{eur(gains_general)}**')
+        b['gainsGeneral'] = gains_general
+    other_income = max(0.0, rental_net) + imputed + savings + activity + gains_general
 
     steps.h('4. Reducción por obtención de rendimientos del trabajo (art. 20)')
     if other_income > 6500:
@@ -210,13 +225,25 @@ def renta2(p, steps, joint=None):
             f'; con el límite del rendimiento neto → **{eur(red)}** (0023)')
     b['0023'] = r2(red)
     b['0025'] = r2(b['0022'] - red)
+    if activity > 0:
+        # Art. 32.2.3.º LIRPF: rentas no exentas (la actividad incluida) < 12.000 € → 1.620 € o 1.620 − 0,405 × (rentas − 8.000),
+        # y junto con la del art. 20 como máximo 3.700 €.
+        rentas = r2(b['0022'] + max(0.0, rental_net) + imputed + savings + activity + gains_general)
+        if rentas < 12000:
+            small = 1620.0 if rentas <= 8000 else r2(1620 - 0.405 * (rentas - 8000))
+            small = r2(max(0.0, min(small, 3700 - b['0023'], activity)))
+            steps.s(f'Reducción del art. 32.2.3.º LIRPF: rentas no exentas {eur(rentas)} < 12.000 € → **{eur(small)}** (con la del art. 20, máximo 3.700 €)')
+            activity = r2(activity - small)
+            b['activityNet'] = activity
+            b['smallReduction'] = small
     steps.s(f'Rendimiento neto reducido (0025) = **{eur(b["0025"])}**')
 
     steps.h('5. Bases imponibles (LIRPF arts. 45-49)')
-    big = r2(b['0025'] + rental_net + imputed)
+    big = r2(b['0025'] + rental_net + imputed + activity + gains_general)
     b['0435'] = big
     steps.s(f'Base imponible general (0435) = {eur(b["0025"])}' + (f' + {eur(rental_net)} (alquiler)' if rental_net else '') +
-            (f' + {eur(imputed)} (imputación)' if imputed else '') + f' = **{eur(big)}**')
+            (f' + {eur(imputed)} (imputación)' if imputed else '') + (f' + {eur(activity)} (actividades)' if activity else '')
+            + (f' + {eur(gains_general)} (ganancias de la base general)' if gains_general else '') + f' = **{eur(big)}**')
     b['0460'] = savings
     if savings:
         steps.s(f'Base imponible del ahorro (0460) = **{eur(savings)}** (detalle en el apartado 0)')
@@ -340,7 +367,7 @@ def renta2(p, steps, joint=None):
     steps.s(f'Cuota líquida (0587) = {eur(b["0545"])} − {eur(applied_s)} + {eur(b["0546"])} − {eur(applied_r)} = {eur(liq)}')
     steps.s(f'Deducción por rendimientos del trabajo (0414) = {eur(lp)} (DA 61.ª: 340 € hasta 16.576 € de íntegros, otras rentas ≤ 6.500; límite: la cuota)')
     steps.s(f'Cuota resultante (0595) = **{eur(b["0595"])}**; pagos a cuenta (0609) = {eur(withheld)}'
-            + (f' (incluye {eur(p["otherWithheld"])} de retenciones del capital o del alquiler)' if p.get('otherWithheld') else '')
+            + (f' (incluye {eur(p["otherWithheld"])} de otros pagos a cuenta: capital, alquiler o actividades)' if p.get('otherWithheld') else '')
             + f'; cuota diferencial (0610) = **{eur(b["0610"])}**')
     if refundable:
         steps.s(f'Deducciones abonables (art. 81 y 81 bis, sin abono anticipado) = {eur(refundable)}')
@@ -689,6 +716,7 @@ def build_autonomo2(a):
     for q in range(1, 5):
         ms, li, lo = quarter_lines(q)
         annual_net += sum(sale_income(x) for x in li) - sum(cost_of(e, pct) for e in lo) - (a.get('amortization', 0))
+        annual_net += sum(x['amount'] for x in a.get('subsidies', []) if x['q'] == q)
         if staff:
             annual_net -= (staff['monthly'] + staff['employerSS']) * len(ms)
     monthly_net = r2(annual_net / active_months)
@@ -836,6 +864,13 @@ def build_autonomo2(a):
 
         # 130
         q_income = r2(sum(sale_income(x) for x in li))
+        for sub in a.get('subsidies', []):
+            # Third batch: current grants (Kit Digital, hiring aid) are income of the activity, outside the VAT.
+            if sub['q'] == q:
+                q_income = r2(q_income + sub['amount'])
+                bank.append(dict(date=date_of(3 * q, 22), concept=f'Cobro de la subvención: {sub["name"]}', amount=sub['amount']))
+                steps.s(f'Subvención corriente «{sub["name"]}» {eur(sub["amount"])}: ingreso de la actividad en el 130 (art. 14.1.b LIRPF y su imputación '
+                        f'según el Impuesto sobre Sociedades); no es contraprestación de una operación, no lleva IVA (art. 78.Dos.3.º LIVA)')
         cum_income = r2(cum_income + q_income)
         cum_exp = r2(cum_exp + cost)
         prenet = r2(cum_income - cum_exp)

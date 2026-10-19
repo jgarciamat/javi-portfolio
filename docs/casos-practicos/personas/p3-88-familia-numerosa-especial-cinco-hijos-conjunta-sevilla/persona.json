@@ -1,0 +1,116 @@
+{
+  "slug": "p3-88-familia-numerosa-especial-cinco-hijos-conjunta-sevilla",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 88",
+  "nif": "00000088L",
+  "domicilio": "Calle Ficticia 88, 41001 Sevilla (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Matrimonio con cinco hijos: familia numerosa especial en conjunta",
+  "descripcion": "Cinco hijos (16, 13, 10, 7 y 2 años). Trabaja él (48.000 €); ella no tiene rentas. Conjunta. Deducción estatal por familia numerosa especial (2.400 €) y andaluza por familia numerosa especial (400 €; base de la conjunta por encima de 30.000 €: no se aplica).",
+  "prueba": [
+    "familia numerosa especial (estado)",
+    "límite de renta de la deducción andaluza (30.000 € en conjunta)",
+    "cinco hijos con menor de 3",
+    "conjunta"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "andalucia",
+          "age": "46",
+          "disability": 0,
+          "children": [
+            {
+              "age": "16",
+              "disability": 0
+            },
+            {
+              "age": "13",
+              "disability": 0
+            },
+            {
+              "age": "10",
+              "disability": 0
+            },
+            {
+              "age": "7",
+              "disability": 0
+            },
+            {
+              "age": "2",
+              "disability": 0
+            }
+          ],
+          "ascendants": [],
+          "shared": true,
+          "gross": "48000.0",
+          "socialSecurity": "3110.4",
+          "withheld": "6500.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "estado-familia-numerosa-especial": {
+              "on": true,
+              "amount": "",
+              "units": "1"
+            }
+          },
+          "joint": "couple",
+          "partner": {
+            "gross": "",
+            "socialSecurity": "0",
+            "withheld": "",
+            "nonSalary": "",
+            "age": "44",
+            "disability": 0,
+            "retired": false,
+            "savings": "",
+            "pension": ""
+          }
+        }
+      }
+    ],
+    "conjunta": {
+      "kind": "couple",
+      "livesWithOtherParent": false
+    }
+  },
+  "documentos": {
+    "borrador": null,
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 48000,
+        "withheld": 6500,
+        "ss": 3110.4
+      }
+    ],
+    "ahorro": [],
+    "alquiler": null,
+    "actividad": [],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  },
+  "conyuge": {
+    "nombre": "Persona Ficticia 88-B",
+    "nif": "00000388C"
+  }
+}

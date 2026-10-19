@@ -1,0 +1,304 @@
+{
+  "slug": "p3-77-nacimiento-rural-alquiler-joven-soria",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 77",
+  "nif": "00000077P",
+  "domicilio": "Calle Ficticia 77, 47001 Valladolid (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "castilla-y-leon",
+  "titulo": "Pareja joven en un pueblo de Soria: primer hijo y alquiler",
+  "descripcion": "Viven de alquiler (350 €/mes) en un pueblo de 600 habitantes y tienen su primer hijo en junio de 2025. Solo trabaja él (24.000 €). Castilla y León: nacimiento en el medio rural (1.420 €) y alquiler para jóvenes en el medio rural (25 %, hasta 612 €), con el límite de 18.900 € de base menos mínimo en individual y 31.500 € en conjunta. La madre no trabaja ni cobra paro: sin deducción por maternidad.",
+  "prueba": [
+    "nacimiento en el medio rural (CyL, 1.420 €)",
+    "alquiler joven rural (CyL, 25 %)",
+    "límite de renta después del mínimo",
+    "conjunta frente a individual"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "castilla-y-leon",
+          "age": "31",
+          "disability": 0,
+          "children": [
+            {
+              "age": "0",
+              "disability": 0
+            }
+          ],
+          "ascendants": [],
+          "shared": true,
+          "gross": "24000.0",
+          "socialSecurity": "1555.2",
+          "withheld": "2800.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "castilla-y-leon-nacimiento-adopcion-rural": {
+              "on": true,
+              "amount": "",
+              "units": "1"
+            },
+            "castilla-y-leon-alquiler-jovenes-rural": {
+              "on": true,
+              "amount": "4200",
+              "units": ""
+            }
+          },
+          "joint": "couple",
+          "partner": {
+            "gross": "",
+            "socialSecurity": "0",
+            "withheld": "",
+            "nonSalary": "",
+            "age": "29",
+            "disability": 0,
+            "retired": false,
+            "savings": "",
+            "pension": ""
+          }
+        }
+      }
+    ],
+    "conjunta": {
+      "kind": "couple",
+      "livesWithOtherParent": false
+    }
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000077P",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 77 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1994",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "CASTILLA Y LEÓN",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Descendientes",
+          "lines": [
+            {
+              "label": "Fecha de nacimiento del descendiente 1",
+              "text": "01/03/2025",
+              "box": "0077"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 24000.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 24000.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 1555.2,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 22444.8,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 20444.8,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 20444.8,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 20444.8,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 20444.8,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5550.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 8150.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 8150.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 1375.22,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 1351.27,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 1375.22,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 29.27,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 1404.49,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 1404.49,
+              "box": "0595"
+            },
+            {
+              "label": "Por rendimientos del trabajo",
+              "amount": 2800.0,
+              "box": "0596"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 2800.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": -1395.51,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": -1395.51,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 24000,
+        "withheld": 2800,
+        "ss": 1555.2
+      }
+    ],
+    "ahorro": [],
+    "alquiler": null,
+    "actividad": [],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  },
+  "conyuge": {
+    "nombre": "Persona Ficticia 77-B",
+    "nif": "00000377D"
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "slug": "p3-105-alquiler-turistico-asalariado-baleares",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 105",
+  "nif": "00000105J",
+  "domicilio": "Calle Ficticia 105, 07701 Maó (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "baleares",
+  "titulo": "Asalariada que alquila una vivienda de uso turístico en Menorca",
+  "descripcion": "Alquila por días, sin servicios hoteleros, un piso de Ciutadella (16.000 € al año): rendimiento del capital inmobiliario sin reducción (no es vivienda habitual del inquilino). Gastos de la plataforma y limpieza.",
+  "prueba": [
+    "vivienda de uso turístico sin servicios (capital inmobiliario)",
+    "sin reducción del art. 23.2",
+    "otras rentas > 6.500"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "baleares",
+          "age": "43",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "31000.0",
+          "socialSecurity": "2008.8",
+          "withheld": "4800.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "rentalOn": true,
+          "rentalIncome": "16000",
+          "rentalExpenses": {
+            "intereses-financiacion": "1500",
+            "reparacion-conservacion": "600",
+            "tributos-tasas": "500",
+            "comunidad-servicios-personales": "3100",
+            "seguros": "300"
+          },
+          "construction": "110000",
+          "rentalReduction": ""
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000105J",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 105 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1982",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "ILLES BALEARS",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 31000.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 31000.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 2008.8,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 28991.2,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 26991.2,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 26991.2,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 33691.2,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 33691.2,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5550.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 5550.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 5550.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 3609.18,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 3656.46,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 3609.18,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 3656.46,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 7265.64,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 7265.64,
+              "box": "0595"
+            },
+            {
+              "label": "Por rendimientos del trabajo",
+              "amount": 4800.0,
+              "box": "0596"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 4800.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 2465.64,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 2465.64,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 31000,
+        "withheld": 4800,
+        "ss": 2008.8
+      }
+    ],
+    "ahorro": [],
+    "alquiler": {
+      "income": 16000,
+      "interest": 1500,
+      "repairs": 600,
+      "other": 3900,
+      "construction": 110000,
+      "reduction": 0,
+      "reductionId": "",
+      "expenses": {
+        "intereses-financiacion": "1500",
+        "reparacion-conservacion": "600",
+        "tributos-tasas": "500",
+        "comunidad-servicios-personales": "3100",
+        "seguros": "300"
+      },
+      "why": "Alquiler turístico de temporada: no es vivienda habitual del inquilino; sin reducción. Comunidad y servicios incluye la limpieza y la comisión de la plataforma"
+    },
+    "actividad": [],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  }
+}

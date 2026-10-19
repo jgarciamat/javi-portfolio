@@ -59,5 +59,5 @@ Fuentes: Ley 35/2006 del IRPF ([BOE-A-2006-20764](https://www.boe.es/buscar/act.
 
 - Cuota líquida (0587) = 1.059,00 − 0,00 + 921,65 − 0,00 = 1.980,65
 - Deducción por rendimientos del trabajo (0414) = 0,00 (DA 61.ª: 340 € hasta 16.576 € de íntegros, otras rentas ≤ 6.500; límite: la cuota)
-- Cuota resultante (0595) = **1.980,65**; pagos a cuenta (0609) = 2.714,00 (incluye 114,00 de retenciones del capital o del alquiler); cuota diferencial (0610) = **-733,35**
+- Cuota resultante (0595) = **1.980,65**; pagos a cuenta (0609) = 2.714,00 (incluye 114,00 de otros pagos a cuenta: capital, alquiler o actividades); cuota diferencial (0610) = **-733,35**
 - Resultado (0670) = **-733,35** (a devolver)

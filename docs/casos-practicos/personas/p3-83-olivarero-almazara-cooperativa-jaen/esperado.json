@@ -1,0 +1,434 @@
+{
+  "slug": "p3-83-olivarero-almazara-cooperativa-jaen",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "concepto": "Retribuciones dinerarias",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0003"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0012"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0013"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "concepto": "Rendimiento neto previo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0017"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "concepto": "Otros gastos deducibles",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0019",
+        "obtenido": 2000
+      },
+      "motivo": "Discrepancia propuesta: el motor da 2.000,00. El motor muestra 2.000 € en la casilla 0019 sin rendimientos del trabajo; el gasto del art. 19.2.f no puede superar el rendimiento previo (0 €). Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0022"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0023"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0025"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "concepto": "Base imponible general",
+      "importe": 5176.22,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0435",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "concepto": "Base liquidable general",
+      "importe": 5176.22,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motorPropuesto": {
+        "campo": "boxes.0500",
+        "obtenido": 0
+      },
+      "motivo": "Discrepancia propuesta: el motor da 0,00. Falta la actividad en el formulario: el motor ya la calcula (rentaActivity.ts) pero toInput no la recibe; ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "concepto": "Base liquidable del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0510"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0511"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "importe": 5790.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0512"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0517"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0518"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0519"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "importe": 5790.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0520"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "concepto": "Cuota íntegra estatal",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0545"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "concepto": "Cuota íntegra autonómica",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0546"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "concepto": "Cuota líquida estatal",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0570"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "concepto": "Cuota líquida autonómica",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0571"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "concepto": "Cuota líquida incrementada total",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0587"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0414"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0595"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 1200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0609"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "concepto": "Cuota diferencial",
+      "importe": -1200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0610"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "concepto": "Resultado de la declaración",
+      "importe": -1200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0670"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "importe": 5176.22,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
+      "importe": 73200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Rendimiento neto previo",
+      "importe": 19032.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Amortizaciones",
+      "importe": 10200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Rendimiento neto minorado",
+      "importe": 8832.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Rendimiento neto de módulos",
+      "importe": 7153.92,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Reducción general del 5 %",
+      "importe": 357.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Módulos agrarios: Rendimiento neto de la actividad",
+      "importe": 6796.22,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3-bis-rendimientos-de-actividades-económicas-lirpf-arts-27-32",
+      "campo": null,
+      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+    },
+    {
+      "modelo": "131",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 131",
+      "importe": null,
+      "valor": "no (art. 109.3 RIRPF)",
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": null
+    },
+    {
+      "modelo": "131",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 131",
+      "importe": null,
+      "valor": "no (art. 109.3 RIRPF)",
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": null
+    },
+    {
+      "modelo": "131",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 131",
+      "importe": null,
+      "valor": "no (art. 109.3 RIRPF)",
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": null
+    },
+    {
+      "modelo": "131",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 131",
+      "importe": null,
+      "valor": "no (art. 109.3 RIRPF)",
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#pagos-fraccionados-de-2026",
+      "campo": null
+    }
+  ]
+}

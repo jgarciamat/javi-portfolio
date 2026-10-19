@@ -1,0 +1,815 @@
+{
+  "slug": "p3-85-horticultor-invernadero-directa-exporta-almeria",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 85",
+  "nif": "00000085Q",
+  "domicilio": "Calle Ficticia 85, 41001 Sevilla (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Horticultor de invernadero en Almería: directa, IVA general y exportación a Alemania",
+  "descripcion": "Invernadero de pimiento. Régimen general del IVA (4 %). Vende el 60 % a un mayorista alemán (entrega intracomunitaria) y el 40 % a una alhóndiga que le retiene el 2 %. Contrata a dos trabajadores (modelo 111). Pagos fraccionados del 2 % (130, sección II).",
+  "prueba": [
+    "estimación directa agraria",
+    "303 al 4 % con entregas intracomunitarias",
+    "130 sección II",
+    "111 por sus trabajadores",
+    "amortización del invernadero"
+  ],
+  "modelos": [
+    "100",
+    "130",
+    "303",
+    "349"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "andalucia",
+          "age": "42",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "0.0",
+          "socialSecurity": "0.0",
+          "withheld": "2000.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "activitiesProposed": [
+            {
+              "kind": "direct",
+              "name": "Hortalizas de invernadero",
+              "dependent": false,
+              "newActivity": false,
+              "withheld": 800,
+              "payments": 1200,
+              "data": {
+                "method": "simplified",
+                "income": {
+                  "sales": 100000.0,
+                  "grants": 0,
+                  "ownUse": 0,
+                  "other": 0
+                },
+                "expenses": {
+                  "other": 65600.0,
+                  "depreciation": 7500.0
+                },
+                "assets": [],
+                "lowValue": [],
+                "health": {
+                  "premiums": 0,
+                  "people": 0,
+                  "withDisability": 0
+                },
+                "home": {
+                  "supplies": 0,
+                  "usedPercent": 0
+                },
+                "provisions": 0
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000085Q",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 85 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1983",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "ANDALUCÍA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 0.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 0.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 0.0,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 0.0,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 0.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 0.0,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 0.0,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 25555.0,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 25555.0,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5790.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 5550.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 5790.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 2388.75,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 2325.2,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 2388.75,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 2325.2,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 4713.95,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 4713.95,
+              "box": "0595"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 2000.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 2713.95,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 2713.95,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [],
+    "ahorro": [],
+    "alquiler": null,
+    "actividad": [
+      "Ingreso: Ventas a la alhóndiga 40.000,00",
+      "Ingreso: Entregas a Alemania 60.000,00",
+      "Gasto: Semillas, abonos y fitosanitarios 16.000,00",
+      "Gasto: Sueldos de dos trabajadores 30.000,00",
+      "Gasto: Seguridad Social de la empresa 9.500,00",
+      "Gasto: Agua de riego y luz 5.000,00",
+      "Gasto: Seguro agrario 1.500,00",
+      "Gasto: Cuota de autónomos (RETA) 3.600,00",
+      "Inmovilizado: invernadero, coste 60.000,00",
+      "Inmovilizado: sistema de riego por goteo, coste 15.000,00",
+      "Retenciones practicadas por los compradores (certificado) 800,00; pagos fraccionados ingresados 1.200,00"
+    ],
+    "m130": [
+      [
+        [
+          "08",
+          "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+          25000
+        ],
+        [
+          "09",
+          "2 % de la casilla 08",
+          500.0
+        ],
+        [
+          "10",
+          "Retenciones e ingresos a cuenta del trimestre",
+          200
+        ],
+        [
+          "11",
+          "Pago fraccionado previo (09 − 10)",
+          300.0
+        ],
+        [
+          "12",
+          "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+          300.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          300.0
+        ],
+        [
+          "17",
+          "Total",
+          300.0
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          300.0
+        ]
+      ],
+      [
+        [
+          "08",
+          "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+          25000
+        ],
+        [
+          "09",
+          "2 % de la casilla 08",
+          500.0
+        ],
+        [
+          "10",
+          "Retenciones e ingresos a cuenta del trimestre",
+          200
+        ],
+        [
+          "11",
+          "Pago fraccionado previo (09 − 10)",
+          300.0
+        ],
+        [
+          "12",
+          "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+          300.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          300.0
+        ],
+        [
+          "17",
+          "Total",
+          300.0
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          300.0
+        ]
+      ],
+      [
+        [
+          "08",
+          "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+          25000
+        ],
+        [
+          "09",
+          "2 % de la casilla 08",
+          500.0
+        ],
+        [
+          "10",
+          "Retenciones e ingresos a cuenta del trimestre",
+          200
+        ],
+        [
+          "11",
+          "Pago fraccionado previo (09 − 10)",
+          300.0
+        ],
+        [
+          "12",
+          "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+          300.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          300.0
+        ],
+        [
+          "17",
+          "Total",
+          300.0
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          300.0
+        ]
+      ],
+      [
+        [
+          "08",
+          "Volumen de ingresos del trimestre (sin subvenciones de capital ni indemnizaciones)",
+          25000
+        ],
+        [
+          "09",
+          "2 % de la casilla 08",
+          500.0
+        ],
+        [
+          "10",
+          "Retenciones e ingresos a cuenta del trimestre",
+          200
+        ],
+        [
+          "11",
+          "Pago fraccionado previo (09 − 10)",
+          300.0
+        ],
+        [
+          "12",
+          "Suma de pagos fraccionados previos (07 + 11), mínimo 0",
+          300.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          300.0
+        ],
+        [
+          "17",
+          "Total",
+          300.0
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          300.0
+        ]
+      ]
+    ],
+    "m131": [],
+    "m303": [
+      [
+        [
+          "01",
+          "Régimen general 4 %: base",
+          10000
+        ],
+        [
+          "03",
+          "Régimen general 4 %: cuota",
+          400.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          400.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          4500.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          615.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          615.0
+        ],
+        [
+          "46",
+          "Resultado régimen general",
+          -215.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          15000
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          -215.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado",
+          -215.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          -215.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          -215.0
+        ],
+        [
+          "72",
+          "A compensar",
+          215.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Régimen general 4 %: base",
+          10000
+        ],
+        [
+          "03",
+          "Régimen general 4 %: cuota",
+          400.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          400.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          4500.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          615.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          615.0
+        ],
+        [
+          "46",
+          "Resultado régimen general",
+          -215.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          15000
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          -215.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado",
+          -215.0
+        ],
+        [
+          "110",
+          "Cuotas a compensar de periodos anteriores",
+          215.0
+        ],
+        [
+          "78",
+          "Cuotas a compensar aplicadas en este periodo",
+          0.0
+        ],
+        [
+          "87",
+          "Cuotas a compensar pendientes para periodos posteriores",
+          215.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          -215.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          -215.0
+        ],
+        [
+          "72",
+          "A compensar",
+          215.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Régimen general 4 %: base",
+          10000
+        ],
+        [
+          "03",
+          "Régimen general 4 %: cuota",
+          400.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          400.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          4500.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          615.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          615.0
+        ],
+        [
+          "46",
+          "Resultado régimen general",
+          -215.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          15000
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          -215.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado",
+          -215.0
+        ],
+        [
+          "110",
+          "Cuotas a compensar de periodos anteriores",
+          430.0
+        ],
+        [
+          "78",
+          "Cuotas a compensar aplicadas en este periodo",
+          0.0
+        ],
+        [
+          "87",
+          "Cuotas a compensar pendientes para periodos posteriores",
+          430.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          -215.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          -215.0
+        ],
+        [
+          "72",
+          "A compensar",
+          215.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Régimen general 4 %: base",
+          10000
+        ],
+        [
+          "03",
+          "Régimen general 4 %: cuota",
+          400.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          400.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          4500.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          615.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          615.0
+        ],
+        [
+          "46",
+          "Resultado régimen general",
+          -215.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          15000
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          -215.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado",
+          -215.0
+        ],
+        [
+          "110",
+          "Cuotas a compensar de periodos anteriores",
+          645.0
+        ],
+        [
+          "78",
+          "Cuotas a compensar aplicadas en este periodo",
+          0.0
+        ],
+        [
+          "87",
+          "Cuotas a compensar pendientes para periodos posteriores",
+          645.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          -215.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          -215.0
+        ],
+        [
+          "73",
+          "A devolver",
+          215.0
+        ]
+      ]
+    ]
+  },
+  "actividadPropuesta": [
+    {
+      "kind": "direct",
+      "name": "Hortalizas de invernadero",
+      "dependent": false,
+      "newActivity": false,
+      "withheld": 800,
+      "payments": 1200,
+      "data": {
+        "method": "simplified",
+        "income": {
+          "sales": 100000.0,
+          "grants": 0,
+          "ownUse": 0,
+          "other": 0
+        },
+        "expenses": {
+          "other": 65600.0,
+          "depreciation": 7500.0
+        },
+        "assets": [],
+        "lowValue": [],
+        "health": {
+          "premiums": 0,
+          "people": 0,
+          "withDisability": 0
+        },
+        "home": {
+          "supplies": 0,
+          "usedPercent": 0
+        },
+        "provisions": 0
+      }
+    }
+  ]
+}
