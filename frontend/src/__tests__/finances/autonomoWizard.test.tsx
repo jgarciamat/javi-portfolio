@@ -145,6 +145,10 @@ describe('the self-employed screen step by step: persona 24 (VAT, first quarter)
     fireEvent.click(
       screen.getByRole('button', { name: tr('tools.renta.prepare.button', { year: 2026 }) })
     );
+    // What it brings first, then one tap takes it to the Renta 2026 and opens it.
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.renta.prepare.take', { year: 2026 }) })
+    );
     expect(onOpenTab).toHaveBeenCalledWith('renta');
     fireEvent.click(screen.getByRole('button', { name: tr('wizard.finishAll') }));
     expect(heading(tr('wizard.finaleTitle'))).toHaveFocus();

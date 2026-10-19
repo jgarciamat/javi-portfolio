@@ -20,7 +20,8 @@ export type QuestionId = (typeof QUESTIONS)[number];
 
 /** The answers of one tap of each question (ccaa and age are typed). */
 export const OPTIONS = {
-  income: ['work', 'pension', 'benefits', 'mixed'],
+  // self: only the income of an activity (no pay); workSelf: a pay and an activity too.
+  income: ['work', 'pension', 'benefits', 'mixed', 'self', 'workSelf'],
   disability: ['0', '33', '65'],
   active: ['yes', 'no'],
   family: ['no', 'yes'],
@@ -59,6 +60,9 @@ function incomeOf(form: RentaForm): string | null {
   return nonSalary < gross ? 'mixed' : 'pension';
 }
 
+/** The kinds of income that are only an activity, with no pay to type. */
+export const noPay = (income: string | null): boolean => income === 'self';
+
 /** Whether to ask if the person works: only a disability with pay that is not all from a job (or all not). */
 export function asksActive(form: RentaForm): boolean {
   const income = answerOf(form, 'income');
@@ -70,19 +74,37 @@ export function asksActive(form: RentaForm): boolean {
  * where the person said they do not work. A job only is an active worker.
  */
 function retiredFor(income: string | null, active: string | undefined, current: boolean): boolean {
-  if (income === 'work') return false;
+  if (income === 'work' || income === 'workSelf') return false;
   if (income === 'pension' || income === 'benefits') return true;
   return active === undefined ? current : active === 'no';
 }
 
-/** The kind of income: the amounts, with the pick where they cannot tell. */
+/**
+ * The kind of income: the amounts, with the pick where they cannot tell. An economic activity brought
+ * (from the self-employed screen, for one) makes it «only the activity» when nothing was picked nor
+ * typed, and a pay «pay and an activity».
+ */
 function incomeAnswer(form: RentaForm, picked: string | null): string | null {
   // A mix picked before typing how much of it is a pension stays a mix.
   if (picked === 'mixed' && form.nonSalary.trim() === '') return picked;
   const typed = incomeOf(form);
+  const withActivity = activityAnswer(form, picked, typed);
+  if (withActivity !== undefined) return withActivity;
   // A pension and benefits look the same in the amounts: the pick tells them apart.
   const same = picked === 'benefits' ? 'pension' : picked;
-  return typed === null || typed === same ? picked ?? typed : typed;
+  return typed === same ? picked : typed;
+}
+
+/** What an activity (or the pick of one) says, when it says something (undefined: nothing). */
+function activityAnswer(
+  form: RentaForm,
+  picked: string | null,
+  typed: string | null
+): string | null | undefined {
+  const activity = (form.activities ?? []).length > 0;
+  if (typed === null) return picked ?? (activity ? 'self' : null);
+  if (typed === 'work' && (activity || picked === 'workSelf')) return 'workSelf';
+  return undefined;
 }
 
 function propertyAnswer(form: RentaForm, picked: string | null): string | null {
@@ -170,10 +192,12 @@ const retiredAfter = (form: RentaForm, income: string | null, active: string | u
 /** The fields each answer means. "No" clears what the question is about. */
 const PATCH: Partial<Record<QuestionId | 'active', Patch>> = {
   income: (form, option) => ({
+    // Only an activity: there is no pay, so nothing of a pay is kept.
+    ...(option === 'self' ? { gross: '', socialSecurity: '', withheld: '' } : {}),
     nonSalary:
       option === 'pension' || option === 'benefits'
         ? form.gross
-        : option === 'work'
+        : option === 'work' || option === 'workSelf' || option === 'self'
         ? ''
         : form.nonSalary,
     retired: retiredAfter(form, option, form.answers.active),

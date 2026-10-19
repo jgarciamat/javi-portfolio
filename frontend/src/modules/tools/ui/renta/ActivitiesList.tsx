@@ -1,5 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { ActivitiesResult } from '../../domain/rentaActivity';
+import { ActivityBoxes } from './ActivityBoxes';
 import { useMoney, type StepProps } from './shared';
 
 /**
@@ -41,6 +42,7 @@ export function ActivitiesList({
           payments: money(result.payments),
         })}
       </p>
+      <ActivityBoxes list={list} result={result} />
     </section>
   );
 }

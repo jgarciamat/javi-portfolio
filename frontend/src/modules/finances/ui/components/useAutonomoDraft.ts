@@ -15,6 +15,7 @@ import {
 } from './AutonomoManual';
 import { vatExtrasOf } from './vatForm';
 import { buildInputs } from './autonomoInputs';
+import { EXTRAS_KEY, MANUAL_KEY, preferredYear } from './autonomoForRenta';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
 import type { KindPreferences } from '../../domain/invoiceLedger';
@@ -31,8 +32,6 @@ export interface Snapshot {
   draft: AutonomoDraft;
   inputs: AutonomoInputs | null;
 }
-const MANUAL_KEY = 'mm_autonomo_manual2';
-const EXTRAS_KEY = 'mm_autonomo_extras';
 export const QUARTERS = [1, 2, 3, 4] as const;
 const THIS_YEAR = new Date().getFullYear();
 export const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
@@ -117,12 +116,14 @@ export function useAutonomoDraft() {
   const { t } = useI18n();
   const plan = useOptionalPlan();
   const action = useAction();
-  const [year, setYear] = useState(THIS_YEAR);
-  const [quarter, setQuarter] = useState<Quarter>(quarterNow);
   const [extras, setExtras] = useStoredExtras();
   // Bumped when the data is wiped, so the import panels forget their messages too.
   const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
+  // The year of the invoices on the device (the 4T of last year is done in January): its last
+  // quarter when it is a past year.
+  const [year, setYear] = useState(() => preferredYear(manual, YEARS, THIS_YEAR));
+  const [quarter, setQuarter] = useState<Quarter>(() => (year < THIS_YEAR ? 4 : quarterNow()));
   const [focus, setFocus] = useState<ReviewFocus | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)

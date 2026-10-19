@@ -103,6 +103,9 @@ describe('Renta section, step by step', () => {
     const onOpenTab = jest.fn();
     renderWithProviders(<RentaView onOpenTab={onOpenTab} />);
     fireEvent.click(screen.getByRole('radio', { name: tr('wizard.renta.opt.activity.yes') }));
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.renta.bring.button', { year: 2025 }) })
+    );
     fireEvent.click(screen.getByRole('button', { name: tr('wizard.renta.openAutonomo') }));
     expect(onOpenTab).toHaveBeenCalledWith('business');
   });

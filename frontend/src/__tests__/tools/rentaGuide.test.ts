@@ -11,6 +11,7 @@ import {
   grossPatch,
   housingDeductions,
   isAnswered,
+  noPay,
   paidPatch,
   tickHousing,
 } from '@modules/tools/domain/rentaGuide';
@@ -327,5 +328,49 @@ describe('the questions a draft answers', () => {
       draftAnswers(reading({ unrented: [{ value: 1, revised: false, days: 90 }] })).property
     ).toBe('other');
     expect(draftAnswers(reading({ ascendantAges: [80] })).family).toBe('yes');
+  });
+});
+
+describe('the income of a self-employed person', () => {
+  const activity = {
+    kind: 'given',
+    name: 'Autónomos',
+    data: { area: 'direct', net: 15000 },
+    withheld: 0,
+    payments: 0,
+  } as const;
+
+  it('is «only my activity» with an activity and no pay, and «pay and activity» with a pay', () => {
+    expect(answerOf(form({ activities: [activity] }), 'income')).toBe('self');
+    expect(answerOf(form({ activities: [activity], gross: '20000' }), 'income')).toBe('workSelf');
+    // Picked before the activity comes, a pay with an activity stays so; a pick with no pay stands.
+    expect(answerOf(form({ gross: '20000', answers: { income: 'workSelf' } }), 'income')).toBe(
+      'workSelf'
+    );
+    expect(answerOf(form({ activities: [activity], answers: { income: 'work' } }), 'income')).toBe(
+      'work'
+    );
+    expect(answerOf(form({ answers: { income: 'self' } }), 'income')).toBe('self');
+    expect(noPay('self')).toBe(true);
+    expect(noPay('workSelf')).toBe(false);
+  });
+
+  it('clears the pay when only the activity is picked, and keeps it with a pay', () => {
+    const typed = form({
+      gross: '20000',
+      nonSalary: '5000',
+      socialSecurity: '1200',
+      withheld: '9',
+    });
+    expect(choose(typed, 'income', 'self')).toMatchObject({
+      gross: '',
+      nonSalary: '',
+      socialSecurity: '',
+      withheld: '',
+      retired: false,
+    });
+    const both = choose(typed, 'income', 'workSelf');
+    expect(both).toMatchObject({ nonSalary: '', retired: false });
+    expect(both).not.toHaveProperty('gross');
   });
 });

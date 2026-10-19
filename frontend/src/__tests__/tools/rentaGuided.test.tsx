@@ -528,3 +528,56 @@ describe('guided questions in English', () => {
     expect(screen.getByRole('switch', { name: 'Expert mode (every field)' })).not.toBeChecked();
   });
 });
+
+describe('guided questions: a self-employed person', () => {
+  const activity = {
+    kind: 'given',
+    name: 'Autónomos',
+    data: { area: 'direct', net: 15000 },
+    withheld: 0,
+    payments: 0,
+  } as NonNullable<RentaForm['activities']>[number];
+  const atIncome = (form: Partial<RentaForm>) =>
+    saved({ ccaaId: 'madrid', age: '40', answers: { ccaa: 'madrid', age: '40' }, ...form });
+
+  it('with only an activity asks for no pay, and says where the activity goes', () => {
+    atIncome({});
+    local();
+    pick('income', 'self');
+    expect(screen.getByText(tr('tools.renta.guide.selfHow'))).toBeInTheDocument();
+    expect(screen.queryByLabelText(tr('tools.renta.gross'))).toBeNull();
+  });
+
+  it('with a pay and an activity asks for the pay and says the activity is there', () => {
+    atIncome({ activities: [activity], gross: '20000' });
+    local();
+    expect(
+      screen.getByRole('radio', { name: tr('tools.renta.guide.opt.income.workSelf') })
+    ).toBeChecked();
+    expect(screen.getByText(tr('tools.renta.guide.selfBrought'))).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('20000');
+    pick('income', 'self');
+    expect(screen.queryByLabelText(tr('tools.renta.gross'))).toBeNull();
+  });
+
+  it('a pay and an activity picked before bringing it: asks for the pay and where it goes', () => {
+    atIncome({});
+    local();
+    pick('income', 'workSelf');
+    expect(screen.getByText(tr('tools.renta.guide.selfHow'))).toBeInTheDocument();
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toBeInTheDocument();
+  });
+
+  it('the summary says «only my activity» without an amount of pay', () => {
+    saved({
+      ccaaId: 'madrid',
+      age: '40',
+      activities: [activity],
+      answers: { ...ALL_NO, ccaa: 'madrid', age: '40', income: 'self' },
+    });
+    local();
+    const summary = screen.getByText(tr('tools.renta.guide.summary')).closest('div') as HTMLElement;
+    expect(summary).toHaveTextContent(tr('tools.renta.guide.opt.income.self'));
+    expect(summary).not.toHaveTextContent(`${tr('tools.renta.guide.opt.income.self')} ·`);
+  });
+});

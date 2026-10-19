@@ -15,6 +15,7 @@ import { WithholdingsPanel } from './AutonomoWithholdings';
 import { AnnualPanel } from './AutonomoAnnual';
 import { VatYearPanel } from './AutonomoVatYear';
 import { annualOf } from './autonomoInputs';
+import { invoiceYears } from './autonomoForRenta';
 import { PrepareRenta } from '@modules/tools/ui/renta/PrepareRenta';
 import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { vatExtrasOf } from './vatForm';
@@ -287,7 +288,14 @@ export function AutonomoDraftCard({
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
         <AnnualPanel form={manual} year={year} />
         {hasManual && <ActivitySummaryPanel annual={annualOf(manual, extras, year)} />}
-        {hasManual && <PrepareRenta annual={annualOf(manual, extras, year)} onOpen={onOpenRenta} />}
+        {hasManual && (
+          <PrepareRenta
+            annual={annualOf(manual, extras, year)}
+            onOpen={onOpenRenta}
+            years={invoiceYears(manual)}
+            onYear={setYear}
+          />
+        )}
         {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
       </StepSection>
     </div>

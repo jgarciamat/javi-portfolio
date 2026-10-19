@@ -8,12 +8,13 @@ import type { RentaMode } from '../../application/useRentaAccess';
 import { rentaProperty } from '../../data/renta/inmuebles';
 import { rentaState } from '../../data/renta/state';
 import { COMPARED_BOXES, ourBoxes } from '../../domain/rentaCompare';
-import { answerOf, choose, OPTIONS, type QuestionId } from '../../domain/rentaGuide';
+import { answerOf, choose, noPay, OPTIONS, type QuestionId } from '../../domain/rentaGuide';
 import { number, propertiesOf } from '../../domain/rentaForm';
 import { reductionMissing } from '../../domain/rentaRentals';
 import { queueOf } from '../../domain/rentaReview';
 import { RentaPlanner, ResultSection, UpgradeCta } from '../RentaPlanner';
 import { ActivitiesList } from './ActivitiesList';
+import { BringActivity } from './AutonomoBring';
 import { DeductionReview } from './DeductionReview';
 import { DeductionsStep } from './DeductionsStep';
 import { DraftStep } from './DraftStep';
@@ -80,6 +81,8 @@ interface Ctx {
   answer: (id: string, value: string) => void;
   onOpenAutonomo?: () => void;
   onHowToFile?: (slug: string) => void;
+  /** Changes the year of the return (the Renta of the account offers the last two). */
+  onYear?: (year: number) => void;
   /** Opens a step that is already open (the investments, from the review or the result). */
   goStep: (index: number) => void;
   /** The year of the return. */
@@ -209,24 +212,28 @@ function youStep(ctx: Ctx): WizardScreen[] {
 function workStep(ctx: Ctx): WizardScreen[] {
   const { p, t } = ctx;
   const income = guided(ctx, 'income');
+  // Only the income of an activity: no pay to type, no payers to ask about.
+  const onlyActivity = noPay(answerOf(p.form, 'income'));
+  const payers = yesNo(
+    ctx,
+    'payers',
+    <div className="tools-form">
+      <Field
+        id="renta-wiz-second-payers"
+        label={t('tools.renta.secondPayers')}
+        hint={t('tools.renta.secondPayersHint')}
+        value={p.form.secondPayers ?? ''}
+        onChange={(v) => p.set({ secondPayers: v })}
+      />
+    </div>
+  );
   return [
     {
       ...income,
-      warning: income.ready && number(p.form.gross) <= 0 ? t(w('warn.gross')) : null,
+      warning:
+        income.ready && !onlyActivity && number(p.form.gross) <= 0 ? t(w('warn.gross')) : null,
     },
-    yesNo(
-      ctx,
-      'payers',
-      <div className="tools-form">
-        <Field
-          id="renta-wiz-second-payers"
-          label={t('tools.renta.secondPayers')}
-          hint={t('tools.renta.secondPayersHint')}
-          value={p.form.secondPayers ?? ''}
-          onChange={(v) => p.set({ secondPayers: v })}
-        />
-      </div>
-    ),
+    ...(onlyActivity ? [] : [payers]),
   ];
 }
 
@@ -289,26 +296,25 @@ function importScreen(ctx: Ctx): WizardScreen {
 function activityScreen(ctx: Ctx): WizardScreen {
   const { p, t, answers, onOpenAutonomo } = ctx;
   const list = p.form.activities ?? [];
-  const screen = yesNo(
-    ctx,
-    'activity',
-    list.length === 0 && (
-      <div className="renta-block">
-        <p>{t(w('activityHow'))}</p>
-        {onOpenAutonomo && (
-          <button type="button" className="btn-secondary" onClick={onOpenAutonomo}>
-            {t(w('openAutonomo'))}
-          </button>
-        )}
-      </div>
-    )
+  // The self-employed year of this device, in one tap (also once brought: to bring it again).
+  const bring = (
+    <BringActivity
+      year={ctx.year}
+      form={p.form}
+      set={p.set}
+      onYear={ctx.onYear}
+      onOpenAutonomo={onOpenAutonomo}
+    />
   );
+  const screen = yesNo(ctx, 'activity', list.length === 0 && <p>{t(w('activityHow'))}</p>);
   return {
     ...screen,
     ready: screen.ready || list.length > 0,
     body: (
       <>
         {screen.body}
+        {/* Always in the same place: what it says stays once the activity is there. */}
+        {(answers.activity === 'yes' || list.length > 0) && bring}
         <ActivitiesList form={p.form} set={p.set} result={p.live.result.activities} />
       </>
     ),
@@ -580,6 +586,8 @@ interface RentaWizardProps {
   onOpenAutonomo?: () => void;
   /** Opens a guide of «Hacienda paso a paso» (in the app). */
   onHowToFile?: (slug: string) => void;
+  /** Changes the year of the return. */
+  onYear?: (year: number) => void;
 }
 
 /** The Renta step by step: the same planner, one short question at a time. */
@@ -590,6 +598,7 @@ export function RentaWizard({
   onExpert,
   onOpenAutonomo,
   onHowToFile,
+  onYear,
 }: RentaWizardProps) {
   const { t } = useI18n();
   const money = useMoney();
@@ -604,6 +613,7 @@ export function RentaWizard({
     answer: controls.answer,
     onOpenAutonomo,
     onHowToFile,
+    onYear,
     goStep: controls.go,
     year,
   };

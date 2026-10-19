@@ -210,6 +210,11 @@ describe('the Renta step by step: the other paths', () => {
     local({ onOpenAutonomo });
     own('activity', 'yes');
     expect(screen.getByText(tr('wizard.renta.warn.activity'))).toBeInTheDocument();
+    // Nothing on this device: it says so and offers the self-employed screen.
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.renta.bring.button', { year: 2025 }) })
+    );
+    expect(screen.getByText(tr('tools.renta.bring.none', { year: 2025 }))).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: tr('wizard.renta.openAutonomo') }));
     expect(onOpenAutonomo).toHaveBeenCalled();
   });

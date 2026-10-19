@@ -15,7 +15,7 @@ const invoice = (book: 'issued' | 'received', n: number): ImportedInvoice => {
     kind: 'material',
     excluded: false,
     date,
-    quarter: Math.floor((Number(date.slice(5, 7)) - 1) / 3) + 1,
+    quarter: (Math.floor((Number(date.slice(5, 7)) - 1) / 3) + 1) as 1 | 2 | 3 | 4,
     base: 100,
     vatRate: 21,
     vat: 21,

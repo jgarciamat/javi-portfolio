@@ -5,6 +5,10 @@ import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { YEAR_ACTIONS_ID } from '@modules/tools/ui/renta/NewReturn';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
+import { rentaState } from '@modules/tools/data/renta/state';
+import { AUTONOMO_ACTIVITY } from '@modules/tools/domain/rentaFromAutonomo';
+import { AnnualFigures } from '@modules/tools/ui/renta/AutonomoBring';
+import { autonomoOnDevice } from '../components/autonomoForRenta';
 import { Icon } from '@shared/components/Icon';
 import { MobileFold } from '@shared/components/MobileFold';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
@@ -17,6 +21,25 @@ import '../css/Sections.css';
 
 const AEAT = 'https://sede.agenciatributaria.gob.es/';
 const CHECKLIST = ['data', 'certificate', 'receipts', 'review'] as const;
+
+/**
+ * The self-employed activity brought to the Renta of this year (from «Preparar mi declaración de la
+ * renta» or step 6): what came, so the person sees at once that the Renta has it.
+ */
+function BroughtActivity({ year }: { year: number }) {
+  const { t } = useI18n();
+  const saved = loadProgress();
+  const brought =
+    saved?.year === year && (saved.form.activities ?? []).some((a) => a.name === AUTONOMO_ACTIVITY);
+  const annual = brought ? autonomoOnDevice(year).annual : null;
+  if (!annual) return null;
+  return (
+    <div className="renta-recovered renta-brought" role="status">
+      <p>{t('app.renta.brought', { year })}</p>
+      <AnnualFigures annual={annual} />
+    </div>
+  );
+}
 
 /** Income tax return (Renta): the figures of the year, whether to file, and what to gather. */
 export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => void }) {
@@ -69,6 +92,12 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
           </p>
         </MobileFold>
+        {year > rentaState.year && (
+          <p className="section-hint renta-provisional" role="note">
+            {t('app.renta.provisional', { year })}
+          </p>
+        )}
+        <BroughtActivity year={year} />
         <div className="tools-main renta-tools">
           <RentaAssistant
             key={`${year}-${Math.round(income)}`}
@@ -76,6 +105,7 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             year={year}
             initialIncome={income > 0 ? String(Math.round(income)) : ''}
             onOpenAutonomo={onOpenTab && (() => onOpenTab('business'))}
+            onYear={(y) => years.includes(y) && setYear(y)}
             onHowToFile={onOpenTab && howToFile}
           />
         </div>

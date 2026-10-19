@@ -16,6 +16,7 @@ import {
   firstOpen,
   grossPatch,
   housingDeductions,
+  noPay,
   paidPatch,
   tickHousing,
   type QuestionId,
@@ -51,13 +52,31 @@ function IncomeAmounts({ form, set }: StepProps) {
   const { t } = useI18n();
   const income = answerOf(form, 'income');
   if (income === null) return null;
+  const activity = (form.activities ?? []).length > 0;
+  // Only an activity: nothing of a pay to type; the activity has its own step.
+  if (noPay(income)) {
+    return (
+      <p className="renta-recovered" role="status">
+        {t(activity ? 'tools.renta.guide.selfBrought' : 'tools.renta.guide.selfHow')}
+      </p>
+    );
+  }
   return (
     <div className="renta-block">
+      {income === 'workSelf' && (
+        <p className="renta-recovered" role="status">
+          {t(activity ? 'tools.renta.guide.selfBrought' : 'tools.renta.guide.selfHow')}
+        </p>
+      )}
       <p className="section-hint">{t('tools.renta.guide.certificate')}</p>
       <div className="tools-form">
         <Field
           id="renta-guide-gross"
-          label={t(income === 'work' ? 'tools.renta.gross' : 'tools.renta.guide.grossAll')}
+          label={t(
+            income === 'work' || income === 'workSelf'
+              ? 'tools.renta.gross'
+              : 'tools.renta.guide.grossAll'
+          )}
           value={form.gross}
           onChange={(v) => set(grossPatch(form, v))}
         />
@@ -325,7 +344,7 @@ type Money = (n: number) => string;
 const DETAILS: Partial<
   Record<QuestionId, (form: RentaForm, answer: string, t: Translate, money: Money) => string | null>
 > = {
-  income: (form, _answer, _t, money) => money(number(form.gross)),
+  income: (form, answer, _t, money) => (noPay(answer) ? null : money(number(form.gross))),
   disability: (form, answer, t) =>
     answer === '0' ? null : t(`tools.renta.guide.opt.active.${form.retired ? 'no' : 'yes'}`),
   family: (form, answer, t) =>

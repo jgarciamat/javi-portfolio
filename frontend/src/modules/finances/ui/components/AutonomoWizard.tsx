@@ -18,6 +18,7 @@ import { WithholdingsForm, WithholdingsPanel } from './AutonomoWithholdings';
 import { ImportChecks } from './ImportChecks';
 import { InvoiceReview } from './InvoiceReview';
 import { annualOf } from './autonomoInputs';
+import { invoiceYears } from './autonomoForRenta';
 import { bringIntoView } from './bringIntoView';
 import { vatExtrasOf, type VatExtras } from './vatForm';
 import { YEARS, useAutonomoDraft, type AutonomoState } from './useAutonomoDraft';
@@ -387,7 +388,12 @@ function rentaScreens(ctx: Ctx): WizardScreen[] {
           {s.hasManual ? (
             <>
               <ActivitySummaryPanel annual={annual} />
-              <PrepareRenta annual={annual} onOpen={onOpenRenta} />
+              <PrepareRenta
+                annual={annual}
+                onOpen={onOpenRenta}
+                years={invoiceYears(s.manual)}
+                onYear={s.setYear}
+              />
             </>
           ) : (
             <p className="section-hint">{t(w('nothingYet'))}</p>
