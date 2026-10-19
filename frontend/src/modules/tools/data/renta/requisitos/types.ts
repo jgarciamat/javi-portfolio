@@ -5,7 +5,10 @@ import type { Check } from '../../../domain/rentaRequirements';
  * where it goes, the checks (rentaRequirements.ts) and the rule it comes from. Kept apart from the
  * catalogue so each community can be checked against its law on its own.
  */
-export type RequirementOverlay = Record<string, { box?: string; checks?: Check[]; norm?: string }>;
+export type RequirementOverlay = Record<
+  string,
+  { box?: string; checks?: Check[]; norm?: string; baseCap?: { group: string; share: number } }
+>;
 
 /** Questions asked by many deductions, in the same words. */
 export const ASK = {

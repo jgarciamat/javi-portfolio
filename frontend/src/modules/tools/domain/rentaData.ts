@@ -106,6 +106,12 @@ export interface Deduction {
   box?: string;
   /** The rule it comes from (the community's law and article). */
   norm?: string;
+  /**
+   * What is spent on the deductions of the same `group` cannot pass `share` of the tax base
+   * ([0500] + [0510]) all together: the regional donations (30 % in the Comunitat Valenciana, 10 % in
+   * Castilla y León). Only for percent deductions (what was spent is known).
+   */
+  baseCap?: { group: string; share: number };
   /** The Tax Agency page that explains it. */
   url: string;
 }

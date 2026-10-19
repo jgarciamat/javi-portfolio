@@ -384,6 +384,8 @@ export const comunitatValencianaRequirements: RequirementOverlay = {
   'comunitat-valenciana-donaciones-otros-fines-culturales': {
     box: '1112',
     norm: LAW,
+    // With the other cultural and Valencian-language donations, up to 30 % of the tax base.
+    baseCap: { group: 'cv-mecenazgo', share: 0.3 },
     checks: [ASK.donationProof],
   },
   'comunitat-valenciana-donaciones-investigacion-covid': {

@@ -850,9 +850,44 @@ function capped(d: Deduction, choice: DeductionChoice, amount: number, input: Re
 }
 
 /** The chosen deductions: what each one gives, split by quota, and those the income rules out. */
-function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
+/**
+ * The share of what was spent that counts for each group of deductions held together to a share of
+ * the tax base (`Deduction.baseCap`): 1 when the group fits.
+ */
+function capFactors(
+  input: RentaInput,
+  liquidable: number,
+  applies: (d: Deduction) => boolean
+): Record<string, number> {
+  const spent: Record<string, { total: number; share: number }> = {};
+  for (const d of [...input.state.deductions, ...input.ccaa.deductions]) {
+    const choice = input.choices[d.id];
+    if (!d.baseCap || d.kind !== 'percent' || !applies(d)) continue;
+    const g = (spent[d.baseCap.group] ??= { total: 0, share: d.baseCap.share });
+    g.total += positive((choice as DeductionChoice).amount ?? 0);
+  }
+  return Object.fromEntries(
+    Object.entries(spent).map(([group, g]) => {
+      const cap = positive(liquidable) * g.share;
+      return [group, g.total > cap ? cap / g.total : 1];
+    })
+  );
+}
+
+function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number, liquidable: number) {
   const blocked: string[] = [];
   const unconfirmed: string[] = [];
+  const joint = input.joint !== undefined;
+  // Only what can be applied (income limit and requirements) counts for the caps of a group.
+  const applies = (d: Deduction) => {
+    const c = input.choices[d.id];
+    return (
+      c?.on === true &&
+      incomeFactor(d, limitBase(d), joint) > 0 &&
+      checkDeduction(d.checks, input.family, c.checks).status === 'ok'
+    );
+  };
+  const caps = capFactors(input, liquidable, applies);
   const lines: DeductionLine[] = [];
   const amountOf = (data: Deduction) => {
     const d = adapted(data, input);
@@ -864,7 +899,10 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
       marked.on && factor > 0 ? checkDeduction(d.checks, input.family, marked.checks) : null;
     if (check?.status === 'fail') blocked.push(d.id);
     if (check?.status === 'missing') unconfirmed.push(d.id);
-    const choice = check && check.status !== 'ok' ? { ...marked, on: false } : marked;
+    const checked = check && check.status !== 'ok' ? { ...marked, on: false } : marked;
+    // Held with the rest of its group to a share of the tax base (regional donations).
+    const cap = d.baseCap ? caps[d.baseCap.group] ?? 1 : 1;
+    const choice = cap < 1 ? { ...checked, amount: positive(checked.amount ?? 0) * cap } : checked;
     const amount = capped(d, choice, deductionAmount(d, choice, factor), input);
     return {
       on: choice.on,
@@ -1002,8 +1040,10 @@ export function computeRenta(input: RentaInput): RentaResult {
     regionalDeductions,
     refundable,
     advanceReceived,
-  } = deductionsOf(withDonations, (d) =>
-    limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
+  } = deductionsOf(
+    withDonations,
+    (d) => limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin }),
+    taxBase + savingsBase
   );
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);

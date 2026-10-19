@@ -235,16 +235,22 @@ export const castillaYLeonRequirements: RequirementOverlay = {
     ],
   },
   'castilla-y-leon-donaciones-fundaciones-patrimonio': {
+    // With the other two of heritage, foundations and R&D, up to 10 % of the tax base.
+    baseCap: { group: 'cyl-donaciones', share: 0.1 },
     box: '0972',
     norm: LAW,
     checks: [ASK.donationProof],
   },
   'castilla-y-leon-donaciones-investigacion': {
+    // With the other two of heritage, foundations and R&D, up to 10 % of the tax base.
+    baseCap: { group: 'cyl-donaciones', share: 0.1 },
     box: '0973',
     norm: LAW,
     checks: [ASK.donationProof],
   },
   'castilla-y-leon-inversion-patrimonio-historico-natural': {
+    // With the other two of heritage, foundations and R&D, up to 10 % of the tax base.
+    baseCap: { group: 'cyl-donaciones', share: 0.1 },
     box: '0974',
     norm: LAW,
     checks: [

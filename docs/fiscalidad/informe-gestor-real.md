@@ -140,6 +140,12 @@ Esfuerzo: **S** (2 días o menos), **M** (1 semana o menos), **L** (2-4 semanas)
 | P0-7 | **El lector de PDF confunde modelos** | Un 390, un PDF con varios trimestres o un 303 foral se leen como un 303 o un 130 estatal sin aviso ([documentos-oficiales.md §6](documentos-oficiales.md#6-consecuencias-para-la-app-para-decidir)) | Rechazarlos o avisar | S |
 | P0-8 | **Criterios fiscales no confirmados en la cuenta**: FIFO global entre brókers, staking en la 0027, airdrops en la 0304, derivados en 1624-1640, clave F/N de la 1803 | Si el criterio no es el de la AEAT, la cifra va a otra casilla o a otra base | Revisión por un gestor colegiado y, si hace falta, una consulta a la DGT | S + coste externo |
 
+**Estado a 19-10-2026 (agente gestor-fiscal):**
+
+- **P0-2 hecho.** Alquileres inmueble a inmueble (`rentaRentals.ts`): titularidad o usufructo, días alquilado y a disposición con imputación, límite de intereses y reparaciones y arrastre por inmueble, gastos anuales por días, amortización del mayor entre coste y valor catastral sin suelo, reducción del 23.2 según contrato y zona tensionada (90/70/60/50 %), 30 % del 23.3, mínimo del art. 24 y retenciones. Un inmueble por pantalla en el asistente con «Añadir otro inmueble». Personas p5-120 a p5-122. Falta: inmuebles accesorios (0133-0147), amortización en casos especiales (0132), anexo D, NIF de inquilinos.
+- **P0-3 hecho.** Pregunta de residencia en el paso 1 (183 días, centro de intereses, presunción familiar, traslado, desplazados, funcionarios en el extranjero, territorio vasco). No residentes, régimen de desplazados, art. 10 y forales ven dónde se presenta (enlaces oficiales) en lugar del resultado; el resto de la app sigue.
+- **P0-4 hecho en lo esencial.** Donativos por lo donado con 80/40/45 %, prioritarias y límite del 10-15 % de la base liquidable (D17). Motor de requisitos: cada deducción autonómica marcada se aplica solo si cumple sus requisitos (edad, hijos y discapacidad comprobados solos; el resto, preguntas sí/no); con su casilla del anexo B y su norma (`data/renta/requisitos/`, `deducciones-requisitos.json`). Falta: el límite conjunto de las donaciones autonómicas sobre la base liquidable (p. ej. 30 % en la Comunitat Valenciana, 10 % en Castilla y León) y las incompatibilidades entre deducciones (hoy se explican en el texto de requisitos, no se bloquean).
+
 ### P1 · Coberturas que usa mucha gente
 
 | # | Qué | Esfuerzo |
