@@ -191,7 +191,7 @@ export function DeclarationTable({
   const { t } = useI18n();
   const money = useMoney();
   const k = 'tools.invest.decl';
-  const sum = summaryOf(ledger, rows);
+  const sum = summaryOf(ledger);
   const capital: [string, number][] = (
     [
       ['0027', sum.capital['0027']],

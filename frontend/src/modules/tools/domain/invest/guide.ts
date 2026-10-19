@@ -66,11 +66,12 @@ export function guideSteps(ledger: LedgerResult | null, rows: DeclarationRow[]):
   const switchedOnly =
     !!ledger &&
     !has('iic') &&
+    !has('etf') &&
     ledger.ops.some((o) => o.kind === 'switchOut' || o.kind === 'switchIn');
   const steps: (GuideStep | false)[] = [
     { id: 'before', sources: [MANUAL] },
     { id: 'draft', sources: [MANUAL] },
-    (all || has('iic')) && { id: 'funds', sources: [MODEL, LAW, MANUAL] },
+    (all || has('iic') || has('etf')) && { id: 'funds', sources: [MODEL, LAW, MANUAL] },
     (all || switchedOnly) && { id: 'onlySwitches', sources: [LAW] },
     (all || has('shares')) && { id: 'shares', sources: [MODEL, LAW] },
     (all || has('crypto')) && {

@@ -17,7 +17,12 @@ import {
 } from '@modules/tools/domain/invest/pdfReports';
 import { legsToOps, fromTo } from '@modules/tools/domain/invest/read';
 import { guideSteps } from '@modules/tools/domain/invest/guide';
-import { declarationRows, reportTables, summaryOf } from '@modules/tools/domain/invest/report';
+import {
+  copyFileName,
+  declarationRows,
+  reportTables,
+  summaryOf,
+} from '@modules/tools/domain/invest/report';
 import type { InvestOp } from '@modules/tools/domain/invest/types';
 
 describe('JSON and statements with sections', () => {
@@ -474,7 +479,7 @@ describe('what to copy and the report', () => {
   );
   const rows = declarationRows(ledger);
 
-  it('groups by fund, issuer, coin and key; a loss waiting for a repurchase does not count', () => {
+  it('one alta per asset, key and sign; a loss kept back by a repurchase goes with its mark', () => {
     expect(
       rows.map((r) => [
         r.section,
@@ -486,13 +491,15 @@ describe('what to copy and the report', () => {
         r.loss,
         r.lossCounted,
         r.sales,
+        r.blocked,
       ])
     ).toEqual([
-      ['iic', 'Fondo Ficticio', undefined, 1000, 1000, 100, 100, 0, 2],
-      ['shares', 'Ficticia Inc', undefined, 150, 100, 50, 0, 0, 1],
-      ['crypto', 'BTC', 'F', 30000, 20000, 10000, 0, 0, 1],
-      ['crypto', 'BTC', 'N', 10000, 20000, 0, 10000, 10000, 1],
-      ['other', 'OIL', undefined, 0, 70, 0, 70, 70, 1],
+      ['iic', 'Fondo Ficticio', undefined, 600, 500, 100, 0, 0, 1, false],
+      ['iic', 'Fondo Ficticio', undefined, 400, 500, 0, 100, 0, 1, true],
+      ['shares', 'Ficticia Inc', undefined, 150, 100, 50, 0, 0, 1, false],
+      ['crypto', 'BTC', 'F', 30000, 20000, 10000, 0, 0, 1, false],
+      ['crypto', 'BTC', 'N', 10000, 20000, 0, 10000, 10000, 1, false],
+      ['other', 'OIL', undefined, 0, 70, 0, 70, 70, 1, false],
     ]);
   });
 
@@ -503,20 +510,99 @@ describe('what to copy and the report', () => {
     expect(sum.general).toBe(5);
   });
 
-  it('the report: sales with the FIFO audit, income, closed positions and years', () => {
+  it('the file to copy: one tab per window, totals, the FIFO detail, the income and the years', () => {
     const tables = reportTables(ledger);
     expect(tables.map((t) => t.name)).toEqual([
-      'Por activo',
-      'Ventas y FIFO',
-      'Rendimientos',
-      'Posiciones cerradas',
-      'Por año',
+      '0 Cómo usar',
+      '1 Fondos (0310)',
+      '3 Acciones (0326)',
+      '4 Monedas virtuales (1800)',
+      '5 Otros elementos (1624)',
+      '6 Totales por casilla',
+      '7 Detalle por operación',
+      '8 Rendimientos',
+      '9 Por año',
     ]);
-    expect(tables[1].rows[1]).toEqual([
+    const tab = (name: string) =>
+      (tables.find((t) => t.name === name) as (typeof tables)[number]).rows;
+    expect(tab('1 Fondos (0310)')[2]).toEqual([
+      2,
+      '',
+      400,
+      500,
+      0,
+      'Sí',
+      'Fondo Ficticio',
+      0,
+      100,
+      0,
+      1,
+      'Sí',
+      '',
+    ]);
+    expect(tab('3 Acciones (0326)')[0].slice(0, 6)).toEqual([
+      'Nº de alta',
+      'Entidad Emisora',
+      'Transacción',
+      'Valor de transmisión (*)',
+      'Valor de adquisición (*)',
+      expect.stringContaining('dos meses'),
+    ]);
+    expect(tab('3 Acciones (0326)')[1]).toEqual([
+      1,
+      'Ficticia Inc',
+      1,
+      150,
+      100,
+      'No',
+      50,
+      0,
+      0,
+      1,
+      'No',
+      '',
+    ]);
+    expect(tab('4 Monedas virtuales (1800)')[1]).toEqual([
+      1,
+      'BTC',
+      'F - Moneda de curso legal',
+      30000,
+      0,
+      20000,
+      0,
+      30000,
+      20000,
+      0,
+      10000,
+      1,
+      '',
+    ]);
+    expect(tab('5 Otros elementos (1624)')[1].slice(0, 5)).toEqual([
+      1,
+      expect.stringContaining('4 - Otros'),
+      'Sí',
+      '01/04/2025',
+      '01/04/2025',
+    ]);
+    expect(tab('6 Totales por casilla').map((r) => r[0])).toEqual([
+      'Casilla',
+      '0324',
+      '0325',
+      '0339',
+      '0340',
+      '1814',
+      '1813',
+      '0386',
+      '0385',
+      '0029',
+      '0588',
+    ]);
+    expect(tab('7 Detalle por operación')[1]).toEqual([
       '01/02/2025',
       'BTC',
       'BTC',
-      'crypto',
+      '4 Monedas virtuales (1800)',
+      1,
       1,
       30000,
       20000,
@@ -524,7 +610,8 @@ describe('what to copy and the report', () => {
       0,
       '01/01/2024: 1 por 20000 €',
     ]);
-    expect(tables[2].rows[1]).toEqual([
+    expect(tab('7 Detalle por operación').at(-1)?.[10]).toBe('Abierta el 01/04/2025');
+    expect(tab('8 Rendimientos')[1]).toEqual([
       '01/04/2025',
       'Degiro',
       'US1',
@@ -534,22 +621,8 @@ describe('what to copy and the report', () => {
       'Extranjero',
       '0029',
     ]);
-    expect(tables[3].rows[1]).toEqual(['01/04/2025', 'Degiro', 'OIL', 'shares', 0, 70, -70]);
     // 10,000 − 10,000 (crypto) + 100 (fund) + 50 (shares) − 70 (CFD) + 10 (dividend) = 90.
-    expect(tables[4].rows[1]).toEqual([2025, 90, 5]);
-    expect(tables[0].rows[3]).toEqual([
-      'crypto',
-      'BTC',
-      'BTC',
-      'F',
-      1,
-      30000,
-      20000,
-      10000,
-      0,
-      '1804 / 1806 / 1809 / 1808',
-    ]);
-    expect(tables[0].rows[1][3]).toBe('');
+    expect(tab('9 Por año')[1]).toEqual([2025, 90, 5]);
     const spanish = buildLedger(
       [
         op({
@@ -561,20 +634,18 @@ describe('what to copy and the report', () => {
           withholding: 0.19,
           withheldIn: 'spain',
         }),
-        op({
-          kind: 'realized',
-          date: '2025-04-01',
-          asset: 'X',
-          assetClass: 'derivative',
-          amount: 1,
-          cost: 0,
-        }),
       ],
       { year: 2025, rates: {} }
     );
     const t = reportTables(spanish);
+    expect(t.map((x) => x.name)).toEqual([
+      '0 Cómo usar',
+      '6 Totales por casilla',
+      '8 Rendimientos',
+      '9 Por año',
+    ]);
     expect(t[2].rows[1][6]).toBe('España');
-    expect(t[3].rows[1][3]).toBe('');
+    expect(copyFileName(2025, 'xlsx')).toBe('Finanverso-Renta-2025-copiar-en-Renta-WEB.xlsx');
   });
 
   it('the guide shows the steps that apply, all of them when nothing was imported', () => {

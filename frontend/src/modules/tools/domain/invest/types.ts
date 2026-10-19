@@ -103,6 +103,8 @@ export interface InvestOp {
   tx?: string;
   /** What a derivative is on (a CFD on shares or on a crypto pair). */
   underlying?: AssetClass;
+  /** Box 1803 when the file says it: paid goods or services (B), got an NFT (O). */
+  counterpart?: import('../rentaGains').Counterpart;
   /** The file does not give the fees (Binance's statement): the cost may be a little higher. */
   feesMissing?: boolean;
 }

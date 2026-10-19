@@ -4,6 +4,7 @@ import {
   fifo,
   type AssetKind,
   type AssetOps,
+  type Counterpart,
   type ForeignTax,
   type GainSection,
   type ImportedSavings,
@@ -75,6 +76,8 @@ export interface IncomeLine {
 /** A result already worked out: a derivative or a position the platform closed. */
 export interface DirectGain {
   date: string;
+  /** When the position was opened (the closing day when the file does not say). */
+  acquired: string;
   account: string;
   asset: string;
   underlying?: AssetClass;
@@ -94,6 +97,8 @@ export interface Holding {
 }
 
 export interface LedgerResult {
+  /** The year of the Renta it was worked out for. */
+  year: number;
   ops: ValuedOp[];
   /** What goes to the Renta (rentaGains.ImportedSavings). */
   imported: ImportedSavings;
@@ -120,7 +125,7 @@ const KIND: Record<AssetClass, AssetKind> = {
 };
 
 /** Platforms that keep the assets in Spain, or where the person keeps them (models 720/721). */
-const SPANISH =
+export const SPANISH =
   /bit2me|fondos y valores|myinvestor|indexa|finizens|renta 4|openbank|bbva|santander|caixabank|ing\b|inversis/i;
 const SELF = /ledger live|etherscan/i;
 
@@ -193,6 +198,11 @@ const coinFee = (op: ValuedOp) => {
     : null;
 };
 
+/** Box 1803: given by the file, another virtual asset for an NFT, another coin, or money. */
+const counterpartOf = (op: ValuedOp): Counterpart =>
+  op.counterpart ??
+  (op.kind === 'swap' ? (op.toClass && op.toClass !== 'crypto' ? 'O' : 'N') : 'F');
+
 /** Book of each asset: its lots for the Renta (AssetOps) and the running queue. */
 class Book {
   readonly assets = new Map<string, AssetOps & { cls: AssetClass }>();
@@ -210,7 +220,7 @@ class Book {
         name: op.assetClass === 'crypto' ? asset : op.name ?? asset,
         code: op.assetClass === 'crypto' ? asset : op.isin ?? asset,
         kind: KIND[op.assetClass],
-        section: op.assetClass === 'etf' ? 'iic' : undefined,
+        section: op.assetClass === 'etf' ? 'etf' : undefined,
         buys: [],
         sells: [],
         cls: op.assetClass,
@@ -240,8 +250,7 @@ class Book {
 
   sell(op: ValuedOp, units: number, proceeds: number, untaxed = false) {
     const { entry, queue } = this.asset(op);
-    const counterpart =
-      op.assetClass === 'crypto' && !untaxed ? (op.kind === 'swap' ? 'N' : 'F') : undefined;
+    const counterpart = untaxed || op.assetClass !== 'crypto' ? undefined : counterpartOf(op);
     entry.sells.push({
       date: op.date,
       units,
@@ -554,6 +563,7 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
           if (inYear(op.date))
             direct.push({
               date: op.date,
+              acquired,
               account: op.account,
               asset: op.asset,
               underlying: op.underlying,
@@ -624,6 +634,7 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
   const derivativeGains = direct.map((d) => d.gain);
   const r = (n: number) => round2(n);
   return {
+    year: options.year,
     ops,
     imported: {
       files: [],

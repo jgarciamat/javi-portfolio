@@ -19,11 +19,18 @@ const finite = (n: number) => (Number.isFinite(n) ? n : 0);
 export type AssetKind = 'listed' | 'unlisted' | 'fund' | 'crypto' | 'other';
 
 /**
- * Where the modelo 100 of 2025 asks for each sale (Orden HAC/277/2026, BOE-A-2026-7041, page 15):
- * iic, units of funds and ETFs (boxes 0310-0325); shares, listed shares (0326-0340); crypto, virtual
- * currencies (1800-1814); other, the rest of the transmissions (other elements, not detailed here).
+ * Box 1803, what was received for the coins (Renta2025.xsd, tipo_ClaveCri): F legal tender, N
+ * another virtual currency, O another virtual asset (an NFT), B goods or services.
  */
-export type GainSection = 'iic' | 'shares' | 'crypto' | 'other';
+export type Counterpart = 'F' | 'N' | 'O' | 'B';
+
+/**
+ * Where the modelo 100 of 2025 asks for each sale (Orden HAC/277/2026, BOE-A-2026-7041, page 15):
+ * iic, units of funds (boxes 0310-0325); etf, listed funds and index SICAV, a part of its own since
+ * 2025 (2225-2236); shares, listed shares (0326-0340); crypto, virtual currencies (1800-1814);
+ * other, the rest of the transmissions (other elements, 1624-1654).
+ */
+export type GainSection = 'iic' | 'etf' | 'shares' | 'crypto' | 'other';
 
 const SECTION_OF: Record<AssetKind, GainSection> = {
   listed: 'shares',
@@ -51,10 +58,9 @@ export interface Disposal {
    */
   untaxed?: boolean;
   /**
-   * Crypto, box 1803: what was received. F: legal tender; N: another virtual currency (keys of the
-   * Renta WEB list, NO CONFIRMADO: taken from a secondary source, check the drop-down).
+   * Crypto, box 1803: what was received (keys of tipo_ClaveCri of Renta2025.xsd).
    */
-  counterpart?: 'F' | 'N';
+  counterpart?: Counterpart;
 }
 
 /** One asset with every purchase (also from earlier years) and the sales of the year. */
@@ -194,7 +200,7 @@ export interface SaleResult {
   section: GainSection;
   /** The purchases each sale used, oldest first: the audit of the FIFO. */
   lots: Lot[];
-  counterpart?: 'F' | 'N';
+  counterpart?: Counterpart;
 }
 
 // Array sort is stable: purchases on the same day keep the order they were typed in.
@@ -419,7 +425,7 @@ function split(amounts: number[]) {
   return { gains, losses, balance: round2(gains - losses) };
 }
 
-const SECTIONS: GainSection[] = ['iic', 'shares', 'crypto', 'other'];
+const SECTIONS: GainSection[] = ['iic', 'etf', 'shares', 'crypto', 'other'];
 
 /** The sales of the year summed by part of the modelo; a deferred loss does not count (art. 33.5). */
 function sectionsOf(sales: SaleResult[]): Record<GainSection, SectionTotals> {

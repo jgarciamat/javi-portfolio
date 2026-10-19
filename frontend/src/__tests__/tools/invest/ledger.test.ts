@@ -836,6 +836,7 @@ describe('securities and funds', () => {
     expect(r.direct).toEqual([
       {
         date: '2025-05-05',
+        acquired: '2025-05-05',
         account: 'Quantfury',
         asset: 'SPCX',
         underlying: 'shares',
@@ -857,7 +858,7 @@ describe('securities and funds', () => {
     );
   });
 
-  it('ETFs go to the funds part of the modelo; gold to "other"; money is never an asset', () => {
+  it('ETFs go to their own part of the modelo (2225-2236); gold to "other"; money is never an asset', () => {
     const r = buildLedger(
       [
         op({
@@ -912,7 +913,7 @@ describe('securities and funds', () => {
       { year: 2025, rates: {} }
     );
     expect(r.sales.map((s) => [s.name, s.section, s.gain])).toEqual([
-      ['IE1', 'iic', 20],
+      ['IE1', 'etf', 20],
       ['XAU', 'other', -10],
     ]);
   });
