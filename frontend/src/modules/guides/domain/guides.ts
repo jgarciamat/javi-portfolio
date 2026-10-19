@@ -1,4 +1,5 @@
 import { GUIDES_AUTONOMOS } from './guidesAutonomos';
+import { GUIDES_DEUDA_PUBLICA } from './guidesDeudaPublica';
 import { GUIDES_RENTA_DEDUCCIONES } from './guidesRentaDeducciones';
 import { GUIDES_RENTA_FAMILIA } from './guidesRentaFamilia';
 import { GUIDES_TRAMITES } from './guidesTramites';
@@ -530,6 +531,7 @@ export const GUIDES: Guide[] = [
     tool: { to: '/simulador-ahorro', label: 'Simulador de ahorro' },
     related: ['interes-compuesto', 'inflacion-y-ahorro'],
   },
+  ...GUIDES_DEUDA_PUBLICA,
   ...GUIDES_AUTONOMOS,
   ...GUIDES_RENTA_FAMILIA,
   ...GUIDES_RENTA_DEDUCCIONES,

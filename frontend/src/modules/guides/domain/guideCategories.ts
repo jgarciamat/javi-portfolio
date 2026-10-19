@@ -45,7 +45,13 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
     label: 'Inversión e independencia',
     blurb: 'Haz crecer tu dinero y entiende el efecto del tiempo y la inflación.',
     color: '#6366f1',
-    slugs: ['interes-compuesto', 'inflacion-y-ahorro', 'independencia-financiera-regla-del-4'],
+    slugs: [
+      'interes-compuesto',
+      'inflacion-y-ahorro',
+      'independencia-financiera-regla-del-4',
+      'como-comprar-letras-del-tesoro',
+      'letras-del-tesoro-renta',
+    ],
   },
   {
     id: 'autonomos',
