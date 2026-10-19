@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
+import { NewReturn, UnderYear } from './renta/NewReturn';
 import { storage } from '@shared/utils/storage';
 import type { RentaAccess, RentaMode } from '../application/useRentaAccess';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
@@ -208,7 +209,7 @@ export function RentaPlanner({
     access,
     busy,
     wipes,
-    wipe,
+    startNew,
     family,
     input,
     live,
@@ -239,9 +240,13 @@ export function RentaPlanner({
             {t('tools.renta.recovered')}
           </p>
         )}
-        <button type="button" className="btn-secondary" onClick={wipe}>
-          {t('tools.renta.wipe')}
-        </button>
+        <UnderYear>
+          <NewReturn
+            year={year}
+            hasActivity={(form.activities?.length ?? 0) > 0}
+            onConfirm={startNew}
+          />
+        </UnderYear>
       </div>
       <ViewSwitch expert={expert} onChange={switchView} />
       <DraftStep

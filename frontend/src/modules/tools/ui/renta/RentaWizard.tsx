@@ -18,6 +18,7 @@ import { DeductionsStep } from './DeductionsStep';
 import { DraftStep } from './DraftStep';
 import { QuestionBody, ready as guidedReady } from './GuidedInterview';
 import { InvestCard, InvestLink } from './InvestCard';
+import { NewReturn } from './NewReturn';
 import { Optimizer } from './Optimizer';
 import { SavingsDetailSection } from './SavingsDetail';
 import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
@@ -583,10 +584,16 @@ export function RentaWizard({
       steps={rentaSteps(ctx)}
       controls={controls}
       onExpert={onExpert}
-      onRestart={() => {
-        p.wipeNow();
-        controls.restart();
-      }}
+      screenAction={
+        <NewReturn
+          year={year}
+          hasActivity={(p.form.activities?.length ?? 0) > 0}
+          onConfirm={(alsoActivity) => {
+            p.startNew(alsoActivity);
+            controls.restart();
+          }}
+        />
+      }
       finale={<Finale p={p} money={money} />}
     />
   );

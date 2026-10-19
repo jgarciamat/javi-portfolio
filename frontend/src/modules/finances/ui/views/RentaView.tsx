@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
+import { YEAR_ACTIONS_ID } from '@modules/tools/ui/renta/NewReturn';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { Icon } from '@shared/components/Icon';
 import { MobileFold } from '@shared/components/MobileFold';
@@ -59,6 +60,8 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             ))}
           </select>
         </div>
+        {/* The expert mode puts «Start a new return» here, under the year. */}
+        <div className="renta-year-actions" id={YEAR_ACTIONS_ID} />
         <MobileFold summary={t('app.renta.fold')}>
           <p className="section-hint">{t('app.renta.hint')}</p>
           <CampaignDates exercise={year} />

@@ -87,6 +87,11 @@ export function rememberMapping(key: string, mapping: Mapping): void {
   storage.setJSON(MAPPINGS_KEY, { ...savedMappings(), [key]: mapping });
 }
 
+/** «Start a new return»: the confirmed mappings go with the rest of the year's data. */
+export function forgetMappings(): void {
+  storage.set(MAPPINGS_KEY, null);
+}
+
 /** The exchange rates loaded (only the currencies the files use, to keep it small). */
 export const savedRates = (): RateTable => storage.getJSON<RateTable>(RATES_KEY, {});
 

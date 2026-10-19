@@ -223,7 +223,6 @@ describe('the planner picks up where it was left', () => {
   });
 
   it('deletes what was saved with the data', () => {
-    jest.spyOn(window, 'confirm').mockReturnValue(true);
     saveProgress({
       year: 2025,
       form: { ...emptyForm(''), gross: '1' },
@@ -231,7 +230,8 @@ describe('the planner picks up where it was left', () => {
       review: NO_REVIEW,
     });
     renderWithProviders(<RentaPlanner mode="local" initialIncome="5" />, { authenticated: false });
-    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
     expect(screen.queryByText(tr('tools.renta.recovered'))).toBeNull();
     expect(localStorage.getItem(PROGRESS_KEY)).toBeNull();

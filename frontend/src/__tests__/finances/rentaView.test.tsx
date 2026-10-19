@@ -54,15 +54,17 @@ describe('Renta section', () => {
   });
 
   it('wipes everything that was entered once the user confirms', async () => {
-    const confirm = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValue(true);
     renderWithProviders(<RentaView />);
     const gross = await screen.findByLabelText(tr('tools.renta.gross'));
     fireEvent.change(gross, { target: { value: '30000' } });
     expect(gross).toHaveValue('30000');
-    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
+    const open = () =>
+      fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    open();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.cancel') }));
     expect(gross).toHaveValue('30000');
-    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.wipe') }));
-    expect(confirm).toHaveBeenCalledWith(tr('tools.renta.wipeConfirm'));
+    open();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 

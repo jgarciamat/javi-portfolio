@@ -4,6 +4,7 @@ import { emptyForm, emptyPartner, type RentaForm, type UnrentedForm } from '../d
 import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 import type { ActivityInput } from '../domain/rentaActivity';
 import type { SavingsDetail } from '../domain/rentaGains';
+import { emptyProperty } from '../domain/rentaRentals';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -92,8 +93,21 @@ function withOptional(form: RentaForm, saved: Record<string, unknown>): RentaFor
   if (saved.assistance === true) form.assistance = true;
   if (isDetail(saved.savingsDetail)) form.savingsDetail = saved.savingsDetail;
   if (Array.isArray(saved.activities)) form.activities = saved.activities.filter(isActivity);
+  // Each rented property over an empty one: a field of the wrong kind is left empty.
+  if (Array.isArray(saved.properties))
+    form.properties = saved.properties
+      .filter(isObject)
+      .map((p, i) => ({ ...over(emptyProperty(i + 1), p), expenses: textMap(p.expenses) }));
   return form;
 }
+
+/** A map of texts (the expenses of a property, by id): anything else is left out. */
+const textMap = (v: unknown): Record<string, string> =>
+  isObject(v)
+    ? Object.fromEntries(
+        Object.entries(v).filter((e): e is [string, string] => typeof e[1] === 'string')
+      )
+    : {};
 
 /** A reading is kept only when it has the shape of this version: else it is read again from the PDF. */
 const isReading = (r: unknown): r is DraftReading =>

@@ -880,3 +880,54 @@
   margin-top: 0.75rem;
   padding-top: 0.75rem;
 }
+
+/* «Start a new return»: one compact line, soft destructive. */
+.renta-new-return {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--red-400, #f87171);
+  border-color: color-mix(in srgb, var(--red-400, #f87171) 45%, transparent);
+}
+
+.renta-new-return-modal {
+  text-align: left;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.renta-new-return-modal .confirm-delete-icon,
+.renta-new-return-modal .confirm-delete-title {
+  text-align: center;
+}
+
+.renta-new-return-modal .confirm-delete-message {
+  margin-bottom: 0.75rem;
+}
+
+.renta-new-return-list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.2rem;
+  font-size: 0.875rem;
+  color: var(--slate-300);
+  line-height: 1.5;
+}
+
+.renta-new-return-modal .renta-check {
+  margin-bottom: 0.75rem;
+}
+
+/* Under the year picker of the Renta screen (expert mode only: empty in the assistant). */
+.renta-year-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.renta-year-actions:empty {
+  display: none;
+}

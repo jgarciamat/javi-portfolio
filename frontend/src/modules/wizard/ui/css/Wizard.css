@@ -551,3 +551,8 @@ html.wiz-contrast .wiz-route-item.is-locked button {
     padding: 0.3rem 0.5rem;
   }
 }
+
+/* A compact action under the title of every screen (the Renta's «Start a new return»). */
+.wiz-screen-action {
+  margin: 0.5rem 0 0.9rem;
+}

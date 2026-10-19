@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
 import {
   computeRenta,
@@ -38,6 +37,7 @@ import type { DeductionSaving } from '../../domain/rentaSavings';
 import { compareBoxes, ourBoxes } from '../../domain/rentaCompare';
 import { deductionSavings, markedSaving } from '../../domain/rentaSavings';
 import { clearProgress, loadProgress, saveProgress } from '../../application/rentaProgress';
+import { forgetMappings } from '../../application/investImport';
 import type { Snapshot } from './ResultStep';
 
 const SNAPSHOT_KEY = 'mm_renta_snapshot_v2';
@@ -148,7 +148,8 @@ function useSavedPlanner(year: number, initialIncome: string) {
   };
   const reset = () => {
     dirty.current = false;
-    clearProgress();
+    // Only this year's data: what is saved for another year is left alone.
+    if (loadProgress()?.year === year) clearProgress();
     setForm(emptyForm(''));
     setDraftState(NO_DRAFT);
     setReviewState(NO_REVIEW);
@@ -242,7 +243,6 @@ export function useRentaPlanner({
   mode: RentaMode;
   year: number;
 }) {
-  const { t } = useI18n();
   const { form, set, setChoice, draft, setDraft, review, decideOn, recovered, reset } =
     useSavedPlanner(year, initialIncome);
   // Bumped from the guided summary: the review of the deductions starts.
@@ -295,8 +295,18 @@ export function useRentaPlanner({
     reset();
     setWipes((n) => n + 1);
   };
-  const wipe = () => {
-    if (window.confirm(t('tools.renta.wipeConfirm'))) wipeNow();
+  /**
+   * «Start a new return»: this year's answers, data, draft, investments (with the column mappings
+   * confirmed), properties and results are wiped. The activity brought from Autónomos is kept
+   * unless `alsoActivity` (Autónomos' own data is never touched here).
+   */
+  const startNew = (alsoActivity: boolean) => {
+    const activities = form.activities;
+    wipeNow();
+    storage.set(SNAPSHOT_KEY, null);
+    setSnapshot(null);
+    forgetMappings();
+    if (!alsoActivity && activities?.length) set({ activities });
   };
 
   return {
@@ -314,8 +324,8 @@ export function useRentaPlanner({
     access,
     busy,
     wipes,
-    wipe,
     wipeNow,
+    startNew,
     family,
     input,
     live,

@@ -373,8 +373,10 @@ describe('step by step or everything together', () => {
     saved({ gross: '31000', ccaaId: 'madrid' });
     at(3);
     local();
-    jest.spyOn(window, 'confirm').mockReturnValue(true);
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('wizard.restart')) }));
+    // One button for it, under the title of every screen (no «Start again» in the toolbar).
+    expect(screen.queryByRole('button', { name: new RegExp(tr('wizard.restart')) })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
     expect(heading(tr('wizard.renta.q.draft'))).toBeInTheDocument();
     await waitFor(() =>
       expect(JSON.parse(localStorage.getItem(wizardKey(rentaState.year)) as string).done).toEqual(
