@@ -4217,7 +4217,7 @@
   "wizard.autonomo.help.invoices": "Sometimes a PDF doesn't say the VAT rate or the date. We show you those invoices here to complete them.",
   "wizard.autonomo.hint.noInvoices": "You haven't imported invoices: nothing to check. Go on to the next step.",
   "wizard.autonomo.opt.invoices.yes": "I've checked it",
-  "wizard.autonomo.q.amounts": "Your income and expenses up to quarter {n}",
+  "wizard.autonomo.q.amounts": "Your income and expenses of quarter {n}",
   "wizard.autonomo.hint.amounts": "If you imported invoices, they are already added up. If not, type the totals without VAT here.",
   "wizard.autonomo.help.amounts": "The base is the amount without VAT. For example: a €121 invoice with 21 % VAT has a €100 base.",
   "wizard.autonomo.advanced": "More options (pro rata, VAT to offset, cash accounting…)",
@@ -4248,5 +4248,8 @@
   "wizard.autonomo.hint.renta": "When the year ends, take your income, expenses, withholdings and form 130 payments to the return with one button.",
   "wizard.autonomo.nothingYet": "When you have data of your activity, you can take it to the return here.",
   "wizard.autonomo.finale": "Your quarter is ready. Copy it on the Tax Agency's website within the deadline (shown in step 4, next to the result).",
-  "wizard.autonomo.notFiled": "This is guidance only: Finanverso does not file anything with the Tax Agency. If in doubt, have it checked by a registered tax adviser."
+  "wizard.autonomo.notFiled": "This is guidance only: Finanverso does not file anything with the Tax Agency. If in doubt, have it checked by a registered tax adviser.",
+  "app.renta.fold": "Campaign dates and how it works",
+  "tools.renta.campaign.fold": "Dates of the income tax campaign",
+  "wizard.autonomo.hint.amountsNext": "Now quarter {n}. If it is the same as the one before, press “Copy quarter {prev}”."
 }

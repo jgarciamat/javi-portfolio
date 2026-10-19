@@ -532,3 +532,15 @@ html.wiz-contrast .wiz-route-item.is-locked button {
 .wiz-body .renta-result > h2 {
   display: none;
 }
+
+/* On a phone the reading tools take two short rows, so the question comes sooner. */
+@media (max-width: 719px) {
+  .wiz-tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .wiz-tool {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
+}

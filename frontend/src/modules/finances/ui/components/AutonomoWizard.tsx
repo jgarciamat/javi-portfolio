@@ -12,7 +12,7 @@ import { AutonomoCloudPanel } from './AutonomoCloud';
 import { AutonomoDraftCard, ExtrasPanel, PeriodPicker, PrepareGate } from './AutonomoDraftCard';
 import { DraftResult } from './AutonomoDraftResult';
 import { AutonomoImport } from './AutonomoImport';
-import { PriorPanel, ProfilePanel, QuarterPanels } from './AutonomoManual';
+import { PriorPanel, ProfilePanel, QuarterPanels, firstQuarterShown } from './AutonomoManual';
 import { AutonomoSummary, summarize } from './AutonomoSummary';
 import { WithholdingsForm, WithholdingsPanel } from './AutonomoWithholdings';
 import { ImportChecks } from './ImportChecks';
@@ -214,34 +214,42 @@ const draftOfPeriod = (s: AutonomoState) =>
 
 function quarterScreens(ctx: Ctx): WizardScreen[] {
   const { s, t } = ctx;
+  const from = firstQuarterShown(s.manual, s.quarter);
+  // One quarter per screen: the 130 still adds up the whole year from the same data.
+  const quarters = Array.from({ length: s.quarter - from }, (_, i) => from + i + 1);
   return [
-    {
-      id: 'amounts',
-      title: t(w('q.amounts'), { n: s.quarter }),
-      hint: t(w('hint.amounts')),
-      help: t(w('help.amounts')),
-      ready: true,
-      noSkip: true,
-      body: (
-        <>
-          <QuarterPanels
-            form={s.manual}
-            onChange={s.changeManual}
-            upTo={s.quarter}
-            year={s.year}
-            vatExtras={s.extras.vat}
-          />
-          <details className="renta-group">
-            <summary>{t(w('advanced'))}</summary>
-            <ExtrasPanel
-              extras={s.extras}
-              quarter={s.quarter}
-              onChange={(patch) => s.setExtras({ ...s.extras, ...patch })}
+    ...quarters.map(
+      (n): WizardScreen => ({
+        id: `amounts-${n}`,
+        title: t(w('q.amounts'), { n }),
+        hint: t(w(n === quarters[0] ? 'hint.amounts' : 'hint.amountsNext'), { n, prev: n - 1 }),
+        help: t(w('help.amounts')),
+        ready: true,
+        noSkip: true,
+        body: (
+          <>
+            <QuarterPanels
+              form={s.manual}
+              onChange={s.changeManual}
+              upTo={s.quarter}
+              year={s.year}
+              vatExtras={s.extras.vat}
+              only={n}
             />
-          </details>
-        </>
-      ),
-    },
+            {n === s.quarter && (
+              <details className="renta-group">
+                <summary>{t(w('advanced'))}</summary>
+                <ExtrasPanel
+                  extras={s.extras}
+                  quarter={s.quarter}
+                  onChange={(patch) => s.setExtras({ ...s.extras, ...patch })}
+                />
+              </details>
+            )}
+          </>
+        ),
+      })
+    ),
     {
       id: 'prepare',
       title: t(w('q.prepare')),

@@ -437,7 +437,8 @@ export function Wizard({ flow, defs, steps, controls, onExpert, onRestart, final
   // After the end, a step opened again from the route is shown instead of the finale.
   const [revisit, setRevisit] = useState(false);
   const [badge, setBadge] = useState<string | null>(null);
-  const [resumeShown, setResumeShown] = useState(controls.resumed);
+  // Nothing to pick up once every step is done: the end is shown instead.
+  const [resumeShown, setResumeShown] = useState(controls.resumed && !finished);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
   const at = progress.at;

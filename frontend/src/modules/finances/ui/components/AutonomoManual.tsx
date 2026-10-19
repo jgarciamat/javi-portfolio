@@ -487,6 +487,10 @@ function QuarterPanel({
   );
 }
 
+/** The first quarter on screen (from 0): only the last one when the filed modelo 130 is on. */
+export const firstQuarterShown = (form: ManualForm, upTo: number): number =>
+  form.prior.on && upTo > 1 ? upTo - 1 : 0;
+
 /**
  * The quarters up to the one of the draft (only that one when the filed modelo 130 is on): income,
  * withholdings, expenses and VAT, each with a way to copy the one before.
@@ -497,12 +501,15 @@ export function QuarterPanels({
   upTo,
   year,
   vatExtras,
+  only,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
   upTo: number;
   year: number;
   vatExtras?: VatExtras;
+  /** Only this quarter (1 to 4): the assistant shows one per screen. */
+  only?: number;
 }) {
   const setQuarter = (index: number, patch: Partial<QuarterForm>) =>
     onChange({
@@ -515,13 +522,13 @@ export function QuarterPanels({
       withheld: form.quarters[q - 1].withheld,
       expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
     });
-  const from = form.prior.on && upTo > 1 ? upTo - 1 : 0;
+  const from = firstQuarterShown(form, upTo);
   return (
     <>
       {form.quarters
         .slice(0, upTo)
         .map((quarter, q) =>
-          q < from ? null : (
+          q < from || (only !== undefined && q !== only - 1) ? null : (
             <QuarterPanel
               key={q}
               quarter={quarter}

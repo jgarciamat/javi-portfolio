@@ -187,6 +187,25 @@ describe('the assistant, one screen at a time', () => {
   });
 });
 
+describe('coming back after the end', () => {
+  it('shows the end, not where it was left', () => {
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        at: 0,
+        screen: 0,
+        done: ['one', 'two'],
+        answers: {},
+        streak: 1,
+        lastDay: null,
+      })
+    );
+    renderWithProviders(<Harness />, { authenticated: false });
+    expect(screen.getByRole('heading', { name: tr('wizard.finaleTitle') })).toBeInTheDocument();
+    expect(screen.queryByText(/Seguimos donde lo dejaste/)).toBeNull();
+  });
+});
+
 describe('reading tools', () => {
   it('makes the letters bigger and the contrast higher, and remembers it', () => {
     const { unmount } = renderWithProviders(<Harness />, { authenticated: false });

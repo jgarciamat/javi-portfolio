@@ -5,6 +5,7 @@ import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { Icon } from '@shared/components/Icon';
+import { MobileFold } from '@shared/components/MobileFold';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import type { DashboardTab } from '../navigation';
@@ -58,9 +59,13 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             ))}
           </select>
         </div>
-        <p className="section-hint">{t('app.renta.hint')}</p>
-        <CampaignDates exercise={year} />
-        <p>{t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}</p>
+        <MobileFold summary={t('app.renta.fold')}>
+          <p className="section-hint">{t('app.renta.hint')}</p>
+          <CampaignDates exercise={year} />
+          <p>
+            {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
+          </p>
+        </MobileFold>
         <div className="tools-main renta-tools">
           <RentaAssistant
             key={`${year}-${Math.round(income)}`}

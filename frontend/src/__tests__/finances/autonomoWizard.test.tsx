@@ -168,7 +168,24 @@ describe('the other paths of the self-employed assistant', () => {
     // Nothing imported: nothing to review.
     expect(screen.getByText(tr(w('hint.noInvoices')))).toBeInTheDocument();
     finish(3);
+    // One quarter per screen, with what was typed kept on the way.
+    expect(heading(tr(w('q.amounts'), { n: 1 }))).toBeInTheDocument();
+    expect(screen.queryByText(tr(w('advanced')))).toBeNull();
+    fireEvent.change(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 1`), {
+      target: { value: '3000' },
+    });
+    expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 2`)).toBeNull();
+    next();
     expect(heading(tr(w('q.amounts'), { n: 2 }))).toBeInTheDocument();
+    expect(screen.getByText(tr(w('hint.amountsNext'), { n: 2, prev: 1 }))).toBeInTheDocument();
+    expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toBeNull();
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('app.autonomo.copyPrevious', { n: 1 }) })
+    );
+    expect(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 2`)).toHaveValue('3000');
+    fireEvent.click(screen.getByRole('button', { name: `← ${tr('wizard.back')}` }));
+    expect(screen.getByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toHaveValue('3000');
+    next();
     fireEvent.click(screen.getByText(tr(w('advanced'))));
     fireEvent.click(screen.getByLabelText(tr('app.autonomo.exempt')));
     expect(JSON.parse(localStorage.getItem('mm_autonomo_extras') as string).exempt).toBe(true);
@@ -219,7 +236,7 @@ describe('the other paths of the self-employed assistant', () => {
         name: tr('app.autonomo.summary.missing.expenses', { n: 1 }),
       })
     );
-    expect(heading(tr(w('q.amounts'), { n: 2 }))).toBeInTheDocument();
+    expect(heading(tr(w('q.amounts'), { n: 1 }))).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole('button', { name: new RegExp(`${tr('wizard.stepN', { n: 6 })}`) })
     );
@@ -240,6 +257,16 @@ describe('the other paths of the self-employed assistant', () => {
     const checks = screen.getByRole('region', { name: tr('app.autonomo.checks.title') });
     fireEvent.click(within(checks).getAllByRole('button')[0]);
     expect(heading(tr(w('q.invoices')))).toBeInTheDocument();
+  });
+
+  it('asks only the quarter of the draft when the earlier 130 were filed', () => {
+    stored({
+      prior: { on: true, income: '9000', expenses: '1000', payments: '1600', withheld: '' },
+    });
+    at(3);
+    open();
+    expect(heading(tr(w('q.amounts'), { n: 2 }))).toBeInTheDocument();
+    expect(screen.queryByLabelText(`${tr('app.autonomo.income.r21')} 1`)).toBeNull();
   });
 
   it('switches to everything together and back, remembering it', () => {

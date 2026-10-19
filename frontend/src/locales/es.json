@@ -4217,7 +4217,7 @@
   "wizard.autonomo.help.invoices": "A veces un PDF no dice el tipo de IVA o la fecha. Aquí te enseñamos esas facturas para que lo completes.",
   "wizard.autonomo.hint.noInvoices": "No has importado facturas: no hay nada que revisar. Sigue al paso siguiente.",
   "wizard.autonomo.opt.invoices.yes": "Ya lo he revisado",
-  "wizard.autonomo.q.amounts": "Tus ingresos y gastos hasta el trimestre {n}",
+  "wizard.autonomo.q.amounts": "Tus ingresos y gastos del trimestre {n}",
   "wizard.autonomo.hint.amounts": "Si importaste facturas, ya están sumadas. Si no, escribe aquí los totales sin IVA.",
   "wizard.autonomo.help.amounts": "La base es la cantidad sin IVA. Por ejemplo: una factura de 121 € con IVA del 21 % tiene una base de 100 €.",
   "wizard.autonomo.advanced": "Más opciones (prorrata, IVA a compensar, criterio de caja…)",
@@ -4248,5 +4248,8 @@
   "wizard.autonomo.hint.renta": "Al acabar el año, lleva tus ingresos, gastos, retenciones y pagos del 130 a la Renta con un botón.",
   "wizard.autonomo.nothingYet": "Cuando tengas datos de tu actividad, aquí podrás llevarlos a la Renta.",
   "wizard.autonomo.finale": "Tu trimestre está preparado. Cópialo en la web de la Agencia Tributaria dentro de plazo (te lo decimos en el paso 4, junto al resultado).",
-  "wizard.autonomo.notFiled": "Es una ayuda orientativa: Finanverso no presenta nada en la Agencia Tributaria. Si tienes dudas, revísalo con un gestor o asesor colegiado."
+  "wizard.autonomo.notFiled": "Es una ayuda orientativa: Finanverso no presenta nada en la Agencia Tributaria. Si tienes dudas, revísalo con un gestor o asesor colegiado.",
+  "app.renta.fold": "Plazos de la campaña y cómo funciona",
+  "tools.renta.campaign.fold": "Fechas de la campaña de la Renta",
+  "wizard.autonomo.hint.amountsNext": "Ahora el trimestre {n}. Si es igual que el anterior, pulsa «Copiar el {prev}.º trimestre»."
 }

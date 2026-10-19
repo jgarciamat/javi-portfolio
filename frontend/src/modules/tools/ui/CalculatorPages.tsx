@@ -13,6 +13,7 @@ import {
 } from '../domain/calculators';
 import { CalculatorLayout, NumberField, number, useMoney } from './CalculatorLayout';
 import { RentaAssistant } from './renta/RentaWizard';
+import { MobileFold } from '@shared/components/MobileFold';
 import { CampaignDates } from './renta/CampaignDates';
 import { rentaState } from '../data/renta/state';
 
@@ -403,13 +404,18 @@ export function GoalCalculatorPage() {
 /** Public page of the income tax return calculator; signed-in people go to the section of the app. */
 export function RentaCalculatorPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   if (isAuthenticated) return <Navigate to={appTabPath('renta')} replace />;
   return (
     <CalculatorLayout
       path="/calculadora-renta"
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
-      lead={<CampaignDates exercise={rentaState.year} />}
+      lead={
+        <MobileFold summary={t('tools.renta.campaign.fold')}>
+          <CampaignDates exercise={rentaState.year} />
+        </MobileFold>
+      }
     >
       <RentaAssistant mode="local" />
     </CalculatorLayout>
