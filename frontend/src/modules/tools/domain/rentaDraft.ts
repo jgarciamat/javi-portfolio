@@ -1,6 +1,9 @@
 import type { Disability } from './rentaCalc';
 import type { Deduction } from './rentaData';
 import type { RentaForm } from './rentaForm';
+import { isRelevant, normalize, type DraftSituation } from './rentaRelevance';
+
+export { isRelevant, normalize, type DraftSituation };
 
 /** What could be read from the text of a tax return draft (borrador). Everything is a suggestion to confirm. */
 export interface DraftReading {
@@ -42,15 +45,6 @@ export interface DraftState {
 
 export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
 
-export interface DraftSituation {
-  childAges: number[];
-  ascendants: number;
-  /** Any disability in the family. */
-  disability: boolean;
-  /** The person rents the home they live in. */
-  rents: boolean;
-}
-
 /** Amounts in a draft always carry the cents (`1.234,56`), which tells them apart from box numbers. */
 const AMOUNT = /(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})/;
 
@@ -58,9 +52,6 @@ const AMOUNT = /(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})/;
 export function parseAmount(text: string): number {
   return Number(text.replace(/\./g, '').replace(',', '.'));
 }
-
-export const normalize = (text: string) =>
-  text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ');
 
 /**
  * The values of the boxes of the official PDF: each one is printed as `label  value  box` ("Retribuciones
@@ -219,32 +210,6 @@ export function readDraft(
     unrented: unrentedIn(amounts, lines),
     boxes: Object.fromEntries(Object.entries(amounts).map(([box, list]) => [box, list[0]])),
   };
-}
-
-const CHILD = /hij|nacimiento|adopci|guarder|maternidad|descend|menor/;
-
-/** What makes a deduction relevant, by words of its id or title: the first rule that matches decides. */
-const RULES: [RegExp, (s: DraftSituation) => boolean][] = [
-  // A single-parent family has one child or more; a large family (Ley 40/2003, art. 2) at least
-  // two (three in general, two in the special cases), as does the separated parent with two.
-  [/monoparental/, (s) => s.childAges.length > 0],
-  [/numerosa|dos hijos/, (s) => s.childAges.length >= 2],
-  [/maternidad|guarder/, (s) => s.childAges.some((a) => a < 3)],
-  [/nacimiento|adopci/, (s) => s.childAges.some((a) => a < 2)],
-  [CHILD, (s) => s.childAges.length > 0],
-  [/ascend|mayor de 65|mayores/, (s) => s.ascendants > 0],
-  [/discapacid/, (s) => s.disability],
-  [/alquiler|arrendamiento/, (s) => s.rents],
-];
-
-/** Groups worth asking about whatever the situation. */
-const ALWAYS: Deduction['group'][] = ['housing', 'health', 'education', 'donations'];
-
-/** Whether a deduction is worth asking about, given the person's situation. */
-export function isRelevant(d: Deduction, s: DraftSituation): boolean {
-  const text = normalize(`${d.id} ${d.title}`);
-  const rule = RULES.find(([words]) => words.test(text));
-  return rule ? rule[1](s) : ALWAYS.includes(d.group);
 }
 
 /** The deductions to ask about: relevant ones that the draft does not seem to include. */
