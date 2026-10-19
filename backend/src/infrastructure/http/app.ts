@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { Container } from '../container';
 import { errorHandler, notFoundHandler, rateLimiterFactory, requireAuth } from './middleware';
 import { authRoutes } from './routes/auth.routes';
+import { businessDataRoutes } from './routes/business-data.routes';
 import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './routes/billing.routes';
 import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
@@ -60,6 +61,7 @@ export function createApp(c: Container): Express {
   api.use(financeRoutes(c, limiter));
   api.use(planningRoutes(c));
   api.use(userRoutes(c, limiter));
+  api.use(businessDataRoutes(c, limiter));
   api.use(videoRoutes(c, limiter));
   api.use(learnRoutes(c, limiter));
   api.use(notFoundHandler);

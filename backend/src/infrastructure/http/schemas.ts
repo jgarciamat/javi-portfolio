@@ -361,6 +361,94 @@ export const autonomoDraftBody = z.object({
       .nullish(),
   }),
 });
+// The self-employed form saved in the account: the same fields the app keeps on the device, as
+// typed (text) or as imported. Strict, so nothing but the form can be stored.
+const formText = z.string().max(24);
+const quarterValue = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]);
+const invoiceAmount = z.number().finite().min(-100_000_000).max(100_000_000);
+const savedExpense = z
+  .object({ kind: z.enum(EXPENSE_KINDS), amount: formText, vatRate: vatRateValue, days: formText })
+  .strict();
+const savedQuarter = z
+  .object({
+    income: z.object({ r21: formText, r10: formText, r4: formText, r0: formText }).strict(),
+    withheld: formText,
+    expenses: z.array(savedExpense).max(500),
+  })
+  .strict();
+const savedInvoice = z
+  .object({
+    id: z.string().min(1).max(40),
+    book: z.enum(['issued', 'received']),
+    kind: z.enum(EXPENSE_KINDS),
+    excluded: z.boolean(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+    quarter: quarterValue,
+    base: invoiceAmount,
+    vatRate: vatRateValue,
+    vat: invoiceAmount,
+    total: invoiceAmount,
+    withheld: invoiceAmount,
+    concept: z.string().max(200),
+    period: quarterValue.nullish(),
+  })
+  .strict();
+const autonomoSaved = z
+  .object({
+    manual: z
+      .object({
+        profile: z
+          .object({
+            workArea: formText,
+            homeArea: formText,
+            vehicleExclusive: z.boolean(),
+            healthPeople: formText,
+            healthDisability: z.boolean(),
+          })
+          .strict(),
+        prior: z
+          .object({
+            on: z.boolean(),
+            income: formText,
+            expenses: formText,
+            payments: formText,
+            withheld: formText,
+          })
+          .strict(),
+        quarters: z.tuple([savedQuarter, savedQuarter, savedQuarter, savedQuarter]),
+        invoices: z.array(savedInvoice).max(5000),
+        model130: z
+          .object({
+            year: z.number().int().min(1970).max(9999),
+            quarter: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+            income: invoiceAmount,
+            expenses: invoiceAmount,
+          })
+          .strict()
+          .nullable(),
+      })
+      .strict(),
+    extras: z
+      .object({
+        hardToJustify: z.boolean(),
+        exempt: z.boolean(),
+        priorNet: formText,
+        toOffset: formText,
+      })
+      .strict(),
+    /** Supplier → kind of expense the user chose, for the next imports. */
+    kinds: z
+      .record(z.string().max(200), z.enum(EXPENSE_KINDS))
+      .refine((kinds) => Object.keys(kinds).length <= 2000, 'Demasiados proveedores'),
+  })
+  .strict();
+export const autonomoDataBody = z
+  .object({
+    data: autonomoSaved,
+    /** The version the device last read or wrote; null when it never had one. */
+    baseVersion: z.number().int().min(1).nullable(),
+  })
+  .strict();
 export const categoryIdParam = z.object({ categoryId: id });
 export const splitGroupBody = z.object({
   name: z.string().trim().min(1).max(60),

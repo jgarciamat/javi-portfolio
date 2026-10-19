@@ -70,3 +70,17 @@ export class TooManyAttemptsError extends DomainError {
     super(code, message, details);
   }
 }
+
+/** The body is larger than the endpoint takes (HTTP 413). */
+export class PayloadTooLargeError extends DomainError {
+  constructor(message: string, code = 'PAYLOAD_TOO_LARGE', details?: Record<string, unknown>) {
+    super(code, message, details);
+  }
+}
+
+/** A feature that cannot work with the server's configuration (HTTP 503). */
+export class UnavailableError extends DomainError {
+  constructor(message: string, code: string) {
+    super(code, message);
+  }
+}

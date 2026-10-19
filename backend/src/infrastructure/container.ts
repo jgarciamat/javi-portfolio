@@ -23,6 +23,7 @@ import { ReminderService } from '@application/push/ReminderService';
 import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
 import { SplitService } from '@application/split/SplitService';
 import { TaxService } from '@application/tax/TaxService';
+import { AutonomoDataService } from '@application/tax/AutonomoDataService';
 import { AssetService } from '@application/assets/AssetService';
 import { AccountService } from '@application/accounts/AccountService';
 import { AuthService } from '@application/auth/AuthService';
@@ -54,6 +55,7 @@ import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
 import { GoogleOAuthIdentityVerifier } from './auth/GoogleIdentityVerifier';
 import { AesSecretBox } from './auth/AesSecretBox';
 import { SqliteTwoFactorRepository } from './sqlite/repositories/SqliteTwoFactorRepository';
+import { SqliteAutonomoDataRepository } from './sqlite/repositories/SqliteAutonomoDataRepository';
 import { ConsoleEmailSender, ResendEmailSender } from './mail/EmailSenders';
 import { Db, SqliteUnitOfWork } from './sqlite/database';
 import {
@@ -129,6 +131,9 @@ function buildAi(config: AppConfig): {
   return { advisor: null, suggester: null };
 }
 
+/** Shortest key material accepted to encrypt user data at rest. */
+const MIN_KEY_MATERIAL = 32;
+
 export type Container = ReturnType<typeof buildContainer>;
 
 /** Composition root: the only place that knows every concrete class. */
@@ -140,6 +145,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     twoFactor: new SqliteTwoFactorRepository(db),
+    autonomoData: new SqliteAutonomoDataRepository(db),
     categories: new SqliteCategoryRepository(db),
     categoryRules: new SqliteCategoryRuleRepository(db),
     assets: new SqliteAssetRepository(db),
@@ -301,6 +307,12 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock
   );
   const renta = new RentaService(repos.renta, entitlements, clock);
+  // The self-employed form saved in the account: its own key (HKDF purpose) from the same material
+  // as the 2FA secrets. Too short a key turns the feature off rather than storing weak ciphertext.
+  const autonomoBox =
+    config.twoFactor.encryptionKey.length >= MIN_KEY_MATERIAL
+      ? new AesSecretBox(config.twoFactor.encryptionKey, 'autonomo-data')
+      : null;
 
   return {
     db,
@@ -445,6 +457,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,
     renta,
+    autonomoData: new AutonomoDataService(repos.autonomoData, autonomoBox, clock),
     learn: new LearnService(PREMIUM_CHAPTERS, entitlements),
     inbox: new InboxService(repos.inbox, importer, config.inbox, clock, entitlements),
     exporter: new ExportService(
@@ -458,7 +471,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.alerts,
       repos.budgets,
       repos.goals,
-      new SqlitePersonalDataReader(db, config.inbox.domain),
+      new SqlitePersonalDataReader(db, config.inbox.domain, autonomoBox),
       clock
     ),
   };
