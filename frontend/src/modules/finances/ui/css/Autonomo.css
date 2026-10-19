@@ -1002,3 +1002,52 @@ button.autonomo-sum-warn {
   gap: 0.25rem;
   font-size: 0.875rem;
 }
+
+/* Activities in modules: the units of each module, at 1 January and on average. */
+.autonomo-modules-units {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+.autonomo-modules-units caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.25rem;
+}
+.autonomo-modules-units th,
+.autonomo-modules-units td {
+  padding: 0.35rem 0.4rem;
+  text-align: left;
+  vertical-align: middle;
+}
+.autonomo-modules-units tbody tr + tr {
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+}
+.autonomo-modules-units .tx-input {
+  width: 100%;
+  min-width: 5rem;
+}
+.autonomo-modules-due {
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .autonomo-modules-units thead {
+    display: none;
+  }
+  .autonomo-modules-units tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 0.5rem;
+    padding: 0.4rem 0;
+  }
+  .autonomo-modules-units th[scope='row'] {
+    grid-column: 1 / -1;
+  }
+  .autonomo-modules-units td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+}

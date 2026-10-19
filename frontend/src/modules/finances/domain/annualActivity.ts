@@ -375,7 +375,8 @@ function estimate131(
     quarter: 4,
     withheld: figures.map((q) => q.withheld),
     income: figures.map((q) => q.income),
-    lastYearNet: inputs.priorYearNet,
+    // Not typed: no reduction of box 09, as in the 130 (estimate130).
+    lastYearNet: inputs.priorYearNet ?? Number.POSITIVE_INFINITY,
     depreciationAtStart: depreciationYear(atStart, year, 'modules').total,
   });
   return r ? r.quarters.map((q) => q.result.due) : [0, 0, 0, 0];

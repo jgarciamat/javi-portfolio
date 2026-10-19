@@ -73,6 +73,8 @@ describe('the self-employed screen step by step: persona 24 (VAT, first quarter)
     fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
     next();
     expect(screen.getByRole('button', { name: `${tr('wizard.next')} →` })).toBeDisabled();
+    pick('method', 'simplified');
+    next();
     pick('regime', 'general');
     next();
     pick('retained', 'no');

@@ -19,6 +19,8 @@ import { invoiceYears } from './autonomoForRenta';
 import { PrepareRenta } from '@modules/tools/ui/renta/PrepareRenta';
 import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { vatExtrasOf } from './vatForm';
+import { ModulesResult } from './AutonomoModules';
+import { inModules } from './activityForm';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
 import { QUARTERS, YEARS, useAutonomoDraft, type Quarter } from './useAutonomoDraft';
@@ -254,6 +256,7 @@ export function AutonomoDraftCard({
               value={manual.activity}
               year={year}
               reagp={vatExtrasOf(extras.vat).regime === 'reagp'}
+              simplifiedVat={vatExtrasOf(extras.vat).regime === 'simplified'}
               onChange={s.setActivity}
             />
             <ExtrasPanel
@@ -269,20 +272,28 @@ export function AutonomoDraftCard({
 
       <StepSection step="result">
         <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
-        {action.error && <p className="form-error">{action.error}</p>}
-
-        <PrepareGate
-          access={{ limit, locked, otherQuarter }}
-          pending={action.pending}
-          onPrepare={() => void prepare()}
-        />
-
-        {snapshot && (
+        {inModules(manual) ? (
+          // Non-farming modules: the 131 (and the 303 of the simplified regime) on the device.
+          <ModulesResult manual={manual} extras={extras} year={year} quarter={quarter} />
+        ) : (
           <>
-            <h3 className="subsection-title">
-              {t('app.autonomo.draftOf', { year: snapshot.draft.year, n: snapshot.draft.quarter })}
-            </h3>
-            <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
+            {action.error && <p className="form-error">{action.error}</p>}
+            <PrepareGate
+              access={{ limit, locked, otherQuarter }}
+              pending={action.pending}
+              onPrepare={() => void prepare()}
+            />
+            {snapshot && (
+              <>
+                <h3 className="subsection-title">
+                  {t('app.autonomo.draftOf', {
+                    year: snapshot.draft.year,
+                    n: snapshot.draft.quarter,
+                  })}
+                </h3>
+                <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
+              </>
+            )}
           </>
         )}
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
@@ -296,7 +307,12 @@ export function AutonomoDraftCard({
             onYear={setYear}
           />
         )}
-        {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
+        {onHowToFile && (
+          <HowToFile
+            slugs={inModules(manual) ? ['modelo-303'] : ['modelo-303', 'modelo-130']}
+            onOpen={onHowToFile}
+          />
+        )}
       </StepSection>
     </div>
   );

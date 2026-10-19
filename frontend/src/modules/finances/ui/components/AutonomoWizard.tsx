@@ -21,6 +21,9 @@ import { annualOf } from './autonomoInputs';
 import { invoiceYears } from './autonomoForRenta';
 import { bringIntoView } from './bringIntoView';
 import { vatExtrasOf, type VatExtras } from './vatForm';
+import { activityOf, inModules } from './activityForm';
+import { ModulesResult, ObjectiveFields } from './AutonomoModules';
+import type { ActivityMethod } from '../../domain/types';
 import { YEARS, useAutonomoDraft, type AutonomoState } from './useAutonomoDraft';
 import { Icon } from '@shared/components/Icon';
 import '../css/Sections.css';
@@ -37,6 +40,8 @@ const ICONS: Record<string, string> = {
   renta: 'flag',
 };
 const REGIMES: VatExtras['regime'][] = ['general', 'simplified', 'reagp'];
+/** Direct estimation (simplified or normal) or modules (estimación objetiva). */
+const METHODS = ['simplified', 'normal', 'objective'];
 const STEP_OF = (id: string) => AUTONOMO_STEPS.findIndex((s) => s.id === id);
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -91,6 +96,7 @@ function asked(
 
 function activityScreens(ctx: Ctx): WizardScreen[] {
   const { s, t } = ctx;
+  const modules = inModules(s.manual);
   const setProfile = (patch: Partial<AutonomoState['manual']['profile']>) =>
     s.changeManual({ ...s.manual, profile: { ...s.manual.profile, ...patch } });
   return [
@@ -110,18 +116,45 @@ function activityScreens(ctx: Ctx): WizardScreen[] {
         />
       ),
     },
+    asked(
+      ctx,
+      'method',
+      METHODS,
+      (answer) =>
+        answer === 'objective' ? (
+          <ObjectiveFields
+            value={activityOf(s.manual.activity).objective}
+            year={s.year}
+            simplifiedVat={vatExtrasOf(s.extras.vat).regime === 'simplified'}
+            paid131={activityOf(s.manual.activity).paid130}
+            onPaid131={(paid130) => s.setActivity({ ...activityOf(s.manual.activity), paid130 })}
+            onChange={(objective) => s.setActivity({ ...activityOf(s.manual.activity), objective })}
+          />
+        ) : null,
+      (method) =>
+        s.setActivity({
+          ...activityOf(s.manual.activity),
+          method: method as ActivityMethod,
+          agrarian: false,
+        })
+    ),
     asked(ctx, 'regime', REGIMES, undefined, (regime) =>
       s.setExtras({
         ...s.extras,
         vat: { ...vatExtrasOf(s.extras.vat), regime: regime as VatExtras['regime'] },
       })
     ),
-    asked(ctx, 'retained', ['yes', 'no'], undefined, (v) =>
-      s.setExtras({ ...s.extras, exempt: v === 'yes' })
-    ),
-    asked(ctx, 'simplified', ['yes', 'no'], undefined, (v) =>
-      s.setExtras({ ...s.extras, hardToJustify: v === 'yes' })
-    ),
+    // In modules the 131 has no exemption for withholdings nor the 5 % of the direct estimation.
+    ...(modules
+      ? []
+      : [
+          asked(ctx, 'retained', ['yes', 'no'], undefined, (v) =>
+            s.setExtras({ ...s.extras, exempt: v === 'yes' })
+          ),
+          asked(ctx, 'simplified', ['yes', 'no'], undefined, (v) =>
+            s.setExtras({ ...s.extras, hardToJustify: v === 'yes' })
+          ),
+        ]),
     asked(ctx, 'home', ['yes', 'no'], (answer) =>
       answer === 'yes' ? <ProfilePanel profile={s.manual.profile} onChange={setProfile} /> : null
     ),
@@ -256,9 +289,11 @@ function quarterScreens(ctx: Ctx): WizardScreen[] {
       title: t(w('q.prepare')),
       hint: t(w('hint.prepare')),
       help: t(w('help.prepare')),
-      ready: draftOfPeriod(s),
+      ready: draftOfPeriod(s) || inModules(s.manual),
       skipLabel: t(w('skip.prepare')),
-      body: (
+      body: inModules(s.manual) ? (
+        <ModulesResult manual={s.manual} extras={s.extras} year={s.year} quarter={s.quarter} />
+      ) : (
         <>
           {s.action.error && <p className="form-error">{s.action.error}</p>}
           <PrepareGate
@@ -314,6 +349,7 @@ function checkScreens(ctx: Ctx): WizardScreen[] {
           value={s.manual.activity}
           year={s.year}
           reagp={vatExtrasOf(s.extras.vat).regime === 'reagp'}
+          simplifiedVat={vatExtrasOf(s.extras.vat).regime === 'simplified'}
           onChange={s.setActivity}
         />
       ) : null

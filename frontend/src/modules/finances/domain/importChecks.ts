@@ -120,6 +120,18 @@ export function irpfDeductible(e: ManualExpense, profile: ManualData['profile'])
   return Math.round(baseCents * irpf + vatCents * Math.max(0, irpf - vat)) / 100;
 }
 
+/**
+ * The VAT of a domestic expense that can be deducted (its share by kind, as the 303 counts it); an
+ * expense without Spanish VAT on the invoice (intra-EU, reverse charge) has none here.
+ */
+export function vatDeductible(e: ManualExpense, profile: ManualData['profile']): number {
+  if ((e.op ?? 'domestic') !== 'domestic') return 0;
+  const cents = Math.round(e.amount * 100);
+  const vatCents = cents - Math.round(cents / (1 + e.vatRate / 100));
+  const [, vat] = SHARES[e.kind]?.(e, profile) ?? [1, 1];
+  return Math.round(vatCents * vat) / 100;
+}
+
 const check = (
   code: CheckCode,
   level: ImportCheck['level'],

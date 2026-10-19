@@ -671,6 +671,35 @@ const savedModules = z
     extraordinary: formText,
   })
   .strict();
+/** A non-farming activity in módulos (frontend activityForm.ts, ObjectiveForm). */
+const savedObjective = z
+  .object({
+    activityId: z.string().max(10),
+    unitsStart: z.array(formText).max(10),
+    unitsYear: z.array(formText).max(10),
+    staffLastYear: formText,
+    special: z.string().max(40),
+    small: z.string().max(40),
+    seasonDays: formText,
+    seasonLastYear: formText,
+    seasonQuarters: z.array(formText).max(4),
+    newYear: z.enum(['', '1', '2']),
+    disabled: z.boolean(),
+    startDate: formText,
+    endDate: formText,
+    noData: z.boolean(),
+    extraordinary: formText,
+    otherIncome: formText,
+    ceutaMelilla: z.boolean(),
+    vatActivity: z.string().max(10),
+    vatStart: z.array(formText).max(10),
+    vatYear: z.array(formText).max(10),
+    vatReduction: formText,
+    vatSupported: formText,
+    vatCompensations: formText,
+    vatRefundsAbroad: formText,
+  })
+  .strict();
 const savedActivity = z
   .object({
     method: z.enum(['simplified', 'normal', 'objective']),
@@ -684,6 +713,7 @@ const savedActivity = z
     compensations: z.array(formText).max(4),
     paid130: z.array(formText).max(4),
     modules: savedModules,
+    objective: savedObjective.optional(),
   })
   .strict();
 const autonomoSaved = z

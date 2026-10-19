@@ -197,6 +197,43 @@ describe('The self-employed form saved in the account', () => {
     expect((await get(ana).expect(200)).body.data.manual.activity).toEqual(activity);
     const wrong = { ...data, manual: { ...data.manual, activity: { ...activity, extra: 1 } } };
     await put(ana, { data: wrong, baseVersion: 1 }).expect(400);
+
+    // A taxi in non-farming modules (frontend activityForm.ts, ObjectiveForm): kept as it is.
+    const objective = {
+      activityId: 'm59',
+      unitsStart: ['0,5', '1', '45'],
+      unitsYear: ['', '', '48'],
+      staffLastYear: '0,5',
+      special: 'upTo100000',
+      small: '',
+      seasonDays: '',
+      seasonLastYear: '',
+      seasonQuarters: ['', '', '', ''],
+      newYear: '',
+      disabled: false,
+      startDate: '',
+      endDate: '',
+      noData: false,
+      extraordinary: '',
+      otherIncome: '',
+      ceutaMelilla: false,
+      vatActivity: '',
+      vatStart: [],
+      vatYear: [],
+      vatReduction: '',
+      vatSupported: '900',
+      vatCompensations: '',
+      vatRefundsAbroad: '',
+    };
+    const taxi = { ...activity, agrarian: false, objective };
+    const withTaxi = { ...data, manual: { ...data.manual, activity: taxi } };
+    await put(ana, { data: withTaxi, baseVersion: 1 }).expect(200);
+    expect((await get(ana).expect(200)).body.data.manual.activity.objective).toEqual(objective);
+    const bad = { ...taxi, objective: { ...objective, newYear: '3' } };
+    await put(ana, {
+      data: { ...data, manual: { ...data.manual, activity: bad } },
+      baseVersion: 2,
+    }).expect(400);
   });
 
   it('keeps the VAT of the quarters, of the invoices and of the year (older copies have none)', async () => {

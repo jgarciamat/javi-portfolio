@@ -3,6 +3,7 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { emptyManual, type ManualForm } from '@modules/finances/ui/components/AutonomoManual';
+import { emptyActivity, emptyObjective } from '@modules/finances/ui/components/activityForm';
 import {
   autonomoOnDevice,
   invoiceYears,
@@ -274,5 +275,52 @@ describe('the activity brought, without contradictory figures, and taken out aga
     expect(autonomoOnDevice(2026).annual?.net).toBe(15200);
     fireEvent.click(button(tr('tools.renta.bring.button', { year: 2026 })));
     expect(screen.getByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeVisible();
+  });
+});
+
+describe('a taxi in módulos → Renta 2026', () => {
+  it('takes the net income of the modules and its 131 to the Renta, box by box', async () => {
+    freezeTime('2026-10-19T12:00:00');
+    // The invented taxi of objectiveModules.test.ts: net income 8,799.08; the 131 is estimated
+    // at 3 % each quarter: 263.97 × 4 = 1,055.88 (no reduction of box 09 without last year's net).
+    const taxi = {
+      ...emptyManual(),
+      invoices: [invoice(2026, 1)],
+      activity: {
+        ...emptyActivity(),
+        method: 'objective',
+        objective: {
+          ...emptyObjective(),
+          activityId: 'm59',
+          unitsStart: ['0,5', '1', '45'],
+          staffLastYear: '0,5',
+          special: 'upTo100000',
+        },
+      },
+    };
+    localStorage.setItem('mm_autonomo_manual2', JSON.stringify(taxi));
+    rentaAt(2026, 5);
+    open();
+    fireEvent.click(button(tr('tools.renta.prepare.button', { year: 2026 })));
+    expect(
+      screen.getByText(tr('tools.renta.bring.fig.payments131'), { exact: false })
+    ).toBeVisible();
+    fireEvent.click(button(tr('tools.renta.prepare.take', { year: 2026 })));
+    await screen.findByLabelText(tr('app.renta.year'));
+    expect(loadProgress()?.form.activities?.[0]).toMatchObject({
+      kind: 'modules',
+      payments: 1055.88,
+    });
+    for (const [box, amount] of [
+      ['1465', '10.358,63'],
+      ['1474', '9262,19'],
+      ['1479', '8799,08'],
+      ['1482', '8799,08'],
+      // Art. 32.2.3.º: income between 8,000 and 12,000 €: 1,620 − 0.405 × 799.08 = 1,296.37.
+      ['1483', '1296,37'],
+      ['1484', '7502,71'],
+      ['0604', '1055,88'],
+    ])
+      expect(boxRow(box)).toHaveTextContent(amount);
   });
 });

@@ -21,8 +21,28 @@ import type { Premises } from './informative';
 import { blank, type Check, contactChecks, error, warn } from './checks';
 import { declarationId, write349 } from './m349';
 import { type BoxValue, type PageFill, type Put, writeSelfAssessment } from './selfAssessment';
+import type { Result131 } from '@modules/finances/domain/module131';
+import type { VatSimplifiedResult } from '@modules/finances/domain/vatSimplified';
+import {
+  dpa131,
+  fills303s,
+  page131,
+  page303s,
+  type Modules131,
+  type Simplified303,
+} from './modules';
 
-export type SedeModel = '111' | '115' | '130' | '303' | '349' | '390' | '190' | '180' | '347';
+export type SedeModel =
+  | '111'
+  | '115'
+  | '130'
+  | '131'
+  | '303'
+  | '349'
+  | '390'
+  | '190'
+  | '180'
+  | '347';
 
 /** What the files need about the person. Typed on the device; never sent to the server. */
 export interface Declarant {
@@ -77,6 +97,15 @@ export type SedeSource =
   | { model: '115'; year: number; quarter: 1 | 2 | 3 | 4; result: Result115 }
   | { model: '130'; draft: AutonomoDraft }
   | { model: '303'; draft: AutonomoDraft }
+  | { model: '131'; year: number; quarter: 1 | 2 | 3 | 4; result: Result131; modules: Modules131 }
+  | {
+      /** The 303 of the simplified regime (módulos): page 2 and its result. */
+      model: '303';
+      year: number;
+      quarter: 1 | 2 | 3 | 4;
+      simplified: VatSimplifiedResult;
+      activity: Simplified303;
+    }
   | { model: '349'; draft: AutonomoDraft; m349: Draft349 }
   | { model: '390'; draft: AutonomoDraft; m390: Draft390 }
   | { model: '190'; year: number; summary: YearSummary }
@@ -128,18 +157,22 @@ function resultOf(source: SedeSource): Result {
     case '111':
     case '115':
       return source.result.result === 'pay' ? 'pay' : 'zero';
-    case '130': {
-      const r = source.draft.irpf.result;
-      if (r === 'pay') return 'pay';
-      return r === 'negative' && source.draft.quarter < 4 ? 'deduct' : 'zero';
-    }
-    case '303': {
-      const r = source.draft.vat.result;
-      return r === 'zero' ? 'zero' : r;
-    }
+    case '130':
+      return result130(source.draft);
+    case '131':
+      return source.result.result;
+    case '303':
+      return 'simplified' in source ? source.simplified.result : source.draft.vat.result;
     default:
       return null;
   }
+}
+
+/** The 130: to pay, to deduct in the next quarters (1T-3T) or nothing. */
+function result130(draft: AutonomoDraft): Result {
+  const r = draft.irpf.result;
+  if (r === 'pay') return 'pay';
+  return r === 'negative' && draft.quarter < 4 ? 'deduct' : 'zero';
 }
 
 const yearOf = (source: SedeSource): number =>
@@ -288,6 +321,88 @@ function plan130(source: Extract<SedeSource, { model: '130' }>, d: Declarant): P
   return { tags: ['01000'], values: record(v), fills: [{ tag: '01000', puts }], checks, kind };
 }
 
+/**
+ * The 131 (DR131_2026.xlsx): the boxes, the activity on page 1 and its data on page DPA; the kind
+ * follows note 1 of page 1 (I, U by direct debit, B to deduct in 1T-3T, N otherwise).
+ */
+function plan131(source: Extract<SedeSource, { model: '131' }>, d: Declarant): Plan {
+  const v = boxesOf(source.result.boxes);
+  const result = resultOf(source);
+  const debit = result === 'pay' && d.iban.trim() !== '';
+  const kind = kindOf(result, debit);
+  const checks = [
+    sumCheck(v, '07', { '02': 1, '04': 1, '06': 1 }),
+    sumCheck(v, '10', { '07': 1, '08': -1, '09': -1 }),
+    sumCheck(v, '13', { '10': 1, '11': -1, '12': -1 }),
+    sumCheck(v, '15', { '13': 1, '14': -1 }),
+  ].filter((c): c is Check => c !== null);
+  const puts = [
+    ...ident(d, source.year, source.quarter, kind),
+    ...page131(source.modules, source.result),
+  ];
+  const tags = ['01000', 'DPA00'];
+  const fills: PageFill[] = [
+    { tag: '01000', puts },
+    { tag: 'DPA00', puts: dpa131(source.modules) },
+  ];
+  if (debit) {
+    tags.push('DID00');
+    fills.push({ tag: 'DID00', puts: [[12, 34, normalIban(d.iban)]] });
+  }
+  return { tags, values: record(v), fills, checks, kind };
+}
+
+/** The 303 of the simplified regime only: pages 1, 2 and 3 (and DID for a debit or a refund). */
+function plan303s(
+  source: Extract<SedeSource, { model: '303'; simplified: VatSimplifiedResult }>,
+  d: Declarant
+): Plan {
+  const v = boxesOf(source.simplified.boxes);
+  const result = resultOf(source);
+  const iban = d.iban.trim() !== '';
+  const kind = kindOf(result, result === 'pay' && iban);
+  const last = source.quarter === 4;
+  const checks: Check[] = [
+    sumCheck(v, '58', { '54': 1, '57': -1 }),
+    sumCheck(v, '69', { '66': 1, '78': -1 }),
+  ].filter((c): c is Check => c !== null);
+  const page1: Put[] = [
+    [13, 1, kind],
+    [14, 9, normalNif(d.nif)],
+    [23, 80, `${d.surname} ${d.name}`],
+    [103, 4, source.year],
+    [107, 2, `${source.quarter}T`],
+    [109, 1, '2'],
+    [110, 1, '2'],
+    // Only the simplified regime (note 5 of page 1).
+    [111, 1, '1'],
+    [112, 1, '2'],
+    [113, 1, '2'],
+    [114, 1, '2'],
+    [115, 1, '2'],
+    [116, 1, '2'],
+    [117, 1, '2'],
+    [127, 1, '2'],
+    // Exonerated from the 390 (only the simplified regime, quarterly): said in the last period.
+    [128, 1, last ? '1' : '0'],
+    [129, 1, '0'],
+    [130, 1, '0'],
+  ];
+  const fills = fills303s(page1, page303s(source.activity, source.simplified, last));
+  const tags = ['01000', '02000', '03000'];
+  if (iban && (result === 'pay' || result === 'refund')) {
+    tags.push('DID00');
+    fills.push({
+      tag: 'DID00',
+      puts: [
+        [23, 34, normalIban(d.iban)],
+        [194, 1, '1'],
+      ],
+    });
+  }
+  return { tags, values: record(v), fills, checks, kind };
+}
+
 /** Boxes the app shows on its 303 that the 2026 form does not have («a compensar», «a devolver»). */
 const APP_ONLY_303 = ['72', '73'];
 
@@ -331,7 +446,10 @@ function flags303(v: Map<string, number>, last: boolean): Put[] {
   ];
 }
 
-function plan303(source: Extract<SedeSource, { model: '303' }>, d: Declarant): Plan {
+function plan303(
+  source: Extract<SedeSource, { model: '303'; draft: AutonomoDraft }>,
+  d: Declarant
+): Plan {
   const { draft } = source;
   const { accrued, deductible, settlement, info = [] } = draft.vat;
   const v = boxesOf([...accrued, ...deductible, ...info, ...settlement]);
@@ -491,10 +609,17 @@ function writer349(source: Extract<SedeSource, { model: '349' }>, d: Declarant):
   };
 }
 
-type SelfModel = '111' | '115' | '130' | '303' | '390';
+type SelfModel = '111' | '115' | '130' | '131' | '303' | '390';
 
 function writerSelf(source: Extract<SedeSource, { model: SelfModel }>, d: Declarant): Writer {
-  const plans = { '111': plan111, '115': plan115, '130': plan130, '303': plan303, '390': plan390 };
+  const plans = {
+    '111': plan111,
+    '115': plan115,
+    '130': plan130,
+    '131': plan131,
+    '303': 'simplified' in source ? plan303s : plan303,
+    '390': plan390,
+  };
   const p = (plans[source.model] as (s: SedeSource, d: Declarant) => Plan)(source, d);
   const quarter = 'quarter' in source ? source.quarter : source.draft.quarter;
   const period = source.model === '390' ? '0A' : `${quarter}T`;

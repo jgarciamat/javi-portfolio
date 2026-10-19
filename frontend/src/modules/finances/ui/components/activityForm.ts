@@ -11,6 +11,12 @@ import {
 } from '@modules/finances/domain/depreciation';
 import { subsidyYear, type SubsidyKind } from '@modules/finances/domain/subsidies';
 import type { ActivityInputs, ActivityMethod, QuarterExtras } from '@modules/finances/domain/types';
+import {
+  SMALL_INDICES,
+  SPECIAL_INDICES,
+  specialKindOf,
+  type ObjectiveInput,
+} from '@modules/finances/domain/objectiveModules';
 
 /** An asset as typed (text, so the fields can be edited freely). */
 export interface AssetForm {
@@ -61,6 +67,67 @@ export interface ModulesForm {
   extraordinary: string;
 }
 
+/** A non-farming activity in módulos as typed (objectiveModules.ts ObjectiveInput, as text). */
+export interface ObjectiveForm {
+  /** The id of the activity of the order (modulos-2025.ts), '' none chosen. */
+  activityId: string;
+  /** Units of each module at 1 January and the average of the year ('' the same as at 1 January). */
+  unitsStart: string[];
+  unitsYear: string[];
+  staffLastYear: string;
+  /** The key of the special index and of the small business one ('' none). */
+  special: string;
+  small: string;
+  seasonDays: string;
+  seasonLastYear: string;
+  seasonQuarters: string[];
+  /** '' not new, '1' first year, '2' second year. */
+  newYear: string;
+  disabled: boolean;
+  startDate: string;
+  endDate: string;
+  noData: boolean;
+  extraordinary: string;
+  otherIncome: string;
+  ceutaMelilla: boolean;
+  /** The simplified regime of VAT: its activity ('' the one of the activity), units ('' derived). */
+  vatActivity: string;
+  vatStart: string[];
+  vatYear: string[];
+  vatReduction: string;
+  /** VAT paid on current purchases of the year ('' the one of the expenses typed). */
+  vatSupported: string;
+  vatCompensations: string;
+  vatRefundsAbroad: string;
+}
+
+export const emptyObjective = (): ObjectiveForm => ({
+  activityId: '',
+  unitsStart: [],
+  unitsYear: [],
+  staffLastYear: '',
+  special: '',
+  small: '',
+  seasonDays: '',
+  seasonLastYear: '',
+  seasonQuarters: ['', '', '', ''],
+  newYear: '',
+  disabled: false,
+  startDate: '',
+  endDate: '',
+  noData: false,
+  extraordinary: '',
+  otherIncome: '',
+  ceutaMelilla: false,
+  vatActivity: '',
+  vatStart: [],
+  vatYear: [],
+  vatReduction: '',
+  vatSupported: '',
+  vatCompensations: '',
+  vatRefundsAbroad: '',
+});
+
 /** The activity of the year beyond the quarters, as typed (older data has none). */
 export interface ActivityForm {
   method: ActivityMethod;
@@ -74,6 +141,7 @@ export interface ActivityForm {
   compensations: string[];
   paid130: string[];
   modules: ModulesForm;
+  objective: ObjectiveForm;
 }
 
 export const ACTIVITY_METHODS: ActivityMethod[] = ['simplified', 'normal', 'objective'];
@@ -105,6 +173,7 @@ export const emptyActivity = (): ActivityForm => ({
   compensations: ['', '', '', ''],
   paid130: ['', '', '', ''],
   modules: emptyModules(),
+  objective: emptyObjective(),
 });
 
 export const newAsset = (year: number): AssetForm => ({
@@ -149,6 +218,7 @@ export function activityOf(form: Partial<ActivityForm> | undefined | null): Acti
       Object.keys(base).map((k) => [k, item[k as keyof T] ?? base[k as keyof T]])
     ) as T;
   const modules = ordered(empty.modules, f.modules);
+  const objective = ordered(empty.objective, f.objective);
   return {
     method: f.method,
     agrarian: f.agrarian,
@@ -161,6 +231,10 @@ export function activityOf(form: Partial<ActivityForm> | undefined | null): Acti
     compensations: [0, 1, 2, 3].map((i) => f.compensations[i] ?? ''),
     paid130: [0, 1, 2, 3].map((i) => f.paid130[i] ?? ''),
     modules: { ...modules, rows: modules.rows.map((r) => ordered(newModuleRow(), r)) },
+    objective: {
+      ...objective,
+      seasonQuarters: [0, 1, 2, 3].map((i) => objective.seasonQuarters[i] ?? ''),
+    },
   };
 }
 
@@ -227,6 +301,37 @@ function modulesOf(m: ModulesForm): Omit<AgrarianModulesInput, 'depreciation'> {
   };
 }
 
+/** The index of a key of the options (1: none, or a key that is not one of them). */
+const indexOf = (options: { key: string; index: number }[], key: string) =>
+  options.find((o) => o.key === key)?.index ?? 1;
+
+/** A date typed as `YYYY-MM-DD`, or null. */
+const dateOf = (text: string) => (/^\d{4}-\d{2}-\d{2}$/.test(text) ? text : null);
+
+/** The activity in módulos as the domain takes it. */
+export function objectiveOf(o: ObjectiveForm): ObjectiveInput {
+  const kind = specialKindOf(o.activityId);
+  return {
+    activityId: o.activityId,
+    unitsStart: o.unitsStart.map(positive),
+    unitsYear: o.unitsYear.map((u) => (optional(u) === null ? null : positive(u))),
+    staffLastYear: positive(o.staffLastYear),
+    specialIndex: kind ? indexOf(SPECIAL_INDICES[kind], o.special) : 1,
+    smallIndex: indexOf(SMALL_INDICES, o.small),
+    seasonDays: positive(o.seasonDays),
+    seasonLastYear: positive(o.seasonLastYear),
+    seasonQuarters: four(o.seasonQuarters, positive),
+    newYear: o.newYear === '1' ? 1 : o.newYear === '2' ? 2 : 0,
+    disabled: o.disabled,
+    startDate: dateOf(o.startDate),
+    endDate: dateOf(o.endDate),
+    noData: o.noData,
+    extraordinary: positive(o.extraordinary),
+    otherIncome: positive(o.otherIncome),
+    ceutaMelilla: o.ceutaMelilla,
+  };
+}
+
 /** The activity as the annual summary and the draft take it. */
 export function toActivityInputs(form: Partial<ActivityForm> | undefined | null): ActivityInputs {
   const a = activityOf(form);
@@ -249,8 +354,18 @@ export function toActivityInputs(form: Partial<ActivityForm> | undefined | null)
     compensations: four(a.compensations, positive),
     paid130: four(a.paid130, optional),
     modules: a.method === 'objective' && a.agrarian ? modulesOf(a.modules) : null,
+    objective:
+      a.method === 'objective' && !a.agrarian && a.objective.activityId !== ''
+        ? objectiveOf(a.objective)
+        : null,
   };
 }
+
+/** The activity is in non-farming módulos: the 131 instead of the 130 (the draft of the server). */
+export const inModules = (manual: { activity?: Partial<ActivityForm> | null }): boolean => {
+  const a = activityOf(manual.activity);
+  return a.method === 'objective' && !a.agrarian;
+};
 
 export const modalityOf = (method: ActivityMethod): Modality =>
   method === 'objective' ? 'modules' : method;

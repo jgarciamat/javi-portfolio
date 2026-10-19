@@ -19,11 +19,12 @@ import {
   type SubsidyForm,
 } from './activityForm';
 import { Boxes } from './AutonomoDraftResult';
+import { ObjectiveFields } from './AutonomoModules';
 
 const k = (key: string) => `app.autonomo.activity.${key}`;
 
 /** A text field with its label (the label names the field for screen readers too). */
-function Field({
+export function Field({
   label,
   value,
   onChange,
@@ -52,7 +53,7 @@ function Field({
   );
 }
 
-function Check({
+export function Check({
   label,
   checked,
   onChange,
@@ -69,7 +70,7 @@ function Check({
   );
 }
 
-function Select<T extends string>({
+export function Select<T extends string>({
   label,
   value,
   options,
@@ -358,7 +359,7 @@ function ModulesFields({
 }
 
 /** Four fields, one a quarter. */
-function QuarterFields({
+export function QuarterFields({
   title,
   values,
   onChange,
@@ -382,6 +383,38 @@ function QuarterFields({
   );
 }
 
+/** In modules: the farming products (annex I) or the activity of annex II and its units. */
+function ModulesOfActivity({
+  a,
+  year,
+  simplifiedVat,
+  set,
+}: {
+  a: ActivityForm;
+  year: number;
+  simplifiedVat: boolean;
+  set: (patch: Partial<ActivityForm>) => void;
+}) {
+  if (a.method !== 'objective') return null;
+  if (a.agrarian)
+    return (
+      <ModulesFields
+        modules={a.modules}
+        onChange={(m) => set({ modules: { ...a.modules, ...m } })}
+      />
+    );
+  return (
+    <ObjectiveFields
+      value={a.objective}
+      year={year}
+      simplifiedVat={simplifiedVat}
+      paid131={a.paid130}
+      onPaid131={(paid130) => set({ paid130 })}
+      onChange={(objective) => set({ objective })}
+    />
+  );
+}
+
 /**
  * The activity of the year beyond the quarters: how it is taxed, the assets and their
  * depreciation, the grants and the other annual figures the Renta needs.
@@ -390,12 +423,15 @@ export function ActivityPanel({
   value,
   year,
   reagp,
+  simplifiedVat = false,
   onChange,
 }: {
   value: ActivityForm | undefined;
   year: number;
   /** The VAT of the year is in the special agricultural regime: its compensations are asked for. */
   reagp: boolean;
+  /** The VAT of the year is in the simplified regime: the modules of the VAT are asked for. */
+  simplifiedVat?: boolean;
   onChange: (value: ActivityForm) => void;
 }) {
   const { t } = useI18n();
@@ -446,12 +482,7 @@ export function ActivityPanel({
         )}
       />
 
-      {objective && a.agrarian && (
-        <ModulesFields
-          modules={a.modules}
-          onChange={(m) => set({ modules: { ...a.modules, ...m } })}
-        />
-      )}
+      <ModulesOfActivity a={a} year={year} simplifiedVat={simplifiedVat} set={set} />
 
       {!objective && (
         <>
