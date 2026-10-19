@@ -815,14 +815,33 @@
   grid-column: 1 / -1;
   flex-direction: row;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.7rem;
-  text-align: left;
+  justify-content: center;
+  gap: 0.7rem;
+  margin: 1rem 0.4rem 0.4rem;
+  padding: 0.7rem 0.9rem;
+  text-align: center;
+  /* Rainbow frame: the panel colour inside, the gradient on the border. */
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--slate-900), var(--slate-900)) padding-box,
+    linear-gradient(
+        90deg,
+        #ff5c5c,
+        #ffa94d,
+        #ffe14d,
+        #5fdc7a,
+        #4dc3ff,
+        #8b7bff,
+        #ff6bd6
+      )
+      border-box;
 }
 
 .burger-nav-text {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.1rem;
   min-width: 0;
 }
