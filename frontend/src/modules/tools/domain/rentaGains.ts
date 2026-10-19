@@ -10,8 +10,26 @@ import { round2 } from './round';
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 const finite = (n: number) => (Number.isFinite(n) ? n : 0);
 
-/** listed: shares and ETFs on a market; unlisted: other shares; fund: investment fund units. */
-export type AssetKind = 'listed' | 'unlisted' | 'fund' | 'crypto';
+/**
+ * listed: shares and ETFs on a market; unlisted: other shares; fund: investment fund units; crypto:
+ * virtual currencies; other: any other asset sold (gold of an app, a derivative...), no window.
+ */
+export type AssetKind = 'listed' | 'unlisted' | 'fund' | 'crypto' | 'other';
+
+/**
+ * Where the modelo 100 of 2025 asks for each sale (Orden HAC/277/2026, BOE-A-2026-7041, page 15):
+ * iic, units of funds and ETFs (boxes 0310-0325); shares, listed shares (0326-0340); crypto, virtual
+ * currencies (1800-1814); other, the rest of the transmissions (other elements, not detailed here).
+ */
+export type GainSection = 'iic' | 'shares' | 'crypto' | 'other';
+
+const SECTION_OF: Record<AssetKind, GainSection> = {
+  listed: 'shares',
+  unlisted: 'other',
+  fund: 'iic',
+  crypto: 'crypto',
+  other: 'other',
+};
 
 /** A purchase: the date (YYYY-MM-DD), the units and what it cost with its expenses (art. 35.1). */
 export interface Lot {
@@ -25,6 +43,16 @@ export interface Disposal {
   date: string;
   units: number;
   proceeds: number;
+  /**
+   * Units that leave without a sale: a transfer between funds (art. 94.1.a, the new units keep the
+   * cost and dates) or a network fee paid in coins. They use up lots but give no gain or loss.
+   */
+  untaxed?: boolean;
+  /**
+   * Crypto, box 1803: what was received. F: legal tender; N: another virtual currency (keys of the
+   * Renta WEB list, NO CONFIRMADO: taken from a secondary source, check the drop-down).
+   */
+  counterpart?: 'F' | 'N';
 }
 
 /** One asset with every purchase (also from earlier years) and the sales of the year. */
@@ -33,6 +61,10 @@ export interface AssetOps {
   kind: AssetKind;
   buys: Lot[];
   sells: Disposal[];
+  /** The part of the modelo where its sales go, when it is not the usual one of its kind (an ETF). */
+  section?: GainSection;
+  /** The ISIN or ticker, for the report. */
+  code?: string;
 }
 
 /** The sale of a property: transmission and acquisition values with their expenses. */
@@ -82,6 +114,30 @@ export interface SavingsDetail {
   generalGains: number[];
   /** Negative balances of the 4 years before: of gains (savings), of capital and of the general gains. */
   pending: { gains: PendingBalance[]; capital: PendingBalance[]; general: PendingBalance[] };
+  /** What came from the files of brokers and exchanges (investImport): replaced on each import. */
+  imported?: ImportedSavings;
+}
+
+/** Tax paid abroad on income taxed here too (LIRPF art. 80): for the deduction of box 0588. */
+export interface ForeignTax {
+  /** Gross income obtained abroad, in euros. */
+  income: number;
+  /** Tax paid there, in euros. */
+  tax: number;
+}
+
+/** The savings read from investment files, kept apart so a new import replaces them. */
+export interface ImportedSavings {
+  files: string[];
+  capital: CapitalIncome;
+  assets: AssetOps[];
+  /** Gains and losses that do not come from a transmission (airdrops, rewards): general base. */
+  generalGains: number[];
+  /** Other results of transmissions already worked out (derivatives, a certificate). */
+  otherGains: number[];
+  /** Spanish withholdings on capital income (box 0597) and on fund gains (box 0603). */
+  withheld: { capital: number; gains: number };
+  foreignTax: ForeignTax[];
 }
 
 export const emptyCapital = (): CapitalIncome => ({
@@ -117,8 +173,12 @@ export interface SaleResult {
   deferred: number;
   /** Units sold that no purchase covers: the data is missing a purchase. */
   unmatched: number;
-  /** A loss with homogeneous purchases near the sale that the app does not judge (funds, crypto). */
+  /** A loss with homogeneous purchases near the sale that the app does not judge (crypto). */
   checkRepurchase: boolean;
+  section: GainSection;
+  /** The purchases each sale used, oldest first: the audit of the FIFO. */
+  lots: Lot[];
+  counterpart?: 'F' | 'N';
 }
 
 // Array sort is stable: purchases on the same day keep the order they were typed in.
@@ -140,10 +200,11 @@ export function addMonths(date: string, months: number): string {
  * The window of art. 33.5: a loss does not count when homogeneous securities were bought "dentro de
  * los dos meses anteriores o posteriores" (listed, letter f) or "en el año anterior o posterior"
  * (unlisted, letter g), while they are still held (also those bought early next year, before the
- * return is filed). It is deferred in the share of the units sold that those still held cover. For fund units and crypto the law does not say
- * clearly which letter applies (NO CONFIRMADO): the app only warns.
+ * return is filed). It is deferred in the share of the units sold that those still held cover. Units
+ * of funds are "participaciones no admitidas a negociación" (letter g, one year) and ETFs are listed
+ * (letter f); for crypto the law gives no rule (NO CONFIRMADO): the app only warns.
  */
-const WINDOW_MONTHS: Partial<Record<AssetKind, number>> = { listed: 2, unlisted: 12 };
+const WINDOW_MONTHS: Partial<Record<AssetKind, number>> = { listed: 2, unlisted: 12, fund: 12 };
 const WARN_MONTHS = 2;
 
 interface OpenLot extends Lot {
@@ -162,17 +223,22 @@ export function fifo(asset: AssetOps): SaleResult[] {
   const raw = sells.map((s) => {
     let units = positive(s.units);
     let cost = 0;
+    const used: Lot[] = [];
     for (const lot of lots) {
       if (units <= 0) break;
       if (lot.date > s.date || lot.left <= 0) continue;
-      const used = Math.min(lot.left, units);
-      cost += (lot.cost * used) / lot.units;
-      lot.left -= used;
-      units -= used;
+      const take = Math.min(lot.left, units);
+      const share = (lot.cost * take) / lot.units;
+      cost += share;
+      used.push({ date: lot.date, units: take, cost: round2(share) });
+      lot.left -= take;
+      units -= take;
     }
-    return { sale: s, cost: round2(cost), unmatched: units };
+    return { sale: s, cost: round2(cost), unmatched: units, used };
   });
-  return raw.map(({ sale, cost, unmatched }) => {
+  const section = asset.section ?? SECTION_OF[asset.kind];
+  return raw.flatMap(({ sale, cost, unmatched, used }) => {
+    if (sale.untaxed) return [];
     const proceeds = round2(positive(sale.proceeds));
     const gain = round2(proceeds - cost);
     const months = WINDOW_MONTHS[asset.kind];
@@ -187,19 +253,24 @@ export function fifo(asset: AssetOps): SaleResult[] {
       deferred = round2(-gain * share);
     }
     const checkRepurchase =
-      gain < 0 && months === undefined && near(WARN_MONTHS).some((l) => l.left > 0);
-    return {
-      name: asset.name,
-      kind: asset.kind,
-      date: sale.date,
-      units: positive(sale.units),
-      proceeds,
-      cost,
-      gain,
-      deferred,
-      unmatched,
-      checkRepurchase,
-    };
+      gain < 0 && asset.kind === 'crypto' && near(WARN_MONTHS).some((l) => l.left > 0);
+    return [
+      {
+        name: asset.name,
+        kind: asset.kind,
+        date: sale.date,
+        units: positive(sale.units),
+        proceeds,
+        cost,
+        gain,
+        deferred,
+        unmatched,
+        checkRepurchase,
+        section,
+        lots: used,
+        counterpart: sale.counterpart,
+      },
+    ];
   });
 }
 
@@ -256,8 +327,25 @@ const carried = (list: PendingBalance[], year: number, own: number): PendingBala
   ...(own > 0 ? [{ year, amount: round2(own) }] : []),
 ];
 
+/** The totals of one part of the modelo: what is copied in its boxes, summed over its sales. */
+export interface SectionTotals {
+  /** Transmission values (0312, 0328, 1804). */
+  proceeds: number;
+  /** Acquisition values (0315, 0331, 1806). */
+  cost: number;
+  /** Gains (0324, 0339, 1814) and losses that count this year (0325, 0340, 1813). */
+  gains: number;
+  losses: number;
+}
+
 export interface SavingsBreakdown {
   sales: SaleResult[];
+  /** The sales summed by the part of the modelo where they go. */
+  sections: Record<GainSection, SectionTotals>;
+  /** Withholdings of the savings: capital (box 0597) and fund gains (box 0603). */
+  withheld: { capital: number; gains: number };
+  /** Tax paid abroad, for the deduction of box 0588. */
+  foreignTax: ForeignTax[];
   properties: PropertyResult[];
   /** Boxes of the modelo 100 of 2025. */
   boxes: {
@@ -315,12 +403,48 @@ function split(amounts: number[]) {
   return { gains, losses, balance: round2(gains - losses) };
 }
 
+const SECTIONS: GainSection[] = ['iic', 'shares', 'crypto', 'other'];
+
+/** The sales of the year summed by part of the modelo; a deferred loss does not count (art. 33.5). */
+function sectionsOf(sales: SaleResult[]): Record<GainSection, SectionTotals> {
+  const out = {} as Record<GainSection, SectionTotals>;
+  for (const section of SECTIONS) {
+    const list = sales.filter((s) => s.section === section);
+    const total = (pick: (s: SaleResult) => number) =>
+      round2(list.reduce((sum, s) => sum + pick(s), 0));
+    out[section] = {
+      proceeds: total((s) => s.proceeds),
+      cost: total((s) => s.cost),
+      gains: total((s) => Math.max(0, s.gain)),
+      losses: total((s) => Math.max(0, -(s.gain + s.deferred))),
+    };
+  }
+  return out;
+}
+
+/** The typed detail with what came from the files added to it. */
+function withImported(detail: SavingsDetail): SavingsDetail {
+  const extra = detail.imported;
+  if (!extra) return detail;
+  const capital = { ...detail.capital };
+  for (const key of Object.keys(capital) as (keyof CapitalIncome)[])
+    capital[key] = round2(finite(capital[key]) + finite(extra.capital[key]));
+  return {
+    ...detail,
+    capital,
+    assets: [...detail.assets, ...extra.assets],
+    otherGains: [...detail.otherGains, ...extra.otherGains],
+    generalGains: [...detail.generalGains, ...extra.generalGains],
+  };
+}
+
 /**
  * The savings base (LIRPF art. 49; modelo 100 of 2025, page 19, in the order of its boxes): each
  * balance with itself, a negative one against the other up to 25 % of it, then the balances of the
  * four years before, the oldest first.
  */
-export function savingsOf(detail: SavingsDetail, year: number): SavingsBreakdown {
+export function savingsOf(typed: SavingsDetail, year: number): SavingsBreakdown {
+  const detail = withImported(typed);
   const inYear = (date: string) => date.startsWith(`${year}-`);
   const sales = detail.assets.flatMap((a) => fifo(a)).filter((s) => inYear(s.date));
   const properties = detail.properties.map(propertyGain);
@@ -367,8 +491,15 @@ export function savingsOf(detail: SavingsDetail, year: number): SavingsBreakdown
       onCapital.used -
       gainsOnCapital.used
   );
+  const imported = typed.imported;
   return {
     sales,
+    sections: sectionsOf(sales),
+    withheld: {
+      capital: round2(positive(imported?.withheld.capital ?? 0)),
+      gains: round2(positive(imported?.withheld.gains ?? 0)),
+    },
+    foreignTax: imported?.foreignTax ?? [],
     properties,
     boxes: {
       '0027': round2(positive(detail.capital.interest)),

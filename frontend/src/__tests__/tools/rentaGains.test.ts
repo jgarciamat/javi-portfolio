@@ -93,7 +93,40 @@ describe('FIFO (LIRPF art. 37.2)', () => {
     expect(fifo(next)[0].deferred).toBe(300);
   });
 
-  it('only warns about repurchases of funds and crypto, whose rule is not confirmed', () => {
+  it('defers the loss of fund units bought again within a year (art. 33.5.g)', () => {
+    const units: AssetOps = {
+      name: 'F',
+      kind: 'fund',
+      buys: [
+        { date: '2024-01-10', units: 10, cost: 1000 },
+        { date: '2025-10-01', units: 10, cost: 700 },
+      ],
+      sells: [{ date: '2025-02-15', units: 10, proceeds: 800 }],
+    };
+    expect(fifo(units)[0]).toMatchObject({ gain: -200, deferred: 200, section: 'iic' });
+  });
+
+  it('units that leave without a sale (fund transfer, fee in coins) use up lots but give no result', () => {
+    const coin: AssetOps = {
+      name: 'C',
+      kind: 'crypto',
+      buys: [
+        { date: '2025-01-01', units: 1, cost: 100 },
+        { date: '2025-01-02', units: 1, cost: 300 },
+      ],
+      sells: [
+        { date: '2025-01-03', units: 1, proceeds: 0, untaxed: true },
+        { date: '2025-01-04', units: 1, proceeds: 500, counterpart: 'N' },
+      ],
+    };
+    const sales = fifo(coin);
+    expect(sales).toHaveLength(1);
+    expect(sales[0]).toMatchObject({ cost: 300, gain: 200, counterpart: 'N', section: 'crypto' });
+    expect(sales[0].lots).toEqual([{ date: '2025-01-02', units: 1, cost: 300 }]);
+    expect(fifo({ ...coin, kind: 'other', section: 'iic' })[0].section).toBe('iic');
+  });
+
+  it('only warns about repurchases of crypto, whose rule is not confirmed', () => {
     const coin: AssetOps = {
       name: 'Z',
       kind: 'crypto',
@@ -115,6 +148,37 @@ describe('FIFO (LIRPF art. 37.2)', () => {
     expect(addMonths('2025-12-31', 2)).toBe('2026-02-28');
     expect(addMonths('2025-03-15', -2)).toBe('2025-01-15');
     expect(addMonths('2024-03-31', -1)).toBe('2024-02-29');
+  });
+});
+
+describe('what came from the investment files', () => {
+  it('is added to what was typed and summed by part of the modelo', () => {
+    const r = savingsOf(
+      detail({
+        capital: { interest: 100, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        imported: {
+          files: ['x.csv'],
+          capital: { interest: 50, dividends: 200, assets: 0, insurance: 0, expenses: 10 },
+          assets: [shares, fund],
+          generalGains: [30],
+          otherGains: [-15],
+          withheld: { capital: 38, gains: 19 },
+          foreignTax: [{ income: 200, tax: 30 }],
+        },
+      }),
+      2025
+    );
+    // 150 + 200 − 10 of capital; 2,470 − 1,000 − 15 of gains.
+    expect(r.boxes['0041']).toBe(340);
+    expect(r.boxes['0424']).toBe(1455);
+    expect(r.sections.shares).toEqual({ proceeds: 5985, cost: 3515, gains: 2470, losses: 0 });
+    expect(r.sections.iic).toEqual({ proceeds: 8000, cost: 9000, gains: 0, losses: 1000 });
+    expect(r.withheld).toEqual({ capital: 38, gains: 19 });
+    expect(r.foreignTax).toEqual([{ income: 200, tax: 30 }]);
+    expect(r.general.positive).toBe(30);
+    const typed = savingsOf(detail({}), 2025);
+    expect(typed.withheld).toEqual({ capital: 0, gains: 0 });
+    expect(typed.foreignTax).toEqual([]);
   });
 });
 

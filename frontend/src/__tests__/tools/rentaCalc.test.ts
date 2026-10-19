@@ -17,7 +17,7 @@ import {
   type RentaInput,
   type FullMinimums,
 } from '@modules/tools/domain/rentaCalc';
-import { emptySavingsDetail } from '@modules/tools/domain/rentaGains';
+import { emptyCapital, emptySavingsDetail } from '@modules/tools/domain/rentaGains';
 import type { Deduction, RentaCcaa, RentaState, TaxBracket } from '@modules/tools/domain/rentaData';
 
 const scale: TaxBracket[] = [
@@ -501,6 +501,46 @@ describe('computeRenta', () => {
     expect(plain.savingsDetail).toBeNull();
     expect(plain.generalGains).toBeNull();
     expect(plain.savingsBase).toBe(750);
+  });
+
+  it('adds the withholdings and the tax paid abroad read from investment files (0597, 0603, 0588)', () => {
+    const imported = (tax: number) => ({
+      files: ['broker.csv'],
+      capital: { ...emptyCapital(), dividends: 1000 },
+      assets: [],
+      generalGains: [],
+      otherGains: [],
+      withheld: { capital: 50, gains: 20 },
+      foreignTax: [{ income: 1000, tax }],
+    });
+    const r = computeRenta(
+      input({ savingsDetail: { ...emptySavingsDetail(), imported: imported(150) } })
+    );
+    expect(r.savingsBase).toBe(1000);
+    // 4,000 of the pay + 50 + 20 of the investments.
+    expect(r.withheld).toBe(4070);
+    // Art. 80: the lesser of 150 paid and 1,000 × the savings rate (190 / 1,000 here): 150.
+    expect(r.savingsQuota).toBe(190);
+    expect(r.doubleTaxation).toBe(150);
+    const plain = computeRenta(
+      input({ savingsDetail: { ...emptySavingsDetail(), imported: imported(0) } })
+    );
+    expect(r.netQuota).toBe(plain.netQuota - 150);
+    // Paid more abroad than the Spanish tax on that income: only the Spanish tax.
+    const high = computeRenta(
+      input({ savingsDetail: { ...emptySavingsDetail(), imported: imported(400) } })
+    );
+    expect(high.doubleTaxation).toBe(190);
+    // No tax at all (the minimum covers everything): nothing to deduct.
+    const none = computeRenta(
+      input({
+        gross: 0,
+        socialSecurity: 0,
+        savingsDetail: { ...emptySavingsDetail(), imported: imported(150) },
+      })
+    );
+    expect(none.doubleTaxation).toBe(0);
+    expect(computeRenta(input()).doubleTaxation).toBe(0);
   });
 
   it('takes what is left of the compensatory pension off the savings base (LIRPF art. 50.2)', () => {

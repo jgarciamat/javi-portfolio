@@ -500,6 +500,8 @@ export interface RentaResult {
   advanceReceived: number;
   /** Deduction for low pay from work (box 0414), already inside `stateDeductions`. */
   lowPay: number;
+  /** Deduction for international double taxation of the savings read from the files (box 0588). */
+  doubleTaxation: number;
   /** Deductions that were chosen but cannot be used because of the income limit. */
   blocked: string[];
   /** What each chosen deduction gives (after the income limit), State's first. */
@@ -875,6 +877,28 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   return { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived };
 }
 
+/**
+ * Box 0588, international double taxation (LIRPF art. 80.1, BOE-A-2006-20764, checked 19-10-2026):
+ * "la menor de" the tax paid abroad and "el resultado de aplicar el tipo medio efectivo de gravamen a
+ * la parte de base liquidable gravada en el extranjero", with the rate of the savings (art. 80.2).
+ * The liquid quota of the savings is taken in the share the deductions left of the whole quota.
+ */
+function doubleTaxationOf(
+  detail: SavingsBreakdown | null,
+  savingsQuota: number,
+  savingsBase: number,
+  quota: { left: number; total: number },
+  room: number
+): number {
+  if (!detail || savingsBase <= 0 || quota.total <= 0) return 0;
+  const rate = (savingsQuota * quota.left) / quota.total / savingsBase;
+  const total = detail.foreignTax.reduce(
+    (sum, f) => sum + Math.min(positive(f.tax), positive(f.income) * rate),
+    0
+  );
+  return round2(Math.min(total, Math.max(0, room)));
+}
+
 /** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
 export function computeRenta(input: RentaInput): RentaResult {
   const { state, ccaa, family } = input;
@@ -951,6 +975,13 @@ export function computeRenta(input: RentaInput): RentaResult {
     quotaLeft
   );
   const lowPay = low.amount;
+  const doubleTaxation = doubleTaxationOf(
+    detail,
+    base.stateSavings + base.regionalSavings,
+    savingsBase,
+    { left: quotaLeft, total: stateQuota + regionalQuota },
+    quotaLeft - lowPay
+  );
   if (lowPay > 0) {
     lines.push({
       id: 'estado-rendimientos-trabajo-bajos',
@@ -960,12 +991,14 @@ export function computeRenta(input: RentaInput): RentaResult {
       amount: round2(lowPay),
     });
   }
-  const netQuota = round2(quotaLeft - lowPay - refundable);
-  // Box 0609: also the withholdings of the activities (0599) and the quarterly payments (0604).
+  const netQuota = round2(quotaLeft - lowPay - doubleTaxation - refundable);
+  // Box 0609: also the withholdings of the activities (0599), the quarterly payments (0604) and the
+  // savings read from the investment files (0597 capital, 0603 fund gains).
   const withheld = round2(
     positive(input.withheld) +
       positive(partner?.withheld ?? 0) +
-      (activities ? activities.withheld + activities.payments : 0)
+      (activities ? activities.withheld + activities.payments : 0) +
+      (detail ? detail.withheld.capital + detail.withheld.gains : 0)
   );
   return {
     otherExpenses,
@@ -1003,6 +1036,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     refundable: round2(refundable),
     advanceReceived: round2(advanceReceived),
     lowPay: round2(lowPay),
+    doubleTaxation,
     blocked,
     lines,
     netQuota,
