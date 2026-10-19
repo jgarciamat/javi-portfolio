@@ -187,7 +187,10 @@ describe('Renta planner: children and income limits', () => {
     const birth = screen.getByText(/Por nacimiento, adopción o acogimiento/, {
       selector: 'strong',
     });
-    fireEvent.click(within(birth.closest('.renta-deduction') as HTMLElement).getByRole('checkbox'));
+    const row = birth.closest('.renta-deduction') as HTMLElement;
+    fireEvent.click(within(row).getByRole('checkbox'));
+    for (const yes of within(row).getAllByRole('radio', { name: tr('tools.renta.req.yes') }))
+      fireEvent.click(yes);
     expect(
       within(box)
         .getAllByRole('listitem')

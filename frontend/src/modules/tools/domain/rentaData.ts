@@ -1,4 +1,5 @@
 /** Data of the income tax return (IRPF) for Spain, by tax year, taken from the Tax Agency manual. */
+import type { Check } from './rentaRequirements';
 
 /** A bracket of a progressive scale: the rate (%) applies from `from` euros up to the next bracket. */
 export interface TaxBracket {
@@ -96,6 +97,15 @@ export interface Deduction {
   splitBetweenParents?: boolean;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */
   requirements: string;
+  /**
+   * The requirements checked before it is applied (rentaRequirements.ts): the age, the children
+   * and a disability are checked by themselves; the rest is asked yes or no.
+   */
+  checks?: Check[];
+  /** The box of the modelo 100 (annex B for the communities) where it goes. */
+  box?: string;
+  /** The rule it comes from (the community's law and article). */
+  norm?: string;
   /** The Tax Agency page that explains it. */
   url: string;
 }

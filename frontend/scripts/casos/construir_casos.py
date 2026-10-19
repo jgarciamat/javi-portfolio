@@ -25,6 +25,16 @@ CHECKED = '2026-10-19'
 MANUAL = 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025'
 
 
+def checks_for(deduction_id):
+    """Las preguntas de requisitos de una deducción (docs/fiscalidad/deducciones-requisitos.json), contestadas
+    «sí»: cada persona del banco cumple los requisitos de las deducciones que aplica (lo dice su historia)."""
+    path = os.path.join(os.path.dirname(OUT), '..', 'fiscalidad', 'deducciones-requisitos.json')
+    with open(path, encoding='utf-8') as fh:
+        req = json.load(fh)['deducciones'].get(deduction_id)
+    asks = [c['id'] for c in (req or {}).get('requisitos', []) if c['kind'] == 'ask']
+    return {a: 'yes' for a in asks}
+
+
 def r2(x):
     # As the engine's round2 (round.ts): first to 15 significant digits, which takes away the noise
     # of binary floats (9.634 × 0.75 × 0.95 = 6.864,225, not 6.864,2249999…), then half up.
@@ -593,6 +603,8 @@ def form_of(p, spouse=None):
             f['unrented'] = [dict(value=str(u['value']), revised=u['revised'], days='' if u['days'] == 365 else str(u['days'])) for u in p['unrented']]
         for d in p.get('deductions', []):
             f['choices'][d['id']] = dict(on=True, amount=d.get('choice_amount', ''), units=d.get('units', ''))
+            if checks_for(d['id']):
+                f['choices'][d['id']]['checks'] = checks_for(d['id'])
         j = p.get('joint')
         if j:
             f['joint'] = j['kind']

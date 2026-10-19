@@ -16,6 +16,7 @@ import { farm2025 } from '../data/renta/agrario-2025';
 import { modules2025 } from '../data/renta/modulos-2025';
 import { round2 } from './round';
 import type { ResidenceForm } from './rentaResidence';
+import type { CheckAnswers } from './rentaRequirements';
 import { emptyProperty, fromLegacy, propertyResult, type PropertyForm } from './rentaRentals';
 
 export interface ChildForm {
@@ -79,6 +80,8 @@ export interface Choice {
   advance?: string;
   /** Months with the right to a deduction by months (maternity), of all the children. */
   months?: string;
+  /** The answers to the questions of its requirements (rentaRequirements.ts). */
+  checks?: CheckAnswers;
 }
 
 /** Everything the person types, as text, in the order of the steps. */
@@ -358,6 +361,7 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         units: c.units === '' ? Math.max(1, form.children.length) : number(c.units),
         advance: number(c.advance),
         ...(c.months !== undefined && c.months.trim() !== '' ? { months: number(c.months) } : {}),
+        ...(c.checks ? { checks: c.checks } : {}),
       },
     ])
   );

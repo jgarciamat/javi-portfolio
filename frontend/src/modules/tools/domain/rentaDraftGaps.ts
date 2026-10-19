@@ -12,6 +12,7 @@ import type { Deduction } from './rentaData';
 import { mentionedIn } from './rentaDraft';
 import type { Choice } from './rentaForm';
 import { round2 } from './round';
+import { allYes } from './rentaRequirements';
 
 /** A deduction the draft applies that the planner does not have yet. */
 export interface DraftGap {
@@ -25,8 +26,21 @@ export interface DraftGap {
   choice: Choice | null;
 }
 
-/** The choice that makes a deduction give `amount`: the units, the base or the amount itself. */
+/**
+ * The choice that makes a deduction give `amount`: the units, the base or the amount itself. The
+ * draft already applies it, so its questions of requirements are taken as answered «yes» (the person
+ * sees them and can change them).
+ */
 export function choiceFor(d: Deduction, amount: number): Choice {
+  return { ...valueFor(d, amount), ...confirmed(d) };
+}
+
+const confirmed = (d: Deduction): Pick<Choice, 'checks'> => {
+  const checks = allYes(d.checks);
+  return checks ? { checks } : {};
+};
+
+function valueFor(d: Deduction, amount: number): Choice {
   if (d.kind === 'fixed') {
     // A fixed amount per unit: as many units as the amount holds (perChild ones by the children).
     const units = d.amount && !d.perChild ? Math.max(1, Math.round(amount / d.amount)) : null;

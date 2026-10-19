@@ -216,7 +216,22 @@ describe('Renta planner: amounts by child, percentages and relatives', () => {
     ) as HTMLElement;
     fireEvent.click(within(birth).getByRole('checkbox'));
     fireEvent.change(within(birth).getByRole('textbox'), { target: { value: '2' } });
+    // Not applied until its requirements are answered (born in the year, minimum, no Bono).
+    expect(
+      within(birth).getByText(tr('tools.renta.req.missing', { count: 3 }))
+    ).toBeInTheDocument();
+    expect(within(birth).queryByText(/2485/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    expect(
+      await screen.findByText(tr('tools.renta.req.pendingResult', { count: 1 }))
+    ).toBeInTheDocument();
+    for (const yes of within(birth).getAllByRole('radio', { name: tr('tools.renta.req.yes') }))
+      fireEvent.click(yes);
     expect(within(birth).getByText(/2485/)).toBeInTheDocument();
+    expect(within(birth).getByText(tr('tools.renta.req.box', { box: '0986' }))).toBeInTheDocument();
+    // One «no» leaves it out.
+    fireEvent.click(within(birth).getAllByRole('radio', { name: tr('tools.renta.req.no') })[2]);
+    expect(within(birth).getByText(tr('tools.renta.req.fail'))).toBeInTheDocument();
 
     const party = screen.getByText(/Cuotas y aportaciones a partidos/).closest('li') as HTMLElement;
     fireEvent.click(within(party).getByRole('checkbox'));
@@ -278,6 +293,10 @@ describe('Renta planner: free calculations', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));
     first.unmount();
+    // Saved by an older version, without the list of deductions waiting for their requirements.
+    const saved = JSON.parse(localStorage.getItem('mm_renta_snapshot_v2') as string);
+    delete saved.result.unconfirmed;
+    localStorage.setItem('mm_renta_snapshot_v2', JSON.stringify(saved));
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     expect(screen.getByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
 

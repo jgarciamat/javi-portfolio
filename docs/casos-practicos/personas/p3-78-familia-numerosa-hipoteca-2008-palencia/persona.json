@@ -64,7 +64,11 @@
             "castilla-y-leon-familia-numerosa": {
               "on": true,
               "amount": "300",
-              "units": ""
+              "units": "",
+              "checks": {
+                "titulo": "yes",
+                "minimo": "yes"
+              }
             },
             "estado-vivienda-habitual-transitorio": {
               "on": true,

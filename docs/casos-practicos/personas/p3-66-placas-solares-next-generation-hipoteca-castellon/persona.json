@@ -51,7 +51,10 @@
             "comunitat-valenciana-autoconsumo-energia-renovable": {
               "on": true,
               "amount": "5000",
-              "units": ""
+              "units": "",
+              "checks": {
+                "registro": "yes"
+              }
             }
           }
         }

@@ -10,6 +10,7 @@ import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } f
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 import { round2 } from './round';
 import type { PropertyResult } from './rentaRentals';
+import { checkDeduction, type CheckAnswers } from './rentaRequirements';
 import { donationChoices, type DonationInput } from './rentaDonations';
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
@@ -242,6 +243,8 @@ export interface DeductionChoice {
   advance?: number;
   /** For a deduction by months (maternity): the months with the right to it, of all the children. */
   months?: number;
+  /** The answers to the questions of its requirements (rentaRequirements.ts). */
+  checks?: CheckAnswers;
 }
 
 /** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
@@ -511,8 +514,10 @@ export interface RentaResult {
   lowPay: number;
   /** Deduction for international double taxation of the savings read from the files (box 0588). */
   doubleTaxation: number;
-  /** Deductions that were chosen but cannot be used because of the income limit. */
+  /** Deductions that were chosen but cannot be used: the income limit, or a requirement not met. */
   blocked: string[];
+  /** Deductions marked with a question of their requirements still to answer: not applied yet. */
+  unconfirmed: string[];
   /** What each chosen deduction gives (after the income limit), State's first. */
   lines: DeductionLine[];
   netQuota: number;
@@ -847,12 +852,19 @@ function capped(d: Deduction, choice: DeductionChoice, amount: number, input: Re
 /** The chosen deductions: what each one gives, split by quota, and those the income rules out. */
 function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   const blocked: string[] = [];
+  const unconfirmed: string[] = [];
   const lines: DeductionLine[] = [];
   const amountOf = (data: Deduction) => {
     const d = adapted(data, input);
-    const choice = input.choices[d.id] ?? { on: false };
+    const marked = input.choices[d.id] ?? { on: false };
     const factor = incomeFactor(d, limitBase(d), input.joint !== undefined);
-    if (choice.on && factor === 0) blocked.push(d.id);
+    if (marked.on && factor === 0) blocked.push(d.id);
+    // Then its requirements: one not met leaves it out, one not answered keeps it waiting.
+    const check =
+      marked.on && factor > 0 ? checkDeduction(d.checks, input.family, marked.checks) : null;
+    if (check?.status === 'fail') blocked.push(d.id);
+    if (check?.status === 'missing') unconfirmed.push(d.id);
+    const choice = check && check.status !== 'ok' ? { ...marked, on: false } : marked;
     const amount = capped(d, choice, deductionAmount(d, choice, factor), input);
     return {
       on: choice.on,
@@ -885,7 +897,15 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
     regionalDeductions += amount;
     if (on) line(d, 'regional', amount);
   }
-  return { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived };
+  return {
+    blocked,
+    unconfirmed,
+    lines,
+    stateDeductions,
+    regionalDeductions,
+    refundable,
+    advanceReceived,
+  };
 }
 
 /**
@@ -974,10 +994,17 @@ export function computeRenta(input: RentaInput): RentaResult {
   // What was given (not the deduction) is turned into the deductions with the limit of the base.
   const donated = donationChoices(input.donations, taxBase + savingsBase);
   const withDonations = donated ? { ...input, choices: { ...input.choices, ...donated } } : input;
-  const { blocked, lines, stateDeductions, regionalDeductions, refundable, advanceReceived } =
-    deductionsOf(withDonations, (d) =>
-      limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
-    );
+  const {
+    blocked,
+    unconfirmed,
+    lines,
+    stateDeductions,
+    regionalDeductions,
+    refundable,
+    advanceReceived,
+  } = deductionsOf(withDonations, (d) =>
+    limitBaseFor(d, { taxBase, savingsBase, minimum: stateMin })
+  );
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
@@ -1056,6 +1083,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     lowPay: round2(lowPay),
     doubleTaxation,
     blocked,
+    unconfirmed,
     lines,
     netQuota,
     withheld,

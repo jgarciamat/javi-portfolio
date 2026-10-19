@@ -52,12 +52,22 @@
             "castilla-y-leon-nacimiento-adopcion-rural": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "checks": {
+                "nacimiento": "yes",
+                "minimo": "yes",
+                "bono": "yes",
+                "municipio": "yes"
+              }
             },
             "castilla-y-leon-alquiler-jovenes-rural": {
               "on": true,
               "amount": "4200",
-              "units": ""
+              "units": "",
+              "checks": {
+                "rural": "yes",
+                "titular": "yes"
+              }
             }
           },
           "joint": "couple",

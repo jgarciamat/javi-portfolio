@@ -55,7 +55,11 @@
             "andalucia-nacimiento-adopcion-acogimiento": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "checks": {
+                "nacimiento": "yes",
+                "minimo": "yes"
+              }
             }
           }
         }

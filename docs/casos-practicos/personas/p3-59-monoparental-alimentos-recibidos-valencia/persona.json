@@ -56,7 +56,10 @@
             "comunitat-valenciana-familia-numerosa-monoparental": {
               "on": true,
               "amount": "330",
-              "units": ""
+              "units": "",
+              "checks": {
+                "titulo": "yes"
+              }
             }
           },
           "joint": "single"

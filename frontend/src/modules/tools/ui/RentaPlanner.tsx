@@ -158,6 +158,17 @@ export function ResultSection({
   );
 }
 
+/** The ticked deductions still waiting for the answers to their requirements. */
+function Waiting({ ids }: { ids: string[] }) {
+  const { t } = useI18n();
+  if (ids.length === 0) return null;
+  return (
+    <p className="form-error" role="status">
+      {t('tools.renta.req.pendingResult', { count: ids.length })}
+    </p>
+  );
+}
+
 /** The result, or what to do to get it. */
 function ResultBody({
   access,
@@ -198,6 +209,8 @@ function ResultBody({
       {shown && (
         <>
           <PendingNotice pending={pending} />
+          {/* A result saved by an older version has no list of deductions waiting. */}
+          <Waiting ids={shown.result.unconfirmed ?? []} />
           <ResultCard shown={shown} money={money} imported={imported} input={input} />
           {!access.premium && (
             <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />

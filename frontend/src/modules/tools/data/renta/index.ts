@@ -1,4 +1,5 @@
 import type { RentaCcaa } from '../../domain/rentaData';
+import type { RequirementOverlay } from './requisitos/types';
 
 /** The communities of the drop-down: each one is loaded on demand (its deductions are long). */
 const LOADERS: Record<string, () => Promise<RentaCcaa>> = {
@@ -46,7 +47,25 @@ export const CCAA_OPTIONS: { id: string; name: string }[] = [
   { id: 'pais-vasco', name: 'País Vasco (régimen foral)' },
 ];
 
+/** The requirements, box and rule of each deduction, checked community by community (requisitos/). */
+const REQUIREMENTS: Record<string, () => Promise<RequirementOverlay>> = {
+  andalucia: () => import('./requisitos/andalucia').then((m) => m.andaluciaRequirements),
+  'castilla-y-leon': () =>
+    import('./requisitos/castilla-y-leon').then((m) => m.castillaYLeonRequirements),
+  'comunitat-valenciana': () =>
+    import('./requisitos/comunitat-valenciana').then((m) => m.comunitatValencianaRequirements),
+};
+
+/** The community's deductions with their requirements. */
+export function withRequirements(ccaa: RentaCcaa, overlay: RequirementOverlay): RentaCcaa {
+  return { ...ccaa, deductions: ccaa.deductions.map((d) => ({ ...d, ...overlay[d.id] })) };
+}
+
 export function loadCcaa(id: string): Promise<RentaCcaa> {
   const load = LOADERS[id];
-  return load ? load() : Promise.reject(new Error(`Unknown community: ${id}`));
+  if (!load) return Promise.reject(new Error(`Unknown community: ${id}`));
+  const overlay = REQUIREMENTS[id];
+  return overlay
+    ? Promise.all([load(), overlay()]).then(([ccaa, o]) => withRequirements(ccaa, o))
+    : load();
 }

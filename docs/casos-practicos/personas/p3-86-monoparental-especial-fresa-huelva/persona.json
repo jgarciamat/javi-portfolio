@@ -70,7 +70,10 @@
             "andalucia-familia-monoparental": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "checks": {
+                "monoparental": "yes"
+              }
             }
           },
           "joint": "single"

@@ -52,12 +52,18 @@
             "comunitat-valenciana-contribuyentes-discapacidad-65": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "checks": {
+                "prestacion": "yes"
+              }
             },
             "comunitat-valenciana-ascendientes-mayores": {
               "on": true,
               "amount": "",
-              "units": "1"
+              "units": "1",
+              "checks": {
+                "convivencia": "yes"
+              }
             }
           }
         }

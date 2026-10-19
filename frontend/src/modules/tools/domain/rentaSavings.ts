@@ -1,6 +1,7 @@
 import { computeRenta, type DeductionChoice, type RentaInput, type RentaResult } from './rentaCalc';
 import type { Deduction } from './rentaData';
 import { round2 } from './round';
+import { allYes } from './rentaRequirements';
 import { DONATION_IDS, type DonationInput } from './rentaDonations';
 
 /** What each donation deduction is made of: taken out to know what it saves. */
@@ -65,6 +66,8 @@ export function deductionSavings(
         : computeRenta(
             withChoice(input, d.id, {
               on: true,
+              // What it would give with its questions answered «yes» (the person's own, if any).
+              checks: chosen?.checks ?? allYes(d.checks),
               amount: example ?? chosen?.amount,
               // As in the form: one per child by default, and at least one.
               units: chosen?.units ?? Math.max(1, input.family.children.length),

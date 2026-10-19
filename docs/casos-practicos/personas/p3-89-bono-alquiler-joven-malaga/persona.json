@@ -47,7 +47,10 @@
             "andalucia-alquiler-vivienda-habitual": {
               "on": true,
               "amount": "7800",
-              "units": ""
+              "units": "",
+              "checks": {
+                "perfil": "yes"
+              }
             }
           },
           "savingsDetail": {

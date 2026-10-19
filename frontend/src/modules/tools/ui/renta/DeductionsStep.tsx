@@ -13,6 +13,8 @@ import { number } from '../../domain/rentaForm';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 import { DONATION_IDS } from '../../domain/rentaDonations';
+import { Requirements } from './Requirements';
+import { checkDeduction } from '../../domain/rentaRequirements';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
@@ -40,8 +42,15 @@ function SavingLine({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  if (saving.blocked && !deduction.incomeLimit) {
+    // Without an income limit, what leaves it out is a requirement (age, children, disability).
+    return (
+      <small className="renta-saving renta-saving--blocked">
+        {t('tools.renta.saving.requirement')}
+      </small>
+    );
+  }
   if (saving.blocked) {
-    // Only an income limit blocks a deduction.
     const limit = deduction.incomeLimit as IncomeLimit;
     return (
       <small className="renta-saving renta-saving--blocked">
@@ -276,6 +285,7 @@ const isPending = (deduction: Deduction, choice: Choice) =>
 function DeductionRow({
   deduction,
   choice,
+  family,
   childCount,
   suggested,
   blocked,
@@ -285,6 +295,7 @@ function DeductionRow({
 }: {
   deduction: Deduction;
   choice: Choice;
+  family: Family;
   childCount: number;
   suggested: boolean;
   blocked: boolean;
@@ -294,6 +305,7 @@ function DeductionRow({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  const requirement = checkDeduction(deduction.checks, family, choice.checks).status;
   const value = deductionAmount(
     deduction,
     {
@@ -320,10 +332,13 @@ function DeductionRow({
         onChange={onChange}
       />
       <DeductionInfo deduction={deduction} />
-      {choice.on && blocked && (
+      {choice.on && blocked && requirement !== 'fail' && (
         <p className="form-error" role="alert">
           {t('tools.renta.blocked')}
         </p>
+      )}
+      {choice.on && (
+        <Requirements deduction={deduction} choice={choice} family={family} onChange={onChange} />
       )}
       {choice.on && (
         <div className="renta-deduction-fields">
@@ -335,7 +350,7 @@ function DeductionRow({
           />
           <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
           <MonthsInput deduction={deduction} choice={choice} onChange={onChange} />
-          {!blocked && (
+          {!blocked && requirement === 'ok' && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>
             </p>
@@ -410,6 +425,7 @@ function DeductionList({
                   key={d.id}
                   deduction={d}
                   choice={choices[d.id] ?? EMPTY}
+                  family={family}
                   childCount={family.children.length}
                   suggested={isSuggested(d)}
                   blocked={blocked.includes(d.id)}

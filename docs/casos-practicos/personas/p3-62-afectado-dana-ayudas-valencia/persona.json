@@ -46,7 +46,10 @@
             "comunitat-valenciana-dana-danos-vivienda": {
               "on": true,
               "amount": "2500",
-              "units": ""
+              "units": "",
+              "checks": {
+                "dana": "yes"
+              }
             }
           }
         }

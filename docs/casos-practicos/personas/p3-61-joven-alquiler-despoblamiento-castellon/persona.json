@@ -46,12 +46,18 @@
             "comunitat-valenciana-arrendamiento-vivienda-habitual": {
               "on": true,
               "amount": "950",
-              "units": ""
+              "units": "",
+              "checks": {
+                "contrato": "yes"
+              }
             },
             "comunitat-valenciana-despoblamiento": {
               "on": true,
               "amount": "330",
-              "units": ""
+              "units": "",
+              "checks": {
+                "municipio": "yes"
+              }
             }
           }
         }
