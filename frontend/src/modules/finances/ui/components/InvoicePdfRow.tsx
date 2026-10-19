@@ -111,7 +111,7 @@ export function PdfFixCell({
   const { t } = useI18n();
   if (!columns.includes('fix')) return null;
   return (
-    <td data-label={t('app.autonomo.review.col.fix')}>
+    <td data-label={t('app.autonomo.review.col.fix')} className="autonomo-review-fix">
       {invoice.source === 'pdf' && (
         <PdfActions
           invoice={invoice}

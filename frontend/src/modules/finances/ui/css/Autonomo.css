@@ -837,6 +837,11 @@ button.autonomo-sum-warn {
   .autonomo-review-table tr td:has(.autonomo-review-actions) {
     grid-column: 1 / -1;
   }
+  /* A card without anything to correct, or a column the correction does not use: no empty heading. */
+  .autonomo-review-table td.autonomo-review-fix:empty,
+  .autonomo-review-table tr.is-editing td:empty {
+    display: none;
+  }
 }
 
 /* The options of «Otros datos para los modelos»: one checkbox per line, the text beside it. */
