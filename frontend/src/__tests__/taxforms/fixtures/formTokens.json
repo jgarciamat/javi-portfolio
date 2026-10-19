@@ -1,0 +1,4834 @@
+{
+  "111": [
+    [
+      {
+        "text": "Este documento no será válido sin la certificación mecánica o, en su defecto, firma autorizada",
+        "x": 74,
+        "y": 66.9,
+        "field": false,
+        "w": 192.7,
+        "h": 4.6
+      },
+      {
+        "text": "Ejemplar para el declarante",
+        "x": 436.4,
+        "y": 66.8,
+        "field": false,
+        "w": 84.5,
+        "h": 6.5
+      },
+      { "text": "Modelo", "x": 488.9, "y": 704.5, "field": false, "w": 19.8, "h": 6 },
+      { "text": "111", "x": 481, "y": 681.5, "field": false, "w": 29.7, "h": 17.8 },
+      {
+        "text": "Retenciones e ingresos a cuenta del IRPF",
+        "x": 247.2,
+        "y": 706.4,
+        "field": false,
+        "w": 203.5,
+        "h": 10.3
+      },
+      {
+        "text": "Rendimientos del trabajo y de actividades económicas, premios y",
+        "x": 237.2,
+        "y": 695.9,
+        "field": false,
+        "w": 223.8,
+        "h": 7.2
+      },
+      {
+        "text": "determinadas ganancias patrimoniales e imputaciones de renta",
+        "x": 240.6,
+        "y": 687.8,
+        "field": false,
+        "w": 220.3,
+        "h": 7.3
+      },
+      { "text": "Autoliquidación", "x": 320.1, "y": 676.4, "field": false, "w": 57.9, "h": 7.7 },
+      {
+        "text": "Ingreso efectuado a favor del Tesoro público.",
+        "x": 97.3,
+        "y": 203.2,
+        "field": false,
+        "w": 114.6,
+        "h": 5.3
+      },
+      {
+        "text": "Cuenta restringida de colaboración en",
+        "x": 210,
+        "y": 203.2,
+        "field": false,
+        "w": 84,
+        "h": 5
+      },
+      {
+        "text": "la recaudación de la AEAT de declaraciones-liquidaciones o autoliquidaciones.",
+        "x": 97.3,
+        "y": 196.8,
+        "field": false,
+        "w": 171.6,
+        "h": 4.9
+      },
+      { "text": "Ingreso", "x": 85.2, "y": 153.9, "field": false, "w": 22.4, "h": 6.2 },
+      { "text": "(4)", "x": 85.2, "y": 178.2, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Negativa", "x": 314.5, "y": 183.3, "field": false, "w": 27.1, "h": 6.5 },
+      { "text": "(5)", "x": 322.3, "y": 193.2, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Importe del ingreso", "x": 107.5, "y": 183, "field": false, "w": 51.6, "h": 5.6 },
+      {
+        "text": "......................",
+        "x": 161.4,
+        "y": 183,
+        "field": false,
+        "w": 34.9,
+        "h": 5.7
+      },
+      { "text": "(casilla", "x": 107.5, "y": 175.4, "field": false, "w": 16.2, "h": 5.2 },
+      { "text": "30", "x": 126.9, "y": 175.4, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": ")", "x": 135.8, "y": 175.4, "field": false, "w": 1.5, "h": 4.5 },
+      {
+        "text": "Si esta autoliquidación es complementaria de otra autoliquidación anterior",
+        "x": 330.5,
+        "y": 161.7,
+        "field": false,
+        "w": 186.6,
+        "h": 5.7
+      },
+      {
+        "text": "correspondiente al mismo concepto, ejercicio y período, indíquelo marcando",
+        "x": 330.5,
+        "y": 154.4,
+        "field": false,
+        "w": 184,
+        "h": 5.4
+      },
+      {
+        "text": "con una \"X\" esta casilla.",
+        "x": 330.5,
+        "y": 147.1,
+        "field": false,
+        "w": 56.3,
+        "h": 5.3
+      },
+      { "text": "Complementaria", "x": 318.4, "y": 95.1, "field": false, "w": 50.9, "h": 6.5 },
+      { "text": "(6)", "x": 318.4, "y": 147.3, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Nº de justificante:", "x": 340, "y": 86.2, "field": false, "w": 53.4, "h": 6.3 },
+      {
+        "text": "En este caso, consigne a continuación el número de justificante identificativo",
+        "x": 330.5,
+        "y": 108.2,
+        "field": false,
+        "w": 184.1,
+        "h": 5.4
+      },
+      {
+        "text": "de la autoliquidación anterior.",
+        "x": 330.5,
+        "y": 100.9,
+        "field": false,
+        "w": 69.7,
+        "h": 5.3
+      },
+      { "text": "Entidad", "x": 119.5, "y": 144.1, "field": false, "w": 13.9, "h": 4.1 },
+      { "text": "Sucursal", "x": 153.4, "y": 144.1, "field": false, "w": 16.1, "h": 4.1 },
+      { "text": "DC", "x": 184.9, "y": 144.1, "field": false, "w": 5.6, "h": 3.9 },
+      { "text": "Número de cuenta", "x": 222.9, "y": 144.1, "field": false, "w": 34.4, "h": 4.2 },
+      {
+        "text": "Código cuenta cliente (CCC)",
+        "x": 166.7,
+        "y": 150.5,
+        "field": false,
+        "w": 58.9,
+        "h": 4.4
+      },
+      { "text": "Forma de pago:", "x": 107.5, "y": 163.7, "field": false, "w": 37.9, "h": 5.4 },
+      { "text": "En efectivo", "x": 179.5, "y": 163.7, "field": false, "w": 26.6, "h": 5.4 },
+      {
+        "text": "E.C. adeudo en cuenta",
+        "x": 237.8,
+        "y": 163.7,
+        "field": false,
+        "w": 54.5,
+        "h": 5.3
+      },
+      {
+        "text": "Autoliquidación negativa",
+        "x": 388.8,
+        "y": 192.6,
+        "field": false,
+        "w": 74.2,
+        "h": 6.2
+      },
+      {
+        "text": "Autoliquidación complementaria",
+        "x": 388.8,
+        "y": 124.6,
+        "field": false,
+        "w": 97.7,
+        "h": 6.3
+      },
+      {
+        "text": "__________________________ , a _____de _______________________de _________",
+        "x": 100.2,
+        "y": 106,
+        "field": false,
+        "w": 192.1,
+        "h": 4.9
+      },
+      { "text": "Firma", "x": 85.2, "y": 84.6, "field": false, "w": 17.7, "h": 6.5 },
+      { "text": "(7)", "x": 85.2, "y": 104.1, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Firma:", "x": 100.2, "y": 95.1, "field": false, "w": 12.6, "h": 4.4 },
+      { "text": "Declarante", "x": 85.2, "y": 587, "field": false, "w": 33.2, "h": 6.5 },
+      { "text": "(1)", "x": 85.2, "y": 622, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Espacio reservado para la etiqueta identificativa",
+        "x": 157,
+        "y": 618.8,
+        "field": false,
+        "w": 113.8,
+        "h": 5.4
+      },
+      {
+        "text": "Si no dispone de etiquetas, consigne los datos identificativos que se solicitan a continuación.",
+        "x": 97.3,
+        "y": 578.1,
+        "field": false,
+        "w": 221.3,
+        "h": 5.4
+      },
+      { "text": "NIF", "x": 100.2, "y": 568.2, "field": false, "w": 6.5, "h": 4 },
+      {
+        "text": "Apellidos y nombre o razón social",
+        "x": 190.4,
+        "y": 568.2,
+        "field": false,
+        "w": 63,
+        "h": 4.2
+      },
+      { "text": "Período", "x": 452.9, "y": 638.9, "field": false, "w": 18.5, "h": 5 },
+      { "text": ".....", "x": 471.4, "y": 638.9, "field": false, "w": 9, "h": 6.5 },
+      { "text": "Ejercicio", "x": 359.6, "y": 638.9, "field": false, "w": 26.2, "h": 6.3 },
+      { "text": "...", "x": 387.6, "y": 638.9, "field": false, "w": 5.4, "h": 6.5 },
+      { "text": "Devengo", "x": 343.5, "y": 631.4, "field": false, "w": 26.4, "h": 6.3 },
+      { "text": "(2)", "x": 351.2, "y": 640.9, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Vista previa: no sirve para presentar",
+        "x": 367.3,
+        "y": 602,
+        "field": false,
+        "w": 78.7,
+        "h": 4.9
+      },
+      { "text": "Liquidación", "x": 85.2, "y": 362.8, "field": false, "w": 34.5, "h": 6.1 },
+      { "text": "(3)", "x": 85.2, "y": 399.3, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Rendimientos dinerarios ...........................................................",
+        "x": 108.9,
+        "y": 523.3,
+        "field": false,
+        "w": 156.5,
+        "h": 5.7
+      },
+      {
+        "text": "Rendimientos en especie ..........................................................",
+        "x": 108.9,
+        "y": 503.8,
+        "field": false,
+        "w": 157.5,
+        "h": 5.7
+      },
+      { "text": "I.", "x": 97.3, "y": 536.1, "field": false, "w": 3.4, "h": 6.1 },
+      {
+        "text": "Rendimientos del trabajo",
+        "x": 108.9,
+        "y": 536.1,
+        "field": false,
+        "w": 70.7,
+        "h": 5.9
+      },
+      { "text": "03", "x": 431.5, "y": 523.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "01", "x": 271.2, "y": 523.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "N.º de perceptores", "x": 283.8, "y": 532.3, "field": false, "w": 38.7, "h": 4.7 },
+      { "text": "N.º de perceptores", "x": 284, "y": 512.9, "field": false, "w": 38.7, "h": 4.7 },
+      {
+        "text": "Importe de las percepciones",
+        "x": 350.9,
+        "y": 532.3,
+        "field": false,
+        "w": 58,
+        "h": 4.6
+      },
+      {
+        "text": "Valor percepciones en especie",
+        "x": 351,
+        "y": 512.9,
+        "field": false,
+        "w": 62.7,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de las retenciones",
+        "x": 444.6,
+        "y": 532.3,
+        "field": false,
+        "w": 54.2,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de los ingresos a cuenta",
+        "x": 444.8,
+        "y": 513,
+        "field": false,
+        "w": 67.1,
+        "h": 4.6
+      },
+      {
+        "text": "Rendimientos dinerarios ...........................................................",
+        "x": 108.9,
+        "y": 474.7,
+        "field": false,
+        "w": 156.5,
+        "h": 5.7
+      },
+      {
+        "text": "Rendimientos en especie ..........................................................",
+        "x": 108.9,
+        "y": 455.2,
+        "field": false,
+        "w": 157.5,
+        "h": 5.7
+      },
+      { "text": "II.", "x": 97.3, "y": 487.5, "field": false, "w": 5.1, "h": 6.1 },
+      {
+        "text": "Rendimientos de actividades económicas",
+        "x": 108.9,
+        "y": 487.5,
+        "field": false,
+        "w": 117,
+        "h": 5.9
+      },
+      { "text": "N.º de perceptores", "x": 283.8, "y": 483.8, "field": false, "w": 38.7, "h": 4.7 },
+      { "text": "N.º de perceptores", "x": 284, "y": 464.3, "field": false, "w": 38.7, "h": 4.7 },
+      {
+        "text": "Importe de las percepciones",
+        "x": 350.9,
+        "y": 483.8,
+        "field": false,
+        "w": 58,
+        "h": 4.6
+      },
+      {
+        "text": "Valor percepciones en especie",
+        "x": 351,
+        "y": 464.3,
+        "field": false,
+        "w": 62.7,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de las retenciones",
+        "x": 444.6,
+        "y": 483.8,
+        "field": false,
+        "w": 54.2,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de los ingresos a cuenta",
+        "x": 444.8,
+        "y": 464.3,
+        "field": false,
+        "w": 67.1,
+        "h": 4.6
+      },
+      {
+        "text": "Premios en metálico .................................................................",
+        "x": 108.9,
+        "y": 416.4,
+        "field": false,
+        "w": 156.2,
+        "h": 5.7
+      },
+      {
+        "text": "Premios en especie ..................................................................",
+        "x": 108.9,
+        "y": 396.9,
+        "field": false,
+        "w": 156.2,
+        "h": 5.7
+      },
+      { "text": "III.", "x": 97.3, "y": 435.7, "field": false, "w": 6.8, "h": 6.1 },
+      {
+        "text": "Premios por la participación en juegos, concursos, rifas o combinaciones aleatorias",
+        "x": 108.9,
+        "y": 435.7,
+        "field": false,
+        "w": 238.8,
+        "h": 6
+      },
+      { "text": "N.º de perceptores", "x": 283.8, "y": 425.5, "field": false, "w": 38.7, "h": 4.7 },
+      { "text": "N.º de perceptores", "x": 284, "y": 406, "field": false, "w": 38.7, "h": 4.7 },
+      {
+        "text": "Importe de las percepciones",
+        "x": 350.9,
+        "y": 425.5,
+        "field": false,
+        "w": 58,
+        "h": 4.6
+      },
+      {
+        "text": "Valor percepciones en especie",
+        "x": 351,
+        "y": 406,
+        "field": false,
+        "w": 62.7,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de las retenciones",
+        "x": 444.6,
+        "y": 425.5,
+        "field": false,
+        "w": 54.2,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de los ingresos a cuenta",
+        "x": 444.8,
+        "y": 406,
+        "field": false,
+        "w": 67.1,
+        "h": 4.6
+      },
+      {
+        "text": "Contraprestaciones dinerarias o en especie ...............................",
+        "x": 108.9,
+        "y": 299.8,
+        "field": false,
+        "w": 156.5,
+        "h": 5.6
+      },
+      { "text": "V.", "x": 97.3, "y": 319.1, "field": false, "w": 5.8, "h": 6.1 },
+      {
+        "text": "Contraprestaciones por la cesión de derechos de imagen: ingresos a cuenta previstos en el artículo 92.8 de la Ley del Impuesto",
+        "x": 108.9,
+        "y": 319.1,
+        "field": false,
+        "w": 370.5,
+        "h": 6.1
+      },
+      { "text": "N.º de perceptores", "x": 283.8, "y": 308.9, "field": false, "w": 38.7, "h": 4.7 },
+      {
+        "text": "Contraprestaciones satisfechas",
+        "x": 350.9,
+        "y": 308.9,
+        "field": false,
+        "w": 64.3,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de los ingresos a cuenta",
+        "x": 444.6,
+        "y": 308.9,
+        "field": false,
+        "w": 67.1,
+        "h": 4.6
+      },
+      { "text": "Total liquidación:", "x": 97.3, "y": 275.2, "field": false, "w": 51.4, "h": 6.2 },
+      { "text": "A deducir", "x": 154.9, "y": 260.9, "field": false, "w": 22.5, "h": 5.3 },
+      {
+        "text": "(exclusivamente en caso de autoliquidación complementaria)",
+        "x": 179,
+        "y": 260.9,
+        "field": false,
+        "w": 123.5,
+        "h": 4.6
+      },
+      { "text": ":", "x": 302.2, "y": 260.9, "field": false, "w": 1.6, "h": 5.7 },
+      {
+        "text": "Resultados a ingresar de anteriores autoliquidaciones por el mismo concepto, ejercicio y período ...................",
+        "x": 162.1,
+        "y": 251.2,
+        "field": false,
+        "w": 264.5,
+        "h": 5.5
+      },
+      {
+        "text": "Resultado a ingresar",
+        "x": 162.1,
+        "y": 231.8,
+        "field": false,
+        "w": 54.7,
+        "h": 5.5
+      },
+      { "text": "(", "x": 218.6, "y": 231.8, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "28", "x": 223.4, "y": 231.8, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 232.2, "y": 231.8, "field": false, "w": 2.8, "h": 5 },
+      { "text": "29", "x": 238.3, "y": 231.8, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": ") ............................................................................................................",
+        "x": 247.2,
+        "y": 231.8,
+        "field": false,
+        "w": 174.6,
+        "h": 5.7
+      },
+      {
+        "text": "Suma de retenciones e ingresos a cuenta (",
+        "x": 162.1,
+        "y": 270.3,
+        "field": false,
+        "w": 101.8,
+        "h": 5.3
+      },
+      { "text": "03", "x": 267.2, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 276.5, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "06", "x": 284.5, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 293.8, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "09", "x": 301.8, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 311.1, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "12", "x": 319.2, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 328.5, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "15", "x": 336.5, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 345.8, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "18", "x": 353.8, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 363.1, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "21", "x": 371.2, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 380.5, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "24", "x": 388.5, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 397.8, "y": 270.3, "field": false, "w": 3.8, "h": 6.5 },
+      { "text": "27", "x": 405.8, "y": 270.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": ") ....", "x": 415.2, "y": 270.3, "field": false, "w": 11.2, "h": 6.5 },
+      { "text": "02", "x": 338.3, "y": 523.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "05", "x": 338.3, "y": 503.7, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "06", "x": 431.5, "y": 503.7, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "04", "x": 271.2, "y": 503.7, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "09", "x": 431.5, "y": 474.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "07", "x": 271.2, "y": 474.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "08", "x": 338.3, "y": 474.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "11", "x": 338.3, "y": 455.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "12", "x": 431.5, "y": 455.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "10", "x": 271.2, "y": 455.1, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "15", "x": 431.5, "y": 416.2, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "13", "x": 271.2, "y": 416.2, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "14", "x": 338.3, "y": 416.2, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "17", "x": 338.3, "y": 396.8, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "18", "x": 431.5, "y": 396.8, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "16", "x": 271.2, "y": 396.8, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "26", "x": 338.3, "y": 299.6, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "27", "x": 431.5, "y": 299.6, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "25", "x": 271.2, "y": 299.6, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "28", "x": 431.3, "y": 270.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "29", "x": 431.3, "y": 251, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "30", "x": 431.5, "y": 231.6, "field": false, "w": 6.8, "h": 6.1 },
+      {
+        "text": "Percepciones dinerarias ...........................................................",
+        "x": 108.9,
+        "y": 358,
+        "field": false,
+        "w": 156.2,
+        "h": 5.7
+      },
+      {
+        "text": "Percepciones en especie ..........................................................",
+        "x": 108.9,
+        "y": 338.6,
+        "field": false,
+        "w": 157.2,
+        "h": 5.7
+      },
+      { "text": "IV.", "x": 97.3, "y": 377.3, "field": false, "w": 7.5, "h": 6.1 },
+      {
+        "text": "Ganancias patrimoniales derivadas de los aprovechamientos forestales de los vecinos en montes públicos",
+        "x": 108.9,
+        "y": 377.3,
+        "field": false,
+        "w": 300.8,
+        "h": 5.9
+      },
+      { "text": "N.º de perceptores", "x": 283.8, "y": 367.2, "field": false, "w": 38.7, "h": 4.7 },
+      { "text": "N.º de perceptores", "x": 284, "y": 347.7, "field": false, "w": 38.7, "h": 4.7 },
+      {
+        "text": "Importe de las percepciones",
+        "x": 350.9,
+        "y": 367.2,
+        "field": false,
+        "w": 58,
+        "h": 4.6
+      },
+      {
+        "text": "Valor percepciones en especie",
+        "x": 351,
+        "y": 347.7,
+        "field": false,
+        "w": 62.7,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de las retenciones",
+        "x": 444.6,
+        "y": 367.2,
+        "field": false,
+        "w": 54.2,
+        "h": 4.6
+      },
+      {
+        "text": "Importe de los ingresos a cuenta",
+        "x": 444.8,
+        "y": 347.7,
+        "field": false,
+        "w": 67.1,
+        "h": 4.6
+      },
+      { "text": "21", "x": 431.5, "y": 357.9, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "19", "x": 271.2, "y": 357.9, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "20", "x": 338.3, "y": 357.9, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "23", "x": 338.3, "y": 338.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "24", "x": 431.5, "y": 338.5, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "22", "x": 271.2, "y": 338.5, "field": false, "w": 6.8, "h": 6.1 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 1 de 1", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "2026", "x": 387.7, "y": 638.9, "field": true },
+      { "text": "3T", "x": 473.4, "y": 638.9, "field": true },
+      { "text": "2", "x": 279.7, "y": 522.5, "field": true },
+      { "text": "2.469,14", "x": 346.8, "y": 522.5, "field": true },
+      { "text": "3.703,71", "x": 440, "y": 522.5, "field": true },
+      { "text": "5", "x": 279.7, "y": 503.1, "field": true },
+      { "text": "6.172,85", "x": 346.8, "y": 503.1, "field": true },
+      { "text": "7.407,42", "x": 440, "y": 503.1, "field": true },
+      { "text": "8", "x": 279.7, "y": 473.9, "field": true },
+      { "text": "9.876,56", "x": 346.8, "y": 473.9, "field": true },
+      { "text": "11.111,13", "x": 440, "y": 473.9, "field": true },
+      { "text": "2", "x": 279.7, "y": 454.5, "field": true },
+      { "text": "13.580,27", "x": 346.8, "y": 454.5, "field": true },
+      { "text": "14.814,84", "x": 440, "y": 454.5, "field": true },
+      { "text": "5", "x": 279.7, "y": 415.6, "field": true },
+      { "text": "-17.283,98", "x": 346.8, "y": 415.6, "field": true },
+      { "text": "18.518,55", "x": 440, "y": 415.6, "field": true },
+      { "text": "8", "x": 279.7, "y": 396.2, "field": true },
+      { "text": "20.987,69", "x": 346.8, "y": 396.2, "field": true },
+      { "text": "22.222,26", "x": 440, "y": 396.2, "field": true },
+      { "text": "2", "x": 279.7, "y": 357.3, "field": true },
+      { "text": "24.691,40", "x": 346.8, "y": 357.3, "field": true },
+      { "text": "-25.925,97", "x": 440, "y": 357.3, "field": true },
+      { "text": "5", "x": 279.7, "y": 337.9, "field": true },
+      { "text": "28.395,11", "x": 346.8, "y": 337.9, "field": true },
+      { "text": "29.629,68", "x": 440, "y": 337.9, "field": true },
+      { "text": "8", "x": 279.7, "y": 299, "field": true },
+      { "text": "32.098,82", "x": 346.8, "y": 299, "field": true },
+      { "text": "33.333,39", "x": 440, "y": 299, "field": true },
+      { "text": "-34.567,96", "x": 440.3, "y": 269.9, "field": true },
+      { "text": "35.802,53", "x": 440.3, "y": 250.4, "field": true },
+      { "text": "37.037,10", "x": 440.5, "y": 231, "field": true }
+    ]
+  ],
+  "115": [
+    [
+      {
+        "text": "Este documento no será válido sin la certificación mecánica o, en su defecto, firma autorizada",
+        "x": 74,
+        "y": 66.9,
+        "field": false,
+        "w": 192.7,
+        "h": 4.6
+      },
+      {
+        "text": "Ejemplar para el declarante",
+        "x": 436.4,
+        "y": 66.8,
+        "field": false,
+        "w": 84.5,
+        "h": 6.5
+      },
+      { "text": "Modelo", "x": 488.9, "y": 704.5, "field": false, "w": 19.8, "h": 6 },
+      { "text": "115", "x": 481, "y": 681.5, "field": false, "w": 29.7, "h": 17.8 },
+      {
+        "text": "Retenciones e ingresos a cuenta",
+        "x": 247.2,
+        "y": 706.4,
+        "field": false,
+        "w": 163.4,
+        "h": 10.5
+      },
+      {
+        "text": "Rendimientos procedentes del arrendamiento o subarrendamiento de inmuebles urbanos",
+        "x": 237.2,
+        "y": 695.9,
+        "field": false,
+        "w": 236.3,
+        "h": 5.6
+      },
+      {
+        "text": "IRPF, Impuesto sobre Sociedades e IRNR (establecimientos permanentes)",
+        "x": 240.6,
+        "y": 687.8,
+        "field": false,
+        "w": 237,
+        "h": 6.7
+      },
+      { "text": "Autoliquidación", "x": 320.1, "y": 676.4, "field": false, "w": 57.9, "h": 7.7 },
+      {
+        "text": "Ingreso efectuado a favor del Tesoro público.",
+        "x": 97.3,
+        "y": 203.2,
+        "field": false,
+        "w": 114.6,
+        "h": 5.3
+      },
+      {
+        "text": "Cuenta restringida de colaboración en",
+        "x": 210,
+        "y": 203.2,
+        "field": false,
+        "w": 84,
+        "h": 5
+      },
+      {
+        "text": "la recaudación de la AEAT de declaraciones-liquidaciones o autoliquidaciones.",
+        "x": 97.3,
+        "y": 196.8,
+        "field": false,
+        "w": 171.6,
+        "h": 4.9
+      },
+      { "text": "Ingreso", "x": 85.2, "y": 153.9, "field": false, "w": 22.4, "h": 6.2 },
+      { "text": "(4)", "x": 85.2, "y": 178.2, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Negativa", "x": 314.5, "y": 183.3, "field": false, "w": 27.1, "h": 6.5 },
+      { "text": "(5)", "x": 322.3, "y": 193.2, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Importe del ingreso", "x": 107.5, "y": 183, "field": false, "w": 51.6, "h": 5.6 },
+      {
+        "text": "......................",
+        "x": 161.4,
+        "y": 183,
+        "field": false,
+        "w": 34.9,
+        "h": 5.7
+      },
+      { "text": "(casilla", "x": 107.5, "y": 175.4, "field": false, "w": 16.2, "h": 5.2 },
+      { "text": "05", "x": 126.9, "y": 175.4, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": ")", "x": 135.8, "y": 175.4, "field": false, "w": 1.5, "h": 4.5 },
+      {
+        "text": "Si esta autoliquidación es complementaria de otra autoliquidación anterior",
+        "x": 330.5,
+        "y": 161.7,
+        "field": false,
+        "w": 186.6,
+        "h": 5.7
+      },
+      {
+        "text": "correspondiente al mismo concepto, ejercicio y período, indíquelo marcando",
+        "x": 330.5,
+        "y": 154.4,
+        "field": false,
+        "w": 184,
+        "h": 5.4
+      },
+      {
+        "text": "con una \"X\" esta casilla.",
+        "x": 330.5,
+        "y": 147.1,
+        "field": false,
+        "w": 56.3,
+        "h": 5.3
+      },
+      { "text": "Complementaria", "x": 318.4, "y": 95.1, "field": false, "w": 50.9, "h": 6.5 },
+      { "text": "(6)", "x": 318.4, "y": 147.3, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Nº de justificante:", "x": 340, "y": 86.2, "field": false, "w": 53.4, "h": 6.3 },
+      {
+        "text": "En este caso, consigne a continuación el número de justificante identificativo",
+        "x": 330.5,
+        "y": 108.2,
+        "field": false,
+        "w": 184.1,
+        "h": 5.4
+      },
+      {
+        "text": "de la autoliquidación anterior.",
+        "x": 330.5,
+        "y": 100.9,
+        "field": false,
+        "w": 69.7,
+        "h": 5.3
+      },
+      { "text": "Entidad", "x": 119.5, "y": 144.1, "field": false, "w": 13.9, "h": 4.1 },
+      { "text": "Sucursal", "x": 153.4, "y": 144.1, "field": false, "w": 16.1, "h": 4.1 },
+      { "text": "DC", "x": 184.9, "y": 144.1, "field": false, "w": 5.6, "h": 3.9 },
+      { "text": "Número de cuenta", "x": 222.9, "y": 144.1, "field": false, "w": 34.4, "h": 4.2 },
+      {
+        "text": "Código cuenta cliente (CCC)",
+        "x": 166.7,
+        "y": 150.5,
+        "field": false,
+        "w": 58.9,
+        "h": 4.4
+      },
+      { "text": "Forma de pago:", "x": 107.5, "y": 163.7, "field": false, "w": 37.9, "h": 5.4 },
+      { "text": "En efectivo", "x": 179.5, "y": 163.7, "field": false, "w": 26.6, "h": 5.4 },
+      {
+        "text": "E.C. adeudo en cuenta",
+        "x": 237.8,
+        "y": 163.7,
+        "field": false,
+        "w": 54.5,
+        "h": 5.3
+      },
+      {
+        "text": "Autoliquidación negativa",
+        "x": 388.8,
+        "y": 192.6,
+        "field": false,
+        "w": 74.2,
+        "h": 6.2
+      },
+      {
+        "text": "Autoliquidación complementaria",
+        "x": 388.8,
+        "y": 124.6,
+        "field": false,
+        "w": 97.7,
+        "h": 6.3
+      },
+      {
+        "text": "__________________________ , a _____de _______________________de _________",
+        "x": 100.2,
+        "y": 106,
+        "field": false,
+        "w": 192.1,
+        "h": 4.9
+      },
+      { "text": "Firma", "x": 85.2, "y": 84.6, "field": false, "w": 17.7, "h": 6.5 },
+      { "text": "(7)", "x": 85.2, "y": 104.1, "field": false, "w": 7.1, "h": 5.8 },
+      { "text": "Firma:", "x": 100.2, "y": 95.1, "field": false, "w": 12.6, "h": 4.4 },
+      { "text": "Declarante", "x": 85.2, "y": 587, "field": false, "w": 33.2, "h": 6.5 },
+      { "text": "(1)", "x": 85.2, "y": 622, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Espacio reservado para la etiqueta identificativa",
+        "x": 157,
+        "y": 618.8,
+        "field": false,
+        "w": 113.8,
+        "h": 5.4
+      },
+      {
+        "text": "Si no dispone de etiquetas, consigne los datos identificativos que se solicitan a continuación.",
+        "x": 97.3,
+        "y": 578.1,
+        "field": false,
+        "w": 221.3,
+        "h": 5.4
+      },
+      { "text": "NIF", "x": 100.2, "y": 568.2, "field": false, "w": 6.5, "h": 4 },
+      {
+        "text": "Apellidos y nombre o razón social",
+        "x": 190.4,
+        "y": 568.2,
+        "field": false,
+        "w": 63,
+        "h": 4.2
+      },
+      { "text": "Período", "x": 452.9, "y": 638.9, "field": false, "w": 18.5, "h": 5 },
+      { "text": ".....", "x": 471.4, "y": 638.9, "field": false, "w": 9, "h": 6.5 },
+      { "text": "Ejercicio", "x": 359.6, "y": 638.9, "field": false, "w": 26.2, "h": 6.3 },
+      { "text": "...", "x": 387.6, "y": 638.9, "field": false, "w": 5.4, "h": 6.5 },
+      { "text": "Devengo", "x": 343.5, "y": 631.4, "field": false, "w": 26.4, "h": 6.3 },
+      { "text": "(2)", "x": 351.2, "y": 640.9, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Vista previa: no sirve para presentar",
+        "x": 367.3,
+        "y": 602,
+        "field": false,
+        "w": 78.7,
+        "h": 4.9
+      },
+      { "text": "Liquidación", "x": 85.2, "y": 362.8, "field": false, "w": 34.5, "h": 6.1 },
+      { "text": "(3)", "x": 85.2, "y": 399.3, "field": false, "w": 7.1, "h": 5.8 },
+      {
+        "text": "Retenciones e ingresos a cuenta",
+        "x": 97.3,
+        "y": 530,
+        "field": false,
+        "w": 94.9,
+        "h": 6.1
+      },
+      { "text": "A deducir", "x": 97.3, "y": 443, "field": false, "w": 28.1, "h": 6.1 },
+      {
+        "text": "(exclusivamente en caso de autoliquidación complementaria):",
+        "x": 130,
+        "y": 443,
+        "field": false,
+        "w": 166.8,
+        "h": 6.1
+      },
+      {
+        "text": "Número de perceptores ................................................................................................",
+        "x": 109.4,
+        "y": 505,
+        "field": false,
+        "w": 228.6,
+        "h": 6.1
+      },
+      {
+        "text": "Base retenciones e ingresos a cuenta ...............................................................................",
+        "x": 109.4,
+        "y": 486,
+        "field": false,
+        "w": 237.7,
+        "h": 6.1
+      },
+      {
+        "text": "Retenciones e ingresos a cuenta ....................................................................................",
+        "x": 109.4,
+        "y": 467,
+        "field": false,
+        "w": 233,
+        "h": 6.1
+      },
+      {
+        "text": "Resultados a ingresar de anteriores autoliquidaciones por el mismo concepto, ejercicio y período ..........",
+        "x": 109.4,
+        "y": 420,
+        "field": false,
+        "w": 280,
+        "h": 6.1
+      },
+      {
+        "text": "Resultado a ingresar ( 03 – 04 ) ...................................................................................",
+        "x": 109.4,
+        "y": 395,
+        "field": false,
+        "w": 232.3,
+        "h": 6.1
+      },
+      { "text": "01", "x": 431.5, "y": 505, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "02", "x": 431.5, "y": 486, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "03", "x": 431.5, "y": 467, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "04", "x": 431.5, "y": 420, "field": false, "w": 6.8, "h": 6.1 },
+      { "text": "05", "x": 431.5, "y": 395, "field": false, "w": 6.8, "h": 6.1 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 1 de 1", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "2026", "x": 387.7, "y": 638.9, "field": true },
+      { "text": "3T", "x": 473.4, "y": 638.9, "field": true },
+      { "text": "2", "x": 440.5, "y": 504.3, "field": true },
+      { "text": "2.469,14", "x": 440.5, "y": 485.3, "field": true },
+      { "text": "3.703,71", "x": 440.5, "y": 466.3, "field": true },
+      { "text": "4.938,28", "x": 440.5, "y": 419.3, "field": true },
+      { "text": "6.172,85", "x": 440.5, "y": 394.3, "field": true }
+    ]
+  ],
+  "130": [
+    [
+      { "text": "Modelo", "x": 492, "y": 692.7, "field": false, "w": 20.1, "h": 6.1 },
+      { "text": "130", "x": 484.1, "y": 669.4, "field": false, "w": 30.2, "h": 18.1 },
+      {
+        "text": "Impuesto sobre la Renta de las Personas Físicas",
+        "x": 237.8,
+        "y": 691.1,
+        "field": false,
+        "w": 222.7,
+        "h": 9.6
+      },
+      {
+        "text": "Actividades económicas en estimación directa",
+        "x": 260,
+        "y": 681.2,
+        "field": false,
+        "w": 178,
+        "h": 8
+      },
+      { "text": "Pago fraccionado", "x": 237.8, "y": 668.4, "field": false, "w": 89.8, "h": 10.7 },
+      { "text": "Autoliquidación", "x": 382.7, "y": 668.4, "field": false, "w": 76.5, "h": 10.1 },
+      {
+        "text": "Este documento no será válido sin la certificación mecánica o, en su defecto, firma autorizada",
+        "x": 76.3,
+        "y": 67,
+        "field": false,
+        "w": 195.7,
+        "h": 4.7
+      },
+      {
+        "text": "Ejemplar para el declarante",
+        "x": 432.9,
+        "y": 67,
+        "field": false,
+        "w": 85.8,
+        "h": 6.6
+      },
+      {
+        "text": "__________________________ , a _____de _______________________de _________",
+        "x": 97.2,
+        "y": 100.4,
+        "field": false,
+        "w": 195.1,
+        "h": 4.9
+      },
+      { "text": "Firma:", "x": 337.7, "y": 100.4, "field": false, "w": 12.8, "h": 4.5 },
+      { "text": "Firma", "x": 83, "y": 82, "field": false, "w": 18, "h": 6.6 },
+      { "text": "(8)", "x": 83, "y": 101.8, "field": false, "w": 7.2, "h": 5.9 },
+      { "text": "Declarante", "x": 82.8, "y": 589.1, "field": false, "w": 33.7, "h": 6.6 },
+      { "text": "(1)", "x": 82.8, "y": 624.7, "field": false, "w": 7.2, "h": 5.9 },
+      {
+        "text": "Vista previa: no sirve para presentar",
+        "x": 364.5,
+        "y": 585.1,
+        "field": false,
+        "w": 78.7,
+        "h": 4.9
+      },
+      { "text": "Apellidos", "x": 96.7, "y": 591.6, "field": false, "w": 18.5, "h": 4.6 },
+      { "text": "NIF", "x": 97, "y": 643.7, "field": false, "w": 6.6, "h": 4.1 },
+      { "text": "Período", "x": 455.6, "y": 630.6, "field": false, "w": 19.7, "h": 5.3 },
+      { "text": "...", "x": 475.1, "y": 630.6, "field": false, "w": 5.5, "h": 6.6 },
+      { "text": "Ejercicio", "x": 360.9, "y": 630.6, "field": false, "w": 26.6, "h": 6.4 },
+      { "text": "...", "x": 389.3, "y": 630.6, "field": false, "w": 5.5, "h": 6.6 },
+      { "text": "Devengo", "x": 341.6, "y": 622.1, "field": false, "w": 26.8, "h": 6.3 },
+      { "text": "(2)", "x": 349.5, "y": 631.8, "field": false, "w": 7.2, "h": 5.9 },
+      { "text": "I.", "x": 94.3, "y": 550, "field": false, "w": 3.7, "h": 6.6 },
+      {
+        "text": "Actividades económicas en estimación directa, modalidad normal o simplificada, distintas de las agrícolas, ganaderas, forestales y",
+        "x": 103.1,
+        "y": 550,
+        "field": false,
+        "w": 411.9,
+        "h": 6.6
+      },
+      { "text": "pesqueras.", "x": 94.3, "y": 542.1, "field": false, "w": 33.9, "h": 6.4 },
+      {
+        "text": "(Datos acumulados del período comprendido entre el primer día del año y el último día del trimestre).",
+        "x": 130.2,
+        "y": 542.1,
+        "field": false,
+        "w": 243.5,
+        "h": 5.4
+      },
+      {
+        "text": "Pago fraccionado previo del trimestre",
+        "x": 94.3,
+        "y": 439.4,
+        "field": false,
+        "w": 104.1,
+        "h": 5.8
+      },
+      { "text": "(", "x": 198, "y": 439.4, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "04", "x": 202.8, "y": 439.4, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 211.8, "y": 439.4, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "05", "x": 218, "y": 439.4, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 227, "y": 439.4, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "06", "x": 233.2, "y": 439.4, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consígnela con signo menos (–) .........",
+        "x": 242.2,
+        "y": 439.4,
+        "field": false,
+        "w": 187.4,
+        "h": 5.5
+      },
+      { "text": "Liquidación", "x": 82.7, "y": 379.8, "field": false, "w": 35.1, "h": 6.3 },
+      { "text": "(3)", "x": 82.7, "y": 416.9, "field": false, "w": 7.2, "h": 5.9 },
+      {
+        "text": "II. Actividades agrícolas, ganaderas, forestales y pesqueras en estimación directa, modalidad normal o simplificada.",
+        "x": 94.3,
+        "y": 421.7,
+        "field": false,
+        "w": 364.6,
+        "h": 6.6
+      },
+      {
+        "text": "Volumen de ingresos del trimestre (excluidas las subvenciones de capital y las indemnizaciones) .............................................................",
+        "x": 94.3,
+        "y": 409.8,
+        "field": false,
+        "w": 335.7,
+        "h": 5.6
+      },
+      { "text": "07", "x": 434.5, "y": 439.4, "field": false, "w": 6.4, "h": 5.8 },
+      {
+        "text": "Ingresos computables correspondientes al conjunto de las actividades ejercidas .....................................................................................",
+        "x": 94.3,
+        "y": 528.2,
+        "field": false,
+        "w": 335.1,
+        "h": 5.7
+      },
+      {
+        "text": "Gastos fiscalmente deducibles correspondientes al conjunto de las actividades ejercidas .........................................................................",
+        "x": 94.3,
+        "y": 518.4,
+        "field": false,
+        "w": 335,
+        "h": 5.6
+      },
+      { "text": "Rendimiento neto (", "x": 94.3, "y": 508.5, "field": false, "w": 45, "h": 5.3 },
+      { "text": "01", "x": 142.6, "y": 508.5, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 151.6, "y": 508.5, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "02", "x": 157.8, "y": 508.5, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consígnela con signo menos (–) ......................................................",
+        "x": 166.8,
+        "y": 508.5,
+        "field": false,
+        "w": 262.9,
+        "h": 5.6
+      },
+      {
+        "text": "20 por 100 del importe de la casilla",
+        "x": 94.3,
+        "y": 498.6,
+        "field": false,
+        "w": 86.9,
+        "h": 5.6
+      },
+      { "text": "03", "x": 184.6, "y": 498.6, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": ", si dicho importe es positivo. (Si la casilla",
+        "x": 192,
+        "y": 498.6,
+        "field": false,
+        "w": 102,
+        "h": 5.5
+      },
+      { "text": "03", "x": 296.8, "y": 498.6, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "fuese negativa, consigne el número cero) ..............",
+        "x": 305.8,
+        "y": 498.6,
+        "field": false,
+        "w": 123.5,
+        "h": 5.5
+      },
+      {
+        "text": "De los trimestres anteriores: suma de los importes positivos de la casilla",
+        "x": 109.1,
+        "y": 478.9,
+        "field": false,
+        "w": 175.9,
+        "h": 5.5
+      },
+      { "text": "07", "x": 288.3, "y": 478.9, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "menos la suma de los importes de la casilla",
+        "x": 297.3,
+        "y": 478.9,
+        "field": false,
+        "w": 105.7,
+        "h": 5.5
+      },
+      { "text": "16", "x": 406.5, "y": 478.9, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "........", "x": 415.8, "y": 478.9, "field": false, "w": 12.9, "h": 5.8 },
+      {
+        "text": "Pago fraccionado previo del trimestre",
+        "x": 94.3,
+        "y": 380.2,
+        "field": false,
+        "w": 104.1,
+        "h": 5.8
+      },
+      { "text": "(", "x": 198, "y": 380.2, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "09", "x": 202.8, "y": 380.2, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 211.8, "y": 380.2, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "10", "x": 218, "y": 380.2, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consígnela con signo menos (–) ..................",
+        "x": 227,
+        "y": 380.2,
+        "field": false,
+        "w": 202.6,
+        "h": 5.5
+      },
+      { "text": "11", "x": 434.5, "y": 380.2, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "01", "x": 434.8, "y": 528.2, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "02", "x": 434.8, "y": 518.4, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "03", "x": 434.7, "y": 508.3, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "A deducir:", "x": 94.3, "y": 488.8, "field": false, "w": 24.3, "h": 5.4 },
+      {
+        "text": "Retenciones e ingresos a cuenta soportados por las actividades incluidas en este apartado y correspondientes",
+        "x": 109.1,
+        "y": 466.7,
+        "field": false,
+        "w": 267.5,
+        "h": 5.5
+      },
+      {
+        "text": "al período comprendido entre el primer día del año y el último día del trimestre ..............................................................................",
+        "x": 109.1,
+        "y": 459.8,
+        "field": false,
+        "w": 319.8,
+        "h": 5.6
+      },
+      {
+        "text": "2 por 100 del importe de la casilla",
+        "x": 94.3,
+        "y": 399.9,
+        "field": false,
+        "w": 83.6,
+        "h": 5.6
+      },
+      { "text": "08", "x": 181.3, "y": 400, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "................................................................................................................................................",
+        "x": 190.4,
+        "y": 400,
+        "field": false,
+        "w": 232.2,
+        "h": 5.8
+      },
+      { "text": "A deducir:", "x": 94.3, "y": 390.1, "field": false, "w": 24.3, "h": 5.4 },
+      {
+        "text": "Retenciones e ingresos a cuenta soportados por las actividades incluidas en este apartado y correspondientes al trimestre ....",
+        "x": 123.9,
+        "y": 390.1,
+        "field": false,
+        "w": 304.7,
+        "h": 5.5
+      },
+      { "text": "04", "x": 434.7, "y": 498.6, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "08", "x": 434.8, "y": 409.8, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "09", "x": 434.8, "y": 400, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "10", "x": 434.7, "y": 389.9, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "05", "x": 434.8, "y": 478.9, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "06", "x": 434.8, "y": 459.2, "field": false, "w": 6.4, "h": 5.8 },
+      {
+        "text": "III. Total liquidación.",
+        "x": 94.3,
+        "y": 359.5,
+        "field": false,
+        "w": 63.5,
+        "h": 6.6
+      },
+      {
+        "text": "Resultado a ingresar de las anteriores autoliquidaciones presentadas por el mismo concepto, ejercicio y período ............................",
+        "x": 109.1,
+        "y": 261.2,
+        "field": false,
+        "w": 320.1,
+        "h": 5.5
+      },
+      {
+        "text": "Resultado de la autoliquidación",
+        "x": 94.3,
+        "y": 251.3,
+        "field": false,
+        "w": 83.9,
+        "h": 5.6
+      },
+      { "text": "(", "x": 180, "y": 251.3, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "17", "x": 184.8, "y": 251.3, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 193.8, "y": 251.3, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "18", "x": 200, "y": 251.3, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": ") ..................................................................................................................................",
+        "x": 209,
+        "y": 251.3,
+        "field": false,
+        "w": 213.2,
+        "h": 5.8
+      },
+      { "text": "19", "x": 434.5, "y": 251.3, "field": false, "w": 6.4, "h": 5.8 },
+      {
+        "text": "Suma de pagos fraccionados previos del trimestre",
+        "x": 94.3,
+        "y": 350,
+        "field": false,
+        "w": 135.7,
+        "h": 5.7
+      },
+      { "text": "(", "x": 231.6, "y": 350, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "07", "x": 236.4, "y": 350, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "+", "x": 245.4, "y": 350, "field": false, "w": 3.4, "h": 5.8 },
+      { "text": "11", "x": 252.5, "y": 350, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consigne el número cero (0) ...",
+        "x": 261.5,
+        "y": 350,
+        "field": false,
+        "w": 168.1,
+        "h": 5.4
+      },
+      {
+        "text": "A deducir (exclusivamente en caso de autoliquidación complementaria):",
+        "x": 94.3,
+        "y": 271,
+        "field": false,
+        "w": 172.4,
+        "h": 5.4
+      },
+      { "text": "A deducir:", "x": 94.3, "y": 340.1, "field": false, "w": 24.3, "h": 5.4 },
+      {
+        "text": "Minoración por aplicación de la deducción a que se refiere el artículo 110.3 c) del Reglamento del Impuesto...........................",
+        "x": 123.9,
+        "y": 340.1,
+        "field": false,
+        "w": 305.4,
+        "h": 5.5
+      },
+      { "text": "Diferencia", "x": 94.3, "y": 330.2, "field": false, "w": 27.5, "h": 5.7 },
+      { "text": "(", "x": 123.3, "y": 330.2, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "12", "x": 128.1, "y": 330.2, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 137.1, "y": 330.2, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "13", "x": 143.3, "y": 330.2, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consígnela con signo menos (–) ................................................................",
+        "x": 152.3,
+        "y": 330.2,
+        "field": false,
+        "w": 277.3,
+        "h": 5.6
+      },
+      {
+        "text": "A deducir (si la diferencia anterior es positiva y con el máximo de su importe):",
+        "x": 94.3,
+        "y": 320.4,
+        "field": false,
+        "w": 187.8,
+        "h": 5.5
+      },
+      { "text": "Total", "x": 94.3, "y": 280.9, "field": false, "w": 13.1, "h": 5.5 },
+      { "text": "(", "x": 108.6, "y": 280.9, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "14", "x": 113.4, "y": 280.9, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 122.4, "y": 280.9, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "15", "x": 128.6, "y": 280.9, "field": false, "w": 5.4, "h": 4.9 },
+      { "text": "–", "x": 137.1, "y": 280.9, "field": false, "w": 2.9, "h": 5.2 },
+      { "text": "16", "x": 143.3, "y": 280.9, "field": false, "w": 5.4, "h": 4.9 },
+      {
+        "text": "). Si se obtiene una cantidad negativa, consígnela con signo menos (–) ................................................................",
+        "x": 152.3,
+        "y": 280.9,
+        "field": false,
+        "w": 277.3,
+        "h": 5.6
+      },
+      { "text": "12", "x": 434.8, "y": 350, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "13", "x": 434.8, "y": 340.1, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "14", "x": 434.7, "y": 330, "field": false, "w": 6.4, "h": 5.8 },
+      {
+        "text": "Resultados negativos de trimestres anteriores ....................................................................................................................",
+        "x": 123.9,
+        "y": 310.5,
+        "field": false,
+        "w": 306.6,
+        "h": 5.8
+      },
+      {
+        "text": "Por destinar cantidades al pago para la adquisición o rehabilitación de la vivienda habitual:",
+        "x": 123.9,
+        "y": 298.8,
+        "field": false,
+        "w": 217.8,
+        "h": 5.4
+      },
+      {
+        "text": "El 2 por 100 de 03 (máximo: 660,14 euros por trimestre) o el 2 por 100 de 08 (máximo: 660,14 euros anuales) ..............",
+        "x": 123.9,
+        "y": 290.8,
+        "field": false,
+        "w": 306.6,
+        "h": 5.8
+      },
+      { "text": "15", "x": 434.8, "y": 310.5, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "16", "x": 434.8, "y": 290.8, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "17", "x": 434.8, "y": 280.9, "field": false, "w": 6.4, "h": 5.8 },
+      { "text": "18", "x": 434.8, "y": 261.2, "field": false, "w": 6.4, "h": 5.8 },
+      {
+        "text": "Si esta autoliquidación es complementaria de otra autoliquidación anterior co-",
+        "x": 331.1,
+        "y": 190.8,
+        "field": false,
+        "w": 186,
+        "h": 5.4
+      },
+      {
+        "text": "rrespondiente al mismo concepto, ejercicio y período, consigne una \"X\" en esta",
+        "x": 331.1,
+        "y": 183.9,
+        "field": false,
+        "w": 186.7,
+        "h": 5.3
+      },
+      { "text": "casilla.", "x": 331.1, "y": 177, "field": false, "w": 15.8, "h": 5.2 },
+      { "text": "Complementaria", "x": 317.3, "y": 130.8, "field": false, "w": 51.7, "h": 6.6 },
+      { "text": "(7)", "x": 317.3, "y": 183.8, "field": false, "w": 7.2, "h": 5.9 },
+      {
+        "text": "Nº de justificante:",
+        "x": 331.8,
+        "y": 130.8,
+        "field": false,
+        "w": 54.2,
+        "h": 6.4
+      },
+      {
+        "text": "En este caso, consigne a continuación el número de justificante identificativo",
+        "x": 331.1,
+        "y": 152.7,
+        "field": false,
+        "w": 185.4,
+        "h": 5.5
+      },
+      {
+        "text": "de la autoliquidación anterior.",
+        "x": 331.1,
+        "y": 145.3,
+        "field": false,
+        "w": 70.8,
+        "h": 5.4
+      },
+      {
+        "text": "Autoliquidación complementaria",
+        "x": 352.4,
+        "y": 165,
+        "field": false,
+        "w": 99.2,
+        "h": 6.4
+      },
+      {
+        "text": "Autoliquidación con resultado a deducir en los siguien-",
+        "x": 352.4,
+        "y": 221.9,
+        "field": false,
+        "w": 168.2,
+        "h": 6.4
+      },
+      {
+        "text": "tes pagos fraccionados del mismo ejercicio",
+        "x": 352.4,
+        "y": 215.3,
+        "field": false,
+        "w": 133.8,
+        "h": 6.5
+      },
+      {
+        "text": "Ingreso efectuado a favor del Tesoro público.",
+        "x": 94.3,
+        "y": 226.1,
+        "field": false,
+        "w": 114.6,
+        "h": 5.3
+      },
+      {
+        "text": "Cuenta restringida de colaboración en",
+        "x": 208.6,
+        "y": 226.1,
+        "field": false,
+        "w": 85.2,
+        "h": 5
+      },
+      {
+        "text": "la recaudación de la AEAT de autoliquidaciones.",
+        "x": 94.3,
+        "y": 219.6,
+        "field": false,
+        "w": 107.4,
+        "h": 5
+      },
+      { "text": "Importe del ingreso", "x": 94.3, "y": 207.4, "field": false, "w": 52.4, "h": 5.6 },
+      {
+        "text": "(casilla 19 ) ..........",
+        "x": 148.6,
+        "y": 207.4,
+        "field": false,
+        "w": 47.4,
+        "h": 5.8
+      },
+      { "text": "Forma de pago:", "x": 104.6, "y": 190.8, "field": false, "w": 38.5, "h": 5.5 },
+      { "text": "Ingreso", "x": 83, "y": 181.2, "field": false, "w": 22.7, "h": 6.3 },
+      { "text": "(4)", "x": 83, "y": 205.9, "field": false, "w": 7.2, "h": 5.9 },
+      { "text": "Código IBAN", "x": 104, "y": 177.2, "field": false, "w": 30.3, "h": 5.2 },
+      { "text": "A deducir", "x": 313.3, "y": 205.8, "field": false, "w": 29.5, "h": 6.4 },
+      { "text": "(5)", "x": 321.2, "y": 216.9, "field": false, "w": 7.2, "h": 5.9 },
+      {
+        "text": "Autoliquidación negativa",
+        "x": 141.3,
+        "y": 133.6,
+        "field": false,
+        "w": 75.4,
+        "h": 6.3
+      },
+      { "text": "Negativa", "x": 79.2, "y": 123.2, "field": false, "w": 27.5, "h": 6.6 },
+      { "text": "(6)", "x": 87.1, "y": 133.1, "field": false, "w": 7.2, "h": 5.9 },
+      { "text": "Nombre", "x": 97, "y": 617.6, "field": false, "w": 16.5, "h": 4.6 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 1 de 1", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "2026", "x": 389.3, "y": 630.6, "field": true },
+      { "text": "3T", "x": 477.1, "y": 630.6, "field": true },
+      { "text": "1.234,57", "x": 442.9, "y": 527.6, "field": true },
+      { "text": "2.469,14", "x": 442.9, "y": 517.8, "field": true },
+      { "text": "3.703,71", "x": 442.8, "y": 507.7, "field": true },
+      { "text": "4.938,28", "x": 442.8, "y": 498.1, "field": true },
+      { "text": "6.172,85", "x": 442.9, "y": 478.4, "field": true },
+      { "text": "7.407,42", "x": 442.9, "y": 458.7, "field": true },
+      { "text": "-8.641,99", "x": 443.2, "y": 438.9, "field": true },
+      { "text": "9.876,56", "x": 442.9, "y": 409.2, "field": true },
+      { "text": "11.111,13", "x": 442.9, "y": 399.4, "field": true },
+      { "text": "12.345,70", "x": 442.8, "y": 389.6, "field": true },
+      { "text": "13.580,27", "x": 443.2, "y": 379.7, "field": true },
+      { "text": "14.814,84", "x": 442.9, "y": 349.4, "field": true },
+      { "text": "16.049,41", "x": 442.9, "y": 339.5, "field": true },
+      { "text": "-17.283,98", "x": 442.8, "y": 329.7, "field": true },
+      { "text": "18.518,55", "x": 442.9, "y": 310, "field": true },
+      { "text": "19.753,12", "x": 442.9, "y": 290.2, "field": true },
+      { "text": "20.987,69", "x": 442.9, "y": 280.4, "field": true },
+      { "text": "22.222,26", "x": 442.9, "y": 260.7, "field": true },
+      { "text": "23.456,83", "x": 443.2, "y": 250.8, "field": true }
+    ]
+  ],
+  "303": [
+    [
+      { "text": "{", "x": 289, "y": 317.6, "field": false, "w": 4, "h": 12 },
+      {
+        "text": "Impuesto sobre el Valor Añadido",
+        "x": 289.2,
+        "y": 646.8,
+        "field": false,
+        "w": 143.5,
+        "h": 9.2
+      },
+      { "text": "Autoliquidación", "x": 289.2, "y": 634.9, "field": false, "w": 55, "h": 7.3 },
+      {
+        "text": "Ingreso del Impuesto sobre el Valor Añadido",
+        "x": 289.2,
+        "y": 625.2,
+        "field": false,
+        "w": 142.2,
+        "h": 6.7
+      },
+      {
+        "text": "a la importación liquidado por la Aduana.",
+        "x": 289.2,
+        "y": 618.5,
+        "field": false,
+        "w": 131.4,
+        "h": 6.7
+      },
+      { "text": "Devengo (2)", "x": 336.9, "y": 591.6, "field": false, "w": 34.2, "h": 6 },
+      {
+        "text": "Recargo equivalencia",
+        "x": 107.7,
+        "y": 263.7,
+        "field": false,
+        "w": 52.9,
+        "h": 5.5
+      },
+      {
+        "text": "..........................................................................",
+        "x": 161,
+        "y": 263.7,
+        "field": false,
+        "w": 123.4,
+        "h": 6
+      },
+      { "text": "{", "x": 288.8, "y": 247.8, "field": false, "w": 4.1, "h": 12.3 },
+      { "text": "Ejercicio", "x": 386.2, "y": 590.9, "field": false, "w": 19, "h": 5 },
+      { "text": "Período", "x": 452.6, "y": 590.9, "field": false, "w": 17.5, "h": 5 },
+      { "text": "Modelo", "x": 463.6, "y": 646.7, "field": false, "w": 20.6, "h": 5.9 },
+      { "text": "303", "x": 453, "y": 620.6, "field": false, "w": 37.4, "h": 22.4 },
+      { "text": "NIF", "x": 105.4, "y": 577.3, "field": false, "w": 7.2, "h": 4.5 },
+      {
+        "text": "Apellidos y nombre o Razón social",
+        "x": 184.5,
+        "y": 577.3,
+        "field": false,
+        "w": 77.1,
+        "h": 5
+      },
+      {
+        "text": "Vista previa: no sirve para presentar",
+        "x": 349.4,
+        "y": 556.2,
+        "field": false,
+        "w": 83.5,
+        "h": 5.2
+      },
+      { "text": "Liquidación (3)", "x": 110.2, "y": 386.4, "field": false, "w": 41.8, "h": 5.9 },
+      { "text": "IVA devengado", "x": 108.4, "y": 359, "field": false, "w": 42.4, "h": 5.9 },
+      { "text": "Régimen general", "x": 108, "y": 337.6, "field": false, "w": 42.1, "h": 5.5 },
+      {
+        "text": "...............................................................................",
+        "x": 150.9,
+        "y": 337.6,
+        "field": false,
+        "w": 131.8,
+        "h": 6
+      },
+      { "text": "IVA deducible", "x": 109.1, "y": 209, "field": false, "w": 38.8, "h": 5.9 },
+      { "text": "Base", "x": 375.3, "y": 206.7, "field": false, "w": 11.2, "h": 4.9 },
+      { "text": "Cuota", "x": 448.2, "y": 206.7, "field": false, "w": 13.2, "h": 4.9 },
+      {
+        "text": "Fecha en que se dictó el auto de declaración",
+        "x": 110.2,
+        "y": 441.3,
+        "field": false,
+        "w": 90,
+        "h": 4.5
+      },
+      { "text": "de concurso", "x": 110.2, "y": 435.3, "field": false, "w": 24.9, "h": 4.6 },
+      {
+        "text": "..............................................",
+        "x": 136.3,
+        "y": 435.3,
+        "field": false,
+        "w": 63.2,
+        "h": 4.9
+      },
+      {
+        "text": "Si se ha dictado auto de declaración de concurso en este",
+        "x": 110.2,
+        "y": 420.8,
+        "field": false,
+        "w": 115.5,
+        "h": 4.5
+      },
+      {
+        "text": "período indique el tipo de autoliquidación",
+        "x": 110.2,
+        "y": 414.8,
+        "field": false,
+        "w": 81.6,
+        "h": 4.5
+      },
+      {
+        "text": ".......................",
+        "x": 194.1,
+        "y": 414.8,
+        "field": false,
+        "w": 31.6,
+        "h": 4.9
+      },
+      { "text": "Preconcursal", "x": 234.4, "y": 423.1, "field": false, "w": 26, "h": 4.5 },
+      { "text": "Postconcursal", "x": 234.4, "y": 412.6, "field": false, "w": 28.5, "h": 4.5 },
+      { "text": "{", "x": 229.5, "y": 412.2, "field": false, "w": 2.2, "h": 6.6 },
+      { "text": "Identificación (1)", "x": 108.6, "y": 601.8, "field": false, "w": 48.4, "h": 6.1 },
+      { "text": "Régimen general", "x": 108.9, "y": 372, "field": false, "w": 49.1, "h": 6.1 },
+      { "text": "Día", "x": 214.5, "y": 446.6, "field": false, "w": 6.3, "h": 4 },
+      { "text": "Mes", "x": 227.9, "y": 446.6, "field": false, "w": 8.3, "h": 4.4 },
+      { "text": "Año", "x": 253.2, "y": 446.6, "field": false, "w": 7.6, "h": 4.3 },
+      {
+        "text": "Sujeto pasivo que tributa exclusivamente a una Administración tributaria",
+        "x": 114.7,
+        "y": 550.1,
+        "field": false,
+        "w": 162,
+        "h": 5.1
+      },
+      {
+        "text": "Foral con IVA a la importación liquidado por la Aduana pendiente de ingreso",
+        "x": 114.7,
+        "y": 544.1,
+        "field": false,
+        "w": 170.3,
+        "h": 5
+      },
+      {
+        "text": "Tributación exclusivamente foral.",
+        "x": 116.3,
+        "y": 556.5,
+        "field": false,
+        "w": 81.4,
+        "h": 5.1
+      },
+      {
+        "text": "Sujeto pasivo inscrito en el Registro de devolución mensual (art. 30 RIVA)",
+        "x": 101.6,
+        "y": 528,
+        "field": false,
+        "w": 165.6,
+        "h": 5.1
+      },
+      { "text": "............", "x": 267.1, "y": 528, "field": false, "w": 18.6, "h": 5.6 },
+      {
+        "text": "Sujeto pasivo que tributa exclusivamente en régimen simplificado",
+        "x": 101.6,
+        "y": 518.3,
+        "field": false,
+        "w": 147,
+        "h": 5.1
+      },
+      {
+        "text": "........................",
+        "x": 248.5,
+        "y": 518.3,
+        "field": false,
+        "w": 37.1,
+        "h": 5.6
+      },
+      {
+        "text": "Autoliquidación conjunta",
+        "x": 101.6,
+        "y": 508.6,
+        "field": false,
+        "w": 54.3,
+        "h": 5
+      },
+      {
+        "text": "....................................................................................",
+        "x": 155.7,
+        "y": 508.6,
+        "field": false,
+        "w": 129.9,
+        "h": 5.6
+      },
+      { "text": "Sujeto pasivo", "x": 101.6, "y": 498.9, "field": false, "w": 30.2, "h": 5 },
+      {
+        "text": "acogido al régimen especial del criterio de Caja (art. 163 undecies LIVA",
+        "x": 133.1,
+        "y": 498.9,
+        "field": false,
+        "w": 151,
+        "h": 4.8
+      },
+      { "text": "Sujeto pasivo", "x": 101.6, "y": 489.2, "field": false, "w": 30.2, "h": 5 },
+      {
+        "text": "destinatario de operaciones acogidas al régimen especial del criterio de caja",
+        "x": 133.1,
+        "y": 489.2,
+        "field": false,
+        "w": 153.8,
+        "h": 4.5
+      },
+      {
+        "text": "Opción por la aplicación de la prorrata especial (art. 103.Dos.1º LIVA)",
+        "x": 101.6,
+        "y": 479.5,
+        "field": false,
+        "w": 157.8,
+        "h": 5.1
+      },
+      { "text": ".................", "x": 259.3, "y": 479.5, "field": false, "w": 26.3, "h": 5.6 },
+      {
+        "text": "Revocación de la opción por la aplicación de la prorrata especial (art. 103.Dos.1º LIVA)",
+        "x": 101.6,
+        "y": 469.8,
+        "field": false,
+        "w": 186.4,
+        "h": 4.8
+      },
+      { "text": "Sujeto pasivo", "x": 101.6, "y": 460.2, "field": false, "w": 30.2, "h": 5 },
+      {
+        "text": "declarado en concurso de acreedores en el presente período de liquidación",
+        "x": 133.1,
+        "y": 460.2,
+        "field": false,
+        "w": 151.4,
+        "h": 4.5
+      },
+      {
+        "text": "Sujeto pasivo acogido voluntariamente al SII",
+        "x": 304.1,
+        "y": 526.9,
+        "field": false,
+        "w": 99.3,
+        "h": 5
+      },
+      {
+        "text": "..................................................",
+        "x": 404.6,
+        "y": 526.9,
+        "field": false,
+        "w": 77.3,
+        "h": 5.6
+      },
+      {
+        "text": "Sujeto pasivo exonerado de la Declaración-resumen anual del IVA, modelo 390",
+        "x": 304.1,
+        "y": 517.2,
+        "field": false,
+        "w": 177.6,
+        "h": 5
+      },
+      { "text": "Sujeto pasivo", "x": 304.1, "y": 507.5, "field": false, "w": 30.2, "h": 5 },
+      {
+        "text": "con volumen anual de operaciones distinto de cero (art. 121 LIVA)",
+        "x": 335.7,
+        "y": 507.5,
+        "field": false,
+        "w": 142.9,
+        "h": 4.9
+      },
+      { "text": "...", "x": 478.5, "y": 507.5, "field": false, "w": 4.4, "h": 5.3 },
+      {
+        "text": "Sujeto pasivo con derecho a deducir",
+        "x": 304.1,
+        "y": 497.8,
+        "field": false,
+        "w": 78.7,
+        "h": 4.9
+      },
+      {
+        "text": "pago a cuenta de entregas de gasolinas,",
+        "x": 384.2,
+        "y": 497.8,
+        "field": false,
+        "w": 87,
+        "h": 4.8
+      },
+      {
+        "text": "gasóleos y biocarburantes posteriores a la ultimación del régimen de depósito",
+        "x": 304.1,
+        "y": 491.8,
+        "field": false,
+        "w": 166.9,
+        "h": 4.8
+      },
+      {
+        "text": "distinto del aduanero",
+        "x": 304.1,
+        "y": 485.9,
+        "field": false,
+        "w": 44.4,
+        "h": 4.8
+      },
+      {
+        "text": "..........................................................................................",
+        "x": 350.8,
+        "y": 485.9,
+        "field": false,
+        "w": 131.5,
+        "h": 5.3
+      },
+      { "text": "150", "x": 296.1, "y": 359.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "151", "x": 370.7, "y": 359.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "152", "x": 418.4, "y": 359.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "165", "x": 296.1, "y": 350.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "166", "x": 370.7, "y": 350.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "167", "x": 418.4, "y": 350.2, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "01", "x": 297.4, "y": 341.3, "field": false, "w": 5, "h": 4.5 },
+      { "text": "02", "x": 371.9, "y": 341.3, "field": false, "w": 5, "h": 4.5 },
+      { "text": "03", "x": 419.7, "y": 341.3, "field": false, "w": 5, "h": 4.5 },
+      { "text": "153", "x": 296.1, "y": 332.3, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "154", "x": 370.7, "y": 332.3, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "155", "x": 418.4, "y": 332.3, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "04", "x": 297.4, "y": 323.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "05", "x": 371.9, "y": 323.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "06", "x": 419.7, "y": 323.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "07", "x": 297.4, "y": 314.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "08", "x": 371.9, "y": 314.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "09", "x": 419.7, "y": 314.4, "field": false, "w": 5, "h": 4.5 },
+      { "text": "156", "x": 295.9, "y": 280.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "157", "x": 370.5, "y": 280.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "158", "x": 418.2, "y": 280.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "168", "x": 295.9, "y": 271.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "169", "x": 370.5, "y": 271.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "170", "x": 418.2, "y": 271.6, "field": false, "w": 7.5, "h": 4.5 },
+      { "text": "16", "x": 297.1, "y": 262.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "17", "x": 371.7, "y": 262.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "18", "x": 419.4, "y": 262.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "19", "x": 297.1, "y": 253.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "20", "x": 371.7, "y": 253.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "21", "x": 419.4, "y": 253.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "22", "x": 297.2, "y": 245.5, "field": false, "w": 5, "h": 4.5 },
+      { "text": "23", "x": 371.8, "y": 245.5, "field": false, "w": 5, "h": 4.5 },
+      { "text": "24", "x": 419.5, "y": 245.5, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Adquisiciones intracomunitarias de bienes y servicios.",
+        "x": 108,
+        "y": 306.5,
+        "field": false,
+        "w": 134.6,
+        "h": 5.6
+      },
+      {
+        "text": "..........................",
+        "x": 243.8,
+        "y": 306.5,
+        "field": false,
+        "w": 43.4,
+        "h": 6
+      },
+      { "text": "10", "x": 296.5, "y": 306.5, "field": false, "w": 5, "h": 4.5 },
+      { "text": "11", "x": 419.4, "y": 306.5, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Otras operaciones con inversión del sujeto pasivo",
+        "x": 108,
+        "y": 297.5,
+        "field": false,
+        "w": 124.9,
+        "h": 5.7
+      },
+      { "text": "(", "x": 234, "y": 297.5, "field": false, "w": 1.4, "h": 4.2 },
+      {
+        "text": "excepto adq. intracom.",
+        "x": 235.4,
+        "y": 297.5,
+        "field": false,
+        "w": 47,
+        "h": 4.6
+      },
+      { "text": ")", "x": 281.9, "y": 297.5, "field": false, "w": 1.4, "h": 4.2 },
+      { "text": "...", "x": 284.3, "y": 297.5, "field": false, "w": 4.6, "h": 5.5 },
+      { "text": "12", "x": 296.5, "y": 297.5, "field": false, "w": 5, "h": 4.5 },
+      { "text": "13", "x": 418.8, "y": 297.5, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Modificación bases y cuotas",
+        "x": 108,
+        "y": 288.6,
+        "field": false,
+        "w": 70.7,
+        "h": 5.7
+      },
+      {
+        "text": "...............................................................",
+        "x": 180.2,
+        "y": 288.6,
+        "field": false,
+        "w": 105.1,
+        "h": 6
+      },
+      { "text": "14", "x": 296.5, "y": 288.6, "field": false, "w": 5, "h": 4.5 },
+      { "text": "15", "x": 418.8, "y": 288.6, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Modificaciones bases y cuotas del recargo de equivalencia",
+        "x": 107.9,
+        "y": 237.1,
+        "field": false,
+        "w": 146.9,
+        "h": 5.6
+      },
+      { "text": "..................", "x": 257.4, "y": 237.1, "field": false, "w": 30, "h": 6 },
+      { "text": "25", "x": 297.1, "y": 237.1, "field": false, "w": 5, "h": 4.5 },
+      { "text": "26", "x": 419.4, "y": 237.1, "field": false, "w": 5, "h": 4.5 },
+      { "text": "Base imponible", "x": 319.1, "y": 368.1, "field": false, "w": 34.3, "h": 5 },
+      { "text": "Tipo %", "x": 390.6, "y": 368.1, "field": false, "w": 14.9, "h": 4.8 },
+      { "text": "Cuota", "x": 451.2, "y": 368.1, "field": false, "w": 13.2, "h": 4.9 },
+      {
+        "text": "Total cuota devengada",
+        "x": 123,
+        "y": 223.5,
+        "field": false,
+        "w": 60.6,
+        "h": 5.6
+      },
+      {
+        "text": "(152 + 167 + 03 + 155",
+        "x": 184.7,
+        "y": 223.5,
+        "field": false,
+        "w": 57.9,
+        "h": 5.9
+      },
+      {
+        "text": "+ 06 + 09 + 11 + 13 + 15 + 158 + 170 + 18 + 21 + 24 + 26) ........",
+        "x": 246,
+        "y": 223.5,
+        "field": false,
+        "w": 170.6,
+        "h": 6
+      },
+      { "text": "27", "x": 419, "y": 223.5, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Por cuotas soportadas en operaciones interiores corrientes",
+        "x": 107.7,
+        "y": 197.6,
+        "field": false,
+        "w": 149.3,
+        "h": 5.7
+      },
+      {
+        "text": "...............................................",
+        "x": 257.2,
+        "y": 197.6,
+        "field": false,
+        "w": 78.4,
+        "h": 6
+      },
+      { "text": "28", "x": 344.7, "y": 197.6, "field": false, "w": 5, "h": 4.5 },
+      { "text": "29", "x": 419.3, "y": 197.6, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Por cuotas soportadas en operaciones interiores con bienes de inversión",
+        "x": 107.7,
+        "y": 188.6,
+        "field": false,
+        "w": 183.3,
+        "h": 5.7
+      },
+      {
+        "text": "...........................",
+        "x": 291.6,
+        "y": 188.6,
+        "field": false,
+        "w": 45,
+        "h": 6
+      },
+      { "text": "30", "x": 344.7, "y": 188.6, "field": false, "w": 5, "h": 4.5 },
+      { "text": "31", "x": 419.3, "y": 188.6, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Por cuotas soportadas en las importaciones de bienes corrientes",
+        "x": 107.7,
+        "y": 179.7,
+        "field": false,
+        "w": 163.6,
+        "h": 5.7
+      },
+      {
+        "text": "......................................",
+        "x": 272.7,
+        "y": 179.7,
+        "field": false,
+        "w": 63.4,
+        "h": 6
+      },
+      { "text": "32", "x": 344.7, "y": 179.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "33", "x": 419.3, "y": 179.7, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Por cuotas soportadas en las importaciones de bienes de inversión",
+        "x": 107.7,
+        "y": 170.7,
+        "field": false,
+        "w": 168.8,
+        "h": 5.7
+      },
+      {
+        "text": "...................................",
+        "x": 277.9,
+        "y": 170.7,
+        "field": false,
+        "w": 58.4,
+        "h": 6
+      },
+      { "text": "34", "x": 344.7, "y": 170.7, "field": false, "w": 5, "h": 4.5 },
+      { "text": "35", "x": 419.3, "y": 170.7, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "En adquisiciones intracomunitarias de bienes y servicios corrientes",
+        "x": 107.7,
+        "y": 161.8,
+        "field": false,
+        "w": 167.4,
+        "h": 5.6
+      },
+      {
+        "text": "....................................",
+        "x": 276.2,
+        "y": 161.8,
+        "field": false,
+        "w": 60,
+        "h": 6
+      },
+      { "text": "36", "x": 344.7, "y": 161.8, "field": false, "w": 5, "h": 4.5 },
+      { "text": "37", "x": 419.3, "y": 161.8, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "En adquisiciones intracomunitarias de bienes de inversión",
+        "x": 107.7,
+        "y": 152.8,
+        "field": false,
+        "w": 144.4,
+        "h": 5.6
+      },
+      {
+        "text": "..................................................",
+        "x": 252.1,
+        "y": 152.8,
+        "field": false,
+        "w": 83.4,
+        "h": 6
+      },
+      { "text": "38", "x": 344.7, "y": 152.8, "field": false, "w": 5, "h": 4.5 },
+      { "text": "39", "x": 419.3, "y": 152.8, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Rectificación de deducciones",
+        "x": 107.7,
+        "y": 143.9,
+        "field": false,
+        "w": 72.9,
+        "h": 5.6
+      },
+      {
+        "text": "...........................................................................................",
+        "x": 181.6,
+        "y": 143.9,
+        "field": false,
+        "w": 151.8,
+        "h": 6
+      },
+      { "text": "40", "x": 344.7, "y": 143.9, "field": false, "w": 5, "h": 4.5 },
+      { "text": "41", "x": 419.3, "y": 143.9, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Compensaciones Régimen Especial A.G. y P.",
+        "x": 108,
+        "y": 135,
+        "field": false,
+        "w": 113,
+        "h": 5.6
+      },
+      {
+        "text": "...............................................................................................................",
+        "x": 221.4,
+        "y": 135,
+        "field": false,
+        "w": 185.1,
+        "h": 6
+      },
+      { "text": "42", "x": 418.8, "y": 135, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Regularización bienes de inversión",
+        "x": 108,
+        "y": 126,
+        "field": false,
+        "w": 86.2,
+        "h": 5.6
+      },
+      {
+        "text": "..............................................................................................................................",
+        "x": 195.6,
+        "y": 126,
+        "field": false,
+        "w": 210.2,
+        "h": 6
+      },
+      { "text": "43", "x": 418.8, "y": 126, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Regularización por aplicación del porcentaje definitivo de prorrata",
+        "x": 108,
+        "y": 117.1,
+        "field": false,
+        "w": 164,
+        "h": 5.7
+      },
+      {
+        "text": ".................................................................................",
+        "x": 273,
+        "y": 117.1,
+        "field": false,
+        "w": 135.1,
+        "h": 6
+      },
+      { "text": "44", "x": 418.8, "y": 117.1, "field": false, "w": 5, "h": 4.5 },
+      { "text": "Total a deducir", "x": 160.3, "y": 103.5, "field": false, "w": 39, "h": 5.5 },
+      {
+        "text": "(29 + 31 + 33 + 35 + 37 + 39 + 41 + 42 + 43 + 44) ................................................",
+        "x": 200.5,
+        "y": 103.5,
+        "field": false,
+        "w": 214,
+        "h": 6
+      },
+      { "text": "45", "x": 419, "y": 103.5, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "Resultado régimen general",
+        "x": 157.5,
+        "y": 83.8,
+        "field": false,
+        "w": 75.2,
+        "h": 5.9
+      },
+      {
+        "text": "(27 - 45) ............................................................................................",
+        "x": 234.4,
+        "y": 83.8,
+        "field": false,
+        "w": 177.8,
+        "h": 6
+      },
+      { "text": "46", "x": 419, "y": 83.8, "field": false, "w": 5, "h": 4.5 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 1 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "2026", "x": 408.3, "y": 590.9, "field": true },
+      { "text": "3T", "x": 471.9, "y": 590.9, "field": true },
+      { "text": "1.234,57", "x": 304.5, "y": 359.2, "field": true },
+      { "text": "21,00", "x": 379.7, "y": 358.8, "field": true },
+      { "text": "3.703,71", "x": 427.5, "y": 358.8, "field": true },
+      { "text": "4.938,28", "x": 305.1, "y": 350.1, "field": true },
+      { "text": "21,00", "x": 379.7, "y": 350.1, "field": true },
+      { "text": "7.407,42", "x": 427.5, "y": 350.1, "field": true },
+      { "text": "-8.641,99", "x": 303.9, "y": 341.5, "field": true },
+      { "text": "21,00", "x": 378.5, "y": 341.5, "field": true },
+      { "text": "11.111,13", "x": 426.2, "y": 341.5, "field": true },
+      { "text": "12.345,70", "x": 305.1, "y": 332.5, "field": true },
+      { "text": "21,00", "x": 379.7, "y": 332.5, "field": true },
+      { "text": "14.814,84", "x": 427.5, "y": 332.5, "field": true },
+      { "text": "16.049,41", "x": 303.9, "y": 323.6, "field": true },
+      { "text": "21,00", "x": 378.5, "y": 323.6, "field": true },
+      { "text": "18.518,55", "x": 426.2, "y": 323.6, "field": true },
+      { "text": "19.753,12", "x": 303.9, "y": 314.6, "field": true },
+      { "text": "21,00", "x": 378.5, "y": 314.7, "field": true },
+      { "text": "22.222,26", "x": 426.2, "y": 314.6, "field": true },
+      { "text": "23.456,83", "x": 303, "y": 305.9, "field": true },
+      { "text": "24.691,40", "x": 425.9, "y": 305.9, "field": true },
+      { "text": "-25.925,97", "x": 303, "y": 296.9, "field": true },
+      { "text": "27.160,54", "x": 425.3, "y": 296.9, "field": true },
+      { "text": "28.395,11", "x": 303, "y": 288.4, "field": true },
+      { "text": "29.629,68", "x": 425.3, "y": 288.4, "field": true },
+      { "text": "30.864,25", "x": 304.9, "y": 280, "field": true },
+      { "text": "21,00", "x": 379.5, "y": 280, "field": true },
+      { "text": "33.333,39", "x": 427.2, "y": 280, "field": true },
+      { "text": "-34.567,96", "x": 304.9, "y": 271.1, "field": true },
+      { "text": "21,00", "x": 379.5, "y": 271.1, "field": true },
+      { "text": "37.037,10", "x": 427.2, "y": 271.1, "field": true },
+      { "text": "38.271,67", "x": 303.6, "y": 262.5, "field": true },
+      { "text": "21,00", "x": 378.2, "y": 262.5, "field": true },
+      { "text": "40.740,81", "x": 426, "y": 262.5, "field": true },
+      { "text": "41.975,38", "x": 303.6, "y": 254.3, "field": true },
+      { "text": "21,00", "x": 378.2, "y": 254.3, "field": true },
+      { "text": "44.444,52", "x": 426, "y": 254.3, "field": true },
+      { "text": "45.679,09", "x": 303.6, "y": 245.4, "field": true },
+      { "text": "21,00", "x": 378.2, "y": 245.4, "field": true },
+      { "text": "48.148,23", "x": 425.9, "y": 245.4, "field": true },
+      { "text": "49.382,80", "x": 304.5, "y": 237.3, "field": true },
+      { "text": "50.617,37", "x": 425.9, "y": 236.9, "field": true },
+      { "text": "-51.851,94", "x": 426.4, "y": 223.3, "field": true },
+      { "text": "53.086,51", "x": 351.9, "y": 198.3, "field": true },
+      { "text": "54.321,08", "x": 426.4, "y": 198.3, "field": true },
+      { "text": "55.555,65", "x": 351.2, "y": 188.5, "field": true },
+      { "text": "56.790,22", "x": 425.8, "y": 188.5, "field": true },
+      { "text": "58.024,79", "x": 351.2, "y": 179.6, "field": true },
+      { "text": "59.259,36", "x": 425.7, "y": 179.6, "field": true },
+      { "text": "-60.493,93", "x": 351.2, "y": 170.6, "field": true },
+      { "text": "61.728,50", "x": 425.8, "y": 170.6, "field": true },
+      { "text": "62.963,07", "x": 351.2, "y": 161.6, "field": true },
+      { "text": "64.197,64", "x": 425.8, "y": 161.6, "field": true },
+      { "text": "65.432,21", "x": 351.2, "y": 152.7, "field": true },
+      { "text": "66.666,78", "x": 425.8, "y": 152.7, "field": true },
+      { "text": "67.901,35", "x": 351.9, "y": 144.6, "field": true },
+      { "text": "-69.135,92", "x": 425.8, "y": 143.7, "field": true },
+      { "text": "70.370,49", "x": 425.3, "y": 134.8, "field": true },
+      { "text": "71.605,06", "x": 425.3, "y": 125.8, "field": true },
+      { "text": "72.839,63", "x": 426.4, "y": 117.5, "field": true },
+      { "text": "74.074,20", "x": 426, "y": 103.2, "field": true },
+      { "text": "75.308,77", "x": 426.1, "y": 83.5, "field": true }
+    ],
+    [
+      {
+        "text": "Actividades en régimen simplificado",
+        "x": 101.3,
+        "y": 566.5,
+        "field": false,
+        "w": 108.5,
+        "h": 6.3
+      },
+      {
+        "text": "(excepto agrícolas, ganaderas y forestales)",
+        "x": 211.8,
+        "y": 566.5,
+        "field": false,
+        "w": 91.2,
+        "h": 4.8
+      },
+      { "text": "Cuotas devengadas", "x": 87.9, "y": 214.7, "field": false, "w": 58.9, "h": 6.2 },
+      {
+        "text": "Total cuota resultante",
+        "x": 148.9,
+        "y": 181.1,
+        "field": false,
+        "w": 55.3,
+        "h": 5.3
+      },
+      { "text": ":", "x": 203.8, "y": 181.1, "field": false, "w": 1.8, "h": 5.4 },
+      { "text": "Si 1T, 2T, 3T:", "x": 212.1, "y": 181.1, "field": false, "w": 33.7, "h": 5.6 },
+      {
+        "text": "(47 + 51 + 52 + 53)",
+        "x": 251.9,
+        "y": 181.1,
+        "field": false,
+        "w": 50.6,
+        "h": 5.9
+      },
+      {
+        "text": "........................................................................",
+        "x": 302.7,
+        "y": 181.1,
+        "field": false,
+        "w": 118.6,
+        "h": 5.9
+      },
+      { "text": "Si 4T:", "x": 212.1, "y": 173.9, "field": false, "w": 14.3, "h": 5.5 },
+      {
+        "text": "(50 + 51 + 52 + 53)",
+        "x": 251.9,
+        "y": 173.9,
+        "field": false,
+        "w": 50.6,
+        "h": 5.9
+      },
+      {
+        "text": "........................................................................",
+        "x": 302.7,
+        "y": 173.9,
+        "field": false,
+        "w": 118.6,
+        "h": 5.9
+      },
+      { "text": "IVA deducible", "x": 89.9, "y": 156.3, "field": false, "w": 41.4, "h": 6.3 },
+      { "text": "Actividad B", "x": 95.9, "y": 554.2, "field": false, "w": 33.3, "h": 6.1 },
+      { "text": "1", "x": 129.2, "y": 552, "field": false, "w": 2.1, "h": 3.7 },
+      { "text": "Epígrafe IAE", "x": 155.7, "y": 553.2, "field": false, "w": 29.5, "h": 5.2 },
+      {
+        "text": "Nº unidades de módulo",
+        "x": 137.4,
+        "y": 537.1,
+        "field": false,
+        "w": 62.5,
+        "h": 6
+      },
+      { "text": "Importe", "x": 243.2, "y": 537.1, "field": false, "w": 20.7, "h": 6.1 },
+      {
+        "text": "Actividades agrícolas, ganaderas y forestales",
+        "x": 102.2,
+        "y": 664,
+        "field": false,
+        "w": 137,
+        "h": 6.3
+      },
+      { "text": "Código", "x": 104.9, "y": 647.1, "field": false, "w": 17, "h": 5.4 },
+      { "text": "Volumen ingresos", "x": 135.1, "y": 647.1, "field": false, "w": 42.7, "h": 5.3 },
+      { "text": "Índice cuota", "x": 197.9, "y": 647.1, "field": false, "w": 29, "h": 5.4 },
+      { "text": "Cuota devengada", "x": 241.6, "y": 647.1, "field": false, "w": 42.1, "h": 5.3 },
+      { "text": "1", "x": 90.1, "y": 399, "field": false, "w": 2.8, "h": 5.1 },
+      { "text": ", 2", "x": 90.1, "y": 404.5, "field": false, "w": 5.7, "h": 5.1 },
+      { "text": ", 3", "x": 90.1, "y": 413.3, "field": false, "w": 5.7, "h": 5.1 },
+      {
+        "text": "Régimen simplificado",
+        "x": 97.7,
+        "y": 677.3,
+        "field": false,
+        "w": 66.5,
+        "h": 6.4
+      },
+      { "text": "Actividad B", "x": 314.9, "y": 554.1, "field": false, "w": 33.3, "h": 6.1 },
+      { "text": "2", "x": 348.2, "y": 551.9, "field": false, "w": 2.1, "h": 3.7 },
+      { "text": "Epígrafe IAE", "x": 374.6, "y": 553.1, "field": false, "w": 29.5, "h": 5.2 },
+      { "text": "4T", "x": 89.5, "y": 290.3, "field": false, "w": 6, "h": 5.1 },
+      { "text": "1", "x": 89.8, "y": 609, "field": false, "w": 2.8, "h": 5.1 },
+      { "text": ", 2", "x": 89.8, "y": 614.6, "field": false, "w": 5.7, "h": 5.1 },
+      { "text": ", 3", "x": 89.8, "y": 623.3, "field": false, "w": 5.7, "h": 5.1 },
+      {
+        "text": "Porcentaje ingreso a cuenta",
+        "x": 97.6,
+        "y": 624.1,
+        "field": false,
+        "w": 67.3,
+        "h": 5.4
+      },
+      { "text": "Ingreso a cuenta", "x": 172.3, "y": 624.1, "field": false, "w": 40, "h": 5.4 },
+      { "text": "4T", "x": 90, "y": 589.1, "field": false, "w": 6, "h": 5.1 },
+      { "text": "Código", "x": 319.1, "y": 646.8, "field": false, "w": 17, "h": 5.4 },
+      { "text": "Volumen ingresos", "x": 350.1, "y": 646.8, "field": false, "w": 42.7, "h": 5.3 },
+      { "text": "Índice cuota", "x": 412.1, "y": 646.8, "field": false, "w": 29, "h": 5.4 },
+      { "text": "Cuota devengada", "x": 455, "y": 646.8, "field": false, "w": 42.1, "h": 5.3 },
+      { "text": "Actividad A", "x": 95.8, "y": 655.3, "field": false, "w": 33.2, "h": 6 },
+      { "text": "1", "x": 129, "y": 653.2, "field": false, "w": 2.1, "h": 3.7 },
+      { "text": "Actividad A", "x": 314.8, "y": 655.2, "field": false, "w": 33.2, "h": 6 },
+      { "text": "2", "x": 348, "y": 653.1, "field": false, "w": 2.1, "h": 3.7 },
+      { "text": "A", "x": 94.1, "y": 664.3, "field": false, "w": 4, "h": 5.5 },
+      { "text": "B", "x": 94, "y": 566.6, "field": false, "w": 4.1, "h": 5.7 },
+      { "text": "A", "x": 173.5, "y": 615.1, "field": false, "w": 2.6, "h": 3.9 },
+      { "text": "%", "x": 134.5, "y": 614.7, "field": false, "w": 4, "h": 4.5 },
+      { "text": "1T, 2T, 3T", "x": 304.7, "y": 609.9, "field": false, "w": 22.9, "h": 5 },
+      { "text": "Cuota soportada", "x": 331.2, "y": 602.5, "field": false, "w": 39.9, "h": 5.4 },
+      {
+        "text": "Cuota anual derivada",
+        "x": 391.6,
+        "y": 602.5,
+        "field": false,
+        "w": 50.3,
+        "h": 5.3
+      },
+      {
+        "text": "operaciones corrientes",
+        "x": 326.3,
+        "y": 596.1,
+        "field": false,
+        "w": 55.3,
+        "h": 5.5
+      },
+      {
+        "text": "del Régimen simplificado",
+        "x": 388.3,
+        "y": 596.1,
+        "field": false,
+        "w": 59.5,
+        "h": 5.4
+      },
+      { "text": "4T", "x": 304.8, "y": 589.4, "field": false, "w": 5.6, "h": 4.8 },
+      { "text": "%", "x": 349.3, "y": 614.7, "field": false, "w": 4, "h": 4.5 },
+      { "text": "Actividades", "x": 98.8, "y": 232.4, "field": false, "w": 29.7, "h": 5.3 },
+      { "text": "A + B", "x": 103.6, "y": 240.4, "field": false, "w": 13.8, "h": 5.3 },
+      {
+        "text": "Porcentaje ingreso a cuenta",
+        "x": 311.1,
+        "y": 623.6,
+        "field": false,
+        "w": 67.3,
+        "h": 5.4
+      },
+      { "text": "Ingreso a cuenta", "x": 385.8, "y": 623.6, "field": false, "w": 40, "h": 5.4 },
+      { "text": "Cuota soportada", "x": 115.2, "y": 603.1, "field": false, "w": 39.9, "h": 5.4 },
+      {
+        "text": "Cuota anual derivada",
+        "x": 175.6,
+        "y": 603.1,
+        "field": false,
+        "w": 50.3,
+        "h": 5.3
+      },
+      {
+        "text": "operaciones corrientes",
+        "x": 110.3,
+        "y": 596.7,
+        "field": false,
+        "w": 55.3,
+        "h": 5.5
+      },
+      {
+        "text": "del Régimen simplificado",
+        "x": 172.3,
+        "y": 596.7,
+        "field": false,
+        "w": 59.5,
+        "h": 5.4
+      },
+      {
+        "text": "* Ver instrucciones para actividades de temporada y accesorias",
+        "x": 97.4,
+        "y": 390.5,
+        "field": false,
+        "w": 135.5,
+        "h": 4.8
+      },
+      {
+        "text": "* Ver instrucciones para actividades de temporada y accesorias",
+        "x": 311.6,
+        "y": 390.1,
+        "field": false,
+        "w": 135.5,
+        "h": 4.8
+      },
+      { "text": "Página 2", "x": 478.5, "y": 706.9, "field": false, "w": 29.6, "h": 7.2 },
+      { "text": "Modelo", "x": 92, "y": 710.4, "field": false, "w": 14.5, "h": 4.4 },
+      { "text": "303", "x": 88.2, "y": 698.5, "field": false, "w": 18.5, "h": 11.1 },
+      { "text": "NIF", "x": 126.5, "y": 708.8, "field": false, "w": 6.9, "h": 4.3 },
+      {
+        "text": "Apellidos y Nombre o Razón social",
+        "x": 212.3,
+        "y": 708.8,
+        "field": false,
+        "w": 75,
+        "h": 4.8
+      },
+      { "text": "B", "x": 173.4, "y": 586.3, "field": false, "w": 2.8, "h": 4.2 },
+      { "text": "A", "x": 388.4, "y": 615.1, "field": false, "w": 2.6, "h": 3.9 },
+      { "text": "B", "x": 388.3, "y": 586.5, "field": false, "w": 2.8, "h": 4.2 },
+      { "text": "54", "x": 427, "y": 175.9, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "%", "x": 484.1, "y": 314.4, "field": false, "w": 4, "h": 4.5 },
+      { "text": "%", "x": 269.4, "y": 314.4, "field": false, "w": 4, "h": 4.5 },
+      { "text": "%", "x": 484.3, "y": 409.6, "field": false, "w": 4, "h": 4.5 },
+      { "text": "%", "x": 269.5, "y": 410, "field": false, "w": 4, "h": 4.5 },
+      { "text": "Módulo 1", "x": 107.9, "y": 526.3, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 2", "x": 107.9, "y": 516.7, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 3", "x": 107.9, "y": 507.2, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 4", "x": 107.9, "y": 497.6, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 5", "x": 107.9, "y": 488.1, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 6", "x": 107.9, "y": 478.6, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 7", "x": 107.9, "y": 469, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 1", "x": 322.1, "y": 526.3, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 2", "x": 322.1, "y": 516.7, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 3", "x": 322.1, "y": 507.2, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 4", "x": 322.1, "y": 497.6, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 5", "x": 322.1, "y": 488.1, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 6", "x": 322.1, "y": 478.6, "field": false, "w": 22.3, "h": 5.4 },
+      { "text": "Módulo 7", "x": 322.1, "y": 469, "field": false, "w": 22.3, "h": 5.4 },
+      {
+        "text": "Nº unidades de módulo",
+        "x": 351.9,
+        "y": 537.1,
+        "field": false,
+        "w": 62.5,
+        "h": 6
+      },
+      { "text": "Importe", "x": 457.7, "y": 537.1, "field": false, "w": 20.7, "h": 6.1 },
+      {
+        "text": "Cuota devengada operaciones corrientes",
+        "x": 95.9,
+        "y": 452.6,
+        "field": false,
+        "w": 99.1,
+        "h": 5.4
+      },
+      { "text": "......", "x": 196, "y": 452.6, "field": false, "w": 11.1, "h": 6.7 },
+      { "text": "C", "x": 213.6, "y": 452.6, "field": false, "w": 2.9, "h": 4 },
+      { "text": "Reducciones", "x": 95.9, "y": 440.6, "field": false, "w": 30.5, "h": 5.3 },
+      {
+        "text": "...........................................",
+        "x": 127.4,
+        "y": 440.6,
+        "field": false,
+        "w": 79.7,
+        "h": 6.7
+      },
+      { "text": "D", "x": 213.6, "y": 440.6, "field": false, "w": 2.9, "h": 4 },
+      {
+        "text": "Cuota devengada operaciones corrientes",
+        "x": 314.9,
+        "y": 452.3,
+        "field": false,
+        "w": 99.1,
+        "h": 5.4
+      },
+      { "text": "....", "x": 415, "y": 452.3, "field": false, "w": 7.4, "h": 6.7 },
+      { "text": "C", "x": 428.6, "y": 452.3, "field": false, "w": 2.9, "h": 4 },
+      { "text": "Reducciones", "x": 314.9, "y": 440.4, "field": false, "w": 30.5, "h": 5.3 },
+      {
+        "text": ".........................................",
+        "x": 346.4,
+        "y": 440.4,
+        "field": false,
+        "w": 76,
+        "h": 6.7
+      },
+      { "text": "D", "x": 428.6, "y": 440.4, "field": false, "w": 2.9, "h": 4 },
+      {
+        "text": "Índice corrector de actividades de temporada",
+        "x": 98,
+        "y": 421.9,
+        "field": false,
+        "w": 109.7,
+        "h": 5.5
+      },
+      { "text": ".......", "x": 209.2, "y": 421.9, "field": false, "w": 13, "h": 6.7 },
+      { "text": "Z", "x": 230.3, "y": 421.9, "field": false, "w": 2.5, "h": 4.1 },
+      {
+        "text": "Porcentaje ingreso a cuenta",
+        "x": 98,
+        "y": 410,
+        "field": false,
+        "w": 67.6,
+        "h": 5.4
+      },
+      {
+        "text": "..................................",
+        "x": 167.2,
+        "y": 410,
+        "field": false,
+        "w": 56,
+        "h": 5.9
+      },
+      { "text": "E", "x": 230.2, "y": 410, "field": false, "w": 2.6, "h": 3.9 },
+      {
+        "text": "Índice corrector de actividades de temporada",
+        "x": 311.7,
+        "y": 421.7,
+        "field": false,
+        "w": 109.7,
+        "h": 5.5
+      },
+      { "text": ".......", "x": 422.9, "y": 421.7, "field": false, "w": 13, "h": 6.7 },
+      { "text": "Z", "x": 444, "y": 421.7, "field": false, "w": 2.5, "h": 4.1 },
+      {
+        "text": "Porcentaje ingreso a cuenta",
+        "x": 311.7,
+        "y": 409.8,
+        "field": false,
+        "w": 67.6,
+        "h": 5.4
+      },
+      {
+        "text": "..................................",
+        "x": 380.9,
+        "y": 409.8,
+        "field": false,
+        "w": 56,
+        "h": 5.9
+      },
+      { "text": "E", "x": 443.9, "y": 409.8, "field": false, "w": 2.6, "h": 3.9 },
+      {
+        "text": "Ingreso a cuenta* ([C] - [D]) x [E]",
+        "x": 97,
+        "y": 397.8,
+        "field": false,
+        "w": 77.6,
+        "h": 5.3
+      },
+      {
+        "text": ".....................",
+        "x": 174.5,
+        "y": 397.8,
+        "field": false,
+        "w": 34.6,
+        "h": 5.9
+      },
+      { "text": "F", "x": 214.3, "y": 397.8, "field": false, "w": 2.3, "h": 3.8 },
+      {
+        "text": "Ingreso a cuenta* ([C] - [D]) x [E]",
+        "x": 312.1,
+        "y": 397.5,
+        "field": false,
+        "w": 77.6,
+        "h": 5.3
+      },
+      {
+        "text": ".....................",
+        "x": 389.6,
+        "y": 397.5,
+        "field": false,
+        "w": 34.6,
+        "h": 5.9
+      },
+      { "text": "F", "x": 429.4, "y": 397.5, "field": false, "w": 2.3, "h": 3.8 },
+      {
+        "text": "Suma de ingresos a cuenta del conjunto de actividades (A",
+        "x": 87.9,
+        "y": 370.4,
+        "field": false,
+        "w": 138.8,
+        "h": 5.4
+      },
+      { "text": "1", "x": 226.7, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ A", "x": 230.2, "y": 370.4, "field": false, "w": 8.6, "h": 5.6 },
+      { "text": "2", "x": 238.9, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ A", "x": 242.4, "y": 370.4, "field": false, "w": 8.6, "h": 5.6 },
+      { "text": "3", "x": 251.1, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ ... + F", "x": 254.6, "y": 370.4, "field": false, "w": 20.6, "h": 6 },
+      { "text": "1", "x": 274.8, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ F", "x": 278.4, "y": 370.4, "field": false, "w": 8.2, "h": 5.6 },
+      { "text": "2", "x": 286.6, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ F", "x": 290.2, "y": 370.4, "field": false, "w": 8.2, "h": 5.6 },
+      { "text": "3", "x": 298.4, "y": 368.3, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ ... )", "x": 302, "y": 370.4, "field": false, "w": 13.9, "h": 6 },
+      {
+        "text": ".................................................................",
+        "x": 317,
+        "y": 370.4,
+        "field": false,
+        "w": 107.1,
+        "h": 5.9
+      },
+      { "text": "47", "x": 427, "y": 370.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Cuotas soportadas operaciones corrientes",
+        "x": 98,
+        "y": 353.5,
+        "field": false,
+        "w": 102.3,
+        "h": 5.4
+      },
+      { "text": "....", "x": 201.8, "y": 353.5, "field": false, "w": 6.6, "h": 5.9 },
+      { "text": "G", "x": 213.4, "y": 353.5, "field": false, "w": 3, "h": 3.9 },
+      {
+        "text": "RESULTADO ( [C] - [D] - [G] ) x [H]",
+        "x": 98,
+        "y": 326.9,
+        "field": false,
+        "w": 80,
+        "h": 5.1
+      },
+      {
+        "text": "...................",
+        "x": 177.1,
+        "y": 326.9,
+        "field": false,
+        "w": 31.3,
+        "h": 5.9
+      },
+      {
+        "text": "Devolución cuotas soportadas otros países",
+        "x": 98,
+        "y": 302.7,
+        "field": false,
+        "w": 105.6,
+        "h": 5.5
+      },
+      { "text": "...", "x": 203.4, "y": 302.7, "field": false, "w": 4.9, "h": 5.9 },
+      { "text": "K", "x": 213.4, "y": 302.7, "field": false, "w": 2.7, "h": 4 },
+      { "text": "Cuota mínima", "x": 98, "y": 293.1, "field": false, "w": 32.7, "h": 5.3 },
+      {
+        "text": "...............................................",
+        "x": 130.9,
+        "y": 293.1,
+        "field": false,
+        "w": 77.4,
+        "h": 5.9
+      },
+      { "text": "L", "x": 213.6, "y": 293.1, "field": false, "w": 2.4, "h": 4.3 },
+      {
+        "text": "Cuota anual derivada régimen simplificado",
+        "x": 98,
+        "y": 280.4,
+        "field": false,
+        "w": 95.8,
+        "h": 5.1
+      },
+      { "text": ".........", "x": 194.4, "y": 280.4, "field": false, "w": 14, "h": 5.6 },
+      { "text": "M", "x": 213.1, "y": 280.4, "field": false, "w": 3.4, "h": 4.1 },
+      {
+        "text": "Índice corrector de actividades de temporada",
+        "x": 98.1,
+        "y": 340,
+        "field": false,
+        "w": 109.7,
+        "h": 5.5
+      },
+      { "text": "........", "x": 209.4, "y": 340, "field": false, "w": 14.8, "h": 6.7 },
+      { "text": "H", "x": 229.4, "y": 340, "field": false, "w": 2.9, "h": 4 },
+      {
+        "text": "Porcentaje cuota mínima",
+        "x": 98.1,
+        "y": 314.8,
+        "field": false,
+        "w": 59.6,
+        "h": 5.4
+      },
+      {
+        "text": "........................................",
+        "x": 157.5,
+        "y": 314.8,
+        "field": false,
+        "w": 65.9,
+        "h": 5.9
+      },
+      { "text": "J", "x": 229.9, "y": 314.8, "field": false, "w": 1.9, "h": 3.8 },
+      {
+        "text": "Cuotas soportadas operaciones corrientes",
+        "x": 312.5,
+        "y": 353.5,
+        "field": false,
+        "w": 102.3,
+        "h": 5.4
+      },
+      { "text": "....", "x": 416.3, "y": 353.5, "field": false, "w": 6.6, "h": 5.9 },
+      { "text": "G", "x": 427.8, "y": 353.5, "field": false, "w": 3, "h": 3.9 },
+      {
+        "text": "RESULTADO ( [C] - [D] - [G] ) x [H]",
+        "x": 312.5,
+        "y": 326.9,
+        "field": false,
+        "w": 80,
+        "h": 5.1
+      },
+      {
+        "text": "...................",
+        "x": 391.6,
+        "y": 326.9,
+        "field": false,
+        "w": 31.3,
+        "h": 5.9
+      },
+      {
+        "text": "Devolución cuotas soportadas otros países",
+        "x": 312.5,
+        "y": 303,
+        "field": false,
+        "w": 105.6,
+        "h": 5.5
+      },
+      { "text": "...", "x": 417.9, "y": 303, "field": false, "w": 4.9, "h": 5.9 },
+      { "text": "K", "x": 427.9, "y": 303, "field": false, "w": 2.7, "h": 4 },
+      { "text": "Cuota mínima", "x": 312.5, "y": 293.4, "field": false, "w": 32.7, "h": 5.3 },
+      {
+        "text": "...............................................",
+        "x": 345.4,
+        "y": 293.4,
+        "field": false,
+        "w": 77.4,
+        "h": 5.9
+      },
+      { "text": "L", "x": 428.1, "y": 293.4, "field": false, "w": 2.4, "h": 4.3 },
+      {
+        "text": "Cuota anual derivada régimen simplificado",
+        "x": 312.5,
+        "y": 280.7,
+        "field": false,
+        "w": 95.8,
+        "h": 5.1
+      },
+      { "text": ".........", "x": 408.9, "y": 280.7, "field": false, "w": 14, "h": 5.6 },
+      { "text": "M", "x": 427.5, "y": 280.7, "field": false, "w": 3.4, "h": 4.1 },
+      {
+        "text": "Índice corrector de actividades de temporada",
+        "x": 312.6,
+        "y": 340,
+        "field": false,
+        "w": 109.7,
+        "h": 5.5
+      },
+      { "text": "........", "x": 423.8, "y": 340, "field": false, "w": 14.8, "h": 6.7 },
+      { "text": "H", "x": 443.9, "y": 340, "field": false, "w": 2.9, "h": 4 },
+      {
+        "text": "Porcentaje cuota mínima",
+        "x": 312.6,
+        "y": 314.8,
+        "field": false,
+        "w": 59.6,
+        "h": 5.4
+      },
+      {
+        "text": "........................................",
+        "x": 371.9,
+        "y": 314.8,
+        "field": false,
+        "w": 65.9,
+        "h": 5.9
+      },
+      { "text": "J", "x": 444.4, "y": 314.8, "field": false, "w": 1.9, "h": 3.8 },
+      {
+        "text": "Suma de cuotas derivadas régimen simplificado del conjunto de actividades ( B",
+        "x": 110,
+        "y": 259.3,
+        "field": false,
+        "w": 190,
+        "h": 5.4
+      },
+      { "text": "1", "x": 299.9, "y": 257.2, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ B", "x": 303.5, "y": 259.3, "field": false, "w": 8.8, "h": 5.8 },
+      { "text": "2", "x": 312.3, "y": 257.2, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ ... + M", "x": 315.1, "y": 259.3, "field": false, "w": 22.1, "h": 6 },
+      { "text": "1", "x": 336.8, "y": 257.2, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ M", "x": 340.4, "y": 259.3, "field": false, "w": 9.7, "h": 5.7 },
+      { "text": "2", "x": 350, "y": 257.2, "field": false, "w": 1.9, "h": 3.4 },
+      { "text": "+ ... )", "x": 353.6, "y": 259.3, "field": false, "w": 13.9, "h": 6 },
+      {
+        "text": ".................................",
+        "x": 368.7,
+        "y": 259.3,
+        "field": false,
+        "w": 54.4,
+        "h": 5.9
+      },
+      { "text": "48", "x": 427.5, "y": 259.3, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Suma de ingresos a cuenta realizados en el ejercicio",
+        "x": 110,
+        "y": 245,
+        "field": false,
+        "w": 126.3,
+        "h": 5.4
+      },
+      {
+        "text": "................................................................................................................",
+        "x": 238.5,
+        "y": 245,
+        "field": false,
+        "w": 184.5,
+        "h": 5.9
+      },
+      { "text": "49", "x": 427.5, "y": 245, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "Resultado (48 - 49)", "x": 110, "y": 230.7, "field": false, "w": 51.6, "h": 5.8 },
+      {
+        "text": "...................................................................................................................................................",
+        "x": 161.6,
+        "y": 230.7,
+        "field": false,
+        "w": 261.5,
+        "h": 6.4
+      },
+      { "text": "50", "x": 427.5, "y": 230.7, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Adquisiciones intracomunitarias de bienes",
+        "x": 88.9,
+        "y": 207.8,
+        "field": false,
+        "w": 100.4,
+        "h": 5.4
+      },
+      {
+        "text": ".............................................................................................................................................",
+        "x": 189.4,
+        "y": 207.8,
+        "field": false,
+        "w": 232.3,
+        "h": 5.9
+      },
+      { "text": "51", "x": 427.2, "y": 207.8, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Entregas de activos fijos",
+        "x": 88.9,
+        "y": 198.2,
+        "field": false,
+        "w": 59,
+        "h": 5.4
+      },
+      {
+        "text": "......................................................................................................................................................................",
+        "x": 148.2,
+        "y": 198.2,
+        "field": false,
+        "w": 273.5,
+        "h": 5.9
+      },
+      { "text": "52", "x": 427.2, "y": 198.2, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "IVA devengado por inversión del sujeto pasivo",
+        "x": 88.9,
+        "y": 188.7,
+        "field": false,
+        "w": 110.8,
+        "h": 5.4
+      },
+      {
+        "text": ".......................................................................................................................................",
+        "x": 199.3,
+        "y": 188.7,
+        "field": false,
+        "w": 222.4,
+        "h": 5.9
+      },
+      { "text": "53", "x": 427.2, "y": 188.7, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Adquisición o importación de activos fijos",
+        "x": 88.9,
+        "y": 146.6,
+        "field": false,
+        "w": 99.3,
+        "h": 5.4
+      },
+      {
+        "text": ".............................................................................................................................................",
+        "x": 189.4,
+        "y": 146.6,
+        "field": false,
+        "w": 232.3,
+        "h": 5.9
+      },
+      { "text": "55", "x": 427.2, "y": 146.6, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Regularización bienes de inversión",
+        "x": 88.9,
+        "y": 137,
+        "field": false,
+        "w": 82.7,
+        "h": 5.3
+      },
+      {
+        "text": ".......................................................................................................................................................",
+        "x": 173,
+        "y": 137,
+        "field": false,
+        "w": 248.8,
+        "h": 5.9
+      },
+      { "text": "56", "x": 427.2, "y": 137, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Total IVA deducible (55 + 56)",
+        "x": 146.5,
+        "y": 127.5,
+        "field": false,
+        "w": 75.5,
+        "h": 5.6
+      },
+      {
+        "text": "................................................................................................................",
+        "x": 222.4,
+        "y": 127.5,
+        "field": false,
+        "w": 199.3,
+        "h": 6.4
+      },
+      { "text": "57", "x": 427.2, "y": 127.5, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Resultado régimen simplificado (54 - 57)",
+        "x": 147.2,
+        "y": 105.4,
+        "field": false,
+        "w": 109.3,
+        "h": 5.7
+      },
+      {
+        "text": ".............................................................................................",
+        "x": 257.5,
+        "y": 105.4,
+        "field": false,
+        "w": 165.5,
+        "h": 6.4
+      },
+      { "text": "58", "x": 427.4, "y": 105.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 2 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "76.543,34", "x": 434.7, "y": 370.7, "field": true },
+      { "text": "-77.777,91", "x": 434.7, "y": 259.2, "field": true },
+      { "text": "79.012,48", "x": 434.5, "y": 244.4, "field": true },
+      { "text": "80.247,05", "x": 434.5, "y": 230.3, "field": true },
+      { "text": "81.481,62", "x": 434.8, "y": 207.2, "field": true },
+      { "text": "82.716,19", "x": 434.8, "y": 197.6, "field": true },
+      { "text": "83.950,76", "x": 434.8, "y": 188.5, "field": true },
+      { "text": "85.185,33", "x": 434.7, "y": 175.3, "field": true },
+      { "text": "-86.419,90", "x": 434.7, "y": 146, "field": true },
+      { "text": "87.654,47", "x": 434.7, "y": 136.4, "field": true },
+      { "text": "88.889,04", "x": 434.7, "y": 126.9, "field": true },
+      { "text": "90.123,61", "x": 434.7, "y": 104.8, "field": true }
+    ],
+    [
+      { "text": "Información adicional", "x": 94.4, "y": 685.3, "field": false, "w": 67, "h": 6.5 },
+      { "text": "Resultado", "x": 96.2, "y": 527.6, "field": false, "w": 30.5, "h": 6.3 },
+      {
+        "text": "Exclusivamente para sujetos pasivos que tributan conjun",
+        "x": 91,
+        "y": 405.2,
+        "field": false,
+        "w": 96,
+        "h": 3.8
+      },
+      { "text": "-", "x": 186.9, "y": 405.2, "field": false, "w": 0.8, "h": 2.4 },
+      {
+        "text": "tamente a la Administración del Estado y a las Haciendas",
+        "x": 91,
+        "y": 400.4,
+        "field": false,
+        "w": 97.2,
+        "h": 3.8
+      },
+      {
+        "text": "Forales. Resultado de la regularización anual.",
+        "x": 91,
+        "y": 395.7,
+        "field": false,
+        "w": 77.2,
+        "h": 3.8
+      },
+      { "text": "euros", "x": 175.6, "y": 386.4, "field": false, "w": 13, "h": 5.2 },
+      { "text": "Base imponible", "x": 372.1, "y": 590.5, "field": false, "w": 36.5, "h": 5.3 },
+      { "text": "Cuota", "x": 461.2, "y": 590.5, "field": false, "w": 14, "h": 5.2 },
+      {
+        "text": "Si esta autoliquidación es rectificativa de otra autoliquidación anterior correspondiente al mismo concepto, ejercicio y período, indíquelo marcando con una \"X\" esta casilla.",
+        "x": 102.4,
+        "y": 204.8,
+        "field": false,
+        "w": 404.8,
+        "h": 5.3
+      },
+      {
+        "text": "Autoliquidación rectificativa",
+        "x": 153.8,
+        "y": 187.9,
+        "field": false,
+        "w": 73.3,
+        "h": 6.1
+      },
+      {
+        "text": "En este caso, consigne a continuación el número de justificante identificativo de la autoliquidación anterior.",
+        "x": 101.7,
+        "y": 168.9,
+        "field": false,
+        "w": 256.4,
+        "h": 5.4
+      },
+      {
+        "text": "Nº. de justificante",
+        "x": 417.3,
+        "y": 182.1,
+        "field": false,
+        "w": 42.4,
+        "h": 5.5
+      },
+      { "text": "Página 3", "x": 478.5, "y": 706.9, "field": false, "w": 29.6, "h": 7.2 },
+      { "text": "Modelo", "x": 92, "y": 710.4, "field": false, "w": 14.5, "h": 4.4 },
+      { "text": "303", "x": 88.2, "y": 698.5, "field": false, "w": 18.5, "h": 11.1 },
+      { "text": "NIF", "x": 126.5, "y": 708.8, "field": false, "w": 6.9, "h": 4.3 },
+      {
+        "text": "Apellidos y Nombre o Razón social",
+        "x": 212.3,
+        "y": 708.8,
+        "field": false,
+        "w": 75,
+        "h": 4.8
+      },
+      {
+        "text": "(No se incluyen las cuotas a compensar generadas en este periodo)",
+        "x": 91.8,
+        "y": 423.8,
+        "field": false,
+        "w": 122.6,
+        "h": 4.1
+      },
+      { "text": "68", "x": 94.6, "y": 385.3, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Regularización cuotas art. 80.Cinco.5ª LIVA .........................................................................................................................................",
+        "x": 88.2,
+        "y": 510.6,
+        "field": false,
+        "w": 333.5,
+        "h": 5.8
+      },
+      { "text": "76", "x": 428.9, "y": 510.6, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Suma de resultados (46 + 58 + 76) ....................................................................................................................................................",
+        "x": 88.2,
+        "y": 497.1,
+        "field": false,
+        "w": 332.8,
+        "h": 5.9
+      },
+      { "text": "64", "x": 428.9, "y": 497.1, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Atribuible a la Administración del Estado ..............",
+        "x": 88.2,
+        "y": 483.6,
+        "field": false,
+        "w": 100.9,
+        "h": 4.6
+      },
+      { "text": "66", "x": 428.9, "y": 483.6, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "IVA a la importación liquidado por la Aduana pendiente de ingreso ..........................................................................................................",
+        "x": 88.2,
+        "y": 470.1,
+        "field": false,
+        "w": 333.1,
+        "h": 5.6
+      },
+      { "text": "77", "x": 428.9, "y": 470.1, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Cuotas a compensar pendientes de periodos anteriores.........................................................................................................................",
+        "x": 88.2,
+        "y": 456.6,
+        "field": false,
+        "w": 332.7,
+        "h": 5.7
+      },
+      { "text": "110", "x": 427.6, "y": 456.6, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Cuotas a compensar de periodos anteriores aplicadas en este periodo",
+        "x": 88.2,
+        "y": 443.1,
+        "field": false,
+        "w": 169,
+        "h": 5.4
+      },
+      {
+        "text": "...................................................................................................",
+        "x": 258,
+        "y": 443.1,
+        "field": false,
+        "w": 163.1,
+        "h": 5.9
+      },
+      { "text": "78", "x": 428.9, "y": 443.1, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Cuotas a compensar de periodos previos pendientes para periodos posteriores (110 - 78) .....................................................................",
+        "x": 88.2,
+        "y": 429.6,
+        "field": false,
+        "w": 332.8,
+        "h": 5.6
+      },
+      { "text": "87", "x": 428.9, "y": 429.6, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "65", "x": 194.3, "y": 484.2, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "%", "x": 230.1, "y": 484.1, "field": false, "w": 4, "h": 4.5 },
+      {
+        "text": "Entregas intracomunitarias de bienes y servicios ...................................................................................................................................",
+        "x": 88.2,
+        "y": 671.3,
+        "field": false,
+        "w": 332.7,
+        "h": 5.7
+      },
+      { "text": "59", "x": 428.9, "y": 671.3, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Exportaciones y operaciones asimiladas ...............................................................................................................................................",
+        "x": 88.2,
+        "y": 657.8,
+        "field": false,
+        "w": 332.6,
+        "h": 5.7
+      },
+      { "text": "60", "x": 428.9, "y": 657.8, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones no sujetas por reglas de localización (excepto las incluidas en la casilla 123) .......................................................................",
+        "x": 88.2,
+        "y": 644.3,
+        "field": false,
+        "w": 333,
+        "h": 5.6
+      },
+      { "text": "120", "x": 427.6, "y": 644.3, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones sujetas con inversión del sujeto pasivo .............................................................................................................................",
+        "x": 88.2,
+        "y": 630.8,
+        "field": false,
+        "w": 333.3,
+        "h": 5.7
+      },
+      { "text": "122", "x": 427.6, "y": 630.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones no sujetas por reglas de localización acogidas a los regímenes especiales de ventanilla única",
+        "x": 88.2,
+        "y": 617.3,
+        "field": false,
+        "w": 255.2,
+        "h": 5.4
+      },
+      {
+        "text": "...............................................",
+        "x": 343.6,
+        "y": 617.3,
+        "field": false,
+        "w": 77.4,
+        "h": 5.9
+      },
+      { "text": "123", "x": 427.6, "y": 617.3, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones sujetas y acogidas a los regímenes especiales de ventanilla única .......................................................................................",
+        "x": 88.2,
+        "y": 603.8,
+        "field": false,
+        "w": 333,
+        "h": 5.6
+      },
+      { "text": "124", "x": 427.6, "y": 603.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Importes de las entregas de bienes y prestaciones de servicios a las que habiéndoles sido aplicado el régimen especial",
+        "x": 88.2,
+        "y": 585.9,
+        "field": false,
+        "w": 254.7,
+        "h": 4.8
+      },
+      {
+        "text": "del criterio de caja hubieran resultado devengadas conforme a la regla general de devengo contenida en el art. 75 LIVA",
+        "x": 88.2,
+        "y": 579.6,
+        "field": false,
+        "w": 255.9,
+        "h": 4.8
+      },
+      { "text": "62", "x": 348.6, "y": 581.2, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "63", "x": 428.9, "y": 581.2, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Importes de las adquisiciones de bienes y servicios a las que sea de aplicación o afecte el régimen",
+        "x": 88,
+        "y": 562.9,
+        "field": false,
+        "w": 237.9,
+        "h": 5.4
+      },
+      {
+        "text": "especial del criterio de caja ..................................................................................................................",
+        "x": 88,
+        "y": 556.5,
+        "field": false,
+        "w": 255.2,
+        "h": 5.8
+      },
+      { "text": "74", "x": 347.6, "y": 558.9, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "75", "x": 428.6, "y": 558.9, "field": false, "w": 5.3, "h": 4.8 },
+      { "text": "Base imponible", "x": 371.5, "y": 568.5, "field": false, "w": 36.5, "h": 5.3 },
+      { "text": "Cuota soportada", "x": 447.5, "y": 568.5, "field": false, "w": 39.9, "h": 5.4 },
+      { "text": "Rectificativa (5)", "x": 100.7, "y": 217.8, "field": false, "w": 47.4, "h": 6.4 },
+      { "text": "Sin actividad (4)", "x": 100, "y": 269.5, "field": false, "w": 48.7, "h": 6.4 },
+      { "text": "Sin actividad", "x": 102.7, "y": 247.2, "field": false, "w": 42, "h": 7.4 },
+      {
+        "text": "Resultado de la autoliquidación (66 + 77 - 78 + 68 + 108) .................................................",
+        "x": 202.7,
+        "y": 409.2,
+        "field": false,
+        "w": 222.4,
+        "h": 5.7
+      },
+      { "text": "69", "x": 428.9, "y": 408.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Resultado a ingresar correspondiente a la anterior autoliquidación o liquidación",
+        "x": 208.2,
+        "y": 398.9,
+        "field": false,
+        "w": 156.1,
+        "h": 4.5
+      },
+      {
+        "text": "administrativa del ejercicio y período objeto de la autoliquidación",
+        "x": 208.2,
+        "y": 393.3,
+        "field": false,
+        "w": 128.1,
+        "h": 4.5
+      },
+      { "text": "(*)", "x": 336.2, "y": 395.2, "field": false, "w": 2.9, "h": 2.7 },
+      {
+        "text": "..............................................................",
+        "x": 340.2,
+        "y": 393.3,
+        "field": false,
+        "w": 84.4,
+        "h": 4.9
+      },
+      { "text": "70", "x": 428.9, "y": 394.9, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Devoluciones acordadas por la Agencia Tributaria como consecuencia de la tramitación de anteriores autoliqui-",
+        "x": 208.2,
+        "y": 387.8,
+        "field": false,
+        "w": 212.7,
+        "h": 4.3
+      },
+      {
+        "text": "daciones o liquidaciones administrativas correspondientes al ejercicio y período objeto de la autoliquidación",
+        "x": 208.2,
+        "y": 382.2,
+        "field": false,
+        "w": 205.9,
+        "h": 4.3
+      },
+      { "text": ".......", "x": 415.1, "y": 382.2, "field": false, "w": 9.5, "h": 4.9 },
+      { "text": "109", "x": 427.6, "y": 383, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Resultado (69 - 70 + 109 - 112)",
+        "x": 202.7,
+        "y": 370.3,
+        "field": false,
+        "w": 85.3,
+        "h": 6
+      },
+      {
+        "text": "............................................................................",
+        "x": 289.9,
+        "y": 370.3,
+        "field": false,
+        "w": 135.2,
+        "h": 6.4
+      },
+      { "text": "71", "x": 428.9, "y": 370.3, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Rectificaciones (excepto incluidas en el motivo siguiente) ........",
+        "x": 112.6,
+        "y": 140.7,
+        "field": false,
+        "w": 151.9,
+        "h": 5.5
+      },
+      {
+        "text": "Discrepancia criterio administrativo .......................................",
+        "x": 112.6,
+        "y": 130.4,
+        "field": false,
+        "w": 151.6,
+        "h": 5.7
+      },
+      {
+        "text": "Indique el motivo de la rectificación:",
+        "x": 101.4,
+        "y": 153,
+        "field": false,
+        "w": 86,
+        "h": 5.4
+      },
+      {
+        "text": "Exclusivamente para determinados supuestos de autoliquida",
+        "x": 91.3,
+        "y": 365.8,
+        "field": false,
+        "w": 102.6,
+        "h": 3.8
+      },
+      { "text": "-", "x": 193.9, "y": 365.8, "field": false, "w": 0.8, "h": 2.4 },
+      {
+        "text": "ción rectificativa por discrepancia de criterio administrativo",
+        "x": 91.3,
+        "y": 361,
+        "field": false,
+        "w": 100.5,
+        "h": 3.9
+      },
+      {
+        "text": "que no deban incluirse en otras casillas. Otros ajustes",
+        "x": 91.3,
+        "y": 356.3,
+        "field": false,
+        "w": 92.1,
+        "h": 3.8
+      },
+      { "text": "euros", "x": 175.8, "y": 345.1, "field": false, "w": 13, "h": 5.2 },
+      { "text": "108", "x": 94.4, "y": 344, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "* En caso de segundas y siguientes autoliquidaciones rectificativas se considerará la última autoliquidación con efectos (ver instrucciones del modelo 303)",
+        "x": 203.2,
+        "y": 356.2,
+        "field": false,
+        "w": 276.7,
+        "h": 4
+      },
+      {
+        "text": "Pago a cuenta de entregas de gasolinas, gasóleos y biocar",
+        "x": 91.3,
+        "y": 324.3,
+        "field": false,
+        "w": 101.1,
+        "h": 3.9
+      },
+      { "text": "-", "x": 192.3, "y": 324.3, "field": false, "w": 0.8, "h": 2.4 },
+      {
+        "text": "burantes posteriores a la ultimación del régimen de depósito",
+        "x": 91.3,
+        "y": 319.6,
+        "field": false,
+        "w": 103.2,
+        "h": 3.9
+      },
+      {
+        "text": "distinto del aduanero atribuible a la Administración del",
+        "x": 91.3,
+        "y": 314.8,
+        "field": false,
+        "w": 91.7,
+        "h": 3.8
+      },
+      {
+        "text": "Estado (Suma de la casilla 36 de todos los modelos 319 co",
+        "x": 91.3,
+        "y": 310,
+        "field": false,
+        "w": 102.1,
+        "h": 3.9
+      },
+      { "text": "-", "x": 193.4, "y": 310, "field": false, "w": 0.8, "h": 2.4 },
+      {
+        "text": "rrespondientes a entregas incluidas en esta autoliquidación)",
+        "x": 91.3,
+        "y": 305.3,
+        "field": false,
+        "w": 101.4,
+        "h": 3.8
+      },
+      { "text": "euros", "x": 176.1, "y": 295.9, "field": false, "w": 13, "h": 5.2 },
+      { "text": "112", "x": 94.7, "y": 294.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 3 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "91.358,18", "x": 436.5, "y": 670.9, "field": true },
+      { "text": "92.592,75", "x": 436.6, "y": 657.4, "field": true },
+      { "text": "93.827,32", "x": 437, "y": 644, "field": true },
+      { "text": "-95.061,89", "x": 437, "y": 630.2, "field": true },
+      { "text": "96.296,46", "x": 437, "y": 616.7, "field": true },
+      { "text": "97.531,03", "x": 437, "y": 603.2, "field": true },
+      { "text": "98.765,60", "x": 355.7, "y": 580.9, "field": true },
+      { "text": "100.000,17", "x": 436.3, "y": 580.9, "field": true },
+      { "text": "101.234,74", "x": 355.9, "y": 559, "field": true },
+      { "text": "102.469,31", "x": 436.5, "y": 559, "field": true },
+      { "text": "-103.703,88", "x": 436.4, "y": 510, "field": true },
+      { "text": "104.938,45", "x": 436.5, "y": 496.5, "field": true },
+      { "text": "21,00", "x": 202.5, "y": 483.8, "field": true },
+      { "text": "107.407,59", "x": 436.5, "y": 483, "field": true },
+      { "text": "108.642,16", "x": 436.5, "y": 469.5, "field": true },
+      { "text": "109.876,73", "x": 437, "y": 456, "field": true },
+      { "text": "111.111,30", "x": 436.5, "y": 442.5, "field": true },
+      { "text": "-112.345,87", "x": 436.5, "y": 429, "field": true },
+      { "text": "113.580,44", "x": 436.8, "y": 408.1, "field": true },
+      { "text": "114.815,01", "x": 436.5, "y": 394.5, "field": true },
+      { "text": "116.049,58", "x": 102.2, "y": 384.7, "field": true },
+      { "text": "117.284,15", "x": 437, "y": 382.4, "field": true },
+      { "text": "118.518,72", "x": 436.5, "y": 369.7, "field": true },
+      { "text": "119.753,29", "x": 103.8, "y": 343.4, "field": true },
+      { "text": "-120.987,86", "x": 104.2, "y": 294.2, "field": true }
+    ],
+    [
+      { "text": "D", "x": 487, "y": 567.2, "field": false, "w": 5, "h": 6.9 },
+      {
+        "text": "Si ha efectuado operaciones por las que tenga obligación de presentar la declaración anual de operaciones con terceras personas, marque una \"X\"",
+        "x": 102.9,
+        "y": 568.7,
+        "field": false,
+        "w": 354.3,
+        "h": 5.4
+      },
+      { "text": ".............", "x": 458.8, "y": 568.7, "field": false, "w": 21.4, "h": 5.9 },
+      {
+        "text": "Información de la tributación por razón de territorio (sólo para sujetos pasivos que tributan a varias Administraciones)",
+        "x": 99.1,
+        "y": 548.9,
+        "field": false,
+        "w": 365.7,
+        "h": 6.5
+      },
+      {
+        "text": "Exclusivamente a cumplimentar en el último período de liquidación por aquellos sujetos pasivos que queden exonerados de la Declaración-resumen anual del IVA",
+        "x": 91.9,
+        "y": 674.6,
+        "field": false,
+        "w": 409.3,
+        "h": 5.3
+      },
+      {
+        "text": "Operaciones realizadas en el ejercicio",
+        "x": 99.4,
+        "y": 502.5,
+        "field": false,
+        "w": 118.3,
+        "h": 6.6
+      },
+      { "text": "Página 4", "x": 478.5, "y": 706.9, "field": false, "w": 29.6, "h": 7.2 },
+      { "text": "Modelo", "x": 92, "y": 710.4, "field": false, "w": 14.5, "h": 4.4 },
+      { "text": "303", "x": 88.2, "y": 698.5, "field": false, "w": 18.5, "h": 11.1 },
+      { "text": "NIF", "x": 126.5, "y": 708.8, "field": false, "w": 6.9, "h": 4.3 },
+      {
+        "text": "Apellidos y Nombre o Razón social",
+        "x": 212.3,
+        "y": 708.8,
+        "field": false,
+        "w": 75,
+        "h": 4.8
+      },
+      { "text": "Código", "x": 440.7, "y": 666.5, "field": false, "w": 16.4, "h": 4.8 },
+      { "text": "de", "x": 446, "y": 661, "field": false, "w": 5.8, "h": 5 },
+      { "text": "actividad", "x": 438.3, "y": 655.4, "field": false, "w": 21.2, "h": 4.9 },
+      { "text": "Epígrafe IAE", "x": 476.3, "y": 662.1, "field": false, "w": 29.2, "h": 4.9 },
+      {
+        "text": "Actividades a las que se refiere la declaración",
+        "x": 102.8,
+        "y": 661.6,
+        "field": false,
+        "w": 110,
+        "h": 5
+      },
+      {
+        "text": "(de mayor a menor importancia por volumen de operaciones)",
+        "x": 214.3,
+        "y": 661.6,
+        "field": false,
+        "w": 130.7,
+        "h": 4.8
+      },
+      { "text": "Otras", "x": 92.2, "y": 632.9, "field": false, "w": 13.2, "h": 5.4 },
+      { "text": "Principal", "x": 92, "y": 652.5, "field": false, "w": 20.2, "h": 5.3 },
+      { "text": "A", "x": 91.7, "y": 660.8, "field": false, "w": 4.4, "h": 6.6 },
+      { "text": "B", "x": 430, "y": 660.8, "field": false, "w": 4.7, "h": 7 },
+      { "text": "C", "x": 467.3, "y": 660.8, "field": false, "w": 4.9, "h": 6.8 },
+      { "text": "Araba/Álava", "x": 91.3, "y": 531.6, "field": false, "w": 29.4, "h": 5.4 },
+      { "text": "..", "x": 121, "y": 531.6, "field": false, "w": 3.3, "h": 5.9 },
+      { "text": "89", "x": 127.4, "y": 531.6, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "%", "x": 161.3, "y": 531.6, "field": false, "w": 3.5, "h": 3.9 },
+      { "text": "Gipuzkoa", "x": 174.4, "y": 531.6, "field": false, "w": 22, "h": 5.2 },
+      { "text": ".....", "x": 197.5, "y": 531.6, "field": false, "w": 8.2, "h": 5.9 },
+      { "text": "90", "x": 209.7, "y": 531.6, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "%", "x": 244.3, "y": 531.6, "field": false, "w": 3.5, "h": 3.9 },
+      { "text": "Bizkaia", "x": 256.7, "y": 531.6, "field": false, "w": 16.8, "h": 5.2 },
+      { "text": "....", "x": 276.5, "y": 531.6, "field": false, "w": 6.6, "h": 5.9 },
+      { "text": "91", "x": 286.4, "y": 531.6, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "%", "x": 321.1, "y": 531.6, "field": false, "w": 3.5, "h": 3.9 },
+      { "text": "Navarra", "x": 333, "y": 531.6, "field": false, "w": 19.1, "h": 5.4 },
+      { "text": "......", "x": 352.8, "y": 531.6, "field": false, "w": 9.9, "h": 5.9 },
+      { "text": "92", "x": 367.5, "y": 531.6, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "%", "x": 402.9, "y": 531.6, "field": false, "w": 3.5, "h": 3.9 },
+      { "text": "Territorio común", "x": 413.3, "y": 531.6, "field": false, "w": 40.5, "h": 5.6 },
+      { "text": "....", "x": 454.5, "y": 531.6, "field": false, "w": 6.6, "h": 5.9 },
+      { "text": "107", "x": 463.8, "y": 531.6, "field": false, "w": 8.7, "h": 5.2 },
+      { "text": "%", "x": 499.1, "y": 531.6, "field": false, "w": 3.5, "h": 3.9 },
+      {
+        "text": "Operaciones en régimen general",
+        "x": 88.3,
+        "y": 482.7,
+        "field": false,
+        "w": 78.3,
+        "h": 5.4
+      },
+      {
+        "text": ".........................................................................................................................................................",
+        "x": 169,
+        "y": 482.7,
+        "field": false,
+        "w": 252.1,
+        "h": 5.9
+      },
+      { "text": "80", "x": 428.1, "y": 482.7, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones a las que habiéndoles sido aplicado el régimen especial del criterio de caja hubieran resultado devengadas conforme a la",
+        "x": 88.3,
+        "y": 474.7,
+        "field": false,
+        "w": 323.1,
+        "h": 5.4
+      },
+      {
+        "text": "regla general de devengo contenida en el art. 75 LIVA",
+        "x": 88.3,
+        "y": 468.4,
+        "field": false,
+        "w": 130.3,
+        "h": 5.4
+      },
+      {
+        "text": "..........................................................................................................................",
+        "x": 220.1,
+        "y": 468.4,
+        "field": false,
+        "w": 201,
+        "h": 5.9
+      },
+      { "text": "81", "x": 428.1, "y": 469.1, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Entregas intracomunitarias de bienes y servicios",
+        "x": 88.3,
+        "y": 456.4,
+        "field": false,
+        "w": 116.1,
+        "h": 5.4
+      },
+      {
+        "text": "..................................................................................................................................",
+        "x": 206.9,
+        "y": 456.4,
+        "field": false,
+        "w": 214.2,
+        "h": 5.9
+      },
+      { "text": "93", "x": 428.1, "y": 456.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Exportaciones y otras operaciones exentas con derecho a deducción",
+        "x": 88.3,
+        "y": 444.5,
+        "field": false,
+        "w": 166.4,
+        "h": 5.4
+      },
+      {
+        "text": "....................................................................................................",
+        "x": 256.4,
+        "y": 444.5,
+        "field": false,
+        "w": 164.8,
+        "h": 5.9
+      },
+      { "text": "94", "x": 428.1, "y": 444.5, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones exentas sin derecho a deducción",
+        "x": 88.3,
+        "y": 432.6,
+        "field": false,
+        "w": 111.2,
+        "h": 5.4
+      },
+      {
+        "text": ".....................................................................................................................................",
+        "x": 202,
+        "y": 432.6,
+        "field": false,
+        "w": 219.1,
+        "h": 5.9
+      },
+      { "text": "83", "x": 428.1, "y": 432.6, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones no sujetas por reglas de localización (excepto las incluidas en la casilla 126)",
+        "x": 88.3,
+        "y": 420.7,
+        "field": false,
+        "w": 215,
+        "h": 5.4
+      },
+      {
+        "text": ".....................................................................",
+        "x": 307.5,
+        "y": 420.7,
+        "field": false,
+        "w": 113.7,
+        "h": 5.9
+      },
+      { "text": "84", "x": 428.1, "y": 420.7, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones sujetas con inversión del sujeto pasivo",
+        "x": 88.3,
+        "y": 408.8,
+        "field": false,
+        "w": 124.3,
+        "h": 5.4
+      },
+      {
+        "text": ".............................................................................................................................",
+        "x": 215.2,
+        "y": 408.8,
+        "field": false,
+        "w": 206,
+        "h": 5.9
+      },
+      { "text": "125", "x": 426.8, "y": 408.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones no sujetas por reglas de localización acogidas a los regímenes especiales de ventanilla única",
+        "x": 88.3,
+        "y": 396.8,
+        "field": false,
+        "w": 255.2,
+        "h": 5.4
+      },
+      {
+        "text": "..............................................",
+        "x": 345.3,
+        "y": 396.8,
+        "field": false,
+        "w": 75.8,
+        "h": 5.9
+      },
+      { "text": "126", "x": 426.8, "y": 396.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones sujetas y acogidas a los regímenes especiales de ventanilla única",
+        "x": 88.3,
+        "y": 384.9,
+        "field": false,
+        "w": 188.9,
+        "h": 5.4
+      },
+      {
+        "text": "......................................................................................",
+        "x": 279.4,
+        "y": 384.9,
+        "field": false,
+        "w": 141.7,
+        "h": 5.9
+      },
+      { "text": "127", "x": 426.8, "y": 384.9, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones intragrupo valoradas conforme a lo dispuesto en los arts. 78 y 79 LIVA",
+        "x": 88.3,
+        "y": 373,
+        "field": false,
+        "w": 203.2,
+        "h": 5.5
+      },
+      {
+        "text": "..............................................................................",
+        "x": 292.6,
+        "y": 373,
+        "field": false,
+        "w": 128.5,
+        "h": 5.9
+      },
+      { "text": "128", "x": 426.8, "y": 373, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Operaciones en régimen simplificado",
+        "x": 88.3,
+        "y": 361.1,
+        "field": false,
+        "w": 88.8,
+        "h": 5.4
+      },
+      {
+        "text": "....................................................................................................................................................",
+        "x": 177.3,
+        "y": 361.1,
+        "field": false,
+        "w": 243.9,
+        "h": 5.9
+      },
+      { "text": "86", "x": 428.1, "y": 361.1, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones en régimen especial de la agricultura, ganadería y pesca",
+        "x": 88.3,
+        "y": 349.2,
+        "field": false,
+        "w": 167.7,
+        "h": 5.4
+      },
+      {
+        "text": "....................................................................................................",
+        "x": 256.4,
+        "y": 349.2,
+        "field": false,
+        "w": 164.8,
+        "h": 5.9
+      },
+      { "text": "95", "x": 428.1, "y": 349.2, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones realizadas por sujetos pasivos acogidos al régimen especial del recargo de equivalencia",
+        "x": 88.3,
+        "y": 337.2,
+        "field": false,
+        "w": 244.1,
+        "h": 5.4
+      },
+      {
+        "text": ".....................................................",
+        "x": 333.8,
+        "y": 337.2,
+        "field": false,
+        "w": 87.3,
+        "h": 5.9
+      },
+      { "text": "96", "x": 428.1, "y": 337.2, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones en Régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección",
+        "x": 88.3,
+        "y": 325.3,
+        "field": false,
+        "w": 259.2,
+        "h": 5.5
+      },
+      {
+        "text": "............................................",
+        "x": 348.6,
+        "y": 325.3,
+        "field": false,
+        "w": 72.5,
+        "h": 5.9
+      },
+      { "text": "97", "x": 428.1, "y": 325.3, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Operaciones en régimen especial de Agencias de Viajes",
+        "x": 88.3,
+        "y": 313.4,
+        "field": false,
+        "w": 134.5,
+        "h": 5.4
+      },
+      {
+        "text": ".......................................................................................................................",
+        "x": 225.1,
+        "y": 313.4,
+        "field": false,
+        "w": 196.1,
+        "h": 5.9
+      },
+      { "text": "98", "x": 428.1, "y": 313.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Entregas de bienes inmuebles, operaciones financieras y relativas al oro de inversión no habituales",
+        "x": 88.3,
+        "y": 301.5,
+        "field": false,
+        "w": 237.9,
+        "h": 5.4
+      },
+      {
+        "text": "..........................................................",
+        "x": 325.6,
+        "y": 301.5,
+        "field": false,
+        "w": 95.6,
+        "h": 5.9
+      },
+      { "text": "79", "x": 428.1, "y": 301.5, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Entregas de bienes de inversión",
+        "x": 88.3,
+        "y": 290.4,
+        "field": false,
+        "w": 76.9,
+        "h": 5.4
+      },
+      {
+        "text": "..........................................................................................................................................................",
+        "x": 167.4,
+        "y": 290.4,
+        "field": false,
+        "w": 253.7,
+        "h": 5.9
+      },
+      { "text": "99", "x": 428.1, "y": 290.4, "field": false, "w": 5.3, "h": 4.8 },
+      {
+        "text": "Total volumen de operaciones (art. 121 Ley IVA) (80 + 81 + 93 + 94 + 83 + 84 + 125 + 126 + 127 + 128 + 86 + 95 + 96",
+        "x": 91.6,
+        "y": 281.6,
+        "field": false,
+        "w": 320.4,
+        "h": 6
+      },
+      {
+        "text": "+ 97 + 98 - 79 - 99)",
+        "x": 90.1,
+        "y": 274.5,
+        "field": false,
+        "w": 53.4,
+        "h": 6.2
+      },
+      {
+        "text": "...............................................................................................................................................................",
+        "x": 146.8,
+        "y": 274.5,
+        "field": false,
+        "w": 273.5,
+        "h": 6.2
+      },
+      { "text": "88", "x": 427.9, "y": 277.6, "field": false, "w": 5.8, "h": 5.2 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 4 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "21,00", "x": 135.9, "y": 531.6, "field": true },
+      { "text": "21,00", "x": 218.2, "y": 531.6, "field": true },
+      { "text": "21,00", "x": 294.9, "y": 531.6, "field": true },
+      { "text": "21,00", "x": 375.6, "y": 531.6, "field": true },
+      { "text": "21,00", "x": 473.8, "y": 531.6, "field": true },
+      { "text": "128.395,28", "x": 435.6, "y": 482.1, "field": true },
+      { "text": "-129.629,85", "x": 435.7, "y": 468.9, "field": true },
+      { "text": "130.864,42", "x": 435.7, "y": 456.5, "field": true },
+      { "text": "132.098,99", "x": 435.7, "y": 444.7, "field": true },
+      { "text": "133.333,56", "x": 435.7, "y": 432.5, "field": true },
+      { "text": "134.568,13", "x": 435.7, "y": 420.7, "field": true },
+      { "text": "135.802,70", "x": 436.3, "y": 408.4, "field": true },
+      { "text": "137.037,27", "x": 436.3, "y": 397, "field": true },
+      { "text": "-138.271,84", "x": 436.3, "y": 384.9, "field": true },
+      { "text": "139.506,41", "x": 436.3, "y": 372.5, "field": true },
+      { "text": "140.740,98", "x": 435.9, "y": 360.6, "field": true },
+      { "text": "141.975,55", "x": 435.9, "y": 348.6, "field": true },
+      { "text": "143.210,12", "x": 435.9, "y": 336.8, "field": true },
+      { "text": "144.444,69", "x": 435.9, "y": 324.7, "field": true },
+      { "text": "145.679,26", "x": 435.9, "y": 312.8, "field": true },
+      { "text": "-146.913,83", "x": 435.9, "y": 301, "field": true },
+      { "text": "148.148,40", "x": 435.9, "y": 289.8, "field": true },
+      { "text": "149.382,97", "x": 435.9, "y": 277, "field": true }
+    ],
+    [
+      { "text": "Página 5", "x": 481.4, "y": 706.9, "field": false, "w": 29.6, "h": 7.2 },
+      { "text": "Modelo", "x": 94.9, "y": 710.4, "field": false, "w": 14.5, "h": 4.4 },
+      { "text": "303", "x": 91.1, "y": 698.5, "field": false, "w": 18.5, "h": 11.1 },
+      { "text": "NIF", "x": 129.4, "y": 708.8, "field": false, "w": 6.9, "h": 4.3 },
+      {
+        "text": "Apellidos y Nombre o Razón social",
+        "x": 215.2,
+        "y": 708.8,
+        "field": false,
+        "w": 75,
+        "h": 4.8
+      },
+      { "text": "1", "x": 93.7, "y": 656.5, "field": false, "w": 9.5, "h": 17.1 },
+      { "text": "4", "x": 93.3, "y": 530.6, "field": false, "w": 9.5, "h": 17.1 },
+      { "text": "3", "x": 93.4, "y": 571.6, "field": false, "w": 9.5, "h": 17.1 },
+      { "text": "2", "x": 93.7, "y": 615.7, "field": false, "w": 9.5, "h": 17.1 },
+      { "text": "5", "x": 93.7, "y": 487.2, "field": false, "w": 9.5, "h": 17.1 },
+      {
+        "text": "IVA deducible: Grupo 1",
+        "x": 97.9,
+        "y": 437.8,
+        "field": false,
+        "w": 71.3,
+        "h": 6.5
+      },
+      {
+        "text": "IVA deducible en operaciones interiores",
+        "x": 89.3,
+        "y": 415.6,
+        "field": false,
+        "w": 105.7,
+        "h": 6
+      },
+      {
+        "text": "...................",
+        "x": 195.5,
+        "y": 415.6,
+        "field": false,
+        "w": 33.8,
+        "h": 6.4
+      },
+      {
+        "text": "IVA deducible en importaciones",
+        "x": 89.3,
+        "y": 388.9,
+        "field": false,
+        "w": 83.7,
+        "h": 5.9
+      },
+      {
+        "text": "...............................",
+        "x": 173.5,
+        "y": 388.9,
+        "field": false,
+        "w": 55.2,
+        "h": 6.4
+      },
+      { "text": "{", "x": 235, "y": 411.7, "field": false, "w": 1.5, "h": 4.5 },
+      {
+        "text": "IVA deducible en adquisiciones intracomunitarias",
+        "x": 89.3,
+        "y": 363.7,
+        "field": false,
+        "w": 129.7,
+        "h": 6
+      },
+      { "text": "......", "x": 219.3, "y": 363.7, "field": false, "w": 10.7, "h": 6.4 },
+      { "text": "Base imponible", "x": 356.7, "y": 432.3, "field": false, "w": 40.9, "h": 5.5 },
+      { "text": "Cuota deducible", "x": 447.6, "y": 432.3, "field": false, "w": 43.4, "h": 5.6 },
+      { "text": "{", "x": 235, "y": 358.4, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "{", "x": 235, "y": 384.1, "field": false, "w": 1.5, "h": 4.5 },
+      {
+        "text": "IVA deducible: Grupo 2",
+        "x": 98.3,
+        "y": 258,
+        "field": false,
+        "w": 71.3,
+        "h": 6.5
+      },
+      {
+        "text": "Actividades con regímenes de deducción diferenciados",
+        "x": 95.5,
+        "y": 454.3,
+        "field": false,
+        "w": 170.8,
+        "h": 6.5
+      },
+      {
+        "text": "IVA deducible en operaciones interiores",
+        "x": 89.3,
+        "y": 232.9,
+        "field": false,
+        "w": 105.7,
+        "h": 6
+      },
+      {
+        "text": "...................",
+        "x": 195.5,
+        "y": 232.9,
+        "field": false,
+        "w": 33.8,
+        "h": 6.4
+      },
+      {
+        "text": "IVA deducible en importaciones",
+        "x": 89.3,
+        "y": 206.3,
+        "field": false,
+        "w": 83.7,
+        "h": 5.9
+      },
+      {
+        "text": "...............................",
+        "x": 173.5,
+        "y": 206.3,
+        "field": false,
+        "w": 55.2,
+        "h": 6.4
+      },
+      { "text": "{", "x": 235, "y": 229, "field": false, "w": 1.5, "h": 4.5 },
+      {
+        "text": "IVA deducible en adquisiciones intracomunitarias",
+        "x": 89.3,
+        "y": 181.1,
+        "field": false,
+        "w": 129.7,
+        "h": 6
+      },
+      { "text": "......", "x": 219.3, "y": 181.1, "field": false, "w": 10.7, "h": 6.4 },
+      { "text": "{", "x": 235, "y": 175.8, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "{", "x": 235, "y": 201.5, "field": false, "w": 1.5, "h": 4.5 },
+      { "text": "504", "x": 458.4, "y": 655.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "503", "x": 414.7, "y": 655.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "502", "x": 291.6, "y": 655.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "501", "x": 167.7, "y": 654.9, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "500", "x": 112, "y": 655.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "Prorrata", "x": 98.9, "y": 684.3, "field": false, "w": 26.2, "h": 6.7 },
+      { "text": "524", "x": 458.7, "y": 485.5, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "523", "x": 415, "y": 485.4, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "522", "x": 291.9, "y": 485.4, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "521", "x": 168, "y": 485.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "520", "x": 112.3, "y": 485.4, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "519", "x": 458.5, "y": 529.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "518", "x": 414.7, "y": 529, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "517", "x": 291.7, "y": 529, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "516", "x": 167.8, "y": 528.8, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "515", "x": 112.1, "y": 529, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "514", "x": 458.4, "y": 570.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "513", "x": 414.7, "y": 570.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "512", "x": 291.6, "y": 570.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "511", "x": 167.7, "y": 569.9, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "510", "x": 112, "y": 570.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "509", "x": 458.4, "y": 614.9, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "508", "x": 414.6, "y": 614.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "507", "x": 291.6, "y": 614.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "506", "x": 167.7, "y": 614.5, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "505", "x": 112, "y": 614.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "CNAE", "x": 128.9, "y": 663.8, "field": false, "w": 12.1, "h": 4.4 },
+      {
+        "text": "Importe total de las operaciones",
+        "x": 189.4,
+        "y": 663.8,
+        "field": false,
+        "w": 69.1,
+        "h": 4.9
+      },
+      {
+        "text": "Importe de las operaciones con derecho a deducción",
+        "x": 291,
+        "y": 663.8,
+        "field": false,
+        "w": 113.7,
+        "h": 4.8
+      },
+      { "text": "Tipo", "x": 426.8, "y": 663.8, "field": false, "w": 9.1, "h": 4.7 },
+      { "text": "% prorrata", "x": 470.3, "y": 663.8, "field": false, "w": 22.2, "h": 4.8 },
+      { "text": "CNAE", "x": 129.1, "y": 624.3, "field": false, "w": 12.1, "h": 4.4 },
+      {
+        "text": "Importe total de las operaciones",
+        "x": 189.6,
+        "y": 624.3,
+        "field": false,
+        "w": 69.1,
+        "h": 4.9
+      },
+      {
+        "text": "Importe de las operaciones con derecho a deducción",
+        "x": 291.3,
+        "y": 624.3,
+        "field": false,
+        "w": 113.7,
+        "h": 4.8
+      },
+      { "text": "Tipo", "x": 427, "y": 624.3, "field": false, "w": 9.1, "h": 4.7 },
+      { "text": "% prorrata", "x": 470.5, "y": 624.3, "field": false, "w": 22.2, "h": 4.8 },
+      { "text": "CNAE", "x": 129.1, "y": 579.7, "field": false, "w": 12.1, "h": 4.4 },
+      {
+        "text": "Importe total de las operaciones",
+        "x": 189.6,
+        "y": 579.7,
+        "field": false,
+        "w": 69.1,
+        "h": 4.9
+      },
+      {
+        "text": "Importe de las operaciones con derecho a deducción",
+        "x": 291.3,
+        "y": 579.7,
+        "field": false,
+        "w": 113.7,
+        "h": 4.8
+      },
+      { "text": "Tipo", "x": 427, "y": 579.7, "field": false, "w": 9.1, "h": 4.7 },
+      { "text": "% prorrata", "x": 470.5, "y": 579.7, "field": false, "w": 22.2, "h": 4.8 },
+      { "text": "CNAE", "x": 129.1, "y": 538.5, "field": false, "w": 12.1, "h": 4.4 },
+      {
+        "text": "Importe total de las operaciones",
+        "x": 189.6,
+        "y": 538.5,
+        "field": false,
+        "w": 69.1,
+        "h": 4.9
+      },
+      {
+        "text": "Importe de las operaciones con derecho a deducción",
+        "x": 291.3,
+        "y": 538.5,
+        "field": false,
+        "w": 113.7,
+        "h": 4.8
+      },
+      { "text": "Tipo", "x": 427, "y": 538.5, "field": false, "w": 9.1, "h": 4.7 },
+      { "text": "% prorrata", "x": 470.5, "y": 538.5, "field": false, "w": 22.2, "h": 4.8 },
+      { "text": "CNAE", "x": 129.1, "y": 495, "field": false, "w": 12.1, "h": 4.4 },
+      {
+        "text": "Importe total de las operaciones",
+        "x": 189.6,
+        "y": 495,
+        "field": false,
+        "w": 69.1,
+        "h": 4.9
+      },
+      {
+        "text": "Importe de las operaciones con derecho a deducción",
+        "x": 291.3,
+        "y": 495,
+        "field": false,
+        "w": 113.7,
+        "h": 4.8
+      },
+      { "text": "Tipo", "x": 427, "y": 495, "field": false, "w": 9.1, "h": 4.7 },
+      { "text": "% prorrata", "x": 470.5, "y": 495, "field": false, "w": 22.2, "h": 4.8 },
+      {
+        "text": "Bienes y servicios corrientes",
+        "x": 239.9,
+        "y": 422.1,
+        "field": false,
+        "w": 76.3,
+        "h": 6
+      },
+      { "text": "......", "x": 318.6, "y": 422.1, "field": false, "w": 10.7, "h": 6.4 },
+      { "text": "700", "x": 334.4, "y": 422.1, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "701", "x": 426.6, "y": 422.1, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 239.9,
+        "y": 412.6,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 292.9,
+        "y": 412.6,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "702", "x": 334.4, "y": 412.6, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "703", "x": 426.6, "y": 412.6, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "Bienes corrientes", "x": 240.1, "y": 394.2, "field": false, "w": 46.4, "h": 6 },
+      {
+        "text": ".......................",
+        "x": 287.7,
+        "y": 394.2,
+        "field": false,
+        "w": 40.9,
+        "h": 6.4
+      },
+      { "text": "704", "x": 334.7, "y": 394.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "705", "x": 426.9, "y": 394.2, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 240.1,
+        "y": 384.6,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 293.2,
+        "y": 384.6,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "706", "x": 334.7, "y": 384.6, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "707", "x": 426.9, "y": 384.6, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes corrientes y servicios",
+        "x": 239.9,
+        "y": 368.8,
+        "field": false,
+        "w": 76.3,
+        "h": 6
+      },
+      { "text": ".......", "x": 316.7, "y": 368.8, "field": false, "w": 12.5, "h": 6.4 },
+      { "text": "708", "x": 334.4, "y": 368.8, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "709", "x": 426.6, "y": 368.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 239.9,
+        "y": 359.2,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 292.9,
+        "y": 359.2,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "710", "x": 334.4, "y": 359.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "711", "x": 426.6, "y": 359.2, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Compensaciones en régimen especial de la agricultura, ganadería y pesca",
+        "x": 89.3,
+        "y": 342.3,
+        "field": false,
+        "w": 198.4,
+        "h": 6
+      },
+      {
+        "text": "......................",
+        "x": 288.9,
+        "y": 342.3,
+        "field": false,
+        "w": 39.1,
+        "h": 6.4
+      },
+      { "text": "712", "x": 334.9, "y": 342.3, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "713", "x": 427, "y": 342.3, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Rectificación de deducciones",
+        "x": 89.3,
+        "y": 324.8,
+        "field": false,
+        "w": 77.6,
+        "h": 6
+      },
+      {
+        "text": ".......................................................................................",
+        "x": 169.9,
+        "y": 324.8,
+        "field": false,
+        "w": 154.8,
+        "h": 6.4
+      },
+      { "text": "714", "x": 334.9, "y": 324.8, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "715", "x": 427, "y": 324.8, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Regularización de bienes de inversión",
+        "x": 89.3,
+        "y": 310.7,
+        "field": false,
+        "w": 100.3,
+        "h": 5.9
+      },
+      {
+        "text": ".............................................................................................................................",
+        "x": 191.8,
+        "y": 310.7,
+        "field": false,
+        "w": 222.4,
+        "h": 6.4
+      },
+      { "text": "716", "x": 427, "y": 310.7, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Suma de deducciones",
+        "x": 145.7,
+        "y": 294.9,
+        "field": false,
+        "w": 58.9,
+        "h": 5.6
+      },
+      {
+        "text": "(701 + 703 + 705 + 707 + 709 + 711 + 713 + 715 + 716)",
+        "x": 208.2,
+        "y": 294.9,
+        "field": false,
+        "w": 155,
+        "h": 6.3
+      },
+      {
+        "text": "................................",
+        "x": 365.1,
+        "y": 294.9,
+        "field": false,
+        "w": 56.9,
+        "h": 6.4
+      },
+      { "text": "717", "x": 427, "y": 294.9, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes y servicios corrientes",
+        "x": 239.9,
+        "y": 239.2,
+        "field": false,
+        "w": 76.3,
+        "h": 6
+      },
+      { "text": "......", "x": 318.6, "y": 239.2, "field": false, "w": 10.7, "h": 6.4 },
+      { "text": "718", "x": 334.4, "y": 239.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "719", "x": 426.6, "y": 239.2, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 239.9,
+        "y": 229.7,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 292.9,
+        "y": 229.7,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "720", "x": 334.4, "y": 229.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "721", "x": 426.6, "y": 229.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "Bienes corrientes", "x": 240.1, "y": 211.3, "field": false, "w": 46.4, "h": 6 },
+      {
+        "text": ".......................",
+        "x": 287.7,
+        "y": 211.3,
+        "field": false,
+        "w": 40.9,
+        "h": 6.4
+      },
+      { "text": "722", "x": 334.7, "y": 211.3, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "723", "x": 426.9, "y": 211.3, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 240.1,
+        "y": 201.7,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 293.2,
+        "y": 201.7,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "724", "x": 334.7, "y": 201.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "725", "x": 426.9, "y": 201.7, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes corrientes y servicios",
+        "x": 239.9,
+        "y": 185.9,
+        "field": false,
+        "w": 76.3,
+        "h": 6
+      },
+      { "text": ".......", "x": 316.7, "y": 185.9, "field": false, "w": 12.5, "h": 6.4 },
+      { "text": "726", "x": 334.4, "y": 185.9, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "727", "x": 426.6, "y": 185.9, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Bienes de inversión",
+        "x": 239.9,
+        "y": 176.3,
+        "field": false,
+        "w": 51.9,
+        "h": 5.9
+      },
+      {
+        "text": "....................",
+        "x": 292.9,
+        "y": 176.3,
+        "field": false,
+        "w": 35.6,
+        "h": 6.4
+      },
+      { "text": "728", "x": 334.4, "y": 176.3, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "729", "x": 426.6, "y": 176.3, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Compensaciones en régimen especial de la agricultura, ganadería y pesca",
+        "x": 89.1,
+        "y": 158.7,
+        "field": false,
+        "w": 198.4,
+        "h": 6
+      },
+      {
+        "text": "......................",
+        "x": 288.6,
+        "y": 158.7,
+        "field": false,
+        "w": 39.1,
+        "h": 6.4
+      },
+      { "text": "730", "x": 334.6, "y": 158.7, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "731", "x": 426.8, "y": 158.7, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Rectificación de deducciones",
+        "x": 89.1,
+        "y": 141.2,
+        "field": false,
+        "w": 77.6,
+        "h": 6
+      },
+      {
+        "text": ".......................................................................................",
+        "x": 169.6,
+        "y": 141.2,
+        "field": false,
+        "w": 154.8,
+        "h": 6.4
+      },
+      { "text": "732", "x": 334.6, "y": 141.2, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "733", "x": 426.8, "y": 141.2, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Regularización de bienes de inversión",
+        "x": 89.3,
+        "y": 127.7,
+        "field": false,
+        "w": 100.3,
+        "h": 5.9
+      },
+      {
+        "text": ".............................................................................................................................",
+        "x": 191.9,
+        "y": 127.7,
+        "field": false,
+        "w": 222.4,
+        "h": 6.4
+      },
+      { "text": "734", "x": 427.1, "y": 127.7, "field": false, "w": 7.9, "h": 4.7 },
+      {
+        "text": "Suma de deducciones",
+        "x": 145.8,
+        "y": 111.8,
+        "field": false,
+        "w": 58.9,
+        "h": 5.6
+      },
+      {
+        "text": "(719 + 721 + 723 + 725 + 727 + 729 + 731 + 733 + 734)",
+        "x": 208.2,
+        "y": 111.8,
+        "field": false,
+        "w": 155,
+        "h": 6.3
+      },
+      {
+        "text": "................................",
+        "x": 365.1,
+        "y": 111.8,
+        "field": false,
+        "w": 56.9,
+        "h": 6.4
+      },
+      { "text": "735", "x": 427.1, "y": 111.8, "field": false, "w": 7.9, "h": 4.7 },
+      { "text": "Base imponible", "x": 356.2, "y": 249.2, "field": false, "w": 40.9, "h": 5.5 },
+      { "text": "Cuota deducible", "x": 447.1, "y": 249.2, "field": false, "w": 43.4, "h": 5.6 },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 5 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "150.617,54", "x": 121.5, "y": 654.5, "field": true },
+      { "text": "151.852,11", "x": 177.2, "y": 654.3, "field": true },
+      { "text": "153.086,68", "x": 301.1, "y": 654.5, "field": true },
+      { "text": "154.321,25", "x": 424.1, "y": 654.5, "field": true },
+      { "text": "21,00", "x": 467.9, "y": 654.6, "field": true },
+      { "text": "156.790,39", "x": 121.4, "y": 614.1, "field": true },
+      { "text": "158.024,96", "x": 177.1, "y": 613.9, "field": true },
+      { "text": "159.259,53", "x": 301, "y": 614.1, "field": true },
+      { "text": "160.494,10", "x": 424.1, "y": 614.1, "field": true },
+      { "text": "21,00", "x": 467.8, "y": 614.3, "field": true },
+      { "text": "162.963,24", "x": 121.5, "y": 569.5, "field": true },
+      { "text": "-164.197,81", "x": 177.2, "y": 569.3, "field": true },
+      { "text": "165.432,38", "x": 301.1, "y": 569.5, "field": true },
+      { "text": "166.666,95", "x": 424.1, "y": 569.5, "field": true },
+      { "text": "21,00", "x": 467.9, "y": 569.6, "field": true },
+      { "text": "169.136,09", "x": 121.5, "y": 528.4, "field": true },
+      { "text": "170.370,66", "x": 177.2, "y": 528.2, "field": true },
+      { "text": "171.605,23", "x": 301.1, "y": 528.4, "field": true },
+      { "text": "-172.839,80", "x": 424.2, "y": 528.4, "field": true },
+      { "text": "21,00", "x": 467.9, "y": 528.6, "field": true },
+      { "text": "175.308,94", "x": 121.8, "y": 484.9, "field": true },
+      { "text": "176.543,51", "x": 177.5, "y": 484.7, "field": true },
+      { "text": "177.778,08", "x": 301.4, "y": 484.9, "field": true },
+      { "text": "179.012,65", "x": 424.4, "y": 484.8, "field": true },
+      { "text": "21,00", "x": 468.2, "y": 485, "field": true },
+      { "text": "-181.481,79", "x": 343.9, "y": 421.5, "field": true },
+      { "text": "182.716,36", "x": 436, "y": 421.5, "field": true },
+      { "text": "183.950,93", "x": 343.9, "y": 412, "field": true },
+      { "text": "185.185,50", "x": 436, "y": 412, "field": true },
+      { "text": "186.420,07", "x": 344.2, "y": 393.6, "field": true },
+      { "text": "187.654,64", "x": 436.3, "y": 393.6, "field": true },
+      { "text": "188.889,21", "x": 344.2, "y": 384, "field": true },
+      { "text": "-190.123,78", "x": 436.3, "y": 384, "field": true },
+      { "text": "191.358,35", "x": 343.9, "y": 368.2, "field": true },
+      { "text": "192.592,92", "x": 436, "y": 368.2, "field": true },
+      { "text": "193.827,49", "x": 343.9, "y": 358.6, "field": true },
+      { "text": "195.062,06", "x": 436, "y": 358.6, "field": true },
+      { "text": "196.296,63", "x": 344.3, "y": 341.7, "field": true },
+      { "text": "197.531,20", "x": 436.5, "y": 341.7, "field": true },
+      { "text": "-198.765,77", "x": 344.3, "y": 324.2, "field": true },
+      { "text": "200.000,34", "x": 436.5, "y": 324.2, "field": true },
+      { "text": "201.234,91", "x": 436.5, "y": 310.1, "field": true },
+      { "text": "202.469,48", "x": 436.5, "y": 294.3, "field": true },
+      { "text": "203.704,05", "x": 343.9, "y": 238.6, "field": true },
+      { "text": "204.938,62", "x": 436, "y": 238.6, "field": true },
+      { "text": "206.173,19", "x": 343.9, "y": 229.1, "field": true },
+      { "text": "-207.407,76", "x": 436, "y": 229.1, "field": true },
+      { "text": "208.642,33", "x": 344.2, "y": 210.7, "field": true },
+      { "text": "209.876,90", "x": 436.3, "y": 210.7, "field": true },
+      { "text": "211.111,47", "x": 344.2, "y": 201.1, "field": true },
+      { "text": "212.346,04", "x": 436.3, "y": 201.1, "field": true },
+      { "text": "213.580,61", "x": 343.9, "y": 185.3, "field": true },
+      { "text": "214.815,18", "x": 436, "y": 185.3, "field": true },
+      { "text": "-216.049,75", "x": 343.9, "y": 175.7, "field": true },
+      { "text": "217.284,32", "x": 436, "y": 175.7, "field": true },
+      { "text": "218.518,89", "x": 344.1, "y": 158.1, "field": true },
+      { "text": "219.753,46", "x": 436.2, "y": 158.1, "field": true },
+      { "text": "220.988,03", "x": 344.1, "y": 140.6, "field": true },
+      { "text": "222.222,60", "x": 436.2, "y": 140.8, "field": true },
+      { "text": "223.457,17", "x": 436.5, "y": 127.1, "field": true },
+      { "text": "-224.691,74", "x": 436.5, "y": 111.2, "field": true }
+    ],
+    [
+      {
+        "text": "Ingreso efectuado a favor del Tesoro Público, cuenta restringida de colaboración en la recaudación de la AEAT de autoliquidaciones.",
+        "x": 98.5,
+        "y": 590.9,
+        "field": false,
+        "w": 343.1,
+        "h": 5.8
+      },
+      { "text": "Importe:", "x": 118.3, "y": 569.5, "field": false, "w": 22.3, "h": 6.1 },
+      {
+        "text": "Si resulta [71] negativa consignar el importe a compensar",
+        "x": 114.2,
+        "y": 666.4,
+        "field": false,
+        "w": 151.6,
+        "h": 5.9
+      },
+      { "text": "C", "x": 143, "y": 647.5, "field": false, "w": 5.9, "h": 8.2 },
+      { "text": "72", "x": 131.2, "y": 649.3, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "IBAN", "x": 105, "y": 351.7, "field": false, "w": 11.5, "h": 4.9 },
+      {
+        "text": "Mediante transferencia a cuenta bancaria abierta en España",
+        "x": 97.6,
+        "y": 362.7,
+        "field": false,
+        "w": 143.6,
+        "h": 5.4
+      },
+      { "text": "IBAN", "x": 113.4, "y": 300, "field": false, "w": 11.5, "h": 4.9 },
+      { "text": "Código SWIFT-BIC", "x": 383.5, "y": 300, "field": false, "w": 43.3, "h": 5.1 },
+      {
+        "text": "Mediante transferencia a cuenta bancaria abierta en el extranjero:",
+        "x": 97.6,
+        "y": 322,
+        "field": false,
+        "w": 157.6,
+        "h": 5.4
+      },
+      { "text": "Unión Europea/SEPA", "x": 97.6, "y": 310.8, "field": false, "w": 50.5, "h": 5.3 },
+      { "text": "Código SWIFT-BIC", "x": 109, "y": 267.5, "field": false, "w": 43.3, "h": 5.1 },
+      {
+        "text": "Número de cuenta/Account no.",
+        "x": 208.3,
+        "y": 267.5,
+        "field": false,
+        "w": 75.4,
+        "h": 5.5
+      },
+      { "text": "Resto países", "x": 97.2, "y": 278.4, "field": false, "w": 30.8, "h": 5.3 },
+      { "text": "Banco/Bank name", "x": 110.6, "y": 247.2, "field": false, "w": 44.1, "h": 5.4 },
+      {
+        "text": "Dirección del Banco/ Bank address",
+        "x": 110.6,
+        "y": 226.9,
+        "field": false,
+        "w": 84.5,
+        "h": 5.4
+      },
+      { "text": "Ciudad/City", "x": 109.3, "y": 205.6, "field": false, "w": 28, "h": 5.4 },
+      { "text": "País/Country", "x": 256.3, "y": 205.6, "field": false, "w": 31.2, "h": 5.4 },
+      {
+        "text": "Código País/Country code",
+        "x": 404.1,
+        "y": 205.6,
+        "field": false,
+        "w": 63.4,
+        "h": 5.4
+      },
+      {
+        "text": "Importe ........................",
+        "x": 103.1,
+        "y": 479.4,
+        "field": false,
+        "w": 66.2,
+        "h": 6.4
+      },
+      {
+        "text": "Solicito que el importe a devolver reseñado, me sea abonado mediante transferencia bancaria a la cuenta indicada de la que soy titular",
+        "x": 96.6,
+        "y": 495,
+        "field": false,
+        "w": 361,
+        "h": 6
+      },
+      { "text": "D", "x": 186.6, "y": 477.6, "field": false, "w": 6, "h": 8.3 },
+      { "text": "73", "x": 174.9, "y": 479.4, "field": false, "w": 5.8, "h": 5.2 },
+      { "text": "Página 6", "x": 480.8, "y": 706.9, "field": false, "w": 29.6, "h": 7.2 },
+      { "text": "Modelo", "x": 94.3, "y": 710.4, "field": false, "w": 14.5, "h": 4.4 },
+      { "text": "303", "x": 90.4, "y": 698.5, "field": false, "w": 18.5, "h": 11.1 },
+      { "text": "NIF", "x": 128.8, "y": 708.8, "field": false, "w": 6.9, "h": 4.3 },
+      {
+        "text": "Apellidos y Nombre o Razón social",
+        "x": 214.6,
+        "y": 708.8,
+        "field": false,
+        "w": 75,
+        "h": 4.8
+      },
+      { "text": "Compensación (6)", "x": 96.2, "y": 683.8, "field": false, "w": 54.6, "h": 6.3 },
+      { "text": "Ingreso (7)", "x": 99.1, "y": 608.9, "field": false, "w": 32.5, "h": 6.4 },
+      { "text": "Devolución (8)", "x": 95.1, "y": 507.1, "field": false, "w": 43.3, "h": 6.3 },
+      { "text": "IBAN", "x": 103.3, "y": 552.1, "field": false, "w": 11.5, "h": 4.9 },
+      { "text": "111", "x": 177.5, "y": 411, "field": false, "w": 8.7, "h": 5.2 },
+      {
+        "text": "Importe ..........................",
+        "x": 102.5,
+        "y": 410.3,
+        "field": false,
+        "w": 69.7,
+        "h": 6.4
+      },
+      { "text": "Rectificación (9)", "x": 95.1, "y": 446.2, "field": false, "w": 49.1, "h": 6.4 },
+      {
+        "text": "Solicito que el importe que, en su caso, pudiera resultar a devolver como consecuencia de la rectificación, me sea abonado mediante transferencia",
+        "x": 96.2,
+        "y": 430.9,
+        "field": false,
+        "w": 394.6,
+        "h": 6.1
+      },
+      {
+        "text": "bancaria a la cuenta indicada de la que soy titular",
+        "x": 96.2,
+        "y": 424.6,
+        "field": false,
+        "w": 131.9,
+        "h": 6
+      },
+      {
+        "text": "SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso",
+        "x": 44,
+        "y": 803,
+        "field": false,
+        "w": 220.1,
+        "h": 8.5
+      },
+      {
+        "text": "Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.",
+        "x": 44,
+        "y": 792,
+        "field": false,
+        "w": 208.1,
+        "h": 6.2
+      },
+      {
+        "text": "Casillas vacías: la app no las calcula.",
+        "x": 40,
+        "y": 40,
+        "field": false,
+        "w": 99.4,
+        "h": 6
+      },
+      { "text": "Página 6 de 6", "x": 518.2, "y": 40, "field": false, "w": 37, "h": 6 },
+      { "text": "225.926,31", "x": 151.6, "y": 647.8, "field": true },
+      { "text": "227.160,88", "x": 195.3, "y": 477.9, "field": true },
+      { "text": "228.395,45", "x": 187.7, "y": 410.4, "field": true }
+    ]
+  ]
+}
