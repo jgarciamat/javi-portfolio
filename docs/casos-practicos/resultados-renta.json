@@ -2394,7 +2394,7 @@
       "casilla": "0570",
       "campo": null,
       "concepto": "Cuota líquida estatal",
-      "esperado": 1369.16,
+      "esperado": 1369.17,
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
@@ -2416,7 +2416,7 @@
       "casilla": "0587",
       "campo": null,
       "concepto": "Cuota líquida incrementada total",
-      "esperado": 2701.06,
+      "esperado": 2701.07,
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
@@ -4648,8 +4648,8 @@
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
       "esperado": 5873.46,
-      "obtenido": 4873.46,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5873.46,
+      "estado": "coincide"
     },
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
@@ -4668,8 +4668,8 @@
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
       "esperado": -226.54,
-      "obtenido": -1226.54,
-      "estado": "discrepancia-conocida"
+      "obtenido": -226.54,
+      "estado": "coincide"
     },
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
@@ -4688,8 +4688,8 @@
       "campo": "result.refundable",
       "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
       "esperado": 2200,
-      "obtenido": 1200,
-      "estado": "discrepancia-conocida"
+      "obtenido": 2200,
+      "estado": "coincide"
     },
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
@@ -4798,8 +4798,8 @@
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
       "esperado": 12000,
-      "obtenido": 9000,
-      "estado": "discrepancia-conocida"
+      "obtenido": 12000,
+      "estado": "coincide"
     },
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
@@ -4808,8 +4808,8 @@
       "campo": "boxes.0519",
       "concepto": "Mínimo personal y familiar, gravamen estatal",
       "esperado": 18700,
-      "obtenido": 15700,
-      "estado": "discrepancia-conocida"
+      "obtenido": 18700,
+      "estado": "coincide"
     },
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
@@ -4818,8 +4818,8 @@
       "campo": "boxes.0520",
       "concepto": "Mínimo personal y familiar, gravamen autonómico",
       "esperado": 18700,
-      "obtenido": 15700,
-      "estado": "discrepancia-conocida"
+      "obtenido": 18700,
+      "estado": "coincide"
     },
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
@@ -4937,8 +4937,8 @@
       "casilla": "0023",
       "campo": "boxes.0023",
       "concepto": "Reducción por obtención de rendimientos del trabajo",
-      "esperado": 5043.63,
-      "obtenido": 5043.63,
+      "esperado": 5043.62,
+      "obtenido": 5043.62,
       "estado": "coincide"
     },
     {
@@ -4947,8 +4947,8 @@
       "casilla": "0025",
       "campo": "boxes.0025",
       "concepto": "Rendimiento neto reducido del trabajo",
-      "esperado": 9098.87,
-      "obtenido": 9098.87,
+      "esperado": 9098.88,
+      "obtenido": 9098.88,
       "estado": "coincide"
     },
     {
@@ -4957,8 +4957,8 @@
       "casilla": "0435",
       "campo": "boxes.0435",
       "concepto": "Base imponible general",
-      "esperado": 9098.87,
-      "obtenido": 9098.87,
+      "esperado": 9098.88,
+      "obtenido": 9098.88,
       "estado": "coincide"
     },
     {
@@ -4967,8 +4967,8 @@
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
-      "esperado": 9098.87,
-      "obtenido": 9098.87,
+      "esperado": 9098.88,
+      "obtenido": 9098.88,
       "estado": "coincide"
     },
     {
@@ -5848,8 +5848,8 @@
       "campo": "boxes.0545",
       "concepto": "Cuota íntegra estatal",
       "esperado": 4230.11,
-      "obtenido": 4230.1,
-      "estado": "discrepancia-conocida"
+      "obtenido": 4230.11,
+      "estado": "coincide"
     },
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
@@ -5878,8 +5878,8 @@
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
       "esperado": 6541.08,
-      "obtenido": 7219.07,
-      "estado": "discrepancia-conocida"
+      "obtenido": 6541.08,
+      "estado": "coincide"
     },
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
@@ -5898,8 +5898,8 @@
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
       "esperado": -1058.92,
-      "obtenido": -380.93,
-      "estado": "discrepancia-conocida"
+      "obtenido": -1058.92,
+      "estado": "coincide"
     },
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
@@ -5908,8 +5908,8 @@
       "campo": "boxes.0670",
       "concepto": "Resultado de la declaración",
       "esperado": -1058.92,
-      "obtenido": -380.93,
-      "estado": "discrepancia-conocida"
+      "obtenido": -1058.92,
+      "estado": "coincide"
     },
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
@@ -5928,8 +5928,8 @@
       "campo": "result.regionalDeductions",
       "concepto": "Deducciones aplicadas en la cuota autonómica",
       "esperado": 678,
-      "obtenido": 0,
-      "estado": "discrepancia-conocida"
+      "obtenido": 678,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6008,8 +6008,8 @@
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
       "esperado": 43698,
-      "obtenido": 43198,
-      "estado": "discrepancia-conocida"
+      "obtenido": 43698,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6068,8 +6068,8 @@
       "campo": "boxes.0545",
       "concepto": "Cuota íntegra estatal",
       "esperado": 5407.63,
-      "obtenido": 5315.13,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5407.63,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6078,8 +6078,8 @@
       "campo": "boxes.0546",
       "concepto": "Cuota íntegra autonómica",
       "esperado": 5640.37,
-      "obtenido": 5545.37,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5640.37,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6098,8 +6098,8 @@
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
       "esperado": 11048,
-      "obtenido": 10860.5,
-      "estado": "discrepancia-conocida"
+      "obtenido": 11048,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6118,8 +6118,8 @@
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
       "esperado": 148,
-      "obtenido": -39.5,
-      "estado": "discrepancia-conocida"
+      "obtenido": 148,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6128,8 +6128,8 @@
       "campo": "boxes.0670",
       "concepto": "Resultado de la declaración",
       "esperado": 148,
-      "obtenido": -39.5,
-      "estado": "discrepancia-conocida"
+      "obtenido": 148,
+      "estado": "coincide"
     },
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
@@ -6138,8 +6138,8 @@
       "campo": "result.pensionReduction",
       "concepto": "Reducción por aportaciones a planes de pensiones",
       "esperado": 3000,
-      "obtenido": 3500,
-      "estado": "discrepancia-conocida"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "15-donativos-castilla-y-leon",
@@ -6348,8 +6348,8 @@
       "campo": "result.stateDeductions",
       "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
       "esperado": 150,
-      "obtenido": 300,
-      "estado": "discrepancia-conocida"
+      "obtenido": 150,
+      "estado": "coincide"
     },
     {
       "caso": "15-donativos-castilla-y-leon",
@@ -6358,8 +6358,8 @@
       "campo": "result.regionalDeductions",
       "concepto": "Deducciones aplicadas en la cuota autonómica",
       "esperado": 150,
-      "obtenido": 0,
-      "estado": "discrepancia-conocida"
+      "obtenido": 150,
+      "estado": "coincide"
     },
     {
       "caso": "16-intereses-dividendos-comunitat-valenciana",
@@ -7228,8 +7228,8 @@
       "campo": "boxes.0435",
       "concepto": "Base imponible general",
       "esperado": 29399.89,
-      "obtenido": 29404,
-      "estado": "discrepancia-conocida"
+      "obtenido": 29399.89,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7238,8 +7238,8 @@
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
       "esperado": 29399.89,
-      "obtenido": 29404,
-      "estado": "discrepancia-conocida"
+      "obtenido": 29399.89,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7298,8 +7298,8 @@
       "campo": "boxes.0545",
       "concepto": "Cuota íntegra estatal",
       "esperado": 5477.98,
-      "obtenido": 5478.6,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5477.98,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7308,8 +7308,8 @@
       "campo": "boxes.0546",
       "concepto": "Cuota íntegra autonómica",
       "esperado": 5343.23,
-      "obtenido": 5343.84,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5343.23,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7328,8 +7328,8 @@
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
       "esperado": 10821.21,
-      "obtenido": 10822.44,
-      "estado": "discrepancia-conocida"
+      "obtenido": 10821.21,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7348,8 +7348,8 @@
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
       "esperado": 5621.21,
-      "obtenido": 5622.44,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5621.21,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7358,8 +7358,8 @@
       "campo": "boxes.0670",
       "concepto": "Resultado de la declaración",
       "esperado": 5621.21,
-      "obtenido": 5622.44,
-      "estado": "discrepancia-conocida"
+      "obtenido": 5621.21,
+      "estado": "coincide"
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -7368,8 +7368,8 @@
       "campo": "result.imputedIncome",
       "concepto": "Imputación de rentas inmobiliarias",
       "esperado": 495.89,
-      "obtenido": 500,
-      "estado": "discrepancia-conocida"
+      "obtenido": 495.89,
+      "estado": "coincide"
     },
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
@@ -7737,9 +7737,9 @@
       "casilla": "0595",
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 2701.06,
-      "obtenido": 2805.99,
-      "estado": "discrepancia-conocida"
+      "esperado": 2701.07,
+      "obtenido": 2701.07,
+      "estado": "coincide"
     },
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
@@ -7757,9 +7757,9 @@
       "casilla": "0610",
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
-      "esperado": -198.94,
-      "obtenido": -94.01,
-      "estado": "discrepancia-conocida"
+      "esperado": -198.93,
+      "obtenido": -198.93,
+      "estado": "coincide"
     },
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
@@ -7767,9 +7767,9 @@
       "casilla": "0670",
       "campo": "boxes.0670",
       "concepto": "Resultado de la declaración",
-      "esperado": -198.94,
-      "obtenido": -94.01,
-      "estado": "discrepancia-conocida"
+      "esperado": -198.93,
+      "obtenido": -198.93,
+      "estado": "coincide"
     },
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
@@ -7777,9 +7777,9 @@
       "casilla": null,
       "campo": "result.stateDeductions",
       "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
-      "esperado": 257.74,
-      "obtenido": 410.55,
-      "estado": "discrepancia-conocida"
+      "esperado": 257.73,
+      "obtenido": 257.73,
+      "estado": "coincide"
     },
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
@@ -7788,8 +7788,8 @@
       "campo": "result.regionalDeductions",
       "concepto": "Deducciones aplicadas en la cuota autonómica",
       "esperado": 257.74,
-      "obtenido": 0,
-      "estado": "discrepancia-conocida"
+      "obtenido": 257.74,
+      "estado": "coincide"
     }
   ]
 }
