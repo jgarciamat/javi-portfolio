@@ -27,6 +27,7 @@ import {
   recurringDeleteQuery,
   recurringPatchBody,
   transferBody,
+  accountListQuery,
 } from '../schemas';
 import { z } from 'zod';
 
@@ -94,7 +95,9 @@ export function planningRoutes(c: Container): Router {
   router.get(
     '/accounts',
     authed((req, res) => {
-      const { accounts, totalCents } = c.accounts.list(req.dataUserId);
+      const { year, month } = accountListQuery.parse(req.query);
+      const period = year !== undefined && month !== undefined ? { year, month } : undefined;
+      const { accounts, totalCents } = c.accounts.list(req.dataUserId, period);
       res.json({ accounts: accounts.map(presentAccount), total: totalCents / 100 });
     })
   );

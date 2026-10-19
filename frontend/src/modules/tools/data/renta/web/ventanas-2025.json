@@ -1,0 +1,120 @@
+{
+  "year": 2025,
+  "source": "AEAT, «Diccionario declaración individual (toma de datos) (Ejercicio 2025)» (diccionarioDlgXSD_2025.properties, 13-05-2026), diccionarioXSD_2025.properties y Renta2025.xsd (24-06-2026), en https://sede.agenciatributaria.gob.es/Sede/ayuda/disenos-registro/modelos-100-199.html; etiquetas copiadas en docs/fiscalidad/como-declarar-cripto-y-fondos.md §1",
+  "checked": "2026-10-19",
+  "apartado": "F2 · Ganancias y pérdidas patrimoniales derivadas de la transmisión de elementos patrimoniales",
+  "windows": {
+    "iic": {
+      "title": "Ganancias y pérdidas por la transmisión de sociedades y fondos de inversión y de SOCIMIS",
+      "help": "https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_6_6_2/transmisiones_instituciones_inversion_colectiva.html",
+      "limit": 60,
+      "fields": [
+        { "key": "nif", "label": "NIF de la sociedad o fondo de inversión", "box": "0311" },
+        { "key": "proceeds", "label": "Valor de transmisión (*)", "box": "0312" },
+        { "key": "cost", "label": "Valor de adquisición (*)", "box": "0315" },
+        { "key": "withheld", "label": "Retenciones" },
+        {
+          "key": "blocked",
+          "label": "Marque la casilla si la transmisión ha originado una pérdida patrimonial que no puede ser computada en 2025 por haberse producido la recompra dentro de los plazos legalmente establecidos"
+        }
+      ],
+      "results": { "gain": "0316", "loss": "0321", "counted": "0322" },
+      "totals": { "gains": "0324", "losses": "0325" }
+    },
+    "etf": {
+      "title": "Ganancias y pérdidas por la transmisión de participaciones de fondos cotizados (ETF) y de acciones de SICAV índice cotizadas",
+      "help": "https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_6_6_2/transmisiones_instituciones_inversion_colectiva.html",
+      "limit": 200,
+      "fields": [
+        {
+          "key": "nif",
+          "label": "NIF del fondo cotizado (ETF) o SICAV índice cotizada",
+          "box": "2225"
+        },
+        {
+          "key": "name",
+          "label": "Denominación del fondo (ETF) o SICAV índice cotizada",
+          "box": "2226",
+          "max": 40
+        },
+        { "key": "isin", "label": "Código ISIN de las acciones o participaciones", "max": 12 },
+        { "key": "proceeds", "label": "Valor de transmisión", "box": "2227" },
+        { "key": "cost", "label": "Valor de adquisición", "box": "2229" },
+        {
+          "key": "blocked",
+          "label": "Marque la casilla si la transmisión ha originado una pérdida patrimonial que no puede ser computada en 2025 por haberse producido la recompra dentro de los plazos legalmente establecidos"
+        }
+      ],
+      "results": { "gain": "2230", "loss": "2233", "counted": "2234" },
+      "totals": { "gains": "2235", "losses": "2236" }
+    },
+    "shares": {
+      "title": "Transmisión de acciones negociadas",
+      "help": "https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_6_6_2/ganancias_perdidas_patrimoniales_derivadas_acciones.html",
+      "limit": 200,
+      "transactions": 500,
+      "fields": [
+        { "key": "entity", "label": "Entidad Emisora", "box": "0327", "max": 20 },
+        { "key": "transaction", "label": "Transacción" },
+        { "key": "proceeds", "label": "Valor de transmisión (*)", "box": "0328" },
+        { "key": "cost", "label": "Valor de adquisición (*)", "box": "0331" },
+        {
+          "key": "blocked",
+          "label": "Marque la casilla si ha obtenido una pérdida patrimonial y ha recomprado acciones homogéneas en los dos meses anteriores o posteriores a la transmisión"
+        }
+      ],
+      "results": { "gain": "0332", "loss": "0337", "counted": "0338" },
+      "totals": { "gains": "0339", "losses": "0340" }
+    },
+    "crypto": {
+      "title": "Ganancias y pérdidas patrimoniales derivadas de la transmisión o permuta de monedas virtuales",
+      "help": "https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_6_6_2/ganancias_perdidas_monedas_virtuales.html",
+      "limit": 300,
+      "fields": [
+        { "key": "name", "label": "Denominación de la moneda virtual", "box": "1802", "max": 25 },
+        {
+          "key": "key",
+          "label": "Indique el tipo de contraprestación recibida a cambio",
+          "box": "1803"
+        },
+        { "key": "proceeds", "label": "Importe de la transmisión" },
+        { "key": "proceedsCosts", "label": "Gastos de la transmisión" },
+        { "key": "cost", "label": "Importe de la adquisición" },
+        { "key": "costCosts", "label": "Gastos de la adquisición" }
+      ],
+      "keys": {
+        "F": "F - Moneda de curso legal",
+        "N": "N - Otra moneda virtual",
+        "O": "O - Otro activo virtual",
+        "B": "B - Bienes o servicios"
+      },
+      "results": {
+        "proceeds": "1804",
+        "cost": "1806",
+        "loss": "1807",
+        "gain": "1809",
+        "counted": "1808"
+      },
+      "totals": { "gains": "1814", "losses": "1813" }
+    },
+    "other": {
+      "title": "Ganancias y pérdidas patrimoniales derivadas de transmisiones de otros elementos patrimoniales",
+      "help": "https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Presentacion/100/7_6_6_2.html",
+      "limit": 80,
+      "fields": [
+        { "key": "type", "label": "Tipo de elemento patrimonial", "box": "1626" },
+        { "key": "onerous", "label": "Transmisión intervivos onerosa (venta, permuta, etc)" },
+        { "key": "sold", "label": "Fecha de transmisión", "box": "1631" },
+        { "key": "bought", "label": "Fecha de adquisición", "box": "1632" },
+        { "key": "proceeds", "label": "Importe de la transmisión" },
+        { "key": "proceedsCosts", "label": "Gastos de la transmisión" },
+        { "key": "cost", "label": "Importe de la adquisición" },
+        { "key": "costCosts", "label": "Gastos de la adquisición" },
+        { "key": "amortization", "label": "Amortizaciones" }
+      ],
+      "typeValue": "4 - Otros elementos patrimoniales (bienes o derechos) no afectos a actividades económicas",
+      "results": { "loss": "1638", "gain": "1640", "counted": "1639" },
+      "totals": { "gains": "0386", "losses": "0385" }
+    }
+  }
+}

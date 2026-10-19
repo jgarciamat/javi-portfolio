@@ -1,0 +1,771 @@
+[
+  {
+    "slug": "p3-100-autonoma-maternidad-madrid",
+    "titulo": "Autónoma de Madrid que tiene un hijo en 2025",
+    "comunidad": "madrid",
+    "modelos": [
+      "100",
+      "130",
+      "303"
+    ],
+    "prueba": [
+      "prestación por nacimiento de una autónoma (exenta)",
+      "maternidad de una autónoma (alta en el RETA)",
+      "bonificación de la cuota durante el descanso"
+    ],
+    "alcance": "fuera"
+  },
+  {
+    "slug": "p3-101-trabajo-en-el-extranjero-7p-madrid",
+    "titulo": "Asalariado desplazado tres meses a Marruecos: exención del art. 7.p",
+    "comunidad": "madrid",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "exención por trabajos en el extranjero (art. 7.p)",
+      "reparto por días",
+      "escala de Madrid"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-102-pensionista-monte-vecinal-ourense",
+    "titulo": "Pensionista comunero de un monte vecinal en mano común",
+    "comunidad": "galicia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "reparto de un monte vecinal (capital mobiliario)",
+      "pensionista",
+      "mínimos de Galicia"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-103-vacuno-leche-titularidad-compartida-pontevedra",
+    "titulo": "Ganadera de vacuno de leche en titularidad compartida",
+    "comunidad": "galicia",
+    "modelos": [
+      "100",
+      "130"
+    ],
+    "prueba": [
+      "titularidad compartida (50 % cada cónyuge)",
+      "vacuno de leche en directa",
+      "REAGP 10,5 %",
+      "exención del 130"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
+    "titulo": "Residente en La Palma con ayuda por la vivienda destruida por el volcán",
+    "comunidad": "canarias",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ayuda por erupción volcánica no integrada",
+      "deducción de La Palma (60 %)",
+      "escala de Canarias"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-105-alquiler-turistico-asalariado-baleares",
+    "titulo": "Asalariada que alquila una vivienda de uso turístico en Menorca",
+    "comunidad": "baleares",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "vivienda de uso turístico sin servicios (capital inmobiliario)",
+      "sin reducción del art. 23.2",
+      "otras rentas > 6.500"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-106-fruticultor-arranque-perales-modulos-lleida",
+    "titulo": "Fruticultor de Lleida que arranca perales con ayuda de la PAC",
+    "comunidad": "cataluna",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "frutos no cítricos (índice 0,37)",
+      "prima de arranque exenta (DA 5.ª)",
+      "amortización de frutales (10 %)",
+      "escala de Cataluña"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-107-viticultor-sin-do-sequia-modulos-ciudad-real",
+    "titulo": "Viticultor manchego sin denominación de origen con ayuda por sequía",
+    "comunidad": "castilla-la-mancha",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "ayuda por sequía (subvención corriente en el volumen)",
+      "uva sin denominación de origen (0,26)",
+      "rendimiento minorado ≤ 9.447,91 € (índice 0,90)"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-108-agricultor-navarra-foral-fuera-de-alcance",
+    "titulo": "Agricultor de la Ribera de Navarra (régimen foral)",
+    "comunidad": "navarra",
+    "modelos": [
+      "F-90 (Navarra)"
+    ],
+    "prueba": [
+      "territorio foral: Navarra (agrario)"
+    ],
+    "alcance": "fuera"
+  },
+  {
+    "slug": "p3-59-monoparental-alimentos-recibidos-valencia",
+    "titulo": "Madre sola con dos hijos que cobra alimentos del padre: familia monoparental general",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "familia monoparental (CV, 330 €)",
+      "alimentos recibidos exentos (art. 7.k)",
+      "mínimo por dos descendientes completo",
+      "conjunta monoparental"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-60-viuda-77-viudedad-apartamento-costa-alicante",
+    "titulo": "Viuda de 77 años con pensión de viudedad y un apartamento en la costa que alquila en verano",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensión de viudedad",
+      "mayor de 75",
+      "alquiler de temporada sin reducción",
+      "imputación de renta por días",
+      "dos pagadores de pensiones"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-61-joven-alquiler-despoblamiento-castellon",
+    "titulo": "Joven de 28 años de alquiler en un pueblo de Castellón en riesgo de despoblamiento",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "alquiler de vivienda habitual (CV, 25 % ≤ 35 años)",
+      "despoblamiento (CV, 330 €)",
+      "sin deducción estatal de alquiler (contrato posterior a 2015)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-62-afectado-dana-ayudas-valencia",
+    "titulo": "Vecino afectado por la DANA de octubre de 2024: ayudas públicas exentas y obras",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ayudas por catástrofe no integradas (DA 5.ª LIRPF)",
+      "ayuda por desalojo exenta",
+      "deducción CV por daños de la DANA (tope 2.000 €)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-63-almendro-olivar-modulos-reagp-alicante",
+    "titulo": "Agricultor de almendro y olivo en módulos (REAGP) en el interior de Alicante",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "módulos agrarios (índice 0,26)",
+      "REAGP: compensación del 12 %",
+      "PAC: pago básico repartido y ecorregimen exento",
+      "seguro agrario (indemnización en el volumen)",
+      "exención del 131 (≥ 70 % retenido)"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-64-citricultor-directa-iva-general-exporta-valencia",
+    "titulo": "Citricultor en estimación directa y régimen general del IVA que vende a Francia",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100",
+      "130",
+      "303",
+      "349"
+    ],
+    "prueba": [
+      "estimación directa simplificada agraria",
+      "303 con ventas al 4 % y entrega intracomunitaria (59, 349)",
+      "130 sección II (2 % del volumen)",
+      "seguro agrario como gasto",
+      "amortización de cítricos (4 %)"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
+    "titulo": "Madre con un hijo nacido en marzo de 2025: prestación por nacimiento exenta",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "prestación por nacimiento exenta (art. 7.h)",
+      "maternidad por meses (art. 81)",
+      "nacimiento CV (600 €, repartido)",
+      "hijo menor de 3 años (mínimo 2.800 €)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-66-placas-solares-next-generation-hipoteca-castellon",
+    "titulo": "Placas solares con ayuda Next Generation e hipoteca anterior a 2013",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ayuda de autoconsumo no integrada (DA 5.ª.4)",
+      "deducción CV por autoconsumo (40 %)",
+      "vivienda habitual, régimen transitorio (DT 18.ª)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-67-comercio-kit-digital-ayuda-contratacion-alicante",
+    "titulo": "Tienda de Alicante con Kit Digital, ayuda a la contratación, empleada y local",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "130",
+      "303",
+      "111",
+      "115",
+      "180",
+      "190",
+      "347",
+      "390",
+      "RETA"
+    ],
+    "prueba": [
+      "Kit Digital (subvención corriente)",
+      "ayuda a la contratación",
+      "111 y 115",
+      "303 general",
+      "130 con subvenciones"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-68-pensionista-discapacidad-65-madre-95-alicante",
+    "titulo": "Pensionista de 70 años con discapacidad del 65 % que cuida de su madre de 95",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensionista con discapacidad 65 %",
+      "ascendiente mayor de 75 a cargo",
+      "deducciones CV de 197 €",
+      "sin incremento de gastos por discapacidad (pensionista)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-69-fija-discontinua-almacen-citricos-paro-valencia",
+    "titulo": "Fija discontinua en un almacén de naranjas que cobra el paro entre campañas",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "fija discontinua",
+      "prestación por desempleo (rendimiento del trabajo)",
+      "sin obligación de declarar",
+      "deducción de 340 € (DA 61.ª)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-70-venta-vivienda-reinversion-dividendos-valencia",
+    "titulo": "Vende su vivienda habitual y reinvierte todo en otra",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "exención por reinversión en vivienda habitual (art. 38)",
+      "dividendos en la base del ahorro",
+      "retención del 19 %"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-71-ovino-leche-modulos-piensos-zamora",
+    "titulo": "Ganadero de ovino de leche en Zamora: módulos con piensos comprados",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "módulos ganaderos (ovino de leche, índice 0,26)",
+      "piensos adquiridos > 50 % (índice 0,50)",
+      "REAGP: compensación del 10,5 %",
+      "ayuda asociada de la PAC",
+      "amortización del ganado reproductor (22 %)",
+      "exención del 131"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-72-vacuno-cria-dehesa-derechos-pac-salamanca",
+    "titulo": "Ganadero de vacuno de cría en la dehesa salmantina que vende derechos de pago básico",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "130"
+    ],
+    "prueba": [
+      "estimación directa ganadera",
+      "venta de derechos de pago básico (ganancia del ahorro)",
+      "ayuda asociada a la vaca nodriza",
+      "REAGP (10,5 %)",
+      "exención del 130"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-73-joven-cerealista-primera-instalacion-cooperativa-burgos",
+    "titulo": "Joven cerealista de Burgos con la ayuda de primera instalación",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "130"
+    ],
+    "prueba": [
+      "ayuda a jóvenes agricultores imputada por cuartas partes (art. 14.1.b)",
+      "retornos cooperativos (capital mobiliario)",
+      "estimación directa",
+      "PAC con complemento para jóvenes"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-74-viticultor-denominacion-origen-modulos-valladolid",
+    "titulo": "Viticultor con uva de denominación de origen en módulos",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "módulos agrarios (índice 0,32)",
+      "seguro agrario por helada",
+      "amortización del viñedo (5 %)",
+      "exención del 131"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-75-viudo-79-hijo-discapacidad-65-leon",
+    "titulo": "Viudo de 79 años que vive con su hijo de 45 con discapacidad del 65 %",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "viudo mayor de 75",
+      "hijo mayor de edad con discapacidad 65 %",
+      "deducción por descendiente con discapacidad (art. 81 bis)",
+      "pensiones de viudedad y jubilación"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-76-huerfana-19-orfandad-exenta-segovia",
+    "titulo": "Huérfana de 19 años con pensión de orfandad y un trabajo de verano",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensión de orfandad exenta (art. 7.h)",
+      "base inferior al mínimo",
+      "devolución de retenciones"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-77-nacimiento-rural-alquiler-joven-soria",
+    "titulo": "Pareja joven en un pueblo de Soria: primer hijo y alquiler",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "nacimiento en el medio rural (CyL, 1.420 €)",
+      "alquiler joven rural (CyL, 25 %)",
+      "límite de renta después del mínimo",
+      "conjunta frente a individual"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-78-familia-numerosa-hipoteca-2008-palencia",
+    "titulo": "Familia numerosa general en Palencia con hipoteca de 2008",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "familia numerosa (estado y CyL)",
+      "vivienda habitual, régimen transitorio con base compartida",
+      "tres hijos al 50 %"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-79-apicultor-modulos-y-asalariado-avila",
+    "titulo": "Asalariado que además es apicultor en módulos (pluriactividad)",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "apicultura en módulos (índice 0,26)",
+      "asalariado y actividad agraria a la vez",
+      "131 del 2 % sin retenciones",
+      "otras rentas > 6.500 (sin reducción del art. 20)"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-80-porcino-engorde-integrado-segovia",
+    "titulo": "Ganadero de porcino de engorde integrado (servicios de cría y engorde)",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "retención del 1 % del porcino de engorde",
+      "servicios de cría, guarda y engorde (índice 0,37)",
+      "índice corrector por personal asalariado",
+      "exención del 131"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-81-acciones-traspaso-fondos-plan-burgos",
+    "titulo": "Venta de acciones, traspaso entre fondos sin tributar y plan de pensiones",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "traspaso entre fondos sin tributación (art. 94)",
+      "ganancia de acciones",
+      "plan de pensiones (1.500 €)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-82-chopera-forestal-leon",
+    "titulo": "Propietario de una chopera en León: corta forestal en módulos",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "actividad forestal en módulos (índice 0,26)",
+      "retención del 2 % forestal (art. 95.5)",
+      "sin amortizaciones en forestal",
+      "pensionista con actividad"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-83-olivarero-almazara-cooperativa-jaen",
+    "titulo": "Olivarero de Jaén socio de una almazara cooperativa",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "módulos agrarios del olivar (0,26)",
+      "personal asalariado (índice 0,90)",
+      "amortización del olivar (3 %)",
+      "ecorregimen exento",
+      "REAGP 12 %"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-84-jornalero-subsidio-agrario-jaen",
+    "titulo": "Jornalero eventual agrario en Jaén con el subsidio agrario",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "subsidio agrario (REASS)",
+      "jornales de varios pagadores",
+      "sin obligación de declarar",
+      "deducción de 340 €"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-85-horticultor-invernadero-directa-exporta-almeria",
+    "titulo": "Horticultor de invernadero en Almería: directa, IVA general y exportación a Alemania",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100",
+      "130",
+      "303",
+      "349"
+    ],
+    "prueba": [
+      "estimación directa agraria",
+      "303 al 4 % con entregas intracomunitarias",
+      "130 sección II",
+      "111 por sus trabajadores",
+      "amortización del invernadero"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-86-monoparental-especial-fresa-huelva",
+    "titulo": "Madre sola con tres hijos (uno con discapacidad) que trabaja en la fresa: monoparental especial",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "monoparental sin alimentos (art. 81 bis.1.d)",
+      "hijo con discapacidad (art. 81 bis.1.a)",
+      "monoparental (Andalucía, 100 €)",
+      "mínimos andaluces"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-87-viuda-derechos-pac-arrendamiento-rustico-cordoba",
+    "titulo": "Viuda que arrienda la finca de su marido y vende sus derechos de pago básico",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensión de viudedad",
+      "arrendamiento de finca rústica",
+      "venta de derechos de pago básico heredados",
+      "mínimos andaluces"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-88-familia-numerosa-especial-cinco-hijos-conjunta-sevilla",
+    "titulo": "Matrimonio con cinco hijos: familia numerosa especial en conjunta",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "familia numerosa especial (estado)",
+      "límite de renta de la deducción andaluza (30.000 € en conjunta)",
+      "cinco hijos con menor de 3",
+      "conjunta"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-89-bono-alquiler-joven-malaga",
+    "titulo": "Joven de 26 años en Málaga con el Bono Alquiler Joven",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "Bono Alquiler Joven (ganancia en la base general)",
+      "alquiler joven en Andalucía (15 %, 1.200 €)",
+      "límite de 25.000 € de bases",
+      "otras rentas en el art. 20"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-90-hostelera-cese-actividad-cadiz",
+    "titulo": "Hostelera de Cádiz que cerró su bar y cobró la prestación por cese de actividad",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100",
+      "130"
+    ],
+    "prueba": [
+      "prestación por cese de actividad (trabajo)",
+      "cese de la actividad a mitad de año",
+      "pérdida por venta de elementos afectos"
+    ],
+    "alcance": "fuera"
+  },
+  {
+    "slug": "p3-91-padre-permiso-nacimiento-pueblo-granada",
+    "titulo": "Padre que disfruta su permiso por nacimiento en un pueblo de Granada",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "prestación por nacimiento del padre exenta",
+      "nacimiento en municipio pequeño (Andalucía, 400 €)",
+      "hijo menor de 3 años"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-92-pensionista-discapacidad-65-almeria",
+    "titulo": "Pensionista con discapacidad del 65 % en Almería",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensión de incapacidad total (no exenta)",
+      "discapacidad 65 % con asistencia",
+      "mayor de 65",
+      "deducción andaluza por discapacidad"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-93-rehabilitacion-energetica-next-generation-sevilla",
+    "titulo": "Rehabilitación energética de la vivienda con ayuda Next Generation",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ayuda Next Generation no integrada",
+      "deducción estatal por eficiencia energética (40 %)",
+      "base menos la subvención"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-94-maiz-regadio-arrendado-modulos-huesca",
+    "titulo": "Agricultor de maíz en regadío eléctrico y tierras arrendadas (Huesca)",
+    "comunidad": "aragon",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "índice corrector de tierras arrendadas (0,90)",
+      "índice corrector de regadío eléctrico (0,75)",
+      "módulos agrarios del cereal (0,26)",
+      "escala de Aragón"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-95-despido-indemnizacion-exenta-teruel",
+    "titulo": "Despedido con indemnización exenta en parte y dos pagadores",
+    "comunidad": "aragon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "indemnización por despido exenta en parte (art. 7.e)",
+      "dos pagadores",
+      "escala de Aragón"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-96-pareja-de-hecho-guarderia-zaragoza",
+    "titulo": "Madre en pareja de hecho con un hijo de 2 años en la guardería",
+    "comunidad": "aragon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pareja de hecho (sin conjunta)",
+      "maternidad + guardería (art. 81.2)",
+      "hijo menor de 3 años al 50 %"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-97-lechuga-ecologica-regadio-modulos-murcia",
+    "titulo": "Hortelano de lechuga ecológica en el Campo de Cartagena",
+    "comunidad": "murcia",
+    "modelos": [
+      "100",
+      "131"
+    ],
+    "prueba": [
+      "agricultura ecológica (0,95)",
+      "regadío eléctrico (0,75)",
+      "hortícolas (0,26)",
+      "escala de Murcia"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p3-98-abuela-81-nieto-huerfano-murcia",
+    "titulo": "Abuela viuda de 81 años con su nieto huérfano a cargo",
+    "comunidad": "murcia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "viuda mayor de 75",
+      "nieto huérfano a cargo (mínimo por descendientes)",
+      "orfandad exenta del nieto"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p3-99-abogado-retenciones-130-exento-murcia",
+    "titulo": "Abogado en Murcia con retención en casi todos sus ingresos",
+    "comunidad": "murcia",
+    "modelos": [
+      "303",
+      "390",
+      "RETA"
+    ],
+    "prueba": [
+      "exención del 130 por retenciones (art. 109.2)",
+      "303 general",
+      "profesional con retención del 15 %"
+    ],
+    "alcance": "parcial"
+  }
+]

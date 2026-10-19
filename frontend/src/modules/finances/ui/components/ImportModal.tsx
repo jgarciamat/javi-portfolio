@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { ScrollRegion } from '@shared/components/ScrollRegion';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
@@ -42,15 +43,22 @@ const SOURCE_MARK: Partial<Record<NonNullable<ImportedRow['categorySource']>, st
   ai: ' ✨',
 };
 
+const IMPORT_ACCEPT =
+  '.csv,.xlsx,.txt,.n43,.q43,.aeb,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
 function FileStep({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   return (
-    <div className="modal-body">
+    <FileDropZone
+      className="modal-body"
+      accept={IMPORT_ACCEPT}
+      onFiles={(list) => void imp.loadFile(list[0])}
+    >
       <p className="section-hint">{t('app.import.hint')}</p>
       <label className="file-drop">
         <input
           type="file"
-          accept=".csv,.txt,.n43,.q43,.aeb,text/csv,text/plain"
+          accept={IMPORT_ACCEPT}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) void imp.loadFile(file);
@@ -58,7 +66,7 @@ function FileStep({ imp }: { imp: ImportState }) {
         />
         <span>{t('app.import.choose')}</span>
       </label>
-    </div>
+    </FileDropZone>
   );
 }
 

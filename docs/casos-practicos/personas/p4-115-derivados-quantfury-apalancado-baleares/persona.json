@@ -1,0 +1,105 @@
+{
+  "slug": "p4-115-derivados-quantfury-apalancado-baleares",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 115",
+  "nif": "00000115T",
+  "domicilio": "Calle Ficticia 115, 07001 Palma (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "baleares",
+  "titulo": "Opera con apalancamiento en Quantfury: acciones y pares de cripto",
+  "descripcion": "Cierra en 2025 tres posiciones: una larga de acciones con +110 $, una corta con −55 $ y un par BTC/USDT con +220 ₮. Una posición de 2024 perdió 11 $ (va en la Renta de 2024). Tipo de cambio INVENTADO: 1,10 $ por euro; el USDT se valora como un dólar (NO CONFIRMADO).",
+  "prueba": [
+    "informe PDF de Quantfury: una ganancia o pérdida por posición, del año del cierre",
+    "derivados en la base del ahorro (arts. 46.b y 49; NO CONFIRMADO)",
+    "aviso de resultados de años anteriores"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "quantfury-historial-de-trading.pdf"
+  ],
+  "tiposDeCambioInventados": {
+    "USD": 1.1
+  },
+  "avisos": [
+    "stablecoinPrice",
+    "derivative",
+    "earlierYears",
+    "lossYears"
+  ],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "baleares",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "quantfury-historial-de-trading.pdf"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 0,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [],
+              "generalGains": [],
+              "otherGains": [
+                100,
+                -50,
+                200
+              ],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": []
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

@@ -50,6 +50,7 @@ const deductions: Deduction[] = [
   // ---------------------------------------------------------------- Familia (abonables)
   {
     id: 'estado-maternidad',
+    refundable: true,
     advance: ADVANCE_MATERNITY,
     group: 'family',
     title: 'Por maternidad (hijos menores de 3 años)',
@@ -59,12 +60,15 @@ const deductions: Deduction[] = [
     amount: 1200,
     unit: 'hijo menor de 3 años',
     limit: 1350,
+    // LIRPF art. 81.3: "de forma proporcional al número de meses" (100 € each).
+    monthly: 100,
     requirements:
       'Madre con derecho al mínimo por descendientes que cobre paro o esté de alta en la Seguridad Social al nacer el hijo, o después con 30 días cotizados. No cuentan los meses con complemento de ayuda a la infancia. Solo la madre (salvo fallecimiento o custodia del padre).',
     url: `${MATERNIDAD}/deduccion-maternidad/cuantia-limite-deduccion.html`,
   },
   {
     id: 'estado-guarderia',
+    refundable: true,
     group: 'family',
     title: 'Gastos de guardería (suma a la de maternidad)',
     summary:
@@ -79,6 +83,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-descendiente-discapacidad',
+    contributionCap: 'each',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por hijo con discapacidad a cargo',
@@ -94,6 +100,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-discapacidad',
+    contributionCap: 'each',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por padre o madre con discapacidad a cargo',
@@ -109,6 +117,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-conyuge-discapacidad',
+    contributionCap: 'each',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por cónyuge con discapacidad a cargo',
@@ -124,6 +134,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa',
+    contributionCap: 'each',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría general',
@@ -139,6 +151,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-especial',
+    contributionCap: 'base',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría especial',
@@ -154,6 +168,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-hijo-adicional',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Incremento de familia numerosa por cada hijo de más',
@@ -169,6 +184,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-separado-dos-hijos',
+    contributionCap: 'each',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por separado o sin matrimonio con dos hijos',
@@ -197,6 +214,8 @@ const deductions: Deduction[] = [
   // ---------------------------------------------------------------- Donativos
   {
     id: 'estado-donativos-ley-49-2002',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a ONG y entidades acogidas al mecenazgo',
     summary:
@@ -210,6 +229,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-donativos-actividades-prioritarias',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a actividades prioritarias de mecenazgo',
     summary:
@@ -223,6 +244,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-donativos-otras-entidades',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Donativos a fundaciones y asociaciones no acogidas al mecenazgo',
     summary:
@@ -235,6 +258,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-partidos-politicos',
+    // Art. 68.3 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'donations',
     title: 'Cuotas y aportaciones a partidos políticos',
     summary:
@@ -265,6 +290,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-patrimonio-historico',
+    // Art. 68.5 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Protección del patrimonio histórico y Patrimonio Mundial',
     summary:
@@ -282,13 +309,17 @@ const deductions: Deduction[] = [
     group: 'housing',
     title: 'Vivienda habitual comprada antes de 2013 (régimen transitorio)',
     summary:
-      'Parte estatal: 7,5 % de lo que pagues al año por tu vivienda (capital, intereses y gastos), con una base máxima de 9.040 euros. Sale hasta 678 euros. Tu comunidad añade su propia parte.',
+      'El 15 % de lo que pagues al año por tu vivienda (capital, intereses y gastos), con una base máxima de 9.040 euros: hasta 1.356 euros, mitad en la parte estatal (7,5 %) y mitad en la autonómica (7,5 %).',
     kind: 'percent',
-    percent: 7.5,
+    // DT 18.ª LIRPF: 7.5 % State and, in the regional part, the community's own rate or else 7.5 %.
+    // Only Cataluña has its own (7.5 %, or 9 % with conditions, not computed here). AEAT, Manual de
+    // ayuda Renta 2025, 9.1.2 "Base de deducción y porcentajes", checked 19-10-2026.
+    percent: 15,
     baseLimit: 9040,
-    limit: 678,
+    limit: 1356,
+    regionalShare: 0.5,
     requirements:
-      'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. No se puede empezar hoy. Tu patrimonio debe subir al menos lo invertido y debes presentar declaración. El exceso sobre 9.040 no se traslada.',
+      'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. Tu patrimonio debe subir al menos lo invertido. En Cataluña el tramo autonómico puede ser del 9 % (compras antes del 30-7-2011 y otros requisitos): aquí se cuenta el 7,5 %.',
     url: `${VIVIENDA}/regimen-transitorio.html`,
   },
   {
@@ -310,16 +341,20 @@ const deductions: Deduction[] = [
     group: 'housing',
     title: 'Alquiler de vivienda habitual con contrato anterior a 2015',
     summary:
-      'Recuperas el 10,05 % del alquiler pagado, con una base máxima de 9.040 euros al año (hasta 908,52 euros). Con base imponible de 17.707,20 a 24.107,20 euros la base máxima baja hasta cero.',
+      'Recuperas el 10,05 % del alquiler pagado, mitad en la parte estatal y mitad en la autonómica, con base máxima de 9.040 euros (hasta 908,52). Con base imponible de 17.707,20 a 24.107,20 la base baja.',
     kind: 'percent',
     percent: 10.05,
     baseLimit: 9040,
     limit: 908.52,
+    // AEAT Manual práctico de Renta 2025, c16 (checked 19-10-2026): "el 50 por 100 del total de la
+    // deducción" in each of the boxes 0562 (State) and 0563 (regional).
+    regionalShare: 0.5,
     incomeLimit: {
       individual: 24107.2,
       joint: 24107.2,
       phaseOutFrom: 17707.2,
       phaseOutTo: 24107.2,
+      phaseOutOf: 'base',
       note: 'Base imponible (general + ahorro). Hasta 17.707,20 euros la base máxima es 9.040. Entre 17.707,20 y 24.107,20 es 9.040 - 1,4125 x (base imponible - 17.707,20). Con 24.107,20 o más, no hay deducción. Se rebaja la base máxima, no el porcentaje.',
     },
     requirements:
@@ -398,6 +433,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ceuta-melilla',
+    // Art. 68.4 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Rentas obtenidas en Ceuta o Melilla',
     summary:
@@ -410,6 +447,9 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-la-palma',
+    // LIRPF DA 57.ª: the deduction of art. 68.4.1.º "en los mismos términos y condiciones", so half
+    // lowers the regional quota as in Ceuta and Melilla (art. 77.1.a).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Residentes en la isla de La Palma',
     summary:
@@ -433,6 +473,8 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-actividades-economicas',
+    // Art. 68.2 LIRPF: half lowers the State quota and half the regional one (arts. 67.1.b, 77.1.b).
+    regionalShare: 0.5,
     group: 'other',
     title: 'Incentivos a la inversión en actividades económicas',
     summary:

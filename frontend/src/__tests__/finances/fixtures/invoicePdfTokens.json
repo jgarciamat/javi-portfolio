@@ -1,0 +1,589 @@
+{
+  "01-luz-cabecera-izquierda.pdf": [
+    [
+      {
+        "text": "Eléctrica del Ejemplo SA",
+        "x": 40,
+        "y": 790,
+        "field": false,
+        "w": 175.9,
+        "h": 15
+      },
+      { "text": "CIF A87654321", "x": 40, "y": 772, "field": false, "w": 66.54, "h": 9.5 },
+      {
+        "text": "Avda. de la Luz 1, 28010 Madrid",
+        "x": 40,
+        "y": 759,
+        "field": false,
+        "w": 136.77,
+        "h": 9.5
+      },
+      { "text": "Cliente:", "x": 340, "y": 790, "field": false, "w": 34.84, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 340, "y": 776, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 340, "y": 763, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 340, "y": 750, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 340, "y": 737, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "FACTURA", "x": 40, "y": 700, "field": false, "w": 86.98, "h": 18 },
+      {
+        "text": "Nº factura: E-2026-000318",
+        "x": 40,
+        "y": 680,
+        "field": false,
+        "w": 112.77,
+        "h": 9.5
+      },
+      {
+        "text": "Fecha factura: 12/03/2026",
+        "x": 40,
+        "y": 666,
+        "field": false,
+        "w": 110.9,
+        "h": 9.5
+      },
+      {
+        "text": "Fecha de vencimiento: 12/04/2026",
+        "x": 40,
+        "y": 652,
+        "field": false,
+        "w": 145.75,
+        "h": 9.5
+      },
+      {
+        "text": "Periodo de facturación: 01/02/2026 - 28/02/2026",
+        "x": 40,
+        "y": 638,
+        "field": false,
+        "w": 203.85,
+        "h": 9.5
+      },
+      { "text": "Concepto", "x": 40, "y": 604, "field": false, "w": 43.8, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 604, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Energía consumida (suministro eléctrico)",
+        "x": 40,
+        "y": 588,
+        "field": false,
+        "w": 172.1,
+        "h": 9.5
+      },
+      { "text": "80,00 €", "x": 523.31, "y": 588, "field": false, "w": 31.69, "h": 9.5 },
+      { "text": "Término de potencia", "x": 40, "y": 574, "field": false, "w": 86.59, "h": 9.5 },
+      { "text": "20,00 €", "x": 523.31, "y": 574, "field": false, "w": 31.69, "h": 9.5 },
+      { "text": "Base imponible", "x": 360, "y": 540, "field": false, "w": 64.94, "h": 9.5 },
+      { "text": "100,00 €", "x": 518.03, "y": 540, "field": false, "w": 36.97, "h": 9.5 },
+      { "text": "IVA 21 %", "x": 360, "y": 525, "field": false, "w": 39.61, "h": 9.5 },
+      { "text": "21,00 €", "x": 523.31, "y": 525, "field": false, "w": 31.69, "h": 9.5 },
+      { "text": "Total factura", "x": 360, "y": 506, "field": false, "w": 57.01, "h": 9.5 },
+      { "text": "121,00 €", "x": 518.03, "y": 506, "field": false, "w": 36.97, "h": 9.5 }
+    ]
+  ],
+  "02-papeleria-tabla-cabecera-derecha.pdf": [
+    [
+      {
+        "text": "Papelería Ejemplar SL",
+        "x": 408.35,
+        "y": 795,
+        "field": false,
+        "w": 147.07,
+        "h": 14
+      },
+      { "text": "B23456789", "x": 506.41, "y": 778, "field": false, "w": 48.59, "h": 9.5 },
+      {
+        "text": "C/ Tinta 4, 46001 Valencia",
+        "x": 444.67,
+        "y": 765,
+        "field": false,
+        "w": 111.95,
+        "h": 9.5
+      },
+      { "text": "FACTURA", "x": 40, "y": 795, "field": false, "w": 96.64, "h": 20 },
+      {
+        "text": "Factura nº F-2026-0012",
+        "x": 40,
+        "y": 770,
+        "field": false,
+        "w": 100.62,
+        "h": 9.5
+      },
+      { "text": "Fecha: 05-02-26", "x": 40, "y": 756, "field": false, "w": 69.7, "h": 9.5 },
+      { "text": "Facturar a", "x": 40, "y": 720, "field": false, "w": 45.93, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 40, "y": 706, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 40, "y": 693, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 40, "y": 680, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 40, "y": 667, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "Descripción", "x": 40, "y": 626, "field": false, "w": 54.38, "h": 9.5 },
+      { "text": "Cantidad", "x": 319.36, "y": 626, "field": false, "w": 40.64, "h": 9.5 },
+      { "text": "Precio", "x": 420.96, "y": 626, "field": false, "w": 29.04, "h": 9.5 },
+      { "text": "Total", "x": 533.06, "y": 626, "field": false, "w": 22.7, "h": 9.5 },
+      {
+        "text": "Paquete de folios A4 (500 hojas)",
+        "x": 40,
+        "y": 608,
+        "field": false,
+        "w": 137.83,
+        "h": 9.5
+      },
+      { "text": "4", "x": 354.72, "y": 608, "field": false, "w": 5.28, "h": 9.5 },
+      { "text": "5,00", "x": 431.51, "y": 608, "field": false, "w": 18.49, "h": 9.5 },
+      { "text": "20,00", "x": 531.23, "y": 608, "field": false, "w": 23.77, "h": 9.5 },
+      {
+        "text": "Cuadernos de tapa dura",
+        "x": 40,
+        "y": 592,
+        "field": false,
+        "w": 102.45,
+        "h": 9.5
+      },
+      { "text": "5", "x": 354.72, "y": 592, "field": false, "w": 5.28, "h": 9.5 },
+      { "text": "7,00", "x": 431.51, "y": 592, "field": false, "w": 18.49, "h": 9.5 },
+      { "text": "35,00", "x": 531.23, "y": 592, "field": false, "w": 23.77, "h": 9.5 },
+      {
+        "text": "Material de oficina variado",
+        "x": 40,
+        "y": 576,
+        "field": false,
+        "w": 110.87,
+        "h": 9.5
+      },
+      { "text": "1", "x": 354.72, "y": 576, "field": false, "w": 5.28, "h": 9.5 },
+      { "text": "30,00", "x": 426.23, "y": 576, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "30,00", "x": 531.23, "y": 576, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Base imponible", "x": 289.88, "y": 530, "field": false, "w": 70.21, "h": 9.5 },
+      { "text": "IVA 21%", "x": 413.27, "y": 530, "field": false, "w": 37.49, "h": 9.5 },
+      { "text": "Total", "x": 533.06, "y": 530, "field": false, "w": 22.7, "h": 9.5 },
+      { "text": "85,00", "x": 336.23, "y": 514, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "17,85", "x": 426.23, "y": 514, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "102,85 €", "x": 518.03, "y": 514, "field": false, "w": 36.97, "h": 9.5 }
+    ]
+  ],
+  "03-restaurante-dos-tipos-iva.pdf": [
+    [
+      {
+        "text": "Restaurante La Mesa Ejemplo SL",
+        "x": 40,
+        "y": 795,
+        "field": false,
+        "w": 220.18,
+        "h": 14
+      },
+      {
+        "text": "NIF: B34567812 · Plaza Mayor 3, 37001 Salamanca",
+        "x": 40,
+        "y": 780,
+        "field": false,
+        "w": 219.67,
+        "h": 9.5
+      },
+      {
+        "text": "Factura simplificada completa",
+        "x": 40,
+        "y": 745,
+        "field": false,
+        "w": 136.21,
+        "h": 9.5
+      },
+      { "text": "Número: T-0457", "x": 40, "y": 731, "field": false, "w": 69.16, "h": 9.5 },
+      {
+        "text": "Fecha de expedición: 2026-04-15",
+        "x": 40,
+        "y": 717,
+        "field": false,
+        "w": 141.52,
+        "h": 9.5
+      },
+      { "text": "Destinatario", "x": 330, "y": 745, "field": false, "w": 54.9, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 330, "y": 731, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 330, "y": 718, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "Concepto", "x": 40, "y": 676, "field": false, "w": 43.8, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 676, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Menú del día comida de trabajo (x3)",
+        "x": 40,
+        "y": 660,
+        "field": false,
+        "w": 152.07,
+        "h": 9.5
+      },
+      { "text": "66,00", "x": 531.23, "y": 660, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Bebidas alcohólicas", "x": 40, "y": 646, "field": false, "w": 83.95, "h": 9.5 },
+      { "text": "24,20", "x": 531.23, "y": 646, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Base imponible", "x": 300, "y": 610, "field": false, "w": 70.21, "h": 9.5 },
+      { "text": "% IVA", "x": 400, "y": 610, "field": false, "w": 26.92, "h": 9.5 },
+      { "text": "Cuota IVA", "x": 510.37, "y": 610, "field": false, "w": 45.39, "h": 9.5 },
+      { "text": "60,00", "x": 336.23, "y": 594, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "10 %", "x": 400, "y": 594, "field": false, "w": 21.65, "h": 9.5 },
+      { "text": "6,00", "x": 536.51, "y": 594, "field": false, "w": 18.49, "h": 9.5 },
+      { "text": "20,00", "x": 336.23, "y": 580, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "21 %", "x": 400, "y": 580, "field": false, "w": 21.65, "h": 9.5 },
+      { "text": "4,20", "x": 536.51, "y": 580, "field": false, "w": 18.49, "h": 9.5 },
+      { "text": "TOTAL", "x": 300, "y": 556, "field": false, "w": 40, "h": 12 },
+      { "text": "90,20 €", "x": 514.97, "y": 556, "field": false, "w": 40.03, "h": 12 }
+    ]
+  ],
+  "04-emitida-profesional-retencion-irpf.pdf": [
+    [
+      { "text": "Laura Martín Gómez", "x": 40, "y": 795, "field": false, "w": 134.58, "h": 14 },
+      { "text": "NIF 12345678Z", "x": 40, "y": 780, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 40, "y": 767, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 40, "y": 754, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "Diseño gráfico y web", "x": 40, "y": 741, "field": false, "w": 88.17, "h": 9.5 },
+      { "text": "FACTURA 2026/014", "x": 435.92, "y": 795, "field": false, "w": 120.64, "h": 13 },
+      { "text": "Fecha: 12.05.2026", "x": 476.54, "y": 778, "field": false, "w": 79.22, "h": 9.5 },
+      { "text": "Cliente", "x": 300, "y": 720, "field": false, "w": 31.67, "h": 9.5 },
+      {
+        "text": "Estudio Norte Ejemplo SL",
+        "x": 300,
+        "y": 706,
+        "field": false,
+        "w": 108.77,
+        "h": 9.5
+      },
+      { "text": "CIF B45678123", "x": 300, "y": 693, "field": false, "w": 66.54, "h": 9.5 },
+      {
+        "text": "C/ Norte 7, 48001 Bilbao",
+        "x": 300,
+        "y": 680,
+        "field": false,
+        "w": 104.03,
+        "h": 9.5
+      },
+      { "text": "Descripción", "x": 40, "y": 636, "field": false, "w": 54.38, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 636, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Diseño de la identidad visual (abril 2026)",
+        "x": 40,
+        "y": 620,
+        "field": false,
+        "w": 171.6,
+        "h": 9.5
+      },
+      { "text": "1.000,00 €", "x": 510.1, "y": 620, "field": false, "w": 44.9, "h": 9.5 },
+      { "text": "Base imponible", "x": 340, "y": 580, "field": false, "w": 64.94, "h": 9.5 },
+      { "text": "1.000,00 €", "x": 510.1, "y": 580, "field": false, "w": 44.9, "h": 9.5 },
+      { "text": "IVA (21%)", "x": 340, "y": 565, "field": false, "w": 43.29, "h": 9.5 },
+      { "text": "210,00 €", "x": 518.03, "y": 565, "field": false, "w": 36.97, "h": 9.5 },
+      { "text": "Retención IRPF (15%)", "x": 340, "y": 550, "field": false, "w": 95.03, "h": 9.5 },
+      { "text": "-150,00 €", "x": 514.86, "y": 550, "field": false, "w": 40.14, "h": 9.5 },
+      { "text": "Total a pagar", "x": 340, "y": 530, "field": false, "w": 59.13, "h": 9.5 },
+      { "text": "1.060,00 €", "x": 510.1, "y": 530, "field": false, "w": 44.9, "h": 9.5 },
+      {
+        "text": "Forma de pago: transferencia a ES00 0000 0000 0000 0000 0000",
+        "x": 40,
+        "y": 480,
+        "field": false,
+        "w": 277.26,
+        "h": 9.5
+      }
+    ]
+  ],
+  "05-abono-rectificativa.pdf": [
+    [
+      { "text": "Informática Ejemplo SL", "x": 40, "y": 795, "field": false, "w": 155.6, "h": 14 },
+      { "text": "CIF: B56781234", "x": 40, "y": 780, "field": false, "w": 69.18, "h": 9.5 },
+      {
+        "text": "FACTURA RECTIFICATIVA (ABONO)",
+        "x": 40,
+        "y": 740,
+        "field": false,
+        "w": 243.42,
+        "h": 14
+      },
+      { "text": "Nº factura: R-2026-003", "x": 40, "y": 722, "field": false, "w": 97.45, "h": 9.5 },
+      {
+        "text": "Rectifica a la factura F-2026-0101 del 02/05/2026",
+        "x": 40,
+        "y": 708,
+        "field": false,
+        "w": 208.58,
+        "h": 9.5
+      },
+      {
+        "text": "Fecha de emisión: 20/05/2026",
+        "x": 40,
+        "y": 694,
+        "field": false,
+        "w": 127.79,
+        "h": 9.5
+      },
+      { "text": "Datos del cliente", "x": 330, "y": 740, "field": false, "w": 75.5, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 330, "y": 726, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 330, "y": 713, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 330, "y": 700, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 330, "y": 687, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "Concepto", "x": 40, "y": 636, "field": false, "w": 43.8, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 636, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Devolución de un ratón inalámbrico",
+        "x": 40,
+        "y": 620,
+        "field": false,
+        "w": 148.89,
+        "h": 9.5
+      },
+      { "text": "-50,00", "x": 528.07, "y": 620, "field": false, "w": 26.93, "h": 9.5 },
+      { "text": "Base imponible", "x": 360, "y": 580, "field": false, "w": 64.94, "h": 9.5 },
+      { "text": "-50,00 €", "x": 520.14, "y": 580, "field": false, "w": 34.86, "h": 9.5 },
+      { "text": "IVA 21%", "x": 360, "y": 565, "field": false, "w": 36.96, "h": 9.5 },
+      { "text": "-10,50 €", "x": 520.14, "y": 565, "field": false, "w": 34.86, "h": 9.5 },
+      { "text": "Total", "x": 360, "y": 546, "field": false, "w": 22.7, "h": 9.5 },
+      { "text": "-60,50 €", "x": 520.14, "y": 546, "field": false, "w": 34.86, "h": 9.5 }
+    ]
+  ],
+  "06-coworking-fecha-escrita-pie.pdf": [
+    [
+      { "text": "FACTURA", "x": 40, "y": 790, "field": false, "w": 106.3, "h": 22 },
+      {
+        "text": "Madrid, 12 de marzo de 2026",
+        "x": 380,
+        "y": 795,
+        "field": false,
+        "w": 124.09,
+        "h": 9.5
+      },
+      {
+        "text": "Número de factura: CW-26-0031",
+        "x": 40,
+        "y": 760,
+        "field": false,
+        "w": 137.8,
+        "h": 9.5
+      },
+      { "text": "Cliente:", "x": 40, "y": 730, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Laura Martín Gómez · NIF 12345678Z",
+        "x": 90,
+        "y": 730,
+        "field": false,
+        "w": 161.04,
+        "h": 9.5
+      },
+      { "text": "Descripción", "x": 40, "y": 686, "field": false, "w": 54.38, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 686, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Alquiler de puesto fijo en coworking, marzo de 2026",
+        "x": 40,
+        "y": 670,
+        "field": false,
+        "w": 218.07,
+        "h": 9.5
+      },
+      { "text": "1.250,00", "x": 518.03, "y": 670, "field": false, "w": 36.97, "h": 9.5 },
+      {
+        "text": "Base imponible: 1.250,00 €",
+        "x": 330,
+        "y": 630,
+        "field": false,
+        "w": 115.12,
+        "h": 9.5
+      },
+      { "text": "IVA 21 %: 262,50 €", "x": 330, "y": 615, "field": false, "w": 81.86, "h": 9.5 },
+      {
+        "text": "Total factura: 1.512,50 €",
+        "x": 330,
+        "y": 596,
+        "field": false,
+        "w": 107.71,
+        "h": 9.5
+      },
+      {
+        "text": "Coworking Ejemplo SL · CIF B67812345 · C/ Compartida 2, 28004 Madrid",
+        "x": 40,
+        "y": 56,
+        "field": false,
+        "w": 261.89,
+        "h": 8
+      }
+    ]
+  ],
+  "07-invoice-in-english.pdf": [
+    [
+      {
+        "text": "Example Cloud Software Ltd",
+        "x": 40,
+        "y": 795,
+        "field": false,
+        "w": 189.81,
+        "h": 14
+      },
+      { "text": "VAT ID: ESB78123456", "x": 40, "y": 780, "field": false, "w": 97.17, "h": 9.5 },
+      { "text": "INVOICE", "x": 420, "y": 795, "field": false, "w": 74.02, "h": 18 },
+      {
+        "text": "Invoice number: INV-0042",
+        "x": 380,
+        "y": 772,
+        "field": false,
+        "w": 110.35,
+        "h": 9.5
+      },
+      {
+        "text": "Invoice date: March 12, 2026",
+        "x": 380,
+        "y": 758,
+        "field": false,
+        "w": 122.51,
+        "h": 9.5
+      },
+      {
+        "text": "Due date: April 11, 2026",
+        "x": 380,
+        "y": 744,
+        "field": false,
+        "w": 102.45,
+        "h": 9.5
+      },
+      { "text": "Bill to:", "x": 40, "y": 730, "field": false, "w": 29.55, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 40, "y": 716, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 40, "y": 703, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "Description", "x": 40, "y": 656, "field": false, "w": 52.26, "h": 9.5 },
+      { "text": "Amount", "x": 519.12, "y": 656, "field": false, "w": 35.88, "h": 9.5 },
+      {
+        "text": "Annual software subscription (hosting plan)",
+        "x": 40,
+        "y": 640,
+        "field": false,
+        "w": 181.63,
+        "h": 9.5
+      },
+      { "text": "€200.00", "x": 520.67, "y": 640, "field": false, "w": 34.33, "h": 9.5 },
+      { "text": "Subtotal", "x": 380, "y": 600, "field": false, "w": 34.86, "h": 9.5 },
+      { "text": "€200.00", "x": 520.67, "y": 600, "field": false, "w": 34.33, "h": 9.5 },
+      { "text": "VAT (21%)", "x": 380, "y": 585, "field": false, "w": 46.46, "h": 9.5 },
+      { "text": "€42.00", "x": 525.95, "y": 585, "field": false, "w": 29.05, "h": 9.5 },
+      { "text": "Total", "x": 380, "y": 566, "field": false, "w": 22.7, "h": 9.5 },
+      { "text": "€242.00", "x": 520.67, "y": 566, "field": false, "w": 34.33, "h": 9.5 }
+    ]
+  ],
+  "08-mayorista-recargo-equivalencia.pdf": [
+    [
+      {
+        "text": "Distribuciones Ejemplo SA",
+        "x": 40,
+        "y": 795,
+        "field": false,
+        "w": 178.93,
+        "h": 14
+      },
+      {
+        "text": "A81234567 · Polígono Sur, nave 8, 41001 Sevilla",
+        "x": 40,
+        "y": 780,
+        "field": false,
+        "w": 207.55,
+        "h": 9.5
+      },
+      { "text": "Factura M-7781", "x": 40, "y": 750, "field": false, "w": 69.16, "h": 9.5 },
+      { "text": "Fecha: 03/06/2026", "x": 40, "y": 736, "field": false, "w": 79.22, "h": 9.5 },
+      { "text": "Cliente", "x": 330, "y": 750, "field": false, "w": 31.67, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 330, "y": 736, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 330, "y": 723, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 330, "y": 710, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 330, "y": 697, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "Artículo", "x": 40, "y": 656, "field": false, "w": 35.89, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 656, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Género para la tienda (lote de temporada)",
+        "x": 40,
+        "y": 640,
+        "field": false,
+        "w": 177.42,
+        "h": 9.5
+      },
+      { "text": "200,00", "x": 525.95, "y": 640, "field": false, "w": 29.05, "h": 9.5 },
+      { "text": "Base imponible", "x": 340, "y": 600, "field": false, "w": 64.94, "h": 9.5 },
+      { "text": "200,00", "x": 525.95, "y": 600, "field": false, "w": 29.05, "h": 9.5 },
+      { "text": "IVA 21%", "x": 340, "y": 585, "field": false, "w": 36.96, "h": 9.5 },
+      { "text": "42,00", "x": 531.23, "y": 585, "field": false, "w": 23.77, "h": 9.5 },
+      {
+        "text": "Recargo de equivalencia 5,2%",
+        "x": 340,
+        "y": 570,
+        "field": false,
+        "w": 128.84,
+        "h": 9.5
+      },
+      { "text": "10,40", "x": 531.23, "y": 570, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Total factura", "x": 340, "y": 550, "field": false, "w": 57.01, "h": 9.5 },
+      { "text": "252,40 €", "x": 518.03, "y": 550, "field": false, "w": 36.97, "h": 9.5 }
+    ]
+  ],
+  "09-escaneada-sin-texto.pdf": [[]],
+  "10-factura-en-dolares.pdf": [
+    [
+      { "text": "Example Hosting Inc", "x": 40, "y": 795, "field": false, "w": 137.7, "h": 14 },
+      { "text": "INVOICE #US-2026-77", "x": 40, "y": 760, "field": false, "w": 98.2, "h": 9.5 },
+      {
+        "text": "Invoice date: 04/02/2026",
+        "x": 40,
+        "y": 746,
+        "field": false,
+        "w": 104.04,
+        "h": 9.5
+      },
+      {
+        "text": "Bill to: Laura Martín Gómez",
+        "x": 40,
+        "y": 720,
+        "field": false,
+        "w": 115.62,
+        "h": 9.5
+      },
+      { "text": "Subtotal", "x": 380, "y": 600, "field": false, "w": 34.86, "h": 9.5 },
+      { "text": "$100.00", "x": 520.67, "y": 600, "field": false, "w": 34.33, "h": 9.5 },
+      { "text": "Tax", "x": 380, "y": 585, "field": false, "w": 15.84, "h": 9.5 },
+      { "text": "$0.00", "x": 531.23, "y": 585, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Total (USD)", "x": 380, "y": 566, "field": false, "w": 51.72, "h": 9.5 },
+      { "text": "$100.00", "x": 520.67, "y": 566, "field": false, "w": 34.33, "h": 9.5 }
+    ]
+  ],
+  "11-gestoria-recibida-con-retencion.pdf": [
+    [
+      {
+        "text": "Asesoría Fiscal Ejemplo SL",
+        "x": 385.21,
+        "y": 795,
+        "field": false,
+        "w": 169.79,
+        "h": 13
+      },
+      {
+        "text": "CIF B81234560 · gestoria@example.test",
+        "x": 383.53,
+        "y": 780,
+        "field": false,
+        "w": 171.75,
+        "h": 9.5
+      },
+      { "text": "Factura", "x": 40, "y": 795, "field": false, "w": 57.79, "h": 16 },
+      { "text": "Nº factura", "x": 40, "y": 770, "field": false, "w": 44.64, "h": 9.5 },
+      { "text": "Fecha factura", "x": 160, "y": 770, "field": false, "w": 61.77, "h": 9.5 },
+      { "text": "Vencimiento", "x": 280, "y": 770, "field": false, "w": 56.49, "h": 9.5 },
+      { "text": "G-26/0009", "x": 40, "y": 756, "field": false, "w": 44.89, "h": 9.5 },
+      { "text": "31/01/2026", "x": 160, "y": 756, "field": false, "w": 47.54, "h": 9.5 },
+      { "text": "15/02/2026", "x": 280, "y": 756, "field": false, "w": 47.54, "h": 9.5 },
+      { "text": "Cliente:", "x": 40, "y": 720, "field": false, "w": 34.84, "h": 9.5 },
+      { "text": "Laura Martín Gómez", "x": 40, "y": 706, "field": false, "w": 87.12, "h": 9.5 },
+      { "text": "NIF 12345678Z", "x": 40, "y": 693, "field": false, "w": 66.01, "h": 9.5 },
+      { "text": "C/ Ejemplo 10, 3.º B", "x": 40, "y": 680, "field": false, "w": 85.31, "h": 9.5 },
+      { "text": "28001 Madrid", "x": 40, "y": 667, "field": false, "w": 58.08, "h": 9.5 },
+      { "text": "Concepto", "x": 40, "y": 626, "field": false, "w": 43.8, "h": 9.5 },
+      { "text": "Importe", "x": 519.97, "y": 626, "field": false, "w": 34.84, "h": 9.5 },
+      {
+        "text": "Asesoría fiscal y contable de enero",
+        "x": 40,
+        "y": 610,
+        "field": false,
+        "w": 147.85,
+        "h": 9.5
+      },
+      { "text": "60,00", "x": 531.23, "y": 610, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Base imponible", "x": 340, "y": 570, "field": false, "w": 64.94, "h": 9.5 },
+      { "text": "60,00", "x": 531.23, "y": 570, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "IVA 21%", "x": 340, "y": 555, "field": false, "w": 36.96, "h": 9.5 },
+      { "text": "12,60", "x": 531.23, "y": 555, "field": false, "w": 23.77, "h": 9.5 },
+      { "text": "Retención IRPF 15%", "x": 340, "y": 540, "field": false, "w": 88.7, "h": 9.5 },
+      { "text": "-9,00", "x": 533.35, "y": 540, "field": false, "w": 21.65, "h": 9.5 },
+      { "text": "Total", "x": 340, "y": 520, "field": false, "w": 22.7, "h": 9.5 },
+      { "text": "63,60 €", "x": 523.31, "y": 520, "field": false, "w": 31.69, "h": 9.5 }
+    ]
+  ]
+}

@@ -8,6 +8,7 @@ import { DeleteAccountModal } from './DeleteAccountModal';
 import { NameSection } from './ProfileNameSection';
 import { PasswordSection } from './ProfilePasswordSection';
 import { Icon } from '@shared/components/Icon';
+import '@shared/components/css/AuthFields.css';
 
 type SectionId = 'avatar' | 'name' | 'password' | 'settings';
 

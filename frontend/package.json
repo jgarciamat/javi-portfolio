@@ -1,13 +1,13 @@
 {
   "name": "portfolio-frontend",
-  "version": "1.41.10",
+  "version": "1.44.0",
   "description": "Portfolio React 19 y DDD",
   "type": "module",
   "scripts": {
     "predev": "node scripts/copy-ocr.mjs",
     "dev": "vite",
     "prebuild": "node scripts/copy-ocr.mjs",
-    "build": "tsc && npm run test:seo && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
+    "build": "tsc -p tsconfig.build.json && npm run test:seo && vite build && node scripts/prerender.mjs && node scripts/compress.mjs",
     "preview": "vite preview",
     "sitemap": "node scripts/sitemap.mjs",
     "test:seo": "node --test scripts/seo/pages.test.mjs",
@@ -22,7 +22,15 @@
     "build:android:prod": "node scripts/patch-plugins.mjs && node scripts/copy-ocr.mjs && tsc && vite build --mode android && node scripts/slim-android.mjs && npx cap sync android",
     "build:ios": "npm run build && npx cap sync ios && npx cap open ios",
     "cap:sync": "npm run build && npx cap sync",
-    "cap:copy": "npx cap copy"
+    "cap:copy": "npx cap copy",
+    "casos": "node scripts/casos/run.mjs",
+    "ecb:update": "node scripts/ecb/update-rates.mjs",
+    "templates": "esbuild scripts/make-templates.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-templates.cjs --log-level=warning && node scripts/.make-templates.cjs; rm -f scripts/.make-templates.cjs",
+    "invoices:examples": "esbuild scripts/make-invoice-pdfs.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-invoice-pdfs.cjs --log-level=warning && node scripts/.make-invoice-pdfs.cjs; rm -f scripts/.make-invoice-pdfs.cjs",
+    "taxforms:verify": "esbuild scripts/taxforms/verify-forms.ts --bundle --platform=node --format=cjs --external:pdfjs-dist --outfile=scripts/.verify-forms.cjs --log-level=warning && node scripts/.verify-forms.cjs; status=$?; rm -f scripts/.verify-forms.cjs; exit $status",
+    "invoices:verify": "esbuild scripts/verify-invoice-pdfs.ts --bundle --platform=node --format=cjs --external:pdfjs-dist --outfile=scripts/.verify-invoice-pdfs.cjs --log-level=warning && node scripts/.verify-invoice-pdfs.cjs; status=$?; rm -f scripts/.verify-invoice-pdfs.cjs; exit $status",
+    "validar-archivo": "node scripts/validar-archivo.mjs",
+    "ejemplo-binance": "esbuild scripts/ejemplo-binance.ts --bundle --platform=node --format=cjs --external:pdfjs-dist --outfile=scripts/.ejemplo-binance.cjs --log-level=warning && node scripts/.ejemplo-binance.cjs; rm -f scripts/.ejemplo-binance.cjs"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",
@@ -32,6 +40,7 @@
     "@capacitor/local-notifications": "^8.3.1",
     "@react-oauth/google": "^0.13.4",
     "@revenuecat/purchases-capacitor": "^13.7.3",
+    "fflate": "^0.8.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",
     "lucide-react": "^1.55.0",
@@ -67,6 +76,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^30.2.0",
     "lint-staged": "^14.0.0",
+    "pdf-lib": "^1.17.1",
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.1",
     "typescript": "^5.3.3",

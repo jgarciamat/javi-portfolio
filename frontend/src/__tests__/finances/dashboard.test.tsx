@@ -33,7 +33,7 @@ describe('menu and sections', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.monthApi.get).toHaveBeenCalled());
     for (const section of DASHBOARD_SECTIONS) {
-      goTo(section.labelKey);
+      goTo(section.menuKey ?? section.labelKey);
       expect(screen.getByRole('region', { name: tr(section.labelKey) })).toBeInTheDocument();
     }
     expect(localStorage.getItem('mm_last_tab')).toBe('settings');
@@ -139,9 +139,13 @@ describe('header', () => {
     const user = f.user({ avatarUrl: 'data:x' });
     localStorage.setItem('mm_user', JSON.stringify(user));
     renderWithProviders(<Dashboard />);
-    // The accessible name starts with the name shown on the button.
+    // The profile lives in the menu, under the account group.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    const menu = screen.getByRole('dialog', { name: tr('app.menu.ariaLabel') });
     fireEvent.click(
-      screen.getByRole('button', { name: tr('app.header.openProfileOf', { name: user.name }) })
+      within(menu).getByRole('button', {
+        name: tr('app.header.openProfileOf', { name: user.name }),
+      })
     );
     expect(
       await screen.findByRole('dialog', { name: tr('app.profile.title') })
@@ -160,7 +164,6 @@ describe('import', () => {
     api.monthApi.get.mockResolvedValue(f.overview({ transactions: [f.transaction()] }));
     renderWithProviders(<Dashboard />, { api, plan: true });
     await screen.findByText('Cena');
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     const dialog = await screen.findByRole('dialog', { name: tr('app.import.title') });
     fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
@@ -181,7 +184,6 @@ describe('import', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     expect(await screen.findByRole('dialog', { name: tr('app.import.title') })).toBeInTheDocument();
   });
@@ -192,7 +194,6 @@ describe('import', () => {
     renderWithProviders(<Dashboard />, { api, plan: true });
     await waitFor(() => expect(api.billingApi.get).toHaveBeenCalled());
     await act(async () => undefined);
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.import.open')) }));
     const dialog = await screen.findByRole('dialog', { name: tr('billing.upgradeTitle') });
     expect(dialog).toHaveTextContent(

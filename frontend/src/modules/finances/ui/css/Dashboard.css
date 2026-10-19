@@ -18,16 +18,48 @@
   background: var(--slate-900);
   border-bottom: 1px solid var(--slate-800);
   padding: 0.85rem 1.5rem;
-  display: flex;
+  /* The Videoteca pill sits in the exact middle, on the same axis as the month below. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
+}
+
+.header > .header-actions {
+  justify-self: end;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.header-socials {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+}
+
+.header-socials a {
+  display: inline-flex;
+  padding: 0.3rem;
+  border-radius: 8px;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.header-socials a:hover,
+.header-socials a:focus-visible {
+  background: var(--slate-800);
+  transform: translateY(-1px);
+}
+
+/* The header is crowded on a phone: the links stay in the login and sign-up pages. */
+@media (max-width: 760px) {
+  .header-socials {
+    display: none;
+  }
 }
 
 .header-logo {
@@ -96,6 +128,7 @@
 /* Phones: no room in the row, so it gets its own full-width line under the brand. */
 @media (max-width: 600px) {
   .header {
+    display: flex;
     flex-wrap: wrap;
     row-gap: 0.6rem;
   }
@@ -117,12 +150,6 @@
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
-}
-
-.header-user {
-  font-size: 0.85rem;
-  color: var(--slate-400);
-  white-space: nowrap;
 }
 
 .btn-logout {
@@ -178,10 +205,19 @@
 
 /* ─── Month navigator ────────────────────────── */
 .month-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
+}
+
+/* Previous and next hug the edges, so the title stays centred whatever their widths. */
+.month-nav > :first-child {
+  justify-self: start;
+}
+
+.month-nav > :last-child {
+  justify-self: end;
 }
 
 .month-nav-center {
@@ -438,39 +474,6 @@
   border-bottom-color: var(--accent);
 }
 
-/* ─── Header: avatar / profile button ─────────── */
-.header-user-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--slate-400);
-  font-size: 0.875rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
-}
-
-.header-user-btn:hover {
-  background: var(--slate-800);
-  color: var(--slate-100);
-}
-
-.header-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--slate-700);
-}
-
-.header-avatar-placeholder {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
 /* ─── Profile page overlay ─────────────────────── */
 .profile-overlay {
   position: fixed;
@@ -640,6 +643,20 @@
   letter-spacing: 0.05em;
 }
 
+.profile-panel .auth-input {
+  /* The same look as the other fields of the app (the movement form, the filters). */
+  padding: 0.6rem 0.8rem;
+  min-height: 2.75rem;
+  font-size: 0.88rem;
+}
+
+/* The email is shown, not edited: the field looks like one and is read-only. */
+.profile-panel .auth-input[readonly],
+.profile-panel .auth-input:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
 .profile-divider {
   border: none;
   border-top: 1px solid var(--slate-800);
@@ -729,14 +746,6 @@
 
 /* ─── Dashboard responsive ───────────────────── */
 @media (max-width: 600px) {
-  .header-user {
-    display: flex;
-  }
-
-  .header-user-name {
-    display: none;
-  }
-
   .header-title {
     font-size: 1rem;
   }

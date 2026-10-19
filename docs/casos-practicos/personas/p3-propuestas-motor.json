@@ -1,0 +1,5 @@
+{
+  "descripcion": "Cifras de las personas p3 en las que el motor de la Renta da hoy otro valor que el cálculo a mano. Para el agente del motor: pasar a discrepancias.json o corregir el motor, y volver a poner su campo en esperado.json.",
+  "comprobado": "2026-10-19",
+  "renta": []
+}

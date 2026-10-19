@@ -1,5 +1,7 @@
 import { VatRate } from '@domain/ports/repositories';
-import { BusinessMovement, splitVat } from './tax';
+import type { VatMovement } from './autonomo-vat';
+import type { DeductionUse, PurchaseOp, QuarterVat } from './autonomo-vat-data';
+import { splitVat } from './tax';
 
 /** Expense kinds the person can enter by hand, each with its own rule for what can be deducted. */
 export const EXPENSE_KINDS = [
@@ -30,17 +32,43 @@ export const SUPPLIES_RATE = 0.3;
 
 export interface ManualExpense {
   kind: ExpenseKind;
-  /** Amount paid, VAT included. */
+  /**
+   * Amount paid, VAT included; for a purchase whose invoice carries no Spanish VAT (intra-EU,
+   * reverse charge, import), its base, and `vatRate` is the rate of the VAT self-assessed or paid
+   * at customs.
+   */
   amount: number;
   vatRate: VatRate;
   /** Meals: days eating out that the amount covers. */
   days?: number;
+  /** What the purchase is for VAT (domestic when absent). */
+  op?: PurchaseOp;
+  /** An investment good (art. 108 LIVA). */
+  investment?: boolean;
+  /** For the special prorrata: used in taxed operations only, in exempt ones only, or in both. */
+  use?: DeductionUse;
+}
+
+/** Sales without VAT on the invoice, by the box of the 303 they go to (bases, euros). */
+export interface ManualSales {
+  intraEU?: number;
+  exports?: number;
+  notSubject?: number;
+  oss?: number;
+  ossSubject?: number;
+  reverse?: number;
+  exempt?: number;
+  exemptOccasional?: number;
+  /** Not subject by art. 7 LIVA: income of the 130 only. */
+  nonVat?: number;
 }
 
 export interface ManualQuarter {
   /** Income without VAT, by VAT rate. */
   income: { r21: number; r10: number; r4: number; r0: number };
   expenses: ManualExpense[];
+  /** The rest of what the VAT of the quarter needs (older data has none). */
+  vat?: (QuarterVat & { sales?: ManualSales | null }) | null;
 }
 
 /** Things that stay the same through the year and decide how some expenses are deducted. */
@@ -112,12 +140,24 @@ export function sharesOf(e: ManualExpense, profile: ManualProfile): Shares {
   }
 }
 
+const SALES: [keyof ManualSales, NonNullable<VatMovement['op']>][] = [
+  ['intraEU', 'intraEU'],
+  ['exports', 'export'],
+  ['notSubject', 'notSubject'],
+  ['oss', 'oss'],
+  ['ossSubject', 'ossSubject'],
+  ['reverse', 'reverse'],
+  ['exempt', 'exempt'],
+  ['exemptOccasional', 'exemptOccasional'],
+  ['nonVat', 'nonVat'],
+];
+
 /** The manual data as movements of the quarters (the middle month), with their deduction shares. */
 export function manualMovements(
   year: number,
   data: ManualData
-): { movements: BusinessMovement[]; lines: ExpenseLine[] } {
-  const movements: BusinessMovement[] = [];
+): { movements: VatMovement[]; lines: ExpenseLine[] } {
+  const movements: VatMovement[] = [];
   const lines: ExpenseLine[] = [];
   data.quarters.forEach((quarter, index) => {
     const date = `${year}-${String(index * 3 + 2).padStart(2, '0')}-15`;
@@ -137,9 +177,28 @@ export function manualMovements(
         });
       }
     }
+    // Sales without VAT: income of the 130 too, each in its box of the 303.
+    const sales = quarter.vat?.sales ?? {};
+    for (const [key, op] of SALES) {
+      const base = sales[key] ?? 0;
+      if (base > 0) {
+        movements.push({
+          date,
+          type: 'INCOME',
+          vatRate: 0,
+          amountCents: Math.round(base * 100),
+          op,
+        });
+      }
+    }
     for (const e of quarter.expenses) {
-      const shares = sharesOf(e, data.profile);
+      // An investment good is depreciated for the income tax, not deducted at once (art. 30 RIRPF):
+      // the 130 leaves it out and says so.
+      const shares = e.investment
+        ? { ...sharesOf(e, data.profile), irpf: 0, note: 'investment' }
+        : sharesOf(e, data.profile);
       const amountCents = Math.round(e.amount * 100);
+      const op = e.op ?? 'domestic';
       movements.push({
         date,
         type: 'EXPENSE',
@@ -147,8 +206,15 @@ export function manualMovements(
         amountCents,
         irpfShare: shares.irpf,
         vatShare: shares.vat,
+        ...(op !== 'domestic' ? { op } : {}),
+        ...(e.investment ? { investment: true } : {}),
+        ...(e.use && e.use !== 'common' ? { use: e.use } : {}),
       });
-      const { baseCents, vatCents } = splitVat(amountCents, e.vatRate);
+      // Without Spanish VAT on the invoice, the amount is the base and the VAT is self-assessed.
+      const { baseCents, vatCents } =
+        op === 'domestic'
+          ? splitVat(amountCents, e.vatRate)
+          : { baseCents: amountCents, vatCents: Math.round((amountCents * e.vatRate) / 100) };
       const vatDeductible = vatCents * shares.vat;
       const deductible = baseCents * shares.irpf + vatCents * Math.max(0, shares.irpf - shares.vat);
       lines.push({

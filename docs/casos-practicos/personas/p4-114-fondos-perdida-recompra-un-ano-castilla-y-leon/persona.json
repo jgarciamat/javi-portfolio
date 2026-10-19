@@ -1,0 +1,137 @@
+{
+  "slug": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 114",
+  "nif": "00000114E",
+  "domicilio": "Calle Ficticia 114, 47001 Valladolid (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "castilla-y-leon",
+  "titulo": "Reembolsa un fondo con pérdida y vuelve a suscribirlo antes de un año",
+  "descripcion": "Reembolsa en abril de 2025 un fondo de bolsa con 1.000 € de pérdida y lo vuelve a suscribir en septiembre: la pérdida no cuenta este año (art. 33.5.g). Reembolsa otro de renta fija con 300 € de ganancia y 57 € de retención.",
+  "prueba": [
+    "regla antiaplicación de pérdidas en participaciones no cotizadas: un año (art. 33.5.g)",
+    "retención del 19 % de la ganancia del fondo (0603)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "banco-movimientos-fondos.csv"
+  ],
+  "tiposDeCambioInventados": null,
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "castilla-y-leon",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "banco-movimientos-fondos.csv"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 0,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "Fondo Ficticio Renta Fija FI",
+                  "code": "ES00FICT0006",
+                  "kind": "fund",
+                  "buys": [
+                    {
+                      "date": "2022-01-01",
+                      "units": 100,
+                      "cost": 2000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-06-01",
+                      "units": 100,
+                      "proceeds": 2300
+                    }
+                  ]
+                },
+                {
+                  "name": "Fondo Ficticio Bolsa FI",
+                  "code": "ES00FICT0005",
+                  "kind": "fund",
+                  "buys": [
+                    {
+                      "date": "2023-01-10",
+                      "units": 50,
+                      "cost": 5000
+                    },
+                    {
+                      "date": "2025-09-01",
+                      "units": 50,
+                      "cost": 3800
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-04-01",
+                      "units": 50,
+                      "proceeds": 4000
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 57
+              },
+              "foreignTax": []
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

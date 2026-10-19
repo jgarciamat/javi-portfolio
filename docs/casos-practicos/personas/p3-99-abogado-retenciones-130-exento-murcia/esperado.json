@@ -1,0 +1,638 @@
+{
+  "slug": "p3-99-abogado-retenciones-130-exento-murcia",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 12000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 2520.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 2520.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 1170.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 2274.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 2274.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 2274.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 2274.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 2274.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3776.67,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Tramo de cotización (rendimiento computable 3.512,30 €/mes)",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#reta",
+      "campo": "reta.bracket",
+      "valor": "G9",
+      "retaInput": {
+        "monthlyNet": 3776.67,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 14000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 2940.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 2940.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 1170.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 2694.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 2694.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 2694.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 2694.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 2694.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3776.67,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 9000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 1890.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 1890.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 1170.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 1644.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 1644.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 1644.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 1644.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 1644.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3776.67,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Régimen general 21 %: base imponible",
+      "importe": 15000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.07"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Régimen general 21 %: cuota",
+      "importe": 3150.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.09"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "27",
+      "concepto": "Total cuota devengada",
+      "importe": 3150.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.27"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+      "importe": 1170.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.28"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "29",
+      "concepto": "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.29"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "45",
+      "concepto": "Total a deducir",
+      "importe": 245.7,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.45"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "46",
+      "concepto": "Resultado régimen general (27 − 45)",
+      "importe": 2904.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.46"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "64",
+      "concepto": "Suma de resultados",
+      "importe": 2904.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.64"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "66",
+      "concepto": "Atribuible a la Administración del Estado (100 %)",
+      "importe": 2904.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.66"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "69",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 2904.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.69"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 2904.3,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m303.71"
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3776.67,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total bases imponibles al 21 % del año",
+      "importe": 50000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total cuotas devengadas al 21 % del año",
+      "importe": 10500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "390",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Total IVA deducible del año (incluida la regularización de la prorrata)",
+      "importe": 982.8,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Cliente particular ficticio (00000992A): importe anual con impuestos",
+      "importe": 12100.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Despacho Compartido Ficticio, S.L. (B00000993): importe anual con impuestos",
+      "importe": 4356.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 5 %)",
+      "importe": 37597.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null,
+      "motivo": "Cifra de la Renta 2026: el motor de la Renta no calcula actividades económicas."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Renta 2026 completa del autónomo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.",
+      "campo": null
+    }
+  ]
+}

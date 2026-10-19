@@ -1,0 +1,164 @@
+{
+  "slug": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 113",
+  "nif": "00000113K",
+  "domicilio": "Calle Ficticia 113, 15001 A Coruña (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "galicia",
+  "titulo": "Vende un ETF en Degiro y reembolsa un fondo que antes traspasó",
+  "descripcion": "ETF comprado en Degiro en 2024 por 2.000 € + 2 € y vendido en 2025 por 2.400 € − 2 €; dividendo de 30 € con 4,50 € retenidos fuera. En su gestora traspasa en 2025 un fondo comprado en 2021 por 1.000 € a otro fondo (no tributa) y después reembolsa este por 1.800 € con 152 € de retención.",
+  "prueba": [
+    "ETF en el apartado de instituciones de inversión colectiva (0310-0325)",
+    "traspaso entre fondos: el nuevo conserva coste y fecha (art. 94.1.a)",
+    "retención del 19 % en el reembolso (casilla 0603)",
+    "doble imposición internacional del dividendo (0588)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "degiro-transacciones.csv",
+    "degiro-estado-de-cuenta.csv",
+    "gestora-movimientos-fondos.csv"
+  ],
+  "tiposDeCambioInventados": null,
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "galicia",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "degiro-transacciones.csv",
+                "degiro-estado-de-cuenta.csv",
+                "gestora-movimientos-fondos.csv"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 30,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "Fondo Indexado Ficticio A FI",
+                  "code": "ES00FICT0003",
+                  "kind": "fund",
+                  "buys": [
+                    {
+                      "date": "2021-02-01",
+                      "units": 100,
+                      "cost": 1000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-02-03",
+                      "units": 100,
+                      "proceeds": 0,
+                      "untaxed": true
+                    }
+                  ]
+                },
+                {
+                  "name": "VANGUARD FICTICIO ALL-WORLD UCITS ETF",
+                  "code": "IE00FICT0001",
+                  "kind": "listed",
+                  "section": "etf",
+                  "buys": [
+                    {
+                      "date": "2024-04-02",
+                      "units": 20,
+                      "cost": 2002
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-05-05",
+                      "units": 20,
+                      "proceeds": 2398
+                    }
+                  ]
+                },
+                {
+                  "name": "Fondo Ficticio B FI",
+                  "code": "ES00FICT0004",
+                  "kind": "fund",
+                  "buys": [
+                    {
+                      "date": "2021-02-01",
+                      "units": 150,
+                      "cost": 1000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-10-01",
+                      "units": 150,
+                      "proceeds": 1800
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 152
+              },
+              "foreignTax": [
+                {
+                  "income": 30,
+                  "tax": 4.5
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

@@ -1,11 +1,13 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef, type CSSProperties, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { BrandLogo } from '@shared/components/BrandLogo';
 import { Icon } from '@shared/components/Icon';
+import { useAuth } from '@shared/hooks/useAuth';
 import { useDialog } from '@shared/hooks/useDialog';
 import {
   DASHBOARD_SECTIONS,
+  GROUP_COLORS,
   offersEnabled,
   SECTION_GROUPS,
   type DashboardTab,
@@ -16,6 +18,7 @@ interface BurgerMenuProps {
   open: boolean;
   tab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
+  onOpenProfile: () => void;
   onClose: () => void;
 }
 
@@ -38,8 +41,9 @@ function MenuFocus({
 }
 
 /** Side menu with every section; the offers entry hides when the user turned offers off. */
-export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps) {
+export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: BurgerMenuProps) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
   const sections = DASHBOARD_SECTIONS.filter(
     (s) => s.id !== 'offers' || (offersEnabled() && showOffers)
@@ -91,10 +95,42 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
         </div>
         <nav className="burger-nav">
           {SECTION_GROUPS.map((group) => (
-            <div key={group} className="burger-nav-group">
+            <div
+              key={group}
+              className="burger-nav-group"
+              role="group"
+              aria-label={t(`app.menu.group.${group}`)}
+            >
+              <h3 className="burger-nav-group-title" aria-hidden="true">
+                {t(`app.menu.group.${group}`)}
+              </h3>
+              {group === 'account' && (
+                <button
+                  className="burger-nav-item"
+                  onClick={() => {
+                    onOpenProfile();
+                    onClose();
+                  }}
+                  style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
+                  aria-label={
+                    user?.name
+                      ? t('app.header.openProfileOf', { name: user.name })
+                      : t('app.header.openProfile')
+                  }
+                >
+                  <span className="burger-nav-icon">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="" className="burger-nav-avatar" />
+                    ) : (
+                      <Icon name="user" />
+                    )}
+                  </span>
+                  <span className="burger-nav-label">{t('app.menu.profile')}</span>
+                </button>
+              )}
               {sections
                 .filter((s) => s.group === group)
-                .map(({ id, icon, labelKey }) => (
+                .map(({ id, icon, labelKey, menuKey, color }) => (
                   <button
                     key={id}
                     className={`burger-nav-item${tab === id ? ' burger-nav-item--active' : ''}`}
@@ -103,11 +139,12 @@ export function BurgerMenu({ open, tab, onSelectTab, onClose }: BurgerMenuProps)
                       onClose();
                     }}
                     aria-current={tab === id ? 'page' : undefined}
+                    style={{ '--section-color': color } as CSSProperties}
                   >
                     <span className="burger-nav-icon">
                       <Icon name={icon} />
                     </span>
-                    <span className="burger-nav-label">{t(labelKey)}</span>
+                    <span className="burger-nav-label">{t(menuKey ?? labelKey)}</span>
                     {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
                   </button>
                 ))}

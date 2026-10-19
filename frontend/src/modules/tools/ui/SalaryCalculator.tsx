@@ -20,6 +20,7 @@ import {
 } from '../domain/salaryCalc';
 import { CalculatorLayout, NumberField, SelectField, number, useMoney } from './CalculatorLayout';
 import { Breakdown, CheckField, Sources, rowsOf, usePercent } from './calculatorParts';
+import { resultTone } from './renta/shared';
 
 interface SalaryForm {
   gross: string;
@@ -270,7 +271,8 @@ function RentaBox({ result, ccaaId }: { result: NetSalary; ccaaId: string }) {
             [t('tools.salary.row.withheld'), money(result.withholding.amount)]
           )}
         />
-        <p className="tools-amount">
+        {/* Red to pay, green refunded: e.difference is what comes back (the opposite sign). */}
+        <p className={`tools-amount renta-amount renta-amount--${resultTone(-e.difference)}`}>
           {e.difference >= 0
             ? t('tools.salary.renta.refund', { amount: money(e.difference) })
             : t('tools.salary.renta.pay', { amount: money(-e.difference) })}

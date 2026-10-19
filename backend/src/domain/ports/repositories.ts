@@ -138,8 +138,14 @@ export interface AccountRepository {
   delete(userId: string, id: string): void;
   /** Movements + transfers that reference the account. */
   countReferences(userId: string, id: string): number;
-  /** Net effect of movements and transfers per account (initial balance not included). */
-  movementBalances(userId: string): Record<string, Cents>;
+  /**
+   * Net effect of movements and transfers per account (initial balance not included). With
+   * `upTo`, only the movements of that period and earlier, and the transfers up to `upTo.endDate`.
+   */
+  movementBalances(
+    userId: string,
+    upTo?: { period: Period; endDate: string }
+  ): Record<string, Cents>;
 }
 
 export interface TransferView {

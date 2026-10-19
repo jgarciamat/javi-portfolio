@@ -1,0 +1,120 @@
+{
+  "slug": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 111",
+  "nif": "00000111L",
+  "domicilio": "Calle Ficticia 111, 46001 València (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Gana con polkadot en Kraken y compensa pérdidas de 2023",
+  "descripcion": "Compró 500 DOT en 2023 por 3.000 €; en 2025 los vende por 4.500 € con 5 € de comisión. Tiene 2.000 € de pérdidas de 2023 sin compensar.",
+  "prueba": [
+    "libro mayor de Kraken (refid) con la comisión en la pata en euros",
+    "compensación de pérdidas de los 4 años anteriores (art. 49)",
+    "lo que sobra pasa a los años siguientes"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "kraken-ledgers.csv"
+  ],
+  "tiposDeCambioInventados": null,
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "comunitat-valenciana",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [
+                {
+                  "year": 2023,
+                  "amount": 2000
+                }
+              ],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "kraken-ledgers.csv"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 0,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "DOT",
+                  "code": "DOT",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2023-03-01",
+                      "units": 500,
+                      "cost": 3000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-05-01",
+                      "units": 500,
+                      "proceeds": 4495,
+                      "counterpart": "F"
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": []
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

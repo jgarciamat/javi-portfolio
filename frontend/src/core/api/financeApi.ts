@@ -13,6 +13,7 @@ import type {
   SplitGroup,
   SplitGroupSummary,
   VatRate,
+  AutonomoCloudCopy,
   AutonomoDraft,
   AutonomoInputs,
   YearTax,
@@ -189,8 +190,10 @@ export const customAlertApi = {
 };
 
 export const accountApi = {
-  getAll() {
-    return apiRequest<{ accounts: Account[]; total: number }>('/accounts');
+  /** With a period, the balances at its end (the same moment as that month's available money). */
+  getAll(period?: { year: number; month: number }) {
+    const query = period ? `?year=${period.year}&month=${period.month}` : '';
+    return apiRequest<{ accounts: Account[]; total: number }>(`/accounts${query}`);
   },
   create(dto: AccountInput) {
     return apiRequest<Account[]>('/accounts', { method: 'POST', body: jsonBody(dto) });
@@ -337,6 +340,20 @@ export const businessApi = {
   /** Counts a draft downloaded as a PDF (the free plan has one; a 402 opens the plans). */
   recordPdf() {
     return apiRequest<{ used: number }>('/business/draft/pdf', { method: 'POST' });
+  },
+  /** The form saved in the account (null when there is none). */
+  data() {
+    return apiRequest<AutonomoCloudCopy | null>('/business/data');
+  },
+  /** Saves the form; a 409 says the account has a newer copy than `baseVersion`. */
+  saveData(data: unknown, baseVersion: number | null) {
+    return apiRequest<{ version: number; updatedAt: string }>('/business/data', {
+      method: 'PUT',
+      body: jsonBody({ data, baseVersion }),
+    });
+  },
+  deleteData() {
+    return apiRequest<void>('/business/data', { method: 'DELETE' });
   },
 };
 

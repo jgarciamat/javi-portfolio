@@ -59,6 +59,7 @@ export const castillaYLeon: RentaCcaa = {
     },
     {
       id: 'castilla-y-leon-nacimiento-adopcion',
+      splitBetweenParents: true,
       group: 'family',
       title: 'Por nacimiento o adopción de hijos',
       summary:
@@ -70,6 +71,7 @@ export const castillaYLeon: RentaCcaa = {
     },
     {
       id: 'castilla-y-leon-nacimiento-adopcion-rural',
+      splitBetweenParents: true,
       group: 'family',
       title: 'Por nacimiento o adopción en el medio rural',
       summary:

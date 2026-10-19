@@ -9,6 +9,7 @@ import {
 } from '@domain/ports/repositories';
 import { Clock } from '@domain/ports/services';
 import { Cents } from '@domain/shared/money';
+import { Period, periodEnd } from '@domain/shared/period';
 import { AccountResolver } from '@application/shared/resolvers';
 import { EntitlementService } from '@application/billing/EntitlementService';
 
@@ -31,9 +32,19 @@ export class AccountService {
     return this.accounts.listByUser(userId).filter((a) => !a.archived).length;
   }
 
-  list(userId: string): { accounts: AccountWithBalance[]; totalCents: Cents } {
+  /**
+   * With `period`, each balance is what the account holds at the end of that period (the same
+   * moment as the month's available balance); without it, everything recorded, future included.
+   */
+  list(userId: string, period?: Period): { accounts: AccountWithBalance[]; totalCents: Cents } {
     const defaultId = this.resolver.defaultAccount(userId).id;
-    const movements = this.accounts.movementBalances(userId);
+    const upTo = period
+      ? {
+          period,
+          endDate: periodEnd(period, this.settings.get(userId).monthStartDay),
+        }
+      : undefined;
+    const movements = this.accounts.movementBalances(userId, upTo);
     const accounts = this.accounts.listByUser(userId).map((a) => {
       const p = a.toPrimitives();
       return {

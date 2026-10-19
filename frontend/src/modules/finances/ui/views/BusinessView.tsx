@@ -1,5 +1,5 @@
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
-import { AutonomoDraftCard } from '../components/AutonomoDraftCard';
+import { AutonomoAssistant } from '../components/AutonomoWizard';
 import type { DashboardTab } from '../navigation';
 
 /**
@@ -9,7 +9,7 @@ import type { DashboardTab } from '../navigation';
 export function BusinessView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => void }) {
   return (
     <div className="section-view">
-      <AutonomoDraftCard
+      <AutonomoAssistant
         onHowToFile={
           onOpenTab &&
           ((slug) => {
@@ -17,6 +17,7 @@ export function BusinessView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) =>
             onOpenTab('hacienda');
           })
         }
+        onOpenRenta={onOpenTab && (() => onOpenTab('renta'))}
       />
     </div>
   );

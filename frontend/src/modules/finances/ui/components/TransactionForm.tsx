@@ -26,6 +26,8 @@ export interface TransactionFormProps {
   /** Opens the form for this type (app shortcut "add expense"); `onQuickAddDone` clears the request. */
   quickAdd: TransactionType | null;
   onQuickAddDone: () => void;
+  /** Opens the form with this account chosen (a new object each time, so the same one can be asked twice). */
+  accountRequest?: { id: string } | null;
 }
 
 /** Collapsible "new movement" form of the month view. */
@@ -38,6 +40,7 @@ export function TransactionForm({
   accounts,
   quickAdd,
   onQuickAddDone,
+  accountRequest = null,
 }: TransactionFormProps) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLDivElement>(null);
@@ -53,18 +56,31 @@ export function TransactionForm({
     t,
   });
 
+  // The anchor has no box of its own (display: contents): the panel inside it is what scrolls into view.
+  const reveal = () =>
+    ((anchor.current as HTMLDivElement).firstElementChild as HTMLElement).scrollIntoView({
+      block: 'start',
+      behavior: scrollBehavior(),
+    });
+
   const { setType } = form;
   useEffect(() => {
     if (!quickAdd) return;
     setType(quickAdd);
     setOpen(true);
-    (anchor.current as HTMLDivElement).scrollIntoView({
-      block: 'start',
-      behavior: scrollBehavior(),
-    });
+    reveal();
     onQuickAddDone();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quickAdd]);
+
+  const { setAccountId } = form;
+  useEffect(() => {
+    if (!accountRequest) return;
+    setAccountId(accountRequest.id);
+    setOpen(true);
+    reveal();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountRequest]);
 
   return (
     <div ref={anchor} className="tx-form-anchor">

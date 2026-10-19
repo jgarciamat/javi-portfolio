@@ -64,11 +64,14 @@ export function CalculatorLayout({
   path,
   titleKey,
   descriptionKey,
+  lead,
   children,
 }: {
   path: string;
   titleKey: string;
   descriptionKey: string;
+  /** Shown to everyone, above the tool or the sign-up wall (the tool itself is for accounts). */
+  lead?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useI18n();
@@ -89,6 +92,7 @@ export function CalculatorLayout({
         </p>
         <h1 className="pricing-title">{t(titleKey)}</h1>
         <p className="pricing-subtitle">{t(descriptionKey)}</p>
+        {lead}
         {gate === 'open' ? (
           <>
             {children}

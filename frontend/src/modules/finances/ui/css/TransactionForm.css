@@ -10,10 +10,44 @@
 }
 
 .tx-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+/* The main pair (what and how much) and the row of selectors share the width evenly. */
+.tx-form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.65rem;
-  margin-bottom: 0.65rem;
+  align-items: end;
+}
+
+.tx-form-row--main {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+/* Same height for every control of the form, the date included. */
+.tx-form-row .tx-input {
+  min-height: 2.75rem;
+  box-sizing: border-box;
+}
+
+/* Helpers under the fields: scan a ticket, pick an image, another currency. */
+.tx-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tx-tools .tx-receipt {
+  display: contents;
+}
+
+.tx-tools .tx-currency {
+  flex: 1 1 100%;
 }
 
 .tx-input {
@@ -121,7 +155,7 @@
 
 /* ─── TransactionForm responsive ─────────────── */
 @media (max-width: 600px) {
-  .tx-form-grid {
+  .tx-form-row:not(.tx-form-row--main) {
     grid-template-columns: 1fr;
   }
 }
@@ -129,6 +163,11 @@
 /* Wrapper that only gives the app shortcut something to scroll to. */
 .tx-form-anchor {
   display: contents;
+}
+
+/* Scrolled to from the account cards or the app shortcuts: leave the sticky header uncovered. */
+.tx-form-anchor > .card {
+  scroll-margin-top: 7rem;
 }
 
 /* ─── Movement in another currency ───────────── */

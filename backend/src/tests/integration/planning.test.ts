@@ -282,6 +282,45 @@ describe('Accounts and transfers', () => {
     expect(list.accounts.map((a: { balance: number }) => a.balance)).toEqual([500, 0]);
   });
 
+  it("can give the balances at the end of a period, so they add up to the month's available money", async () => {
+    const created = await request(ctx.app)
+      .post('/api/accounts')
+      .set(user.auth)
+      .send({ name: 'Efectivo', type: 'cash', initialBalance: 200 })
+      .expect(201);
+    const cash = created.body.find((a: { name: string }) => a.name === 'Efectivo');
+    await addTransaction(ctx, user, { type: 'INCOME', category: 'Salario', amount: 1000 });
+    await addTransaction(ctx, user, { amount: 70, date: '2026-04-05' });
+    await addTransaction(ctx, user, { amount: 30, date: '2026-05-05', accountId: cash.id });
+    const [main] = (await accounts()).accounts;
+    await request(ctx.app)
+      .post('/api/transfers')
+      .set(user.auth)
+      .send({ fromAccountId: main.id, toAccountId: cash.id, amount: 100, date: '2026-04-20' })
+      .expect(201);
+
+    const at = async (year: number, month: number) =>
+      (
+        await request(ctx.app)
+          .get(`/api/accounts?year=${year}&month=${month}`)
+          .set(user.auth)
+          .expect(200)
+      ).body;
+    // March: the income and the initial balance only; April adds the expense and the transfer.
+    const march = await at(2026, 3);
+    expect(march.total).toBe(1200);
+    expect(march.accounts.map((a: { balance: number }) => a.balance)).toEqual([1000, 200]);
+    const april = await at(2026, 4);
+    expect(april.accounts.map((a: { balance: number }) => a.balance)).toEqual([830, 300]);
+    // The total is the available money of the same month.
+    const monthView = (await request(ctx.app).get('/api/months/2026/4').set(user.auth)).body;
+    expect(april.total).toBe(monthView.available);
+    // With no period everything counts, future movements included.
+    expect((await accounts()).total).toBe(1100);
+    // Year and month go together.
+    await request(ctx.app).get('/api/accounts?year=2026').set(user.auth).expect(400);
+  });
+
   it('protects the default account and accounts with movements', async () => {
     const [main] = (await accounts()).accounts;
     expect(

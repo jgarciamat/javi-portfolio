@@ -1,0 +1,285 @@
+{
+  "slug": "p3-87-viuda-derechos-pac-arrendamiento-rustico-cordoba",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 87",
+  "nif": "00000087H",
+  "domicilio": "Calle Ficticia 87, 41001 Sevilla (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Viuda que arrienda la finca de su marido y vende sus derechos de pago básico",
+  "descripcion": "Pensión de viudedad de 12.500 €. Heredó la explotación: arrienda las tierras (rendimiento del capital inmobiliario de una finca rústica, sin reducción y sin retención) y vende los derechos de pago básico heredados (ganancia: valor de venta menos el de la herencia).",
+  "prueba": [
+    "pensión de viudedad",
+    "arrendamiento de finca rústica",
+    "venta de derechos de pago básico heredados",
+    "mínimos andaluces"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "andalucia",
+          "age": "69",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "12500.0",
+          "socialSecurity": "0.0",
+          "withheld": "200.0",
+          "nonSalary": "12500",
+          "retired": true,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "2500",
+          "choices": {},
+          "rentalOn": true,
+          "rentalIncome": "9000",
+          "rentalExpenses": {
+            "tributos-tasas": "600"
+          },
+          "construction": "0",
+          "rentalReduction": ""
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000087H",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 87 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1956",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "ANDALUCÍA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 12500.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 12500.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 0.0,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 12500.0,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 10500.0,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 10500.0,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 18900.0,
+              "box": "0435"
+            },
+            {
+              "label": "Base imponible del ahorro",
+              "amount": 2500.0,
+              "box": "0460"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 18900.0,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 2500.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 6700.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 6990.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 6700.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 6990.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 1557.75,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 1516.45,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 1557.75,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 1516.45,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 3074.2,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 3074.2,
+              "box": "0595"
+            },
+            {
+              "label": "Por rendimientos del trabajo",
+              "amount": 200.0,
+              "box": "0596"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 200.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 2874.2,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 2874.2,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Instituto Ficticio de Pensiones (viudedad)",
+        "nif": "Q00000871",
+        "gross": 12500,
+        "withheld": 200,
+        "ss": 0.0
+      }
+    ],
+    "ahorro": [
+      "Derechos de pago básico: venta 10.000 − valor en la herencia (Impuesto sobre Sucesiones) 7.500 = ganancia **2.500,00** (base del ahorro)"
+    ],
+    "alquiler": {
+      "income": 9000,
+      "interest": 0,
+      "repairs": 0,
+      "other": 600,
+      "construction": 0,
+      "reduction": 0,
+      "reductionId": "",
+      "expenses": {
+        "tributos-tasas": "600"
+      },
+      "why": "Finca rústica: sin reducción (art. 23.2 solo para viviendas); IBI rústico como gasto"
+    },
+    "actividad": [],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "p3-90-hostelera-cese-actividad-cadiz",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 90",
+  "nif": "00000090K",
+  "domicilio": "Calle Ficticia 90, 41001 Sevilla (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Hostelera de Cádiz que cerró su bar y cobró la prestación por cese de actividad",
+  "descripcion": "Cerró su bar en estimación directa en junio de 2025 y cobró 3.600 € de prestación por cese de actividad (rendimiento del trabajo). Vendió la maquinaria con pérdida (base general). El bar estaba en directa simplificada: rendimiento de enero a junio.",
+  "prueba": [
+    "prestación por cese de actividad (trabajo)",
+    "cese de la actividad a mitad de año",
+    "pérdida por venta de elementos afectos"
+  ],
+  "modelos": [
+    "100",
+    "130"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "Falta el detalle de la actividad (libros) y el motor no recoge todavía actividades desde el formulario: se deja como caso de prueba de importación.",
+  "documentos": {}
+}

@@ -77,6 +77,7 @@ describe('reading a draft', () => {
         label:
           'Por cantidades satisfechas en gastos asociados a la práctica del deporte y actividades saludables',
         amount: 41.7,
+        box: '1960',
       },
     ]);
   });
@@ -224,7 +225,13 @@ describe('a real draft (2025, Comunitat Valenciana)', () => {
       withheld: String(reading.withheld),
       savings: String(reading.savings),
       choices: {
-        'comunitat-valenciana-practica-deporte': { on: true, amount: '139.01', units: '' },
+        'comunitat-valenciana-practica-deporte': {
+          on: true,
+          amount: '139.01',
+          units: '',
+          // Its requirements, answered: gym or club fees, with an invoice and paid by card.
+          checks: { deporte: 'yes' as const, factura: 'yes' as const },
+        },
       },
     };
     const result = computeRenta(

@@ -1,4 +1,5 @@
 import { PersonalDataReader } from '@domain/ports/repositories';
+import { SecretBox } from '@domain/ports/two-factor';
 import { fromCents } from '@domain/shared/money';
 import { Db } from '../database';
 
@@ -29,7 +30,12 @@ function parseJson(text: string): unknown {
  * for dates and counts; secrets (push keys, Stripe subscription ids) are never read.
  */
 export class SqlitePersonalDataReader implements PersonalDataReader {
-  constructor(private readonly db: Db, private readonly inboxDomain: string | null = null) {}
+  constructor(
+    private readonly db: Db,
+    private readonly inboxDomain: string | null = null,
+    /** Opens the self-employed form saved in the account: the export carries it in clear. */
+    private readonly autonomoBox: SecretBox | null = null
+  ) {}
 
   sectionsFor(userId: string): Record<string, unknown> {
     return {
@@ -99,6 +105,23 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         userId
       ),
       security: this.security(userId),
+      autonomoData: this.autonomoData(userId),
+    };
+  }
+
+  /** The self-employed form saved in the account, decrypted (null when it cannot be). */
+  private autonomoData(userId: string): Row | null {
+    const row = this.one(
+      'SELECT payload_enc, updated_at, version FROM autonomo_data WHERE user_id = ?',
+      userId
+    );
+    if (!row) return null;
+    const plain = this.autonomoBox?.decrypt(row.payload_enc as string) ?? null;
+    return {
+      updatedAt: row.updated_at,
+      version: row.version,
+      data: plain === null ? null : parseJson(plain),
+      unreadable: plain === null,
     };
   }
 

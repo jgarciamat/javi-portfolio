@@ -1,0 +1,1832 @@
+{
+  "slug": "p3-67-comercio-kit-digital-ayuda-contratacion-alicante",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 67",
+  "nif": "00000067K",
+  "domicilio": "Calle Ficticia 67, 46001 València (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Tienda de Alicante con Kit Digital, ayuda a la contratación, empleada y local",
+  "descripcion": "Comercio de electrodomésticos (estimación directa simplificada, IVA general). Cobra 3.000 € del Kit Digital y 4.500 € de ayuda autonómica por contratar a una trabajadora indefinida: subvenciones corrientes, ingreso de la actividad sin IVA. Local alquilado a un particular (115) y una empleada (111).",
+  "prueba": [
+    "Kit Digital (subvención corriente)",
+    "ayuda a la contratación",
+    "111 y 115",
+    "303 general",
+    "130 con subvenciones"
+  ],
+  "modelos": [
+    "130",
+    "303",
+    "111",
+    "115",
+    "180",
+    "190",
+    "347",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "general",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 1210000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 1210000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 1210000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-05",
+        "type": "EXPENSE",
+        "amountCents": 2178000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 1290667,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 1290667,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 1290666,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-05",
+        "type": "EXPENSE",
+        "amountCents": 2299000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 1129333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 1129333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 1129334,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-05",
+        "type": "EXPENSE",
+        "amountCents": 2057000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 1815000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 1815000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 1815000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-05",
+        "type": "EXPENSE",
+        "amountCents": 3267000,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-004",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10666.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-005",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10666.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-006",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 10666.66,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-007",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 9333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-008",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 9333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-009",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 9333.34,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-010",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 15000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-011",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 15000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-012",
+        "client": "Ventas a particulares (tiques del mes)",
+        "nif": "",
+        "base": 15000.0,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-05",
+        "number": "F-03-MAT",
+        "supplier": "Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "nif": "A00000673",
+        "base": 18000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-05",
+        "number": "F-06-MAT",
+        "supplier": "Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "nif": "A00000673",
+        "base": 19000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-05",
+        "number": "F-09-MAT",
+        "supplier": "Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "nif": "A00000673",
+        "base": 17000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000671G",
+        "base": 1200,
+        "rate": 21,
+        "retention": 228.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SUP",
+        "supplier": "Eléctrica Ficticia, S.A.",
+        "nif": "A00000672",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-05",
+        "number": "F-12-MAT",
+        "supplier": "Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "nif": "A00000673",
+        "base": 27000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Ventas a particulares (tiques del mes)",
+        "amount": 12100.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Ventas a particulares (tiques del mes)",
+        "amount": 12100.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Ventas a particulares (tiques del mes)",
+        "amount": 12100.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "amount": -21780.0
+      },
+      {
+        "date": "2026-01-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-01-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-02-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-02-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-03-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-03-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-004 Ventas a particulares (tiques del mes)",
+        "amount": 12906.67
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-005 Ventas a particulares (tiques del mes)",
+        "amount": 12906.67
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-006 Ventas a particulares (tiques del mes)",
+        "amount": 12906.66
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "amount": -22990.0
+      },
+      {
+        "date": "2026-04-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-04-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-05-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-05-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-06-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-06-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-06-22",
+        "concept": "Cobro de la subvención: Kit Digital",
+        "amount": 3000
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-007 Ventas a particulares (tiques del mes)",
+        "amount": 11293.33
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-008 Ventas a particulares (tiques del mes)",
+        "amount": 11293.33
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-009 Ventas a particulares (tiques del mes)",
+        "amount": 11293.34
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "amount": -20570.0
+      },
+      {
+        "date": "2026-07-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-07-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-08-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-08-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-09-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-09-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-09-22",
+        "concept": "Cobro de la subvención: Ayuda a la contratación indefinida",
+        "amount": 4500
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-010 Ventas a particulares (tiques del mes)",
+        "amount": 18150.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-011 Ventas a particulares (tiques del mes)",
+        "amount": 18150.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-012 Ventas a particulares (tiques del mes)",
+        "amount": 18150.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1224.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Eléctrica Ficticia, S.A.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Distribuidor Ficticio de Electrodomésticos, S.A.",
+        "amount": -32670.0
+      },
+      {
+        "date": "2026-10-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-10-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-11-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-11-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-12-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -1440.0
+      },
+      {
+        "date": "2026-12-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -480
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -302.65
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          30000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          6300.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          6300.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          22350.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          4693.5
+        ],
+        [
+          "45",
+          "Total a deducir",
+          4693.5
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1606.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1606.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1606.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1606.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1606.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          32000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          6720.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          6720.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          23350.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          4903.5
+        ],
+        [
+          "45",
+          "Total a deducir",
+          4903.5
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1816.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1816.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1816.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1816.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1816.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          28000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          5880.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          5880.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          21350.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          4483.5
+        ],
+        [
+          "45",
+          "Total a deducir",
+          4483.5
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1396.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1396.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1396.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1396.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1396.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          45000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          9450.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          9450.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          31350.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          6583.5
+        ],
+        [
+          "45",
+          "Total a deducir",
+          6583.5
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          2866.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          2866.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          2866.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          2866.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          2866.5
+        ]
+      ]
+    ],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          30000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          29238.05
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          761.95
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          152.39
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          152.39
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          152.39
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          152.39
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          152.39
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          152.39
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          65000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          59676.11
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          5323.89
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1064.78
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          152.39
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          912.39
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          912.39
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          912.39
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          912.39
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          912.39
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          97500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          88089.16
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          9410.84
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1882.17
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1064.78
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          817.39
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          817.39
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          817.39
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          817.39
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          817.39
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          142500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          126627.21
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          15872.79
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          3174.56
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1882.17
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1292.39
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1292.39
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1292.39
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1292.39
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1292.39
+        ]
+      ]
+    ],
+    "m111": [
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          4500
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          180.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          0
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          0.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          0.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          180.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          180.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          4500
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          180.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          0
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          0.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          0.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          180.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          180.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          4500
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          180.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          0
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          0.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          0.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          180.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          180.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          1
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          4500
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          180.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          0
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          0.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          0.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          180.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          180.0
+        ]
+      ]
+    ],
+    "m115": [
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          3600.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          684.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          684.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          3600.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          684.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          684.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          3600.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          684.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          684.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          3600.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          684.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          684.0
+        ]
+      ]
+    ]
+  }
+}

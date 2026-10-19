@@ -224,7 +224,10 @@ describe('FinancesContext', () => {
     fireEvent.click(screen.getByText('add-tx'));
     await waitFor(() => expect(txCreate).toHaveBeenCalled());
     await waitFor(() => expect(monthGet).toHaveBeenCalledWith(2026, 3));
-    expect(accGetAll).toHaveBeenCalledTimes(2);
+    // The balances follow the viewed month: once on load, once for each month change and once more
+    // after the mutation.
+    expect(accGetAll).toHaveBeenCalledTimes(4);
+    expect(accGetAll).toHaveBeenCalledWith({ year: 2026, month: 4 });
 
     // April was cached before the mutation: it must be fetched again.
     monthGet.mockClear();

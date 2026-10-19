@@ -1,3 +1,4 @@
+import { FileDropZone } from '@shared/components/FileDropZone';
 import { useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { ConsentBoxes } from '@modules/billing/ui/PlanOptions';
@@ -5,24 +6,18 @@ import { formatPrice } from '@modules/billing/ui/pricing';
 import type { CheckoutConsent } from '@modules/billing/domain/types';
 import { errorMessage } from '@shared/utils/errors';
 import type { DraftAccess } from '../../application/useRentaAccess';
-import { readPdfText } from '../../application/readPdf';
-import { readDraft, type DraftReading } from '../../domain/rentaDraft';
+import { loadXmlMap, readDraftFile } from '../../application/readDraftFile';
+import { readDraftXml } from '../../domain/rentaDraftXml';
+import { readDraft, type DraftReading, type DraftState } from '../../domain/rentaDraft';
+import type { CompareRow } from '../../domain/rentaCompare';
 import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
+import { applyReading } from '../../domain/rentaDraftApply';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
+import { DraftComparison } from './DraftComparison';
+import type { DraftGap } from '../../domain/rentaDraftGaps';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
-
-/** What the planner keeps about the draft: what was read, and what the person answered. */
-export interface DraftState {
-  reading: DraftReading | null;
-  rents: boolean;
-  dismissed: string[];
-  /** The draft as it was read, kept while the person tries next year's return with the same data. */
-  scenario: { form: RentaForm; reading: DraftReading } | null;
-}
-
-export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
 
 /** The year of the return the draft belongs to (the exercise); the next campaign is two years on. */
 export const DRAFT_EXERCISE = 2025;
@@ -35,6 +30,7 @@ export function nextYearForm(form: RentaForm): RentaForm {
     ...form,
     age: older(form.age),
     children: form.children.map((c) => ({ ...c, age: older(c.age) })),
+    partner: { ...form.partner, age: older(form.partner.age) },
     choices: {},
   };
 }
@@ -48,30 +44,6 @@ const FIELD_LABELS: { key: keyof DraftReading; label: string }[] = [
   { key: 'rentalIncome', label: 'tools.renta.rentalIncome' },
   { key: 'savings', label: 'tools.renta.savings' },
 ];
-
-/** The form with what was read from the draft: only what was found, the rest is left as it was. */
-export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaForm> {
-  const text = (n: number | null, current: string) => (n === null ? current : String(n));
-  return {
-    ccaaId: r.ccaaId ?? form.ccaaId,
-    gross: text(r.gross, form.gross),
-    socialSecurity: text(r.socialSecurity, form.socialSecurity),
-    withheld: text(r.withheld, form.withheld),
-    pension: text(r.pension, form.pension),
-    savings: text(r.savings, form.savings),
-    rentalOn: r.rentalIncome !== null || form.rentalOn,
-    rentalIncome: text(r.rentalIncome, form.rentalIncome),
-    age: r.age === null ? form.age : String(r.age),
-    ascendants:
-      r.ascendantAges.length > 0
-        ? r.ascendantAges.map((age) => ({ over75: age >= 75, disability: 0 as const }))
-        : form.ascendants,
-    children:
-      r.childAges.length > 0
-        ? r.childAges.map((age) => ({ age: String(age), disability: 0 as const }))
-        : form.children,
-  };
-}
 
 /** What the person needs to read a draft: two months of Premium, or the one-month pass. */
 function DraftPaywall({ access }: { access: DraftAccess }) {
@@ -134,11 +106,27 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
   );
 }
 
+/** A file of another year is the base of this one; the Agency's file is read box by box. */
+function FileNotes({ reading }: { reading: DraftReading }) {
+  const { t } = useI18n();
+  return (
+    <>
+      {reading.exercise !== null && reading.exercise !== DRAFT_EXERCISE && (
+        <p className="renta-scenario" role="status">
+          {t('tools.renta.draft.otherYear', { exercise: reading.exercise })}
+        </p>
+      )}
+      {'format' in reading && <p className="section-hint">{t('tools.renta.draft.fromXml')}</p>}
+    </>
+  );
+}
+
 /** What was read from the draft, and the deductions it already applies. */
 function DraftFound({ reading }: { reading: DraftReading }) {
   const { t } = useI18n();
   const money = useMoney();
   const found = FIELD_LABELS.filter(({ key }) => reading[key] !== null);
+  const extra = (reading.disability ?? 0) > 0 || reading.unrented.length > 0;
   const shown = (key: keyof DraftReading) => {
     const value = reading[key];
     if (key === 'ccaaId')
@@ -149,7 +137,8 @@ function DraftFound({ reading }: { reading: DraftReading }) {
   return (
     <>
       <h3>{t('tools.renta.draft.found')}</h3>
-      {found.length === 0 ? (
+      <FileNotes reading={reading} />
+      {found.length === 0 && !extra ? (
         <p className="form-error">{t('tools.renta.draft.nothing')}</p>
       ) : (
         <ul className="renta-minimum">
@@ -163,6 +152,18 @@ function DraftFound({ reading }: { reading: DraftReading }) {
             <li>
               <span>{t('tools.renta.children')}</span>
               <strong>{reading.childAges.length}</strong>
+            </li>
+          )}
+          {reading.disability !== null && reading.disability > 0 && (
+            <li>
+              <span>{t('tools.renta.ownDisability')}</span>
+              <strong>{t(`tools.renta.disability.${reading.disability}`)}</strong>
+            </li>
+          )}
+          {reading.unrented.length > 0 && (
+            <li>
+              <span>{t('tools.renta.unrented')}</span>
+              <strong>{reading.unrented.length}</strong>
             </li>
           )}
         </ul>
@@ -306,7 +307,10 @@ function MissingQuestions({
   );
 }
 
-/** Reading the draft: from the PDF or pasted as text, in the browser. */
+/** The draft's PDF, or the file Renta WEB downloads (a «.txt» that is an XML; also as «.xml»). */
+const DRAFT_ACCEPT = '.pdf,.txt,.xml,application/pdf,text/plain,application/xml,text/xml';
+
+/** Reading the draft: from the PDF, the Agency's file or pasted as text, in the browser. */
 function DraftReader({
   form,
   set,
@@ -327,20 +331,39 @@ function DraftReader({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<'read' | 'locked' | null>(null);
 
-  const analyse = async (text: string) => {
-    setError(null);
-    if (!(await access.use())) {
-      setError('locked');
-      return;
-    }
-    const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
-    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
+  /** A reading of the draft, from any format: into the planner, its deductions marked next. */
+  const use = (result: DraftReading) => {
+    onDraft({
+      ...draft,
+      reading: result,
+      rents: !result.ownsHome,
+      dismissed: [],
+      scenario: null,
+      pending: true,
+    });
     set(applyReading(form, result));
   };
+  const allowed = async () => {
+    setError(null);
+    if (await access.use()) return true;
+    setError('locked');
+    return false;
+  };
+  const analyse = async (text: string, lines?: string[]) => {
+    if (!(await allowed())) return;
+    use(readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines }));
+  };
+  /** The PDF of the draft, or the Agency's file (the «.txt» of Renta WEB, an XML), by its content. */
   const fromFile = async (file: File) => {
     setBusy(true);
     try {
-      await analyse(await readPdfText(file));
+      const read = await readDraftFile(file);
+      if (read.kind === 'pdf') await analyse(read.pdf.text, read.pdf.lines);
+      else if (read.kind === 'text') await analyse(read.text);
+      else if (await allowed()) {
+        const map = await loadXmlMap(read.exercise);
+        use(readDraftXml(read.text, { year: DRAFT_EXERCISE, map }));
+      }
     } catch {
       setError('read');
     } finally {
@@ -357,25 +380,27 @@ function DraftReader({
           })}
         </p>
       )}
-      <p className="renta-privacy" role="note">
-        {t('tools.renta.draft.privacy')}
-      </p>
-      <div className="button-row">
-        <input
-          ref={input}
-          type="file"
-          accept="application/pdf"
-          hidden
-          aria-label={t('tools.renta.draft.file')}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void fromFile(file);
-          }}
-        />
-        <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
-          {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
-        </button>
-      </div>
+      <FileDropZone accept={DRAFT_ACCEPT} onFiles={(list) => void fromFile(list[0])}>
+        <p className="renta-privacy" role="note">
+          {t('tools.renta.draft.privacy')}
+        </p>
+        <div className="button-row">
+          <input
+            ref={input}
+            type="file"
+            accept={DRAFT_ACCEPT}
+            hidden
+            aria-label={t('tools.renta.draft.file')}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void fromFile(file);
+            }}
+          />
+          <button className="btn-primary" disabled={busy} onClick={() => input.current?.click()}>
+            {busy ? t('tools.renta.draft.reading') : t('tools.renta.draft.upload')}
+          </button>
+        </div>
+      </FileDropZone>
       {error && (
         <p className="form-error">
           {error === 'locked' ? t('tools.renta.draft.refused') : t('tools.renta.draft.error')}
@@ -410,6 +435,7 @@ export function DraftStep({
   draft,
   onDraft,
   accept,
+  comparison,
 }: {
   form: RentaForm;
   set: (patch: Partial<RentaForm>) => void;
@@ -423,6 +449,8 @@ export function DraftStep({
   draft: DraftState;
   onDraft: (draft: DraftState) => void;
   accept: (id: string) => void;
+  /** The draft's boxes next to the planner's, and the planner's result. */
+  comparison: { rows: CompareRow[]; result: number; gaps: DraftGap[]; withGaps: number };
 }) {
   const { t } = useI18n();
   const { reading } = draft;
@@ -445,6 +473,16 @@ export function DraftStep({
           {reading && (
             <section className="renta-block" aria-live="polite">
               <DraftFound reading={reading} />
+              {!draft.scenario && (
+                <DraftComparison
+                  reading={reading}
+                  rows={comparison.rows}
+                  result={comparison.result}
+                  gaps={comparison.gaps}
+                  withGaps={comparison.withGaps}
+                  onAdd={(id, choice) => set({ choices: { ...form.choices, [id]: choice } })}
+                />
+              )}
               <DraftScenario
                 form={form}
                 set={set}

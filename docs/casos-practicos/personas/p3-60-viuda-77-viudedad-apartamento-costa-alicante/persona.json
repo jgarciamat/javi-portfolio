@@ -1,0 +1,335 @@
+{
+  "slug": "p3-60-viuda-77-viudedad-apartamento-costa-alicante",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 60",
+  "nif": "00000060Z",
+  "domicilio": "Calle Ficticia 60, 46001 València (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Viuda de 77 años con pensión de viudedad y un apartamento en la costa que alquila en verano",
+  "descripcion": "Cobra pensión de viudedad (14.000 €) y de jubilación (9.000 €): dos pagadores, ambos pensiones. Alquila en julio, agosto y septiembre su apartamento de Torrevieja (no es vivienda habitual del inquilino: sin reducción) y el resto del año queda a su disposición: imputación por los días sin alquilar.",
+  "prueba": [
+    "pensión de viudedad",
+    "mayor de 75",
+    "alquiler de temporada sin reducción",
+    "imputación de renta por días",
+    "dos pagadores de pensiones"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "comunitat-valenciana",
+          "age": "77",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "23000.0",
+          "socialSecurity": "0.0",
+          "withheld": "1300.0",
+          "nonSalary": "23000",
+          "retired": true,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "secondPayers": "9000.0",
+          "rentalOn": true,
+          "rentalIncome": "4500",
+          "rentalExpenses": {
+            "reparacion-conservacion": "200",
+            "tributos-tasas": "120",
+            "comunidad-servicios-personales": "120",
+            "seguros": "50"
+          },
+          "construction": "15123.29",
+          "rentalReduction": "",
+          "unrented": [
+            {
+              "value": "48000",
+              "revised": true,
+              "days": "273"
+            }
+          ]
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000060Z",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 60 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1948",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "COMUNITAT VALENCIANA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 23000.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 23000.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 0.0,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 23000.0,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 21000.0,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 21000.0,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Bienes inmuebles",
+          "lines": [
+            {
+              "label": "A disposición de sus titulares.",
+              "text": "X",
+              "box": "0073"
+            },
+            {
+              "label": "Valor catastral del inmueble",
+              "amount": 48000.0,
+              "box": "0083"
+            },
+            {
+              "label": "Valor catastral revisado (Si/No)",
+              "text": "SI",
+              "box": "0084"
+            },
+            {
+              "label": "Nº de días a disposición del contribuyente.",
+              "text": "273",
+              "box": "0085"
+            },
+            {
+              "label": "Renta inmobiliaria imputada.",
+              "amount": 394.92,
+              "box": "0089"
+            },
+            {
+              "label": "Suma de imputaciones de rentas inmobiliarias",
+              "amount": 394.92,
+              "box": "0155"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 24951.22,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 24951.22,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 8100.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 8910.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 8100.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 8910.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 2055.93,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 1920.78,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 2055.93,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 1920.78,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 3976.71,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 3976.71,
+              "box": "0595"
+            },
+            {
+              "label": "Por rendimientos del trabajo",
+              "amount": 1300.0,
+              "box": "0596"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 1300.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 2676.71,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 2676.71,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Instituto Ficticio de Pensiones (viudedad)",
+        "nif": "Q00000601",
+        "gross": 14000,
+        "withheld": 900,
+        "ss": 0.0
+      },
+      {
+        "name": "Instituto Ficticio de Pensiones (jubilación)",
+        "nif": "Q00000602",
+        "gross": 9000,
+        "withheld": 400,
+        "ss": 0.0
+      }
+    ],
+    "ahorro": [],
+    "alquiler": {
+      "income": 4500,
+      "interest": 0,
+      "repairs": 200,
+      "other": 290,
+      "construction": 15123.29,
+      "reduction": 0,
+      "reductionId": "",
+      "expenses": {
+        "reparacion-conservacion": "200",
+        "tributos-tasas": "120",
+        "comunidad-servicios-personales": "120",
+        "seguros": "50"
+      },
+      "why": "Alquiler de temporada (92 días): no es vivienda habitual del inquilino, sin reducción del art. 23.2. Gastos y amortización en proporción a los días alquilados: el coste de construcción de 60.000 € × 92/365 = 15.123,29"
+    },
+    "actividad": [],
+    "m130": [],
+    "m131": [],
+    "m303": []
+  }
+}

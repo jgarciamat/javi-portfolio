@@ -1,0 +1,80 @@
+{
+  "slug": "p5-125-alquiler-sin-perfil-deporte-malaga",
+  "banco": "p5",
+  "nombre": "Persona Ficticia 125",
+  "nif": "00000125X",
+  "domicilio": "Calle Ficticia 125, 29001 Málaga (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Asalariado de 40 años en Málaga: la deducción de alquiler no le corresponde y la de deporte sí",
+  "descripcion": "Vive de alquiler, pero tiene 40 años, sin discapacidad ni otro perfil de la deducción andaluza por alquiler: contesta «no» a su requisito y no se aplica. Paga 300 € de cuotas de su club deportivo: 15 % = 45 €.",
+  "prueba": [
+    "requisito no cumplido: la deducción no se aplica",
+    "deporte (Andalucía, 15 % con tope de 100 €)",
+    "casillas 0853 y 0921 del anexo B"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "andalucia",
+          "age": "40",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "24000.0",
+          "socialSecurity": "1555.2",
+          "withheld": "3000.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "andalucia-alquiler-vivienda-habitual": {
+              "on": true,
+              "amount": "7200",
+              "units": "",
+              "checks": {
+                "perfil": "no"
+              }
+            },
+            "andalucia-ejercicio-fisico-deporte": {
+              "on": true,
+              "amount": "300",
+              "units": "",
+              "checks": {
+                "cuotas": "yes"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 24000,
+        "withheld": 3000,
+        "ss": 1555.2
+      }
+    ],
+    "inmuebles": []
+  }
+}

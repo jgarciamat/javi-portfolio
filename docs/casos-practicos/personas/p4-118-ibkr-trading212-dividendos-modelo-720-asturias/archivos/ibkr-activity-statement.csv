@@ -1,0 +1,10 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,Title,Activity Statement (archivo inventado)
+Trades,Header,DataDiscriminator,Asset Category,Currency,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,USD,FICT,"2024-03-05, 10:00:00",100,550,550,-55000,-11,55011,0,0,O
+Trades,Data,Order,Stocks,USD,FICT,"2025-09-10, 10:00:00",-10,660,660,6600,-11,-5501.1,1087.9,0,C
+Dividends,Header,Currency,Date,Description,Amount
+Dividends,Data,USD,2025-06-15,FICT(US00FICT0008) Cash Dividend USD 4.40 per Share (Ordinary Dividend),440.00
+Dividends,Data,Total,,,440.00
+Withholding Tax,Header,Currency,Date,Description,Amount,Code
+Withholding Tax,Data,USD,2025-06-15,FICT(US00FICT0008) Cash Dividend USD 4.40 per Share - US Tax,-66.00,

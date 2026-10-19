@@ -1,0 +1,150 @@
+{
+  "slug": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 117",
+  "nif": "00000117W",
+  "domicilio": "Calle Ficticia 117, 50001 Zaragoza (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "aragon",
+  "titulo": "Vende ether en Bitpanda y cobra recompensas y cashback en Crypto.com",
+  "descripcion": "Compró 1 ETH en 2024 por 2.000 € y vende medio en 2025 por 1.500 €. Recibe 0,01 ETH de staking (30 €), 0,001 BTC de «Crypto Earn» (50 €) y 10 CRO de cashback de la tarjeta (1 €).",
+  "prueba": [
+    "recompensas de staking y préstamo como capital mobiliario (0027)",
+    "cashback en cripto como ganancia de la base general (NO CONFIRMADO)",
+    "el valor de la recompensa es el coste de las monedas recibidas"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "bitpanda-transacciones.csv",
+    "cryptocom-transacciones.csv"
+  ],
+  "tiposDeCambioInventados": null,
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "aragon",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "bitpanda-transacciones.csv",
+                "cryptocom-transacciones.csv"
+              ],
+              "capital": {
+                "interest": 80,
+                "dividends": 0,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "ETH",
+                  "code": "ETH",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2024-03-01",
+                      "units": 1,
+                      "cost": 2000
+                    },
+                    {
+                      "date": "2025-05-01",
+                      "units": 0.01,
+                      "cost": 30
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-03-01",
+                      "units": 0.5,
+                      "proceeds": 1500,
+                      "counterpart": "F"
+                    }
+                  ]
+                },
+                {
+                  "name": "CRO",
+                  "code": "CRO",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2025-02-01",
+                      "units": 10,
+                      "cost": 1
+                    }
+                  ],
+                  "sells": []
+                },
+                {
+                  "name": "BTC",
+                  "code": "BTC",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2025-02-15",
+                      "units": 0.001,
+                      "cost": 50
+                    }
+                  ],
+                  "sells": []
+                }
+              ],
+              "generalGains": [
+                1
+              ],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": []
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

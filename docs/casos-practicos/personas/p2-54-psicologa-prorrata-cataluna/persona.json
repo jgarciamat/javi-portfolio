@@ -1,0 +1,1874 @@
+{
+  "slug": "p2-54-psicologa-prorrata-cataluna",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 54",
+  "nif": "00000054P",
+  "domicilio": "Calle Ficticia 54, 17001 Girona (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "cataluna",
+  "titulo": "Psicóloga con terapia exenta y peritajes con IVA: prorrata",
+  "descripcion": "La psicoterapia es asistencia sanitaria exenta (art. 20.Uno.3.º LIVA) y los informes periciales para juzgados y abogados llevan IVA y retención del 15 %. Deduce el IVA soportado con la prorrata provisional del 25 % (la definitiva de 2025) y regulariza en el 4T con la definitiva de 2026 (casilla 44).",
+  "prueba": [
+    "prorrata general (arts. 102-106 LIVA)",
+    "regularización de la prorrata en el 4T (casilla 44)",
+    "IVA no deducible como gasto del IRPF",
+    "operaciones exentas sin casilla en el 303",
+    "retención del 15 % en parte de los ingresos"
+  ],
+  "modelos": [
+    "130",
+    "303",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "prorrata",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 141167,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 141167,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 141166,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 233333,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 233333,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 233334,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 100833,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 100833,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 100834,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 320000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 320000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 320000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 161333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 161333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 161334,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-004",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-005",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-006",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-007",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-008",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-009",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-010",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1166.67,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-011",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1166.67,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1166.66,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-013",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 2333.33,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-014",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 2333.33,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-015",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 2333.34,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-016",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 833.33,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-017",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 833.33,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-018",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 833.34,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-019",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3200.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-020",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3200.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-021",
+        "client": "Pacientes (terapia, exenta)",
+        "nif": "",
+        "base": 3200.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "exempt"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-022",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1333.33,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-023",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1333.33,
+        "rate": 21,
+        "withheldRate": 15
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-024",
+        "client": "Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "nif": "B00000541",
+        "base": 1333.34,
+        "rate": 21,
+        "withheldRate": 15
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "nif": "B00000542",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SOF",
+        "supplier": "Software Clínico Ficticio, S.L.",
+        "nif": "B00000543",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000544",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-004 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1060.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-005 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1060.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-006 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1060.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-007 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-008 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-009 Pacientes (terapia, exenta)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-010 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1236.67
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-011 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1236.67
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-012 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1236.66
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-013 Pacientes (terapia, exenta)",
+        "amount": 2333.33
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-014 Pacientes (terapia, exenta)",
+        "amount": 2333.33
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-015 Pacientes (terapia, exenta)",
+        "amount": 2333.34
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-016 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 883.33
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-017 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 883.33
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-018 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 883.34
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-019 Pacientes (terapia, exenta)",
+        "amount": 3200.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-020 Pacientes (terapia, exenta)",
+        "amount": 3200.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-021 Pacientes (terapia, exenta)",
+        "amount": 3200.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-022 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1413.33
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-023 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1413.33
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-024 Despacho de Abogados Ficticio, S.L.P. (peritajes)",
+        "amount": 1413.34
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Consulta Ficticia Girona, S.L. (alquiler de despacho por horas)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Software Clínico Ficticio, S.L.",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -452.94
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          3000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          630.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          630.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          1470.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          77.18
+        ],
+        [
+          "45",
+          "Total a deducir",
+          77.18
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          552.82
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          552.82
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          552.82
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          552.82
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          552.82
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          3500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          735.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          735.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          1470.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          77.18
+        ],
+        [
+          "45",
+          "Total a deducir",
+          77.18
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          657.82
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          657.82
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          657.82
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          657.82
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          657.82
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          2500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          525.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          525.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          1470.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          77.18
+        ],
+        [
+          "45",
+          "Total a deducir",
+          77.18
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          447.82
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          447.82
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          447.82
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          447.82
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          447.82
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          4000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          840.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          840.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          1470.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          77.18
+        ],
+        [
+          "44",
+          "Regularización por aplicación del porcentaje definitivo de prorrata",
+          37.02
+        ],
+        [
+          "45",
+          "Total a deducir",
+          114.2
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          725.8
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          725.8
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          725.8
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          725.8
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          725.8
+        ]
+      ]
+    ],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          12000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          3507.31
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          8492.69
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1698.54
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          450.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1248.54
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1248.54
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1248.54
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1248.54
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1248.54
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          24500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          7039.63
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          17460.37
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          3492.07
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1248.54
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          975.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1268.53
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1268.53
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1268.53
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1268.53
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1268.53
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          34000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          10421.94
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          23578.06
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          4715.61
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          2517.07
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          1350.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          848.54
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          848.54
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          848.54
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          848.54
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          848.54
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          47600.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          13974.09
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          33625.91
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          6725.18
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          3365.61
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          1950.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1409.57
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1409.57
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1409.57
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1409.57
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1409.57
+        ]
+      ]
+    ],
+    "m111": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "m115": [
+      [],
+      [],
+      [],
+      []
+    ]
+  }
+}

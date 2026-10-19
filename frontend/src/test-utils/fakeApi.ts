@@ -44,6 +44,9 @@ function fakeBusinessApi(): FakeApi['businessApi'] {
     removeCategory: ok(undefined),
     draft: ok(f.autonomoDraft()),
     recordPdf: ok({ used: 1 }),
+    data: ok(null),
+    saveData: ok({ version: 1, updatedAt: '2026-03-15T12:00:00.000Z' }),
+    deleteData: ok(undefined),
     tax: ok({
       year: 2026,
       quarters: [1, 2, 3, 4].map((quarter) => ({

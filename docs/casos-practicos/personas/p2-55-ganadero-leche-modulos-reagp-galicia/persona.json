@@ -1,0 +1,36 @@
+{
+  "slug": "p2-55-ganadero-leche-modulos-reagp-galicia",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 55",
+  "nif": "00000055D",
+  "domicilio": "Calle Ficticia 55, 27001 Lugo (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "galicia",
+  "titulo": "Ganadero de vacuno de leche en módulos y en el REAGP",
+  "descripcion": "Vende toda la leche a una cooperativa que le retiene el 2 % y le paga la compensación del REAGP (10,5 % en ganadería, art. 130 LIVA). Más del 70 % de sus ingresos tiene retención: no presenta el 131. No presenta 303 (REAGP). La Renta va por módulos agrarios (índice de rendimiento de la Orden del año).",
+  "prueba": [
+    "estimación objetiva agraria",
+    "REAGP: compensación del 10,5 %",
+    "exención del 131 por retenciones ≥ 70 %",
+    "retención del 2 % a actividades agrícolas y ganaderas"
+  ],
+  "modelos": [
+    "100 (módulos agrarios)"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "La app ya calcula los módulos agrarios (agrarianModules.ts) y el REAGP, pero no se ha confirmado en fuente oficial si la compensación del REAGP entra en el volumen de ingresos al que se aplica el índice de rendimiento (0,20 del vacuno de leche): sin eso el rendimiento no se puede fijar a mano. Calculado solo lo que fija la ley: compensación del 10,5 % y retención del 2 %.",
+  "documentos": {
+    "datos": {
+      "ventasLeche": [
+        18000,
+        17500,
+        16800,
+        18200
+      ],
+      "compensacion": 10.5,
+      "retencion": 2
+    }
+  }
+}

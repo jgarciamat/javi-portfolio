@@ -153,7 +153,6 @@ describe('month view', () => {
     const downloads = captureDownloads();
     setup();
     await screen.findByText('Cena');
-    fireEvent.click(screen.getByRole('button', { name: tr('app.export.options') }));
     fireEvent.click(screen.getByRole('button', { name: literal(tr('app.export.month')) }));
     expect(downloads.names).toEqual(['finanverso_2026-03_marzo.csv']);
     const [csv] = await downloads.text();

@@ -21,6 +21,29 @@ export function useMoney() {
   return (n: number) => formatter.format(n);
 }
 
+/** The result of a return: to pay above zero, to be refunded below, nothing either way at zero. */
+export type ResultTone = 'pay' | 'refund' | 'zero';
+
+export const resultTone = (result: number): ResultTone =>
+  Math.round(result * 100) === 0 ? 'zero' : result > 0 ? 'pay' : 'refund';
+
+/** «Te saldría a pagar / a devolver» as the label of a result (the words never depend on colour). */
+export const resultLabel = (result: number) =>
+  ({
+    pay: 'tools.renta.toPay',
+    refund: 'tools.renta.refund',
+    zero: 'tools.renta.zeroResult',
+  }[resultTone(result)]);
+
+/** The amount of a result: red to pay, green to be refunded, neutral at zero (Renta.css). */
+export function ResultAmount({ result, money }: { result: number; money: (n: number) => string }) {
+  return (
+    <strong className={`renta-amount renta-amount--${resultTone(result)}`}>
+      {money(Math.abs(result))}
+    </strong>
+  );
+}
+
 /** A long date in the language of the app. */
 export function useDate() {
   const { locale } = useI18n();
@@ -51,6 +74,36 @@ export function DisabilitySelect({
         </option>
       ))}
     </select>
+  );
+}
+
+/** Options of one tap: native radios with their label, inside the fieldset of the question. */
+export function RadioOptions({
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  options: { value: string; label: string }[];
+  value: string | null;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="renta-options">
+      {options.map((o) => (
+        <label key={o.value} className="renta-option">
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            checked={value === o.value}
+            onChange={() => onChange(o.value)}
+          />
+          <span>{o.label}</span>
+        </label>
+      ))}
+    </div>
   );
 }
 
@@ -124,7 +177,9 @@ export function markedAfter(id: string | null): HTMLElement | undefined {
 /** Scrolls to a deduction (opening its group) and puts the focus on the amount to fill in. */
 export function reveal(row: HTMLElement | null | undefined): void {
   // Without a row, the end of the list: the result.
-  const target = row ?? (document.querySelector('.renta-result') as HTMLElement);
+  const target = row ?? document.querySelector<HTMLElement>('.renta-result');
+  // The assistant shows one step at a time: the result may not be on the page.
+  if (!target) return;
   const group = target.closest('details');
   if (group) group.open = true;
   // A deduction is centred; the result is shown from its heading.

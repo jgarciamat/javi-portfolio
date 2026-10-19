@@ -1,14 +1,14 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
 import { useRentaAccess } from '@modules/tools/application/useRentaAccess';
-import { readPdfText } from '@modules/tools/application/readPdf';
+import { readPdf } from '@modules/tools/application/readPdf';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 import type { RentaAccess } from '@modules/billing/domain/types';
 
-jest.mock('@modules/tools/application/readPdf', () => ({ readPdfText: jest.fn() }));
-const read = readPdfText as jest.Mock;
+jest.mock('@modules/tools/application/readPdf', () => ({ readPdf: jest.fn() }));
+const read = readPdf as jest.Mock;
 
 jest.mock('@core/billing/playStore', () => ({
   ...jest.requireActual('@core/billing/playStore'),
@@ -25,8 +25,10 @@ const { redirectTo } = jest.requireMock('@shared/utils/navigation') as { redirec
 // Answering every question of a community is slow on a busy machine.
 jest.setTimeout(60000);
 
+// The full form: the expert mode (the guided questions have their own suite).
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
   read.mockReset();
   playStore.playBillingAvailable.mockReturnValue(false);
   playStore.purchasePremium.mockReset();
@@ -112,7 +114,7 @@ describe('Renta planner: the draft', () => {
   });
 
   it('reads a PDF file in the browser', async () => {
-    read.mockResolvedValue(DRAFT);
+    read.mockResolvedValue({ text: DRAFT, lines: DRAFT.split('\n') });
     render();
     const input = await screen.findByLabelText(tr('tools.renta.draft.file'));
     fireEvent.change(input, { target: { files: [new File(['x'], 'borrador.pdf')] } });
@@ -291,7 +293,8 @@ describe('Renta planner: who can read a draft', () => {
 describe('Renta planner: going through the marked deductions', () => {
   /** Answers every question: the first two apply, the rest do not. */
   const answerAll = async () => {
-    await paste(DRAFT);
+    // Without the draft's own deduction, which is marked as soon as the draft is read.
+    await paste(DRAFT.replace(/\n\s*Por nacimiento.*\n.*0564/, ''));
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
     const yes = () => screen.queryAllByRole('button', { name: /^Me corresponde:/ });
     await screen.findAllByRole('button', { name: /^Me corresponde:/ });
@@ -413,5 +416,33 @@ describe('Renta planner: none of them interest me, and next year', () => {
     expect(screen.getByLabelText(tr('tools.renta.age'))).toHaveValue('31');
     expect(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 }))).toHaveValue('2');
     expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
+  });
+});
+
+describe('Renta planner: dropping the draft', () => {
+  it('reads a PDF dropped on the upload block, and refuses other files', async () => {
+    read.mockResolvedValue({ text: DRAFT, lines: DRAFT.split('\n') });
+    render();
+    const button = await screen.findByRole('button', { name: tr('tools.renta.draft.upload') });
+    const zone = button.closest('.file-drop-zone') as HTMLElement;
+    fireEvent.dragEnter(zone, { dataTransfer: { types: ['Files'] } });
+    expect(within(zone).getAllByText(tr('app.drop.here')).length).toBeGreaterThan(0);
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['x'], 'foto.png', { type: 'image/png' })],
+      },
+    });
+    expect(read).not.toHaveBeenCalled();
+    expect(screen.getByText(tr('app.drop.rejected', { files: 'foto.png' }))).toBeInTheDocument();
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['x'], 'borrador.pdf', { type: 'application/pdf' })],
+      },
+    });
+    await waitFor(() =>
+      expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('30000')
+    );
   });
 });

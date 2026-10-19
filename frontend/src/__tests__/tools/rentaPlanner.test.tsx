@@ -6,7 +6,11 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 
-beforeEach(() => localStorage.clear());
+// These suites drive the full form: the expert mode (the guided questions have their own).
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
+});
 
 const choose = async (id: string) => {
   fireEvent.change(screen.getByLabelText(tr('tools.renta.ccaa')), { target: { value: id } });
@@ -49,7 +53,9 @@ describe('Renta planner: the steps', () => {
   it('explains that the foral communities file elsewhere', async () => {
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     await choose('navarra');
-    expect(await screen.findByRole('note')).toHaveTextContent(/régimen foral/);
+    expect(
+      await screen.findByText(/régimen foral/, { selector: '.renta-foral' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: tr('tools.renta.officialSite') })).toBeInTheDocument();
     expect(screen.queryByText(/Deducciones de Navarra/)).toBeNull();
   });
@@ -100,9 +106,12 @@ describe('Renta planner: the steps', () => {
     renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
       authenticated: false,
     });
-    expect(screen.getByText(tr('tools.renta.obligation.yes'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.overLimit'))).toBeInTheDocument();
     fill('tools.renta.gross', '18000');
-    expect(screen.getByText(tr('tools.renta.obligation.no'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.none'))).toBeInTheDocument();
+    // 18,000 € with 2,000 € from a second payer: over 15,876 € (art. 96.3).
+    fill('tools.renta.secondPayers', '2000');
+    expect(screen.getByText(tr('tools.renta.obligation.twoPayers'))).toBeInTheDocument();
     fill('tools.renta.gross', '');
     expect(screen.queryByRole('status')).toBeNull();
   });
@@ -128,7 +137,7 @@ describe('Renta planner: deductions', () => {
 
   it('marks a deduction, asks for the amount and says what it gives', async () => {
     await open();
-    const donations = screen.getByText(/Donativos a ONG y entidades/);
+    const donations = screen.getByText(/Cuotas y aportaciones a partidos/);
     const row = donations.closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
     expect(within(row).getByText(tr('tools.renta.gives'), { exact: false })).toBeInTheDocument();
@@ -140,7 +149,9 @@ describe('Renta planner: deductions', () => {
   });
 
   it('suggests the maternity deduction when there is a child under three', async () => {
-    renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
+    renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
+      authenticated: false,
+    });
     expect(screen.queryByText(tr('tools.renta.suggested'))).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('tools.renta.addChild')) }));
     fireEvent.change(screen.getByLabelText(tr('tools.renta.childAge', { n: 1 })), {
@@ -149,8 +160,14 @@ describe('Renta planner: deductions', () => {
     expect(await screen.findByText(tr('tools.renta.suggested'))).toBeInTheDocument();
     const row = screen.getByText(/Por maternidad/).closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
-    fireEvent.change(within(row).getByRole('textbox'), { target: { value: '2' } });
-    expect(within(row).getByText(/2\.400|2400/)).toBeInTheDocument();
+    // The first field is the number of children; the second, what was collected with the modelo 140.
+    fireEvent.change(within(row).getAllByRole('textbox')[0], { target: { value: '2' } });
+    expect(
+      within(row.querySelector('.renta-gives') as HTMLElement).getByText(/2\.400|2400/)
+    ).toBeInTheDocument();
+    fireEvent.change(within(row).getAllByRole('textbox')[1], { target: { value: '1200' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    expect(await screen.findByText(tr('tools.renta.line.advanceReceived'))).toBeInTheDocument();
     expect(within(row).getByRole('link', { name: tr('tools.renta.official') })).toHaveAttribute(
       'href',
       expect.stringContaining('agenciatributaria')
@@ -179,7 +196,9 @@ describe('Renta planner: fields', () => {
     const row = (await screen.findByText(/Gastos de guardería/)).closest('li') as HTMLElement;
     fireEvent.click(within(row).getByRole('checkbox'));
     fireEvent.change(within(row).getAllByRole('textbox')[0], { target: { value: '800' } });
-    expect(within(row).getByText(/800/)).toBeInTheDocument();
+    expect(
+      within(row.querySelector('.renta-gives') as HTMLElement).getByText(/800/)
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));
     expect(screen.getByText(tr('tools.renta.kidLine', { n: 1, age: 5 }))).toBeInTheDocument();
@@ -197,12 +216,29 @@ describe('Renta planner: amounts by child, percentages and relatives', () => {
     ) as HTMLElement;
     fireEvent.click(within(birth).getByRole('checkbox'));
     fireEvent.change(within(birth).getByRole('textbox'), { target: { value: '2' } });
+    // Not applied until its requirements are answered (born in the year, minimum, no Bono).
+    expect(
+      within(birth).getByText(tr('tools.renta.req.missing', { count: 3 }))
+    ).toBeInTheDocument();
+    expect(within(birth).queryByText(/2485/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    expect(
+      await screen.findByText(tr('tools.renta.req.pendingResult', { count: 1 }))
+    ).toBeInTheDocument();
+    for (const yes of within(birth).getAllByRole('radio', { name: tr('tools.renta.req.yes') }))
+      fireEvent.click(yes);
     expect(within(birth).getByText(/2485/)).toBeInTheDocument();
+    expect(within(birth).getByText(tr('tools.renta.req.box', { box: '0986' }))).toBeInTheDocument();
+    // One «no» leaves it out.
+    fireEvent.click(within(birth).getAllByRole('radio', { name: tr('tools.renta.req.no') })[2]);
+    expect(within(birth).getByText(tr('tools.renta.req.fail'))).toBeInTheDocument();
 
     const party = screen.getByText(/Cuotas y aportaciones a partidos/).closest('li') as HTMLElement;
     fireEvent.click(within(party).getByRole('checkbox'));
     fireEvent.change(within(party).getByRole('textbox'), { target: { value: '100' } });
-    expect(within(party).getByText(/20,00/)).toBeInTheDocument();
+    expect(
+      within(party.querySelector('.renta-gives') as HTMLElement).getByText(/20,00/)
+    ).toBeInTheDocument();
   });
 
   it('changes one of several relatives without touching the others', () => {
@@ -257,6 +293,10 @@ describe('Renta planner: free calculations', () => {
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));
     first.unmount();
+    // Saved by an older version, without the list of deductions waiting for their requirements.
+    const saved = JSON.parse(localStorage.getItem('mm_renta_snapshot_v2') as string);
+    delete saved.result.unconfirmed;
+    localStorage.setItem('mm_renta_snapshot_v2', JSON.stringify(saved));
     renderWithProviders(<RentaPlanner mode="local" />, { authenticated: false });
     expect(screen.getByText(new RegExp(tr('tools.renta.toPay')))).toBeInTheDocument();
 
@@ -276,6 +316,25 @@ describe('Renta planner: free calculations', () => {
       expect(screen.getByText(tr(`tools.renta.line.${key}`))).toBeInTheDocument();
     }
     expect(screen.getByText(tr('tools.renta.minimum.personal'))).toBeInTheDocument();
+  });
+
+  it('shows the State and the regional half of the home bought before 2013 apart', async () => {
+    renderWithProviders(<RentaPlanner mode="local" initialIncome="42000" />, {
+      authenticated: false,
+    });
+    await choose('madrid');
+    const home = (await screen.findByText(/Vivienda habitual comprada antes de 2013/)).closest(
+      'li'
+    ) as HTMLElement;
+    fireEvent.click(within(home).getByRole('checkbox'));
+    fireEvent.change(within(home).getByRole('textbox'), { target: { value: '10000' } });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
+    // 7.5 % + 7.5 % of 9,040 (DT 18.ª LIRPF): 678 € in each quota.
+    for (const part of ['state', 'regional']) {
+      const label = new RegExp(`\\(${tr(`tools.renta.part.${part}`)}\\)`);
+      const line = (await screen.findByText(label)).closest('li') as HTMLElement;
+      expect(within(line).getByText(/678,00/)).toBeInTheDocument();
+    }
   });
 
   it('is live and unlimited with Premium', async () => {

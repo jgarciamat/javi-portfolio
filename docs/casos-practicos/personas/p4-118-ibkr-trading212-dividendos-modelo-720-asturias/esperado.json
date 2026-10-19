@@ -1,0 +1,97 @@
+{
+  "slug": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "concepto": "Intereses",
+      "importe": 2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0027"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "concepto": "Dividendos",
+      "importe": 400,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0029"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "importe": 402,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0041"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0422",
+      "concepto": "Suma de ganancias del ahorro",
+      "importe": 989,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0422"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0423",
+      "concepto": "Suma de pérdidas del ahorro",
+      "importe": 50,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0423"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "importe": 939,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 1341,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "concepto": "Deducción por doble imposición internacional",
+      "importe": 60,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "result.doubleTaxation"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 4500,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "boxes.0609"
+    }
+  ]
+}

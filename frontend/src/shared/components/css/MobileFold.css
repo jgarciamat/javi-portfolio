@@ -1,0 +1,33 @@
+.mobile-fold {
+  margin: 0.4rem 0 0.8rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+  padding: 0 0.8rem;
+}
+.mobile-fold > summary {
+  min-height: 2.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+.mobile-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.mobile-fold > summary::before {
+  content: '▸';
+  transition: transform 0.15s;
+}
+.mobile-fold[open] > summary::before {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-fold > summary::before {
+    transition: none;
+  }
+}
+.mobile-fold[open] {
+  padding-bottom: 0.6rem;
+}

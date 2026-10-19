@@ -1,0 +1,81 @@
+{
+  "slug": "p5-124-alquiler-joven-donacion-fundacion-valladolid",
+  "banco": "p5",
+  "nombre": "Persona Ficticia 124",
+  "nif": "00000124D",
+  "domicilio": "Calle Ficticia 124, 47001 Valladolid (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "castilla-y-leon",
+  "titulo": "Joven de 29 años de alquiler en Valladolid que dona a una fundación de la región",
+  "descripcion": "Trabaja en Valladolid (22.000 € brutos), vive de alquiler (500 € al mes, titular del contrato) y dona 200 € a una fundación de Castilla y León con certificado. Las dos deducciones de Castilla y León miden su tope de renta después del mínimo personal (18.900 €).",
+  "prueba": [
+    "alquiler de vivienda para jóvenes (CyL, 20 % con tope de 459 €)",
+    "edad comprobada sola (menor de 36)",
+    "donación a fundaciones (CyL, 15 %)",
+    "casillas 0975 y 0972 del anexo B"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "castilla-y-leon",
+          "age": "29",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "22000.0",
+          "socialSecurity": "1425.6",
+          "withheld": "2300.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "castilla-y-leon-alquiler-jovenes": {
+              "on": true,
+              "amount": "6000",
+              "units": "",
+              "checks": {
+                "titular": "yes"
+              }
+            },
+            "castilla-y-leon-donaciones-fundaciones-patrimonio": {
+              "on": true,
+              "amount": "200",
+              "units": "",
+              "checks": {
+                "certificado-donacion": "yes"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 22000,
+        "withheld": 2300,
+        "ss": 1425.6
+      }
+    ],
+    "inmuebles": []
+  }
+}

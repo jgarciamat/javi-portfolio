@@ -1,0 +1,87 @@
+{
+  "slug": "05-familia-numerosa-especial-conjunta-galicia",
+  "nombre": "Persona Ficticia 05",
+  "nif": "00000005M",
+  "domicilio": "Calle Ficticia 5, 15001 A Coruña (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "galicia",
+  "titulo": "Matrimonio con cinco hijos en conjunta: familia numerosa especial",
+  "descripcion": "Cinco hijos (2, 5, 8, 11 y 14 años); solo trabaja el primer declarante. Declaración conjunta.",
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "galicia",
+          "age": "42",
+          "disability": 0,
+          "children": [
+            {
+              "age": "14",
+              "disability": 0
+            },
+            {
+              "age": "11",
+              "disability": 0
+            },
+            {
+              "age": "8",
+              "disability": 0
+            },
+            {
+              "age": "5",
+              "disability": 0
+            },
+            {
+              "age": "2",
+              "disability": 0
+            }
+          ],
+          "ascendants": [],
+          "shared": true,
+          "gross": "45000",
+          "socialSecurity": "2858",
+          "withheld": "7500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "savings": "",
+          "choices": {
+            "estado-familia-numerosa-especial": {
+              "on": true,
+              "amount": "",
+              "units": "1"
+            }
+          },
+          "joint": "couple",
+          "partner": {
+            "gross": "",
+            "socialSecurity": "0",
+            "withheld": "",
+            "nonSalary": "",
+            "age": "40",
+            "disability": 0,
+            "retired": false,
+            "savings": "",
+            "pension": ""
+          }
+        }
+      }
+    ],
+    "conjunta": {
+      "kind": "couple",
+      "livesWithOtherParent": false
+    }
+  },
+  "documentos": {
+    "borrador": null
+  }
+}

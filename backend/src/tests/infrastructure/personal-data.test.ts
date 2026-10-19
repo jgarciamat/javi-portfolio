@@ -2,6 +2,9 @@ import { openDatabase, Db } from '@infrastructure/sqlite/database';
 import { migrate } from '@infrastructure/sqlite/migrator';
 import { migrations } from '@infrastructure/sqlite/migrations';
 import { SqlitePersonalDataReader } from '@infrastructure/sqlite/repositories/SqlitePersonalDataReader';
+import { AesSecretBox } from '@infrastructure/auth/AesSecretBox';
+
+const box = new AesSecretBox('k'.repeat(40), 'autonomo-data');
 
 const NOW = '2026-03-15T10:00:00.000Z';
 
@@ -61,6 +64,9 @@ function seed(db: Db): void {
       VALUES ('ana', 'k1', '{"tip":"ahorra"}', '${NOW}'), ('ana', 'k2', 'not json', '${NOW}');
     INSERT INTO affiliate_clicks (user_id, offer_id, clicked_at) VALUES ('ana', 'bank-x', '${NOW}');
   `);
+  db.prepare(
+    'INSERT INTO autonomo_data (user_id, payload_enc, updated_at, version) VALUES (?, ?, ?, ?)'
+  ).run('ana', box.encrypt('{"extras":{"priorNet":"-300"}}'), NOW, 4);
 }
 
 describe('SqlitePersonalDataReader', () => {
@@ -74,7 +80,9 @@ describe('SqlitePersonalDataReader', () => {
   afterEach(() => db.close());
 
   it('exports every extra section of the user, without secrets', () => {
-    const data = new SqlitePersonalDataReader(db, 'facturas.finanverso.app').sectionsFor('ana');
+    const data = new SqlitePersonalDataReader(db, 'facturas.finanverso.app', box).sectionsFor(
+      'ana'
+    );
     expect(data).toMatchObject({
       assets: [
         {
@@ -148,6 +156,12 @@ describe('SqlitePersonalDataReader', () => {
         { key: 'k2', advice: 'not json' },
       ],
       affiliateClicks: [{ offerId: 'bank-x', clickedAt: NOW }],
+      autonomoData: {
+        data: { extras: { priorNet: '-300' } },
+        unreadable: false,
+        version: 4,
+        updatedAt: NOW,
+      },
     });
     const text = JSON.stringify(data);
     expect(text).not.toMatch(/sub_secret|KEY|AUTH|\/fcm\/send|carl|bea/);
@@ -168,8 +182,23 @@ describe('SqlitePersonalDataReader', () => {
         referredBy: null,
       },
       household: { role: 'member', joinedAt: NOW },
+      autonomoData: null,
     });
     expect(new SqlitePersonalDataReader(db).sectionsFor('carl').household).toEqual({ role: null });
+  });
+
+  it('says the saved self-employed form cannot be opened without its key', () => {
+    expect(new SqlitePersonalDataReader(db).sectionsFor('ana').autonomoData).toEqual({
+      data: null,
+      unreadable: true,
+      version: 4,
+      updatedAt: NOW,
+    });
+  });
+
+  it('removes the saved self-employed form with the account', () => {
+    db.prepare("DELETE FROM users WHERE id = 'ana'").run();
+    expect(db.prepare('SELECT COUNT(*) AS n FROM autonomo_data').get()).toEqual({ n: 0 });
   });
 
   it('leaves the inbox address out while the feature has no domain', () => {

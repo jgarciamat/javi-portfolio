@@ -172,3 +172,882 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ─── Importing: one drop zone for books and forms ───────────────────────── */
+.autonomo-drop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.9rem;
+  padding: 1.25rem 1rem;
+  border: 2px dashed rgba(129, 140, 248, 0.45);
+  border-radius: 12px;
+  text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.autonomo-drop.is-dragging {
+  border-color: var(--accent-200);
+  background: rgba(99, 102, 241, 0.12);
+}
+.autonomo-drop-text {
+  margin: 0;
+  font-weight: 600;
+}
+.autonomo-drop .section-hint {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.autonomo-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.autonomo-templates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  margin-top: 0.9rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+/* Links that look like small secondary buttons. */
+.autonomo-templates a.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.autonomo-import-files {
+  list-style: none;
+  padding: 0;
+  margin: 0.9rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+.autonomo-import-file {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.autonomo-import-file p {
+  margin: 0.3rem 0 0;
+}
+
+/* ─── Reviewing the imported invoices ────────────────────────────────────── */
+.autonomo-review-scroll {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+.autonomo-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.autonomo-pager span {
+  flex: 1 1 12rem;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  /* The position first, on its own line; the four buttons share the next one. */
+  .autonomo-pager span {
+    order: -1;
+    flex-basis: 100%;
+  }
+  .autonomo-pager button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 0.25rem;
+  }
+}
+.autonomo-review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.autonomo-review-table caption {
+  text-align: left;
+  font-weight: 700;
+  padding: 0.25rem 0 0.5rem;
+}
+.autonomo-review-table th,
+.autonomo-review-table td {
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  vertical-align: middle;
+}
+.autonomo-review-table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.autonomo-review-date {
+  white-space: nowrap;
+}
+.autonomo-review-table .num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.autonomo-review-table select.tx-input {
+  min-width: 11rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.autonomo-review-table input[type='checkbox'] {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.autonomo-review-table tr.is-excluded td:not(:first-child) {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+.autonomo-review-table tr.is-negative .num {
+  color: var(--red-300, #fca5a5);
+}
+.autonomo-review-table tr.is-highlighted td {
+  background: rgba(99, 102, 241, 0.16);
+}
+.autonomo-review-offer td {
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-review-offer td span {
+  display: inline-block;
+  margin: 0.2rem 0.6rem 0.2rem 0;
+}
+
+/* On a phone each invoice is a card: the headings go next to each value. */
+@media (max-width: 640px) {
+  .autonomo-review-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .autonomo-review-table,
+  .autonomo-review-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .autonomo-review-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.8rem;
+    background: rgba(0, 0, 0, 0.18);
+  }
+  .autonomo-review-table td {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    border: none;
+    padding: 0;
+    text-align: left;
+  }
+  .autonomo-review-table td.num {
+    text-align: left;
+  }
+  .autonomo-review-table td::before {
+    content: attr(data-label);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  /* Who and the kind of expense take the whole width of the card. */
+  .autonomo-review-table td.autonomo-review-who,
+  .autonomo-review-table td.autonomo-review-kind {
+    grid-column: 1 / -1;
+  }
+  .autonomo-review-table td.autonomo-review-who {
+    font-weight: 600;
+  }
+  .autonomo-review-table select.tx-input {
+    min-width: 0;
+    width: 100%;
+  }
+  .autonomo-review-table tr.autonomo-review-offer,
+  .autonomo-review-table tr.autonomo-review-offer td {
+    display: block;
+  }
+  .autonomo-review-offer td::before {
+    content: none;
+  }
+}
+
+/* ─── Before calculating ─────────────────────────────────────────────────── */
+.autonomo-checks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.autonomo-check {
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border-left: 4px solid rgba(129, 140, 248, 0.7);
+  background: rgba(99, 102, 241, 0.07);
+}
+.autonomo-check--warn {
+  border-left-color: rgba(251, 191, 36, 0.85);
+  background: rgba(251, 191, 36, 0.08);
+}
+.autonomo-check p {
+  margin: 0;
+}
+.autonomo-check-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+.autonomo-check-actions .btn-secondary {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+/* ─── The result in plain words ──────────────────────────────────────────── */
+.autonomo-explain {
+  margin: 0.5rem 0 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-explain h4 {
+  margin: 0 0 0.4rem;
+}
+.autonomo-explain p {
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
+/* ─── Steps and the summary ──────────────────── */
+/* Always in sight, right under the app's sticky header (its height comes from useHeaderOffset). */
+.autonomo-sum {
+  position: sticky;
+  top: var(--autonomo-top, 0px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0.75rem -0.25rem 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.8rem;
+  background: var(--slate-900);
+  border: 1px solid var(--slate-800);
+  box-shadow: 0 6px 14px -10px rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+}
+.autonomo-sum-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+}
+button.autonomo-sum-item {
+  cursor: pointer;
+  border-color: var(--slate-700);
+}
+button.autonomo-sum-item:hover,
+button.autonomo-sum-item:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-sum-period {
+  font-weight: 600;
+}
+.autonomo-sum-key {
+  color: var(--text-secondary);
+}
+.autonomo-sum-sign,
+.autonomo-sum-short {
+  display: none;
+}
+button.autonomo-sum-missing,
+button.autonomo-sum-warn {
+  border-color: rgba(251, 191, 36, 0.55);
+  color: var(--amber-300);
+}
+.autonomo-sum-ok {
+  color: var(--green-300);
+}
+
+.autonomo-stepbar ol {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  padding: 0;
+  counter-reset: none;
+}
+.autonomo-stepbar li {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.autonomo-stepbar button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--slate-800);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.autonomo-stepbar button:hover,
+.autonomo-stepbar button:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-stepbar li.is-current button {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.14);
+}
+.autonomo-stepbar-n,
+.autonomo-step-n {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--slate-800);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.autonomo-stepbar li.is-current .autonomo-stepbar-n,
+.autonomo-step-n {
+  background: var(--accent);
+  color: #fff;
+}
+.autonomo-stepbar-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.autonomo-step {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--slate-800);
+  /* Scrolled to from the bar: clear the app's header and the summary. */
+  scroll-margin-top: calc(var(--autonomo-top, 0px) + 4.5rem);
+}
+.autonomo-step-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+.autonomo-step-title:focus {
+  outline: none;
+}
+.autonomo-step-title:focus-visible {
+  outline: 2px solid var(--accent-400);
+  outline-offset: 4px;
+}
+.autonomo-step-hint {
+  margin: 0 0 0.75rem;
+}
+.autonomo-step .autonomo-panel[id],
+#autonomo-period {
+  scroll-margin-top: calc(var(--autonomo-top, 0px) + 4.5rem);
+}
+
+/* A phone: the summary is one compact line that scrolls sideways, the bar shows short names. */
+@media (max-width: 640px) {
+  .autonomo-sum {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0.5rem -0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.6rem;
+    font-size: 0.78rem;
+  }
+  .autonomo-sum::-webkit-scrollbar {
+    display: none;
+  }
+  .autonomo-sum-item {
+    padding: 0.15rem 0.45rem;
+    gap: 0.15rem;
+  }
+  .autonomo-sum-long {
+    display: none;
+  }
+  .autonomo-sum-short,
+  .autonomo-sum-sign {
+    display: inline;
+  }
+  /* The words stay for screen readers; the + and − say it on screen. */
+  .autonomo-sum-key {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .autonomo-stepbar ol {
+    gap: 0.35rem;
+  }
+  .autonomo-stepbar button {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.45rem 0.3rem;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .autonomo-stepbar-name {
+    white-space: normal;
+  }
+  .autonomo-step {
+    scroll-margin-top: calc(var(--autonomo-top, 0px) + 3rem);
+  }
+}
+
+/* ─── Where the data is kept ─────────────────── */
+.autonomo-storage {
+  margin: 0 0 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--slate-800);
+  background: rgba(255, 255, 255, 0.025);
+}
+.autonomo-storage > .section-hint {
+  margin: 0 0 0.5rem;
+}
+.autonomo-storage-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.autonomo-switch span {
+  font-weight: 600;
+}
+.autonomo-sync {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--green-300);
+}
+.autonomo-sync--checking,
+.autonomo-sync--saving {
+  color: var(--text-secondary);
+}
+.autonomo-sync--offline,
+.autonomo-sync--conflict,
+.autonomo-sync--tooLarge,
+.autonomo-sync--unavailable {
+  color: var(--amber-300);
+}
+.autonomo-sync--error,
+.autonomo-sync--deleteFailed {
+  color: var(--red-300);
+}
+.autonomo-previous {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.7rem;
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-previous p {
+  margin: 0 0 0.4rem;
+}
+.autonomo-copies {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+}
+.autonomo-copy {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--slate-700);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.autonomo-copy:hover,
+.autonomo-copy:focus-visible {
+  border-color: var(--accent-400);
+}
+.autonomo-copy span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+/* The two cloud dialogs wear the look of the app's confirmations (see ConfirmDeleteModal.css). */
+.autonomo-dialog {
+  max-width: 420px;
+}
+
+.autonomo-dialog--wide {
+  max-width: 560px;
+}
+
+.autonomo-dialog .confirm-delete-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-400) 16%, transparent);
+  color: var(--accent-400);
+  font-size: 1.6rem;
+}
+
+/* One action per line, the main one first and full width: easy to hit on a phone. */
+.autonomo-dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.autonomo-dialog-actions > button {
+  width: 100%;
+  padding: 0.7rem 1rem;
+}
+
+.autonomo-dialog--wide .autonomo-copies {
+  text-align: left;
+  margin: 0 0 1rem;
+}
+
+/* Withholdings (modelos 111 and 115): one fold per quarter in step 2, the panel in step 3. */
+.autonomo-wh-quarter {
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  margin-top: 0.6rem;
+}
+
+.autonomo-wh-toggle {
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0.2rem 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.autonomo-wh-totals {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.autonomo-wh-filed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-200);
+}
+
+.autonomo-wh-deadline {
+  font-weight: 600;
+}
+
+.autonomo-review-retention input {
+  width: 6.5rem;
+}
+
+.autonomo-review-retention select {
+  margin-top: 0.3rem;
+}
+
+/* ─── Invoices read from a PDF ───────────────────────────────────────────── */
+.autonomo-import-summary {
+  margin: 0.9rem 0 0;
+  font-weight: 600;
+}
+.autonomo-import-me {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0;
+}
+.autonomo-import-file .autonomo-import-actions {
+  margin-top: 0.45rem;
+}
+.autonomo-review-flag {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--amber-300);
+}
+.autonomo-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.autonomo-review-actions .btn-primary,
+.autonomo-review-actions .btn-secondary {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+.autonomo-review-table tr.is-editing td {
+  background: rgba(99, 102, 241, 0.08);
+  vertical-align: top;
+}
+.autonomo-review-table tr.is-editing input.tx-input {
+  min-width: 7.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.autonomo-review-table tr.is-editing select.tx-input {
+  min-width: 5.5rem;
+}
+.autonomo-review-table tr.is-editing .inline-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+}
+@media (max-width: 640px) {
+  .autonomo-review-table tr.is-editing input.tx-input {
+    min-width: 0;
+    width: 100%;
+  }
+  /* The buttons to correct an invoice take the whole width of its card. */
+  .autonomo-review-table tr td:has(.autonomo-review-actions) {
+    grid-column: 1 / -1;
+  }
+  /* A card without anything to correct, or a column the correction does not use: no empty heading. */
+  .autonomo-review-table td.autonomo-review-fix:empty,
+  .autonomo-review-table tr.is-editing td:empty {
+    display: none;
+  }
+}
+
+/* The options of «Otros datos para los modelos»: one checkbox per line, the text beside it. */
+.autonomo-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0.9rem;
+}
+
+.autonomo-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.autonomo-option input[type='checkbox'] {
+  flex: none;
+  margin-top: 0.2rem;
+}
+
+/* ─── The VAT family: other operations of a quarter, the year, and the 303/349/390 panels ─── */
+.autonomo-tile--refund {
+  border-color: rgba(34, 197, 94, 0.6);
+}
+.autonomo-vatq,
+.autonomo-vaty {
+  margin-top: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.7rem;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+}
+.autonomo-vatq > summary,
+.autonomo-vaty > summary,
+.autonomo-zero > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.autonomo-vatq h5,
+.autonomo-vaty h5,
+.autonomo-model h5 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.95rem;
+}
+.autonomo-rare {
+  font-weight: 400;
+  opacity: 0.7;
+}
+.autonomo-investment {
+  margin-top: 0.4rem;
+}
+.autonomo-model {
+  margin-top: 1.25rem;
+}
+.autonomo-plain,
+.autonomo-warnings {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+}
+.autonomo-warnings li {
+  color: #fbbf24;
+}
+.autonomo-zero {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+.autonomo-deadline {
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+.autonomo-review-op select,
+.autonomo-review-op input {
+  min-width: 9rem;
+}
+.autonomo-review-op input {
+  margin-top: 0.3rem;
+}
+.tx-input.is-invalid {
+  border-color: rgba(248, 113, 113, 0.8);
+}
+@media (max-width: 640px) {
+  .autonomo-vatq,
+  .autonomo-vaty {
+    padding: 0.5rem;
+  }
+  .autonomo-review-op select,
+  .autonomo-review-op input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* Yearly summaries (190, 180, 347) and the warnings of assets abroad. */
+.autonomo-annual-model {
+  margin-top: 1rem;
+}
+
+.autonomo-annual-records {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.autonomo-annual-records th,
+.autonomo-annual-records td {
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-wrap: anywhere;
+}
+
+.autonomo-annual-records td:last-child,
+.autonomo-annual-records th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.autonomo-annual-wealth {
+  margin-top: 1rem;
+}
+
+.autonomo-annual-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.autonomo-annual-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Activities in modules: the units of each module, at 1 January and on average. */
+.autonomo-modules-units {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+.autonomo-modules-units caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: 0.25rem;
+}
+.autonomo-modules-units th,
+.autonomo-modules-units td {
+  padding: 0.35rem 0.4rem;
+  text-align: left;
+  vertical-align: middle;
+}
+.autonomo-modules-units tbody tr + tr {
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+}
+.autonomo-modules-units .tx-input {
+  width: 100%;
+  min-width: 5rem;
+}
+.autonomo-modules-due {
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .autonomo-modules-units thead {
+    display: none;
+  }
+  .autonomo-modules-units tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 0.5rem;
+    padding: 0.4rem 0;
+  }
+  .autonomo-modules-units th[scope='row'] {
+    grid-column: 1 / -1;
+  }
+  .autonomo-modules-units td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+}

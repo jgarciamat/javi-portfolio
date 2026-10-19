@@ -1,0 +1,20 @@
+{
+  "slug": "25-autonomo-modulos-andalucia",
+  "nombre": "Persona Ficticia 25",
+  "nif": "00000025W",
+  "domicilio": "Calle Ficticia 25, 41001 Sevilla (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Taxista en estimación objetiva (módulos)",
+  "descripcion": "Taxista en módulos (epígrafe 721.2) con IVA en régimen simplificado: modelos 131 y 303 simplificado, y la Renta con rendimiento por módulos. Finanverso no calcula módulos todavía.",
+  "modelos": [
+    "131",
+    "303 (simplificado)",
+    "390",
+    "100"
+  ],
+  "alcance": "fuera",
+  "motivoFueraDeAlcance": "El motor no calcula la estimación objetiva (módulos) ni el IVA simplificado: los signos y módulos de la Orden de módulos de cada año no están en la app.",
+  "datosFicticios": true,
+  "documentos": {}
+}

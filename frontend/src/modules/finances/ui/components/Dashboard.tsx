@@ -1,4 +1,12 @@
-import { Suspense, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
 import { useAuth } from '@shared/hooks/useAuth';
@@ -23,6 +31,7 @@ import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
 import { BrandLogo } from '@shared/components/BrandLogo';
+import { SocialIcons } from '@shared/components/SocialLinks';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
 
@@ -81,7 +90,15 @@ function SectionLoading() {
   );
 }
 
-function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTour: () => void }) {
+function TabContent({
+  dash,
+  onStartTour,
+  onImport,
+}: {
+  dash: UseDashboardReturn;
+  onStartTour: () => void;
+  onImport: () => void;
+}) {
   const { year, categories } = useFinances();
   const simple = SIMPLE_VIEWS[dash.tab];
   if (simple) return simple(dash.setTab);
@@ -107,6 +124,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
           onManageCategories={dash.openCategoryModal}
           onManageBudgets={() => dash.setTab('budgets')}
           onOpenTab={dash.setTab}
+          onImport={onImport}
         />
       );
   }
@@ -114,7 +132,7 @@ function TabContent({ dash, onStartTour }: { dash: UseDashboardReturn; onStartTo
 
 function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel: ReactNode }) {
   const { t } = useI18n();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   return (
     <header className="header">
       <div className="header-brand">
@@ -135,6 +153,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
           <h1 className="header-title">{t('app.header.title')}</h1>
           <p className="header-sub">{sectionLabel}</p>
         </div>
+        <SocialIcons />
       </div>
       <button
         type="button"
@@ -150,26 +169,6 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
         </span>
       </button>
       <div className="header-actions">
-        <button
-          className="header-user header-user-btn"
-          onClick={dash.openProfile}
-          // The name shown on the button is part of its accessible name.
-          aria-label={
-            user?.name
-              ? t('app.header.openProfileOf', { name: user.name })
-              : t('app.header.openProfile')
-          }
-          title={t('app.header.openProfile')}
-        >
-          {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt="" className="header-avatar" />
-          ) : (
-            <span className="header-avatar-placeholder" aria-hidden="true">
-              <Icon name="user" size={20} />
-            </span>
-          )}
-          <span className="header-user-name">{user?.name}</span>
-        </button>
         <LanguageSwitcher />
         <button onClick={logout} className="btn-logout">
           {t('app.header.logout')}
@@ -286,14 +285,17 @@ export function Dashboard() {
           dash={dash}
           sectionLabel={
             <>
-              <Icon name={section.icon} size={14} /> {sectionLabel}
+              <span className="section-badge" style={{ color: section.color }}>
+                <Icon name={section.icon} size={14} />
+              </span>{' '}
+              {sectionLabel}
             </>
           }
         />
         {dash.tab === 'monthly' && (
           <div className="sticky-nav">
             <div className="sticky-nav-inner">
-              <MonthNavCard onImport={openImport} />
+              <MonthNavCard />
             </div>
           </div>
         )}
@@ -309,11 +311,12 @@ export function Dashboard() {
           aria-label={sectionLabel}
           tabIndex={-1}
           data-tour="section"
+          style={{ '--section-color': section.color } as CSSProperties}
         >
           {/* A failing section does not take the menu down; changing section clears the error. */}
           <ErrorBoundary key={dash.tab}>
             <Suspense fallback={<SectionLoading />}>
-              <TabContent dash={dash} onStartTour={tour.start} />
+              <TabContent dash={dash} onStartTour={tour.start} onImport={openImport} />
             </Suspense>
           </ErrorBoundary>
         </div>
@@ -323,6 +326,7 @@ export function Dashboard() {
         open={dash.menuOpen}
         tab={dash.tab}
         onSelectTab={selectFromMenu}
+        onOpenProfile={dash.openProfile}
         onClose={() => dash.setMenuOpen(false)}
       />
       <Suspense fallback={null}>

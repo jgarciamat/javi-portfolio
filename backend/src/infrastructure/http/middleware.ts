@@ -7,9 +7,11 @@ import {
   DomainError,
   ForbiddenError,
   NotFoundError,
+  PayloadTooLargeError,
   PaymentRequiredError,
   TooManyAttemptsError,
   UnauthorizedError,
+  UnavailableError,
   ValidationError,
 } from '@domain/errors';
 import { AuthService } from '@application/auth/AuthService';
@@ -70,6 +72,8 @@ function statusFor(error: DomainError): number {
   if (error instanceof NotFoundError) return 404;
   if (error instanceof ConflictError) return 409;
   if (error instanceof TooManyAttemptsError) return 429;
+  if (error instanceof PayloadTooLargeError) return 413;
+  if (error instanceof UnavailableError) return 503;
   return 400;
 }
 

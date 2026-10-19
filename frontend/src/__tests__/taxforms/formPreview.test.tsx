@@ -1,0 +1,284 @@
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { renderWithI18n } from '@test-utils/render';
+import { autonomoDraft } from '@test-utils/fixtures';
+import { FormPreview, fileName, previewText } from '@modules/taxforms/ui/FormPreview';
+import {
+  AnnualFormPreviews,
+  AutonomoFormPreviews,
+  Model131FormPreview,
+  WithholdingFormPreviews,
+} from '@modules/taxforms/ui/FormPreviews';
+import type { FilledForm } from '@modules/taxforms/domain/values';
+import type { Summary347, YearSummary } from '@modules/finances/domain/annualSummaries';
+import type { Result131 } from '@modules/finances/domain/module131';
+import type { WithholdingResult } from '@modules/finances/domain/withholdings';
+
+const draw = jest.fn(async (..._args: unknown[]) => undefined);
+/** Page and width of each drawing (the canvas itself is left out of the messages). */
+const drawn = () => draw.mock.calls.map((c) => [c[0], c[2]]);
+const close = jest.fn(async () => undefined);
+const openFormView = jest.fn(async () => ({ pages: 2, draw, close }));
+jest.mock('@modules/taxforms/application/formView', () => ({
+  openFormView: (...args: unknown[]) => openFormView(...(args as [])),
+  canvasPng: async () => new Blob(['png'], { type: 'image/png' }),
+}));
+
+const share = jest.fn(async () => 'saved');
+jest.mock('@shared/utils/shareImage', () => ({
+  shareImage: (...args: unknown[]) => share(...(args as [])),
+}));
+
+const native = jest.fn(() => false);
+jest.mock('@shared/utils/platform', () => ({ isNativeApp: () => native() }));
+
+const form130: FilledForm = {
+  model: '130',
+  year: 2026,
+  period: '3T',
+  values: { '01': 12000, '04': 1800 },
+  pending: [],
+};
+
+const t = (key: string, vars?: Record<string, string | number>) =>
+  `${key}${vars ? JSON.stringify(vars) : ''}`;
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  native.mockReturnValue(false);
+});
+
+describe('The words and the files of a preview', () => {
+  it('names the files by model, year, period and page', () => {
+    expect(fileName(form130, 'pdf')).toBe('modelo-130-2026-3T-vista-previa.pdf');
+    expect(fileName(form130, 'png', 2)).toBe('modelo-130-2026-3T-vista-previa-pag2.png');
+    const yearly = { ...form130, year: 2025, period: null };
+    expect(fileName(yearly, 'pdf')).toBe('modelo-130-2025-vista-previa.pdf');
+  });
+
+  it('writes the legend and the title with the period, or only the year', () => {
+    expect(previewText(t, form130).legend).toBe('taxforms.mark.legend');
+    expect(previewText(t, form130).title).toContain('"period":"2026 3T"');
+    expect(previewText(t, { ...form130, period: null }).title).toContain('"period":"2026"');
+  });
+});
+
+describe('A preview on the screen', () => {
+  it('opens page by page, goes forward and back, and closes', async () => {
+    renderWithI18n(<FormPreview form={form130} label="Modelo 130" />);
+    const toggle = screen.getByRole('button', { name: 'Ver vista previa' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
+    await waitFor(() => expect(drawn()).toContainEqual([1, 600]));
+    expect(screen.getByRole('button', { name: 'Ocultar vista previa' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    expect(screen.getByRole('img', { name: /modelo 130, página 1 de 2/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Página anterior' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Página siguiente' }));
+    await waitFor(() => expect(drawn()).toContainEqual([2, 600]));
+    expect(screen.getByRole('button', { name: 'Página siguiente' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Página anterior' }));
+    await waitFor(() => expect(drawn().at(-1)).toEqual([1, 600]));
+    // The figures typed in, for screen readers.
+    expect(screen.getByText('Casillas rellenadas (2)')).toBeInTheDocument();
+    expect(screen.getByText('12.000,00')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ocultar vista previa' }));
+    expect(screen.getByRole('button', { name: 'Ver vista previa' })).toBeInTheDocument();
+    // Opened again, the same view is used.
+    fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Ocultar vista previa' })));
+    expect(openFormView).toHaveBeenCalledTimes(1);
+  });
+
+  it('downloads the PDF on a computer and shares it on a phone, building it once', async () => {
+    renderWithI18n(<FormPreview form={form130} label="Modelo 130" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Descargar PDF' }));
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    const [blob, name, , mode] = share.mock.calls[0] as unknown as [Blob, string, string, string];
+    expect(blob.type).toBe('application/pdf');
+    expect(name).toBe('modelo-130-2026-3T-vista-previa.pdf');
+    expect(mode).toBe('download');
+    native.mockReturnValue(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Descargar PDF' }));
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(2));
+    expect((share.mock.calls[1] as unknown[])[3]).toBe('share');
+    expect(((share.mock.calls[1] as unknown[])[0] as Blob).size).toBe(blob.size);
+  });
+
+  it('downloads the page as a PNG, opening the view when needed', async () => {
+    renderWithI18n(<FormPreview form={form130} label="Modelo 130" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Descargar imagen (PNG)' }));
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(drawn()).toContainEqual([1, 1240]);
+    expect((share.mock.calls[0] as unknown[])[1]).toBe('modelo-130-2026-3T-vista-previa-pag1.png');
+  });
+
+  it('says so when the preview cannot be built or drawn', async () => {
+    openFormView.mockRejectedValueOnce(new Error('broken'));
+    renderWithI18n(<FormPreview form={form130} label="Modelo 130" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('No se ha podido preparar');
+    draw.mockRejectedValueOnce(new Error('canvas'));
+    fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
+    await waitFor(() => expect(draw).toHaveBeenCalled());
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+  });
+
+  it('lists the boxes left for the draft and starts again with new figures', async () => {
+    const renta: FilledForm = {
+      model: '130',
+      year: 2025,
+      period: null,
+      values: { '01': 30000 },
+      pending: ['05', '07'],
+    };
+    const { rerender } = renderWithI18n(<FormPreview form={renta} label="Renta" />);
+    expect(screen.getByText(/05, 07/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
+    await screen.findByRole('button', { name: 'Ocultar vista previa' }, { timeout: 15000 });
+    await act(async () => {
+      rerender(<FormPreview form={{ ...renta, values: { '01': 31000 } }} label="Renta" />);
+    });
+    expect(screen.getByRole('button', { name: 'Ver vista previa' })).toBeInTheDocument();
+  }, 30000);
+
+  it('uses the width of its column when the page has one', async () => {
+    jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320);
+    renderWithI18n(<FormPreview form={form130} label="Modelo 130" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ver vista previa' }));
+    await waitFor(() => expect(drawn()).toContainEqual([1, 320]));
+    jest.restoreAllMocks();
+  });
+});
+
+describe('The previews of each screen', () => {
+  it('shows the 303 and the 130 of a draft, and only the 303 when the 130 is not filed', () => {
+    const { unmount } = renderWithI18n(<AutonomoFormPreviews draft={autonomoDraft()} />);
+    expect(screen.getByRole('heading', { name: 'Modelo 303 · IVA' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 130/ })).toBeInTheDocument();
+    unmount();
+    const exempt = autonomoDraft();
+    exempt.irpf = { ...exempt.irpf, required: false };
+    renderWithI18n(<AutonomoFormPreviews draft={exempt} />);
+    expect(screen.queryByRole('heading', { name: /Modelo 130/ })).not.toBeInTheDocument();
+  });
+
+  it('shows the 111 and the 115 only when they are filed', () => {
+    const result = (m111: string, m115: string) =>
+      ({
+        quarter: 2,
+        m111: { result: m111, boxes: [{ box: '28', label: 'Suma', amount: 150 }] },
+        m115: { result: m115, boxes: [{ box: '03', label: 'Ret.', amount: 57 }] },
+        warnings: [],
+      } as unknown as WithholdingResult);
+    const { unmount } = renderWithI18n(
+      <WithholdingFormPreviews result={result('pay', 'zero')} year={2026} />
+    );
+    expect(screen.getByRole('heading', { name: /Modelo 111/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 115/ })).toBeInTheDocument();
+    unmount();
+    const { container } = renderWithI18n(
+      <WithholdingFormPreviews result={result('none', 'none')} year={2026} />
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('The previews of the yearly summaries and of the modules', () => {
+  const summary = (records: number) =>
+    ({
+      model: '190',
+      records: Array.from({ length: records }, () => ({
+        nif: '00000001R',
+        name: 'PERSONA DE PRUEBA',
+        key: 'G',
+        subkey: '01',
+        paid: 1000,
+        inKind: 0,
+        withheld: 150,
+        rate: null,
+        typed: false,
+      })),
+      boxes: [
+        { box: '01', label: 'Percepciones', amount: records },
+        { box: '02', label: 'Importe', amount: 1000 * records },
+        { box: '03', label: 'Retenciones', amount: 150 * records },
+      ],
+      warnings: [],
+    } as unknown as YearSummary);
+  const m347 = (records: number) =>
+    ({
+      known: true,
+      threshold: 3005.06,
+      records: Array.from({ length: records }, () => ({
+        key: 'B',
+        nif: null,
+        name: 'CLIENTE DE PRUEBA',
+        total: 5000,
+        quarters: [5000, 0, 0, 0],
+        premises: false,
+        withheld: false,
+        reverse: false,
+      })),
+      boxes: [
+        { box: '', label: 'Personas', amount: records },
+        { box: '', label: 'Importe', amount: 5000 * records },
+      ],
+      warnings: [],
+      left: 0,
+    } as unknown as Summary347);
+
+  it('shows the summaries that have someone in them, and none when empty', () => {
+    const { unmount } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(1)} m180={summary(0)} m347={m347(1)} year={2026} />
+    );
+    expect(screen.getByRole('heading', { name: /resúmenes anuales de 2026/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 190/ })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Modelo 180/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 347/ })).toBeInTheDocument();
+    // The words of the records are listed with the figures.
+    expect(screen.getByText('CLIENTE DE PRUEBA')).toBeInTheDocument();
+    unmount();
+    const { container } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(0)} m180={summary(2)} m347={m347(0)} year={2026} />
+    );
+    expect(screen.getByRole('heading', { name: /Modelo 180/ })).toBeInTheDocument();
+    expect(container).not.toBeEmptyDOMElement();
+  });
+
+  it('shows nothing when no summary has anyone', () => {
+    const { container } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(0)} m180={summary(0)} m347={m347(0)} year={2026} />
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows the 131 of a quarter of modules', () => {
+    const result = {
+      boxes: [{ box: '15', label: 'Resultado', amount: 100 }],
+      due: 100,
+      result: 'pay',
+    } as Result131;
+    renderWithI18n(<Model131FormPreview result={result} year={2026} quarter={2} />);
+    expect(screen.getByRole('heading', { name: /Modelo 131/ })).toBeInTheDocument();
+  });
+
+  it('adds the 349 and the 390 to the forms of the quarter when the draft has them', () => {
+    const draft = autonomoDraft({
+      quarter: 4,
+      m349: {
+        required: true,
+        monthly: false,
+        operators: [{ key: 'S', vatId: 'FR12345678901', name: 'Client', base: 900 }],
+        rectifications: [],
+        boxes: [{ box: 'importe', label: 'Importe', amount: 900 }],
+        warnings: [],
+      },
+      m390: { sections: [], prorrata: 100, reconciliation: [], warnings: [] },
+    });
+    renderWithI18n(<AutonomoFormPreviews draft={draft} />);
+    expect(screen.getByRole('heading', { name: /Modelo 349/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 390/ })).toBeInTheDocument();
+  });
+});

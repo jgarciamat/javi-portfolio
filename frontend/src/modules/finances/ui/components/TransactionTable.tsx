@@ -19,6 +19,8 @@ export interface TransactionTableProps {
   onDelete: (id: string) => Promise<unknown> | void;
   onPatch: (id: string, changes: { notes: string | null }) => Promise<unknown> | void;
   onEdit: (tx: Transaction) => void;
+  /** With two or more accounts: each movement says which one it belongs to. */
+  showAccount?: boolean;
 }
 
 type TableState = ReturnType<typeof useTransactionTable>;
@@ -108,10 +110,26 @@ function DayToggle({
   );
 }
 
-function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['onEdit'] }) {
+function DesktopTable({
+  table,
+  onEdit,
+  showAccount,
+}: {
+  table: TableState;
+  onEdit: RowProps['onEdit'];
+  showAccount?: boolean;
+}) {
   const { t, tCategory } = useI18n();
   const { date } = useFormat();
-  const headers = ['date', 'description', 'notes', 'category', 'type', 'amount'];
+  const headers = [
+    'date',
+    'description',
+    ...(showAccount ? ['account'] : []),
+    'notes',
+    'category',
+    'type',
+    'amount',
+  ];
   return (
     <ScrollRegion className="tx-table-wrap" label={t('app.transaction.table.caption')}>
       <table className="tx-table">
@@ -134,7 +152,7 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
             return (
               <Fragment key={dayKey}>
                 <tr className="tx-day-separator">
-                  <td colSpan={7}>
+                  <td colSpan={headers.length + 1}>
                     <DayToggle
                       className="tx-day-label tx-day-toggle"
                       label={label}
@@ -149,6 +167,7 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
                     <tr key={tx.id}>
                       <td className="tx-cell-date">{date(tx.date)}</td>
                       <td className="tx-cell-description">{tx.description}</td>
+                      {showAccount && <td className="tx-cell-account">{tx.accountName}</td>}
                       <td className="tx-notes-cell">
                         <Notes tx={tx} table={table} />
                       </td>
@@ -175,7 +194,15 @@ function DesktopTable({ table, onEdit }: { table: TableState; onEdit: RowProps['
   );
 }
 
-function MobileCardList({ table, onEdit }: { table: TableState; onEdit: RowProps['onEdit'] }) {
+function MobileCardList({
+  table,
+  onEdit,
+  showAccount,
+}: {
+  table: TableState;
+  onEdit: RowProps['onEdit'];
+  showAccount?: boolean;
+}) {
   const { tCategory } = useI18n();
   const { date } = useFormat();
   return (
@@ -198,6 +225,7 @@ function MobileCardList({ table, onEdit }: { table: TableState; onEdit: RowProps
                     <div className="tx-card-desc">{tx.description}</div>
                     <div className="tx-card-meta">
                       {date(tx.date)} · {tCategory(tx.category)}
+                      {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
                     </div>
                     <Notes tx={tx} table={table} />
                   </div>
@@ -220,6 +248,7 @@ export function TransactionTable({
   onDelete,
   onPatch,
   onEdit,
+  showAccount,
 }: TransactionTableProps) {
   const { t, locale } = useI18n();
   const mobile = useMediaQuery(MOBILE_QUERY);
@@ -237,9 +266,9 @@ export function TransactionTable({
         </p>
       )}
       {mobile ? (
-        <MobileCardList table={table} onEdit={onEdit} />
+        <MobileCardList table={table} onEdit={onEdit} showAccount={showAccount} />
       ) : (
-        <DesktopTable table={table} onEdit={onEdit} />
+        <DesktopTable table={table} onEdit={onEdit} showAccount={showAccount} />
       )}
       {table.pendingDeleteId !== null && (
         <ConfirmDeleteModal onConfirm={table.confirmDelete} onCancel={table.cancelDelete} />

@@ -19,6 +19,30 @@ export interface TransactionFormFieldsProps {
   accounts: Account[];
 }
 
+/** The account the movement belongs to (shown only when there is more than one to choose from). */
+function AccountField({ form, accounts }: { form: UseTransactionFormReturn; accounts: Account[] }) {
+  const { t } = useI18n();
+  return (
+    <div className="tx-field">
+      <span className="tx-field-label" aria-hidden="true">
+        {t('app.transaction.form.account')}
+      </span>
+      <select
+        className="tx-input"
+        value={form.fields.accountId ?? ''}
+        onChange={(e) => form.setAccountId(e.target.value)}
+        aria-label={t('app.transaction.form.account')}
+      >
+        {accounts.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.icon} {a.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 /** Fields shared by the "new movement" form and the edit dialog. */
 export function TransactionFormFields({
   form,
@@ -50,96 +74,94 @@ export function TransactionFormFields({
 
   return (
     <div className="tx-form-grid">
-      <div className="tx-field">
-        <label className="tx-field-label" htmlFor={`${id}-description`}>
-          {t('app.transaction.form.description')}
-        </label>
-        <input
-          ref={refs.description}
-          id={`${id}-description`}
-          className="tx-input"
-          value={fields.description}
-          onChange={(e) => form.setDescription(e.target.value)}
-          maxLength={200}
-          required
-          {...check('description')}
-        />
+      <div className="tx-form-row tx-form-row--main">
+        <div className="tx-field">
+          <label className="tx-field-label" htmlFor={`${id}-description`}>
+            {t('app.transaction.form.description')}
+          </label>
+          <input
+            ref={refs.description}
+            id={`${id}-description`}
+            className="tx-input"
+            value={fields.description}
+            onChange={(e) => form.setDescription(e.target.value)}
+            maxLength={200}
+            required
+            {...check('description')}
+          />
+        </div>
+        <div className="tx-field">
+          <label className="tx-field-label" htmlFor={`${id}-amount`}>
+            {t('app.transaction.form.amount')}
+          </label>
+          <input
+            ref={refs.amount}
+            id={`${id}-amount`}
+            className="tx-input"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            value={fields.amount}
+            onChange={(e) => form.setAmount(e.target.value)}
+            required
+            {...check('amount')}
+          />
+        </div>
       </div>
-      <div className="tx-field">
-        <label className="tx-field-label" htmlFor={`${id}-amount`}>
-          {t('app.transaction.form.amount')}
-        </label>
-        <input
-          ref={refs.amount}
-          id={`${id}-amount`}
-          className="tx-input"
-          type="number"
-          min="0.01"
-          step="0.01"
-          inputMode="decimal"
-          value={fields.amount}
-          onChange={(e) => form.setAmount(e.target.value)}
-          required
-          {...check('amount')}
-        />
+      <div className="tx-form-row">
+        <div className="tx-field">
+          <span className="tx-field-label" aria-hidden="true">
+            {t('app.transaction.form.type')}
+          </span>
+          <select
+            className="tx-input"
+            value={fields.type}
+            onChange={(e) => form.setType(e.target.value as TransactionType)}
+            aria-label={t('app.transaction.form.type')}
+          >
+            {TRANSACTION_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(TYPE_LABEL_KEYS[type])}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="tx-field">
+          <span className="tx-field-label" aria-hidden="true">
+            {t('app.transaction.form.category')}
+          </span>
+          <select
+            ref={refs.category}
+            className="tx-input"
+            value={fields.category}
+            onChange={(e) => form.handleCategoryChange(e.target.value, onManageCategories)}
+            aria-label={t('app.transaction.form.category.placeholder')}
+            required
+            {...check('category')}
+          >
+            <option value="">{t('app.transaction.form.category.placeholder')}</option>
+            <option value={MANAGE_CATEGORIES}>⚙ {t('app.transaction.form.category.manage')}</option>
+            <option disabled>──────────────</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.icon} {tCategory(c.name)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="tx-field">
+          <span className="tx-field-label" aria-hidden="true">
+            {t('app.transaction.form.date')}
+          </span>
+          <DateField
+            value={fields.date}
+            onChange={form.setDate}
+            label={t('app.transaction.form.date')}
+          />
+        </div>
+        {selectable.length > 1 && <AccountField form={form} accounts={selectable} />}
       </div>
-      <ReceiptScanner
-        onScanned={(r) => {
-          if (r.merchant && !fields.description.trim()) form.setDescription(r.merchant);
-          if (r.total !== null) form.setAmount(String(r.total));
-          if (r.date) form.setDate(r.date);
-        }}
-      />
-      <CurrencyConverter form={form} />
-      <select
-        className="tx-input"
-        value={fields.type}
-        onChange={(e) => form.setType(e.target.value as TransactionType)}
-        aria-label={t('app.transaction.form.type')}
-      >
-        {TRANSACTION_TYPES.map((type) => (
-          <option key={type} value={type}>
-            {t(TYPE_LABEL_KEYS[type])}
-          </option>
-        ))}
-      </select>
-      <select
-        ref={refs.category}
-        className="tx-input"
-        value={fields.category}
-        onChange={(e) => form.handleCategoryChange(e.target.value, onManageCategories)}
-        aria-label={t('app.transaction.form.category.placeholder')}
-        required
-        {...check('category')}
-      >
-        <option value="">{t('app.transaction.form.category.placeholder')}</option>
-        <option value={MANAGE_CATEGORIES}>⚙ {t('app.transaction.form.category.manage')}</option>
-        <option disabled>──────────────</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.name}>
-            {c.icon} {tCategory(c.name)}
-          </option>
-        ))}
-      </select>
-      <DateField
-        value={fields.date}
-        onChange={form.setDate}
-        label={t('app.transaction.form.date')}
-      />
-      {selectable.length > 1 && (
-        <select
-          className="tx-input"
-          value={fields.accountId ?? ''}
-          onChange={(e) => form.setAccountId(e.target.value)}
-          aria-label={t('app.transaction.form.account')}
-        >
-          {selectable.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.icon} {a.name}
-            </option>
-          ))}
-        </select>
-      )}
       <div className="tx-field tx-field--notes">
         <label className="tx-field-label" htmlFor={`${id}-notes`}>
           {t('app.transaction.form.notes')}
@@ -152,6 +174,16 @@ export function TransactionFormFields({
           maxLength={500}
           rows={2}
         />
+      </div>
+      <div className="tx-tools">
+        <ReceiptScanner
+          onScanned={(r) => {
+            if (r.merchant && !fields.description.trim()) form.setDescription(r.merchant);
+            if (r.total !== null) form.setAmount(String(r.total));
+            if (r.date) form.setDate(r.date);
+          }}
+        />
+        <CurrencyConverter form={form} />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
-import { MonthNavCard } from '@modules/finances/ui/components/MonthlyView';
+import { MonthActions } from '@modules/finances/ui/components/MonthActions';
 import { RecapShare } from '@modules/finances/ui/components/RecapShare';
 import { recapImage } from '@modules/finances/domain/recapImage';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -176,9 +176,8 @@ describe('Share the month', () => {
 describe('Month summary on demand', () => {
   const open = async () => {
     const api = createFakeApi();
-    renderWithProviders(<MonthNavCard />, { api });
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.export.options') }));
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.recap.open')) }));
+    renderWithProviders(<MonthActions />, { api });
+    fireEvent.click(await screen.findByRole('button', { name: new RegExp(tr('app.recap.open')) }));
     return screen.findByRole('dialog');
   };
 

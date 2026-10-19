@@ -316,3 +316,20 @@ describe('the live camera of the web app', () => {
     );
   });
 });
+
+describe('ReceiptScanner: dropping a photo', () => {
+  it('reads an image dropped on the scanner', async () => {
+    const onScanned = jest.fn();
+    renderWithI18n(<ReceiptScanner onScanned={onScanned} />);
+    const zone = screen
+      .getByRole('button', { name: new RegExp(tr('app.receipt.scan')) })
+      .closest('.file-drop-zone') as HTMLElement;
+    fireEvent.drop(zone, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [new File(['x'], 'ticket.jpg', { type: 'image/jpeg' })],
+      },
+    });
+    await waitFor(() => expect(onScanned).toHaveBeenCalled());
+  });
+});

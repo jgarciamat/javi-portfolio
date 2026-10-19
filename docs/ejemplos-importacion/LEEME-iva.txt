@@ -1,0 +1,51 @@
+EJEMPLO DEL IVA COMPLETO (303, 349 y 390) · un comercio con la UE y fuera de ella · datos inventados
+
+Archivos
+  ejemplo-ue-facturas-emitidas-2026.xlsx   11 facturas con las columnas de IVA del libro de la AEAT
+                                            (Clave de Operación, Calificación, Operación Exenta, recargo,
+                                            NIF-IVA): ventas en España al 21 % y al 10 %, una venta a un
+                                            comerciante en recargo de equivalencia, entregas a Francia (E5),
+                                            un servicio a Portugal (N2) y exportaciones (E2).
+  ejemplo-ue-facturas-recibidas-2026.xlsx  14 facturas: mercancía nacional, compras a Alemania (clave 09),
+                                            una licencia de Irlanda (servicio), un DUA de importación (F5),
+                                            una carretilla (bien de inversión), una obra con inversión del
+                                            sujeto pasivo y la cuota de autónomos.
+  ejemplo-ue-modelo-303-2T-2026.pdf        El 303 del 2.º trimestre (plantilla de Finanverso rellenada).
+  ejemplo-ue-modelo-349-2T-2026.pdf        El 349 del 2.º trimestre.
+  ejemplo-ue-modelo-390-2026.pdf           El 390 del año.
+
+Dónde se prueba: Autónomos → paso 1 «Trae tus datos» → «Importar» (año 2026). En el paso 2, cada
+trimestre tiene «IVA: otras operaciones» ya rellenado con lo que dicen los libros.
+
+QUÉ DEBE SALIR (importando los dos libros)
+  Modelo 303
+    1T: 27 = 1.417,00 (1.050 del 21 % + 315 autorrepercutidos de Alemania + 52 de recargo)
+        45 = 945,00 (420 interior + 210 del DUA + 315 intracomunitarias) · 59 = 3.000 · 60 = 2.000
+        Resultado (71): 472,00 € a ingresar
+    2T: 27 = 1.365,00 · 45 = 693,00 · 59 = 1.500 (servicio a Portugal) · 60 = 1.000 · 71 = 672,00 €
+    3T: 27 = 1.045,00 · 45 = 1.302,00 (la carretilla va a 30-31: 4.000 / 840)
+        46 = −257,00 → a compensar (casilla 72)
+    4T: 12-13 = 800 / 168 (obra con inversión del sujeto pasivo) · 27 = 1.428,00 · 45 = 693,00
+        110 = 257 aplicados (78) · 71 = 478,00 € a ingresar
+  Modelo 349
+    1T: E Francia 3.000 · A Alemania 1.500 (2 registros, 4.500 €)
+    2T: S Portugal 1.500 · A Alemania 1.200 · I Irlanda 300 (cuadra con 59 = 1.500 y 10 = 1.500)
+    3T: E Francia 2.500 · 4T: no hay
+  Modelo 390 (4.º trimestre): 05/06 = 20.500 / 4.305 · 33 = 25.300 · 34 = 5.203 · 47 = 5.255
+    64 = 3.633 · 65 = 84 = 86 = 1.622 · 95 = 1.622 · 99 = 21.500 · 103 = 7.000 · 104 = 3.000
+    108 = 31.500 · sin avisos (95 − 97 − 662 = 86)
+  Modelo 130 del 4.º trimestre: ingresos 31.500 − gastos 14.500 (la carretilla se amortiza, no se resta
+    entera) = 17.000 · 20 % = 3.400 − 2.920 pagados antes = 480,00 €
+
+Importando el 303 del 2T: el 2.º trimestre queda con 5.000 al 21 %, 59 = 1.500 y 60 = 1.000, y los
+  gastos por canal (interior 1.800 + 378, intracomunitarias 1.500). Su resultado (672) se guarda para
+  la conciliación del 390.
+Importando el 349 del 2T: sus tres operadores pasan a «Operaciones intracomunitarias» del 2T.
+Importando el 390: si es del año anterior al del borrador, su casilla 97 + 662 pasa a «IVA a compensar al
+  empezar el año» y su prorrata (118) a «Prorrata provisional».
+
+Para ver avisos: borra el NIF-IVA de una factura intracomunitaria en la tabla de revisión («falta el
+  NIF-IVA»), o cambia la operación de la compra a Alemania a «Nacional» («compra de la UE sin
+  autorrepercutir» y el 349 deja de cuadrar con la casilla 10).
+Plantillas en blanco: modelo-303-plantilla.pdf (todas las casillas de 2026), modelo-349-plantilla.pdf
+  y modelo-390-plantilla.pdf, en el mismo botón «Plantillas».

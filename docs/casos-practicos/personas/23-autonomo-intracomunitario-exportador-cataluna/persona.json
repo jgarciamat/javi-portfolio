@@ -1,0 +1,1962 @@
+{
+  "slug": "23-autonomo-intracomunitario-exportador-cataluna",
+  "nombre": "Persona Ficticia 23",
+  "nif": "00000023T",
+  "domicilio": "Calle Ficticia 23, 08001 Barcelona (dirección inventada)",
+  "ejercicio": 2026,
+  "comunidad": "cataluna",
+  "titulo": "Autónomo que vende en España, a la UE y fuera de la UE",
+  "descripcion": "Comercio de productos: ventas en España al 21 %, entregas intracomunitarias a un cliente francés (exentas, casilla 59 y modelo 349) y exportaciones (casilla 60). Compra mercancía en España y a un proveedor alemán (adquisición intracomunitaria, casillas 10-11 y 36-37).",
+  "modelos": [
+    "130",
+    "303",
+    "349",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomo": {
+    "ejercicio": 2026,
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 270000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 270000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 270000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 170000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 240000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 130000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 240000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 130000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 240000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 130000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 484000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 200000,
+        "vatRate": 0,
+        "op": "export"
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 363000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 100000,
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
+      }
+    ],
+    "inputs": {
+      "quarters": [
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1436.04,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1436.04,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1436.04,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 0.0,
+          "socialSecurity": 1436.04,
+          "vatNotDeductible": 0
+        }
+      ],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    },
+    "retenciones": [
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 22200
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 23100
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 20100
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 27000
+      }
+    ]
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-004",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-005",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-006",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-007",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-008",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-009",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-010",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-011",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-013",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-014",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-015",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-016",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-017",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-018",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1700.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-019",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-020",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-021",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 3000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-022",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2400.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-023",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1300.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-024",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2400.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-025",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1300.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-026",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 2400.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-027",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 1300.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-028",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-029",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-030",
+        "client": "Cliente Nacional Ficticio, S.L.",
+        "nif": "B00000077",
+        "base": 4000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-031",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-032",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-033",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-034",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-035",
+        "client": "Client Fictif SARL (Francia)",
+        "nif": "FR00000000001",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "eu"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-036",
+        "client": "Fictional Customer Ltd (fuera de la UE)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 0,
+        "withheldRate": 0,
+        "kind": "export"
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-15",
+        "number": "C-01",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "DE-01",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-02-15",
+        "number": "C-02",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "DE-02",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-03-15",
+        "number": "C-03",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "DE-03",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-04-15",
+        "number": "C-04",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "DE-04",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-05-15",
+        "number": "C-05",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "DE-05",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-06-15",
+        "number": "C-06",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "DE-06",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-07-15",
+        "number": "C-07",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "DE-07",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-08-15",
+        "number": "C-08",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "DE-08",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-09-15",
+        "number": "C-09",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "DE-09",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-10-15",
+        "number": "C-10",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "DE-10",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-11-15",
+        "number": "C-11",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "DE-11",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      },
+      {
+        "date": "2026-12-15",
+        "number": "C-12",
+        "supplier": "Mayorista Ficticio, S.A.",
+        "nif": "A00000088",
+        "base": 3000.0,
+        "rate": 21,
+        "retention": 0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "DE-12",
+        "supplier": "Fiktiver Lieferant GmbH (Alemania)",
+        "nif": "DE000000001",
+        "base": 1000.0,
+        "rate": 0,
+        "retention": 0,
+        "kind": "material",
+        "eu": true
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-001 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-002 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-003 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-004 Client Fictif SARL (Francia)",
+        "amount": 2700.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-005 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-006 Client Fictif SARL (Francia)",
+        "amount": 2700.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-007 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-008 Client Fictif SARL (Francia)",
+        "amount": 2700.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-009 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-010 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-011 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-012 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-013 Client Fictif SARL (Francia)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-014 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-015 Client Fictif SARL (Francia)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-016 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-017 Client Fictif SARL (Francia)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-018 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1700.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-019 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-020 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-021 Cliente Nacional Ficticio, S.L.",
+        "amount": 3630.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-022 Client Fictif SARL (Francia)",
+        "amount": 2400.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-023 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1300.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-024 Client Fictif SARL (Francia)",
+        "amount": 2400.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-025 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1300.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-026 Client Fictif SARL (Francia)",
+        "amount": 2400.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-027 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 1300.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-028 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-029 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-030 Cliente Nacional Ficticio, S.L.",
+        "amount": 4840.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-031 Client Fictif SARL (Francia)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-032 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-033 Client Fictif SARL (Francia)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-034 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-035 Client Fictif SARL (Francia)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-036 Fictional Customer Ltd (fuera de la UE)",
+        "amount": 2000.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Mayorista Ficticio, S.A.",
+        "amount": -3630.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Fiktiver Lieferant GmbH (Alemania)",
+        "amount": -1000.0
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          9000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1890.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias: base",
+          3000
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias: cuota",
+          630.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          2520.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          9000.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1890.0
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes corrientes: base",
+          3000
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+          630.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          2520.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          0.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          8100
+        ],
+        [
+          "60",
+          "Exportaciones y operaciones asimiladas",
+          5100
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          0.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          0.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          0.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          0.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          12000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          2520.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias: base",
+          3000
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias: cuota",
+          630.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          3150.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          9000.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1890.0
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes corrientes: base",
+          3000
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+          630.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          2520.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          630.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          6000
+        ],
+        [
+          "60",
+          "Exportaciones y operaciones asimiladas",
+          5100
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          630.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          630.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          630.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          630.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          9000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1890.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias: base",
+          3000
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias: cuota",
+          630.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          2520.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          9000.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1890.0
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes corrientes: base",
+          3000
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+          630.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          2520.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          0.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          7200
+        ],
+        [
+          "60",
+          "Exportaciones y operaciones asimiladas",
+          3900
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          0.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          0.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          0.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          0.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          12000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          2520.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias: base",
+          3000
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias: cuota",
+          630.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          3150.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          9000.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          1890.0
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes corrientes: base",
+          3000
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias de bienes corrientes: cuota",
+          630.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          2520.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          630.0
+        ],
+        [
+          "59",
+          "Entregas intracomunitarias de bienes",
+          9000
+        ],
+        [
+          "60",
+          "Exportaciones y operaciones asimiladas",
+          6000
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          630.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          630.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          630.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          630.0
+        ]
+      ]
+    ],
+    "m111": [],
+    "m115": []
+  }
+}

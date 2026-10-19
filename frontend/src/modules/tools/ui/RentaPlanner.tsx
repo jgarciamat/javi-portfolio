@@ -1,39 +1,39 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
+import { NewReturn, UnderYear } from './renta/NewReturn';
+import { DonationsFields } from './renta/DonationsFields';
+import { OutOfScope, scopeOf } from './renta/Residence';
+import type { ResidenceScope } from '../domain/rentaResidence';
 import { storage } from '@shared/utils/storage';
-import { computeRenta, descendantBreakdown, incomeFactor, limitBaseFor } from '../domain/rentaCalc';
-import type { RentaCcaa } from '../domain/rentaData';
-import {
-  emptyForm,
-  familyOf,
-  number,
-  toInput,
-  type Choice,
-  type RentaForm,
-} from '../domain/rentaForm';
-import { workReductionOf } from '../domain/rentaWork';
-import { useRentaAccess, type RentaAccess, type RentaMode } from '../application/useRentaAccess';
-import { loadCcaa } from '../data/renta';
+import type { RentaAccess, RentaMode } from '../application/useRentaAccess';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
-import { mentionedIn, missingDeductions } from '../domain/rentaDraft';
+import { DeductionReview } from './renta/DeductionReview';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
-import { DraftStep, NO_DRAFT, type DraftState } from './renta/DraftStep';
+import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
+import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
+import { InvestCard, InvestLink } from './renta/InvestCard';
+import { ActivitiesList } from './renta/ActivitiesList';
+import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
+import type { ImportedSavings } from '../domain/rentaGains';
+import type { RentaInput } from '../domain/rentaCalc';
 import { Step, useMoney } from './renta/shared';
+import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
+import { useRentaPlanner } from './renta/useRentaPlanner';
 import './css/Renta.css';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
-const SNAPSHOT_KEY = 'mm_renta_snapshot_v2';
-const NO_CCAA: RentaCcaa = { id: '', name: '', regime: 'common', deductions: [], source: '' };
+/** Guided questions or the full form (expert mode): a preference of this device. */
+export const VIEW_KEY = 'mm_renta_view';
 
 /** The way to more calculations: the upgrade dialog in the app, a free account outside it. */
-function UpgradeCta({ access }: { access: RentaAccess }) {
+export function UpgradeCta({ access }: { access: RentaAccess }) {
   const { t } = useI18n();
   if (access.upgrade) {
     return (
@@ -49,67 +49,6 @@ function UpgradeCta({ access }: { access: RentaAccess }) {
       </Link>
     </p>
   );
-}
-
-/** What the draft says about the deductions: what is missing, pending an amount or already in it. */
-function useDeductionHints(
-  form: RentaForm,
-  ccaa: RentaCcaa | null,
-  draft: DraftState,
-  family: ReturnType<typeof familyOf>,
-  live: Snapshot
-) {
-  const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
-  const mentioned = useMemo(
-    () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
-    [all, draft]
-  );
-  // With the person's income some deductions cannot be claimed: asking about them would be pointless.
-  const missing = useMemo(
-    () =>
-      draft.reading
-        ? missingDeductions(
-            all.filter(
-              (d) =>
-                !draft.dismissed.includes(d.id) &&
-                !form.choices[d.id]?.on &&
-                incomeFactor(d, limitBaseFor(d, live.result)) > 0
-            ),
-            mentioned,
-            {
-              childAges: family.children.map((c) => c.age),
-              ascendants: form.ascendants.length,
-              disability: [
-                form.disability,
-                ...form.children.map((c) => c.disability),
-                ...form.ascendants.map((a) => a.disability),
-              ].some((level) => level > 0),
-              rents: draft.rents,
-            }
-          )
-        : [],
-    [all, draft, form, family, mentioned, live.result]
-  );
-  const pending = useMemo(
-    () =>
-      all
-        .filter((d) => {
-          const choice = form.choices[d.id];
-          const needsAmount = d.kind === 'percent' || d.kind === 'special';
-          return choice?.on && needsAmount && number(choice.amount) <= 0;
-        })
-        .map((d) => d.id),
-    [all, form.choices]
-  );
-  const marked = Object.values(form.choices).filter((c) => c.on).length;
-  const hints = useMemo(() => {
-    const map: Record<string, 'inDraft' | 'missing'> = {};
-    for (const id of mentioned) map[id] = 'inDraft';
-    for (const d of missing) map[d.id] = 'missing';
-    return map;
-  }, [mentioned, missing]);
-
-  return { missing, pending, marked, hints };
 }
 
 interface FreeGateProps {
@@ -166,14 +105,27 @@ function AfterFreeResult({ access, busy, calculate, inApp }: FreeGateProps) {
 }
 
 /** The estimated result, or the way to get it. */
-function ResultSection({
+export function ResultSection({
   access,
   shown,
   busy,
   pending,
   calculate,
   mode,
+  n,
+  invest,
+  imported,
+  input,
+  scope,
 }: {
+  n: number;
+  /** Residence: a return filed elsewhere shows where instead of a result (rentaResidence.ts). */
+  scope?: ResidenceScope;
+  input?: RentaInput;
+  /** What came from the investment files, for the losses of earlier years found in them. */
+  imported?: ImportedSavings;
+  /** «Have you invested in crypto or funds?»: the way to import them. */
+  invest?: React.ReactNode;
   access: RentaAccess;
   shown: Snapshot | null;
   busy: boolean;
@@ -182,27 +134,122 @@ function ResultSection({
   mode: RentaMode;
 }) {
   const { t } = useI18n();
-  const money = useMoney();
   const inApp = mode === 'account';
   return (
-    <Step n={5} titleKey="tools.renta.step4" className="renta-result">
-      <div aria-live="polite">
-        {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
-        {!access.loading && !shown && (
-          <BeforeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
-        )}
-        {shown && (
-          <>
-            <PendingNotice pending={pending} />
-            <ResultCard shown={shown} money={money} />
-            {!access.premium && (
-              <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
-            )}
-          </>
-        )}
-        <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
-      </div>
+    <Step n={n} titleKey="tools.renta.step4" className="renta-result">
+      {scope?.kind === 'out' ? (
+        <OutOfScope scope={scope} />
+      ) : (
+        <ResultBody
+          access={access}
+          shown={shown}
+          busy={busy}
+          pending={pending}
+          calculate={calculate}
+          inApp={inApp}
+          imported={imported}
+          input={input}
+          invest={invest}
+          residencePending={scope?.kind === 'pending'}
+        />
+      )}
+      <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
     </Step>
+  );
+}
+
+/** The ticked deductions still waiting for the answers to their requirements. */
+function Waiting({ ids }: { ids: string[] }) {
+  const { t } = useI18n();
+  if (ids.length === 0) return null;
+  return (
+    <p className="form-error" role="status">
+      {t('tools.renta.req.pendingResult', { count: ids.length })}
+    </p>
+  );
+}
+
+/** The result, or what to do to get it. */
+function ResultBody({
+  access,
+  shown,
+  busy,
+  pending,
+  calculate,
+  inApp,
+  imported,
+  input,
+  invest,
+  residencePending,
+}: {
+  access: RentaAccess;
+  shown: Snapshot | null;
+  busy: boolean;
+  pending: string[];
+  calculate: () => Promise<void>;
+  inApp: boolean;
+  imported?: ImportedSavings;
+  input?: RentaInput;
+  invest?: React.ReactNode;
+  residencePending: boolean;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  return (
+    <div aria-live="polite">
+      {residencePending && (
+        <p className="section-hint" role="note">
+          {t('tools.renta.residence.pendingNote')}
+        </p>
+      )}
+      {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
+      {!access.loading && !shown && (
+        <BeforeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
+      )}
+      {shown && (
+        <>
+          <PendingNotice pending={pending} />
+          {/* A result saved by an older version has no list of deductions waiting. */}
+          <Waiting ids={shown.result.unconfirmed ?? []} />
+          <ResultCard shown={shown} money={money} imported={imported} input={input} />
+          {!access.premium && (
+            <AfterFreeResult access={access} busy={busy} calculate={calculate} inApp={inApp} />
+          )}
+        </>
+      )}
+      {invest}
+    </div>
+  );
+}
+
+/** Guided questions or the full form: remembered on this device. */
+function useExpertView(): [boolean, (on: boolean) => void] {
+  const [expert, setExpert] = useState(() => storage.get(VIEW_KEY) === 'expert');
+  const switchView = (on: boolean) => {
+    storage.set(VIEW_KEY, on ? 'expert' : 'guided');
+    setExpert(on);
+  };
+  return [expert, switchView];
+}
+
+/** The switch to the expert mode: both modes fill in the same form, nothing is lost on the way. */
+function ViewSwitch({ expert, onChange }: { expert: boolean; onChange: (on: boolean) => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="renta-view">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          role="switch"
+          checked={expert}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span>{t('tools.renta.view.expert')}</span>
+      </label>
+      <p className="section-hint">
+        {t(expert ? 'tools.renta.view.expertHint' : 'tools.renta.view.guidedHint')}
+      </p>
+    </div>
   );
 }
 
@@ -210,68 +257,70 @@ function ResultSection({
 export function RentaPlanner({
   initialIncome = '',
   mode,
+  year = rentaState.year,
 }: {
   initialIncome?: string;
   mode: RentaMode;
+  /** The year of the return the data is saved for. */
+  year?: number;
 }) {
-  const [form, setForm] = useState<RentaForm>(() => emptyForm(initialIncome));
-  const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
-  const [loadError, setLoadError] = useState(false);
-  const access = useRentaAccess(mode);
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
-    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
-  );
-  const [busy, setBusy] = useState(false);
-  const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
-  const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
-
-  useEffect(() => {
-    let cancelled = false;
-    setCcaa(null);
-    setLoadError(false);
-    if (!form.ccaaId) return undefined;
-    loadCcaa(form.ccaaId)
-      .then((data) => !cancelled && setCcaa(data))
-      .catch(() => !cancelled && setLoadError(true));
-    return () => {
-      cancelled = true;
-    };
-  }, [form.ccaaId]);
-
-  const reduction = useMemo(() => workReductionOf(rentaState), []);
-  const family = useMemo(() => familyOf(form), [form]);
-  const live: Snapshot = useMemo(() => {
-    const input = toInput(form, {
-      state: rentaState,
-      ccaa: ccaa ?? NO_CCAA,
-      extras: rentaWorkExtras,
-      property: rentaProperty,
-      workReduction: reduction,
-    });
-    return {
-      result: computeRenta(input),
-      kids: descendantBreakdown(family, rentaState.minimums),
-    };
-  }, [form, ccaa, reduction, family]);
-
-  const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
-
-  const shown = access.premium ? live : snapshot;
-  const calculate = async () => {
-    setBusy(true);
-    const allowed = await access.consume();
-    setBusy(false);
-    if (allowed) {
-      storage.setJSON(SNAPSHOT_KEY, live);
-      setSnapshot(live);
-    }
-  };
-  const setChoice = (id: string, choice: Choice) =>
-    setForm((f) => ({ ...f, choices: { ...f.choices, [id]: choice } }));
+  const {
+    form,
+    set,
+    setChoice,
+    draft,
+    setDraft,
+    review,
+    decideOn,
+    recovered,
+    ccaa,
+    loadError,
+    access,
+    busy,
+    wipes,
+    startNew,
+    family,
+    input,
+    live,
+    savings,
+    saved,
+    comparison,
+    all,
+    found,
+    dismissed,
+    missing,
+    pending,
+    marked,
+    hints,
+    shown,
+    calculate,
+    reviewStart,
+    startReview,
+    accept,
+  } = useRentaPlanner({ initialIncome, mode, year });
+  const { t } = useI18n();
+  const [expert, switchView] = useExpertView();
+  const scope = scopeOf(form);
 
   return (
     <div className="renta-planner">
+      <div className="renta-wipe">
+        {recovered && (
+          <p className="renta-recovered" role="status">
+            {t('tools.renta.recovered')}
+          </p>
+        )}
+        <UnderYear>
+          <NewReturn
+            year={year}
+            hasActivity={(form.activities?.length ?? 0) > 0}
+            onConfirm={startNew}
+          />
+        </UnderYear>
+      </div>
+      <ViewSwitch expert={expert} onChange={switchView} />
       <DraftStep
+        key={wipes}
         form={form}
         set={set}
         missing={missing}
@@ -281,11 +330,47 @@ export function RentaPlanner({
         upgrade={<UpgradeCta access={access} />}
         draft={draft}
         onDraft={setDraft}
-        accept={(id) => setChoice(id, { on: true, amount: '', units: '' })}
+        accept={accept}
+        comparison={comparison}
       />
-      <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
-      <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
-      <PropertyStep form={form} set={set} property={rentaProperty} />
+      {expert ? (
+        <>
+          <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
+          <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
+          <PropertyStep form={form} set={set} property={rentaProperty} />
+        </>
+      ) : (
+        <GuidedInterview
+          key={wipes}
+          form={form}
+          set={set}
+          ccaa={ccaa}
+          loadError={loadError}
+          deductions={all}
+          property={rentaProperty}
+          reading={draft.reading}
+          onReview={startReview}
+        />
+      )}
+      <ActivitiesList form={form} set={set} result={live.result.activities} />
+      <DeductionReview
+        // A new community is a new list: the review starts again.
+        key={ccaa?.id ?? ''}
+        n={expert ? 4 : 2}
+        ccaa={ccaa}
+        deductions={all}
+        candidates={found.candidates}
+        outOfReach={found.outOfReach}
+        dismissed={dismissed}
+        review={review}
+        choices={form.choices}
+        savings={savings}
+        markedSaving={saved}
+        onDecide={decideOn}
+        startSignal={reviewStart}
+        invest={<InvestLink form={form} />}
+      />
+      <Optimizer form={form} set={set} ccaa={ccaa} found={found.candidates} savings={savings} />
       <DeductionsStep
         state={rentaState}
         ccaa={ccaa}
@@ -294,7 +379,21 @@ export function RentaPlanner({
         family={family}
         blocked={live.result.blocked}
         hints={hints}
+        savings={savings}
+        markedSaving={saved}
         onChange={setChoice}
+        n={expert ? 5 : 3}
+        lead={
+          <>
+            <InvestCard form={form} set={set} input={input} />
+            <h3>{t('tools.renta.donations.title')}</h3>
+            <DonationsFields
+              form={form}
+              set={set}
+              taxBase={live.result.taxBase + live.result.savingsBase}
+            />
+          </>
+        }
       />
 
       <ResultSection
@@ -304,7 +403,15 @@ export function RentaPlanner({
         pending={pending}
         calculate={calculate}
         mode={mode}
+        n={expert ? 6 : 4}
+        invest={<InvestLink form={form} />}
+        imported={form.savingsDetail?.imported}
+        input={input}
+        scope={scope}
       />
+      {shown && scope.kind !== 'out' && (
+        <RentaFormPreview result={shown.result} input={input} year={year} />
+      )}
     </div>
   );
 }

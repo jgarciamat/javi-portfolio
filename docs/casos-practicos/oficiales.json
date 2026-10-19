@@ -1,0 +1,3584 @@
+{
+ "descripcion": "Casos prácticos resueltos (oficiales de la AEAT y de la Seguridad Social, y de apoyo no oficiales marcados) que sirven de verdad de referencia del banco de pruebas de Finanverso. Enunciados resumidos con palabras propias; importes copiados de la fuente.",
+ "comprobado": "2026-10-19",
+ "total": 62,
+ "casos": [
+  {
+   "id": "renta-c03-01",
+   "modelo": "100",
+   "apartado": "rendimientos del trabajo",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 3",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c03-rendimientos-trabajo/caso-practico.html",
+    "seccion": "Caso práctico",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Trabajador con discapacidad del 33 % despedido de forma improcedente el 12-03-2025 tras 25 años en la empresa (contrato anterior al 12-02-2012). Cobra indemnización y paro en pago único. Se pide el rendimiento neto reducido del trabajo.",
+   "datos": {
+    "retribuciones_dinerarias": 10100,
+    "indemnizacion_despido": 75000,
+    "cotizaciones_ss": 3600,
+    "salario_diario_regulador": 90,
+    "desempleo_pago_unico": 16800,
+    "otras_rentas_no_exentas": 5500,
+    "discapacidad_pct": 33
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Indemnización exenta (720 días x 90 €)",
+     "importe": 64800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Indemnización sujeta",
+     "importe": 10200.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 30 % art. 18.2",
+     "importe": 3060.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto previo",
+     "importe": 13640.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Otros gastos art. 19.2.f (general)",
+     "importe": 2000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Incremento por trabajador activo con discapacidad",
+     "importe": 3500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto",
+     "importe": 8140.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción por obtención de rendimientos del trabajo",
+     "importe": 7302.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido",
+     "importe": 838.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Indemnización 45/33 días con tope 720 días (DT 11ª ET). El pago único del paro está exento. Reducción art. 20 con umbrales 2025 (14.852 € rendimiento neto; 6.500 € otras rentas); en otros años cambian los importes de la reducción."
+  },
+  {
+   "id": "renta-c04-01",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/caso-practico.html",
+    "seccion": "Caso práctico – 1. Vivienda arrendada en zona no tensionada",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Matrimonio (conjunta) con una vivienda alquilada con contrato de 2021 hasta mayo de 2025 y nuevo contrato desde junio de 2025. Se calcula amortización 3 %, mobiliario 10 % y reducción del 60 % (contrato antiguo) y 50 % (contrato nuevo).",
+   "datos": {
+    "renta_mensual_contrato_antiguo": 900,
+    "meses_contrato_antiguo": 5,
+    "renta_mensual_contrato_nuevo": 1000,
+    "meses_contrato_nuevo": 7,
+    "precio_adquisicion": 120000,
+    "gastos_adquisicion": 9000,
+    "intereses_hipoteca": 400,
+    "valor_catastral": 76200,
+    "valor_catastral_construccion": 39120,
+    "mobiliario": 8500,
+    "ibi": 320,
+    "comunidad": 900,
+    "reparacion_fachada": 500
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ingresos íntegros",
+     "importe": 11500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Base amortización inmueble (coste sin suelo)",
+     "importe": 66228.6
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización vivienda 3 %",
+     "importe": 1986.86
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización muebles 10 %",
+     "importe": 850.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos deducibles",
+     "importe": 4956.86
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto",
+     "importe": 6543.14
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 60 % (contrato anterior a 26-05-2023)",
+     "importe": 1460.78
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 50 % (contrato nuevo)",
+     "importe": 2054.25
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido",
+     "importe": 3028.11
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Desde 2024 (Ley 12/2023) contratos posteriores al 26-05-2023 aplican 50/60/70/90 %; los anteriores mantienen el 60 %. Antes de 2024 la reducción era 60 % general. En Renta Web se da de alta un arrendamiento por contrato."
+  },
+  {
+   "id": "renta-c04-02",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/caso-practico.html",
+    "seccion": "Caso práctico – 2. Vivienda arrendada en zona tensionada",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Vivienda en Granollers (zona tensionada) alquilada desde abril de 2025 rebajando la renta más de un 5 % respecto al contrato previo: reducción del 90 %. Gastos prorrateados por 9 meses e imputación de renta por los 3 meses vacía.",
+   "datos": {
+    "renta_mensual": 650,
+    "meses_alquilada": 9,
+    "renta_mensual_contrato_anterior": 700,
+    "precio_adquisicion": 70000,
+    "gastos_adquisicion": 3000,
+    "intereses_anuales": 200,
+    "valor_catastral": 46200,
+    "valor_catastral_construccion": 29120,
+    "mobiliario": 6900,
+    "ibi": 260,
+    "comunidad": 850,
+    "reparacion": 210
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ingresos íntegros",
+     "importe": 5850.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización vivienda (3 % x 45.990 x 9/12)",
+     "importe": 1034.78
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización muebles (9/12)",
+     "importe": 388.13
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos deducibles",
+     "importe": 2562.91
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto",
+     "importe": 3287.09
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 90 %",
+     "importe": 2958.38
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido",
+     "importe": 328.71
+    },
+    {
+     "casilla": null,
+     "concepto": "Renta imputada 1,1 % por 90 días",
+     "importe": 125.31
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El 90 % solo existe desde 2024 y exige zona tensionada declarada y rebaja >5 %. Los gastos del período no alquilado no son deducibles (STS 270/2021)."
+  },
+  {
+   "id": "renta-c04-03",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/caso-practico.html",
+    "seccion": "Caso práctico – 3. Vivienda arrendada a familiar",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Vivienda alquilada a un hermano por 300 €/mes. El rendimiento neto sale negativo, pero se declara como mínimo el 1,1 % del valor catastral. Los intereses se limitan a los ingresos y el exceso pasa a 4 años.",
+   "datos": {
+    "renta_mensual": 300,
+    "precio_adquisicion_con_gastos": 45000,
+    "valor_catastral": 13800,
+    "valor_catastral_construccion": 8970,
+    "ibi": 91,
+    "intereses": 4200,
+    "comunidad": 720,
+    "aire_acondicionado_mejora": 1500
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Intereses deducibles (límite ingresos)",
+     "importe": 3600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Intereses pendientes para 4 años",
+     "importe": 600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización vivienda + mejora",
+     "importe": 900.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos deducibles",
+     "importe": 5311.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto (negativo)",
+     "importe": -1711.0
+    },
+    {
+     "casilla": null,
+     "concepto": "1,1 % valor catastral",
+     "importe": 151.8
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento a declarar",
+     "importe": 151.8
+    },
+    {
+     "casilla": null,
+     "concepto": "Suma rendimientos netos reducidos de las 3 viviendas",
+     "importe": 3508.62
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Regla del rendimiento mínimo para parientes hasta 3.er grado (art. 24 LIRPF). La mejora se amortiza al 3 % prorrateada por meses."
+  },
+  {
+   "id": "renta-c04-04",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/gastos-deducibles/cantidades-destinadas-amortizacion.html",
+    "seccion": "Cantidades destinadas a la amortización – Ejemplo (inmueble heredado)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Inmueble heredado y alquilado. Se compara el coste de adquisición (valor ISD + gastos) sin suelo con el valor catastral sin suelo para la amortización anual del 3 %, y se fija el límite de amortización acumulada.",
+   "datos": {
+    "valor_isd": 100000,
+    "gastos_tributos_adquisicion": 2000,
+    "valor_catastral": 80000,
+    "porcentaje_suelo": 20
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Coste de adquisición sin suelo",
+     "importe": 81600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Valor catastral sin suelo",
+     "importe": 64000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortización anual máxima (3 %)",
+     "importe": 2448.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Límite amortización acumulada",
+     "importe": 81600.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El límite acumulado se apoya en la resolución del TEAC de 18-12-2025 y la STS 1502/2025 (amortización entre 1 % y 3 %), citadas en el manual 2025; en manuales anteriores no figura este matiz."
+  },
+  {
+   "id": "renta-c04-05",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/gastos-deducibles/cantidades-destinadas-amortizacion.html",
+    "seccion": "Cantidades destinadas a la amortización – Ejemplo (usufructo temporal)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Compra de un usufructo de 10 años sobre un inmueble que se alquila. La amortización es el coste dividido entre los años de duración, con el límite de los ingresos del derecho.",
+   "datos": {
+    "coste_usufructo": 100000,
+    "duracion_anios": 10,
+    "renta_anual": 20000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Amortización anual del usufructo",
+     "importe": 10000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Límite (rendimientos íntegros)",
+     "importe": 20000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Si el usufructo fuese vitalicio se aplicaría el 3 % sobre el coste."
+  },
+  {
+   "id": "renta-c04-06",
+   "modelo": "100",
+   "apartado": "capital inmobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 4",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c04-rendimientos-capital-inmobiliario/rendimiento-neto-reducido.html",
+    "seccion": "Rendimiento neto reducido – Ejemplo",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Contribuyente con un local y dos viviendas alquiladas (contratos de 01-09-2023). La reparación de la vivienda 2 supera sus ingresos y el exceso se arrastra; la reducción del 50 % solo se aplica a la vivienda con rendimiento positivo.",
+   "datos": {
+    "ingresos_vivienda1": 6865,
+    "ingresos_vivienda2": 7980,
+    "ingresos_local": 10230,
+    "reparacion_vivienda1": 2150,
+    "reparacion_vivienda2": 9210,
+    "reparacion_local": 5890,
+    "ibi_v1": 500,
+    "ibi_v2": 900,
+    "ibi_local": 350,
+    "comunidad_v1": 580,
+    "comunidad_v2": 1385,
+    "comunidad_local": 540,
+    "amort_v1": 200,
+    "amort_v2": 300,
+    "amort_local": 320
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto vivienda 1",
+     "importe": 3435.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto vivienda 2",
+     "importe": -2585.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto local",
+     "importe": 3130.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 50 % vivienda 1",
+     "importe": 1717.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso reparación vivienda 2 a 4 años",
+     "importe": 1230.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Suma rendimientos netos reducidos",
+     "importe": 2262.5
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Contrato posterior al 26-05-2023 sin requisitos de incremento: 50 %. La amortización del enunciado está simplificada (3 % valor catastral)."
+  },
+  {
+   "id": "renta-c05-01",
+   "modelo": "100",
+   "apartado": "capital mobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 5",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c05-rendimientos-capital-mobiliario/caso-practico.html",
+    "seccion": "Caso práctico – A. Rendimientos a integrar en la base imponible del ahorro",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Matrimonio en gananciales (conjunta): cupón y conversión de obligaciones convertibles, dividendos, intereses de cuenta y canje de participaciones preferentes. Se calcula el rendimiento neto del ahorro y las retenciones al 19 %.",
+   "datos": {
+    "nominal_obligaciones": 6000,
+    "gastos_suscripcion": 60,
+    "tipo_interes_pct": 7.5,
+    "acciones_recibidas": 500,
+    "nominal_accion": 6,
+    "cotizacion_conversion_pct": 250,
+    "dividendos": 1502,
+    "gastos_custodia": 90,
+    "intereses_cc": 37,
+    "preferentes_suscritas": 40000,
+    "obligaciones_recibidas": 38100,
+    "acciones_canje": 5000,
+    "cotizacion_canje": 8.1
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Cupón obligaciones",
+     "importe": 450.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento por conversión",
+     "importe": 1440.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Preferentes: conversión (negativo)",
+     "importe": -1900.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Preferentes: canje (positivo)",
+     "importe": 2400.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total ingresos íntegros ahorro",
+     "importe": 3929.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto base del ahorro",
+     "importe": 3839.0
+    },
+    {
+     "casilla": "0597",
+     "concepto": "Retenciones capital mobiliario",
+     "importe": 377.91
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Retención del 19 % en 2025; casilla 0597 para retenciones según el manual."
+  },
+  {
+   "id": "renta-c05-02",
+   "modelo": "100",
+   "apartado": "capital mobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 5",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c05-rendimientos-capital-mobiliario/caso-practico.html",
+    "seccion": "Caso práctico – B. Arrendamiento de negocio (cafetería), base imponible general",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "El mismo matrimonio arrienda una cafetería con local, instalaciones y mobiliario (arrendamiento de negocio): es capital mobiliario de la base general.",
+   "datos": {
+    "canon_mensual": 1300,
+    "amortizacion_local": 900,
+    "mobiliario": 15000,
+    "coef_mobiliario_pct": 10,
+    "reparacion_aire": 1100,
+    "ibi": 800,
+    "gastos_administracion": 360
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ingresos íntegros",
+     "importe": 15600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos deducibles",
+     "importe": 4660.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido",
+     "importe": 10940.0
+    },
+    {
+     "casilla": "0597",
+     "concepto": "Retenciones (19 %)",
+     "importe": 2964.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El arrendamiento de negocio no es capital inmobiliario ni tiene reducción por vivienda."
+  },
+  {
+   "id": "renta-c05-03",
+   "modelo": "100",
+   "apartado": "capital mobiliario",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 5",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c05-rendimientos-capital-mobiliario/rendimientos-integrar-base-imponible-ahorro/rendimientos-procedentes-cesion-terceros-capitales-propios/ejemplo-rendimientos-procedentes-cesion-terceros.html",
+    "seccion": "Ejemplo: rendimientos procedentes de la cesión a terceros de capitales propios",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Intereses de depósito, venta de obligaciones, préstamo a sociedad vinculada (parte a base general por exceso sobre 3 veces los fondos propios), venta con recompra de obligaciones (pérdida diferida), obligaciones bonificadas y Deuda del Estado.",
+   "datos": {
+    "intereses_deposito": 400,
+    "obligaciones_M_venta_neta": 5770,
+    "obligaciones_M_coste_mitad": 5400,
+    "intereses_prestamo_vinculada": 5000,
+    "prestamo": 70000,
+    "fondos_propios": 50000,
+    "participacion_pct": 40,
+    "obligaciones_T_venta": 7210,
+    "obligaciones_T_coste": 7815,
+    "intereses_bonificadas": 210,
+    "deuda_estado_venta": 30050,
+    "deuda_estado_coste": 27600,
+    "gastos_custodia": 41
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Intereses vinculada a base general",
+     "importe": 714.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Intereses vinculada a base del ahorro",
+     "importe": 4285.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Pérdida obligaciones T diferida por recompra",
+     "importe": -605.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Retenciones no practicadas deducibles (bonificadas)",
+     "importe": 47.88
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimientos íntegros base ahorro",
+     "importe": 7715.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto base ahorro",
+     "importe": 7674.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto base general",
+     "importe": 714.5
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Regla antiaplicación de pérdidas por recompra en 2 meses. Retención 19 %."
+  },
+  {
+   "id": "renta-c07-01",
+   "modelo": "100",
+   "apartado": "actividades económicas estimación directa",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 7",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c07-rendimientos-actividades-economicas-estimacion-directa/caso-practico.html",
+    "seccion": "Caso práctico (actividad profesional, estimación directa simplificada)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Médico radiólogo en directa simplificada: ajustes por autoconsumo, sueldo al cónyuge no deducible, variación de existencias y 5 % de gastos de difícil justificación (máx. 2.000 €). Las ventas de inmovilizado van a ganancias.",
+   "datos": {
+    "honorarios": 124000,
+    "conferencias": 10800,
+    "autoconsumo_valor": 600,
+    "existencias_iniciales": 13100,
+    "existencias_finales": 16100,
+    "sueldos_registrados": 18900,
+    "sueldo_conyuge_no_deducible": 1200,
+    "seguridad_social": 5900,
+    "reta": 3300,
+    "compras": 19000,
+    "amortizaciones": 7900
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Total ingresos fiscales",
+     "importe": 138400.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos fiscales",
+     "importe": 78300.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Provisiones y gastos de difícil justificación",
+     "importe": 2000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto (tabla)",
+     "importe": 58100.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Atención: las notas (10) y (11) del manual dicen 61.400 € pero la tabla y la aritmética dan 58.100 €; usar 58.100. Gastos de difícil justificación: 5 % con tope 2.000 € (en 2023 fue excepcionalmente el 7 %)."
+  },
+  {
+   "id": "renta-c07-02",
+   "modelo": "100",
+   "apartado": "actividades económicas estimación directa",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 7",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c07-rendimientos-actividades-economicas-estimacion-directa/fase-3-determinacion-rendimiento-neto-total/reduccion-rendimientos-actividades-artisticas/ejemplo-red_actvs_artisticas.html",
+    "seccion": "Ejemplo: reducción por rendimientos de actividades artísticas",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Creadora de contenido (grupo 869) obtiene en 2025 un rendimiento extraordinario. Se aplica la nueva reducción del 30 % sobre el exceso sobre el 130 % de la media de los tres años anteriores, con tope de 150.000 €.",
+   "datos": {
+    "ingresos_2025": 500000,
+    "gastos_2025": 110000,
+    "rn_2022": 125000,
+    "rn_2023": 145000,
+    "rn_2024": 105000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Media 3 años",
+     "importe": 125000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "130 % de la media",
+     "importe": 162500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto 2025",
+     "importe": 390000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso",
+     "importe": 227500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción (30 % de 150.000)",
+     "importe": 45000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Reducción nueva (no existía en Renta 2024)."
+  },
+  {
+   "id": "renta-c08-01",
+   "modelo": "100",
+   "apartado": "actividades económicas estimación objetiva (módulos)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 8",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c08-rendimientos-actividades-economicas-eo-fores/caso-practico.html",
+    "seccion": "Caso práctico (bar, epígrafe 673.1)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Bar en módulos con 3 asalariados y 2 contratados en septiembre, 35 kW, 8 mesas, 10 m de barra y una máquina tipo B. Se recorren las fases: rendimiento previo, minoraciones por empleo e inversión, índice corrector de exceso, reducción del 5 % y gastos extraordinarios.",
+   "datos": {
+    "personal_asalariado_unidades": 3.66,
+    "personal_no_asalariado": 1,
+    "kw": 35,
+    "mesas": 8,
+    "metros_barra": 10,
+    "maquinas_B": 1,
+    "retribuciones_personal": 41500,
+    "mobiliario_nuevo": 2400,
+    "gasto_extraordinario_inundacion": 1200
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto previo",
+     "importe": 50111.95
+    },
+    {
+     "casilla": null,
+     "concepto": "Minoración incentivos al empleo",
+     "importe": 2693.38
+    },
+    {
+     "casilla": null,
+     "concepto": "Minoración incentivos a la inversión",
+     "importe": 6050.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto minorado",
+     "importe": 41368.57
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto de módulos (índice exceso)",
+     "importe": 44603.33
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción general 5 %",
+     "importe": 2230.17
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido total",
+     "importe": 41173.16
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Importes por unidad e índices de la Orden HAC/1347/2024 para 2025; cambian cada año, igual que el porcentaje de la reducción general (5 % en 2025)."
+  },
+  {
+   "id": "renta-c09-01",
+   "modelo": "100",
+   "apartado": "actividades económicas estimación objetiva (agraria)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 9",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c09-rendimientos-actividades-economicas-eo-fores/caso-practico.html",
+    "seccion": "Caso práctico (agricultura y ovino de carne)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Agricultor y ganadero en módulos agrarios: reparto de la ayuda PAC entre cultivos, índices de rendimiento por producto, amortizaciones, índice corrector por personal asalariado (0,90) y reducción del 5 %.",
+   "datos": {
+    "ventas_maiz_con_compensacion": 54880,
+    "ventas_corderos": 29835,
+    "ventas_horticolas": 19040,
+    "trabajos_otros_agricultores": 4760,
+    "ayuda_pac": 6250,
+    "coste_personal": 18000,
+    "utiles_nuevos": 1260
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto previo",
+     "importe": 25889.42
+    },
+    {
+     "casilla": null,
+     "concepto": "Amortizaciones",
+     "importe": 11185.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto minorado",
+     "importe": 14704.42
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto de módulos (x 0,90)",
+     "importe": 13233.98
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción general 5 %",
+     "importe": 661.7
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto reducido total",
+     "importe": 12572.28
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Índices de la Orden HAC/1347/2024 (ejercicio 2025); los índices de rendimiento y reducciones varían por año y por sequías/incidencias. Al superar 12.000 € no aplica la reducción del art. 32.2.3º."
+  },
+  {
+   "id": "renta-c10-01",
+   "modelo": "100",
+   "apartado": "imputación de rentas inmobiliarias",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 10",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c10-regimenes-especiales-imputacion-atribucion-rentas/regimen-imputacion-rentas-inmobiliarias/ejemplo-imputacion-rentas-inmobiliarias.html",
+    "seccion": "Ejemplo: imputación de rentas inmobiliarias",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Titular de vivienda habitual con garaje (sin imputación), apartamento de playa y un piso comprado en julio y alquilado en septiembre sin valor catastral notificado (50 % del precio, prorrateado 62 días).",
+   "datos": {
+    "vc_playa": 40800,
+    "precio_piso_nuevo": 105000,
+    "dias_a_disposicion": 62
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Imputación apartamento playa (1,1 %)",
+     "importe": 448.8
+    },
+    {
+     "casilla": null,
+     "concepto": "Imputación piso adquirido en 2025",
+     "importe": 98.1
+    },
+    {
+     "casilla": null,
+     "concepto": "Total rentas imputadas",
+     "importe": 546.9
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Para 2025 el manual aplica el 1,1 % a un valor revisado en 2015 gracias al RDL 16/2025 (cambia la DA 55ª LIRPF y fija el corte en revisiones desde 2012). Con la regla anterior (revisión en los 10 años previos) ese valor habría quedado fuera en 2025. Revisar en otros ejercicios."
+  },
+  {
+   "id": "renta-c11-01",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/caso-practico.html",
+    "seccion": "Caso práctico – 1. Transmisión de participaciones de fondo de inversión",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Reembolso de participaciones de un fondo adquiridas en 2004.",
+   "datos": {
+    "valor_transmision": 15800,
+    "valor_adquisicion": 15000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial (base del ahorro)",
+     "importe": 800.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Se declara en el apartado F2 de IIC con retención."
+  },
+  {
+   "id": "renta-c11-02",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/caso-practico.html",
+    "seccion": "Caso práctico – 2. Transmisión del piso",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta en 2025 de un piso comprado en 1994 y alquilado en 1995-1996: se restan plusvalía municipal y amortizaciones, y se aplican coeficientes de abatimiento a la parte generada hasta el 19-01-2006.",
+   "datos": {
+    "precio_venta": 150000,
+    "plusvalia_municipal": 1900,
+    "precio_compra": 90000,
+    "gastos_compra": 8000,
+    "amortizaciones_1995_1996": 1620,
+    "dias_hasta_19_01_2006": 4049,
+    "dias_totales": 11151
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Valor de transmisión",
+     "importe": 148100.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Valor de adquisición",
+     "importe": 96380.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial",
+     "importe": 51720.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia generada hasta 19-01-2006",
+     "importe": 18779.87
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción por abatimiento (11,11 %)",
+     "importe": 2086.44
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial reducida",
+     "importe": 49633.56
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "DT 9ª LIRPF con límite de 400.000 € de valor de transmisión acumulado desde 2015."
+  },
+  {
+   "id": "renta-c11-03",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/caso-practico.html",
+    "seccion": "Caso práctico – 3. Venta de acciones con recompra de valores homogéneos",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de acciones cotizadas con pérdida y recompra de homogéneas al mes siguiente: la pérdida no se integra hasta vender las recompradas.",
+   "datos": {
+    "valor_transmision": 12000,
+    "valor_adquisicion": 16800,
+    "recompra": 16500
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Pérdida patrimonial no integrable en 2025",
+     "importe": -4800.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Regla de los 2 meses para valores cotizados (1 año para no cotizados)."
+  },
+  {
+   "id": "renta-c11-04",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/determinacion-importe-ganancias-perdidas-patrimon-generales/ejemplos/ejemplo-1.html",
+    "seccion": "Ejemplo 1: transmisión de inmueble adquirido antes del 31-12-1994",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta en 2025 de un chalet comprado en 1992 con una mejora de 2012. Se separa la ganancia del chalet (con abatimiento sobre la parte previa a 2006) y la de la mejora.",
+   "datos": {
+    "precio_venta_total": 500000,
+    "parte_mejora": 150000,
+    "plusvalia_municipal": 15000,
+    "precio_compra": 100000,
+    "itp": 7000,
+    "notaria_registro": 1000,
+    "coste_mejora": 75000,
+    "dias_totales": 11803,
+    "dias_hasta_19_01_2006": 4849
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ganancia chalet",
+     "importe": 227000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia anterior a 20-01-2006",
+     "importe": 93257.9
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 33,33 %",
+     "importe": 31082.86
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia posterior a 20-01-2006",
+     "importe": 133703.64
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia de la mejora",
+     "importe": 75000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial computable",
+     "importe": 270878.68
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Sin coeficientes de actualización desde 2015. Quedan 65.000 € del límite de 400.000 €."
+  },
+  {
+   "id": "renta-c11-05",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/determinacion-importe-ganancias-perdidas-patrimon-generales/ejemplos/ejemplo-2.html",
+    "seccion": "Ejemplo 2: transmisión de acciones cotizadas adquiridas antes del 31-12-1994",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de acciones cotizadas compradas en 1991. La parte reducible se calcula con el valor del Impuesto sobre el Patrimonio 2005 y solo sobre el resto del límite de 400.000 € (65.000 €).",
+   "datos": {
+    "valor_transmision": 75000,
+    "valor_adquisicion": 57000,
+    "valor_ip_2005": 66000,
+    "limite_restante": 65000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ganancia total",
+     "importe": 18000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia anterior a 20-01-2006",
+     "importe": 9000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia susceptible de reducción",
+     "importe": 7800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción 100 %",
+     "importe": 7800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial computable",
+     "importe": 10200.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Encadenado con el ejemplo 1 (mismo contribuyente)."
+  },
+  {
+   "id": "renta-c11-06",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/determinacion-importe-ganancias-perdidas-patrimon-especificas/transmisiones-onerosas-valores-admitidos-negociacion/ejemplo-venta-acciones-total-parcialmente-liberadas.html",
+    "seccion": "Ejemplo: venta de acciones total o parcialmente liberadas",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de 1.600 acciones aplicando FIFO: primero las compradas en 2001 junto con las totalmente liberadas (coste repartido) y después 100 de las parcialmente liberadas de 2011.",
+   "datos": {
+    "acciones_2001": 900,
+    "precio_2001": 10,
+    "liberadas_totalmente": 600,
+    "parcialmente_liberadas": 500,
+    "pago_parcialmente_liberadas": 2500,
+    "acciones_vendidas": 1600,
+    "precio_venta": 10
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Coste unitario tras liberadas",
+     "importe": 6.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia lote 2001 (1.500 acc.)",
+     "importe": 6000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia lote 2011 (100 acc.)",
+     "importe": 500.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Ejemplo de FIFO con acciones liberadas. El manual da la ganancia de cada lote por separado."
+  },
+  {
+   "id": "renta-c11-07",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/ganancias-excluidas-gravamen-supuestos-reinversion/transmision-vivienda-habitual-reinversion-importe/requisitos-condiciones-aplicacion-exencion/otros-requisitos-condiciones-aplicacion-exencion.html",
+    "seccion": "Exención por reinversión en vivienda habitual – Ejemplo",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de la vivienda habitual con hipoteca pendiente y compra de otra. Basta reinvertir el precio menos el préstamo cancelado para que la ganancia quede exenta del todo.",
+   "datos": {
+    "valor_transmision": 95000,
+    "valor_adquisicion": 60000,
+    "prestamo_pendiente": 4000,
+    "reinversion": 91000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ganancia patrimonial",
+     "importe": 35000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia exenta por reinversión",
+     "importe": 35000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia sujeta",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Si la reinversión es parcial, la exención es proporcional."
+  },
+  {
+   "id": "renta-c11-08",
+   "modelo": "100",
+   "apartado": "ganancias y pérdidas patrimoniales",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 11",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales/ganancias-excluidas-gravamen-supuestos-reinversion/transmision-elementos-patrimoniales-contribuyentes-mayores/ejemplo-reinversion-rentas-vitalicias.html",
+    "seccion": "Ejemplo: reinversión en rentas vitalicias",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Mayor de 65 años vende acciones e inmueble y reinvierte en una renta vitalicia. Tope de 240.000 €: la segunda ganancia solo queda exenta en proporción.",
+   "datos": {
+    "venta_acciones": 50000,
+    "coste_acciones": 20000,
+    "venta_inmueble": 250000,
+    "coste_inmueble": 110000,
+    "limite_reinversion": 240000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Ganancia acciones exenta",
+     "importe": 30000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia inmueble",
+     "importe": 140000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Ganancia inmueble exenta",
+     "importe": 106400.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Límite de 240.000 € por contribuyente; reinversión en 6 meses."
+  },
+  {
+   "id": "renta-c12-01",
+   "modelo": "100",
+   "apartado": "integración y compensación de rentas",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 12",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c12-integracion-compensacion-rentas/caso-practico.html",
+    "seccion": "Caso práctico",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Integración y compensación en base general (límite del 25 % para saldos negativos de G/P) y en base del ahorro (cruce del 25 % entre rendimientos de capital y G/P), con pérdidas pendientes de 2021 y 2022.",
+   "datos": {
+    "rn_trabajo": 50000,
+    "rn_actividad": -5000,
+    "imputacion_inmobiliaria": 300,
+    "ganancia_bg": 4500,
+    "perdida_bg": 9600,
+    "rcm_negativo_ahorro": -800,
+    "ganancia_ahorro": 5600,
+    "perdida_ahorro": 1600,
+    "pendiente_2021_bg": 600,
+    "pendiente_2021_ahorro_gp": 700,
+    "pendiente_2021_rcm": 500,
+    "pendiente_2022_ahorro_gp": 2100
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Saldo rendimientos e imputaciones",
+     "importe": 45300.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Compensaciones base general",
+     "importe": 5700.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Base imponible general",
+     "importe": 39600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Saldo G/P ahorro",
+     "importe": 4000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Compensaciones base ahorro",
+     "importe": 3800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Base imponible del ahorro",
+     "importe": 200.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Las pérdidas se compensan en los 4 años siguientes. El límite del 25 % se aplica en cada base."
+  },
+  {
+   "id": "renta-c13-01",
+   "modelo": "100",
+   "apartado": "reducciones de la base imponible",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 13",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c13-determinacion-renta-contribuyente-sujeta-gravamen/caso-practico.html",
+    "seccion": "Caso práctico: plan de pensiones y patrimonio protegido de hijo con discapacidad",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Padre que aporta a su plan de empleo, al plan de pensiones de su hijo con discapacidad y a su patrimonio protegido junto a 4 hermanos. Límite conjunto de 24.250 € y prorrateo.",
+   "datos": {
+    "bi_hijo": 30000,
+    "aportacion_propia_hijo": 20000,
+    "bi_padre": 55500,
+    "aportacion_padre_plan_empleo": 1500,
+    "contribucion_empresa": 2500,
+    "aportacion_padre_plan_hijo": 4250,
+    "aportacion_padre_patrimonio": 6250,
+    "aportacion_cada_hermano": 5000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Base liquidable general hijo",
+     "importe": 10000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción plan de empleo padre",
+     "importe": 4000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción plan del hijo (padre)",
+     "importe": 4250.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción patrimonio protegido (padre)",
+     "importe": 5773.81
+    },
+    {
+     "casilla": null,
+     "concepto": "Base liquidable general padre",
+     "importe": 41476.19
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso pendiente padre",
+     "importe": 476.19
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Límites 2025: 1.500 € general + 8.500 € por contribuciones de empresa; 24.250 € discapacidad."
+  },
+  {
+   "id": "renta-c13-02",
+   "modelo": "100",
+   "apartado": "reducciones de la base imponible",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 13",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c13-determinacion-renta-contribuyente-sujeta-gravamen/reducciones-base-imponible-general/reducciones-aportaciones-contribuciones-sistemas-prevision-social/normas-comunes-aplicables-aportaciones-sistemas-social/ejemplo-aportaciones-sistemas-prevision-social.html",
+    "seccion": "Ejemplo: aportaciones a sistemas de previsión social",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Trabajador con excesos de 2024, plan individual, contribución de empresa, retribución flexible al plan de empleo y seguro colectivo de dependencia. Se aplica el límite del 30 % de los rendimientos del trabajo.",
+   "datos": {
+    "bi_general": 30500,
+    "rn_trabajo": 30500,
+    "ri_trabajo": 35000,
+    "excesos_2024": 5000,
+    "plan_individual": 500,
+    "contribucion_empresa": 1400,
+    "retribucion_flexible": 2300,
+    "seguro_dependencia": 1000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Límite 30 % rendimientos netos",
+     "importe": 9150.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Máximo aportación trabajador a plan de empleo",
+     "importe": 1475.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción excesos 2024",
+     "importe": 5000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción aportaciones 2025",
+     "importe": 4150.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Base liquidable general",
+     "importe": 21350.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso pendiente aportaciones",
+     "importe": 50.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso pendiente dependencia",
+     "importe": 1000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Cuadro del art. 52.1.1º (aportación del trabajador según contribución empresarial) vigente desde 2023."
+  },
+  {
+   "id": "renta-c14-01",
+   "modelo": "100",
+   "apartado": "mínimo personal y familiar",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 14",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c14-adecuacion-impuesto-circunstancias-personales/ejemplos-practicos/ejemplo-1.html",
+    "seccion": "Ejemplo 1. Matrimonio con hijos comunes (Cantabria)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Matrimonio con tres hijos (27 años con discapacidad del 33 %, 22 y 19). Mínimo en tributación individual (50 % cada uno) y conjunta.",
+   "datos": {
+    "edad_hijos": "27, 22, 19",
+    "discapacidad_hijo1_pct": 33
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Mínimo por descendientes (individual)",
+     "importe": 4550.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo personal y familiar (individual, cada cónyuge)",
+     "importe": 11600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Mínimo por descendientes (conjunta)",
+     "importe": 9100.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo personal y familiar (conjunta)",
+     "importe": 17650.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Cantabria no modifica los mínimos. Errata en la tabla del manual: muestra 5.500 en una celda del mínimo del contribuyente (es 5.550)."
+  },
+  {
+   "id": "renta-c14-02",
+   "modelo": "100",
+   "apartado": "mínimo personal y familiar",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 14",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c14-adecuacion-impuesto-circunstancias-personales/ejemplos-practicos/ejemplo-2.html",
+    "seccion": "Ejemplo 2. Pareja de hecho con hijos comunes (Comunitat Valenciana)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Pareja de hecho con hijos de 18, 12 y 6 años; el menor tiene 4.050 € de rentas. Mínimos estatal y autonómico valenciano en individual y en conjunta de un progenitor con los menores.",
+   "datos": {
+    "edad_hijos": "18, 12, 6",
+    "rentas_hijo_menor": 4050
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Total mínimo individual estatal",
+     "importe": 8100.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo individual autonómico",
+     "importe": 8910.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo conjunta estatal",
+     "importe": 12100.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo conjunta autonómico",
+     "importe": 13310.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Importes autonómicos valencianos (6.105 € contribuyente, etc.) pueden variar cada año."
+  },
+  {
+   "id": "renta-c14-03",
+   "modelo": "100",
+   "apartado": "mínimo personal y familiar",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 14",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c14-adecuacion-impuesto-circunstancias-personales/ejemplos-practicos/ejemplo-6.html",
+    "seccion": "Ejemplo 6. Hijo adoptado con discapacidad (La Rioja)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Madre que adopta en 2025 a un niño de 5 años con discapacidad del 40 %; se aplica el incremento por menor de 3 años por la adopción y el mínimo autonómico de discapacidad de La Rioja (+10 %).",
+   "datos": {
+    "edad_adoptado": 5,
+    "discapacidad_pct": 40
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Incremento por adopción (menor de 3 años)",
+     "importe": 2800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo estatal",
+     "importe": 13750.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total mínimo autonómico",
+     "importe": 14050.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Monoparental: reducción de 2.150 € en conjunta."
+  },
+  {
+   "id": "renta-c15-01",
+   "modelo": "100",
+   "apartado": "cuotas íntegras (escalas)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 15",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/ejemplo-practico-calculo-cuotas-integras-autonomica.html",
+    "seccion": "Ejemplo práctico: cálculo de las cuotas íntegras estatal y autonómica",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Residente en Aragón con base liquidable general de 23.900 €, del ahorro de 2.800 € y mínimo de 5.550 €. Se aplican las escalas estatal y autonómica y se resta la cuota del mínimo.",
+   "datos": {
+    "blg": 23900,
+    "bla": 2800,
+    "minimo": 5550
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Cuota escala estatal sobre BLG",
+     "importe": 2667.75
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota escala autonómica sobre BLG",
+     "importe": 2621.89
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota del mínimo (9,50 %)",
+     "importe": 527.25
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra general estatal",
+     "importe": 2140.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra general autonómica",
+     "importe": 2094.64
+    },
+    {
+     "casilla": null,
+     "concepto": "Gravamen ahorro (cada parte)",
+     "importe": 266.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra estatal",
+     "importe": 2406.5
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra autonómica",
+     "importe": 2360.64
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "La escala aragonesa cambia por comunidad y año. Escala del ahorro 2025: 30 % por encima de 300.000 € (28 % en 2024)."
+  },
+  {
+   "id": "renta-c15-02",
+   "modelo": "100",
+   "apartado": "cuotas íntegras (escalas)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 15",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/especialidades-determinacion-cuota-integra-estatal-autonomica/anualidades-alimentos-favor-hijos/ejemplo-anualidades-alimentos-favor-hijos.html",
+    "seccion": "Ejemplo: anualidades por alimentos en favor de los hijos",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Residente en la Comunitat Valenciana con base general de 63.000 € que paga 12.000 € de alimentos a sus hijos por resolución judicial: escalas aplicadas por separado y mínimo incrementado en 1.980 €.",
+   "datos": {
+    "blg": 63000,
+    "anualidades": 12000,
+    "bla": 5000,
+    "minimo": 5550
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Cuota estatal anualidades",
+     "importe": 1140.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota estatal resto base",
+     "importe": 7285.75
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota del mínimo + 1.980 (estatal)",
+     "importe": 715.35
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota general estatal",
+     "importe": 7710.4
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota general autonómica",
+     "importe": 7682.35
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra estatal",
+     "importe": 8185.4
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota íntegra autonómica",
+     "importe": 8157.35
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "La escala autonómica valenciana 2025 es propia; otros años/CCAA difieren."
+  },
+  {
+   "id": "renta-c16-01",
+   "modelo": "100",
+   "apartado": "deducciones (donativos)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 16",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c16-deducciones-generales-cuota/deducciones-donativos-otras-aportaciones/donativos-realizados-entidades-incluidas/ejemplo-deduccion-donativos.html",
+    "seccion": "Ejemplo: deducción por donativos (Ley 49/2002)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Donativo de 1.000 € a una ONG nueva (80 % hasta 250 € y 40 % el resto) y 1.000 € a una fundación con donaciones crecientes en los dos años previos (fidelidad: 45 % + 5 %).",
+   "datos": {
+    "donativo_ong": 1000,
+    "donaciones_fundacion_2023": 700,
+    "donaciones_fundacion_2024": 1000,
+    "donaciones_fundacion_2025": 1000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Base de deducción",
+     "importe": 2000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción ONG",
+     "importe": 500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción fundación",
+     "importe": 500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción por donativos",
+     "importe": 1000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Desde 2024 (RDL 6/2023): 80 % hasta 250 €, 40 % resto, 45 %/50 % por fidelidad de 3 años. Antes de 2024: 150 € y 35 %/40 %, fidelidad de 4 años."
+  },
+  {
+   "id": "renta-c16-02",
+   "modelo": "100",
+   "apartado": "deducciones (vivienda habitual régimen transitorio)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 16",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c16-deducciones-generales-cuota/deduccion-inversion-vivienda-habitual-regimen-transitorio/condiciones-requisitos-caracter-general/comprobacion-situacion-patrimonial.html",
+    "seccion": "Comprobación de la situación patrimonial – Ejemplo",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Contribuyente con vivienda comprada en 2006 que invierte 9.000 € (1.000 € de intereses). Se comprueba el aumento de patrimonio: la base deducible se limita a ese aumento más los intereses.",
+   "datos": {
+    "precio_vivienda": 150000,
+    "prestamo_pendiente_inicio": 95000,
+    "inversion_2025": 9000,
+    "intereses": 1000,
+    "cuenta_inicio": 5700,
+    "cuenta_final": 3000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Patrimonio final",
+     "importe": 66000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Patrimonio inicial",
+     "importe": 60700.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Aumento de patrimonio",
+     "importe": 5300.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Base de deducción (aumento + intereses)",
+     "importe": 6300.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El manual no calcula la deducción (sería el 15 % sobre la base con máximo de 9.040 €). Solo para adquisiciones anteriores a 2013."
+  },
+  {
+   "id": "renta-c16-03",
+   "modelo": "100",
+   "apartado": "deducciones (alquiler vivienda habitual régimen transitorio)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 16",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c16-deducciones-generales-cuota/deduccion-alquiler-vivienda-habitual-regimen-transitorio.html",
+    "seccion": "Deducción por alquiler de la vivienda habitual (régimen transitorio) – Ejemplo",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Inquilino desde 2012 con base imponible total de 22.100 €; la base máxima de deducción se reduce de forma lineal entre 17.707,20 y 24.107,20 €.",
+   "datos": {
+    "alquiler_pagado": 6900,
+    "bi_general": 21500,
+    "bi_ahorro": 600
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Base máxima de deducción",
+     "importe": 2835.17
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción (10,05 %)",
+     "importe": 284.93
+    },
+    {
+     "casilla": "0562",
+     "concepto": "Mitad de la deducción (tramo estatal)",
+     "importe": 142.46
+    },
+    {
+     "casilla": "0563",
+     "concepto": "Mitad de la deducción (tramo autonómico)",
+     "importe": 142.46
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Solo contratos anteriores a 01-01-2015 con deducción en años previos."
+  },
+  {
+   "id": "renta-c18-01",
+   "modelo": "100",
+   "apartado": "deducción por maternidad",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 18",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/resultado-declaracion/deduccion-maternidad-incremento-adicional-gastos-custodia/ejemplo-deduccion-maternidad-incremento-gastos-custodia/caso-a-alta-ss-posterioridad-nacimiento.html",
+    "seccion": "Ejemplo deducción por maternidad – Caso a)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Madre de mellizos nacidos en enero de 2025 y de un hijo que cumple 3 años en septiembre; se da de alta en la Seguridad Social en abril y llega a 30 días cotizados en mayo. Deducción con incremento de 150 € y gastos de guardería.",
+   "datos": {
+    "cuota_diferencial": 1500,
+    "matricula_guarderia": 300,
+    "guarderia_mensual": 500,
+    "guarderia_julio": 250,
+    "beca": 700,
+    "ayuda_empresa_mensual": 80
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Deducción por cada mellizo",
+     "importe": 950.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción hijo mayor",
+     "importe": 550.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción por maternidad total",
+     "importe": 2450.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Gasto de custodia no subvencionado",
+     "importe": 2290.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Incremento por gastos de custodia",
+     "importe": 166.67
+    },
+    {
+     "casilla": null,
+     "concepto": "Resultado de la declaración",
+     "importe": -1116.67
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Desde 2023 no hay límite por cotizaciones y basta 30 días cotizados en el momento posterior al parto (incremento de 150 €)."
+  },
+  {
+   "id": "renta-c18-02",
+   "modelo": "100",
+   "apartado": "deducción por familia numerosa",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 18",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/resultado-declaracion/deducciones-familia-numerosa-personas-discapacidad-cargo/ejemplos/ejemplo-4-deduccion-familia-numerosa-derecho.html",
+    "seccion": "Ejemplo 4. Familia numerosa con cesión del derecho y abono anticipado",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Familia numerosa general con 4 hijos; el padre cede el derecho a la madre y cobraron el abono anticipado desde marzo. Se regulariza deducción frente a anticipo.",
+   "datos": {
+    "hijos": 4,
+    "meses": 12,
+    "meses_anticipo": 10,
+    "cotizaciones_conjuntas": 2627,
+    "cuota_diferencial": 300
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Deducción familia numerosa general",
+     "importe": 1200.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Incremento por hijo adicional",
+     "importe": 600.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total deducción",
+     "importe": 1800.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Abono anticipado percibido",
+     "importe": 1500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Resultado de la declaración",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Incremento de 600 € por hijo que exceda el mínimo vigente desde 2018."
+  },
+  {
+   "id": "renta-c18-03",
+   "modelo": "100",
+   "apartado": "deducción por obtención de rendimientos del trabajo",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, cap. 18",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/deducciones-cuota-liquida-total/deduccion-obtencion-rendimientos-trabajo/ejemplos-deduccion-obtencion-rendimientos-trabajo/ejemplo-1-trabajadora-cuenta-ajena-rentas.html",
+    "seccion": "Ejemplo 1: trabajadora por cuenta ajena sin otras rentas",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Trabajadora con 16.500 € de rendimientos íntegros y sin otras rentas; le corresponde el máximo de la nueva deducción (340 €) pero se limita a su cuota íntegra total.",
+   "datos": {
+    "ri_trabajo": 16500,
+    "cotizaciones_ss": 1200,
+    "cuota_integra_total": 187.19
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Importe máximo de la deducción",
+     "importe": 340.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Límite (cuota íntegra proporcional al trabajo)",
+     "importe": 187.19
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Deducción nueva en 2025 (no existe en Renta 2024) para rendimientos íntegros por debajo de 18.276 €, máximo con menos de 16.576 €."
+  },
+  {
+   "id": "303-01",
+   "modelo": "303",
+   "apartado": "IVA régimen general (supuesto práctico Manual IVA, 1T)",
+   "ejercicio": 2024,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2024, cap. 9, supuesto práctico modelo 390 (liquidación 1T)",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/Manual_IVA_2024.pdf",
+    "seccion": "Cap. 9, La declaración-resumen anual. Modelo 390, Supuesto práctico, págs. 291-294; formulario relleno: https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_303_es_es.pdf (pág. 1-3)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Fabricante de electrodomésticos en régimen general (con actividad agrícola en REAGP aparte). En el 1T vende en el interior, a comerciantes en recargo de equivalencia y exporta; compra en España, en la UE (bienes y transporte) e importa. Tenía 3.000 € a compensar del 4T anterior.",
+   "datos": {
+    "ventas_interiores_y_servicios_base": 83000,
+    "ventas_a_recargo_equivalencia_base": 24000,
+    "adquisiciones_intracomunitarias_base": 21000,
+    "compras_interiores_corrientes_base": 47000,
+    "importaciones_base": 12000,
+    "exportaciones": 12000,
+    "cuota_a_compensar_periodo_anterior": 3000
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Base imponible 21 %",
+     "importe": 83000.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Cuota 21 %",
+     "importe": 17430.0
+    },
+    {
+     "casilla": "10",
+     "concepto": "Base adquisiciones intracomunitarias",
+     "importe": 21000.0
+    },
+    {
+     "casilla": "11",
+     "concepto": "Cuota adquisiciones intracomunitarias",
+     "importe": 4410.0
+    },
+    {
+     "casilla": "22",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 24000.0
+    },
+    {
+     "casilla": "24",
+     "concepto": "Cuota recargo de equivalencia",
+     "importe": 1248.0
+    },
+    {
+     "casilla": "27",
+     "concepto": "Total cuota devengada",
+     "importe": 23088.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base IVA soportado interior corriente",
+     "importe": 47000.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Cuota IVA soportado interior corriente",
+     "importe": 9870.0
+    },
+    {
+     "casilla": "32",
+     "concepto": "Base importaciones bienes corrientes",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "33",
+     "concepto": "Cuota importaciones bienes corrientes",
+     "importe": 2520.0
+    },
+    {
+     "casilla": "36",
+     "concepto": "Base adquisiciones intracomunitarias corrientes (deducible)",
+     "importe": 21000.0
+    },
+    {
+     "casilla": "37",
+     "concepto": "Cuota adquisiciones intracomunitarias corrientes (deducible)",
+     "importe": 4410.0
+    },
+    {
+     "casilla": "45",
+     "concepto": "Total a deducir",
+     "importe": 16800.0
+    },
+    {
+     "casilla": "46",
+     "concepto": "Resultado régimen general",
+     "importe": 6288.0
+    },
+    {
+     "casilla": "60",
+     "concepto": "Exportaciones y operaciones asimiladas",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "110",
+     "concepto": "Cuotas a compensar pendientes de periodos anteriores",
+     "importe": 3000.0
+    },
+    {
+     "casilla": "78",
+     "concepto": "Cuotas a compensar aplicadas en este periodo",
+     "importe": 3000.0
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado a ingresar",
+     "importe": 3288.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Mismo supuesto en el Manual IVA 2025 (ejercicio 2025) con cifras idénticas; el formulario relleno del manual 2025 confirma las casillas. La casilla 60 (12.000) se asigna por el texto del supuesto ('exportaciones del trimestre 12.000'); en el texto extraído del PDF los números de las casillas 59/60 aparecen juntos. Tipo RE 5,2 % y casillas 150-170 (tipos 0/2/5 %) dependen del diseño del modelo vigente."
+  },
+  {
+   "id": "303-02",
+   "modelo": "303",
+   "apartado": "IVA régimen general (supuesto práctico, 2T a compensar)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 9, supuesto práctico modelo 390 + formulario 303 relleno",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_303_es_es.pdf",
+    "seccion": "Págs. 4-6 (2T); enunciado en https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/manual-iva-2025/capitulo-09-declaraciones-informativas-iva-379/declaracion-resumen-anual-modelo-390/supuesto-practico-modelo-390.html",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Mismo fabricante, 2T: ventas con descuento, anticipos de clientes, compra de bien de inversión, servicio de abogado francés (ISP), devolución de compras a Holanda y resolución de una venta de 2024. El trimestre sale a compensar.",
+   "datos": {
+    "base_21": 91000,
+    "rectificacion_bases_devengadas": -12000,
+    "importaciones_base": 36000,
+    "bien_inversion_base": 5000,
+    "entregas_intracomunitarias_exentas": 12000,
+    "exportaciones": 9000
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Base imponible 21 %",
+     "importe": 91000.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Cuota 21 %",
+     "importe": 19110.0
+    },
+    {
+     "casilla": "10",
+     "concepto": "Base adquisiciones intracomunitarias",
+     "importe": 21000.0
+    },
+    {
+     "casilla": "11",
+     "concepto": "Cuota adquisiciones intracomunitarias",
+     "importe": 4410.0
+    },
+    {
+     "casilla": "14",
+     "concepto": "Modificación bases",
+     "importe": -12000.0
+    },
+    {
+     "casilla": "15",
+     "concepto": "Modificación cuotas",
+     "importe": -2520.0
+    },
+    {
+     "casilla": "24",
+     "concepto": "Cuota recargo de equivalencia (base 12.000 al 5,2 %)",
+     "importe": 624.0
+    },
+    {
+     "casilla": "27",
+     "concepto": "Total cuota devengada",
+     "importe": 21624.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Cuota soportada interior corriente (base 57.000)",
+     "importe": 11970.0
+    },
+    {
+     "casilla": "31",
+     "concepto": "Cuota soportada interior bienes de inversión (base 5.000)",
+     "importe": 1050.0
+    },
+    {
+     "casilla": "33",
+     "concepto": "Cuota importaciones corrientes (base 36.000)",
+     "importe": 7560.0
+    },
+    {
+     "casilla": "37",
+     "concepto": "Cuota adquisiciones intracomunitarias corrientes (base 21.000)",
+     "importe": 4410.0
+    },
+    {
+     "casilla": "41",
+     "concepto": "Rectificación de deducciones (base -6.000)",
+     "importe": -1260.0
+    },
+    {
+     "casilla": "45",
+     "concepto": "Total a deducir",
+     "importe": 23730.0
+    },
+    {
+     "casilla": "46",
+     "concepto": "Resultado régimen general",
+     "importe": -2106.0
+    },
+    {
+     "casilla": "59",
+     "concepto": "Entregas intracomunitarias",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "60",
+     "concepto": "Exportaciones",
+     "importe": 9000.0
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado",
+     "importe": -2106.0
+    },
+    {
+     "casilla": "72",
+     "concepto": "A compensar",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base soportado interior corriente",
+     "importe": 57000.0
+    },
+    {
+     "casilla": "30",
+     "concepto": "Base soportado interior bienes de inversión",
+     "importe": 5000.0
+    },
+    {
+     "casilla": "32",
+     "concepto": "Base importaciones corrientes",
+     "importe": 36000.0
+    },
+    {
+     "casilla": "36",
+     "concepto": "Base adquisiciones intracomunitarias corrientes",
+     "importe": 21000.0
+    },
+    {
+     "casilla": "40",
+     "concepto": "Rectificación de deducciones: base",
+     "importe": -6000.0
+    },
+    {
+     "casilla": "110",
+     "concepto": "Cuotas a compensar pendientes de periodos anteriores",
+     "importe": 0.0
+    },
+    {
+     "casilla": "87",
+     "concepto": "Cuotas pendientes para periodos posteriores",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Caso útil de trimestre negativo que pasa a compensar (casilla 72). Las bases interiores 57.000/5.000/36.000 son las del formulario relleno. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
+  },
+  {
+   "id": "303-03",
+   "modelo": "303",
+   "apartado": "IVA régimen general (3T, a ingresar sin aplicar compensación)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, formulario 303 relleno del supuesto práctico",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_303_es_es.pdf",
+    "seccion": "Págs. 7-9 (3T)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "3T: autoconsumo, ventas interiores (incluida a particular italiano y a empresa francesa sin salida de bienes), adquisición intracomunitaria, devolución de ventas. Decide no aplicar los 2.106 € pendientes de compensar.",
+   "datos": {
+    "base_21": 94200,
+    "devolucion_ventas_base": -6000,
+    "aib_base": 12000
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Base imponible 21 %",
+     "importe": 94200.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Cuota 21 %",
+     "importe": 19782.0
+    },
+    {
+     "casilla": "11",
+     "concepto": "Cuota adquisiciones intracomunitarias (base 12.000)",
+     "importe": 2520.0
+    },
+    {
+     "casilla": "14",
+     "concepto": "Modificación bases",
+     "importe": -6000.0
+    },
+    {
+     "casilla": "15",
+     "concepto": "Modificación cuotas",
+     "importe": -1260.0
+    },
+    {
+     "casilla": "24",
+     "concepto": "Cuota recargo de equivalencia (base 24.000)",
+     "importe": 1248.0
+    },
+    {
+     "casilla": "27",
+     "concepto": "Total cuota devengada",
+     "importe": 22290.0
+    },
+    {
+     "casilla": "45",
+     "concepto": "Total a deducir",
+     "importe": 4032.0
+    },
+    {
+     "casilla": "46",
+     "concepto": "Resultado régimen general",
+     "importe": 18258.0
+    },
+    {
+     "casilla": "110",
+     "concepto": "Cuotas a compensar pendientes de periodos anteriores",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "87",
+     "concepto": "Cuotas pendientes para periodos posteriores",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado a ingresar",
+     "importe": 18258.0
+    },
+    {
+     "casilla": "10",
+     "concepto": "Base adquisiciones intracomunitarias",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "22",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 24000.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base soportado interior corriente",
+     "importe": 1200.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Cuota soportado interior corriente",
+     "importe": 252.0
+    },
+    {
+     "casilla": "32",
+     "concepto": "Base importaciones corrientes",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "33",
+     "concepto": "Cuota importaciones corrientes",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "36",
+     "concepto": "Base adquisiciones intracomunitarias corrientes",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "37",
+     "concepto": "Cuota adquisiciones intracomunitarias corrientes",
+     "importe": 2520.0
+    },
+    {
+     "casilla": "78",
+     "concepto": "Cuotas a compensar aplicadas en este periodo",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Muestra que la compensación es opcional: 110 = 87 sin rellenar 78. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
+  },
+  {
+   "id": "303-04",
+   "modelo": "303",
+   "apartado": "IVA régimen general (4T, a compensar)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, formulario 303 relleno del supuesto práctico",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_303_es_es.pdf",
+    "seccion": "Págs. 10-12 (4T)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "4T: entrega del contrato público (devengo diferido), ventas en RE, devolución de mercancías, compras al 10 % y 21 %, anticipo a proveedor, descuentos sobre compras y facturas recibidas del 3T.",
+   "datos": {
+    "base_21": 102000,
+    "compras_base_total": 162000
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Base imponible 21 %",
+     "importe": 102000.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Cuota 21 %",
+     "importe": 21420.0
+    },
+    {
+     "casilla": "14",
+     "concepto": "Modificación bases",
+     "importe": -3000.0
+    },
+    {
+     "casilla": "15",
+     "concepto": "Modificación cuotas",
+     "importe": -630.0
+    },
+    {
+     "casilla": "24",
+     "concepto": "Cuota recargo de equivalencia (base 12.000)",
+     "importe": 624.0
+    },
+    {
+     "casilla": "27",
+     "concepto": "Total cuota devengada",
+     "importe": 21414.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Base soportado interior corriente",
+     "importe": 162000.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Cuota soportado interior corriente",
+     "importe": 27420.0
+    },
+    {
+     "casilla": "40",
+     "concepto": "Rectificación deducciones base",
+     "importe": -18000.0
+    },
+    {
+     "casilla": "41",
+     "concepto": "Rectificación deducciones cuota",
+     "importe": -3780.0
+    },
+    {
+     "casilla": "45",
+     "concepto": "Total a deducir",
+     "importe": 23640.0
+    },
+    {
+     "casilla": "46",
+     "concepto": "Resultado régimen general",
+     "importe": -2226.0
+    },
+    {
+     "casilla": "60",
+     "concepto": "Exportaciones",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "110",
+     "concepto": "Cuotas a compensar pendientes de periodos anteriores",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "87",
+     "concepto": "Pendientes para periodos posteriores",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado",
+     "importe": -2226.0
+    },
+    {
+     "casilla": "72",
+     "concepto": "A compensar",
+     "importe": 2226.0
+    },
+    {
+     "casilla": "22",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "78",
+     "concepto": "Cuotas a compensar aplicadas en este periodo",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Casilla 28 mezcla bases al 10 % y 21 % (60.000 + 84.000 + 18.000). En 4T puede optarse por devolución (73) en vez de compensar. Casillas completadas y corregidas el 19-10-2026 leyendo con pdf.js el formulario relleno del Manual (capa de texto)."
+  },
+  {
+   "id": "303-05",
+   "modelo": "303",
+   "apartado": "IVA régimen simplificado (módulos), 1T",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 7 régimen simplificado, supuesto práctico (cafetería) – modelo 303 1T relleno",
+    "url": "https://www3.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_7_303_1T.pdf",
+    "seccion": "Cap. 7 Supuesto práctico; enunciado y solución también en Manual_IVA_2024.pdf págs. 220-223",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Cafetería (epígrafe 672.1) en régimen simplificado: 3 personas, 20 kW, 5 mesas y 2 máquinas tipo B a 1 de enero. El ingreso a cuenta trimestral es el 4 % de la cuota devengada por operaciones corrientes.",
+   "datos": {
+    "personal": 3,
+    "potencia_kw": 20,
+    "mesas": 5,
+    "maquinas_B": 2,
+    "porcentaje_ingreso_cuenta": 4
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Módulo 1 personal (3 x 2.356,07)",
+     "importe": 7068.21
+    },
+    {
+     "casilla": null,
+     "concepto": "Módulo 2 potencia (20 x 124,00)",
+     "importe": 2480.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Módulo 3 mesas (5 x 70,86)",
+     "importe": 354.3
+    },
+    {
+     "casilla": null,
+     "concepto": "Módulo 5 máquinas B (2 x 832,60)",
+     "importe": 1665.2
+    },
+    {
+     "casilla": "C",
+     "concepto": "Cuota devengada operaciones corrientes",
+     "importe": 11567.71
+    },
+    {
+     "casilla": "F",
+     "concepto": "Ingreso a cuenta (4 %)",
+     "importe": 462.71
+    },
+    {
+     "casilla": "47",
+     "concepto": "Suma de ingresos a cuenta",
+     "importe": 462.71
+    },
+    {
+     "casilla": "54",
+     "concepto": "Total cuota resultante",
+     "importe": 462.71
+    },
+    {
+     "casilla": "58",
+     "concepto": "Resultado régimen simplificado",
+     "importe": 462.71
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado a ingresar",
+     "importe": 462.71
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Igual en 2T y 3T. Cuotas por módulo y % dependen de la Orden de módulos anual. No aplicable a profesionales en estimación directa."
+  },
+  {
+   "id": "303-06",
+   "modelo": "303",
+   "apartado": "IVA régimen simplificado (módulos), 4T liquidación anual",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 7 – modelo 303 4T relleno (cafetería)",
+    "url": "https://www3.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_7_303_4T.pdf",
+    "seccion": "Cap. 7 Supuesto práctico (solución puntos 2 y 3)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Cálculo de la cuota anual de la cafetería con 4,10 personas, comparando cuota menos soportado (+1 % difícil justificación) con la cuota mínima del 13 %; suma IVA de adquisición intracomunitaria y deduce activos fijos; resta los 3 ingresos a cuenta.",
+   "datos": {
+    "personal": 4.1,
+    "iva_soportado_corriente": 9330.0,
+    "aib_base": 2500,
+    "activos_fijos_base": 2450
+   },
+   "resultados": [
+    {
+     "casilla": "C",
+     "concepto": "Cuota devengada operaciones corrientes",
+     "importe": 14159.39
+    },
+    {
+     "casilla": "G",
+     "concepto": "Cuotas soportadas corrientes (+1 %)",
+     "importe": 9471.59
+    },
+    {
+     "casilla": "I",
+     "concepto": "Resultado (C-D-G)",
+     "importe": 4687.8
+    },
+    {
+     "casilla": "L",
+     "concepto": "Cuota mínima (13 %)",
+     "importe": 1840.72
+    },
+    {
+     "casilla": "M",
+     "concepto": "Cuota anual derivada",
+     "importe": 4687.8
+    },
+    {
+     "casilla": "48",
+     "concepto": "Suma cuotas derivadas",
+     "importe": 4687.8
+    },
+    {
+     "casilla": "49",
+     "concepto": "Ingresos a cuenta del ejercicio",
+     "importe": 1388.13
+    },
+    {
+     "casilla": "50",
+     "concepto": "Resultado (48-49)",
+     "importe": 3299.67
+    },
+    {
+     "casilla": "51",
+     "concepto": "IVA adquisiciones intracomunitarias",
+     "importe": 525.0
+    },
+    {
+     "casilla": "54",
+     "concepto": "Total cuota resultante",
+     "importe": 3824.67
+    },
+    {
+     "casilla": "55",
+     "concepto": "IVA deducible activos fijos",
+     "importe": 514.5
+    },
+    {
+     "casilla": "58",
+     "concepto": "Resultado régimen simplificado",
+     "importe": 3310.17
+    },
+    {
+     "casilla": "71",
+     "concepto": "Resultado a ingresar",
+     "importe": 3310.17
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "El simplificado queda exonerado del 390 si es la única actividad en territorio común."
+  },
+  {
+   "id": "390-01",
+   "modelo": "390",
+   "apartado": "Resumen anual IVA – liquidación y resultados",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 9, supuesto práctico modelo 390 – formulario 390 relleno",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_390_resumen_anual_es_es.pdf",
+    "seccion": "Págs. 2-6 del formulario; enunciado en la página supuesto-practico-modelo-390.html del manual 2025",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Resumen anual de los cuatro 303 del fabricante (303-01 a 303-04): suma de bases y cuotas, resultado anual, compensación del ejercicio anterior y resultados de las liquidaciones.",
+   "datos": {
+    "trimestres": [
+     "3.288 ingresar",
+     "-2.106 compensar",
+     "18.258 ingresar",
+     "-2.226 compensar"
+    ]
+   },
+   "resultados": [
+    {
+     "casilla": "05",
+     "concepto": "Base régimen ordinario 21 %",
+     "importe": 370200.0
+    },
+    {
+     "casilla": "06",
+     "concepto": "Cuota régimen ordinario 21 %",
+     "importe": 77742.0
+    },
+    {
+     "casilla": "25",
+     "concepto": "Base adquisiciones intracomunitarias de bienes 21 %",
+     "importe": 48000.0
+    },
+    {
+     "casilla": "26",
+     "concepto": "Cuota AIB 21 %",
+     "importe": 10080.0
+    },
+    {
+     "casilla": "551",
+     "concepto": "Base adquisiciones intracomunitarias de servicios 21 %",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "33",
+     "concepto": "Total bases IVA",
+     "importe": 403200.0
+    },
+    {
+     "casilla": "34",
+     "concepto": "Total cuotas IVA",
+     "importe": 84672.0
+    },
+    {
+     "casilla": "601",
+     "concepto": "Base recargo de equivalencia 5,2 %",
+     "importe": 72000.0
+    },
+    {
+     "casilla": "602",
+     "concepto": "Cuota recargo de equivalencia",
+     "importe": 3744.0
+    },
+    {
+     "casilla": "47",
+     "concepto": "Total cuotas IVA y RE",
+     "importe": 88416.0
+    },
+    {
+     "casilla": "64",
+     "concepto": "Total deducciones",
+     "importe": 68202.0
+    },
+    {
+     "casilla": "65",
+     "concepto": "Resultado régimen general",
+     "importe": 20214.0
+    },
+    {
+     "casilla": "84",
+     "concepto": "Suma de resultados",
+     "importe": 20214.0
+    },
+    {
+     "casilla": "85",
+     "concepto": "Compensación cuotas ejercicio anterior",
+     "importe": 3000.0
+    },
+    {
+     "casilla": "86",
+     "concepto": "Resultado liquidación anual",
+     "importe": 17214.0
+    },
+    {
+     "casilla": "95",
+     "concepto": "Total resultados a ingresar en autoliquidaciones",
+     "importe": 21546.0
+    },
+    {
+     "casilla": "97",
+     "concepto": "Resultado último periodo a compensar",
+     "importe": 2226.0
+    },
+    {
+     "casilla": "662",
+     "concepto": "Cuotas pendientes de compensación generadas en el ejercicio distintas de las de la 97",
+     "importe": 2106.0
+    },
+    {
+     "casilla": "552",
+     "concepto": "Cuota adquisiciones intracomunitarias de servicios 21 %",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "29",
+     "concepto": "Modificación de bases",
+     "importe": -21000.0
+    },
+    {
+     "casilla": "30",
+     "concepto": "Modificación de cuotas",
+     "importe": -4410.0
+    },
+    {
+     "casilla": "603",
+     "concepto": "Base IVA deducible interior corriente 10 %",
+     "importe": 60000.0
+    },
+    {
+     "casilla": "604",
+     "concepto": "Cuota IVA deducible interior corriente 10 %",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "605",
+     "concepto": "Base IVA deducible interior corriente 21 %",
+     "importe": 207200.0
+    },
+    {
+     "casilla": "606",
+     "concepto": "Cuota IVA deducible interior corriente 21 %",
+     "importe": 43512.0
+    },
+    {
+     "casilla": "48",
+     "concepto": "Total base interior corriente",
+     "importe": 267200.0
+    },
+    {
+     "casilla": "49",
+     "concepto": "Total cuota interior corriente",
+     "importe": 49512.0
+    },
+    {
+     "casilla": "613",
+     "concepto": "Base interior bienes de inversión 21 %",
+     "importe": 5000.0
+    },
+    {
+     "casilla": "614",
+     "concepto": "Cuota interior bienes de inversión 21 %",
+     "importe": 1050.0
+    },
+    {
+     "casilla": "52",
+     "concepto": "Total base importaciones corrientes",
+     "importe": 54000.0
+    },
+    {
+     "casilla": "53",
+     "concepto": "Total cuota importaciones corrientes",
+     "importe": 11340.0
+    },
+    {
+     "casilla": "56",
+     "concepto": "Total base adquisiciones intracomunitarias de bienes corrientes",
+     "importe": 42000.0
+    },
+    {
+     "casilla": "57",
+     "concepto": "Total cuota adquisiciones intracomunitarias de bienes corrientes",
+     "importe": 8820.0
+    },
+    {
+     "casilla": "597",
+     "concepto": "Total base adquisiciones intracomunitarias de servicios",
+     "importe": 6000.0
+    },
+    {
+     "casilla": "598",
+     "concepto": "Total cuota adquisiciones intracomunitarias de servicios",
+     "importe": 1260.0
+    },
+    {
+     "casilla": "639",
+     "concepto": "Rectificación de deducciones: base",
+     "importe": -18000.0
+    },
+    {
+     "casilla": "62",
+     "concepto": "Rectificación de deducciones: cuota",
+     "importe": -3780.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Comprobación: 95 (3.288+18.258) − 97 − 662 = 17.214 = 86. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: la cuota al 21 % es la casilla 06 (no la 07), las cuotas pendientes generadas en el ejercicio van a la 662 (la 98 es «a devolver») y las adquisiciones intracomunitarias de servicios al 21 % son la 551/552. La devolución de compras al proveedor holandés (2T, 41 = −1.260) aparece en el 390 restada de las adquisiciones intracomunitarias corrientes (56/57 = 42.000/8.820), no en la 639/62. La 232 (1.200) y la 230 (500) dependen de detalles del enunciado que la app no recoge."
+  },
+  {
+   "id": "390-02",
+   "modelo": "390",
+   "apartado": "Resumen anual IVA – volumen de operaciones",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, supuesto práctico modelo 390 – formulario relleno, apartado 10",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/Cap_9_390_resumen_anual_es_es.pdf",
+    "seccion": "Pág. 6, apartado 10 Volumen de operaciones",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Volumen anual: operaciones en régimen general (83.000+91.000+88.200+99.000), entregas intracomunitarias, exportaciones, REAGP (ventas agrícolas + 12 % compensación) y venta exenta de inmueble que no computa.",
+   "datos": {
+    "rg_por_trimestre": [
+     83000,
+     91000,
+     88200,
+     99000
+    ],
+    "reagp_por_trimestre": [
+     16800,
+     12320,
+     8176,
+     26880
+    ]
+   },
+   "resultados": [
+    {
+     "casilla": "99",
+     "concepto": "Operaciones en régimen general",
+     "importe": 361200.0
+    },
+    {
+     "casilla": "101",
+     "concepto": "Operaciones en régimen especial agricultura, ganadería y pesca",
+     "importe": 64176.0
+    },
+    {
+     "casilla": "103",
+     "concepto": "Entregas intracomunitarias exentas",
+     "importe": 12000.0
+    },
+    {
+     "casilla": "104",
+     "concepto": "Exportaciones y otras exentas con derecho a deducción",
+     "importe": 33000.0
+    },
+    {
+     "casilla": "106",
+     "concepto": "Entregas de bienes inmuebles y operaciones financieras no habituales",
+     "importe": 72000.0
+    },
+    {
+     "casilla": "108",
+     "concepto": "Total volumen de operaciones",
+     "importe": 470376.0
+    },
+    {
+     "casilla": "105",
+     "concepto": "Operaciones exentas sin derecho a deducción (venta del inmueble)",
+     "importe": 72000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Casilla 99 excluye AIB recibidas y no duplica la base del RE ni resta la resolución de la venta de 2024. Corregido el 19-10-2026 con el formulario relleno (pdf.js) y el diseño de registro 390 de 2025: el régimen especial de agricultura es la casilla 101 (la 100 es el régimen simplificado) y la venta exenta del inmueble va a la 105 y se resta en la 106. La 105 no figura legible en el texto extraído: se deduce de la fórmula de la 108. Licencia a empresa portuguesa no sujeta iría en casilla 110 (sin importe en el supuesto)."
+  },
+  {
+   "id": "349-01",
+   "modelo": "349",
+   "apartado": "Operaciones intracomunitarias – declaración trimestral",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 9, supuesto práctico modelo 349",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/manual-iva-2025/capitulo-09-declaraciones-informativas-iva-379/declaracion-recapitulativa-operac-intracomunitarias-modelo-349/supuesto-practico-modelo-349.html",
+    "seccion": "Solución en imagen https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IVA/IVA_2025/Imagenes/C9-mod349-2025.PNG",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "En mayo compra dos lotes a un holandés, vende máquinas a un portugués, interviene en una operación triangular (compra a griego, entrega a portugués) y presta un servicio de peritación a un portugués. Se agrupa por operador y clave en el 2T.",
+   "datos": {
+    "compras_NL": [
+     3455.25,
+     2841.91
+    ],
+    "entrega_PT": 3344.55,
+    "triangular_PT": 10609.31,
+    "servicio_PT": 5000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "NL – clave A (adquisiciones)",
+     "importe": 6297.16
+    },
+    {
+     "casilla": null,
+     "concepto": "PT – clave E (entregas)",
+     "importe": 3344.55
+    },
+    {
+     "casilla": null,
+     "concepto": "PT – clave T (operación triangular)",
+     "importe": 10609.31
+    },
+    {
+     "casilla": null,
+     "concepto": "PT – clave S (servicios prestados)",
+     "importe": 5000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El 349 no tiene casillas numeradas por operador; se usan claves (A, E, T, S, I...). La compra al griego en la triangular no se declara como A. Periodicidad trimestral salvo superar 50.000 € de entregas/servicios en el trimestre."
+  },
+  {
+   "id": "349-02",
+   "modelo": "349",
+   "apartado": "Operaciones intracomunitarias – rectificación de periodos anteriores",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico IVA 2025, cap. 9, supuesto práctico modelo 349",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/manual-iva-2025/capitulo-09-declaraciones-informativas-iva-379/declaracion-recapitulativa-operac-intracomunitarias-modelo-349/supuesto-practico-modelo-349.html",
+    "seccion": "Hoja de rectificaciones (imagen C9-mod349-2025.PNG)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "En septiembre se anula la compra de 3.455,25 € al holandés. Se declara en el 349 del 3T como rectificación del 2T, indicando la base rectificada y la declarada antes.",
+   "datos": {
+    "importe_anulado": 3455.25
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "NL clave A, rectifica 2T: base imponible rectificada",
+     "importe": 2841.91
+    },
+    {
+     "casilla": null,
+     "concepto": "Base imponible declarada anteriormente",
+     "importe": 6297.16
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "La rectificación consigna el nuevo total, no la diferencia."
+  },
+  {
+   "id": "347-01",
+   "modelo": "347",
+   "apartado": "Operaciones con terceros – devoluciones y modificaciones de base",
+   "ejercicio": 2014,
+   "fuente": {
+    "titulo": "AEAT – Modelo 347, Preguntas frecuentes",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-347-decla_____racion-anual-operaciones-personas_/preguntas-frecuentes.html",
+    "seccion": "Devoluciones, descuentos o modificaciones de la base imponible – ejemplo 1",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de 4.000 € en enero que, por impago, se anula vía modificación de base en el 4T del mismo año. El importe anual neto con ese cliente es 0, así que no se declara.",
+   "datos": {
+    "venta": 4000,
+    "modificacion_base": -4000,
+    "umbral": 3005.06
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Importe anual a declarar (no obligado)",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Umbral 3.005,06 € por tercero y año, IVA incluido; se compara en valor absoluto el neto anual."
+  },
+  {
+   "id": "347-02",
+   "modelo": "347",
+   "apartado": "Operaciones con terceros – devolución en ejercicio distinto",
+   "ejercicio": 2014,
+   "fuente": {
+    "titulo": "AEAT – Modelo 347, Preguntas frecuentes",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-347-decla_____racion-anual-operaciones-personas_/preguntas-frecuentes.html",
+    "seccion": "Devoluciones, descuentos o modificaciones de la base imponible – ejemplo 2",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de 20.000 € en diciembre de un año y devolución de 4.000 € en el 1T del siguiente. Se declara en ambos años con clave B; el segundo año con importe negativo porque su valor absoluto supera el umbral.",
+   "datos": {
+    "venta_dic_anio1": 20000,
+    "devolucion_1T_anio2": -4000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Año 1 – clave B – importe anual / 4T",
+     "importe": 20000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Año 2 – clave B – importe anual / 1T",
+     "importe": -4000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Ejemplo con años 2013/2014 pero criterio vigente. Desglose trimestral obligatorio."
+  },
+  {
+   "id": "347-03",
+   "modelo": "347",
+   "apartado": "Operaciones con terceros – criterio de caja y arrendamiento de local",
+   "ejercicio": 2014,
+   "fuente": {
+    "titulo": "AEAT – Modelo 347, Preguntas frecuentes",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-347-decla_____racion-anual-operaciones-personas_/preguntas-frecuentes.html",
+    "seccion": "Régimen especial del criterio de caja (proveedor y destinatario)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "(a) Proveedor en criterio de caja factura 4.000 € en febrero, cobra 2.500 € en noviembre y 1.500 € al año siguiente. (b) Arrendatario de un local cuyo arrendador está en criterio de caja paga 10.000 € de renta en el año.",
+   "datos": {
+    "factura": 4000,
+    "cobro_anio1": 2500,
+    "cobro_anio2": 1500,
+    "renta_local": 10000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "(a) Año 1 clave B – importe anual",
+     "importe": 4000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "(a) Año 1 – importe criterio de caja",
+     "importe": 2500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "(a) Año 2 clave B – importe anual",
+     "importe": 0.0
+    },
+    {
+     "casilla": null,
+     "concepto": "(a) Año 2 – importe criterio de caja",
+     "importe": 1500.0
+    },
+    {
+     "casilla": null,
+     "concepto": "(b) Arrendatario clave A, marca arrendamiento local – importe anual",
+     "importe": 10000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "(b) Importe criterio de caja",
+     "importe": 10000.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Los arrendamientos de local con retención se declaran también en el 347 (marca de arrendamiento) además del 180."
+  },
+  {
+   "id": "347-04",
+   "modelo": "347",
+   "apartado": "Operaciones con terceros – discrepancia de trimestre cliente/proveedor",
+   "ejercicio": 2014,
+   "fuente": {
+    "titulo": "AEAT – Modelo 347, Preguntas frecuentes",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-347-decla_____racion-anual-operaciones-personas_/preguntas-frecuentes.html",
+    "seccion": "Discrepancias entre cliente y proveedor",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Venta de 10.000 € el 20 de marzo; el cliente recibe y registra la factura el 30 de abril. Cada uno la imputa al trimestre en que la registra.",
+   "datos": {
+    "importe": 10000
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Proveedor – clave B – 1T",
+     "importe": 10000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Cliente – clave A – 2T",
+     "importe": 10000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Explica cruces de datos AEAT por trimestres distintos."
+  },
+  {
+   "id": "130-01",
+   "modelo": "130",
+   "apartado": "Pago fraccionado IRPF estimación directa",
+   "ejercicio": 2024,
+   "fuente": {
+    "titulo": "Quaderno – Modelo 130: qué es y cómo rellenarlo",
+    "url": "https://quaderno.io/es/articulos/impuestos/modelo-130-irpf/",
+    "seccion": "Ejemplo de cumplimentación (2T)",
+    "oficial": false,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Profesional en el 2T con 15.000 € de ingresos acumulados y 750 € de gastos acumulados; sin retenciones, sin pagos previos y sin minoración.",
+   "datos": {
+    "ingresos_acumulados": 15000,
+    "gastos_acumulados": 750
+   },
+   "resultados": [
+    {
+     "casilla": "01",
+     "concepto": "Ingresos computables acumulados",
+     "importe": 15000.0
+    },
+    {
+     "casilla": "02",
+     "concepto": "Gastos deducibles acumulados",
+     "importe": 750.0
+    },
+    {
+     "casilla": "03",
+     "concepto": "Rendimiento neto",
+     "importe": 14250.0
+    },
+    {
+     "casilla": "04",
+     "concepto": "20 % de casilla 03",
+     "importe": 2850.0
+    },
+    {
+     "casilla": "07",
+     "concepto": "Resultado apartado I",
+     "importe": 2850.0
+    },
+    {
+     "casilla": "12",
+     "concepto": "Suma 07 + 11",
+     "importe": 2850.0
+    },
+    {
+     "casilla": "13",
+     "concepto": "Minoración art. 110.3.c RIRPF",
+     "importe": 0.0
+    },
+    {
+     "casilla": "14",
+     "concepto": "12 - 13",
+     "importe": 2850.0
+    },
+    {
+     "casilla": "17",
+     "concepto": "Total",
+     "importe": 2850.0
+    },
+    {
+     "casilla": "19",
+     "concepto": "Resultado a ingresar",
+     "importe": 2850.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Fuente no oficial. Curioso que siendo 2T no haya pago del 1T en casilla 05; usar solo como estructura. Sin ejemplo resuelto oficial localizado (instrucciones AEAT solo describen casillas). Reglas oficiales vigentes: ver bloque 'reglas_2026'. Aviso: Infoautónomos (actualizado 23/09/2025) explica la casilla 13 anualizando el rendimiento del trimestre, lo que no coincide con las instrucciones AEAT (rendimiento neto del ejercicio anterior) – no reutilizar."
+  },
+  {
+   "id": "130-02",
+   "modelo": "130",
+   "apartado": "Rendimiento neto en estimación directa simplificada (base de casillas 01-03 y del IRPF anual)",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Manual práctico de Renta 2025, Parte 1, cap. 7 – Caso práctico (actividad profesional en estimación directa)",
+    "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2025/ManualRenta2025Parte1_es_es.pdf",
+    "seccion": "Cap. 7, Caso práctico, págs. 489-492",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Radiólogo en estimación directa simplificada: ajusta honorarios (autoconsumo de 10 radiografías a su hijo), variación de existencias, sueldo no deducible del cónyuge, cuota RETA deducible y 5 % de difícil justificación con tope de 2.000 €.",
+   "datos": {
+    "honorarios": 124000,
+    "conferencias": 10800,
+    "cuota_RETA": 3300,
+    "seguridad_social_empleados": 5900
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Total ingresos fiscales",
+     "importe": 138400.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Total gastos fiscales",
+     "importe": 78300.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Provisiones y gastos de difícil justificación (tope)",
+     "importe": 2000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto",
+     "importe": 58100.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Es caso de Renta anual, no un modelo 130, pero muestra qué va en casillas 01/02 del 130 (incluidos los gastos de difícil justificación). El manual tiene una errata: las notas (10) y (11) citan 61.400 € y la tabla 58.100 €. El tope de 2.000 € y el 5 % pueden variar (en 2023 fue del 7 %)."
+  },
+  {
+   "id": "111-01",
+   "modelo": "111",
+   "apartado": "Retenciones a profesionales (15 %)",
+   "ejercicio": 2026,
+   "fuente": {
+    "titulo": "Invoo – Modelo 111: quién lo presenta, plazos y cómo rellenarlo",
+    "url": "https://invoo.es/es/blog/formacion/modelo-111-retenciones-irpf-guia-autonomos/",
+    "seccion": "Ejemplo práctico (Carmen, diseñadora)",
+    "oficial": false,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Autónoma contrata a un fotógrafo en el 1T 2026: factura de 800 € más 21 % de IVA con retención del 15 %. Declara la retención en el 111.",
+   "datos": {
+    "base": 800.0,
+    "iva_21": 168.0,
+    "retencion_15": 120.0,
+    "total_a_pagar": 848.0
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Nº perceptores actividades económicas",
+     "importe": 1
+    },
+    {
+     "casilla": "08",
+     "concepto": "Importe percepciones",
+     "importe": 800.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Retenciones",
+     "importe": 120.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Total liquidación",
+     "importe": 120.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Fuente no oficial. Tipo 15 % confirmado en cuadro AEAT 2026. Casilla 30 (resultado a ingresar) no aparece en el ejemplo."
+  },
+  {
+   "id": "111-02",
+   "modelo": "111",
+   "apartado": "Retenciones a profesionales (15 % y 7 % nuevo inicio)",
+   "ejercicio": 2026,
+   "fuente": {
+    "titulo": "Invoo – Modelo 111: quién lo presenta, plazos y cómo rellenarlo",
+    "url": "https://invoo.es/es/blog/formacion/modelo-111-retenciones-irpf-guia-autonomos/",
+    "seccion": "Variante con dos fotógrafos",
+    "oficial": false,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Dos profesionales en el trimestre: uno factura 800 € con retención del 15 % y otro 500 € con retención del 7 % (nuevo inicio).",
+   "datos": {
+    "factura1": {
+     "base": 800,
+     "tipo": 15,
+     "retencion": 120
+    },
+    "factura2": {
+     "base": 500,
+     "tipo": 7,
+     "retencion": 35
+    }
+   },
+   "resultados": [
+    {
+     "casilla": "07",
+     "concepto": "Nº perceptores",
+     "importe": 2
+    },
+    {
+     "casilla": "08",
+     "concepto": "Importe percepciones",
+     "importe": 1300.0
+    },
+    {
+     "casilla": "09",
+     "concepto": "Retenciones",
+     "importe": 155.0
+    },
+    {
+     "casilla": "28",
+     "concepto": "Total liquidación",
+     "importe": 155.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Fuente no oficial. 7 % aplica el año de inicio y los dos siguientes, si el profesional lo comunica al pagador. Otro ejemplo localizado (Quaderno: 2 profesionales, 2.500 € y 525 € retenidos) implica un 21 % y parece erróneo; no se incluye."
+  },
+  {
+   "id": "115-01",
+   "modelo": "115",
+   "apartado": "Retenciones arrendamiento de local (19 %) y complementaria",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "Infoautónomos – Modelo 115 IRPF alquileres",
+    "url": "https://www.infoautonomos.com/fiscalidad/modelo-115-irpf-alquileres/",
+    "seccion": "Ejemplo de declaración original y complementaria",
+    "oficial": false,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Un arrendatario declara 1.000 € de renta de un local a un arrendador, pero retiene por error un 15 %. Presenta complementaria aplicando el 19 % e ingresa solo la diferencia.",
+   "datos": {
+    "base": 1000,
+    "tipo_correcto": 19,
+    "tipo_erroneo": 15
+   },
+   "resultados": [
+    {
+     "casilla": "01",
+     "concepto": "Nº perceptores",
+     "importe": 1
+    },
+    {
+     "casilla": "02",
+     "concepto": "Base retenciones",
+     "importe": 1000.0
+    },
+    {
+     "casilla": "03",
+     "concepto": "Retenciones (complementaria, 19 %)",
+     "importe": 190.0
+    },
+    {
+     "casilla": "04",
+     "concepto": "Resultado anterior declaración",
+     "importe": 150.0
+    },
+    {
+     "casilla": "05",
+     "concepto": "Resultado a ingresar (complementaria)",
+     "importe": 40.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Fuente no oficial y con una errata en otro párrafo (dice 19 % de 1.000 = 180 €). Tipo 19 % confirmado en el cuadro oficial AEAT 2026. Base sin IVA. El resumen anual es el modelo 180, no el 190."
+  },
+  {
+   "id": "190-01",
+   "modelo": "190",
+   "apartado": "Resumen anual de retenciones – profesional clave G01",
+   "ejercicio": 2025,
+   "fuente": {
+    "titulo": "STEL Order – Modelo 190: qué es, claves, subclaves y cómo rellenarlo",
+    "url": "https://www.stelorder.com/blog/modelo-190/",
+    "seccion": "Ejemplo práctico del modelo 190",
+    "oficial": false,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Empresa paga en el año 15.000 € brutos a un diseñador autónomo con retención del 15 %; en el 190 figura como perceptor clave G subclave 01.",
+   "datos": {
+    "importe_integro": 15000,
+    "tipo": 15
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Perceptor clave G / subclave 01 – percepción íntegra",
+     "importe": 15000.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Retención practicada",
+     "importe": 2250.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Fuente no oficial. El mismo ejemplo incluye un alquiler de oficina (24.000 €, 19 %, 4.560 €) con clave I, lo cual es erróneo: los arrendamientos de inmuebles urbanos van al 180/115, no al 190. El total que da la fuente (6.810 €) por tanto no debe usarse. La suma de retenciones del 190 debe cuadrar con los 111 del año."
+  },
+  {
+   "id": "720-01",
+   "modelo": "720",
+   "apartado": "Bienes en el extranjero – cálculo del umbral de 50.000 € (cuentas)",
+   "ejercicio": 2012,
+   "fuente": {
+    "titulo": "AEAT – Modelo 720, Preguntas frecuentes: forma de calcular el límite que obliga a declarar",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-720-decla_____sobre-bienes-derechos-extranjero_/preguntas-frecuentes/forma-calcular-limite-que-obliga-declarar.html",
+    "seccion": "Ejemplo cuenta única 2012-2013",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Cuenta en el extranjero con saldo máximo de 67.000 € en abril, pero 45.650 € a 31/12 y 46.200,45 € de saldo medio del 4T. No hay obligación porque ninguna de las dos referencias supera 50.000 €; tampoco hay que informar de su cancelación posterior.",
+   "datos": {
+    "saldo_maximo": 67000,
+    "saldo_31_12": 45650,
+    "saldo_medio_4T": 46200.45,
+    "saldo_cancelacion": 56246.75
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Obligación de declarar (no)",
+     "importe": 0.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Solo cuentan el saldo a 31/12 y el saldo medio del último trimestre, nunca el máximo. Umbral 50.000 € por bloque (cuentas; valores/seguros/rentas; inmuebles)."
+  },
+  {
+   "id": "720-02",
+   "modelo": "720",
+   "apartado": "Bienes en el extranjero – fondo y cuenta tras venta de inmueble",
+   "ejercicio": 2012,
+   "fuente": {
+    "titulo": "AEAT – Modelo 720, Preguntas frecuentes: forma de calcular el límite que obliga a declarar",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-720-decla_____sobre-bienes-derechos-extranjero_/preguntas-frecuentes/forma-calcular-limite-que-obliga-declarar.html",
+    "seccion": "Ejemplo venta de apartamento y fondo extranjero",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Vende un apartamento en el extranjero en agosto por 120.000 €, ingresa el dinero en una cuenta extranjera y compra un fondo. Debe declarar el fondo (55.900 € a 31/12) y la cuenta (saldo medio 4T 58.900 €, aunque a 31/12 tenga 45.256 €); el inmueble ya vendido no.",
+   "datos": {
+    "venta_inmueble": 120000,
+    "fondo_31_12": 55900,
+    "cuenta_media_4T": 58900,
+    "cuenta_31_12": 45256
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Fondo de inversión a declarar (valor 31/12)",
+     "importe": 55900.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuenta a declarar (saldo medio 4T)",
+     "importe": 58900.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "Basta con que una de las dos referencias de la cuenta supere 50.000 €."
+  },
+  {
+   "id": "720-03",
+   "modelo": "720",
+   "apartado": "Bienes en el extranjero – nueva presentación por incremento > 20.000 €",
+   "ejercicio": 2014,
+   "fuente": {
+    "titulo": "AEAT – Modelo 720, Preguntas frecuentes: frecuencia en la presentación de la declaración",
+    "url": "https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/declaraciones-informativas/modelo-720-decla_____sobre-bienes-derechos-extranjero_/preguntas-frecuentes/frecuencia-presentacion-declaracion.html",
+    "seccion": "Ejemplo 2012-2014",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Declaró en 2012 cuentas por 55.000 € (media 4T) y 57.000 € (31/12). En 2013 suben 15.000/18.000 € y no hay que repetir. En 2014 el aumento acumulado a 31/12 frente a 2012 es de 28.000 €, más de 20.000 €, y hay que volver a presentar por todas las cuentas.",
+   "datos": {
+    "cuentas_2012_media4T": 55000,
+    "cuentas_2012_31_12": 57000,
+    "incremento_2013": [
+     15000,
+     18000
+    ],
+    "incremento_acumulado_2014": [
+     17000,
+     28000
+    ]
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Incremento a 31/12 que obliga (2014 vs 2012)",
+     "importe": 28000.0
+    }
+   ],
+   "reutilizable": "tal-cual",
+   "notas": "El incremento se mide frente a la última declaración presentada, por bloque. El texto de la FAQ tiene redacción algo confusa en la comparación año a año."
+  },
+  {
+   "id": "RETA-01",
+   "modelo": "RETA",
+   "apartado": "Cotización autónomos por rendimientos – tabla reducida",
+   "ejercicio": 2023,
+   "fuente": {
+    "titulo": "Revista de la Seguridad Social – Dudas sobre el nuevo sistema de cotización de autónomos",
+    "url": "https://revista.seg-social.es/-/20221214-dudas-autónomos",
+    "seccion": "Ejemplos prácticos, Ejemplo 1 (periodista freelance)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Periodista freelance con 900 €/mes de ingresos y 185 €/mes de gastos. Al rendimiento neto se le resta el 7 % de gastos genéricos y el promedio resultante determina la cuota de 2023.",
+   "datos": {
+    "ingresos_mes": 900,
+    "gastos_mes": 185
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto mensual",
+     "importe": 715.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción gastos genéricos 7 %",
+     "importe": 50.05
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento computable mensual",
+     "importe": 664.95
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota mensual 2023",
+     "importe": 230.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Cuota de 2023; las bases cambian cada año (ver tabla 2026). El ejemplo simplificado no suma la propia cuota RETA al rendimiento, como exige el art. 308.1.c LGSS en estimación directa. 7 % (3 % societarios) requiere 90 días de alta según la fuente."
+  },
+  {
+   "id": "RETA-02",
+   "modelo": "RETA",
+   "apartado": "Cotización autónomos por rendimientos – tabla general",
+   "ejercicio": 2023,
+   "fuente": {
+    "titulo": "Revista de la Seguridad Social – Dudas sobre el nuevo sistema de cotización de autónomos",
+    "url": "https://revista.seg-social.es/-/20221214-dudas-autónomos",
+    "seccion": "Ejemplos prácticos, Ejemplo 2 (tienda de moda)",
+    "oficial": true,
+    "comprobado": "2026-10-19"
+   },
+   "enunciado": "Tienda de moda con 4.150 €/mes de ingresos y gastos de alquiler, género, suministros y amortización. Rendimiento neto de 1.980 €; tras el 7 %, la cuota de 2023 es de 310 €.",
+   "datos": {
+    "ingresos_mes": 4150,
+    "alquiler": 900,
+    "mercaderia": 600,
+    "gastos_corrientes": 400,
+    "amortizacion": 270
+   },
+   "resultados": [
+    {
+     "casilla": null,
+     "concepto": "Rendimiento neto mensual",
+     "importe": 1980.0
+    },
+    {
+     "casilla": null,
+     "concepto": "Deducción gastos genéricos 7 %",
+     "importe": 138.6
+    },
+    {
+     "casilla": null,
+     "concepto": "Rendimiento computable mensual",
+     "importe": 1841.4
+    },
+    {
+     "casilla": null,
+     "concepto": "Cuota mensual 2023",
+     "importe": 310.0
+    }
+   ],
+   "reutilizable": "estructura",
+   "notas": "Cuota de 2023, no extrapolable: para otro año hay que buscar el tramo en la tabla oficial de ese año (ver tabla 2026 en el informe). El ejemplo no suma la propia cuota RETA al rendimiento neto."
+  }
+ ]
+}

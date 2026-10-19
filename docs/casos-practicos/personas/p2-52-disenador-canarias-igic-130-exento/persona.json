@@ -1,0 +1,1581 @@
+{
+  "slug": "p2-52-disenador-canarias-igic-130-exento",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 52",
+  "nif": "00000052Y",
+  "domicilio": "Calle Ficticia 52, 38001 Santa Cruz de Tenerife (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "canarias",
+  "titulo": "Diseñador web en Canarias: IGIC y sin modelo 130 por retenciones",
+  "descripcion": "En Canarias no hay IVA sino IGIC (7 %, modelo 420 ante la Agencia Tributaria Canaria, fuera de Finanverso). Más del 70 % de sus ingresos del año anterior tuvo retención del 15 %: no está obligado al 130 (art. 109.1 RIRPF). Su gestor es una persona física: modelo 111.",
+  "prueba": [
+    "IGIC en lugar de IVA (sin 303)",
+    "exención del 130 por retenciones ≥ 70 %",
+    "111 por el gestor",
+    "IGIC fuera de ingresos y gastos"
+  ],
+  "modelos": [
+    "111",
+    "190",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "none-igic",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 303166,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 303166,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 303167,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 53500,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 53500,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 53500,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 363800,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 363800,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 363800,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 64200,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 64200,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 64200,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 272850,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 272850,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 272850,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 48150,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 48150,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 48150,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 424434,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 424434,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 424433,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 74900,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 74900,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 74900,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 16050,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 4815,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 8560,
+        "vatRate": 7
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": true,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2833.33,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2833.33,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2833.34,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-004",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 500.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-005",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 500.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-006",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 500.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-007",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3400.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-008",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3400.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-009",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3400.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-010",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 600.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-011",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 600.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 600.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-013",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2550.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-014",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2550.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-015",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 2550.0,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-016",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 450.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-017",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 450.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-018",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 450.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-019",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3966.67,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-020",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3966.67,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-021",
+        "client": "Hoteles Ficticios Tinerfeños, S.L.",
+        "nif": "B00000521",
+        "base": 3966.66,
+        "rate": 7,
+        "withheldRate": 15,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-022",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 700.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-023",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 700.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-024",
+        "client": "Cliente particular ficticio",
+        "nif": "00000522Q",
+        "base": 700.0,
+        "rate": 7,
+        "withheldRate": 0,
+        "tax": "IGIC"
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Coworking Ficticio Santa Cruz, S.L.",
+        "nif": "B00000523",
+        "base": 150,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "other",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SUP",
+        "supplier": "Teléfono Ficticio Canarias, S.A.",
+        "nif": "A00000524",
+        "base": 45,
+        "rate": 7,
+        "retention": 0.0,
+        "kind": "supplies",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-PRO",
+        "supplier": "Gestor Ficticio Tinerfeño",
+        "nif": "00000525L",
+        "base": 80,
+        "rate": 7,
+        "retention": 12.0,
+        "kind": "pro",
+        "tax": "IGIC"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2606.66
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2606.66
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2606.67
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-004 Cliente particular ficticio",
+        "amount": 535.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-005 Cliente particular ficticio",
+        "amount": 535.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-006 Cliente particular ficticio",
+        "amount": 535.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-007 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3128.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-008 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3128.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-009 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3128.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-010 Cliente particular ficticio",
+        "amount": 642.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-011 Cliente particular ficticio",
+        "amount": 642.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-012 Cliente particular ficticio",
+        "amount": 642.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-013 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2346.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-014 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2346.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-015 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 2346.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-016 Cliente particular ficticio",
+        "amount": 481.5
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-017 Cliente particular ficticio",
+        "amount": 481.5
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-018 Cliente particular ficticio",
+        "amount": 481.5
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-019 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3649.34
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-020 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3649.34
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-021 Hoteles Ficticios Tinerfeños, S.L.",
+        "amount": 3649.33
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-022 Cliente particular ficticio",
+        "amount": 749.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-023 Cliente particular ficticio",
+        "amount": 749.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-024 Cliente particular ficticio",
+        "amount": 749.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Coworking Ficticio Santa Cruz, S.L.",
+        "amount": -160.5
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Teléfono Ficticio Canarias, S.A.",
+        "amount": -48.15
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Gestor Ficticio Tinerfeño",
+        "amount": -73.6
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -478.68
+      }
+    ],
+    "m303": [],
+    "m130": [],
+    "m111": [
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          0
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          0
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          240.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          36.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          36.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          36.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          0
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          0
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          240.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          36.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          36.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          36.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          0
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          0
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          240.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          36.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          36.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          36.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          0
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          0
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          1
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          240.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          36.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          36.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          36.0
+        ]
+      ]
+    ],
+    "m115": [
+      [],
+      [],
+      [],
+      []
+    ]
+  }
+}

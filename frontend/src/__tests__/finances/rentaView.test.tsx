@@ -1,11 +1,15 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { createFakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+// The full form: the expert mode (the guided questions have their own suite).
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
+  // Everything together, not the step-by-step assistant (it has its own suite).
+  localStorage.setItem('mm_renta_assistant', 'expert');
   freezeTime('2026-03-15T12:00:00');
 });
 afterEach(restoreTime);
@@ -26,21 +30,40 @@ describe('Renta section', () => {
     });
     renderWithProviders(<RentaView />, { api });
     expect(
-      await screen.findByText(
-        /En 2025 registraste .*25\.?000.* de ingresos y .*1\.?500.* de gastos/
-      )
+      await screen.findByText(/en 2025 entraron .*25\.?000.* y salieron .*1\.?500.*/)
     ).toBeInTheDocument();
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenCalledWith(2025));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('25000');
-    expect(screen.getByText(tr('tools.renta.obligation.yes'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.overLimit'))).toBeInTheDocument();
   });
 
   it('changes the year and starts empty when nothing was recorded', async () => {
     const api = createFakeApi();
     renderWithProviders(<RentaView />, { api });
     expect(await screen.findByLabelText(tr('tools.renta.gross'))).toHaveValue('');
-    fireEvent.change(screen.getByLabelText(tr('app.renta.year')), { target: { value: '2024' } });
-    await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2024));
+    fireEvent.change(screen.getByLabelText(tr('app.renta.year')), { target: { value: '2026' } });
+    await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2026));
+  });
+
+  it('only offers the last return and the running year', async () => {
+    renderWithProviders(<RentaView />);
+    const years = within(await screen.findByLabelText(tr('app.renta.year'))).getAllByRole('option');
+    expect(years.map((o) => o.textContent)).toEqual(['2026', '2025']);
+  });
+
+  it('wipes everything that was entered once the user confirms', async () => {
+    renderWithProviders(<RentaView />);
+    const gross = await screen.findByLabelText(tr('tools.renta.gross'));
+    fireEvent.change(gross, { target: { value: '30000' } });
+    expect(gross).toHaveValue('30000');
+    const open = () =>
+      fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.button') }));
+    open();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.cancel') }));
+    expect(gross).toHaveValue('30000');
+    open();
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.newReturn.confirm') }));
+    expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('');
   });
 
   it('does the calculation inside the app, without a link to the public page', async () => {
@@ -58,5 +81,30 @@ describe('Renta section', () => {
       'href',
       'https://sede.agenciatributaria.gob.es/'
     );
+  });
+});
+
+describe('Renta section, step by step', () => {
+  it('opens the self-employed screen to bring the activity', () => {
+    localStorage.removeItem('mm_renta_assistant');
+    localStorage.setItem(
+      'mm_renta_wizard_2025',
+      JSON.stringify({
+        at: 5,
+        screen: 0,
+        done: ['you', 'family', 'work', 'home', 'invest'],
+        answers: {},
+        streak: 1,
+        lastDay: '2026-03-14',
+      })
+    );
+    const onOpenTab = jest.fn();
+    renderWithProviders(<RentaView onOpenTab={onOpenTab} />);
+    fireEvent.click(screen.getByRole('radio', { name: tr('wizard.renta.opt.activity.yes') }));
+    fireEvent.click(
+      screen.getByRole('button', { name: tr('tools.renta.bring.button', { year: 2025 }) })
+    );
+    fireEvent.click(screen.getByRole('button', { name: tr('wizard.renta.openAutonomo') }));
+    expect(onOpenTab).toHaveBeenCalledWith('business');
   });
 });

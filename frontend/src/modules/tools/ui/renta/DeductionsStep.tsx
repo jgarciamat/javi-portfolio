@@ -1,14 +1,78 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { deductionAmount, type Family } from '../../domain/rentaCalc';
-import type { Deduction, DeductionGroup, RentaCcaa, RentaState } from '../../domain/rentaData';
+import type {
+  Deduction,
+  DeductionGroup,
+  IncomeLimit,
+  RentaCcaa,
+  RentaState,
+} from '../../domain/rentaData';
 import type { Choice } from '../../domain/rentaForm';
 import { number } from '../../domain/rentaForm';
+import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
+import { DONATION_IDS } from '../../domain/rentaDonations';
+import { Requirements } from './Requirements';
+import { checkDeduction } from '../../domain/rentaRequirements';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
 const EMPTY: Choice = { on: false, amount: '', units: '' };
+const NO_SAVING: DeductionSaving = { saving: 0, blocked: false, example: null };
+
+/** Highest saving first; the ones the income does not allow, at the end (the sort keeps ties in order). */
+export const bySaving =
+  (savings: Record<string, DeductionSaving>) => (a: Deduction, b: Deduction) => {
+    const x = savings[a.id] ?? NO_SAVING;
+    const y = savings[b.id] ?? NO_SAVING;
+    if (x.blocked !== y.blocked) return x.blocked ? 1 : -1;
+    return y.saving - x.saving;
+  };
+
+/** What a deduction saves with the data as it is, or why it cannot be used. */
+function SavingLine({
+  deduction,
+  on,
+  saving,
+}: {
+  deduction: Deduction;
+  on: boolean;
+  saving: DeductionSaving;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  if (saving.blocked && !deduction.incomeLimit) {
+    // Without an income limit, what leaves it out is a requirement (age, children, disability).
+    return (
+      <small className="renta-saving renta-saving--blocked">
+        {t('tools.renta.saving.requirement')}
+      </small>
+    );
+  }
+  if (saving.blocked) {
+    const limit = deduction.incomeLimit as IncomeLimit;
+    return (
+      <small className="renta-saving renta-saving--blocked">
+        {t('tools.renta.saving.blocked')}{' '}
+        {limit.note ?? t('tools.renta.saving.limit', { limit: money(limit.individual) })}
+      </small>
+    );
+  }
+  const amount = money(saving.saving);
+  return (
+    <small className="renta-saving">
+      {saving.saving <= 0
+        ? t('tools.renta.saving.none')
+        : on
+        ? t('tools.renta.saving.on', { amount })
+        : t('tools.renta.saving.off', { amount })}
+      {saving.example !== null && (
+        <em> {t('tools.renta.saving.example', { amount: money(saving.example) })}</em>
+      )}
+    </small>
+  );
+}
 
 /** The checkbox of a deduction, its title and its badges. */
 function DeductionHead({
@@ -16,12 +80,14 @@ function DeductionHead({
   choice,
   suggested,
   hint,
+  saving,
   onChange,
 }: {
   deduction: Deduction;
   choice: Choice;
   suggested: boolean;
   hint?: Hint;
+  saving: DeductionSaving;
   onChange: (choice: Choice) => void;
 }) {
   const { t } = useI18n();
@@ -44,6 +110,7 @@ function DeductionHead({
           <em className={`renta-badge renta-badge--${hint}`}>{t(`tools.renta.hint.${hint}`)}</em>
         )}
         <small>{deduction.summary}</small>
+        <SavingLine deduction={deduction} on={choice.on} saving={saving} />
       </span>
     </label>
   );
@@ -125,6 +192,58 @@ function DeductionInput({
   );
 }
 
+/** The months with the right to a deduction by months (maternity: 100 € each). */
+function MonthsInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  if (!deduction.monthly) return null;
+  return (
+    <label className="tools-field">
+      <span>{t('tools.renta.months')}</span>
+      <input
+        className="tx-input"
+        inputMode="numeric"
+        value={choice.months ?? ''}
+        placeholder="12"
+        onChange={(e) => onChange({ ...choice, months: e.target.value })}
+      />
+    </label>
+  );
+}
+
+/** What was already collected in advance with the modelo 140 or 143, for those that have one. */
+function AdvanceInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  if (!deduction.advance) return null;
+  return (
+    <label className="tools-field">
+      <span>{t('tools.renta.advanceReceived', { model: deduction.advance.model })}</span>
+      <input
+        className="tx-input"
+        inputMode="decimal"
+        value={choice.advance ?? ''}
+        placeholder="0"
+        onChange={(e) => onChange({ ...choice, advance: e.target.value })}
+      />
+    </label>
+  );
+}
+
 /** The buttons of a marked deduction: on to the next one, or not this one after all. */
 function DeductionNav({
   deduction,
@@ -166,22 +285,27 @@ const isPending = (deduction: Deduction, choice: Choice) =>
 function DeductionRow({
   deduction,
   choice,
+  family,
   childCount,
   suggested,
   blocked,
   hint,
+  saving,
   onChange,
 }: {
   deduction: Deduction;
   choice: Choice;
+  family: Family;
   childCount: number;
   suggested: boolean;
   blocked: boolean;
   hint?: Hint;
+  saving: DeductionSaving;
   onChange: (choice: Choice) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  const requirement = checkDeduction(deduction.checks, family, choice.checks).status;
   const value = deductionAmount(
     deduction,
     {
@@ -204,13 +328,17 @@ function DeductionRow({
         choice={choice}
         suggested={suggested}
         hint={hint}
+        saving={saving}
         onChange={onChange}
       />
       <DeductionInfo deduction={deduction} />
-      {choice.on && blocked && (
+      {choice.on && blocked && requirement !== 'fail' && (
         <p className="form-error" role="alert">
           {t('tools.renta.blocked')}
         </p>
+      )}
+      {choice.on && (
+        <Requirements deduction={deduction} choice={choice} family={family} onChange={onChange} />
       )}
       {choice.on && (
         <div className="renta-deduction-fields">
@@ -220,7 +348,9 @@ function DeductionRow({
             childCount={childCount}
             onChange={onChange}
           />
-          {!blocked && (
+          <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
+          <MonthsInput deduction={deduction} choice={choice} onChange={onChange} />
+          {!blocked && requirement === 'ok' && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>
             </p>
@@ -240,6 +370,7 @@ function DeductionList({
   family,
   blocked,
   hints,
+  savings,
   openGroups,
   onChange,
 }: {
@@ -250,6 +381,7 @@ function DeductionList({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
+  savings: Record<string, DeductionSaving>;
   openGroups: DeductionGroup[];
   onChange: (id: string, choice: Choice) => void;
 }) {
@@ -276,7 +408,7 @@ function DeductionList({
       />
       {visible.length === 0 && <p className="section-hint">{t('tools.renta.noMatch')}</p>}
       {GROUPS.map((group) => {
-        const items = visible.filter((d) => d.group === group);
+        const items = visible.filter((d) => d.group === group).sort(bySaving(savings));
         if (items.length === 0) return null;
         return (
           <details
@@ -293,10 +425,12 @@ function DeductionList({
                   key={d.id}
                   deduction={d}
                   choice={choices[d.id] ?? EMPTY}
+                  family={family}
                   childCount={family.children.length}
                   suggested={isSuggested(d)}
                   blocked={blocked.includes(d.id)}
                   hint={hints[d.id]}
+                  saving={savings[d.id] ?? NO_SAVING}
                   onChange={(c) => onChange(d.id, c)}
                 />
               ))}
@@ -328,6 +462,8 @@ export function PendingNotice({ pending }: { pending: string[] }) {
   );
 }
 
+const DONATIONS: string[] = Object.values(DONATION_IDS);
+
 /** Step 4: the deductions of the State and of the community, by group. */
 export function DeductionsStep({
   state,
@@ -337,7 +473,11 @@ export function DeductionsStep({
   family,
   blocked,
   hints,
+  savings,
+  markedSaving,
   onChange,
+  n = 4,
+  lead = null,
 }: {
   state: RentaState;
   ccaa: RentaCcaa | null;
@@ -346,21 +486,40 @@ export function DeductionsStep({
   family: Family;
   blocked: string[];
   hints: Record<string, Hint>;
+  /** What each deduction saves with the data as it is, by id. */
+  savings: Record<string, DeductionSaving>;
+  /** What the marked ones save together. */
+  markedSaving: number;
   onChange: (id: string, choice: Choice) => void;
+  /** The number of the step (the guided mode has fewer before it). */
+  n?: number;
+  /** A card shown first (the expert screen: «My investments»). */
+  lead?: React.ReactNode;
 }) {
   const { t } = useI18n();
+  const money = useMoney();
   const foral = ccaa?.regime === 'foral';
+  const marked = Object.values(choices).some((c) => c.on);
   return (
-    <Step n={4} titleKey="tools.renta.step3">
+    <Step n={n} titleKey="tools.renta.step3">
+      {lead}
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
+      <p className="section-hint">{t('tools.renta.saving.hint')}</p>
+      {marked && (
+        <p className="renta-saving-total" role="status">
+          {t('tools.renta.saving.total')} <strong>{money(markedSaving)}</strong>
+        </p>
+      )}
       <DeductionList
         title={t('tools.renta.stateDeductions')}
         hint={t('tools.renta.stateHint')}
-        deductions={state.deductions}
+        // The donations are asked by what was given, in their own fields (DonationsFields).
+        deductions={state.deductions.filter((d) => !DONATIONS.includes(d.id))}
         choices={choices}
         family={family}
         blocked={blocked}
         hints={hints}
+        savings={savings}
         openGroups={['family', 'housing']}
         onChange={onChange}
       />
@@ -373,6 +532,7 @@ export function DeductionsStep({
           family={family}
           blocked={blocked}
           hints={hints}
+          savings={savings}
           openGroups={['family', 'health', 'education']}
           onChange={onChange}
         />

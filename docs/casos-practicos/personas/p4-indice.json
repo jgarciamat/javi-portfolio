@@ -1,0 +1,143 @@
+[
+  {
+    "slug": "p4-109-cripto-binance-ledger-staking-madrid",
+    "titulo": "Vende bitcoin comprado en dos veces en Binance y cobra staking en su Ledger",
+    "comunidad": "madrid",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "FIFO entre compras de años distintos (art. 37.2 y ayuda AEAT de monedas virtuales)",
+      "transferencia a una cartera propia emparejada (no es transmisión)",
+      "staking como capital mobiliario (DGT V1766-22), casilla 0027 NO CONFIRMADA"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+    "titulo": "Cambia bitcoin por ether en Coinbase y después vende el ether con pérdida",
+    "comunidad": "cataluna",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "permuta cripto-cripto: transmisión por el valor de mercado (art. 37.1.h)",
+      "el valor de la permuta es el coste del ether recibido",
+      "comisiones en la adquisición y en la transmisión (art. 35)",
+      "recompensa «learn» como ganancia de la base general (NO CONFIRMADO)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+    "titulo": "Gana con polkadot en Kraken y compensa pérdidas de 2023",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "libro mayor de Kraken (refid) con la comisión en la pata en euros",
+      "compensación de pérdidas de los 4 años anteriores (art. 49)",
+      "lo que sobra pasa a los años siguientes"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+    "titulo": "Acciones de EE. UU. en Revolut con dividendos retenidos en origen",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "importes en dólares pasados a euros con el tipo de cada día (aquí uno inventado)",
+      "dividendos (0029) y gastos de custodia (0037)",
+      "deducción por doble imposición internacional (0588, art. 80)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+    "titulo": "Vende un ETF en Degiro y reembolsa un fondo que antes traspasó",
+    "comunidad": "galicia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ETF en el apartado de instituciones de inversión colectiva (0310-0325)",
+      "traspaso entre fondos: el nuevo conserva coste y fecha (art. 94.1.a)",
+      "retención del 19 % en el reembolso (casilla 0603)",
+      "doble imposición internacional del dividendo (0588)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-114-fondos-perdida-recompra-un-ano-castilla-y-leon",
+    "titulo": "Reembolsa un fondo con pérdida y vuelve a suscribirlo antes de un año",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "regla antiaplicación de pérdidas en participaciones no cotizadas: un año (art. 33.5.g)",
+      "retención del 19 % de la ganancia del fondo (0603)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-115-derivados-quantfury-apalancado-baleares",
+    "titulo": "Opera con apalancamiento en Quantfury: acciones y pares de cripto",
+    "comunidad": "baleares",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "informe PDF de Quantfury: una ganancia o pérdida por posición, del año del cierre",
+      "derivados en la base del ahorro (arts. 46.b y 49; NO CONFIRMADO)",
+      "aviso de resultados de años anteriores"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+    "titulo": "Extracto de eToro con acciones, bitcoin, un CFD y dividendos",
+    "comunidad": "murcia",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "extracto de eToro en Excel (hojas «Closed Positions» y «Dividends»)",
+      "las acciones y el bitcoin con su compra (FIFO), el CFD como derivado",
+      "doble imposición internacional (0588)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+    "titulo": "Vende ether en Bitpanda y cobra recompensas y cashback en Crypto.com",
+    "comunidad": "aragon",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "recompensas de staking y préstamo como capital mobiliario (0027)",
+      "cashback en cripto como ganancia de la base general (NO CONFIRMADO)",
+      "el valor de la recompensa es el coste de las monedas recibidas"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+    "titulo": "Acciones en Interactive Brokers por más de 50.000 € y un ETF en Trading 212",
+    "comunidad": "asturias",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "extracto de actividad de Interactive Brokers (secciones Trades, Dividends, Withholding Tax)",
+      "aviso del modelo 720: valores en el extranjero por más de 50.000 €",
+      "pérdida de un ETF en el apartado de IIC"
+    ],
+    "alcance": "dentro"
+  }
+]

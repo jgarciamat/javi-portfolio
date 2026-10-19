@@ -1,0 +1,27 @@
+{
+  "slug": "p2-58-foral-gipuzkoa-autonomo-fuera-de-alcance",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 58",
+  "nif": "00000058N",
+  "domicilio": "Calle Ficticia 58, 20001 Donostia / San Sebastián (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "pais-vasco",
+  "titulo": "Autónomo residente en Gipuzkoa (régimen foral, TicketBAI)",
+  "descripcion": "Fontanero autónomo en Donostia: IRPF, pagos fraccionados e IVA ante la Diputación Foral de Gipuzkoa (TicketBAI, modelo 130 foral y 303 foral). Fuera del alcance de Finanverso.",
+  "prueba": [
+    "territorio foral: Gipuzkoa",
+    "autónomo foral"
+  ],
+  "modelos": [
+    "109 foral",
+    "130 foral",
+    "303 foral"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "Territorio foral de Gipuzkoa: normativa, escalas y modelos propios (TicketBAI y modelos forales), no los de la AEAT.",
+  "documentos": {
+    "datos": null
+  }
+}

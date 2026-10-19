@@ -1,0 +1,339 @@
+{
+  "slug": "p2-44-taxista-modulos-extremadura",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "390",
+      "casilla": null,
+      "concepto": "Resumen anual",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El modelo 390 (exonerado en régimen simplificado) y el resto de la Renta (mínimos, cuota) no se comparan aquí: solo el 131, el 303 simplificado y la actividad.",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "casilla": "1465",
+      "concepto": "Rendimiento neto previo",
+      "importe": 10358.63,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1465"
+    },
+    {
+      "modelo": "100",
+      "casilla": "1466",
+      "concepto": "Minoración por incentivos al empleo",
+      "importe": 67.31,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1466"
+    },
+    {
+      "modelo": "100",
+      "casilla": "1468",
+      "concepto": "Rendimiento neto minorado",
+      "importe": 10291.32,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1468"
+    },
+    {
+      "modelo": "100",
+      "casilla": "1474",
+      "concepto": "Rendimiento neto de módulos",
+      "importe": 9262.19,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1474"
+    },
+    {
+      "modelo": "100",
+      "casilla": "1475",
+      "concepto": "Reducción de carácter general",
+      "importe": 463.11,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1475"
+    },
+    {
+      "modelo": "100",
+      "casilla": "1479",
+      "concepto": "Rendimiento neto de la actividad",
+      "importe": 8799.08,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#irpf-rendimiento-neto-por-modulos",
+      "campo": "renta.1479"
+    },
+    {
+      "modelo": "131",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Rendimiento neto",
+      "importe": 8799.08,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.01"
+    },
+    {
+      "modelo": "131",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Pago fraccionado previo",
+      "importe": 263.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.02"
+    },
+    {
+      "modelo": "131",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Minoración",
+      "importe": 100,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.09"
+    },
+    {
+      "modelo": "131",
+      "periodo": "1T",
+      "casilla": "15",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 163.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.15"
+    },
+    {
+      "modelo": "131",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Rendimiento neto",
+      "importe": 8799.08,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.01"
+    },
+    {
+      "modelo": "131",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Pago fraccionado previo",
+      "importe": 263.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.02"
+    },
+    {
+      "modelo": "131",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Minoración",
+      "importe": 100,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.09"
+    },
+    {
+      "modelo": "131",
+      "periodo": "2T",
+      "casilla": "15",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 163.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.15"
+    },
+    {
+      "modelo": "131",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Rendimiento neto",
+      "importe": 8799.08,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.01"
+    },
+    {
+      "modelo": "131",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Pago fraccionado previo",
+      "importe": 263.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.02"
+    },
+    {
+      "modelo": "131",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Minoración",
+      "importe": 100,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.09"
+    },
+    {
+      "modelo": "131",
+      "periodo": "3T",
+      "casilla": "15",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 163.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.15"
+    },
+    {
+      "modelo": "131",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Rendimiento neto",
+      "importe": 8799.08,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.01"
+    },
+    {
+      "modelo": "131",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Pago fraccionado previo",
+      "importe": 263.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.02"
+    },
+    {
+      "modelo": "131",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Minoración",
+      "importe": 100,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.09"
+    },
+    {
+      "modelo": "131",
+      "periodo": "4T",
+      "casilla": "15",
+      "concepto": "Resultado de la autoliquidación",
+      "importe": 163.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "m131.15"
+    },
+    {
+      "modelo": "100",
+      "casilla": "0604",
+      "concepto": "Pagos fraccionados ingresados",
+      "importe": 655.88,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-131",
+      "campo": "renta.0604"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "47",
+      "concepto": "Ingreso a cuenta",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.47"
+    },
+    {
+      "modelo": "303",
+      "periodo": "1T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "47",
+      "concepto": "Ingreso a cuenta",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.47"
+    },
+    {
+      "modelo": "303",
+      "periodo": "2T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "47",
+      "concepto": "Ingreso a cuenta",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.47"
+    },
+    {
+      "modelo": "303",
+      "periodo": "3T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 87.51,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.71"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "48",
+      "concepto": "Cuota anual derivada del régimen simplificado",
+      "importe": 632.79,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.48"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "49",
+      "concepto": "Ingresos a cuenta del ejercicio",
+      "importe": 262.53,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.49"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "50",
+      "concepto": "Resultado",
+      "importe": 370.26,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.50"
+    },
+    {
+      "modelo": "303",
+      "periodo": "4T",
+      "casilla": "71",
+      "concepto": "Resultado de la liquidación",
+      "importe": 370.26,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#modelo-303-en-regimen-simplificado",
+      "campo": "m303s.71"
+    }
+  ]
+}

@@ -14,14 +14,18 @@ import {
   type TaxBox,
 } from '@modules/finances/domain/types';
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
+import { AutonomoExplain } from './AutonomoExplain';
+import { VatFamily } from './AutonomoVatResult';
+import { AutonomoFormPreviews } from '@modules/taxforms/ui/FormPreviews';
+import { SedeFiles, sedeSourcesOfDraft } from './SedeFiles';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
 type Translate = ReturnType<typeof useI18n>['t'];
 type Format = ReturnType<typeof useFormat>;
 
-/** A table of the boxes of an official form. */
-function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
+/** A table of the boxes of an official form (a number of people is a count, not money). */
+export function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
   const { t } = useI18n();
   const { money } = useFormat();
   return (
@@ -40,7 +44,7 @@ function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
             <tr key={`${b.box}-${b.label}`}>
               <td>{b.box}</td>
               <td>{b.label}</td>
-              <td>{b.label.startsWith('Tipo') ? `${b.amount} %` : money(b.amount)}</td>
+              <td>{/perceptores$|^Número total/.test(b.label) ? b.amount : money(b.amount)}</td>
             </tr>
           ))}
         </tbody>
@@ -296,33 +300,48 @@ function PdfActions({ draft, inputs }: { draft: AutonomoDraft; inputs: AutonomoI
   );
 }
 
-/** What the draft says, in words, and the boxes behind it. */
+/**
+ * What the draft says, in words, and the boxes behind it; then its files (the PDF, the previews of
+ * the forms and the files for the Agencia Tributaria). `part` shows only one half (the assistant
+ * shows the files in a step of their own).
+ */
 export function DraftResult({
   draft,
   inputs,
+  part = 'all',
 }: {
   draft: AutonomoDraft;
   inputs: AutonomoInputs | null;
+  part?: 'all' | 'summary' | 'files';
 }) {
   const { t } = useI18n();
-  const { vat, irpf } = draft;
+  const { irpf } = draft;
   return (
     <div className="autonomo-result" aria-live="polite">
-      <SummaryTiles draft={draft} />
+      {part !== 'files' && (
+        <>
+          <SummaryTiles draft={draft} />
+          <AutonomoExplain draft={draft} />
 
-      {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
-      <Boxes title={t('app.autonomo.accrued')} boxes={vat.accrued} />
-      <Boxes title={t('app.autonomo.deductible')} boxes={vat.deductible} />
-      <Boxes title={t('app.autonomo.settlement')} boxes={vat.settlement} />
-      {irpf.required ? (
-        <Boxes title={t('app.autonomo.irpfBoxes')} boxes={irpf.boxes} />
-      ) : (
-        <p className="section-hint">{t('app.autonomo.irpf.notRequiredText')}</p>
+          {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
+          <VatFamily draft={draft} />
+          {irpf.required ? (
+            <Boxes title={t('app.autonomo.irpfBoxes')} boxes={irpf.boxes} />
+          ) : (
+            <p className="section-hint">{t('app.autonomo.irpf.notRequiredText')}</p>
+          )}
+
+          <RetaAndDeadlines draft={draft} />
+          <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
+        </>
       )}
-
-      <RetaAndDeadlines draft={draft} />
-      <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
-      <PdfActions draft={draft} inputs={inputs} />
+      {part !== 'summary' && (
+        <>
+          <PdfActions draft={draft} inputs={inputs} />
+          <AutonomoFormPreviews draft={draft} />
+          <SedeFiles sources={sedeSourcesOfDraft(draft)} />
+        </>
+      )}
     </div>
   );
 }

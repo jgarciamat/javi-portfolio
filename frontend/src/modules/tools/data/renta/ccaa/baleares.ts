@@ -20,8 +20,13 @@ export const baleares: RentaCcaa = {
   ],
   scaleSource:
     'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-ayuda-presentacion/irpf-2025/8-cumplimentacion-irpf/8_4-cuota-integra/8_4_3-gravamen-base-liquidable-general/8_4_3_2-cuota-integra-autonomica.html',
+  // AEAT Manual práctico de Renta 2025, c14, "Mínimo autonómico personal y familiar: Illes Balears"
+  // (checked 19-10-2026), under "Mínimo del contribuyente mayor de 65 años": "6.105 euros anuales por
+  // importe del mínimo por contribuyente general", plus 1,265 € (65) and 1,540 € (75). Under 65 the
+  // State's 5,550 € apply. Rule: art. 2 of Decreto Legislativo 1/2014 of the Illes Balears.
   minimums: {
     personal: 5550,
+    personalOver65: 6105,
     descendants: [2400, 2970, 4400, 4950],
     under3: 2800,
     ascendants: 1265,

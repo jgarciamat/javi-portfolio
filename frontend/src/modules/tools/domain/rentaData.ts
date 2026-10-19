@@ -1,4 +1,5 @@
 /** Data of the income tax return (IRPF) for Spain, by tax year, taken from the Tax Agency manual. */
+import type { Check } from './rentaRequirements';
 
 /** A bracket of a progressive scale: the rate (%) applies from `from` euros up to the next bracket. */
 export interface TaxBracket {
@@ -21,6 +22,13 @@ export interface IncomeLimit {
   afterMinimum?: boolean;
   /** How the limit works, in plain words, when it is not a simple threshold. */
   note?: string;
+  /**
+   * What goes down between `phaseOutFrom` and `phaseOutTo`: the deduction itself (`amount`, the
+   * default), its maximum base (`base`: the State's rent of before 2015, LIRPF DT 15.ª) or its
+   * maximum in euros (`limit`: the Comunitat Valenciana's, Ley 13/1997 art. 4). Without that base
+   * or maximum in the data, the amount goes down.
+   */
+  phaseOutOf?: 'amount' | 'base' | 'limit';
 }
 
 /**
@@ -61,10 +69,49 @@ export interface Deduction {
   baseLimit?: number;
   /** Limit on the taxpayer's base to apply it (the checker warns when the person is over it). */
   incomeLimit?: IncomeLimit;
+  /**
+   * A State deduction that is split between the two quotas: the share (0 to 1) that lowers the
+   * regional one (LIRPF arts. 67.1.b and 77.1.b: half of those of art. 68.2 to 68.5; DT 15.ª and
+   * 18.ª: the regional half of the rent and the home of the transitional regime). Unset: all State.
+   */
+  regionalShare?: number;
+  /**
+   * Paid out even when there is no tax to pay: it lowers the differential quota, not the quota (LIRPF
+   * arts. 81 and 81 bis: maternity and its increase for nursery, large family, and people with a
+   * disability or the separated parent with two children in their care).
+   */
+  refundable?: boolean;
   /** Can be paid monthly in advance with a model (maternity: 140; large family and disability: 143). */
   advance?: AdvancePayment;
+  /** Euros per month with the right to it (maternity: 100 €, LIRPF art. 81.3): the months are asked. */
+  monthly?: number;
+  /**
+   * Held to the person's social security contributions of the year (LIRPF art. 81 bis.2): `each`
+   * deduction (and each relative) on its own, or only its first 1,200 € (`base`: the increase of a
+   * large family of the special category is not held, art. 81 bis.1.c).
+   */
+  contributionCap?: 'each' | 'base';
+  /** A higher maximum up to an age (the Valencian rent: 950 € up to 35 years). */
+  ageLimit?: { maxAge: number; limit: number };
+  /** Split in halves between the two parents when each files on their own (births, adoptions). */
+  splitBetweenParents?: boolean;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */
   requirements: string;
+  /**
+   * The requirements checked before it is applied (rentaRequirements.ts): the age, the children
+   * and a disability are checked by themselves; the rest is asked yes or no.
+   */
+  checks?: Check[];
+  /** The box of the modelo 100 (annex B for the communities) where it goes. */
+  box?: string;
+  /** The rule it comes from (the community's law and article). */
+  norm?: string;
+  /**
+   * What is spent on the deductions of the same `group` cannot pass `share` of the tax base
+   * ([0500] + [0510]) all together: the regional donations (30 % in the Comunitat Valenciana, 10 % in
+   * Castilla y León). Only for percent deductions (what was spent is known).
+   */
+  baseCap?: { group: string; share: number };
   /** The Tax Agency page that explains it. */
   url: string;
 }
@@ -72,6 +119,11 @@ export interface Deduction {
 /** Minimums (euros) that a community sets for its own part of the tax; missing = the State's. */
 export interface MinimumAmounts {
   personal?: number;
+  /**
+   * The general minimum of a taxpayer of 65 or more, when the community raises it only for them (Illes
+   * Balears: 6,105 € instead of 5,550 €, plus the 1,265 € for age).
+   */
+  personalOver65?: number;
   /** By order of birth: 1st, 2nd, 3rd, 4th and following. */
   descendants?: number[];
   /** Extra per descendant under 3 years old. */

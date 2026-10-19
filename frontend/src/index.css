@@ -154,6 +154,27 @@ input[type='date'] {
   margin-bottom: 1.25rem;
 }
 
+/* ─── Result of a return ─────────────────────── */
+/* Red to pay, green to be refunded, neutral at zero, with the tokens of losses and gains. The words
+   always say which one it is: the colour only backs them up. Two classes, so that it wins over the
+   colour of the place where the amount sits (for example the green of .wiz-saving strong). */
+.renta-amount.renta-amount--pay {
+  color: var(--red-400);
+}
+.renta-amount.renta-amount--refund {
+  color: var(--green-400);
+}
+.renta-amount.renta-amount--zero {
+  color: inherit;
+}
+/* High contrast: the strongest tone of each (lighter on the dark theme, darker on the light one). */
+html.wiz-contrast .renta-amount.renta-amount--pay {
+  color: var(--red-300);
+}
+html.wiz-contrast .renta-amount.renta-amount--refund {
+  color: var(--green-300);
+}
+
 /* ─── Shared buttons ─────────────────────────── */
 .btn-primary {
   background: var(--accent-600);
@@ -368,6 +389,11 @@ input[type='date'] {
   flex-shrink: 0;
   vertical-align: -0.2em;
   margin-right: 0.15em;
+}
+
+/* TikTok's note is white on dark backgrounds and black on light ones. */
+.social-icon--tiktok {
+  color: var(--slate-100);
 }
 
 button > .icon:only-child,

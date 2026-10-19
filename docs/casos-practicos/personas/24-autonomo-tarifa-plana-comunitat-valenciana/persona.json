@@ -1,0 +1,1409 @@
+{
+  "slug": "24-autonomo-tarifa-plana-comunitat-valenciana",
+  "nombre": "Persona Ficticia 24",
+  "nif": "00000024R",
+  "domicilio": "Calle Ficticia 24, 46001 València (dirección inventada)",
+  "ejercicio": 2026,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Profesional que empezó en julio de 2025 con la tarifa plana",
+  "descripcion": "Programadora (actividad profesional) dada de alta el 1-7-2025: cuota reducida de 80 € hasta junio de 2026; retención del 7 % a sus clientes empresa (inicio de actividad). En 2025 ganó 8.500 € netos: minoración de 100 € por trimestre en el 130.",
+  "modelos": [
+    "130",
+    "303",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomo": {
+    "ejercicio": 2026,
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 121000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 145200,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 133100,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 169400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "EXPENSE",
+        "amountCents": 6050,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [
+        {
+          "withheld": 210.0,
+          "socialSecurity": 240.0,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 252.0,
+          "socialSecurity": 240.0,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 231.0,
+          "socialSecurity": 1142.64,
+          "vatNotDeductible": 0
+        },
+        {
+          "withheld": 294.0,
+          "socialSecurity": 1142.64,
+          "vatNotDeductible": 0
+        }
+      ],
+      "hardToJustify": true,
+      "priorYearNet": 8500,
+      "exempt130": false,
+      "vatToOffset": 0
+    },
+    "retenciones": [
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 6000
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 7200
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 6600
+      },
+      {
+        "staff": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "pros": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "rent": {
+          "people": 0,
+          "paid": 0,
+          "withheld": 0
+        },
+        "income": 8400
+      }
+    ]
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-002",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-003",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-004",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-005",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-006",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-007",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-008",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-009",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-010",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-011",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1200.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-013",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-014",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-015",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-016",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-017",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-018",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1100.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-019",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-020",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-021",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-022",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-023",
+        "client": "Empresa Cliente Ficticia, S.L.",
+        "nif": "B00000066",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-024",
+        "client": "Particular Ficticio",
+        "nif": "00000601G",
+        "base": 1400.0,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-15",
+        "number": "F-01-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-01-15",
+        "number": "F-01-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "F-02-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-15",
+        "number": "F-02-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "F-03-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-15",
+        "number": "F-03-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "F-04-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-04-15",
+        "number": "F-04-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "F-05-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-15",
+        "number": "F-05-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "F-06-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-15",
+        "number": "F-06-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "F-07-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-07-15",
+        "number": "F-07-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "F-08-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-15",
+        "number": "F-08-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "F-09-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-15",
+        "number": "F-09-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "F-10-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-10-15",
+        "number": "F-10-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "F-11-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-15",
+        "number": "F-11-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "F-12-OTH",
+        "supplier": "Coworking Ficticio",
+        "nif": "B00000044",
+        "base": 150,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-15",
+        "number": "F-12-SOF",
+        "supplier": "Software Ficticio (suscripción)",
+        "nif": "B00000055",
+        "base": 50,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "software"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-001 Empresa Cliente Ficticia, S.L.",
+        "amount": 1140.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro factura 2026-002 Particular Ficticio",
+        "amount": 1210.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-003 Empresa Cliente Ficticia, S.L.",
+        "amount": 1140.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro factura 2026-004 Particular Ficticio",
+        "amount": 1210.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-005 Empresa Cliente Ficticia, S.L.",
+        "amount": 1140.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro factura 2026-006 Particular Ficticio",
+        "amount": 1210.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-007 Empresa Cliente Ficticia, S.L.",
+        "amount": 1368.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro factura 2026-008 Particular Ficticio",
+        "amount": 1452.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-009 Empresa Cliente Ficticia, S.L.",
+        "amount": 1368.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro factura 2026-010 Particular Ficticio",
+        "amount": 1452.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-011 Empresa Cliente Ficticia, S.L.",
+        "amount": 1368.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro factura 2026-012 Particular Ficticio",
+        "amount": 1452.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-013 Empresa Cliente Ficticia, S.L.",
+        "amount": 1254.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro factura 2026-014 Particular Ficticio",
+        "amount": 1331.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-015 Empresa Cliente Ficticia, S.L.",
+        "amount": 1254.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro factura 2026-016 Particular Ficticio",
+        "amount": 1331.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-017 Empresa Cliente Ficticia, S.L.",
+        "amount": 1254.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro factura 2026-018 Particular Ficticio",
+        "amount": 1331.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-019 Empresa Cliente Ficticia, S.L.",
+        "amount": 1596.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro factura 2026-020 Particular Ficticio",
+        "amount": 1694.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-021 Empresa Cliente Ficticia, S.L.",
+        "amount": 1596.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro factura 2026-022 Particular Ficticio",
+        "amount": 1694.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-023 Empresa Cliente Ficticia, S.L.",
+        "amount": 1596.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro factura 2026-024 Particular Ficticio",
+        "amount": 1694.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Coworking Ficticio",
+        "amount": -181.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Software Ficticio (suscripción)",
+        "amount": -60.5
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -380.88
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          6000
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1260.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1260.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          600.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          126.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          126.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1134.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1134.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1134.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1134.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1134.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          7200
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1512.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1512.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          600.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          126.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          126.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1386.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1386.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1386.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1386.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1386.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          6600
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1386.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1386.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          600.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          126.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          126.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1260.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1260.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1260.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1260.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1260.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Base imponible al 21 %",
+          8400
+        ],
+        [
+          "09",
+          "Cuota al 21 %",
+          1764.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1764.0
+        ],
+        [
+          "28",
+          "Base de cuotas soportadas en operaciones interiores corrientes",
+          600.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes",
+          126.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          126.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1638.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1638.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1638.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1638.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1638.0
+        ]
+      ]
+    ],
+    "m111": [],
+    "m115": []
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "slug": "p4-109-cripto-binance-ledger-staking-madrid",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "concepto": "Intereses (recompensas de staking)",
+      "importe": 10,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0027"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "importe": 10,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0041"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "importe": 23000,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 23010,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 4500,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "boxes.0609"
+    }
+  ]
+}

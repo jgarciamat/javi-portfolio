@@ -1,0 +1,16 @@
+{
+  "slug": "p2-58-foral-gipuzkoa-autonomo-fuera-de-alcance",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "109 foral",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "Territorio foral de Gipuzkoa: normativa, escalas y modelos propios (TicketBAI y modelos forales), no los de la AEAT.",
+      "campo": null
+    }
+  ]
+}

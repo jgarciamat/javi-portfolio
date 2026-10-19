@@ -86,10 +86,12 @@ export function FinancesProvider({ children }: { children: ReactNode }) {
     month,
     !!token
   );
-  const accounts = useResource(() => accountApi.getAll().then((r) => r.accounts), [accountApi], {
-    enabled: !!token,
-    initial: [] as Account[],
-  });
+  // Balances at the end of the viewed month, so they add up to its available money.
+  const accounts = useResource(
+    () => accountApi.getAll({ year, month }).then((r) => r.accounts),
+    [accountApi, year, month],
+    { enabled: !!token, initial: [] as Account[] }
+  );
   const refreshAccounts = accounts.reload;
 
   /**

@@ -1,0 +1,16 @@
+{
+  "slug": "p3-100-autonoma-maternidad-madrid",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "La bonificación de la cuota de autónomos durante el descanso por nacimiento (art. 38 bis Ley 20/2007) y su efecto en el 130 no están confirmados en fuente oficial en esta revisión.",
+      "campo": null
+    }
+  ]
+}

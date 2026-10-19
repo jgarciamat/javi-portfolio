@@ -3,6 +3,7 @@ import { Account, AccountType } from '@domain/model/Account';
 import { Transfer } from '@domain/model/Transfer';
 import { AccountRepository, TransferRepository, TransferView } from '@domain/ports/repositories';
 import { Cents } from '@domain/shared/money';
+import { Period } from '@domain/shared/period';
 import { Db } from '../database';
 
 interface AccountRow {
@@ -83,19 +84,30 @@ export class SqliteAccountRepository implements AccountRepository {
     return tx.n + tr.n;
   }
 
-  movementBalances(userId: string): Record<string, Cents> {
+  movementBalances(
+    userId: string,
+    upTo?: { period: Period; endDate: string }
+  ): Record<string, Cents> {
+    // The movements belong to a period (year, month); the transfers only have a date.
+    const inPeriod = upTo ? 'AND (year, month) <= (@year, @month)' : '';
+    const byDate = upTo ? 'AND date <= @endDate' : '';
     const rows = this.db
       .prepare(
         `SELECT account_id AS id, SUM(delta) AS cents FROM (
            SELECT account_id, CASE WHEN type = 'INCOME' THEN amount_cents ELSE -amount_cents END AS delta
-             FROM transactions WHERE user_id = @userId
+             FROM transactions WHERE user_id = @userId ${inPeriod}
            UNION ALL
-           SELECT to_account_id, amount_cents FROM transfers WHERE user_id = @userId
+           SELECT to_account_id, amount_cents FROM transfers WHERE user_id = @userId ${byDate}
            UNION ALL
-           SELECT from_account_id, -amount_cents FROM transfers WHERE user_id = @userId
+           SELECT from_account_id, -amount_cents FROM transfers WHERE user_id = @userId ${byDate}
          ) GROUP BY account_id`
       )
-      .all({ userId }) as { id: string; cents: number }[];
+      .all({
+        userId,
+        ...(upTo
+          ? { year: upTo.period.year, month: upTo.period.month, endDate: upTo.endDate }
+          : {}),
+      }) as { id: string; cents: number }[];
     return Object.fromEntries(rows.map((r) => [r.id, r.cents]));
   }
 }

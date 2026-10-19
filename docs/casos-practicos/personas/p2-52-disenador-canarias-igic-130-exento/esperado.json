@@ -1,0 +1,478 @@
+{
+  "slug": "p2-52-disenador-canarias-igic-130-exento",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "130",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 240.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "1T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#1º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3475.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Tramo de cotización (rendimiento computable 3.231,75 €/mes)",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#reta",
+      "campo": "reta.bracket",
+      "valor": "G9",
+      "retaInput": {
+        "monthlyNet": 3475.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "130",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 240.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "2T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#2º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3475.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "130",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 240.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "3T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#3º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3475.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "130",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Obligación de presentar el 130",
+      "importe": null,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": null,
+      "valor": "no (art. 109.1 RIRPF)"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "01",
+      "concepto": "Perceptores, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.01"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "02",
+      "concepto": "Percepciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.02"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "03",
+      "concepto": "Retenciones, trabajo dinerario",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.03"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "07",
+      "concepto": "Perceptores, actividades económicas",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.07"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "08",
+      "concepto": "Percepciones, actividades económicas",
+      "importe": 240.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.08"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "09",
+      "concepto": "Retenciones, actividades económicas",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.09"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "28",
+      "concepto": "Suma de retenciones",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.28"
+    },
+    {
+      "modelo": "111",
+      "periodo": "4T",
+      "casilla": "30",
+      "concepto": "Resultado a ingresar",
+      "importe": 36.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "m111.30"
+    },
+    {
+      "modelo": "RETA",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Cuota mensual de autónomo (base mínima del tramo)",
+      "importe": 478.68,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#4º-trimestre-de-2026",
+      "campo": "reta.feeMin",
+      "retaInput": {
+        "monthlyNet": 3475.0,
+        "person": "individual",
+        "flatRate": false
+      }
+    },
+    {
+      "modelo": "347",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Cliente particular ficticio (00000522Q): importe anual con impuestos",
+      "importe": 7222.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "2026",
+      "casilla": null,
+      "concepto": "Rendimiento neto de la actividad para la Renta 2026 (estimación directa simplificada, con el 5 %)",
+      "importe": 34158.05,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#resúmenes-anuales",
+      "campo": null,
+      "motivo": "Cifra de la Renta 2026: el motor de la Renta no calcula actividades económicas."
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Renta 2026 completa del autónomo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El motor de la Renta no calcula los rendimientos de actividades económicas en el modelo 100.",
+      "campo": null
+    }
+  ]
+}

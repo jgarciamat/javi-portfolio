@@ -38,7 +38,11 @@ const title = (g = m303) => tr(guideKey(g, 'title'));
 const checkbox = (g: typeof m303, step: string, n: number) =>
   screen.getByLabelText(tr(stepKey(g, g.steps.find((s) => s.id === step)!, `c${n}`)));
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
+});
 
 describe('Hacienda paso a paso: content', () => {
   it('has every text in Spanish and English, unique slugs and official https links', () => {
@@ -299,6 +303,8 @@ describe('Hacienda paso a paso on the public site', () => {
     'shows visitors (%s) the first step, the titles of the rest and the wall',
     (locale) => {
       localStorage.clear();
+      // Everything together (the assistant has its own suite).
+      localStorage.setItem('mm_autonomo_assistant', 'expert');
       const t = (key: string, vars?: Record<string, string | number>) =>
         translate(locale, key, vars);
       for (const g of HACIENDA_GUIDES) {

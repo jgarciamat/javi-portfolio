@@ -1,0 +1,123 @@
+/* ─── Previews of the official forms ─────────────────────── */
+.taxforms {
+  margin-top: 1.25rem;
+}
+
+.taxforms > p {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.taxform {
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.taxform h4 {
+  margin: 0 0 0.6rem;
+}
+
+.taxform-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Blue to dark blue, as the main actions of the month: white text stays above 5:1 all along. */
+.taxform-btn {
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.taxform-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.taxform-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.taxform-btn:focus-visible,
+.taxform-actions .btn-secondary:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.taxform-actions .btn-secondary {
+  min-height: 2.75rem;
+}
+
+.taxform-view {
+  margin-top: 0.75rem;
+}
+
+.taxform-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* «Página 12 de 25» on one line, also on a phone (the buttons take the rest). */
+.taxform-pager > span {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .taxform-pager .btn-secondary {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* The page is a sheet of paper in both themes, as wide as the screen allows. */
+.taxform-sheet {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.taxform-sheet canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.taxform-boxes {
+  margin-top: 0.5rem;
+}
+
+.taxform-boxes summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.taxform-boxes table {
+  border-collapse: collapse;
+  margin-top: 0.4rem;
+}
+
+.taxform-boxes th,
+.taxform-boxes td {
+  padding: 0.2rem 0.75rem 0.2rem 0;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .taxform-actions > button {
+    flex: 1 1 100%;
+  }
+}

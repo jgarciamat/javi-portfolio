@@ -1,0 +1,244 @@
+[
+  {
+    "slug": "01-asalariado-soltero-madrid",
+    "titulo": "Asalariado soltero, sin hijos",
+    "comunidad": "madrid",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "02-pareja-un-sueldo-conjunta-andalucia",
+    "titulo": "Matrimonio con un solo sueldo y dos hijos: individual frente a conjunta",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "03-pareja-dos-sueldos-individual-cataluna",
+    "titulo": "Matrimonio con dos sueldos: dos declaraciones individuales",
+    "comunidad": "cataluna",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "04-familia-numerosa-general-viudo-castilla-y-leon",
+    "titulo": "Viudo con tres hijos: familia numerosa general",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "05-familia-numerosa-especial-conjunta-galicia",
+    "titulo": "Matrimonio con cinco hijos en conjunta: familia numerosa especial",
+    "comunidad": "galicia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "06-monoparental-comunitat-valenciana",
+    "titulo": "Madre sola con un hijo: individual frente a conjunta monoparental",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "07-hijo-menor-3-guarderia-murcia",
+    "titulo": "Madre trabajadora con un hijo de 1 año y guardería",
+    "comunidad": "murcia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "08-jubilado-discapacidad-65-aragon",
+    "titulo": "Jubilado de 72 años con discapacidad del 65 %",
+    "comunidad": "aragon",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "09-pensionista-y-trabajo-canarias",
+    "titulo": "Pensionista de 66 años que además trabaja a tiempo parcial",
+    "comunidad": "canarias",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "10-dos-pagadores-baleares",
+    "titulo": "Joven con dos pagadores en el año",
+    "comunidad": "baleares",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "11-paro-y-trabajo-andalucia",
+    "titulo": "Medio año en paro y medio año trabajando",
+    "comunidad": "andalucia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "12-alquiler-de-piso-propio-madrid",
+    "titulo": "Asalariada que alquila un piso y tiene otro vacío",
+    "comunidad": "madrid",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "13-hipoteca-anterior-2013-madrid",
+    "titulo": "Hipoteca de la vivienda habitual comprada en 2010",
+    "comunidad": "madrid",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "14-plan-pensiones-empresa-cataluna",
+    "titulo": "Aportaciones propias a un plan individual y de la empresa a un plan de empleo",
+    "comunidad": "cataluna",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "15-donativos-castilla-y-leon",
+    "titulo": "Donativo de 500 € a una ONG de la Ley 49/2002",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "16-intereses-dividendos-comunitat-valenciana",
+    "titulo": "Asalariado con intereses y dividendos",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "17-venta-acciones-fondos-720-aragon",
+    "titulo": "Venta de acciones (FIFO), reembolso de un fondo con pérdida y cuenta en el extranjero",
+    "comunidad": "aragon",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "18-criptomonedas-fifo-compensacion-murcia",
+    "titulo": "Criptomonedas: ganancia FIFO en una, pérdida en otra y compensación del 25 %",
+    "comunidad": "murcia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "19-venta-vivienda-habitual-mayor-65-baleares",
+    "titulo": "Jubilada de 68 años que vende su vivienda habitual",
+    "comunidad": "baleares",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "20-herencia-venta-segunda-vivienda-galicia",
+    "titulo": "Hereda un piso en 2020 y lo vende en 2025",
+    "comunidad": "galicia",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "21-movilidad-sindicato-discapacidad-canarias",
+    "titulo": "Trabajadora con discapacidad del 33 % que se muda por un nuevo empleo",
+    "comunidad": "canarias",
+    "modelos": [
+      "100"
+    ]
+  },
+  {
+    "slug": "22-autonomo-ed-empleado-local-madrid",
+    "titulo": "Autónomo en estimación directa simplificada con empleado, gestor y local alquilado",
+    "comunidad": "madrid",
+    "modelos": [
+      "130",
+      "303",
+      "111",
+      "115",
+      "180",
+      "190",
+      "390",
+      "347",
+      "RETA"
+    ]
+  },
+  {
+    "slug": "23-autonomo-intracomunitario-exportador-cataluna",
+    "titulo": "Autónomo que vende en España, a la UE y fuera de la UE",
+    "comunidad": "cataluna",
+    "modelos": [
+      "130",
+      "303",
+      "349",
+      "390",
+      "RETA"
+    ]
+  },
+  {
+    "slug": "24-autonomo-tarifa-plana-comunitat-valenciana",
+    "titulo": "Profesional que empezó en julio de 2025 con la tarifa plana",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "130",
+      "303",
+      "390",
+      "RETA"
+    ]
+  },
+  {
+    "slug": "25-autonomo-modulos-andalucia",
+    "titulo": "Taxista en estimación objetiva (módulos)",
+    "comunidad": "andalucia",
+    "modelos": [
+      "131",
+      "303 (simplificado)",
+      "390",
+      "100"
+    ]
+  },
+  {
+    "slug": "26-no-residente-fuera-de-alcance",
+    "titulo": "Residente en Francia con un piso alquilado en España",
+    "comunidad": "extranjero",
+    "modelos": [
+      "210"
+    ]
+  },
+  {
+    "slug": "27-foral-bizkaia-fuera-de-alcance",
+    "titulo": "Asalariada residente en Bizkaia (régimen foral)",
+    "comunidad": "pais-vasco",
+    "modelos": [
+      "100 foral (Bizkaia)"
+    ]
+  },
+  {
+    "slug": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+    "titulo": "Inquilino con contrato de 2014: deducción estatal transitoria",
+    "comunidad": "castilla-y-leon",
+    "modelos": [
+      "100"
+    ]
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "slug": "p3-100-autonoma-maternidad-madrid",
+  "banco": "p3",
+  "nombre": "Persona Ficticia 100",
+  "nif": "00000100P",
+  "domicilio": "Calle Ficticia 100, 28001 Madrid (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "madrid",
+  "titulo": "Autónoma de Madrid que tiene un hijo en 2025",
+  "descripcion": "Diseñadora autónoma (directa simplificada). Su hijo nace en febrero: la Seguridad Social le paga la prestación por nacimiento (exenta, art. 7.h) y durante el descanso no paga la cuota de autónomos (bonificación). Deducción por maternidad de febrero a diciembre.",
+  "prueba": [
+    "prestación por nacimiento de una autónoma (exenta)",
+    "maternidad de una autónoma (alta en el RETA)",
+    "bonificación de la cuota durante el descanso"
+  ],
+  "modelos": [
+    "100",
+    "130",
+    "303"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "La bonificación de la cuota de autónomos durante el descanso por nacimiento (art. 38 bis Ley 20/2007) y su efecto en el 130 no están confirmados en fuente oficial en esta revisión.",
+  "documentos": {}
+}

@@ -18,6 +18,8 @@ import {
   rowsFromCSV,
 } from '@modules/finances/domain/importParsers';
 
+import { readSpreadsheet, sheetAsText } from '../spreadsheet';
+
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
 
 /** The person's choice to let the AI suggest categories (off until they turn it on). */
@@ -88,10 +90,30 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setSkipped(parsed.skipped);
   };
 
+  /** A statement as a table of text: find the bank, the header row and the columns. */
+  const loadTable = (parsedTable: string[][]) => {
+    if (parsedTable.length < 2) throw new Error('empty');
+    // Banks put account details above the header and some split their columns.
+    const found = detectBank(parsedTable);
+    const bankTable = normalizeBankTable(parsedTable.slice(found.headerRow), found.bank);
+    setFormat('csv');
+    setBank(found.bank);
+    setTable(bankTable);
+    applyMapping(bankTable, bankMapping(bankTable[0], found.bank));
+  };
+
   const loadFile = async (file: File) => {
     setError(null);
     setFileName(file.name);
     try {
+      if (/\.xlsx?$/i.test(file.name)) {
+        // A spreadsheet export: its first sheet with data is the table, as a CSV would be.
+        const sheet = (await readSpreadsheet(file)).find((sh) => sh.rows.length >= 2);
+        if (!sheet) throw new Error('empty');
+        loadTable(sheetAsText(sheet));
+        setStep('mapping');
+        return;
+      }
       const text = await readStatement(file);
       if (looksLikeNorma43(text)) {
         const parsed = parseNorma43(text);
@@ -99,15 +121,7 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         setRows(parsed.rows);
         setSkipped(parsed.skipped);
       } else {
-        const parsedTable = parseCSV(text);
-        if (parsedTable.length < 2) throw new Error('empty');
-        // Banks put account details above the header and some split their columns.
-        const found = detectBank(parsedTable);
-        const bankTable = normalizeBankTable(parsedTable.slice(found.headerRow), found.bank);
-        setFormat('csv');
-        setBank(found.bank);
-        setTable(bankTable);
-        applyMapping(bankTable, bankMapping(bankTable[0], found.bank));
+        loadTable(parseCSV(text));
       }
       setStep('mapping');
     } catch {

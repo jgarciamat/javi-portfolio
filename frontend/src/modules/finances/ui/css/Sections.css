@@ -13,6 +13,16 @@
   flex-wrap: wrap;
 }
 
+/* The colour of the section (set on the screen by the dashboard) marks its title. */
+.dashboard-section .section-title {
+  border-left: 3px solid var(--section-color, transparent);
+  padding-left: 0.6rem;
+}
+
+.section-badge {
+  display: inline-flex;
+}
+
 .section-title {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
@@ -673,8 +683,8 @@
   top: 0;
   left: 0;
   height: 100%;
-  width: 280px;
-  max-width: 80vw;
+  width: 340px;
+  max-width: 92vw;
   background: var(--slate-900);
   border-right: 1px solid var(--slate-800);
   z-index: 51;
@@ -741,31 +751,53 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding: 0.75rem;
+  padding: 0.6rem;
   flex: 1;
   overflow-y: auto;
 }
 
+/* Every section in one glance: each group is a grid of icon-over-label tiles. */
+.burger-nav-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.3rem;
+}
+
+.burger-nav-group-title {
+  grid-column: 1 / -1;
+  margin: 0.2rem 0.3rem 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+
 .burger-nav-group + .burger-nav-group {
   border-top: 1px solid var(--slate-800);
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
 }
 
 .burger-nav-item {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 1rem;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  padding: 0.55rem 0.2rem;
   border-radius: 10px;
   background: none;
   border: none;
   color: var(--slate-400);
-  font-size: 0.95rem;
+  font-size: 0.72rem;
+  line-height: 1.15;
   font-family: inherit;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   width: 100%;
+  min-width: 0;
 }
 
 .burger-nav-item:hover {
@@ -780,16 +812,30 @@
 }
 
 .burger-nav-icon {
+  color: var(--section-color, inherit);
   font-size: 1.2rem;
   width: 1.6rem;
   text-align: center;
 }
 
+.burger-nav-avatar {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--section-color);
+}
+
 .burger-nav-label {
-  flex: 1;
+  flex: 0 1 auto;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .burger-nav-dot {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
   width: 6px;
   height: 6px;
   border-radius: 50%;

@@ -1,0 +1,16 @@
+{
+  "slug": "p3-90-hostelera-cese-actividad-cadiz",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "Falta el detalle de la actividad (libros) y el motor no recoge todavía actividades desde el formulario: se deja como caso de prueba de importación.",
+      "campo": null
+    }
+  ]
+}

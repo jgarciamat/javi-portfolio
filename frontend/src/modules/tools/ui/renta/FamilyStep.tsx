@@ -2,9 +2,11 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { CCAA_OPTIONS } from '../../data/renta';
 import type { RentaCcaa } from '../../domain/rentaData';
 import { DisabilitySelect, Field, Step, type StepProps } from './shared';
+import { JointSection } from './JointStep';
+import { ResidenceQuestions } from './Residence';
 
 /** The children of the person, and whether the minimum is shared with the other parent. */
-function ChildrenSection({ form, set }: StepProps) {
+export function ChildrenSection({ form, set }: StepProps) {
   const { t } = useI18n();
   return (
     <>
@@ -41,6 +43,7 @@ function ChildrenSection({ form, set }: StepProps) {
               />
             </label>
             <button
+              type="button"
               className="btn-secondary"
               aria-label={t('tools.renta.removeChild', { n: i + 1 })}
               onClick={() => set({ children: form.children.filter((_, j) => j !== i) })}
@@ -52,6 +55,7 @@ function ChildrenSection({ form, set }: StepProps) {
       </ul>
       <div className="button-row">
         <button
+          type="button"
           className="btn-secondary"
           onClick={() => set({ children: [...form.children, { age: '5', disability: 0 }] })}
         >
@@ -73,7 +77,7 @@ function ChildrenSection({ form, set }: StepProps) {
 }
 
 /** The parents or grandparents who live with the person. */
-function AscendantsSection({ form, set }: StepProps) {
+export function AscendantsSection({ form, set }: StepProps) {
   const { t } = useI18n();
   return (
     <>
@@ -111,6 +115,7 @@ function AscendantsSection({ form, set }: StepProps) {
               />
             </label>
             <button
+              type="button"
               className="btn-secondary"
               aria-label={t('tools.renta.removeAscendant', { n: i + 1 })}
               onClick={() => set({ ascendants: form.ascendants.filter((_, j) => j !== i) })}
@@ -122,6 +127,7 @@ function AscendantsSection({ form, set }: StepProps) {
       </ul>
       <div className="button-row">
         <button
+          type="button"
           className="btn-secondary"
           onClick={() =>
             set({ ascendants: [...form.ascendants, { over75: false, disability: 0 }] })
@@ -178,6 +184,16 @@ export function FamilyStep({
           />
         </div>
       </div>
+      {form.disability === 33 && (
+        <label className="renta-check">
+          <input
+            type="checkbox"
+            checked={form.assistance === true}
+            onChange={(e) => set({ assistance: e.target.checked })}
+          />
+          <span>{t('tools.renta.assistance')}</span>
+        </label>
+      )}
       {loadError && <p className="form-error">{t('tools.renta.loadError')}</p>}
       {foral && ccaa && (
         <p className="renta-foral" role="note">
@@ -188,9 +204,14 @@ export function FamilyStep({
         </p>
       )}
 
+      <h3>{t('tools.renta.residence.title')}</h3>
+      <ResidenceQuestions form={form} set={set} />
+
       <ChildrenSection form={form} set={set} />
 
       <AscendantsSection form={form} set={set} />
+
+      <JointSection form={form} set={set} />
     </Step>
   );
 }

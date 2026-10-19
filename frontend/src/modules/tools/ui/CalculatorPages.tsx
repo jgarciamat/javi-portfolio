@@ -12,7 +12,10 @@ import {
   vatBreakdown,
 } from '../domain/calculators';
 import { CalculatorLayout, NumberField, number, useMoney } from './CalculatorLayout';
-import { RentaPlanner } from './RentaPlanner';
+import { RentaAssistant } from './renta/RentaWizard';
+import { MobileFold } from '@shared/components/MobileFold';
+import { CampaignDates } from './renta/CampaignDates';
+import { rentaState } from '../data/renta/state';
 
 /** 50/30/20: how to split a net monthly income. */
 export function BudgetRulePage() {
@@ -401,14 +404,20 @@ export function GoalCalculatorPage() {
 /** Public page of the income tax return calculator; signed-in people go to the section of the app. */
 export function RentaCalculatorPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useI18n();
   if (isAuthenticated) return <Navigate to={appTabPath('renta')} replace />;
   return (
     <CalculatorLayout
       path="/calculadora-renta"
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
+      lead={
+        <MobileFold summary={t('tools.renta.campaign.fold')}>
+          <CampaignDates exercise={rentaState.year} />
+        </MobileFold>
+      }
     >
-      <RentaPlanner mode="local" />
+      <RentaAssistant mode="local" />
     </CalculatorLayout>
   );
 }

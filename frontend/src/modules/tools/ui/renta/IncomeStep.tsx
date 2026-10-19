@@ -1,6 +1,11 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { rentaObligation } from '../../domain/calculators';
-import { SOCIAL_SECURITY_EXPENSE, SOCIAL_SECURITY_RATE, number } from '../../domain/rentaForm';
+import {
+  SOCIAL_SECURITY_EXPENSE,
+  SOCIAL_SECURITY_RATE,
+  number,
+  obligationIncome,
+} from '../../domain/rentaForm';
 import type { RentaWorkExtras } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
 
@@ -31,13 +36,33 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
           value={form.withheld}
           onChange={(v) => set({ withheld: v })}
         />
+        <Field
+          id="renta-non-salary"
+          label={t('tools.renta.nonSalary')}
+          hint={t('tools.renta.nonSalaryHint')}
+          value={form.nonSalary}
+          onChange={(v) => set({ nonSalary: v })}
+        />
+        <Field
+          id="renta-second-payers"
+          label={t('tools.renta.secondPayers')}
+          hint={t('tools.renta.secondPayersHint')}
+          value={form.secondPayers ?? ''}
+          onChange={(v) => set({ secondPayers: v })}
+        />
       </div>
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={form.retired}
+          onChange={(e) => set({ retired: e.target.checked })}
+        />
+        <span>{t('tools.renta.retired')}</span>
+      </label>
       <p className="section-hint">{t('tools.renta.incomeHint')}</p>
       {gross > 0 && (
         <p className="renta-obligation" role="status">
-          {rentaObligation({ mainIncome: gross, otherIncome: 0 }).required
-            ? t('tools.renta.obligation.yes')
-            : t('tools.renta.obligation.no')}
+          {t(`tools.renta.obligation.${rentaObligation(obligationIncome(form)).reason}`)}
         </p>
       )}
 
@@ -97,6 +122,20 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             label={t('tools.renta.compensatory')}
             value={form.compensatory}
             onChange={(v) => set({ compensatory: v })}
+          />
+          <Field
+            id="renta-child-support"
+            label={t('tools.renta.childSupport')}
+            hint={t('tools.renta.childSupportHint')}
+            value={form.childSupport ?? ''}
+            onChange={(v) => set({ childSupport: v })}
+          />
+          <Field
+            id="renta-pension-capital"
+            label={t('tools.renta.pensionCapital2006')}
+            hint={t('tools.renta.pensionCapital2006Hint')}
+            value={form.pensionCapital2006 ?? ''}
+            onChange={(v) => set({ pensionCapital2006: v })}
           />
         </div>
         <ul className="renta-notes">

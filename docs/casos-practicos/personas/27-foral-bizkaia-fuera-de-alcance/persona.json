@@ -1,0 +1,17 @@
+{
+  "slug": "27-foral-bizkaia-fuera-de-alcance",
+  "nombre": "Persona Ficticia 27",
+  "nif": "00000027G",
+  "domicilio": "Calle Ficticia 27, 48001 Bilbao (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "pais-vasco",
+  "titulo": "Asalariada residente en Bizkaia (régimen foral)",
+  "descripcion": "Reside en Bizkaia: presenta la Renta ante la Hacienda Foral de Bizkaia con su normativa propia. Fuera del alcance del motor (solo régimen común).",
+  "modelos": [
+    "100 foral (Bizkaia)"
+  ],
+  "alcance": "fuera",
+  "motivoFueraDeAlcance": "Territorios forales (País Vasco y Navarra): normativa y escalas propias, no las del régimen común.",
+  "datosFicticios": true,
+  "documentos": {}
+}

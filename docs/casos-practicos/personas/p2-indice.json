@@ -1,0 +1,485 @@
+[
+  {
+    "slug": "p2-29-tres-pagadores-asturias",
+    "titulo": "Joven con tres pagadores en el año",
+    "comunidad": "asturias",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "varios pagadores",
+      "obligación de declarar (15.876 €)",
+      "reducción art. 20, tramo 17.673,52-19.747,50",
+      "mínimos de Asturias"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-30-pensionista-78-discapacidad-33-asistencia-asturias",
+    "titulo": "Pensionista de 78 años con discapacidad del 33 % y movilidad reducida",
+    "comunidad": "asturias",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensionista",
+      "mayor de 75",
+      "discapacidad 33 % + asistencia (art. 60.3)",
+      "mínimos de Asturias",
+      "sin incremento de gastos del trabajo por discapacidad (pensionista)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-31-madre-conyuge-discapacidad-65-hijo-2-asturias",
+    "titulo": "Madre trabajadora, marido sin rentas con discapacidad del 65 % y un hijo de 2 años",
+    "comunidad": "asturias",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "conjunta frente a individual",
+      "discapacidad del cónyuge en la conjunta",
+      "deducción por maternidad",
+      "deducción por cónyuge con discapacidad (art. 81 bis)",
+      "hijo menor de 3 años"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-32-autonomo-directa-normal-empleados-local-asturias",
+    "titulo": "Carpintería en estimación directa NORMAL con dos empleados, profesionales y local",
+    "comunidad": "asturias",
+    "modelos": [
+      "130",
+      "303",
+      "111",
+      "115",
+      "180",
+      "190",
+      "347",
+      "390",
+      "RETA"
+    ],
+    "prueba": [
+      "estimación directa normal (sin 5 %)",
+      "amortización como gasto",
+      "111 con trabajo y profesionales",
+      "115 del local",
+      "303 régimen general",
+      "190, 180 y 347"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-33-arrendador-contrato-2024-reduccion-50-cantabria",
+    "titulo": "Asalariado que alquila un piso con contrato de 2024 (reducción del 50 %)",
+    "comunidad": "cantabria",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "alquiler de vivienda contrato posterior al 26-05-2023 (50 %)",
+      "gastos del inmueble",
+      "amortización 3 %",
+      "escala de Cantabria"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-34-separado-compensatoria-alimentos-cantabria",
+    "titulo": "Separado que paga pensión compensatoria y alimentos a sus hijos",
+    "comunidad": "cantabria",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "pensión compensatoria (art. 55)",
+      "anualidades por alimentos a hijos (arts. 64 y 75)",
+      "sin mínimo por descendientes",
+      "escala de Cantabria"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-35-familia-numerosa-hijo-discapacidad-conjunta-cantabria",
+    "titulo": "Familia numerosa general con un hijo con discapacidad del 33 %: individual frente a conjunta",
+    "comunidad": "cantabria",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "familia numerosa general (art. 81 bis)",
+      "descendiente con discapacidad (art. 81 bis)",
+      "mínimo por discapacidad de un hijo",
+      "conjunta frente a individual"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-36-autonoma-tarifa-plana-2026-isp-ue-cantabria",
+    "titulo": "Diseñadora que se da de alta el 1-2-2026 con tarifa plana y software de Irlanda",
+    "comunidad": "cantabria",
+    "modelos": [
+      "130",
+      "303",
+      "349",
+      "390",
+      "RETA"
+    ],
+    "prueba": [
+      "alta a mitad de trimestre",
+      "tarifa plana 2026",
+      "retención del 7 % de inicio",
+      "adquisición intracomunitaria de servicios (10-11 y 36-37)",
+      "349 clave I"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-37-hipoteca-2011-castilla-la-mancha",
+    "titulo": "Hipoteca de la vivienda habitual comprada en 2011 (7.000 € al año)",
+    "comunidad": "castilla-la-mancha",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "deducción por vivienda habitual (DT 18.ª)",
+      "base por debajo de 9.040 €",
+      "tramo autonómico al 7,5 % (Castilla-La Mancha no tiene porcentaje propio)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-38-venta-segunda-vivienda-donacion-castilla-la-mancha",
+    "titulo": "Vende un piso comprado en 2008 y recibe una donación de su madre",
+    "comunidad": "castilla-la-mancha",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ganancia por venta de inmueble (art. 34-35)",
+      "mejoras en el valor de adquisición",
+      "plusvalía municipal como gasto de venta",
+      "imputación de renta por días",
+      "donación recibida (ISD, no IRPF)",
+      "tramos altos de la base del ahorro"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-39-dos-pagadores-no-obligado-devolucion-castilla-la-mancha",
+    "titulo": "Dos pagadores por debajo de 15.876 €: no está obligado, pero le devuelven",
+    "comunidad": "castilla-la-mancha",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "varios pagadores sin obligación de declarar",
+      "reducción art. 20 máxima (7.302)",
+      "base inferior al mínimo",
+      "devolución de retenciones"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-40-rescate-plan-pensiones-capital-dt12-castilla-la-mancha",
+    "titulo": "Jubilado que rescata su plan de pensiones en forma de capital (reducción del 40 %)",
+    "comunidad": "castilla-la-mancha",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "rescate de plan de pensiones en capital",
+      "reducción del 40 % (DT 12.ª)",
+      "dos pagadores (pensión y gestora)",
+      "tipo marginal alto en un año"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-41-ascendiente-80-discapacidad-65-extremadura",
+    "titulo": "Asalariada que vive con su madre de 80 años con discapacidad del 65 %",
+    "comunidad": "extremadura",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "mínimo por ascendientes (mayor de 75)",
+      "discapacidad de ascendiente 65 % + asistencia",
+      "deducción por ascendiente con discapacidad (art. 81 bis)",
+      "escala de Extremadura"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+    "titulo": "Inversor con dividendos, un fondo heredado y pérdidas de 2022 por compensar",
+    "comunidad": "extremadura",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "rendimientos del capital mobiliario y gastos de custodia",
+      "fondo heredado: valor del ISD",
+      "integración y compensación de ganancias y pérdidas (art. 49)",
+      "pérdidas de años anteriores (4 años)",
+      "retenciones del capital"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-43-cripto-permuta-extremadura",
+    "titulo": "Criptomonedas: permuta de BTC por ETH y venta con pérdida",
+    "comunidad": "extremadura",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "permuta entre criptomonedas (art. 37.1.h)",
+      "valor de adquisición del ETH recibido",
+      "ganancia y pérdida en el mismo año",
+      "modelo 721 (no obligado)"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-44-taxista-modulos-extremadura",
+    "titulo": "Taxista en estimación objetiva (módulos) en Mérida",
+    "comunidad": "extremadura",
+    "modelos": [
+      "131",
+      "303 (simplificado)",
+      "390",
+      "100"
+    ],
+    "prueba": [
+      "estimación objetiva",
+      "IVA simplificado",
+      "personal asalariado en módulos"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-45-padre-solo-hijo-discapacidad-65-la-rioja",
+    "titulo": "Padre solo con un hijo con discapacidad del 65 %: mínimo propio de La Rioja",
+    "comunidad": "la-rioja",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "mínimo autonómico por discapacidad de descendientes (La Rioja)",
+      "asistencia por discapacidad ≥ 65 %",
+      "monoparental conjunta (2.150)",
+      "deducción por descendiente con discapacidad"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-46-alquiler-rendimiento-negativo-la-rioja",
+    "titulo": "Piso alquilado con rendimiento negativo (contrato de 2020)",
+    "comunidad": "la-rioja",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "rendimiento de capital inmobiliario negativo",
+      "límite de intereses y reparaciones (art. 23.1.a)",
+      "exceso a 4 años",
+      "sin reducción con rendimiento negativo"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-47-planes-conyuge-donativo-recurrente-la-rioja",
+    "titulo": "Plan propio, plan del cónyuge sin rentas y donativo recurrente",
+    "comunidad": "la-rioja",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "plan de pensiones propio (1.500)",
+      "plan del cónyuge (art. 51.7, 1.000)",
+      "donativo con fidelidad (45 %)",
+      "reparto 50/50 de la deducción"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-48-asalariado-residente-ceuta",
+    "titulo": "Asalariado que vive y trabaja en Ceuta: deducción del 60 %",
+    "comunidad": "ceuta",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "deducción por rentas obtenidas en Ceuta (60 %)",
+      "escala autonómica supletoria",
+      "retenciones bonificadas"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-49-abogada-ceuta-130-al-8-sin-iva",
+    "titulo": "Abogada en Ceuta: sin IVA (IPSI) y pago fraccionado al 8 %",
+    "comunidad": "ceuta",
+    "modelos": [
+      "130",
+      "RETA"
+    ],
+    "prueba": [
+      "sin 303 en Ceuta (IPSI)",
+      "130 al 8 %",
+      "estimación directa simplificada",
+      "sin retenciones"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-50-asalariada-local-alquilado-melilla",
+    "titulo": "Asalariada en Melilla que alquila un local en la ciudad",
+    "comunidad": "melilla",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "deducción por rentas obtenidas en Melilla (60 %)",
+      "alquiler de local sin reducción",
+      "retención del alquiler en los pagos a cuenta",
+      "otras rentas ≤ 6.500"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-51-madre-separada-dos-hijos-melilla",
+    "titulo": "Madre separada con dos hijos que no recibe alimentos",
+    "comunidad": "melilla",
+    "modelos": [
+      "100"
+    ],
+    "prueba": [
+      "ascendiente separado con dos hijos sin alimentos (art. 81 bis)",
+      "mínimo por descendientes completo",
+      "deducción del 60 % de Melilla"
+    ],
+    "alcance": "dentro"
+  },
+  {
+    "slug": "p2-52-disenador-canarias-igic-130-exento",
+    "titulo": "Diseñador web en Canarias: IGIC y sin modelo 130 por retenciones",
+    "comunidad": "canarias",
+    "modelos": [
+      "111",
+      "190",
+      "RETA"
+    ],
+    "prueba": [
+      "IGIC en lugar de IVA (sin 303)",
+      "exención del 130 por retenciones ≥ 70 %",
+      "111 por el gestor",
+      "IGIC fuera de ingresos y gastos"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-53-tienda-recargo-equivalencia-local-baleares",
+    "titulo": "Tienda de ropa en recargo de equivalencia con local alquilado",
+    "comunidad": "baleares",
+    "modelos": [
+      "130",
+      "115",
+      "180",
+      "347",
+      "RETA"
+    ],
+    "prueba": [
+      "recargo de equivalencia (sin 303)",
+      "IVA repercutido como ingreso del IRPF",
+      "IVA y recargo soportados como gasto",
+      "115 del local",
+      "347 del proveedor y del arrendador"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-54-psicologa-prorrata-cataluna",
+    "titulo": "Psicóloga con terapia exenta y peritajes con IVA: prorrata",
+    "comunidad": "cataluna",
+    "modelos": [
+      "130",
+      "303",
+      "390",
+      "RETA"
+    ],
+    "prueba": [
+      "prorrata general (arts. 102-106 LIVA)",
+      "regularización de la prorrata en el 4T (casilla 44)",
+      "IVA no deducible como gasto del IRPF",
+      "operaciones exentas sin casilla en el 303",
+      "retención del 15 % en parte de los ingresos"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-55-ganadero-leche-modulos-reagp-galicia",
+    "titulo": "Ganadero de vacuno de leche en módulos y en el REAGP",
+    "comunidad": "galicia",
+    "modelos": [
+      "100 (módulos agrarios)"
+    ],
+    "prueba": [
+      "estimación objetiva agraria",
+      "REAGP: compensación del 10,5 %",
+      "exención del 131 por retenciones ≥ 70 %",
+      "retención del 2 % a actividades agrícolas y ganaderas"
+    ],
+    "alcance": "fuera"
+  },
+  {
+    "slug": "p2-56-pluriactividad-tienda-online-isp-comunitat-valenciana",
+    "titulo": "Asalariado con una tienda online: pluriactividad y servicios de fuera",
+    "comunidad": "comunitat-valenciana",
+    "modelos": [
+      "130",
+      "303",
+      "349",
+      "390",
+      "RETA",
+      "100"
+    ],
+    "prueba": [
+      "pluriactividad (RETA + Régimen General)",
+      "servicios de un proveedor UE (10-11, 36-37) y 349 clave I",
+      "servicios de fuera de la UE (12-13 y 28-29)",
+      "130 sin retenciones"
+    ],
+    "alcance": "parcial"
+  },
+  {
+    "slug": "p2-57-foral-navarra-fuera-de-alcance",
+    "titulo": "Asalariado residente en Navarra (régimen foral)",
+    "comunidad": "navarra",
+    "modelos": [
+      "F-90 (Navarra)"
+    ],
+    "prueba": [
+      "territorio foral: Navarra"
+    ],
+    "alcance": "fuera"
+  },
+  {
+    "slug": "p2-58-foral-gipuzkoa-autonomo-fuera-de-alcance",
+    "titulo": "Autónomo residente en Gipuzkoa (régimen foral, TicketBAI)",
+    "comunidad": "pais-vasco",
+    "modelos": [
+      "109 foral",
+      "130 foral",
+      "303 foral"
+    ],
+    "prueba": [
+      "territorio foral: Gipuzkoa",
+      "autónomo foral"
+    ],
+    "alcance": "fuera"
+  }
+]

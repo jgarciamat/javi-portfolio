@@ -98,3 +98,6 @@ frontend/playwright-report/
 # Local only (public repo): Claude agents and TikTok follow lists with third-party usernames
 .claude/agents/
 docs/marketing/tiktok-seguir/
+
+# Banco de casos: los documentos de la tercera tanda se regeneran con `CASOS_PREFIX=p3 node frontend/scripts/casos/run-personas2.mjs`
+docs/casos-practicos/personas/p3-*/documentos/
