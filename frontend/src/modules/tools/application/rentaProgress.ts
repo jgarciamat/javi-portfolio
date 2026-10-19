@@ -12,6 +12,7 @@ import type { ActivityInput } from '../domain/rentaActivity';
 import type { SavingsDetail } from '../domain/rentaGains';
 import { emptyProperty } from '../domain/rentaRentals';
 import { emptyResidence } from '../domain/rentaResidence';
+import { withoutAutonomoActivity } from '../domain/rentaFromAutonomo';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -173,4 +174,10 @@ export function saveProgress(progress: RentaProgress): void {
 
 export function clearProgress(): void {
   storage.set(PROGRESS_KEY, null);
+}
+
+/** Takes the activity brought from Autónomos out of the saved Renta (nothing else changes). */
+export function removeSavedAutonomo(): void {
+  const saved = loadProgress();
+  if (saved) saveProgress({ ...saved, form: withoutAutonomoActivity(saved.form) });
 }

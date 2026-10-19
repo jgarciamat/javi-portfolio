@@ -1814,6 +1814,7 @@
   "tools.renta.removeActivity.title": "Take the self-employed activity out?",
   "tools.renta.removeActivity.message": "The activity brought from the self-employed section will be taken out of your Renta. Your self-employed data is not touched.",
   "tools.renta.removeActivity.cancel": "Cancel",
+  "tools.renta.removeActivity.removed": "Self-employed activity taken out of your Renta",
   "tools.renta.removeActivity.confirm": "Take it out",
   "tools.renta.line.activities": "Economic activities",
   "tools.renta.opt.title": "Reviewer: what could save you money",

@@ -167,3 +167,25 @@ describe('«Preparar mi declaración de la renta»', () => {
     expect(screen.queryByRole('region', { name: tr('tools.renta.activities.title') })).toBeNull();
   });
 });
+
+describe('the confirmation panel and the activity already in the Renta', () => {
+  const remove = () => tr('tools.renta.removeActivity.button');
+
+  it('offers to take it out only when it is there, and takes it out of the saved Renta', () => {
+    const { rerender } = renderWithProviders(<PrepareRenta annual={annual} years={[2025]} />);
+    press();
+    expect(screen.queryByRole('button', { name: remove() })).toBeNull();
+    take();
+    expect(loadProgress()?.form.activities).toHaveLength(1);
+    rerender(<PrepareRenta annual={annual} years={[2025]} />);
+    press();
+    fireEvent.click(screen.getByRole('button', { name: remove() }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.cancel') }));
+    expect(loadProgress()?.form.activities).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: remove() }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.confirm') }));
+    expect(loadProgress()?.form.activities).toEqual([]);
+    expect(screen.getByRole('status')).toHaveTextContent(tr('tools.renta.removeActivity.removed'));
+    expect(screen.queryByRole('button', { name: remove() })).toBeNull();
+  });
+});

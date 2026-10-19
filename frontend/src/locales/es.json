@@ -1814,6 +1814,7 @@
   "tools.renta.removeActivity.title": "¿Quitar la actividad de autónomo?",
   "tools.renta.removeActivity.message": "Se quitará de tu Renta la actividad traída de Autónomos. Tus datos de Autónomos no se tocan.",
   "tools.renta.removeActivity.cancel": "Cancelar",
+  "tools.renta.removeActivity.removed": "Actividad de autónomo quitada de tu Renta",
   "tools.renta.removeActivity.confirm": "Quitar",
   "tools.renta.line.activities": "Actividades económicas",
   "tools.renta.opt.title": "Revisor: lo que podría ahorrarte dinero",

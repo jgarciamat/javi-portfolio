@@ -12,6 +12,7 @@ import {
   AUTONOMO_ACTIVITY,
   activityFromAnnual,
   withAutonomoActivity,
+  withoutAutonomoActivity,
 } from '../../domain/rentaFromAutonomo';
 import type { RentaForm } from '../../domain/rentaForm';
 import { useMoney } from './shared';
@@ -23,7 +24,14 @@ import { useMoney } from './shared';
  */
 
 /** The figures of the year that go to the Renta, to look at before taking them. */
-export function AnnualFigures({ annual }: { annual: AnnualActivity }) {
+export function AnnualFigures({
+  annual,
+  onRemove,
+}: {
+  annual: AnnualActivity;
+  /** Only when the activity is already in the Renta: offers to take it out, right under the figures. */
+  onRemove?: () => void;
+}) {
   const { t } = useI18n();
   const money = useMoney();
   const k = 'tools.renta.bring.fig';
@@ -57,6 +65,7 @@ export function AnnualFigures({ annual }: { annual: AnnualActivity }) {
       {/* Where each figure comes from, so nothing looks like it came from elsewhere. */}
       <p className="section-hint">{t(`${k}.source`, { year: annual.year })}</p>
       {direct && annual.expenses.reta === 0 && <p className="section-hint">{t(`${k}.noReta`)}</p>}
+      {onRemove && <RemoveActivity onRemove={onRemove} />}
     </>
   );
 }
@@ -95,6 +104,7 @@ export function BringActivity({
 }) {
   const { t } = useI18n();
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [removed, setRemoved] = useState(false);
   const brought = (form.activities ?? []).some((a) => a.name === AUTONOMO_ACTIVITY);
   const bring = () => {
     const found = bringOutcome(autonomoOnDevice(year));
@@ -102,7 +112,12 @@ export function BringActivity({
       const activity = activityFromAnnual(found.annual);
       set({ activities: withAutonomoActivity(form, activity!).activities });
     }
+    setRemoved(false);
     setOutcome(found);
+  };
+  const remove = () => {
+    set({ activities: withoutAutonomoActivity(form).activities });
+    setRemoved(true);
   };
   const k = 'tools.renta.bring';
   return (
@@ -114,8 +129,13 @@ export function BringActivity({
       {outcome?.kind === 'done' && brought && (
         <div className="renta-recovered" role="status">
           <p>{t(`${k}.done`, { year })}</p>
-          <AnnualFigures annual={outcome.annual} />
+          <AnnualFigures annual={outcome.annual} onRemove={remove} />
         </div>
+      )}
+      {removed && !brought && (
+        <p className="renta-recovered" role="status">
+          {t('tools.renta.removeActivity.removed')}
+        </p>
       )}
       {outcome?.kind === 'otherYear' && (
         <div className="form-error" role="status">
@@ -147,19 +167,12 @@ export function BringActivity({
  * delete dialog. Only the activity brought from Autónomos goes (with its withholdings, payments and
  * boxes); the self-employed screen keeps its data, and step 6 offers to bring it again.
  */
-export function RemoveActivity({
-  form,
-  set,
-}: {
-  form: RentaForm;
-  set: (p: Partial<RentaForm>) => void;
-}) {
+export function RemoveActivity({ onRemove }: { onRemove: () => void }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const k = 'tools.renta.removeActivity';
   const remove = () => {
-    // Only shown next to the activity itself: the list is there.
-    set({ activities: form.activities!.filter((a) => a.name !== AUTONOMO_ACTIVITY) });
+    onRemove();
     setOpen(false);
   };
   return (

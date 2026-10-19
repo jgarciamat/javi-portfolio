@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import { annualActivity, NO_ACTIVITY } from '@modules/finances/domain/annualActivity';
 import type { AutonomoInputs } from '@modules/finances/domain/types';
 import type { ActivitiesResult } from '@modules/tools/domain/rentaActivity';
 import { emptyForm } from '@modules/tools/domain/rentaForm';
+import { withoutAutonomoActivity } from '@modules/tools/domain/rentaFromAutonomo';
 import { ActivitiesList } from '@modules/tools/ui/renta/ActivitiesList';
 import { ActivityBoxes } from '@modules/tools/ui/renta/ActivityBoxes';
 import { AnnualFigures, BringActivity, bringOutcome } from '@modules/tools/ui/renta/AutonomoBring';
+import { emptyManual } from '@modules/finances/ui/components/AutonomoManual';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 /** An invented year in non-farming módulos: the contract gives no net income for it. */
@@ -143,5 +146,53 @@ describe('taking an activity out of the Renta', () => {
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(set).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('taking the activity out from the panel that shows its figures', () => {
+  const remove = tr('tools.renta.removeActivity.button');
+  const bring = tr('tools.renta.bring.button', { year: 2025 });
+
+  it('offers it only once brought; asks first; then leaves the form clean and says so', () => {
+    const manual = {
+      ...emptyManual(),
+      quarters: emptyManual().quarters.map(() => ({
+        income: { r21: '5000', r10: '', r4: '', r0: '' },
+        withheld: '750',
+        expenses: [],
+      })),
+      invoices: [{ id: 'a', book: 'issued', kind: 'other', excluded: false, date: '2025-02-01' }],
+    };
+    localStorage.setItem('mm_autonomo_manual2', JSON.stringify(manual));
+    let latest = emptyForm('');
+    const Host = () => {
+      const [form, setForm] = useState(emptyForm(''));
+      latest = form;
+      return <BringActivity year={2025} form={form} set={(p) => setForm({ ...form, ...p })} />;
+    };
+    renderWithProviders(<Host />);
+    expect(screen.queryByRole('button', { name: remove })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: bring }));
+    expect(latest.activities).toHaveLength(1);
+    // Cancel: still there.
+    fireEvent.click(screen.getByRole('button', { name: remove }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.cancel') }));
+    expect(latest.activities).toHaveLength(1);
+    // Confirm: gone, the panel too, with the notice; the button to bring it again stays.
+    fireEvent.click(screen.getByRole('button', { name: remove }));
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeActivity.confirm') }));
+    expect(latest.activities).toEqual([]);
+    expect(screen.queryByText(tr('tools.renta.bring.done', { year: 2025 }))).toBeNull();
+    expect(screen.queryByRole('button', { name: remove })).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent(tr('tools.renta.removeActivity.removed'));
+    fireEvent.click(screen.getByRole('button', { name: bring }));
+    expect(latest.activities).toHaveLength(1);
+    expect(screen.queryByText(tr('tools.renta.removeActivity.removed'))).toBeNull();
+  });
+});
+
+describe('the form without the activity of Autónomos', () => {
+  it('works on a form that never had activities', () => {
+    expect(withoutAutonomoActivity(emptyForm('')).activities).toEqual([]);
   });
 });

@@ -293,9 +293,19 @@ describe('the activity brought, without contradictory figures, and taken out aga
     // The banner on top follows what the planner saves.
     expect(await screen.findByText(tr('app.renta.brought', { year: 2026 }))).toBeVisible();
 
-    fireEvent.click(button(tr('tools.renta.removeActivity.button')));
+    // The button of the panel on top (the Renta of the account), cancelled first: nothing changes.
+    const banner = screen.getByText(tr('app.renta.brought', { year: 2026 })).parentElement!;
+    fireEvent.click(
+      within(banner).getByRole('button', { name: tr('tools.renta.removeActivity.button') })
+    );
+    fireEvent.click(button(tr('tools.renta.removeActivity.cancel')));
+    expect(loadProgress()?.form.activities).toHaveLength(1);
+    fireEvent.click(
+      within(banner).getByRole('button', { name: tr('tools.renta.removeActivity.button') })
+    );
     fireEvent.click(button(tr('tools.renta.removeActivity.confirm')));
     expect(loadProgress()?.form.activities).toEqual([]);
+    expect(screen.getByText(tr('tools.renta.removeActivity.removed'))).toBeVisible();
     expect(screen.queryByText(tr('app.renta.brought', { year: 2026 }))).toBeNull();
     expect(screen.queryByText(tr('tools.renta.bring.done', { year: 2026 }))).toBeNull();
     expect(screen.queryByText(tr('tools.renta.activities.boxes'))).toBeNull();
