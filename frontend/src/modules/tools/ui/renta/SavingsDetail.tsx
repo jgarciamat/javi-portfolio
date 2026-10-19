@@ -13,8 +13,9 @@ import {
   type SavingsDetail,
 } from '../../domain/rentaGains';
 import { useMoney, type StepProps } from './shared';
+import { InvestImport } from './invest/InvestImport';
 
-const KINDS: AssetKind[] = ['listed', 'fund', 'crypto', 'unlisted'];
+const KINDS: AssetKind[] = ['listed', 'fund', 'crypto', 'unlisted', 'other'];
 const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvested'];
 const CAPITAL: (keyof CapitalIncome)[] = [
   'interest',
@@ -366,6 +367,7 @@ function Summary({ detail }: { detail: SavingsDetail }) {
 /** The savings in detail: interest and dividends, sales lot by lot, properties and earlier losses. */
 export function SavingsDetailSection({ form, set }: StepProps) {
   const { t } = useI18n();
+  const [importing, setImporting] = useState(false);
   const detail = form.savingsDetail;
   const k = 'tools.renta.gains';
   const update = (patch: Partial<SavingsDetail>) =>
@@ -382,9 +384,35 @@ export function SavingsDetailSection({ form, set }: StepProps) {
         />
         <span>{t(`${k}.on`)}</span>
       </label>
+      <button
+        className="btn-secondary"
+        aria-expanded={importing}
+        onClick={() => setImporting(!importing)}
+      >
+        {t('tools.invest.open')}
+      </button>
+      {importing && (
+        <InvestImport
+          year={rentaState.year}
+          onApply={(imported) =>
+            set({ savingsDetail: { ...(detail ?? emptySavingsDetail()), imported } })
+          }
+        />
+      )}
       {detail && (
         <div className="renta-block">
           <p className="section-hint">{t(`${k}.hint`)}</p>
+          {detail.imported && (
+            <p className="section-hint" role="status">
+              {t('tools.invest.inRenta', {
+                files: detail.imported.files.join(', '),
+                count: detail.imported.assets.length,
+              })}{' '}
+              <button className="btn-secondary" onClick={() => update({ imported: undefined })}>
+                {t('tools.invest.remove')}
+              </button>
+            </p>
+          )}
           <h4>{t(`${k}.capital`)}</h4>
           <div className="tools-form">
             {CAPITAL.map((key) => (

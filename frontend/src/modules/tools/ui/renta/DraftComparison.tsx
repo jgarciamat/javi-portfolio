@@ -3,6 +3,7 @@ import { draftResult, type CompareRow } from '../../domain/rentaCompare';
 import type { DraftReading } from '../../domain/rentaDraft';
 import { rentaState } from '../../data/renta/state';
 import { useMoney } from './shared';
+import { InvestGuide } from './invest/InvestGuide';
 
 /** A difference (never zero) with its sign: what the planner gives over the draft. */
 const signed = (n: number, money: (n: number) => string) =>
@@ -104,6 +105,7 @@ export function DraftComparison({
           </div>
         </>
       )}
+      <InvestGuide />
     </section>
   );
 }
