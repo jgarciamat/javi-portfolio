@@ -2983,7 +2983,7 @@
   "app.autonomo.wh.explain.111.pay": "Modelo 111: a ingresar {due}: retuviste {parts}.",
   "app.autonomo.wh.explain.111.zero": "Modelo 111: pagaste rentas con retención, pero no retuviste nada: presenta la declaración negativa (0,00 €).",
   "app.autonomo.wh.explain.111.none": "Modelo 111: este trimestre no pagaste nóminas ni facturas con retención, así que no se presenta (si ya no vas a retener, comunica la baja con el modelo 036).",
-  "app.autonomo.wh.explain.115.pay": "Modelo 115: a ingresar {due}: retuviste esa cantidad de {base} de alquiler pagado a {who}.",
+  "app.autonomo.wh.explain.115.pay": "Modelo 115: a ingresar {due}: lo que retuviste del alquiler pagado a {who} ({base} sin IVA).",
   "app.autonomo.wh.explain.115.zero": "Modelo 115: pagaste alquiler sujeto a retención, pero no retuviste nada: presenta la declaración negativa (0,00 €).",
   "app.autonomo.wh.explain.115.none": "Modelo 115: este trimestre no pagaste alquiler con retención, así que no se presenta.",
   "app.autonomo.wh.warn.rate": "La retención de la factura de «{who}» es del {rate} % y lo esperado es el {expected}. Revisa el importe en la tabla de facturas.",

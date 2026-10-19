@@ -287,7 +287,15 @@ export function withholdingsFor({
     round2(rent.withheld + data.rent.withheld)
   );
   const warnings = [
-    ...invoiceWarnings(year, ofQuarter, received, key),
+    // A filed form stands: the invoices it replaces are not checked.
+    ...invoiceWarnings(
+      year,
+      ofQuarter.filter(
+        (i) => !(data.filed111 && roleOf(i) === 'professional') && !(data.filed115 && isRent(i))
+      ),
+      received,
+      key
+    ),
     ...typedWarnings(data),
     ...(income === 0 && m111.due + m115.due > 0 ? [{ code: 'noIncome' as const }] : []),
   ];

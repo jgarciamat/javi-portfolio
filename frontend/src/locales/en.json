@@ -2983,7 +2983,7 @@
   "app.autonomo.wh.explain.111.pay": "Form 111: {due} to pay: you withheld {parts}.",
   "app.autonomo.wh.explain.111.zero": "Form 111: you paid income subject to withholding but withheld nothing: file a nil return (0.00 €).",
   "app.autonomo.wh.explain.111.none": "Form 111: you paid no salaries or invoices with withholding this quarter, so it is not filed (if you will no longer withhold, report it with form 036).",
-  "app.autonomo.wh.explain.115.pay": "Form 115: {due} to pay: you withheld it from {base} of rent paid to {who}.",
+  "app.autonomo.wh.explain.115.pay": "Form 115: {due} to pay: what you withheld from the rent paid to {who} ({base} without VAT).",
   "app.autonomo.wh.explain.115.zero": "Form 115: you paid rent subject to withholding but withheld nothing: file a nil return (0.00 €).",
   "app.autonomo.wh.explain.115.none": "Form 115: you paid no rent with withholding this quarter, so it is not filed.",
   "app.autonomo.wh.warn.rate": "The withholding of the invoice from «{who}» is {rate} % and {expected} was expected. Check the amount in the invoice table.",

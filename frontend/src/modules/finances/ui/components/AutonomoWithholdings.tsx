@@ -300,7 +300,7 @@ export function WithholdingsForm({
         const result = withholdingsOfForm(form, year, q);
         return (
           <QuarterWithholdings
-            key={q}
+            key={`${q}-${upTo}`}
             q={q}
             value={value}
             open={q === upTo}

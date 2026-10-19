@@ -160,6 +160,18 @@ describe('The modelos 111 and 115 of a quarter', () => {
     );
     expect(result.m111.pros).toEqual({ people: 2, withheld: 150, base: 1000 });
     expect(result.m115).toMatchObject({ due: 76, people: 1, base: 400 });
+    // Nor are they checked: an odd rate or a rent without withholding there is not flagged.
+    const odd = run(
+      [
+        invoice({ base: 300, retention: 10 }),
+        invoice({ concept: 'Local', kind: 'rent', base: 1000 }),
+        invoice({ concept: 'Otro', base: 300, retention: 10, withholding: 'none' }),
+      ],
+      data
+    );
+    expect(odd.warnings).toEqual([]);
+    const half = run([invoice({ base: 300, retention: 10 })], { ...data, filed111: false });
+    expect(half.warnings.map((w) => w.code)).toEqual(['rate']);
   });
 });
 
