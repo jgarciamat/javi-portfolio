@@ -9,6 +9,8 @@ import {
   presentTransaction,
 } from '../presenters';
 import {
+  bulkDeleteBody,
+  bulkUpdateBody,
   idParam,
   importBody,
   periodParams,
@@ -130,6 +132,22 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
             c.transactions.create(req.dataUserId, { ...body, amountCents: body.amount })
           )
         );
+    })
+  );
+
+  /** Same change for many movements in one SQLite transaction; answers what was applied/skipped. */
+  router.patch(
+    '/transactions/bulk',
+    authed((req, res) => {
+      const { ids, changes } = bulkUpdateBody.parse(req.body);
+      res.json(c.transactions.bulkUpdate(req.dataUserId, ids, changes));
+    })
+  );
+
+  router.post(
+    '/transactions/bulk-delete',
+    authed((req, res) => {
+      res.json(c.transactions.bulkDelete(req.dataUserId, bulkDeleteBody.parse(req.body).ids));
     })
   );
 

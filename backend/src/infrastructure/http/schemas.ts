@@ -136,6 +136,36 @@ export const transactionBody = z.object({
 
 export const transactionPatchBody = transactionBody.partial();
 
+/** Most movements a bulk operation accepts at once. */
+export const BULK_MAX = 500;
+const bulkIds = z.array(id).min(1).max(BULK_MAX);
+
+export const bulkDeleteBody = z.object({ ids: bulkIds }).strict();
+
+export const bulkUpdateBody = z
+  .object({
+    ids: bulkIds,
+    changes: z
+      .object({
+        category: categoryName.optional(),
+        categoryId: id.optional(),
+        type: transactionType.optional(),
+        accountId: id.optional(),
+        date: date.optional(),
+        notes: z.string().max(1000).nullable().optional(),
+        notesMode: z.enum(['replace', 'append']).default('replace'),
+      })
+      .strict()
+      .refine(
+        (c) =>
+          [c.category, c.categoryId, c.type, c.accountId, c.date, c.notes].some(
+            (v) => v !== undefined
+          ),
+        'Indica al menos un cambio'
+      ),
+  })
+  .strict();
+
 export const searchQuery = z.object({
   q: z.string().max(100).optional(),
   type: transactionType.optional(),

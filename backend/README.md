@@ -48,6 +48,7 @@ commit y copia de seguridad previa (`VACUUM INTO`) si la BD ya tenía datos.
 | `GET/POST /api/auth/verify-email · resend-verification · forgot-password · reset-password` | Emails |
 | `GET /api/months/:year/:month` | Mes completo: movimientos, resumen, saldo arrastrado, presupuestos y alertas |
 | `GET·POST /api/transactions` · `PUT·PATCH·DELETE /api/transactions/:id` | Movimientos |
+| `POST /api/transactions/bulk-delete` · `PATCH /api/transactions/bulk` | Operaciones en lote (máx. 500 ids, una transacción SQLite; responde `applied` y `skipped` con motivo) |
 | `GET /api/transactions/search` · `GET /api/transactions/annual/:year` · `POST /api/transactions/import` | Búsqueda, anual, importación |
 | `/api/categories` (`PATCH` renombra, `DELETE ?reassignTo=`) | Categorías |
 | `/api/accounts`, `/api/transfers` | Cuentas y transferencias |
