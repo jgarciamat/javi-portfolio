@@ -14,6 +14,7 @@ import {
 import { figuresFor } from '../../domain/fiscalFigures';
 import { wealthWarnings, type AbroadBlock, type WealthWarning } from '../../domain/wealthWarnings';
 import { Boxes } from './AutonomoDraftResult';
+import { SedeFiles, sedeSourcesOfYear } from './SedeFiles';
 import { toWithholdingQuarter, withholdingsOf } from './withholdingForm';
 import type { ManualForm } from './AutonomoManual';
 
@@ -183,13 +184,17 @@ export function AnnualPanel({ form, year }: { form: ManualForm; year: number }) 
   const { t } = useI18n();
   const quarters = withholdingsOf(form).map(toWithholdingQuarter);
   const figures = figuresFor(year);
+  const s190 = summary190(year, form.invoices, quarters);
+  const s180 = summary180(year, form.invoices, quarters);
+  const s347 = summary347(year, form.invoices);
   return (
     <section className="autonomo-panel autonomo-annual" aria-labelledby="autonomo-annual-title">
       <h3 id="autonomo-annual-title">{t(key('title'), { year })}</h3>
       {figures?.provisional && <p className="section-hint">{t(key('provisional'), { year })}</p>}
-      <Withholding summary={summary190(year, form.invoices, quarters)} year={year} />
-      <Withholding summary={summary180(year, form.invoices, quarters)} year={year} />
-      <Operations summary={summary347(year, form.invoices)} year={year} />
+      <Withholding summary={s190} year={year} />
+      <Withholding summary={s180} year={year} />
+      <Operations summary={s347} year={year} />
+      <SedeFiles sources={sedeSourcesOfYear(year, s190, s180, s347)} />
       <Wealth year={year} />
       <p className="section-hint">{t(key('note'))}</p>
     </section>

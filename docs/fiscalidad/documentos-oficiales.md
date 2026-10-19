@@ -231,6 +231,9 @@ La app escribe, en el dispositivo, el fichero de cada modelo según su diseño d
 | 303 | `DR303e26v101.xlsx` (páginas 01, 03 y DID; 2026 y siguientes) | Sí: «Importar» en la ventana inicial del formulario 2026 (`modelo-303.html`) | `.303` |
 | 349 | `DR_Anexo_349.pdf` (registros tipo 1 y 2 de 500) | Sí: «Importar» del formulario, fichero «formato BOE» (`declaraciones-informativas-ayuda-tecnica/modelos-349-720.html`); más de 40.000 registros, TGVI online | `.349` |
 | 390 | `dr390e2025.xlsx` (páginas 1, 2, 2 bis, 3, 4, 6 y, con contenido, 7) | Sí, pero como **«Presentación (con fichero)» → «Leer declaración»**, con los campos **no editables** (`modelo-390/modelo-390-presentacion-mediante-fichero.html`) | `.390` |
+| 190 | `DISENOS_LOGICOS_190_2025.pdf` (tipo 1 y un tipo 2 por profesional, clave G, subclave 01 o 03) | Sí: las declaraciones informativas tienen formulario web con «importar» (hasta 40.000 registros) y TGVI online (`declaraciones-informativas-ayuda-tecnica/formas-presentacion-declaraciones-informativas.html`) | `.190` |
+| 180 | `DR_Mod_180_2023.pdf` (un tipo 2 por arrendador con el local: situación, referencia catastral y dirección) | Igual que el 190 | `.180` |
+| 347 | `347.pdf` («Ejercicio 2025 y siguientes»; un registro «declarado» por persona y clave, con los cuatro trimestres) | Igual que el 190 | `.347` |
 
 **NO CONFIRMADO (hay que probarlo importando un fichero en la sede):**
 - Codificación ISO-8859-1 en los ficheros `<T…>` (solo la fijan expresamente los diseños del 349, 347 y 190) y ausencia de salto de línea final.
@@ -239,5 +242,8 @@ La app escribe, en el dispositivo, el fichero de cada modelo según su diseño d
 - 390 de 2026: el diseño publicado es el de 2025; la app avisa.
 - Que la sede acepte la extensión `.111`/`.130`/`.303`/`.390` (la ayuda del 111 habla de «texto plano (.txt)»): si el selector no la admite, basta renombrar.
 - Clave de actividad del 390 (letra y dos cifras) y CNAE de 3 caracteres con prorrata: formato comprobado solo contra el diseño.
+- 190 de 2026 (diseño publicado: 2025), 180 posterior a 2023: la app avisa. En el 190 solo van profesionales con NIF y una sola subclave; los totales tecleados (empleados, clave A) no tienen perceptor y bloquean el fichero.
+- Número identificativo de las informativas: modelo + ejercicio + `000001` (la ayuda «número de justificante» admite cualquier número que empiece por el modelo y no sea todo ceros).
+- 347: si las facturas con retención o los servicios no sujetos van también en el 347 (heredado de `annualSummaries.ts`).
 
-**Fuera por ahora:** página 2 (régimen simplificado) y 5 (prorratas y sectores diferenciados) del 303; páginas 5 y 8 del 390; 303 de exonerados del 390 (página 4); autoliquidaciones complementarias o rectificativas; modelos 131, 180, 190 y 347 (aún no están en `develop`).
+**Fuera por ahora:** página 2 (régimen simplificado) y 5 (prorratas y sectores diferenciados) del 303; páginas 5 y 8 del 390; 303 de exonerados del 390 (página 4); autoliquidaciones complementarias o rectificativas; modelo 131 (el cálculo `module131.ts` está en `develop`, pero sin pantalla ni datos de las actividades; su diseño `DR131_2026.xlsx` necesita además la página de actividades). En el 190, las percepciones de empleados (clave A, con datos personales y familiares); en el 347, los registros de inmueble de un arrendador.

@@ -15,10 +15,14 @@ import type { AutonomoDraft, Draft349, Draft390, TaxBox } from '@modules/finance
 import type { Result111, Result115 } from '@modules/finances/domain/withholdings';
 import { FieldError, latin1 } from './fixedWidth';
 import { nifKind, normalIban, normalNif, validIban, vatIdShapeOk } from './ids';
+import type { Summary347, YearSummary } from '@modules/finances/domain/annualSummaries';
+import { planInformative } from './annualFiles';
+import type { Premises } from './informative';
+import { blank, type Check, contactChecks, error, warn } from './checks';
 import { declarationId, write349 } from './m349';
 import { type BoxValue, type PageFill, type Put, writeSelfAssessment } from './selfAssessment';
 
-export type SedeModel = '111' | '115' | '130' | '303' | '349' | '390';
+export type SedeModel = '111' | '115' | '130' | '303' | '349' | '390' | '190' | '180' | '347';
 
 /** What the files need about the person. Typed on the device; never sent to the server. */
 export interface Declarant {
@@ -29,9 +33,11 @@ export interface Declarant {
   name: string;
   /** Only to pay by direct debit or to receive a refund. */
   iban: string;
-  /** 349: the person the AEAT can call about it. */
+  /** 349, 190, 180 and 347: the person the AEAT can call about it. */
   phone: string;
   contact: string;
+  /** 190: the e-mail of that person. */
+  email: string;
   /** 390: main activity, its key in the instructions of the 390 (e.g. «A03») and IAE heading. */
   activity: string;
   activityCode: string;
@@ -40,6 +46,14 @@ export interface Declarant {
   cnae: string;
   /** 390: there are operations to declare in the 347. */
   thirdParties: boolean;
+  /** 190, 180 and 347: what each record needs and the app does not keep, by `recordId`. */
+  records: Record<string, RecordExtra>;
+}
+
+/** The province of the domicile of a payee or person and, in the 180, the premises rented. */
+export interface RecordExtra {
+  province: string;
+  premises?: Partial<Premises>;
 }
 
 export const EMPTY_DECLARANT: Declarant = {
@@ -54,6 +68,8 @@ export const EMPTY_DECLARANT: Declarant = {
   iae: '',
   cnae: '',
   thirdParties: false,
+  email: '',
+  records: {},
 };
 
 export type SedeSource =
@@ -62,13 +78,12 @@ export type SedeSource =
   | { model: '130'; draft: AutonomoDraft }
   | { model: '303'; draft: AutonomoDraft }
   | { model: '349'; draft: AutonomoDraft; m349: Draft349 }
-  | { model: '390'; draft: AutonomoDraft; m390: Draft390 };
+  | { model: '390'; draft: AutonomoDraft; m390: Draft390 }
+  | { model: '190'; year: number; summary: YearSummary }
+  | { model: '180'; year: number; summary: YearSummary }
+  | { model: '347'; year: number; summary: Summary347 };
 
-export interface Check {
-  level: 'error' | 'warn';
-  code: string;
-  values?: Record<string, string | number>;
-}
+export type { Check };
 
 export interface SedeFile {
   model: SedeModel;
@@ -92,13 +107,15 @@ export interface Built {
 export function needs(source: SedeSource): {
   iban: boolean;
   contact: boolean;
+  email: boolean;
   activity: boolean;
   cnae: boolean;
 } {
   const result = resultOf(source);
   return {
     iban: result === 'pay' || result === 'refund',
-    contact: source.model === '349',
+    contact: ['349', '190', '180', '347'].includes(source.model),
+    email: source.model === '190',
     activity: source.model === '390',
     cnae: source.model === '390' && boxesOf(source.m390.sections).has('118'),
   };
@@ -125,8 +142,6 @@ function resultOf(source: SedeSource): Result {
   }
 }
 
-const quarterOf = (source: SedeSource): number | null =>
-  'draft' in source ? source.draft.quarter : source.quarter;
 const yearOf = (source: SedeSource): number =>
   'draft' in source ? source.draft.year : source.year;
 
@@ -142,10 +157,6 @@ function boxesOf(list: TaxBox[] | { boxes: TaxBox[] }[]): Map<string, number> {
 const get = (map: Map<string, number>, box: string): number => map.get(box) ?? 0;
 
 const record = (map: Map<string, number>): Record<string, BoxValue> => Object.fromEntries(map);
-
-const error = (code: string, values?: Check['values']): Check => ({ level: 'error', code, values });
-const warn = (code: string, values?: Check['values']): Check => ({ level: 'warn', code, values });
-const blank = (text: string): boolean => text.trim() === '';
 
 /** NIF, surname and, for a person, first name. */
 function identityChecks(d: Declarant): Check[] {
@@ -438,8 +449,7 @@ function operatorChecks(o: { vatId: string; name: string; base: number }): Check
 function plan349Checks(m349: Draft349, d: Declarant): Check[] {
   const checks: Check[] = [];
   if (m349.monthly) checks.push(error('monthly349'));
-  if (!/^\d{9}$/.test(d.phone.replace(/\s/g, ''))) checks.push(error('phone'));
-  if (blank(d.contact)) checks.push(error('contactMissing'));
+  checks.push(...contactChecks(d));
   checks.push(...[...m349.operators, ...m349.rectifications].flatMap(operatorChecks));
   // 303 ↔ 349: the supplies must be box 59 and the acquisitions box 10 of the same period.
   const coherence = m349.warnings.filter((w) => w.code === 'vs59' || w.code === 'vs10');
@@ -452,39 +462,69 @@ function plan349Checks(m349: Draft349, d: Declarant): Check[] {
 const fileName = (d: Declarant, model: SedeModel, year: number, period: string): string =>
   `${normalNif(d.nif)}${year}${period}.${model}`;
 
+/** How a file is written once its checks pass: its period, its kind and the writer. */
+export interface Writer {
+  checks: Check[];
+  kind: string | null;
+  period: string;
+  /** Writes the text; it may add warnings to `checks` (boxes left out). */
+  write: (checks: Check[]) => string;
+}
+
+function writer349(source: Extract<SedeSource, { model: '349' }>, d: Declarant): Writer {
+  const { year, quarter } = source.draft;
+  const period = `${quarter}T`;
+  const head = {
+    year,
+    period,
+    nif: d.nif,
+    name: `${d.surname} ${d.name}`,
+    phone: d.phone,
+    contact: d.contact,
+    id: declarationId(year, quarter),
+  };
+  return {
+    checks: plan349Checks(source.m349, d),
+    kind: null,
+    period,
+    write: () => write349(head, source.m349),
+  };
+}
+
+type SelfModel = '111' | '115' | '130' | '303' | '390';
+
+function writerSelf(source: Extract<SedeSource, { model: SelfModel }>, d: Declarant): Writer {
+  const plans = { '111': plan111, '115': plan115, '130': plan130, '303': plan303, '390': plan390 };
+  const p = (plans[source.model] as (s: SedeSource, d: Declarant) => Plan)(source, d);
+  const quarter = 'quarter' in source ? source.quarter : source.draft.quarter;
+  const period = source.model === '390' ? '0A' : `${quarter}T`;
+  const envelope = { model: source.model, year: yearOf(source), period };
+  return {
+    checks: p.checks,
+    kind: p.kind,
+    period: envelope.period,
+    write: (checks) => {
+      const out = writeSelfAssessment(envelope, p.tags, p.values, p.fills);
+      for (const box of out.unplaced) checks.push(warn('unplaced', { box }));
+      return out.text;
+    },
+  };
+}
+
+function writerOf(source: SedeSource, d: Declarant): Writer {
+  if (source.model === '349') return writer349(source, d);
+  if (source.model === '190' || source.model === '180' || source.model === '347')
+    return planInformative(source, d);
+  return writerSelf(source, d);
+}
+
 /** The file of a form and the checks; no file when a check is an error. */
 export function buildSedeFile(source: SedeSource, d: Declarant): Built {
   const year = yearOf(source);
-  const checks = declarantChecks(d, resultOf(source));
-  if (source.model === '349') {
-    checks.push(...plan349Checks(source.m349, d));
-    const period = `${source.draft.quarter}T`;
-    if (checks.some((c) => c.level === 'error')) return { file: null, checks, kind: null };
-    const head = {
-      year,
-      period,
-      nif: d.nif,
-      name: `${d.surname} ${d.name}`,
-      phone: d.phone,
-      contact: d.contact,
-      id: declarationId(year, source.draft.quarter),
-    };
-    return guarded(checks, null, () =>
-      makeFile(d, '349', year, period, write349(head, source.m349))
-    );
-  }
-  const plans = { '111': plan111, '115': plan115, '130': plan130, '303': plan303, '390': plan390 };
-  const p = (plans[source.model] as (s: SedeSource, d: Declarant) => Plan)(source, d);
-  checks.push(...p.checks);
-  const quarter = quarterOf(source);
-  const period = source.model === '390' ? '0A' : `${quarter}T`;
-  if (checks.some((c) => c.level === 'error')) return { file: null, checks, kind: p.kind };
-  const model = source.model;
-  return guarded(checks, p.kind, () => {
-    const out = writeSelfAssessment({ model, year, period }, p.tags, p.values, p.fills);
-    for (const box of out.unplaced) checks.push(warn('unplaced', { box }));
-    return makeFile(d, model, year, period, out.text);
-  });
+  const w = writerOf(source, d);
+  const checks = [...declarantChecks(d, resultOf(source)), ...w.checks];
+  if (checks.some((c) => c.level === 'error')) return { file: null, checks, kind: w.kind };
+  return guarded(checks, w.kind, () => makeFile(d, source.model, year, w.period, w.write(checks)));
 }
 
 /** Writes the file; a value that does not fit its field is an error, not a broken file. */

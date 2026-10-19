@@ -1057,13 +1057,20 @@ describe('The checks of the person', () => {
   });
 
   it('says what each form needs', () => {
-    expect(needs(source)).toEqual({ iban: true, contact: false, activity: false, cnae: false });
+    expect(needs(source)).toEqual({
+      iban: true,
+      contact: false,
+      email: false,
+      activity: false,
+      cnae: false,
+    });
     const zero: SedeSource = { ...source, result: { ...result115, result: 'zero' } };
     expect(needs(zero).iban).toBe(false);
     const draft = autonomoDraft();
     expect(needs({ model: '349', draft, m349 })).toEqual({
       iban: false,
       contact: true,
+      email: false,
       activity: false,
       cnae: false,
     });

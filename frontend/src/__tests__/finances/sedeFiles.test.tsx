@@ -6,7 +6,14 @@ import {
   SedeFiles,
   sedeSourcesOfDraft,
   sedeSourcesOfWithholdings,
+  sedeSourcesOfYear,
 } from '@modules/finances/ui/components/SedeFiles';
+import type {
+  PayeeRecord,
+  Record347,
+  Summary347,
+  YearSummary,
+} from '@modules/finances/domain/annualSummaries';
 import { fromLatin1 } from '@modules/finances/application/aeatFiles/fixedWidth';
 import type { SedeSource } from '@modules/finances/application/aeatFiles/models';
 import type { Draft349, Draft390, TaxBox } from '@modules/finances/domain/types';
@@ -227,5 +234,131 @@ describe('The panel', () => {
     expect(screen.getByLabelText(tr('aeatFiles.remember'))).toBeChecked();
     fireEvent.click(screen.getByLabelText(tr('aeatFiles.remember')));
     expect(localStorage.getItem(SEDE_DECLARANT_KEY)).toBeNull();
+  });
+});
+
+const payee = (over: Partial<PayeeRecord>): PayeeRecord => ({
+  nif: '00000000T',
+  name: 'Estudio Inventado',
+  key: 'G',
+  subkey: '01',
+  paid: 2000,
+  inKind: 0,
+  withheld: 300,
+  rate: null,
+  typed: false,
+  ...over,
+});
+const s190: YearSummary = {
+  model: '190',
+  records: [payee({}), payee({ typed: true, key: 'A', nif: null, name: '' })],
+  boxes: [],
+  warnings: [],
+};
+const s180: YearSummary = {
+  model: '180',
+  records: [payee({ nif: 'B12345674', name: 'Locales Inventados SL', key: null, rate: 19 })],
+  boxes: [],
+  warnings: [],
+};
+const r347: Record347 = {
+  key: 'A',
+  nif: null,
+  name: '',
+  total: 4000,
+  quarters: [1000, 1000, 1000, 1000],
+  premises: false,
+  withheld: false,
+  reverse: false,
+};
+const s347: Summary347 = {
+  known: true,
+  threshold: 3005.06,
+  records: [r347],
+  boxes: [],
+  warnings: [],
+  left: 0,
+};
+const empty347: Summary347 = { ...s347, records: [] };
+
+describe('The yearly informative returns', () => {
+  it('offers the 190, the 180 and the 347 when they have records', () => {
+    expect(sedeSourcesOfYear(2025, s190, s180, s347).map((s) => s.model)).toEqual([
+      '190',
+      '180',
+      '347',
+    ]);
+    const none190 = { ...s190, records: [] };
+    expect(sedeSourcesOfYear(2025, none190, { ...s180, records: [] }, empty347)).toEqual([]);
+  });
+
+  it('asks for the province of each person and the premises of each rent, then writes the 180', () => {
+    renderWithProviders(<SedeFiles sources={sedeSourcesOfYear(2025, s190, s180, s347)} />);
+    openPanel();
+    fillPerson();
+    type('aeatFiles.field.phone', '600000000');
+    type('aeatFiles.field.contact', 'Lucía');
+    type('aeatFiles.field.email', 'lucia@example.test');
+    // The 190 has typed totals (no person) and the 347 a record without NIF: no file for them.
+    expect(screen.getAllByText(tr('aeatFiles.blocked'))).toHaveLength(3);
+    expect(
+      screen.getByText(
+        `${tr('aeatFiles.records.key.A', { who: '—' })} · ${tr('aeatFiles.records.noNif')}`
+      )
+    ).toBeInTheDocument();
+    const row180 = screen.getByRole('heading', { name: tr('aeatFiles.model.180') })
+      .parentElement as HTMLElement;
+    const v = within(row180);
+    fireEvent.change(v.getByLabelText(tr('aeatFiles.records.province')), {
+      target: { value: '28' },
+    });
+    fireEvent.change(v.getByLabelText(tr('aeatFiles.records.situation')), {
+      target: { value: '4' },
+    });
+    const text = (key: string, value: string) =>
+      fireEvent.change(v.getByLabelText(tr(`aeatFiles.records.${key}`)), { target: { value } });
+    text('street', 'Calle Inventada');
+    text('municipality', 'Madrid');
+    text('municipalityCode', '28079');
+    text('postcode', '28001');
+    fireEvent.change(v.getByLabelText(tr('aeatFiles.records.premisesProvince')), {
+      target: { value: '28' },
+    });
+    expect(
+      v.getByRole('button', { name: tr('aeatFiles.download', { file: '12345678Z2025.180' }) })
+    ).toBeInTheDocument();
+    const row190 = screen.getByRole('heading', { name: tr('aeatFiles.model.190') })
+      .parentElement as HTMLElement;
+    fireEvent.change(within(row190).getByLabelText(tr('aeatFiles.records.province')), {
+      target: { value: '08' },
+    });
+    expect(
+      within(row190).getByText(tr('aeatFiles.check.typed190', { key: 'A' }), { exact: false })
+    ).toBeInTheDocument();
+  });
+
+  it('asks nothing per record when there are only typed totals', () => {
+    const typed = { ...s190, records: [s190.records[1]] };
+    renderWithProviders(<SedeFiles sources={[{ model: '190', year: 2025, summary: typed }]} />);
+    openPanel();
+    expect(screen.queryByText(tr('aeatFiles.records.title', { n: 1 }))).toBeNull();
+  });
+
+  it('names the sales of the 347 and a person with a NIF', () => {
+    const sale = { ...r347, key: 'B' as const, nif: '00000000T', name: 'Cliente' };
+    renderWithProviders(
+      <SedeFiles
+        sources={sedeSourcesOfYear(
+          2025,
+          { ...s190, records: [] },
+          { ...s180, records: [] },
+          { ...s347, records: [sale] }
+        )}
+      />
+    );
+    openPanel();
+    expect(
+      screen.getByText(`${tr('aeatFiles.records.key.B', { who: 'Cliente' })} · 00000000T`)
+    ).toBeInTheDocument();
   });
 });

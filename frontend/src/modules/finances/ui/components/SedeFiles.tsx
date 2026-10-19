@@ -13,7 +13,10 @@ import {
   type SedeFile,
   type SedeSource,
 } from '../../application/aeatFiles/models';
+import type { Informative } from '../../application/aeatFiles/annualFiles';
+import type { Summary347, YearSummary } from '../../domain/annualSummaries';
 import type { AutonomoDraft } from '../../domain/types';
+import { SedeRecords } from './SedeRecords';
 import type { WithholdingResult } from '../../domain/withholdings';
 import '../css/SedeFiles.css';
 
@@ -22,6 +25,9 @@ export const SEDE_DECLARANT_KEY = 'mm_sede_declarant';
 
 /** Values of a check that are money (the rest are box numbers, rates or names). */
 const MONEY = ['expected', 'got', 'difference'];
+
+const isInformative = (s: SedeSource): s is Informative =>
+  s.model === '190' || s.model === '180' || s.model === '347';
 
 /** Phones and the app offer the share sheet; a computer just downloads the file. */
 const shareMode = (): 'share' | 'download' =>
@@ -47,7 +53,15 @@ function CheckItem({ check }: { check: Check }) {
 }
 
 /** One file: its checks, the kind of declaration and the download button. */
-function FileRow({ source, declarant }: { source: SedeSource; declarant: Declarant }) {
+function FileRow({
+  source,
+  declarant,
+  onChange,
+}: {
+  source: SedeSource;
+  declarant: Declarant;
+  onChange: Dispatch<SetStateAction<Declarant>>;
+}) {
   const { t } = useI18n();
   const [failed, setFailed] = useState(false);
   const built = useMemo(() => buildSedeFile(source, declarant), [source, declarant]);
@@ -66,6 +80,9 @@ function FileRow({ source, declarant }: { source: SedeSource; declarant: Declara
   return (
     <div className="sede-file">
       <h5>{label}</h5>
+      {isInformative(source) && (
+        <SedeRecords source={source} declarant={declarant} onChange={onChange} />
+      )}
       {built.kind && (
         <p className="section-hint">
           {t('aeatFiles.kind', { kind: t(`aeatFiles.kind.${built.kind}`) })}
@@ -98,7 +115,7 @@ function FileRow({ source, declarant }: { source: SedeSource; declarant: Declara
   );
 }
 
-type TextKey = Exclude<keyof Declarant, 'thirdParties'>;
+type TextKey = Exclude<keyof Declarant, 'thirdParties' | 'records'>;
 
 function Field({
   name,
@@ -158,6 +175,7 @@ function DeclarantForm({
     ['iban', any('iban'), t('aeatFiles.hint.iban')],
     ['phone', any('contact')],
     ['contact', any('contact')],
+    ['email', any('email')],
     ['activity', any('activity')],
     ['activityCode', any('activity'), t('aeatFiles.hint.activityCode')],
     ['iae', any('activity')],
@@ -240,7 +258,7 @@ export function SedeFiles({ sources }: { sources: SedeSource[] }) {
           {t('aeatFiles.remember')}
         </label>
         {sources.map((s) => (
-          <FileRow key={s.model} source={s} declarant={declarant} />
+          <FileRow key={s.model} source={s} declarant={declarant} onChange={setDeclarant} />
         ))}
       </div>
     </section>
@@ -267,5 +285,19 @@ export function sedeSourcesOfWithholdings(result: WithholdingResult, year: numbe
     ...(result.m115.result !== 'none'
       ? [{ model: '115' as const, year, quarter: q, result: result.m115 }]
       : []),
+  ];
+}
+
+/** The yearly informative returns that have records: 190, 180 and 347. */
+export function sedeSourcesOfYear(
+  year: number,
+  s190: YearSummary,
+  s180: YearSummary,
+  s347: Summary347
+): SedeSource[] {
+  return [
+    ...(s190.records.length > 0 ? [{ model: '190' as const, year, summary: s190 }] : []),
+    ...(s180.records.length > 0 ? [{ model: '180' as const, year, summary: s180 }] : []),
+    ...(s347.records.length > 0 ? [{ model: '347' as const, year, summary: s347 }] : []),
   ];
 }
