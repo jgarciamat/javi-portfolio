@@ -427,7 +427,7 @@ PEOPLE = [
            age=66, gross=16500, nonSalary=11000, ss=357.5, withheld=600),
     person(10, 'dos-pagadores-baleares', 'baleares', 'Joven con dos pagadores en el año',
            'Dos empleos seguidos (15.000 € y 8.000 €). El segundo pagador supera 1.500 €: está obligado a declarar.',
-           age=29, gross=23000, ss=1495, withheld=1970),
+           age=29, gross=23000, ss=1495, withheld=1970, secondPayers=8000),
     person(11, 'paro-y-trabajo-andalucia', 'andalucia', 'Medio año en paro y medio año trabajando',
            'Prestación por desempleo de 7.200 € y un sueldo de 8.400 €. La prestación es rendimiento del trabajo.',
            age=41, gross=15600, nonSalary=7200, ss=872, withheld=250),
@@ -577,6 +577,8 @@ def form_of(p, spouse=None):
         'savings': str(q.get('savings', '')) if q.get('savings') else '',
         'choices': {},
     }
+    if q.get('secondPayers'):
+        f['secondPayers'] = str(q['secondPayers'])
     if spouse is None and p.get('detail'):
         f['savingsDetail'] = savings_detail_of(p['detail'])
         f['savings'] = ''
@@ -1079,7 +1081,6 @@ def main():
 PENDING_100 = {
     4: [('Deducción autonómica de Castilla y León por familia numerosa', 'Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial.')],
     7: [('Deducción autonómica de Murcia por gastos de guardería', 'Límites de renta y requisitos 2025 no confirmados con un caso oficial.')],
-    10: [('Obligación de declarar con dos pagadores', 'Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula.')],
     17: [('Modelo 720 (bienes en el extranjero)', 'Declaración informativa, sin cuota: fuera del motor.')],
     21: [('Deducción de Canarias por discapacidad', 'Requisitos 2025 no confirmados con un caso oficial.')],
 }
@@ -1087,6 +1088,11 @@ PENDING_100 = {
 
 def add_pending(p, figures):
     out = list(figures)
+    if p.get('secondPayers'):
+        # Art. 96.3: more than 15,876 € with more than 1,500 € from the second and following payers.
+        must = p['gross'] > 22000 or (p['gross'] > 15876 and p['secondPayers'] > 1500)
+        out.append(dict(modelo='100', declaracion='individual', casilla=None, concepto='Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)',
+                        importe=1.0 if must else 0.0, origen='calculo-a-mano', ref='calculo.md#declaración-individual-del-primer-declarante', campo='obligation.required'))
     # The savings in detail (FIFO, exemptions, art. 49): the hand figures of the savings steps above.
     for key, concept, amount in p.get('detail', {}).get('figures', []):
         out.append(dict(modelo='100', declaracion='individual', casilla=None if '.' in key or not key[0].isdigit() else key, concepto=concept,

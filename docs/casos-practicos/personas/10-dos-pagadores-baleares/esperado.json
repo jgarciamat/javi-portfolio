@@ -287,11 +287,11 @@
       "modelo": "100",
       "declaracion": "individual",
       "casilla": null,
-      "concepto": "Obligación de declarar con dos pagadores",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula.",
-      "campo": null
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "obligation.required"
     }
   ]
 }

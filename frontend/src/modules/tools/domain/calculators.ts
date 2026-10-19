@@ -167,14 +167,16 @@ export interface RentaInput {
 export type RentaReason = 'overLimit' | 'twoPayers' | 'none';
 
 export const RENTA_LIMIT_ONE_PAYER = 22_000;
-export const RENTA_LIMIT_SEVERAL_PAYERS = 15_000;
+// LIRPF art. 96.3 (BOE-A-2006-20764, consolidated text, checked 19-10-2026): "El límite ... será de
+// 15.876 euros" with more than one payer when the second and following pay more than 1,500 €.
+export const RENTA_LIMIT_SEVERAL_PAYERS = 15_876;
 export const RENTA_SECOND_PAYER_MIN = 1_500;
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
 /**
  * Whether the person has to file the return because of the income from work: more than
- * 22,000 € in total, or more than 15,000 € when the payers after the first paid more than
+ * 22,000 € in total, or more than 15,876 € when the payers after the first paid more than
  * 1,500 €. Other reasons (rent, capital gains…) exist: this is only a guide.
  */
 export function rentaObligation(input: RentaInput): { required: boolean; reason: RentaReason } {

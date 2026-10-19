@@ -375,7 +375,7 @@ RENTA = [
       age=27, **worker(0, 0, payers=[payer('Hostelería Ficticia Astur, S.L.', 'B00000291', 12000, 1100, 777.6),
                                       payer('Comercio Ficticio del Nalón, S.L.', 'B00000292', 6000, 120, 388.8),
                                       payer('Eventos Ficticios Gijón, S.L.', 'B00000293', 3000, 60, 194.4)]),
-      pending=[('Obligación de declarar con varios pagadores', 'Sí: 2.º y siguientes pagadores 9.000 € > 1.500 € y total 21.000 € > 15.876 € (art. 96.3 LIRPF). El motor no lo calcula.')]),
+      ),
     P(30, 'pensionista-78-discapacidad-33-asistencia-asturias', 'asturias', 'Pensionista de 78 años con discapacidad del 33 % y movilidad reducida',
       'Pensión de jubilación de 24.000 € e intereses de 600 €. Discapacidad del 33 % con movilidad reducida acreditada: suma 3.000 € de gastos de asistencia (art. 60.3) aunque no llegue al 65 %.',
       ['pensionista', 'mayor de 75', 'discapacidad 33 % + asistencia (art. 60.3)', 'mínimos de Asturias', 'sin incremento de gastos del trabajo por discapacidad (pensionista)'],
@@ -431,7 +431,7 @@ RENTA = [
       'Dos empleos (10.000 y 5.000 €), 15.000 € en total: no llega a 15.876 €, así que no está obligado a declarar; aun así declara para recuperar los 100 € retenidos. Base liquidable por debajo del mínimo: cuota cero.',
       ['varios pagadores sin obligación de declarar', 'reducción art. 20 máxima (7.302)', 'base inferior al mínimo', 'devolución de retenciones'],
       age=24, **worker(0, 0, payers=[payer('Logística Ficticia Talavera, S.L.', 'B00000391', 10000, 0, 648), payer('Almacenes Ficticios Toledo, S.L.', 'B00000392', 5000, 100, 324)]),
-      pending=[('Obligación de declarar', 'No: total 15.000 € ≤ 15.876 € aunque el segundo pagador pase de 1.500 € (art. 96.3 LIRPF); le conviene declarar para que le devuelvan. El motor no lo calcula.')]),
+      ),
     P(40, 'rescate-plan-pensiones-capital-dt12-castilla-la-mancha', 'castilla-la-mancha', 'Jubilado que rescata su plan de pensiones en forma de capital (reducción del 40 %)',
       'Se jubiló en 2024 y en 2025 rescata de una vez 30.000 € de su plan de pensiones; 12.000 € corresponden a aportaciones hasta el 31-12-2006 (certificado de la gestora): reducción del 40 % de la DT 12.ª LIRPF, en plazo (año de la contingencia y dos siguientes). Además cobra 16.000 € de pensión.',
       ['rescate de plan de pensiones en capital', 'reducción del 40 % (DT 12.ª)', 'dos pagadores (pensión y gestora)', 'tipo marginal alto en un año'],
@@ -486,7 +486,7 @@ RENTA = [
       rental=dict(income=6000, interest=4200, repairs=2500, other=1370, construction=110000, reduction=60, reductionId='contratos-anteriores-60',
                   expenses={'intereses-financiacion': '4200', 'reparacion-conservacion': '2500', 'tributos-tasas': '450', 'comunidad-servicios-personales': '720', 'seguros': '200'},
                   why='Contrato de 2020 (anterior al 26-05-2023): reducción del 60 %, pero solo sobre rendimientos positivos (art. 23.2)'),
-      pending=[('Exceso de intereses y reparaciones para los 4 años siguientes (700,00)', 'El motor no guarda saldos de años anteriores ni posteriores.')]),
+      excess=700),
     P(47, 'planes-conyuge-donativo-recurrente-la-rioja', 'la-rioja', 'Plan propio, plan del cónyuge sin rentas y donativo recurrente',
       'Aporta 1.500 € a su plan de pensiones y 1.000 € al de su mujer, que no tiene rentas. Dona 1.000 € a la misma ONG por tercer año (1.000 en 2023 y 2024): el resto pasa del 40 al 45 %.',
       ['plan de pensiones propio (1.500)', 'plan del cónyuge (art. 51.7, 1.000)', 'donativo con fidelidad (45 %)', 'reparto 50/50 de la deducción'],
@@ -985,6 +985,9 @@ def form2(p):
         f['childSupport'] = str(p['alimentos'])
     if p.get('dt12'):
         f['pensionCapital2006'] = str(r2(p['dt12'] / 0.4))
+    if len(p.get('payers', [])) > 1:
+        # Art. 96.3: the second and following payers "por orden de cuantía".
+        f['secondPayers'] = str(r2(sum(sorted(x['gross'] for x in p['payers'])[:-1])))
     if p.get('detail'):
         f['savingsDetail'] = cc.savings_detail_of(p['detail'])
         f['savings'] = ''
@@ -1063,6 +1066,15 @@ def build_renta2(p):
         bj = renta2(dict(p), steps, joint=p['joint'])
         figures += figures2(p, bj, 'conjunta', 'calculo.md#declaración-conjunta')
         steps.s(f'Comparación: individual {eur(b["0670"])} frente a conjunta {eur(bj["0670"])} → {"mejor la individual" if b["0670"] <= bj["0670"] else "mejor la conjunta"}')
+    if len(p.get('payers', [])) > 1 and not p.get('retired'):
+        others = sum(sorted(x['gross'] for x in p['payers'])[:-1])
+        must = p['gross'] > 22000 or (p['gross'] > 15876 and others > 1500)
+        figures.append(dict(modelo='100', declaracion='individual', casilla=None, concepto='Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)',
+                            importe=1.0 if must else 0.0, origen='calculo-a-mano', ref='calculo.md#declaración-individual-del-primer-declarante', campo='obligation.required'))
+    if p.get('excess') is not None:
+        # Art. 23.1.a.1.º: interest and repairs over the rent, for the next four years (box 0108).
+        figures.append(dict(modelo='100', declaracion='individual', casilla='0108', concepto='Exceso de intereses y reparaciones para los 4 años siguientes',
+                            importe=float(p['excess']), origen='calculo-a-mano', ref='calculo.md#declaración-individual-del-primer-declarante', campo='rental.excess'))
     for key, concept, amount in p.get('detail', {}).get('figures', []):
         figures.append(dict(modelo='100', declaracion='individual', casilla=key if key[0].isdigit() else None, concepto=concept, importe=float(amount),
                             origen='calculo-a-mano', ref='calculo.md#0-rentas-del-ahorro', campo=f'savings.{key}'))

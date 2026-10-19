@@ -47,6 +47,13 @@ export function RentalSection({
               />
             ))}
             <Field
+              id="renta-pending-excess"
+              label={t('tools.renta.rentalPendingExcess')}
+              hint={t('tools.renta.rentalPendingExcessHint')}
+              value={form.rentalPendingExcess ?? ''}
+              onChange={(v) => set({ rentalPendingExcess: v })}
+            />
+            <Field
               id="renta-construction"
               label={t('tools.renta.construction')}
               hint={rental.amortizationNote}

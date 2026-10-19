@@ -24,17 +24,6 @@
       "motivo": "Límites de renta y requisitos 2025 no confirmados con un caso oficial."
     },
     {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Obligación de declarar con dos pagadores",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula."
-    },
-    {
       "caso": "17-venta-acciones-fondos-720-aragon",
       "declaracion": "individual",
       "casilla": null,
@@ -57,17 +46,6 @@
       "motivo": "Requisitos 2025 no confirmados con un caso oficial."
     },
     {
-      "caso": "p2-29-tres-pagadores-asturias",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Obligación de declarar con varios pagadores",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "Sí: 2.º y siguientes pagadores 9.000 € > 1.500 € y total 21.000 € > 15.876 € (art. 96.3 LIRPF). El motor no lo calcula."
-    },
-    {
       "caso": "p2-38-venta-segunda-vivienda-donacion-castilla-la-mancha",
       "declaracion": "individual",
       "casilla": null,
@@ -77,28 +55,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "No tributa en el IRPF del donatario (art. 6.4 LIRPF): se declara en el Impuesto sobre Donaciones de Castilla-La Mancha, fuera de Finanverso."
-    },
-    {
-      "caso": "p2-39-dos-pagadores-no-obligado-devolucion-castilla-la-mancha",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Obligación de declarar",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "No: total 15.000 € ≤ 15.876 € aunque el segundo pagador pase de 1.500 € (art. 96.3 LIRPF); le conviene declarar para que le devuelvan. El motor no lo calcula."
-    },
-    {
-      "caso": "p2-46-alquiler-rendimiento-negativo-la-rioja",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes (700,00)",
-      "esperado": null,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no guarda saldos de años anteriores ni posteriores."
     },
     {
       "caso": "p2-51-madre-separada-dos-hijos-melilla",
@@ -4102,6 +4058,16 @@
       "estado": "coincide"
     },
     {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "obligation.required",
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "esperado": 1,
+      "obtenido": 1,
+      "estado": "coincide"
+    },
+    {
       "caso": "11-paro-y-trabajo-andalucia",
       "declaracion": "individual",
       "casilla": "0003",
@@ -8012,6 +7978,16 @@
       "estado": "coincide"
     },
     {
+      "caso": "p2-29-tres-pagadores-asturias",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "obligation.required",
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "esperado": 1,
+      "obtenido": 1,
+      "estado": "coincide"
+    },
+    {
       "caso": "p2-30-pensionista-78-discapacidad-33-asistencia-asturias",
       "declaracion": "individual",
       "casilla": "0003",
@@ -10952,6 +10928,16 @@
       "estado": "coincide"
     },
     {
+      "caso": "p2-39-dos-pagadores-no-obligado-devolucion-castilla-la-mancha",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "obligation.required",
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
       "caso": "p2-40-rescate-plan-pensiones-capital-dt12-castilla-la-mancha",
       "declaracion": "individual",
       "casilla": "0003",
@@ -13039,6 +13025,16 @@
       "concepto": "Rendimiento neto reducido del inmueble alquilado",
       "esperado": -4670,
       "obtenido": -4670,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p2-46-alquiler-rendimiento-negativo-la-rioja",
+      "declaracion": "individual",
+      "casilla": "0108",
+      "campo": "rental.excess",
+      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes",
+      "esperado": 700,
+      "obtenido": 700,
       "estado": "coincide"
     },
     {

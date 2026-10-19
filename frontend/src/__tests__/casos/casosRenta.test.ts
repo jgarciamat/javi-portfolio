@@ -9,9 +9,11 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { computeRenta, type RentaInput, type RentaResult } from '@modules/tools/domain/rentaCalc';
 import { COMPARED_BOXES, ourBoxes, type ComparedBox } from '@modules/tools/domain/rentaCompare';
+import { rentaObligation } from '@modules/tools/domain/calculators';
 import {
   emptyForm,
   emptyPartner,
+  obligationIncome,
   partnerOf,
   toInput,
   type RentaForm,
@@ -74,6 +76,7 @@ const formOf = (partial: Partial<RentaForm>): RentaForm => ({
 interface Computed {
   result: RentaResult;
   input: RentaInput;
+  form: RentaForm;
   /** The spouse's pay in a joint return: the planner's boxes 0003 and 0013 are the person's only. */
   partner: { gross: number; socialSecurity: number };
 }
@@ -95,6 +98,7 @@ beforeAll(async () => {
       computed.set(`${persona.slug}|${decl.id}`, {
         result: computeRenta(input),
         input,
+        form,
         partner: { gross: 0, socialSecurity: 0 },
       });
       if (decl.id === 'individual' && renta.conjunta) {
@@ -108,6 +112,7 @@ beforeAll(async () => {
           result,
           // The boxes of the joint return are of the unit (the spouse's minimum, the whole children).
           input: jointInputOf(input, spouse, result.jointReduction),
+          form,
           partner: {
             gross: spouse?.gross ?? 0,
             socialSecurity: spouse?.socialSecurity ?? 0,
@@ -133,6 +138,9 @@ function savingsValue(result: RentaResult, key: string): number {
 function engineValue(campo: string, c: Computed): number {
   const [kind, key] = campo.split('.');
   if (kind === 'result') return c.result[key as keyof RentaResult] as number;
+  // 1: has to file the return (LIRPF art. 96), 0: does not.
+  if (kind === 'obligation') return rentaObligation(obligationIncome(c.form)).required ? 1 : 0;
+  if (kind === 'rental') return c.input.rental?.excessCarry ?? Number.NaN;
   if (kind === 'savings') return savingsValue(c.result, campo.slice('savings.'.length));
   const boxes = ourBoxes(c.result, c.input);
   const extra = key === '0003' ? c.partner.gross : key === '0013' ? c.partner.socialSecurity : 0;

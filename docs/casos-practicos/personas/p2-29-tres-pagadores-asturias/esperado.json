@@ -287,11 +287,11 @@
       "modelo": "100",
       "declaracion": "individual",
       "casilla": null,
-      "concepto": "Obligación de declarar con varios pagadores",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "Sí: 2.º y siguientes pagadores 9.000 € > 1.500 € y total 21.000 € > 15.876 € (art. 96.3 LIRPF). El motor no lo calcula.",
-      "campo": null
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "importe": 1.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "obligation.required"
     }
   ]
 }

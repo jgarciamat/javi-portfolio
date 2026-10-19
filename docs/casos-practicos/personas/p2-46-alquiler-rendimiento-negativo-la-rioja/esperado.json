@@ -296,12 +296,12 @@
     {
       "modelo": "100",
       "declaracion": "individual",
-      "casilla": null,
-      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes (700,00)",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "El motor no guarda saldos de años anteriores ni posteriores.",
-      "campo": null
+      "casilla": "0108",
+      "concepto": "Exceso de intereses y reparaciones para los 4 años siguientes",
+      "importe": 700.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "rental.excess"
     }
   ]
 }

@@ -91,6 +91,10 @@ describe('Renta planner: property', () => {
     fireEvent.change(interest, { target: { value: '1000' } });
     fireEvent.change(screen.getByLabelText(/IBI, tasas/), { target: { value: '400' } });
     expect(screen.getByText(tr('tools.renta.line.rental'))).toBeInTheDocument();
+    // What was left of earlier years' interest and repairs lowers the rent too.
+    const beforeExcess = resultText();
+    fill('tools.renta.rentalPendingExcess', '500');
+    expect(resultText()).not.toBe(beforeExcess);
     const select = screen.getByLabelText(tr('tools.renta.rentalReduction'));
     const before = resultText();
     fireEvent.change(select, { target: { value: (select as HTMLSelectElement).options[1].value } });

@@ -104,9 +104,12 @@ describe('Renta planner: the steps', () => {
     renderWithProviders(<RentaPlanner mode="local" initialIncome="30000" />, {
       authenticated: false,
     });
-    expect(screen.getByText(tr('tools.renta.obligation.yes'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.overLimit'))).toBeInTheDocument();
     fill('tools.renta.gross', '18000');
-    expect(screen.getByText(tr('tools.renta.obligation.no'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.none'))).toBeInTheDocument();
+    // 18,000 € with 2,000 € from a second payer: over 15,876 € (art. 96.3).
+    fill('tools.renta.secondPayers', '2000');
+    expect(screen.getByText(tr('tools.renta.obligation.twoPayers'))).toBeInTheDocument();
     fill('tools.renta.gross', '');
     expect(screen.queryByRole('status')).toBeNull();
   });

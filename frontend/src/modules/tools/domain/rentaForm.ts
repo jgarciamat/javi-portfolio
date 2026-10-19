@@ -71,6 +71,8 @@ export interface RentaForm {
   withheld: string;
   /** Pensions and benefits inside the gross: they are not pay from a job. */
   nonSalary: string;
+  /** Part of the gross paid by the second and following payers (for the obligation to file). */
+  secondPayers?: string;
   /** The income is a pension: no extra expenses for a disability. */
   retired: boolean;
   /** Amount per work expense (union fees, legal defence...), by id. */
@@ -92,6 +94,8 @@ export interface RentaForm {
   construction: string;
   /** The reduction chosen for the rent ('' = none). */
   rentalReduction: string;
+  /** Interest and repairs of 2021-2024 still to deduct (box 0103). */
+  rentalPendingExcess?: string;
   unrented: UnrentedForm[];
   savings: string;
   /** The savings in detail (interest, sales lot by lot, properties, earlier losses): replaces `savings`. */
@@ -225,7 +229,14 @@ export function workExpensesOf(form: RentaForm, extras: RentaWorkExtras): number
   }, 0);
 }
 
-/** The rental figures: the expenses with interest and repairs held to the rent, and the depreciation. */
+/**
+ * The rental figures: the expenses with interest and repairs held to the rent, and the depreciation.
+ * LIRPF art. 23.1.a.1.º (BOE-A-2006-20764, checked 19-10-2026): interest and repairs together "no
+ * podrá exceder ... de la cuantía de los rendimientos íntegros"; "el exceso podrá deducirse en los
+ * cuatro años siguientes". Modelo 100 of 2025 (BOE-A-2026-7041, page 7): what is pending from
+ * 2021-2024 goes first (0103-0104), then this year's (0107), with [0104] + [0107] up to [0102];
+ * the rest of this year's is box 0108.
+ */
 export function rentalOf(form: RentaForm, property: RentaProperty): RentaInput['rental'] {
   if (!form.rentalOn) return null;
   const income = number(form.rentalIncome);
@@ -237,11 +248,16 @@ export function rentalOf(form: RentaForm, property: RentaProperty): RentaInput['
     else free += amount;
   }
   const reduction = property.rental.reductions.find((r) => r.id === form.rentalReduction);
+  const room = Math.max(0, income);
+  const pendingApplied = Math.min(Math.max(0, number(form.rentalPendingExcess)), room);
+  const current = Math.min(capped, room - pendingApplied);
   return {
     income,
-    expenses: free + Math.min(capped, income),
+    expenses: free + pendingApplied + current,
     amortization: (number(form.construction) * property.rental.amortizationRate) / 100,
     reductionPercent: reduction?.percent ?? 0,
+    pendingApplied,
+    excessCarry: capped - current,
   };
 }
 
@@ -277,6 +293,13 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
       },
     ])
   );
+}
+
+/** The pay of the first payer and of the others, for the obligation to file (LIRPF art. 96). */
+export function obligationIncome(form: RentaForm): { mainIncome: number; otherIncome: number } {
+  const gross = number(form.gross);
+  const others = Math.min(gross, Math.max(0, number(form.secondPayers)));
+  return { mainIncome: gross - others, otherIncome: others };
 }
 
 /** The calculation input for what is in the form. */

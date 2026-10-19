@@ -287,11 +287,11 @@
       "modelo": "100",
       "declaracion": "individual",
       "casilla": null,
-      "concepto": "Obligación de declarar",
-      "importe": null,
-      "origen": "pendiente",
-      "motivo": "No: total 15.000 € ≤ 15.876 € aunque el segundo pagador pase de 1.500 € (art. 96.3 LIRPF); le conviene declarar para que le devuelvan. El motor no lo calcula.",
-      "campo": null
+      "concepto": "Obligación de declarar (1 sí, 0 no; art. 96 LIRPF)",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "obligation.required"
     }
   ]
 }

@@ -43,7 +43,8 @@
           "spousePlan": "",
           "compensatory": "",
           "savings": "",
-          "choices": {}
+          "choices": {},
+          "secondPayers": "5000.0"
         }
       }
     ],

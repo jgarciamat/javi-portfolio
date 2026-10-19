@@ -33,7 +33,8 @@
           "pension": "",
           "pensionEmployer": "",
           "savings": "",
-          "choices": {}
+          "choices": {},
+          "secondPayers": "8000"
         }
       }
     ],

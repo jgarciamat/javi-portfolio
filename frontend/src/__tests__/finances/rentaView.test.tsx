@@ -34,7 +34,7 @@ describe('Renta section', () => {
     ).toBeInTheDocument();
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenCalledWith(2025));
     expect(screen.getByLabelText(tr('tools.renta.gross'))).toHaveValue('25000');
-    expect(screen.getByText(tr('tools.renta.obligation.yes'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.obligation.overLimit'))).toBeInTheDocument();
   });
 
   it('changes the year and starts empty when nothing was recorded', async () => {

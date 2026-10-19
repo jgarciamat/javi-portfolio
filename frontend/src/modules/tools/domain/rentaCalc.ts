@@ -340,6 +340,10 @@ export interface RentalInput {
   amortization: number;
   /** Share of the net rent that is not taxed (0 to 90). */
   reductionPercent: number;
+  /** Interest and repairs of earlier years applied this year (box 0104), inside `expenses`. */
+  pendingApplied?: number;
+  /** Interest and repairs of this year over the limit, for the next four years (box 0108). */
+  excessCarry?: number;
 }
 
 export interface RentaInput {

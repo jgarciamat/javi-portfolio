@@ -1,4 +1,11 @@
-import { daysInYear, emptyForm, unrentedOf } from '@modules/tools/domain/rentaForm';
+import {
+  daysInYear,
+  emptyForm,
+  obligationIncome,
+  rentalOf,
+  unrentedOf,
+} from '@modules/tools/domain/rentaForm';
+import { rentaProperty } from '@modules/tools/data/renta/inmuebles';
 
 const form = (unrented: ReturnType<typeof emptyForm>['unrented']) => ({
   ...emptyForm(''),
@@ -30,5 +37,46 @@ describe('properties at the owner’s disposal', () => {
 
   it('knows the leap years', () => {
     expect([2024, 2025, 2100, 2000].map(daysInYear)).toEqual([366, 365, 365, 366]);
+  });
+});
+
+describe('interest and repairs of a rented property (LIRPF art. 23.1.a.1.º)', () => {
+  const rented = (over: Partial<ReturnType<typeof emptyForm>>) => ({
+    ...emptyForm(''),
+    rentalOn: true,
+    rentalIncome: '6000',
+    rentalExpenses: { 'intereses-financiacion': '4200', 'reparacion-conservacion': '2500' },
+    ...over,
+  });
+
+  it('holds them to the rent and keeps the rest for four years (case p2-46)', () => {
+    // 4,200 + 2,500 = 6,700 against 6,000 of rent: 700 for the next years (box 0108).
+    expect(rentalOf(rented({}), rentaProperty)).toMatchObject({
+      expenses: 6000,
+      pendingApplied: 0,
+      excessCarry: 700,
+    });
+  });
+
+  it('uses what was pending from earlier years first (boxes 0103-0104)', () => {
+    const r = rentalOf(rented({ rentalPendingExcess: '1000' }), rentaProperty);
+    expect(r).toMatchObject({ expenses: 6000, pendingApplied: 1000, excessCarry: 1700 });
+    const small = rentalOf(
+      rented({ rentalPendingExcess: '500', rentalExpenses: { 'intereses-financiacion': '1000' } }),
+      rentaProperty
+    );
+    expect(small).toMatchObject({ expenses: 1500, pendingApplied: 500, excessCarry: 0 });
+  });
+});
+
+describe('the obligation to file (LIRPF art. 96)', () => {
+  it('splits the pay of the first payer and the others', () => {
+    const f = { ...emptyForm('18000'), secondPayers: '2000' };
+    expect(obligationIncome(f)).toEqual({ mainIncome: 16000, otherIncome: 2000 });
+    expect(obligationIncome({ ...f, secondPayers: '90000' })).toEqual({
+      mainIncome: 0,
+      otherIncome: 18000,
+    });
+    expect(obligationIncome(emptyForm('100'))).toEqual({ mainIncome: 100, otherIncome: 0 });
   });
 });
