@@ -90,6 +90,10 @@ En pocas palabras: la app cubre bien el caso «nómina o pensión + algún alqui
 
 El JSON detalla una a una las 87 casillas calculadas o leídas y las 494 parciales.
 
+### Novedad posterior a la medición: inversiones (19-10-2026)
+
+Sin volver a medir los porcentajes de arriba: con «Importar mis inversiones» ([inversiones.md](inversiones.md)) la app **calcula** a partir de los archivos de brókers y exchanges los totales que hay que copiar en los apartados de IIC (0312, 0315, 0316, 0321, 0322), acciones negociadas (0328, 0331, 0332, 0337, 0338) y monedas virtuales (1802-1814, agrupados por moneda y clave), los rendimientos 0027, 0029, 0031 y 0037, las retenciones 0597 y 0603 (dentro de la 0609) y la deducción 0588. Las casillas de identificación (NIF del fondo, entidad emisora) siguen siendo **LEÍDAS** del certificado por la persona. Derivados en 1624-1640 y recompensas en 0304: **PARCIAL** (criterio NO CONFIRMADO).
+
 ## Cobertura de los modelos del autónomo
 
 | Modelo | Estado | Dónde | Casillas | Cobertura | Qué falta |

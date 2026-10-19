@@ -506,12 +506,13 @@ describe('what to copy and the report', () => {
   it('the report: sales with the FIFO audit, income, closed positions and years', () => {
     const tables = reportTables(ledger);
     expect(tables.map((t) => t.name)).toEqual([
+      'Por activo',
       'Ventas y FIFO',
       'Rendimientos',
       'Posiciones cerradas',
       'Por año',
     ]);
-    expect(tables[0].rows[1]).toEqual([
+    expect(tables[1].rows[1]).toEqual([
       '01/02/2025',
       'BTC',
       'BTC',
@@ -523,7 +524,7 @@ describe('what to copy and the report', () => {
       0,
       '01/01/2024: 1 por 20000 €',
     ]);
-    expect(tables[1].rows[1]).toEqual([
+    expect(tables[2].rows[1]).toEqual([
       '01/04/2025',
       'Degiro',
       'US1',
@@ -533,9 +534,22 @@ describe('what to copy and the report', () => {
       'Extranjero',
       '0029',
     ]);
-    expect(tables[2].rows[1]).toEqual(['01/04/2025', 'Degiro', 'OIL', 'shares', 0, 70, -70]);
+    expect(tables[3].rows[1]).toEqual(['01/04/2025', 'Degiro', 'OIL', 'shares', 0, 70, -70]);
     // 10,000 − 10,000 (crypto) + 100 (fund) + 50 (shares) − 70 (CFD) + 10 (dividend) = 90.
-    expect(tables[3].rows[1]).toEqual([2025, 90, 5]);
+    expect(tables[4].rows[1]).toEqual([2025, 90, 5]);
+    expect(tables[0].rows[3]).toEqual([
+      'crypto',
+      'BTC',
+      'BTC',
+      'F',
+      1,
+      30000,
+      20000,
+      10000,
+      0,
+      '1804 / 1806 / 1809 / 1808',
+    ]);
+    expect(tables[0].rows[1][3]).toBe('');
     const spanish = buildLedger(
       [
         op({
@@ -559,8 +573,8 @@ describe('what to copy and the report', () => {
       { year: 2025, rates: {} }
     );
     const t = reportTables(spanish);
-    expect(t[1].rows[1][6]).toBe('España');
-    expect(t[2].rows[1][3]).toBe('');
+    expect(t[2].rows[1][6]).toBe('España');
+    expect(t[3].rows[1][3]).toBe('');
   });
 
   it('the guide shows the steps that apply, all of them when nothing was imported', () => {

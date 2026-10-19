@@ -216,11 +216,41 @@ export function reportTables(
       d.gain,
     ]),
   ];
+  const byAsset = [
+    [
+      'Apartado',
+      'Fondo, empresa o moneda',
+      'Código',
+      'Clave 1803',
+      'Ventas',
+      'Valor de transmisión (€)',
+      'Valor de adquisición (€)',
+      'Ganancias (€)',
+      'Pérdidas que cuentan (€)',
+      'Casillas',
+    ],
+    ...declarationRows(ledger).map((r) => {
+      const b = SECTION_BOXES[r.section];
+      return [
+        r.section,
+        r.name,
+        r.code,
+        r.counterpart ?? '',
+        r.sales,
+        r.proceeds,
+        r.cost,
+        r.gain,
+        r.lossCounted,
+        `${b.proceeds} / ${b.cost} / ${b.gain} / ${b.counted}`,
+      ];
+    }),
+  ];
   const years = [
     ['Año', 'Resultado base del ahorro (€)', 'Resultado base general (€)'],
     ...Object.entries(ledger.years).map(([y, v]) => [Number(y), v.savings, v.general]),
   ];
   return [
+    { name: 'Por activo', rows: byAsset },
     { name: 'Ventas y FIFO', rows: sales },
     { name: 'Rendimientos', rows: income },
     { name: 'Posiciones cerradas', rows: direct },
