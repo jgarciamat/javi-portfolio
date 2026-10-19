@@ -74,6 +74,12 @@ export interface Deduction {
    * 18.ª: the regional half of the rent and the home of the transitional regime). Unset: all State.
    */
   regionalShare?: number;
+  /**
+   * Paid out even when there is no tax to pay: it lowers the differential quota, not the quota (LIRPF
+   * arts. 81 and 81 bis: maternity and its increase for nursery, large family, and people with a
+   * disability or the separated parent with two children in their care).
+   */
+  refundable?: boolean;
   /** Can be paid monthly in advance with a model (maternity: 140; large family and disability: 143). */
   advance?: AdvancePayment;
   /** Key conditions in plain language: income limits, ages, who it is for (max 280 characters). */

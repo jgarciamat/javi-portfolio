@@ -3,45 +3,6 @@
   "comprobado": "2026-10-19",
   "renta": [
     {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": "boxes.0595",
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 5873.46,
-      "obtenido": 4873.46,
-      "severidad": "media",
-      "causa": "La deducción por gastos de guardería (estado-guarderia) no se trata como abonable: isRefundable() en rentaCalc.ts solo reconoce /maternidad|familia-numerosa|discapacidad/, así que se resta de la cuota estatal (0595) en vez de sumarse a las abonables, y con poca cuota se perdería. El resultado final (0670) coincide en este caso.",
-      "fuente": "Art. 81.2 LIRPF; Manual práctico Renta 2025, cap. 18 (caso oficial renta-c18-01)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": "boxes.0610",
-      "concepto": "Cuota diferencial",
-      "esperado": -226.54,
-      "obtenido": -1226.54,
-      "severidad": "media",
-      "causa": "La deducción por gastos de guardería (estado-guarderia) no se trata como abonable: isRefundable() en rentaCalc.ts solo reconoce /maternidad|familia-numerosa|discapacidad/, así que se resta de la cuota estatal (0595) en vez de sumarse a las abonables, y con poca cuota se perdería. El resultado final (0670) coincide en este caso.",
-      "fuente": "Art. 81.2 LIRPF; Manual práctico Renta 2025, cap. 18 (caso oficial renta-c18-01)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.refundable",
-      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
-      "esperado": 2200,
-      "obtenido": 1200,
-      "severidad": "media",
-      "causa": "La deducción por gastos de guardería (estado-guarderia) no se trata como abonable: isRefundable() en rentaCalc.ts solo reconoce /maternidad|familia-numerosa|discapacidad/, así que se resta de la cuota estatal (0595) en vez de sumarse a las abonables, y con poca cuota se perdería. El resultado final (0670) coincide en este caso.",
-      "fuente": "Art. 81.2 LIRPF; Manual práctico Renta 2025, cap. 18 (caso oficial renta-c18-01)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
       "caso": "15-donativos-castilla-y-leon",
       "declaracion": "individual",
       "casilla": null,

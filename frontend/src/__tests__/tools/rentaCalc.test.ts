@@ -58,7 +58,7 @@ const state: RentaState = {
   workReduction: { maxReduction: 0, fullUntil: 0, zeroFrom: 0, notes: '' },
   baseReductions: { pensionPlanLimit: 1500, pensionPlanEmployerLimit: 8500, notes: '' },
   deductions: [
-    deduction({ id: 'estado-maternidad', kind: 'fixed', perChild: [1200] }),
+    deduction({ id: 'estado-maternidad', kind: 'fixed', perChild: [1200], refundable: true }),
     deduction({ id: 'estado-donativos', kind: 'percent', percent: 80, baseLimit: 250 }),
   ],
   source: 'x',
@@ -284,10 +284,23 @@ describe('deductionAmount', () => {
     expect(deductionAmount(deduction({ kind: 'special' }), { on: true })).toBe(0);
   });
 
-  it('knows which deductions are paid out even without tax to pay', () => {
-    expect(isRefundable(deduction({ id: 'estado-maternidad' }))).toBe(true);
-    expect(isRefundable(deduction({ id: 'estado-familia-numerosa' }))).toBe(true);
-    expect(isRefundable(deduction({ id: 'estado-donativos' }))).toBe(false);
+  it('knows which deductions are paid out even without tax to pay', async () => {
+    expect(isRefundable(deduction({ id: 'x', refundable: true }))).toBe(true);
+    expect(isRefundable(deduction({ id: 'estado-maternidad' }))).toBe(false);
+    // LIRPF arts. 81 and 81 bis, as the AEAT Manual 2025 (c18) lists them. Before, a pattern on the
+    // id left out the nursery and the separated parent, and took in the works for disability.
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    expect(rentaState.deductions.filter(isRefundable).map((d) => d.id)).toEqual([
+      'estado-maternidad',
+      'estado-guarderia',
+      'estado-descendiente-discapacidad',
+      'estado-ascendiente-discapacidad',
+      'estado-conyuge-discapacidad',
+      'estado-familia-numerosa',
+      'estado-familia-numerosa-especial',
+      'estado-familia-numerosa-hijo-adicional',
+      'estado-ascendiente-separado-dos-hijos',
+    ]);
   });
 });
 
@@ -602,6 +615,22 @@ describe('computeRenta with the real data', () => {
       })
     );
   };
+
+  it('pays out the nursery with the maternity, even without tax (case 07 of the bank)', async () => {
+    const family: Family = { ...alone, children: [{ age: 1, disability: 0 }] };
+    const choices = {
+      'estado-maternidad': { on: true, units: 1 },
+      'estado-guarderia': { on: true, amount: 1000 },
+    };
+    // 1,200 + 1,000 are taken from the differential quota (before: only the 1,200 of maternity, and
+    // the 1,000 lowered the State quota, so with little tax they were lost).
+    const r = await run('murcia', 36000, family, choices);
+    expect(r.refundable).toBe(2200);
+    const poor = await run('murcia', 9000, family, choices);
+    expect(poor.stateQuota).toBe(0);
+    expect(poor.refundable).toBe(2200);
+    expect(poor.result).toBe(-2200);
+  });
 
   it('splits the home bought before 2013 in a State and a regional half (case 13 of the bank)', async () => {
     // DT 18.ª LIRPF: 7.5 % State + 7.5 % regional of up to 9,040 €. Before: only the 678 € of the State.

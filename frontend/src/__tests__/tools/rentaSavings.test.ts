@@ -26,7 +26,7 @@ const DEDUCTIONS = [
   deduction('s2', { kind: 'special', amount: 300 }),
   deduction('big', { kind: 'special' }),
   deduction('lim', { amount: 50, incomeLimit: { individual: 1000 } }),
-  deduction('estado-maternidad', { perChild: [1200] }),
+  deduction('estado-maternidad', { perChild: [1200], refundable: true }),
 ];
 
 const flat = [{ from: 0, rate: 10 }];

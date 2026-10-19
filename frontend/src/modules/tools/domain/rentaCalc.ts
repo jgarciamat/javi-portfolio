@@ -288,9 +288,14 @@ export function splitDeduction(amount: number, share: number): { state: number; 
   return { state: round2(amount - regional), regional };
 }
 
-/** The deductions that are paid out even when there is no tax to pay (maternity, large family, disability). */
-export const isRefundable = (d: Deduction): boolean =>
-  /maternidad|familia-numerosa|discapacidad/.test(d.id);
+/**
+ * The deductions that are paid out even when there is no tax to pay (maternity and nursery, large
+ * family, disability in care, separated parent with two children): those marked in the data. AEAT
+ * Manual práctico de Renta 2025, c18, "Resultado de la declaración" (checked 19-10-2026): they are
+ * taken from the differential quota. It used to be a pattern on the id, which left out the nursery
+ * and the separated parent and took in the works for disability of the home (a quota deduction).
+ */
+export const isRefundable = (d: Deduction): boolean => d.refundable === true;
 
 // ─── The whole calculation ────────────────────────────────────────────────────
 

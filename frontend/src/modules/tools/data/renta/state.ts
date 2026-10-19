@@ -50,6 +50,7 @@ const deductions: Deduction[] = [
   // ---------------------------------------------------------------- Familia (abonables)
   {
     id: 'estado-maternidad',
+    refundable: true,
     advance: ADVANCE_MATERNITY,
     group: 'family',
     title: 'Por maternidad (hijos menores de 3 años)',
@@ -65,6 +66,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-guarderia',
+    refundable: true,
     group: 'family',
     title: 'Gastos de guardería (suma a la de maternidad)',
     summary:
@@ -79,6 +81,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-descendiente-discapacidad',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por hijo con discapacidad a cargo',
@@ -94,6 +97,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-discapacidad',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por padre o madre con discapacidad a cargo',
@@ -109,6 +113,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-conyuge-discapacidad',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por cónyuge con discapacidad a cargo',
@@ -124,6 +129,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría general',
@@ -139,6 +145,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-especial',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por familia numerosa de categoría especial',
@@ -154,6 +161,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-familia-numerosa-hijo-adicional',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Incremento de familia numerosa por cada hijo de más',
@@ -169,6 +177,7 @@ const deductions: Deduction[] = [
   },
   {
     id: 'estado-ascendiente-separado-dos-hijos',
+    refundable: true,
     advance: ADVANCE_FAMILY,
     group: 'family',
     title: 'Por separado o sin matrimonio con dos hijos',
