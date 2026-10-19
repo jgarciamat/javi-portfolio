@@ -148,7 +148,7 @@ async function build(
   return doc.save();
 }
 
-export const model130 = () =>
+export const model130 = (filled?: Filled) =>
   build(
     [
       'Modelo 130 · plantilla de Finanverso',
@@ -188,10 +188,11 @@ export const model130 = () =>
       },
       { box: '17', label: 'Total (14 - 15 - 16)' },
       { box: '19', label: 'Resultado de la declaración' },
-    ]
+    ],
+    filled
   );
 
-export const model303 = () =>
+export const model303 = (filled?: Filled) =>
   build(
     [
       'Modelo 303 · plantilla de Finanverso',
@@ -220,7 +221,8 @@ export const model303 = () =>
       { box: '59', label: 'Entregas intracomunitarias de bienes y servicios (base)' },
       { box: '60', label: 'Exportaciones y operaciones asimiladas (base)' },
       { box: '71', label: 'Resultado de la autoliquidación' },
-    ]
+    ],
+    filled
   );
 
 // Boxes and labels of the 111 and the 115 as the AEAT instructions and record layouts give them
