@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
+import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { Icon } from '@shared/components/Icon';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
@@ -19,14 +20,17 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
   const { t } = useI18n();
   const { money } = useFormat();
   const { currentPeriod } = useFinances();
-  // The return filed in spring is the one of the previous year.
-  const [year, setYear] = useState(currentPeriod.year - 1);
+  // Only the last return and the one of the running year: older campaigns are closed.
+  const years = [currentPeriod.year, currentPeriod.year - 1];
+  // The year of what was left half done; else the return filed in spring, the previous year's.
+  const [year, setYear] = useState(() => {
+    const saved = loadProgress()?.year;
+    return saved !== undefined && years.includes(saved) ? saved : currentPeriod.year - 1;
+  });
   const { data } = useAnnualSummary(year);
   const months = Object.values(data?.months ?? {});
   const income = months.reduce((sum, m) => sum + m.income, 0);
   const expenses = months.reduce((sum, m) => sum + m.expenses, 0);
-  // Only the last return and the one of the running year: older campaigns are closed.
-  const years = [currentPeriod.year, currentPeriod.year - 1];
 
   return (
     <div className="section-view">
@@ -54,6 +58,7 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
           <RentaPlanner
             key={`${year}-${Math.round(income)}`}
             mode="account"
+            year={year}
             initialIncome={income > 0 ? String(Math.round(income)) : ''}
           />
         </div>

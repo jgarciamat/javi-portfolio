@@ -1633,6 +1633,7 @@
   "tools.renta.retired": "Mis ingresos son una pensión: no trabajo en activo (no se suman los 3.500 € de gastos por discapacidad).",
   "tools.renta.wipe": "Eliminar los datos actuales",
   "tools.renta.wipeConfirm": "Se borrarán todos los datos que has metido y el borrador leído, y todo volverá a cero y desmarcado. ¿Continuar?",
+  "tools.renta.recovered": "Hemos recuperado lo que tenías escrito.",
   "tools.renta.compare.title": "Tu borrador frente a Finanverso, casilla a casilla",
   "tools.renta.compare.refund": "a devolver {amount}",
   "tools.renta.compare.pay": "a pagar {amount}",

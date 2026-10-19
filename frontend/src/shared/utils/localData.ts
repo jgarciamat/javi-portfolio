@@ -7,7 +7,7 @@
  * - `mm_renta_uses`: the public tax calculator's one free use per browser.
  *
  * Removed, among others: session (`mm_token`, `mm_refresh_token`, `mm_user`), drafts
- * (`mm_renta_snapshot_v2`, `mm_autonomo_*`, `mm_hacienda_*`), captured payments
+ * (`mm_renta_snapshot_v2`, `mm_renta_progress`, `mm_autonomo_*`, `mm_hacienda_*`), captured payments
  * (`mm_captured*`, `mm_capture_enabled`), invite codes (`mm_ref`, `mm_join`), the
  * signup source (`mm_acq`), app lock, reminders and UI state.
  */

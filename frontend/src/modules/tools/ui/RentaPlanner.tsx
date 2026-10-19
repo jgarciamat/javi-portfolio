@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
@@ -28,6 +28,7 @@ import { rentaState } from '../data/renta/state';
 import { mentionedIn, missingDeductions, NO_DRAFT, type DraftState } from '../domain/rentaDraft';
 import { compareBoxes, ourBoxes } from '../domain/rentaCompare';
 import { deductionSavings, markedSaving } from '../domain/rentaSavings';
+import { clearProgress, loadProgress, saveProgress } from '../application/rentaProgress';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
@@ -215,6 +216,47 @@ function ResultSection({
   );
 }
 
+/** The data saved for this year, if any: another year's data is not mixed with this one. */
+function restoredFor(year: number) {
+  const saved = loadProgress();
+  return saved && saved.year === year ? saved : null;
+}
+
+/** The form and the draft: saved on the device as they change, and recovered on the way back. */
+function useSavedPlanner(year: number, initialIncome: string) {
+  const [restored] = useState(() => restoredFor(year));
+  const [form, setForm] = useState<RentaForm>(() => restored?.form ?? emptyForm(initialIncome));
+  const [draft, setDraftState] = useState<DraftState>(() => restored?.draft ?? NO_DRAFT);
+  const [recovered, setRecovered] = useState(restored !== null);
+  // Only what the person changes is saved: an untouched planner keeps the income of the year.
+  const dirty = useRef(restored !== null);
+
+  useEffect(() => {
+    if (dirty.current) saveProgress({ year, form, draft });
+  }, [year, form, draft]);
+
+  const set = (patch: Partial<RentaForm>) => {
+    dirty.current = true;
+    setForm((f) => ({ ...f, ...patch }));
+  };
+  const setChoice = (id: string, choice: Choice) => {
+    dirty.current = true;
+    setForm((f) => ({ ...f, choices: { ...f.choices, [id]: choice } }));
+  };
+  const setDraft = (next: DraftState) => {
+    dirty.current = true;
+    setDraftState(next);
+  };
+  const reset = () => {
+    dirty.current = false;
+    clearProgress();
+    setForm(emptyForm(''));
+    setDraftState(NO_DRAFT);
+    setRecovered(false);
+  };
+  return { form, set, setChoice, draft, setDraft, recovered, reset };
+}
+
 /** What each deduction saves with the data as it is, and the draft's boxes next to ours. */
 function useInsights(
   input: RentaInput,
@@ -250,12 +292,18 @@ function useInsights(
 export function RentaPlanner({
   initialIncome = '',
   mode,
+  year = rentaState.year,
 }: {
   initialIncome?: string;
   mode: RentaMode;
+  /** The year of the return the data is saved for. */
+  year?: number;
 }) {
   const { t } = useI18n();
-  const [form, setForm] = useState<RentaForm>(() => emptyForm(initialIncome));
+  const { form, set, setChoice, draft, setDraft, recovered, reset } = useSavedPlanner(
+    year,
+    initialIncome
+  );
   const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
   const [loadError, setLoadError] = useState(false);
   const access = useRentaAccess(mode);
@@ -263,10 +311,8 @@ export function RentaPlanner({
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
   const [busy, setBusy] = useState(false);
-  const [draft, setDraft] = useState<DraftState>(NO_DRAFT);
   // Bumped when the data is wiped, so the draft reader forgets its pasted text and messages too.
   const [wipes, setWipes] = useState(0);
-  const set = (patch: Partial<RentaForm>) => setForm((f) => ({ ...f, ...patch }));
 
   useEffect(() => {
     let cancelled = false;
@@ -317,16 +363,18 @@ export function RentaPlanner({
   };
   const wipe = () => {
     if (!window.confirm(t('tools.renta.wipeConfirm'))) return;
-    setForm(emptyForm(''));
-    setDraft(NO_DRAFT);
+    reset();
     setWipes((n) => n + 1);
   };
-  const setChoice = (id: string, choice: Choice) =>
-    setForm((f) => ({ ...f, choices: { ...f.choices, [id]: choice } }));
 
   return (
     <div className="renta-planner">
       <div className="renta-wipe">
+        {recovered && (
+          <p className="renta-recovered" role="status">
+            {t('tools.renta.recovered')}
+          </p>
+        )}
         <button type="button" className="btn-secondary" onClick={wipe}>
           {t('tools.renta.wipe')}
         </button>

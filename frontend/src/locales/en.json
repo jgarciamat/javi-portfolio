@@ -1633,6 +1633,7 @@
   "tools.renta.retired": "My income is a pension: I do not work (the extra disability expenses are not added).",
   "tools.renta.wipe": "Delete current data",
   "tools.renta.wipeConfirm": "Everything you entered and the draft you read will be cleared, and all back to zero and unticked. Continue?",
+  "tools.renta.recovered": "We have recovered what you had entered.",
   "tools.renta.compare.title": "Your draft next to Finanverso, box by box",
   "tools.renta.compare.refund": "a refund of {amount}",
   "tools.renta.compare.pay": "{amount} to pay",
