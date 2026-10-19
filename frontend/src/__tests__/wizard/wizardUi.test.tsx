@@ -207,23 +207,55 @@ describe('coming back after the end', () => {
 });
 
 describe('reading tools', () => {
-  it('makes the letters bigger and the contrast higher, and remembers it', () => {
+  it('starts with high contrast, saving nothing until the person chooses', () => {
+    renderWithProviders(<Harness />, { authenticated: false });
+    expect(screen.getByRole('button', { name: tr('wizard.contrast') })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(document.documentElement).toHaveClass('wiz-contrast');
+    expect(localStorage.getItem(PREFS_KEY)).toBeNull();
+  });
+
+  it('makes the letters bigger and remembers the contrast turned off', () => {
     const { unmount } = renderWithProviders(<Harness />, { authenticated: false });
     const big = screen.getByRole('button', { name: tr('wizard.big') });
     fireEvent.click(big);
     expect(big).toHaveAttribute('aria-pressed', 'true');
     expect(document.documentElement).toHaveClass('wiz-big-text');
-    fireEvent.click(screen.getByRole('button', { name: tr('wizard.contrast') }));
-    expect(document.documentElement).toHaveClass('wiz-contrast');
+    // Letters only: the contrast is still not a choice.
     expect(JSON.parse(localStorage.getItem(PREFS_KEY) as string)).toEqual({
       big: true,
       contrast: true,
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('wizard.contrast') }));
+    expect(document.documentElement).not.toHaveClass('wiz-contrast');
+    expect(JSON.parse(localStorage.getItem(PREFS_KEY) as string)).toEqual({
+      big: true,
+      contrast: false,
+      contrastChosen: true,
     });
     unmount();
     // Leaving the assistant leaves the rest of the app as it was.
     expect(document.documentElement).not.toHaveClass('wiz-big-text');
     renderWithProviders(<Harness />, { authenticated: false });
-    expect(document.documentElement).toHaveClass('wiz-big-text', 'wiz-contrast');
+    expect(document.documentElement).toHaveClass('wiz-big-text');
+    expect(document.documentElement).not.toHaveClass('wiz-contrast');
+  });
+
+  it('turns the contrast on for a copy saved before without a choice of it', () => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ big: false, contrast: false }));
+    renderWithProviders(<Harness />, { authenticated: false });
+    expect(document.documentElement).toHaveClass('wiz-contrast');
+  });
+
+  it('keeps the contrast on when the person chose it', () => {
+    localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ big: false, contrast: true, contrastChosen: true })
+    );
+    renderWithProviders(<Harness />, { authenticated: false });
+    expect(document.documentElement).toHaveClass('wiz-contrast');
   });
 
   it('opens the expert mode and starts again only after confirming', () => {

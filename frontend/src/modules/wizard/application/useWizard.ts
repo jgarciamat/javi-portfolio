@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { storage } from '@shared/utils/storage';
 import {
   NEW_PROGRESS,
@@ -54,15 +54,40 @@ export interface WizardPrefs {
 
 export const PREFS_KEY = 'mm_wizard_prefs';
 
+/** What is saved: `contrastChosen` tells «turned off by the person» from «never chose». */
+interface SavedPrefs extends WizardPrefs {
+  contrastChosen?: boolean;
+}
+
+/**
+ * The preferences of the device. High contrast is on until the person turns it off (then that
+ * choice stays); copies saved before without a choice of contrast count as no choice.
+ */
 export function useWizardPrefs(): [WizardPrefs, (patch: Partial<WizardPrefs>) => void] {
-  const [prefs, setPrefs] = useState<WizardPrefs>(() => {
-    const saved = storage.getJSON<Partial<WizardPrefs> | null>(PREFS_KEY, null);
-    return { big: saved?.big === true, contrast: saved?.contrast === true };
+  const [prefs, setPrefs] = useState<SavedPrefs>(() => {
+    const saved = storage.getJSON<Partial<SavedPrefs> | null>(PREFS_KEY, null);
+    const chosen = saved?.contrastChosen === true;
+    return {
+      big: saved?.big === true,
+      contrast: chosen ? saved?.contrast === true : true,
+      ...(chosen ? { contrastChosen: true } : {}),
+    };
   });
-  useEffect(() => storage.setJSON(PREFS_KEY, prefs), [prefs]);
+  // Saved only once the person changes something: opening the assistant chooses nothing.
+  const touched = useRef(false);
+  useEffect(() => {
+    if (touched.current) storage.setJSON(PREFS_KEY, prefs);
+  }, [prefs]);
   // From the latest value: two quick taps never undo each other.
-  const change = (patch: Partial<WizardPrefs>) => setPrefs((p) => ({ ...p, ...patch }));
-  return [prefs, change];
+  const change = (patch: Partial<WizardPrefs>) => {
+    touched.current = true;
+    setPrefs((p) => ({
+      ...p,
+      ...patch,
+      ...('contrast' in patch ? { contrastChosen: true } : {}),
+    }));
+  };
+  return [{ big: prefs.big, contrast: prefs.contrast }, change];
 }
 
 /** Step by step (the assistant) or everything together (expert mode): remembered on this device. */
