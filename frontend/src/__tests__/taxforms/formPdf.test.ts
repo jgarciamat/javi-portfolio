@@ -89,10 +89,12 @@ describe('The layouts measured on the BOE', () => {
 
   it('keeps none of the Tax Agency branding', async () => {
     const models = ['130', '111', '115', '303', '131', '390', '349', '190', '180', '347'];
-    for (const model of [...models, '309', '123'] as FormModel[]) {
+    for (const model of [...models, '309', '123', '100'] as FormModel[]) {
       const texts = (await loadLayout(model)).pages.flatMap((p) => p.t.map((t) => t[4]));
       expect(
-        texts.filter((t) => /^Agencia Tributaria$|agenciatributaria|^MINISTERIO/.test(t))
+        texts.filter((t) =>
+          /^Agencia Tributaria$|agenciatributaria|^MINISTERIO|^9\d \d{3} \d{2} \d{2}$/.test(t)
+        )
       ).toEqual([]);
     }
   });

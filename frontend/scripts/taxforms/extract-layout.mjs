@@ -157,6 +157,8 @@ const DROP = [
   /^Tel[eé]fono/,
   /^91 554 87 70/,
   /^901 33 55 33$/,
+  // The phone of the Tax Agency on page 1 of the Renta.
+  /^91 333 53 33$/,
   /www\.agenciatributaria\.es/,
   /^https:\/\/sede\.agenciatributaria/,
 ];
