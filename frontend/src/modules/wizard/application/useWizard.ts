@@ -59,11 +59,9 @@ export function useWizardPrefs(): [WizardPrefs, (patch: Partial<WizardPrefs>) =>
     const saved = storage.getJSON<Partial<WizardPrefs> | null>(PREFS_KEY, null);
     return { big: saved?.big === true, contrast: saved?.contrast === true };
   });
-  const change = (patch: Partial<WizardPrefs>) => {
-    const next = { ...prefs, ...patch };
-    storage.setJSON(PREFS_KEY, next);
-    setPrefs(next);
-  };
+  useEffect(() => storage.setJSON(PREFS_KEY, prefs), [prefs]);
+  // From the latest value: two quick taps never undo each other.
+  const change = (patch: Partial<WizardPrefs>) => setPrefs((p) => ({ ...p, ...patch }));
   return [prefs, change];
 }
 
