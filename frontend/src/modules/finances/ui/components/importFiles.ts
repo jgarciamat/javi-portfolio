@@ -13,7 +13,12 @@ import {
   type KindPreferences,
 } from '../../domain/invoiceLedger';
 import { entriesOf, kindOfInvoice, type InvoicePdf } from '../../domain/invoicePdf';
-import { carryFrom390, type TaxModelParse, type TaxModelPdf } from '../../domain/taxModelPdf';
+import {
+  carryFrom390,
+  type ForalTerritory,
+  type TaxModelParse,
+  type TaxModelPdf,
+} from '../../domain/taxModelPdf';
 import { applyInvoices, applyModel130, applyModel303, applyModel349 } from './importForm';
 import type { ManualForm } from './AutonomoManual';
 import { importWithholdingModel } from './withholdingForm';
@@ -103,16 +108,39 @@ const note = (key: string, values?: Line['values']): Line => ({
   values,
 });
 
-/** Why a read PDF cannot be used, or null when it can. */
-function modelProblem(parsed: TaxModelParse | null, year: number, years: readonly number[]) {
-  if (!parsed) return 'unreadable';
-  if (!parsed.ok) return parsed.reason;
-  const { data } = parsed;
+/** The foral Treasuries by name: the same in both languages. */
+const TERRITORY: Record<ForalTerritory, string> = {
+  bizkaia: 'Bizkaia',
+  gipuzkoa: 'Gipuzkoa',
+  alava: 'Araba/Álava',
+  navarra: 'Navarra',
+  basque: 'Euskadi',
+};
+
+/** What the error says of the PDF: the foral Treasury, or the periods it mixes. */
+function problemValues(parsed: TaxModelParse | null): Record<string, string> {
+  if (parsed?.ok !== false) return {};
+  if (parsed.reason === 'foral') return { territory: TERRITORY[parsed.territory] };
+  if (parsed.reason === 'severalPeriods') return { periods: parsed.periods.join(', ') };
+  return {};
+}
+
+/** Why a read form cannot go into the draft, or null when it can. */
+function dataProblem(data: TaxModelPdf, year: number, years: readonly number[]) {
+  // The Renta is compared in its own tool; the 131 (modules) is not the direct estimation of the draft.
+  if (data.model === '100') return 'renta';
+  if (data.model === '131') return 'modules';
   // The 390 is of a year, not of a quarter.
   if (data.model === '390') return null;
   if (data.quarter === null) return 'noPeriod';
   if (!years.includes(data.year ?? year)) return 'year';
   return data.model === '130' && data.quarter === 4 ? 'lastQuarter' : null;
+}
+
+/** Why a read PDF cannot be used, or null when it can. */
+function modelProblem(parsed: TaxModelParse | null, year: number, years: readonly number[]) {
+  if (!parsed) return 'unreadable';
+  return parsed.ok ? dataProblem(parsed.data, year, years) : parsed.reason;
 }
 
 /** What the modelo 303 brought that the draft takes differently, or not at all. */
@@ -146,7 +174,7 @@ export function importModel(
         {
           tone: 'error',
           key: `app.autonomo.model.error.${problem}`,
-          values: { years: years.join(', ') },
+          values: { years: years.join(', '), ...problemValues(parsed) },
         },
       ],
     };

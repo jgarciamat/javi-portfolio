@@ -192,6 +192,22 @@ describe('Importing a filed modelo 130 or 303 from the same place', () => {
     await error('year');
     await upload(ok({ quarter: 4, boxes: { '01': 1 } }));
     await error('lastQuarter');
+    await upload({ ok: false, reason: 'notAForm' });
+    await error('notAForm');
+    await upload(ok({ model: '100', quarter: null, boxes: { '0003': 1 } }));
+    await error('renta');
+    await upload(ok({ model: '131', boxes: { '01': 1 } }));
+    await error('modules');
+    const said = (key: string, values: Record<string, string>) =>
+      waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          tr(`app.autonomo.model.error.${key}`, values)
+        )
+      );
+    await upload({ ok: false, reason: 'foral', territory: 'alava' });
+    await said('foral', { territory: 'Araba/Álava' });
+    await upload({ ok: false, reason: 'severalPeriods', periods: ['2026 1T', '2026 2T'] });
+    await said('severalPeriods', { periods: '2026 1T, 2026 2T' });
     expect(onPeriod).not.toHaveBeenCalled();
     // Choosing nothing in the dialog does nothing.
     await act(async () => {

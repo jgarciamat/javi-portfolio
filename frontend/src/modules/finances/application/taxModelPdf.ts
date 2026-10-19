@@ -41,6 +41,22 @@ function tokenOf(item: TextItem, text: string): PdfToken {
   return { text, x: x + per * lead, y, field: false, w: per * text.length, h: item.height };
 }
 
+/** A filled text field of the form as a token; null for the empty ones, buttons and links. */
+function fieldToken(w: Widget): PdfToken | null {
+  const value = typeof w.fieldValue === 'string' ? w.fieldValue.trim() : '';
+  if (w.subtype !== 'Widget' || w.fieldType !== 'Tx' || value === '') return null;
+  return {
+    text: value,
+    x: w.rect[0],
+    y: w.rect[1] + BASELINE,
+    // The official form keeps its labels in fields too: they are text, not something typed in.
+    field: !LABEL_FIELD.test(w.fieldName ?? ''),
+    // Its size, to pair it with a box number printed above it (030, 840).
+    w: w.rect[2] - w.rect[0],
+    h: w.rect[3] - w.rect[1],
+  };
+}
+
 /** Every piece of text and every filled form field of the pages, with its place on the page. */
 export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
   const pages: PdfToken[][] = [];
@@ -52,15 +68,8 @@ export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
       if (text && item.transform) tokens.push(tokenOf(item as TextItem, text));
     }
     for (const w of (await page.getAnnotations()) as Widget[]) {
-      const value = typeof w.fieldValue === 'string' ? w.fieldValue.trim() : '';
-      if (w.subtype !== 'Widget' || w.fieldType !== 'Tx' || value === '') continue;
-      tokens.push({
-        text: value,
-        x: w.rect[0],
-        y: w.rect[1] + BASELINE,
-        // The official form keeps its labels in fields too: they are text, not something typed in.
-        field: !LABEL_FIELD.test(w.fieldName ?? ''),
-      });
+      const token = fieldToken(w);
+      if (token) tokens.push(token);
     }
     pages.push(tokens);
   }

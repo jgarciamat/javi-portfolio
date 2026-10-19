@@ -197,12 +197,12 @@ describe('Reading the boxes of the modelo 130 from the official fillable form', 
 
 describe('What is not a modelo 130 or 303', () => {
   it('is refused, saying it does not know the form', () => {
-    const renta = [
-      text('Modelo 100', 10, 10),
-      text('Impuesto sobre la Renta de las Personas Físicas', 10, 20),
+    const census = [
+      text('Modelo 036', 10, 10),
+      text('Declaración censal de alta', 10, 20),
       text('18.379,04', 100, 30),
     ];
-    expect(parseTaxModelTokens([renta])).toEqual({ ok: false, reason: 'unknownModel' });
+    expect(parseTaxModelTokens([census])).toEqual({ ok: false, reason: 'unknownModel' });
     expect(parseTaxModelTokens([])).toEqual({ ok: false, reason: 'unknownModel' });
   });
 

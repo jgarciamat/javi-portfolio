@@ -1,18 +1,20 @@
 import { EU_PREFIXES, normalVatId } from './vatBook';
 import { KEYS_349, type IntraOp, type Key349, type VatRate } from './types';
+import { formKindOf, type ForalTerritory, type FormKind, type TaxModel } from './taxModelDetect';
+
+export type { ForalTerritory, TaxModel } from './taxModelDetect';
 
 /**
- * Reading the modelos 130, 303, 390, 349, 111 and 115 from a PDF, without knowing which version of the
- * form it is.
+ * Reading the modelos 130, 303, 390, 349, 111, 115 and 100 from a PDF, without knowing which version
+ * of the form it is.
  *
- * Every box of these forms is printed with its number, and its amount sits on the same line to the
- * right of it. That holds for the official fillable form (the number and the field are both widgets),
- * for the PDF that the Tax Agency's own page produces (everything is text) and for the templates of
- * the app. So the reader does not look for «the line that says Ingresos computables» but pairs every
- * amount with the box number that is nearest to its left on the same line.
+ * Every box of these forms is printed with its number, and its amount sits on the same line next to
+ * it: to its right on the forms (the official fillable form, the PDF of the Tax Agency's page, the
+ * templates and previews of the app), to its left on the PDF of Renta WEB («66.661,66 0435»). So the
+ * reader does not look for «the line that says Ingresos computables» but pairs every amount with the
+ * box number next to it on its line. Fillable forms that print the number above the field (030, 840)
+ * are paired upwards when the line has none.
  */
-
-export type TaxModel = '130' | '303' | '390' | '349' | '111' | '115';
 
 /** A piece of the page: text or a form field, where it is (PDF points) and whether it is an amount. */
 export interface PdfToken {
@@ -21,7 +23,7 @@ export interface PdfToken {
   y: number;
   /** Typed in a form field (a plain number is fine); printed text only counts when it looks like an amount. */
   field: boolean;
-  /** Width and font size of printed text, when the PDF gives them (to join pieces of one word). */
+  /** Width and font size of printed text (or the size of a field), when the PDF gives them. */
   w?: number;
   h?: number;
 }
@@ -29,9 +31,9 @@ export interface PdfToken {
 export interface TaxModelPdf {
   model: TaxModel;
   year: number | null;
-  /** 1 to 4; null when the period is not a quarter (monthly 303) or could not be read. */
+  /** 1 to 4; null when the period is not a quarter (monthly 303, 390, Renta) or could not be read. */
   quarter: 1 | 2 | 3 | 4 | null;
-  /** Box number ("01", "07", "150"…) to its amount in euros. */
+  /** Box number ("01", "07", "150", "0435"…) to its amount in euros. */
   boxes: Record<string, number>;
   /** Modelo 349: one line per operator and key (corrections with the period they correct). */
   operators?: IntraOp[];
@@ -39,20 +41,28 @@ export interface TaxModelPdf {
 
 export type TaxModelParse =
   | { ok: true; data: TaxModelPdf }
-  | { ok: false; reason: 'unknownModel' | 'noBoxes' };
+  /** Not a form the app knows; a blank form; a publication or manual that prints forms. */
+  | { ok: false; reason: 'unknownModel' | 'noBoxes' | 'notAForm' }
+  /** A form of a foral Treasury: its boxes do not mean what the State's do. */
+  | { ok: false; reason: 'foral'; territory: ForalTerritory }
+  /** Several periods in one PDF (the four quarters of a year): their figures would be mixed. */
+  | { ok: false; reason: 'severalPeriods'; periods: string[] };
 
 const boxRange = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, i) => String(from + i).padStart(2, '0'));
 
 /** Boxes that exist on each form: a number outside them is a page number, a year or a percentage. */
-const BOXES: Record<TaxModel, Set<string>> = {
+const BOXES: Record<Exclude<TaxModel, '100'>, Set<string>> = {
   // Boxes 01-30 of the 111 and 01-05 of the 115, as the AEAT instructions and record layouts number
   // them (checked on 19 October 2026; see domain/withholdings.ts).
   '111': new Set(boxRange(1, 30)),
   '115': new Set(boxRange(1, 5)),
-  '130': new Set(Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(2, '0'))),
-  // Boxes of the 2026 design of the 303 (DR303e26v101.xlsx, pages 1-4), with 72 «a compensar» and
-  // 73 «a devolver» of the form, and the 153-155, 165-167 and 16-18 of the older rates.
+  '130': new Set(boxRange(1, 19)),
+  // Orden HAP/258/2015 (BOE-A-2015-1656), page 8: boxes 01-15 of the 131.
+  '131': new Set(boxRange(1, 15)),
+  // Every box of the 2026 design of the 303 (Orden HAC/27/2026, anexo III, and DR303e26v101.xlsx,
+  // the same list as the preview's layout), the prorrata of page 5 (500-524, 700-735) included. The
+  // boxes the design no longer has (61, 67, 82, 85, 113-119, 121) are not read.
   '303': new Set([
     ...boxRange(1, 60),
     ...['62', '63', '64', '65', '66', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77'],
@@ -61,6 +71,8 @@ const BOXES: Record<TaxModel, Set<string>> = {
     ...['120', '122', '123', '124', '125', '126', '127', '128'],
     ...['150', '151', '152', '153', '154', '155', '156', '157', '158'],
     ...['165', '166', '167', '168', '169', '170'],
+    ...boxRange(500, 524),
+    ...boxRange(700, 735),
   ]),
   // Every box of the 2025 design of the 390 (dr390e2025.xlsx), the latest published.
   '390': new Set([
@@ -84,90 +96,130 @@ const BOXES: Record<TaxModel, Set<string>> = {
 
 /** Same line: the number of a box and its amount differ by a couple of points at most. */
 const SAME_LINE = 6;
+/** A fillable form that prints the number above the field: the field is just under it. */
+const ABOVE = 16;
 
 const AMOUNT = /^-?\d{1,3}(\.\d{3})*,\d{2}$|^-?\d+,\d{2}$|^-?\d+\.\d{2}$|^-?\d+$/;
 const PRINTED_AMOUNT = /^-?\d{1,3}(\.\d{3})*,\d{2}$|^-?\d+,\d{2}$/;
+/**
+ * Printed amounts without cents: the Tax Agency's examples print a whole «-6.000» or «0». A box
+ * number never has a dot, a sign or is 0, so these cannot be taken for one.
+ */
+const PRINTED_WHOLE = /^-?\d{1,3}(\.\d{3})+$|^-\d+$|^0$/;
 
-/** "1.234,56" / "1234,56" / "1234.56" / "5300" as euros; NaN when it is not an amount. */
+/** "1.234,56" / "1234,56" / "1234.56" / "5300" / "-6.000" as euros; NaN when it is not an amount. */
 export function amountOf(text: string): number {
   const clean = text.trim().replace(/[€\s]/g, '');
+  if (/^-?\d{1,3}(\.\d{3})+$/.test(clean)) return Number(clean.replace(/\./g, ''));
   if (!AMOUNT.test(clean)) return NaN;
   const normal = clean.includes(',') ? clean.replace(/\./g, '').replace(',', '.') : clean;
   return Number(normal);
 }
 
-const labelOf = (text: string): string | null => /^\[?(\d{2,3})\]?$/.exec(text.trim())?.[1] ?? null;
+/**
+ * The box a number names on each form: four digits on the Renta, one or two on the old 115 (2002,
+ * «1»…«5»), two or three on the rest.
+ */
+function labelOf(text: string, model: TaxModel): string | null {
+  const clean = text.trim();
+  if (model === '100') return /^\[?(\d{4})\]?$/.exec(clean)?.[1] ?? null;
+  const id = (model === '115' ? /^\[?(\d{1,2})\]?$/ : /^\[?(\d{2,3})\]?$/).exec(clean)?.[1];
+  return id === undefined ? null : id.padStart(2, '0');
+}
 
-/** The VAT forms by the words of their title, the annual summary first. */
-const VAT_TITLES: [RegExp, TaxModel][] = [
-  [/resumen anual/, '390'],
-  [/autoliquidaci[oó]n/, '303'],
-];
+const isBox = (model: TaxModel, id: string): boolean => model === '100' || BOXES[model].has(id);
 
-/** Which form is it: the title and the words only that form has. */
-function modelOf(tokens: PdfToken[]): TaxModel | null {
-  const text = tokens
-    .map((t) => t.text)
-    .join(' ')
-    .toLowerCase()
-    // The 303 asks whether one is exempt from the 390 (page 1, «exonerado», and page 4 of the 2026
-    // design, «exonerados»): that mention is not its title.
-    .replace(/exonerad[oa]s? de la declaraci[oó]n-? ?resumen anual/g, '');
-  // The withholding forms first: their titles say «retenciones e ingresos a cuenta», as the box 06
-  // of the 130 does, so the 130 is told apart by what only the 111 and the 115 have.
-  if (/retenciones e ingresos a cuenta/.test(text)) {
-    if (/arrendamiento o subarrendamiento de inmuebles urbanos/.test(text)) return '115';
-    if (/rendimientos del trabajo/.test(text) && !/pago fraccionado/.test(text)) return '111';
+// ─── The period ──────────────────────────────────────────────────────────────
+
+type Quarter = 1 | 2 | 3 | 4;
+
+interface Period {
+  year: number | null;
+  quarter: Quarter | null;
+  /** The tokens that hold the year and the period: they are not amounts of a box. */
+  used: PdfToken[];
+}
+
+const sameLine = (a: PdfToken, b: PdfToken) => Math.abs(a.y - b.y) <= SAME_LINE;
+
+/** The tokens to the right of a label on its line, from the nearest. */
+const rightOf = (tokens: PdfToken[], label: PdfToken) =>
+  tokens
+    .filter((o) => o !== label && sameLine(o, label) && o.x > label.x)
+    .sort((a, b) => a.x - b.x);
+
+/** The tokens just under a label (a fillable form with the label above its field), nearest first. */
+const under = (tokens: PdfToken[], label: PdfToken) =>
+  tokens
+    .filter(
+      (o) => o.y < label.y && label.y - o.y <= 25 && o.x >= label.x - 20 && o.x <= label.x + 80
+    )
+    .sort((a, b) => b.y - a.y);
+
+/**
+ * The year next to «Ejercicio»: in one piece, in the same piece («Ejercicio 2025»), or cut in pieces
+ * that follow each other («202» «5», or digit by digit as the official 390 prints «2 0 2 5»).
+ */
+function yearOf(tokens: PdfToken[]): { year: number; used: PdfToken[] } | null {
+  const inline = tokens.find((t) => /^ejercicio:? ?20\d{2}$/i.test(t.text.trim()));
+  if (inline) return { year: Number(inline.text.trim().slice(-4)), used: [inline] };
+  const label = tokens.find((t) => /^ejercicio$/i.test(t.text.trim()));
+  if (!label) return null;
+  const right = rightOf(tokens, label);
+  const whole = right.find((t) => /^20\d{2}$/.test(t.text.trim()));
+  if (whole) return { year: Number(whole.text.trim()), used: [whole] };
+  const pieces: PdfToken[] = [];
+  const digitsOf = () => pieces.map((p) => p.text.trim()).join('');
+  for (const t of right) {
+    if (!/^\d{1,3}$/.test(t.text.trim())) break;
+    pieces.push(t);
+    if (digitsOf().length >= 4) break;
   }
-  // The 349 and the 390 before the 303: their titles mention the VAT too.
-  if (/recapitulativa de operaciones intracomunitarias/.test(text)) return '349';
-  const vat = /impuesto sobre el valor a[ñn]adido/.test(text);
-  const vatModel = VAT_TITLES.find(([title]) => vat && title.test(text));
-  if (vatModel) return vatModel[1];
-  if (
-    /pago fraccionado/.test(text) &&
-    /(estimaci[oó]n directa|actividades econ[oó]micas)/.test(text)
-  ) {
-    return '130';
-  }
-  return null;
+  const digits = digitsOf();
+  if (/^20\d{2}$/.test(digits)) return { year: Number(digits), used: pieces };
+  const below = under(tokens, label).find((t) => /^20\d{2}$/.test(t.text.trim()));
+  return below ? { year: Number(below.text.trim()), used: [below] } : null;
+}
+
+const QUARTER = /^([1-4])T?$/i;
+
+/** The quarter next to «Período» («3T» or «3»), or under it on a fillable form. */
+function quarterOf(tokens: PdfToken[]): { quarter: Quarter; used: PdfToken } | null {
+  const inline = tokens.find((t) => /^per[ií]odo:? ?[1-4]T$/i.test(t.text.trim()));
+  if (inline) return { quarter: Number(inline.text.trim().slice(-2, -1)) as Quarter, used: inline };
+  const label = tokens.find((t) => /^per[ií]odo$/i.test(t.text.trim()));
+  if (!label) return null;
+  const found =
+    rightOf(tokens, label).find((t) => QUARTER.test(t.text.trim())) ??
+    under(tokens, label).find((t) => QUARTER.test(t.text.trim()));
+  return found ? { quarter: Number(found.text.trim()[0]) as Quarter, used: found } : null;
+}
+
+function periodOf(tokens: PdfToken[]): Period {
+  const year = yearOf(tokens);
+  const quarter = quarterOf(tokens);
+  return {
+    year: year?.year ?? null,
+    quarter: quarter?.quarter ?? null,
+    used: [...(year?.used ?? []), ...(quarter ? [quarter.used] : [])],
+  };
 }
 
 /**
- * The year printed digit by digit, in four boxes, to the right of its label, as the official 390
- * does («Ejercicio 2 0 2 5»).
+ * The periods the pages print, when they are more than one: a PDF with the four quarters of a year
+ * would otherwise give the boxes of the first one mixed with those of the rest.
  */
-function digitsAfter(tokens: PdfToken[], word: RegExp): string | null {
-  const label = tokens.find((t) => word.test(t.text.trim()));
-  if (!label) return null;
-  const digits = tokens
-    .filter(
-      (o) => Math.abs(o.y - label.y) <= SAME_LINE && o.x > label.x && /^\d$/.test(o.text.trim())
-    )
-    .sort((a, b) => a.x - b.x)
-    .slice(0, 4)
-    .map((o) => o.text.trim())
-    .join('');
-  return /^20\d{2}$/.test(digits) ? digits : null;
+function periodsOf(pages: PdfToken[][]): string[] {
+  const read = pages.map((p) => periodOf(joinPieces(p)));
+  const quarters = new Set(
+    read.filter((p) => p.quarter !== null).map((p) => `${p.year ?? ''} ${p.quarter}T`.trim())
+  );
+  if (quarters.size > 1) return [...quarters];
+  const years = new Set(read.filter((p) => p.year !== null).map((p) => String(p.year)));
+  return years.size > 1 ? [...years] : [];
 }
 
-/** The year and the quarter printed next to «Ejercicio» and «Período». */
-function periodOf(tokens: PdfToken[]): Pick<TaxModelPdf, 'year' | 'quarter'> {
-  const after = (word: RegExp, accepts: RegExp): string | null => {
-    const label = tokens.find((t) => word.test(t.text.trim()));
-    if (!label) return null;
-    const same = tokens
-      .filter((o) => o !== label && Math.abs(o.y - label.y) <= SAME_LINE && o.x > label.x)
-      .sort((a, b) => a.x - b.x);
-    return same.map((o) => o.text.trim()).find((text) => accepts.test(text)) ?? null;
-  };
-  const year = after(/^ejercicio$/i, /^20\d{2}$/) ?? digitsAfter(tokens, /^ejercicio$/i);
-  const period = after(/^per[ií]odo$/i, /^[1-4]T?$/i);
-  return {
-    year: year ? Number(year) : null,
-    quarter: period ? (Number(period[0]) as 1 | 2 | 3 | 4) : null,
-  };
-}
+// ─── Pieces of text ──────────────────────────────────────────────────────────
 
 /** A piece of a number: digits, a dot or a comma (the official forms print «1 7 . 2 14,00»). */
 const NUMBER_PIECE = /^-?[\d.,]+$/;
@@ -200,39 +252,112 @@ function touches(prev: PdfToken, t: PdfToken): boolean {
 const stack = (pages: PdfToken[][]): PdfToken[] =>
   pages.flatMap((tokens, page) => joinPieces(tokens).map((t) => ({ ...t, y: t.y - page * 10000 })));
 
-/** Boxes with their amounts: every amount is paired with the closest box number to its left on its line. */
+/** The page a stacked token is on. */
+const pageOf = (t: PdfToken) => Math.floor((1000 - t.y) / 10000);
+
+// ─── Pairing amounts with boxes ──────────────────────────────────────────────
+
+type Side = 'left' | 'right';
+
+/**
+ * Which side of its amount the box number is printed on: on each line with both, whether the line
+ * starts with a number of box (the forms) or ends with one (Renta WEB). The forms win a tie.
+ */
+function sideOf(labels: PdfToken[], values: PdfToken[]): Side {
+  let left = 0;
+  let right = 0;
+  for (const value of values) {
+    const line = [...labels, ...values].filter((t) => sameLine(t, value)).sort((a, b) => a.x - b.x);
+    if (line[0] !== value && labels.includes(line[0])) left++;
+    if (line[line.length - 1] !== value && labels.includes(line[line.length - 1])) right++;
+  }
+  return right > left ? 'right' : 'left';
+}
+
+/** The number of the box an amount belongs to: next to it on its line, or above a field. */
+function labelFor(value: PdfToken, labels: PdfToken[], side: Side): PdfToken | undefined {
+  const line = labels.filter((l) => sameLine(l, value));
+  const beside =
+    side === 'left'
+      ? line.filter((l) => l.x < value.x).sort((a, b) => b.x - a.x)[0]
+      : line.filter((l) => l.x > value.x).sort((a, b) => a.x - b.x)[0];
+  if (beside || !value.field) return beside;
+  return labels
+    .filter(
+      (l) =>
+        l.y > value.y &&
+        l.y - value.y <= ABOVE &&
+        l.x >= value.x - 4 &&
+        l.x <= value.x + (value.w ?? 80)
+    )
+    .sort((a, b) => a.y - b.y)[0];
+}
+
+/** Every amount paired with the box number next to it; the tokens of the period are not amounts. */
+function boxesFrom(tokens: PdfToken[], model: TaxModel, used: PdfToken[]): Record<string, number> {
+  // Box numbers are printed (or label fields of the official form): what is typed in is a value.
+  const labels = tokens.filter((t) => {
+    const id = t.field ? null : labelOf(t.text, model);
+    return id !== null && isBox(model, id);
+  });
+  const values = tokens.filter((t) => {
+    if (used.includes(t) || labels.includes(t)) return false;
+    return t.field ? !Number.isNaN(amountOf(t.text)) : PRINTED_AMOUNT.test(t.text.trim());
+  });
+  // Whole amounts printed («-6.000», «0») count only right after their box number: a row of them is a
+  // table of figures (the quarters of a 390), not the boxes of the form. And a page with no amount in
+  // cents is the statement of a case or a table, not a filled form.
+  const filled = new Set(values.map(pageOf));
+  const wholes = tokens.filter(
+    (t) =>
+      !t.field && !used.includes(t) && filled.has(pageOf(t)) && PRINTED_WHOLE.test(t.text.trim())
+  );
+  const side = model === '100' ? sideOf(labels, values) : 'left';
+
+  const boxes: Record<string, number> = {};
+  // The first amount a box gets stays (the Renta repeats a box for each property: the first one).
+  const put = (label: PdfToken, value: PdfToken) => {
+    const id = labelOf(label.text, model) as string;
+    if (!(id in boxes)) boxes[id] = amountOf(value.text);
+  };
+  for (const value of values) {
+    const label = labelFor(value, labels, side);
+    if (label) put(label, value);
+  }
+  const all = [...labels, ...values, ...wholes];
+  for (const whole of wholes) {
+    const label = labelFor(whole, labels, 'left');
+    if (!label) continue;
+    const between = (t: PdfToken) => sameLine(t, whole) && t.x > label.x && t.x < whole.x;
+    if (!all.some(between)) put(label, whole);
+  }
+  return boxes;
+}
+
+/** Why a PDF that is not a State form the app reads is refused. */
+function refusal(kind: Exclude<FormKind, { kind: 'model' }>): TaxModelParse {
+  if (kind.kind === 'foral') return { ok: false, reason: 'foral', territory: kind.territory };
+  return { ok: false, reason: kind.kind === 'notAForm' ? 'notAForm' : 'unknownModel' };
+}
+
+/** Which form a PDF is, its period and its boxes with their amounts. */
 export function parseTaxModelTokens(pages: PdfToken[][]): TaxModelParse {
   const tokens = stack(pages);
-  const model = modelOf(tokens);
-  if (!model) return { ok: false, reason: 'unknownModel' };
+  const kind = formKindOf(tokens, pages.length);
+  if (kind.kind !== 'model') return refusal(kind);
+  const { model } = kind;
+  const periods = periodsOf(pages);
+  if (periods.length > 1) return { ok: false, reason: 'severalPeriods', periods };
+  const { used, ...period } = periodOf(tokens);
 
-  const known = BOXES[model];
   if (model === '349') {
     const operators = operators349(tokens);
     if (operators.length === 0) return { ok: false, reason: 'noBoxes' };
-    return { ok: true, data: { model, ...periodOf(tokens), boxes: {}, operators } };
+    return { ok: true, data: { model, ...period, boxes: {}, operators } };
   }
-  const labels = tokens.filter((t) => {
-    const id = labelOf(t.text);
-    return id !== null && known.has(id);
-  });
-  const values = tokens.filter((t) => {
-    const printed = PRINTED_AMOUNT.test(t.text.trim());
-    return t.field ? !Number.isNaN(amountOf(t.text)) : printed;
-  });
-
-  const boxes: Record<string, number> = {};
-  for (const value of values) {
-    const label = labels
-      .filter((l) => l !== value && Math.abs(l.y - value.y) <= SAME_LINE && l.x < value.x)
-      .sort((a, b) => b.x - a.x)[0];
-    if (!label) continue;
-    const id = labelOf(label.text) as string;
-    // The first amount a box gets stays: the closer to the box, the likelier it is the right one.
-    if (!(id in boxes)) boxes[id] = amountOf(value.text);
-  }
+  const boxes = boxesFrom(tokens, model, used);
   if (Object.keys(boxes).length === 0) return { ok: false, reason: 'noBoxes' };
-  return { ok: true, data: { model, ...periodOf(tokens), boxes } };
+  return { ok: true, data: { model, ...period, boxes } };
 }
 
 const KEY_TOKEN = /^[A-Z]$/;

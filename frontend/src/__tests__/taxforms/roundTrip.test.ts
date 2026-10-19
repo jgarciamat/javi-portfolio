@@ -23,13 +23,9 @@ describe.each(['130', '111', '115', '303'] as FormModel[])(
       // Every box read has the figure typed in, and none is read that was not typed.
       for (const [id, value] of Object.entries(read.data.boxes))
         expect(form.values[id]).toBe(value);
-      const read303 = Object.keys(read.data.boxes).length;
-      if (model === '303') {
-        // The reader knows every box but those of the page of the prorrata (500-524, 700-735).
-        // Page 4 says «exonerados de la Declaración-resumen anual»: it is still read as a 303.
-        expect(read303).toBe(124);
-        expect(read.data.boxes['71']).toBe(form.values['71']);
-      } else expect(read303).toBe(Object.keys(form.values).length);
+      // Every box comes back, the page of the prorrata of the 303 (500-524, 700-735) included; its
+      // page 4 says «exonerados de la Declaración-resumen anual» and it is still read as a 303.
+      expect(Object.keys(read.data.boxes).length).toBe(Object.keys(form.values).length);
     });
   }
 );

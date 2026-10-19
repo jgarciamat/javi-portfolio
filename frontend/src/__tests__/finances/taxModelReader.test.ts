@@ -47,10 +47,10 @@ describe('Reading the pieces of a PDF', () => {
     expect(pages[0]).toEqual([
       { text: 'Modelo 130', x: 10, y: 700, field: false },
       // The baseline of a field is a little above its bottom edge.
-      { text: '11.300,00', x: 475, y: 581, field: true },
+      { text: '11.300,00', x: 475, y: 581, field: true, w: 80, h: 14 },
       // The labels of the official form are fields, but they are printed text.
-      { text: '01', x: 462, y: 579, field: false },
-      { text: '7', x: 1, y: 4, field: true },
+      { text: '01', x: 462, y: 579, field: false, w: 80, h: 14 },
+      { text: '7', x: 1, y: 4, field: true, w: 2, h: 2 },
     ]);
     expect(pages[1]).toEqual([{ text: 'Página 2', x: 5, y: 5, field: false }]);
   });
