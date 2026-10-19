@@ -182,6 +182,32 @@ function DeductionInput({
   );
 }
 
+/** What was already collected in advance with the modelo 140 or 143, for those that have one. */
+function AdvanceInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  if (!deduction.advance) return null;
+  return (
+    <label className="tools-field">
+      <span>{t('tools.renta.advanceReceived', { model: deduction.advance.model })}</span>
+      <input
+        className="tx-input"
+        inputMode="decimal"
+        value={choice.advance ?? ''}
+        placeholder="0"
+        onChange={(e) => onChange({ ...choice, advance: e.target.value })}
+      />
+    </label>
+  );
+}
+
 /** The buttons of a marked deduction: on to the next one, or not this one after all. */
 function DeductionNav({
   deduction,
@@ -280,18 +306,7 @@ function DeductionRow({
             childCount={childCount}
             onChange={onChange}
           />
-          {deduction.advance && (
-            <label className="tools-field">
-              <span>{t('tools.renta.advanceReceived', { model: deduction.advance.model })}</span>
-              <input
-                className="tx-input"
-                inputMode="decimal"
-                value={choice.advance ?? ''}
-                placeholder="0"
-                onChange={(e) => onChange({ ...choice, advance: e.target.value })}
-              />
-            </label>
-          )}
+          <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
           {!blocked && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>

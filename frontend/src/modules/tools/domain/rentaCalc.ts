@@ -656,6 +656,13 @@ function lowPayOf(input: RentaInput, otherIncome: number, quotaLeft: number) {
   return { amount, clear };
 }
 
+/** The refundable deductions marked that were collected in advance (modelos 140 and 143). */
+function advanceOf(input: RentaInput): number {
+  return input.state.deductions
+    .filter((d) => isRefundable(d) && d.advance && input.choices[d.id]?.on)
+    .reduce((sum, d) => sum + positive(input.choices[d.id].advance ?? 0), 0);
+}
+
 /** The chosen deductions: what each one gives, split by quota, and those the income rules out. */
 function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   const blocked: string[] = [];
@@ -671,14 +678,13 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number) {
   let stateDeductions = 0;
   let regionalDeductions = 0;
   let refundable = 0;
-  let advanceReceived = 0;
+  // What was already collected each month is given back in the return (see computeRenta).
+  const advanceReceived = advanceOf(input);
   for (const d of input.state.deductions) {
     const { on, amount } = amountOf(d);
     if (isRefundable(d)) {
       refundable += amount;
       if (on) line(d, 'state', amount);
-      // What was already collected each month is given back in the return (see computeRenta).
-      if (on && d.advance) advanceReceived += positive(input.choices[d.id].advance ?? 0);
       continue;
     }
     // A State deduction with a regional part lowers each quota by its share, each up to its quota.
