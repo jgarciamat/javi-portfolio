@@ -2996,7 +2996,6 @@
   "app.autonomo.wh.part.pros": "profesionales",
   "app.autonomo.wh.part.rent": "alquiler",
   "app.autonomo.wh.summary": "Retenciones: 111 {m111} · 115 {m115}",
-  "app.autonomo.wh.col.retention": "Retención IRPF",
   "app.autonomo.wh.retentionOf": "Retención de la factura de {invoice}",
   "app.autonomo.wh.roleOf": "A qué modelo va la retención de la factura de {invoice}",
   "app.autonomo.wh.role.none": "Retención: no aplica",
@@ -3008,5 +3007,6 @@
   "app.autonomo.model.done.111": "Importado el modelo 111 del {quarter}.º trimestre de {year}: sus empleados y profesionales quedan en «Retenciones que practicas» de ese trimestre.",
   "app.autonomo.model.done.115": "Importado el modelo 115 del {quarter}.º trimestre de {year}: su alquiler queda en «Retenciones que practicas» de ese trimestre.",
   "app.autonomo.model.note.filed": "Las retenciones de las facturas recibidas del {quarter}.º trimestre ya no se suman a ese modelo: manda el que presentaste.",
-  "app.autonomo.model.note.ignored111": "El modelo tenía importes que no se usan aquí (casillas {boxes}: actividades en especie, premios, ganancias forestales o derechos de imagen): no se han importado."
+  "app.autonomo.model.note.ignored111": "El modelo tenía importes que no se usan aquí (casillas {boxes}: actividades en especie, premios, ganancias forestales o derechos de imagen): no se han importado.",
+  "app.autonomo.review.col.retention": "Retención IRPF"
 }

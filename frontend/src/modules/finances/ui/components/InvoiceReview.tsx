@@ -9,10 +9,12 @@ import {
   supplierKey,
   updateInvoices,
   type ImportedInvoice,
+  type InvoicePatch,
   type KindPreferences,
 } from '../../domain/invoiceLedger';
 import { applyInvoices, KIND_PREFERENCES_KEY } from './importForm';
 import { bringIntoView } from './bringIntoView';
+import { RetentionCell } from './InvoiceRetention';
 import type { ManualForm } from './AutonomoManual';
 
 /** An invoice to show: `n` changes on every request, so asking twice for the same one works. */
@@ -27,7 +29,7 @@ export const invoiceRowId = (id: string) => `autonomo-invoice-${id}`;
 function withChange(
   form: ManualForm,
   ids: string[],
-  patch: Partial<Pick<ImportedInvoice, 'kind' | 'excluded'>>
+  patch: InvoicePatch
 ): ManualForm {
   const { list, quarters } = updateInvoices(form.invoices, ids, patch);
   let next: ManualForm = { ...form, invoices: list };
@@ -54,6 +56,7 @@ function BookTable({
   onKind,
   onExcluded,
   onApplyOffer,
+  onRetention,
 }: {
   book: BookKind;
   invoices: ImportedInvoice[];
@@ -62,6 +65,8 @@ function BookTable({
   onKind: (invoice: ImportedInvoice, kind: ExpenseKind) => void;
   onExcluded: (invoice: ImportedInvoice, excluded: boolean) => void;
   onApplyOffer: (offer: Offer) => void;
+  /** Corrects the withholding of a received invoice (modelos 111 and 115). */
+  onRetention: (invoice: ImportedInvoice, patch: InvoicePatch) => void;
 }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
@@ -76,6 +81,7 @@ function BookTable({
     'vat',
     'total',
     received ? 'kind' : 'withheld',
+    ...(received ? ['retention'] : []),
   ];
   const label = (key: string) => t(`app.autonomo.review.col.${key}`);
   const who = (i: ImportedInvoice) => i.concept || t('app.autonomo.review.noName');
@@ -158,6 +164,14 @@ function BookTable({
                   <td data-label={label('withheld')} className="num">
                     {money(i.withheld)}
                   </td>
+                )}
+                {received && (
+                  <RetentionCell
+                    invoice={i}
+                    name={name}
+                    label={label('retention')}
+                    onChange={(patch) => onRetention(i, patch)}
+                  />
                 )}
               </tr>
             );
@@ -283,6 +297,7 @@ export function InvoiceReview({
                   setOffer(null);
                 }}
                 onApplyOffer={applyOffer}
+                onRetention={(i, patch) => onChange(withChange(form, [i.id], patch))}
               />
             </div>
           ))}

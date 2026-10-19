@@ -2996,7 +2996,6 @@
   "app.autonomo.wh.part.pros": "professionals",
   "app.autonomo.wh.part.rent": "rent",
   "app.autonomo.wh.summary": "Withholdings: 111 {m111} · 115 {m115}",
-  "app.autonomo.wh.col.retention": "Income tax withheld",
   "app.autonomo.wh.retentionOf": "Withholding of the invoice from {invoice}",
   "app.autonomo.wh.roleOf": "Which form the withholding of the invoice from {invoice} goes to",
   "app.autonomo.wh.role.none": "Withholding: not applicable",
@@ -3008,5 +3007,6 @@
   "app.autonomo.model.done.111": "Imported form 111 for quarter {quarter} of {year}: its employees and professionals go to «Withholdings you make» for that quarter.",
   "app.autonomo.model.done.115": "Imported form 115 for quarter {quarter} of {year}: its rent goes to «Withholdings you make» for that quarter.",
   "app.autonomo.model.note.filed": "The withholdings of the received invoices of quarter {quarter} are no longer added to that form: the one you filed stands.",
-  "app.autonomo.model.note.ignored111": "The form had amounts not used here (boxes {boxes}: activities in kind, prizes, forestry gains or image rights): they were not imported."
+  "app.autonomo.model.note.ignored111": "The form had amounts not used here (boxes {boxes}: activities in kind, prizes, forestry gains or image rights): they were not imported.",
+  "app.autonomo.review.col.retention": "Income tax withheld"
 }
