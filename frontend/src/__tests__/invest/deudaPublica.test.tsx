@@ -1,12 +1,14 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 import { CHAPTERS, ASSET_CLASSES, findChapter } from '@modules/invest/domain/content';
 import { InvestView } from '@modules/invest/ui/InvestView';
+import { AssetCard } from '@modules/invest/ui/AssetCard';
+import { ChapterVideos } from '@modules/invest/ui/ChapterVideos';
 import { GUIDES, findGuide } from '@modules/guides/domain/guides';
 import { categoryOf } from '@modules/guides/domain/guideCategories';
 import { VIDEOS } from '@modules/guides/domain/videos';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
-import { literal, renderWithProviders, tr } from '@test-utils/render';
+import { literal, renderWithI18n, renderWithProviders, tr } from '@test-utils/render';
 
 const DEBT = [
   'letras-del-tesoro',
@@ -40,6 +42,11 @@ describe('Government debt chapters in the catalogue', () => {
     expect(findChapter('bonos-obligaciones-estado')!.level).toBe(2);
     expect(findChapter('comprar-deuda-publica')!.withCalc).toBe(false);
     expect(DEBT.filter((id) => findChapter(id)!.withCalc)).toHaveLength(4);
+  });
+
+  it('shows nothing for videos that are not published', () => {
+    const { container } = renderWithProviders(<ChapterVideos numbers={[9999]} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('link only to videos that exist and are published', () => {
@@ -115,6 +122,20 @@ describe('The fixed income card of the map', () => {
         name: literal(findChapter('deuda-publica-renta')!.title),
       })
     ).toBeInTheDocument();
+  });
+
+  it('names the chapters in English', () => {
+    const onOpen = jest.fn();
+    const card = ASSET_CLASSES.find((a) => a.id === 'renta-fija')!;
+    renderWithI18n(
+      <AssetCard asset={card} open onToggle={() => {}} onOpenChapter={onOpen} />,
+      'en'
+    );
+    const nav = screen.getByRole('navigation', { name: 'Spanish government debt, step by step' });
+    fireEvent.click(
+      within(nav).getByRole('button', { name: literal(findChapter('letras-del-tesoro')!.titleEn) })
+    );
+    expect(onOpen).toHaveBeenCalledWith('letras-del-tesoro');
   });
 });
 
