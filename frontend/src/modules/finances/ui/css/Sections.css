@@ -846,6 +846,19 @@
   min-width: 0;
 }
 
+/* The gift sits at the left edge so the two lines are centred in the whole frame. */
+.burger-nav-item--wide .burger-nav-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.burger-nav-item--wide .burger-nav-text {
+  flex: 1;
+  padding: 0 2.4rem;
+}
+
 .burger-nav-sub {
   font-size: 0.68rem;
   color: var(--slate-500);
