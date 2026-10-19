@@ -13,6 +13,8 @@ import {
 } from '../domain/calculators';
 import { CalculatorLayout, NumberField, number, useMoney } from './CalculatorLayout';
 import { RentaPlanner } from './RentaPlanner';
+import { CampaignDates } from './renta/CampaignDates';
+import { rentaState } from '../data/renta/state';
 
 /** 50/30/20: how to split a net monthly income. */
 export function BudgetRulePage() {
@@ -407,6 +409,7 @@ export function RentaCalculatorPage() {
       path="/calculadora-renta"
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
+      lead={<CampaignDates exercise={rentaState.year} />}
     >
       <RentaPlanner mode="local" />
     </CalculatorLayout>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { RentaPlanner } from '@modules/tools/ui/RentaPlanner';
+import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { loadProgress } from '@modules/tools/application/rentaProgress';
 import { Icon } from '@shared/components/Icon';
 import { requestHaciendaGuide } from '@modules/guides/application/haciendaLink';
@@ -53,6 +54,7 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
           </select>
         </div>
         <p className="section-hint">{t('app.renta.hint')}</p>
+        <CampaignDates exercise={year} />
         <p>{t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}</p>
         <div className="tools-main renta-tools">
           <RentaPlanner
