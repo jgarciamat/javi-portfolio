@@ -108,6 +108,8 @@ Esfuerzo: **S** (≤ 2 días), **M** (≤ 1 semana), **L** (2-4 semanas), **XL**
 
 **Datos:** fichero de operaciones del bróker o exchange (fecha, cantidad, precio, comisiones). Esto exige **importadores** (CSV de brókeres y exchanges), lo más caro del bloque.
 
+**Estado (19-10-2026):** hecho el importador de inversiones en el dispositivo (40 formatos, mapeo guiado, PDF de Quantfury y certificados), el motor (FIFO global, permutas, recompensas, traspasos, regla de un año en fondos, 0588) y la guía «Cómo declarar esto»: ver [inversiones.md](inversiones.md). Falta: inmuebles del anexo C, precio aplazado, canjes y fusiones, y confirmar las columnas con archivos reales.
+
 **Validación:** casos prácticos del capítulo 11 del Manual ([ganancias](https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c11-ganancias-perdidas-patrimoniales.html)) y los informes fiscales anuales de los brókeres como contraste.
 
 **Riesgos:** alto. Un FIFO mal hecho o una permuta olvidada producen errores grandes. Recomendación: primero **leer** las casillas del borrador (que ya trae las ventas de valores cotizados con retención) y solo después calcular.
