@@ -9,6 +9,7 @@ import {
 import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 import { round2 } from './round';
+import type { PropertyResult } from './rentaRentals';
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
@@ -359,6 +360,8 @@ export interface RentalInput {
   pendingApplied?: number;
   /** Interest and repairs of this year over the limit, for the next four years (box 0108). */
   excessCarry?: number;
+  /** Each property worked out on its own (rentaRentals.ts): the net is the sum of theirs. */
+  items?: PropertyResult[];
 }
 
 export interface RentaInput {
@@ -535,6 +538,8 @@ export function lowPayDeduction(grossPay: number, otherIncome: number): number {
 /** Rent after expenses, depreciation and the reduction (it can be negative). */
 export function rentalNet(rental: RentalInput | null): number {
   if (!rental) return 0;
+  // Property by property, each with its own reduction (box 0156 = sum of the 0154).
+  if (rental.items) return round2(rental.items.reduce((s, r) => s + r.reducedNet, 0));
   const net = positive(rental.income) - positive(rental.expenses) - positive(rental.amortization);
   const percent = Math.min(90, positive(rental.reductionPercent));
   return round2(net > 0 ? net * (1 - percent / 100) : net);

@@ -14,6 +14,8 @@ import type { SavingsDetail } from './rentaGains';
 import type { ActivityInput } from './rentaActivity';
 import { farm2025 } from '../data/renta/agrario-2025';
 import { modules2025 } from '../data/renta/modulos-2025';
+import { round2 } from './round';
+import { emptyProperty, fromLegacy, propertyResult, type PropertyForm } from './rentaRentals';
 
 export interface ChildForm {
   age: string;
@@ -101,6 +103,11 @@ export interface RentaForm {
   rentalReduction: string;
   /** Interest and repairs of 2021-2024 still to deduct (box 0103). */
   rentalPendingExcess?: string;
+  /**
+   * The rented properties one by one (rentaRentals.ts). When set, the single rental above is not
+   * used: it is only read to bring a return typed before into the first property.
+   */
+  properties?: PropertyForm[];
   unrented: UnrentedForm[];
   savings: string;
   /** Economic activities (direct, módulos or farming), as the engine takes them (rentaActivity.ts). */
@@ -191,9 +198,6 @@ export function familyOf(form: RentaForm): Family {
   };
 }
 
-/** Rent expenses that cannot together pass the rent: interest, financing and repairs. */
-const CAPPED_EXPENSE = /interes|financiaci|reparaci|conservaci/;
-
 export interface RentaData {
   state: RentaState;
   ccaa: RentaCcaa;
@@ -236,35 +240,42 @@ export function workExpensesOf(form: RentaForm, extras: RentaWorkExtras): number
   }, 0);
 }
 
+/** The rented properties: those typed one by one, or the single rental of before as one. */
+export function propertiesOf(form: RentaForm): PropertyForm[] {
+  if (!form.rentalOn) return [];
+  if (form.properties) return form.properties;
+  // Nothing typed in the single rental of before: a new property, let as a home by default.
+  const typed =
+    form.rentalIncome.trim() !== '' ||
+    form.construction.trim() !== '' ||
+    Object.values(form.rentalExpenses).some((v) => v.trim() !== '');
+  return [typed ? fromLegacy(form) : emptyProperty(1)];
+}
+
 /**
- * The rental figures: the expenses with interest and repairs held to the rent, and the depreciation.
- * LIRPF art. 23.1.a.1.º (BOE-A-2006-20764, checked 19-10-2026): interest and repairs together "no
- * podrá exceder ... de la cuantía de los rendimientos íntegros"; "el exceso podrá deducirse en los
- * cuatro años siguientes". Modelo 100 of 2025 (BOE-A-2026-7041, page 7): what is pending from
- * 2021-2024 goes first (0103-0104), then this year's (0107), with [0104] + [0107] up to [0102];
- * the rest of this year's is box 0108.
+ * The rental figures, property by property (rentaRentals.ts): each one with its own limit of
+ * interest and repairs, reduction and depreciation (LIRPF art. 23, BOE-A-2006-20764, checked
+ * 19-10-2026: the limit is "por cada bien"), then added up for the general base (box 0156).
  */
-export function rentalOf(form: RentaForm, property: RentaProperty): RentaInput['rental'] {
-  if (!form.rentalOn) return null;
-  const income = number(form.rentalIncome);
-  let capped = 0;
-  let free = 0;
-  for (const item of property.rental.expenses) {
-    const amount = number(form.rentalExpenses[item.id]);
-    if (CAPPED_EXPENSE.test(item.id)) capped += amount;
-    else free += amount;
-  }
-  const reduction = property.rental.reductions.find((r) => r.id === form.rentalReduction);
-  const room = Math.max(0, income);
-  const pendingApplied = Math.min(Math.max(0, number(form.rentalPendingExcess)), room);
-  const current = Math.min(capped, room - pendingApplied);
+export function rentalOf(
+  form: RentaForm,
+  property: RentaProperty,
+  year = 2025,
+  rates = { standard: property.imputation.standardRate, revised: property.imputation.revisedRate }
+): RentaInput['rental'] {
+  const list = propertiesOf(form);
+  if (list.length === 0) return null;
+  const items = list.map((p) => propertyResult(p, property, daysInYear(year), parseDecimal, rates));
+  const sum = (pick: (r: (typeof items)[number]) => number) =>
+    round2(items.reduce((s, r) => s + pick(r), 0));
   return {
-    income,
-    expenses: free + pendingApplied + current,
-    amortization: (number(form.construction) * property.rental.amortizationRate) / 100,
-    reductionPercent: reduction?.percent ?? 0,
-    pendingApplied,
-    excessCarry: capped - current,
+    income: sum((r) => r.income),
+    expenses: sum((r) => r.pendingApplied + r.cappedApplied + r.otherExpenses),
+    amortization: sum((r) => r.amortization),
+    reductionPercent: 0,
+    pendingApplied: sum((r) => r.pendingApplied),
+    excessCarry: sum((r) => r.excessCarry),
+    items,
   };
 }
 
@@ -278,9 +289,15 @@ export const daysInYear = (year: number): number =>
  * 19-10-2026): "la que proporcionalmente corresponda al número de días comprendidos en dicho
  * período" (181 of 365 days, not 6 of 12 months).
  */
-export function unrentedOf(form: RentaForm, year: number): { standard: number; revised: number } {
+export function unrentedOf(
+  form: RentaForm,
+  year: number,
+  rental: RentaInput['rental'] = null
+): { standard: number; revised: number } {
   const totals = { standard: 0, revised: 0 };
   const full = daysInYear(year);
+  // A rented property imputes rent too for the days it was at the owner's disposal (art. 85).
+  for (const r of rental?.items ?? []) totals[r.revised ? 'revised' : 'standard'] += r.imputedValue;
   for (const p of form.unrented) {
     const days = Math.min(full, Math.max(0, p.days.trim() === '' ? full : number(p.days)));
     totals[p.revised ? 'revised' : 'standard'] += (number(p.value) * days) / full;
@@ -312,10 +329,13 @@ export function obligationIncome(form: RentaForm): { mainIncome: number; otherIn
 
 /** The calculation input for what is in the form. */
 export function toInput(form: RentaForm, data: RentaData): RentaInput {
+  const rental = rentalOf(form, data.property, data.state.year);
+  // The withholdings on the rent (box 0153) go with the rest to box 0609.
+  const rentWithheld = rental?.items?.reduce((s, r) => s + r.withheld, 0) ?? 0;
   return {
     gross: number(form.gross),
     socialSecurity: socialSecurityOf(form),
-    withheld: number(form.withheld),
+    withheld: round2(number(form.withheld) + rentWithheld),
     nonSalaryIncome: number(form.nonSalary),
     retired: form.retired,
     workExpensesExtra: workExpensesOf(form, data.extras),
@@ -326,8 +346,8 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     compensatoryPension: number(form.compensatory),
     childSupport: number(form.childSupport),
     pensionCapital2006: number(form.pensionCapital2006),
-    rental: rentalOf(form, data.property),
-    imputedValues: unrentedOf(form, data.state.year),
+    rental,
+    imputedValues: unrentedOf(form, data.state.year, rental),
     savings: number(form.savings),
     savingsDetail: form.savingsDetail,
     // The tables of the módulos of 2025 (Orden HAC/1347/2024): the year of the return.
