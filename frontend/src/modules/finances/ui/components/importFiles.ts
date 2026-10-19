@@ -4,7 +4,15 @@ import {
   type BookKind,
   type BookSkipped,
 } from '../../domain/invoiceBook';
-import { mergeInvoices, toInvoices, type KindPreferences } from '../../domain/invoiceLedger';
+import {
+  addInvoices,
+  missingOf,
+  mergeInvoices,
+  toInvoices,
+  toPdfInvoices,
+  type KindPreferences,
+} from '../../domain/invoiceLedger';
+import { entriesOf, kindOfInvoice, type InvoicePdf } from '../../domain/invoicePdf';
 import type { TaxModelParse } from '../../domain/taxModelPdf';
 import { applyInvoices, applyModel130, applyModel303 } from './importForm';
 import type { ManualForm } from './AutonomoManual';
@@ -17,6 +25,11 @@ export interface Line {
   tone: 'done' | 'note' | 'error';
   key: string;
   values?: Record<string, string | number>;
+  /** Values shown as money and as dates (an empty date is «no date»). */
+  money?: Record<string, number>;
+  dates?: Record<string, string>;
+  /** Review codes of an invoice read from a PDF, said one after the other. */
+  reasons?: string[];
 }
 
 /** What a file does: the form it leaves (none when it could not be used), what to say, and where to go. */
@@ -24,6 +37,8 @@ export interface Applied {
   form?: ManualForm;
   lines: Line[];
   period?: { year: number; quarter: 1 | 2 | 3 | 4 };
+  /** The invoices of the file in the review (a PDF invoice): to show them. */
+  ids?: string[];
 }
 
 const SKIPPED: (keyof BookSkipped)[] = ['year', 'rate', 'amount'];
@@ -157,6 +172,62 @@ export function importModel(
     lines: [
       { tone: 'done', key: 'app.autonomo.model.done.303', values: { year: at, quarter } },
       ...notes303(found, dropped, quarter),
+    ],
+  };
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * An invoice read from a PDF into the form, in the given book: it is added to the invoices of its
+ * quarter (the others stay). Importing it again finds it by its id and changes nothing.
+ */
+export function importInvoicePdf(
+  form: ManualForm,
+  invoice: InvoicePdf,
+  book: BookKind,
+  preferences: KindPreferences
+): Applied {
+  const incoming = toPdfInvoices(
+    book,
+    entriesOf(invoice, book),
+    invoice.review,
+    kindOfInvoice(invoice),
+    preferences
+  );
+  const merged = addInvoices(form.invoices, incoming);
+  const ids = incoming.map((i) => i.id);
+  const first = incoming[0];
+  const values = {
+    who: first.concept,
+    quarters: Array.from(new Set(incoming.map((i) => `T${i.quarter}`))).join(', '),
+  };
+  const money = {
+    total: invoice.total ?? round2(incoming.reduce((s, i) => s + i.total - i.withheld, 0)),
+  };
+  const dates = { date: first.date };
+  if (merged.fresh.length === 0) {
+    return { ids, lines: [{ tone: 'note', key: 'app.autonomo.pdf.again', values, money, dates }] };
+  }
+  const missing = incoming.some((i) => missingOf(i).length > 0);
+  return {
+    ids,
+    form: applyInvoices({ ...form, invoices: merged.list }, book, merged.quarters),
+    lines: [
+      { tone: 'done', key: `app.autonomo.pdf.done.${book}`, values, money, dates },
+      ...(invoice.review.length > 0
+        ? [{ tone: 'note' as const, key: 'app.autonomo.pdf.check', reasons: invoice.review }]
+        : []),
+      ...(invoice.mismatch
+        ? [
+            {
+              tone: 'note' as const,
+              key: 'app.autonomo.pdf.mismatch',
+              money: { expected: invoice.mismatch.expected, printed: invoice.mismatch.total },
+            },
+          ]
+        : []),
+      ...(missing ? [{ tone: 'note' as const, key: 'app.autonomo.pdf.missing' }] : []),
     ],
   };
 }

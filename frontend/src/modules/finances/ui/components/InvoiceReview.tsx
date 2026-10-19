@@ -5,14 +5,26 @@ import { storage } from '@shared/utils/storage';
 import { EXPENSE_KINDS, type ExpenseKind } from '@modules/finances/domain/types';
 import type { BookKind } from '../../domain/invoiceBook';
 import {
+  editInvoice,
+  missingOf,
   sameSupplier,
   supplierKey,
   updateInvoices,
   type ImportedInvoice,
+  type InvoiceEdit,
   type InvoicePatch,
   type KindPreferences,
 } from '../../domain/invoiceLedger';
-import { applyInvoices, KIND_PREFERENCES_KEY } from './importForm';
+import {
+  fixButtonId,
+  pdfColumn,
+  PdfEditRow,
+  PdfFixCell,
+  PdfFlag,
+  quarterLabel,
+  type PdfHandlers,
+} from './InvoicePdfRow';
+import { applyChanged, KIND_PREFERENCES_KEY } from './importForm';
 import { bringIntoView } from './bringIntoView';
 import { RetentionCell } from './InvoiceRetention';
 import type { ManualForm } from './AutonomoManual';
@@ -28,12 +40,7 @@ export const invoiceRowId = (id: string) => `autonomo-invoice-${id}`;
 /** The invoices with a change, and the quarters it touches worked out again. */
 function withChange(form: ManualForm, ids: string[], patch: InvoicePatch): ManualForm {
   const { list, quarters } = updateInvoices(form.invoices, ids, patch);
-  let next: ManualForm = { ...form, invoices: list };
-  for (const book of ['issued', 'received'] as const) {
-    const changed = quarters[book];
-    if (changed) next = applyInvoices(next, book, changed);
-  }
-  return next;
+  return applyChanged({ ...form, invoices: list }, quarters);
 }
 
 /** The supplier's other invoices can take the kind just chosen for one of them. */
@@ -44,6 +51,31 @@ interface Offer {
   others: string[];
 }
 
+/** How a row looks: left out, asked for by a warning, a credit note. */
+const rowClass = (i: ImportedInvoice, highlight: string | null) =>
+  [
+    i.excluded ? 'is-excluded' : '',
+    highlight === i.id ? 'is-highlighted' : '',
+    i.base < 0 ? 'is-negative' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+/**
+ * An invoice read from a PDF being corrected, in the columns of its table. One with fields to fill
+ * in stays out of the draft (its «Include» box is off) until they are there.
+ */
+const editRow = (i: ImportedInvoice, columns: string[], name: string, pdf: PdfHandlers) => (
+  <PdfEditRow
+    key={i.id}
+    invoice={i}
+    columns={columns}
+    name={name}
+    onSave={(edit: InvoiceEdit, kind: ExpenseKind) => pdf.onSave(i, edit, kind)}
+    onCancel={pdf.onCancel}
+  />
+);
+
 function BookTable({
   book,
   invoices,
@@ -53,6 +85,7 @@ function BookTable({
   onExcluded,
   onApplyOffer,
   onRetention,
+  pdf,
 }: {
   book: BookKind;
   invoices: ImportedInvoice[];
@@ -63,6 +96,7 @@ function BookTable({
   onApplyOffer: (offer: Offer) => void;
   /** Corrects the withholding of a received invoice (modelos 111 and 115). */
   onRetention: (invoice: ImportedInvoice, patch: InvoicePatch) => void;
+  pdf: PdfHandlers;
 }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
@@ -78,9 +112,11 @@ function BookTable({
     'total',
     received ? 'kind' : 'withheld',
     ...(received ? ['retention'] : []),
+    ...pdfColumn(invoices),
   ];
   const label = (key: string) => t(`app.autonomo.review.col.${key}`);
   const who = (i: ImportedInvoice) => i.concept || t('app.autonomo.review.noName');
+  const when = (i: ImportedInvoice) => (i.date ? date(i.date) : t('app.autonomo.pdf.noDate'));
   return (
     <table className="autonomo-review-table">
       <caption>{t(`app.autonomo.review.${book}`, { n: invoices.length })}</caption>
@@ -97,36 +133,29 @@ function BookTable({
         {[...invoices]
           .sort((a, b) => a.date.localeCompare(b.date))
           .flatMap((i) => {
-            const name = t('app.autonomo.review.invoice', { who: who(i), date: date(i.date) });
+            const name = t('app.autonomo.review.invoice', { who: who(i), date: when(i) });
+            if (pdf.editing === i.id) return [editRow(i, head, name, pdf)];
             const row = (
-              <tr
-                key={i.id}
-                id={invoiceRowId(i.id)}
-                className={[
-                  i.excluded ? 'is-excluded' : '',
-                  highlight === i.id ? 'is-highlighted' : '',
-                  i.base < 0 ? 'is-negative' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
+              <tr key={i.id} id={invoiceRowId(i.id)} className={rowClass(i, highlight)}>
                 <td data-label={label('include')}>
                   <input
                     type="checkbox"
                     checked={!i.excluded}
+                    disabled={missingOf(i).length > 0}
                     aria-label={t('app.autonomo.review.includeOf', { invoice: name })}
                     onChange={(e) => onExcluded(i, !e.target.checked)}
                   />
                 </td>
                 <td data-label={label('date')} className="autonomo-review-date">
-                  {date(i.date)}
+                  {when(i)}
                 </td>
-                <td data-label={label('quarter')}>T{i.quarter}</td>
+                <td data-label={label('quarter')}>{quarterLabel(i)}</td>
                 <td
                   data-label={label(received ? 'supplier' : 'client')}
                   className="autonomo-review-who"
                 >
                   {who(i)}
+                  <PdfFlag invoice={i} />
                 </td>
                 <td data-label={label('base')} className="num">
                   {money(i.base)}
@@ -162,6 +191,7 @@ function BookTable({
                   </td>
                 )}
                 {received && <RetentionCell invoice={i} name={name} onChange={onRetention} />}
+                <PdfFixCell columns={head} invoice={i} name={name} pdf={pdf} />
               </tr>
             );
             if (offer?.id !== i.id) return [row];
@@ -209,6 +239,13 @@ export function InvoiceReview({
   const [open, setOpen] = useState(true);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [offer, setOffer] = useState<Offer | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  // After a correction, the focus goes back to the button that opened it.
+  const [returnTo, setReturnTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (returnTo) document.getElementById(fixButtonId(returnTo))?.focus();
+  }, [returnTo]);
 
   useEffect(() => {
     if (!focus) return;
@@ -243,6 +280,32 @@ export function InvoiceReview({
     setOffer(null);
   };
 
+  const close = (id: string) => {
+    setEditing(null);
+    setReturnTo(id);
+  };
+  const pdf: PdfHandlers = {
+    editing,
+    onEdit: (i) => {
+      setEditing(i.id);
+      setReturnTo(null);
+      setOffer(null);
+    },
+    onChecked: (i) => onChange(withChange(form, [i.id], { review: [] })),
+    onSave: (i, edit, kind) => {
+      const key = supplierKey(edit.concept);
+      if (kind !== i.kind && key) {
+        const preferences = storage.getJSON<KindPreferences>(KIND_PREFERENCES_KEY, {});
+        storage.setJSON(KIND_PREFERENCES_KEY, { ...preferences, [key]: kind });
+      }
+      const { list, quarters } = editInvoice(form.invoices, i.id, edit);
+      const fixed = list.map((x) => (x.id === i.id ? { ...x, kind } : x));
+      onChange(applyChanged({ ...form, invoices: fixed }, quarters));
+      close(i.id);
+    },
+    onCancel: () => close(editing as string),
+  };
+
   const books = (['issued', 'received'] as const)
     .map((book) => ({ book, list: invoices.filter((i) => i.book === book) }))
     .filter((b) => b.list.length > 0);
@@ -273,6 +336,9 @@ export function InvoiceReview({
       {open && (
         <div id="autonomo-review-body">
           <p className="section-hint">{t('app.autonomo.review.hint')}</p>
+          {invoices.some((i) => i.source === 'pdf') && (
+            <p className="section-hint">{t('app.autonomo.review.pdf.hint')}</p>
+          )}
           {books.map(({ book, list }) => (
             <div key={book} className="autonomo-review-scroll">
               <BookTable
@@ -287,6 +353,7 @@ export function InvoiceReview({
                 }}
                 onApplyOffer={applyOffer}
                 onRetention={(i, patch) => onChange(withChange(form, [i.id], patch))}
+                pdf={pdf}
               />
             </div>
           ))}

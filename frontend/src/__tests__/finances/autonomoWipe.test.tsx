@@ -7,7 +7,7 @@ import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
 jest.mock('@modules/finances/application/taxModelPdf');
-const read = reader.readTaxModelPdf as jest.MockedFunction<typeof reader.readTaxModelPdf>;
+const read = reader.readImportPdf as jest.MockedFunction<typeof reader.readImportPdf>;
 
 const open = () => {
   const api = createFakeApi();
@@ -64,12 +64,15 @@ describe('Deleting the data of the self-employed draft', () => {
   it('shows up when a modelo 130 is imported, moves the draft to the next quarter, and wipes the message with the rest', async () => {
     jest.spyOn(window, 'confirm').mockReturnValue(true);
     read.mockResolvedValue({
-      ok: true,
-      data: {
-        model: '130',
-        year: 2026,
-        quarter: 2,
-        boxes: { '01': 11300, '05': 86.6, '07': 158.75 },
+      kind: 'model',
+      parsed: {
+        ok: true,
+        data: {
+          model: '130',
+          year: 2026,
+          quarter: 2,
+          boxes: { '01': 11300, '05': 86.6, '07': 158.75 },
+        },
       },
     });
     open();

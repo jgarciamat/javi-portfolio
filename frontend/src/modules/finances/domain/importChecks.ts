@@ -1,4 +1,4 @@
-import { supplierKey, type ImportedInvoice } from './invoiceLedger';
+import { needsCheck, supplierKey, type ImportedInvoice } from './invoiceLedger';
 import type { ManualData, ManualExpense } from './types';
 
 /**
@@ -17,7 +17,8 @@ export type CheckCode =
   | 'model130Expenses'
   | 'vat0'
   | 'negative'
-  | 'years';
+  | 'years'
+  | 'pdfReview';
 
 export interface ImportCheck {
   code: CheckCode;
@@ -210,7 +211,12 @@ export function checkImport(input: CheckInput): ImportCheck[] {
   );
   const negative = used.filter((i) => i.base < 0);
   const years = Array.from(new Set(used.map((i) => Number(i.date.slice(0, 4))))).sort();
+  // Read from a PDF with doubts or gaps: also the ones left out until they are completed.
+  const pdf = input.invoices.filter(needsCheck);
   const all: ImportCheck[] = [
+    ...(pdf.length > 0
+      ? [check('pdfReview', 'warn', { values: { n: pdf.length }, invoices: pdf.map((i) => i.id) })]
+      : []),
     ...duplicates(used),
     ...(period.length > 0
       ? [

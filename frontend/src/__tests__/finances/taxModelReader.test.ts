@@ -1,4 +1,4 @@
-import { readTaxModelPdf, tokensFromPdf } from '@modules/finances/application/taxModelPdf';
+import { readImportPdf, tokensFromPdf } from '@modules/finances/application/taxModelPdf';
 
 /** A page as pdf.js hands it over: text with its transform, and the form fields with their rectangle. */
 const page = (items: unknown[], widgets: unknown[]) => ({
@@ -63,7 +63,7 @@ jest.mock('pdfjs-dist/build/pdf.worker.min.mjs?url', () => ({ default: 'worker.j
   virtual: true,
 });
 
-describe('readTaxModelPdf', () => {
+describe('readImportPdf', () => {
   const file = { arrayBuffer: async () => new ArrayBuffer(1) } as unknown as File;
   const open = (doc: unknown) =>
     (jest.requireMock('pdfjs-dist').getDocument as jest.Mock).mockReturnValue({
@@ -88,14 +88,25 @@ describe('readTaxModelPdf', () => {
           []
         ),
     });
-    expect(await readTaxModelPdf(file)).toEqual({
-      ok: true,
-      data: { model: '130', year: 2026, quarter: 1, boxes: { '01': 5300 } },
+    expect(await readImportPdf(file)).toEqual({
+      kind: 'model',
+      parsed: { ok: true, data: { model: '130', year: 2026, quarter: 1, boxes: { '01': 5300 } } },
     });
   });
 
-  it('says it is not a form it knows when the PDF has no title of the modelo 130 or 303', async () => {
+  it('reads a PDF without the title of the modelo 130 or 303 as an invoice', async () => {
     open({ numPages: 1, getPage: async () => page([text('Una factura', 1, 1)], []) });
-    expect(await readTaxModelPdf(file)).toEqual({ ok: false, reason: 'unknownModel' });
+    expect(await readImportPdf(file)).toEqual({
+      kind: 'invoice',
+      parsed: { ok: false, reason: 'noText' },
+    });
+  });
+
+  it('keeps the width and size of the printed pieces, without the spaces around them', async () => {
+    const item = { str: '  Total ', transform: [1, 0, 0, 1, 100, 50], width: 16, height: 10 };
+    const doc = { numPages: 1, getPage: async () => page([item], []) };
+    expect((await tokensFromPdf(doc))[0]).toEqual([
+      { text: 'Total', x: 104, y: 50, field: false, w: 10, h: 10 },
+    ]);
   });
 });

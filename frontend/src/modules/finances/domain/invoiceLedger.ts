@@ -1,5 +1,6 @@
 import { guessExpenseKind, type BookEntry, type BookKind } from './invoiceBook';
-import type { ExpenseKind } from './types';
+import type { Missing, PdfEntry } from './invoicePdf';
+import type { ExpenseKind, VatRate } from './types';
 import type { WithholdingRole } from './withholdings';
 
 /**
@@ -21,11 +22,23 @@ export interface ImportedInvoice extends BookEntry {
   retentionFix?: number;
   /** Which form the withholding goes to, when the person chose it (otherwise it follows the kind). */
   withholding?: WithholdingRole;
+  /** Read from an invoice in PDF: its fields can be corrected in the review. */
+  source?: 'pdf';
+  /** Why the reading should be checked (codes of the PDF reader); empty once the person did. */
+  review?: string[];
+  /** Fields the PDF did not give: the invoice stays out of the draft until they are filled in. */
+  missing?: Missing[];
 }
+
+/** What is still to check of an invoice read from a PDF (none for the others). */
+export const reviewOf = (i: ImportedInvoice): string[] => i.review ?? [];
+export const missingOf = (i: ImportedInvoice): Missing[] => i.missing ?? [];
+/** Whether an invoice still has something to check or to fill in. */
+export const needsCheck = (i: ImportedInvoice) => reviewOf(i).length > 0 || missingOf(i).length > 0;
 
 /** What the person can correct in an imported invoice. */
 export type InvoicePatch = Partial<
-  Pick<ImportedInvoice, 'kind' | 'excluded' | 'retentionFix' | 'withholding'>
+  Pick<ImportedInvoice, 'kind' | 'excluded' | 'retentionFix' | 'withholding' | 'review'>
 >;
 
 /** Supplier (normalised) → the kind the person chose for it, for the next imports. */
@@ -102,8 +115,109 @@ export function mergeInvoices(
   incoming: ImportedInvoice[]
 ): { list: ImportedInvoice[]; quarters: Quarter[] } {
   const quarters = Array.from(new Set(incoming.map((i) => i.quarter))).sort();
-  const kept = list.filter((i) => i.book !== book || !quarters.includes(i.quarter));
+  const ids = new Set(incoming.map((i) => i.id));
+  // Invoices read from PDFs are not part of the book: they stay unless the book has them too.
+  const kept = list.filter((i) =>
+    i.source === 'pdf' ? !ids.has(i.id) : i.book !== book || !quarters.includes(i.quarter)
+  );
   return { list: [...kept, ...incoming], quarters };
+}
+
+/**
+ * The entries of an invoice read from a PDF as invoices of a book. One with missing fields stays out
+ * of the draft until the person completes it; the kind starts from what was chosen for the supplier.
+ */
+export function toPdfInvoices(
+  book: BookKind,
+  entries: PdfEntry[],
+  review: string[],
+  guessed: ExpenseKind,
+  preferences: KindPreferences
+): ImportedInvoice[] {
+  const seen = new Map<string, number>();
+  return entries.map(({ missing, ...entry }) => {
+    const key = sameKey(book, entry);
+    const n = (seen.get(key) ?? 0) + 1;
+    seen.set(key, n);
+    return {
+      ...entry,
+      id: n === 1 ? hash(key) : `${hash(key)}-${n}`,
+      book,
+      kind: book === 'issued' ? 'other' : preferences[supplierKey(entry.concept)] ?? guessed,
+      excluded: missing.length > 0,
+      source: 'pdf',
+      review,
+      missing,
+    };
+  });
+}
+
+/** New invoices added to the list; the ones already there (same id) are kept as they are. */
+export function addInvoices(
+  list: ImportedInvoice[],
+  incoming: ImportedInvoice[]
+): { list: ImportedInvoice[]; quarters: Quarter[]; fresh: ImportedInvoice[] } {
+  const ids = new Set(list.map((i) => i.id));
+  const fresh = incoming.filter((i) => !ids.has(i.id));
+  const quarters = Array.from(new Set(fresh.map((i) => i.quarter))).sort();
+  return { list: [...list, ...fresh], quarters, fresh };
+}
+
+/** The invoices without some of them; `quarters` are the ones whose figures change, by book. */
+export function dropInvoices(
+  list: ImportedInvoice[],
+  ids: string[]
+): { list: ImportedInvoice[]; quarters: Partial<Record<BookKind, Quarter[]>> } {
+  const quarters: Partial<Record<BookKind, Quarter[]>> = {};
+  for (const i of list.filter((x) => ids.includes(x.id))) {
+    const changed = (quarters[i.book] ??= []);
+    if (!changed.includes(i.quarter)) changed.push(i.quarter);
+  }
+  return { list: list.filter((i) => !ids.includes(i.id)), quarters };
+}
+
+/** What the person can correct of an invoice read from a PDF. */
+export interface InvoiceEdit {
+  date: string;
+  concept: string;
+  base: number;
+  vatRate: VatRate;
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * An invoice corrected by the person: its quarter follows its date, its VAT the base and rate (the
+ * printed VAT stays while they do not change). Corrected means checked: it has nothing left to review,
+ * and one that was incomplete goes into the draft. The id stays, so importing the PDF again finds it.
+ */
+export function editInvoice(
+  list: ImportedInvoice[],
+  id: string,
+  edit: InvoiceEdit
+): { list: ImportedInvoice[]; quarters: Partial<Record<BookKind, Quarter[]>> } {
+  const old = list.find((i) => i.id === id) as ImportedInvoice;
+  const quarter = (Math.floor((Number(edit.date.slice(5, 7)) - 1) / 3) + 1) as Quarter;
+  const incomplete = missingOf(old).length > 0;
+  const vat =
+    !incomplete && edit.base === old.base && edit.vatRate === old.vatRate
+      ? old.vat
+      : round2((edit.base * edit.vatRate) / 100);
+  const next: ImportedInvoice = {
+    ...old,
+    ...edit,
+    concept: edit.concept.trim(),
+    quarter,
+    vat,
+    total: round2(edit.base + vat),
+    excluded: incomplete ? false : old.excluded,
+    review: [],
+    missing: [],
+  };
+  return {
+    list: list.map((i) => (i.id === id ? next : i)),
+    quarters: { [old.book]: Array.from(new Set([old.quarter, quarter])) },
+  };
 }
 
 /** The invoices with a change to some of them; `quarters` are the ones whose figures change. */

@@ -5,6 +5,8 @@ import type { ManualForm } from './AutonomoManual';
 
 /** Supplier → kind of expense the person chose: the next imports start from it. */
 export const KIND_PREFERENCES_KEY = 'mm_autonomo_kinds';
+/** The person's own tax id and name, learnt from an invoice they said they issued (device only). */
+export const ME_KEY = 'mm_autonomo_me';
 
 /** Money as the form's text fields take it: no zeros left over, a dot for the decimals. */
 const text = (n: number): string => (n === 0 ? '' : String(n));
@@ -47,6 +49,19 @@ export function applyInvoices(form: ManualForm, book: BookKind, quarters: Quarte
       };
     }),
   };
+}
+
+/** The quarters of each book that a change touched, worked out again. */
+export function applyChanged(
+  form: ManualForm,
+  quarters: Partial<Record<BookKind, Quarter[]>>
+): ManualForm {
+  let next = form;
+  for (const book of ['issued', 'received'] as const) {
+    const changed = quarters[book];
+    if (changed) next = applyInvoices(next, book, changed);
+  }
+  return next;
 }
 
 /** The modelo 130 of a quarter hands its totals to the next one: they become the «already filed» totals. */

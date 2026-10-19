@@ -405,6 +405,7 @@ export function AutonomoManual({
   focus = null,
   checks = null,
   extras = null,
+  onShow,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
@@ -418,6 +419,8 @@ export function AutonomoManual({
   checks?: ReactNode;
   /** The other options of the draft, after the quarters. */
   extras?: ReactNode;
+  /** Opens an imported invoice in the review (from the result of its file). */
+  onShow?: (id: string) => void;
 }) {
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
@@ -447,6 +450,7 @@ export function AutonomoManual({
           years={years}
           onChange={onChange}
           onPeriod={onPeriod}
+          onShow={onShow}
         />
         <ProfilePanel profile={form.profile} onChange={setProfile} />
         {upTo > 1 && <PriorPanel prior={form.prior} onChange={setPrior} />}

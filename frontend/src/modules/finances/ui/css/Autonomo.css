@@ -779,6 +779,66 @@ button.autonomo-sum-warn {
   margin-top: 0.3rem;
 }
 
+/* ─── Invoices read from a PDF ───────────────────────────────────────────── */
+.autonomo-import-summary {
+  margin: 0.9rem 0 0;
+  font-weight: 600;
+}
+.autonomo-import-me {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0;
+}
+.autonomo-import-file .autonomo-import-actions {
+  margin-top: 0.45rem;
+}
+.autonomo-review-flag {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--amber-300);
+}
+.autonomo-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.autonomo-review-actions .btn-primary,
+.autonomo-review-actions .btn-secondary {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+.autonomo-review-table tr.is-editing td {
+  background: rgba(99, 102, 241, 0.08);
+  vertical-align: top;
+}
+.autonomo-review-table tr.is-editing input.tx-input {
+  min-width: 7.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+.autonomo-review-table tr.is-editing select.tx-input {
+  min-width: 5.5rem;
+}
+.autonomo-review-table tr.is-editing .inline-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+}
+@media (max-width: 640px) {
+  .autonomo-review-table tr.is-editing input.tx-input {
+    min-width: 0;
+    width: 100%;
+  }
+  /* The buttons to correct an invoice take the whole width of its card. */
+  .autonomo-review-table tr td:has(.autonomo-review-actions) {
+    grid-column: 1 / -1;
+  }
+}
+
 /* The options of «Otros datos para los modelos»: one checkbox per line, the text beside it. */
 .autonomo-options {
   display: flex;

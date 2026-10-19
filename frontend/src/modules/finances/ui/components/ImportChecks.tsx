@@ -61,7 +61,7 @@ export function ImportChecks({
                       onClick={() => onInvoice(id)}
                     >
                       {t('app.autonomo.checks.open', {
-                        invoice: `${date(i.date)} · ${
+                        invoice: `${i.date ? date(i.date) : t('app.autonomo.pdf.noDate')} · ${
                           i.concept || t('app.autonomo.review.noName')
                         } · ${money(i.total)}`,
                       })}

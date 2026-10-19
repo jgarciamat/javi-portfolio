@@ -1,4 +1,5 @@
 import { parseTaxModelTokens, type PdfToken, type TaxModelParse } from '../domain/taxModelPdf';
+import { parseInvoiceTokens, type InvoicePdfParse } from '../domain/invoicePdf';
 
 /** The part of a pdf.js document the reader uses (so tests and scripts can hand it their own). */
 export interface PdfDocument {
@@ -12,6 +13,8 @@ export interface PdfDocument {
 interface TextItem {
   str: string;
   transform: number[];
+  width?: number;
+  height?: number;
 }
 interface Widget {
   subtype?: string;
@@ -27,6 +30,17 @@ const LABEL_FIELD = /^(texto|textofijo|acc\.|inst|bot|lista|codbar)/i;
 /** Where the text baseline of a field sits, a little above its bottom edge. */
 const BASELINE = 2;
 
+/** A printed piece with its place, and its width and size when pdf.js gives them. */
+function tokenOf(item: TextItem, text: string): PdfToken {
+  const [x, y] = [item.transform[4], item.transform[5]];
+  if (typeof item.width !== 'number' || typeof item.height !== 'number')
+    return { text, x, y, field: false };
+  // The width covers the spaces trimmed off: keep the share of the text that is left.
+  const per = item.width / item.str.length;
+  const lead = item.str.length - item.str.trimStart().length;
+  return { text, x: x + per * lead, y, field: false, w: per * text.length, h: item.height };
+}
+
 /** Every piece of text and every filled form field of the pages, with its place on the page. */
 export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
   const pages: PdfToken[][] = [];
@@ -35,8 +49,7 @@ export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
     const tokens: PdfToken[] = [];
     for (const item of (await page.getTextContent()).items as Partial<TextItem>[]) {
       const text = item.str?.trim();
-      if (text && item.transform)
-        tokens.push({ text, x: item.transform[4], y: item.transform[5], field: false });
+      if (text && item.transform) tokens.push(tokenOf(item as TextItem, text));
     }
     for (const w of (await page.getAnnotations()) as Widget[]) {
       const value = typeof w.fieldValue === 'string' ? w.fieldValue.trim() : '';
@@ -54,11 +67,28 @@ export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
   return pages;
 }
 
-/** The boxes of a modelo 130 or 303 in a PDF, read in the browser: the file never leaves the device. */
-export async function readTaxModelPdf(file: File): Promise<TaxModelParse> {
+/** What a PDF dropped in the import is: a filed modelo 130/303, or else an invoice (or neither). */
+export type ImportPdf =
+  | { kind: 'model'; parsed: TaxModelParse }
+  | { kind: 'invoice'; parsed: InvoicePdfParse };
+
+/** The pieces of a PDF given as bytes, read with pdf.js: the file never leaves the device. */
+async function openPdf(file: File): Promise<PdfToken[][]> {
   const pdfjs = await import('pdfjs-dist');
   const worker = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
   pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
   const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
-  return parseTaxModelTokens(await tokensFromPdf(pdf as unknown as PdfDocument));
+  return tokensFromPdf(pdf as unknown as PdfDocument);
+}
+
+/** A modelo when the form's title is there; otherwise the PDF is read as an invoice. */
+export function classifyPdf(pages: PdfToken[][]): ImportPdf {
+  const model = parseTaxModelTokens(pages);
+  if (model.ok || model.reason !== 'unknownModel') return { kind: 'model', parsed: model };
+  return { kind: 'invoice', parsed: parseInvoiceTokens(pages) };
+}
+
+/** Reads a PDF dropped in the import of the self-employed screen. */
+export async function readImportPdf(file: File): Promise<ImportPdf> {
+  return classifyPdf(await openPdf(file));
 }

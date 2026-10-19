@@ -11,7 +11,8 @@ import type { TaxModelParse } from '@modules/finances/domain/taxModelPdf';
 import { tr } from '@test-utils/render';
 
 jest.mock('@modules/finances/application/taxModelPdf');
-const read = reader.readTaxModelPdf as jest.MockedFunction<typeof reader.readTaxModelPdf>;
+const read = reader.readImportPdf as jest.MockedFunction<typeof reader.readImportPdf>;
+const model = (parsed: TaxModelParse) => ({ kind: 'model' as const, parsed });
 
 let latest: ManualForm = emptyManual();
 const onPeriod = jest.fn();
@@ -49,7 +50,7 @@ const choose = (...files: File[]) =>
   });
 const upload = async (parsed: TaxModelParse | Error, file = pdf()) => {
   if (parsed instanceof Error) read.mockRejectedValueOnce(parsed);
-  else read.mockResolvedValueOnce(parsed);
+  else read.mockResolvedValueOnce(model(parsed));
   choose(file);
   await waitFor(() => expect(read).toHaveBeenCalled());
 };
@@ -141,7 +142,7 @@ describe('Importing a filed modelo 130 or 303 from the same place', () => {
 
   it('takes a book and a 303 of the same quarter dropped together: the 303 wins and its invoices leave', async () => {
     show();
-    read.mockResolvedValueOnce(ok({ model: '303', quarter: 1, boxes: { '07': 900 } }));
+    read.mockResolvedValueOnce(model(ok({ model: '303', quarter: 1, boxes: { '07': 900 } })));
     choose(
       csv(
         'ventas.csv',
@@ -158,7 +159,7 @@ describe('Importing a filed modelo 130 or 303 from the same place', () => {
 
   it('imports the books that come after a modelo 130 in the year of the PDF', async () => {
     show();
-    read.mockResolvedValueOnce(ok({ year: 2025, quarter: 1, boxes: { '01': 10 } }));
+    read.mockResolvedValueOnce(model(ok({ year: 2025, quarter: 1, boxes: { '01': 10 } })));
     choose(
       pdf(),
       csv('ventas.csv', 'Fecha;Cliente;Base imponible;Tipo IVA\n15/05/2025;Ana;100;21\n')

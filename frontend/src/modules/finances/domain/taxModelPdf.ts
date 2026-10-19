@@ -19,6 +19,9 @@ export interface PdfToken {
   y: number;
   /** Typed in a form field (a plain number is fine); printed text only counts when it looks like an amount. */
   field: boolean;
+  /** Width and font size of printed text, when the PDF gives them (to join pieces of one word). */
+  w?: number;
+  h?: number;
 }
 
 export interface TaxModelPdf {

@@ -25,7 +25,8 @@
     "cap:copy": "npx cap copy",
     "casos": "node scripts/casos/run.mjs",
     "templates": "esbuild scripts/make-templates.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-templates.cjs --log-level=warning && node scripts/.make-templates.cjs; rm -f scripts/.make-templates.cjs",
-    "invoices:examples": "esbuild scripts/make-invoice-pdfs.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-invoice-pdfs.cjs --log-level=warning && node scripts/.make-invoice-pdfs.cjs; rm -f scripts/.make-invoice-pdfs.cjs"
+    "invoices:examples": "esbuild scripts/make-invoice-pdfs.ts --bundle --platform=node --format=cjs --outfile=scripts/.make-invoice-pdfs.cjs --log-level=warning && node scripts/.make-invoice-pdfs.cjs; rm -f scripts/.make-invoice-pdfs.cjs",
+    "invoices:verify": "esbuild scripts/verify-invoice-pdfs.ts --bundle --platform=node --format=cjs --external:pdfjs-dist --outfile=scripts/.verify-invoice-pdfs.cjs --log-level=warning && node scripts/.verify-invoice-pdfs.cjs; status=$?; rm -f scripts/.verify-invoice-pdfs.cjs; exit $status"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",

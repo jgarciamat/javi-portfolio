@@ -182,6 +182,11 @@ function ExtrasPanel({
   );
 }
 
+/** An invoice in the review (null: the review itself), from a warning or from an imported file. */
+const nextFocus =
+  (id: string | null) =>
+  (f: ReviewFocus | null): ReviewFocus => ({ id, n: (f?.n ?? 0) + 1 });
+
 /** Today as `YYYY-MM-DD` in the person's time zone. */
 const today = (): string => {
   const d = new Date();
@@ -334,11 +339,12 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           setQuarter(q);
         }}
         focus={focus}
+        onShow={(id) => setFocus(nextFocus(id))}
         checks={
           <ImportChecks
             checks={checks}
             invoices={manual.invoices}
-            onInvoice={(id) => setFocus((f) => ({ id, n: (f?.n ?? 0) + 1 }))}
+            onInvoice={(id) => setFocus(nextFocus(id))}
             onQuarter={toQuarter}
           />
         }

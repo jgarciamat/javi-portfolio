@@ -3,7 +3,7 @@ import { useApi } from '@core/context/ApiContext';
 import { errorCode } from '@core/api/http';
 import { storage } from '@shared/utils/storage';
 import type { AutonomoCloudCopy, ExpenseKind } from '@modules/finances/domain/types';
-import type { KindPreferences } from '../../domain/invoiceLedger';
+import { missingOf, reviewOf, type KindPreferences } from '../../domain/invoiceLedger';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
 import { withholdingsOf } from './withholdingForm';
 
@@ -153,6 +153,10 @@ export function toSaved(
         ...(i.nif ? { nif: i.nif } : {}),
         ...(i.retentionFix !== undefined ? { retentionFix: i.retentionFix } : {}),
         ...(i.withholding ? { withholding: i.withholding } : {}),
+        // Read from a PDF: what is still to check (only on those, so the others stay as they were).
+        ...(i.source === 'pdf'
+          ? { source: i.source, review: [...reviewOf(i)], missing: [...missingOf(i)] }
+          : {}),
       })),
       model130: model130
         ? {
