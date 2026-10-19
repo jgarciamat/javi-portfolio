@@ -885,6 +885,67 @@
   line-height: 1.5;
 }
 
+.invite-tiers {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: var(--slate-200);
+}
+
+.invite-tiers th,
+.invite-tiers td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--slate-800);
+  text-align: left;
+}
+
+.invite-tiers th {
+  font-weight: 600;
+  color: var(--slate-400);
+}
+
+.invite-tiers tr.is-earned td {
+  color: var(--green-400, #4ade80);
+  font-weight: 600;
+}
+
+.invite-tiers tr.is-earned td:last-child::after {
+  content: ' ✓';
+}
+
+/* ─── The invited user's free month: what is missing for it ──────────────── */
+.invitee-goal {
+  border: 1px solid var(--accent-500, #6366f1);
+}
+
+.invitee-goal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.invitee-goal-head .section-title {
+  margin: 0;
+}
+
+.invitee-goal .getting-started-list li {
+  flex-wrap: wrap;
+}
+
+.invitee-goal .getting-started-text {
+  min-width: 10rem;
+}
+
+.invitee-goal-done {
+  border-color: var(--green-500);
+}
+
+.invitee-goal-done p {
+  margin: 0.3rem 0 0;
+}
+
 .invite-foot {
   display: flex;
   justify-content: flex-end;
@@ -894,14 +955,19 @@
 html.wiz-contrast .invite-linkbox,
 html.wiz-contrast .invite-stats li,
 html.wiz-contrast .invite-copy,
-html.wiz-contrast .invite-bar {
+html.wiz-contrast .invite-bar,
+html.wiz-contrast .invitee-goal,
+html.wiz-contrast .invitee-goal .getting-started-bar {
   border: 2px solid var(--slate-300);
 }
 
 html.wiz-contrast .invite-subtitle,
 html.wiz-contrast .invite-stats li,
-html.wiz-contrast .invite-months {
+html.wiz-contrast .invite-months,
+html.wiz-contrast .invite-tiers th,
+html.wiz-contrast .invitee-goal .getting-started-text {
   color: var(--slate-100);
+  text-decoration: none;
 }
 
 html.wiz-contrast .invite-bar span {
@@ -926,5 +992,9 @@ html.wiz-contrast .invite-bar span {
   .invite-copy {
     flex: 1 1 100%;
     justify-content: center;
+  }
+
+  .invitee-goal .getting-started-list .btn-secondary {
+    flex: 1 1 100%;
   }
 }

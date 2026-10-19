@@ -5,8 +5,14 @@ import { errorMessage } from '@shared/utils/errors';
 import { isNativeApp } from '@shared/utils/platform';
 import { PLAY_SUBSCRIPTIONS_URL } from '@core/billing/playStore';
 import { usePlan } from '../application/PlanContext';
-import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domain/types';
+import type {
+  BillingOverview,
+  FirstStepId,
+  HouseholdPerson,
+  LimitedResource,
+} from '../domain/types';
 import { InviteCard } from './InviteCard';
+import { InviteeGoal } from './InviteeGoal';
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
@@ -198,8 +204,11 @@ function UpgradeCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
-/** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
-export function PlanView() {
+/**
+ * "Tu plan": status, usage against the limits and the way to upgrade or manage it; for an invited
+ * user, also what is missing for their free month (`onOpenStep` opens where each step is done).
+ */
+export function PlanView({ onOpenStep }: { onOpenStep?: (id: FirstStepId) => void }) {
   const { t } = useI18n();
   const { overview, loading } = usePlan();
 
@@ -217,6 +226,7 @@ export function PlanView() {
       ) : (
         <PlanCard overview={overview} />
       )}
+      {onOpenStep && <InviteeGoal onOpenStep={onOpenStep} />}
       <UsageCard overview={overview} />
       {!member && <InviteCard />}
       {!paying && !member && <UpgradeCard overview={overview} />}

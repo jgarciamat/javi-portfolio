@@ -1,4 +1,4 @@
-import { act, fireEvent, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, renderHook, screen, waitFor, within } from '@testing-library/react';
 import { Capacitor } from '@capacitor/core';
 import { billingApi, offersApi } from '@core/api/billingApi';
 import { ApiError, apiRequest } from '@core/api/http';
@@ -464,8 +464,10 @@ describe('Invite a friend', () => {
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
     withPlan(<PlanView />);
     expect(await screen.findByText('https://finanverso.app/?ref=ABCD2345')).toBeInTheDocument();
-    expect(screen.getByText(tr('billing.invite.progressMany', { missing: 4 }))).toBeVisible();
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '33');
+    expect(screen.getByText(tr('billing.invite.progressMany', { missing: 3 }))).toBeVisible();
+    // 2 friends: 1 of the 4 between the first month (1) and the second (5).
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
+    expect(screen.getByText('1/5')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAccessibleName(
       /completado los primeros pasos: 2/
     );
@@ -499,17 +501,51 @@ describe('Invite a friend', () => {
     }
   });
 
-  it('says "1 friend" when only one is missing and hides the bar when none is', async () => {
+  it('says "1 friend" when only one is missing', async () => {
     const api = createFakeApi();
-    api.billingApi.referral.mockResolvedValue(f.referral({ missing: 1 }));
-    const view = withPlan(<PlanView />, f.billing(), api);
+    api.billingApi.referral.mockResolvedValue(f.referral({ missing: 1, qualified: 4 }));
+    withPlan(<PlanView />, f.billing(), api);
     expect(await screen.findByText(tr('billing.invite.progressOne'))).toBeVisible();
-    view.unmount();
-    const done = createFakeApi();
-    done.billingApi.referral.mockResolvedValue(f.referral({ missing: 0, qualified: 0 }));
-    withPlan(<PlanView />, f.billing(), done);
-    await screen.findByText(tr('billing.invite.monthsTitle'));
-    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
+  });
+
+  it('shows the table of months, with those already earned marked', async () => {
+    withPlan(<PlanView />);
+    fireEvent.click(await screen.findByText(tr('billing.invite.monthsTitle')));
+    const table = screen.getByRole('table');
+    const rows = within(table).getAllByRole('row');
+    expect(rows).toHaveLength(6);
+    expect(within(rows[0]).getByText(tr('billing.invite.monthsColFriends'))).toBeVisible();
+    expect(within(rows[1]).getByText(tr('billing.invite.friendOne'))).toBeVisible();
+    expect(within(rows[1]).getByText(tr('billing.invite.monthOne'))).toBeVisible();
+    expect(rows[1]).toHaveClass('is-earned');
+    expect(within(rows[2]).getByText(tr('billing.invite.friendMany', { count: 5 }))).toBeVisible();
+    expect(within(rows[2]).getByText(tr('billing.invite.monthMany', { count: 2 }))).toBeVisible();
+    expect(rows[2]).not.toHaveClass('is-earned');
+    expect(within(rows[5]).getByText(tr('billing.invite.friendMany', { count: 50 }))).toBeVisible();
+    expect(within(rows[5]).getByText(tr('billing.invite.monthMany', { count: 5 }))).toBeVisible();
+  });
+
+  it('says when every month has been earned', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockResolvedValue(
+      f.referral({ qualified: 50, rewardsEarned: 5, missing: 0, nextAt: null, maxed: true })
+    );
+    withPlan(<PlanView />, f.billing(), api);
+    expect(await screen.findByText(tr('billing.invite.progressMaxed', { max: 5 }))).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName(/Has conseguido el máximo/);
+    expect(screen.getByText('5/5')).toBeInTheDocument();
+  });
+
+  it('starts the bar from zero before the first friend', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockResolvedValue(
+      f.referral({ qualified: 0, pending: 0, rewardsEarned: 0, missing: 1, nextAt: 1 })
+    );
+    withPlan(<PlanView />, f.billing(), api);
+    expect(await screen.findByText(tr('billing.invite.progressOne'))).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
   });
 
   it('keeps the dialog usable (close button) while the code is still loading', () => {

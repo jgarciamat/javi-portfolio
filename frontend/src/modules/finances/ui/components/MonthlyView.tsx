@@ -14,6 +14,8 @@ import { useGettingStarted } from '../../application/hooks/useGettingStarted';
 import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
 import { useRowSelection } from '@shared/hooks/useRowSelection';
 import { TransactionBulkActions } from './TransactionBulkActions';
+import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
+import { InviteeGoal } from '@modules/billing/ui/InviteeGoal';
 import type { DashboardTab } from '../navigation';
 import { AIAdvisor } from './AIAdvisor';
 import { BudgetProgress } from './BudgetProgress';
@@ -210,9 +212,11 @@ function CurrentPeriodPanels({
   onOpenTab: (tab: DashboardTab) => void;
 }) {
   const f = useFinances();
+  const openStep = useOpenFirstStep(onOpenTab);
   if (!f.isCurrentPeriod) return null;
   return (
     <>
+      <InviteeGoal onOpenStep={openStep} dismissible refreshKey={f.transactions.length} />
       {checklist.visible ? (
         <GettingStarted checklist={checklist} onOpenTab={onOpenTab} />
       ) : (

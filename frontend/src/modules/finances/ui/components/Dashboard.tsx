@@ -29,6 +29,7 @@ import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
 import { BurgerMenu } from './BurgerMenu';
 import { InviteDialog } from './InviteDialog';
+import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
@@ -79,9 +80,14 @@ const SIMPLE_VIEWS: Partial<
   learn: (open) => <LearnView onOpenTab={open} />,
   invest: () => <InvestView />,
   videos: () => <VideosView />,
-  plan: () => <PlanView />,
+  plan: (open) => <PlanWithSteps onOpenTab={open} />,
   offers: () => <OffersView />,
 };
+
+/** "Your plan", whose first steps for an invited user open the right section. */
+function PlanWithSteps({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
+  return <PlanView onOpenStep={useOpenFirstStep(onOpenTab)} />;
+}
 
 function SectionLoading() {
   const { t } = useI18n();

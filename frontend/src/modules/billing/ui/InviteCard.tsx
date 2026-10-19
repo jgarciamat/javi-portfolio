@@ -4,7 +4,27 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { inviteLink } from '@core/referral';
 import { Icon } from '@shared/components/Icon';
 import { useResource } from '@shared/hooks/useResource';
+import type { ReferralSummary } from '../domain/types';
 import './css/Billing.css';
+
+type Translate = ReturnType<typeof useI18n>['t'];
+
+const plural = (t: Translate, unit: 'friend' | 'month', count: number) =>
+  count === 1 ? t(`billing.invite.${unit}One`) : t(`billing.invite.${unit}Many`, { count });
+
+/** How far the user is from the next month, counted from the month just earned. */
+function tierPercent(data: ReferralSummary): number {
+  if (data.nextAt === null) return 100;
+  const from = data.tiers[data.rewardsEarned - 1] ?? 0;
+  return Math.round(((data.qualified - from) / (data.nextAt - from)) * 100);
+}
+
+function progressText(data: ReferralSummary, t: Translate): string {
+  if (data.maxed) return t('billing.invite.progressMaxed', { max: data.maxRewards });
+  return data.missing === 1
+    ? t('billing.invite.progressOne')
+    : t('billing.invite.progressMany', { missing: data.missing });
+}
 
 /**
  * "Invite a friend": a link that gives both a free month of Premium. Inside "Your plan" it is a
@@ -28,15 +48,27 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
     await navigator.clipboard.writeText(link);
     setCopied(true);
   };
-  const total = data ? data.qualified + data.missing : 0;
-  const percent = data && total > 0 ? Math.round((data.qualified / total) * 100) : 0;
+  const percent = data ? tierPercent(data) : 0;
   const stats = data
     ? [
-        { key: 'statQualified', icon: 'checkCircle', value: data.qualified },
-        { key: 'statPending', icon: 'clock', value: data.pending },
-        { key: 'statEarned', icon: 'gift', value: data.rewardsEarned },
+        { key: 'statQualified', icon: 'checkCircle', value: `${data.qualified}` },
+        { key: 'statPending', icon: 'clock', value: `${data.pending}` },
+        {
+          key: 'statEarned',
+          icon: 'gift',
+          value: `${data.rewardsEarned}/${data.maxRewards}`,
+        },
       ]
     : [];
+  const statsLabel = data
+    ? t(data.maxed ? 'billing.invite.statsMaxed' : 'billing.invite.stats', {
+        qualified: data.qualified,
+        pending: data.pending,
+        earned: data.rewardsEarned,
+        max: data.maxRewards,
+        missing: data.missing,
+      })
+    : '';
 
   return (
     <section className={onClose ? 'invite invite--dialog' : 'card invite invite--card'}>
@@ -99,33 +131,38 @@ export function InviteCard({ onClose }: { onClose?: () => void }) {
               </li>
             ))}
           </ul>
-          {data.missing > 0 && (
-            <div className="invite-progress">
-              <p className="invite-progress-text">
-                {data.missing === 1
-                  ? t('billing.invite.progressOne')
-                  : t('billing.invite.progressMany', { missing: data.missing })}
-              </p>
-              <div
-                className="invite-bar"
-                role="progressbar"
-                aria-label={t('billing.invite.stats', {
-                  qualified: data.qualified,
-                  pending: data.pending,
-                  earned: data.rewardsEarned,
-                  missing: data.missing,
-                })}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={percent}
-              >
-                <span style={{ width: `${percent}%` }} />
-              </div>
+          <div className="invite-progress">
+            <p className="invite-progress-text">{progressText(data, t)}</p>
+            <div
+              className="invite-bar"
+              role="progressbar"
+              aria-label={statsLabel}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={percent}
+            >
+              <span style={{ width: `${percent}%` }} />
             </div>
-          )}
+          </div>
           <details className="invite-months">
             <summary>{t('billing.invite.monthsTitle')}</summary>
             <p>{t('billing.invite.monthsRule')}</p>
+            <table className="invite-tiers">
+              <thead>
+                <tr>
+                  <th scope="col">{t('billing.invite.monthsColFriends')}</th>
+                  <th scope="col">{t('billing.invite.monthsColMonths')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.tiers.map((friends, i) => (
+                  <tr key={friends} className={i < data.rewardsEarned ? 'is-earned' : undefined}>
+                    <td>{plural(t, 'friend', friends)}</td>
+                    <td>{plural(t, 'month', i + 1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </details>
         </>
       )}

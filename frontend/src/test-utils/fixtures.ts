@@ -322,9 +322,30 @@ export const referral = (over: Partial<ReferralSummary> = {}): ReferralSummary =
   pending: 1,
   rewardDays: 30,
   rewardsEarned: 1,
-  missing: 4,
+  missing: 3,
+  nextAt: 5,
+  maxed: false,
+  maxRewards: 5,
+  tiers: [1, 5, 20, 40, 50],
+  invited: null,
   ...over,
 });
+
+/** The first steps of an invited user, with `counts` of what they have. */
+export const inviteeSteps = (
+  counts: Partial<Record<'movements' | 'budgets' | 'goals' | 'automations', number>> = {}
+) =>
+  (
+    [
+      ['movements', 3],
+      ['budgets', 1],
+      ['goals', 1],
+      ['automations', 1],
+    ] as const
+  ).map(([id, goal]) => {
+    const count = Math.min(counts[id] ?? 0, goal);
+    return { id, count, goal, done: count >= goal };
+  });
 
 export const catalog = (over: Partial<PlanCatalog> = {}): PlanCatalog => ({
   currency: 'EUR',
