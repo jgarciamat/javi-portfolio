@@ -1,6 +1,7 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { RentaResult } from '../../domain/rentaCalc';
 import type { JointComparison } from '../../domain/rentaJoint';
+import { resultTone } from './shared';
 
 type Row = { key: string; of: (r: RentaResult) => number };
 
@@ -72,7 +73,16 @@ export function JointTable({
               <tr key={row.key}>
                 <th scope="row">{t(`tools.renta.joint.row.${row.key}`)}</th>
                 {columns.map((c) => (
-                  <td key={c.key} data-label={c.label}>
+                  <td
+                    key={c.key}
+                    data-label={c.label}
+                    className={
+                      // The result in its colour: red to pay (positive), green refunded (negative).
+                      row.key === 'result'
+                        ? `renta-amount renta-amount--${resultTone(c.value(row))}`
+                        : undefined
+                    }
+                  >
                     {money(c.value(row))}
                   </td>
                 ))}

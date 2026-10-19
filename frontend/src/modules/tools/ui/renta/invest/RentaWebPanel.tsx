@@ -1,21 +1,37 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { Icon } from '@shared/components/Icon';
 import { storage } from '@shared/utils/storage';
 import type { LedgerResult } from '../../../domain/invest/ledger';
-import { copyFileName, reportTables } from '../../../domain/invest/report';
+import { copyFileName, copyPlan, reportTables, type CopyPlan } from '../../../domain/invest/report';
 import {
   APARTADO,
+  OTHER_GROUPINGS,
   rentaWebKit,
+  webValue,
+  WINDOWS,
   type Alta,
   type KitWarning,
+  type OtherGrouping,
   type RentaWebKit,
 } from '../../../domain/invest/rentaWeb';
 import { download, reportPdf, xlsxBlob, xlsxOf } from '../../../application/investImport';
 import { useMoney } from '../shared';
 
 /** What is copied into Renta WEB: an amount with a decimal comma and no thousands separator. */
-export const forRentaWeb = (value: string | number) =>
-  typeof value === 'number' ? value.toFixed(2).replace('.', ',') : value;
+export const forRentaWeb = webValue;
+
+/** The id of the panel in the result, for the link under the amount. */
+export const RENTA_WEB_RESULT_ID = 'invest-web-result';
+
+const GROUPING_KEY = 'renta.invest.otherGrouping';
+
+/** Whether the panel has anything to show for a ledger (sales to copy or amounts for boxes). */
+export function hasRentaWebCopy(ledger: LedgerResult | null): boolean {
+  if (!ledger) return false;
+  const kit = rentaWebKit(ledger);
+  return kit.windows.length > 0 || kit.totals.length > 0;
+}
 
 interface Step {
   window: RentaWebKit['windows'][number];
@@ -63,12 +79,13 @@ function Field({
  * «Copiar a Renta WEB»: window by window and alta by alta, each field with its label and a copy
  * button; the person marks each alta as done and sees how many are left.
  */
-export function CopyMode({ kit }: { kit: RentaWebKit }) {
+export function CopyMode({ kit, grouping }: { kit: RentaWebKit; grouping: OtherGrouping }) {
   const { t } = useI18n();
   const money = useMoney();
   const k = 'tools.invest.web';
   const steps = stepsOf(kit);
-  const doneKey = `renta.invest.copied.${kit.year}`;
+  // Another grouping gives other altas: what was marked with one is not done with the other.
+  const doneKey = `renta.invest.copied.${kit.year}${grouping === 'position' ? '' : `.${grouping}`}`;
   const [done, setDone] = useState<string[]>(() => storage.getJSON<string[]>(doneKey, []));
   const [at, setAt] = useState(0);
   const [copied, setCopied] = useState('');
@@ -201,51 +218,233 @@ function KitWarnings({ warnings }: { warnings: KitWarning[] }) {
   );
 }
 
-/** The file to copy into Renta WEB (Excel and PDF) and the step by step mode, for a ledger. */
-export function RentaWebPanel({ ledger }: { ledger: LedgerResult }) {
+/** How many rows and where, and the totals Renta WEB must show at the end of each window. */
+function PlanWindows({ plan }: { plan: CopyPlan }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  const k = 'tools.invest.web';
+  return (
+    <ul className="invest-web-windows">
+      {plan.windows.map((w) => (
+        <li key={w.section}>
+          <strong>
+            {t(`${k}.window${w.rows === 1 ? 'One' : ''}`, { title: w.title, rows: w.rows })}
+          </strong>
+          <span>
+            {t(`${k}.windowTotals`, {
+              gainsBox: w.gains.box,
+              gains: money(w.gains.amount),
+              lossesBox: w.losses.box,
+              losses: money(w.losses.amount),
+            })}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The way to the window in Renta WEB, drawn as boxes with arrows, ending in its fields. */
+function RouteMap({ kit }: { kit: RentaWebKit }) {
+  const { t } = useI18n();
+  const k = 'tools.invest.web.route';
+  const first = kit.windows[0];
+  return (
+    <figure className="invest-route">
+      <figcaption>{t(`${k}.title`)}</figcaption>
+      <ol>
+        <li>{t(`${k}.web`)}</li>
+        <li>{t(`${k}.declaration`)}</li>
+        <li>{APARTADO}</li>
+        <li>
+          {t(`${k}.window`, {
+            window: kit.windows.map((w) => `«${w.def.title}»`).join(t(`${k}.or`)),
+          })}
+        </li>
+        <li>{t(`${k}.alta`)}</li>
+        <li className="invest-route-fields">
+          {t(`${k}.fields`, { window: first.def.title })}
+          <span>
+            {first.def.fields.map((f) => (
+              <span key={f.key} className="invest-route-field">
+                {f.label}
+              </span>
+            ))}
+          </span>
+        </li>
+      </ol>
+    </figure>
+  );
+}
+
+/** One row worked out: each field of the window with what to write in it. */
+function Example({ plan }: { plan: CopyPlan }) {
+  const { t } = useI18n();
+  const k = 'tools.invest.web.example';
+  const example = plan.example as NonNullable<CopyPlan['example']>;
+  return (
+    <div className="invest-web-example">
+      <h5>{t(`${k}.title`, { n: example.alta, window: example.title })}</h5>
+      <p className="section-hint">{t(`${k}.hint`, { tab: example.tab })}</p>
+      <table className="renta-compare-table">
+        <thead>
+          <tr>
+            <th scope="col">{t(`${k}.field`)}</th>
+            <th scope="col">{t(`${k}.value`)}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {example.fields.map((f) => (
+            <tr key={f.label}>
+              <th scope="row">{f.label}</th>
+              <td>
+                <strong>{f.value}</strong>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** «Otros elementos»: one row per position, per month or two per instrument, as the person picks. */
+function Grouping({
+  ledger,
+  value,
+  onChange,
+}: {
+  ledger: LedgerResult;
+  value: OtherGrouping;
+  onChange: (g: OtherGrouping) => void;
+}) {
+  const { t } = useI18n();
+  const k = 'tools.invest.web.group';
+  const rowsOf = (g: OtherGrouping) =>
+    rentaWebKit(ledger, { other: g }).windows.find((w) => w.section === 'other')?.altas.length ?? 0;
+  const rows = OTHER_GROUPINGS.map(rowsOf);
+  // Only when grouping saves rows.
+  if (rows[0] <= rows[2]) return null;
+  const totals = WINDOWS.other.totals;
+  return (
+    <fieldset className="renta-block invest-web-group">
+      <legend>{t(`${k}.title`)}</legend>
+      {OTHER_GROUPINGS.map((g, i) => (
+        <label key={g} className="renta-check">
+          <input
+            type="radio"
+            name="invest-web-group"
+            checked={value === g}
+            onChange={() => onChange(g)}
+          />
+          <span>{t(`${k}.${g}`, { rows: rows[i] })}</span>
+        </label>
+      ))}
+      <p className="section-hint">
+        {t(`${k}.hint`, { gainsBox: totals.gains, lossesBox: totals.losses })}
+      </p>
+    </fieldset>
+  );
+}
+
+/**
+ * «Qué tienes que copiar en Renta WEB»: how many rows go in each window and the totals to see, the
+ * step by step mode first (the big button), the three steps, the way to the window drawn, one row
+ * worked out, and the Excel and the PDF. `compact` (the end of the assistant) keeps the numbers and
+ * the buttons.
+ */
+export function RentaWebPanel({
+  ledger,
+  compact = false,
+  id,
+}: {
+  ledger: LedgerResult;
+  compact?: boolean;
+  id?: string;
+}) {
   const { t } = useI18n();
   const k = 'tools.invest.web';
-  const kit = useMemo(() => rentaWebKit(ledger), [ledger]);
+  const titleId = useId();
+  const [grouping, setGrouping] = useState<OtherGrouping>(() =>
+    storage.getJSON<OtherGrouping>(GROUPING_KEY, 'position')
+  );
+  const kit = useMemo(() => rentaWebKit(ledger, { other: grouping }), [ledger, grouping]);
   const [copying, setCopying] = useState(false);
-  if (kit.windows.length === 0 && kit.totals.length === 0) return null;
+  if (!hasRentaWebCopy(ledger)) return null;
+  const plan = copyPlan(kit);
   const tables = () => reportTables(ledger, kit);
+  const group = (g: OtherGrouping) => {
+    setGrouping(g);
+    storage.setJSON(GROUPING_KEY, g);
+  };
+  const start = kit.windows.length > 0 && (
+    <button
+      type="button"
+      className="btn-primary invest-web-start"
+      aria-expanded={copying}
+      onClick={() => setCopying(!copying)}
+    >
+      <Icon name="clipboard" /> {t(`${k}.start`)}
+    </button>
+  );
+  const files = (
+    <div className="button-row">
+      <button
+        type="button"
+        className={compact ? 'btn-primary' : 'btn-secondary'}
+        onClick={() => download(copyFileName(ledger.year, 'xlsx'), xlsxBlob(xlsxOf(tables())))}
+      >
+        <Icon name="download" /> {t(`${k}.xlsx`)}
+      </button>
+      <button
+        type="button"
+        className="btn-secondary"
+        onClick={async () =>
+          download(
+            copyFileName(ledger.year, 'pdf'),
+            await reportPdf(t(`${k}.pdfTitle`, { year: ledger.year }), tables())
+          )
+        }
+      >
+        <Icon name="file" /> {t(`${k}.pdf`)}
+      </button>
+    </div>
+  );
   return (
-    <section className="renta-block invest-web" aria-labelledby="invest-web-title">
-      <h4 id="invest-web-title">{t(`${k}.title`)}</h4>
-      <p className="section-hint">{t(`${k}.intro`)}</p>
-      <KitWarnings warnings={kit.warnings} />
-      <div className="button-row">
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={() => download(copyFileName(ledger.year, 'xlsx'), xlsxBlob(xlsxOf(tables())))}
-        >
-          {t(`${k}.xlsx`)}
-        </button>
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={async () =>
-            download(
-              copyFileName(ledger.year, 'pdf'),
-              await reportPdf(t(`${k}.pdfTitle`, { year: ledger.year }), tables())
-            )
-          }
-        >
-          {t(`${k}.pdf`)}
-        </button>
-        {kit.windows.length > 0 && (
-          <button
-            type="button"
-            className="btn-primary"
-            aria-expanded={copying}
-            onClick={() => setCopying(!copying)}
-          >
-            {t(`${k}.start`)}
-          </button>
-        )}
-      </div>
-      {copying && <CopyMode kit={kit} />}
+    <section id={id} className="renta-block invest-web" aria-labelledby={titleId} tabIndex={-1}>
+      <h4 id={titleId} className="invest-web-title">
+        <Icon name="clipboard" /> {t(`${k}.title`)}
+      </h4>
+      {plan.rows > 0 ? (
+        <p className="invest-web-lead">
+          {t(`${k}.lead${plan.rows === 1 ? 'One' : ''}`, {
+            rows: plan.rows,
+            minutes: plan.minutes,
+          })}
+        </p>
+      ) : (
+        <p className="invest-web-lead">{t(`${k}.onlyBoxes`)}</p>
+      )}
+      {start}
+      {copying && <CopyMode kit={kit} grouping={grouping} />}
+      <PlanWindows plan={plan} />
+      {!compact && <Grouping ledger={ledger} value={grouping} onChange={group} />}
+      {!compact && plan.example && (
+        <>
+          <h5>{t(`${k}.stepsTitle`)}</h5>
+          <ol className="invest-web-steps">
+            <li>{t(`${k}.step1`, { apartado: APARTADO })}</li>
+            <li>{t(`${k}.step2`)}</li>
+            <li>{t(`${k}.step3`)}</li>
+          </ol>
+          <RouteMap kit={kit} />
+          <Example plan={plan} />
+          <p className="section-hint">{t(`${k}.intro`)}</p>
+        </>
+      )}
+      {!compact && <KitWarnings warnings={kit.warnings} />}
+      {files}
+      {!compact && <p className="section-hint">{t(`${k}.filesHint`)}</p>}
     </section>
   );
 }

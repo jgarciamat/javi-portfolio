@@ -358,6 +358,9 @@ export function InvestImport({
         <p className="section-hint">{t(`${k}.formats`)}</p>
       </FileDropZone>
 
+      {/* Right after reading the files: what to copy into Renta WEB, before any detail. */}
+      {(ops.length > 0 || certificate.length > 0) && <RentaWebPanel ledger={ledger} />}
+
       {removed && (
         <p className="section-hint" role="status">
           {t(applied ? `${k}.removedApplied` : `${k}.removed`, { file: removed })}
@@ -469,7 +472,6 @@ export function InvestImport({
           <WarningsList warnings={ledger.warnings} />
           <h4>{t(`${k}.decl.title`, { year })}</h4>
           <DeclarationTable ledger={ledger} rows={rows} />
-          <RentaWebPanel ledger={ledger} />
           <div className="button-row">
             <button
               className="btn-primary"

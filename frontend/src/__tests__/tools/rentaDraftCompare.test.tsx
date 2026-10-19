@@ -110,14 +110,14 @@ describe('Renta planner: the draft next to the planner', () => {
     expect(
       await screen.findByText(tr('tools.renta.compare.allMatch'), { exact: false })
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        tr('tools.renta.compare.summarySame', {
-          draft: tr('tools.renta.compare.refund', { amount: '1117,09 €' }),
-        }).replace(/\s/g, ' '),
-        { normalizer: (s) => s.replace(/\s/g, ' ') }
-      )
-    ).toBeInTheDocument();
+    const same = document.querySelector('.renta-compare-summary') as HTMLElement;
+    expect(same.textContent?.replace(/\s/g, ' ')).toBe(
+      tr('tools.renta.compare.summarySame', {
+        draft: tr('tools.renta.compare.refund', { amount: '1117,09 €' }),
+      }).replace(/\s/g, ' ')
+    );
+    // A refund is green (the words say it too).
+    expect(same.querySelector('.renta-amount--refund')).not.toBeNull();
   });
 
   it('sums up the whole difference in one line', async () => {
@@ -137,6 +137,8 @@ describe('Renta planner: the draft next to the planner', () => {
     expect(document.querySelector('.renta-compare-summary')).toHaveTextContent(
       /Tu borrador da a pagar 500,00.*nosotros damos a pagar/
     );
+    // To pay is red: the draft's amount and ours.
+    expect(document.querySelectorAll('.renta-compare-summary .renta-amount--pay')).toHaveLength(2);
   });
 
   it('warns about a draft of another year and shows no summary without the result', async () => {

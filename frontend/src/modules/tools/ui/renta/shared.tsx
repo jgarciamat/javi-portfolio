@@ -21,6 +21,29 @@ export function useMoney() {
   return (n: number) => formatter.format(n);
 }
 
+/** The result of a return: to pay above zero, to be refunded below, nothing either way at zero. */
+export type ResultTone = 'pay' | 'refund' | 'zero';
+
+export const resultTone = (result: number): ResultTone =>
+  Math.round(result * 100) === 0 ? 'zero' : result > 0 ? 'pay' : 'refund';
+
+/** «Te saldría a pagar / a devolver» as the label of a result (the words never depend on colour). */
+export const resultLabel = (result: number) =>
+  ({
+    pay: 'tools.renta.toPay',
+    refund: 'tools.renta.refund',
+    zero: 'tools.renta.zeroResult',
+  }[resultTone(result)]);
+
+/** The amount of a result: red to pay, green to be refunded, neutral at zero (Renta.css). */
+export function ResultAmount({ result, money }: { result: number; money: (n: number) => string }) {
+  return (
+    <strong className={`renta-amount renta-amount--${resultTone(result)}`}>
+      {money(Math.abs(result))}
+    </strong>
+  );
+}
+
 /** A long date in the language of the app. */
 export function useDate() {
   const { locale } = useI18n();

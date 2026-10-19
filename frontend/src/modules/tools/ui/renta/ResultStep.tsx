@@ -6,6 +6,11 @@ import { JointTable } from './JointResult';
 import { InvestInResult } from './invest/InvestSummary';
 import { rentaState } from '../../data/renta/state';
 import type { ImportedSavings } from '../../domain/rentaGains';
+import { Icon } from '@shared/components/Icon';
+import { scrollBehavior } from '@shared/utils/motion';
+import { ResultAmount, resultLabel, resultTone } from './shared';
+import { hasRentaWebCopy, RENTA_WEB_RESULT_ID } from './invest/RentaWebPanel';
+import { ledgerOf } from '../../domain/invest/summary';
 
 export interface Snapshot {
   result: RentaResult;
@@ -174,13 +179,28 @@ export function ResultCard({
 }) {
   const { t } = useI18n();
   const { result, kids } = shown;
-  const toPay = result.result >= 0;
+  // What to copy of the investments is further down, in the panel of InvestInResult.
+  const toCopy = !!result.savingsDetail && !!imported && hasRentaWebCopy(ledgerOf(imported));
   return (
     <>
-      <p className={`renta-total ${toPay ? 'renta-total--pay' : 'renta-total--refund'}`}>
-        {toPay ? t('tools.renta.toPay') : t('tools.renta.refund')}:{' '}
-        <strong>{money(Math.abs(result.result))}</strong>
+      <p className={`renta-total renta-total--${resultTone(result.result)}`}>
+        {t(resultLabel(result.result))}: <ResultAmount result={result.result} money={money} />
       </p>
+      {toCopy && (
+        <p className="renta-invest-link">
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              const panel = document.getElementById(RENTA_WEB_RESULT_ID) as HTMLElement;
+              panel.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+              panel.focus({ preventScroll: true });
+            }}
+          >
+            <Icon name="clipboard" /> {t('tools.invest.web.resultLink')}
+          </button>
+        </p>
+      )}
       {result.blocked.length > 0 && (
         <p className="form-error" role="alert">
           {t('tools.renta.blockedSummary', { count: result.blocked.length })}

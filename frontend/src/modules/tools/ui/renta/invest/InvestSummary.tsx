@@ -10,7 +10,7 @@ import { lossesToRecover, recoverOptions, type RecoverYear } from '../../../doma
 import type { RentaInput } from '../../../domain/rentaCalc';
 import type { PendingBalance } from '../../../domain/rentaGains';
 import { useMoney } from '../shared';
-import { RentaWebPanel } from './RentaWebPanel';
+import { RENTA_WEB_RESULT_ID, RentaWebPanel } from './RentaWebPanel';
 
 const LGT = 'https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186';
 const LIRPF = 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764';
@@ -265,7 +265,7 @@ export function InvestInResult({
           today()
         )}
       />
-      {ledger && <RentaWebPanel ledger={ledger} />}
+      {ledger && <RentaWebPanel ledger={ledger} id={RENTA_WEB_RESULT_ID} />}
       <WhatHappened />
     </section>
   );

@@ -27,7 +27,9 @@ import { ResidenceQuestions, scopeOf } from './Residence';
 import { AddProperty, PropertyCard } from './PropertyCard';
 import { SavingsDetailSection } from './SavingsDetail';
 import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
-import { Field, RadioOptions, useMoney } from './shared';
+import { Field, RadioOptions, ResultAmount, resultLabel, useMoney } from './shared';
+import { RentaWebPanel } from './invest/RentaWebPanel';
+import { ledgerOf } from '../../domain/invest/summary';
 import { useRentaPlanner, type RentaPlannerState } from './useRentaPlanner';
 import '../css/Renta.css';
 
@@ -422,6 +424,8 @@ function BoxesToCopy({ p }: { p: RentaPlannerState }) {
   };
   return (
     <>
+      {/* The investments are copied window by window, not here: say where, before the list. */}
+      {p.form.savingsDetail?.imported && <p className="wiz-note">{t(w('boxesInvest'))}</p>}
       <ul className="wiz-boxes">
         {COMPARED_BOXES.filter((b) => boxes[b] !== 0).map((b) => (
           <li key={b}>
@@ -551,6 +555,8 @@ export function rentaSteps(ctx: Ctx): WizardStepView[] {
 /** The end: what the review saves, the result and the reminder that nothing is filed. */
 function Finale({ p, money }: { p: RentaPlannerState; money: (n: number) => string }) {
   const { t } = useI18n();
+  const imported = p.form.savingsDetail?.imported;
+  const ledger = imported ? ledgerOf(imported) : null;
   return (
     <>
       <p className="wiz-hint">{t(w('finale'))}</p>
@@ -559,10 +565,11 @@ function Finale({ p, money }: { p: RentaPlannerState; money: (n: number) => stri
       )}
       {p.shown && scopeOf(p.form).kind !== 'out' && (
         <p className="wiz-saving">
-          {t(p.shown.result.result >= 0 ? 'tools.renta.toPay' : 'tools.renta.refund')}:{' '}
-          <strong>{money(Math.abs(p.shown.result.result))}</strong>
+          {t(resultLabel(p.shown.result.result))}:{' '}
+          <ResultAmount result={p.shown.result.result} money={money} />
         </p>
       )}
+      {ledger && <RentaWebPanel ledger={ledger} compact />}
       <p className="plan-note">{t(w('notFiled'))}</p>
     </>
   );

@@ -450,10 +450,29 @@ describe('the Renta step by step: persona p4-109 (crypto investor in Madrid)', (
     own('others', 'no');
     finish(7);
     skip();
-    expect(await screen.findByText(tr('tools.renta.toPay'), { exact: false })).toBeInTheDocument();
+    const total = (await screen.findByText(tr('tools.renta.toPay'), { exact: false })).closest(
+      'p'
+    ) as HTMLElement;
+    // To pay: the amount in red (the words say it too).
+    expect(total.querySelector('.renta-amount--pay')).not.toBeNull();
+    // Under the amount, the way to what to copy of the investments.
+    const scroll = jest.fn();
+    Object.assign(HTMLElement.prototype, { scrollIntoView: scroll });
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.invest.web.resultLink') }));
+    expect(scroll).toHaveBeenCalled();
+    expect(document.activeElement).toHaveClass('invest-web');
     next();
     // Box 0460 of the persona (calculo.md): 23,000 € of gains and 10 € of staking.
     expect(screen.getByText('0460').closest('li')).toHaveTextContent('23.010,00');
+    expect(screen.getByText(tr('wizard.renta.boxesInvest'))).toBeInTheDocument();
+    next();
+    fireEvent.click(screen.getByRole('button', { name: tr('wizard.finishAll') }));
+    // The end: the result in red and the buttons to copy the investments.
+    expect(document.querySelector('.wiz-saving .renta-amount--pay')).not.toBeNull();
+    expect(screen.getByRole('button', { name: tr('tools.invest.web.xlsx') })).toHaveClass(
+      'btn-primary'
+    );
+    expect(screen.getByRole('button', { name: tr('tools.invest.web.start') })).toBeInTheDocument();
   });
 });
 

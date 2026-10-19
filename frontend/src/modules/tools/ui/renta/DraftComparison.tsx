@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { draftResult, type CompareRow } from '../../domain/rentaCompare';
 import type { DraftReading } from '../../domain/rentaDraft';
@@ -5,7 +6,7 @@ import type { Deduction } from '../../domain/rentaData';
 import { verdictOf, type DraftGap, type Verdict } from '../../domain/rentaDraftGaps';
 import type { Choice } from '../../domain/rentaForm';
 import { rentaState } from '../../data/renta/state';
-import { useMoney } from './shared';
+import { resultTone, useMoney } from './shared';
 import { InvestGuide } from './invest/InvestGuide';
 
 /** A difference (never zero) with its sign: what the planner gives over the draft. */
@@ -16,20 +17,29 @@ const signed = (n: number, money: (n: number) => string) =>
 function Summary({ draft, ours }: { draft: number; ours: number }) {
   const { t } = useI18n();
   const money = useMoney();
-  const outcome = (n: number) =>
-    n < 0
-      ? t('tools.renta.compare.refund', { amount: money(-n) })
-      : t('tools.renta.compare.pay', { amount: money(n) });
+  // Each outcome in its colour (red to pay, green refunded); the words say which it is.
+  const outcome = (n: number) => (
+    <span className={`renta-amount renta-amount--${resultTone(n)}`}>
+      {n < 0
+        ? t('tools.renta.compare.refund', { amount: money(-n) })
+        : t('tools.renta.compare.pay', { amount: money(n) })}
+    </span>
+  );
   const diff = Math.round((ours - draft) * 100) / 100;
+  const text =
+    diff === 0
+      ? t('tools.renta.compare.summarySame', { draft: '{draft}' })
+      : t('tools.renta.compare.summary', {
+          draft: '{draft}',
+          ours: '{ours}',
+          diff: money(Math.abs(diff)),
+        });
+  const parts: Record<string, ReactNode> = { '{draft}': outcome(draft), '{ours}': outcome(ours) };
   return (
     <p className="renta-compare-summary">
-      {diff === 0
-        ? t('tools.renta.compare.summarySame', { draft: outcome(draft) })
-        : t('tools.renta.compare.summary', {
-            draft: outcome(draft),
-            ours: outcome(ours),
-            diff: money(Math.abs(diff)),
-          })}
+      {text.split(/(\{draft\}|\{ours\})/).map((piece, i) => (
+        <Fragment key={i}>{parts[piece] ?? piece}</Fragment>
+      ))}
     </p>
   );
 }
