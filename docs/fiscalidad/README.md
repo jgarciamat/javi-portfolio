@@ -10,10 +10,11 @@
 |---|---|
 | [modelos.md](modelos.md) | Inventario de los modelos tributarios y de Seguridad Social de una persona física, un autónomo (estimación directa o módulos), un inversor o arrendador, y los casos especiales que quedan fuera. Incluye plazos de 2026, normas, obligatoriedad, relaciones entre modelos y si la app los trata. |
 | [renta-casillas.md](renta-casillas.md) · [renta-casillas.json](renta-casillas.json) | Catálogo de las **2.205 casillas** de 4 cifras y las **70 de identificación** del modelo 100 de Renta 2025, sacado del impreso oficial del BOE: apartado, página, tipo, fórmula impresa, normas, dependencia autonómica y confianza de la etiqueta. |
-| [cobertura.md](cobertura.md) · [cobertura.json](cobertura.json) | Mapa entre ese catálogo y el código de la app: qué casillas calcula, lee, cubre en parte o no soporta, con porcentajes por apartado y por modelo; **24 discrepancias** con la norma ordenadas por gravedad, y las cifras fijas comprobadas. |
+| [cobertura.md](cobertura.md) · [cobertura.json](cobertura.json) | Mapa entre ese catálogo y el código de la app: qué casillas calcula, lee, cubre en parte o no soporta, con porcentajes por apartado y por modelo; **24 discrepancias** con la norma ordenadas por gravedad y con su estado, y las cifras fijas comprobadas. Medido de nuevo el 19-10-2026 por la tarde. |
 | [documentos-oficiales.md](documentos-oficiales.md) · [documentos-oficiales.json](documentos-oficiales.json) | Qué documento oficial existe de cada modelo (rellenable, facsímil, diseño de registro), la mejor fuente para las vistas previas, fallos del lector de PDF y qué PDF puede generar el dueño identificándose. |
 | [contrato-actividad-anual.md](contrato-actividad-anual.md) | Contrato anual de la actividad económica del autónomo para la Renta: qué entrega `annualActivity.ts` (ingresos, gastos, amortización, subvenciones, rendimiento neto, 0599, 0604, módulos agrarios), sus casillas, avisos, fuentes y NO CONFIRMADOS. |
 | [inversiones.md](inversiones.md) | Importar archivos de brókers, exchanges y gestoras (cripto, fondos, ETF, acciones, derivados): formatos soportados y no, columnas, reglas fiscales con su fuente, guía «Cómo declarar esto», NO CONFIRMADOS y decisiones pendientes. |
+| [informe-gestor-real.md](informe-gestor-real.md) | **Informe final para el dueño: qué le falta a Finanverso para ser un gestor real** (Renta y autónomos). Resumen ejecutivo, cobertura por flujo y por modelo, banco de casos, lo que falta por prioridad (P0, P1, P2), lo que hace un gestor y la app no, riesgos legales, NO CONFIRMADOS consolidados, verificaciones del dueño, mantenimiento anual y hoja de ruta. |
 | [hoja-de-ruta.md](hoja-de-ruta.md) | Propuesta priorizada (14 bloques con esfuerzo S/M/L/XL) para llegar a una Renta y unos modelos de autónomo lo más completos posible, cómo validarlos y qué textos usar para no prometer de más. |
 
 ## Metodología
@@ -29,9 +30,13 @@
 
 ## Resultados en una frase
 
-- **Modelo 100:** la app cubre (calculado o leído) el **29,7 %** de las casillas de importe del núcleo del asalariado, y el 46,3 % contando las parciales. Del modelo entero cubre el 3,8 % (25,5 % con parciales, sobre todo por el anexo B de deducciones autonómicas). No trata actividades económicas, ganancias patrimoniales detalladas ni regímenes especiales.
-- **Autónomo:** 130 al 68 % (sección I), 303 al 21 %, 111 al 40 %, 115 al 100 % y RETA 2026 correctos; 390, 190 y 347 solo con el plazo.
-- **Discrepancias más graves:** mínimo por discapacidad sin los gastos de asistencia; aportación propia a planes sin el límite de 1.500 €; resultado sin restar los abonos anticipados (140/143); mínimo de mayores de 65 en Baleares; ventas sin IVA en la casilla 150 del 303.
+Medición del 19-10-2026 por la tarde; la de la mañana, entre paréntesis.
+
+- **Modelo 100:** la app cubre (calculado o leído) el **40,2 %** de las casillas de importe del núcleo del asalariado (29,7 %), y el 59,8 % contando las parciales. Del modelo entero cubre el 9,1 % (3,8 %), y el 34,7 % con parciales.
+  - Ya calcula el capital mobiliario del ahorro, las ganancias de fondos, acciones, cripto e inmuebles, la integración y compensación, la estimación directa que viene de Autónomos, las agrarias en módulos y las reducciones del art. 32.
+  - No trata regímenes especiales, exit tax ni anexos informativos. Los módulos no agrarios tienen motor, pero no pantalla.
+- **Autónomo:** 303 al 100 % de lo aplicable al régimen general; 130 al 89 %; 111 al 40 %; 115 al 100 %; 390, 349, 190, 180 y 347 calculados, con fichero para la sede; 131 sin pantalla; 720, 721 y 714 como avisos.
+- **Discrepancias:** las 7 «bug probable» están corregidas. De las 24, 13 siguen abiertas y 2 lo están en parte. Las que más pesan ahora son los alquileres agregados (D10), las cifras de 2026 y 2027 sin versionar (D22-D24) y los donativos sin el límite del 10 % (D17).
 
 ## Cómo actualizar cada año
 
