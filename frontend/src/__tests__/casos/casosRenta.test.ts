@@ -120,8 +120,6 @@ beforeAll(async () => {
 function engineValue(campo: string, c: Computed): number {
   const [kind, key] = campo.split('.');
   if (kind === 'result') return c.result[key as keyof RentaResult] as number;
-  if (key === '0510') return c.result.savingsBase;
-  if (key === '0520') return c.result.minimum.regionalTotal;
   const boxes = ourBoxes(c.result, c.input);
   const extra = key === '0003' ? c.partner.gross : key === '0013' ? c.partner.socialSecurity : 0;
   expect(COMPARED_BOXES).toContain(key);

@@ -388,13 +388,25 @@ export interface RentaResult {
   jointReduction: number;
   /** Joint return: the 340 € deduction was left out because its joint rules are not clear. */
   lowPayLeftOut: boolean;
+  /** Gross pay from work of the return (box 0012; in a joint one, of the whole unit). */
+  workGross: number;
+  /** Net pay before the "other expenses" of art. 19.2.f (box 0017). */
+  workPrevious: number;
   /** General taxable base, before the reductions of the base (box 0435). */
   generalBase: number;
   /** General tax base, after them (box 0500). */
   taxBase: number;
-  /** Savings tax base. */
+  /** Savings taxable base, before the reductions that can reach it (box 0460). */
+  savingsIncome: number;
+  /** Savings tax base (box 0510). */
   savingsBase: number;
-  minimum: { total: number; items: MinimumItem[]; regionalTotal: number };
+  minimum: {
+    total: number;
+    items: MinimumItem[];
+    regionalTotal: number;
+    /** The regional minimum item by item (boxes 0512 and 0518). */
+    regionalItems: MinimumItem[];
+  };
   stateQuota: number;
   regionalQuota: number;
   /** The part of the quotas that comes from the savings base. */
@@ -531,6 +543,8 @@ function workIncome(input: RentaInput, earners: Earner[]) {
     otherExpenses: sum(shares) + sum(increments),
     netIncome: round2(Math.max(0, afterShares - sum(increments))),
     reductionBase: round2(sum(before)),
+    /** The gross pay of the return (box 0012), and the net before the "other expenses" (box 0017). */
+    gross: round2(sum(earners.map((e) => e.gross))),
     /** Each earner's own net pay: the 30 % limit of the pension plans is per member (art. 84.2.1.º). */
     each: before.map((b, i) => Math.max(0, b - shares[i] - increments[i])),
   };
@@ -598,6 +612,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     pensionReduction,
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
+    savingsIncome: savingsTotal,
     savingsBase: round2(savingsTotal - jointSavings),
   };
 }
@@ -676,6 +691,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     pensionReduction,
     otherReductions,
     taxBase,
+    savingsIncome,
     savingsBase,
   } = basesOf(input, earners, work);
 
@@ -737,6 +753,8 @@ export function computeRenta(input: RentaInput): RentaResult {
   return {
     otherExpenses,
     netIncome,
+    workGross: work.gross,
+    workPrevious: work.reductionBase,
     workReduction: reduction,
     rentalNet: rentNet,
     imputedIncome: imputed,
@@ -746,8 +764,14 @@ export function computeRenta(input: RentaInput): RentaResult {
     lowPayLeftOut: !low.clear,
     generalBase: round2(Math.max(0, beforeReductions)),
     taxBase,
+    savingsIncome,
     savingsBase,
-    minimum: { total: stateMin.total, items: stateMin.items, regionalTotal: regionMin.total },
+    minimum: {
+      total: stateMin.total,
+      items: stateMin.items,
+      regionalTotal: regionMin.total,
+      regionalItems: regionMin.items,
+    },
     stateQuota,
     regionalQuota,
     savingsQuota: round2(base.stateSavings + base.regionalSavings),

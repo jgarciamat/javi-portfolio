@@ -588,7 +588,8 @@ CAMPO_LABELS = {
     'regionalDeductions': 'Deducciones aplicadas en la cuota autonómica',
 }
 # Casillas que el motor de la app devuelve (rentaCompare.ourBoxes y campos de RentaResult).
-ENGINE_BOXES = {'0003', '0013', '0019', '0022', '0023', '0025', '0435', '0500', '0510', '0511', '0517', '0519', '0520', '0545', '0546', '0414', '0595', '0609', '0610', '0670'}
+ENGINE_BOXES = {'0003', '0012', '0013', '0017', '0019', '0022', '0023', '0025', '0155', '0435', '0460', '0500', '0510', '0511', '0512', '0517', '0518',
+                '0519', '0520', '0545', '0546', '0570', '0571', '0587', '0414', '0595', '0609', '0610', '0670'}
 
 
 def figures_of(boxes, decl, ref):

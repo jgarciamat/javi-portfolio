@@ -21,7 +21,7 @@
       "importe": 28000.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0012"
     },
     {
       "modelo": "100",
@@ -41,7 +41,7 @@
       "importe": 26222.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0017"
     },
     {
       "modelo": "100",
@@ -101,7 +101,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0460"
     },
     {
       "modelo": "100",
@@ -141,7 +141,7 @@
       "importe": 5956.65,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0512"
     },
     {
       "modelo": "100",
@@ -161,7 +161,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0518"
     },
     {
       "modelo": "100",
@@ -211,7 +211,7 @@
       "importe": 2188.8,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -221,7 +221,7 @@
       "importe": 1901.03,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -231,7 +231,7 @@
       "importe": 4089.83,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",

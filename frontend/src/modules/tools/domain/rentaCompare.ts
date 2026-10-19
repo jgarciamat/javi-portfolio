@@ -1,8 +1,10 @@
 import {
   countsAsDescendant,
   disabilityAmount,
+  mergeMinimums,
   type FullMinimums,
   type Family,
+  type MinimumItem,
   type RentaInput,
   type RentaResult,
 } from './rentaCalc';
@@ -11,18 +13,29 @@ import { round2 } from './round';
 /** The boxes of the return (modelo 100) that the planner also works out, in the order of the form. */
 export const COMPARED_BOXES = [
   '0003',
+  '0012',
   '0013',
+  '0017',
   '0019',
   '0022',
   '0023',
   '0025',
+  '0155',
   '0435',
+  '0460',
   '0500',
+  '0510',
   '0511',
+  '0512',
   '0517',
+  '0518',
   '0519',
+  '0520',
   '0545',
   '0546',
+  '0570',
+  '0571',
+  '0587',
   '0414',
   '0595',
   '0609',
@@ -34,16 +47,23 @@ export type ComparedBox = (typeof COMPARED_BOXES)[number];
 
 /** The boxes each one is worked out from: a difference there explains the one here. */
 const COMES_FROM: Partial<Record<ComparedBox, ComparedBox[]>> = {
-  '0022': ['0003', '0013', '0019'],
-  '0023': ['0003', '0013'],
+  '0012': ['0003'],
+  '0017': ['0012', '0013'],
+  '0022': ['0003', '0012', '0013', '0017', '0019'],
+  '0023': ['0003', '0013', '0017'],
   '0025': ['0022', '0023'],
-  '0435': ['0025'],
+  '0435': ['0025', '0155'],
   '0500': ['0435'],
+  '0510': ['0460'],
   '0519': ['0511', '0517'],
-  '0545': ['0500', '0519'],
-  '0546': ['0500', '0519'],
+  '0520': ['0512', '0518'],
+  '0545': ['0500', '0510', '0519'],
+  '0546': ['0500', '0510', '0520'],
+  '0570': ['0545'],
+  '0571': ['0546'],
+  '0587': ['0570', '0571'],
   '0414': ['0003'],
-  '0595': ['0545', '0546', '0414'],
+  '0595': ['0587', '0545', '0546', '0414'],
   '0610': ['0595', '0609'],
   '0670': ['0610'],
 };
@@ -65,27 +85,55 @@ export function disabilityMinimum(family: Family, m: FullMinimums): number {
   return round2(disabilityAmount(family.disability, m) + children + ascendants);
 }
 
-/** What the planner gives for each compared box. */
+/** The minimum of the taxpayer: the general amount and the one for age (boxes 0511 and 0512). */
+const ownMinimum = (items: MinimumItem[]): number =>
+  round2(
+    items
+      .filter((i) => i.key === 'personal' || i.key === 'age')
+      .reduce((sum, i) => sum + i.amount, 0)
+  );
+
+/**
+ * What the planner gives for each compared box. The liquid quotas (Orden HAC/277/2026, modelo 100
+ * 2025, BOE-A-2026-7041, page 22: [0570] = [0545] − deductions, [0571] = [0546] − deductions, and
+ * page 23: [0587] = [0585] + [0586]) are taken before the 340 € deduction of box 0414, which the
+ * model takes off after them ([0595] = [0587] − [0588] − [0414] − ...).
+ */
 export function ourBoxes(result: RentaResult, input: RentaInput): Record<ComparedBox, number> {
-  const own = result.minimum.items
-    .filter((i) => i.key === 'personal' || i.key === 'age')
-    .reduce((sum, i) => sum + i.amount, 0);
   // The refundable deductions (maternity, large family...) come after the result of box 0595.
   const quota = round2(result.netQuota + result.refundable);
+  const partner = input.joint?.partner ?? null;
+  const disability = (m: FullMinimums) =>
+    round2(
+      disabilityMinimum(input.family, m) + (partner ? disabilityAmount(partner.disability, m) : 0)
+    );
+  const stateLiquid = round2(result.stateQuota - (result.stateDeductions - result.lowPay));
+  const regionalLiquid = round2(result.regionalQuota - result.regionalDeductions);
   return {
     '0003': round2(Math.max(0, input.gross)),
+    '0012': result.workGross,
     '0013': round2(Math.max(0, input.socialSecurity)),
+    '0017': result.workPrevious,
     '0019': result.otherExpenses,
     '0022': result.netIncome,
     '0023': result.workReduction,
     '0025': round2(result.netIncome - result.workReduction),
+    '0155': result.imputedIncome,
     '0435': result.generalBase,
+    '0460': result.savingsIncome,
     '0500': result.taxBase,
-    '0511': round2(own),
-    '0517': disabilityMinimum(input.family, input.state.minimums),
+    '0510': result.savingsBase,
+    '0511': ownMinimum(result.minimum.items),
+    '0512': ownMinimum(result.minimum.regionalItems),
+    '0517': disability(input.state.minimums),
+    '0518': disability(mergeMinimums(input.state.minimums, input.ccaa.minimums)),
     '0519': result.minimum.total,
+    '0520': result.minimum.regionalTotal,
     '0545': result.stateQuota,
     '0546': result.regionalQuota,
+    '0570': stateLiquid,
+    '0571': regionalLiquid,
+    '0587': round2(stateLiquid + regionalLiquid),
     '0414': result.lowPay,
     '0595': quota,
     '0609': result.withheld,
@@ -124,6 +172,16 @@ export interface CompareRow {
 /** The reason of a difference in each box that does not depend on which way it goes. */
 const REASONS: Partial<Record<ComparedBox, string>> = {
   '0003': 'gross',
+  '0012': 'gross',
+  '0017': 'workExpenses',
+  '0155': 'otherIncome',
+  '0460': 'savings',
+  '0510': 'baseReductions',
+  '0512': 'age',
+  '0518': 'disabilityMinimum',
+  '0520': 'familyMinimum',
+  '0570': 'deductions',
+  '0571': 'deductions',
   '0022': 'workExpenses',
   '0023': 'reduction',
   '0435': 'otherIncome',

@@ -4,7 +4,7 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 | Parte | Coinciden | Discrepancias | Pendientes o no soportadas |
 |---|---:|---:|---:|
-| Renta (modelo 100, motor del frontend) | 537 | 0 | 220 |
+| Renta (modelo 100, motor del frontend) | 747 | 0 | 10 |
 | Autónomos 130 y 303 (motor del backend, `npm run casos`) | 272 | 20 | 24 |
 | Casos oficiales reproducidos por el motor (`casosOficiales.test.ts`) | 9 | 0 | resto del catálogo |
 
@@ -35,7 +35,6 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 ## Pendientes por motivo
 
-- 210 × El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano).
 - 1 × Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial.
 - 1 × Límites de renta y requisitos 2025 no confirmados con un caso oficial.
 - 1 × Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula.

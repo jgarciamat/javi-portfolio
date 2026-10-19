@@ -29,13 +29,16 @@ const PENSIONER: Partial<RentaForm> = {
 };
 
 /** The boxes of the draft for that case, worked out by the Tax Agency. */
-const DRAFT: Record<ComparedBox, number> = {
+const DRAFT: Partial<Record<ComparedBox, number>> = {
   '0003': 18379.04,
+  '0012': 18379.04,
   '0013': 1235.98,
+  '0017': 17143.06,
   '0019': 2000,
   '0022': 15143.06,
   '0023': 3292.64,
   '0025': 11850.42,
+  '0155': 49.12,
   '0435': 11899.54,
   '0500': 11899.54,
   '0511': 6700,
@@ -71,6 +74,9 @@ const ctx = (over: Partial<CompareContext> = {}): CompareContext => ({
   ...over,
 });
 
+const reason0460 = (ours: ReturnType<typeof ourBoxes>) =>
+  compareBoxes({ '0460': ours['0460'] - 100 }, ours, ctx())[0].why?.key;
+
 const whyOf = (rows: ReturnType<typeof compareBoxes>, box: ComparedBox) =>
   rows.find((r) => r.box === box)?.why;
 
@@ -78,7 +84,7 @@ describe('comparing with the draft', () => {
   it('gives every box of the real draft to the cent', async () => {
     const { input, result } = await run({});
     const rows = compareBoxes(DRAFT, ourBoxes(result, input), ctx());
-    expect(rows).toHaveLength(18);
+    expect(rows).toHaveLength(21);
     expect(rows.filter((r) => r.differs)).toEqual([]);
     expect(result.result).toBe(-1117.09);
   });
@@ -165,6 +171,43 @@ describe('comparing with the draft', () => {
         m
       )
     ).toBe(3000 / 2 + 9000 + 3000);
+  });
+
+  it('gives the boxes of the savings, the regional minimum and the liquid quotas', async () => {
+    const { input, result } = await run({ savings: '1000' });
+    const ours = ourBoxes(result, input);
+    expect(ours['0460']).toBe(1000);
+    expect(ours['0510']).toBe(1000);
+    // Castilla y León keeps the State's minimums: 5,550 + 1,150 and the 3,000 for a 33 % disability.
+    expect(ours['0512']).toBe(6700);
+    expect(ours['0518']).toBe(3000);
+    expect(ours['0520']).toBe(result.minimum.regionalTotal);
+    expect(ours['0587']).toBe(Math.round((ours['0570'] + ours['0571']) * 100) / 100);
+    // The 340 € deduction (0414) comes after the liquid quota: 0595 = 0587 − 0414.
+    expect(ours['0595']).toBe(Math.round((ours['0587'] - ours['0414']) * 100) / 100);
+    expect(reason0460(ours)).toBe('savings');
+  });
+
+  it('adds the spouse’s disability to the minimum boxes of a joint return', async () => {
+    const { input } = await run({});
+    const joint = {
+      ...input,
+      joint: {
+        reduction: 3400,
+        partner: {
+          gross: 0,
+          socialSecurity: 0,
+          withheld: 0,
+          age: 60,
+          disability: 33 as const,
+          savings: 0,
+          pensionPlan: 0,
+        },
+      },
+    };
+    const ours = ourBoxes(computeRenta(joint), joint);
+    expect(ours['0517']).toBe(6000);
+    expect(ours['0518']).toBe(6000);
   });
 
   it('takes the result of the draft from its last box', () => {

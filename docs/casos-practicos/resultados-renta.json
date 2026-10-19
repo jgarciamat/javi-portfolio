@@ -2,622 +2,6 @@
   "motor": "frontend/src/modules/tools/domain",
   "filas": [
     {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 28000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 26222,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5956.65,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2188.8,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1901.03,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "01-asalariado-soltero-madrid",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 4089.83,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 32000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 29968,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5790,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2508.45,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2433.97,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 4942.42,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 32000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 29968,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5790,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1756.2,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1670.8,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
-      "declaracion": "conjunta",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 3427,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 30000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 28095,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2355.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2388.95,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 4744.7,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 24000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 22476,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1512.9,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1543.25,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conyuge",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 3056.15,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 54000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 50571,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 5082.14,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 5312.24,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "03-pareja-dos-sueldos-individual-cataluna",
-      "declaracion": "conjunta",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 10394.38,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 40000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 37460,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2964.1,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2814.1,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 5778.2,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
       "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
       "declaracion": "individual",
       "casilla": null,
@@ -627,358 +11,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 45000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 42142,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5789,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1597.77,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1417.92,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "05-familia-numerosa-especial-conjunta-galicia",
-      "declaracion": "conjunta",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 3015.69,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 22000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 20603,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6105,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1165.86,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1085.31,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 2251.17,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 22000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 20603,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6105,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 907.86,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 827.31,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "06-monoparental-comunitat-valenciana",
-      "declaracion": "conjunta",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 1735.17,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 36000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 33714,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 3065.6,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2807.86,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "07-hijo-menor-3-guarderia-murcia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 5873.46,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
     },
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
@@ -992,270 +24,6 @@
       "motivo": "Límites de renta y requisitos 2025 no confirmados con un caso oficial."
     },
     {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 18000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 18000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6700,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 12000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 16500,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 16142.5,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6768,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 227.89,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 209.78,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "09-pensionista-y-trabajo-canarias",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 437.67,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 23000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 21505,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1502.1,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1514.96,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "10-dos-pagadores-baleares",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 3017.06,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
       "caso": "10-dos-pagadores-baleares",
       "declaracion": "individual",
       "casilla": null,
@@ -1265,633 +33,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 15600,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 14728,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5790,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "11-paro-y-trabajo-andalucia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 38000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 35587,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0155",
-      "campo": null,
-      "concepto": "Suma de imputaciones de rentas inmobiliarias",
-      "esperado": 1200,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5956.65,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 4103.2,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 3547.61,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "12-alquiler-de-piso-propio-madrid",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 7650.81,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 42000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 39333,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5956.65,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 3552.11,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2988.97,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "13-hipoteca-anterior-2013-madrid",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 6541.08,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 52000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 48698,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 5407.63,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 5640.37,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "14-plan-pensiones-empresa-cataluna",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 11048,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 30000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 28095,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2319.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2226.3,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "15-donativos-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 4546.05,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 26000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 24349,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 2000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6105,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2097.85,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1972.9,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "16-intereses-dividendos-comunitat-valenciana",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 4070.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 45000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 42142,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 1770,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 4917.92,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 4810.46,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "17-venta-acciones-fondos-720-aragon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 9728.38,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
     },
     {
       "caso": "17-venta-acciones-fondos-720-aragon",
@@ -1918,94 +59,6 @@
     {
       "caso": "18-criptomonedas-fifo-compensacion-murcia",
       "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 33000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 30904,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 750,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 2962.35,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 2752.38,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 5714.73,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "18-criptomonedas-fifo-compensacion-murcia",
-      "declaracion": "individual",
       "casilla": null,
       "campo": null,
       "concepto": "Ganancias y pérdidas de criptomonedas por FIFO y compensación del 25 %",
@@ -2028,94 +81,6 @@
     {
       "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
       "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 22000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 22000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 400,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6815,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1490.25,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1509.65,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 2999.9,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
-      "declaracion": "individual",
       "casilla": null,
       "campo": null,
       "concepto": "Exención de la ganancia de la vivienda habitual por mayor de 65 años",
@@ -2123,105 +88,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "El motor no recibe ganancias exentas: se comprueba solo que la base del ahorro no la incluye."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 33000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 30904,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0155",
-      "campo": null,
-      "concepto": "Suma de imputaciones de rentas inmobiliarias",
-      "esperado": 495.89,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 24500,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5789,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 5477.98,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 5343.23,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "20-herencia-venta-segunda-vivienda-galicia",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 10821.21,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
     },
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
@@ -2237,94 +103,6 @@
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
       "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 27000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 25105,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5606,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 3030,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 989.1,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 903.64,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 1892.74,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "21-movilidad-sindicato-discapacidad-canarias",
-      "declaracion": "individual",
       "casilla": null,
       "campo": null,
       "concepto": "Deducción de Canarias por discapacidad",
@@ -2332,94 +110,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Requisitos 2025 no confirmados con un caso oficial."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0012",
-      "campo": null,
-      "concepto": "Total ingresos íntegros computables del trabajo",
-      "esperado": 24000,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0017",
-      "campo": null,
-      "concepto": "Rendimiento neto previo",
-      "esperado": 22476,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0460",
-      "campo": null,
-      "concepto": "Base imponible del ahorro",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0512",
-      "campo": null,
-      "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 5550,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0518",
-      "campo": null,
-      "concepto": "Mínimo por discapacidad, importe autonómico",
-      "esperado": 0,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0570",
-      "campo": null,
-      "concepto": "Cuota líquida estatal",
-      "esperado": 1369.17,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0571",
-      "campo": null,
-      "concepto": "Cuota líquida autonómica",
-      "esperado": 1331.9,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0587",
-      "campo": null,
-      "concepto": "Cuota líquida incrementada total",
-      "esperado": 2701.07,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
     },
     {
       "caso": "01-asalariado-soltero-madrid",
@@ -2434,11 +124,31 @@
     {
       "caso": "01-asalariado-soltero-madrid",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 28000,
+      "obtenido": 28000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1778,
       "obtenido": 1778,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 26222,
+      "obtenido": 26222,
       "estado": "coincide"
     },
     {
@@ -2494,6 +204,16 @@
     {
       "caso": "01-asalariado-soltero-madrid",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -2524,9 +244,29 @@
     {
       "caso": "01-asalariado-soltero-madrid",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5956.65,
+      "obtenido": 5956.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -2569,6 +309,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1901.03,
       "obtenido": 1901.03,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2188.8,
+      "obtenido": 2188.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1901.03,
+      "obtenido": 1901.03,
+      "estado": "coincide"
+    },
+    {
+      "caso": "01-asalariado-soltero-madrid",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 4089.83,
+      "obtenido": 4089.83,
       "estado": "coincide"
     },
     {
@@ -2634,11 +404,31 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 32000,
+      "obtenido": 32000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2032,
       "obtenido": 2032,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 29968,
+      "obtenido": 29968,
       "estado": "coincide"
     },
     {
@@ -2694,6 +484,16 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -2724,9 +524,29 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5790,
+      "obtenido": 5790,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -2769,6 +589,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2433.97,
       "obtenido": 2433.97,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2508.45,
+      "obtenido": 2508.45,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2433.97,
+      "obtenido": 2433.97,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 4942.42,
+      "obtenido": 4942.42,
       "estado": "coincide"
     },
     {
@@ -2834,11 +684,31 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "conjunta",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 32000,
+      "obtenido": 32000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2032,
       "obtenido": 2032,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 29968,
+      "obtenido": 29968,
       "estado": "coincide"
     },
     {
@@ -2894,6 +764,16 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "conjunta",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -2924,9 +804,29 @@
     {
       "caso": "02-pareja-un-sueldo-conjunta-andalucia",
       "declaracion": "conjunta",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5790,
+      "obtenido": 5790,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -2969,6 +869,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1670.8,
       "obtenido": 1670.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1756.2,
+      "obtenido": 1756.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1670.8,
+      "obtenido": 1670.8,
+      "estado": "coincide"
+    },
+    {
+      "caso": "02-pareja-un-sueldo-conjunta-andalucia",
+      "declaracion": "conjunta",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 3427,
+      "obtenido": 3427,
       "estado": "coincide"
     },
     {
@@ -3044,11 +974,31 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 30000,
+      "obtenido": 30000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1905,
       "obtenido": 1905,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 28095,
+      "obtenido": 28095,
       "estado": "coincide"
     },
     {
@@ -3104,6 +1054,16 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -3134,9 +1094,29 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -3179,6 +1159,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2388.95,
       "obtenido": 2388.95,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2355.75,
+      "obtenido": 2355.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2388.95,
+      "obtenido": 2388.95,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 4744.7,
+      "obtenido": 4744.7,
       "estado": "coincide"
     },
     {
@@ -3244,11 +1254,31 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conyuge",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 24000,
+      "obtenido": 24000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1524,
       "obtenido": 1524,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 22476,
+      "obtenido": 22476,
       "estado": "coincide"
     },
     {
@@ -3304,6 +1334,16 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conyuge",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -3334,9 +1374,29 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conyuge",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -3379,6 +1439,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1543.25,
       "obtenido": 1543.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1512.9,
+      "obtenido": 1512.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1543.25,
+      "obtenido": 1543.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conyuge",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 3056.15,
+      "obtenido": 3056.15,
       "estado": "coincide"
     },
     {
@@ -3444,11 +1534,31 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conjunta",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 54000,
+      "obtenido": 54000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 3429,
       "obtenido": 3429,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 50571,
+      "obtenido": 50571,
       "estado": "coincide"
     },
     {
@@ -3504,6 +1614,16 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conjunta",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -3534,9 +1654,29 @@
     {
       "caso": "03-pareja-dos-sueldos-individual-cataluna",
       "declaracion": "conjunta",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -3579,6 +1719,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 5312.24,
       "obtenido": 5312.24,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 5082.14,
+      "obtenido": 5082.14,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 5312.24,
+      "obtenido": 5312.24,
+      "estado": "coincide"
+    },
+    {
+      "caso": "03-pareja-dos-sueldos-individual-cataluna",
+      "declaracion": "conjunta",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 10394.38,
+      "obtenido": 10394.38,
       "estado": "coincide"
     },
     {
@@ -3654,11 +1824,31 @@
     {
       "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 40000,
+      "obtenido": 40000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2540,
       "obtenido": 2540,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 37460,
+      "obtenido": 37460,
       "estado": "coincide"
     },
     {
@@ -3714,6 +1904,16 @@
     {
       "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -3744,9 +1944,29 @@
     {
       "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -3789,6 +2009,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2814.1,
       "obtenido": 2814.1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2964.1,
+      "obtenido": 2964.1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2814.1,
+      "obtenido": 2814.1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "04-familia-numerosa-general-viudo-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 5778.2,
+      "obtenido": 5778.2,
       "estado": "coincide"
     },
     {
@@ -3864,11 +2114,31 @@
     {
       "caso": "05-familia-numerosa-especial-conjunta-galicia",
       "declaracion": "conjunta",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 45000,
+      "obtenido": 45000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2858,
       "obtenido": 2858,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 42142,
+      "obtenido": 42142,
       "estado": "coincide"
     },
     {
@@ -3924,6 +2194,16 @@
     {
       "caso": "05-familia-numerosa-especial-conjunta-galicia",
       "declaracion": "conjunta",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -3954,9 +2234,29 @@
     {
       "caso": "05-familia-numerosa-especial-conjunta-galicia",
       "declaracion": "conjunta",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5789,
+      "obtenido": 5789,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -3999,6 +2299,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1417.92,
       "obtenido": 1417.92,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1597.77,
+      "obtenido": 1597.77,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1417.92,
+      "obtenido": 1417.92,
+      "estado": "coincide"
+    },
+    {
+      "caso": "05-familia-numerosa-especial-conjunta-galicia",
+      "declaracion": "conjunta",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 3015.69,
+      "obtenido": 3015.69,
       "estado": "coincide"
     },
     {
@@ -4084,11 +2414,31 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 22000,
+      "obtenido": 22000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1397,
       "obtenido": 1397,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 20603,
+      "obtenido": 20603,
       "estado": "coincide"
     },
     {
@@ -4144,6 +2494,16 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -4174,9 +2534,29 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6105,
+      "obtenido": 6105,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -4219,6 +2599,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1085.31,
       "obtenido": 1085.31,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1165.86,
+      "obtenido": 1165.86,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1085.31,
+      "obtenido": 1085.31,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2251.17,
+      "obtenido": 2251.17,
       "estado": "coincide"
     },
     {
@@ -4284,11 +2694,31 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "conjunta",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 22000,
+      "obtenido": 22000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1397,
       "obtenido": 1397,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 20603,
+      "obtenido": 20603,
       "estado": "coincide"
     },
     {
@@ -4344,6 +2774,16 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "conjunta",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -4374,9 +2814,29 @@
     {
       "caso": "06-monoparental-comunitat-valenciana",
       "declaracion": "conjunta",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6105,
+      "obtenido": 6105,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -4419,6 +2879,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 827.31,
       "obtenido": 827.31,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 907.86,
+      "obtenido": 907.86,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 827.31,
+      "obtenido": 827.31,
+      "estado": "coincide"
+    },
+    {
+      "caso": "06-monoparental-comunitat-valenciana",
+      "declaracion": "conjunta",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1735.17,
+      "obtenido": 1735.17,
       "estado": "coincide"
     },
     {
@@ -4494,11 +2984,31 @@
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 36000,
+      "obtenido": 36000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2286,
       "obtenido": 2286,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 33714,
+      "obtenido": 33714,
       "estado": "coincide"
     },
     {
@@ -4554,6 +3064,16 @@
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -4584,9 +3104,29 @@
     {
       "caso": "07-hijo-menor-3-guarderia-murcia",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -4629,6 +3169,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2807.86,
       "obtenido": 2807.86,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 3065.6,
+      "obtenido": 3065.6,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2807.86,
+      "obtenido": 2807.86,
+      "estado": "coincide"
+    },
+    {
+      "caso": "07-hijo-menor-3-guarderia-murcia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 5873.46,
+      "obtenido": 5873.46,
       "estado": "coincide"
     },
     {
@@ -4704,11 +3274,31 @@
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 18000,
+      "obtenido": 18000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 0,
       "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 18000,
+      "obtenido": 18000,
       "estado": "coincide"
     },
     {
@@ -4764,6 +3354,16 @@
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -4794,9 +3394,29 @@
     {
       "caso": "08-jubilado-discapacidad-65-aragon",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6700,
+      "obtenido": 6700,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 12000,
+      "obtenido": 12000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 12000,
       "obtenido": 12000,
       "estado": "coincide"
@@ -4837,6 +3457,36 @@
       "casilla": "0546",
       "campo": "boxes.0546",
       "concepto": "Cuota íntegra autonómica",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "08-jubilado-discapacidad-65-aragon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -4904,11 +3554,31 @@
     {
       "caso": "09-pensionista-y-trabajo-canarias",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 16500,
+      "obtenido": 16500,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 357.5,
       "obtenido": 357.5,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 16142.5,
+      "obtenido": 16142.5,
       "estado": "coincide"
     },
     {
@@ -4964,6 +3634,16 @@
     {
       "caso": "09-pensionista-y-trabajo-canarias",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -4994,9 +3674,29 @@
     {
       "caso": "09-pensionista-y-trabajo-canarias",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6768,
+      "obtenido": 6768,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5039,6 +3739,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 209.78,
       "obtenido": 209.78,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 227.89,
+      "obtenido": 227.89,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 209.78,
+      "obtenido": 209.78,
+      "estado": "coincide"
+    },
+    {
+      "caso": "09-pensionista-y-trabajo-canarias",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 437.67,
+      "obtenido": 437.67,
       "estado": "coincide"
     },
     {
@@ -5104,11 +3834,31 @@
     {
       "caso": "10-dos-pagadores-baleares",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 23000,
+      "obtenido": 23000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1495,
       "obtenido": 1495,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 21505,
+      "obtenido": 21505,
       "estado": "coincide"
     },
     {
@@ -5164,6 +3914,16 @@
     {
       "caso": "10-dos-pagadores-baleares",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -5194,9 +3954,29 @@
     {
       "caso": "10-dos-pagadores-baleares",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5239,6 +4019,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1514.96,
       "obtenido": 1514.96,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1502.1,
+      "obtenido": 1502.1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1514.96,
+      "obtenido": 1514.96,
+      "estado": "coincide"
+    },
+    {
+      "caso": "10-dos-pagadores-baleares",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 3017.06,
+      "obtenido": 3017.06,
       "estado": "coincide"
     },
     {
@@ -5304,11 +4114,31 @@
     {
       "caso": "11-paro-y-trabajo-andalucia",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 15600,
+      "obtenido": 15600,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 872,
       "obtenido": 872,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 14728,
+      "obtenido": 14728,
       "estado": "coincide"
     },
     {
@@ -5364,6 +4194,16 @@
     {
       "caso": "11-paro-y-trabajo-andalucia",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -5394,9 +4234,29 @@
     {
       "caso": "11-paro-y-trabajo-andalucia",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5790,
+      "obtenido": 5790,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5437,6 +4297,36 @@
       "casilla": "0546",
       "campo": "boxes.0546",
       "concepto": "Cuota íntegra autonómica",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "11-paro-y-trabajo-andalucia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5504,11 +4394,31 @@
     {
       "caso": "12-alquiler-de-piso-propio-madrid",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 38000,
+      "obtenido": 38000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2413,
       "obtenido": 2413,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 35587,
+      "obtenido": 35587,
       "estado": "coincide"
     },
     {
@@ -5554,11 +4464,31 @@
     {
       "caso": "12-alquiler-de-piso-propio-madrid",
       "declaracion": "individual",
+      "casilla": "0155",
+      "campo": "boxes.0155",
+      "concepto": "Suma de imputaciones de rentas inmobiliarias",
+      "esperado": 1200,
+      "obtenido": 1200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
       "casilla": "0435",
       "campo": "boxes.0435",
       "concepto": "Base imponible general",
       "esperado": 36647,
       "obtenido": 36647,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
       "estado": "coincide"
     },
     {
@@ -5594,9 +4524,29 @@
     {
       "caso": "12-alquiler-de-piso-propio-madrid",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5956.65,
+      "obtenido": 5956.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5639,6 +4589,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 3547.61,
       "obtenido": 3547.61,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 4103.2,
+      "obtenido": 4103.2,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 3547.61,
+      "obtenido": 3547.61,
+      "estado": "coincide"
+    },
+    {
+      "caso": "12-alquiler-de-piso-propio-madrid",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 7650.81,
+      "obtenido": 7650.81,
       "estado": "coincide"
     },
     {
@@ -5724,11 +4704,31 @@
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 42000,
+      "obtenido": 42000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2667,
       "obtenido": 2667,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 39333,
+      "obtenido": 39333,
       "estado": "coincide"
     },
     {
@@ -5784,6 +4784,16 @@
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -5814,9 +4824,29 @@
     {
       "caso": "13-hipoteca-anterior-2013-madrid",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5956.65,
+      "obtenido": 5956.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -5859,6 +4889,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 3666.97,
       "obtenido": 3666.97,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 3552.11,
+      "obtenido": 3552.11,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2988.97,
+      "obtenido": 2988.97,
+      "estado": "coincide"
+    },
+    {
+      "caso": "13-hipoteca-anterior-2013-madrid",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 6541.08,
+      "obtenido": 6541.08,
       "estado": "coincide"
     },
     {
@@ -5944,11 +5004,31 @@
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 52000,
+      "obtenido": 52000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 3302,
       "obtenido": 3302,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 48698,
+      "obtenido": 48698,
       "estado": "coincide"
     },
     {
@@ -6004,6 +5084,16 @@
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -6034,9 +5124,29 @@
     {
       "caso": "14-plan-pensiones-empresa-cataluna",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -6079,6 +5189,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 5640.37,
       "obtenido": 5640.37,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 5407.63,
+      "obtenido": 5407.63,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 5640.37,
+      "obtenido": 5640.37,
+      "estado": "coincide"
+    },
+    {
+      "caso": "14-plan-pensiones-empresa-cataluna",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 11048,
+      "obtenido": 11048,
       "estado": "coincide"
     },
     {
@@ -6154,11 +5294,31 @@
     {
       "caso": "15-donativos-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 30000,
+      "obtenido": 30000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1905,
       "obtenido": 1905,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 28095,
+      "obtenido": 28095,
       "estado": "coincide"
     },
     {
@@ -6214,6 +5374,16 @@
     {
       "caso": "15-donativos-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -6244,9 +5414,29 @@
     {
       "caso": "15-donativos-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -6289,6 +5479,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2376.3,
       "obtenido": 2376.3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2319.75,
+      "obtenido": 2319.75,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2226.3,
+      "obtenido": 2226.3,
+      "estado": "coincide"
+    },
+    {
+      "caso": "15-donativos-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 4546.05,
+      "obtenido": 4546.05,
       "estado": "coincide"
     },
     {
@@ -6374,11 +5594,31 @@
     {
       "caso": "16-intereses-dividendos-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 26000,
+      "obtenido": 26000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1651,
       "obtenido": 1651,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 24349,
+      "obtenido": 24349,
       "estado": "coincide"
     },
     {
@@ -6434,6 +5674,16 @@
     {
       "caso": "16-intereses-dividendos-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 2000,
+      "obtenido": 2000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -6464,9 +5714,29 @@
     {
       "caso": "16-intereses-dividendos-comunitat-valenciana",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6105,
+      "obtenido": 6105,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -6509,6 +5779,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1972.9,
       "obtenido": 1972.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2097.85,
+      "obtenido": 2097.85,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1972.9,
+      "obtenido": 1972.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "16-intereses-dividendos-comunitat-valenciana",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 4070.75,
+      "obtenido": 4070.75,
       "estado": "coincide"
     },
     {
@@ -6574,11 +5874,31 @@
     {
       "caso": "17-venta-acciones-fondos-720-aragon",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 45000,
+      "obtenido": 45000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2858,
       "obtenido": 2858,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 42142,
+      "obtenido": 42142,
       "estado": "coincide"
     },
     {
@@ -6634,6 +5954,16 @@
     {
       "caso": "17-venta-acciones-fondos-720-aragon",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 1770,
+      "obtenido": 1770,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -6664,9 +5994,29 @@
     {
       "caso": "17-venta-acciones-fondos-720-aragon",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -6709,6 +6059,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 4810.46,
       "obtenido": 4810.46,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 4917.92,
+      "obtenido": 4917.92,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 4810.46,
+      "obtenido": 4810.46,
+      "estado": "coincide"
+    },
+    {
+      "caso": "17-venta-acciones-fondos-720-aragon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 9728.38,
+      "obtenido": 9728.38,
       "estado": "coincide"
     },
     {
@@ -6774,11 +6154,31 @@
     {
       "caso": "18-criptomonedas-fifo-compensacion-murcia",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 33000,
+      "obtenido": 33000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2096,
       "obtenido": 2096,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 30904,
+      "obtenido": 30904,
       "estado": "coincide"
     },
     {
@@ -6834,6 +6234,16 @@
     {
       "caso": "18-criptomonedas-fifo-compensacion-murcia",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 750,
+      "obtenido": 750,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -6864,9 +6274,29 @@
     {
       "caso": "18-criptomonedas-fifo-compensacion-murcia",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -6909,6 +6339,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 2752.38,
       "obtenido": 2752.38,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 2962.35,
+      "obtenido": 2962.35,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 2752.38,
+      "obtenido": 2752.38,
+      "estado": "coincide"
+    },
+    {
+      "caso": "18-criptomonedas-fifo-compensacion-murcia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 5714.73,
+      "obtenido": 5714.73,
       "estado": "coincide"
     },
     {
@@ -6974,11 +6434,31 @@
     {
       "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 22000,
+      "obtenido": 22000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 0,
       "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 22000,
+      "obtenido": 22000,
       "estado": "coincide"
     },
     {
@@ -7034,6 +6514,16 @@
     {
       "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 400,
+      "obtenido": 400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -7064,9 +6554,29 @@
     {
       "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 6815,
+      "obtenido": 6815,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -7109,6 +6619,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1509.65,
       "obtenido": 1509.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1490.25,
+      "obtenido": 1490.25,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1509.65,
+      "obtenido": 1509.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "19-venta-vivienda-habitual-mayor-65-baleares",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2999.9,
+      "obtenido": 2999.9,
       "estado": "coincide"
     },
     {
@@ -7174,11 +6714,31 @@
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 33000,
+      "obtenido": 33000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 2096,
       "obtenido": 2096,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 30904,
+      "obtenido": 30904,
       "estado": "coincide"
     },
     {
@@ -7224,11 +6784,31 @@
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
       "declaracion": "individual",
+      "casilla": "0155",
+      "campo": "boxes.0155",
+      "concepto": "Suma de imputaciones de rentas inmobiliarias",
+      "esperado": 495.89,
+      "obtenido": 495.89,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
       "casilla": "0435",
       "campo": "boxes.0435",
       "concepto": "Base imponible general",
       "esperado": 29399.89,
       "obtenido": 29399.89,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 24500,
+      "obtenido": 24500,
       "estado": "coincide"
     },
     {
@@ -7264,9 +6844,29 @@
     {
       "caso": "20-herencia-venta-segunda-vivienda-galicia",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5789,
+      "obtenido": 5789,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -7309,6 +6909,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 5343.23,
       "obtenido": 5343.23,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 5477.98,
+      "obtenido": 5477.98,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 5343.23,
+      "obtenido": 5343.23,
+      "estado": "coincide"
+    },
+    {
+      "caso": "20-herencia-venta-segunda-vivienda-galicia",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 10821.21,
+      "obtenido": 10821.21,
       "estado": "coincide"
     },
     {
@@ -7384,11 +7014,31 @@
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 27000,
+      "obtenido": 27000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1715,
       "obtenido": 1715,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 25105,
+      "obtenido": 25105,
       "estado": "coincide"
     },
     {
@@ -7444,6 +7094,16 @@
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -7474,11 +7134,31 @@
     {
       "caso": "21-movilidad-sindicato-discapacidad-canarias",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5606,
+      "obtenido": 5606,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
       "esperado": 3000,
       "obtenido": 3000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "esperado": 3030,
+      "obtenido": 3030,
       "estado": "coincide"
     },
     {
@@ -7519,6 +7199,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 903.64,
       "obtenido": 903.64,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 989.1,
+      "obtenido": 989.1,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 903.64,
+      "obtenido": 903.64,
+      "estado": "coincide"
+    },
+    {
+      "caso": "21-movilidad-sindicato-discapacidad-canarias",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 1892.74,
+      "obtenido": 1892.74,
       "estado": "coincide"
     },
     {
@@ -7584,11 +7294,31 @@
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0012",
+      "campo": "boxes.0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "esperado": 24000,
+      "obtenido": 24000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0013",
       "campo": "boxes.0013",
       "concepto": "Cotizaciones a la Seguridad Social",
       "esperado": 1524,
       "obtenido": 1524,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "campo": "boxes.0017",
+      "concepto": "Rendimiento neto previo",
+      "esperado": 22476,
+      "obtenido": 22476,
       "estado": "coincide"
     },
     {
@@ -7644,6 +7374,16 @@
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0460",
+      "campo": "boxes.0460",
+      "concepto": "Base imponible del ahorro",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0500",
       "campo": "boxes.0500",
       "concepto": "Base liquidable general",
@@ -7674,9 +7414,29 @@
     {
       "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
       "declaracion": "individual",
+      "casilla": "0512",
+      "campo": "boxes.0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "esperado": 5550,
+      "obtenido": 5550,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
       "casilla": "0517",
       "campo": "boxes.0517",
       "concepto": "Mínimo por discapacidad, importe estatal",
+      "esperado": 0,
+      "obtenido": 0,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "campo": "boxes.0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
       "esperado": 0,
       "obtenido": 0,
       "estado": "coincide"
@@ -7719,6 +7479,36 @@
       "concepto": "Cuota íntegra autonómica",
       "esperado": 1589.64,
       "obtenido": 1589.64,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "campo": "boxes.0570",
+      "concepto": "Cuota líquida estatal",
+      "esperado": 1369.17,
+      "obtenido": 1369.17,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "campo": "boxes.0571",
+      "concepto": "Cuota líquida autonómica",
+      "esperado": 1331.9,
+      "obtenido": 1331.9,
+      "estado": "coincide"
+    },
+    {
+      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "campo": "boxes.0587",
+      "concepto": "Cuota líquida incrementada total",
+      "esperado": 2701.07,
+      "obtenido": 2701.07,
       "estado": "coincide"
     },
     {
