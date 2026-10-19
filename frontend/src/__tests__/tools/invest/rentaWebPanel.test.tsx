@@ -83,15 +83,12 @@ describe('«Cópialo en Renta WEB»', () => {
     renderWithProviders(<RentaWebPanel ledger={ledger} />, { authenticated: false });
     expect(screen.getByText(tr(`${k}.warn.fiscalData`))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.warn.carteraValores`))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.xlsx`) }));
+    expect(screen.queryByRole('button', { name: /Excel/ })).toBeNull();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: tr(`${k}.pdf`) }));
     });
-    await waitFor(() => expect(names).toHaveLength(2));
-    expect(names).toEqual([
-      'Finanverso-Renta-2025-copiar-en-Renta-WEB.xlsx',
-      'Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf',
-    ]);
+    await waitFor(() => expect(names).toHaveLength(1));
+    expect(names).toEqual(['Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf']);
     click.mockRestore();
   });
 
@@ -200,7 +197,7 @@ describe('«Cópialo en Renta WEB»', () => {
         )}
       />
     );
-    expect(screen.getByRole('button', { name: tr(`${k}.xlsx`) })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr(`${k}.pdf`) })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr(`${k}.start`) })).toBeNull();
   });
 });

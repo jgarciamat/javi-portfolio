@@ -13,7 +13,7 @@ import { readQuantfury } from '@modules/tools/domain/invest/pdfReports';
 import { reportTables, summaryOf } from '@modules/tools/domain/invest/report';
 import { cut, rentaWebKit, WINDOWS } from '@modules/tools/domain/invest/rentaWeb';
 import type { InvestOp } from '@modules/tools/domain/invest/types';
-import { xlsxOf } from '@modules/tools/application/investImport';
+import { buildXlsx } from '../../../../scripts/xlsx';
 import { BINANCE_WORKBOOK } from '@test-utils/binanceWorkbook';
 
 let n = 0;
@@ -507,7 +507,7 @@ describe('every made-up case gives the same totals as declaring each sale', () =
   });
 
   it('the Binance statement', () => {
-    const sheets = readXlsx(xlsxOf(BINANCE_WORKBOOK as never).slice().buffer as ArrayBuffer);
+    const sheets = readXlsx(buildXlsx(BINANCE_WORKBOOK).slice().buffer as ArrayBuffer);
     const l = buildLedger(
       readTables(sheets, 'b.xlsx').flatMap((r) => r.ops),
       { year: 2025, rates: { USD: [['2020-01-01', 1.25]] } }

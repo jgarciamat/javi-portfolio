@@ -1089,7 +1089,12 @@ html.wiz-contrast .renta-new-return:focus-visible {
   border-radius: 10px;
   background: var(--slate-800);
 }
-.invest-web-start {
+.invest-web-actions {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.invest-web-start,
+.invest-web-pdf {
   display: inline-flex;
   align-items: center;
   justify-content: center;

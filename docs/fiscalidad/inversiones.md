@@ -18,7 +18,8 @@ Código:
 | Motor fiscal | `domain/invest/ledger.ts` y `domain/rentaGains.ts` |
 | Tabla para copiar e informe | `domain/invest/report.ts` |
 | Guía «Cómo declarar esto» | `domain/invest/guide.ts` y `ui/renta/invest/InvestGuide.tsx` |
-| Lectura de archivos, descargas (XLSX/PDF) | `application/investImport.ts` |
+| Lectura de archivos y descarga | `application/investImport.ts` |
+| PDF para copiar en Renta WEB | `application/reportPdf.ts` (datos en `domain/invest/report.ts`) |
 
 ## 1. Formatos soportados
 
@@ -108,7 +109,7 @@ El lector se escribió a partir de la estructura que describió el dueño; **no 
 - «Añadir una compra o venta que no está en los archivos».
 - Casilla «Hago esto como actividad económica».
 - Tabla «Lo que tienes que copiar en tu Renta» con el número de casilla de cada columna, agrupada como Renta WEB: por fondo, por emisor, por moneda y clave.
-- Informe descargable en Excel y PDF: ventas con las compras usadas (auditoría FIFO), rendimientos, posiciones cerradas y resultado por año.
+- Informe descargable en PDF: ventas con las compras usadas (auditoría FIFO), rendimientos, posiciones cerradas y resultado por año.
 - «Llevar a mi Renta» y, en el detalle del ahorro, «Quitar lo importado».
 - Guía «Cómo declarar esto» (§5).
 
@@ -148,7 +149,8 @@ Renta WEB **no importa** ganancias ni pérdidas: se teclean en las ventanas del 
 - **Cripto:** denominación (25), tipo de contraprestación con las cuatro claves F, N, O y B, importe y gastos de la transmisión y de la adquisición (la app pone el neto en «Importe» y 0 en «Gastos»: el resultado es el mismo).
 - **Límites** de `Renta2025.xsd` (cripto 300, fondos 60, ETF 200, acciones 200 emisores, otros elementos 80): si no caben se unen signos del mismo activo y, después, se agrupa por activo; en otros elementos, por instrumento con la primera apertura y el último cierre. Cada paso se avisa.
 - **Avisos:** «puede venir ya en tus datos fiscales» (fondos de entidad española o ISIN ES), Cartera de Valores incompatible con el relleno a mano, ETF en su apartado, ventas agrupadas.
-- **Entregables:** `Finanverso-Renta-<año>-copiar-en-Renta-WEB.xlsx` (pestañas 0 Cómo usar, 1 Fondos, 2 ETF, 3 Acciones, 4 Monedas virtuales, 5 Otros elementos, 6 Totales por casilla, 7 Detalle por operación, 8 Rendimientos, 9 Por año; solo las que tienen datos) y el mismo contenido en PDF. Se descargan desde «Mis inversiones» y desde el resultado.
+- **Entregable:** `Finanverso-Renta-<año>-copiar-en-Renta-WEB.pdf`, con el botón destacado «Descargar PDF para copiar en Renta WEB» junto a «Copiar a Renta WEB paso a paso» (en «Mis inversiones», en el resultado y al final del asistente). A4 apaisado: página «Empieza aquí» (recuadros con filas por ventana, tiempo estimado y totales por casilla; los 3 pasos numerados; el ejemplo resuelto de una fila, campo de Renta WEB → qué escribes), una sección por ventana («Copia estas N filas en la ventana “…”», tabla con cabecera de color y filas alternas, columnas a copiar en amarillo suave, columnas de comprobación en gris con el rótulo «No copiar», cuadradito «Hecho» y número de alta, cabecera repetida en cada página y totales de la ventana al final), la página «Totales que debes ver en Renta WEB» con el aviso de guardar el archivo y el detalle FIFO al menos 4 años (art. 66 LGT), y el anexo en letra pequeña (detalle por operación FIFO, rendimientos y resultado por año). Cabecera con el título y la marca «Preparado con Finanverso · no es un documento oficial»; pie con «Página X de Y», el año y el nombre del archivo. Importes con coma decimal y sin separador de miles (como los pide Renta WEB, `como-declarar-cripto-y-fondos.md` §6.3). Helvetica estándar: los textos se pasan a WinAnsi (se conservan tildes, ñ y €; lo demás se escribe con letras o «?»). Con 400+ filas se genera en menos de un segundo.
+- **Excel retirado (decisión del dueño, 19-10-2026):** antes se descargaba también `…-copiar-en-Renta-WEB.xlsx` con el mismo contenido. El dueño pidió quitarlo («ya está en PDF, quita lo del Excel, el PDF está bien»): se borró el escritor de xlsx del informe (`xlsxOf`), su botón y sus textos. Los tests y `npm run ejemplo-binance` construyen sus libros de prueba con `scripts/xlsx.ts` (el mismo de Autónomos).
 - **Modo «Copiar a Renta WEB»:** alta por alta, cada campo con su etiqueta oficial y botón «Copiar» (importes con coma decimal y sin separador de miles: `1234,56`), progreso, marca de hecho (se recuerda en el dispositivo), vuelta atrás, cómo abrir cada ventana y enlace a la ayuda de la sede; al final, los totales que debe mostrar Renta WEB.
 
 **Pruebas que debe hacer el dueño** en Renta WEB Open 2025 (no pide identificarse ni presenta nada):
@@ -166,5 +168,5 @@ Renta WEB **no importa** ganancias ni pérdidas: se teclean en las ventanas del 
 
 ## 7. Pruebas
 
-- `frontend/src/__tests__/tools/invest/`: un archivo inventado por plataforma (`formats.test.ts`), el motor con cifras a mano (`ledger.test.ts`), lectores, mapeo, PDF, informe y guía (`readers.test.ts`), lectura de archivos y descargas (`investImport.test.ts`) y la pantalla (`investImportUi.test.tsx`).
+- `frontend/src/__tests__/tools/invest/`: un archivo inventado por plataforma (`formats.test.ts`), el motor con cifras a mano (`ledger.test.ts`), lectores, mapeo, PDF, informe y guía (`readers.test.ts`), lectura de archivos y descargas (`investImport.test.ts`), el PDF (`reportPdf.test.ts`) y la pantalla (`investImportUi.test.tsx`).
 - Banco de casos: 10 personas inventadas **p4-109 a p4-118** en `docs/casos-practicos/personas/` con sus archivos de ejemplo de Binance, Ledger Live, Coinbase, Kraken, Revolut, Degiro, una gestora española, un banco, Quantfury (PDF), eToro (Excel), Bitpanda, Crypto.com, Interactive Brokers y Trading 212. `casosRenta.test.ts` compara sus casillas con el cálculo a mano y `casosInversiones.test.ts` vuelve a leer los archivos del disco. Se regeneran con `node scripts/casos/run-personas4.mjs` (desde `frontend/`), que también deja una copia privada en `~/Downloads/pruebas finanverso/personas/109 - …` con su LEEME.txt.

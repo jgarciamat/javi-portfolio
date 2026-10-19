@@ -5,8 +5,8 @@
  */
 import { writeFileSync } from 'fs';
 import { join } from 'path';
-import { xlsxOf } from '../src/modules/tools/application/investImport';
 import { BINANCE_WORKBOOK } from '../src/test-utils/binanceWorkbook';
+import { buildXlsx } from './xlsx';
 
 const out = join(
   process.cwd(),
@@ -16,5 +16,5 @@ const out = join(
   'ejemplos',
   'binance-informe-inventado.xlsx'
 );
-writeFileSync(out, xlsxOf(BINANCE_WORKBOOK));
+writeFileSync(out, buildXlsx(BINANCE_WORKBOOK));
 console.log(out);

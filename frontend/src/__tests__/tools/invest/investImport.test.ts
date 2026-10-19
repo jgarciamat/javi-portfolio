@@ -1,22 +1,20 @@
 import { strToU8 as rawU8, zipSync } from 'fflate';
+import { buildXlsx } from '../../../../scripts/xlsx';
 
 const strToU8 = (s: string) => new Uint8Array(rawU8(s));
-import { readXlsx } from '@modules/finances/application/spreadsheet';
 import {
   download,
   loadBundledRates,
   readEcbFile,
   readInvestFile,
   rememberMapping,
-  reportPdf,
   resetBundledRates,
   saveRates,
   savedMappings,
   savedRates,
-  xlsxBlob,
-  xlsxOf,
 } from '@modules/tools/application/investImport';
 import { readPdf } from '@modules/tools/application/readPdf';
+import { reportPdf } from '@modules/tools/application/reportPdf';
 
 jest.mock('@modules/tools/application/readPdf', () => ({ readPdf: jest.fn() }));
 const pdf = readPdf as jest.MockedFunction<typeof readPdf>;
@@ -41,7 +39,7 @@ describe('reading the files on the device', () => {
       )
     );
     expect(csv.readings[0].format?.id).toBe('binance-trades');
-    const book = xlsxOf([
+    const book = buildXlsx([
       {
         name: 'Closed Positions',
         rows: [
@@ -62,7 +60,7 @@ describe('reading the files on the device', () => {
   });
 
   it('a Binance workbook: the information sheet is left out (and its data not kept)', async () => {
-    const book = xlsxOf([
+    const book = buildXlsx([
       {
         name: 'Customer Information',
         rows: [
@@ -84,7 +82,7 @@ describe('reading the files on the device', () => {
       ['Transaction History', 'binance-history', false, []],
     ]);
     expect(read.tables).toEqual([]);
-    const alone = xlsxOf([
+    const alone = buildXlsx([
       {
         name: 'Hoja1',
         rows: [
@@ -159,30 +157,22 @@ describe('what is remembered and the exchange rates', () => {
 });
 
 describe('downloads', () => {
-  it('writes a workbook that Excel (and our own reader) can open, with many columns', () => {
-    const header = Array.from({ length: 28 }, (_, i) => `C${i} <&>"`);
-    const bytes = xlsxOf([
-      { name: 'Ventas y FIFO', rows: [header, [1.5, 'texto']] },
-      { name: 'Un nombre de hoja demasiado largo para Excel', rows: [['a']] },
-    ]);
-    const sheets = readXlsx(bytes.slice().buffer as ArrayBuffer);
-    expect(sheets.map((s) => s.name)).toEqual(['Ventas y FIFO', 'Un nombre de hoja demasiado lar']);
-    expect(sheets[0].rows[0][27]).toBe('C27 <&>"');
-    expect(sheets[0].rows[1]).toEqual([1.5, 'texto']);
-    expect(xlsxBlob(bytes).type).toContain('spreadsheetml');
-  });
-
-  it('a PDF with one table per sheet, and hands files to the browser', async () => {
-    const blob = await reportPdf('Informe', [
-      {
-        name: 'Ventas',
-        rows: [
-          ['A', 'B'],
-          [1, 'x'],
-        ],
-      },
-      { name: 'Otra', rows: [['C']] },
-    ]);
+  it('a PDF with one table per section, and hands files to the browser', async () => {
+    const blob = await reportPdf({
+      title: 'Informe',
+      year: 2025,
+      plan: { windows: [], rows: 0, minutes: 0, example: null },
+      sheets: [
+        {
+          name: 'Ventas',
+          rows: [
+            ['A', 'B'],
+            [1, 'x'],
+          ],
+        },
+        { name: 'Otra', rows: [['C']] },
+      ],
+    });
     expect(blob.size).toBeGreaterThan(1000);
     const create = jest.fn(() => 'blob:x');
     const revoke = jest.fn();

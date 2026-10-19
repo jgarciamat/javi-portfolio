@@ -3,13 +3,13 @@
  * (headers only, checked with `npm run validar-archivo`) and invented data (test-utils).
  */
 import { readXlsx } from '@modules/finances/application/spreadsheet';
-import { xlsxOf } from '@modules/tools/application/investImport';
 import { readTables, withInfoSheets } from '@modules/tools/domain/invest/detect';
 import { buildLedger } from '@modules/tools/domain/invest/ledger';
 import { reportLines, validationReport } from '@modules/tools/domain/invest/validate';
 import { BINANCE_WORKBOOK } from '@test-utils/binanceWorkbook';
+import { buildXlsx } from '../../../../scripts/xlsx';
 
-const sheets = readXlsx(xlsxOf(BINANCE_WORKBOOK as never).slice().buffer as ArrayBuffer);
+const sheets = readXlsx(buildXlsx(BINANCE_WORKBOOK).slice().buffer as ArrayBuffer);
 const readings = withInfoSheets(readTables(sheets, 'Binance- informe.xlsx'));
 const of = (name: string) => readings.find((r) => r.table === name) as (typeof readings)[number];
 const pick = (name: string) =>

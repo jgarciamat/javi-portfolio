@@ -469,7 +469,7 @@ describe('the Renta step by step: persona p4-109 (crypto investor in Madrid)', (
     fireEvent.click(screen.getByRole('button', { name: tr('wizard.finishAll') }));
     // The end: the result in red and the buttons to copy the investments.
     expect(document.querySelector('.wiz-saving .renta-amount--pay')).not.toBeNull();
-    expect(screen.getByRole('button', { name: tr('tools.invest.web.xlsx') })).toHaveClass(
+    expect(screen.getByRole('button', { name: tr('tools.invest.web.pdf') })).toHaveClass(
       'btn-primary'
     );
     expect(screen.getByRole('button', { name: tr('tools.invest.web.start') })).toBeInTheDocument();
