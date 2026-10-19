@@ -408,3 +408,71 @@ describe('The Renta (modelo 100)', () => {
     expect(parse(title)).toEqual({ ok: false, reason: 'noBoxes' });
   });
 });
+
+describe('The forms the previews print (190, 347, 349, 390…)', () => {
+  it('knows a summary by the number printed big in its header', () => {
+    const page = [
+      text('190', 474, 668, 17.6),
+      text('Ejercicio', 368, 587),
+      text('Ejercicio', 356, 570),
+      typed('2025', 474, 568, 33),
+      text('01', 460, 426),
+      typed('2', 470, 424),
+    ];
+    const read = parse(page);
+    if (!read.ok) throw new Error(read.reason);
+    // The first «Ejercicio» is the title of its section: the year is by the second one.
+    expect(read.data).toMatchObject({
+      model: '190',
+      year: 2025,
+      quarter: null,
+      boxes: { '01': 2 },
+    });
+  });
+
+  it('takes the figure typed in a box, not the rate the form prints by it', () => {
+    const page = [
+      text('390', 466, 610, 18),
+      text('41', 238, 574),
+      text('1,75', 369, 574),
+      typed('137.037,27', 247, 572, 107),
+    ];
+    const read = parse(page);
+    if (!read.ok) throw new Error(read.reason);
+    expect(read.data.boxes['41']).toBe(137037.27);
+  });
+
+  it('reads the operators of a 349 with the country in its own cell and corrections in two lines', () => {
+    const page = [
+      text('Declaración recapitulativa de operaciones intracomunitarias', 240, 700),
+      typed('FR', 90, 628, 20),
+      typed('12345678901', 118, 628, 61),
+      typed('CLIENT PARIS', 187, 628, 235),
+      typed('E', 430, 628, 7),
+      typed('1.500,00', 445, 628, 61),
+      // A correction: the operator, the labels of the next line, then its period and bases.
+      typed('DE', 90, 575, 20),
+      typed('123456789', 118, 575, 61),
+      typed('KUNDE', 187, 575, 235),
+      typed('S', 498, 575, 7),
+      text('Ejercicio', 88, 567),
+      text('Base imponible rectificada', 152, 567),
+      typed('2025', 88, 556, 32),
+      typed('2T', 129, 556, 15),
+      typed('800,00', 152, 556, 172),
+      typed('700,00', 332, 556, 172),
+    ];
+    const read = parse(page);
+    if (!read.ok) throw new Error(read.reason);
+    expect(read.data.operators).toEqual([
+      { key: 'E', vatId: 'FR12345678901', name: 'CLIENT PARIS', base: 1500 },
+      {
+        key: 'S',
+        vatId: 'DE123456789',
+        name: 'KUNDE',
+        base: 800,
+        rectifies: { year: 2025, quarter: 2, previous: 700 },
+      },
+    ]);
+  });
+});

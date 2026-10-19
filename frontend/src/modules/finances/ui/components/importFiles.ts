@@ -13,6 +13,7 @@ import {
   type KindPreferences,
 } from '../../domain/invoiceLedger';
 import { entriesOf, kindOfInvoice, type InvoicePdf } from '../../domain/invoicePdf';
+import { INFORMATIVE } from '../../domain/taxModelDetect';
 import {
   carryFrom390,
   type ForalTerritory,
@@ -130,6 +131,8 @@ function dataProblem(data: TaxModelPdf, year: number, years: readonly number[]) 
   // The Renta is compared in its own tool; the 131 (modules) is not the direct estimation of the draft.
   if (data.model === '100') return 'renta';
   if (data.model === '131') return 'modules';
+  // Summaries and other forms the app previews: they say nothing the quarterly draft takes.
+  if ((INFORMATIVE as readonly string[]).includes(data.model)) return 'informative';
   // The 390 is of a year, not of a quarter.
   if (data.model === '390') return null;
   if (data.quarter === null) return 'noPeriod';
@@ -174,7 +177,11 @@ export function importModel(
         {
           tone: 'error',
           key: `app.autonomo.model.error.${problem}`,
-          values: { years: years.join(', '), ...problemValues(parsed) },
+          values: {
+            years: years.join(', '),
+            ...(parsed?.ok ? { model: parsed.data.model } : {}),
+            ...problemValues(parsed),
+          },
         },
       ],
     };

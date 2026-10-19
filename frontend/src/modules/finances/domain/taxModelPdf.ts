@@ -89,9 +89,19 @@ const BOXES: Record<Exclude<TaxModel, '100'>, Set<string>> = {
     ...boxRange(599, 698),
     ...boxRange(700, 741),
     ...boxRange(745, 776),
+    // The payment on account of the 319 (Orden HAC/27/2026, anexo IV, page 6), new in 2026.
+    '112',
   ]),
   // The 349 has no numbered boxes: its operators are read line by line (operators349).
   '349': new Set(),
+  // Summaries and other forms the app previews (docs/fiscalidad/documentos-oficiales.md): the boxes
+  // of their facsimiles. 180: summary 01-03 (Orden de 20-11-2000); 190: 01-03 (Orden EHA/3127/2009);
+  // 347: 01-04 (Orden HAP/1732/2014); 123: 01-14 (Orden HAC/56/2024); 309: 01-27 (Orden HFP/1245/2022).
+  '180': new Set(boxRange(1, 3)),
+  '190': new Set(boxRange(1, 3)),
+  '347': new Set(boxRange(1, 4)),
+  '123': new Set(boxRange(1, 14)),
+  '309': new Set(boxRange(1, 27)),
 };
 
 /** Same line: the number of a box and its amount differ by a couple of points at most. */
@@ -163,8 +173,16 @@ const under = (tokens: PdfToken[], label: PdfToken) =>
 function yearOf(tokens: PdfToken[]): { year: number; used: PdfToken[] } | null {
   const inline = tokens.find((t) => /^ejercicio:? ?20\d{2}$/i.test(t.text.trim()));
   if (inline) return { year: Number(inline.text.trim().slice(-4)), used: [inline] };
-  const label = tokens.find((t) => /^ejercicio$/i.test(t.text.trim()));
-  if (!label) return null;
+  // The summaries print «Ejercicio» twice: as the title of the section and by its cell.
+  for (const label of tokens.filter((t) => /^ejercicio$/i.test(t.text.trim()))) {
+    const found = yearBy(tokens, label);
+    if (found) return found;
+  }
+  return null;
+}
+
+/** The year next to one «Ejercicio» label, or under it. */
+function yearBy(tokens: PdfToken[], label: PdfToken): { year: number; used: PdfToken[] } | null {
   const right = rightOf(tokens, label);
   const whole = right.find((t) => /^20\d{2}$/.test(t.text.trim()));
   if (whole) return { year: Number(whole.text.trim()), used: [whole] };
@@ -320,7 +338,9 @@ function boxesFrom(tokens: PdfToken[], model: TaxModel, used: PdfToken[]): Recor
     const id = labelOf(label.text, model) as string;
     if (!(id in boxes)) boxes[id] = amountOf(value.text);
   };
-  for (const value of values) {
+  // What is typed in a field goes first: the form prints rates next to some boxes («1,75» by the 41
+  // of the 390), and those are not the amount of the box.
+  for (const value of [...values].sort((a, b) => Number(b.field) - Number(a.field))) {
     const label = labelFor(value, labels, side);
     if (label) put(label, value);
   }
@@ -364,10 +384,38 @@ const KEY_TOKEN = /^[A-Z]$/;
 const VAT_ID = /^[A-Z]{2}[0-9A-Z]{2,15}$/;
 const PERIOD = /^([1-4])T$/;
 
+const vatIdOf = (cells: string[]) =>
+  cells.find((c) => {
+    const clean = normalVatId(c);
+    return VAT_ID.test(clean) && EU_PREFIXES.includes(clean.slice(0, 2));
+  });
+const amountsOf = (cells: string[]) =>
+  cells.filter((c) => PRINTED_AMOUNT.test(c) || /^\d+\.\d{2}$/.test(c));
+
+/**
+ * The official form asks for the country («FR») and the VAT number without it in two cells: they are
+ * read as one VAT number.
+ */
+function withCountry(cells: string[]): string[] {
+  const out: string[] = [];
+  for (const c of cells) {
+    const prev = out[out.length - 1];
+    const joined = prev && EU_PREFIXES.includes(prev) ? normalVatId(prev + c) : '';
+    if (joined && VAT_ID.test(joined) && !vatIdOf([prev]) && !EU_PREFIXES.includes(c)) {
+      out[out.length - 1] = joined;
+    } else out.push(c);
+  }
+  return out;
+}
+
+/** A record of two lines: the second line has amounts and no operator of its own. */
+const RECORD_GAP = 25;
+
 /**
  * The lines of a 349: each has the VAT number of the operator, its key and the base; a correction also
  * the year and the quarter it corrects and, after the new base, the one declared before. The words
- * left on the line are the name of the operator.
+ * left on the line are the name of the operator. The official form writes a correction in two lines
+ * (the operator, then the period and the bases): they are read as one.
  */
 function operators349(tokens: PdfToken[]): IntraOp[] {
   const lines: PdfToken[][] = [];
@@ -376,20 +424,39 @@ function operators349(tokens: PdfToken[]): IntraOp[] {
     if (line) line.push(t);
     else lines.push([t]);
   }
+  const texts = lines.map((l) =>
+    withCountry(l.sort((a, b) => a.x - b.x).map((t) => t.text.trim()))
+  );
   const out: IntraOp[] = [];
-  for (const line of lines) {
-    const cells = line.sort((a, b) => a.x - b.x).map((t) => t.text.trim());
-    const id = cells.find((c) => {
-      const clean = normalVatId(c);
-      return VAT_ID.test(clean) && EU_PREFIXES.includes(clean.slice(0, 2));
-    });
+  texts.forEach((own, i) => {
+    // The second line of a record: the next one below with amounts and no operator (the labels of
+    // the form may sit between them).
+    const j = texts.findIndex(
+      (other, k) =>
+        k > i &&
+        lines[i][0].y - lines[k][0].y <= RECORD_GAP &&
+        !vatIdOf(other) &&
+        amountsOf(other).length > 0
+    );
+    const cells = amountsOf(own).length === 0 && j > 0 ? [...own, ...texts[j]] : own;
+    const id = vatIdOf(cells);
     const key = cells.find((c) => KEY_TOKEN.test(c) && (KEYS_349 as readonly string[]).includes(c));
-    const amounts = cells.filter((c) => PRINTED_AMOUNT.test(c) || /^\d+\.\d{2}$/.test(c));
-    if (!id || !key || amounts.length === 0) continue;
+    const amounts = amountsOf(cells);
+    if (!id || !key || amounts.length === 0) return;
     const year = cells.find((c) => /^20\d{2}$/.test(c));
     const period = cells.map((c) => PERIOD.exec(c)).find((m) => m !== null);
+    // The country of the operator in its own cell is the prefix of its VAT number, not its name.
+    const country = normalVatId(id).slice(0, 2);
     const name = cells
-      .filter((c) => c !== id && c !== key && !amounts.includes(c) && c !== year && !PERIOD.test(c))
+      .filter(
+        (c) =>
+          c !== id &&
+          c !== key &&
+          c !== country &&
+          !amounts.includes(c) &&
+          c !== year &&
+          !PERIOD.test(c)
+      )
       .join(' ')
       .trim();
     out.push({
@@ -407,7 +474,7 @@ function operators349(tokens: PdfToken[]): IntraOp[] {
           }
         : {}),
     });
-  }
+  });
   return out;
 }
 

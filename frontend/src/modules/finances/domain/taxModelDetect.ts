@@ -7,7 +7,21 @@ import type { PdfToken } from './taxModelPdf';
  * § 1 «Haciendas forales» and § 2 (checked on 19 October 2026).
  */
 
-export type TaxModel = '100' | '111' | '115' | '130' | '131' | '303' | '349' | '390';
+export type TaxModel =
+  | '100'
+  | '111'
+  | '115'
+  | '130'
+  | '131'
+  | '303'
+  | '349'
+  | '390'
+  // Read (their boxes, as the previews of the app print them) but not taken into the draft.
+  | InformativeModel;
+
+/** Forms the reader knows that the self-employed draft does not import. */
+export const INFORMATIVE = ['123', '180', '190', '309', '347'] as const;
+export type InformativeModel = (typeof INFORMATIVE)[number];
 
 /** The four foral Treasuries; «basque» when the PDF does not say which of the three Basque ones. */
 export type ForalTerritory = 'bizkaia' | 'gipuzkoa' | 'alava' | 'navarra' | 'basque';
@@ -60,6 +74,7 @@ const NUMBERED: Record<string, TaxModel> = {
   '303': '303',
   '349': '349',
   '390': '390',
+  ...Object.fromEntries(INFORMATIVE.map((m) => [m, m])),
 };
 
 function printedNumber(tokens: PdfToken[]): TaxModel | null {

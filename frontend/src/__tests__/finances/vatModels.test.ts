@@ -226,6 +226,19 @@ describe('Importing a 349 or a 390 into the form', () => {
     ).toEqual([]);
   });
 
+  it('reads the summaries and other forms the app previews, but does not import them', () => {
+    for (const model of ['190', '180', '347', '123', '309'] as const) {
+      const [line] = importModel(emptyManual(), ok({ model, boxes: { '01': 1 } }), 2026, [
+        2026,
+      ]).lines;
+      expect(line).toMatchObject({
+        tone: 'error',
+        key: 'app.autonomo.model.error.informative',
+        values: { model },
+      });
+    }
+  });
+
   it('hands the VAT to offset and the prorrata of last year’s 390 to this year', () => {
     const applied = importModel(
       emptyManual(),
