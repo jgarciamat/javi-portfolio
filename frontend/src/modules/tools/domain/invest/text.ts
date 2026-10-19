@@ -31,6 +31,8 @@ function decimalOf(text: string, locale: NumberLocale): string | null {
 /** A plain number written in either style; NaN when it is not one. */
 export function toNumber(text: string, locale: NumberLocale): number {
   const clean = text.replace(/['\u00a0\u202f ]/g, '');
+  // Excel writes big numbers in scientific notation: 5.19399e17.
+  if (/^\d+(\.\d+)?e[+-]?\d+$/i.test(clean)) return Number(clean);
   if (!/^\d[\d.,]*$/.test(clean)) return Number.NaN;
   const decimal = decimalOf(clean, locale);
   if (decimal === null) return Number(clean.replace(/[.,]/g, ''));
@@ -67,6 +69,7 @@ export function parseMoney(cell: Cell, locale: NumberLocale): Money {
     sign = -1;
     return c;
   });
+  if (/^\d+(\.\d+)?e[+-]?\d+$/i.test(text)) return { value: sign * Number(text), currency: null };
   const m = MONEY.exec(text);
   if (!m) return { value: Number.NaN, currency: null };
   const code = (m[1] || m[3] || '').toUpperCase();

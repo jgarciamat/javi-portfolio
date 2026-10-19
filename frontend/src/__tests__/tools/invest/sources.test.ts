@@ -165,9 +165,10 @@ describe('information sheets of a report', () => {
     skipped: 0,
     header,
     headerRow: 0,
+    dataRows: 1,
   });
 
-  it('are not asked to be mapped when another sheet was recognised, and lose their header', () => {
+  it('are not asked to be mapped and lose their header; other unknown sheets are offered the mapping', () => {
     const out = withInfoSheets([
       reading('Customer Information', false, ['Nombre', 'Persona', 'ID']),
       reading('Trades', true),
@@ -176,7 +177,7 @@ describe('information sheets of a report', () => {
     expect(out.map((r) => [r.table, !!r.info, r.header])).toEqual([
       ['Customer Information', true, []],
       ['Trades', false, ['a', 'b', 'c']],
-      ['Otra', true, []],
+      ['Otra', false, ['a', 'b', 'c']],
     ]);
   });
 

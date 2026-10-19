@@ -68,7 +68,11 @@ export function OpsTable({
                 <td data-label={t(`${k}.date`)}>{date(op.date)}</td>
                 <td data-label={t(`${k}.platform`)}>{op.account}</td>
                 <td data-label={t(`${k}.kind`)}>
-                  {t(`tools.invest.kind.${op.kind}`)}
+                  {t(
+                    `tools.invest.kind.${
+                      op.note === 'fiatDeposit' || op.note === 'fiatWithdrawal' ? op.note : op.kind
+                    }`
+                  )}
                   {op.reward && ` (${t(`tools.invest.reward.${op.reward}`)})`}
                   {op.toAsset && ` → ${op.toAsset}`}
                 </td>

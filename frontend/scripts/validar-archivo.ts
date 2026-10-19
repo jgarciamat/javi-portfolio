@@ -61,7 +61,16 @@ async function main() {
     if (isQuantfury(lines)) {
       const ops = readQuantfury(lines);
       readings = [
-        { table: 'pdf', format: null, ops, skipped: 0, header: [], headerRow: 0, info: false },
+        {
+          table: 'pdf',
+          format: null,
+          ops,
+          skipped: 0,
+          header: [],
+          headerRow: 0,
+          info: false,
+          dataRows: ops.length,
+        },
       ];
       console.log('PDF reconocido: Quantfury, informe del historial de trading');
     } else if (isCertificate(lines)) certificate = readCertificate(lines);
@@ -76,7 +85,9 @@ async function main() {
     readings.flatMap((r) => r.ops),
     { year: rentaState.year, rates, withheldIn: withheldInOf() }
   );
-  console.log(reportLines(validationReport(readings, ledger, certificate)).join('\n'));
+  console.log(
+    reportLines(validationReport(readings, ledger, certificate, basename(path))).join('\n')
+  );
 }
 
 void main();

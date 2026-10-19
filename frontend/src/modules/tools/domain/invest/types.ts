@@ -103,6 +103,8 @@ export interface InvestOp {
   tx?: string;
   /** What a derivative is on (a CFD on shares or on a crypto pair). */
   underlying?: AssetClass;
+  /** The file does not give the fees (Binance's statement): the cost may be a little higher. */
+  feesMissing?: boolean;
 }
 
 /** Something the person has to look at before taking the figures to the Renta. */
@@ -130,6 +132,7 @@ export interface InvestWarning {
     | 'lostAssets'
     | 'switchEtf'
     | 'inferredPrice'
+    | 'noFees'
     | 'lossYears';
   asset?: string;
   opId?: string;

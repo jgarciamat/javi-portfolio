@@ -113,6 +113,8 @@ export interface FormatSpec {
   confirmed: string | null;
   /** Header names (normalised, exact or prefix) that all have to be in the header row. */
   signature: string[];
+  /** And at least one of these (a sheet whose date column has several names). */
+  anyOf?: string[];
   locale: NumberLocale;
   order: DateOrder;
   /** Header names of each field, the first one found wins; ">name" is the column after "name". */
@@ -128,6 +130,11 @@ export interface FormatSpec {
    * not understand (counted as skipped); undefined: read it the generic way.
    */
   row?: (r: RowReader, base: InvestOp, ctx: FormatContext) => InvestOp[] | null | undefined;
+  /**
+   * The name of the sheet it has to be on (a workbook with one sheet per kind of operation, as
+   * Binance's statement): with it, the header can be looser.
+   */
+  sheet?: RegExp;
   /** Something worked out from the whole table first (the address of a wallet...). */
   prepare?: (rows: RowReader[]) => FormatContext;
 }
@@ -160,7 +167,8 @@ export function indexOf(
 
 /** The format whose signature the header row has. */
 export function fits(header: string[], spec: FormatSpec): boolean {
-  return spec.signature.every((name) => header.some((h) => matches(h, name)));
+  const has = (name: string) => header.some((h) => matches(h, name));
+  return spec.signature.every(has) && (!spec.anyOf || spec.anyOf.some(has));
 }
 
 /** The meaning of a type word: the first rule that matches. */
@@ -411,15 +419,16 @@ export function readWith(
   spec: FormatSpec,
   rows: Cell[][],
   headerRow: number,
-  source: string
-): { ops: InvestOp[]; skipped: number } {
+  source: string,
+  table = ''
+): { ops: InvestOp[]; skipped: number; rows: number } {
   const header = rows[headerRow].map(norm);
   const index = indexOf(header, spec.columns);
   const body = rows
     .slice(headerRow + 1)
     .filter((cells) => cells.some((c) => c !== null && String(c).trim() !== ''));
   const readers = body.map((cells) => new RowReader(cells, index, header, spec.locale));
-  const ctx = spec.prepare?.(readers) ?? {};
+  const ctx = { table, ...spec.prepare?.(readers) };
   const ops: InvestOp[] = [];
   const legs: Leg[] = [];
   let skipped = 0;
@@ -446,5 +455,5 @@ export function readWith(
   const groups = new Map<string, Leg[]>();
   for (const leg of legs) groups.set(leg.group, [...(groups.get(leg.group) ?? []), leg]);
   for (const group of groups.values()) ops.push(...legsToOps(group));
-  return { ops, skipped };
+  return { ops, skipped, rows: body.length };
 }

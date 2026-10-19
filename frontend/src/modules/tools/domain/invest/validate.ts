@@ -11,6 +11,10 @@ import type { CertificateLine } from './pdfReports';
 export interface ValidationReport {
   tables: {
     n: number;
+    /** The sheet's name ("" for a file of one table: its name is the file's, which may be personal). */
+    sheet: string;
+    /** Rows with something under the header. */
+    rows: number;
     format: string | null;
     confirmed: boolean;
     operations: number;
@@ -35,7 +39,8 @@ const count = (keys: string[]) =>
 export function validationReport(
   readings: TableReading[],
   ledger: LedgerResult,
-  certificate: CertificateLine[] = []
+  certificate: CertificateLine[] = [],
+  file = ''
 ): ValidationReport {
   const years = new Map<number, { sections: Record<string, number>; direct: number }>();
   const yearOf = (date: string) => {
@@ -57,6 +62,8 @@ export function validationReport(
   return {
     tables: readings.map((r, i) => ({
       n: i + 1,
+      sheet: r.table === file ? '' : r.table.replace(`${file} · `, ''),
+      rows: r.dataRows,
       format: r.format ? `${r.format.platform} · ${r.format.file}` : null,
       confirmed: !!r.format?.confirmed,
       operations: r.ops.length,
@@ -93,13 +100,13 @@ export function reportLines(r: ValidationReport): string[] {
     '',
     ...r.tables.map(
       (t) =>
-        `Tabla ${t.n}: ${
+        `${t.sheet ? `Hoja «${t.sheet}»` : `Tabla ${t.n}`} → ${
           t.info
             ? 'hoja informativa, sin operaciones'
             : t.format
             ? `${t.format}${t.confirmed ? '' : ' (columnas por comprobar)'}`
             : `no reconocida; columnas: ${t.columns.join(' | ') || '—'}`
-        } · operaciones ${t.operations} · filas no entendidas ${t.skipped}`
+        } → ${t.operations} operaciones · filas ${t.rows} · no entendidas ${t.skipped}`
     ),
     '',
     `Operaciones: ${r.operations}`,

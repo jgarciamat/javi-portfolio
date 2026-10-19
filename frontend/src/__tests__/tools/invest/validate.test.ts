@@ -57,6 +57,8 @@ describe('the validation report', () => {
     expect(r.tables).toEqual([
       {
         n: 1,
+        sheet: 'Trades',
+        rows: 3,
         format: expect.stringContaining('Binance'),
         confirmed: false,
         operations: 2,
@@ -64,7 +66,17 @@ describe('the validation report', () => {
         info: false,
         columns: [],
       },
-      { n: 2, format: null, confirmed: false, operations: 0, skipped: 0, info: true, columns: [] },
+      {
+        n: 2,
+        sheet: 'Customer Information',
+        rows: 1,
+        format: null,
+        confirmed: false,
+        operations: 0,
+        skipped: 0,
+        info: true,
+        columns: [],
+      },
     ]);
     expect(r.byKind).toEqual({ buy: 1, sell: 1, realized: 1, reward: 1 });
     // 2025: 1,998 − 1,501.50 = 496.50 of crypto and the CFD −10; 2024: an airdrop of 4.
@@ -100,6 +112,8 @@ describe('the validation report', () => {
       ...r,
       tables: [{ ...r.tables[0], format: 'X · Y', confirmed: true }],
     }).join('\n');
-    expect(confirmed).toContain('Tabla 1: X · Y · operaciones');
+    expect(confirmed).toContain('Hoja «x» → X · Y → 0 operaciones');
+    const unnamed = reportLines({ ...r, tables: [{ ...r.tables[0], sheet: '' }] }).join('\n');
+    expect(unnamed).toContain('Tabla 1 → no reconocida');
   });
 });

@@ -418,6 +418,7 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
     once(warnings, { code: 'missingPrice', asset: op.asset, opId: op.id });
 
   for (const op of ops) {
+    if (op.feesMissing) once(warnings, { code: 'noFees', asset: op.account });
     const value = op.value ?? 0;
     const feeUnits = coinFee(op);
     if (feeUnits && feeUnits !== op.asset && feeUnits !== op.toAsset) {

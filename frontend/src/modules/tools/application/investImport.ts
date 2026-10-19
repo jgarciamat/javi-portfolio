@@ -38,7 +38,17 @@ export async function readInvestFile(file: File): Promise<FileReading> {
         const ops = readQuantfury(lines);
         return {
           ...empty,
-          readings: [{ table: name, format: QUANTFURY, ops, skipped: 0, header: [], headerRow: 0 }],
+          readings: [
+            {
+              table: name,
+              format: QUANTFURY,
+              ops,
+              skipped: 0,
+              header: [],
+              headerRow: 0,
+              dataRows: ops.length,
+            },
+          ],
         };
       }
       const certificate = isCertificate(lines) ? readCertificate(lines) : [];

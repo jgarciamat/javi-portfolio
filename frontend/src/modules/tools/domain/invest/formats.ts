@@ -1588,6 +1588,425 @@ export const SPANISH_ENTITIES = [
   'Inversis',
 ];
 
+// ─── Binance account statement (one workbook, one sheet per kind) ─────────────
+
+/**
+ * Binance's account statement in Excel: «Customer Information» and «Assets Overview» (left out as
+ * information: they hold the name, the id and the wallet addresses), then one sheet per kind of
+ * operation, each with its own header somewhere down the sheet. The sheet's name says what it is,
+ * in English or Spanish; the columns are the usual ones of each export (NO CONFIRMADO for every
+ * version of the statement: the person sees every row).
+ */
+const BINANCE_DOCS =
+  'https://www.binance.com/en/support/faq/how-to-generate-transaction-history-statement-e4ff64f2533f4d23a0b3f8f17f510eab';
+const DATE = ['date(utc)', 'date (utc)', 'time(utc)', 'utc_time', 'date', 'time', 'fecha', 'hora'];
+const failed = (r: import('./read').RowReader) =>
+  /cancel|fail|expir|reject|rechaz|anulad|pending|pendiente|processing/i.test(r.text('status'));
+
+/** Money paid in or taken out: no gain, but the origin of the funds (to check the purchases). */
+const fiatMove = (op: InvestOp, amount: number, out: boolean): InvestOp[] =>
+  one({
+    ...op,
+    kind: 'ignore',
+    asset: op.currency ?? 'EUR',
+    assetClass: 'fiat',
+    units: amount,
+    note: out ? 'fiatWithdrawal' : 'fiatDeposit',
+  });
+
+const binanceSheet = {
+  ...base,
+  platform: 'Binance',
+  category: 'crypto' as const,
+  docs: BINANCE_DOCS,
+  defaultClass: 'crypto' as const,
+};
+
+const binanceOrders: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-orders',
+  file: 'Informe de cuenta: hoja «Order History» o «Trade History»',
+  sheet: /order|trade|spot|[oó]rdenes|operaciones/i,
+  signature: ['pair'],
+  columns: {
+    date: DATE,
+    pair: ['pair', 'par', 'market', 'symbol', 'mercado'],
+    side: ['side', 'lado', 'type', 'tipo', 'direction'],
+    units: ['filled', 'executed', 'ejecutado', 'quantity', 'cantidad', 'order amount'],
+    amount: ['total', 'importe', 'amount'],
+    price: [
+      'avgtrading price',
+      'avg trading price',
+      'average price',
+      'precio medio',
+      'price',
+      'precio',
+      'order price',
+    ],
+    fee: ['fee', 'comision', 'commission'],
+    feeCurrency: ['fee coin', 'fee asset', 'fee currency', 'moneda de la comision'],
+    status: ['status', 'estado'],
+  },
+  // Cancelled or unfilled orders did not happen.
+  row: (r, op) => {
+    if (failed(r) || !op.units) return [];
+    const amount = parseMoney(r.cell('amount'), 'en');
+    const fee = parseMoney(r.cell('fee'), 'en');
+    const next = {
+      ...op,
+      amount: Number.isFinite(amount.value) && amount.value ? Math.abs(amount.value) : null,
+      feeCurrency: op.feeCurrency ?? fee.currency,
+    };
+    return pairTrade(false)(r, next);
+  },
+};
+
+const binanceConvert: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-convert',
+  file: 'Informe de cuenta: hoja «Convert», «OTC Trading» o «Dust» (conversiones)',
+  sheet: /convert|otc|dust|small asset|conversi|restos/i,
+  signature: [],
+  anyOf: DATE,
+  columns: {
+    date: DATE,
+    asset: ['from asset', 'from coin', 'sell coin', 'base asset', 'moneda origen', 'coin', 'asset'],
+    units: [
+      'sell',
+      'from amount',
+      'amount sold',
+      'sell amount',
+      'from',
+      'cantidad origen',
+      'amount',
+      'quantity',
+    ],
+    toAsset: ['to asset', 'to coin', 'buy coin', 'quote asset', 'moneda destino'],
+    toUnits: [
+      'buy',
+      'to amount',
+      'amount bought',
+      'buy amount',
+      'to',
+      'cantidad destino',
+      'converted bnb',
+      'bnb',
+    ],
+    fee: ['fee', 'service charge', 'comision'],
+    status: ['status', 'estado'],
+    pair: ['pair', 'par'],
+  },
+  // "0.01 BTC" in Sell and "300 USDT" in Buy, or the coins in columns of their own.
+  row: (r, op) => {
+    if (failed(r)) return [];
+    const from = parseMoney(r.cell('units'), 'en');
+    const to = parseMoney(r.cell('toUnits'), 'en');
+    const pair = splitPair(r.text('pair'));
+    const asset = cleanAsset(from.currency ?? (r.text('asset') || pair?.[0] || ''));
+    // A dust conversion gives BNB when the sheet does not say.
+    const toAsset = cleanAsset(to.currency ?? (r.text('toAsset') || pair?.[1] || 'BNB'));
+    if (!asset || !Number.isFinite(from.value) || !Number.isFinite(to.value)) return null;
+    return one(
+      fromTo({
+        ...op,
+        kind: 'swap',
+        asset,
+        assetClass: FIAT.has(asset) ? 'fiat' : 'crypto',
+        units: Math.abs(from.value),
+        toAsset,
+        toUnits: Math.abs(to.value),
+        amount: null,
+        currency: null,
+        feeCurrency: op.fee ? op.feeCurrency ?? toAsset : null,
+      })
+    );
+  },
+};
+
+const binanceTransfers: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-transfers',
+  file: 'Informe de cuenta: hojas «Deposit History» y «Withdrawal History» (cripto)',
+  sheet: /^(?!.*fiat).*(deposit|withdraw|dep[oó]sito|retirada|ingreso)/i,
+  signature: [],
+  anyOf: DATE,
+  columns: {
+    date: DATE,
+    asset: ['coin', 'asset', 'currency', 'moneda', 'token'],
+    units: ['amount', 'cantidad', 'quantity'],
+    fee: ['transaction fee', 'network fee', 'fee', 'comision'],
+    status: ['status', 'estado'],
+  },
+  // Between own wallets they are not taxed: the ledger pairs them with the other side.
+  row: (r, op, ctx) => {
+    if (failed(r) || !op.units || !op.asset) return [];
+    const out = /withdraw|retirada/i.test(ctx.table);
+    if (op.assetClass === 'fiat') return [];
+    return one({ ...op, kind: out ? 'transferOut' : 'transferIn', feeCurrency: op.asset });
+  },
+};
+
+const binanceFiat: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-fiat',
+  file: 'Informe de cuenta: hojas «Fiat Deposit/Withdrawal History» (euros, dólares…)',
+  sheet: /fiat/i,
+  signature: [],
+  anyOf: DATE,
+  columns: {
+    date: DATE,
+    currency: ['coin', 'currency', 'fiat', 'moneda'],
+    amount: ['indicated amount', 'amount', 'importe', 'cantidad'],
+    fee: ['fee', 'comision'],
+    status: ['status', 'estado'],
+  },
+  // Money in and out: no gain, but it is the origin of the funds (kept to check the purchases).
+  row: (r, op, ctx) => {
+    if (failed(r) || op.amount === null) return [];
+    const out = /withdraw|retirada/i.test(ctx.table);
+    return fiatMove(op, op.amount, out);
+  },
+};
+
+const binanceRewards: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-rewards',
+  file: 'Informe de cuenta: hojas de Earn, Staking, Savings, Launchpool, Airdrop, Referral o Cashback',
+  sheet:
+    /earn|staking|saving|launchpool|launchpad|airdrop|distribution|referral|cashback|reward|recompensa|interes|ahorro/i,
+  signature: [],
+  anyOf: DATE,
+  columns: {
+    date: DATE,
+    asset: ['coin', 'asset', 'token', 'reward coin', 'moneda'],
+    units: [
+      'amount',
+      'rewards amount',
+      'reward amount',
+      'interest',
+      'quantity',
+      'cantidad',
+      'importe',
+    ],
+    type: ['type', 'operation', 'product', 'remark', 'tipo'],
+    status: ['status', 'estado'],
+  },
+  row: (r, op, ctx) => {
+    if (failed(r) || !op.units || !op.asset) return [];
+    const word = norm(`${ctx.table} ${r.text('type')}`);
+    const reward = /staking|stake/.test(word)
+      ? 'staking'
+      : /airdrop|distribution/.test(word)
+      ? 'airdrop'
+      : /referral|commission/.test(word)
+      ? 'referral'
+      : /cashback/.test(word)
+      ? 'cashback'
+      : 'lending';
+    return one({ ...op, kind: 'reward', reward, amount: null, currency: null });
+  },
+};
+
+const binanceDerivatives: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-derivatives',
+  file: 'Informe de cuenta: hojas de Futures o Margin (resultado de cada operación)',
+  sheet: /futur|margin|margen|deriv/i,
+  signature: [],
+  anyOf: DATE,
+  columns: {
+    date: DATE,
+    asset: ['asset', 'coin', 'margin asset', 'moneda'],
+    pair: ['symbol', 'pair', 'par'],
+    amount: [
+      'realized profit',
+      'realized pnl',
+      'realised pnl',
+      'pnl',
+      'profit',
+      'beneficio realizado',
+      'amount',
+      'importe',
+    ],
+    type: ['type', 'tipo', 'income type'],
+    status: ['status', 'estado'],
+  },
+  // A leveraged result: realized profit, funding and commissions; borrowing and repaying are not.
+  row: (r, op) => {
+    const type = norm(r.text('type'));
+    if (
+      type &&
+      !/realized|realised|funding|commission|fee|interest|liquidation|insurance|pnl/.test(type)
+    )
+      return [];
+    const value = r.money('amount').value;
+    if (!Number.isFinite(value) || value === 0) return [];
+    const quote = splitPair(r.text('pair'))?.[1];
+    return one({
+      ...op,
+      kind: 'realized',
+      assetClass: 'derivative',
+      asset: r.text('pair') || op.asset,
+      underlying: 'crypto',
+      units: 0,
+      amount: Math.max(0, value),
+      cost: Math.max(0, -value),
+      acquired: op.date,
+      currency: r.text('asset') ? cleanAsset(r.text('asset')) : quote ? cleanAsset(quote) : 'USDT',
+    });
+  },
+};
+
+/**
+ * The sheets of Binance's statement with their exact headers (as the owner's file has them,
+ * checked 19-10-2026 with `npm run validar-archivo`, headers only). UserID, addresses, TXID and
+ * serial numbers are never read.
+ */
+const binanceTransfer = (out: boolean): FormatSpec => ({
+  ...binanceSheet,
+  id: out ? 'binance-withdrawals' : 'binance-deposits',
+  file: `Informe de cuenta: hoja «${out ? 'Withdrawal' : 'Deposit'} History» (cripto)`,
+  signature: [
+    'currency',
+    'amount',
+    'account type',
+    out ? 'destination address' : 'deposit address',
+  ],
+  columns: {
+    date: [out ? 'apply time' : 'create time', 'create time', 'time'],
+    asset: ['currency'],
+    units: ['amount'],
+    status: ['status'],
+  },
+  row: (r, op) => {
+    if (failed(r) || !op.units) return [];
+    return one({ ...op, kind: out ? 'transferOut' : 'transferIn', feeCurrency: op.asset });
+  },
+});
+
+const binanceFiatSheet = (out: boolean): FormatSpec => ({
+  ...binanceSheet,
+  id: out ? 'binance-fiat-withdrawals' : 'binance-fiat-deposits',
+  file: `Informe de cuenta: hoja «Fiat ${out ? 'Withdrawal' : 'Deposit'} History»`,
+  signature: [
+    'status',
+    'create time',
+    'amount',
+    'currency',
+    out ? 'withdraw channel' : 'golden channel',
+  ],
+  columns: {
+    date: ['create time'],
+    currency: ['currency'],
+    amount: ['amount'],
+    status: ['status'],
+  },
+  row: (r, op) => {
+    if (failed(r) || op.amount === null) return [];
+    return fiatMove(op, op.amount, out);
+  },
+});
+
+/** Market ID «BTCUSDT»: the coins from Amount Unit and Price Unit, or split against the quotes. */
+const binanceOrderHistory: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-order-history',
+  file: 'Informe de cuenta: hoja «Order History»',
+  signature: ['market id', 'trade qty', 'side', 'status'],
+  columns: {
+    date: ['time', 'update time'],
+    side: ['side'],
+    pair: ['market id'],
+    units: ['trade qty'],
+    price: ['average price', 'price'],
+    status: ['status'],
+    note: ['type'],
+  },
+  // Only what was traded counts (also what a cancelled order had filled). This report has no
+  // fees: the person is told the cost may be a little higher.
+  row: (r, op) => {
+    if (!op.units) return [];
+    const pair = splitPair(r.text('pair'));
+    const base = cleanAsset(String(r.byHeader('amount unit') ?? '') || pair?.[0] || '');
+    const quote = cleanAsset(String(r.byHeader('price unit') ?? '') || pair?.[1] || '');
+    if (!base || !quote) return null;
+    const buy = /buy/i.test(r.text('side'));
+    const amount = Math.round(op.units * Math.abs(r.num('price')) * 1e10) / 1e10;
+    const usdt = parseMoney(r.byHeader('usdt equivalent'), 'en').value;
+    const ref = Number.isFinite(usdt) && usdt ? { amount: Math.abs(usdt), currency: 'USDT' } : null;
+    const marked = { ...op, feesMissing: true, fee: 0, feeCurrency: null };
+    if (FIAT.has(quote))
+      return one({ ...marked, kind: buy ? 'buy' : 'sell', asset: base, amount, currency: quote });
+    return one({
+      ...marked,
+      kind: 'swap',
+      asset: buy ? quote : base,
+      units: buy ? amount : op.units,
+      toAsset: buy ? base : quote,
+      toUnits: buy ? op.units : amount,
+      assetClass: 'crypto',
+      toClass: 'crypto',
+      amount: ref?.amount ?? null,
+      currency: ref?.currency ?? null,
+    });
+  },
+};
+
+/**
+ * OTC Trading / Convert: what was paid (RequestAmountCoin, or BaseCoin) and what was received.
+ * With a card or money it is a purchase; between two coins, a swap valued by its USDT equivalent.
+ * Only completed orders count.
+ */
+const binanceOtc: FormatSpec = {
+  ...binanceSheet,
+  id: 'binance-otc',
+  file: 'Informe de cuenta: hoja «OTC Trading» / Convert',
+  signature: ['basecoin', 'quotecoin', 'basecoinamount', 'quotecoinamount'],
+  columns: {
+    date: ['createtime', 'usercompletedtime', 'updatetime'],
+    asset: ['basecoin'],
+    units: ['basecoinamount'],
+    toAsset: ['quotecoin'],
+    toUnits: ['quotecoinamount'],
+    status: ['userstatus'],
+  },
+  row: (r, op) => {
+    const statuses = norm(`${r.text('status')} ${String(r.byHeader('channelstatus') ?? '')}`);
+    const done =
+      /success|complet|finish|done/.test(statuses) ||
+      !!String(r.byHeader('usercompletedtime') ?? '');
+    if (/fail|cancel|expir|reject|refund|timeout/.test(statuses) || !done) return [];
+    const baseCoin = cleanAsset(r.text('asset'));
+    const quoteCoin = cleanAsset(r.text('toAsset'));
+    const paid = cleanAsset(String(r.byHeader('requestamountcoin') ?? '')) || baseCoin;
+    const [given, got] =
+      paid === quoteCoin
+        ? [
+            { asset: quoteCoin, units: Math.abs(r.num('toUnits')) },
+            { asset: baseCoin, units: op.units },
+          ]
+        : [
+            { asset: baseCoin, units: op.units },
+            { asset: quoteCoin, units: Math.abs(r.num('toUnits')) },
+          ];
+    const usdt = parseMoney(r.byHeader('usdt equivalent'), 'en').value;
+    return one(
+      fromTo({
+        ...op,
+        kind: 'swap',
+        asset: given.asset,
+        assetClass: FIAT.has(given.asset) ? 'fiat' : 'crypto',
+        units: given.units,
+        toAsset: got.asset,
+        toUnits: got.units,
+        amount: FIAT.has(given.asset) || FIAT.has(got.asset) ? null : Math.abs(usdt) || null,
+        currency: FIAT.has(given.asset) || FIAT.has(got.asset) ? null : 'USDT',
+        feesMissing: true,
+      })
+    );
+  },
+};
+
 /** Where the withholding of each format's dividends is paid, for the ledger. */
 export const withheldInOf = (): Record<string, 'origin' | 'spain'> =>
   Object.fromEntries(
@@ -1641,4 +2060,17 @@ export const FORMATS: FormatSpec[] = [
   schwab,
   fidelity,
   spanishFunds('es-funds', 'Fondos y valores (entidad española)'),
+  binanceTransfer(false),
+  binanceTransfer(true),
+  binanceFiatSheet(false),
+  binanceFiatSheet(true),
+  binanceOrderHistory,
+  binanceOtc,
+  // The sheets of a workbook, last: a known export of any platform comes first.
+  binanceFiat,
+  binanceTransfers,
+  binanceDerivatives,
+  binanceRewards,
+  binanceConvert,
+  binanceOrders,
 ];

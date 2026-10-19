@@ -20,6 +20,7 @@ describe('numbers and money as files write them', () => {
     expect(toNumber('15000', 'en')).toBe(15000);
     expect(toNumber("1'234.5", 'en')).toBe(1234.5);
     expect(toNumber('abc', 'en')).toBeNaN();
+    expect(toNumber('5.19399e17', 'en')).toBe(5.19399e17);
   });
 
   it('takes the currency written before or after the number, and the sign', () => {
@@ -33,6 +34,8 @@ describe('numbers and money as files write them', () => {
     expect(parseMoney('(45,10)', 'es')).toEqual({ value: -45.1, currency: null });
     expect(parseMoney('£3', 'en').currency).toBe('GBP');
     expect(parseMoney(7, 'en')).toEqual({ value: 7, currency: null });
+    expect(parseMoney('5.19399e17', 'en')).toEqual({ value: 5.19399e17, currency: null });
+    expect(parseMoney('-1e3', 'en')).toEqual({ value: -1000, currency: null });
     expect(parseMoney(null, 'en').value).toBeNaN();
     expect(parseMoney('12 34 X', 'en').value).toBeNaN();
     expect(amountOf('n/a', 'en')).toBe(0);

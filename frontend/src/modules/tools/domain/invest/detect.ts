@@ -12,6 +12,8 @@ export interface TableReading {
   /** The header row when no format was recognised (for the guided mapping). */
   header: string[];
   headerRow: number;
+  /** Rows with something under the header (0: an empty sheet, or one with only its header). */
+  dataRows: number;
   /**
    * A sheet with no operations (customer data, summary, instructions): it is not shown nor kept,
    * and the mapping is not asked for it.
@@ -21,17 +23,17 @@ export interface TableReading {
 
 /** Names of the sheets of a report that hold no operations (NO CONFIRMADO for each platform). */
 const INFO_SHEET =
-  /customer|client|cliente|information|informaci[oó]n|summary|resumen|instruc|disclaimer|aviso|readme|cover|portada|glossary|glosario|overview|notes|notas|legal/i;
+  /customer|assets? overview|balance|saldo|client|cliente|information|informaci[oó]n|summary|resumen|instruc|disclaimer|aviso|readme|cover|portada|glossary|glosario|overview|notes|notas|legal/i;
 
 /**
- * The readings of a file, with its unknown tables marked as informative when another table of the
- * same file was recognised or when they look like one; their header is dropped (it may hold the
- * name or the id of the customer).
+ * The readings of a file, with its unknown tables marked as informative when they look like one
+ * (customer data, balances, a summary), have no rows or under three columns; their header is
+ * dropped (it may hold the name or the id of the customer). Any other unknown sheet with data is
+ * offered the guided mapping, on its own.
  */
 export function withInfoSheets(readings: TableReading[]): TableReading[] {
-  const recognised = readings.some((r) => r.format);
   return readings.map((r) =>
-    !r.format && (recognised || INFO_SHEET.test(r.table) || r.header.length < 3)
+    !r.format && (INFO_SHEET.test(r.table) || r.header.length < 3 || r.dataRows === 0)
       ? { ...r, info: true, header: [] }
       : r
   );
@@ -86,22 +88,28 @@ export function jsonTables(name: string, text: string): Table[] {
   });
 }
 
+/** A format of a workbook's sheet: never for a whole file (a CSV is named after its file). */
+const ofSheet = (re: RegExp, name: string) =>
+  !/\.(csv|txt|json|xlsx?|xlsm|pdf)\b/i.test(name) && re.test(name);
+
 /** Rows that start another known header (a report with several blocks one under another). */
-function blocks(rows: Cell[][]): { start: number; spec: FormatSpec }[] {
+function blocks(rows: Cell[][], sheet: string): { start: number; spec: FormatSpec }[] {
   const found: { start: number; spec: FormatSpec }[] = [];
   rows.forEach((row, i) => {
     const header = row.map(norm);
-    const spec = FORMATS.find((s) => fits(header, s));
+    const spec = FORMATS.find((s) => (!s.sheet || ofSheet(s.sheet, sheet)) && fits(header, s));
     if (spec) found.push({ start: i, spec });
   });
   return found;
 }
 
+const hasData = (row: Cell[]) => row.some((c) => c !== null && String(c).trim() !== '');
+
 /** Reads every table of a file with the formats it fits. */
 export function readTables(tables: Table[], source: string): TableReading[] {
   const out: TableReading[] = [];
   for (const table of tables.flatMap(splitSections)) {
-    const found = blocks(table.rows);
+    const found = blocks(table.rows, table.name);
     if (found.length === 0) {
       const headerRow = guessHeader(table.rows);
       out.push({
@@ -111,14 +119,23 @@ export function readTables(tables: Table[], source: string): TableReading[] {
         skipped: 0,
         header: (table.rows[headerRow] ?? []).map((c) => String(c ?? '')),
         headerRow,
+        dataRows: table.rows.slice(headerRow + 1).filter(hasData).length,
       });
       continue;
     }
     found.forEach(({ start, spec }, i) => {
       const end = found[i + 1]?.start ?? table.rows.length;
       const rows = table.rows.slice(0, end);
-      const { ops, skipped } = readWith(spec, rows, start, `${source}:${table.name}`);
-      out.push({ table: table.name, format: spec, ops, skipped, header: [], headerRow: start });
+      const read = readWith(spec, rows, start, `${source}:${table.name}`, table.name);
+      out.push({
+        table: table.name,
+        format: spec,
+        ops: read.ops,
+        skipped: read.skipped,
+        header: [],
+        headerRow: start,
+        dataRows: read.rows,
+      });
     });
   }
   return out;

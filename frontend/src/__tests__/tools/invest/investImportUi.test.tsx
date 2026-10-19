@@ -425,6 +425,46 @@ describe('taking a file out, and the pages of the table', () => {
   });
 });
 
+describe('money paid in and taken out', () => {
+  it('is named as such in the table of operations', async () => {
+    const { OpsTable } = await import('@modules/tools/ui/renta/invest/InvestTables');
+    const base = {
+      id: 'f1',
+      format: 'binance-fiat-deposits',
+      account: 'Binance',
+      date: '2025-01-02',
+      at: '2025-01-02T00:00:00',
+      kind: 'ignore' as const,
+      asset: 'EUR',
+      assetClass: 'fiat' as const,
+      units: 10,
+      amount: 10,
+      currency: 'EUR',
+      eur: 10,
+      fee: 0,
+      feeCurrency: null,
+      value: 10,
+      feeEur: 0,
+    };
+    renderWithProviders(
+      <OpsTable
+        ops={[
+          { ...base, note: 'fiatDeposit' },
+          { ...base, id: 'f2', note: 'fiatWithdrawal' },
+          { ...base, id: 'f3' },
+        ]}
+        edits={{}}
+        onEdit={jest.fn()}
+        resetKey=""
+      />,
+      { authenticated: false }
+    );
+    expect(screen.getByText(tr(`${k}.kind.fiatDeposit`))).toBeInTheDocument();
+    expect(screen.getByText(tr(`${k}.kind.fiatWithdrawal`))).toBeInTheDocument();
+    expect(screen.getByText(tr(`${k}.kind.ignore`))).toBeInTheDocument();
+  });
+});
+
 describe('the guide from the draft reviewer', () => {
   it('lists every step with its sources, without any "not confirmed" label', () => {
     renderWithProviders(<InvestGuide />);
