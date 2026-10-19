@@ -28,6 +28,8 @@ export interface ImportedInvoice extends BookEntry {
   review?: string[];
   /** Fields the PDF did not give: the invoice stays out of the draft until they are filled in. */
   missing?: Missing[];
+  /** The person corrected what it is for VAT: importing the book again keeps it. */
+  opFix?: boolean;
 }
 
 /** What is still to check of an invoice read from a PDF (none for the others). */
@@ -38,7 +40,18 @@ export const needsCheck = (i: ImportedInvoice) => reviewOf(i).length > 0 || miss
 
 /** What the person can correct in an imported invoice. */
 export type InvoicePatch = Partial<
-  Pick<ImportedInvoice, 'kind' | 'excluded' | 'retentionFix' | 'withholding' | 'review'>
+  Pick<
+    ImportedInvoice,
+    | 'kind'
+    | 'excluded'
+    | 'retentionFix'
+    | 'withholding'
+    | 'review'
+    | 'op'
+    | 'vatId'
+    | 'key349'
+    | 'opFix'
+  >
 >;
 
 /** Supplier (normalised) → the kind the person chose for it, for the next imports. */
@@ -98,12 +111,21 @@ export function toInvoices(
       book,
       kind,
       excluded: old?.excluded ?? false,
-      // The corrections of the withholding stay too.
+      // The corrections of the withholding stay too, and those of the VAT.
       ...(old?.retentionFix !== undefined ? { retentionFix: old.retentionFix } : {}),
       ...(old?.withholding ? { withholding: old.withholding } : {}),
+      ...(old?.opFix ? vatFixOf(old) : {}),
     };
   });
 }
+
+/** What the person corrected of the VAT of an invoice, to keep it on a new import. */
+const vatFixOf = (old: ImportedInvoice): Partial<ImportedInvoice> => ({
+  opFix: true,
+  op: old.op,
+  ...(old.vatId ? { vatId: old.vatId } : {}),
+  ...(old.key349 ? { key349: old.key349 } : {}),
+});
 
 /**
  * The invoices with a newly imported book: its quarters are replaced (as the form's are), the other

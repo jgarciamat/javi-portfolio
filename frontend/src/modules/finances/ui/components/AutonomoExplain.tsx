@@ -28,6 +28,8 @@ function vatSentence(t: Translate, money: Money, vat: AutonomoDraft['vat']): str
       return t(key('noActivity'));
     case 'offset':
       return t(key('offset'), { due, accrued, deductible });
+    case 'refund':
+      return t(key('refund'), { due, accrued, deductible });
     case 'zero':
       return applied > 0
         ? t(key('zeroApplied'), { before, applied: money(applied) })

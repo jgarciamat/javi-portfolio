@@ -24,6 +24,8 @@ import { StepBar, StepSection, goToStep, useCurrentStep, type Step } from './Aut
 import { AutonomoSummary, summarize } from './AutonomoSummary';
 import { AutonomoCloudPanel } from './AutonomoCloud';
 import { WithholdingsPanel } from './AutonomoWithholdings';
+import { VatYearPanel } from './AutonomoVatYear';
+import { toVatOptions, vatExtrasOf } from './vatForm';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
 import type { KindPreferences } from '../../domain/invoiceLedger';
@@ -69,7 +71,9 @@ function buildInputs(manual: ManualForm, extras: Extras, quarter: Quarter): Auto
     hardToJustify: extras.hardToJustify,
     priorYearNet: extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet),
     exempt130: extras.exempt,
-    vatToOffset: number(extras.toOffset),
+    // The VAT left to offset is the one at the start of the year: the quarters carry it on.
+    vatToOffset: 0,
+    vat: toVatOptions(extras.vat, number(extras.toOffset), manual.filed303 ?? []),
     manual: toManualData(manual),
     prior:
       manual.prior.on && quarter > 1
@@ -129,9 +133,11 @@ function PeriodPicker({
 /** Hard-to-justify expenses, the 130 exemption, last year's net and the VAT to offset. */
 function ExtrasPanel({
   extras,
+  quarter,
   onChange,
 }: {
   extras: Extras;
+  quarter: Quarter;
   onChange: (patch: Partial<Extras>) => void;
 }) {
   const { t } = useI18n();
@@ -178,9 +184,23 @@ function ExtrasPanel({
           <small className="autonomo-hint">{t('app.autonomo.toOffsetHint')}</small>
         </label>
       </div>
+      <VatYearPanel value={extras.vat} quarter={quarter} onChange={(vat) => onChange({ vat })} />
     </section>
   );
 }
+
+/** What the 390 of last year hands to this one: the VAT to offset and the provisional prorrata. */
+const withCarry = (
+  extras: Extras,
+  carry: { toOffset: string; provisional: string | null }
+): Extras => ({
+  ...extras,
+  toOffset: carry.toOffset,
+  vat: {
+    ...vatExtrasOf(extras.vat),
+    ...(carry.provisional !== null ? { provisional: carry.provisional } : {}),
+  },
+});
 
 /** An invoice in the review (null: the review itself), from a warning or from an imported file. */
 const nextFocus =
@@ -233,6 +253,50 @@ function useStoredExtras() {
     setExtras(next);
   };
   return [extras, changeExtras] as const;
+}
+
+/** Prepare the draft, or the plans when the free plan cannot prepare this one. */
+function PrepareGate({
+  access: { limit, locked, otherQuarter },
+  pending,
+  onPrepare,
+}: {
+  access: ReturnType<typeof quarterDraftAccess>;
+  pending: boolean;
+  onPrepare: () => void;
+}) {
+  const { t } = useI18n();
+  const plan = useOptionalPlan();
+  if (otherQuarter) {
+    return (
+      <PremiumGate>
+        <p className="section-hint">{t('app.autonomo.otherQuarterLocked')}</p>
+        <button
+          className="btn-primary"
+          onClick={() => plan!.openUpgrade({ kind: 'limit', resource: 'autonomoDrafts', limit: 1 })}
+        >
+          {t('app.autonomo.goPremium')}
+        </button>
+      </PremiumGate>
+    );
+  }
+  if (locked) {
+    return (
+      <UsedFreeGate
+        text={t('app.autonomo.usedFree')}
+        resource="autonomoDrafts"
+        limit={limit as number}
+      />
+    );
+  }
+  return (
+    <div className="button-row">
+      <button className="btn-primary" disabled={pending} onClick={onPrepare}>
+        {pending ? t('app.autonomo.preparing') : t('app.autonomo.prepare')}
+      </button>
+      {limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>}
+    </div>
+  );
 }
 
 /**
@@ -349,44 +413,25 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           />
         }
         extras={
-          <ExtrasPanel extras={extras} onChange={(patch) => setExtras({ ...extras, ...patch })} />
+          <ExtrasPanel
+            extras={extras}
+            quarter={quarter}
+            onChange={(patch) => setExtras({ ...extras, ...patch })}
+          />
         }
+        vatExtras={extras.vat}
+        onCarry={(carry) => setExtras(withCarry(extras, carry))}
       />
 
       <StepSection step="result">
         <PeriodPicker year={year} quarter={quarter} onYear={setYear} onQuarter={setQuarter} />
         {action.error && <p className="form-error">{action.error}</p>}
 
-        {otherQuarter ? (
-          <PremiumGate>
-            <p className="section-hint">{t('app.autonomo.otherQuarterLocked')}</p>
-            <button
-              className="btn-primary"
-              onClick={() =>
-                plan!.openUpgrade({ kind: 'limit', resource: 'autonomoDrafts', limit: 1 })
-              }
-            >
-              {t('app.autonomo.goPremium')}
-            </button>
-          </PremiumGate>
-        ) : locked ? (
-          <UsedFreeGate
-            text={t('app.autonomo.usedFree')}
-            resource="autonomoDrafts"
-            limit={limit as number}
-          />
-        ) : (
-          <div className="button-row">
-            <button
-              className="btn-primary"
-              disabled={action.pending}
-              onClick={() => void prepare()}
-            >
-              {action.pending ? t('app.autonomo.preparing') : t('app.autonomo.prepare')}
-            </button>
-            {limit === 1 && <small className="section-hint">{t('app.autonomo.freeOne')}</small>}
-          </div>
-        )}
+        <PrepareGate
+          access={{ limit, locked, otherQuarter }}
+          pending={action.pending}
+          onPrepare={() => void prepare()}
+        />
 
         {snapshot && (
           <>

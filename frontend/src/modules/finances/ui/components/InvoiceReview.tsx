@@ -27,6 +27,7 @@ import {
 import { applyChanged, KIND_PREFERENCES_KEY } from './importForm';
 import { bringIntoView } from './bringIntoView';
 import { RetentionCell } from './InvoiceRetention';
+import { VatOpCell } from './InvoiceVatCell';
 import type { ManualForm } from './AutonomoManual';
 
 /** An invoice to show: `n` changes on every request, so asking twice for the same one works. */
@@ -85,6 +86,7 @@ function BookTable({
   onExcluded,
   onApplyOffer,
   onRetention,
+  onVat,
   pdf,
 }: {
   book: BookKind;
@@ -96,6 +98,8 @@ function BookTable({
   onApplyOffer: (offer: Offer) => void;
   /** Corrects the withholding of a received invoice (modelos 111 and 115). */
   onRetention: (invoice: ImportedInvoice, patch: InvoicePatch) => void;
+  /** Corrects what the invoice is for VAT, and the VAT number of an intra-EU one. */
+  onVat: (invoice: ImportedInvoice, patch: InvoicePatch) => void;
   pdf: PdfHandlers;
 }) {
   const { t } = useI18n();
@@ -112,6 +116,7 @@ function BookTable({
     'total',
     received ? 'kind' : 'withheld',
     ...(received ? ['retention'] : []),
+    'op',
     ...pdfColumn(invoices),
   ];
   const label = (key: string) => t(`app.autonomo.review.col.${key}`);
@@ -191,6 +196,7 @@ function BookTable({
                   </td>
                 )}
                 {received && <RetentionCell invoice={i} name={name} onChange={onRetention} />}
+                <VatOpCell invoice={i} name={name} onChange={onVat} />
                 <PdfFixCell columns={head} invoice={i} name={name} pdf={pdf} />
               </tr>
             );
@@ -353,6 +359,7 @@ export function InvoiceReview({
                 }}
                 onApplyOffer={applyOffer}
                 onRetention={(i, patch) => onChange(withChange(form, [i.id], patch))}
+                onVat={(i, patch) => onChange(withChange(form, [i.id], patch))}
                 pdf={pdf}
               />
             </div>

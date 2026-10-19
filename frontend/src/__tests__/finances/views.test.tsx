@@ -835,7 +835,9 @@ describe('the self-employed draft', () => {
         hardToJustify: true,
         priorYearNet: 9500,
         exempt130: true,
-        vatToOffset: 40,
+        // What was left to offset at the start of the year: the quarters carry it on.
+        vatToOffset: 0,
+        vat: { offsetStart: 40 },
         prior: null,
         manual: {
           profile: {

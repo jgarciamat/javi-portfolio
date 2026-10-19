@@ -100,7 +100,7 @@ describe('Importing a filed modelo 130 or 303 from the same place', () => {
       ok({
         model: '303',
         quarter: 2,
-        boxes: { '04': 1000, '07': 5000, '28': 725, '29': 146.2, '12': 3 },
+        boxes: { '04': 1000, '07': 5000, '28': 725, '29': 146.2, '44': 3 },
       })
     );
     expect(await screen.findByRole('status')).toHaveTextContent(
@@ -116,7 +116,7 @@ describe('Importing a filed modelo 130 or 303 from the same place', () => {
     expect(screen.getByText(tr('app.autonomo.model.note.expense'))).toBeInTheDocument();
     expect(screen.getByText(tr('app.autonomo.model.note.rate'))).toBeInTheDocument();
     expect(
-      screen.getByText(tr('app.autonomo.model.note.ignored', { boxes: '12' }))
+      screen.getByText(tr('app.autonomo.model.note.ignored', { boxes: '44' }))
     ).toBeInTheDocument();
     // The other quarters are left alone.
     expect(latest.quarters[0].income.r21).toBe('');

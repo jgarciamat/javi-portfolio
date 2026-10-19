@@ -1,5 +1,15 @@
 import { parseBookDate } from './excelDates';
-import type { ExpenseKind, VatRate } from './types';
+import type { ExpenseKind, Key349, PurchaseOp, SaleOp, VatRate } from './types';
+import {
+  cashOf,
+  investmentOf,
+  isEuVatId,
+  key349Of,
+  normalVatId,
+  purchaseOpOf,
+  saleOpOf,
+  type VatCells,
+} from './vatBook';
 
 /**
  * Invoice books (issued and received) kept in a spreadsheet: the AEAT-style layout that gestorías and
@@ -32,6 +42,17 @@ export interface BookEntry {
   concept: string;
   /** The quarter a «Periodo/Trimestre» column says it belongs to (only when the book has one). */
   period?: 1 | 2 | 3 | 4 | null;
+  /** What it is for VAT, when it is not a plain domestic operation (see vatBook.ts). */
+  op?: SaleOp | PurchaseOp;
+  /** An investment good (received book, «Bien de inversión»). */
+  investment?: boolean;
+  /** The VAT number of the other party of an intra-EU operation, and its key of the 349. */
+  vatId?: string;
+  key349?: Key349;
+  /** Under cash accounting (key 07): the VAT is due when collected or paid. */
+  cash?: boolean;
+  /** The book gave no VAT rate for a purchase that self-assesses it: 21 % was assumed. */
+  rateGuessed?: boolean;
 }
 
 /** Rows that did not make it into the result, and why. */
@@ -96,6 +117,19 @@ interface Columns {
   concept: number;
   period: number;
   nif: number;
+  key: number;
+  qualification: number;
+  exempt: number;
+  reRate: number;
+  reFee: number;
+  investment: number;
+  reverse: number;
+  invoiceType: number;
+  opType: number;
+  key349: number;
+  vatId: number;
+  country: number;
+  idNumber: number;
 }
 
 type Matcher = { include: RegExp[]; exclude?: RegExp };
@@ -159,8 +193,22 @@ const MATCHERS: Record<keyof Columns, Matcher[]> = {
     },
     { include: [/concepto/] },
   ],
-  period: [{ include: [/trimestre/, /periodo/], exclude: /fecha|ejercicio/ }],
-  nif: [{ include: [/\bnif\b/, /\bcif\b/, /\bn\.i\.f\b/] }],
+  period: [{ include: [/trimestre/, /periodo/], exclude: /fecha|ejercicio|deduccion/ }],
+  nif: [{ include: [/\bnif\b/, /\bcif\b/, /\bn\.i\.f\b/], exclude: /iva|vat|intracom/ }],
+  // The VAT columns of the AEAT layout of the books [vatBook.ts] and of the app's template.
+  key: [{ include: [/clave (de )?operacion/], exclude: /349|intracom/ }],
+  qualification: [{ include: [/calificacion/] }],
+  exempt: [{ include: [/operacion exenta/, /causa (de )?exencion/] }],
+  reRate: [{ include: [/tipo (de )?recargo/] }],
+  reFee: [{ include: [/cuota recargo/] }],
+  investment: [{ include: [/bien(es)? de inversion/] }],
+  reverse: [{ include: [/inversion del sujeto pasivo/] }],
+  invoiceType: [{ include: [/tipo (de )?factura/] }],
+  opType: [{ include: [/tipo (de )?operacion/] }],
+  key349: [{ include: [/clave 349/, /clave (operacion )?intracomunitaria/] }],
+  vatId: [{ include: [/nif.?iva/, /vat (id|number)/, /nif intracomunitario/] }],
+  country: [{ include: [/codigo pais/] }],
+  idNumber: [{ include: [/^identificacion$/] }],
 };
 
 function pick(headers: string[], matchers: Matcher[]): number {
@@ -294,7 +342,9 @@ function entryOf(
   if (Number.isNaN(base) && Number.isFinite(totalRaw) && Number.isFinite(vatRaw))
     base = totalRaw - vatRaw;
   if (Number.isNaN(base)) return 'amount';
-  const vatRate = rateOf(bookNumber(at(col.rate)), base, vatRaw);
+  const concept = String(at(col.concept) ?? '').trim();
+  const vatInfo = vatOf(row, col, kind, concept);
+  const { vatRate, guessed } = rateFor(bookNumber(at(col.rate)), base, vatRaw, kind, vatInfo);
   if (vatRate === null) return 'rate';
   const vat = Number.isFinite(vatRaw) ? round2(vatRaw) : round2((base * vatRate) / 100);
   const month = Number(date.slice(5, 7));
@@ -306,8 +356,82 @@ function entryOf(
     vat,
     total: round2(base + vat),
     ...withholdingsOf(row, col, kind, base),
-    concept: String(at(col.concept) ?? '').trim(),
+    concept,
     ...periodOf(row, col),
+    ...vatInfo,
+    ...guessed,
+  };
+}
+
+/**
+ * The VAT rate of a row. An operation without Spanish VAT may come with no rate: an exempt sale is at
+ * 0 %, and a purchase that self-assesses its VAT is taken at 21 %, to check.
+ */
+function rateFor(
+  raw: number,
+  base: number,
+  vat: number,
+  kind: BookKind,
+  info: Pick<BookEntry, 'op'>
+): { vatRate: VatRate | null; guessed: Pick<BookEntry, 'rateGuessed'> } {
+  const rate = rateOf(raw, base, vat);
+  if (rate !== null || !Number.isNaN(raw) || Number.isFinite(vat) || !info.op) {
+    return { vatRate: rate, guessed: {} };
+  }
+  return kind === 'received'
+    ? { vatRate: 21, guessed: { rateGuessed: true } }
+    : { vatRate: 0, guessed: {} };
+}
+
+/** Services that a business of another member state usually bills (the rest are goods). */
+const SERVICE_KINDS: ExpenseKind[] = ['software', 'advertising', 'management', 'training'];
+
+/** What the VAT columns of a row say: only the fields that are not the plain domestic case. */
+function vatOf(
+  row: BookCell[],
+  col: Columns,
+  kind: BookKind,
+  concept: string
+): Pick<BookEntry, 'op' | 'investment' | 'vatId' | 'key349' | 'cash'> {
+  const cells = cellsOf(row, col, kind);
+  const services = /servicio/.test(cells.free) || SERVICE_KINDS.includes(guessExpenseKind(concept));
+  const op = kind === 'issued' ? saleOpOf(cells) : purchaseOpOf(cells, services);
+  const key349 = key349Of(cells, op, services);
+  return {
+    ...(op !== 'domestic' ? { op } : {}),
+    ...(kind === 'received' && investmentOf(cells) ? { investment: true } : {}),
+    ...(cells.vatId ? { vatId: cells.vatId } : {}),
+    ...(key349 ? { key349 } : {}),
+    ...(cashOf(cells) ? { cash: true } : {}),
+  };
+}
+
+/** The VAT number of the other party: its own column, the country and number apart, or the NIF. */
+function vatIdOf(raw: (index: number) => string, col: Columns): string {
+  const own = raw(col.vatId) || `${raw(col.country)}${raw(col.idNumber)}`;
+  const fallback = raw(col.nif);
+  return normalVatId(isEuVatId(own) ? own : isEuVatId(fallback) ? fallback : '');
+}
+
+/** The VAT columns of a row as text. */
+function cellsOf(row: BookCell[], col: Columns, kind: BookKind): VatCells {
+  const at = (index: number): string => (index >= 0 ? norm(row[index]) : '');
+  const raw = (index: number): string => (index >= 0 ? String(row[index] ?? '').trim() : '');
+  const positive = (index: number) => {
+    const n = bookNumber(index >= 0 ? row[index] : undefined);
+    return Number.isFinite(n) && n > 0;
+  };
+  return {
+    key: at(col.key),
+    qualification: at(col.qualification),
+    exempt: at(col.exempt),
+    reverse: at(col.reverse),
+    investment: at(col.investment),
+    invoiceType: at(col.invoiceType),
+    free: at(col.opType),
+    key349: raw(col.key349),
+    surcharge: kind === 'issued' && (positive(col.reFee) || positive(col.reRate)),
+    vatId: vatIdOf(raw, col),
   };
 }
 
@@ -415,16 +539,25 @@ export interface QuarterIncome {
   withheld: number;
 }
 
-/** Income base by VAT rate and withholdings, for each quarter that has invoices. */
+/** A sale with Spanish VAT (to anyone, a retailer in the surcharge too): it goes by its rate. */
+export const isTaxedSale = (e: Pick<BookEntry, 'op'>): boolean =>
+  e.op === undefined || e.op === 'domestic' || e.op === 're';
+
+/**
+ * Income base by VAT rate and withholdings, for each quarter that has invoices. The sales without
+ * Spanish VAT (intra-EU, exports…) are not here: they go to their own box of the 303 (vatOfBook).
+ */
 export function incomeByQuarter(
   entries: BookEntry[]
 ): Partial<Record<1 | 2 | 3 | 4, QuarterIncome>> {
   const out: Partial<Record<1 | 2 | 3 | 4, QuarterIncome>> = {};
   for (const e of entries) {
     const q = (out[e.quarter] ??= { r21: 0, r10: 0, r4: 0, r0: 0, withheld: 0 });
-    q[`r${e.vatRate}` as 'r21' | 'r10' | 'r4' | 'r0'] = round2(
-      q[`r${e.vatRate}` as 'r21' | 'r10' | 'r4' | 'r0'] + e.base
-    );
+    if (isTaxedSale(e)) {
+      q[`r${e.vatRate}` as 'r21' | 'r10' | 'r4' | 'r0'] = round2(
+        q[`r${e.vatRate}` as 'r21' | 'r10' | 'r4' | 'r0'] + e.base
+      );
+    }
     q.withheld = round2(q.withheld + e.withheld);
   }
   return out;
@@ -464,13 +597,19 @@ export function guessExpenseKind(concept: string): ExpenseKind {
 
 export interface ExpenseLineData {
   kind: ExpenseKind;
-  /** With VAT included, as the draft asks for it. */
+  /** With VAT included, as the draft asks for it; the base when the invoice has no Spanish VAT. */
   amount: number;
   vatRate: VatRate;
   days: number | null;
+  /** What the purchase is for VAT and whether it is an investment good (absent: domestic, no). */
+  op?: PurchaseOp;
+  investment?: boolean;
 }
 
-/** Expense lines per quarter: invoices of the same kind and VAT rate are added up, meals stay one each. */
+/**
+ * Expense lines per quarter: invoices of the same kind, VAT rate and operation are added up, meals
+ * stay one each. An intra-EU purchase, a reverse charge or an import counts its base.
+ */
 export function expensesByQuarter<E extends BookEntry>(
   entries: E[],
   kindOf: (entry: E) => ExpenseKind = (e) => guessExpenseKind(e.concept)
@@ -479,11 +618,29 @@ export function expensesByQuarter<E extends BookEntry>(
   for (const e of entries) {
     const lines = (out[e.quarter] ??= []);
     const kind = kindOf(e);
+    const op = (e.op ?? 'domestic') as PurchaseOp;
+    const investment = Boolean(e.investment);
+    const amount = op === 'domestic' ? e.total : e.base;
     const same =
-      kind === 'meals' ? undefined : lines.find((l) => l.kind === kind && l.vatRate === e.vatRate);
-    if (same) same.amount = round2(same.amount + e.total);
+      kind === 'meals'
+        ? undefined
+        : lines.find(
+            (l) =>
+              l.kind === kind &&
+              l.vatRate === e.vatRate &&
+              (l.op ?? 'domestic') === op &&
+              Boolean(l.investment) === investment
+          );
+    if (same) same.amount = round2(same.amount + amount);
     else
-      lines.push({ kind, amount: e.total, vatRate: e.vatRate, days: kind === 'meals' ? 1 : null });
+      lines.push({
+        kind,
+        amount,
+        vatRate: e.vatRate,
+        days: kind === 'meals' ? 1 : null,
+        ...(op !== 'domestic' ? { op } : {}),
+        ...(investment ? { investment } : {}),
+      });
   }
   return out;
 }

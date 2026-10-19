@@ -93,6 +93,8 @@ describe('One place to import invoice books', () => {
       '/plantillas/facturas-recibidas.xlsx',
       '/plantillas/modelo-130-plantilla.pdf',
       '/plantillas/modelo-303-plantilla.pdf',
+      '/plantillas/modelo-349-plantilla.pdf',
+      '/plantillas/modelo-390-plantilla.pdf',
       '/plantillas/modelo-111-plantilla.pdf',
       '/plantillas/modelo-115-plantilla.pdf',
     ]);
@@ -209,7 +211,7 @@ describe('One place to import invoice books', () => {
     ]);
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.import.are.issued') }));
     await waitFor(() => expect(latest.quarters[0].income.r21).toBe('100'));
-    expect(screen.queryByRole('group')).toBeNull();
+    expect(screen.queryByRole('group', { name: /libro\.csv|otro\.csv/ })).toBeNull();
   });
 
   it('uses the name of the file when the sheet does not say which book it is', async () => {

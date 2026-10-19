@@ -15,6 +15,7 @@ import {
 } from '@modules/finances/domain/types';
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
 import { AutonomoExplain } from './AutonomoExplain';
+import { VatFamily } from './AutonomoVatResult';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
@@ -41,13 +42,7 @@ export function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
             <tr key={`${b.box}-${b.label}`}>
               <td>{b.box}</td>
               <td>{b.label}</td>
-              <td>
-                {b.label.startsWith('Tipo')
-                  ? `${b.amount} %`
-                  : /perceptores$/.test(b.label)
-                  ? b.amount
-                  : money(b.amount)}
-              </td>
+              <td>{/perceptores$/.test(b.label) ? b.amount : money(b.amount)}</td>
             </tr>
           ))}
         </tbody>
@@ -312,16 +307,14 @@ export function DraftResult({
   inputs: AutonomoInputs | null;
 }) {
   const { t } = useI18n();
-  const { vat, irpf } = draft;
+  const { irpf } = draft;
   return (
     <div className="autonomo-result" aria-live="polite">
       <SummaryTiles draft={draft} />
       <AutonomoExplain draft={draft} />
 
       {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
-      <Boxes title={t('app.autonomo.accrued')} boxes={vat.accrued} />
-      <Boxes title={t('app.autonomo.deductible')} boxes={vat.deductible} />
-      <Boxes title={t('app.autonomo.settlement')} boxes={vat.settlement} />
+      <VatFamily draft={draft} />
       {irpf.required ? (
         <Boxes title={t('app.autonomo.irpfBoxes')} boxes={irpf.boxes} />
       ) : (

@@ -13,8 +13,8 @@ import {
   type KindPreferences,
 } from '../../domain/invoiceLedger';
 import { entriesOf, kindOfInvoice, type InvoicePdf } from '../../domain/invoicePdf';
-import type { TaxModelParse } from '../../domain/taxModelPdf';
-import { applyInvoices, applyModel130, applyModel303 } from './importForm';
+import { carryFrom390, type TaxModelParse, type TaxModelPdf } from '../../domain/taxModelPdf';
+import { applyInvoices, applyModel130, applyModel303, applyModel349 } from './importForm';
 import type { ManualForm } from './AutonomoManual';
 import { importWithholdingModel } from './withholdingForm';
 
@@ -39,6 +39,8 @@ export interface Applied {
   period?: { year: number; quarter: 1 | 2 | 3 | 4 };
   /** The invoices of the file in the review (a PDF invoice): to show them. */
   ids?: string[];
+  /** What the 390 of last year hands to this one: VAT to offset and provisional prorrata. */
+  carry?: { toOffset: string; provisional: string | null };
 }
 
 const SKIPPED: (keyof BookSkipped)[] = ['year', 'rate', 'amount'];
@@ -106,6 +108,8 @@ function modelProblem(parsed: TaxModelParse | null, year: number, years: readonl
   if (!parsed) return 'unreadable';
   if (!parsed.ok) return parsed.reason;
   const { data } = parsed;
+  // The 390 is of a year, not of a quarter.
+  if (data.model === '390') return null;
   if (data.quarter === null) return 'noPeriod';
   if (!years.includes(data.year ?? year)) return 'year';
   return data.model === '130' && data.quarter === 4 ? 'lastQuarter' : null;
@@ -113,13 +117,13 @@ function modelProblem(parsed: TaxModelParse | null, year: number, years: readonl
 
 /** What the modelo 303 brought that the draft takes differently, or not at all. */
 function notes303(
-  { expense, ignored }: ReturnType<typeof applyModel303>['found'],
+  { expenses, ignored }: ReturnType<typeof applyModel303>['found'],
   dropped: number,
   quarter: number
 ) {
   return [
-    ...(expense ? [note('expense')] : []),
-    ...(expense && !expense.exact ? [note('rate')] : []),
+    ...(expenses.length > 0 ? [note('expense')] : []),
+    ...(expenses.some((l) => !l.exact) ? [note('rate')] : []),
     ...(ignored.length > 0 ? [note('ignored', { boxes: ignored.join(', ') })] : []),
     ...(dropped > 0 ? [note('invoices', { n: dropped, quarter })] : []),
   ];
@@ -148,8 +152,22 @@ export function importModel(
     };
   }
   const { data } = parsed as Extract<TaxModelParse, { ok: true }>;
+  if (data.model === '390') return import390(data, year);
   const quarter = data.quarter as 1 | 2 | 3 | 4;
   const at = data.year ?? year;
+  if (data.model === '349') {
+    return {
+      form: applyModel349(form, data, quarter),
+      period: { year: at, quarter },
+      lines: [
+        {
+          tone: 'done',
+          key: 'app.autonomo.model.done.349',
+          values: { year: at, quarter, n: (data.operators ?? []).length },
+        },
+      ],
+    };
+  }
   if (data.model === '111' || data.model === '115')
     return importWithholdingModel(form, data, at, quarter);
   if (data.model === '130') {
@@ -177,6 +195,43 @@ export function importModel(
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * The 390 of last year hands its definitive prorrata and the VAT left to offset to this year; the
+ * one of this year is only a reference to compare with the draft of the fourth quarter.
+ */
+function import390(data: TaxModelPdf, year: number): Applied {
+  const at = data.year ?? year;
+  if (at !== year - 1) {
+    return {
+      lines: [
+        {
+          tone: at === year ? 'note' : 'error',
+          key: `app.autonomo.model.m390.${at === year ? 'same' : 'year'}`,
+          values: { year: at, draft: year },
+        },
+      ],
+    };
+  }
+  const carry = carryFrom390(data.boxes);
+  return {
+    carry: {
+      toOffset: carry.toOffset === 0 ? '' : String(carry.toOffset),
+      provisional: carry.prorrata !== null && carry.prorrata < 100 ? String(carry.prorrata) : null,
+    },
+    lines: [
+      {
+        tone: 'done',
+        key: 'app.autonomo.model.done.390',
+        values: { year: at, next: year },
+        money: { toOffset: carry.toOffset },
+      },
+      ...(carry.prorrata !== null && carry.prorrata < 100
+        ? [note('prorrata', { pct: carry.prorrata })]
+        : []),
+    ],
+  };
+}
 
 /**
  * An invoice read from a PDF into the form, in the given book: it is added to the invoices of its

@@ -277,12 +277,14 @@ describe('Checks of the imported invoices before the draft', () => {
     const checks = checkImport(input({ invoices: list }));
     expect(checks.map((c) => [c.code, c.level, c.invoices])).toEqual([
       ['years', 'warn', [list[3].id]],
+      // An issued invoice without VAT and without saying why (exempt, export…).
+      ['exemptNoCause', 'info', [list[3].id]],
       ['emptyIncome', 'info', []],
       ['vat0', 'info', [list[1].id]],
       ['negative', 'info', [list[2].id]],
     ]);
     expect(checks[0].values).toEqual({ years: '2025, 2026', year: 2026 });
-    expect(checks[3].amounts).toEqual({ total: -12.1 });
+    expect(checks[4].amounts).toEqual({ total: -12.1 });
   });
 });
 

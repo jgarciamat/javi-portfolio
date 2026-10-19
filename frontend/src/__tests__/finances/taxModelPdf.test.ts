@@ -95,14 +95,25 @@ describe('Reading the boxes of the modelo 303 from the official PDF', () => {
   it('hands the draft the income by rate and the expenses of current operations', () => {
     const parsed = parseTaxModelTokens([OFFICIAL_303]);
     if (!parsed.ok) throw new Error('no');
-    expect(
-      quarterFrom303({ ...parsed.data.boxes, '59': 5000, '60': 7000, '04': 1000, '01': 200 })
-    ).toEqual({
-      income: { r21: 83000, r10: 1000, r4: 200, r0: 12000 },
-      // 47,000 + 9,870 = 56,870 with VAT, and 9,870 / 47,000 is exactly 21 %.
-      expense: { amount: 56870, vatRate: 21, exact: true },
-      ignored: ['10'],
+    const found = quarterFrom303({
+      ...parsed.data.boxes,
+      '59': 5000,
+      '60': 7000,
+      '04': 1000,
+      '01': 200,
     });
+    // The intra-EU supplies (59) and the exports (60) are not sales at 0 % (box 150): each one
+    // keeps its own box.
+    expect(found.income).toEqual({ r21: 83000, r10: 1000, r4: 200, r0: 0 });
+    expect(found.vat.sales).toMatchObject({ intraEU: 5000, exports: 7000 });
+    // The sales to retailers in the surcharge (box 22) are part of the 21 % base.
+    expect(found.vat.re).toEqual({ r21: 24000, r10: 0, r4: 0, tobacco: 0 });
+    // 47,000 + 9,870 = 56,870 with VAT, and 9,870 / 47,000 is exactly 21 %; the intra-EU purchase
+    // (36-37 are not on this page) is read on the second one.
+    expect(found.expenses).toEqual([
+      { amount: 56870, vatRate: 21, exact: true, op: 'domestic', investment: false },
+    ]);
+    expect(found.ignored).toEqual([]);
   });
 });
 
@@ -237,12 +248,75 @@ describe('amountOf', () => {
 });
 
 describe('quarterFrom303 and rateOfRatio', () => {
-  it('gives no expense when there are no current operations, and flags the other VAT boxes it cannot use', () => {
-    expect(quarterFrom303({ '07': 100, '12': 50, '34': 10, '38': 1 })).toEqual({
-      income: { r21: 100, r10: 0, r4: 0, r0: 0 },
-      expense: null,
-      ignored: ['12', '34', '38'],
+  it('gives no expense without purchases, and flags the boxes it cannot carry to the quarter', () => {
+    const found = quarterFrom303({ '07': 100, '44': 5, '62': 1, '74': 2 });
+    expect(found.income).toEqual({ r21: 100, r10: 0, r4: 0, r0: 0 });
+    expect(found.expenses).toEqual([]);
+    expect(found.ignored).toEqual(['44', '62', '74']);
+    expect(found.result).toBeNull();
+  });
+
+  it('takes every channel of the 2026 form: sales without VAT, surcharge, corrections and expenses', () => {
+    // The 1T of the worked case of the Manual práctico de IVA 2025 (cap. 9), with a reverse charge.
+    const found = quarterFrom303({
+      '07': 83000,
+      '09': 17430,
+      '150': 50,
+      '22': 24000,
+      '156': 1000,
+      '19': 300,
+      '168': 200,
+      '12': 1000,
+      '13': 210,
+      '28': 48000,
+      '29': 10080,
+      '30': 5000,
+      '31': 1050,
+      '32': 12000,
+      '33': 2520,
+      '34': 100,
+      '35': 21,
+      '36': 21000,
+      '37': 4410,
+      '38': 10,
+      '39': 2.1,
+      '14': -3000,
+      '15': -630,
+      '25': -100,
+      '26': -5.2,
+      '40': -18000,
+      '41': -3780,
+      '42': 12,
+      '43': -8,
+      '76': 30,
+      '77': 50,
+      '59': 12000,
+      '60': 9000,
+      '120': 1,
+      '122': 2,
+      '123': 3,
+      '124': 4,
+      '71': 3288,
     });
+    expect(found.income).toEqual({ r21: 83000, r10: 0, r4: 0, r0: 50 });
+    expect(found.expenses).toEqual([
+      { amount: 1000, vatRate: 21, exact: true, op: 'reverse', investment: false },
+      { amount: 56870, vatRate: 21, exact: true, op: 'domestic', investment: false },
+      { amount: 6050, vatRate: 21, exact: true, op: 'domestic', investment: true },
+      { amount: 12000, vatRate: 21, exact: true, op: 'import', investment: false },
+      { amount: 100, vatRate: 21, exact: true, op: 'import', investment: true },
+      { amount: 21000, vatRate: 21, exact: true, op: 'intraGoods', investment: false },
+      { amount: 10, vatRate: 21, exact: true, op: 'intraGoods', investment: true },
+    ]);
+    expect(found.vat).toEqual({
+      sales: { intraEU: 12000, exports: 9000, notSubject: 1, reverse: 2, oss: 3, ossSubject: 4 },
+      re: { r21: 25000, r10: 300, r4: 200, tobacco: 1000 },
+      salesFix: { base: -3000, vat: -630 },
+      reFix: { base: -100, fee: -5.2 },
+      deductionFix: { base: -18000, vat: -3780 },
+      oneOff: { reagp: 12, investmentAdjust: -8, art80: 30, importDeferred: 50 },
+    });
+    expect(found.result).toBe(3288);
   });
 
   it('puts the VAT rate that base and VAT point to, and says when it was a mix of rates', () => {
@@ -252,15 +326,11 @@ describe('quarterFrom303 and rateOfRatio', () => {
     expect(rateOfRatio(1000, 0)).toBe(0);
     expect(rateOfRatio(1000, 150)).toBeNull();
     expect(rateOfRatio(0, 10)).toBeNull();
-    expect(quarterFrom303({ '28': 725, '29': 146.2 }).expense).toEqual({
-      amount: 871.2,
-      vatRate: 21,
-      exact: false,
-    });
-    expect(quarterFrom303({ '28': 100, '29': 11 }).expense).toEqual({
-      amount: 111,
-      vatRate: 10,
-      exact: false,
-    });
+    expect(quarterFrom303({ '28': 725, '29': 146.2 }).expenses).toEqual([
+      { amount: 871.2, vatRate: 21, exact: false, op: 'domestic', investment: false },
+    ]);
+    expect(quarterFrom303({ '28': 100, '29': 11 }).expenses).toEqual([
+      { amount: 111, vatRate: 10, exact: false, op: 'domestic', investment: false },
+    ]);
   });
 });

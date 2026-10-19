@@ -1,6 +1,7 @@
 import { guessExpenseKind, type BookEntry, type BookKind } from './invoiceBook';
 import type { PdfToken } from './taxModelPdf';
 import type { ExpenseKind, VatRate } from './types';
+import { isEuVatId, normalVatId } from './vatBook';
 
 /**
  * Reading an ordinary invoice from the text of its PDF (the ones that come by email; not photos).
@@ -561,7 +562,12 @@ export type ReviewCode =
   | 'reverse'
   | 'currency'
   | 'several'
-  | 'issuer';
+  | 'issuer'
+  // What the invoice says it is for VAT: to check the operation it was given.
+  | 'intraEU'
+  | 'export'
+  | 'exempt'
+  | 'notSubject';
 
 export interface TaxLine {
   rate: VatRate | null;
@@ -594,7 +600,27 @@ export interface InvoicePdf {
   review: ReviewCode[];
   /** What the amounts add up to against the printed total, when they differ. */
   mismatch: { expected: number; total: number } | null;
+  /** What the text says the operation is for VAT (reverse charge, intra-EU, export…), if anything. */
+  vatHint?: VatHint | null;
 }
+
+export type VatHint = 'reverse' | 'intraEU' | 'export' | 'exempt' | 'notSubject';
+
+/**
+ * The wording of the invoices that says what the operation is for VAT, first match wins: reverse
+ * charge (art. 84 LIVA, art. 196 Directive 2006/112), intra-EU supply (art. 25 LIVA, art. 138
+ * Directive), export (art. 21), not subject by the place of supply (arts. 69-72) and exempt (art. 20).
+ */
+const VAT_HINTS: [RegExp, VatHint][] = [
+  [/inversion del sujeto pasivo|reverse charge|art(\.|iculo)? ?84|art(\.|icle)? ?196/, 'reverse'],
+  [
+    /entrega intracomunitaria|intra-?community supply|art(\.|iculo)? ?25 (de la )?(liva|ley)|exent[ao].{0,30}\bart(\.|iculo)? ?25\b|art(\.|icle)? ?138/,
+    'intraEU',
+  ],
+  [/exportaci|\bexport\b|exent[ao].{0,30}\bart(\.|iculo)? ?21\b/, 'export'],
+  [/no sujet[ao]|not subject|outside the scope|art(\.|iculo)? ?(69|70|72)\b/, 'notSubject'],
+  [/exent[ao]|exempt|art(\.|iculo)? ?20\b/, 'exempt'],
+];
 
 export type InvoicePdfParse =
   | { ok: true; invoice: InvoicePdf }
@@ -912,9 +938,11 @@ function amountsOf(lines: Line[], low: string, review: Set<ReviewCode>) {
 }
 
 /** Amounts in another currency next to the euros, or VAT that the buyer declares. */
-function flagsOf(low: string, review: Set<ReviewCode>) {
+function flagsOf(low: string, review: Set<ReviewCode>): VatHint | null {
   if (FOREIGN.some(([re]) => re.test(low))) review.add('currency');
-  if (/inversion del sujeto pasivo|reverse charge/.test(low)) review.add('reverse');
+  const hint = VAT_HINTS.find(([re]) => re.test(low))?.[1] ?? null;
+  if (hint) review.add(hint);
+  return hint;
 }
 
 /** Date, number and parties of an invoice, with what to check about them. */
@@ -936,7 +964,7 @@ export function parseInvoiceTokens(pages: PdfToken[][]): InvoicePdfParse {
   const rejected = rejection(pages, lines, low);
   if (rejected) return rejected;
   const review = new Set<ReviewCode>();
-  flagsOf(low, review);
+  const vatHint = flagsOf(low, review);
   const head = headOf(pages, lines, low, review);
   const amounts = amountsOf(lines, low, review);
   const credit =
@@ -957,6 +985,7 @@ export function parseInvoiceTokens(pages: PdfToken[][]): InvoicePdfParse {
         expected: signed(amounts.mismatch.expected),
         total: signed(amounts.mismatch.total),
       },
+      vatHint,
     },
   };
 }
@@ -1026,21 +1055,63 @@ function withholdingOf(
   };
 }
 
+/** Services a business of another member state usually bills (the rest are goods). */
+const SERVICE_KINDS: ExpenseKind[] = ['software', 'advertising', 'management', 'training'];
+
+/** What the hint of the text makes of the invoice in a book: its operation and the other's VAT number. */
+function vatOfHint(
+  invoice: InvoicePdf,
+  book: BookKind
+): Pick<BookEntry, 'op' | 'vatId'> & { selfAssessed: boolean } {
+  const party = book === 'issued' ? invoice.client : invoice.issuer;
+  const vatId = isEuVatId(party.nif) ? normalVatId(party.nif as string) : undefined;
+  const hint = invoice.vatHint;
+  const out = (op: BookEntry['op'], selfAssessed = false) => ({
+    ...(op ? { op } : {}),
+    ...(vatId ? { vatId } : {}),
+    selfAssessed,
+  });
+  if (!hint) return out(undefined);
+  if (book === 'issued') return out(hint);
+  // A purchase without VAT: from another member state it is intra-EU, otherwise a reverse charge.
+  if (hint === 'reverse' || hint === 'intraEU') {
+    if (!vatId) return out('reverse', true);
+    return out(
+      SERVICE_KINDS.includes(kindOfInvoice(invoice)) ? 'intraServices' : 'intraGoods',
+      true
+    );
+  }
+  return out(undefined);
+}
+
+/** The amounts of a tax line as an entry takes them (what was not read is 0, the rate 21 %). */
+const amountsOfTax = (t: TaxLine): Pick<BookEntry, 'base' | 'vatRate' | 'vat' | 'total'> => ({
+  base: t.base ?? 0,
+  vatRate: t.rate ?? 21,
+  vat: t.vat ?? 0,
+  total: round2((t.base ?? 0) + (t.vat ?? 0)),
+});
+
 /** The invoice as one entry per VAT rate; the withholding goes with the first one. */
 export function entriesOf(invoice: InvoicePdf, book: BookKind): PdfEntry[] {
   const party = book === 'issued' ? invoice.client : invoice.issuer;
   const month = invoice.date ? Number(invoice.date.slice(5, 7)) : 1;
-  return invoice.taxes.map((t, i) => ({
-    date: invoice.date ?? '',
-    quarter: (Math.floor((month - 1) / 3) + 1) as BookEntry['quarter'],
-    base: t.base ?? 0,
-    vatRate: t.rate ?? 21,
-    vat: t.vat ?? 0,
-    total: round2((t.base ?? 0) + (t.vat ?? 0)),
-    ...withholdingOf(invoice, book, i === 0),
-    concept: party.name ?? party.nif ?? '',
-    missing: missingOf(invoice, t),
-  }));
+  const { selfAssessed, ...vat } = vatOfHint(invoice, book);
+  return invoice.taxes.map((tax, i) => {
+    // The buyer self-assesses the VAT a supplier did not charge: at 21 %, to check.
+    const guessed = selfAssessed && (tax.rate ?? 0) === 0;
+    const t = guessed ? { ...tax, rate: 21 as VatRate } : tax;
+    return {
+      date: invoice.date ?? '',
+      quarter: (Math.floor((month - 1) / 3) + 1) as BookEntry['quarter'],
+      ...amountsOfTax(t),
+      ...withholdingOf(invoice, book, i === 0),
+      concept: party.name ?? party.nif ?? '',
+      missing: missingOf(invoice, t),
+      ...vat,
+      ...(guessed ? { rateGuessed: true } : {}),
+    };
+  });
 }
 
 /** The kind of an expense from its supplier and, when that says nothing, from what was bought. */

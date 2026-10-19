@@ -6,6 +6,7 @@ import type { AutonomoCloudCopy, ExpenseKind } from '@modules/finances/domain/ty
 import { missingOf, reviewOf, type KindPreferences } from '../../domain/invoiceLedger';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
 import { withholdingsOf } from './withholdingForm';
+import { NO_VAT_EXTRAS, isEmptyVat, vatExtrasOf, vatOfForm } from './vatForm';
 
 /**
  * «Save in my account too»: the self-employed form copied to the account, encrypted on the server,
@@ -132,7 +133,12 @@ export function toSaved(
           amount: e.amount,
           vatRate: e.vatRate,
           days: e.days,
+          // The VAT of the purchase, only when it is not the plain domestic case.
+          ...(e.op && e.op !== 'domestic' ? { op: e.op } : {}),
+          ...(e.investment ? { investment: true } : {}),
+          ...(e.use && e.use !== 'common' ? { use: e.use } : {}),
         })),
+        ...(isEmptyVat(q.vat) ? {} : { vat: vatOfForm(q.vat) }),
       })),
       invoices: ((manual.invoices ?? []) as ManualForm['invoices']).map((i) => ({
         id: i.id,
@@ -153,6 +159,7 @@ export function toSaved(
         ...(i.nif ? { nif: i.nif } : {}),
         ...(i.retentionFix !== undefined ? { retentionFix: i.retentionFix } : {}),
         ...(i.withholding ? { withholding: i.withholding } : {}),
+        ...vatOfInvoice(i),
         // Read from a PDF: what is still to check (only on those, so the others stay as they were).
         ...(i.source === 'pdf'
           ? { source: i.source, review: [...reviewOf(i)], missing: [...missingOf(i)] }
@@ -167,18 +174,35 @@ export function toSaved(
           }
         : null,
       withholdings: withholdingsOf(manual as Pick<ManualForm, 'withholdings'>),
+      ...(manual.filed303?.some((f) => f !== null)
+        ? { filed303: [0, 1, 2, 3].map((i) => manual.filed303?.[i] ?? null) }
+        : {}),
     },
     extras: {
       hardToJustify: options.hardToJustify,
       exempt: options.exempt,
       priorNet: options.priorNet,
       toOffset: options.toOffset,
+      ...(JSON.stringify(vatExtrasOf(options.vat)) === JSON.stringify(NO_VAT_EXTRAS)
+        ? {}
+        : { vat: vatExtrasOf(options.vat) }),
     },
     kinds: Object.fromEntries(
       Object.keys(kinds)
         .sort()
         .map((k) => [k, kinds[k] as ExpenseKind])
     ),
+  };
+}
+
+/** What an invoice is for VAT, only when the book or the reading said something (older data: none). */
+function vatOfInvoice(i: ManualForm['invoices'][number]): Partial<ManualForm['invoices'][number]> {
+  const flags = (['investment', 'cash', 'rateGuessed', 'opFix'] as const).filter((f) => i[f]);
+  return {
+    ...(i.op && i.op !== 'domestic' ? { op: i.op } : {}),
+    ...(i.vatId ? { vatId: i.vatId } : {}),
+    ...(i.key349 ? { key349: i.key349 } : {}),
+    ...Object.fromEntries(flags.map((f) => [f, true])),
   };
 }
 

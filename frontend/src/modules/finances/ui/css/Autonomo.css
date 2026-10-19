@@ -865,3 +865,74 @@ button.autonomo-sum-warn {
   flex: none;
   margin-top: 0.2rem;
 }
+
+/* ─── The VAT family: other operations of a quarter, the year, and the 303/349/390 panels ─── */
+.autonomo-tile--refund {
+  border-color: rgba(34, 197, 94, 0.6);
+}
+.autonomo-vatq,
+.autonomo-vaty {
+  margin-top: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.7rem;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+}
+.autonomo-vatq > summary,
+.autonomo-vaty > summary,
+.autonomo-zero > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.autonomo-vatq h5,
+.autonomo-vaty h5,
+.autonomo-model h5 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.95rem;
+}
+.autonomo-rare {
+  font-weight: 400;
+  opacity: 0.7;
+}
+.autonomo-investment {
+  margin-top: 0.4rem;
+}
+.autonomo-model {
+  margin-top: 1.25rem;
+}
+.autonomo-plain,
+.autonomo-warnings {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+}
+.autonomo-warnings li {
+  color: #fbbf24;
+}
+.autonomo-zero {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+.autonomo-deadline {
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+.autonomo-review-op select,
+.autonomo-review-op input {
+  min-width: 9rem;
+}
+.autonomo-review-op input {
+  margin-top: 0.3rem;
+}
+.tx-input.is-invalid {
+  border-color: rgba(248, 113, 113, 0.8);
+}
+@media (max-width: 640px) {
+  .autonomo-vatq,
+  .autonomo-vaty {
+    padding: 0.5rem;
+  }
+  .autonomo-review-op select,
+  .autonomo-review-op input {
+    min-width: 0;
+    width: 100%;
+  }
+}

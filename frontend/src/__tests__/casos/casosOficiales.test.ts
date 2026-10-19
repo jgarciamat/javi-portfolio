@@ -31,6 +31,7 @@ interface Case {
   id: string;
   modelo: string;
   apartado: string;
+  reutilizable?: string;
   fuente: { oficial: boolean };
   resultados: { casilla: string | null; concepto: string; importe: number }[];
 }
@@ -158,10 +159,16 @@ const CHECKS: Record<string, () => void> = {
 
 /** Why a case has no automatic check (by model, or by the part of the return). */
 function reasonOf(c: Case): string {
-  if (c.modelo !== '100')
-    return c.modelo === 'RETA'
-      ? 'Ejemplo de 2023 con otra tabla de cuotas: solo sirve de estructura.'
-      : `Modelo ${c.modelo}: el motor de la app no lo calcula en el frontend (130 y 303 están en el backend; ver npm run casos).`;
+  if (c.modelo !== '100') {
+    if (c.modelo === 'RETA')
+      return 'Ejemplo de 2023 con otra tabla de cuotas: solo sirve de estructura.';
+    // The VAT family is worked out by the backend: its official cases are checked there.
+    if (['303', '349', '390'].includes(c.modelo))
+      return c.reutilizable === 'estructura'
+        ? `Modelo ${c.modelo} del régimen simplificado (módulos): la app solo avisa, no lo calcula.`
+        : `Modelo ${c.modelo}: lo calcula el backend y lo comprueba backend/src/tests/domain/autonomo-vat-official.test.ts al céntimo.`;
+    return `Modelo ${c.modelo}: el motor de la app no lo calcula en el frontend (130 y 303 están en el backend; ver npm run casos).`;
+  }
   return `Apartado «${c.apartado}»: el motor no calcula este supuesto con los datos de la fuente.`;
 }
 

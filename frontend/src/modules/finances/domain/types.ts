@@ -620,16 +620,112 @@ export const EXPENSE_KINDS = [
 ] as const;
 export type ExpenseKind = (typeof EXPENSE_KINDS)[number];
 
+/** What an issued invoice is for VAT (backend autonomo-vat-data.ts, SALE_OPS). */
+export const SALE_OPS = [
+  'domestic',
+  're',
+  'intraEU',
+  'export',
+  'notSubject',
+  'oss',
+  'ossSubject',
+  'reverse',
+  'exempt',
+  'exemptOccasional',
+  'nonVat',
+] as const;
+export type SaleOp = (typeof SALE_OPS)[number];
+/** What a received invoice is for VAT (backend PURCHASE_OPS). */
+export const PURCHASE_OPS = [
+  'domestic',
+  'intraGoods',
+  'intraServices',
+  'reverse',
+  'import',
+] as const;
+export type PurchaseOp = (typeof PURCHASE_OPS)[number];
+export const DEDUCTION_USES = ['common', 'taxed', 'exempt'] as const;
+export type DeductionUse = (typeof DEDUCTION_USES)[number];
+/** Keys of the modelo 349 (AEAT record design, type 2, position 133). */
+export const KEYS_349 = ['E', 'M', 'H', 'A', 'T', 'S', 'I', 'R', 'D', 'C'] as const;
+export type Key349 = (typeof KEYS_349)[number];
+
 export interface ManualExpense {
   kind: ExpenseKind;
+  /** VAT included; without Spanish VAT on the invoice (intra-EU, reverse charge, import), the base. */
   amount: number;
   vatRate: VatRate;
   days?: number;
+  op?: PurchaseOp;
+  investment?: boolean;
+  use?: DeductionUse;
+}
+
+/** One operation of the modelo 349 (euros). */
+export interface IntraOp {
+  key: Key349;
+  vatId: string;
+  name: string;
+  base: number;
+  rectifies?: { year: number; quarter: 1 | 2 | 3 | 4; previous: number } | null;
+}
+
+/** Sales without VAT on the invoice, by box of the 303 (bases, euros). */
+export interface ManualSales {
+  intraEU?: number;
+  exports?: number;
+  notSubject?: number;
+  oss?: number;
+  ossSubject?: number;
+  reverse?: number;
+  exempt?: number;
+  exemptOccasional?: number;
+  nonVat?: number;
+}
+
+export interface CashRates {
+  r21: number;
+  r10: number;
+  r4: number;
+}
+
+/** The VAT of a quarter beyond the invoices with VAT (backend QuarterVat). */
+export interface QuarterVat {
+  sales?: ManualSales | null;
+  re?: { r21?: number; r10?: number; r4?: number; tobacco?: number } | null;
+  salesFix?: { base: number; vat: number; priorYear?: number } | null;
+  reFix?: { base: number; fee: number } | null;
+  deductionFix?: { base: number; vat: number } | null;
+  intraFix?: { base: number; vat: number } | null;
+  reagp?: number;
+  investmentAdjust?: number;
+  art80?: number;
+  importDeferred?: number;
+  cash?: {
+    invoiced: CashRates;
+    collected: CashRates;
+    purchasesInvoiced: CashRates;
+    purchasesPaid: CashRates;
+  } | null;
+  intra?: IntraOp[];
 }
 
 export interface ManualQuarter {
   income: { r21: number; r10: number; r4: number; r0: number };
   expenses: ManualExpense[];
+  vat?: QuarterVat | null;
+}
+
+/** The VAT of the year (backend VatOptions). */
+export interface VatOptions {
+  prorrata?: { provisional: number | null; special: boolean } | null;
+  investments?: { year: number; vat: number; pct: number; realEstate: boolean }[];
+  offsetStart?: number | null;
+  skipOffset?: number[];
+  refund?: boolean;
+  filed?: (number | null)[];
+  reagpVolume?: number;
+  regime?: 'general' | 'simplified' | 'reagp';
 }
 
 export interface ManualData {
@@ -665,6 +761,8 @@ export interface AutonomoInputs {
   priorYearNet: number | null;
   exempt130: boolean;
   vatToOffset: number;
+  /** The VAT of the year: prorrata, investment goods, what is left to offset, refund. */
+  vat?: VatOptions | null;
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
   /** Totals of the modelo 130 already filed for the earlier quarters. */
@@ -686,12 +784,21 @@ export interface AutonomoDraft {
   quarter: 1 | 2 | 3 | 4;
   used: number;
   vat: {
-    result: 'pay' | 'offset' | 'zero' | 'noActivity';
+    result: 'pay' | 'offset' | 'refund' | 'zero' | 'noActivity';
     amountDue: number;
     accrued: TaxBox[];
     deductible: TaxBox[];
     settlement: TaxBox[];
+    /** «Información adicional» (drafts saved before it have none). */
+    info?: TaxBox[];
+    /** Percentage of the VAT borne that was deducted. */
+    prorrata?: number;
+    warnings?: string[];
   };
+  /** Intra-EU operations of the quarter (none: null or absent). */
+  m349?: Draft349 | null;
+  /** The annual summary, with the fourth quarter. */
+  m390?: Draft390 | null;
   irpf: {
     required: boolean;
     result: 'pay' | 'negative' | 'zero' | 'notRequired';
@@ -710,6 +817,43 @@ export interface AutonomoDraft {
   deadlines: { model: string; label: string; date: string }[];
   /** Breakdown of the expenses typed by hand (null when the movements were used). */
   expenses: ExpenseLine[] | null;
+}
+
+export interface Draft349 {
+  required: boolean;
+  monthly: boolean;
+  operators: { key: Key349; vatId: string; name: string; base: number }[];
+  rectifications: {
+    key: Key349;
+    vatId: string;
+    name: string;
+    base: number;
+    year: number;
+    quarter: 1 | 2 | 3 | 4;
+    previous: number;
+  }[];
+  boxes: TaxBox[];
+  warnings: {
+    code: string;
+    name?: string;
+    vatId?: string;
+    expected?: number;
+    got?: number;
+    amount?: number;
+  }[];
+}
+
+export interface Draft390 {
+  sections: { id: string; boxes: TaxBox[] }[];
+  prorrata: number;
+  reconciliation: { quarter: number; computed: number; filed: number | null; difference: number }[];
+  warnings: {
+    code: string;
+    quarter?: number;
+    difference?: number;
+    expected?: number;
+    got?: number;
+  }[];
 }
 
 export interface SplitGroupSummary {

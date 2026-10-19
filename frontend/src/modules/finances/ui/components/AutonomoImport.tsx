@@ -45,6 +45,8 @@ const TEMPLATES = [
   ['received', '/plantillas/facturas-recibidas.xlsx'],
   ['130', '/plantillas/modelo-130-plantilla.pdf'],
   ['303', '/plantillas/modelo-303-plantilla.pdf'],
+  ['349', '/plantillas/modelo-349-plantilla.pdf'],
+  ['390', '/plantillas/modelo-390-plantilla.pdf'],
   ['111', '/plantillas/modelo-111-plantilla.pdf'],
   ['115', '/plantillas/modelo-115-plantilla.pdf'],
 ] as const;
@@ -320,6 +322,7 @@ export function AutonomoImport({
   onChange,
   onPeriod,
   onShow,
+  onCarry,
 }: {
   form: ManualForm;
   year: number;
@@ -330,6 +333,8 @@ export function AutonomoImport({
   onPeriod: (year: number, quarter: Quarter) => void;
   /** Opens an imported invoice in the review. */
   onShow?: (id: string) => void;
+  /** What the 390 of last year hands to this one (VAT to offset, provisional prorrata). */
+  onCarry?: (carry: NonNullable<Applied['carry']>) => void;
 }) {
   const { t } = useI18n();
   const [results, setResults] = useState<FileResult[]>([]);
@@ -342,7 +347,8 @@ export function AutonomoImport({
   const counter = useRef(0);
 
   /** Applies what a file gave to the form as it is now, and moves the draft when a PDF says so. */
-  const apply = ({ form: next, lines, period }: Applied): Line[] => {
+  const apply = ({ form: next, lines, period, carry }: Applied): Line[] => {
+    if (carry) onCarry?.(carry);
     if (next) {
       latest.current = { ...latest.current, form: next };
       onChange(next);

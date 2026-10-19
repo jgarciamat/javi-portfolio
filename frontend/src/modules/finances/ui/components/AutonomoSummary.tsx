@@ -38,8 +38,15 @@ export function summarize(
   const data = toManualData(manual);
   const prior = manual.prior.on && quarter > 1;
   const quarters = data.quarters.slice(prior ? quarter - 1 : 0, quarter);
+  // Every sale counts: with VAT by rate and without it (intra-EU, exports…), as the 130 takes them.
   const income = quarters.reduce(
-    (s, q) => s + q.income.r21 + q.income.r10 + q.income.r4 + q.income.r0,
+    (s, q) =>
+      s +
+      q.income.r21 +
+      q.income.r10 +
+      q.income.r4 +
+      q.income.r0 +
+      Object.values(q.vat?.sales ?? {}).reduce((t, v) => t + (v as number), 0),
     prior ? amount(manual.prior.income) : 0
   );
   const expenses = quarters.reduce(

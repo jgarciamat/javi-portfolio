@@ -1,5 +1,6 @@
 import { needsCheck, supplierKey, type ImportedInvoice } from './invoiceLedger';
 import type { ManualData, ManualExpense } from './types';
+import { isEuVatId } from './vatBook';
 
 /**
  * What to look at before preparing the draft: things in the imported invoices that are often a
@@ -18,7 +19,13 @@ export type CheckCode =
   | 'vat0'
   | 'negative'
   | 'years'
-  | 'pdfReview';
+  | 'pdfReview'
+  | 'intraNoVatId'
+  | 'notSelfAssessed'
+  | 'exemptNoCause'
+  | 'investmentSmall'
+  | 'rateGuessed'
+  | 'cashBook';
 
 export interface ImportCheck {
   code: CheckCode;
@@ -67,6 +74,15 @@ const NO_VAT: ManualExpense['kind'][] = ['quota', 'staff', 'health', 'fines'];
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/** The income of a quarter as the 130 takes it: with VAT by rate and the sales without it. */
+const incomeOf = (q: ManualData['quarters'][number]): number =>
+  q.income.r21 +
+  q.income.r10 +
+  q.income.r4 +
+  q.income.r0 +
+  // The sales of the server data are always numbers (vatForm.ts gives them all).
+  Object.values(q.vat?.sales ?? {}).reduce((s: number, v) => s + (v as number), 0);
+
 type Shares = (e: ManualExpense, profile: ManualData['profile']) => [irpf: number, vat: number];
 
 /** The shares of income tax and VAT of the kinds that are not fully deducted. */
@@ -88,11 +104,18 @@ const SHARES: Partial<Record<ManualExpense['kind'], Shares>> = {
   fines: () => [0, 0],
 };
 
+/** Investment goods are worth at least 500,000 pesetas (art. 108.Dos.5.º Ley 37/1992 del IVA). */
+export const INVESTMENT_MIN = 3005.06;
+
 /** What an expense counts for the income tax, in euros. */
 export function irpfDeductible(e: ManualExpense, profile: ManualData['profile']): number {
+  // An investment good is depreciated, not deducted at once (the backend leaves it out of the 130).
+  if (e.investment) return 0;
   const cents = Math.round(e.amount * 100);
-  const baseCents = Math.round(cents / (1 + e.vatRate / 100));
-  const vatCents = cents - baseCents;
+  // Without Spanish VAT on the invoice the amount is the base and the VAT is self-assessed.
+  const domestic = (e.op ?? 'domestic') === 'domestic';
+  const baseCents = domestic ? Math.round(cents / (1 + e.vatRate / 100)) : cents;
+  const vatCents = domestic ? cents - baseCents : Math.round((cents * e.vatRate) / 100);
   const [irpf, vat] = SHARES[e.kind]?.(e, profile) ?? [1, 1];
   return Math.round(baseCents * irpf + vatCents * Math.max(0, irpf - vat)) / 100;
 }
@@ -132,9 +155,7 @@ function emptyQuarters(input: CheckInput, used: ImportedInvoice[]): ImportCheck[
     for (let q = input.from; q <= last; q++) {
       const typed = input.manual.quarters[q - 1];
       const has =
-        book === 'issued'
-          ? Object.values(typed.income).some((v) => v > 0)
-          : typed.expenses.some((e) => e.amount > 0);
+        book === 'issued' ? incomeOf(typed) > 0 : typed.expenses.some((e) => e.amount > 0);
       if (!has && !used.some((i) => i.book === book && i.quarter === q)) {
         out.push(
           check(book === 'issued' ? 'emptyIncome' : 'emptyExpenses', 'info', {
@@ -172,9 +193,7 @@ function model130(input: CheckInput): ImportCheck[] {
   const books = new Set(
     input.invoices.filter((i) => i.quarter <= filed.quarter).map((i) => i.book)
   );
-  const income = round2(
-    upTo.reduce((s, q) => s + q.income.r21 + q.income.r10 + q.income.r4 + q.income.r0, 0)
-  );
+  const income = round2(upTo.reduce((s, q) => s + incomeOf(q), 0));
   let expenses = upTo.reduce(
     (s, q) => s + q.expenses.reduce((t, e) => t + irpfDeductible(e, input.manual.profile), 0),
     0
@@ -200,6 +219,53 @@ function model130(input: CheckInput): ImportCheck[] {
   if (books.has('issued')) compare('model130Income', income, filed.income);
   if (books.has('received')) compare('model130Expenses', expenses, filed.expenses);
   return out;
+}
+
+const INTRA_OPS = ['intraEU', 'intraGoods', 'intraServices'];
+
+/** The VAT of the invoices: intra-EU without a VAT number, purchases not self-assessed, exempt sales… */
+function vatChecks(used: ImportedInvoice[]): ImportCheck[] {
+  const list = (code: CheckCode, level: ImportCheck['level'], found: ImportedInvoice[]) =>
+    found.length > 0
+      ? [check(code, level, { values: { n: found.length }, invoices: found.map((i) => i.id) })]
+      : [];
+  const op = (i: ImportedInvoice) => i.op ?? 'domestic';
+  return [
+    ...list(
+      'intraNoVatId',
+      'warn',
+      used.filter((i) => INTRA_OPS.includes(op(i)) && !isEuVatId(i.vatId))
+    ),
+    // A supplier of another member state that charged no VAT: the buyer self-assesses it (art. 84).
+    ...list(
+      'notSelfAssessed',
+      'warn',
+      used.filter(
+        (i) => i.book === 'received' && op(i) === 'domestic' && i.vatRate === 0 && isEuVatId(i.nif)
+      )
+    ),
+    // An issued invoice without VAT and without saying why (exempt, export, intra-EU…).
+    ...list(
+      'exemptNoCause',
+      'info',
+      used.filter((i) => i.book === 'issued' && op(i) === 'domestic' && i.vatRate === 0)
+    ),
+    ...list(
+      'investmentSmall',
+      'info',
+      used.filter((i) => i.investment && Math.abs(i.base) < INVESTMENT_MIN)
+    ),
+    ...list(
+      'rateGuessed',
+      'info',
+      used.filter((i) => i.rateGuessed)
+    ),
+    ...list(
+      'cashBook',
+      'info',
+      used.filter((i) => i.cash)
+    ),
+  ];
 }
 
 /** Everything worth a look before preparing the draft: the warnings first. */
@@ -236,6 +302,7 @@ export function checkImport(input: CheckInput): ImportCheck[] {
         ]
       : []),
     ...otherShare(used),
+    ...vatChecks(used),
     ...model130(input),
     ...emptyQuarters(input, used),
     ...(vat0.length > 0

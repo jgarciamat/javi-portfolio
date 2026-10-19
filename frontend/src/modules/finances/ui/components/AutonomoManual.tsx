@@ -5,12 +5,18 @@ import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
 import { StepSection } from './AutonomoSteps';
 import { emptyWithholdings, type WithholdingForm } from './withholdingForm';
 import { WithholdingsForm } from './AutonomoWithholdings';
+import { QuarterVatPanel } from './AutonomoVatQuarter';
+import { toQuarterVat, vatOfForm, type VatExtras, type VatForm } from './vatForm';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
   EXPENSE_KINDS,
+  PURCHASE_OPS,
+  DEDUCTION_USES,
+  type DeductionUse,
   type ExpenseKind,
   type ManualData,
+  type PurchaseOp,
   type VatRate,
 } from '@modules/finances/domain/types';
 
@@ -29,7 +35,18 @@ export interface ManualForm {
     income: { r21: string; r10: string; r4: string; r0: string };
     /** Withholdings that clients applied to the invoices of the quarter. */
     withheld: string;
-    expenses: { kind: ExpenseKind; amount: string; vatRate: VatRate; days: string }[];
+    expenses: {
+      kind: ExpenseKind;
+      amount: string;
+      vatRate: VatRate;
+      days: string;
+      /** What the purchase is for VAT (absent: domestic), investment good, use for the prorrata. */
+      op?: PurchaseOp;
+      investment?: boolean;
+      use?: DeductionUse;
+    }[];
+    /** The VAT of the quarter beyond the invoices with VAT (older data has none). */
+    vat?: VatForm;
   }[];
   /** The invoices imported from the books: the quarters they bring are worked out from them. */
   invoices: ImportedInvoice[];
@@ -37,6 +54,8 @@ export interface ManualForm {
   model130: Model130Figures | null;
   /** Employees, professionals and rent of each quarter, for the modelos 111 and 115 (older data has none). */
   withholdings?: WithholdingForm[];
+  /** Results (box 71) of the modelos 303 imported, by quarter: the 390 is reconciled with them. */
+  filed303?: (number | null)[];
 }
 
 /** Accumulated income and expenses (boxes 01 and 02) of a filed modelo 130. */
@@ -52,7 +71,10 @@ export interface Extras {
   hardToJustify: boolean;
   exempt: boolean;
   priorNet: string;
+  /** VAT left to offset at the start of the year (box 110 of the first quarter). */
   toOffset: string;
+  /** The VAT of the year: prorrata, investment goods, refund… (older data has none). */
+  vat?: VatExtras;
 }
 
 export const NO_EXTRAS: Extras = {
@@ -99,20 +121,27 @@ export function toManualData(form: ManualForm): ManualData {
       healthPeople: Math.floor(num(form.profile.healthPeople)),
       healthDisability: form.profile.healthDisability,
     },
-    quarters: form.quarters.map((q) => ({
-      income: {
-        r21: num(q.income.r21),
-        r10: num(q.income.r10),
-        r4: num(q.income.r4),
-        r0: num(q.income.r0),
-      },
-      expenses: q.expenses.map((e) => ({
-        kind: e.kind,
-        amount: num(e.amount),
-        vatRate: e.vatRate,
-        days: Math.floor(num(e.days)),
-      })),
-    })) as ManualData['quarters'],
+    quarters: form.quarters.map((q) => {
+      const vat = toQuarterVat(q.vat);
+      return {
+        income: {
+          r21: num(q.income.r21),
+          r10: num(q.income.r10),
+          r4: num(q.income.r4),
+          r0: num(q.income.r0),
+        },
+        expenses: q.expenses.map((e) => ({
+          kind: e.kind,
+          amount: num(e.amount),
+          vatRate: e.vatRate,
+          days: Math.floor(num(e.days)),
+          ...(e.op && e.op !== 'domestic' ? { op: e.op } : {}),
+          ...(e.investment ? { investment: true } : {}),
+          ...(e.use && e.use !== 'common' ? { use: e.use } : {}),
+        })),
+        ...(vat ? { vat } : {}),
+      };
+    }) as ManualData['quarters'],
   };
 }
 
@@ -233,15 +262,23 @@ function PriorPanel({
 function ExpenseRow({
   expense,
   id,
+  special,
   onChange,
   onRemove,
 }: {
   expense: ExpenseForm;
   id: string;
+  /** The special prorrata is on: each purchase says what it is used for. */
+  special: boolean;
   onChange: (patch: Partial<ExpenseForm>) => void;
   onRemove: () => void;
 }) {
   const { t } = useI18n();
+  // Without Spanish VAT on the invoice, the amount to type is its base.
+  const amountLabel =
+    expense.op && expense.op !== 'domestic'
+      ? t('app.autonomo.vatOp.base')
+      : t('app.autonomo.expenseAmount');
   return (
     <li>
       <div className="autonomo-expense-top">
@@ -271,7 +308,7 @@ function ExpenseRow({
       </div>
       <div className="autonomo-expense-fields">
         <label className="field">
-          <span className="field-label">{t('app.autonomo.expenseAmount')}</span>
+          <span className="field-label">{amountLabel}</span>
           <input
             className="tx-input"
             inputMode="decimal"
@@ -295,6 +332,38 @@ function ExpenseRow({
             ))}
           </select>
         </label>
+        <label className="field">
+          <span className="field-label">{t('app.autonomo.vatOp.label')}</span>
+          <select
+            className="tx-input"
+            aria-label={`${t('app.autonomo.vatOp.label')} ${id}`}
+            value={expense.op ?? 'domestic'}
+            onChange={(e) => onChange({ op: e.target.value as PurchaseOp })}
+          >
+            {PURCHASE_OPS.map((op) => (
+              <option key={op} value={op}>
+                {t(`app.autonomo.vatOp.purchase.${op}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        {special && (
+          <label className="field">
+            <span className="field-label">{t('app.autonomo.vatUse.label')}</span>
+            <select
+              className="tx-input"
+              aria-label={`${t('app.autonomo.vatUse.label')} ${id}`}
+              value={expense.use ?? 'common'}
+              onChange={(e) => onChange({ use: e.target.value as DeductionUse })}
+            >
+              {DEDUCTION_USES.map((use) => (
+                <option key={use} value={use}>
+                  {t(`app.autonomo.vatUse.${use}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {expense.kind === 'meals' && (
           <label className="field">
             <span className="field-label">{t('app.autonomo.days')}</span>
@@ -308,6 +377,18 @@ function ExpenseRow({
           </label>
         )}
       </div>
+      <label className="renta-check autonomo-investment">
+        <input
+          type="checkbox"
+          aria-label={`${t('app.autonomo.vatOp.investment')} ${id}`}
+          checked={Boolean(expense.investment)}
+          onChange={(e) => onChange({ investment: e.target.checked })}
+        />
+        <span>{t('app.autonomo.vatOp.investment')}</span>
+      </label>
+      {expense.investment && (
+        <small className="autonomo-hint">{t('app.autonomo.vatOp.investmentHint')}</small>
+      )}
     </li>
   );
 }
@@ -316,11 +397,16 @@ function ExpenseRow({
 function QuarterPanel({
   quarter,
   q,
+  vatExtras,
+  year,
   onChange,
   onCopyPrevious,
 }: {
   quarter: QuarterForm;
   q: number;
+  /** The VAT of the year: special prorrata and cash accounting show more fields. */
+  vatExtras: VatExtras | undefined;
+  year: number;
   onChange: (patch: Partial<QuarterForm>) => void;
   onCopyPrevious: () => void;
 }) {
@@ -370,6 +456,7 @@ function QuarterPanel({
             key={i}
             expense={expense}
             id={`${q + 1}.${i + 1}`}
+            special={Boolean(vatExtras?.special)}
             onChange={(patch) => setExpense(i, patch)}
             onRemove={() => onChange({ expenses: quarter.expenses.filter((_, j) => j !== i) })}
           />
@@ -386,6 +473,13 @@ function QuarterPanel({
       >
         + {t('app.autonomo.addExpense')}
       </button>
+      <QuarterVatPanel
+        q={q}
+        year={year}
+        vat={vatOfForm(quarter.vat)}
+        cashBasis={Boolean(vatExtras?.cashBasis)}
+        onChange={(vat) => onChange({ vat })}
+      />
     </section>
   );
 }
@@ -405,7 +499,9 @@ export function AutonomoManual({
   focus = null,
   checks = null,
   extras = null,
+  vatExtras,
   onShow,
+  onCarry,
 }: {
   form: ManualForm;
   onChange: (form: ManualForm) => void;
@@ -419,8 +515,12 @@ export function AutonomoManual({
   checks?: ReactNode;
   /** The other options of the draft, after the quarters. */
   extras?: ReactNode;
+  /** The VAT of the year, which decides some fields of the quarters. */
+  vatExtras?: VatExtras;
   /** Opens an imported invoice in the review (from the result of its file). */
   onShow?: (id: string) => void;
+  /** What the 390 of last year hands to this one. */
+  onCarry?: (carry: { toOffset: string; provisional: string | null }) => void;
 }) {
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
@@ -451,6 +551,7 @@ export function AutonomoManual({
           onChange={onChange}
           onPeriod={onPeriod}
           onShow={onShow}
+          onCarry={onCarry}
         />
         <ProfilePanel profile={form.profile} onChange={setProfile} />
         {upTo > 1 && <PriorPanel prior={form.prior} onChange={setPrior} />}
@@ -468,6 +569,8 @@ export function AutonomoManual({
                 key={q}
                 quarter={quarter}
                 q={q}
+                vatExtras={vatExtras}
+                year={year}
                 onChange={(patch) => setQuarter(q, patch)}
                 onCopyPrevious={() => copyPrevious(q)}
               />
