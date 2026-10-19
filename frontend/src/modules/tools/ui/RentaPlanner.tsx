@@ -370,7 +370,7 @@ export function RentaPlanner({
         startSignal={reviewStart}
         invest={<InvestLink form={form} />}
       />
-      <Optimizer form={form} set={set} ccaa={ccaa} found={found.candidates} savings={savings} />
+      <Optimizer form={form} set={set} ccaa={ccaa} found={missing} />
       <DeductionsStep
         state={rentaState}
         ccaa={ccaa}

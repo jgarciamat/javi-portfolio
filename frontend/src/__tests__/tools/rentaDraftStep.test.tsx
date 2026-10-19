@@ -148,12 +148,17 @@ describe('Renta planner: answering every question', () => {
     render();
     await paste(DRAFT);
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
+    // The reviewer counts the deductions still to decide, without a figure for them.
+    const left = /^Te quedan \d+ deducciones/;
+    expect(screen.getByText(left)).toBeInTheDocument();
     for (let i = 0; i < 200; i++) {
       const next = screen.queryAllByRole('button', { name: /^No me corresponde:/ })[0];
       if (!next) break;
       fireEvent.click(next);
     }
     expect(screen.getByText(tr('tools.renta.draft.noneMissing'))).toBeInTheDocument();
+    // Every one dismissed: none is counted (nor its saving) in the reviewer any more.
+    expect(screen.queryByText(left)).toBeNull();
   });
 });
 

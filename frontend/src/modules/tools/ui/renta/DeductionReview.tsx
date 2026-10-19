@@ -196,7 +196,8 @@ function ReviewItem({
       <p className="renta-why">
         <strong>{t('tools.renta.requirements')}:</strong> {deduction.requirements}
       </p>
-      <Saving saving={saving} />
+      {/* What it saves only once the person says it applies: not for a mere possibility. */}
+      {status === 'marked' && <Saving saving={saving} />}
       <a href={deduction.url} target="_blank" rel="noopener noreferrer">
         {t('tools.renta.official')}
       </a>
