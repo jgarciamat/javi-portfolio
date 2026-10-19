@@ -348,7 +348,11 @@ describe('The activity as the draft and the summary take it', () => {
 });
 
 describe('The activity in the self-employed screen', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    // Everything together (the assistant has its own suite).
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
+  });
 
   it('sends the depreciation with the draft and shows the summary of the year', async () => {
     const api = createFakeApi();

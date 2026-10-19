@@ -20,14 +20,7 @@ import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { vatExtrasOf } from './vatForm';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
-import {
-  QUARTERS,
-  YEARS,
-  nextFocus,
-  useAutonomoDraft,
-  withCarry,
-  type Quarter,
-} from './useAutonomoDraft';
+import { QUARTERS, YEARS, useAutonomoDraft, type Quarter } from './useAutonomoDraft';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
@@ -243,17 +236,14 @@ export function AutonomoDraftCard({
         upTo={quarter}
         year={year}
         years={YEARS}
-        onPeriod={(y, q) => {
-          setYear(y);
-          setQuarter(q);
-        }}
+        onPeriod={s.setPeriod}
         focus={focus}
-        onShow={(id) => setFocus(nextFocus(id))}
+        onShow={s.showInvoice}
         checks={
           <ImportChecks
             checks={checks}
             invoices={manual.invoices}
-            onInvoice={(id) => setFocus(nextFocus(id))}
+            onInvoice={s.showInvoice}
             onQuarter={toQuarter}
           />
         }
@@ -263,7 +253,7 @@ export function AutonomoDraftCard({
               value={manual.activity}
               year={year}
               reagp={vatExtrasOf(extras.vat).regime === 'reagp'}
-              onChange={(activity) => changeManual({ ...manual, activity })}
+              onChange={s.setActivity}
             />
             <ExtrasPanel
               extras={extras}
@@ -273,7 +263,7 @@ export function AutonomoDraftCard({
           </>
         }
         vatExtras={extras.vat}
-        onCarry={(carry) => setExtras(withCarry(extras, carry))}
+        onCarry={s.carry}
       />
 
       <StepSection step="result">

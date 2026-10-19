@@ -30,6 +30,8 @@ jest.mock('@core/notifications/notifications', () => ({
 
 beforeEach(() => {
   localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
   jest.clearAllMocks();
   freezeTime();
 });
@@ -691,7 +693,11 @@ describe('the self-employed draft', () => {
       ...over,
     });
 
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    // Everything together (the assistant has its own suite).
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
+  });
 
   it('has no categories to mark: everything is typed by hand', async () => {
     open();
@@ -1341,6 +1347,8 @@ describe('the appearance setting', () => {
       .fn()
       .mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia;
     localStorage.clear();
+    // Everything together (the assistant has its own suite).
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
     renderWithProviders(<SettingsView onOpenProfile={jest.fn()} onStartTour={jest.fn()} />);
     const select = await screen.findByRole('combobox', {
       name: new RegExp(tr('app.settings.theme')),

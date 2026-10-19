@@ -91,6 +91,8 @@ const issued = () => latest.invoices.filter((i) => i.book === 'issued');
 
 beforeEach(() => {
   localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
   focusCalls = 0;
   pdfs = {
     [LUZ]: invoice(LUZ),

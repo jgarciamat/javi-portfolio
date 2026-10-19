@@ -377,7 +377,11 @@ describe('The expenses of a quarter, by VAT operation', () => {
 });
 
 describe('The VAT of the year on the self-employed screen', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    // Everything together (the assistant has its own suite).
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
+  });
 
   it('sends the prorrata and takes what the 390 of last year carries', async () => {
     read.mockClear();

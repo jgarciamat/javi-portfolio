@@ -37,6 +37,8 @@ const open = async () => {
 
 beforeEach(() => {
   localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
   // The fourth quarter of 2026 has begun: the draft opens on it.
   freezeTime('2026-10-18T12:00:00');
 });

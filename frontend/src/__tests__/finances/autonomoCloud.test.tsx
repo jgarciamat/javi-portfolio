@@ -75,6 +75,8 @@ const dialog = () => screen.getByRole('dialog');
 
 beforeEach(() => {
   localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
   jest.useFakeTimers({
     now: new Date(NOW),
     doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'],
@@ -248,6 +250,20 @@ describe('Saving in the account', () => {
   it('brings in the account copy on an empty device (a cleared browser)', async () => {
     await setup({ cloud: { on: true }, remote: copy({ manual: withIncome('750') }, 5) });
     await waitFor(() => expect(income().value).toBe('750'));
+  });
+
+  it('brings in where the person was in the step-by-step assistant too', async () => {
+    const wizard = {
+      at: 1,
+      screen: 0,
+      done: ['activity'],
+      answers: { regime: 'general' },
+      streak: 1,
+      lastDay: '2026-10-17',
+    };
+    await setup({ cloud: { on: true }, remote: copy({ manual: withIncome('750'), wizard }, 5) });
+    await waitFor(() => expect(income().value).toBe('750'));
+    expect(JSON.parse(localStorage.getItem('mm_autonomo_wizard') as string)).toEqual(wizard);
   });
 
   it('does nothing when both copies are the same, and replaces one that cannot be read', async () => {

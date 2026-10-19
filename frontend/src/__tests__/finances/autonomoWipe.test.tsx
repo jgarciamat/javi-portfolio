@@ -21,6 +21,8 @@ const wipeButton = () => screen.queryByRole('button', { name: tr('app.autonomo.w
 
 beforeEach(() => {
   localStorage.clear();
+  // Everything together (the assistant has its own suite).
+  localStorage.setItem('mm_autonomo_assistant', 'expert');
   freezeTime('2026-10-18T12:00:00');
   read.mockReset();
 });

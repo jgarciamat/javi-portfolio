@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BusinessView } from '@modules/finances/ui/views/BusinessView';
 
-jest.mock('@modules/finances/ui/components/AutonomoDraftCard', () => ({
-  AutonomoDraftCard: ({ onOpenRenta }: { onOpenRenta?: () => void }) => (
+jest.mock('@modules/finances/ui/components/AutonomoWizard', () => ({
+  AutonomoAssistant: ({ onOpenRenta }: { onOpenRenta?: () => void }) => (
     <button onClick={onOpenRenta}>renta</button>
   ),
 }));

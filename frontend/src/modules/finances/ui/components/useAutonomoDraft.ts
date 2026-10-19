@@ -169,6 +169,16 @@ export function useAutonomoDraft() {
   return {
     year,
     setYear,
+    /** The year and quarter a PDF is about. */
+    setPeriod: (y: number, q: Quarter) => {
+      setYear(y);
+      setQuarter(q);
+    },
+    /** Opens an imported invoice in the review. */
+    showInvoice: (id: string | null) => setFocus(nextFocus(id)),
+    /** What the 390 of last year hands to this one. */
+    carry: (c: { toOffset: string; provisional: string | null }) => setExtras(withCarry(extras, c)),
+    setActivity: (activity: ManualForm['activity']) => changeManual({ ...manual, activity }),
     quarter,
     setQuarter,
     extras,

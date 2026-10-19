@@ -284,6 +284,8 @@ describe('The panel of the modelos 111 and 115, in step 3', () => {
 describe('The withholdings on the self-employed screen', () => {
   beforeEach(() => {
     localStorage.clear();
+    // Everything together (the assistant has its own suite).
+    localStorage.setItem('mm_autonomo_assistant', 'expert');
     freezeTime('2026-07-10T12:00:00');
   });
   afterEach(() => restoreTime());
