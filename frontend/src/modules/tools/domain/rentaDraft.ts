@@ -1,4 +1,6 @@
+import type { Disability } from './rentaCalc';
 import type { Deduction } from './rentaData';
+import type { RentaForm } from './rentaForm';
 
 /** What could be read from the text of a tax return draft (borrador). Everything is a suggestion to confirm. */
 export interface DraftReading {
@@ -19,7 +21,26 @@ export interface DraftReading {
   ownsHome: boolean;
   /** The deductions the draft already applies, as it names them, with what each one gives. */
   applied: { label: string; amount: number }[];
+  /** The tax year the draft is for ("Ejercicio 2025"). */
+  exercise: number | null;
+  /** The person's own degree of disability (box 0011); null when the draft does not say. */
+  disability: Disability | null;
+  /** Properties at the owner's disposal: their cadastral value, how it was valued and the months. */
+  unrented: { value: number; revised: boolean; months: number }[];
+  /** The amount of each box, the first time it appears (only amounts: no names or ids). */
+  boxes: Record<string, number>;
 }
+
+/** What the planner keeps about the draft: what was read, and what the person answered. */
+export interface DraftState {
+  reading: DraftReading | null;
+  rents: boolean;
+  dismissed: string[];
+  /** The draft as it was read, kept while the person tries next year's return with the same data. */
+  scenario: { form: RentaForm; reading: DraftReading } | null;
+}
+
+export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
 
 export interface DraftSituation {
   childAges: number[];
@@ -50,6 +71,52 @@ export function boxesOf(text: string): Record<string, string[]> {
   const pair = /(\d{1,3}(?:\.\d{3})*,\d{2}|\d{2}\/\d{2}\/\d{4})\s+(\d{4})(?!\d)/g;
   for (const m of text.matchAll(pair)) (boxes[m[2]] ??= []).push(m[1]);
   return boxes;
+}
+
+/** An amount and the box after it: `18.379,04   0003`, or `-1.117,09   0610` for a refund. */
+const BOX_AMOUNT = /(?<![\d.,])(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+(\d{4})(?!\d)/g;
+
+/** Every amount of each box, in the order of the lines (the same box repeats for each property). */
+export function boxAmounts(lines: string[]): Record<string, number[]> {
+  const boxes: Record<string, number[]> = {};
+  for (const line of lines) {
+    for (const m of line.matchAll(BOX_AMOUNT)) (boxes[m[2]] ??= []).push(parseAmount(m[1]));
+  }
+  return boxes;
+}
+
+/** The person's degree of disability, from the words of box 0011 (the first declarant comes first). */
+export function disabilityIn(text: string): Disability | null {
+  const at = text.indexOf('grado de discapacidad');
+  if (at < 0) return null;
+  const rest = text.slice(at + 'grado de discapacidad'.length, at + 140);
+  // Up to the box number: what follows belongs to the next line.
+  const end = rest.search(/\b\d{4}\b/);
+  const words = end < 0 ? rest : rest.slice(0, end);
+  if (/superior al 65/.test(words)) return 65;
+  if (/superior al 33/.test(words)) return 33;
+  return 0;
+}
+
+/** Imputed income of 1.1 % of the cadastral value means a revised value; 2 %, one that was not. */
+const REVISED_RATE = 0.015;
+
+/** The days each property was at the owner's disposal (box 0085): a whole number, without cents. */
+const DAYS = /(?<![\d.,/])(\d{1,3})\s+0085(?!\d)/g;
+
+/** Properties at the owner's disposal: box 0083 (value) with 0089 (imputed income) and 0085 (days). */
+function unrentedIn(boxes: Record<string, number[]>, lines: string[]): DraftReading['unrented'] {
+  const values = boxes['0083'] ?? [];
+  const imputed = boxes['0089'] ?? [];
+  const days = lines.flatMap((line) => [...line.matchAll(DAYS)].map((m) => Number(m[1])));
+  return values
+    .map((value, i) => ({ value, imputed: imputed[i], days: days[i] }))
+    .filter((p) => p.imputed !== undefined && p.value > 0)
+    .map((p) => ({
+      value: p.value,
+      revised: p.imputed / p.value < REVISED_RATE,
+      months: p.days === undefined ? 12 : Math.min(12, Math.round((p.days / 365) * 12)),
+    }));
 }
 
 const amountIn = (boxes: Record<string, string[]>, ...ids: string[]): number | null => {
@@ -119,10 +186,18 @@ export function mentionedIn(applied: { label: string }[], deductions: Deduction[
 /** Reads the text of a draft. `communities` are matched by name against the text. */
 export function readDraft(
   rawText: string,
-  options: { year: number; communities: { id: string; name: string }[] }
+  options: {
+    year: number;
+    communities: { id: string; name: string }[];
+    /** The printed lines of the PDF; without them, the lines of the text. */
+    lines?: string[];
+  }
 ): DraftReading {
   const text = normalize(rawText);
   const boxes = boxesOf(text);
+  const lines = options.lines ?? rawText.split('\n');
+  const amounts = boxAmounts(lines);
+  const exercise = /ejercicio (\d{4})/.exec(text);
   const dates = (id: string) => boxes[id] ?? [];
   const named = options.communities.find((c) => text.includes(normalize(c.name)));
   const own = dates('0010')[0];
@@ -139,6 +214,10 @@ export function readDraft(
     age: own ? ageIn(own, options.year) : null,
     ownsHome: text.includes('vivienda habitual en'),
     applied: appliedDeductions(rawText),
+    exercise: exercise ? Number(exercise[1]) : null,
+    disability: disabilityIn(text),
+    unrented: unrentedIn(amounts, lines),
+    boxes: Object.fromEntries(Object.entries(amounts).map(([box, list]) => [box, list[0]])),
   };
 }
 

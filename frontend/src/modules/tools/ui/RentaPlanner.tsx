@@ -2,7 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
-import { computeRenta, descendantBreakdown, incomeFactor, limitBaseFor } from '../domain/rentaCalc';
+import {
+  computeRenta,
+  descendantBreakdown,
+  incomeFactor,
+  limitBaseFor,
+  type RentaInput,
+  type RentaResult,
+} from '../domain/rentaCalc';
 import type { RentaCcaa } from '../domain/rentaData';
 import {
   emptyForm,
@@ -18,9 +25,10 @@ import { loadCcaa } from '../data/renta';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
 import { rentaProperty } from '../data/renta/inmuebles';
 import { rentaState } from '../data/renta/state';
-import { mentionedIn, missingDeductions } from '../domain/rentaDraft';
+import { mentionedIn, missingDeductions, NO_DRAFT, type DraftState } from '../domain/rentaDraft';
+import { compareBoxes, ourBoxes } from '../domain/rentaCompare';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
-import { DraftStep, NO_DRAFT, type DraftState } from './renta/DraftStep';
+import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { IncomeStep } from './renta/IncomeStep';
 import { PropertyStep } from './renta/PropertyStep';
@@ -206,6 +214,31 @@ function ResultSection({
   );
 }
 
+/** The draft's boxes next to ours. */
+function useInsights(
+  input: RentaInput,
+  result: RentaResult,
+  form: RentaForm,
+  reading: DraftState['reading']
+) {
+  const comparison = useMemo(
+    () => ({
+      rows: reading
+        ? compareBoxes(reading.boxes, ourBoxes(result, input), {
+            disability: form.disability,
+            retired: form.retired,
+            mobility: form.mobility,
+            socialSecurityTyped: form.socialSecurity.trim() !== '',
+            nonSalary: number(form.nonSalary),
+          })
+        : [],
+      result: result.result,
+    }),
+    [reading, result, input, form]
+  );
+  return { comparison };
+}
+
 /** Step by step: your situation, your income, property, the deductions and the estimated result. */
 export function RentaPlanner({
   initialIncome = '',
@@ -243,19 +276,25 @@ export function RentaPlanner({
 
   const reduction = useMemo(() => workReductionOf(rentaState), []);
   const family = useMemo(() => familyOf(form), [form]);
-  const live: Snapshot = useMemo(() => {
-    const input = toInput(form, {
-      state: rentaState,
-      ccaa: ccaa ?? NO_CCAA,
-      extras: rentaWorkExtras,
-      property: rentaProperty,
-      workReduction: reduction,
-    });
-    return {
+  const input = useMemo(
+    () =>
+      toInput(form, {
+        state: rentaState,
+        ccaa: ccaa ?? NO_CCAA,
+        extras: rentaWorkExtras,
+        property: rentaProperty,
+        workReduction: reduction,
+      }),
+    [form, ccaa, reduction]
+  );
+  const live: Snapshot = useMemo(
+    () => ({
       result: computeRenta(input),
       kids: descendantBreakdown(family, rentaState.minimums),
-    };
-  }, [form, ccaa, reduction, family]);
+    }),
+    [input, family]
+  );
+  const { comparison } = useInsights(input, live.result, form, draft.reading);
 
   const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
 
@@ -297,6 +336,7 @@ export function RentaPlanner({
         draft={draft}
         onDraft={setDraft}
         accept={(id) => setChoice(id, { on: true, amount: '', units: '' })}
+        comparison={comparison}
       />
       <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
       <IncomeStep form={form} set={set} extras={rentaWorkExtras} />

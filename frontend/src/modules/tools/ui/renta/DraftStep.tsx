@@ -5,24 +5,15 @@ import { formatPrice } from '@modules/billing/ui/pricing';
 import type { CheckoutConsent } from '@modules/billing/domain/types';
 import { errorMessage } from '@shared/utils/errors';
 import type { DraftAccess } from '../../application/useRentaAccess';
-import { readPdfText } from '../../application/readPdf';
-import { readDraft, type DraftReading } from '../../domain/rentaDraft';
+import { readPdf } from '../../application/readPdf';
+import { readDraft, type DraftReading, type DraftState } from '../../domain/rentaDraft';
+import type { CompareRow } from '../../domain/rentaCompare';
 import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
+import { DraftComparison } from './DraftComparison';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
-
-/** What the planner keeps about the draft: what was read, and what the person answered. */
-export interface DraftState {
-  reading: DraftReading | null;
-  rents: boolean;
-  dismissed: string[];
-  /** The draft as it was read, kept while the person tries next year's return with the same data. */
-  scenario: { form: RentaForm; reading: DraftReading } | null;
-}
-
-export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
 
 /** The year of the return the draft belongs to (the exercise); the next campaign is two years on. */
 export const DRAFT_EXERCISE = 2025;
@@ -62,6 +53,15 @@ export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaFor
     rentalOn: r.rentalIncome !== null || form.rentalOn,
     rentalIncome: text(r.rentalIncome, form.rentalIncome),
     age: r.age === null ? form.age : String(r.age),
+    disability: r.disability ?? form.disability,
+    unrented:
+      r.unrented.length > 0
+        ? r.unrented.map((p) => ({
+            value: String(p.value),
+            revised: p.revised,
+            months: p.months === 12 ? '' : String(p.months),
+          }))
+        : form.unrented,
     ascendants:
       r.ascendantAges.length > 0
         ? r.ascendantAges.map((age) => ({ over75: age >= 75, disability: 0 as const }))
@@ -139,6 +139,7 @@ function DraftFound({ reading }: { reading: DraftReading }) {
   const { t } = useI18n();
   const money = useMoney();
   const found = FIELD_LABELS.filter(({ key }) => reading[key] !== null);
+  const extra = (reading.disability ?? 0) > 0 || reading.unrented.length > 0;
   const shown = (key: keyof DraftReading) => {
     const value = reading[key];
     if (key === 'ccaaId')
@@ -149,7 +150,7 @@ function DraftFound({ reading }: { reading: DraftReading }) {
   return (
     <>
       <h3>{t('tools.renta.draft.found')}</h3>
-      {found.length === 0 ? (
+      {found.length === 0 && !extra ? (
         <p className="form-error">{t('tools.renta.draft.nothing')}</p>
       ) : (
         <ul className="renta-minimum">
@@ -163,6 +164,18 @@ function DraftFound({ reading }: { reading: DraftReading }) {
             <li>
               <span>{t('tools.renta.children')}</span>
               <strong>{reading.childAges.length}</strong>
+            </li>
+          )}
+          {reading.disability !== null && reading.disability > 0 && (
+            <li>
+              <span>{t('tools.renta.ownDisability')}</span>
+              <strong>{t(`tools.renta.disability.${reading.disability}`)}</strong>
+            </li>
+          )}
+          {reading.unrented.length > 0 && (
+            <li>
+              <span>{t('tools.renta.unrented')}</span>
+              <strong>{reading.unrented.length}</strong>
             </li>
           )}
         </ul>
@@ -327,20 +340,21 @@ function DraftReader({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<'read' | 'locked' | null>(null);
 
-  const analyse = async (text: string) => {
+  const analyse = async (text: string, lines?: string[]) => {
     setError(null);
     if (!(await access.use())) {
       setError('locked');
       return;
     }
-    const result = readDraft(text, { year: 2025, communities: CCAA_OPTIONS });
+    const result = readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines });
     onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
     set(applyReading(form, result));
   };
   const fromFile = async (file: File) => {
     setBusy(true);
     try {
-      await analyse(await readPdfText(file));
+      const pdf = await readPdf(file);
+      await analyse(pdf.text, pdf.lines);
     } catch {
       setError('read');
     } finally {
@@ -410,6 +424,7 @@ export function DraftStep({
   draft,
   onDraft,
   accept,
+  comparison,
 }: {
   form: RentaForm;
   set: (patch: Partial<RentaForm>) => void;
@@ -423,6 +438,8 @@ export function DraftStep({
   draft: DraftState;
   onDraft: (draft: DraftState) => void;
   accept: (id: string) => void;
+  /** The draft's boxes next to the planner's, and the planner's result. */
+  comparison: { rows: CompareRow[]; result: number };
 }) {
   const { t } = useI18n();
   const { reading } = draft;
@@ -445,6 +462,13 @@ export function DraftStep({
           {reading && (
             <section className="renta-block" aria-live="polite">
               <DraftFound reading={reading} />
+              {!draft.scenario && (
+                <DraftComparison
+                  reading={reading}
+                  rows={comparison.rows}
+                  result={comparison.result}
+                />
+              )}
               <DraftScenario
                 form={form}
                 set={set}

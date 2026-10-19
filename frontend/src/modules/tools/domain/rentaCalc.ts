@@ -79,7 +79,12 @@ export function mergeMinimums(state: FullMinimums, own?: MinimumAmounts): FullMi
 export const countsAsDescendant = (c: Child): boolean => c.age < 25 || c.disability >= 33;
 
 const nth = (list: number[], index: number): number => list[Math.min(index, list.length - 1)];
-const disabilityAmount = (level: Disability, m: FullMinimums, descendant = false): number => {
+/** The minimum for a disability of `level` (a descendant's can have its own amounts). */
+export const disabilityAmount = (
+  level: Disability,
+  m: FullMinimums,
+  descendant = false
+): number => {
   if (level >= 65) return (descendant ? m.descendantDisability65 : undefined) ?? m.disability65;
   if (level >= 33) return (descendant ? m.descendantDisability33 : undefined) ?? m.disability33;
   return 0;
@@ -268,6 +273,8 @@ export interface RentaInput {
 }
 
 export interface RentaResult {
+  /** The "other expenses" of work (2,000 €, more with a disability or a move): box 0019. */
+  otherExpenses: number;
   netIncome: number;
   workReduction: number;
   rentalNet: number;
@@ -275,7 +282,9 @@ export interface RentaResult {
   pensionReduction: number;
   /** Other reductions: spouse plan and compensatory pension. */
   otherReductions: number;
-  /** General tax base. */
+  /** General taxable base, before the reductions of the base (box 0435). */
+  generalBase: number;
+  /** General tax base, after them (box 0500). */
   taxBase: number;
   /** Savings tax base. */
   savingsBase: number;
@@ -289,6 +298,8 @@ export interface RentaResult {
   stateDeductions: number;
   regionalDeductions: number;
   refundable: number;
+  /** Deduction for low pay from work (box 0414), already inside `stateDeductions`. */
+  lowPay: number;
   /** Deductions that were chosen but cannot be used because of the income limit. */
   blocked: string[];
   /** What each chosen deduction gives (after the income limit), State's first. */
@@ -327,11 +338,6 @@ export function rentalNet(rental: RentalInput | null): number {
   return round2(net > 0 ? net * (1 - percent / 100) : net);
 }
 
-/** Deductible expenses of work: the general amount, more with a disability or a move, plus the extra ones. */
-function workExpenses(input: RentaInput): number {
-  return generalExpenses(input) + positive(input.workExpensesExtra);
-}
-
 /** The "other expenses" of art. 19.2.f: 2,000 euros, more for a worker with a disability or who moved. */
 function generalExpenses(input: RentaInput): number {
   const { state, family } = input;
@@ -352,7 +358,8 @@ function generalExpenses(input: RentaInput): number {
 /** Work income minus expenses, reductions and the pension plan: the base the scales are applied to. */
 export function computeRenta(input: RentaInput): RentaResult {
   const { state, ccaa, family } = input;
-  const expenses = workExpenses(input);
+  const otherExpenses = generalExpenses(input);
+  const expenses = otherExpenses + positive(input.workExpensesExtra);
   const netIncome = round2(
     Math.max(0, positive(input.gross) - positive(input.socialSecurity) - expenses)
   );
@@ -476,12 +483,14 @@ export function computeRenta(input: RentaInput): RentaResult {
   }
   const netQuota = round2(quotaLeft - lowPay - refundable);
   return {
+    otherExpenses,
     netIncome,
     workReduction: reduction,
     rentalNet: rentNet,
     imputedIncome: imputed,
     pensionReduction,
     otherReductions,
+    generalBase: round2(Math.max(0, beforeReductions)),
     taxBase,
     savingsBase,
     minimum: { total: stateMin.total, items: stateMin.items, regionalTotal: regionMin.total },
@@ -492,6 +501,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     stateDeductions: round2(appliedState + lowPay),
     regionalDeductions: round2(appliedRegional),
     refundable: round2(refundable),
+    lowPay: round2(lowPay),
     blocked,
     lines,
     netQuota,

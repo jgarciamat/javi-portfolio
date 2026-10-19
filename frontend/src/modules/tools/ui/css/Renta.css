@@ -341,3 +341,106 @@
   justify-content: flex-end;
   margin-bottom: 0.75rem;
 }
+
+/* ─── Saved progress, draft comparison, savings and campaign dates ─────────── */
+
+.renta-compare {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+.renta-compare h3 {
+  margin: 0;
+}
+.renta-compare-summary {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.45);
+  font-weight: 600;
+}
+.renta-compare-warning {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--amber-400, #f59e0b);
+}
+/* The table scrolls on its own on a narrow screen, never the page. */
+.renta-compare-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.renta-compare-table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.renta-compare-table th,
+.renta-compare-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.renta-compare-table th[scope='row'],
+.renta-compare-table thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.renta-compare-differs th,
+.renta-compare-differs td {
+  background: rgba(245, 158, 11, 0.1);
+}
+.renta-compare-differs td:last-child {
+  color: var(--amber-300);
+  font-weight: 700;
+}
+.renta-compare-table .renta-compare-why td {
+  text-align: left;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* On a phone each box is a small card: its name, then the three figures side by side. */
+@media (max-width: 600px) {
+  .renta-compare-table {
+    min-width: 0;
+  }
+  .renta-compare-table thead {
+    display: none;
+  }
+  .renta-compare-table tbody {
+    display: block;
+    border-bottom: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  }
+  .renta-compare-table tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .renta-compare-table th,
+  .renta-compare-table td {
+    border-bottom: 0;
+  }
+  .renta-compare-table th[scope='row'],
+  .renta-compare-table .renta-compare-why td {
+    grid-column: 1 / -1;
+  }
+  .renta-compare-table td[data-label] {
+    padding: 0.2rem 0.35rem 0.5rem;
+    text-align: left;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .renta-compare-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+}
