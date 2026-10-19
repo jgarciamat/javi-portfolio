@@ -6,12 +6,13 @@ import { formatPrice } from '@modules/billing/ui/pricing';
 import type { CheckoutConsent } from '@modules/billing/domain/types';
 import { errorMessage } from '@shared/utils/errors';
 import type { DraftAccess } from '../../application/useRentaAccess';
-import { readPdf } from '../../application/readPdf';
+import { loadXmlMap, readDraftFile } from '../../application/readDraftFile';
+import { readDraftXml } from '../../domain/rentaDraftXml';
 import { readDraft, type DraftReading, type DraftState } from '../../domain/rentaDraft';
 import type { CompareRow } from '../../domain/rentaCompare';
 import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
-import { draftAnswers } from '../../domain/rentaGuide';
+import { applyReading } from '../../domain/rentaDraftApply';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
 import { DraftComparison } from './DraftComparison';
@@ -43,41 +44,6 @@ const FIELD_LABELS: { key: keyof DraftReading; label: string }[] = [
   { key: 'rentalIncome', label: 'tools.renta.rentalIncome' },
   { key: 'savings', label: 'tools.renta.savings' },
 ];
-
-/** The form with what was read from the draft: only what was found, the rest is left as it was. */
-export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaForm> {
-  const text = (n: number | null, current: string) => (n === null ? current : String(n));
-  return {
-    // The guided questions the draft answers are marked as answered.
-    answers: { ...form.answers, ...draftAnswers(r) },
-    ccaaId: r.ccaaId ?? form.ccaaId,
-    gross: text(r.gross, form.gross),
-    socialSecurity: text(r.socialSecurity, form.socialSecurity),
-    withheld: text(r.withheld, form.withheld),
-    pension: text(r.pension, form.pension),
-    savings: text(r.savings, form.savings),
-    rentalOn: r.rentalIncome !== null || form.rentalOn,
-    rentalIncome: text(r.rentalIncome, form.rentalIncome),
-    age: r.age === null ? form.age : String(r.age),
-    disability: r.disability ?? form.disability,
-    unrented:
-      r.unrented.length > 0
-        ? r.unrented.map((p) => ({
-            value: String(p.value),
-            revised: p.revised,
-            days: p.days === null ? '' : String(p.days),
-          }))
-        : form.unrented,
-    ascendants:
-      r.ascendantAges.length > 0
-        ? r.ascendantAges.map((age) => ({ over75: age >= 75, disability: 0 as const }))
-        : form.ascendants,
-    children:
-      r.childAges.length > 0
-        ? r.childAges.map((age) => ({ age: String(age), disability: 0 as const }))
-        : form.children,
-  };
-}
 
 /** What the person needs to read a draft: two months of Premium, or the one-month pass. */
 function DraftPaywall({ access }: { access: DraftAccess }) {
@@ -140,6 +106,21 @@ function DraftPaywall({ access }: { access: DraftAccess }) {
   );
 }
 
+/** A file of another year is the base of this one; the Agency's file is read box by box. */
+function FileNotes({ reading }: { reading: DraftReading }) {
+  const { t } = useI18n();
+  return (
+    <>
+      {reading.exercise !== null && reading.exercise !== DRAFT_EXERCISE && (
+        <p className="renta-scenario" role="status">
+          {t('tools.renta.draft.otherYear', { exercise: reading.exercise })}
+        </p>
+      )}
+      {'format' in reading && <p className="section-hint">{t('tools.renta.draft.fromXml')}</p>}
+    </>
+  );
+}
+
 /** What was read from the draft, and the deductions it already applies. */
 function DraftFound({ reading }: { reading: DraftReading }) {
   const { t } = useI18n();
@@ -156,6 +137,7 @@ function DraftFound({ reading }: { reading: DraftReading }) {
   return (
     <>
       <h3>{t('tools.renta.draft.found')}</h3>
+      <FileNotes reading={reading} />
       {found.length === 0 && !extra ? (
         <p className="form-error">{t('tools.renta.draft.nothing')}</p>
       ) : (
@@ -325,7 +307,10 @@ function MissingQuestions({
   );
 }
 
-/** Reading the draft: from the PDF or pasted as text, in the browser. */
+/** The draft's PDF, or the file Renta WEB downloads (a «.txt» that is an XML; also as «.xml»). */
+const DRAFT_ACCEPT = '.pdf,.txt,.xml,application/pdf,text/plain,application/xml,text/xml';
+
+/** Reading the draft: from the PDF, the Agency's file or pasted as text, in the browser. */
 function DraftReader({
   form,
   set,
@@ -346,21 +331,39 @@ function DraftReader({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<'read' | 'locked' | null>(null);
 
-  const analyse = async (text: string, lines?: string[]) => {
-    setError(null);
-    if (!(await access.use())) {
-      setError('locked');
-      return;
-    }
-    const result = readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines });
-    onDraft({ ...draft, reading: result, rents: !result.ownsHome, dismissed: [], scenario: null });
+  /** A reading of the draft, from any format: into the planner, its deductions marked next. */
+  const use = (result: DraftReading) => {
+    onDraft({
+      ...draft,
+      reading: result,
+      rents: !result.ownsHome,
+      dismissed: [],
+      scenario: null,
+      pending: true,
+    });
     set(applyReading(form, result));
   };
+  const allowed = async () => {
+    setError(null);
+    if (await access.use()) return true;
+    setError('locked');
+    return false;
+  };
+  const analyse = async (text: string, lines?: string[]) => {
+    if (!(await allowed())) return;
+    use(readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines }));
+  };
+  /** The PDF of the draft, or the Agency's file (the «.txt» of Renta WEB, an XML), by its content. */
   const fromFile = async (file: File) => {
     setBusy(true);
     try {
-      const pdf = await readPdf(file);
-      await analyse(pdf.text, pdf.lines);
+      const read = await readDraftFile(file);
+      if (read.kind === 'pdf') await analyse(read.pdf.text, read.pdf.lines);
+      else if (read.kind === 'text') await analyse(read.text);
+      else if (await allowed()) {
+        const map = await loadXmlMap(read.exercise);
+        use(readDraftXml(read.text, { year: DRAFT_EXERCISE, map }));
+      }
     } catch {
       setError('read');
     } finally {
@@ -377,7 +380,7 @@ function DraftReader({
           })}
         </p>
       )}
-      <FileDropZone accept=".pdf,application/pdf" onFiles={(list) => void fromFile(list[0])}>
+      <FileDropZone accept={DRAFT_ACCEPT} onFiles={(list) => void fromFile(list[0])}>
         <p className="renta-privacy" role="note">
           {t('tools.renta.draft.privacy')}
         </p>
@@ -385,7 +388,7 @@ function DraftReader({
           <input
             ref={input}
             type="file"
-            accept="application/pdf"
+            accept={DRAFT_ACCEPT}
             hidden
             aria-label={t('tools.renta.draft.file')}
             onChange={(e) => {

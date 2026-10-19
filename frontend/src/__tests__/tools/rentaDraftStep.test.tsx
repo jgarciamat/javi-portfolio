@@ -293,7 +293,8 @@ describe('Renta planner: who can read a draft', () => {
 describe('Renta planner: going through the marked deductions', () => {
   /** Answers every question: the first two apply, the rest do not. */
   const answerAll = async () => {
-    await paste(DRAFT);
+    // Without the draft's own deduction, which is marked as soon as the draft is read.
+    await paste(DRAFT.replace(/\n\s*Por nacimiento.*\n.*0564/, ''));
     await screen.findByText(/Deducciones de Comunitat Valenciana/);
     const yes = () => screen.queryAllByRole('button', { name: /^Me corresponde:/ });
     await screen.findAllByRole('button', { name: /^Me corresponde:/ });

@@ -2408,13 +2408,13 @@
   "tools.renta.childAids.none": "none selected.",
   "tools.renta.childAids.total": "Estimated total for children:",
   "tools.renta.draft.title": "Import your draft and find what is missing",
-  "tools.renta.draft.hint": "Download your draft from the Tax Agency as a PDF and upload it: we read it, fill in your data and ask about the State and community deductions you have not ticked and could claim.",
+  "tools.renta.draft.hint": "Download your draft from the Tax Agency (the PDF, or the .txt file Renta WEB downloads) and upload it: we read it, fill in your data and ask you about the deductions of your region and of the State you have not marked and could claim.",
   "tools.renta.draft.premium": "Reading your draft is an exclusive feature: create your account to get it.",
-  "tools.renta.draft.privacy": "Your draft is read on your own device: the PDF is not uploaded to any server. We only use the figures to fill in the calculator.",
-  "tools.renta.draft.upload": "Upload my draft (PDF)",
+  "tools.renta.draft.privacy": "Your draft is read on your own device: the file is not uploaded to any server. We only use the figures to fill in the calculator; your tax ID, name, date of birth and bank account are neither kept nor shown.",
+  "tools.renta.draft.upload": "Upload my draft",
   "tools.renta.draft.file": "Draft file",
   "tools.renta.draft.reading": "Reading…",
-  "tools.renta.draft.error": "I could not read that file. Try the original PDF or paste the text.",
+  "tools.renta.draft.error": "I could not read that file. Try the original PDF, the .txt file from Renta WEB, or paste the text.",
   "tools.renta.draft.paste": "Or paste the text of the draft here",
   "tools.renta.draft.read": "Read the text",
   "tools.renta.draft.found": "This is what I found",
@@ -4639,5 +4639,7 @@
   "tools.renta.campaign.fold": "Dates of the income tax campaign",
   "wizard.autonomo.hint.amountsNext": "Now quarter {n}. If it is the same as the one before, press “Copy quarter {prev}”.",
   "app.drop.here": "Drop the file here",
-  "app.drop.rejected": "We can't use \"{files}\". Try another type of file."
+  "app.drop.rejected": "We can't use \"{files}\". Try another type of file.",
+  "tools.renta.draft.otherYear": "This file is from the {exercise} tax return; we will use it to fill in your usual data and compare.",
+  "tools.renta.draft.fromXml": "Read from the Tax Agency file: each figure comes from its box, with no reading errors. The deductions your draft already has are marked with their amount."
 }

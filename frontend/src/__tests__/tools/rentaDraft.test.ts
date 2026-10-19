@@ -77,6 +77,7 @@ describe('reading a draft', () => {
         label:
           'Por cantidades satisfechas en gastos asociados a la práctica del deporte y actividades saludables',
         amount: 41.7,
+        box: '1960',
       },
     ]);
   });

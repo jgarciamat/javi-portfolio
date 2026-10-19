@@ -100,8 +100,9 @@ describe('Renta planner: the draft next to the planner', () => {
       target: { value: '1630,99' },
     });
     expect(within(row('0414')).getByText('=')).toBeInTheDocument();
-    expect(within(row('0595')).getByText(why('deductions'))).toBeInTheDocument();
 
+    // The draft's donations (36 € in both halves) are filled in as what was given.
+    expect(screen.getByLabelText(tr('tools.renta.donations.general'))).toHaveValue('45');
     // What was given (45 €), not the deduction: 80 % = 36 €, half of it in the State part (0552).
     fireEvent.change(screen.getByLabelText(tr('tools.renta.donations.general')), {
       target: { value: '45' },

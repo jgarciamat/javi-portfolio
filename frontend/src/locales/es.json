@@ -2408,13 +2408,13 @@
   "tools.renta.childAids.none": "ninguna marcada.",
   "tools.renta.childAids.total": "Total estimado por hijos:",
   "tools.renta.draft.title": "Importa tu borrador y descubre lo que te falta",
-  "tools.renta.draft.hint": "Descarga tu borrador de la Agencia Tributaria en PDF y súbelo: lo leemos, rellenamos tus datos y te preguntamos por las deducciones de tu comunidad y del Estado que no has marcado y podrías pedir.",
+  "tools.renta.draft.hint": "Descarga tu borrador de la Agencia Tributaria (el PDF, o el fichero .txt que descarga Renta WEB) y súbelo: lo leemos, rellenamos tus datos y te preguntamos por las deducciones de tu comunidad y del Estado que no has marcado y podrías pedir.",
   "tools.renta.draft.premium": "Leer tu borrador es una función exclusiva: crea tu cuenta para conseguirla.",
-  "tools.renta.draft.privacy": "Tu borrador se lee en tu propio dispositivo: el PDF no se sube a ningún servidor. Solo usamos las cifras para rellenar la calculadora.",
-  "tools.renta.draft.upload": "Subir mi borrador (PDF)",
+  "tools.renta.draft.privacy": "Tu borrador se lee en tu propio dispositivo: el archivo no se sube a ningún servidor. Solo usamos las cifras para rellenar la calculadora; tu NIF, tu nombre, tu fecha de nacimiento y tu cuenta bancaria no se guardan ni se muestran.",
+  "tools.renta.draft.upload": "Subir mi borrador",
   "tools.renta.draft.file": "Archivo del borrador",
   "tools.renta.draft.reading": "Leyendo…",
-  "tools.renta.draft.error": "No he podido leer ese archivo. Prueba con el PDF original o pega el texto.",
+  "tools.renta.draft.error": "No he podido leer ese archivo. Prueba con el PDF original, con el fichero .txt de Renta WEB o pega el texto.",
   "tools.renta.draft.paste": "O pega aquí el texto del borrador",
   "tools.renta.draft.read": "Leer el texto",
   "tools.renta.draft.found": "Esto es lo que he encontrado",
@@ -4639,5 +4639,7 @@
   "tools.renta.campaign.fold": "Fechas de la campaña de la Renta",
   "wizard.autonomo.hint.amountsNext": "Ahora el trimestre {n}. Si es igual que el anterior, pulsa «Copiar el {prev}.º trimestre».",
   "app.drop.here": "Suelta el archivo aquí",
-  "app.drop.rejected": "No podemos usar «{files}». Prueba con otro tipo de archivo."
+  "app.drop.rejected": "No podemos usar «{files}». Prueba con otro tipo de archivo.",
+  "tools.renta.draft.otherYear": "Este fichero es de la Renta {exercise}; lo usaremos para rellenar tus datos habituales y comparar.",
+  "tools.renta.draft.fromXml": "Leído del fichero de la Agencia Tributaria: cada cifra sale de su casilla, sin errores de lectura. Las deducciones que ya trae tu borrador quedan marcadas con su importe."
 }

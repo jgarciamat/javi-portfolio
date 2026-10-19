@@ -5,6 +5,56 @@ import { isRelevant, normalize, type DraftSituation } from './rentaRelevance';
 
 export { isRelevant, normalize, type DraftSituation };
 
+/** A deduction the draft applies: its line as printed, what it gives and its box. */
+export interface AppliedDeduction {
+  label: string;
+  amount: number;
+  /** The box of the return (the regional ones: 0801 to 2246; empty when not read). */
+  box?: string;
+  /** What was spent, by deduction of the catalogue, when the draft details it (the Agency's file). */
+  bases?: Record<string, number>;
+  /** The deduction of the catalogue, when the box says which one it is (the State ones). */
+  id?: string;
+}
+
+/**
+ * The State deductions of the quota the draft applies, by their boxes (modelo 100 of 2025, Orden
+ * HAC/277/2026, BOE-A-2026-7041, page 22; the same boxes in 2023 and 2024 by the Agency's data
+ * dictionaries): the State part and the regional part of each one, added up.
+ */
+const STATE_BOXES: { boxes: string[]; id: string; label: string }[] = [
+  {
+    boxes: ['0547', '0548'],
+    id: 'estado-vivienda-habitual-transitorio',
+    label: 'Deducción por inversión en vivienda habitual',
+  },
+  {
+    boxes: ['0549'],
+    id: 'estado-empresas-nueva-creacion',
+    label: 'Deducción por inversión en empresas de nueva o reciente creación',
+  },
+  {
+    boxes: ['0552', '0553'],
+    id: 'estado-donativos-ley-49-2002',
+    label: 'Por donativos y otras aportaciones',
+  },
+  {
+    boxes: ['0562', '0563'],
+    id: 'estado-alquiler-transitorio',
+    label: 'Por alquiler de la vivienda habitual (régimen transitorio)',
+  },
+];
+
+/** The State deductions the draft applies, from its boxes. */
+export function stateApplied(boxes: Record<string, number>): AppliedDeduction[] {
+  return STATE_BOXES.flatMap(({ boxes: ids, id, label }) => {
+    // Half and half (LIRPF arts. 67.1.b and 77.1.b): a text with only the State part has both.
+    const regional = ids.length > 1 ? boxes[ids[1]] ?? boxes[ids[0]] ?? 0 : 0;
+    const amount = Math.round(((boxes[ids[0]] ?? 0) + regional) * 100) / 100;
+    return amount > 0 ? [{ label, amount, box: ids[0], id }] : [];
+  });
+}
+
 /** What could be read from the text of a tax return draft (borrador). Everything is a suggestion to confirm. */
 export interface DraftReading {
   ccaaId: string | null;
@@ -23,7 +73,7 @@ export interface DraftReading {
   /** The draft lists a property that was the main home. */
   ownsHome: boolean;
   /** The deductions the draft already applies, as it names them, with what each one gives. */
-  applied: { label: string; amount: number }[];
+  applied: AppliedDeduction[];
   /** The tax year the draft is for ("Ejercicio 2025"). */
   exercise: number | null;
   /** The person's own degree of disability (box 0011); null when the draft does not say. */
@@ -41,6 +91,8 @@ export interface DraftState {
   dismissed: string[];
   /** The draft as it was read, kept while the person tries next year's return with the same data. */
   scenario: { form: RentaForm; reading: DraftReading } | null;
+  /** Just read: the deductions it applies are still to be marked, once its community is loaded. */
+  pending?: boolean;
 }
 
 export const NO_DRAFT: DraftState = { reading: null, rents: false, dismissed: [], scenario: null };
@@ -137,17 +189,17 @@ const fold = (text: string) =>
     .toLowerCase();
 
 /** The deductions that the draft applies: the lines between the "Deducciones" heading and the totals. */
-export function appliedDeductions(rawText: string): { label: string; amount: number }[] {
+export function appliedDeductions(rawText: string): AppliedDeduction[] {
   const flat = rawText.replace(/\s+/g, ' ');
   const lower = fold(flat);
   const from = lower.indexOf('deducciones autonomicas de');
   if (from < 0) return [];
   const end = lower.indexOf('suma de deducciones autonomicas', from);
   if (end < 0) return [];
-  const lines: { label: string; amount: number }[] = [];
-  const line = /(Por [^0-9]{12,}?)\s+(\d{1,3}(?:\.\d{3})*,\d{2})\s+\d{4}/g;
+  const lines: AppliedDeduction[] = [];
+  const line = /(Por [^0-9]{12,}?)\s+(\d{1,3}(?:\.\d{3})*,\d{2})\s+(\d{4})/g;
   for (const m of flat.slice(from, end).matchAll(line)) {
-    lines.push({ label: m[1].trim(), amount: parseAmount(m[2]) });
+    lines.push({ label: m[1].trim(), amount: parseAmount(m[2]), box: m[3] });
   }
   return lines;
 }
@@ -173,6 +225,10 @@ export function mentionedIn(applied: { label: string }[], deductions: Deduction[
     })
     .map((d) => d.id);
 }
+
+/** The first amount of each box. */
+const firstOf = (amounts: Record<string, number[]>): Record<string, number> =>
+  Object.fromEntries(Object.entries(amounts).map(([box, list]) => [box, list[0]]));
 
 /** Reads the text of a draft. `communities` are matched by name against the text. */
 export function readDraft(
@@ -204,11 +260,11 @@ export function readDraft(
     ascendantAges: dates('0092').map((d) => ageIn(d, options.year)),
     age: own ? ageIn(own, options.year) : null,
     ownsHome: text.includes('vivienda habitual en'),
-    applied: appliedDeductions(rawText),
+    applied: [...stateApplied(firstOf(amounts)), ...appliedDeductions(rawText)],
     exercise: exercise ? Number(exercise[1]) : null,
     disability: disabilityIn(text),
     unrented: unrentedIn(amounts, lines),
-    boxes: Object.fromEntries(Object.entries(amounts).map(([box, list]) => [box, list[0]])),
+    boxes: firstOf(amounts),
   };
 }
 

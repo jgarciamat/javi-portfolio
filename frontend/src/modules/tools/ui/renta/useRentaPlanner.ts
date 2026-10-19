@@ -36,7 +36,8 @@ import {
 } from '../../domain/rentaReview';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { compareBoxes, ourBoxes } from '../../domain/rentaCompare';
-import { draftGaps, withGaps, type DraftGap } from '../../domain/rentaDraftGaps';
+import { draftDeductionIds, draftGaps, withGaps, type DraftGap } from '../../domain/rentaDraftGaps';
+import { withDraftDeductions } from '../../domain/rentaDraftApply';
 import { deductionSavings, markedSaving } from '../../domain/rentaSavings';
 import { clearProgress, loadProgress, saveProgress } from '../../application/rentaProgress';
 import { forgetMappings } from '../../application/investImport';
@@ -59,7 +60,15 @@ function useDeductionHints(
 ) {
   const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
   const mentioned = useMemo(
-    () => (draft.reading ? mentionedIn(draft.reading.applied, all) : []),
+    () =>
+      draft.reading
+        ? [
+            ...new Set([
+              ...mentionedIn(draft.reading.applied, all),
+              ...draftDeductionIds(draft.reading.applied, all),
+            ]),
+          ]
+        : [],
     [all, draft]
   );
   // The draft's "it does not apply" and the review's are the same: nothing is asked twice.
@@ -234,6 +243,35 @@ function useLive(
   );
 }
 
+/**
+ * Once a draft is read and its community's data is loaded, the deductions it already applies are
+ * marked with what they give (rentaDraftApply.ts), so the planner starts from the draft's result.
+ */
+function useDraftDeductions({
+  form,
+  set,
+  draft,
+  setDraft,
+  ccaa,
+}: {
+  form: RentaForm;
+  set: (patch: Partial<RentaForm>) => void;
+  draft: DraftState;
+  setDraft: (draft: DraftState) => void;
+  ccaa: RentaCcaa | null;
+}) {
+  useEffect(() => {
+    const { reading } = draft;
+    if (!draft.pending || !reading) return;
+    // The community's deductions are needed to know which ones they are.
+    if (reading.ccaaId && ccaa?.id !== reading.ccaaId) return;
+    const all = [...rentaState.deductions, ...(ccaa?.deductions ?? [])];
+    const { choices, donations } = withDraftDeductions(form, reading.applied, all);
+    set(donations ? { choices, donations } : { choices });
+    setDraft({ ...draft, pending: false });
+  }, [draft, ccaa, form, set, setDraft]);
+}
+
 /** The community's data, loaded when it is chosen. */
 function useCcaa(id: string) {
   const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
@@ -271,6 +309,7 @@ export function useRentaPlanner({
   // Bumped from the guided summary: the review of the deductions starts.
   const [reviewStart, setReviewStart] = useState(0);
   const { ccaa, loadError } = useCcaa(form.ccaaId);
+  useDraftDeductions({ form, set, draft, setDraft, ccaa });
   const access = useRentaAccess(mode);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
