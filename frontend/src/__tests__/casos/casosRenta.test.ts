@@ -140,6 +140,7 @@ function engineValue(campo: string, c: Computed): number {
   if (kind === 'result') return c.result[key as keyof RentaResult] as number;
   // 1: has to file the return (LIRPF art. 96), 0: does not.
   if (kind === 'obligation') return rentaObligation(obligationIncome(c.form)).required ? 1 : 0;
+  if (kind === 'activities') return c.result.activities?.total ?? Number.NaN;
   if (kind === 'activity') {
     // activity.<n>.<field>: a figure of one activity worked out (rentaActivity.ts).
     const [, n, field] = campo.split('.');

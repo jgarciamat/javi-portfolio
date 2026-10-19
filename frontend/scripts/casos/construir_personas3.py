@@ -679,10 +679,10 @@ def figures3(p, b, decl, ref):
             out.append(dict(modelo='100', declaracion=decl, casilla=None, concepto=p2.LABELS[k], importe=b[k], origen='calculo-a-mano', ref=ref, campo=f'result.{k}'))
     if b.get('activityNet'):
         out.append(dict(modelo='100', declaracion=decl, casilla=None, concepto='Rendimiento neto de actividades económicas (base general)', importe=b['activityNet'],
-                        origen='calculo-a-mano', ref=ref, campo=None, motivo=ACT_GAP))
+                        origen='calculo-a-mano', ref=ref, campo='activities.total'))
     if b.get('gainsGeneral'):
         out.append(dict(modelo='100', declaracion=decl, casilla='0303', concepto='Ganancias patrimoniales de la base general (ayudas públicas)', importe=b['gainsGeneral'],
-                        origen='calculo-a-mano', ref=ref, campo=None))
+                        origen='calculo-a-mano', ref=ref, campo='savings.0420'))
     for f in out:
         k = PROPOSALS.get((p['slug'], decl, f['campo']))
         if k and abs(k['esperado'] - f['importe']) < 0.005:

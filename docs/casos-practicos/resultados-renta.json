@@ -79,17 +79,6 @@
       "motivo": "54.000 × 92/365 = 13.610,96 €, exentos (art. 7.p LIRPF; RIRPF art. 6). El motor recibe ya la parte no exenta."
     },
     {
-      "caso": "p3-103-vacuno-leche-titularidad-compartida-pontevedra",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 18838.5,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
       "caso": "p3-104-la-palma-volcan-ayuda-reconstruccion-canarias",
       "declaracion": "individual",
       "casilla": null,
@@ -105,33 +94,11 @@
       "declaracion": "individual",
       "casilla": null,
       "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 15380.5,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-106-fruticultor-arranque-perales-modulos-lleida",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
       "concepto": "Prima de arranque de perales (12.000 €)",
       "esperado": null,
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Exenta (DA 5.ª.1.a.6.ª LIRPF): no se integra."
-    },
-    {
-      "caso": "p3-107-viticultor-sin-do-sequia-modulos-ciudad-real",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 817.78,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
     },
     {
       "caso": "p3-62-afectado-dana-ayudas-valencia",
@@ -143,28 +110,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "No se integran en la base (DA 5.ª.1.c y 5.ª.3 LIRPF): se declaran solo como información."
-    },
-    {
-      "caso": "p3-63-almendro-olivar-modulos-reagp-alicante",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 2595.49,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-64-citricultor-directa-iva-general-exporta-valencia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 25650,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
     },
     {
       "caso": "p3-65-nacimiento-2025-prestacion-exenta-valencia",
@@ -189,50 +134,6 @@
       "motivo": "Se declara y queda exenta (art. 38.1): el motor recibe la base del ahorro ya neta."
     },
     {
-      "caso": "p3-71-ovino-leche-modulos-piensos-zamora",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 698.16,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-72-vacuno-cria-dehesa-derechos-pac-salamanca",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 33012.5,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-73-joven-cerealista-primera-instalacion-cooperativa-burgos",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 21223,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-74-viticultor-denominacion-origen-modulos-valladolid",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 8524.87,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
       "caso": "p3-76-huerfana-19-orfandad-exenta-segovia",
       "declaracion": "individual",
       "casilla": null,
@@ -242,72 +143,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Exenta (art. 7.h LIRPF, menor de 22 años): no se declara como rendimiento."
-    },
-    {
-      "caso": "p3-79-apicultor-modulos-y-asalariado-avila",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 2915.55,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-80-porcino-engorde-integrado-segovia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 17845.75,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-82-chopera-forestal-leon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 6639.36,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-83-olivarero-almazara-cooperativa-jaen",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 5176.22,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-85-horticultor-invernadero-directa-exporta-almeria",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 25555,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
-      "caso": "p3-89-bono-alquiler-joven-malaga",
-      "declaracion": "individual",
-      "casilla": "0303",
-      "campo": null,
-      "concepto": "Ganancias patrimoniales de la base general (ayudas públicas)",
-      "esperado": 2400,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano)."
     },
     {
       "caso": "p3-89-bono-alquiler-joven-malaga",
@@ -332,17 +167,6 @@
       "motivo": "Exenta (art. 7.h LIRPF)."
     },
     {
-      "caso": "p3-94-maiz-regadio-arrendado-modulos-huesca",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 1117.88,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
-    },
-    {
       "caso": "p3-95-despido-indemnizacion-exenta-teruel",
       "declaracion": "individual",
       "casilla": null,
@@ -352,17 +176,6 @@
       "obtenido": null,
       "estado": "pendiente",
       "motivo": "Exenta (art. 7.e LIRPF): no se suma a los rendimientos del trabajo; la parte que excede (8.000 €) va en el sueldo del primer pagador."
-    },
-    {
-      "caso": "p3-97-lechuga-ecologica-regadio-modulos-murcia",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": null,
-      "concepto": "Rendimiento neto de actividades económicas (base general)",
-      "esperado": 4901.02,
-      "obtenido": null,
-      "estado": "pendiente",
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
     },
     {
       "caso": "01-asalariado-soltero-madrid",
@@ -15418,6 +15231,16 @@
       "caso": "p3-103-vacuno-leche-titularidad-compartida-pontevedra",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 18838.5,
+      "obtenido": 18838.5,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-103-vacuno-leche-titularidad-compartida-pontevedra",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Estimación directa: Ingresos",
       "esperado": 222160,
@@ -16328,6 +16151,16 @@
       "caso": "p3-106-fruticultor-arranque-perales-modulos-lleida",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 15380.5,
+      "obtenido": 15380.5,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-106-fruticultor-arranque-perales-modulos-lleida",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 87000,
@@ -16672,6 +16505,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": -520,
       "obtenido": -520,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-107-viticultor-sin-do-sequia-modulos-ciudad-real",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 817.78,
+      "obtenido": 817.78,
       "estado": "coincide"
     },
     {
@@ -18518,6 +18361,16 @@
       "caso": "p3-63-almendro-olivar-modulos-reagp-alicante",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 2595.49,
+      "obtenido": 2595.49,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-63-almendro-olivar-modulos-reagp-alicante",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 42040,
@@ -18862,6 +18715,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": 3431.05,
       "obtenido": 3431.05,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-64-citricultor-directa-iva-general-exporta-valencia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 25650,
+      "obtenido": 25650,
       "estado": "coincide"
     },
     {
@@ -20638,6 +20501,16 @@
       "caso": "p3-71-ovino-leche-modulos-piensos-zamora",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 698.16,
+      "obtenido": 698.16,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-71-ovino-leche-modulos-piensos-zamora",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 77010,
@@ -20988,6 +20861,16 @@
       "caso": "p3-72-vacuno-cria-dehesa-derechos-pac-salamanca",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 33012.5,
+      "obtenido": 33012.5,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-72-vacuno-cria-dehesa-derechos-pac-salamanca",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Estimación directa: Ingresos",
       "esperado": 90350,
@@ -21308,6 +21191,16 @@
       "caso": "p3-73-joven-cerealista-primera-instalacion-cooperativa-burgos",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 21223,
+      "obtenido": 21223,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-73-joven-cerealista-primera-instalacion-cooperativa-burgos",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Estimación directa: Ingresos",
       "esperado": 78040,
@@ -21622,6 +21515,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": -349.65,
       "obtenido": -349.65,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-74-viticultor-denominacion-origen-modulos-valladolid",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 8524.87,
+      "obtenido": 8524.87,
       "estado": "coincide"
     },
     {
@@ -23458,6 +23361,16 @@
       "caso": "p3-79-apicultor-modulos-y-asalariado-avila",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 2915.55,
+      "obtenido": 2915.55,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-79-apicultor-modulos-y-asalariado-avila",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 16000,
@@ -23802,6 +23715,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": 1771.48,
       "obtenido": 1771.48,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-80-porcino-engorde-integrado-segovia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 17845.75,
+      "obtenido": 17845.75,
       "estado": "coincide"
     },
     {
@@ -24448,6 +24371,16 @@
       "caso": "p3-82-chopera-forestal-leon",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 6639.36,
+      "obtenido": 6639.36,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-82-chopera-forestal-leon",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 26880,
@@ -24792,6 +24725,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": -1200,
       "obtenido": -1200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-83-olivarero-almazara-cooperativa-jaen",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 5176.22,
+      "obtenido": 5176.22,
       "estado": "coincide"
     },
     {
@@ -25432,6 +25375,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": 2713.95,
       "obtenido": 2713.95,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-85-horticultor-invernadero-directa-exporta-almeria",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 25555,
+      "obtenido": 25555,
       "estado": "coincide"
     },
     {
@@ -26955,6 +26908,16 @@
       "estado": "coincide"
     },
     {
+      "caso": "p3-89-bono-alquiler-joven-malaga",
+      "declaracion": "individual",
+      "casilla": "0303",
+      "campo": "savings.0420",
+      "concepto": "Ganancias patrimoniales de la base general (ayudas públicas)",
+      "esperado": 2400,
+      "obtenido": 2400,
+      "estado": "coincide"
+    },
+    {
       "caso": "p3-91-padre-permiso-nacimiento-pueblo-granada",
       "declaracion": "individual",
       "casilla": "0003",
@@ -28098,6 +28061,16 @@
       "caso": "p3-94-maiz-regadio-arrendado-modulos-huesca",
       "declaracion": "individual",
       "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 1117.88,
+      "obtenido": 1117.88,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-94-maiz-regadio-arrendado-modulos-huesca",
+      "declaracion": "individual",
+      "casilla": null,
       "campo": "activity.0.income",
       "concepto": "Módulos agrarios: Volumen de ingresos de la actividad agraria",
       "esperado": 114400,
@@ -29022,6 +28995,16 @@
       "concepto": "Resultado de la declaración",
       "esperado": -1400,
       "obtenido": -1400,
+      "estado": "coincide"
+    },
+    {
+      "caso": "p3-97-lechuga-ecologica-regadio-modulos-murcia",
+      "declaracion": "individual",
+      "casilla": null,
+      "campo": "activities.total",
+      "concepto": "Rendimiento neto de actividades económicas (base general)",
+      "esperado": 4901.02,
+      "obtenido": 4901.02,
       "estado": "coincide"
     },
     {

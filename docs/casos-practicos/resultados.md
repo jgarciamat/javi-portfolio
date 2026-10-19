@@ -4,7 +4,7 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 | Parte | Coinciden | Discrepancias | Pendientes o no soportadas |
 |---|---:|---:|---:|
-| Renta (modelo 100, motor del frontend) | 2901 | 0 | 33 |
+| Renta (modelo 100, motor del frontend) | 2918 | 0 | 16 |
 | Autónomos 130 y 303 (motor del backend, `npm run casos`) | 320 | 0 | 0 |
 | Casos oficiales reproducidos por el motor (`casosOficiales.test.ts`) | 9 | 0 | resto del catálogo |
 
@@ -35,7 +35,6 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 ## Pendientes por motivo
 
-- 16 × El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json.
 - 1 × Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial.
 - 1 × Límites de renta y requisitos 2025 no confirmados con un caso oficial.
 - 1 × Declaración informativa, sin cuota: fuera del motor.
@@ -49,7 +48,6 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 - 1 × Exenta (art. 7.h LIRPF): no forma parte de los rendimientos del trabajo.
 - 1 × Se declara y queda exenta (art. 38.1): el motor recibe la base del ahorro ya neta.
 - 1 × Exenta (art. 7.h LIRPF, menor de 22 años): no se declara como rendimiento.
-- 1 × El motor no devuelve esta casilla (se comprueba solo en el cálculo a mano).
 - 1 × La AEAT habla de «cantidades satisfechas» y no dice si se resta la ayuda: se toma el alquiler pagado entero (NO CONFIRMADO).
 - 1 × Exenta (art. 7.h LIRPF).
 - 1 × Exenta (art. 7.e LIRPF): no se suma a los rendimientos del trabajo; la parte que excede (8.000 €) va en el sueldo del primer pagador.

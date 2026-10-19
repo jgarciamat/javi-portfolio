@@ -291,8 +291,7 @@
       "importe": 18838.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motivo": "El formulario de la Renta aún no recoge actividades económicas (el motor las calcula en rentaActivity.ts): ver actividadPropuesta en persona.json."
+      "campo": "activities.total"
     },
     {
       "modelo": "100",
