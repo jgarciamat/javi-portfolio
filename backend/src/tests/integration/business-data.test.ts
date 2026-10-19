@@ -146,6 +146,117 @@ describe('The self-employed form saved in the account', () => {
     expect((await get(ana).expect(200)).body).toMatchObject({ data: next, version: 2 });
   });
 
+  it('keeps the VAT of the quarters, of the invoices and of the year (older copies have none)', async () => {
+    const vat = {
+      sales: {
+        intraEU: '3000',
+        exports: '',
+        notSubject: '',
+        oss: '',
+        ossSubject: '',
+        reverse: '',
+        exempt: '',
+        exemptOccasional: '',
+        nonVat: '',
+      },
+      re: { r21: '1000', r10: '', r4: '', tobacco: '' },
+      salesFix: { base: '-100', vat: '-21', priorYear: '' },
+      reFix: { base: '', fee: '' },
+      deductionFix: { base: '', vat: '' },
+      intraFix: { base: '', vat: '' },
+      oneOff: { reagp: '', investmentAdjust: '', art80: '', importDeferred: '' },
+      cash: {
+        invoiced: { r21: '', r10: '', r4: '' },
+        collected: { r21: '', r10: '', r4: '' },
+        purchasesInvoiced: { r21: '', r10: '', r4: '' },
+        purchasesPaid: { r21: '', r10: '', r4: '' },
+      },
+      intra: [
+        {
+          key: 'E',
+          vatId: 'FR00000000001',
+          name: 'Client Fictif',
+          base: '3000',
+          rect: false,
+          rectYear: '',
+          rectQuarter: '',
+          previous: '',
+        },
+      ],
+    };
+    const base = form();
+    const data = {
+      ...base,
+      manual: {
+        ...base.manual,
+        quarters: [
+          {
+            ...base.manual.quarters[0],
+            expenses: [
+              {
+                kind: 'material',
+                amount: '1000',
+                vatRate: 21,
+                days: '',
+                op: 'import',
+                investment: true,
+                use: 'taxed',
+              },
+            ],
+            vat,
+          },
+          ...base.manual.quarters.slice(1),
+        ],
+        invoices: [
+          {
+            ...base.manual.invoices[0],
+            op: 'intraEU',
+            vatId: 'FR00000000001',
+            key349: 'E',
+            opFix: true,
+          },
+          {
+            ...base.manual.invoices[1],
+            op: 'intraGoods',
+            investment: true,
+            cash: true,
+            rateGuessed: true,
+          },
+        ],
+        filed303: [472, null, null, null],
+      },
+      extras: {
+        ...base.extras,
+        vat: {
+          provisional: '80',
+          special: false,
+          refund: true,
+          skip: [3],
+          regime: 'general',
+          reagpVolume: '',
+          cashBasis: false,
+          investments: [{ year: '2024', vat: '1000', pct: '50', realEstate: false }],
+        },
+      },
+    };
+    await put(ana, { data, baseVersion: null }).expect(200);
+    expect((await get(ana).expect(200)).body.data).toEqual(data);
+    // Only what the form has: an unknown operation or key is refused.
+    const wrong = { ...data, manual: { ...data.manual, filed303: [1, 2] } };
+    await put(ana, { data: wrong, baseVersion: 1 }).expect(400);
+    const badKey = {
+      ...data,
+      manual: {
+        ...data.manual,
+        quarters: [
+          { ...data.manual.quarters[0], vat: { ...vat, intra: [{ ...vat.intra[0], key: 'Z' }] } },
+          ...data.manual.quarters.slice(1),
+        ],
+      },
+    };
+    await put(ana, { data: badKey, baseVersion: 1 }).expect(400);
+  });
+
   it('encrypts the form at rest: no figure or name is stored in clear', async () => {
     await put(ana, { data: form(), baseVersion: null }).expect(200);
     const [row] = stored();

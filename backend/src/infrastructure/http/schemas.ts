@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { EXPENSE_KINDS } from '@domain/services/autonomo-expenses';
-import { DEDUCTION_USES, KEYS_349, PURCHASE_OPS } from '@domain/services/autonomo-vat-data';
+import {
+  DEDUCTION_USES,
+  KEYS_349,
+  PURCHASE_OPS,
+  SALE_OPS,
+} from '@domain/services/autonomo-vat-data';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 
@@ -474,13 +479,73 @@ const PDF_REVIEW_CODES = [
   'issuer',
 ] as const;
 const savedExpense = z
-  .object({ kind: z.enum(EXPENSE_KINDS), amount: formText, vatRate: vatRateValue, days: formText })
+  .object({
+    kind: z.enum(EXPENSE_KINDS),
+    amount: formText,
+    vatRate: vatRateValue,
+    days: formText,
+    op: z.enum(PURCHASE_OPS).optional(),
+    investment: z.boolean().optional(),
+    use: z.enum(DEDUCTION_USES).optional(),
+  })
+  .strict();
+const textRecord = <K extends string>(keys: readonly K[]) =>
+  z
+    .object(Object.fromEntries(keys.map((k) => [k, formText])) as Record<K, typeof formText>)
+    .strict();
+const savedCash = textRecord(['r21', 'r10', 'r4'] as const);
+/** The VAT of a quarter as the form keeps it (frontend vatForm.ts), all text. */
+const savedVat = z
+  .object({
+    sales: textRecord([
+      'intraEU',
+      'exports',
+      'notSubject',
+      'oss',
+      'ossSubject',
+      'reverse',
+      'exempt',
+      'exemptOccasional',
+      'nonVat',
+    ] as const),
+    re: textRecord(['r21', 'r10', 'r4', 'tobacco'] as const),
+    salesFix: textRecord(['base', 'vat', 'priorYear'] as const),
+    reFix: textRecord(['base', 'fee'] as const),
+    deductionFix: textRecord(['base', 'vat'] as const),
+    intraFix: textRecord(['base', 'vat'] as const),
+    oneOff: textRecord(['reagp', 'investmentAdjust', 'art80', 'importDeferred'] as const),
+    cash: z
+      .object({
+        invoiced: savedCash,
+        collected: savedCash,
+        purchasesInvoiced: savedCash,
+        purchasesPaid: savedCash,
+      })
+      .strict(),
+    intra: z
+      .array(
+        z
+          .object({
+            key: z.enum(KEYS_349),
+            vatId: z.string().max(20),
+            name: z.string().max(120),
+            base: formText,
+            rect: z.boolean(),
+            rectYear: formText,
+            rectQuarter: formText,
+            previous: formText,
+          })
+          .strict()
+      )
+      .max(500),
+  })
   .strict();
 const savedQuarter = z
   .object({
     income: z.object({ r21: formText, r10: formText, r4: formText, r0: formText }).strict(),
     withheld: formText,
     expenses: z.array(savedExpense).max(500),
+    vat: savedVat.optional(),
   })
   .strict();
 const savedInvoice = z
@@ -510,8 +575,20 @@ const savedInvoice = z
       .array(z.enum(['date', 'base', 'rate']))
       .max(3)
       .optional(),
+    /** What the invoice is for VAT (books with the AEAT columns, or the reading of a PDF). */
+    op: z
+      .enum([...SALE_OPS, ...PURCHASE_OPS.filter((o) => o !== 'domestic')] as [string, ...string[]])
+      .optional(),
+    investment: z.boolean().optional(),
+    vatId: z.string().max(20).optional(),
+    key349: z.enum(KEYS_349).optional(),
+    cash: z.boolean().optional(),
+    rateGuessed: z.boolean().optional(),
+    /** The person corrected its VAT operation: a new import keeps it. */
+    opFix: z.boolean().optional(),
   })
   .strict();
+const filedResult = z.number().finite().min(-100_000_000).max(100_000_000).nullable();
 const savedPayees = z.object({ people: formText, paid: formText, withheld: formText }).strict();
 const savedWithholding = z
   .object({
@@ -570,6 +647,8 @@ const autonomoSaved = z
           savedWithholding,
           savedWithholding,
         ]),
+        /** Results (box 71) of the 303 imported, by quarter. */
+        filed303: z.tuple([filedResult, filedResult, filedResult, filedResult]).optional(),
       })
       .strict(),
     extras: z
@@ -578,6 +657,26 @@ const autonomoSaved = z
         exempt: z.boolean(),
         priorNet: formText,
         toOffset: formText,
+        /** The VAT of the year (frontend vatForm.ts, VatExtras). */
+        vat: z
+          .object({
+            provisional: formText,
+            special: z.boolean(),
+            refund: z.boolean(),
+            skip: z.array(quarterValue).max(4),
+            regime: z.enum(['general', 'simplified', 'reagp']),
+            reagpVolume: formText,
+            cashBasis: z.boolean(),
+            investments: z
+              .array(
+                z
+                  .object({ year: formText, vat: formText, pct: formText, realEstate: z.boolean() })
+                  .strict()
+              )
+              .max(100),
+          })
+          .strict()
+          .optional(),
       })
       .strict(),
     /** Supplier → kind of expense the user chose, for the next imports. */
