@@ -23,6 +23,7 @@ import { bringIntoView } from './bringIntoView';
 import { StepBar, StepSection, goToStep, useCurrentStep, type Step } from './AutonomoSteps';
 import { AutonomoSummary, summarize } from './AutonomoSummary';
 import { AutonomoCloudPanel } from './AutonomoCloud';
+import { WithholdingsPanel } from './AutonomoWithholdings';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
 import type { KindPreferences } from '../../domain/invoiceLedger';
@@ -300,7 +301,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
       <AutonomoSummary
         year={year}
         quarter={quarter}
-        summary={summarize(manual, quarter, checks, !hasData)}
+        summary={summarize(manual, quarter, checks, !hasData, year)}
         onPeriod={() => {
           setStep('result');
           bringIntoView('autonomo-period', ['select']);
@@ -389,6 +390,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
             <DraftResult draft={snapshot.draft} inputs={snapshot.inputs} />
           </>
         )}
+        <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
         {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
       </StepSection>
     </div>

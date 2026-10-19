@@ -729,3 +729,52 @@ button.autonomo-sum-warn {
   text-align: left;
   margin: 0 0 1rem;
 }
+
+/* Withholdings (modelos 111 and 115): one fold per quarter in step 2, the panel in step 3. */
+.autonomo-wh-quarter {
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  margin-top: 0.6rem;
+}
+
+.autonomo-wh-toggle {
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0.2rem 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.autonomo-wh-totals {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.autonomo-wh-filed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-200);
+}
+
+.autonomo-wh-deadline {
+  font-weight: 600;
+}
+
+.autonomo-review-retention input {
+  width: 6.5rem;
+}
+
+.autonomo-review-retention select {
+  margin-top: 0.3rem;
+}

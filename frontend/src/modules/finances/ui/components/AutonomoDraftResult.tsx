@@ -21,8 +21,8 @@ import '../css/Autonomo.css';
 type Translate = ReturnType<typeof useI18n>['t'];
 type Format = ReturnType<typeof useFormat>;
 
-/** A table of the boxes of an official form. */
-function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
+/** A table of the boxes of an official form (a number of people is a count, not money). */
+export function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
   const { t } = useI18n();
   const { money } = useFormat();
   return (
@@ -41,7 +41,13 @@ function Boxes({ title, boxes }: { title: string; boxes: TaxBox[] }) {
             <tr key={`${b.box}-${b.label}`}>
               <td>{b.box}</td>
               <td>{b.label}</td>
-              <td>{b.label.startsWith('Tipo') ? `${b.amount} %` : money(b.amount)}</td>
+              <td>
+                {b.label.startsWith('Tipo')
+                  ? `${b.amount} %`
+                  : /perceptores$/.test(b.label)
+                  ? b.amount
+                  : money(b.amount)}
+              </td>
             </tr>
           ))}
         </tbody>

@@ -4,6 +4,7 @@ import { AutonomoImport } from './AutonomoImport';
 import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
 import { StepSection } from './AutonomoSteps';
 import { emptyWithholdings, type WithholdingForm } from './withholdingForm';
+import { WithholdingsForm } from './AutonomoWithholdings';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { parseDecimal } from '@shared/utils/numbers';
 import {
@@ -468,6 +469,7 @@ export function AutonomoManual({
               />
             )
           )}
+        <WithholdingsForm form={form} onChange={onChange} year={year} upTo={upTo} />
         {extras}
       </StepSection>
     </>

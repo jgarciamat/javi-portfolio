@@ -3,6 +3,8 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { missingQuarters, type ImportCheck } from '../../domain/importChecks';
 import { toManualData, type ManualForm } from './AutonomoManual';
+import { bringIntoView } from './bringIntoView';
+import { withholdingsOfForm } from './withholdingForm';
 
 export interface Summary {
   income: number;
@@ -11,6 +13,8 @@ export interface Summary {
   missing: ReturnType<typeof missingQuarters>;
   warnings: number;
   empty: boolean;
+  /** What the modelos 111 and 115 of the quarter come to (null: neither is filed). */
+  withholdings: { m111: number; m115: number } | null;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -22,13 +26,14 @@ const amount = (text: string) => {
 /**
  * The figures of the year up to the quarter of the draft, as the draft will take them: the income
  * without VAT and the expenses as paid. With the filed modelo 130 on, its totals stand for the
- * earlier quarters.
+ * earlier quarters. The modelos 111 and 115 are of the quarter alone (they do not add up).
  */
 export function summarize(
   manual: ManualForm,
   quarter: number,
   checks: ImportCheck[],
-  empty: boolean
+  empty: boolean,
+  year: number
 ): Summary {
   const data = toManualData(manual);
   const prior = manual.prior.on && quarter > 1;
@@ -41,7 +46,10 @@ export function summarize(
     (s, q) => s + q.expenses.reduce((t, e) => t + e.amount, 0),
     prior ? amount(manual.prior.expenses) : 0
   );
+  const { m111, m115 } = withholdingsOfForm(manual, year, quarter as 1 | 2 | 3 | 4);
   return {
+    withholdings:
+      m111.result === 'none' && m115.result === 'none' ? null : { m111: m111.due, m115: m115.due },
     income: round2(income),
     expenses: round2(expenses),
     invoices: manual.invoices.length,
@@ -110,6 +118,18 @@ export function AutonomoSummary({
       <span className="autonomo-sum-item">
         {t('app.autonomo.summary.invoices', { n: summary.invoices })}
       </span>
+      {summary.withholdings && (
+        <button
+          type="button"
+          className="autonomo-sum-item"
+          onClick={() => bringIntoView('autonomo-withholdings', ['h3'])}
+        >
+          {t('app.autonomo.wh.summary', {
+            m111: money(summary.withholdings.m111),
+            m115: money(summary.withholdings.m115),
+          })}
+        </button>
+      )}
       {missing.map((text, i) => (
         <button
           key={summary.missing[i].quarter}
