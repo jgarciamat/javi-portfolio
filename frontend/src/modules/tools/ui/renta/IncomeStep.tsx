@@ -113,6 +113,20 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             value={form.compensatory}
             onChange={(v) => set({ compensatory: v })}
           />
+          <Field
+            id="renta-child-support"
+            label={t('tools.renta.childSupport')}
+            hint={t('tools.renta.childSupportHint')}
+            value={form.childSupport ?? ''}
+            onChange={(v) => set({ childSupport: v })}
+          />
+          <Field
+            id="renta-pension-capital"
+            label={t('tools.renta.pensionCapital2006')}
+            hint={t('tools.renta.pensionCapital2006Hint')}
+            value={form.pensionCapital2006 ?? ''}
+            onChange={(v) => set({ pensionCapital2006: v })}
+          />
         </div>
         <ul className="renta-notes">
           {extras.baseReductions.map((r) => (

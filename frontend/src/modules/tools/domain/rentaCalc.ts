@@ -45,6 +45,11 @@ export interface Family {
   ascendants: Ascendant[];
   /** The children are claimed together with the other parent: each one takes half. */
   sharedChildren: boolean;
+  /**
+   * The taxpayer needs the help of third parties or has reduced mobility: the 3,000 € of "gastos de
+   * asistencia" also below 65 % (LIRPF art. 60.1, second paragraph).
+   */
+  assistance?: boolean;
 }
 
 export interface MinimumItem {
@@ -85,21 +90,25 @@ export const countsAsDescendant = (c: Child): boolean => c.age < 25 || c.disabil
 
 const nth = (list: number[], index: number): number => list[Math.min(index, list.length - 1)];
 /**
- * The minimum for a disability of `level` (a descendant's can have its own amounts). From 65 % it
- * includes the "gastos de asistencia" (3,000 €, or the community's own amount): LIRPF art. 60.1, 60.2
- * and 60.3 give them to the taxpayer, descendants and ascendants with a degree "igual o superior al
- * 65 por ciento" (BOE-A-2006-20764, consolidated text; AEAT Manual práctico de Renta 2025, c14,
- * "Mínimo por discapacidad", checked 19-10-2026). Third-party help or reduced mobility below 65 % is
- * not asked by the planner, so it is not counted.
+ * The minimum for a disability of `level` (a descendant's can have its own amounts). The "gastos de
+ * asistencia" (3,000 €, or the community's own amount) are added from 65 %, and below it when the
+ * person "acredite necesitar ayuda de terceras personas o movilidad reducida" (`assistance`): LIRPF
+ * art. 60.1, 60.2 and 60.3 (BOE-A-2006-20764, consolidated text; AEAT Manual práctico de Renta 2025,
+ * c14, "Mínimo por discapacidad", checked 19-10-2026). The planner asks it for the taxpayer only.
  */
 export const disabilityAmount = (
   level: Disability,
   m: FullMinimums,
-  descendant = false
+  descendant = false,
+  assistance = false
 ): number => {
   if (level >= 65)
     return ((descendant ? m.descendantDisability65 : undefined) ?? m.disability65) + m.assistance;
-  if (level >= 33) return (descendant ? m.descendantDisability33 : undefined) ?? m.disability33;
+  if (level >= 33)
+    return (
+      ((descendant ? m.descendantDisability33 : undefined) ?? m.disability33) +
+      (assistance ? m.assistance : 0)
+    );
   return 0;
 };
 
@@ -161,7 +170,7 @@ export function computeMinimum(
   );
   if (ascendants > 0) items.push({ key: 'ascendants', amount: ascendants });
 
-  const own = disabilityAmount(family.disability, m);
+  const own = disabilityAmount(family.disability, m, false, family.assistance);
   if (own > 0) items.push({ key: 'disability', amount: own });
 
   return { total: round2(items.reduce((sum, i) => sum + i.amount, 0)), items };
@@ -191,6 +200,24 @@ export function descendantBreakdown(
 /** Quota of a scale for a base, once the minimum is lowered from it (never below zero). */
 export function applyMinimum(scale: TaxBracket[], base: number, minimum: number): number {
   return round2(Math.max(0, applyScale(scale, base) - applyScale(scale, minimum)));
+}
+
+/**
+ * The tax of the general base. With maintenance paid to the children by a court decision below the
+ * base, the scale is applied apart to the maintenance and to the rest of the base, and what the
+ * scale gives for the part of the base of the minimum "incrementado en 1.980 euros anuales" is taken
+ * off, never below zero (LIRPF art. 64 for the State's scale and art. 75 for the regional one;
+ * AEAT Manual práctico de Renta 2025, c15, "Anualidades por alimentos a favor de los hijos").
+ */
+export function generalQuota(
+  scale: TaxBracket[],
+  base: number,
+  minimum: number,
+  childSupport = 0
+): number {
+  if (childSupport <= 0 || childSupport >= base) return applyMinimum(scale, base, minimum);
+  const tax = applyScale(scale, childSupport) + applyScale(scale, base - childSupport);
+  return round2(Math.max(0, tax - applyScale(scale, Math.min(base, minimum + 1980))));
 }
 
 // ─── Deductions ───────────────────────────────────────────────────────────────
@@ -328,6 +355,14 @@ export interface RentaInput {
   retired?: boolean;
   /** Union fees, professional association and legal defence (already within their limits). */
   workExpensesExtra: number;
+  /**
+   * The part of a pension plan collected as a lump sum that comes from contributions made up to
+   * 31-12-2006, within the year of the contingency or the two after: it is reduced by 40 % (LIRPF DT
+   * 12.ª, with art. 17.2.b of the TRLIRPF in force on 31-12-2006), box 0011.
+   */
+  pensionCapital2006?: number;
+  /** Maintenance paid to the children by a court decision, without their minimum (LIRPF arts. 64 and 75). */
+  childSupport?: number;
   /** Change of residence for work reasons. */
   geographicMobility: boolean;
   /** Own contributions to pension plans, and those the employer makes (euros). */
@@ -407,6 +442,8 @@ export interface RentaResult {
   lowPayLeftOut: boolean;
   /** Gross pay from work of the return (box 0012; in a joint one, of the whole unit). */
   workGross: number;
+  /** The reductions of the gross pay (box 0011: the 40 % of the DT 12.ª). */
+  workReductions: number;
   /** Net pay before the "other expenses" of art. 19.2.f (box 0017). */
   workPrevious: number;
   /** General taxable base, before the reductions of the base (box 0435). */
@@ -494,9 +531,14 @@ interface Earner {
   main: boolean;
 }
 
+/** The reductions of box 0011 (only the 40 % of the DT 12.ª is asked). */
+export const transitionalReduction = (input: Pick<RentaInput, 'pensionCapital2006'>): number =>
+  round2(positive(input.pensionCapital2006 ?? 0) * 0.4);
+
 function earnersOf(input: RentaInput): Earner[] {
   const main: Earner = {
-    gross: positive(input.gross),
+    // Box 0012: the gross pay less the reductions of box 0011.
+    gross: Math.max(0, positive(input.gross) - transitionalReduction(input)),
     socialSecurity: positive(input.socialSecurity),
     extra: positive(input.workExpensesExtra),
     active: !input.retired,
@@ -755,7 +797,8 @@ export function computeRenta(input: RentaInput): RentaResult {
 
   /** State and regional tax for a given minimum: the minimum that does not fit in the general base goes to savings. */
   const quotas = (minState: number, minRegion: number) => {
-    const general = (scale: TaxBracket[], min: number) => applyMinimum(scale, taxBase, min);
+    const general = (scale: TaxBracket[], min: number) =>
+      generalQuota(scale, taxBase, min, positive(input.childSupport ?? 0));
     const savings = (scale: TaxBracket[], min: number) =>
       applyScale(scale, Math.max(0, savingsBase - Math.max(0, min - taxBase)));
     return {
@@ -808,6 +851,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherExpenses,
     netIncome,
     workGross: work.gross,
+    workReductions: transitionalReduction(input),
     workPrevious: work.reductionBase,
     workReduction: reduction,
     rentalNet: rentNet,

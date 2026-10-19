@@ -965,6 +965,14 @@ def form2(p):
         'pension': str(p['planOwn']) if p.get('planOwn') else '', 'pensionEmployer': '', 'spousePlan': str(p['spousePlan']) if p.get('spousePlan') else '',
         'compensatory': str(p['compensatory']) if p.get('compensatory') else '', 'savings': str(p['savings']) if p.get('savings') else '', 'choices': {},
     }
+    # Fields the engine took later: assistance (art. 60.1), maintenance to the children (arts. 64 and 75)
+    # and the part of a plan collected as capital from contributions up to 2006 (DT 12.ª, 40 %).
+    if p.get('assistance'):
+        f['assistance'] = True
+    if p.get('alimentos'):
+        f['childSupport'] = str(p['alimentos'])
+    if p.get('dt12'):
+        f['pensionCapital2006'] = str(r2(p['dt12'] / 0.4))
     if p.get('rental'):
         rt = p['rental']
         f.update(rentalOn=True, rentalIncome=str(rt['income']), rentalExpenses=rt['expenses'], construction=str(rt['construction']), rentalReduction=rt['reductionId'])

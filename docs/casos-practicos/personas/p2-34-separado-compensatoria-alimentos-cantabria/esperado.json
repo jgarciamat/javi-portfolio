@@ -21,7 +21,7 @@
       "importe": 42000.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0012"
     },
     {
       "modelo": "100",
@@ -41,7 +41,7 @@
       "importe": 39278.4,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0017"
     },
     {
       "modelo": "100",
@@ -101,7 +101,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0460"
     },
     {
       "modelo": "100",
@@ -141,7 +141,7 @@
       "importe": 5550.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0512"
     },
     {
       "modelo": "100",
@@ -161,7 +161,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0518"
     },
     {
       "modelo": "100",
@@ -191,12 +191,7 @@
       "importe": 2795.16,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0545",
-        "obtenido": 3247.26
-      },
-      "motivo": "Discrepancia propuesta: el motor da 3.247,26. El motor no aplica las anualidades por alimentos a los hijos (arts. 64 y 75 LIRPF): escala por separado y mínimo incrementado en 1.980 €."
+      "campo": "boxes.0545"
     },
     {
       "modelo": "100",
@@ -206,12 +201,7 @@
       "importe": 2547.32,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0546",
-        "obtenido": 3003.62
-      },
-      "motivo": "Discrepancia propuesta: el motor da 3.003,62. El motor no aplica las anualidades por alimentos a los hijos (arts. 64 y 75 LIRPF): escala por separado y mínimo incrementado en 1.980 €."
+      "campo": "boxes.0546"
     },
     {
       "modelo": "100",
@@ -221,7 +211,7 @@
       "importe": 2795.16,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -231,7 +221,7 @@
       "importe": 2547.32,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -241,7 +231,7 @@
       "importe": 5342.48,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -261,12 +251,7 @@
       "importe": 5342.48,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 6250.88
-      },
-      "motivo": "Discrepancia propuesta: el motor da 6.250,88. El motor no aplica las anualidades por alimentos a los hijos (arts. 64 y 75 LIRPF): escala por separado y mínimo incrementado en 1.980 €."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -286,12 +271,7 @@
       "importe": -2557.52,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": -1649.12
-      },
-      "motivo": "Discrepancia propuesta: el motor da -1.649,12. El motor no aplica las anualidades por alimentos a los hijos (arts. 64 y 75 LIRPF): escala por separado y mínimo incrementado en 1.980 €."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -301,12 +281,7 @@
       "importe": -2557.52,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": -1649.12
-      },
-      "motivo": "Discrepancia propuesta: el motor da -1.649,12. El motor no aplica las anualidades por alimentos a los hijos (arts. 64 y 75 LIRPF): escala por separado y mínimo incrementado en 1.980 €."
+      "campo": "boxes.0670"
     },
     {
       "modelo": "100",

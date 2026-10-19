@@ -21,7 +21,7 @@
       "importe": 33000.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0012"
     },
     {
       "modelo": "100",
@@ -41,7 +41,7 @@
       "importe": 30861.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0017"
     },
     {
       "modelo": "100",
@@ -101,7 +101,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0460"
     },
     {
       "modelo": "100",
@@ -141,7 +141,7 @@
       "importe": 5550.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0512"
     },
     {
       "modelo": "100",
@@ -161,7 +161,7 @@
       "importe": 12900.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0518"
     },
     {
       "modelo": "100",
@@ -211,7 +211,7 @@
       "importe": 1329.24,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -221,7 +221,7 @@
       "importe": 1089.58,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -231,7 +231,7 @@
       "importe": 2418.82,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -311,7 +311,7 @@
       "importe": 33000.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0012"
     },
     {
       "modelo": "100",
@@ -331,7 +331,7 @@
       "importe": 30861.6,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0017"
     },
     {
       "modelo": "100",
@@ -391,7 +391,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0460"
     },
     {
       "modelo": "100",
@@ -431,7 +431,7 @@
       "importe": 5550.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0512"
     },
     {
       "modelo": "100",
@@ -451,7 +451,7 @@
       "importe": 12900.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0518"
     },
     {
       "modelo": "100",
@@ -501,7 +501,7 @@
       "importe": 1006.74,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -511,7 +511,7 @@
       "importe": 797.18,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -521,7 +521,7 @@
       "importe": 1803.92,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-conjunta",
-      "campo": null
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",

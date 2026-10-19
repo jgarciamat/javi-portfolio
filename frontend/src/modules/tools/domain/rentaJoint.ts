@@ -95,18 +95,27 @@ function childrenToOneOf(input: RentaInput, spouse: JointMember): JointCompariso
     : { to: 'partner', individual: round2(toPartner) };
 }
 
+/** The input of the joint return: the unit, with the reduction of the base. */
+export function jointInputOf(
+  input: RentaInput,
+  spouse: JointMember | null,
+  reduction: number
+): RentaInput {
+  return {
+    ...input,
+    // In a couple's return the children are part of the unit: their whole minimum is there.
+    family: spouse ? { ...input.family, sharedChildren: false } : input.family,
+    joint: { partner: spouse, reduction },
+  };
+}
+
 /** The joint return, and the same with a single 2,000 € of "other expenses" when both earn. */
 function jointOf(
   input: RentaInput,
   spouse: JointMember | null,
   reduction: number
 ): { joint: RentaResult; oneGeneralExpense: number | null } {
-  const jointInput: RentaInput = {
-    ...input,
-    // In a couple's return the children are part of the unit: their whole minimum is there.
-    family: spouse ? { ...input.family, sharedChildren: false } : input.family,
-    joint: { partner: spouse, reduction },
-  };
+  const jointInput = jointInputOf(input, spouse, reduction);
   const twoEarners = spouse !== null && input.gross > 0 && spouse.gross > 0;
   return {
     joint: computeRenta(jointInput),

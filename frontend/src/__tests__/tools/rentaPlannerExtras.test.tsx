@@ -52,6 +52,25 @@ describe('Renta planner: work, contributions and savings', () => {
     expect(screen.getByLabelText(tr('tools.renta.retired'))).toBeChecked();
   });
 
+  it('lowers the tax with the help of a third person, child maintenance and an old pension plan', async () => {
+    render('45000');
+    await screen.findByText(new RegExp(tr('tools.renta.toPay')));
+    expect(screen.queryByLabelText(tr('tools.renta.assistance'))).toBeNull();
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.ownDisability')), {
+      target: { value: '33' },
+    });
+    const withDisability = resultText();
+    fireEvent.click(screen.getByLabelText(tr('tools.renta.assistance')));
+    expect(screen.getByLabelText(tr('tools.renta.assistance'))).toBeChecked();
+    expect(resultText()).not.toBe(withDisability);
+    const withAssistance = resultText();
+    fill('tools.renta.childSupport', '4800');
+    expect(resultText()).not.toBe(withAssistance);
+    const withSupport = resultText();
+    fill('tools.renta.pensionCapital2006', '12000');
+    expect(resultText()).not.toBe(withSupport);
+  });
+
   it('adds savings to the result', async () => {
     render();
     await screen.findByText(new RegExp(tr('tools.renta.toPay')));

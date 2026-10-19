@@ -4,6 +4,7 @@ import {
   lowPayDeduction,
   computeMinimum,
   computeRenta,
+  generalQuota,
   countsAsDescendant,
   deductionAmount,
   disabilityAmount,
@@ -246,6 +247,16 @@ describe('computeMinimum', () => {
     expect(mergeMinimums(minimums, { personal: undefined }).personal).toBe(5550);
   });
 
+  it('adds the 3,000 € of assistance below 65 % with the help of third parties (art. 60.1)', () => {
+    const family = { ...alone, disability: 33 as const };
+    expect(computeMinimum(family, minimums).total).toBe(5550 + 3000);
+    expect(computeMinimum({ ...family, assistance: true }, minimums).total).toBe(5550 + 6000);
+    // From 65 % they are always there.
+    expect(computeMinimum({ ...alone, disability: 65, assistance: true }, minimums).total).toBe(
+      5550 + 12000
+    );
+  });
+
   it('raises the general minimum only from 65 where the community says so (Illes Balears)', () => {
     // AEAT Manual 2025, c14, Illes Balears: over 65, 6,105 € + 1,265 €; under 65, the State's 5,550 €.
     const balears = mergeMinimums(minimums, { personalOver65: 6105, over65: 1265, over75: 1540 });
@@ -378,6 +389,27 @@ describe('computeRenta', () => {
     expect(r.otherReductions).toBe(2200);
     expect(r.taxBase).toBe(28000 - 2200);
     expect(computeRenta(input({ gross: 3000, compensatoryPension: 9999 })).taxBase).toBe(0);
+  });
+
+  it('applies the scale apart to child maintenance (LIRPF arts. 64 and 75)', () => {
+    // Base 30,000, maintenance 4,800, minimum 5,550: scale(4,800) 456 + scale(25,200) 2,862.75
+    // − scale(5,550 + 1,980) 715.35 = 2,603.40 (without it, 3,582.75 − 527.25 = 3,055.50).
+    expect(generalQuota(scale, 30000, 5550, 4800)).toBe(2603.4);
+    expect(generalQuota(scale, 30000, 5550)).toBe(3055.5);
+    expect(generalQuota(scale, 30000, 5550, 30000)).toBe(3055.5);
+    expect(generalQuota(scale, 8000, 9000, 1000)).toBe(0);
+    // 32,000 − 2,000 − 2,000 = 28,000 of base in the engine: lower with the maintenance.
+    const plain = computeRenta(input());
+    const support = computeRenta(input({ childSupport: 4800 }));
+    expect(support.stateQuota).toBeLessThan(plain.stateQuota);
+  });
+
+  it('reduces by 40 % the plan collected as capital from contributions up to 2006 (DT 12.ª)', () => {
+    const r = computeRenta(input({ pensionCapital2006: 12000 }));
+    expect(r.workReductions).toBe(4800);
+    expect(r.workGross).toBe(32000 - 4800);
+    expect(r.netIncome).toBe(32000 - 4800 - 2000 - 2000);
+    expect(computeRenta(input()).workReductions).toBe(0);
   });
 
   it('works the savings out of the detail and puts the other gains in the general base', () => {

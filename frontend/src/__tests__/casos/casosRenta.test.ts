@@ -16,7 +16,7 @@ import {
   toInput,
   type RentaForm,
 } from '@modules/tools/domain/rentaForm';
-import { compareJoint, type JointKind } from '@modules/tools/domain/rentaJoint';
+import { compareJoint, jointInputOf, type JointKind } from '@modules/tools/domain/rentaJoint';
 import { workReductionOf } from '@modules/tools/domain/rentaWork';
 import { loadCcaa } from '@modules/tools/data/renta';
 import { rentaJoint } from '@modules/tools/data/renta/conjunta';
@@ -103,9 +103,11 @@ beforeAll(async () => {
           livesWithOtherParent: renta.conjunta.livesWithOtherParent,
           rules: rentaJoint,
         });
+        const result = (joint as NonNullable<typeof joint>).joint;
         computed.set(`${persona.slug}|conjunta`, {
-          result: (joint as NonNullable<typeof joint>).joint,
-          input,
+          result,
+          // The boxes of the joint return are of the unit (the spouse's minimum, the whole children).
+          input: jointInputOf(input, spouse, result.jointReduction),
           partner: {
             gross: spouse?.gross ?? 0,
             socialSecurity: spouse?.socialSecurity ?? 0,

@@ -44,7 +44,8 @@
           "spousePlan": "",
           "compensatory": "",
           "savings": "600",
-          "choices": {}
+          "choices": {},
+          "assistance": true
         }
       }
     ],

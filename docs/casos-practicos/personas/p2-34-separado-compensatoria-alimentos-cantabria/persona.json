@@ -43,7 +43,8 @@
           "spousePlan": "",
           "compensatory": "6000",
           "savings": "",
-          "choices": {}
+          "choices": {},
+          "childSupport": "4800"
         }
       }
     ],

@@ -183,6 +183,16 @@ export function FamilyStep({
           />
         </div>
       </div>
+      {form.disability === 33 && (
+        <label className="renta-check">
+          <input
+            type="checkbox"
+            checked={form.assistance === true}
+            onChange={(e) => set({ assistance: e.target.checked })}
+          />
+          <span>{t('tools.renta.assistance')}</span>
+        </label>
+      )}
       {loadError && <p className="form-error">{t('tools.renta.loadError')}</p>}
       {foral && ccaa && (
         <p className="renta-foral" role="note">

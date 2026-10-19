@@ -82,7 +82,9 @@ export function disabilityMinimum(family: Family, m: FullMinimums): number {
     (sum, a) => sum + disabilityAmount(a.disability, m),
     0
   );
-  return round2(disabilityAmount(family.disability, m) + children + ascendants);
+  return round2(
+    disabilityAmount(family.disability, m, false, family.assistance) + children + ascendants
+  );
 }
 
 /** The minimum of the taxpayer: the general amount and the one for age (boxes 0511 and 0512). */

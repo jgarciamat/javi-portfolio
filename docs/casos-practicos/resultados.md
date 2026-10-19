@@ -4,8 +4,8 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 | Parte | Coinciden | Discrepancias | Pendientes o no soportadas |
 |---|---:|---:|---:|
-| Renta (modelo 100, motor del frontend) | 747 | 0 | 10 |
-| Autónomos 130 y 303 (motor del backend, `npm run casos`) | 272 | 20 | 24 |
+| Renta (modelo 100, motor del frontend) | 1392 | 0 | 19 |
+| Autónomos 130 y 303 (motor del backend, `npm run casos`) | 320 | 0 | 0 |
 | Casos oficiales reproducidos por el motor (`casosOficiales.test.ts`) | 9 | 0 | resto del catálogo |
 
 ## Discrepancias
@@ -35,13 +35,21 @@ Cada cifra de `personas/*/esperado.json` contra el motor ACTUAL de la app. «Pen
 
 ## Pendientes por motivo
 
+- 2 × El motor no guarda saldos de años anteriores ni posteriores.
 - 1 × Sus importes dependen del número de hijos y de la renta: no se ha confirmado la regla 2025 con un caso oficial.
 - 1 × Límites de renta y requisitos 2025 no confirmados con un caso oficial.
 - 1 × Dato informativo (sí, por superar el segundo pagador 1.500 € y el total 15.876 €): el motor no lo calcula.
 - 1 × El motor recibe la base del ahorro ya neta: no calcula ganancias por lotes.
 - 1 × Declaración informativa, sin cuota: fuera del motor.
 - 1 × El motor recibe la base del ahorro ya neta: no calcula FIFO ni la compensación del art. 49.
-- 1 × El motor no guarda saldos de años anteriores ni posteriores.
 - 1 × El motor no recibe ganancias exentas: se comprueba solo que la base del ahorro no la incluye.
 - 1 × El motor recibe la base del ahorro ya calculada.
 - 1 × Requisitos 2025 no confirmados con un caso oficial.
+- 1 × Sí: 2.º y siguientes pagadores 9.000 € > 1.500 € y total 21.000 € > 15.876 € (art. 96.3 LIRPF). El motor no lo calcula.
+- 1 × No tributa en el IRPF del donatario (art. 6.4 LIRPF): se declara en el Impuesto sobre Donaciones de Castilla-La Mancha, fuera de Finanverso.
+- 1 × El motor recibe la base del ahorro ya calculada: no calcula la ganancia de un inmueble.
+- 1 × No: total 15.000 € ≤ 15.876 € aunque el segundo pagador pase de 1.500 € (art. 96.3 LIRPF); le conviene declarar para que le devuelvan. El motor no lo calcula.
+- 1 × El motor no guarda saldos de años anteriores: recibe la base del ahorro ya compensada.
+- 1 × El motor recibe la base del ahorro ya neta.
+- 1 × El motor recibe la base del ahorro ya neta: no calcula permutas ni FIFO.
+- 1 × No se compara aquí: la deducción del 60 % cambia con la cuota de la conjunta y el formulario solo guarda un importe.

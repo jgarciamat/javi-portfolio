@@ -21,7 +21,7 @@
       "importe": 41200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0012"
     },
     {
       "modelo": "100",
@@ -41,7 +41,7 @@
       "importe": 41200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0017"
     },
     {
       "modelo": "100",
@@ -61,12 +61,7 @@
       "importe": 39200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0022",
-        "obtenido": 44000
-      },
-      "motivo": "Discrepancia propuesta: el motor da 44.000,00. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0022"
     },
     {
       "modelo": "100",
@@ -86,12 +81,7 @@
       "importe": 39200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0025",
-        "obtenido": 44000
-      },
-      "motivo": "Discrepancia propuesta: el motor da 44.000,00. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0025"
     },
     {
       "modelo": "100",
@@ -101,12 +91,7 @@
       "importe": 39200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0435",
-        "obtenido": 44000
-      },
-      "motivo": "Discrepancia propuesta: el motor da 44.000,00. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0435"
     },
     {
       "modelo": "100",
@@ -116,7 +101,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0460"
     },
     {
       "modelo": "100",
@@ -126,12 +111,7 @@
       "importe": 39200.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0500",
-        "obtenido": 44000
-      },
-      "motivo": "Discrepancia propuesta: el motor da 44.000,00. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0500"
     },
     {
       "modelo": "100",
@@ -161,7 +141,7 @@
       "importe": 6700.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0512"
     },
     {
       "modelo": "100",
@@ -181,7 +161,7 @@
       "importe": 0.0,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0518"
     },
     {
       "modelo": "100",
@@ -211,12 +191,7 @@
       "importe": 4466.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0545",
-        "obtenido": 5354.25
-      },
-      "motivo": "Discrepancia propuesta: el motor da 5.354,25. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0545"
     },
     {
       "modelo": "100",
@@ -226,12 +201,7 @@
       "importe": 4466.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0546",
-        "obtenido": 5354.25
-      },
-      "motivo": "Discrepancia propuesta: el motor da 5.354,25. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0546"
     },
     {
       "modelo": "100",
@@ -241,7 +211,7 @@
       "importe": 4466.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0570"
     },
     {
       "modelo": "100",
@@ -251,7 +221,7 @@
       "importe": 4466.25,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0571"
     },
     {
       "modelo": "100",
@@ -261,7 +231,7 @@
       "importe": 8932.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null
+      "campo": "boxes.0587"
     },
     {
       "modelo": "100",
@@ -281,12 +251,7 @@
       "importe": 8932.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0595",
-        "obtenido": 10708.5
-      },
-      "motivo": "Discrepancia propuesta: el motor da 10.708,50. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0595"
     },
     {
       "modelo": "100",
@@ -306,12 +271,7 @@
       "importe": 532.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0610",
-        "obtenido": 2308.5
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.308,50. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0610"
     },
     {
       "modelo": "100",
@@ -321,12 +281,7 @@
       "importe": 532.5,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
-      "campo": null,
-      "motorPropuesto": {
-        "campo": "boxes.0670",
-        "obtenido": 2308.5
-      },
-      "motivo": "Discrepancia propuesta: el motor da 2.308,50. El motor no aplica la reducción del 40 % de la DT 12.ª LIRPF a la parte del rescate del plan de pensiones aportada hasta 2006."
+      "campo": "boxes.0670"
     }
   ]
 }

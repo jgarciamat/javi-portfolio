@@ -60,6 +60,8 @@ export interface RentaForm {
   ccaaId: string;
   age: string;
   disability: Disability;
+  /** Needs the help of third parties or has reduced mobility (3,000 € more below 65 %). */
+  assistance?: boolean;
   children: ChildForm[];
   ascendants: AscendantForm[];
   shared: boolean;
@@ -77,6 +79,10 @@ export interface RentaForm {
   pensionEmployer: string;
   spousePlan: string;
   compensatory: string;
+  /** Maintenance paid to the children by a court decision (they do not live with the person). */
+  childSupport?: string;
+  /** Pension plan collected as a lump sum, the part from contributions up to 2006 (DT 12.ª). */
+  pensionCapital2006?: string;
   rentalOn: boolean;
   rentalIncome: string;
   /** Amount per deductible rental expense, by id. */
@@ -167,6 +173,7 @@ export function familyOf(form: RentaForm): Family {
     children,
     ascendants,
     sharedChildren: form.shared,
+    assistance: form.disability === 33 && form.assistance === true,
   };
 }
 
@@ -283,6 +290,8 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     pensionPlanEmployer: number(form.pensionEmployer),
     spousePlan: number(form.spousePlan),
     compensatoryPension: number(form.compensatory),
+    childSupport: number(form.childSupport),
+    pensionCapital2006: number(form.pensionCapital2006),
     rental: rentalOf(form, data.property),
     imputedValues: unrentedOf(form, data.state.year),
     savings: number(form.savings),
