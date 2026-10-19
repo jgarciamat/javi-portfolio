@@ -1,10 +1,14 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { DeductionLine, RentaResult } from '../../domain/rentaCalc';
 import { descendantBreakdown } from '../../domain/rentaCalc';
+import type { JointComparison } from '../../domain/rentaJoint';
+import { JointTable } from './JointResult';
 
 export interface Snapshot {
   result: RentaResult;
   kids: ReturnType<typeof descendantBreakdown>;
+  /** Individual against joint, when the person can file with a family unit. */
+  joint?: JointComparison | null;
 }
 
 /** An amount that is taken off, shown with a minus sign unless it is zero. */
@@ -131,6 +135,7 @@ export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: numbe
         <dd>{minus(result.withheld, money)}</dd>
       </dl>
       <ChildAids shown={shown} money={money} />
+      {shown.joint && <JointTable joint={shown.joint} money={money} />}
       {result.lines.length > 0 && (
         <>
           <h3>{t('tools.renta.yourDeductions')}</h3>

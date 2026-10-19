@@ -25,8 +25,10 @@ const { redirectTo } = jest.requireMock('@shared/utils/navigation') as { redirec
 // Answering every question of a community is slow on a busy machine.
 jest.setTimeout(60000);
 
+// The full form: the expert mode (the guided questions have their own suite).
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
   read.mockReset();
   playStore.playBillingAvailable.mockReturnValue(false);
   playStore.purchasePremium.mockReset();

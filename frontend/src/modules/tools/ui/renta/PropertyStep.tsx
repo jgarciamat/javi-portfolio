@@ -3,18 +3,29 @@ import type { RentaProperty } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
 
 /** Rented properties: the income, the expenses and the reduction that applies. */
-function RentalSection({ form, set, rental }: StepProps & { rental: RentaProperty['rental'] }) {
+export function RentalSection({
+  form,
+  set,
+  rental,
+  toggle = true,
+}: StepProps & {
+  rental: RentaProperty['rental'];
+  /** The check box to turn it on (the guided question asks it on its own). */
+  toggle?: boolean;
+}) {
   const { t } = useI18n();
   return (
     <>
-      <label className="renta-check">
-        <input
-          type="checkbox"
-          checked={form.rentalOn}
-          onChange={(e) => set({ rentalOn: e.target.checked })}
-        />
-        <span>{t('tools.renta.rentalOn')}</span>
-      </label>
+      {toggle && (
+        <label className="renta-check">
+          <input
+            type="checkbox"
+            checked={form.rentalOn}
+            onChange={(e) => set({ rentalOn: e.target.checked })}
+          />
+          <span>{t('tools.renta.rentalOn')}</span>
+        </label>
+      )}
       {form.rentalOn && (
         <div className="renta-block">
           <div className="tools-form">
@@ -76,7 +87,7 @@ function RentalSection({ form, set, rental }: StepProps & { rental: RentaPropert
 }
 
 /** Properties that are not rented: the imputed income of each one. */
-function UnrentedSection({
+export function UnrentedSection({
   form,
   set,
   imputation,
@@ -120,6 +131,7 @@ function UnrentedSection({
               <span>{t('tools.renta.revised', { rate: imputation.revisedRate })}</span>
             </label>
             <button
+              type="button"
               className="btn-secondary"
               aria-label={t('tools.renta.removeUnrented', { n: i + 1 })}
               onClick={() => set({ unrented: form.unrented.filter((_, j) => j !== i) })}
@@ -131,6 +143,7 @@ function UnrentedSection({
       </ul>
       <div className="button-row">
         <button
+          type="button"
           className="btn-secondary"
           onClick={() =>
             set({ unrented: [...form.unrented, { value: '', revised: false, months: '' }] })

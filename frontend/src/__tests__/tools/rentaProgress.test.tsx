@@ -14,7 +14,11 @@ import { RentaView } from '@modules/finances/ui/views/RentaView';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
-beforeEach(() => localStorage.clear());
+// These suites drive the full form: the expert mode (the guided questions have their own).
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
+});
 
 const reading = readDraft('Retribuciones dinerarias 1.000,00 0003', {
   year: 2025,
@@ -64,6 +68,18 @@ describe('saving the planner on the device', () => {
       retired: true,
     });
     expect(reviveForm(null)).toEqual(emptyForm(''));
+  });
+
+  it('keeps the spouse and the guided answers field by field', () => {
+    const form = reviveForm({
+      joint: 'couple',
+      partner: { gross: '9000', age: 70, retired: 'yes' },
+      answers: { ccaa: 'madrid', age: 40 },
+    });
+    expect(form.joint).toBe('couple');
+    expect(form.partner).toEqual({ ...emptyForm('').partner, gross: '9000' });
+    expect(form.answers).toEqual({ ccaa: 'madrid' });
+    expect(reviveForm({ partner: 'none' }).partner).toEqual(emptyForm('').partner);
   });
 
   it('drops a draft that does not have the shape of this version', () => {

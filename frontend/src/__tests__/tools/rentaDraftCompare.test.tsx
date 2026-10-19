@@ -5,7 +5,11 @@ import * as f from '@test-utils/fixtures';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 jest.setTimeout(60000);
-beforeEach(() => localStorage.clear());
+// These suites drive the full form: the expert mode (the guided questions have their own).
+beforeEach(() => {
+  localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
+});
 
 const premium = () => {
   const api = createFakeApi();

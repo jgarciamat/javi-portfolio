@@ -516,3 +516,161 @@
     font-weight: 400;
   }
 }
+
+/* ─── Guided questions and the joint return ─────────────────────────────────── */
+
+.renta-view {
+  display: grid;
+  gap: 0.2rem;
+}
+.renta-view .section-hint {
+  margin: 0;
+}
+.renta-guide-count {
+  margin: 0 0 0.3rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.renta-progress {
+  width: 100%;
+  height: 0.5rem;
+  margin-bottom: 1rem;
+  accent-color: var(--accent-600);
+}
+.renta-question {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.renta-question > legend {
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.renta-question > legend:focus-visible {
+  outline: 2px solid var(--accent-600);
+  outline-offset: 4px;
+}
+.renta-follow-up {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+}
+.renta-follow-up > legend {
+  font-size: 1rem;
+}
+.renta-why {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+.renta-options {
+  display: grid;
+  gap: 0.5rem;
+}
+.renta-option {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 3rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+  cursor: pointer;
+}
+.renta-option:has(input:checked) {
+  border-color: var(--accent-600);
+  background: rgba(99, 102, 241, 0.12);
+}
+.renta-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent-600);
+  outline-offset: 2px;
+}
+.renta-option input {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+.renta-guide-nav {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.renta-guide-nav > button {
+  width: auto;
+  margin: 0;
+}
+.renta-guide-nav > .btn-primary {
+  flex: 1;
+}
+.renta-guide-keys {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+}
+.renta-summary ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.renta-summary li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--slate-800, rgba(128, 128, 128, 0.3));
+  border-radius: 12px;
+}
+.renta-summary li > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  min-width: 0;
+}
+.renta-summary li span:first-child {
+  color: var(--text-secondary);
+}
+.renta-joint {
+  display: grid;
+  gap: 0.6rem;
+}
+.renta-joint h3 {
+  margin: 0;
+}
+.renta-joint-verdict {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.45);
+}
+@media (max-width: 480px) {
+  .renta-summary li {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+@media (max-width: 600px) {
+  /* Up to four columns: one line each, the label on the left and the amount on the right. */
+  .renta-joint .renta-compare-table tr {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .renta-joint .renta-compare-table td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .renta-joint .renta-compare-table td[data-label]::before {
+    display: inline;
+    font-size: 0.85rem;
+  }
+}

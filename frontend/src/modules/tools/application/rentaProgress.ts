@@ -1,6 +1,6 @@
 import { storage } from '@shared/utils/storage';
 import { NO_DRAFT, type DraftReading, type DraftState } from '../domain/rentaDraft';
-import { emptyForm, type RentaForm } from '../domain/rentaForm';
+import { emptyForm, emptyPartner, type RentaForm } from '../domain/rentaForm';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -21,14 +21,23 @@ const isObject = (v: unknown): v is Record<string, unknown> =>
 const sameKind = (a: unknown, b: unknown) =>
   Array.isArray(a) ? Array.isArray(b) : isObject(a) ? isObject(b) : typeof a === typeof b;
 
-/** A saved form over an empty one: every field of the wrong kind (old or broken data) is left empty. */
-export function reviveForm(saved: unknown): RentaForm {
-  const form = emptyForm('');
-  if (!isObject(saved)) return form;
-  const fields = form as unknown as Record<string, unknown>;
-  for (const key of Object.keys(form)) {
+/** Every field of `saved` with the kind of the same field of `empty` (old or broken data is left out). */
+function over<T extends object>(empty: T, saved: unknown): T {
+  if (!isObject(saved)) return empty;
+  const fields = empty as unknown as Record<string, unknown>;
+  for (const key of Object.keys(empty)) {
     if (sameKind(fields[key], saved[key])) fields[key] = saved[key];
   }
+  return empty;
+}
+
+/** A saved form over an empty one: every field of the wrong kind (old or broken data) is left empty. */
+export function reviveForm(saved: unknown): RentaForm {
+  const form = over(emptyForm(''), saved);
+  form.partner = over(emptyPartner(), form.partner);
+  form.answers = Object.fromEntries(
+    Object.entries(form.answers).filter(([, value]) => typeof value === 'string')
+  );
   // Lists of rows: only rows that are objects (a row with a missing field still reads as empty).
   form.children = form.children.filter(isObject);
   form.ascendants = form.ascendants.filter(isObject);

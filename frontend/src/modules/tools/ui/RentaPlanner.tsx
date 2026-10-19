@@ -15,11 +15,14 @@ import {
   emptyForm,
   familyOf,
   number,
+  partnerOf,
   toInput,
   type Choice,
   type RentaForm,
 } from '../domain/rentaForm';
 import { workReductionOf } from '../domain/rentaWork';
+import { compareJoint } from '../domain/rentaJoint';
+import { rentaJoint } from '../data/renta/conjunta';
 import { useRentaAccess, type RentaAccess, type RentaMode } from '../application/useRentaAccess';
 import { loadCcaa } from '../data/renta';
 import { rentaWorkExtras } from '../data/renta/estado-extra';
@@ -32,6 +35,7 @@ import { clearProgress, loadProgress, saveProgress } from '../application/rentaP
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
+import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
@@ -40,6 +44,8 @@ import './css/Renta.css';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 const SNAPSHOT_KEY = 'mm_renta_snapshot_v2';
+/** Guided questions or the full form (expert mode): a preference of this device. */
+export const VIEW_KEY = 'mm_renta_view';
 const NO_CCAA: RentaCcaa = { id: '', name: '', regime: 'common', deductions: [], source: '' };
 
 /** The way to more calculations: the upgrade dialog in the app, a free account outside it. */
@@ -183,7 +189,9 @@ function ResultSection({
   pending,
   calculate,
   mode,
+  n,
 }: {
+  n: number;
   access: RentaAccess;
   shown: Snapshot | null;
   busy: boolean;
@@ -195,7 +203,7 @@ function ResultSection({
   const money = useMoney();
   const inApp = mode === 'account';
   return (
-    <Step n={5} titleKey="tools.renta.step4" className="renta-result">
+    <Step n={n} titleKey="tools.renta.step4" className="renta-result">
       <div aria-live="polite">
         {access.loading && <p className="section-hint">{t('app.common.loading')}</p>}
         {!access.loading && !shown && (
@@ -288,6 +296,59 @@ function useInsights(
   return { savings, saved, comparison };
 }
 
+/** The result as the data is now, with the joint return compared when the person can file one. */
+function useLive(
+  input: RentaInput,
+  family: ReturnType<typeof familyOf>,
+  form: RentaForm
+): Snapshot {
+  return useMemo(
+    () => ({
+      result: computeRenta(input),
+      kids: descendantBreakdown(family, rentaState.minimums),
+      joint:
+        form.joint === 'couple' || form.joint === 'single'
+          ? compareJoint(input, form.joint, partnerOf(form), {
+              livesWithOtherParent: form.otherParent,
+              rules: rentaJoint,
+            })
+          : null,
+    }),
+    [input, family, form]
+  );
+}
+
+/** Guided questions or the full form: remembered on this device. */
+function useExpertView(): [boolean, (on: boolean) => void] {
+  const [expert, setExpert] = useState(() => storage.get(VIEW_KEY) === 'expert');
+  const switchView = (on: boolean) => {
+    storage.set(VIEW_KEY, on ? 'expert' : 'guided');
+    setExpert(on);
+  };
+  return [expert, switchView];
+}
+
+/** The switch to the expert mode: both modes fill in the same form, nothing is lost on the way. */
+function ViewSwitch({ expert, onChange }: { expert: boolean; onChange: (on: boolean) => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="renta-view">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          role="switch"
+          checked={expert}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        <span>{t('tools.renta.view.expert')}</span>
+      </label>
+      <p className="section-hint">
+        {t(expert ? 'tools.renta.view.expertHint' : 'tools.renta.view.guidedHint')}
+      </p>
+    </div>
+  );
+}
+
 /** Step by step: your situation, your income, property, the deductions and the estimated result. */
 export function RentaPlanner({
   initialIncome = '',
@@ -313,6 +374,8 @@ export function RentaPlanner({
   const [busy, setBusy] = useState(false);
   // Bumped when the data is wiped, so the draft reader forgets its pasted text and messages too.
   const [wipes, setWipes] = useState(0);
+  const [expert, switchView] = useExpertView();
+  const deductions = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
 
   useEffect(() => {
     let cancelled = false;
@@ -340,13 +403,7 @@ export function RentaPlanner({
       }),
     [form, ccaa, reduction]
   );
-  const live: Snapshot = useMemo(
-    () => ({
-      result: computeRenta(input),
-      kids: descendantBreakdown(family, rentaState.minimums),
-    }),
-    [input, family]
-  );
+  const live = useLive(input, family, form);
   const { savings, saved, comparison } = useInsights(input, live.result, ccaa, form, draft.reading);
 
   const { missing, pending, marked, hints } = useDeductionHints(form, ccaa, draft, family, live);
@@ -379,6 +436,7 @@ export function RentaPlanner({
           {t('tools.renta.wipe')}
         </button>
       </div>
+      <ViewSwitch expert={expert} onChange={switchView} />
       <DraftStep
         key={wipes}
         form={form}
@@ -393,9 +451,24 @@ export function RentaPlanner({
         accept={(id) => setChoice(id, { on: true, amount: '', units: '' })}
         comparison={comparison}
       />
-      <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
-      <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
-      <PropertyStep form={form} set={set} property={rentaProperty} />
+      {expert ? (
+        <>
+          <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
+          <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
+          <PropertyStep form={form} set={set} property={rentaProperty} />
+        </>
+      ) : (
+        <GuidedInterview
+          key={wipes}
+          form={form}
+          set={set}
+          ccaa={ccaa}
+          loadError={loadError}
+          deductions={deductions}
+          property={rentaProperty}
+          reading={draft.reading}
+        />
+      )}
       <DeductionsStep
         state={rentaState}
         ccaa={ccaa}
@@ -407,6 +480,7 @@ export function RentaPlanner({
         savings={savings}
         markedSaving={saved}
         onChange={setChoice}
+        n={expert ? 4 : 2}
       />
 
       <ResultSection
@@ -416,6 +490,7 @@ export function RentaPlanner({
         pending={pending}
         calculate={calculate}
         mode={mode}
+        n={expert ? 5 : 3}
       />
     </div>
   );

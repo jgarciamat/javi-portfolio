@@ -10,6 +10,7 @@ import { readDraft, type DraftReading, type DraftState } from '../../domain/rent
 import type { CompareRow } from '../../domain/rentaCompare';
 import type { Deduction } from '../../domain/rentaData';
 import type { RentaForm } from '../../domain/rentaForm';
+import { draftAnswers } from '../../domain/rentaGuide';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
 import { DraftComparison } from './DraftComparison';
@@ -26,6 +27,7 @@ export function nextYearForm(form: RentaForm): RentaForm {
     ...form,
     age: older(form.age),
     children: form.children.map((c) => ({ ...c, age: older(c.age) })),
+    partner: { ...form.partner, age: older(form.partner.age) },
     choices: {},
   };
 }
@@ -44,6 +46,8 @@ const FIELD_LABELS: { key: keyof DraftReading; label: string }[] = [
 export function applyReading(form: RentaForm, r: DraftReading): Partial<RentaForm> {
   const text = (n: number | null, current: string) => (n === null ? current : String(n));
   return {
+    // The guided questions the draft answers are marked as answered.
+    answers: { ...form.answers, ...draftAnswers(r) },
     ccaaId: r.ccaaId ?? form.ccaaId,
     gross: text(r.gross, form.gross),
     socialSecurity: text(r.socialSecurity, form.socialSecurity),

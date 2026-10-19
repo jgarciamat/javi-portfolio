@@ -54,6 +54,36 @@ export function DisabilitySelect({
   );
 }
 
+/** Options of one tap: native radios with their label, inside the fieldset of the question. */
+export function RadioOptions({
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  options: { value: string; label: string }[];
+  value: string | null;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="renta-options">
+      {options.map((o) => (
+        <label key={o.value} className="renta-option">
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            checked={value === o.value}
+            onChange={() => onChange(o.value)}
+          />
+          <span>{o.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 /** A labelled text field of the planner. */
 export function Field({
   id,

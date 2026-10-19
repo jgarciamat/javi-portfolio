@@ -403,6 +403,7 @@ export function DeductionsStep({
   savings,
   markedSaving,
   onChange,
+  n = 4,
 }: {
   state: RentaState;
   ccaa: RentaCcaa | null;
@@ -416,13 +417,15 @@ export function DeductionsStep({
   /** What the marked ones save together. */
   markedSaving: number;
   onChange: (id: string, choice: Choice) => void;
+  /** The number of the step (the guided mode has fewer before it). */
+  n?: number;
 }) {
   const { t } = useI18n();
   const money = useMoney();
   const foral = ccaa?.regime === 'foral';
   const marked = Object.values(choices).some((c) => c.on);
   return (
-    <Step n={4} titleKey="tools.renta.step3">
+    <Step n={n} titleKey="tools.renta.step3">
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
       <p className="section-hint">{t('tools.renta.saving.hint')}</p>
       {marked && (

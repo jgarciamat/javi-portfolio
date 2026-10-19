@@ -4,8 +4,10 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
 
+// The full form: the expert mode (the guided questions have their own suite).
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('mm_renta_view', 'expert');
   freezeTime('2026-03-15T12:00:00');
 });
 afterEach(restoreTime);

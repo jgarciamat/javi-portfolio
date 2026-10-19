@@ -5,6 +5,7 @@ import type {
   DeductionChoice,
   Disability,
   Family,
+  JointMember,
   RentaInput,
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
@@ -26,6 +27,24 @@ export interface UnrentedForm {
   revised: boolean;
   months: string;
 }
+
+/** The other person of a joint return: their pay, age and basic income. */
+export interface PartnerForm {
+  gross: string;
+  socialSecurity: string;
+  withheld: string;
+  /** Pensions and benefits inside the gross. */
+  nonSalary: string;
+  age: string;
+  disability: Disability;
+  /** Their income is a pension (or benefits): not an active worker. */
+  retired: boolean;
+  savings: string;
+  pension: string;
+}
+
+/** Whether the person can file with a family unit: '' not answered yet. */
+export type JointChoice = '' | 'none' | 'couple' | 'single';
 
 export interface Choice {
   on: boolean;
@@ -66,12 +85,33 @@ export interface RentaForm {
   unrented: UnrentedForm[];
   savings: string;
   choices: Record<string, Choice>;
+  joint: JointChoice;
+  partner: PartnerForm;
+  /** Single parent: lives with the father or mother of one of the children (no joint reduction). */
+  otherParent: boolean;
+  /** The option picked in each guided question, by question id. */
+  answers: Record<string, string>;
+  /** Rent of the home paid in the year, and mortgage paid for a home bought before 2013 (guided). */
+  rentPaid: string;
+  mortgagePaid: string;
 }
 
 export const SOCIAL_SECURITY_RATE = 0.065;
 
 /** Social security has its own field, so it is not asked again among the other work expenses. */
 export const SOCIAL_SECURITY_EXPENSE = 'cotizaciones-seguridad-social';
+
+export const emptyPartner = (): PartnerForm => ({
+  gross: '',
+  socialSecurity: '',
+  withheld: '',
+  nonSalary: '',
+  age: '40',
+  disability: 0,
+  retired: false,
+  savings: '',
+  pension: '',
+});
 
 export const emptyForm = (initialIncome: string): RentaForm => ({
   ccaaId: '',
@@ -99,6 +139,12 @@ export const emptyForm = (initialIncome: string): RentaForm => ({
   unrented: [],
   savings: '',
   choices: {},
+  joint: '',
+  partner: emptyPartner(),
+  otherParent: false,
+  answers: {},
+  rentPaid: '',
+  mortgagePaid: '',
 });
 
 export const number = (text: string | undefined): number => {
@@ -137,6 +183,25 @@ export const socialSecurityOf = (form: RentaForm): number =>
   form.socialSecurity.trim() === ''
     ? number(form.gross) * SOCIAL_SECURITY_RATE
     : number(form.socialSecurity);
+
+/** The spouse as the calculation needs them (social security, when empty, as a share of the pay). */
+export function partnerOf(form: RentaForm): JointMember {
+  const p = form.partner;
+  return {
+    gross: number(p.gross),
+    socialSecurity:
+      p.socialSecurity.trim() === ''
+        ? number(p.gross) * SOCIAL_SECURITY_RATE
+        : number(p.socialSecurity),
+    withheld: number(p.withheld),
+    nonSalaryIncome: number(p.nonSalary),
+    retired: p.retired,
+    age: number(p.age),
+    disability: p.disability,
+    savings: number(p.savings),
+    pensionPlan: number(p.pension),
+  };
+}
 
 /** Union fees, professional association and legal defence, each within its own limit. */
 export function workExpensesOf(form: RentaForm, extras: RentaWorkExtras): number {
