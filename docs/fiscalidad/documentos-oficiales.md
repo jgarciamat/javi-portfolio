@@ -128,6 +128,26 @@ URLs: `AEAT` = `https://sede.agenciatributaria.gob.es` y `BOE-A-…` = `https://
 
 `BOXES` del 303 incluye casillas que ya no existen en 2026 (61, 67, 82, 85, 113-119 y 121) y le falta la nueva 112.
 
+### 2.1 Correcciones del lector (19-10-2026)
+
+Todos los fallos de la tabla anterior están corregidos en `frontend/src/modules/finances/domain/{taxModelDetect,taxModelPdf}.ts`, con pruebas sobre PDF sintéticos (`src/__tests__/finances/taxModelDetect.test.ts`) y sobre las piezas reales del Manual de IVA 2025 (`vatModels.test.ts`):
+
+| Fallo | Corrección |
+|---|---|
+| 390 leído como 303 | Manda el número del modelo impreso en grande en la cabecera; si no hay texto de título, el periodo «0A» o las casillas 600-698 (solo existen en el 390) lo identifican. |
+| Falsos positivos (BOE 41 = 1,75; manual de Renta) | Un PDF con «Boletín Oficial del Estado», «cve: BOE-» o «Verificable en www.boe.es», o de más de 40 páginas (salvo la Renta), se rechaza con `notAForm`. |
+| Modelos forales | «Diputación Foral de…», «… Foru Aldundia», «Hacienda Foral/Tributaria de Navarra», «Gobierno de Navarra», «F-69», «F-90» → rechazo `foral` con el territorio y aviso al usuario. Los nombres sueltos (Bizkaia, Navarra…) no bastan, porque el 303 estatal los imprime en las casillas 89-92. |
+| Varios trimestres en un PDF | Se lee el periodo de cada página; si hay más de uno, rechazo `severalPeriods` con la lista, sin mezclar cifras. |
+| Importes sin decimales | «-6.000» y «0» se aceptan si van justo después de su casilla, en una página que tenga algún importe con céntimos (así no se toman las tablas de enunciado del Manual). |
+| 47-57, 112, 500-524 y 700-735 del 303 | En `BOXES`, que es ahora la lista exacta del diseño de 2026 (la misma que la maquetación de la vista previa). |
+| Año partido («202» «5») | Se unen las piezas de dígitos seguidas a la derecha de «Ejercicio»; también «Ejercicio 2025» en una pieza y el año bajo su etiqueta (AcroForm del 110). |
+| Renta WEB (casilla a la derecha) | Lectura del modelo 100: casillas de 4 cifras, y el lado (derecha o izquierda) se decide por mayoría de líneas. |
+| Etiqueta encima (030, 840) | Un campo sin número en su línea se empareja con el número justo encima (máx. 16 pt). El 030 y el 840 no se importan en la app: solo se ha generalizado el emparejamiento. |
+| 115 antiguo | Título con espacios y saltos normalizados y casillas de 1 dígito («1»…«5»). |
+| Ida y vuelta de las vistas previas | `npm run taxforms:verify`: 130 19/19, 111 30/30, 115 5/5, 303 **185/185** y, nuevo, 100 **838/838** casillas de 4 cifras. |
+
+La maquetación del 100 tenía un «0543» fantasma del facsímil (BOE-A-2026-7041, pág. 32) encima de las casillas 1608, 0592, 0593, 0594 y 0600; se ha quitado (y `extract-layout.mjs` lo descarta con `GHOSTS`). La entrada 0543 de [renta-casillas.json](renta-casillas.json) arrastra el mismo error: su etiqueta real es el tipo medio de gravamen autonómico (pág. 42 del BOE).
+
 ## 3. Plan para las vistas previas idénticas
 
 Regla general. Si hay un **AcroForm oficial**, se toman las coordenadas exactas de cada campo (/Rect de pypdf o `getAnnotations()` de pdf.js) y del fondo, y se reproduce el formato A4 595×842. Si solo hay **facsímil en texto vectorial**, se miden con pdf.js las posiciones (`transform`) de cada número de casilla y de las etiquetas en la página del anexo. La caja de importe va a su derecha, donde termina la celda del dibujo (hay que medir también los trazados del operador `re`). Si el facsímil es **imagen o trazados sin texto**, se renderiza la página a 2× y se mide a mano. Las etiquetas literales salen siempre del diseño de registro vigente; la maquetación sale del facsímil.
