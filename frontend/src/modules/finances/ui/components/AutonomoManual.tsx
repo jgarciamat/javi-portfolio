@@ -158,7 +158,7 @@ const PRIOR_FIELDS = [
 ] as const;
 
 /** Office and home areas, people in the health insurance, exclusive vehicle, disability. */
-function ProfilePanel({
+export function ProfilePanel({
   profile,
   onChange,
 }: {
@@ -221,7 +221,7 @@ function ProfilePanel({
 }
 
 /** The totals of the modelo 130 already filed for the earlier quarters. */
-function PriorPanel({
+export function PriorPanel({
   prior,
   onChange,
 }: {
@@ -488,6 +488,56 @@ function QuarterPanel({
 }
 
 /**
+ * The quarters up to the one of the draft (only that one when the filed modelo 130 is on): income,
+ * withholdings, expenses and VAT, each with a way to copy the one before.
+ */
+export function QuarterPanels({
+  form,
+  onChange,
+  upTo,
+  year,
+  vatExtras,
+}: {
+  form: ManualForm;
+  onChange: (form: ManualForm) => void;
+  upTo: number;
+  year: number;
+  vatExtras?: VatExtras;
+}) {
+  const setQuarter = (index: number, patch: Partial<QuarterForm>) =>
+    onChange({
+      ...form,
+      quarters: form.quarters.map((q, i) => (i === index ? { ...q, ...patch } : q)),
+    });
+  const copyPrevious = (q: number) =>
+    setQuarter(q, {
+      income: { ...form.quarters[q - 1].income },
+      withheld: form.quarters[q - 1].withheld,
+      expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
+    });
+  const from = form.prior.on && upTo > 1 ? upTo - 1 : 0;
+  return (
+    <>
+      {form.quarters
+        .slice(0, upTo)
+        .map((quarter, q) =>
+          q < from ? null : (
+            <QuarterPanel
+              key={q}
+              quarter={quarter}
+              q={q}
+              vatExtras={vatExtras}
+              year={year}
+              onChange={(patch) => setQuarter(q, patch)}
+              onCopyPrevious={() => copyPrevious(q)}
+            />
+          )
+        )}
+    </>
+  );
+}
+
+/**
  * Steps 1 and 2 of the screen: bringing the data in (the import, the person's situation and the
  * filed modelo 130) and reviewing it (the imported invoices, the warnings, the quarters typed by
  * hand or worked out from the invoices, and the other options).
@@ -528,19 +578,6 @@ export function AutonomoManual({
   const { t } = useI18n();
   const setProfile = (patch: Partial<ManualForm['profile']>) =>
     onChange({ ...form, profile: { ...form.profile, ...patch } });
-  const setQuarter = (index: number, patch: Partial<QuarterForm>) =>
-    onChange({
-      ...form,
-      quarters: form.quarters.map((q, i) => (i === index ? { ...q, ...patch } : q)),
-    });
-  const copyPrevious = (q: number) =>
-    setQuarter(q, {
-      income: { ...form.quarters[q - 1].income },
-      withheld: form.quarters[q - 1].withheld,
-      expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
-    });
-
-  const from = form.prior.on && upTo > 1 ? upTo - 1 : 0;
   const setPrior = (patch: Partial<ManualForm['prior']>) =>
     onChange({ ...form, prior: { ...form.prior, ...patch } });
 
@@ -564,21 +601,13 @@ export function AutonomoManual({
         <InvoiceReview form={form} onChange={onChange} focus={focus} />
         {checks}
         <p className="section-hint">{t('app.autonomo.manualHint')}</p>
-        {form.quarters
-          .slice(0, upTo)
-          .map((quarter, q) =>
-            q < from ? null : (
-              <QuarterPanel
-                key={q}
-                quarter={quarter}
-                q={q}
-                vatExtras={vatExtras}
-                year={year}
-                onChange={(patch) => setQuarter(q, patch)}
-                onCopyPrevious={() => copyPrevious(q)}
-              />
-            )
-          )}
+        <QuarterPanels
+          form={form}
+          onChange={onChange}
+          upTo={upTo}
+          year={year}
+          vatExtras={vatExtras}
+        />
         <WithholdingsForm form={form} onChange={onChange} year={year} upTo={upTo} />
         {extras}
       </StepSection>

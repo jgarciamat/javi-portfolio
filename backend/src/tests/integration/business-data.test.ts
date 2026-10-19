@@ -310,6 +310,33 @@ describe('The self-employed form saved in the account', () => {
     await put(ana, { data: badKey, baseVersion: 1 }).expect(400);
   });
 
+  it('keeps where the person is in the step-by-step assistant, and only that', async () => {
+    const base = form();
+    const wizard = {
+      at: 3,
+      screen: 1,
+      done: ['activity', 'import', 'review'],
+      answers: { regime: 'general', withholdings: 'unknown' },
+      streak: 2,
+      lastDay: '2026-10-19',
+    };
+    const data = { ...base, wizard };
+    await put(ana, { data, baseVersion: null }).expect(200);
+    expect((await get(ana).expect(200)).body.data.wizard).toEqual(wizard);
+    await put(ana, { data: { ...data, wizard: { ...wizard, extra: 1 } }, baseVersion: 1 }).expect(
+      400
+    );
+    await put(ana, {
+      data: { ...data, wizard: { ...wizard, lastDay: 'ayer' } },
+      baseVersion: 1,
+    }).expect(400);
+    const many = Object.fromEntries(Array.from({ length: 201 }, (_, i) => [`q${i}`, 'yes']));
+    await put(ana, {
+      data: { ...data, wizard: { ...wizard, answers: many } },
+      baseVersion: 1,
+    }).expect(400);
+  });
+
   it('encrypts the form at rest: no figure or name is stored in clear', async () => {
     await put(ana, { data: form(), baseVersion: null }).expect(200);
     const [row] = stored();

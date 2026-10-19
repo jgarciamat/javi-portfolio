@@ -759,6 +759,23 @@ const autonomoSaved = z
           .optional(),
       })
       .strict(),
+    /** Where the person is in the step-by-step assistant (frontend wizard.ts, WizardProgress). */
+    wizard: z
+      .object({
+        at: z.number().int().min(0).max(30),
+        screen: z.number().int().min(0).max(50),
+        done: z.array(z.string().max(40)).max(30),
+        answers: z
+          .record(z.string().max(60), z.string().max(200))
+          .refine((a) => Object.keys(a).length <= 200, 'Demasiadas respuestas'),
+        streak: z.number().int().min(0).max(10_000),
+        lastDay: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .nullable(),
+      })
+      .strict()
+      .optional(),
     /** Supplier → kind of expense the user chose, for the next imports. */
     kinds: z
       .record(z.string().max(200), z.enum(EXPENSE_KINDS))

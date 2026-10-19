@@ -8,6 +8,8 @@ import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './Autonomo
 import { withholdingsOf } from './withholdingForm';
 import { activityOf, isEmptyActivity, type ActivityForm } from './activityForm';
 import { NO_VAT_EXTRAS, isEmptyVat, vatExtrasOf, vatOfForm } from './vatForm';
+import { reviveProgress, type WizardProgress } from '@modules/wizard/domain/wizard';
+import { AUTONOMO_STEPS } from '../../domain/autonomoWizard';
 
 /**
  * «Save in my account too»: the self-employed form copied to the account, encrypted on the server,
@@ -24,6 +26,15 @@ export interface AutonomoSaved {
   manual: ManualForm;
   extras: Extras;
   kinds: KindPreferences;
+  /** Where the person is in the step-by-step assistant, once they moved in it. */
+  wizard?: WizardProgress;
+}
+
+/** The progress of the assistant as the account keeps it (only once there is something). */
+function savedWizard(wizard: unknown): Pick<AutonomoSaved, 'wizard'> {
+  const p = reviveProgress(wizard, AUTONOMO_STEPS);
+  const moved = p.at > 0 || p.screen > 0 || p.done.length > 0 || Object.keys(p.answers).length > 0;
+  return moved ? { wizard: p } : {};
 }
 
 /** Wait after the last change before saving. */
@@ -102,7 +113,8 @@ type Partialish<T> = { [K in keyof T]?: T[K] extends object ? Partialish<T[K]> :
 export function toSaved(
   manual: Partialish<ManualForm>,
   extras: Partialish<Extras>,
-  kinds: KindPreferences
+  kinds: KindPreferences,
+  wizard: unknown = null
 ): AutonomoSaved {
   const empty = emptyManual();
   const profile = { ...empty.profile, ...manual.profile };
@@ -197,6 +209,7 @@ export function toSaved(
         .sort()
         .map((k) => [k, kinds[k] as ExpenseKind])
     ),
+    ...savedWizard(wizard),
   };
 }
 
@@ -214,7 +227,7 @@ function vatOfInvoice(i: ManualForm['invoices'][number]): Partial<ManualForm['in
 /** The account copy as the form takes it. */
 const fromRemote = (data: unknown): AutonomoSaved => {
   const d = data as Partial<AutonomoSaved>;
-  return toSaved(d.manual ?? {}, d.extras ?? {}, d.kinds ?? {});
+  return toSaved(d.manual ?? {}, d.extras ?? {}, d.kinds ?? {}, d.wizard);
 };
 
 const EMPTY = JSON.stringify(toSaved(emptyManual(), NO_EXTRAS, {}).manual);

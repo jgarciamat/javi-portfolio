@@ -1,21 +1,10 @@
-import { useRef, useState } from 'react';
-import { useApi } from '@core/context/ApiContext';
+import { useRef } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { recordPositiveMoment } from '@core/review/review';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
-import { useAction } from '@shared/hooks/useAction';
 import { Icon } from '@shared/components/Icon';
 import { useHeaderOffset } from '@shared/hooks/useHeaderOffset';
-import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
-import {
-  AutonomoManual,
-  NO_EXTRAS,
-  emptyManual,
-  toManualData,
-  type Extras,
-  type ManualForm,
-} from './AutonomoManual';
+import { AutonomoManual, type Extras } from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
 import { ImportChecks } from './ImportChecks';
 import { bringIntoView } from './bringIntoView';
@@ -25,40 +14,25 @@ import { AutonomoCloudPanel } from './AutonomoCloud';
 import { WithholdingsPanel } from './AutonomoWithholdings';
 import { AnnualPanel } from './AutonomoAnnual';
 import { VatYearPanel } from './AutonomoVatYear';
-import { vatExtrasOf } from './vatForm';
-import { annualOf, buildInputs } from './autonomoInputs';
+import { annualOf } from './autonomoInputs';
 import { PrepareRenta } from '@modules/tools/ui/renta/PrepareRenta';
 import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
-import { toSaved, useAutonomoCloud } from './autonomoSync';
-import { KIND_PREFERENCES_KEY } from './importForm';
-import type { KindPreferences } from '../../domain/invoiceLedger';
-import type { ReviewFocus } from './InvoiceReview';
-import { checkImport } from '../../domain/importChecks';
+import { vatExtrasOf } from './vatForm';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
-import type { AutonomoDraft, AutonomoInputs } from '@modules/finances/domain/types';
+import {
+  QUARTERS,
+  YEARS,
+  nextFocus,
+  useAutonomoDraft,
+  withCarry,
+  type Quarter,
+} from './useAutonomoDraft';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
-const SNAPSHOT_KEY = 'mm_autonomo_draft2';
-
-/** The last draft with the data it was prepared from (to put them in the PDF). */
-interface Snapshot {
-  draft: AutonomoDraft;
-  inputs: AutonomoInputs | null;
-}
-const MANUAL_KEY = 'mm_autonomo_manual2';
-const EXTRAS_KEY = 'mm_autonomo_extras';
-const QUARTERS = [1, 2, 3, 4] as const;
-const THIS_YEAR = new Date().getFullYear();
-const YEARS = [THIS_YEAR - 1, THIS_YEAR, THIS_YEAR + 1];
-
-type Quarter = 1 | 2 | 3 | 4;
-
-const quarterNow = (): Quarter => (Math.floor(new Date().getMonth() / 3) + 1) as Quarter;
-
 /** The year and the quarter of the draft. */
-function PeriodPicker({
+export function PeriodPicker({
   year,
   quarter,
   onYear,
@@ -101,7 +75,7 @@ function PeriodPicker({
 }
 
 /** Hard-to-justify expenses, the 130 exemption, last year's net and the VAT to offset. */
-function ExtrasPanel({
+export function ExtrasPanel({
   extras,
   quarter,
   onChange,
@@ -159,74 +133,8 @@ function ExtrasPanel({
   );
 }
 
-/** What the 390 of last year hands to this one: the VAT to offset and the provisional prorrata. */
-const withCarry = (
-  extras: Extras,
-  carry: { toOffset: string; provisional: string | null }
-): Extras => ({
-  ...extras,
-  toOffset: carry.toOffset,
-  vat: {
-    ...vatExtrasOf(extras.vat),
-    ...(carry.provisional !== null ? { provisional: carry.provisional } : {}),
-  },
-});
-
-/** An invoice in the review (null: the review itself), from a warning or from an imported file. */
-const nextFocus =
-  (id: string | null) =>
-  (f: ReviewFocus | null): ReviewFocus => ({ id, n: (f?.n ?? 0) + 1 });
-
-/** Today as `YYYY-MM-DD` in the person's time zone. */
-const today = (): string => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-    d.getDate()
-  ).padStart(2, '0')}`;
-};
-
-/** What to look at in the imported invoices before preparing the draft of a quarter. */
-const checksFor = (manual: ManualForm, extras: Extras, year: number, quarter: Quarter) =>
-  checkImport({
-    invoices: manual.invoices,
-    manual: toManualData(manual),
-    year,
-    today: today(),
-    // With the filed modelo 130 on, only the quarter of the draft is on screen.
-    from: manual.prior.on && quarter > 1 ? quarter : 1,
-    upTo: quarter,
-    model130: manual.model130,
-    hardToJustify: extras.hardToJustify,
-  });
-
-/** The manual form, kept on the device between visits. */
-function useStoredManual() {
-  const [manual, setManual] = useState<ManualForm>(() => ({
-    ...emptyManual(),
-    ...storage.getJSON<Partial<ManualForm>>(MANUAL_KEY, {}),
-  }));
-  const changeManual = (next: ManualForm) => {
-    storage.setJSON(MANUAL_KEY, next);
-    setManual(next);
-  };
-  return [manual, changeManual] as const;
-}
-
-/** The other options, kept on the device too (and in the account with the rest). */
-function useStoredExtras() {
-  const [extras, setExtras] = useState<Extras>(() => ({
-    ...NO_EXTRAS,
-    ...storage.getJSON<Partial<Extras>>(EXTRAS_KEY, {}),
-  }));
-  const changeExtras = (next: Extras) => {
-    storage.setJSON(EXTRAS_KEY, next);
-    setExtras(next);
-  };
-  return [extras, changeExtras] as const;
-}
-
 /** Prepare the draft, or the plans when the free plan cannot prepare this one. */
-function PrepareGate({
+export function PrepareGate({
   access: { limit, locked, otherQuarter },
   pending,
   onPrepare,
@@ -281,51 +189,11 @@ export function AutonomoDraftCard({
   /** Opens the Renta, once «Preparar mi declaración de la renta» has taken the year there. */
   onOpenRenta?: () => void;
 }) {
-  const { businessApi } = useApi();
   const { t } = useI18n();
-  const plan = useOptionalPlan();
-  const action = useAction();
-  const [year, setYear] = useState(THIS_YEAR);
-  const [quarter, setQuarter] = useState<Quarter>(quarterNow);
-  const [extras, setExtras] = useStoredExtras();
-  // Bumped when the data is wiped, so the import panels forget their messages too.
-  const [wipes, setWipes] = useState(0);
-  const [manual, changeManual] = useStoredManual();
-  const [focus, setFocus] = useState<ReviewFocus | null>(null);
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
-    storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
-  );
-
-  const kinds = storage.getJSON<KindPreferences>(KIND_PREFERENCES_KEY, {});
-  const cloud = useAutonomoCloud(toSaved(manual, extras, kinds), (data) => {
-    storage.setJSON(KIND_PREFERENCES_KEY, data.kinds);
-    changeManual(data.manual);
-    setExtras(data.extras);
-  });
-
-  const hasManual = JSON.stringify(manual) !== JSON.stringify(emptyManual());
-  const hasData = hasManual || JSON.stringify(extras) !== JSON.stringify(NO_EXTRAS);
-  const wipe = () => {
-    if (!window.confirm(t(cloud.on ? 'app.autonomo.wipeConfirmCloud' : 'app.autonomo.wipeConfirm')))
-      return;
-    changeManual(emptyManual());
-    setExtras(NO_EXTRAS);
-    setWipes((n) => n + 1);
-    void cloud.wipe(toSaved(emptyManual(), NO_EXTRAS, kinds));
-  };
-
-  const checks = checksFor(manual, extras, year, quarter);
-  const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
-  const prepare = () =>
-    action.run(async () => {
-      const inputs = buildInputs(manual, extras, year, quarter);
-      const result = await businessApi.draft(year, quarter, inputs);
-      const next: Snapshot = { draft: result, inputs };
-      storage.setJSON(SNAPSHOT_KEY, next);
-      setSnapshot(next);
-      recordPositiveMoment();
-      await plan?.refresh();
-    });
+  const s = useAutonomoDraft();
+  const { year, setYear, quarter, setQuarter, extras, setExtras, wipes, manual, changeManual } = s;
+  const { focus, setFocus, snapshot, cloud, hasManual, hasData, wipe, checks, action, prepare } = s;
+  const { limit, locked, otherQuarter } = s.access;
 
   const root = useRef<HTMLDivElement>(null);
   // The summary stays right under the header of the app.

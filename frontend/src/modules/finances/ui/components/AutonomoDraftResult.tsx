@@ -300,34 +300,48 @@ function PdfActions({ draft, inputs }: { draft: AutonomoDraft; inputs: AutonomoI
   );
 }
 
-/** What the draft says, in words, and the boxes behind it. */
+/**
+ * What the draft says, in words, and the boxes behind it; then its files (the PDF, the previews of
+ * the forms and the files for the Agencia Tributaria). `part` shows only one half (the assistant
+ * shows the files in a step of their own).
+ */
 export function DraftResult({
   draft,
   inputs,
+  part = 'all',
 }: {
   draft: AutonomoDraft;
   inputs: AutonomoInputs | null;
+  part?: 'all' | 'summary' | 'files';
 }) {
   const { t } = useI18n();
   const { irpf } = draft;
   return (
     <div className="autonomo-result" aria-live="polite">
-      <SummaryTiles draft={draft} />
-      <AutonomoExplain draft={draft} />
+      {part !== 'files' && (
+        <>
+          <SummaryTiles draft={draft} />
+          <AutonomoExplain draft={draft} />
 
-      {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
-      <VatFamily draft={draft} />
-      {irpf.required ? (
-        <Boxes title={t('app.autonomo.irpfBoxes')} boxes={irpf.boxes} />
-      ) : (
-        <p className="section-hint">{t('app.autonomo.irpf.notRequiredText')}</p>
+          {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
+          <VatFamily draft={draft} />
+          {irpf.required ? (
+            <Boxes title={t('app.autonomo.irpfBoxes')} boxes={irpf.boxes} />
+          ) : (
+            <p className="section-hint">{t('app.autonomo.irpf.notRequiredText')}</p>
+          )}
+
+          <RetaAndDeadlines draft={draft} />
+          <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
+        </>
       )}
-
-      <RetaAndDeadlines draft={draft} />
-      <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
-      <PdfActions draft={draft} inputs={inputs} />
-      <AutonomoFormPreviews draft={draft} />
-      <SedeFiles sources={sedeSourcesOfDraft(draft)} />
+      {part !== 'summary' && (
+        <>
+          <PdfActions draft={draft} inputs={inputs} />
+          <AutonomoFormPreviews draft={draft} />
+          <SedeFiles sources={sedeSourcesOfDraft(draft)} />
+        </>
+      )}
     </div>
   );
 }
