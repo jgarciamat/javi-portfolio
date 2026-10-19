@@ -15,6 +15,10 @@ const LIMIT_30K: IncomeLimit = {
   phaseOutFrom: 27000,
   phaseOutTo: 30000,
   note: 'Importe completo por debajo de 27.000 € (44.000 € en conjunta); baja en línea recta hasta cero en 30.000 € (47.000 € en conjunta).',
+  // Ley 13/1997 art. 4: what goes down is the maximum of the deduction (the AEAT guide: "multiplicar
+  // el límite de la deducción (297 euros) por un porcentaje", checked 19-10-2026). For a fixed amount
+  // it is the same; a percentage with no maximum in these data keeps lowering the amount.
+  phaseOutOf: 'limit',
 };
 
 /** Tope de salud, deporte y música: hasta 60.000 € (78.000 € conjunta); los límites bajan desde 54.000 € (72.000 €). */
@@ -24,6 +28,8 @@ const LIMIT_60K: IncomeLimit = {
   phaseOutFrom: 54000,
   phaseOutTo: 60000,
   note: 'Límites completos por debajo de 54.000 € (72.000 € en conjunta); entre 54.000 y 60.000 € (72.000 y 78.000 €) bajan en línea recta hasta cero. Subido por el Decreto-ley 1/2026, con efectos desde 2025.',
+  // The AEAT guide (deporte, checked 19-10-2026): "los límites de la deducción" times a percentage.
+  phaseOutOf: 'limit',
 };
 
 const HEALTH_PROOF =
@@ -562,6 +568,7 @@ export const comunitatValenciana: RentaCcaa = {
         phaseOutFrom: 40000,
         phaseOutTo: 45000,
         note: 'Tope completo por debajo de 40.000 € (55.000 € en conjunta); baja en línea recta hasta cero en 45.000 € (60.000 € en conjunta).',
+        phaseOutOf: 'limit',
       },
       requirements:
         'Vivienda habitual en un municipio afectado. No cuenta lo cubierto por seguros ni ayudas públicas, ni los enseres. Pago no en efectivo. Lo que no quepa por falta de cuota se arrastra 4 años. Dos declarantes se reparten los 2.000 €.',

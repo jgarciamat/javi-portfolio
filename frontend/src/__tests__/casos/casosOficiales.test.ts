@@ -14,6 +14,7 @@ import {
   deductionAmount,
   incomeFactor,
   lowPayDeduction,
+  splitDeduction,
   type RentaInput,
 } from '@modules/tools/domain/rentaCalc';
 import type { Deduction } from '@modules/tools/domain/rentaData';
@@ -133,11 +134,13 @@ const CHECKS: Record<string, () => void> = {
   'renta-c16-03': () => {
     const d = deduction('estado-alquiler-transitorio');
     const got = deductionAmount(d, { on: true, amount: 6900 }, incomeFactor(d, 22100));
-    const expected = figure('renta-c16-03', 'Deducción (10,05 %)');
-    const k = known.find((x) => x.id === 'renta-c16-03');
-    // Known: the engine lowers the deduction instead of its maximum base.
-    expect(k?.esperado).toBe(expected);
-    expect(got).toBeCloseTo(k?.obtenido as number, 2);
+    // The maximum base goes down (2,835.17), not the deduction: before the fix the engine gave 217.48.
+    expect(got).toBe(figure('renta-c16-03', 'Deducción (10,05 %)'));
+    // Half in each box (0562 and 0563), the odd cent in the regional one so they add up.
+    expect(splitDeduction(got, d.regionalShare as number)).toEqual({
+      state: 142.46,
+      regional: 142.47,
+    });
   },
   'renta-c18-02': () => {
     const general = deductionAmount(deduction('estado-familia-numerosa'), { on: true, units: 1 });
@@ -165,6 +168,10 @@ function reasonOf(c: Case): string {
 describe('casos oficiales del Manual práctico (Renta 2025)', () => {
   it('el catálogo tiene al menos 40 casos', () => {
     expect(cases.length).toBeGreaterThanOrEqual(40);
+  });
+  it('cada discrepancia oficial conocida es de un caso del catálogo', () => {
+    // A fixed one is removed from discrepancias.json (renta-c16-03 was, on 19-10-2026).
+    for (const k of known) expect(cases.map((c) => c.id)).toContain(k.id);
   });
   for (const c of cases) {
     const check = CHECKS[c.id];

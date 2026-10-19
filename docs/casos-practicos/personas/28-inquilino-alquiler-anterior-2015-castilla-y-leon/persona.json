@@ -189,7 +189,7 @@
             },
             {
               "label": "Cuota líquida estatal",
-              "amount": 1369.16,
+              "amount": 1369.17,
               "box": "0570"
             },
             {
@@ -199,7 +199,7 @@
             },
             {
               "label": "Cuota líquida incrementada total [(585)+(586)]",
-              "amount": 2701.06,
+              "amount": 2701.07,
               "box": "0587"
             },
             {
@@ -209,7 +209,7 @@
             },
             {
               "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
-              "amount": 2701.06,
+              "amount": 2701.07,
               "box": "0595"
             },
             {
@@ -224,12 +224,12 @@
             },
             {
               "label": "Cuota diferencial [(595)-(609)]",
-              "amount": -198.94,
+              "amount": -198.93,
               "box": "0610"
             },
             {
               "label": "Resultado de la declaración",
-              "amount": -198.94,
+              "amount": -198.93,
               "box": "0670"
             }
           ]

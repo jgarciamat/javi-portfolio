@@ -261,71 +261,6 @@
       "causa": "La imputación de un inmueble que no estuvo todo el año se prorratea por meses (formulario) y no por días: 6/12 en vez de 181/365 (500,00 frente a 495,89).",
       "fuente": "Art. 85 LIRPF; Manual práctico Renta 2025, cap. 10 (caso oficial renta-c10-01, prorrateo por días)",
       "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0595",
-      "campo": "boxes.0595",
-      "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 2701.06,
-      "obtenido": 2805.99,
-      "severidad": "alta",
-      "causa": "La deducción transitoria por alquiler con base imponible entre 17.707,20 y 24.107,20 € rebaja el IMPORTE de la deducción en proporción (incomeFactor) cuando la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)); además va toda a la cuota estatal en vez de mitad y mitad (0562/0563).",
-      "fuente": "DT 15.ª y art. 68.7 LIRPF (redacción a 31-12-2014); Manual práctico Renta 2025, cap. 16 (caso oficial renta-c16-03)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0610",
-      "campo": "boxes.0610",
-      "concepto": "Cuota diferencial",
-      "esperado": -198.94,
-      "obtenido": -94.01,
-      "severidad": "alta",
-      "causa": "La deducción transitoria por alquiler con base imponible entre 17.707,20 y 24.107,20 € rebaja el IMPORTE de la deducción en proporción (incomeFactor) cuando la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)); además va toda a la cuota estatal en vez de mitad y mitad (0562/0563).",
-      "fuente": "DT 15.ª y art. 68.7 LIRPF (redacción a 31-12-2014); Manual práctico Renta 2025, cap. 16 (caso oficial renta-c16-03)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": "0670",
-      "campo": "boxes.0670",
-      "concepto": "Resultado de la declaración",
-      "esperado": -198.94,
-      "obtenido": -94.01,
-      "severidad": "alta",
-      "causa": "La deducción transitoria por alquiler con base imponible entre 17.707,20 y 24.107,20 € rebaja el IMPORTE de la deducción en proporción (incomeFactor) cuando la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)); además va toda a la cuota estatal en vez de mitad y mitad (0562/0563).",
-      "fuente": "DT 15.ª y art. 68.7 LIRPF (redacción a 31-12-2014); Manual práctico Renta 2025, cap. 16 (caso oficial renta-c16-03)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.stateDeductions",
-      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
-      "esperado": 257.74,
-      "obtenido": 410.55,
-      "severidad": "alta",
-      "causa": "La deducción transitoria por alquiler con base imponible entre 17.707,20 y 24.107,20 € rebaja el IMPORTE de la deducción en proporción (incomeFactor) cuando la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)); además va toda a la cuota estatal en vez de mitad y mitad (0562/0563).",
-      "fuente": "DT 15.ª y art. 68.7 LIRPF (redacción a 31-12-2014); Manual práctico Renta 2025, cap. 16 (caso oficial renta-c16-03)",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "28-inquilino-alquiler-anterior-2015-castilla-y-leon",
-      "declaracion": "individual",
-      "casilla": null,
-      "campo": "result.regionalDeductions",
-      "concepto": "Deducciones aplicadas en la cuota autonómica",
-      "esperado": 257.74,
-      "obtenido": 0,
-      "severidad": "alta",
-      "causa": "La deducción transitoria por alquiler con base imponible entre 17.707,20 y 24.107,20 € rebaja el IMPORTE de la deducción en proporción (incomeFactor) cuando la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)); además va toda a la cuota estatal en vez de mitad y mitad (0562/0563).",
-      "fuente": "DT 15.ª y art. 68.7 LIRPF (redacción a 31-12-2014); Manual práctico Renta 2025, cap. 16 (caso oficial renta-c16-03)",
-      "origenEsperado": "calculo-a-mano"
     }
   ],
   "autonomos": [
@@ -590,18 +525,5 @@
       "origenEsperado": "calculo-a-mano"
     }
   ],
-  "oficiales": [
-    {
-      "id": "renta-c16-03",
-      "modelo": "100",
-      "casilla": "0562 + 0563",
-      "concepto": "Deducción por alquiler de la vivienda habitual (régimen transitorio)",
-      "esperado": 284.93,
-      "obtenido": 217.48,
-      "severidad": "alta",
-      "causa": "incomeFactor() en rentaCalc.ts rebaja el importe de la deducción en proporción a la base imponible entre 17.707,20 y 24.107,20 €; la ley rebaja la BASE máxima (9.040 − 1,4125 × (BI − 17.707,20)) y aplica el 10,05 % a lo pagado hasta esa base. Con 6.900 € pagados y BI 22.100 €: oficial 284,93 €, motor 217,48 €.",
-      "fuente": "Manual práctico Renta 2025, cap. 16, ejemplo de la deducción por alquiler (caso renta-c16-03)",
-      "origenEsperado": "oficial"
-    }
-  ]
+  "oficiales": []
 }

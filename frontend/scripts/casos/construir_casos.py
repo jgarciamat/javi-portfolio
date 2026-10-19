@@ -617,12 +617,15 @@ def rent_deduction(p, big):
         base_max = r2(9040 - 1.4125 * (big - 17707.2))
     else:
         base_max = 0.0
-    half = r2(min(paid, base_max) * 5.025 / 100)
-    d['state'] = half
-    d['regional'] = half
+    # Manual práctico 2025, c16 (renta-c16-03): 10,05 % of the base, then "el 50 por 100 del total
+    # de la deducción" in each box (the regional half rounded, the State's the rest).
+    total = r2(min(paid, base_max) * 10.05 / 100)
+    regional = r2(total / 2)
+    d['state'] = r2(total - regional)
+    d['regional'] = regional
     d['how'] = (f'base imponible {eur(big)}: base máxima 9.040 − 1,4125 × ({eur(big)} − 17.707,20) = {eur(base_max)}; '
-                f'5,025 % × min({eur(paid)}, {eur(base_max)}) = {eur(half)} en la cuota estatal (0562) y otro tanto en la autonómica (0563): '
-                f'{eur(r2(2 * half))} en total. Se rebaja la BASE máxima, no el importe de la deducción (caso oficial renta-c16-03)')
+                f'10,05 % × min({eur(paid)}, {eur(base_max)}) = {eur(total)}, el 50 % en cada cuota: {eur(d["state"])} en la estatal (0562) '
+                f'y {eur(regional)} en la autonómica (0563). Se rebaja la BASE máxima, no el importe de la deducción (caso oficial renta-c16-03)')
 
 
 def build_renta(p):

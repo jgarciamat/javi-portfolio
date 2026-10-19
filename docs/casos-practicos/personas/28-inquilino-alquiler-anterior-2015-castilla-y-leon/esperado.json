@@ -208,7 +208,7 @@
       "declaracion": "individual",
       "casilla": "0570",
       "concepto": "Cuota líquida estatal",
-      "importe": 1369.16,
+      "importe": 1369.17,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": null
@@ -228,7 +228,7 @@
       "declaracion": "individual",
       "casilla": "0587",
       "concepto": "Cuota líquida incrementada total",
-      "importe": 2701.06,
+      "importe": 2701.07,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": null
@@ -248,7 +248,7 @@
       "declaracion": "individual",
       "casilla": "0595",
       "concepto": "Cuota resultante de la autoliquidación",
-      "importe": 2701.06,
+      "importe": 2701.07,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0595"
@@ -268,7 +268,7 @@
       "declaracion": "individual",
       "casilla": "0610",
       "concepto": "Cuota diferencial",
-      "importe": -198.94,
+      "importe": -198.93,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0610"
@@ -278,7 +278,7 @@
       "declaracion": "individual",
       "casilla": "0670",
       "concepto": "Resultado de la declaración",
-      "importe": -198.94,
+      "importe": -198.93,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0670"
@@ -288,7 +288,7 @@
       "declaracion": "individual",
       "casilla": null,
       "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
-      "importe": 257.74,
+      "importe": 257.73,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "result.stateDeductions"

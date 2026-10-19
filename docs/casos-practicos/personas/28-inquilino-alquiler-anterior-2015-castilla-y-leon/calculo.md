@@ -47,8 +47,8 @@ Fuentes: Ley 35/2006 del IRPF (BOE-A-2006-20764) y Manual práctico de Renta 202
 
 ### 9. Deducciones, cuota resultante y resultado
 
-- Alquiler de vivienda habitual, régimen transitorio (DT 15.ª LIRPF, art. 68.7 en su redacción de 2014): base imponible 20.476,00: base máxima 9.040 − 1,4125 × (20.476,00 − 17.707,20) = 5.129,07; 5,025 % × min(7.200,00, 5.129,07) = 257,74 en la cuota estatal (0562) y otro tanto en la autonómica (0563): 515,48 en total. Se rebaja la BASE máxima, no el importe de la deducción (caso oficial renta-c16-03)
-- Cuota líquida (0587) = 1.626,90 − 257,74 + 1.589,64 − 257,74 = 2.701,06
+- Alquiler de vivienda habitual, régimen transitorio (DT 15.ª LIRPF, art. 68.7 en su redacción de 2014): base imponible 20.476,00: base máxima 9.040 − 1,4125 × (20.476,00 − 17.707,20) = 5.129,07; 10,05 % × min(7.200,00, 5.129,07) = 515,47, el 50 % en cada cuota: 257,73 en la estatal (0562) y 257,74 en la autonómica (0563). Se rebaja la BASE máxima, no el importe de la deducción (caso oficial renta-c16-03)
+- Cuota líquida (0587) = 1.626,90 − 257,73 + 1.589,64 − 257,74 = 2.701,07
 - Deducción por rendimientos del trabajo (0414) = 0,00 (340 € hasta 16.576 € de íntegros del trabajo, menos 0,2 por euro hasta 18.276; otras rentas ≤ 6.500; límite: la cuota)
-- Cuota resultante (0595) = **2.701,06**; retenciones (0609) = 2.900,00; cuota diferencial (0610) = **-198,94**
-- Resultado (0670) = **-198,94** (a devolver)
+- Cuota resultante (0595) = **2.701,07**; retenciones (0609) = 2.900,00; cuota diferencial (0610) = **-198,93**
+- Resultado (0670) = **-198,93** (a devolver)

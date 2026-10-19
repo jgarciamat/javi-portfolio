@@ -514,6 +514,60 @@ describe('incomeFactor', () => {
   });
 });
 
+describe('what the income limit lowers', () => {
+  const phaseOut = { individual: 30000, phaseOutFrom: 27000, phaseOutTo: 30000 };
+  const at = (d: Deduction, spent: number, base: number) =>
+    deductionAmount(d, { on: true, amount: spent }, incomeFactor(d, base));
+
+  it('lowers the maximum base of the State rent of before 2015 (renta-c16-03 and case 28)', async () => {
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    const rent = rentaState.deductions.find(
+      (d) => d.id === 'estado-alquiler-transitorio'
+    ) as Deduction;
+    // Official: 9,040 − 1.4125 × (22,100 − 17,707.20) = 2,835.17; × 10.05 % = 284.93 (was 217.48).
+    expect(at(rent, 6900, 22100)).toBe(284.93);
+    // Case 28: base 5,129.07 × 10.05 % = 515.47, under what was paid (7,200).
+    expect(at(rent, 7200, 20476)).toBe(515.47);
+    // Paid less than the lowered base: 10.05 % of what was paid.
+    expect(at(rent, 2000, 22100)).toBe(201);
+    expect(at(rent, 9040, 17707.2)).toBe(908.52);
+    expect(at(rent, 9040, 24107.2)).toBe(0);
+    // Without a maximum in euros the lowered base is the only cap.
+    const noCap = { ...rent, limit: undefined };
+    expect(at(noCap, 6900, 22100)).toBe(284.93);
+  });
+
+  it('lowers the maximum in euros of a Valencian deduction, not the deduction', () => {
+    // AEAT guide (custodia en guarderías): with 28,500 € the 297 € limit is 50 %: 148.50.
+    const nursery = deduction({
+      kind: 'percent',
+      percent: 15,
+      limit: 297,
+      incomeLimit: { ...phaseOut, phaseOutOf: 'limit' },
+    });
+    expect(at(nursery, 600, 28500)).toBe(90);
+    expect(at(nursery, 3000, 28500)).toBe(148.5);
+    expect(at(nursery, 3000, 26000)).toBe(297);
+  });
+
+  it('lowers the deduction itself by default or when the data have no base or maximum', () => {
+    const plain = { kind: 'percent' as const, percent: 10 };
+    expect(at(deduction({ ...plain, incomeLimit: phaseOut }), 1000, 28500)).toBe(50);
+    expect(
+      at(deduction({ ...plain, incomeLimit: { ...phaseOut, phaseOutOf: 'limit' } }), 1000, 28500)
+    ).toBe(50);
+    expect(
+      at(deduction({ ...plain, incomeLimit: { ...phaseOut, phaseOutOf: 'base' } }), 1000, 28500)
+    ).toBe(50);
+    const special = deduction({
+      kind: 'special',
+      baseLimit: 4500,
+      incomeLimit: { ...phaseOut, phaseOutOf: 'base' },
+    });
+    expect(at(special, 100, 28500)).toBe(50);
+  });
+});
+
 describe('computeRenta with the real data', () => {
   const run = async (id: string, gross: number, family: Family, choices = {}) => {
     const { loadCcaa } = await import('@modules/tools/data/renta');

@@ -245,14 +245,35 @@ function spentValue(d: Deduction, choice: DeductionChoice): number {
   return positive(choice.amount ?? 0);
 }
 
-/** What a deduction gives for the choices the person made (`factor`: share allowed by the income limit). */
+/**
+ * What a deduction gives for the choices the person made (`factor`: share allowed by the income
+ * limit). The factor lowers what the law lowers (see `IncomeLimit.phaseOutOf`): the maximum base of
+ * the State's rent of before 2015 (9,040 − 1.4125 × (base − 17,707.20), LIRPF DT 15.ª; AEAT Manual
+ * práctico de Renta 2025, c16, example 6,900 € paid with a base of 22,100 €: 2,835.17 × 10.05 % =
+ * 284.93), the maximum in euros of the Valencian ones (Ley 13/1997 art. 4; AEAT guide of the
+ * Comunitat Valenciana 2025: "multiplicar el límite de la deducción ... por un porcentaje"), or else
+ * the deduction itself. Checked 19-10-2026.
+ */
 export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 1): number {
   if (!choice.on) return 0;
   if (d.kind === 'fixed') {
     const units = Math.max(1, Math.floor(choice.units ?? 1));
     return round2(fixedValue(d, units) * factor);
   }
-  return round2(Math.min(spentValue(d, choice), d.limit ?? Infinity) * factor);
+  return round2(loweredValue(d, choice, factor));
+}
+
+/** A percent or special deduction with the income limit's `factor` on what the law lowers. */
+function loweredValue(d: Deduction, choice: DeductionChoice, factor: number): number {
+  const target = d.incomeLimit?.phaseOutOf;
+  const limit = d.limit ?? Infinity;
+  if (target === 'base' && d.kind === 'percent' && d.baseLimit !== undefined) {
+    const lowered = { ...d, baseLimit: round2(d.baseLimit * factor) };
+    return Math.min(spentValue(lowered, choice), limit);
+  }
+  if (target === 'limit' && d.limit !== undefined)
+    return Math.min(spentValue(d, choice), d.limit * factor);
+  return Math.min(spentValue(d, choice), limit) * factor;
 }
 
 /**

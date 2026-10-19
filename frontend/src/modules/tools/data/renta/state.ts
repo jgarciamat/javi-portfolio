@@ -314,16 +314,20 @@ const deductions: Deduction[] = [
     group: 'housing',
     title: 'Alquiler de vivienda habitual con contrato anterior a 2015',
     summary:
-      'Recuperas el 10,05 % del alquiler pagado, con una base máxima de 9.040 euros al año (hasta 908,52 euros). Con base imponible de 17.707,20 a 24.107,20 euros la base máxima baja hasta cero.',
+      'Recuperas el 10,05 % del alquiler pagado, mitad en la parte estatal y mitad en la autonómica, con base máxima de 9.040 euros (hasta 908,52). Con base imponible de 17.707,20 a 24.107,20 la base baja.',
     kind: 'percent',
     percent: 10.05,
     baseLimit: 9040,
     limit: 908.52,
+    // AEAT Manual práctico de Renta 2025, c16 (checked 19-10-2026): "el 50 por 100 del total de la
+    // deducción" in each of the boxes 0562 (State) and 0563 (regional).
+    regionalShare: 0.5,
     incomeLimit: {
       individual: 24107.2,
       joint: 24107.2,
       phaseOutFrom: 17707.2,
       phaseOutTo: 24107.2,
+      phaseOutOf: 'base',
       note: 'Base imponible (general + ahorro). Hasta 17.707,20 euros la base máxima es 9.040. Entre 17.707,20 y 24.107,20 es 9.040 - 1,4125 x (base imponible - 17.707,20). Con 24.107,20 o más, no hay deducción. Se rebaja la base máxima, no el porcentaje.',
     },
     requirements:

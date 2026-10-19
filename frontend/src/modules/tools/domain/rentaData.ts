@@ -21,6 +21,13 @@ export interface IncomeLimit {
   afterMinimum?: boolean;
   /** How the limit works, in plain words, when it is not a simple threshold. */
   note?: string;
+  /**
+   * What goes down between `phaseOutFrom` and `phaseOutTo`: the deduction itself (`amount`, the
+   * default), its maximum base (`base`: the State's rent of before 2015, LIRPF DT 15.ª) or its
+   * maximum in euros (`limit`: the Comunitat Valenciana's, Ley 13/1997 art. 4). Without that base
+   * or maximum in the data, the amount goes down.
+   */
+  phaseOutOf?: 'amount' | 'base' | 'limit';
 }
 
 /**
