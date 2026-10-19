@@ -371,6 +371,40 @@
   }
 }
 
+/* ─── Before calculating ─────────────────────────────────────────────────── */
+.autonomo-checks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.autonomo-check {
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border-left: 4px solid rgba(129, 140, 248, 0.7);
+  background: rgba(99, 102, 241, 0.07);
+}
+.autonomo-check--warn {
+  border-left-color: rgba(251, 191, 36, 0.85);
+  background: rgba(251, 191, 36, 0.08);
+}
+.autonomo-check p {
+  margin: 0;
+}
+.autonomo-check-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+.autonomo-check-actions .btn-secondary {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
 .autonomo-wipe {
   display: flex;
   justify-content: flex-end;

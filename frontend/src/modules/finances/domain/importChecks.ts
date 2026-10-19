@@ -1,0 +1,249 @@
+import { supplierKey, type ImportedInvoice } from './invoiceLedger';
+import type { ManualData, ManualExpense } from './types';
+
+/**
+ * What to look at before preparing the draft: things in the imported invoices that are often a
+ * mistake (a repeated invoice, a wrong kind of expense, a missing quarter…). Nothing here stops the
+ * draft; each warning points to the invoices or the quarter it is about.
+ */
+
+export type CheckCode =
+  | 'duplicate'
+  | 'period'
+  | 'emptyIncome'
+  | 'emptyExpenses'
+  | 'otherShare'
+  | 'model130Income'
+  | 'model130Expenses'
+  | 'vat0'
+  | 'negative'
+  | 'years';
+
+export interface ImportCheck {
+  code: CheckCode;
+  /** "warn": probably wrong; "info": worth a look. */
+  level: 'warn' | 'info';
+  /** Plain values of the message. */
+  values: Record<string, string | number>;
+  /** Amounts of the message, in euros (shown as money). */
+  amounts: Record<string, number>;
+  /** The invoices it is about, to open them in the review. */
+  invoices: string[];
+  /** The quarter it is about, when it is about a quarter. */
+  quarter: number | null;
+}
+
+export interface CheckInput {
+  invoices: ImportedInvoice[];
+  /** The figures the draft will be prepared with (typed or worked out from the invoices). */
+  manual: ManualData;
+  year: number;
+  /** Today, `YYYY-MM-DD`: only the quarters that have begun can be missing. */
+  today: string;
+  /** Quarters on screen, from 1: the earlier ones are covered by a filed modelo 130. */
+  from: number;
+  upTo: number;
+  /** The figures of an imported modelo 130 (boxes 01 and 02). */
+  model130: { year: number; quarter: number; income: number; expenses: number } | null;
+  hardToJustify: boolean;
+}
+
+/** Share of all expenses that «Other» may reach before it is worth a look. */
+export const OTHER_SHARE = 0.3;
+/** Euros of difference allowed against a filed modelo 130 (roundings). */
+export const MODEL130_TOLERANCE = 1;
+
+// The rules of the server (backend autonomo-expenses.ts sharesOf), only the income tax part: the
+// check needs the deductible expenses that a filed modelo 130 shows in its box 02.
+const MEALS_DAILY_LIMIT = 26.67;
+const HEALTH_PER_PERSON = 500;
+const HEALTH_DISABILITY = 1500;
+const SUPPLIES_RATE = 0.3;
+const HARD_TO_JUSTIFY_RATE = 0.05;
+const HARD_TO_JUSTIFY_MAX = 2000;
+/** Kinds that never carry VAT: a 0 % rate on them is expected. */
+const NO_VAT: ManualExpense['kind'][] = ['quota', 'staff', 'health', 'fines'];
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+type Shares = (e: ManualExpense, profile: ManualData['profile']) => [irpf: number, vat: number];
+
+/** The shares of income tax and VAT of the kinds that are not fully deducted. */
+const SHARES: Partial<Record<ManualExpense['kind'], Shares>> = {
+  supplies: (_, p) => {
+    const share = p.homeArea > 0 ? Math.min(1, p.workArea / p.homeArea) * SUPPLIES_RATE : 0;
+    return [share, share];
+  },
+  vehicle: (e, p) => (e.amount <= 0 || p.vehicleExclusive ? [1, 1] : [0, 0.5]),
+  meals: (e) => {
+    const share = e.amount > 0 ? Math.min(1, ((e.days ?? 0) * MEALS_DAILY_LIMIT) / e.amount) : 0;
+    return [share, share];
+  },
+  clients: () => [1, 0],
+  health: (e, p) => {
+    const limit = p.healthPeople * (p.healthDisability ? HEALTH_DISABILITY : HEALTH_PER_PERSON);
+    return [e.amount > 0 ? Math.min(1, limit / e.amount) : 0, 0];
+  },
+  fines: () => [0, 0],
+};
+
+/** What an expense counts for the income tax, in euros. */
+export function irpfDeductible(e: ManualExpense, profile: ManualData['profile']): number {
+  const cents = Math.round(e.amount * 100);
+  const baseCents = Math.round(cents / (1 + e.vatRate / 100));
+  const vatCents = cents - baseCents;
+  const [irpf, vat] = SHARES[e.kind]?.(e, profile) ?? [1, 1];
+  return Math.round(baseCents * irpf + vatCents * Math.max(0, irpf - vat)) / 100;
+}
+
+const check = (
+  code: CheckCode,
+  level: ImportCheck['level'],
+  more: Partial<Omit<ImportCheck, 'code' | 'level'>>
+): ImportCheck => ({ code, level, values: {}, amounts: {}, invoices: [], quarter: null, ...more });
+
+/** The same invoice more than once: same book, date, supplier, base and VAT rate. */
+function duplicates(used: ImportedInvoice[]): ImportCheck[] {
+  const groups = new Map<string, ImportedInvoice[]>();
+  for (const i of used) {
+    const key = [i.book, i.date, supplierKey(i.concept), i.base.toFixed(2), i.vatRate].join('|');
+    groups.set(key, [...(groups.get(key) ?? []), i]);
+  }
+  return Array.from(groups.values())
+    .filter((g) => g.length > 1)
+    .map((g) =>
+      check('duplicate', 'warn', {
+        values: { n: g.length, who: g[0].concept, date: g[0].date },
+        amounts: { base: g[0].base },
+        invoices: g.map((i) => i.id),
+      })
+    );
+}
+
+/** Quarters that have begun and have no invoice of a book, when that book was imported. */
+function emptyQuarters(input: CheckInput, used: ImportedInvoice[]): ImportCheck[] {
+  const [y, m] = input.today.split('-').map(Number);
+  const begun = input.year < y ? 4 : input.year === y ? Math.floor((m - 1) / 3) + 1 : 0;
+  const last = Math.min(begun, input.upTo);
+  const out: ImportCheck[] = [];
+  for (const book of ['issued', 'received'] as const) {
+    if (!input.invoices.some((i) => i.book === book)) continue;
+    for (let q = input.from; q <= last; q++) {
+      const typed = input.manual.quarters[q - 1];
+      const has =
+        book === 'issued'
+          ? Object.values(typed.income).some((v) => v > 0)
+          : typed.expenses.some((e) => e.amount > 0);
+      if (!has && !used.some((i) => i.book === book && i.quarter === q)) {
+        out.push(
+          check(book === 'issued' ? 'emptyIncome' : 'emptyExpenses', 'info', {
+            values: { q },
+            quarter: q,
+          })
+        );
+      }
+    }
+  }
+  return out;
+}
+
+/** «Other expenses» above 30 % of all of them: the kind was probably not recognised. */
+function otherShare(used: ImportedInvoice[]): ImportCheck[] {
+  const received = used.filter((i) => i.book === 'received');
+  const total = round2(received.reduce((s, i) => s + i.total, 0));
+  const others = received.filter((i) => i.kind === 'other');
+  const other = round2(others.reduce((s, i) => s + i.total, 0));
+  if (total <= 0 || other / total <= OTHER_SHARE) return [];
+  return [
+    check('otherShare', 'warn', {
+      values: { share: Math.round((other / total) * 100) },
+      amounts: { other, total },
+      invoices: others.map((i) => i.id),
+    }),
+  ];
+}
+
+/** A filed modelo 130 against what the invoices give for the same quarters. */
+function model130(input: CheckInput): ImportCheck[] {
+  const filed = input.model130;
+  if (!filed || filed.year !== input.year) return [];
+  const upTo = input.manual.quarters.slice(0, filed.quarter);
+  const books = new Set(
+    input.invoices.filter((i) => i.quarter <= filed.quarter).map((i) => i.book)
+  );
+  const income = round2(
+    upTo.reduce((s, q) => s + q.income.r21 + q.income.r10 + q.income.r4 + q.income.r0, 0)
+  );
+  let expenses = upTo.reduce(
+    (s, q) => s + q.expenses.reduce((t, e) => t + irpfDeductible(e, input.manual.profile), 0),
+    0
+  );
+  if (input.hardToJustify) {
+    expenses += Math.min(
+      Math.max(0, income - expenses) * HARD_TO_JUSTIFY_RATE,
+      HARD_TO_JUSTIFY_MAX
+    );
+  }
+  expenses = round2(expenses);
+  const out: ImportCheck[] = [];
+  const compare = (code: CheckCode, books: number, filedAmount: number) => {
+    if (Math.abs(books - filedAmount) > MODEL130_TOLERANCE) {
+      out.push(
+        check(code, 'warn', {
+          values: { quarter: filed.quarter },
+          amounts: { filed: filedAmount, books, diff: round2(books - filedAmount) },
+        })
+      );
+    }
+  };
+  if (books.has('issued')) compare('model130Income', income, filed.income);
+  if (books.has('received')) compare('model130Expenses', expenses, filed.expenses);
+  return out;
+}
+
+/** Everything worth a look before preparing the draft: the warnings first. */
+export function checkImport(input: CheckInput): ImportCheck[] {
+  const used = input.invoices.filter((i) => !i.excluded);
+  const period = used.filter((i) => i.period != null && i.period !== i.quarter);
+  const vat0 = used.filter(
+    (i) => i.book === 'received' && i.vatRate === 0 && !NO_VAT.includes(i.kind)
+  );
+  const negative = used.filter((i) => i.base < 0);
+  const years = Array.from(new Set(used.map((i) => Number(i.date.slice(0, 4))))).sort();
+  const all: ImportCheck[] = [
+    ...duplicates(used),
+    ...(period.length > 0
+      ? [
+          check('period', 'warn', {
+            values: { n: period.length },
+            invoices: period.map((i) => i.id),
+          }),
+        ]
+      : []),
+    // Invoices of another year than the draft's are mixed into its quarters.
+    ...(years.some((y) => y !== input.year)
+      ? [
+          check('years', 'warn', {
+            values: { years: years.join(', '), year: input.year },
+            invoices: used.filter((i) => !i.date.startsWith(`${input.year}-`)).map((i) => i.id),
+          }),
+        ]
+      : []),
+    ...otherShare(used),
+    ...model130(input),
+    ...emptyQuarters(input, used),
+    ...(vat0.length > 0
+      ? [check('vat0', 'info', { values: { n: vat0.length }, invoices: vat0.map((i) => i.id) })]
+      : []),
+    ...(negative.length > 0
+      ? [
+          check('negative', 'info', {
+            values: { n: negative.length },
+            amounts: { total: round2(negative.reduce((s, i) => s + i.total, 0)) },
+            invoices: negative.map((i) => i.id),
+          }),
+        ]
+      : []),
+  ];
+  return [...all.filter((c) => c.level === 'warn'), ...all.filter((c) => c.level === 'info')];
+}

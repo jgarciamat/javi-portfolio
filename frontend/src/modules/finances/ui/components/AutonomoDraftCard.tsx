@@ -10,6 +10,10 @@ import { storage } from '@shared/utils/storage';
 import { HowToFile } from '@modules/guides/ui/HaciendaGuides';
 import { AutonomoManual, emptyManual, toManualData, type ManualForm } from './AutonomoManual';
 import { DraftResult } from './AutonomoDraftResult';
+import { ImportChecks } from './ImportChecks';
+import { bringIntoView } from './bringIntoView';
+import type { ReviewFocus } from './InvoiceReview';
+import { checkImport } from '../../domain/importChecks';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 import { UsedFreeGate, quarterDraftAccess } from './AutonomoLimit';
 import type { AutonomoDraft, AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
@@ -172,6 +176,28 @@ function ExtrasPanel({
   );
 }
 
+/** Today as `YYYY-MM-DD` in the person's time zone. */
+const today = (): string => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
+};
+
+/** What to look at in the imported invoices before preparing the draft of a quarter. */
+const checksFor = (manual: ManualForm, extras: Extras, year: number, quarter: Quarter) =>
+  checkImport({
+    invoices: manual.invoices,
+    manual: toManualData(manual),
+    year,
+    today: today(),
+    // With the filed modelo 130 on, only the quarter of the draft is on screen.
+    from: manual.prior.on && quarter > 1 ? quarter : 1,
+    upTo: quarter,
+    model130: manual.model130,
+    hardToJustify: extras.hardToJustify,
+  });
+
 /** The manual form, kept on the device between visits. */
 function useStoredManual() {
   const [manual, setManual] = useState<ManualForm>(() => ({
@@ -200,6 +226,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
   // Bumped when the data is wiped, so the import panels forget their messages too.
   const [wipes, setWipes] = useState(0);
   const [manual, changeManual] = useStoredManual();
+  const [focus, setFocus] = useState<ReviewFocus | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
   );
@@ -214,6 +241,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
     setWipes((n) => n + 1);
   };
 
+  const checks = checksFor(manual, extras, year, quarter);
   const { limit, locked, otherQuarter } = quarterDraftAccess(plan, year, quarter);
   const prepare = () =>
     action.run(async () => {
@@ -255,11 +283,19 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
           setYear(y);
           setQuarter(q);
         }}
+        focus={focus}
       />
 
       <ExtrasPanel
         extras={extras}
         onChange={(patch) => setExtras((current) => ({ ...current, ...patch }))}
+      />
+
+      <ImportChecks
+        checks={checks}
+        invoices={manual.invoices}
+        onInvoice={(id) => setFocus((f) => ({ id, n: (f?.n ?? 0) + 1 }))}
+        onQuarter={(q) => bringIntoView(`autonomo-quarter-${q}`, ['h3'])}
       />
 
       {otherQuarter ? (

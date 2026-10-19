@@ -101,7 +101,7 @@ const issuedRows = issued.map((i, n): XlsxCell[] => {
   const held = round2((i.base * i.retention) / 100);
   return [
     '2026',
-    `${Math.floor(Number(i.date.slice(5, 7) as string) / 4) + 1}T`,
+    `${Math.ceil(Number(i.date.slice(5, 7)) / 3)}T`,
     'I01',
     { date: i.date },
     `2026-${String(n + 1).padStart(3, '0')}`,
