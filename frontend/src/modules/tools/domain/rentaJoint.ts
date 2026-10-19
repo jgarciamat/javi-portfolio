@@ -6,6 +6,7 @@ import {
   type RentaInput,
   type RentaResult,
 } from './rentaCalc';
+import { round2 } from './round';
 
 /** couple: spouses and their minor children; single: one parent with the children who live with them. */
 export type JointKind = 'couple' | 'single';
@@ -38,8 +39,6 @@ export interface JointComparison {
   /** The 340 € deduction of the individual returns that the joint one leaves out. */
   lowPayLeftOut: number;
 }
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** Whether the family unit exists: a couple always; one parent needs a minor child (LIRPF art. 82.1). */
 export function canFileJointly(kind: JointKind, children: Child[], rules: JointRules): boolean {

@@ -92,7 +92,8 @@ def scale_tax(scale, base):
         to = scale[i + 1][0] if i + 1 < len(scale) else float('inf')
         if base <= frm:
             break
-        tax += (min(base, to) - frm) * rate / 100
+        # Each bracket rounded to the cent, as the AEAT draft does (see frontend round.ts).
+        tax += r2((min(base, to) - frm) * rate / 100)
     return r2(tax)
 
 
@@ -101,9 +102,10 @@ def work_reduction(rn):
     if rn <= 14852:
         return 7302.0
     if rn <= 17673.52:
-        return r2(7302 - 1.75 * (rn - 14852))
+        # The product is rounded before it is taken off, as in a real draft (box 0023 3.292,64).
+        return r2(7302 - r2(1.75 * (rn - 14852)))
     if rn < 19747.5:
-        return r2(2364.34 - 1.14 * (rn - 17673.52))
+        return r2(2364.34 - r2(1.14 * (rn - 17673.52)))
     return 0.0
 
 

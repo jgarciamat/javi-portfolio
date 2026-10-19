@@ -6,6 +6,7 @@ import {
   type RentaInput,
   type RentaResult,
 } from './rentaCalc';
+import { round2 } from './round';
 
 /** The boxes of the return (modelo 100) that the planner also works out, in the order of the form. */
 export const COMPARED_BOXES = [
@@ -50,8 +51,6 @@ const COMES_FROM: Partial<Record<ComparedBox, ComparedBox[]>> = {
 /** Below a cent there is nothing to explain; up to a euro it is the rounding of the steps. */
 const CENT = 0.005;
 const ROUNDING = 1;
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** The minimum for disabilities: the person's own, the children's and the ascendants' (box 0517). */
 export function disabilityMinimum(family: Family, m: FullMinimums): number {

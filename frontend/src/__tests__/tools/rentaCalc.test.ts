@@ -130,6 +130,13 @@ describe('applyScale', () => {
     expect(applyScale(scale, 30000)).toBe(3582.75);
     expect(applyScale(scale, 12450)).toBe(1182.75);
     expect(applyScale(scale, 0)).toBe(0);
+  });
+
+  it('rounds the tax of each bracket to the cent, half up (case 13 of the bank)', async () => {
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    // 1,182.75 + 930 + 2,250 + 2,133 × 18.5 % (394.605 → 394.61) = 4,757.36, not 4,757.35.
+    expect(applyScale(rentaState.scale, 37333)).toBe(4757.36);
+    expect(applyMinimum(rentaState.scale, 37333, 5550)).toBe(4230.11);
     expect(applyScale(scale, -10)).toBe(0);
     expect(applyScale(scale, Number.NaN)).toBe(0);
     expect(applyScale(scale, 50000)).toBe(1182.75 + 930 + 2250 + 14800 * 0.185);

@@ -1,5 +1,6 @@
 import { computeRenta, type DeductionChoice, type RentaInput, type RentaResult } from './rentaCalc';
 import type { Deduction } from './rentaData';
+import { round2 } from './round';
 
 /** Amounts used when the person has not typed one, always shown as an example. */
 export const EXAMPLE_SPENT = 1000;
@@ -13,8 +14,6 @@ export interface DeductionSaving {
   /** The amount the saving was worked out with when none was typed; null when it is the person's. */
   example: number | null;
 }
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** The example for a deduction that depends on an amount: what was spent, or the deduction itself. */
 export function exampleAmount(d: Deduction): number {

@@ -68,7 +68,7 @@
       "declaracion": "individual",
       "casilla": "0023",
       "concepto": "Reducción por obtención de rendimientos del trabajo",
-      "importe": 5043.63,
+      "importe": 5043.62,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0023"
@@ -78,7 +78,7 @@
       "declaracion": "individual",
       "casilla": "0025",
       "concepto": "Rendimiento neto reducido del trabajo",
-      "importe": 9098.87,
+      "importe": 9098.88,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0025"
@@ -88,7 +88,7 @@
       "declaracion": "individual",
       "casilla": "0435",
       "concepto": "Base imponible general",
-      "importe": 9098.87,
+      "importe": 9098.88,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0435"
@@ -108,7 +108,7 @@
       "declaracion": "individual",
       "casilla": "0500",
       "concepto": "Base liquidable general",
-      "importe": 9098.87,
+      "importe": 9098.88,
       "origen": "calculo-a-mano",
       "ref": "calculo.md#declaración-individual-del-primer-declarante",
       "campo": "boxes.0500"

@@ -22,16 +22,16 @@ Fuentes: Ley 35/2006 del IRPF (BOE-A-2006-20764) y Manual práctico de Renta 202
 
 ### 4. Reducción por obtención de rendimientos del trabajo (art. 20)
 
-- Sobre el rendimiento neto previo 16.142,50: 7.302 − 1,75 × (16.142,50 − 14.852); con el límite del rendimiento neto → **5.043,63** (0023)
-- Rendimiento neto reducido (0025) = **9.098,87**
+- Sobre el rendimiento neto previo 16.142,50: 7.302 − 1,75 × (16.142,50 − 14.852); con el límite del rendimiento neto → **5.043,62** (0023)
+- Rendimiento neto reducido (0025) = **9.098,88**
 
 ### 5. Bases imponibles (LIRPF arts. 45-49)
 
-- Base imponible general (0435) = 9.098,87 = **9.098,87**
+- Base imponible general (0435) = 9.098,88 = **9.098,88**
 
 ### 6. Reducciones de la base y bases liquidables (arts. 50-55 y 84)
 
-- Base liquidable general (0500) = 9.098,87 = **9.098,87**
+- Base liquidable general (0500) = 9.098,88 = **9.098,88**
 - Base liquidable del ahorro (0510) = **0,00**
 
 ### 7. Mínimo personal y familiar (arts. 56-61)
@@ -41,8 +41,8 @@ Fuentes: Ley 35/2006 del IRPF (BOE-A-2006-20764) y Manual práctico de Renta 202
 
 ### 8. Cuotas íntegras (arts. 63-66 y 74-76)
 
-- General estatal: escala(9.098,87) 864,39 − escala(mínimo 6.700,00) 636,50 = 227,89
-- General autonómica (Canarias): escala(9.098,87) 818,90 − escala(mínimo 6.768,00) 609,12 = 209,78
+- General estatal: escala(9.098,88) 864,39 − escala(mínimo 6.700,00) 636,50 = 227,89
+- General autonómica (Canarias): escala(9.098,88) 818,90 − escala(mínimo 6.768,00) 609,12 = 209,78
 - Cuota íntegra estatal (0545) = **227,89**; autonómica (0546) = **209,78**
 
 ### 9. Deducciones, cuota resultante y resultado

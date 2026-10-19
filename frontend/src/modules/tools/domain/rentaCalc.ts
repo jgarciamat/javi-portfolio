@@ -1,10 +1,14 @@
 import type { RentaWorkExtras } from './rentaExtras';
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
+import { round2 } from './round';
 
-const round2 = (n: number) => Math.round(n * 100) / 100;
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
-/** Tax of a progressive scale: every bracket taxes only the part of the base inside it. */
+/**
+ * Tax of a progressive scale: every bracket taxes only the part of the base inside it, and the tax
+ * of each bracket is rounded to the cent (half up) before they are added, the same way the AEAT's
+ * draft rounds each product (see {@link round2} and rentaWork.ts).
+ */
 export function applyScale(scale: TaxBracket[], base: number): number {
   const amount = positive(base);
   let tax = 0;
@@ -12,7 +16,7 @@ export function applyScale(scale: TaxBracket[], base: number): number {
     const from = scale[i].from;
     const to = i + 1 < scale.length ? scale[i + 1].from : Infinity;
     if (amount <= from) break;
-    tax += (Math.min(amount, to) - from) * (scale[i].rate / 100);
+    tax += round2((Math.min(amount, to) - from) * (scale[i].rate / 100));
   }
   return round2(tax);
 }
