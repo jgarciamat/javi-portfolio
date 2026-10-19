@@ -7,6 +7,7 @@ import {
   type WithholdingWarning,
 } from '../../domain/withholdings';
 import { Boxes } from './AutonomoDraftResult';
+import { WithholdingFormPreviews } from '@modules/taxforms/ui/FormPreviews';
 import {
   emptyWithholding,
   withWithholding,
@@ -380,6 +381,7 @@ export function WithholdingsPanel({
       {result.m115.result !== 'none' && (
         <Boxes title={t('app.autonomo.model', { model: '115' })} boxes={result.m115.boxes} />
       )}
+      <WithholdingFormPreviews result={result} year={year} />
       <p className="section-hint">{t(key('note'))}</p>
     </section>
   );

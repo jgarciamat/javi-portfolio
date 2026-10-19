@@ -16,6 +16,7 @@ import {
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
 import { AutonomoExplain } from './AutonomoExplain';
 import { VatFamily } from './AutonomoVatResult';
+import { AutonomoFormPreviews } from '@modules/taxforms/ui/FormPreviews';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
@@ -324,6 +325,7 @@ export function DraftResult({
       <RetaAndDeadlines draft={draft} />
       <p className="plan-note">{t('app.autonomo.disclaimer')}</p>
       <PdfActions draft={draft} inputs={inputs} />
+      <AutonomoFormPreviews draft={draft} />
     </div>
   );
 }

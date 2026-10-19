@@ -47,6 +47,7 @@ import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
+import { RentaFormPreview } from '@modules/taxforms/ui/FormPreviews';
 import { Step, useMoney } from './renta/shared';
 import './css/Renta.css';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
@@ -540,6 +541,7 @@ export function RentaPlanner({
         mode={mode}
         n={expert ? 6 : 4}
       />
+      {shown && <RentaFormPreview result={shown.result} input={input} year={year} />}
     </div>
   );
 }
