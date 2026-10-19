@@ -58,6 +58,9 @@ void (async () => {
       }
     }
     const wanted = Object.keys(form.values);
+    // The reader takes the four-digit boxes of the Renta; the two-digit ones of its header (dates,
+    // codes, the rows of the family) are not amounts it reads.
+    const readable = model === '100' ? wanted.filter((id) => /^\d{4}$/.test(id)) : wanted;
     const fieldMisses = wanted.filter((id) => !(`casilla.${id}` in typed));
     let line = `${model}: ${pdf.numPages} págs., ${wanted.length} casillas rellenadas, ${
       wanted.length - fieldMisses.length
@@ -66,8 +69,9 @@ void (async () => {
       failures++;
       line += ` · FALTAN ${fieldMisses.join(' ')}`;
     }
-    if (model !== '100') {
-      const pages = await tokensFromPdf(pdf as unknown as PdfDocument);
+    const pages = await tokensFromPdf(pdf as unknown as PdfDocument);
+    // The Renta is too large for a fixture (25 pages): its round trip is checked here only.
+    if (model !== '100')
       fixtures[model] = pages.map((tokens) =>
         tokens.map((t) => ({
           ...t,
@@ -77,22 +81,30 @@ void (async () => {
           ...(t.h !== undefined ? { h: Math.round(t.h * 10) / 10 } : {}),
         }))
       );
-      const read = parseTaxModelTokens(pages);
-      if (!read.ok) {
+    const read = parseTaxModelTokens(pages);
+    if (!read.ok) {
+      failures++;
+      line += ` · LECTOR: ${read.reason}`;
+    } else {
+      const { boxes, year, quarter } = read.data;
+      const same = readable.filter((id) => boxes[id] === form.values[id]);
+      const wrong = readable.filter((id) => id in boxes && boxes[id] !== form.values[id]);
+      const unread = readable.filter((id) => !(id in boxes));
+      const extra = Object.keys(boxes).filter((id) => !(id in form.values));
+      line += ` · lector: modelo ${read.data.model}, ${year} ${quarter ?? '-'}T, ${
+        same.length
+      } iguales`;
+      if (unread.length) line += `, sin leer ${unread.join(' ')}`;
+      if (
+        unread.length ||
+        wrong.length ||
+        extra.length ||
+        read.data.model !== model ||
+        // The Renta prints its year on the layout (2025); the quarterly forms type it in.
+        (model !== '100' && year !== form.year)
+      ) {
         failures++;
-        line += ` · LECTOR: ${read.reason}`;
-      } else {
-        const { boxes, year, quarter } = read.data;
-        const same = wanted.filter((id) => boxes[id] === form.values[id]);
-        const wrong = wanted.filter((id) => id in boxes && boxes[id] !== form.values[id]);
-        const unread = wanted.filter((id) => !(id in boxes));
-        const extra = Object.keys(boxes).filter((id) => !(id in form.values));
-        line += ` · lector: modelo ${read.data.model}, ${year} ${quarter}T, ${same.length} iguales`;
-        if (unread.length) line += `, sin leer ${unread.join(' ')}`;
-        if (wrong.length || extra.length || read.data.model !== model || year !== form.year) {
-          failures++;
-          line += ` · MAL ${wrong.join(' ')} · DE MÁS ${extra.join(' ')}`;
-        }
+        line += ` · MAL ${wrong.join(' ')} · DE MÁS ${extra.join(' ')}`;
       }
     }
     console.log(line);

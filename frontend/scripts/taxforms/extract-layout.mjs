@@ -84,6 +84,13 @@ const OVERRIDES = {
   },
 };
 
+/**
+ * Box numbers the facsimile prints by mistake on top of the right ones: model → page (1-based) →
+ * numbers. Page 32 of BOE-A-2026-7041 (page 12 of the Renta) prints «0543» over 1608, 0592, 0593,
+ * 0594 and 0600; the 0543 is the average autonomic rate of page 22.
+ */
+const GHOSTS = { 100: { 32: ['0543'] } };
+
 const round = (n) => Math.round(n * 10) / 10;
 
 const [file, model, from, to] = process.argv.slice(2);
@@ -215,6 +222,7 @@ for (let n = Number(from); n <= Number(to); n++) {
   const { rects, lines } = await graphicsOf(page);
   const texts = (await textsOf(page))
     .filter((t) => t.y < 750 && t.y > 64 && !DROP.some((re) => re.test(t.str)))
+    .filter((t) => !(GHOSTS[model]?.[n] ?? []).includes(t.str))
     .flatMap((t) => {
       // «Período .....»: the word alone, so the reader finds the period typed after it.
       const m = /^(Ejercicio|Per[ií]odo)( ?\.+)$/.exec(t.str);
