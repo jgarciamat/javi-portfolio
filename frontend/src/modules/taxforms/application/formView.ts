@@ -5,7 +5,13 @@ export interface ViewPage {
     canvasContext: CanvasRenderingContext2D;
     viewport: unknown;
     annotationMode?: number;
-  }): { promise: Promise<void> };
+  }): RenderTask;
+}
+
+/** A drawing under way: pdf.js lets it be cancelled. */
+export interface RenderTask {
+  promise: Promise<void>;
+  cancel?: () => void;
 }
 
 export interface ViewDocument {
@@ -35,11 +41,26 @@ export async function openFormView(bytes: Uint8Array): Promise<FormView> {
   return viewOf(doc);
 }
 
+/** The drawing under way on each canvas: a canvas can only take one at a time. */
+const drawing = new WeakMap<HTMLCanvasElement, { task: RenderTask; turn: number }>();
+/** The last drawing asked for on each canvas. */
+const latest = new WeakMap<HTMLCanvasElement, number>();
+
 export function viewOf(doc: ViewDocument): FormView {
   return {
     pages: doc.numPages,
     async draw(n, canvas, width) {
+      // A new page asked for while another is being drawn (quick «next» taps): the old one stops.
+      const turn = (latest.get(canvas) ?? 0) + 1;
+      latest.set(canvas, turn);
+      const running = drawing.get(canvas);
+      if (running) {
+        running.task.cancel?.();
+        await running.task.promise.catch(() => undefined);
+      }
       const page = await doc.getPage(n);
+      // A later call took the canvas meanwhile: it draws, this one does not.
+      if (turn !== latest.get(canvas)) return;
       const ratio = window.devicePixelRatio || 1;
       const base = page.getViewport({ scale: 1 });
       const viewport = page.getViewport({ scale: (width / base.width) * ratio });
@@ -47,11 +68,20 @@ export function viewOf(doc: ViewDocument): FormView {
       canvas.height = Math.round(viewport.height);
       const context = canvas.getContext('2d');
       if (!context) return;
-      await page.render({
+      const task = page.render({
         canvasContext: context,
         viewport,
         annotationMode: ANNOTATIONS_IN_CANVAS,
-      }).promise;
+      });
+      drawing.set(canvas, { task, turn });
+      try {
+        await task.promise;
+      } catch (e) {
+        // Cancelled for a newer page: not a failure.
+        if ((e as { name?: string })?.name !== 'RenderingCancelledException') throw e;
+      } finally {
+        if (drawing.get(canvas)?.turn === turn) drawing.delete(canvas);
+      }
     },
     close: () => doc.destroy(),
   };

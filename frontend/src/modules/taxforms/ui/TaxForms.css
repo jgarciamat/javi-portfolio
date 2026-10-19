@@ -68,6 +68,19 @@
   margin-bottom: 0.5rem;
 }
 
+/* «Página 12 de 25» on one line, also on a phone (the buttons take the rest). */
+.taxform-pager > span {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .taxform-pager .btn-secondary {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
 /* The page is a sheet of paper in both themes, as wide as the screen allows. */
 .taxform-sheet {
   background: #fff;

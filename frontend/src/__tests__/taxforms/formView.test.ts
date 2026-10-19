@@ -73,3 +73,52 @@ describe('Showing a preview page by page', () => {
     await expect(canvasPng(canvas)).rejects.toThrow('png');
   });
 });
+
+describe('Drawing pages one after another on the same canvas', () => {
+  const cancelled = () =>
+    Object.assign(new Error('cancelled'), { name: 'RenderingCancelledException' });
+
+  it('stops the page being drawn when another is asked for, and draws only the last one', async () => {
+    const canvas = document.createElement('canvas');
+    jest.spyOn(canvas, 'getContext').mockReturnValue({} as never);
+    let reject: (e: unknown) => void = () => undefined;
+    const cancel = jest.fn(() => reject(cancelled()));
+    const pages: number[] = [];
+    const slow: ViewDocument = {
+      numPages: 3,
+      getPage: async (n) => ({
+        getViewport: ({ scale }) => ({ width: 595 * scale, height: 842 * scale }),
+        render: () => {
+          pages.push(n);
+          return n === 1
+            ? { promise: new Promise<void>((_, no) => (reject = no)), cancel }
+            : { promise: Promise.resolve() };
+        },
+      }),
+      destroy: async () => undefined,
+    };
+    const view = viewOf(slow);
+    const first = view.draw(1, canvas, 100);
+    await new Promise((r) => setTimeout(r, 0));
+    // Two quick taps: the first drawing is cancelled, the second request gives way to the third.
+    const second = view.draw(2, canvas, 100);
+    const third = view.draw(3, canvas, 100);
+    await Promise.all([first, second, third]);
+    expect(cancel).toHaveBeenCalled();
+    expect(pages).toEqual([1, 3]);
+  });
+
+  it('passes on a failure that is not a cancellation', async () => {
+    const canvas = document.createElement('canvas');
+    jest.spyOn(canvas, 'getContext').mockReturnValue({} as never);
+    const broken: ViewDocument = {
+      numPages: 1,
+      getPage: async () => ({
+        getViewport: ({ scale }) => ({ width: 595 * scale, height: 842 * scale }),
+        render: () => ({ promise: Promise.reject(new Error('broken')) }),
+      }),
+      destroy: async () => undefined,
+    };
+    await expect(viewOf(broken).draw(1, canvas, 100)).rejects.toThrow('broken');
+  });
+});
