@@ -23,7 +23,7 @@ const annual = annualOf(manual, extras, 2025);
 
 Si solo tienes los datos que se envían al servidor (`AutonomoInputs`, con su campo `activity`), usa `annualActivity(year, inputs)` de `domain/annualActivity.ts`. El formulario es el de la pantalla de Autónomos, el mismo que se guarda en el dispositivo y en la cuenta (`AutonomoSaved.manual` y `.extras`).
 
-Una cuenta tiene **un solo formulario por año** y no guarda el año. Quien llame debe pasar el ejercicio de la Renta y comprobar que el formulario es de ese año: el selector de la pantalla y las fechas de las facturas lo dicen.
+Una cuenta tiene **un solo formulario por año** y no guarda el año. Quien llame debe pasar el ejercicio de la Renta y comprobar que el formulario es de ese año: las fechas de las facturas lo dicen (`autonomoForRenta.ts`: `invoiceYears`, `yearCheck` y `autonomoOnDevice(year)`, que lee el formulario guardado en el dispositivo). La pantalla de Autónomos se abre en el año de las facturas (en su 4.º trimestre si es un año pasado), y «Preparar mi declaración de la renta» lleva el año a la Renta **de ese mismo ejercicio**, enseñando antes lo que lleva para confirmarlo; si las facturas son de otro año, lo dice y ofrece cambiarlo. En la Renta, el paso 6 tiene el botón «Traer mi actividad de Autónomos (año)» con el mismo control y el desglose casilla por casilla (`rentaActivityBoxes.ts`).
 
 ## 2. Qué devuelve: `AnnualActivity` (versión 1)
 
@@ -48,7 +48,7 @@ Todos los importes van en euros con dos decimales.
 | `expenses.stockDecrease` | Disminución de existencias. | 0182 |
 | `expenses.depreciation.tangible` y `.intangible` | Amortización del inmovilizado material e intangible. | 0208 y 0227 |
 | `expenses.provisions` | Provisiones; solo en la modalidad normal. | 0219 |
-| `expenses.hardToJustify` | Provisiones y gastos de difícil justificación; solo en la simplificada. | 0222 |
+| `expenses.hardToJustify` | Provisiones y gastos de difícil justificación; solo en la simplificada y **siempre** en ella (art. 30.2.4.ª RIRPF): la casilla de la pantalla solo decide si se aplica en el 130. | 0222 |
 | `expenses.total` | Total de gastos deducibles. | 0220 o 0223 |
 | `subsidies.exempt` | Ayudas de la DA 5.ª LIRPF: **no** se integran en la base. | — |
 | `subsidies.unassigned` | Subvenciones de capital sin bien amortizable: tributan al vender el bien; no se calculan. | — |

@@ -401,7 +401,15 @@ describe('Annual activity: normal modality, farming, grants and what is not work
     const inputs = inputsOf(four(quarter(1000)), null);
     inputs.quarters[0] = { withheld: 0, socialSecurity: 200, vatNotDeductible: 50 };
     const year = annualActivity(2026, inputs);
-    expect([year.expenses.reta, year.expenses.byKind.other, year.net]).toEqual([200, 50, 750]);
+    // 1,000 − 200 − 50 = 750, less the 5 % of the simplified modality (37.50): 712.50.
+    expect([year.expenses.reta, year.expenses.byKind.other, year.net]).toEqual([200, 50, 712.5]);
+  });
+
+  it('takes the 5 % of the simplified modality in the Renta even with the option of the 130 off', () => {
+    // Art. 30.2.4.ª RIRPF: in the Renta it is part of the modality, not a choice.
+    const inputs = { ...inputsOf(four(quarter(1000)), null), hardToJustify: false };
+    const year = annualActivity(2026, inputs);
+    expect([year.expenses.hardToJustify, year.net]).toEqual([50, 950]);
   });
 });
 

@@ -328,8 +328,10 @@ function expensesOfYear(
       retaFix.refunded
   );
   const difference = round2(income - box0218);
+  // In the Renta the 5 % is part of the simplified modality, not an option (art. 30.2.4.ª RIRPF;
+  // Manual Renta 2025, cap. 7): the option of the screen is only for the modelo 130.
   const hard =
-    activity.method === 'simplified' && inputs.hardToJustify
+    activity.method === 'simplified'
       ? Math.min(round2(Math.max(0, difference) * hardRateOf(year)), HARD_MAX)
       : 0;
   return {
