@@ -1,5 +1,6 @@
 import { guessExpenseKind, type BookEntry, type BookKind } from './invoiceBook';
 import type { ExpenseKind } from './types';
+import type { WithholdingRole } from './withholdings';
 
 /**
  * The invoices imported from the books, one by one, so the person can check them and correct the
@@ -16,7 +17,16 @@ export interface ImportedInvoice extends BookEntry {
   kind: ExpenseKind;
   /** Left out of the draft by the person. */
   excluded: boolean;
+  /** The withholding of a received invoice as the person corrected it (the book's stays in `retention`). */
+  retentionFix?: number;
+  /** Which form the withholding goes to, when the person chose it (otherwise it follows the kind). */
+  withholding?: WithholdingRole;
 }
+
+/** What the person can correct in an imported invoice. */
+export type InvoicePatch = Partial<
+  Pick<ImportedInvoice, 'kind' | 'excluded' | 'retentionFix' | 'withholding'>
+>;
 
 /** Supplier (normalised) → the kind the person chose for it, for the next imports. */
 export type KindPreferences = Record<string, ExpenseKind>;
@@ -69,7 +79,16 @@ export function toInvoices(
       book === 'issued'
         ? 'other'
         : old?.kind ?? preferences[supplierKey(entry.concept)] ?? guessExpenseKind(entry.concept);
-    return { ...entry, id, book, kind, excluded: old?.excluded ?? false };
+    return {
+      ...entry,
+      id,
+      book,
+      kind,
+      excluded: old?.excluded ?? false,
+      // The corrections of the withholding stay too.
+      ...(old?.retentionFix !== undefined ? { retentionFix: old.retentionFix } : {}),
+      ...(old?.withholding ? { withholding: old.withholding } : {}),
+    };
   });
 }
 
@@ -91,7 +110,7 @@ export function mergeInvoices(
 export function updateInvoices(
   list: ImportedInvoice[],
   ids: string[],
-  patch: Partial<Pick<ImportedInvoice, 'kind' | 'excluded'>>
+  patch: InvoicePatch
 ): { list: ImportedInvoice[]; quarters: Partial<Record<BookKind, Quarter[]>> } {
   const quarters: Partial<Record<BookKind, Quarter[]>> = {};
   const next = list.map((i) => {

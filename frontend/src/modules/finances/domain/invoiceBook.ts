@@ -21,6 +21,13 @@ export interface BookEntry {
   total: number;
   /** IRPF withheld by the client (issued invoices only). */
   withheld: number;
+  /**
+   * IRPF the person withheld from the supplier (received invoices of a book that has a withholding
+   * column): it goes to the modelo 111 or 115, not to the draft of the 130.
+   */
+  retention?: number;
+  /** The supplier's tax id (NIF/CIF), when the book has the column: it tells two suppliers apart. */
+  nif?: string;
   /** Who or what: the client, the supplier or the concept. */
   concept: string;
   /** The quarter a «Periodo/Trimestre» column says it belongs to (only when the book has one). */
@@ -88,6 +95,7 @@ interface Columns {
   total: number;
   concept: number;
   period: number;
+  nif: number;
 }
 
 type Matcher = { include: RegExp[]; exclude?: RegExp };
@@ -147,10 +155,12 @@ const MATCHERS: Record<keyof Columns, Matcher[]> = {
   concept: [
     {
       include: [/nombre (destinatario|expedidor)/, /cliente/, /proveedor/, /descripcion/, /nombre/],
+      exclude: /\bnif\b|\bcif\b/,
     },
     { include: [/concepto/] },
   ],
   period: [{ include: [/trimestre/, /periodo/], exclude: /fecha|ejercicio/ }],
+  nif: [{ include: [/\bnif\b/, /\bcif\b/, /\bn\.i\.f\b/] }],
 };
 
 function pick(headers: string[], matchers: Matcher[]): number {
@@ -219,17 +229,36 @@ const rateOf = (raw: number, base: number, vat: number): VatRate | null => {
   return RATES.find((r) => Math.abs(r - rate) < 0.05) ?? null;
 };
 
-/** The withholding of an issued invoice: its amount, or its rate over the base. */
-function withheldOf(
-  kind: BookKind,
-  base: number,
-  retention: number,
-  retentionRate: number
-): number {
-  if (kind === 'received') return 0;
+/** The withholding of an invoice: its amount, or its rate over the base. */
+function heldOf(base: number, retention: number, retentionRate: number): number {
   if (Number.isFinite(retention)) return round2(Math.abs(retention));
   const rate = retentionRate > 0 && retentionRate < 1 ? retentionRate * 100 : retentionRate;
   return Number.isFinite(rate) ? round2((base * rate) / 100) : 0;
+}
+
+/**
+ * What an invoice says about withholdings: issued ones keep theirs in `withheld` (the 130 takes it);
+ * received ones in `retention`, with the sign of the base so a credit note takes it back.
+ */
+function withholdingsOf(
+  row: BookCell[],
+  col: Columns,
+  kind: BookKind,
+  base: number
+): Pick<BookEntry, 'withheld' | 'retention' | 'nif'> {
+  const at = (index: number): BookCell => (index >= 0 ? row[index] : undefined);
+  const held = heldOf(base, bookNumber(at(col.retention)), bookNumber(at(col.retentionRate)));
+  if (kind === 'issued') return { withheld: held };
+  const nif = String(at(col.nif) ?? '')
+    .replace(/[\s.-]/g, '')
+    .toUpperCase();
+  return {
+    withheld: 0,
+    ...(col.retention >= 0 || col.retentionRate >= 0
+      ? { retention: round2(Math.abs(held) * (base < 0 ? -1 : 1)) }
+      : {}),
+    ...(nif ? { nif } : {}),
+  };
 }
 
 /** «1T», «T1», «2.º trimestre», «Q3» or a bare «4» as a quarter; anything else (a month) is null. */
@@ -276,12 +305,7 @@ function entryOf(
     vatRate,
     vat,
     total: round2(base + vat),
-    withheld: withheldOf(
-      kind,
-      base,
-      bookNumber(at(col.retention)),
-      bookNumber(at(col.retentionRate))
-    ),
+    ...withholdingsOf(row, col, kind, base),
     concept: String(at(col.concept) ?? '').trim(),
     ...periodOf(row, col),
   };
@@ -344,8 +368,12 @@ function kindOfName(name: string): BookKind | null {
  */
 function kindOfHeaders(headers: string[]): BookKind | null {
   const text = headers.join(' | ');
-  const issued = /retencion|retenido|irpf|cliente|destinatario|repercutid/.test(text);
-  if (issued === /proveedor|expedidor|acreedor|soportad/.test(text)) return null;
+  const received = /proveedor|expedidor|acreedor|soportad/.test(text);
+  // A received book can have withholdings too (those the person made to professionals and landlords).
+  const issued =
+    /cliente|destinatario|repercutid/.test(text) ||
+    (!received && /retencion|retenido|irpf/.test(text));
+  if (issued === received) return null;
   return issued ? 'issued' : 'received';
 }
 
