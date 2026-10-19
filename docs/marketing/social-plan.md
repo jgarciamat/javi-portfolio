@@ -4,6 +4,9 @@ Objetivo: conseguir usuarios para Money Manager con vídeos cortos útiles (90 v
 pongan en riesgo las cuentas. Los vídeos, guiones, pies de foto y calendario están en `/Users/javi/money-manager-videos/`
 (`GUIONES.md`, `CALENDARIO.md`, `calendario.csv`).
 
+**Informe de audiencia y crecimiento (oct-2026):** qué busca la gente, hashtags, referentes, 30 ideas con ganchos,
+embudo con UTM, anuncios y plan de 30 días en [`informe-tiktok-instagram.md`](informe-tiktok-instagram.md).
+
 ## 1. Crear las cuentas (lo hace el propietario, una sola vez)
 
 Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no puedo crearlas ni verificarlas.
