@@ -14,6 +14,7 @@ import {
   type TaxBox,
 } from '@modules/finances/domain/types';
 import { UsedFreeGate, usageLimit } from './AutonomoLimit';
+import { AutonomoExplain } from './AutonomoExplain';
 import '../css/Sections.css';
 import '../css/Autonomo.css';
 
@@ -309,6 +310,7 @@ export function DraftResult({
   return (
     <div className="autonomo-result" aria-live="polite">
       <SummaryTiles draft={draft} />
+      <AutonomoExplain draft={draft} />
 
       {draft.expenses && draft.expenses.length > 0 && <Deductible lines={draft.expenses} />}
       <Boxes title={t('app.autonomo.accrued')} boxes={vat.accrued} />

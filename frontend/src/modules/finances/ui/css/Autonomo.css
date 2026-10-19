@@ -405,6 +405,21 @@
   text-align: left;
 }
 
+/* ─── The result in plain words ──────────────────────────────────────────── */
+.autonomo-explain {
+  margin: 0.5rem 0 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(99, 102, 241, 0.08);
+}
+.autonomo-explain h4 {
+  margin: 0 0 0.4rem;
+}
+.autonomo-explain p {
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
 .autonomo-wipe {
   display: flex;
   justify-content: flex-end;
