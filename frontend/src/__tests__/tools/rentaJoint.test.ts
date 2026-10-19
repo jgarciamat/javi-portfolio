@@ -144,11 +144,12 @@ describe('joint return of a couple', () => {
     // 26,050 + 24,180 less a single 7,750 (the spouse's 65 %), not 3,500 + 7,750.
     expect(r.otherExpenses).toBe(2000 + 2000 + 7750);
     expect(r.netIncome).toBe(26050 + 24180 - 7750);
-    // 1,150 for 70 years, 1,150 + 1,400 for 80; 3,000 for 33 % and 9,000 for 65 %.
+    // 1,150 for 70 years, 1,150 + 1,400 for 80; 3,000 for 33 % and 9,000 + 3,000 of assistance
+    // for 65 % (LIRPF art. 60.3).
     expect(r.minimum.items).toEqual([
       { key: 'personal', amount: 5550 },
       { key: 'age', amount: 3700 },
-      { key: 'disability', amount: 12000 },
+      { key: 'disability', amount: 15000 },
     ]);
   });
 

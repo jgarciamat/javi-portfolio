@@ -42,45 +42,6 @@
       "origenEsperado": "calculo-a-mano"
     },
     {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0517",
-      "campo": "boxes.0517",
-      "concepto": "Mínimo por discapacidad, importe estatal",
-      "esperado": 12000,
-      "obtenido": 9000,
-      "severidad": "alta",
-      "causa": "El mínimo por discapacidad no suma los 3.000 € de gastos de asistencia con discapacidad del 65 % o más: computeMinimum()/disabilityAmount() en rentaCalc.ts nunca usa minimums.assistance (también falta en disabilityMinimum() de rentaCompare.ts).",
-      "fuente": "Art. 60.1 y 60.3 LIRPF; Manual práctico Renta 2025, cap. 14",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0519",
-      "campo": "boxes.0519",
-      "concepto": "Mínimo personal y familiar, gravamen estatal",
-      "esperado": 18700,
-      "obtenido": 15700,
-      "severidad": "alta",
-      "causa": "El mínimo por discapacidad no suma los 3.000 € de gastos de asistencia con discapacidad del 65 % o más: computeMinimum()/disabilityAmount() en rentaCalc.ts nunca usa minimums.assistance (también falta en disabilityMinimum() de rentaCompare.ts).",
-      "fuente": "Art. 60.1 y 60.3 LIRPF; Manual práctico Renta 2025, cap. 14",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
-      "caso": "08-jubilado-discapacidad-65-aragon",
-      "declaracion": "individual",
-      "casilla": "0520",
-      "campo": "boxes.0520",
-      "concepto": "Mínimo personal y familiar, gravamen autonómico",
-      "esperado": 18700,
-      "obtenido": 15700,
-      "severidad": "alta",
-      "causa": "El mínimo por discapacidad no suma los 3.000 € de gastos de asistencia con discapacidad del 65 % o más: computeMinimum()/disabilityAmount() en rentaCalc.ts nunca usa minimums.assistance (también falta en disabilityMinimum() de rentaCompare.ts).",
-      "fuente": "Art. 60.1 y 60.3 LIRPF; Manual práctico Renta 2025, cap. 14",
-      "origenEsperado": "calculo-a-mano"
-    },
-    {
       "caso": "13-hipoteca-anterior-2013-madrid",
       "declaracion": "individual",
       "casilla": "0545",

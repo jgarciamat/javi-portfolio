@@ -6,6 +6,7 @@ import {
   computeRenta,
   countsAsDescendant,
   deductionAmount,
+  disabilityAmount,
   incomeFactor,
   isRefundable,
   rentalNet,
@@ -206,8 +207,24 @@ describe('computeMinimum', () => {
     expect(result.items.find((i) => i.key === 'ascendants')?.amount).toBe(
       1150 + 1400 + 3000 + 1150
     );
-    expect(result.items.find((i) => i.key === 'disability')?.amount).toBe(9000);
-    expect(result.items.find((i) => i.key === 'descendants')?.amount).toBe(2400 + 2800 + 9000);
+    // 65 % adds the 3,000 € of assistance (LIRPF art. 60.3) to the 9,000, also for a child.
+    expect(result.items.find((i) => i.key === 'disability')?.amount).toBe(9000 + 3000);
+    expect(result.items.find((i) => i.key === 'descendants')?.amount).toBe(
+      2400 + 2800 + 9000 + 3000
+    );
+  });
+
+  it('adds the assistance of 65 % to an ascendant, and the community its own amount', () => {
+    const family: Family = { ...alone, ascendants: [{ over75: false, disability: 65 }] };
+    expect(computeMinimum(family, minimums).items).toContainEqual({
+      key: 'ascendants',
+      amount: 1150 + 9000 + 3000,
+    });
+    // 33 % has no assistance.
+    expect(disabilityAmount(33, minimums)).toBe(3000);
+    // Madrid's own amounts (9,659.44 + 3,219.81 of assistance).
+    const madrid = mergeMinimums(minimums, { disability65: 9659.44, assistance: 3219.81 });
+    expect(disabilityAmount(65, madrid)).toBe(12879.25);
   });
 
   it('uses the amounts of the community where it has its own', () => {
@@ -600,9 +617,10 @@ describe('computeRenta with the real data', () => {
     const rioja = await loadCcaa('la-rioja');
     const merged = mergeMinimums(rentaState.minimums, rioja.minimums);
     const own = computeMinimum({ ...alone, disability: 65 }, merged);
-    expect(own.items.find((i) => i.key === 'disability')?.amount).toBe(9000);
+    // The 3,000 € of assistance (LIRPF art. 60.3) are the State's: La Rioja does not change them.
+    expect(own.items.find((i) => i.key === 'disability')?.amount).toBe(9000 + 3000);
     const kid = computeMinimum({ ...alone, children: [{ age: 10, disability: 65 }] }, merged);
-    expect(kid.items.find((i) => i.key === 'descendants')?.amount).toBe(2400 + 9900);
+    expect(kid.items.find((i) => i.key === 'descendants')?.amount).toBe(2400 + 9900 + 3000);
     const light = computeMinimum({ ...alone, children: [{ age: 10, disability: 33 }] }, merged);
     expect(light.items.find((i) => i.key === 'descendants')?.amount).toBe(2400 + 3300);
   });

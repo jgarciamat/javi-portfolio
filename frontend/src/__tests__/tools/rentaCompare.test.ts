@@ -164,7 +164,7 @@ describe('comparing with the draft', () => {
         },
         m
       )
-    ).toBe(3000 / 2 + 9000);
+    ).toBe(3000 / 2 + 9000 + 3000);
   });
 
   it('takes the result of the draft from its last box', () => {

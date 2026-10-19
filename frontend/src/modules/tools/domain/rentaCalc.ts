@@ -79,13 +79,21 @@ export function mergeMinimums(state: FullMinimums, own?: MinimumAmounts): FullMi
 export const countsAsDescendant = (c: Child): boolean => c.age < 25 || c.disability >= 33;
 
 const nth = (list: number[], index: number): number => list[Math.min(index, list.length - 1)];
-/** The minimum for a disability of `level` (a descendant's can have its own amounts). */
+/**
+ * The minimum for a disability of `level` (a descendant's can have its own amounts). From 65 % it
+ * includes the "gastos de asistencia" (3,000 €, or the community's own amount): LIRPF art. 60.1, 60.2
+ * and 60.3 give them to the taxpayer, descendants and ascendants with a degree "igual o superior al
+ * 65 por ciento" (BOE-A-2006-20764, consolidated text; AEAT Manual práctico de Renta 2025, c14,
+ * "Mínimo por discapacidad", checked 19-10-2026). Third-party help or reduced mobility below 65 % is
+ * not asked by the planner, so it is not counted.
+ */
 export const disabilityAmount = (
   level: Disability,
   m: FullMinimums,
   descendant = false
 ): number => {
-  if (level >= 65) return (descendant ? m.descendantDisability65 : undefined) ?? m.disability65;
+  if (level >= 65)
+    return ((descendant ? m.descendantDisability65 : undefined) ?? m.disability65) + m.assistance;
   if (level >= 33) return (descendant ? m.descendantDisability33 : undefined) ?? m.disability33;
   return 0;
 };
