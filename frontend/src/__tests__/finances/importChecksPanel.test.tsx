@@ -87,7 +87,9 @@ describe('«Before you calculate»', () => {
     fireEvent.click(within(items[0]).getAllByRole('button')[1]);
     const row = document.getElementById(`autonomo-invoice-${list[1].id}`) as HTMLElement;
     expect(row).toHaveClass('is-highlighted');
-    await waitFor(() => expect(within(row).getByRole('combobox')).toHaveFocus());
+    await waitFor(() =>
+      expect(within(row).getByRole('combobox', { name: /^Tipo de gasto/ })).toHaveFocus()
+    );
   });
 
   it('opens the review again when it was folded, and goes to an empty quarter', async () => {

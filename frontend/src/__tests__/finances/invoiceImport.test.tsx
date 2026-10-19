@@ -79,7 +79,7 @@ const issuedDone = tr('app.autonomo.import.done.issued', {
 beforeEach(() => localStorage.clear());
 
 describe('One place to import invoice books', () => {
-  it('has one button, one file input for several files and the four templates', () => {
+  it('has one button, one file input for several files and the templates', () => {
     show();
     expect(screen.getAllByRole('button', { name: tr('app.autonomo.import.choose') })).toHaveLength(
       1
@@ -93,6 +93,8 @@ describe('One place to import invoice books', () => {
       '/plantillas/facturas-recibidas.xlsx',
       '/plantillas/modelo-130-plantilla.pdf',
       '/plantillas/modelo-303-plantilla.pdf',
+      '/plantillas/modelo-111-plantilla.pdf',
+      '/plantillas/modelo-115-plantilla.pdf',
     ]);
     const click = jest.spyOn(input(), 'click');
     fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.import.choose') }));
