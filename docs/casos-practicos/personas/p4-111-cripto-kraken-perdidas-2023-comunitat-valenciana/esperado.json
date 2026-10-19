@@ -1,0 +1,57 @@
+{
+  "slug": "p4-111-cripto-kraken-perdidas-2023-comunitat-valenciana",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "importe": 1495,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0439",
+      "concepto": "Pérdidas de años anteriores compensadas con las ganancias",
+      "importe": 1495,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.pendingGainsOnGains"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Pérdidas que quedan para los años siguientes",
+      "importe": 505,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.carry.gains"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 4500,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "boxes.0609"
+    }
+  ]
+}

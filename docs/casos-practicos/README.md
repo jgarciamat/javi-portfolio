@@ -8,6 +8,7 @@ La verdad de referencia y las pruebas de regresión de la Renta (modelo 100) y d
 | `personas/<slug>/persona.json` | Los datos de entrada en el formato del motor (`RentaForm` de `rentaForm.ts`; los movimientos y `DraftInputs` del backend para autónomos) y la descripción |
 | `personas/<slug>/esperado.json` | Cada cifra esperada por modelo y casilla, con su origen: `oficial` (un caso de `oficiales.json`), `calculo-a-mano` (los pasos están en `calculo.md`) o `pendiente` (con el motivo) |
 | `personas/<slug>/calculo.md` | El cálculo a mano, paso a paso, con la fórmula y el artículo |
+| `personas/p4-<slug>/archivos/` | Inversores (p4-109 a p4-118): archivos inventados de cada plataforma (CSV, Excel, PDF) para «Importar mis inversiones»; se regeneran con `node scripts/casos/run-personas4.mjs` |
 | `personas/<slug>/documentos/` | Documentos sintéticos para los importadores: borrador de Renta en PDF, libros de facturas y extracto en Excel, facturas en PDF, 130 y 303 presentados y el resumen de casillas |
 | `discrepancias.json` | Las diferencias conocidas entre el motor y la referencia, con severidad, causa probable y fuente |
 | `resultados.md`, `resultados-renta.json`, `resultados-autonomos.json` | La última pasada del banco de pruebas |

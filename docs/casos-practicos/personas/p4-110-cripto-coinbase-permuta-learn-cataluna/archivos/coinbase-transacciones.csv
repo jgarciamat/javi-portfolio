@@ -1,0 +1,7 @@
+Transactions
+User,persona.ficticia.110@example.com,ficticio
+Timestamp,Transaction Type,Asset,Quantity Transacted,Price Currency,Price at Transaction,Subtotal,Total (inclusive of fees and/or spread),Fees and/or Spread,Notes
+2024-01-05T10:00:00Z,Buy,BTC,0.2,EUR,€40000.00,€8000.00,€8080.00,€80.00,Bought 0.2 BTC for €8080.00 EUR
+2025-02-10T10:00:00Z,Convert,BTC,0.1,EUR,€90000.00,€9000.00,€9000.00,€0.00,Converted 0.1 BTC to 3 ETH
+2025-04-01T10:00:00Z,Learning Reward,XLM,10,EUR,€0.20,€2.00,€2.00,€0.00,
+2025-09-01T10:00:00Z,Sell,ETH,3,EUR,€2500.00,€7500.00,€7425.00,€75.00,Sold 3 ETH for €7425.00 EUR

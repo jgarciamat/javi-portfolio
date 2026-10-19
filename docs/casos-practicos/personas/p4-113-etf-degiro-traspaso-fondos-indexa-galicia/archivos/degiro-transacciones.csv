@@ -1,0 +1,3 @@
+Fecha,Hora,Producto,ISIN,Bolsa de referencia,Centro de ejecución,Número,Precio,,Valor local,,Valor,,Tipo de cambio,Costes de transacción,,Total,,ID Orden
+02-04-2024,10:00,VANGUARD FICTICIO ALL-WORLD UCITS ETF,IE00FICT0001,XET,XETR,20,"100,00",EUR,"-2000,00",EUR,"-2000,00",EUR,,"-2,00",EUR,"-2002,00",EUR,ficticia-1
+05-05-2025,10:00,VANGUARD FICTICIO ALL-WORLD UCITS ETF,IE00FICT0001,XET,XETR,-20,"120,00",EUR,"2400,00",EUR,"2400,00",EUR,,"-2,00",EUR,"2398,00",EUR,ficticia-2

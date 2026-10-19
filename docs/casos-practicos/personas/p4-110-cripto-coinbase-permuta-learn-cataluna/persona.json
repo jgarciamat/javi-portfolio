@@ -1,0 +1,151 @@
+{
+  "slug": "p4-110-cripto-coinbase-permuta-learn-cataluna",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 110",
+  "nif": "00000110H",
+  "domicilio": "Calle Ficticia 110, 08001 Barcelona (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "cataluna",
+  "titulo": "Cambia bitcoin por ether en Coinbase y después vende el ether con pérdida",
+  "descripcion": "Compra 0,2 BTC en 2024 por 8.000 € más 80 € de comisión. En 2025 convierte 0,1 BTC en 3 ETH (valor de mercado 9.000 €) y vende los 3 ETH por 7.500 € con 75 € de comisión. Recibe 10 XLM (2 €) por aprender.",
+  "prueba": [
+    "permuta cripto-cripto: transmisión por el valor de mercado (art. 37.1.h)",
+    "el valor de la permuta es el coste del ether recibido",
+    "comisiones en la adquisición y en la transmisión (art. 35)",
+    "recompensa «learn» como ganancia de la base general (NO CONFIRMADO)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "coinbase-transacciones.csv"
+  ],
+  "tiposDeCambioInventados": null,
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "cataluna",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "coinbase-transacciones.csv"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 0,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "BTC",
+                  "code": "BTC",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2024-01-05",
+                      "units": 0.2,
+                      "cost": 8080
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-02-10",
+                      "units": 0.1,
+                      "proceeds": 9000,
+                      "counterpart": "N"
+                    }
+                  ]
+                },
+                {
+                  "name": "ETH",
+                  "code": "ETH",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2025-02-10",
+                      "units": 3,
+                      "cost": 9000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-09-01",
+                      "units": 3,
+                      "proceeds": 7425,
+                      "counterpart": "F"
+                    }
+                  ]
+                },
+                {
+                  "name": "XLM",
+                  "code": "XLM",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2025-04-01",
+                      "units": 10,
+                      "cost": 2
+                    }
+                  ],
+                  "sells": []
+                }
+              ],
+              "generalGains": [
+                2
+              ],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": []
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

@@ -1,0 +1,145 @@
+{
+  "slug": "p4-118-ibkr-trading212-dividendos-modelo-720-asturias",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 118",
+  "nif": "00000118A",
+  "domicilio": "Calle Ficticia 118, 33001 Oviedo (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "asturias",
+  "titulo": "Acciones en Interactive Brokers por más de 50.000 € y un ETF en Trading 212",
+  "descripcion": "Compró 100 acciones ficticias en 2024 por 55.000 $ + 11 $; en 2025 vende 10 por 6.600 $ − 11 $ y cobra 440 $ de dividendo con 66 $ retenidos. En Trading 212 compra y vende un ETF con 50 € de pérdida y cobra 2 € de intereses. Tipo de cambio INVENTADO: 1,10 $ por euro.",
+  "prueba": [
+    "extracto de actividad de Interactive Brokers (secciones Trades, Dividends, Withholding Tax)",
+    "aviso del modelo 720: valores en el extranjero por más de 50.000 €",
+    "pérdida de un ETF en el apartado de IIC"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "ibkr-activity-statement.csv",
+    "trading212-historial.csv"
+  ],
+  "tiposDeCambioInventados": {
+    "USD": 1.1
+  },
+  "avisos": [
+    "model720"
+  ],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "asturias",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "ibkr-activity-statement.csv",
+                "trading212-historial.csv"
+              ],
+              "capital": {
+                "interest": 2,
+                "dividends": 400,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "FICT",
+                  "code": "FICT",
+                  "kind": "listed",
+                  "buys": [
+                    {
+                      "date": "2024-03-05",
+                      "units": 100,
+                      "cost": 50010
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-09-10",
+                      "units": 10,
+                      "proceeds": 5990
+                    }
+                  ]
+                },
+                {
+                  "name": "Fondo Indexado Ficticio UCITS ETF",
+                  "code": "IE00FICT0009",
+                  "kind": "listed",
+                  "section": "iic",
+                  "buys": [
+                    {
+                      "date": "2025-01-10",
+                      "units": 10,
+                      "cost": 1000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-11-10",
+                      "units": 10,
+                      "proceeds": 950
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": [
+                {
+                  "income": 400,
+                  "tax": 60
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

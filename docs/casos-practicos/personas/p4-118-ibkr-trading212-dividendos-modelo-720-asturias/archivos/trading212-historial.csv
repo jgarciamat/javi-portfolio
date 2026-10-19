@@ -1,0 +1,4 @@
+Action,Time,ISIN,Ticker,Name,No. of shares,Price / share,Currency (Price / share),Exchange rate,Result,Currency (Result),Total,Currency (Total),Withholding tax,Currency (Withholding tax),Currency conversion fee,Currency (Currency conversion fee)
+Market buy,2025-01-10 10:00:00,IE00FICT0009,FICE,Fondo Indexado Ficticio UCITS ETF,10,100.00,EUR,1.00,,,1000.00,EUR,,,,
+Market sell,2025-11-10 10:00:00,IE00FICT0009,FICE,Fondo Indexado Ficticio UCITS ETF,10,95.00,EUR,1.00,-50.00,EUR,950.00,EUR,,,,
+Interest on cash,2025-12-01 10:00:00,,,,,,,,,,2.00,EUR,,,,

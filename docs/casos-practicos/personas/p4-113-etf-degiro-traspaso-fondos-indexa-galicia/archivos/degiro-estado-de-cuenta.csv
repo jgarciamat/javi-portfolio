@@ -1,0 +1,3 @@
+Fecha,Hora,Fecha valor,Producto,ISIN,Descripción,Tipo,Variación,,Saldo,,ID Orden
+01-03-2025,08:00,01-03-2025,EMPRESA FICTICIA SA,FR00FICT0002,Dividendo,,EUR,"30,00",EUR,"30,00",
+01-03-2025,08:00,01-03-2025,EMPRESA FICTICIA SA,FR00FICT0002,Retención del dividendo,,EUR,"-4,50",EUR,"25,50",

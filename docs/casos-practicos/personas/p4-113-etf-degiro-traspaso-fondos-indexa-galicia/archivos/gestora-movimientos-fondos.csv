@@ -1,0 +1,5 @@
+Fecha de operación;Fondo;ISIN;Tipo de operación;Participaciones;Valor liquidativo;Importe;Retención
+01/02/2021;Fondo Indexado Ficticio A FI;ES00FICT0003;Suscripción;100;10,00;1.000,00;
+03/02/2025;Fondo Indexado Ficticio A FI;ES00FICT0003;Traspaso de salida;100;15,00;1.500,00;
+05/02/2025;Fondo Ficticio B FI;ES00FICT0004;Traspaso de entrada;150;10,00;1.500,00;
+01/10/2025;Fondo Ficticio B FI;ES00FICT0004;Reembolso;150;12,00;1.800,00;152,00

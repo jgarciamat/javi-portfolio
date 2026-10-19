@@ -1,0 +1,57 @@
+{
+  "slug": "p4-113-etf-degiro-traspaso-fondos-indexa-galicia",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0029",
+      "concepto": "Dividendos",
+      "importe": 30,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0029"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "importe": 1196,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 1226,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0588",
+      "concepto": "Deducción por doble imposición internacional",
+      "importe": 4.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "result.doubleTaxation"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 4652,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "boxes.0609"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "slug": "p4-117-cripto-bitpanda-cryptocom-cashback-earn-aragon",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0027",
+      "concepto": "Intereses (staking y Crypto Earn)",
+      "importe": 80,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0027"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0041",
+      "concepto": "Rendimiento neto del capital mobiliario",
+      "importe": 80,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0041"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0424",
+      "concepto": "Saldo neto positivo de ganancias del ahorro",
+      "importe": 500,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0424"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 580,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0460"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0420",
+      "concepto": "Saldo positivo de ganancias de la base general",
+      "importe": 1,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "savings.0420"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 4500,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#cálculo",
+      "campo": "boxes.0609"
+    }
+  ]
+}

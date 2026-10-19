@@ -1,0 +1,146 @@
+{
+  "slug": "p4-116-etoro-acciones-cripto-cfd-dividendos-murcia",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 116",
+  "nif": "00000116R",
+  "domicilio": "Calle Ficticia 116, 30001 Murcia (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "murcia",
+  "titulo": "Extracto de eToro con acciones, bitcoin, un CFD y dividendos",
+  "descripcion": "Posiciones cerradas en 2025: acciones (+220 $), bitcoin (−110 $) y un CFD corto apalancado (+33 $). Dividendo neto de 18,70 $ con 3,30 $ retenidos. Tipo de cambio INVENTADO: 1,10 $ por euro.",
+  "prueba": [
+    "extracto de eToro en Excel (hojas «Closed Positions» y «Dividends»)",
+    "las acciones y el bitcoin con su compra (FIFO), el CFD como derivado",
+    "doble imposición internacional (0588)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "etoro-extracto-de-cuenta.xlsx"
+  ],
+  "tiposDeCambioInventados": {
+    "USD": 1.1
+  },
+  "avisos": [
+    "derivative",
+    "realizedMatching"
+  ],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "murcia",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "etoro-extracto-de-cuenta.xlsx"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 20,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 0
+              },
+              "assets": [
+                {
+                  "name": "FICTICIA CORP",
+                  "code": "US00FICT0007",
+                  "kind": "listed",
+                  "buys": [
+                    {
+                      "date": "2024-01-10",
+                      "units": 10,
+                      "cost": 1000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-02-10",
+                      "units": 10,
+                      "proceeds": 1200
+                    }
+                  ]
+                },
+                {
+                  "name": "BITCOIN",
+                  "code": "BITCOIN",
+                  "kind": "crypto",
+                  "buys": [
+                    {
+                      "date": "2024-05-01",
+                      "units": 0.01,
+                      "cost": 500
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-04-01",
+                      "units": 0.01,
+                      "proceeds": 400,
+                      "counterpart": "F"
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [
+                30
+              ],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": [
+                {
+                  "income": 20,
+                  "tax": 3
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}

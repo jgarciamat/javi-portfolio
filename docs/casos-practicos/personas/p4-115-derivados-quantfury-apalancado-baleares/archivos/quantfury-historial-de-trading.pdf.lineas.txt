@@ -1,0 +1,22 @@
+Informe del historial de trading
+01/01/2024 - 31/12/2025
+Generado: 15/01/2026 10:00:00 AM UTC
+Nombre del cliente: PERSONA FICTICIA 115 (datos inventados)
+Posiciones Cerradas
+Acciones y ETFs
+Símbolo   Fecha/Hora de la posición   Acción   Precio   Cantidad   Valor   G&P de la posición
+FICTA   10/12/2024 3:00:00 PM UTC   COMPRAR (abrir)   $50.00   10 acciones   $500.00
+12/12/2024 3:00:00 PM UTC   VENDER (cerrar)   $48.90   10 acciones   $500.00   -$11.00
+Total   -$11.00
+FICTB   03/03/2025 3:00:00 PM UTC   COMPRAR (abrir)   $100.00   10 acciones   $1,000.00
+10/03/2025 3:00:00 PM UTC   VENDER (cerrar)   $111.00   10 acciones   $1,000.00   +$110.00
+Total   +$110.00
+FICTC   01/05/2025 3:00:00 PM UTC   VENDER (abrir)   $20.00   50 acciones   $1,000.00
+05/05/2025 3:00:00 PM UTC   COMPRAR (añadir)   $21.00   25 acciones   $525.00
+12/05/2025 3:00:00 PM UTC   COMPRAR (cerrar)   $20.80   75 acciones   $1,525.00   -$55.00
+Total   -$55.00
+Pares de criptomonedas
+Símbolo   Fecha/Hora de la posición   Acción   Precio   Cantidad   Valor   G&P de la posición
+BTC/USDT   01/08/2025 11:00:00 AM UTC   COMPRAR (abrir)   60,000.00   0.05 BTC   USDT 3,000.00
+20/08/2025 11:00:00 AM UTC   VENDER (cerrar)   64,400.00   0.05 BTC   USDT 3,000.00   +USDT 220.00
+Total   +USDT 220.00

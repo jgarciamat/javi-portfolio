@@ -1,0 +1,121 @@
+{
+  "slug": "p4-112-acciones-revolut-dividendos-usa-andalucia",
+  "banco": "p4",
+  "nombre": "Persona Ficticia 112",
+  "nif": "00000112C",
+  "domicilio": "Calle Ficticia 112, 41001 Sevilla (dirección inventada)",
+  "ejercicio": 2025,
+  "comunidad": "andalucia",
+  "titulo": "Acciones de EE. UU. en Revolut con dividendos retenidos en origen",
+  "descripcion": "Compró 10 acciones ficticias por 1.100 $ en 2024 y vende 5 por 660 $ en 2025. Cobra 22 $ de dividendo con 3,30 $ retenidos en EE. UU. y paga 1,10 $ de custodia. Tipo de cambio INVENTADO: 1,10 $ por euro.",
+  "prueba": [
+    "importes en dólares pasados a euros con el tipo de cada día (aquí uno inventado)",
+    "dividendos (0029) y gastos de custodia (0037)",
+    "deducción por doble imposición internacional (0588, art. 80)"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "archivos": [
+    "revolut-extracto-acciones.csv"
+  ],
+  "tiposDeCambioInventados": {
+    "USD": 1.1
+  },
+  "avisos": [],
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "andalucia",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "30000",
+          "socialSecurity": "1905",
+          "withheld": "4500",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {},
+          "savingsDetail": {
+            "capital": {
+              "interest": 0,
+              "dividends": 0,
+              "assets": 0,
+              "insurance": 0,
+              "expenses": 0
+            },
+            "assets": [],
+            "properties": [],
+            "otherGains": [],
+            "generalGains": [],
+            "pending": {
+              "gains": [],
+              "capital": [],
+              "general": []
+            },
+            "imported": {
+              "files": [
+                "revolut-extracto-acciones.csv"
+              ],
+              "capital": {
+                "interest": 0,
+                "dividends": 20,
+                "assets": 0,
+                "insurance": 0,
+                "expenses": 1
+              },
+              "assets": [
+                {
+                  "name": "FICT",
+                  "code": "FICT",
+                  "kind": "listed",
+                  "buys": [
+                    {
+                      "date": "2024-02-01",
+                      "units": 10,
+                      "cost": 1000
+                    }
+                  ],
+                  "sells": [
+                    {
+                      "date": "2025-03-03",
+                      "units": 5,
+                      "proceeds": 600
+                    }
+                  ]
+                }
+              ],
+              "generalGains": [],
+              "otherGains": [],
+              "withheld": {
+                "capital": 0,
+                "gains": 0
+              },
+              "foreignTax": [
+                {
+                  "income": 20,
+                  "tax": 3
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {}
+}
