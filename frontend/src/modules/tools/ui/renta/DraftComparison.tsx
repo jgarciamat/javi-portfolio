@@ -1,6 +1,9 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { draftResult, type CompareRow } from '../../domain/rentaCompare';
 import type { DraftReading } from '../../domain/rentaDraft';
+import type { Deduction } from '../../domain/rentaData';
+import { verdictOf, type DraftGap, type Verdict } from '../../domain/rentaDraftGaps';
+import type { Choice } from '../../domain/rentaForm';
 import { rentaState } from '../../data/renta/state';
 import { useMoney } from './shared';
 import { InvestGuide } from './invest/InvestGuide';
@@ -19,7 +22,7 @@ function Summary({ draft, ours }: { draft: number; ours: number }) {
       : t('tools.renta.compare.pay', { amount: money(n) });
   const diff = Math.round((ours - draft) * 100) / 100;
   return (
-    <p className="renta-compare-summary" role="status">
+    <p className="renta-compare-summary">
       {diff === 0
         ? t('tools.renta.compare.summarySame', { draft: outcome(draft) })
         : t('tools.renta.compare.summary', {
@@ -31,16 +34,81 @@ function Summary({ draft, ours }: { draft: number; ours: number }) {
   );
 }
 
+/**
+ * The verdict first, in colour: green when the result is the draft's, amber when the difference is
+ * the draft's deductions not marked here yet, red only for a difference they do not explain.
+ */
+function VerdictLine({ verdict }: { verdict: Verdict }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  const k = (key: string) => `tools.renta.compare.verdict.${key}`;
+  return (
+    <div className={`renta-verdict renta-verdict--${verdict.kind}`} role="status">
+      <p className="renta-verdict-title">
+        <strong>{t(k(verdict.kind))}</strong>
+      </p>
+      {verdict.kind === 'explained' && (
+        <p>{t(k('explainedWhy'), { amount: money(verdict.explained) })}</p>
+      )}
+      {verdict.kind === 'unexplained' && verdict.explained > 0 && (
+        <p>{t(k('partlyExplained'), { amount: money(verdict.explained) })}</p>
+      )}
+      <details className="renta-verdict-meaning">
+        <summary>{t(k('meaningTitle'))}</summary>
+        <p>{t(k(`meaning.${verdict.kind}`))}</p>
+      </details>
+    </div>
+  );
+}
+
+/** The draft's deductions missing here, each one with a button to add it with its amount. */
+function Gaps({ gaps, onAdd }: { gaps: DraftGap[]; onAdd: (id: string, choice: Choice) => void }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  if (gaps.length === 0) return null;
+  return (
+    <ul className="renta-gaps" aria-label={t('tools.renta.compare.gaps.title')}>
+      {gaps.map((g) => (
+        <li key={g.label}>
+          <span>
+            {g.label}: <strong>{money(g.amount)}</strong>
+          </span>
+          {g.deduction && g.choice ? (
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => onAdd((g.deduction as Deduction).id, g.choice as Choice)}
+            >
+              {t('tools.renta.compare.gaps.add')}
+            </button>
+          ) : (
+            <small className="renta-field-hint">{t('tools.renta.compare.gaps.copy')}</small>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** The draft's boxes next to the planner's, with a likely reason for each difference. */
 export function DraftComparison({
   reading,
   rows,
   result,
+  gaps,
+  withGaps,
+  onAdd,
 }: {
   reading: DraftReading;
   rows: CompareRow[];
   /** The planner's result: to pay over zero, to be refunded below. */
   result: number;
+  /** The draft's deductions not marked here yet (rentaDraftGaps.ts). */
+  gaps: DraftGap[];
+  /** The planner's result with them added. */
+  withGaps: number;
+  /** Marks one of them with the amount of the draft. */
+  onAdd: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -63,7 +131,13 @@ export function DraftComparison({
         <p className="form-error">{t('tools.renta.compare.noBoxes')}</p>
       ) : (
         <>
-          {theirs !== null && <Summary draft={theirs} ours={result} />}
+          {theirs !== null && (
+            <>
+              <VerdictLine verdict={verdictOf(theirs, result, withGaps)} />
+              <Summary draft={theirs} ours={result} />
+            </>
+          )}
+          <Gaps gaps={gaps} onAdd={onAdd} />
           <p className="section-hint">
             {differing === 0
               ? t('tools.renta.compare.allMatch')

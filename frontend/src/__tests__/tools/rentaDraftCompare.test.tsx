@@ -188,3 +188,64 @@ describe('Renta planner: the draft next to the planner', () => {
     expect(screen.queryByRole('region', { name: tr('tools.renta.compare.title') })).toBeNull();
   });
 });
+
+/**
+ * The draft of persona p3-61 (a young tenant in a Castellón village at risk of depopulation; made-up
+ * data): it already applies two Valencian deductions that the planner has not marked yet.
+ */
+const VALENCIAN = [
+  'Modelo 100   Ejercicio 2025',
+  'Fecha de nacimiento   01/01/1997   0010',
+  '2025   COMUNITAT VALENCIANA   0070',
+  'Retribuciones dinerarias   21.000,00   0003',
+  'Cotizac. Seguridad Social   1.360,80   0013',
+  'Cuota íntegra estatal   1.263,39   0545',
+  'Cuota íntegra autonómica   1.192,44   0546',
+  'Deducciones autonómicas de la Comunitat Valenciana',
+  'Por alquiler de vivienda habitual   950,00   0961',
+  'Por vivir en un municipio en riesgo de despoblamiento   330,00   0985',
+  'Suma de deducciones autonómicas   1.280,00',
+  'Total pagos a cuenta   1.900,00   0609',
+  'Resultado de la declaración   -636,61   0670',
+].join('\n');
+
+describe('the verdict next to the draft', () => {
+  const verdict = (key: string) => tr(`tools.renta.compare.verdict.${key}`);
+
+  it('explains a difference made of the draft’s deductions and adds them until it matches', async () => {
+    render();
+    await paste(VALENCIAN);
+    await table();
+    // Not «you would pay more»: the draft already applies deductions that are not ticked here.
+    expect(await screen.findByText(verdict('explained'))).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        verdict('explainedWhy').replace('{amount}', '1192,44 €').replace(/\s/g, ' '),
+        {
+          normalizer: (s) => s.replace(/\s/g, ' '),
+        }
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByText(verdict('meaningTitle'))).toBeInTheDocument();
+    const add = () => screen.getAllByRole('button', { name: tr('tools.renta.compare.gaps.add') });
+    expect(add()).toHaveLength(2);
+    fireEvent.click(add()[0]);
+    fireEvent.click(add()[0]);
+    expect(await screen.findByText(verdict('match'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('tools.renta.compare.gaps.add') })).toBeNull();
+  });
+
+  it('says red when the draft’s deductions do not explain it, and copies an unknown one', async () => {
+    render();
+    await paste(
+      VALENCIAN.replace('-636,61   0670', '-900,00   0670').replace(
+        'Por vivir en un municipio en riesgo de despoblamiento',
+        'Por una deducción que no tenemos en la lista'
+      )
+    );
+    await table();
+    expect(await screen.findByText(verdict('unexplained'))).toBeInTheDocument();
+    expect(screen.getByText(tr('tools.renta.compare.gaps.copy'))).toBeInTheDocument();
+    expect(screen.getByText(/aún no has marcado aquí/)).toBeInTheDocument();
+  });
+});

@@ -967,3 +967,61 @@ html.wiz-contrast .renta-new-return:focus-visible {
   margin: 0 0 0.6rem;
   padding-left: 1.2rem;
 }
+
+/* The draft next to the planner: a verdict in colour, then the detail. */
+.renta-verdict {
+  border-left: 4px solid var(--slate-500);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin: 0.5rem 0 0.75rem;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.renta-verdict p {
+  margin: 0 0 0.4rem;
+}
+
+.renta-verdict--match {
+  border-color: var(--green-400);
+}
+
+.renta-verdict--match .renta-verdict-title {
+  color: var(--green-300);
+}
+
+.renta-verdict--explained {
+  border-color: var(--amber-400);
+}
+
+.renta-verdict--explained .renta-verdict-title {
+  color: var(--amber-300);
+}
+
+.renta-verdict--unexplained {
+  border-color: var(--red-400);
+}
+
+.renta-verdict--unexplained .renta-verdict-title {
+  color: var(--red-300);
+}
+
+.renta-verdict-meaning > summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.renta-gaps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.renta-gaps li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}

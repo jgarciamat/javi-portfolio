@@ -8,6 +8,7 @@ import {
 } from '../../domain/rentaCalc';
 import type { RentaCcaa } from '../../domain/rentaData';
 import {
+  choicesOf,
   emptyForm,
   familyOf,
   number,
@@ -35,6 +36,7 @@ import {
 } from '../../domain/rentaReview';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { compareBoxes, ourBoxes } from '../../domain/rentaCompare';
+import { draftGaps, withGaps, type DraftGap } from '../../domain/rentaDraftGaps';
 import { deductionSavings, markedSaving } from '../../domain/rentaSavings';
 import { clearProgress, loadProgress, saveProgress } from '../../application/rentaProgress';
 import { forgetMappings } from '../../application/investImport';
@@ -158,6 +160,26 @@ function useSavedPlanner(year: number, initialIncome: string) {
   return { form, set, setChoice, draft, setDraft, review, decideOn, recovered, reset };
 }
 
+/**
+ * The deductions the draft already applies that are not marked here yet, and the planner's result
+ * with them added (rentaDraftGaps.ts): what they explain of the difference.
+ */
+function gapsOf(
+  reading: DraftState['reading'],
+  input: RentaInput,
+  form: RentaForm,
+  ccaa: RentaCcaa | null
+): { gaps: DraftGap[]; withGaps: number } {
+  if (!reading) return { gaps: [], withGaps: 0 };
+  const gaps = draftGaps(
+    reading.applied,
+    [...rentaState.deductions, ...(ccaa?.deductions ?? [])],
+    form.choices
+  );
+  const choices = choicesOf({ ...form, choices: withGaps(form.choices, gaps) });
+  return { gaps, withGaps: computeRenta({ ...input, choices }).result };
+}
+
 /** What each deduction saves with the data as it is, and the draft's boxes next to ours. */
 function useInsights(
   input: RentaInput,
@@ -183,8 +205,9 @@ function useInsights(
           })
         : [],
       result: result.result,
+      ...gapsOf(reading, input, form, ccaa),
     }),
-    [reading, result, input, form]
+    [reading, result, input, form, ccaa]
   );
   return { savings, saved, comparison };
 }

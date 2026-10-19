@@ -15,6 +15,7 @@ import { draftAnswers } from '../../domain/rentaGuide';
 import { CCAA_OPTIONS } from '../../data/renta';
 import { Step, markedAfter, reveal, useDate, useMoney } from './shared';
 import { DraftComparison } from './DraftComparison';
+import type { DraftGap } from '../../domain/rentaDraftGaps';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
 /** The year of the return the draft belongs to (the exercise); the next campaign is two years on. */
@@ -446,7 +447,7 @@ export function DraftStep({
   onDraft: (draft: DraftState) => void;
   accept: (id: string) => void;
   /** The draft's boxes next to the planner's, and the planner's result. */
-  comparison: { rows: CompareRow[]; result: number };
+  comparison: { rows: CompareRow[]; result: number; gaps: DraftGap[]; withGaps: number };
 }) {
   const { t } = useI18n();
   const { reading } = draft;
@@ -474,6 +475,9 @@ export function DraftStep({
                   reading={reading}
                   rows={comparison.rows}
                   result={comparison.result}
+                  gaps={comparison.gaps}
+                  withGaps={comparison.withGaps}
+                  onAdd={(id, choice) => set({ choices: { ...form.choices, [id]: choice } })}
                 />
               )}
               <DraftScenario
