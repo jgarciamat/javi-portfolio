@@ -8,6 +8,7 @@ import {
   usePlan,
 } from '@modules/billing/application/PlanContext';
 import { PlanBanner } from '@modules/billing/ui/PlanBanner';
+import { InviteCard } from '@modules/billing/ui/InviteCard';
 import { PlanView } from '@modules/billing/ui/PlanView';
 import { OffersView } from '@modules/billing/ui/OffersView';
 import { PricingPage } from '@modules/billing/ui/PricingPage';
@@ -463,15 +464,62 @@ describe('Invite a friend', () => {
     Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
     withPlan(<PlanView />);
     expect(await screen.findByText('https://finanverso.app/?ref=ABCD2345')).toBeInTheDocument();
-    expect(
-      screen.getByText(/primeros pasos: 2 · en camino: 1 · meses ganados: 1\. Te faltan 4/)
-    ).toBeVisible();
+    expect(screen.getByText(tr('billing.invite.progressMany', { missing: 4 }))).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '33');
+    expect(screen.getByRole('progressbar')).toHaveAccessibleName(
+      /completado los primeros pasos: 2/
+    );
+    expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(6);
+    expect(screen.getByText(tr('billing.invite.step3', { days: 30 }))).toBeVisible();
+    expect(screen.getByText(tr('billing.invite.monthsTitle'))).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: tr('app.common.close') })).toBeNull();
     expect(screen.queryByRole('button', { name: tr('billing.invite.share') })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: tr('billing.invite.copy') }));
     await waitFor(() =>
       expect(writeText).toHaveBeenCalledWith('https://finanverso.app/?ref=ABCD2345')
     );
     expect(await screen.findByText(tr('billing.invite.copied'))).toBeInTheDocument();
+  });
+
+  it('goes back to "Copy link" after a moment', async () => {
+    jest.useFakeTimers();
+    try {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+      withPlan(<PlanView />);
+      const button = await screen.findByRole('button', { name: tr('billing.invite.copy') });
+      await act(async () => fireEvent.click(button));
+      expect(screen.getByText(tr('billing.invite.copied'))).toBeInTheDocument();
+      act(() => {
+        jest.advanceTimersByTime(3000);
+      });
+      expect(screen.getByText(tr('billing.invite.copy'))).toBeInTheDocument();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('says "1 friend" when only one is missing and hides the bar when none is', async () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockResolvedValue(f.referral({ missing: 1 }));
+    const view = withPlan(<PlanView />, f.billing(), api);
+    expect(await screen.findByText(tr('billing.invite.progressOne'))).toBeVisible();
+    view.unmount();
+    const done = createFakeApi();
+    done.billingApi.referral.mockResolvedValue(f.referral({ missing: 0, qualified: 0 }));
+    withPlan(<PlanView />, f.billing(), done);
+    await screen.findByText(tr('billing.invite.monthsTitle'));
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
+  it('keeps the dialog usable (close button) while the code is still loading', () => {
+    const api = createFakeApi();
+    api.billingApi.referral.mockReturnValue(new Promise(() => undefined));
+    const onClose = jest.fn();
+    renderWithProviders(<InviteCard onClose={onClose} />, { api, plan: true, finances: false });
+    fireEvent.click(screen.getAllByRole('button', { name: tr('app.common.close') })[0]);
+    expect(onClose).toHaveBeenCalled();
+    expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
   it('offers the native share sheet when the device has one', async () => {

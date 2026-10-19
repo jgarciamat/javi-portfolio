@@ -167,7 +167,8 @@ describe('invite from the menu', () => {
     fireEvent.click(within(menu).getByTestId('menu-invite'));
     const dialog = await screen.findByRole('dialog', { name: tr('billing.invite.title') });
     expect(await within(dialog).findByText('https://finanverso.app/?ref=ABCD2345')).toBeVisible();
-    fireEvent.click(within(dialog).getByRole('button', { name: tr('app.common.close') }));
+    expect(within(dialog).getByText(tr('billing.invite.subtitle'))).toBeVisible();
+    fireEvent.click(within(dialog).getAllByRole('button', { name: tr('app.common.close') })[0]);
     expect(screen.queryByRole('dialog', { name: tr('billing.invite.title') })).toBeNull();
   });
 });

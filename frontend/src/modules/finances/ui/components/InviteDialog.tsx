@@ -6,13 +6,8 @@ import { InviteCard } from '@modules/billing/ui/InviteCard';
 export function InviteDialog({ onClose }: { onClose: () => void }) {
   const { t } = useI18n();
   return (
-    <Modal label={t('billing.invite.title')} onClose={onClose}>
-      <InviteCard />
-      <div className="button-row">
-        <button className="btn-secondary" onClick={onClose}>
-          {t('app.common.close')}
-        </button>
-      </div>
+    <Modal label={t('billing.invite.title')} onClose={onClose} className="modal-panel invite-panel">
+      <InviteCard onClose={onClose} />
     </Modal>
   );
 }
