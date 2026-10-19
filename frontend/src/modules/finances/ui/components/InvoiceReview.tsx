@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { storage } from '@shared/utils/storage';
@@ -29,6 +29,7 @@ import { bringIntoView } from './bringIntoView';
 import { RetentionCell } from './InvoiceRetention';
 import { VatOpCell } from './InvoiceVatCell';
 import type { ManualForm } from './AutonomoManual';
+import { INVOICE_PAGE, InvoicePager, pageOfIndex, validPage } from './InvoicePager';
 
 /** An invoice to show: `n` changes on every request, so asking twice for the same one works. */
 export interface ReviewFocus {
@@ -77,9 +78,14 @@ const editRow = (i: ImportedInvoice, columns: string[], name: string, pdf: PdfHa
   />
 );
 
+/** The invoices of a book in the order of the table: by date. */
+const sortedOf = (list: ImportedInvoice[]) =>
+  [...list].sort((a, b) => a.date.localeCompare(b.date));
+
 function BookTable({
   book,
   invoices,
+  caption,
   highlight,
   offer,
   onKind,
@@ -90,7 +96,10 @@ function BookTable({
   pdf,
 }: {
   book: BookKind;
+  /** The invoices of the page shown, in order. */
   invoices: ImportedInvoice[];
+  /** The caption, with the number of invoices of the whole book. */
+  caption: string;
   highlight: string | null;
   offer: Offer | null;
   onKind: (invoice: ImportedInvoice, kind: ExpenseKind) => void;
@@ -124,7 +133,7 @@ function BookTable({
   const when = (i: ImportedInvoice) => (i.date ? date(i.date) : t('app.autonomo.pdf.noDate'));
   return (
     <table className="autonomo-review-table">
-      <caption>{t(`app.autonomo.review.${book}`, { n: invoices.length })}</caption>
+      <caption>{caption}</caption>
       <thead>
         <tr>
           {head.map((key) => (
@@ -135,96 +144,116 @@ function BookTable({
         </tr>
       </thead>
       <tbody>
-        {[...invoices]
-          .sort((a, b) => a.date.localeCompare(b.date))
-          .flatMap((i) => {
-            const name = t('app.autonomo.review.invoice', { who: who(i), date: when(i) });
-            if (pdf.editing === i.id) return [editRow(i, head, name, pdf)];
-            const row = (
-              <tr key={i.id} id={invoiceRowId(i.id)} className={rowClass(i, highlight)}>
-                <td data-label={label('include')}>
-                  <input
-                    type="checkbox"
-                    checked={!i.excluded}
-                    disabled={missingOf(i).length > 0}
-                    aria-label={t('app.autonomo.review.includeOf', { invoice: name })}
-                    onChange={(e) => onExcluded(i, !e.target.checked)}
-                  />
-                </td>
-                <td data-label={label('date')} className="autonomo-review-date">
-                  {when(i)}
-                </td>
-                <td data-label={label('quarter')}>{quarterLabel(i)}</td>
-                <td
-                  data-label={label(received ? 'supplier' : 'client')}
-                  className="autonomo-review-who"
-                >
-                  {who(i)}
-                  <PdfFlag invoice={i} />
-                </td>
-                <td data-label={label('base')} className="num">
-                  {money(i.base)}
-                </td>
-                <td data-label={label('rate')} className="num">
-                  {i.vatRate} %
-                </td>
-                <td data-label={label('vat')} className="num">
-                  {money(i.vat)}
-                </td>
-                <td data-label={label('total')} className="num">
-                  {money(i.total)}
-                </td>
-                {received ? (
-                  <td data-label={label('kind')} className="autonomo-review-kind">
-                    <select
-                      className="tx-input"
-                      aria-label={t('app.autonomo.review.kindOf', { invoice: name })}
-                      value={i.kind}
-                      disabled={i.excluded}
-                      onChange={(e) => onKind(i, e.target.value as ExpenseKind)}
-                    >
-                      {EXPENSE_KINDS.map((kind) => (
-                        <option key={kind} value={kind}>
-                          {t(`app.autonomo.kind.${kind}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                ) : (
-                  <td data-label={label('withheld')} className="num">
-                    {money(i.withheld)}
-                  </td>
-                )}
-                {received && <RetentionCell invoice={i} name={name} onChange={onRetention} />}
-                <VatOpCell invoice={i} name={name} onChange={onVat} />
-                <PdfFixCell columns={head} invoice={i} name={name} pdf={pdf} />
-              </tr>
-            );
-            if (offer?.id !== i.id) return [row];
-            return [
-              row,
-              <tr key={`${i.id}-offer`} className="autonomo-review-offer">
-                <td colSpan={head.length}>
-                  <span>
-                    {t('app.autonomo.review.offer', {
-                      n: offer.others.length,
-                      supplier: offer.supplier,
-                      kind: t(`app.autonomo.kind.${offer.kind}`),
-                    })}
-                  </span>
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => onApplyOffer(offer)}
+        {invoices.flatMap((i) => {
+          const name = t('app.autonomo.review.invoice', { who: who(i), date: when(i) });
+          if (pdf.editing === i.id) return [editRow(i, head, name, pdf)];
+          const row = (
+            <tr key={i.id} id={invoiceRowId(i.id)} className={rowClass(i, highlight)}>
+              <td data-label={label('include')}>
+                <input
+                  type="checkbox"
+                  checked={!i.excluded}
+                  disabled={missingOf(i).length > 0}
+                  aria-label={t('app.autonomo.review.includeOf', { invoice: name })}
+                  onChange={(e) => onExcluded(i, !e.target.checked)}
+                />
+              </td>
+              <td data-label={label('date')} className="autonomo-review-date">
+                {when(i)}
+              </td>
+              <td data-label={label('quarter')}>{quarterLabel(i)}</td>
+              <td
+                data-label={label(received ? 'supplier' : 'client')}
+                className="autonomo-review-who"
+              >
+                {who(i)}
+                <PdfFlag invoice={i} />
+              </td>
+              <td data-label={label('base')} className="num">
+                {money(i.base)}
+              </td>
+              <td data-label={label('rate')} className="num">
+                {i.vatRate} %
+              </td>
+              <td data-label={label('vat')} className="num">
+                {money(i.vat)}
+              </td>
+              <td data-label={label('total')} className="num">
+                {money(i.total)}
+              </td>
+              {received ? (
+                <td data-label={label('kind')} className="autonomo-review-kind">
+                  <select
+                    className="tx-input"
+                    aria-label={t('app.autonomo.review.kindOf', { invoice: name })}
+                    value={i.kind}
+                    disabled={i.excluded}
+                    onChange={(e) => onKind(i, e.target.value as ExpenseKind)}
                   >
-                    {t('app.autonomo.review.applyAll', { n: offer.others.length })}
-                  </button>
+                    {EXPENSE_KINDS.map((kind) => (
+                      <option key={kind} value={kind}>
+                        {t(`app.autonomo.kind.${kind}`)}
+                      </option>
+                    ))}
+                  </select>
                 </td>
-              </tr>,
-            ];
-          })}
+              ) : (
+                <td data-label={label('withheld')} className="num">
+                  {money(i.withheld)}
+                </td>
+              )}
+              {received && <RetentionCell invoice={i} name={name} onChange={onRetention} />}
+              <VatOpCell invoice={i} name={name} onChange={onVat} />
+              <PdfFixCell columns={head} invoice={i} name={name} pdf={pdf} />
+            </tr>
+          );
+          if (offer?.id !== i.id) return [row];
+          return [
+            row,
+            <tr key={`${i.id}-offer`} className="autonomo-review-offer">
+              <td colSpan={head.length}>
+                <span>
+                  {t('app.autonomo.review.offer', {
+                    n: offer.others.length,
+                    supplier: offer.supplier,
+                    kind: t(`app.autonomo.kind.${offer.kind}`),
+                  })}
+                </span>
+                <button type="button" className="btn-secondary" onClick={() => onApplyOffer(offer)}>
+                  {t('app.autonomo.review.applyAll', { n: offer.others.length })}
+                </button>
+              </td>
+            </tr>,
+          ];
+        })}
       </tbody>
     </table>
+  );
+}
+
+/** A book with its pager above and below when it has more than one page. */
+function PagedBook({
+  invoices,
+  page,
+  onPage,
+  ...rest
+}: Omit<Parameters<typeof BookTable>[0], 'caption'> & {
+  /** Every invoice of the book, in order: the totals do not depend on the page. */
+  page: number;
+  onPage: (page: number) => void;
+}) {
+  const { t } = useI18n();
+  const caption = t(`app.autonomo.review.${rest.book}`, { n: invoices.length });
+  const shown = invoices.slice((page - 1) * INVOICE_PAGE, page * INVOICE_PAGE);
+  const pager = invoices.length > INVOICE_PAGE && (
+    <InvoicePager current={page} count={invoices.length} label={caption} go={onPage} />
+  );
+  return (
+    <>
+      {pager}
+      <BookTable {...rest} invoices={shown} caption={caption} />
+      {pager}
+    </>
   );
 }
 
@@ -248,25 +277,39 @@ export function InvoiceReview({
   const [editing, setEditing] = useState<string | null>(null);
   // After a correction, the focus goes back to the button that opened it.
   const [returnTo, setReturnTo] = useState<string | null>(null);
+  // The page of each table; kept when the invoices change, and brought back into range.
+  const [pages, setPages] = useState<Record<BookKind, number>>({ issued: 1, received: 1 });
+  // The focus request already scrolled to (it waits for its page to be on screen).
+  const scrolled = useRef<number | null>(null);
 
   useEffect(() => {
     if (returnTo) document.getElementById(fixButtonId(returnTo))?.focus();
   }, [returnTo]);
 
+  const { invoices } = form;
+
   useEffect(() => {
     if (!focus) return;
     setOpen(true);
     setHighlight(focus.id);
+    // The page of the invoice asked for, in its own table.
+    const target = invoices.find((i) => i.id === focus.id);
+    if (!target) return;
+    const index = sortedOf(invoices.filter((i) => i.book === target.book)).indexOf(target);
+    setPages((p) => ({ ...p, [target.book]: pageOfIndex(index) }));
+    // Only a new request moves the page; the invoices changing afterwards do not.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus]);
 
   useEffect(() => {
-    if (!focus || !open) return;
+    if (!focus || !open || scrolled.current === focus.n) return;
     // An invoice: its kind (or its «Include» box when it is left out); the review: its own button.
-    if (focus.id) bringIntoView(invoiceRowId(focus.id), ['select:not(:disabled)', 'input']);
-    else bringIntoView('autonomo-review', ['button']);
-  }, [focus, open]);
+    const done = focus.id
+      ? bringIntoView(invoiceRowId(focus.id), ['select:not(:disabled)', 'input'])
+      : bringIntoView('autonomo-review', ['button']);
+    if (done) scrolled.current = focus.n;
+  }, [focus, open, pages]);
 
-  const { invoices } = form;
   if (invoices.length === 0) return null;
 
   const setKind = (invoice: ImportedInvoice, kind: ExpenseKind) => {
@@ -313,7 +356,7 @@ export function InvoiceReview({
   };
 
   const books = (['issued', 'received'] as const)
-    .map((book) => ({ book, list: invoices.filter((i) => i.book === book) }))
+    .map((book) => ({ book, list: sortedOf(invoices.filter((i) => i.book === book)) }))
     .filter((b) => b.list.length > 0);
   const excluded = invoices.filter((i) => i.excluded).length;
 
@@ -347,9 +390,11 @@ export function InvoiceReview({
           )}
           {books.map(({ book, list }) => (
             <div key={book} className="autonomo-review-scroll">
-              <BookTable
+              <PagedBook
                 book={book}
                 invoices={list}
+                page={validPage(pages[book], list.length)}
+                onPage={(page) => setPages({ ...pages, [book]: page })}
                 highlight={highlight}
                 offer={offer}
                 onKind={setKind}
