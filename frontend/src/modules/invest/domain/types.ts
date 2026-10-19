@@ -9,6 +9,8 @@ export interface AssetClass {
   id: string;
   /** Chapter of the Learn section that explains this class in depth. */
   chapterId?: string;
+  /** More chapters on the same class, shown as links under the main one. */
+  moreChapters?: string[];
   num: string;
   emoji: string;
   color: string;
@@ -42,7 +44,7 @@ export type ChartId =
   | 'bondCurve'
   | 'leverage'
   | 'stockVsIndex';
-export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax' | 'stock';
+export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax' | 'stock' | 'letra';
 
 export type Block =
   | { k: 'h'; t: string }
@@ -87,6 +89,8 @@ export interface ChapterInfo
   minutes: number;
   withCalc: boolean;
   premium: boolean;
+  /** Numbers of the Videoteca videos on the same topic (see `guides/domain/videos.ts`). */
+  videos?: number[];
 }
 
 /** The text of a chapter: its blocks and its glossary. */
