@@ -66,7 +66,7 @@ export type FullMinimums = Required<
     | 'assistance'
   >
 > &
-  Pick<MinimumAmounts, 'descendantDisability33' | 'descendantDisability65'>;
+  Pick<MinimumAmounts, 'descendantDisability33' | 'descendantDisability65' | 'personalOver65'>;
 
 /** The minimums of a community: its own amounts where it has them, the State's for the rest. */
 export function mergeMinimums(state: FullMinimums, own?: MinimumAmounts): FullMinimums {
@@ -136,7 +136,9 @@ export function computeMinimum(
   m: FullMinimums
 ): { total: number; items: MinimumItem[] } {
   const share = family.sharedChildren ? 0.5 : 1;
-  const items: MinimumItem[] = [{ key: 'personal', amount: m.personal }];
+  // A community can raise the general amount only from 65 (Illes Balears, see `personalOver65`).
+  const personal = family.age >= 65 ? m.personalOver65 ?? m.personal : m.personal;
+  const items: MinimumItem[] = [{ key: 'personal', amount: personal }];
   // LIRPF art. 57.2 ("edad superior a 65/75 años"), with the age at the accrual date, 31 December
   // (art. 61.1.ª). The AEAT Manual práctico de Renta 2025 applies it to taxpayers "de edad igual o
   // superior a 65 años" (and 75): turning 65 (or 75) by 31 December is enough.

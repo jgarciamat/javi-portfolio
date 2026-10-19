@@ -6557,8 +6557,8 @@
       "casilla": "0512",
       "campo": "boxes.0512",
       "concepto": "Mínimo contribuyente, importe autonómico",
-      "esperado": 6815,
-      "obtenido": 6815,
+      "esperado": 7370,
+      "obtenido": 7370,
       "estado": "coincide"
     },
     {
@@ -6597,8 +6597,8 @@
       "casilla": "0520",
       "campo": "boxes.0520",
       "concepto": "Mínimo personal y familiar, gravamen autonómico",
-      "esperado": 6815,
-      "obtenido": 6815,
+      "esperado": 7370,
+      "obtenido": 7370,
       "estado": "coincide"
     },
     {
@@ -6617,8 +6617,8 @@
       "casilla": "0546",
       "campo": "boxes.0546",
       "concepto": "Cuota íntegra autonómica",
-      "esperado": 1509.65,
-      "obtenido": 1509.65,
+      "esperado": 1459.7,
+      "obtenido": 1459.7,
       "estado": "coincide"
     },
     {
@@ -6637,8 +6637,8 @@
       "casilla": "0571",
       "campo": "boxes.0571",
       "concepto": "Cuota líquida autonómica",
-      "esperado": 1509.65,
-      "obtenido": 1509.65,
+      "esperado": 1459.7,
+      "obtenido": 1459.7,
       "estado": "coincide"
     },
     {
@@ -6647,8 +6647,8 @@
       "casilla": "0587",
       "campo": "boxes.0587",
       "concepto": "Cuota líquida incrementada total",
-      "esperado": 2999.9,
-      "obtenido": 2999.9,
+      "esperado": 2949.95,
+      "obtenido": 2949.95,
       "estado": "coincide"
     },
     {
@@ -6667,8 +6667,8 @@
       "casilla": "0595",
       "campo": "boxes.0595",
       "concepto": "Cuota resultante de la autoliquidación",
-      "esperado": 2999.9,
-      "obtenido": 2999.9,
+      "esperado": 2949.95,
+      "obtenido": 2949.95,
       "estado": "coincide"
     },
     {
@@ -6687,8 +6687,8 @@
       "casilla": "0610",
       "campo": "boxes.0610",
       "concepto": "Cuota diferencial",
-      "esperado": 23.9,
-      "obtenido": 23.9,
+      "esperado": -26.05,
+      "obtenido": -26.05,
       "estado": "coincide"
     },
     {
@@ -6697,8 +6697,8 @@
       "casilla": "0670",
       "campo": "boxes.0670",
       "concepto": "Resultado de la declaración",
-      "esperado": 23.9,
-      "obtenido": 23.9,
+      "esperado": -26.05,
+      "obtenido": -26.05,
       "estado": "coincide"
     },
     {

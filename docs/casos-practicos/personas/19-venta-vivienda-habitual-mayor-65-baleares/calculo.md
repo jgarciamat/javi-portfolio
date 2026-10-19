@@ -43,18 +43,18 @@ Fuentes: Ley 35/2006 del IRPF (BOE-A-2006-20764) y Manual práctico de Renta 202
 ### 7. Mínimo personal y familiar (arts. 56-61)
 
 - Estatal (0519): contribuyente 5.550,00 + edad 1.150,00 + descendientes 0,00 + ascendientes 0,00 + discapacidad 0,00 = **6.700,00**
-- Autonómico de Illes Balears (0520): contribuyente 5.550,00 + edad 1.265,00 + descendientes 0,00 + ascendientes 0,00 + discapacidad 0,00 = **6.815,00**
+- Autonómico de Illes Balears (0520): contribuyente 6.105,00 + edad 1.265,00 + descendientes 0,00 + ascendientes 0,00 + discapacidad 0,00 = **7.370,00**
 
 ### 8. Cuotas íntegras (arts. 63-66 y 74-76)
 
 - General estatal: escala(20.000,00) 2.088,75 − escala(mínimo 6.700,00) 636,50 = 1.452,25
-- General autonómica (Illes Balears): escala(20.000,00) 2.085,00 − escala(mínimo 6.815,00) 613,35 = 1.471,65
+- General autonómica (Illes Balears): escala(20.000,00) 2.085,00 − escala(mínimo 7.370,00) 663,30 = 1.421,70
 - Ahorro: escala de 9,5 / 10,5 / 11,5 / 13,5 / 15 % en cada mitad sobre 400,00 → estatal 38,00 y autonómica 38,00
-- Cuota íntegra estatal (0545) = **1.490,25**; autonómica (0546) = **1.509,65**
+- Cuota íntegra estatal (0545) = **1.490,25**; autonómica (0546) = **1.459,70**
 
 ### 9. Deducciones, cuota resultante y resultado
 
-- Cuota líquida (0587) = 1.490,25 − 0,00 + 1.509,65 − 0,00 = 2.999,90
+- Cuota líquida (0587) = 1.490,25 − 0,00 + 1.459,70 − 0,00 = 2.949,95
 - Deducción por rendimientos del trabajo (0414) = 0,00 (340 € hasta 16.576 € de íntegros del trabajo, menos 0,2 por euro hasta 18.276; otras rentas ≤ 6.500; límite: la cuota)
-- Cuota resultante (0595) = **2.999,90**; retenciones (0609) = 2.976,00; cuota diferencial (0610) = **23,90**
-- Resultado (0670) = **23,90** (a ingresar)
+- Cuota resultante (0595) = **2.949,95**; retenciones (0609) = 2.976,00; cuota diferencial (0610) = **-26,05**
+- Resultado (0670) = **-26,05** (a devolver)

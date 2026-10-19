@@ -244,6 +244,14 @@ describe('computeMinimum', () => {
     expect(mergeMinimums(minimums)).toEqual(minimums);
     expect(mergeMinimums(minimums, { personal: undefined }).personal).toBe(5550);
   });
+
+  it('raises the general minimum only from 65 where the community says so (Illes Balears)', () => {
+    // AEAT Manual 2025, c14, Illes Balears: over 65, 6,105 € + 1,265 €; under 65, the State's 5,550 €.
+    const balears = mergeMinimums(minimums, { personalOver65: 6105, over65: 1265, over75: 1540 });
+    expect(computeMinimum({ ...alone, age: 64 }, balears).total).toBe(5550);
+    expect(computeMinimum({ ...alone, age: 65 }, balears).total).toBe(7370);
+    expect(computeMinimum({ ...alone, age: 75 }, balears).total).toBe(8910);
+  });
 });
 
 describe('deductionAmount', () => {

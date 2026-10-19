@@ -158,7 +158,7 @@
             },
             {
               "label": "Mínimo contribuyente. Importe autonómico",
-              "amount": 6815.0,
+              "amount": 7370.0,
               "box": "0512"
             },
             {
@@ -168,7 +168,7 @@
             },
             {
               "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
-              "amount": 6815.0,
+              "amount": 7370.0,
               "box": "0520"
             }
           ]
@@ -183,7 +183,7 @@
             },
             {
               "label": "Cuota íntegra autonómica [(533)+(541)]",
-              "amount": 1509.65,
+              "amount": 1459.7,
               "box": "0546"
             },
             {
@@ -193,12 +193,12 @@
             },
             {
               "label": "Cuota líquida autonómica",
-              "amount": 1509.65,
+              "amount": 1459.7,
               "box": "0571"
             },
             {
               "label": "Cuota líquida incrementada total [(585)+(586)]",
-              "amount": 2999.9,
+              "amount": 2949.95,
               "box": "0587"
             },
             {
@@ -208,7 +208,7 @@
             },
             {
               "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
-              "amount": 2999.9,
+              "amount": 2949.95,
               "box": "0595"
             },
             {
@@ -223,12 +223,12 @@
             },
             {
               "label": "Cuota diferencial [(595)-(609)]",
-              "amount": 23.9,
+              "amount": -26.05,
               "box": "0610"
             },
             {
               "label": "Resultado de la declaración",
-              "amount": 23.9,
+              "amount": -26.05,
               "box": "0670"
             }
           ]

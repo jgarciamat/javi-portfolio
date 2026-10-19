@@ -91,6 +91,11 @@ export interface Deduction {
 /** Minimums (euros) that a community sets for its own part of the tax; missing = the State's. */
 export interface MinimumAmounts {
   personal?: number;
+  /**
+   * The general minimum of a taxpayer of 65 or more, when the community raises it only for them (Illes
+   * Balears: 6,105 € instead of 5,550 €, plus the 1,265 € for age).
+   */
+  personalOver65?: number;
   /** By order of birth: 1st, 2nd, 3rd, 4th and following. */
   descendants?: number[];
   /** Extra per descendant under 3 years old. */

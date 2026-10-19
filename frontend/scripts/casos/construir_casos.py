@@ -64,7 +64,9 @@ CCAA = {
                      min=dict(personal=5606, descendants=[2424, 2727, 4040, 4545], under3=2828, ascendants=1162, ascendantsOver75=1414,
                               over65=1162, over75=1414, disability33=3030, disability65=9090, assistance=3030)),
     'baleares': dict(name='Illes Balears', scale=[(0, 9), (10000, 11.25), (18000, 14.25), (30000, 17.5), (48000, 19), (70000, 21.75), (90000, 22.75), (120000, 23.75), (175000, 24.75)],
-                     min=dict(personal=5550, descendants=[2400, 2970, 4400, 4950], under3=2800, ascendants=1265, ascendantsOver75=1540,
+                     # Manual práctico de Renta 2025, c14, «Mínimo autonómico ... Illes Balears»: el del contribuyente mayor de 65
+                     # años es «6.105 euros anuales por importe del mínimo por contribuyente general» más 1.265 (y 1.540 desde 75).
+                     min=dict(personal=5550, personalOver65=6105, descendants=[2400, 2970, 4400, 4950], under3=2800, ascendants=1265, ascendantsOver75=1540,
                               over65=1265, over75=1540, disability33=3300, disability65=9900, assistance=3300)),
     'aragon': dict(name='Aragón', scale=[(0, 9.5), (13072.5, 12), (21210, 15), (36960, 18.5), (52500, 20.5), (60000, 23), (80000, 24), (90000, 25), (130000, 25.5)], min=None),
     'murcia': dict(name='Región de Murcia', scale=[(0, 9.5), (12450, 11.2), (20200, 13.3), (34000, 17.9), (60000, 22.5)], min=None),
@@ -132,7 +134,7 @@ class Steps:
 def minimum_of(m, fam, steps, label, joint_partner=None):
     """Mínimo personal y familiar (arts. 56-61 LIRPF) con los importes `m`."""
     items = {}
-    items['personal'] = m['personal']
+    items['personal'] = m.get('personalOver65', m['personal']) if fam['age'] >= 65 else m['personal']
     age_extra = (m['over65'] if fam['age'] >= 65 else 0) + (m['over75'] if fam['age'] >= 75 else 0)
     if joint_partner:
         age_extra += (m['over65'] if joint_partner['age'] >= 65 else 0) + (m['over75'] if joint_partner['age'] >= 75 else 0)
