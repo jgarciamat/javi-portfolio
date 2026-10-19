@@ -1,0 +1,262 @@
+{
+  "slug": "p2-42-inversor-fondo-heredado-perdidas-anteriores-extremadura",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 42",
+  "nif": "00000042L",
+  "domicilio": "Calle Ficticia 42, 06800 Mérida (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "extremadura",
+  "titulo": "Inversor con dividendos, un fondo heredado y pérdidas de 2022 por compensar",
+  "descripcion": "Intereses, dividendos y gastos de custodia; reembolsa un fondo heredado en 2023 (valor de adquisición: el del Impuesto sobre Sucesiones) con ganancia y vende acciones con pérdida; compensa 2.000 € de pérdidas patrimoniales de 2022.",
+  "prueba": [
+    "rendimientos del capital mobiliario y gastos de custodia",
+    "fondo heredado: valor del ISD",
+    "integración y compensación de ganancias y pérdidas (art. 49)",
+    "pérdidas de años anteriores (4 años)",
+    "retenciones del capital"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "extremadura",
+          "age": "60",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "52000.0",
+          "socialSecurity": "3369.6",
+          "withheld": "12138.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "6640",
+          "choices": {}
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000042L",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 42 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1965",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "EXTREMADURA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 52000.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 52000.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 3369.6,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 48630.4,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 46630.4,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 46630.4,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 46630.4,
+              "box": "0435"
+            },
+            {
+              "label": "Base imponible del ahorro",
+              "amount": 6640.0,
+              "box": "0460"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 46630.4,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 6640.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5550.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 5550.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 5550.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 6587.32,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 6929.58,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 6587.32,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 6929.58,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 13516.9,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 13516.9,
+              "box": "0595"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 12138.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": 1378.9,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": 1378.9,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 52000,
+        "withheld": 10200,
+        "ss": 3369.6
+      }
+    ],
+    "ahorro": [
+      "Capital mobiliario: intereses 1.200 + dividendos 2.500 − custodia y administración 60 (art. 26.1.a) = **3.640,00**",
+      "Fondo heredado en 2023: valor de adquisición el declarado en Sucesiones, 30.000; reembolso 36.500 → ganancia **6.500,00**",
+      "Acciones compradas en 2021 por 9.000 y vendidas por 7.500 → pérdida **−1.500,00**",
+      "Ganancias y pérdidas entre sí: 6.500 − 1.500 = 5.000; menos pérdidas pendientes de 2022 (−2.000, art. 49.1.b, dentro de los 4 años) = **3.000,00**",
+      "Base del ahorro = 3.640 + 3.000 = **6.640,00**; retenciones del capital 228 (intereses) + 475 (dividendos) + 1.235 (fondo) = 1.938,00"
+    ],
+    "alquiler": null
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "slug": "p2-51-madre-separada-dos-hijos-melilla",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0003",
+      "concepto": "Retribuciones dinerarias",
+      "importe": 26000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0003"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0012",
+      "concepto": "Total ingresos íntegros computables del trabajo",
+      "importe": 26000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0013",
+      "concepto": "Cotizaciones a la Seguridad Social",
+      "importe": 1684.8,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0013"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0017",
+      "concepto": "Rendimiento neto previo",
+      "importe": 24315.2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0019",
+      "concepto": "Otros gastos deducibles",
+      "importe": 2000.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0019"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0022",
+      "concepto": "Rendimiento neto del trabajo",
+      "importe": 22315.2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0022"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0023",
+      "concepto": "Reducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0023"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0025",
+      "concepto": "Rendimiento neto reducido del trabajo",
+      "importe": 22315.2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0025"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0435",
+      "concepto": "Base imponible general",
+      "importe": 22315.2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0435"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0460",
+      "concepto": "Base imponible del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0500",
+      "concepto": "Base liquidable general",
+      "importe": 22315.2,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0500"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0510",
+      "concepto": "Base liquidable del ahorro",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0510"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0511",
+      "concepto": "Mínimo contribuyente, importe estatal",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0511"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0512",
+      "concepto": "Mínimo contribuyente, importe autonómico",
+      "importe": 5550.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0517",
+      "concepto": "Mínimo por discapacidad, importe estatal",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0517"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0518",
+      "concepto": "Mínimo por discapacidad, importe autonómico",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0519",
+      "concepto": "Mínimo personal y familiar, gravamen estatal",
+      "importe": 10650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0519"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0520",
+      "concepto": "Mínimo personal y familiar, gravamen autonómico",
+      "importe": 10650.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0520"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0545",
+      "concepto": "Cuota íntegra estatal",
+      "importe": 1418.28,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0545"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0546",
+      "concepto": "Cuota íntegra autonómica",
+      "importe": 1418.28,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0546"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0570",
+      "concepto": "Cuota líquida estatal",
+      "importe": 567.31,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0571",
+      "concepto": "Cuota líquida autonómica",
+      "importe": 567.31,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0587",
+      "concepto": "Cuota líquida incrementada total",
+      "importe": 1134.62,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0414",
+      "concepto": "Deducción por obtención de rendimientos del trabajo",
+      "importe": 0.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0414"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0595",
+      "concepto": "Cuota resultante de la autoliquidación",
+      "importe": 1134.62,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0595"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0609",
+      "concepto": "Total pagos a cuenta",
+      "importe": 1500.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0609"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0610",
+      "concepto": "Cuota diferencial",
+      "importe": -365.38,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0610"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": "0670",
+      "concepto": "Resultado de la declaración",
+      "importe": -1565.38,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "boxes.0670"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Deducciones abonables (maternidad, familia numerosa…)",
+      "importe": 1200.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "result.refundable"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Deducciones aplicadas en la cuota estatal (incluye la 0414)",
+      "importe": 850.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "result.stateDeductions"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Deducciones aplicadas en la cuota autonómica",
+      "importe": 850.97,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#declaración-individual-del-primer-declarante",
+      "campo": "result.regionalDeductions"
+    },
+    {
+      "modelo": "100",
+      "declaracion": "individual",
+      "casilla": null,
+      "concepto": "Conjunta monoparental",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "No se compara aquí: la deducción del 60 % cambia con la cuota de la conjunta y el formulario solo guarda un importe.",
+      "campo": null
+    }
+  ]
+}

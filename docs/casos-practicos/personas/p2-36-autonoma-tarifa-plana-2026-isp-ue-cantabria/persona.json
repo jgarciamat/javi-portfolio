@@ -1,0 +1,1841 @@
+{
+  "slug": "p2-36-autonoma-tarifa-plana-2026-isp-ue-cantabria",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 36",
+  "nif": "00000036J",
+  "domicilio": "Calle Ficticia 36, 39001 Santander (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "cantabria",
+  "titulo": "Diseñadora que se da de alta el 1-2-2026 con tarifa plana y software de Irlanda",
+  "descripcion": "Profesional (diseño gráfico) desde el 1-2-2026: tarifa plana, retención del 7 % a sus clientes empresa (año de inicio y dos siguientes) y una suscripción de software de un proveedor irlandés: inversión del sujeto pasivo (303, casillas 10-11 y 36-37; 349 clave I).",
+  "prueba": [
+    "alta a mitad de trimestre",
+    "tarifa plana 2026",
+    "retención del 7 % de inicio",
+    "adquisición intracomunitaria de servicios (10-11 y 36-37)",
+    "349 clave I"
+  ],
+  "modelos": [
+    "130",
+    "303",
+    "349",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "general",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 127050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 127050,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 54450,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 54450,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 183517,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 183517,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 183516,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 78650,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 78650,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 78650,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 155283,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 155283,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 155284,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 66550,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 66550,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 66550,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 211750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 211750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 211750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 90750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 90750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 90750,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 14520,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 4840,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-02-15",
+        "number": "2026-001",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1050.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-002",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1050.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-003",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 450.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-004",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 450.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-005",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1516.67,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-006",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1516.67,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-007",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1516.66,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-008",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 650.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-009",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 650.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-010",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 650.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-011",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1283.33,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-012",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1283.33,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-013",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1283.34,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-014",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 550.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-015",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 550.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-016",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 550.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-017",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1750.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-018",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1750.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-019",
+        "client": "Agencia Ficticia Cántabra, S.L.",
+        "nif": "B00000361",
+        "base": 1750.0,
+        "rate": 21,
+        "withheldRate": 7
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-020",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 750.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-021",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 750.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-022",
+        "client": "Cliente particular ficticio",
+        "nif": "00000362V",
+        "base": 750.0,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SOF",
+        "supplier": "Software Ficticio Ltd (Irlanda)",
+        "nif": "IE0000000AB",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Coworking Ficticio Santander, S.L.",
+        "nif": "B00000363",
+        "base": 120,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SUP",
+        "supplier": "Teléfono Ficticio, S.A.",
+        "nif": "A00000364",
+        "base": 40,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-001 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1197.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-002 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1197.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-003 Cliente particular ficticio",
+        "amount": 544.5
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-004 Cliente particular ficticio",
+        "amount": 544.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-005 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1729.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-006 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1729.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-007 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1728.99
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-008 Cliente particular ficticio",
+        "amount": 786.5
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-009 Cliente particular ficticio",
+        "amount": 786.5
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-010 Cliente particular ficticio",
+        "amount": 786.5
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-011 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1463.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-012 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1463.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-013 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1463.01
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-014 Cliente particular ficticio",
+        "amount": 665.5
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-015 Cliente particular ficticio",
+        "amount": 665.5
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-016 Cliente particular ficticio",
+        "amount": 665.5
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-017 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1995.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-018 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1995.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-019 Agencia Ficticia Cántabra, S.L.",
+        "amount": 1995.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-020 Cliente particular ficticio",
+        "amount": 907.5
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-021 Cliente particular ficticio",
+        "amount": 907.5
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-022 Cliente particular ficticio",
+        "amount": 907.5
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Software Ficticio Ltd (Irlanda)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Coworking Ficticio Santander, S.L.",
+        "amount": -145.2
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Teléfono Ficticio, S.A.",
+        "amount": -48.4
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -80.0
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          3000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          630.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          120.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          25.2
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          655.2
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          320.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          67.2
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          120.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          25.2
+        ],
+        [
+          "45",
+          "Total a deducir",
+          92.4
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          562.8
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          562.8
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          562.8
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          562.8
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          562.8
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          6500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1365.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          180.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          37.8
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1402.8
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          480.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          100.8
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          180.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          37.8
+        ],
+        [
+          "45",
+          "Total a deducir",
+          138.6
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1264.2
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1264.2
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1264.2
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1264.2
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1264.2
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          5500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1155.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          180.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          37.8
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1192.8
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          480.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          100.8
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          180.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          37.8
+        ],
+        [
+          "45",
+          "Total a deducir",
+          138.6
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1054.2
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1054.2
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1054.2
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1054.2
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1054.2
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          7500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1575.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          180.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          37.8
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1612.8
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          480.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          100.8
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          180.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          37.8
+        ],
+        [
+          "45",
+          "Total a deducir",
+          138.6
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1474.2
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1474.2
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1474.2
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1474.2
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1474.2
+        ]
+      ]
+    ],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          3000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          720.0
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          2280.0
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          456.0
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          147.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          309.0
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          309.0
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          309.0
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          309.0
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          309.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          9500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          1900.0
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          7600.0
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1520.0
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          309.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          465.51
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          745.49
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          745.49
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          745.49
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          745.49
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          745.49
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          15000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          3030.0
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          11970.0
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          2394.0
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1054.49
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          735.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          604.51
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          604.51
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          604.51
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          604.51
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          604.51
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          22500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          4260.0
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          18240.0
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          3648.0
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1659.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          1102.5
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          886.5
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          886.5
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          886.5
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          886.5
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          886.5
+        ]
+      ]
+    ],
+    "m111": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "m115": [
+      [],
+      [],
+      [],
+      []
+    ]
+  }
+}

@@ -1,0 +1,281 @@
+{
+  "slug": "p2-50-asalariada-local-alquilado-melilla",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 50",
+  "nif": "00000050G",
+  "domicilio": "Calle Ficticia 50, 52001 Melilla (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "melilla",
+  "titulo": "Asalariada en Melilla que alquila un local en la ciudad",
+  "descripcion": "Trabaja en Melilla y alquila un local comercial situado allí (sin reducción: no es vivienda); el inquilino le retiene el 19 %. Las dos rentas se obtienen en Melilla: deducción del 60 % sobre toda la cuota.",
+  "prueba": [
+    "deducción por rentas obtenidas en Melilla (60 %)",
+    "alquiler de local sin reducción",
+    "retención del alquiler en los pagos a cuenta",
+    "otras rentas ≤ 6.500"
+  ],
+  "modelos": [
+    "100"
+  ],
+  "alcance": "dentro",
+  "datosFicticios": true,
+  "renta": {
+    "declaraciones": [
+      {
+        "id": "individual",
+        "form": {
+          "ccaaId": "melilla",
+          "age": "45",
+          "disability": 0,
+          "children": [],
+          "ascendants": [],
+          "shared": false,
+          "gross": "28000.0",
+          "socialSecurity": "1814.4",
+          "withheld": "3424.0",
+          "nonSalary": "",
+          "retired": false,
+          "workExpenses": {},
+          "mobility": false,
+          "pension": "",
+          "pensionEmployer": "",
+          "spousePlan": "",
+          "compensatory": "",
+          "savings": "",
+          "choices": {
+            "estado-ceuta-melilla": {
+              "on": true,
+              "amount": "3655.01",
+              "units": ""
+            }
+          },
+          "rentalOn": true,
+          "rentalIncome": "9600",
+          "rentalExpenses": {
+            "reparacion-conservacion": "600",
+            "tributos-tasas": "400",
+            "comunidad-servicios-personales": "300",
+            "seguros": "150"
+          },
+          "construction": "80000",
+          "rentalReduction": ""
+        }
+      }
+    ],
+    "conjunta": null
+  },
+  "documentos": {
+    "borrador": {
+      "exercise": 2025,
+      "sections": [
+        {
+          "title": "Primer declarante",
+          "lines": [
+            {
+              "label": "NIF",
+              "text": "00000050G",
+              "box": "0001"
+            },
+            {
+              "label": "Apellidos y nombre",
+              "text": "FICTICIA 50 PERSONA",
+              "box": "0002"
+            },
+            {
+              "label": "Fecha de nacimiento",
+              "text": "15/06/1980",
+              "box": "0010"
+            },
+            {
+              "label": "Grado de discapacidad",
+              "text": "(0) Sin discapacidad",
+              "box": "0011"
+            }
+          ]
+        },
+        {
+          "title": "Comunidad o Ciudad Autónoma de residencia en el ejercicio 2025",
+          "lines": [
+            {
+              "label": "Comunidad Autónoma de residencia habitual en 2025",
+              "text": "MELILLA",
+              "box": "0070"
+            }
+          ]
+        },
+        {
+          "title": "Rendimientos del trabajo",
+          "lines": [
+            {
+              "label": "Retribuciones dinerarias",
+              "amount": 28000.0,
+              "box": "0003"
+            },
+            {
+              "label": "Total ingresos íntegros computables [(03)+(07)+(08)+(24)+(09)+(10)-(11)-(58)]",
+              "amount": 28000.0,
+              "box": "0012"
+            },
+            {
+              "label": "Cotizac. Seguridad Social, Mutualidad Funcionarios, detracciones derechos pasivos y Coleg. Huérfanos",
+              "amount": 1814.4,
+              "box": "0013"
+            },
+            {
+              "label": "Rendimiento neto previo [(12)-(13)-(14)-(15)-(16)]",
+              "amount": 26185.6,
+              "box": "0017"
+            },
+            {
+              "label": "Otros gastos deducibles",
+              "amount": 2000.0,
+              "box": "0019"
+            },
+            {
+              "label": "Rendimiento neto [(18)-(19)-(20)-(21)]",
+              "amount": 24185.6,
+              "box": "0022"
+            },
+            {
+              "label": "Reducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0023"
+            },
+            {
+              "label": "Rendimiento neto reducido [(22)-(23)]",
+              "amount": 24185.6,
+              "box": "0025"
+            }
+          ]
+        },
+        {
+          "title": "Base imponible general y base imponible del ahorro",
+          "lines": [
+            {
+              "label": "Base imponible general [(420)-(431)+(432)-(433)-(434)]",
+              "amount": 29935.6,
+              "box": "0435"
+            },
+            {
+              "label": "Base liquidable general [(435)-(491)-(492)-(493)-(494)-(495)-(496)-(497)]",
+              "amount": 29935.6,
+              "box": "0500"
+            },
+            {
+              "label": "Base liquidable del ahorro [(460)-(506)-(507)]",
+              "amount": 0.0,
+              "box": "0510"
+            }
+          ]
+        },
+        {
+          "title": "Adecuación del impuesto a las circunstancias personales y familiares",
+          "lines": [
+            {
+              "label": "Mínimo contribuyente. Importe estatal",
+              "amount": 5550.0,
+              "box": "0511"
+            },
+            {
+              "label": "Mínimo contribuyente. Importe autonómico",
+              "amount": 5550.0,
+              "box": "0512"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen estatal",
+              "amount": 5550.0,
+              "box": "0519"
+            },
+            {
+              "label": "Mínimo personal y familiar para calcular el gravamen autonómico",
+              "amount": 5550.0,
+              "box": "0520"
+            }
+          ]
+        },
+        {
+          "title": "Cálculo del impuesto y resultado de la declaración",
+          "lines": [
+            {
+              "label": "Cuota íntegra estatal [(532)+(540)]",
+              "amount": 3045.84,
+              "box": "0545"
+            },
+            {
+              "label": "Cuota íntegra autonómica [(533)+(541)]",
+              "amount": 3045.84,
+              "box": "0546"
+            },
+            {
+              "label": "Cuota líquida estatal",
+              "amount": 1218.34,
+              "box": "0570"
+            },
+            {
+              "label": "Cuota líquida autonómica",
+              "amount": 1218.33,
+              "box": "0571"
+            },
+            {
+              "label": "Cuota líquida incrementada total [(585)+(586)]",
+              "amount": 2436.67,
+              "box": "0587"
+            },
+            {
+              "label": "Deducción por obtención de rendimientos del trabajo",
+              "amount": 0.0,
+              "box": "0414"
+            },
+            {
+              "label": "Cuota resultante de la autoliquidación [(587)-(588)-(414)-(589)-(590)-(591)]",
+              "amount": 2436.67,
+              "box": "0595"
+            },
+            {
+              "label": "Total pagos a cuenta [suma de (592) + (593)+ (594) + (596) a (606)]",
+              "amount": 3424.0,
+              "box": "0609"
+            },
+            {
+              "label": "Cuota diferencial [(595)-(609)]",
+              "amount": -987.33,
+              "box": "0610"
+            },
+            {
+              "label": "Resultado de la declaración",
+              "amount": -987.33,
+              "box": "0670"
+            }
+          ]
+        }
+      ]
+    },
+    "pagadores": [
+      {
+        "name": "Empresa Ficticia Empleadora, S.L.",
+        "nif": "B00000901",
+        "gross": 28000,
+        "withheld": 1600,
+        "ss": 1814.4
+      }
+    ],
+    "ahorro": [],
+    "alquiler": {
+      "income": 9600,
+      "interest": 0,
+      "repairs": 600,
+      "other": 850,
+      "construction": 80000,
+      "reduction": 0,
+      "reductionId": "",
+      "expenses": {
+        "reparacion-conservacion": "600",
+        "tributos-tasas": "400",
+        "comunidad-servicios-personales": "300",
+        "seguros": "150"
+      },
+      "why": "Local comercial: la reducción del art. 23.2 es solo para viviendas"
+    }
+  }
+}

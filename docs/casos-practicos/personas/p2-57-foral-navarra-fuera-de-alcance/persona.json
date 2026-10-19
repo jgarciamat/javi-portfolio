@@ -1,0 +1,24 @@
+{
+  "slug": "p2-57-foral-navarra-fuera-de-alcance",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 57",
+  "nif": "00000057B",
+  "domicilio": "Calle Ficticia 57, 31001 Pamplona (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2025,
+  "comunidad": "navarra",
+  "titulo": "Asalariado residente en Navarra (régimen foral)",
+  "descripcion": "Reside en Pamplona: presenta la Renta (modelo F-90) ante la Hacienda Foral de Navarra con su propia ley del IRPF y sus escalas. Fuera del alcance del motor (solo régimen común).",
+  "prueba": [
+    "territorio foral: Navarra"
+  ],
+  "modelos": [
+    "F-90 (Navarra)"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "Territorio foral de Navarra: normativa, escalas y modelos propios (F-90), no los del régimen común.",
+  "documentos": {
+    "datos": null
+  }
+}

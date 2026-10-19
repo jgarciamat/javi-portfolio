@@ -1,0 +1,1385 @@
+{
+  "slug": "p2-49-abogada-ceuta-130-al-8-sin-iva",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 49",
+  "nif": "00000049A",
+  "domicilio": "Calle Ficticia 49, 51001 Ceuta (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "ceuta",
+  "titulo": "Abogada en Ceuta: sin IVA (IPSI) y pago fraccionado al 8 %",
+  "descripcion": "Despacho en Ceuta con clientes particulares. En Ceuta no se aplica el IVA (allí rige el IPSI, impuesto local que Finanverso no cubre): no presenta 303. Con derecho a la deducción del art. 68.4, el pago fraccionado del 130 es el 8 % en lugar del 20 % (art. 110.1 RIRPF).",
+  "prueba": [
+    "sin 303 en Ceuta (IPSI)",
+    "130 al 8 %",
+    "estimación directa simplificada",
+    "sin retenciones"
+  ],
+  "modelos": [
+    "130",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "none-ipsi",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 300000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 366667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 366667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 366666,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 266667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 266667,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 266666,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 400000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 400000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 400000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 25000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 6000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3000.0,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-004",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3666.67,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-005",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3666.67,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-006",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 3666.66,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-007",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 2666.67,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-008",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 2666.67,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-009",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 2666.66,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-010",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 4000.0,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-011",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 4000.0,
+        "rate": 0,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-012",
+        "client": "Clientes particulares (minutas, sin NIF)",
+        "nif": "",
+        "base": 4000.0,
+        "rate": 0,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Centro de Negocios Ficticio, S.L. (despacho)",
+        "nif": "B00000492",
+        "base": 250,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Colegio de Abogados Ficticio (cuota)",
+        "nif": "Q00000493",
+        "base": 60,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SOF",
+        "supplier": "Base de Datos Jurídica Ficticia, S.L.",
+        "nif": "B00000494",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Clientes particulares (minutas, sin NIF)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Clientes particulares (minutas, sin NIF)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Clientes particulares (minutas, sin NIF)",
+        "amount": 3000.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-004 Clientes particulares (minutas, sin NIF)",
+        "amount": 3666.67
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-005 Clientes particulares (minutas, sin NIF)",
+        "amount": 3666.67
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-006 Clientes particulares (minutas, sin NIF)",
+        "amount": 3666.66
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-007 Clientes particulares (minutas, sin NIF)",
+        "amount": 2666.67
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-008 Clientes particulares (minutas, sin NIF)",
+        "amount": 2666.67
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-009 Clientes particulares (minutas, sin NIF)",
+        "amount": 2666.66
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-010 Clientes particulares (minutas, sin NIF)",
+        "amount": 4000.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-011 Clientes particulares (minutas, sin NIF)",
+        "amount": 4000.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-012 Clientes particulares (minutas, sin NIF)",
+        "amount": 4000.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Centro de Negocios Ficticio, S.L. (despacho)",
+        "amount": -250.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Colegio de Abogados Ficticio (cuota)",
+        "amount": -60.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Base de Datos Jurídica Ficticia, S.L.",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -427.21
+      }
+    ],
+    "m303": [],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          9000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          2779.05
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          6220.95
+        ],
+        [
+          "04",
+          "8 % de la casilla 03",
+          497.68
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          497.68
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          497.68
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          497.68
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          497.68
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          497.68
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          20000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          5658.1
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          14341.9
+        ],
+        [
+          "04",
+          "8 % de la casilla 03",
+          1147.35
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          497.68
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          649.67
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          649.67
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          649.67
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          649.67
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          649.67
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          28000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          8387.15
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          19612.85
+        ],
+        [
+          "04",
+          "8 % de la casilla 03",
+          1569.03
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1147.35
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          421.68
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          421.68
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          421.68
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          421.68
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          421.68
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          40000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          11316.19
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          28683.81
+        ],
+        [
+          "04",
+          "8 % de la casilla 03",
+          2294.7
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1569.03
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          725.67
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          725.67
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          725.67
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          725.67
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          725.67
+        ]
+      ]
+    ],
+    "m111": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "m115": [
+      [],
+      [],
+      [],
+      []
+    ]
+  }
+}

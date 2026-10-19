@@ -1,0 +1,35 @@
+{
+  "slug": "p2-44-taxista-modulos-extremadura",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 44",
+  "nif": "00000044K",
+  "domicilio": "Calle Ficticia 44, 06800 Mérida (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "extremadura",
+  "titulo": "Taxista en estimación objetiva (módulos) en Mérida",
+  "descripcion": "Taxista (epígrafe 721.2) en módulos con IVA simplificado: modelos 131 y 303 simplificado, sin libro de facturas de ventas. Segundo caso de módulos del banco (el 25 es de Andalucía) con otros signos: un conductor asalariado a media jornada y 45.000 km al año.",
+  "prueba": [
+    "estimación objetiva",
+    "IVA simplificado",
+    "personal asalariado en módulos"
+  ],
+  "modelos": [
+    "131",
+    "303 (simplificado)",
+    "390",
+    "100"
+  ],
+  "alcance": "fuera",
+  "datosFicticios": true,
+  "motivoFueraDeAlcance": "El motor no calcula la estimación objetiva (módulos) ni el IVA simplificado: los módulos de 2026 (Orden de módulos del año) no están en la app ni se han confirmado aquí.",
+  "documentos": {
+    "datos": {
+      "epigrafe": "721.2",
+      "personalNoAsalariado": 1,
+      "personalAsalariadoHoras": 900,
+      "distanciaKm": 45000,
+      "asientos": 5
+    }
+  }
+}

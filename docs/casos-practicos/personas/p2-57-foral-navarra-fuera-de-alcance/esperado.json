@@ -1,0 +1,16 @@
+{
+  "slug": "p2-57-foral-navarra-fuera-de-alcance",
+  "ejercicio": 2025,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "F-90 (Navarra)",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "Territorio foral de Navarra: normativa, escalas y modelos propios (F-90), no los del régimen común.",
+      "campo": null
+    }
+  ]
+}

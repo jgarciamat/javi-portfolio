@@ -1,0 +1,2819 @@
+{
+  "slug": "p2-32-autonomo-directa-normal-empleados-local-asturias",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 32",
+  "nif": "00000032D",
+  "domicilio": "Calle Ficticia 32, 33001 Oviedo (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "asturias",
+  "titulo": "Carpintería en estimación directa NORMAL con dos empleados, profesionales y local",
+  "descripcion": "Renunció a la simplificada: estimación directa normal (sin el 5 % de difícil justificación; amortización según tablas). Dos empleados, asesor fiscal y abogada (personas físicas, retención del 15 %), local alquilado a un particular (19 %, modelo 115) y compras de madera.",
+  "prueba": [
+    "estimación directa normal (sin 5 %)",
+    "amortización como gasto",
+    "111 con trabajo y profesionales",
+    "115 del local",
+    "303 régimen general",
+    "190, 180 y 347"
+  ],
+  "modelos": [
+    "130",
+    "303",
+    "111",
+    "115",
+    "180",
+    "190",
+    "347",
+    "390",
+    "RETA"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "general",
+    "estimacion": "normal",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 1258400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 1258400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 1258400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 838933,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 838933,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 838934,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-05",
+        "type": "EXPENSE",
+        "amountCents": 2178000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 1403600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 1403600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 1403600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 935733,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 935733,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 935734,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-05",
+        "type": "EXPENSE",
+        "amountCents": 2420000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 1137400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 1137400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 1137400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 758267,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 758267,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 758266,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-05",
+        "type": "EXPENSE",
+        "amountCents": 1936000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 1524600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 1524600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 1524600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 1016400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 1016400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 1016400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 217800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 18150,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 48400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 9000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-05",
+        "type": "EXPENSE",
+        "amountCents": 2662000,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": false,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 10400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 10400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 10400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-01-15",
+        "number": "2026-004",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6933.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-005",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6933.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-006",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6933.34,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-007",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 11600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-008",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 11600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-009",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 11600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-010",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 7733.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-011",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 7733.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-012",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 7733.34,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-013",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 9400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-014",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 9400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-015",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 9400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-016",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6266.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-017",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6266.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-018",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 6266.66,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-019",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 12600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-020",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 12600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-021",
+        "client": "Constructora Ficticia del Norte, S.L.",
+        "nif": "B00000321",
+        "base": 12600.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-022",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 8400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-023",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 8400.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-024",
+        "client": "Promociones Ficticias Astur, S.L.",
+        "nif": "B00000322",
+        "base": 8400.0,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-03-05",
+        "number": "F-03-MAT",
+        "supplier": "Maderas Ficticias, S.A.",
+        "nif": "A00000325",
+        "base": 18000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-06-05",
+        "number": "F-06-MAT",
+        "supplier": "Maderas Ficticias, S.A.",
+        "nif": "A00000325",
+        "base": 20000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-09-05",
+        "number": "F-09-MAT",
+        "supplier": "Maderas Ficticias, S.A.",
+        "nif": "A00000325",
+        "base": 16000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-REN",
+        "supplier": "Arrendador Ficticio del local",
+        "nif": "00000321E",
+        "base": 1800,
+        "rate": 21,
+        "retention": 342.0,
+        "kind": "rent"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-PRO",
+        "supplier": "Asesor Fiscal Ficticio",
+        "nif": "00000322T",
+        "base": 250,
+        "rate": 21,
+        "retention": 37.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-PRO",
+        "supplier": "Abogada Ficticia",
+        "nif": "00000324W",
+        "base": 150,
+        "rate": 21,
+        "retention": 22.5,
+        "kind": "pro"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SUP",
+        "supplier": "Eléctrica Ficticia, S.A. (luz)",
+        "nif": "A00000326",
+        "base": 400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "supplies"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-INS",
+        "supplier": "Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "nif": "A00000327",
+        "base": 90,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "insurance"
+      },
+      {
+        "date": "2026-12-05",
+        "number": "F-12-MAT",
+        "supplier": "Maderas Ficticias, S.A.",
+        "nif": "A00000325",
+        "base": 22000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Constructora Ficticia del Norte, S.L.",
+        "amount": 12584.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Constructora Ficticia del Norte, S.L.",
+        "amount": 12584.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Constructora Ficticia del Norte, S.L.",
+        "amount": 12584.0
+      },
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-004 Promociones Ficticias Astur, S.L.",
+        "amount": 8389.33
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-005 Promociones Ficticias Astur, S.L.",
+        "amount": 8389.33
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-006 Promociones Ficticias Astur, S.L.",
+        "amount": 8389.34
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Maderas Ficticias, S.A.",
+        "amount": -21780.0
+      },
+      {
+        "date": "2026-01-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-01-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-02-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-02-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-03-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-03-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-007 Constructora Ficticia del Norte, S.L.",
+        "amount": 14036.0
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-008 Constructora Ficticia del Norte, S.L.",
+        "amount": 14036.0
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-009 Constructora Ficticia del Norte, S.L.",
+        "amount": 14036.0
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-010 Promociones Ficticias Astur, S.L.",
+        "amount": 9357.33
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-011 Promociones Ficticias Astur, S.L.",
+        "amount": 9357.33
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-012 Promociones Ficticias Astur, S.L.",
+        "amount": 9357.34
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Maderas Ficticias, S.A.",
+        "amount": -24200.0
+      },
+      {
+        "date": "2026-04-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-04-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-05-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-05-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-06-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-06-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-013 Constructora Ficticia del Norte, S.L.",
+        "amount": 11374.0
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-014 Constructora Ficticia del Norte, S.L.",
+        "amount": 11374.0
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-015 Constructora Ficticia del Norte, S.L.",
+        "amount": 11374.0
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-016 Promociones Ficticias Astur, S.L.",
+        "amount": 7582.67
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-017 Promociones Ficticias Astur, S.L.",
+        "amount": 7582.67
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-018 Promociones Ficticias Astur, S.L.",
+        "amount": 7582.66
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Maderas Ficticias, S.A.",
+        "amount": -19360.0
+      },
+      {
+        "date": "2026-07-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-07-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-08-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-08-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-09-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-09-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-019 Constructora Ficticia del Norte, S.L.",
+        "amount": 15246.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-020 Constructora Ficticia del Norte, S.L.",
+        "amount": 15246.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-021 Constructora Ficticia del Norte, S.L.",
+        "amount": 15246.0
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-022 Promociones Ficticias Astur, S.L.",
+        "amount": 10164.0
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-023 Promociones Ficticias Astur, S.L.",
+        "amount": 10164.0
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-024 Promociones Ficticias Astur, S.L.",
+        "amount": 10164.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Arrendador Ficticio del local",
+        "amount": -1836.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Asesor Fiscal Ficticio",
+        "amount": -265.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Abogada Ficticia",
+        "amount": -159.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Eléctrica Ficticia, S.A. (luz)",
+        "amount": -484.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Aseguradora Ficticia, S.A. (seguro, exento de IVA)",
+        "amount": -90.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Maderas Ficticias, S.A.",
+        "amount": -26620.0
+      },
+      {
+        "date": "2026-10-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-10-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-11-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-11-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-12-30",
+        "concept": "Nóminas de los empleados (líquido)",
+        "amount": -3344.0
+      },
+      {
+        "date": "2026-12-30",
+        "concept": "Seguros sociales de la empresa",
+        "amount": -1200
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -504.41
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          52000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          10920.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          10920.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          25800.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          5418.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          5418.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          5502.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          5502.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          5502.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          5502.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          5502.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          58000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          12180.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          12180.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          27800.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          5838.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          5838.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          6342.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          6342.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          6342.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          6342.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          6342.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          47000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          9870.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          9870.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          23800.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          4998.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          4998.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          4872.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          4872.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          4872.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          4872.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          4872.0
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          63000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          13230.0
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          13230.0
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          29800.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          6258.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          6258.0
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          6972.0
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          6972.0
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          6972.0
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          6972.0
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          6972.0
+        ]
+      ]
+    ],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          52000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados",
+          43333.23
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          8666.77
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1733.35
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1733.35
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1733.35
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1733.35
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1733.35
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1733.35
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          110000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados",
+          88666.46
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          21333.54
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          4266.71
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          1733.35
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          2533.36
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          2533.36
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          2533.36
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          2533.36
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          2533.36
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          157000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados",
+          129999.69
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          27000.31
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          5400.06
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          4266.71
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          1133.35
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          1133.35
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          1133.35
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          1133.35
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          1133.35
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          220000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados",
+          177332.92
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          42667.08
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          8533.42
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          5400.06
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          3133.36
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          3133.36
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          3133.36
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          3133.36
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          3133.36
+        ]
+      ]
+    ],
+    "m111": [
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          2
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          11400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          1368.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          2
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          1200.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          180.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          1548.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          1548.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          2
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          11400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          1368.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          2
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          1200.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          180.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          1548.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          1548.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          2
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          11400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          1368.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          2
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          1200.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          180.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          1548.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          1548.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Perceptores, trabajo dinerario",
+          2
+        ],
+        [
+          "02",
+          "Percepciones, trabajo dinerario",
+          11400
+        ],
+        [
+          "03",
+          "Retenciones, trabajo dinerario",
+          1368.0
+        ],
+        [
+          "07",
+          "Perceptores, actividades económicas",
+          2
+        ],
+        [
+          "08",
+          "Percepciones, actividades económicas",
+          1200.0
+        ],
+        [
+          "09",
+          "Retenciones, actividades económicas",
+          180.0
+        ],
+        [
+          "28",
+          "Suma de retenciones",
+          1548.0
+        ],
+        [
+          "30",
+          "Resultado a ingresar",
+          1548.0
+        ]
+      ]
+    ],
+    "m115": [
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          5400.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          1026.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          1026.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          5400.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          1026.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          1026.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          5400.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          1026.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          1026.0
+        ]
+      ],
+      [
+        [
+          "01",
+          "Nº de perceptores",
+          1
+        ],
+        [
+          "02",
+          "Base de las retenciones",
+          5400.0
+        ],
+        [
+          "03",
+          "Retenciones",
+          1026.0
+        ],
+        [
+          "05",
+          "Resultado a ingresar",
+          1026.0
+        ]
+      ]
+    ]
+  }
+}

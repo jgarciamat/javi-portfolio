@@ -1,0 +1,1846 @@
+{
+  "slug": "p2-56-pluriactividad-tienda-online-isp-comunitat-valenciana",
+  "banco": "p2",
+  "nombre": "Persona Ficticia 56",
+  "nif": "00000056X",
+  "domicilio": "Calle Ficticia 56, 03001 Alacant (dirección inventada)",
+  "iban": "ES00 0000 0000 0000 0000 0000",
+  "ejercicio": 2026,
+  "comunidad": "comunitat-valenciana",
+  "titulo": "Asalariado con una tienda online: pluriactividad y servicios de fuera",
+  "descripcion": "Trabaja por cuenta ajena y además vende por internet a particulares de España (estimación directa simplificada). Paga publicidad a una empresa irlandesa (adquisición intracomunitaria de servicios: 10-11 y 36-37) y una plataforma de comercio de EE. UU. (inversión del sujeto pasivo: 12-13 y 28-29). Cotiza en pluriactividad.",
+  "prueba": [
+    "pluriactividad (RETA + Régimen General)",
+    "servicios de un proveedor UE (10-11, 36-37) y 349 clave I",
+    "servicios de fuera de la UE (12-13 y 28-29)",
+    "130 sin retenciones"
+  ],
+  "modelos": [
+    "130",
+    "303",
+    "349",
+    "390",
+    "RETA",
+    "100"
+  ],
+  "alcance": "parcial",
+  "datosFicticios": true,
+  "autonomoPropuesto": {
+    "ejercicio": 2026,
+    "regimenIva": "general",
+    "estimacion": "simplificada",
+    "movimientos": [
+      {
+        "date": "2026-01-15",
+        "type": "INCOME",
+        "amountCents": 242000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-15",
+        "type": "INCOME",
+        "amountCents": 242000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-15",
+        "type": "INCOME",
+        "amountCents": 242000,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-01-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-02-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-03-05",
+        "type": "EXPENSE",
+        "amountCents": 290400,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-15",
+        "type": "INCOME",
+        "amountCents": 282333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-15",
+        "type": "INCOME",
+        "amountCents": 282333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-15",
+        "type": "INCOME",
+        "amountCents": 282334,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-04-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-05-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-06-05",
+        "type": "EXPENSE",
+        "amountCents": 338800,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-15",
+        "type": "INCOME",
+        "amountCents": 262167,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-15",
+        "type": "INCOME",
+        "amountCents": 262167,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-15",
+        "type": "INCOME",
+        "amountCents": 262166,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-07-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-08-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-09-05",
+        "type": "EXPENSE",
+        "amountCents": 314600,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-15",
+        "type": "INCOME",
+        "amountCents": 403333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-15",
+        "type": "INCOME",
+        "amountCents": 403333,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-15",
+        "type": "INCOME",
+        "amountCents": 403334,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 30000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 8000,
+        "vatRate": 0
+      },
+      {
+        "date": "2026-10-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-11-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-10",
+        "type": "EXPENSE",
+        "amountCents": 30250,
+        "vatRate": 21
+      },
+      {
+        "date": "2026-12-05",
+        "type": "EXPENSE",
+        "amountCents": 484000,
+        "vatRate": 21
+      }
+    ],
+    "inputs": {
+      "quarters": [],
+      "hardToJustify": true,
+      "priorYearNet": null,
+      "exempt130": false,
+      "vatToOffset": 0
+    }
+  },
+  "documentos": {
+    "emitidas": [
+      {
+        "date": "2026-01-15",
+        "number": "2026-001",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-02-15",
+        "number": "2026-002",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-03-15",
+        "number": "2026-003",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2000.0,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-04-15",
+        "number": "2026-004",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-05-15",
+        "number": "2026-005",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-06-15",
+        "number": "2026-006",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2333.34,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-07-15",
+        "number": "2026-007",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2166.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-08-15",
+        "number": "2026-008",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2166.67,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-09-15",
+        "number": "2026-009",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 2166.66,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-10-15",
+        "number": "2026-010",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 3333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-11-15",
+        "number": "2026-011",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 3333.33,
+        "rate": 21,
+        "withheldRate": 0
+      },
+      {
+        "date": "2026-12-15",
+        "number": "2026-012",
+        "client": "Ventas online a particulares (resumen mensual)",
+        "nif": "",
+        "base": 3333.34,
+        "rate": 21,
+        "withheldRate": 0
+      }
+    ],
+    "recibidas": [
+      {
+        "date": "2026-01-10",
+        "number": "F-01-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-01-10",
+        "number": "F-01-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-02-10",
+        "number": "F-02-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-10",
+        "number": "F-03-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-03-05",
+        "number": "F-03-MAT",
+        "supplier": "Proveedor Ficticio de Género, S.L.",
+        "nif": "B00000562",
+        "base": 2400,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-04-10",
+        "number": "F-04-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-05-10",
+        "number": "F-05-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-10",
+        "number": "F-06-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-06-05",
+        "number": "F-06-MAT",
+        "supplier": "Proveedor Ficticio de Género, S.L.",
+        "nif": "B00000562",
+        "base": 2800,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-07-10",
+        "number": "F-07-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-08-10",
+        "number": "F-08-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-10",
+        "number": "F-09-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-09-05",
+        "number": "F-09-MAT",
+        "supplier": "Proveedor Ficticio de Género, S.L.",
+        "nif": "B00000562",
+        "base": 2600,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-ADV",
+        "supplier": "Publicidad Ficticia Ltd (Irlanda)",
+        "nif": "IE0000000CD",
+        "base": 300,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "advertising",
+        "isp": "eu"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-SOF",
+        "supplier": "Fictitious Commerce Platform Inc. (EE. UU.)",
+        "nif": "",
+        "base": 80,
+        "rate": 0,
+        "retention": 0.0,
+        "kind": "software",
+        "isp": "noneu"
+      },
+      {
+        "date": "2026-10-10",
+        "number": "F-10-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-11-10",
+        "number": "F-11-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-10",
+        "number": "F-12-OTH",
+        "supplier": "Mensajería Ficticia, S.L.",
+        "nif": "B00000561",
+        "base": 250,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "other"
+      },
+      {
+        "date": "2026-12-05",
+        "number": "F-12-MAT",
+        "supplier": "Proveedor Ficticio de Género, S.L.",
+        "nif": "B00000562",
+        "base": 4000,
+        "rate": 21,
+        "retention": 0.0,
+        "kind": "material"
+      }
+    ],
+    "banco": [
+      {
+        "date": "2026-01-25",
+        "concept": "Cobro 2026-001 Ventas online a particulares (resumen mensual)",
+        "amount": 2420.0
+      },
+      {
+        "date": "2026-02-25",
+        "concept": "Cobro 2026-002 Ventas online a particulares (resumen mensual)",
+        "amount": 2420.0
+      },
+      {
+        "date": "2026-03-25",
+        "concept": "Cobro 2026-003 Ventas online a particulares (resumen mensual)",
+        "amount": 2420.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-01-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-02-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-03-20",
+        "concept": "Pago Proveedor Ficticio de Género, S.L.",
+        "amount": -2904.0
+      },
+      {
+        "date": "2026-01-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-02-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-03-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-04-25",
+        "concept": "Cobro 2026-004 Ventas online a particulares (resumen mensual)",
+        "amount": 2823.33
+      },
+      {
+        "date": "2026-05-25",
+        "concept": "Cobro 2026-005 Ventas online a particulares (resumen mensual)",
+        "amount": 2823.33
+      },
+      {
+        "date": "2026-06-25",
+        "concept": "Cobro 2026-006 Ventas online a particulares (resumen mensual)",
+        "amount": 2823.34
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-04-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-05-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-06-20",
+        "concept": "Pago Proveedor Ficticio de Género, S.L.",
+        "amount": -3388.0
+      },
+      {
+        "date": "2026-04-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-05-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-06-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-07-25",
+        "concept": "Cobro 2026-007 Ventas online a particulares (resumen mensual)",
+        "amount": 2621.67
+      },
+      {
+        "date": "2026-08-25",
+        "concept": "Cobro 2026-008 Ventas online a particulares (resumen mensual)",
+        "amount": 2621.67
+      },
+      {
+        "date": "2026-09-25",
+        "concept": "Cobro 2026-009 Ventas online a particulares (resumen mensual)",
+        "amount": 2621.66
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-07-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-08-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-09-20",
+        "concept": "Pago Proveedor Ficticio de Género, S.L.",
+        "amount": -3146.0
+      },
+      {
+        "date": "2026-07-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-08-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-09-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-10-25",
+        "concept": "Cobro 2026-010 Ventas online a particulares (resumen mensual)",
+        "amount": 4033.33
+      },
+      {
+        "date": "2026-11-25",
+        "concept": "Cobro 2026-011 Ventas online a particulares (resumen mensual)",
+        "amount": 4033.33
+      },
+      {
+        "date": "2026-12-25",
+        "concept": "Cobro 2026-012 Ventas online a particulares (resumen mensual)",
+        "amount": 4033.34
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Publicidad Ficticia Ltd (Irlanda)",
+        "amount": -300.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Fictitious Commerce Platform Inc. (EE. UU.)",
+        "amount": -80.0
+      },
+      {
+        "date": "2026-10-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-11-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Mensajería Ficticia, S.L.",
+        "amount": -302.5
+      },
+      {
+        "date": "2026-12-20",
+        "concept": "Pago Proveedor Ficticio de Género, S.L.",
+        "amount": -4840.0
+      },
+      {
+        "date": "2026-10-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-11-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      },
+      {
+        "date": "2026-12-28",
+        "concept": "Cuota de autónomos (RETA)",
+        "amount": -226.47
+      }
+    ],
+    "m303": [
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          6000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1260.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          900.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          189.0
+        ],
+        [
+          "12",
+          "Otras operaciones con inversión del sujeto pasivo: base",
+          240.0
+        ],
+        [
+          "13",
+          "Otras operaciones con inversión del sujeto pasivo: cuota",
+          50.4
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1499.4
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          3390.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          711.9
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          900.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          189.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          900.9
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          598.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          598.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          598.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          598.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          598.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          7000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1470.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          900.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          189.0
+        ],
+        [
+          "12",
+          "Otras operaciones con inversión del sujeto pasivo: base",
+          240.0
+        ],
+        [
+          "13",
+          "Otras operaciones con inversión del sujeto pasivo: cuota",
+          50.4
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1709.4
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          3790.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          795.9
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          900.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          189.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          984.9
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          724.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          724.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          724.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          724.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          724.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          6500.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          1365.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          900.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          189.0
+        ],
+        [
+          "12",
+          "Otras operaciones con inversión del sujeto pasivo: base",
+          240.0
+        ],
+        [
+          "13",
+          "Otras operaciones con inversión del sujeto pasivo: cuota",
+          50.4
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          1604.4
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          3590.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          753.9
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          900.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          189.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          942.9
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          661.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          661.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          661.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          661.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          661.5
+        ]
+      ],
+      [
+        [
+          "07",
+          "Régimen general 21 %: base imponible",
+          10000.0
+        ],
+        [
+          "09",
+          "Régimen general 21 %: cuota",
+          2100.0
+        ],
+        [
+          "10",
+          "Adquisiciones intracomunitarias de bienes y servicios: base",
+          900.0
+        ],
+        [
+          "11",
+          "Adquisiciones intracomunitarias de bienes y servicios: cuota",
+          189.0
+        ],
+        [
+          "12",
+          "Otras operaciones con inversión del sujeto pasivo: base",
+          240.0
+        ],
+        [
+          "13",
+          "Otras operaciones con inversión del sujeto pasivo: cuota",
+          50.4
+        ],
+        [
+          "27",
+          "Total cuota devengada",
+          2339.4
+        ],
+        [
+          "28",
+          "Cuotas soportadas en operaciones interiores corrientes: base (sin prorratear)",
+          4990.0
+        ],
+        [
+          "29",
+          "Cuotas soportadas en operaciones interiores corrientes: cuota deducible",
+          1047.9
+        ],
+        [
+          "36",
+          "Adquisiciones intracomunitarias de bienes y servicios corrientes: base",
+          900.0
+        ],
+        [
+          "37",
+          "Adquisiciones intracomunitarias corrientes: cuota deducible",
+          189.0
+        ],
+        [
+          "45",
+          "Total a deducir",
+          1236.9
+        ],
+        [
+          "46",
+          "Resultado régimen general (27 − 45)",
+          1102.5
+        ],
+        [
+          "64",
+          "Suma de resultados",
+          1102.5
+        ],
+        [
+          "66",
+          "Atribuible a la Administración del Estado (100 %)",
+          1102.5
+        ],
+        [
+          "69",
+          "Resultado de la autoliquidación",
+          1102.5
+        ],
+        [
+          "71",
+          "Resultado de la liquidación",
+          1102.5
+        ]
+      ]
+    ],
+    "m130": [
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          6000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          5020.94
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          979.06
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          195.81
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          0.0
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          195.81
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          195.81
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          195.81
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          195.81
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          195.81
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          13000.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          10471.88
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          2528.12
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          505.62
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          195.81
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          309.81
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          309.81
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          309.81
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          309.81
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          309.81
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          19500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          15707.82
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          3792.18
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          758.44
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          505.62
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          252.82
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          252.82
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          252.82
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          252.82
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          252.82
+        ]
+      ],
+      [
+        [
+          "01",
+          "Ingresos computables acumulados",
+          29500.0
+        ],
+        [
+          "02",
+          "Gastos fiscalmente deducibles acumulados (con el 5 % de difícil justificación)",
+          22448.76
+        ],
+        [
+          "03",
+          "Rendimiento neto (01 − 02)",
+          7051.24
+        ],
+        [
+          "04",
+          "20 % de la casilla 03",
+          1410.25
+        ],
+        [
+          "05",
+          "Pagos fraccionados de trimestres anteriores",
+          758.44
+        ],
+        [
+          "06",
+          "Retenciones soportadas acumuladas",
+          0.0
+        ],
+        [
+          "07",
+          "Pago fraccionado previo (04 − 05 − 06)",
+          651.81
+        ],
+        [
+          "12",
+          "Suma (07 + 11), mínimo 0",
+          651.81
+        ],
+        [
+          "13",
+          "Minoración (art. 110.3.c RIRPF)",
+          0.0
+        ],
+        [
+          "14",
+          "Diferencia (12 − 13)",
+          651.81
+        ],
+        [
+          "15",
+          "Resultados negativos de trimestres anteriores",
+          0.0
+        ],
+        [
+          "17",
+          "Total (14 − 15 − 16)",
+          651.81
+        ],
+        [
+          "19",
+          "Resultado de la autoliquidación",
+          651.81
+        ]
+      ]
+    ],
+    "m111": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "m115": [
+      [],
+      [],
+      [],
+      []
+    ]
+  }
+}

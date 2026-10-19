@@ -1,0 +1,100 @@
+{
+  "slug": "p2-55-ganadero-leche-modulos-reagp-galicia",
+  "ejercicio": 2026,
+  "comprobado": "2026-10-19",
+  "cifras": [
+    {
+      "modelo": "100 (módulos agrarios)",
+      "casilla": null,
+      "concepto": "Resultado del modelo",
+      "importe": null,
+      "origen": "pendiente",
+      "motivo": "El motor no calcula los rendimientos agrarios en módulos ni el REAGP. Calculado a mano solo lo que fija la ley: compensación del 10,5 % y retención del 2 %; el rendimiento neto depende del índice de la Orden de módulos (NO CONFIRMADO aquí).",
+      "campo": null
+    },
+    {
+      "modelo": "REAGP",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Compensación a tanto alzado (10,5 %)",
+      "importe": 1890.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#lo-que-fija-la-ley",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "1T",
+      "casilla": null,
+      "concepto": "Retención del 2 % de la cooperativa",
+      "importe": 397.8,
+      "origen": "pendiente",
+      "valorProbable": 397.8,
+      "motivo": "Base de la retención (con o sin la compensación del REAGP) NO CONFIRMADA en fuente oficial en esta revisión.",
+      "campo": null
+    },
+    {
+      "modelo": "REAGP",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Compensación a tanto alzado (10,5 %)",
+      "importe": 1837.5,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#lo-que-fija-la-ley",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "2T",
+      "casilla": null,
+      "concepto": "Retención del 2 % de la cooperativa",
+      "importe": 386.75,
+      "origen": "pendiente",
+      "valorProbable": 386.75,
+      "motivo": "Base de la retención (con o sin la compensación del REAGP) NO CONFIRMADA en fuente oficial en esta revisión.",
+      "campo": null
+    },
+    {
+      "modelo": "REAGP",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Compensación a tanto alzado (10,5 %)",
+      "importe": 1764.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#lo-que-fija-la-ley",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "3T",
+      "casilla": null,
+      "concepto": "Retención del 2 % de la cooperativa",
+      "importe": 371.28,
+      "origen": "pendiente",
+      "valorProbable": 371.28,
+      "motivo": "Base de la retención (con o sin la compensación del REAGP) NO CONFIRMADA en fuente oficial en esta revisión.",
+      "campo": null
+    },
+    {
+      "modelo": "REAGP",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Compensación a tanto alzado (10,5 %)",
+      "importe": 1911.0,
+      "origen": "calculo-a-mano",
+      "ref": "calculo.md#lo-que-fija-la-ley",
+      "campo": null
+    },
+    {
+      "modelo": "100",
+      "periodo": "4T",
+      "casilla": null,
+      "concepto": "Retención del 2 % de la cooperativa",
+      "importe": 402.22,
+      "origen": "pendiente",
+      "valorProbable": 402.22,
+      "motivo": "Base de la retención (con o sin la compensación del REAGP) NO CONFIRMADA en fuente oficial en esta revisión.",
+      "campo": null
+    }
+  ]
+}
