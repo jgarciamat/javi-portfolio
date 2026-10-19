@@ -76,6 +76,68 @@ function ChildAids({ shown, money }: { shown: Snapshot; money: (n: number) => st
   );
 }
 
+/** One line of the result, only when it has something. */
+function Line({ show, label, value }: { show: boolean; label: string; value: string }) {
+  if (!show) return null;
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </>
+  );
+}
+
+/** The lines of the calculation, from the net income to the withholdings. */
+function ResultLines({ result, money }: { result: RentaResult; money: (n: number) => string }) {
+  const { t } = useI18n();
+  const line = (key: string) => t(`tools.renta.line.${key}`);
+  return (
+    <dl className="renta-lines">
+      <Line show label={line('netIncome')} value={money(result.netIncome)} />
+      <Line show={result.rentalNet !== 0} label={line('rental')} value={money(result.rentalNet)} />
+      <Line
+        show={result.activities !== null}
+        label={line('activities')}
+        value={money(result.activities?.total ?? 0)}
+      />
+      <Line
+        show={result.imputedIncome > 0}
+        label={line('imputed')}
+        value={money(result.imputedIncome)}
+      />
+      <Line
+        show
+        label={line('reductions')}
+        value={minus(
+          result.workReduction + result.pensionReduction + result.otherReductions,
+          money
+        )}
+      />
+      <Line show label={line('base')} value={money(result.taxBase)} />
+      <Line
+        show={result.savingsBase > 0}
+        label={line('savingsBase')}
+        value={money(result.savingsBase)}
+      />
+      <Line show label={line('minimum')} value={money(result.minimum.total)} />
+      <Line show label={line('stateQuota')} value={money(result.stateQuota)} />
+      <Line show label={line('regionalQuota')} value={money(result.regionalQuota)} />
+      <Line
+        show
+        label={line('deductions')}
+        value={minus(result.stateDeductions + result.regionalDeductions + result.refundable, money)}
+      />
+      <Line show label={line('netQuota')} value={money(result.netQuota)} />
+      <Line show label={line('withheld')} value={minus(result.withheld, money)} />
+      <Line
+        show={result.advanceReceived > 0}
+        label={line('advanceReceived')}
+        value={`+${money(result.advanceReceived)}`}
+      />
+    </dl>
+  );
+}
+
 /** The estimated result: how much to pay or get back, line by line, and what the family minimum saves. */
 export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: number) => string }) {
   const { t } = useI18n();
@@ -92,54 +154,7 @@ export function ResultCard({ shown, money }: { shown: Snapshot; money: (n: numbe
           {t('tools.renta.blockedSummary', { count: result.blocked.length })}
         </p>
       )}
-      <dl className="renta-lines">
-        <dt>{t('tools.renta.line.netIncome')}</dt>
-        <dd>{money(result.netIncome)}</dd>
-        {result.rentalNet !== 0 && (
-          <>
-            <dt>{t('tools.renta.line.rental')}</dt>
-            <dd>{money(result.rentalNet)}</dd>
-          </>
-        )}
-        {result.imputedIncome > 0 && (
-          <>
-            <dt>{t('tools.renta.line.imputed')}</dt>
-            <dd>{money(result.imputedIncome)}</dd>
-          </>
-        )}
-        <dt>{t('tools.renta.line.reductions')}</dt>
-        <dd>
-          {minus(result.workReduction + result.pensionReduction + result.otherReductions, money)}
-        </dd>
-        <dt>{t('tools.renta.line.base')}</dt>
-        <dd>{money(result.taxBase)}</dd>
-        {result.savingsBase > 0 && (
-          <>
-            <dt>{t('tools.renta.line.savingsBase')}</dt>
-            <dd>{money(result.savingsBase)}</dd>
-          </>
-        )}
-        <dt>{t('tools.renta.line.minimum')}</dt>
-        <dd>{money(result.minimum.total)}</dd>
-        <dt>{t('tools.renta.line.stateQuota')}</dt>
-        <dd>{money(result.stateQuota)}</dd>
-        <dt>{t('tools.renta.line.regionalQuota')}</dt>
-        <dd>{money(result.regionalQuota)}</dd>
-        <dt>{t('tools.renta.line.deductions')}</dt>
-        <dd>
-          {minus(result.stateDeductions + result.regionalDeductions + result.refundable, money)}
-        </dd>
-        <dt>{t('tools.renta.line.netQuota')}</dt>
-        <dd>{money(result.netQuota)}</dd>
-        <dt>{t('tools.renta.line.withheld')}</dt>
-        <dd>{minus(result.withheld, money)}</dd>
-        {result.advanceReceived > 0 && (
-          <>
-            <dt>{t('tools.renta.line.advanceReceived')}</dt>
-            <dd>+{money(result.advanceReceived)}</dd>
-          </>
-        )}
-      </dl>
+      <ResultLines result={result} money={money} />
       <ChildAids shown={shown} money={money} />
       {shown.joint && <JointTable joint={shown.joint} money={money} />}
       {result.lines.length > 0 && (

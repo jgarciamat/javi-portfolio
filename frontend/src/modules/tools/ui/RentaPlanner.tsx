@@ -45,6 +45,7 @@ import { DraftStep } from './renta/DraftStep';
 import { FamilyStep } from './renta/FamilyStep';
 import { GuidedInterview } from './renta/GuidedInterview';
 import { IncomeStep } from './renta/IncomeStep';
+import { ActivitiesList } from './renta/ActivitiesList';
 import { Optimizer } from './renta/Optimizer';
 import { PropertyStep } from './renta/PropertyStep';
 import { ResultCard, type Snapshot } from './renta/ResultStep';
@@ -502,6 +503,7 @@ export function RentaPlanner({
           onReview={() => setReviewStart((n) => n + 1)}
         />
       )}
+      <ActivitiesList form={form} set={set} result={live.result.activities} />
       <DeductionReview
         // A new community is a new list: the review starts again.
         key={ccaa?.id ?? ''}

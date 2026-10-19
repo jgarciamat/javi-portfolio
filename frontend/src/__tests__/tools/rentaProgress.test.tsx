@@ -118,6 +118,39 @@ describe('saving the planner on the device', () => {
     expect(reviveForm({ partner: 'none' }).partner).toEqual(emptyForm('').partner);
   });
 
+  it('keeps the fields asked later when they have their shape', () => {
+    const activity = {
+      kind: 'given',
+      name: 'A',
+      withheld: 0,
+      payments: 0,
+      data: { area: 'direct', net: 1 },
+    };
+    const detail = {
+      capital: {},
+      pending: {},
+      assets: [],
+      properties: [],
+      otherGains: [],
+      generalGains: [],
+    };
+    const good = reviveForm({
+      childSupport: '100',
+      secondPayers: 2,
+      assistance: true,
+      savingsDetail: detail,
+      activities: [activity, { kind: 'other', data: {} }, 'x'],
+    });
+    expect(good).toMatchObject({ childSupport: '100', assistance: true, activities: [activity] });
+    expect(good.secondPayers).toBeUndefined();
+    expect(good.savingsDetail).toEqual(detail);
+    const bad = reviveForm({ savingsDetail: { capital: {} }, activities: 'x', assistance: 'yes' });
+    expect(bad.savingsDetail).toBeUndefined();
+    expect(bad.activities).toBeUndefined();
+    expect(bad.assistance).toBeUndefined();
+    expect(reviveForm(null).childSupport).toBeUndefined();
+  });
+
   it('drops a draft that does not have the shape of this version', () => {
     const base = { version: PROGRESS_VERSION, year: 2025, form: {} };
     raw({ ...base, draft: { reading: { boxes: {} } } });

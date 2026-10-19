@@ -2,6 +2,8 @@ import { storage } from '@shared/utils/storage';
 import { NO_DRAFT, type DraftReading, type DraftState } from '../domain/rentaDraft';
 import { emptyForm, emptyPartner, type RentaForm, type UnrentedForm } from '../domain/rentaForm';
 import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
+import type { ActivityInput } from '../domain/rentaActivity';
+import type { SavingsDetail } from '../domain/rentaGains';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -62,6 +64,34 @@ export function reviveForm(saved: unknown): RentaForm {
   form.children = form.children.filter(isObject);
   form.ascendants = form.ascendants.filter(isObject);
   form.unrented = (form.unrented as unknown[]).filter(isObject).map(unrentedRow);
+  return withOptional(form, isObject(saved) ? saved : {});
+}
+
+const OPTIONAL_TEXT = [
+  'childSupport',
+  'pensionCapital2006',
+  'secondPayers',
+  'rentalPendingExcess',
+] as const;
+
+const isDetail = (d: unknown): d is SavingsDetail =>
+  isObject(d) &&
+  isObject(d.capital) &&
+  isObject(d.pending) &&
+  ['assets', 'properties', 'otherGains', 'generalGains'].every((k) => Array.isArray(d[k]));
+
+const isActivity = (a: unknown): a is ActivityInput =>
+  isObject(a) &&
+  ['direct', 'modules', 'agrarian', 'given'].includes(a.kind as string) &&
+  isObject(a.data);
+
+/** The fields the planner asked later (not in every saved form): kept when they have their shape. */
+function withOptional(form: RentaForm, saved: Record<string, unknown>): RentaForm {
+  for (const key of OPTIONAL_TEXT)
+    if (typeof saved[key] === 'string') form[key] = saved[key] as string;
+  if (saved.assistance === true) form.assistance = true;
+  if (isDetail(saved.savingsDetail)) form.savingsDetail = saved.savingsDetail;
+  if (Array.isArray(saved.activities)) form.activities = saved.activities.filter(isActivity);
   return form;
 }
 

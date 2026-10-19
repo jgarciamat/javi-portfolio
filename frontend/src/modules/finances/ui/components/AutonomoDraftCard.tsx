@@ -27,6 +27,7 @@ import { AnnualPanel } from './AutonomoAnnual';
 import { VatYearPanel } from './AutonomoVatYear';
 import { vatExtrasOf } from './vatForm';
 import { annualOf, buildInputs } from './autonomoInputs';
+import { PrepareRenta } from '@modules/tools/ui/renta/PrepareRenta';
 import { ActivityPanel, ActivitySummaryPanel } from './AutonomoActivity';
 import { toSaved, useAutonomoCloud } from './autonomoSync';
 import { KIND_PREFERENCES_KEY } from './importForm';
@@ -272,7 +273,14 @@ function PrepareGate({
  * Self-employed: the draft of the quarterly VAT and income tax forms, and the contribution.
  * `onHowToFile` opens the step-by-step guide to file a form on the Agencia Tributaria website.
  */
-export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string) => void }) {
+export function AutonomoDraftCard({
+  onHowToFile,
+  onOpenRenta,
+}: {
+  onHowToFile?: (slug: string) => void;
+  /** Opens the Renta, once «Preparar mi declaración de la renta» has taken the year there. */
+  onOpenRenta?: () => void;
+}) {
   const { businessApi } = useApi();
   const { t } = useI18n();
   const plan = useOptionalPlan();
@@ -421,6 +429,7 @@ export function AutonomoDraftCard({ onHowToFile }: { onHowToFile?: (slug: string
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
         <AnnualPanel form={manual} year={year} />
         {hasManual && <ActivitySummaryPanel annual={annualOf(manual, extras, year)} />}
+        {hasManual && <PrepareRenta annual={annualOf(manual, extras, year)} onOpen={onOpenRenta} />}
         {onHowToFile && <HowToFile slugs={['modelo-303', 'modelo-130']} onOpen={onHowToFile} />}
       </StepSection>
     </div>

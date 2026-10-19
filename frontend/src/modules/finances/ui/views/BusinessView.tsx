@@ -17,6 +17,7 @@ export function BusinessView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) =>
             onOpenTab('hacienda');
           })
         }
+        onOpenRenta={onOpenTab && (() => onOpenTab('renta'))}
       />
     </div>
   );

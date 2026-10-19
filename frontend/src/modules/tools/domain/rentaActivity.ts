@@ -517,6 +517,14 @@ export type ActivityInput = (
     }
   | { kind: 'modules'; name: string; data: ModulesActivity; withheld: number; payments: number }
   | { kind: 'agrarian'; name: string; data: FarmActivity; withheld: number; payments: number }
+  | {
+      /** A net income already worked out elsewhere (the self-employed screen), by its kind. */
+      kind: 'given';
+      name: string;
+      data: { area: 'direct' | 'modules' | 'agrarian'; net: number };
+      withheld: number;
+      payments: number;
+    }
 ) & {
   /**
    * The share (0-1) of the net income that is the taxpayer's: 0.5 in a farm of shared ownership
@@ -542,7 +550,11 @@ export interface ActivitiesResult {
   /** Boxes 0599 and 0604. */
   withheld: number;
   payments: number;
-  each: { name: string; net: number; detail: DirectResult | ModulesResult | FarmResult }[];
+  each: {
+    name: string;
+    net: number;
+    detail: DirectResult | ModulesResult | FarmResult | { net: number };
+  }[];
 }
 
 /**
@@ -608,6 +620,10 @@ function netsOf(
       totals.direct += net;
       if (a.newActivity && net > 0) totals.start += net;
       each.push({ name: a.name, net, detail: r });
+    } else if (a.kind === 'given') {
+      const net = shareOf(a, round2(finite(a.data.net)));
+      totals[a.data.area] += net;
+      each.push({ name: a.name, net, detail: { net } });
     } else {
       const r = a.kind === 'modules' ? modulesNet(a.data, table) : farmNet(a.data, indices);
       const net = shareOf(a, r.net);
