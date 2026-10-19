@@ -33,7 +33,7 @@ Todos los importes van en euros con dos decimales.
 |---|---|---|
 | `version` | `1`. Sube si cambia el significado de un campo. | — |
 | `year` | Ejercicio. | — |
-| `regime` | Uno de estos valores: `directSimplified`, `directNormal`, `agrarianSimplified`, `agrarianNormal`, `objective` (módulos no agrarios, no calculados) u `objectiveAgrarian`. | — |
+| `regime` | Uno de estos valores: `directSimplified`, `directNormal`, `agrarianSimplified`, `agrarianNormal`, `objective` (módulos no agrarios) u `objectiveAgrarian`. | — |
 | `modality` | `'S'`, `'N'` o `null` en módulos. | 0168 |
 | `income.sales` | Ventas y servicios, con IVA o sin él (todas las bases). | 0171 |
 | `income.currentSubsidies` | Subvenciones corrientes y la parte del año de la ayuda a jóvenes agricultores. | 0173 |
@@ -52,7 +52,8 @@ Todos los importes van en euros con dos decimales.
 | `expenses.total` | Total de gastos deducibles. | 0220 o 0223 |
 | `subsidies.exempt` | Ayudas de la DA 5.ª LIRPF: **no** se integran en la base. | — |
 | `subsidies.unassigned` | Subvenciones de capital sin bien amortizable: tributan al vender el bien; no se calculan. | — |
-| `net` | Rendimiento neto antes de las reducciones del art. 32 (`null` en módulos no agrarios). | 0224, o 1553 en módulos agrarios |
+| `net` | Rendimiento neto antes de las reducciones del art. 32 (`null` en módulos si no se eligió la actividad). | 0224; 1479 en módulos; 1553 en módulos agrarios |
+| `objective` | Módulos no agrarios: `result` (casillas 1465-1479 del motor de la Renta) e `input` (lo que se pasa al motor como actividad `modules`). | 1465-1479 |
 | `withholdings` | Retenciones que le practicaron sus clientes (casilla 06 del 130, o 10 en la sección agraria). | **0599** |
 | `payments130.quarters`, `.source` y `.total` | Lo pagado en cada 130, con su origen: `filed` (casilla 19 escrita por el usuario), `estimated` (estimación de la app) o `none`. | **0604** |
 | `boxes` | Mapa casilla → importe, ya listo para el modelo 100 (ver el punto 4). | — |
@@ -101,8 +102,8 @@ Las fórmulas son las del impreso de 2025 (Orden HAC/277/2026, BOE-A-2026-7041):
 |---|---|
 | `noData` | No hay trimestres: no uses el resultado. |
 | `priorTotals` | El 130 se preparó con los totales de un 130 anterior: comprueba que el año entero está en la app. |
-| `objective` | Actividad en módulos que no es agraria: `net` vale `null`. Pide el rendimiento al usuario o deriva al programa de la AEAT. |
-| `payments131` | En módulos los pagos del año son los del 131, no los del 130: la 0604 sale de los 131 presentados. |
+| `objective` | Actividad en módulos sin actividad elegida (o desconocida en la orden del año): `net` vale `null`. |
+| `payments131` | En módulos los pagos del año son los del 131: `payments130` lleva la casilla 15 de cada 131 presentado o, si no se escribió, la estimación de la app (`objectiveModules.ts instalments131`). |
 | `payments130Estimated` | Alguna 0604 es una estimación: pide la casilla 19 de cada 130 presentado. |
 | `investmentNoAsset` | Hay gastos de inversión sin bienes que amortizar: falta la amortización. |
 | `capitalNoAsset` | Subvención de capital sin bien amortizable: tributa al vender el bien (no calculado). |
@@ -212,7 +213,6 @@ La libertad de amortización en módulos es para bienes de hasta 601,01 €, con
 
 ## 8. Lo que no cubre
 
-- Módulos no agrarios (el 131 y su rendimiento anual son de otro bloque).
 - Varias actividades a la vez.
 - Entidades en atribución.
 - La libertad de amortización con creación de empleo (art. 102 LIS) y la de vehículos eléctricos y puntos de recarga (DA 18.ª LIS, prorrogada a 2026).
@@ -252,4 +252,20 @@ El motor (`frontend/src/modules/tools/domain/rentaActivity.ts`, de otro bloque) 
 
 Con un solo producto el resultado es el mismo. Con varios, el reparto no tiene caso oficial (NO CONFIRMADO en los dos lados).
 
-**`kind: 'modules'` (no agrario):** el contrato no lo calcula (`net = null`, aviso `objective`).
+**`kind: 'modules'` (no agrario):** el contrato da `objective.input` (`ModulesActivity`: unidades medias del año, índices, amortización del año como `extraDepreciation`, gastos extraordinarios y subvenciones) y `rentaFromAutonomo.ts` lo pasa tal cual; el motor da las mismas 1465-1479 que el contrato y aplica el art. 32.2.3.º (1483) y la 1484.
+
+## 10. Módulos no agrarios (19-10-2026)
+
+Pantalla: «Tu actividad en módulos» (Actividad del año, y paso 1 del asistente) → `activityForm.ts ObjectiveForm` → `objectiveModules.ts`. Resultado del trimestre en el dispositivo (`modulesView.ts`): 131 y, en régimen simplificado del IVA, la página 2 del 303 (`vatSimplified.ts`, datos en `vatModules2025.ts`), con vista previa del 131 y ficheros (`aeatFiles/modules.ts`).
+
+Reglas (Órdenes HAC/1347/2024 y HAC/1425/2025, anexo II, iguales cifra a cifra; comprobado el 19-10-2026):
+- Rendimiento: 2.1 unidades, 2.2 incentivos al empleo (0,40 por aumento + tramos) e inversión (amortización de la tabla de módulos), 2.3 índices (especiales a.1-a.4, pequeña dimensión incompatible con a.2-a.5 y con el de exceso, temporada incompatible con inicio), DA 1.ª 5 %, anexo III.2 y III.3 (gastos extraordinarios, subvenciones). Caso oficial: Manual Renta 2025, cap. 8 (bar 673.1), 41.173,16 €.
+- 131: datos a 1 de enero y amortización al máximo de los bienes en uso a esa fecha (instr. 3); 2/3/4 % (instr. 4); trimestre incompleto por días (instr. 5); temporada por días del trimestre sobre los del año anterior (instr. 6); sin datos-base, 2 % de los ingresos; negativos a deducir después; sin rendimiento del año anterior escrito, sin minoración de la casilla 09.
+- 303 simplificado: personal empleado = asalariados + no asalariados; ingreso a cuenta de 1T-3T con su porcentaje; 4T con IVA soportado del año, 1 % de difícil justificación y cuota mínima; activos fijos en la 55; compensación entre trimestres.
+
+Decisiones y límites (seguimiento interno):
+- Una sola actividad. Las accesorias de minoristas en recargo (charcutería, asado de pollos, reparación 653.2, fotografía 659.3, loterías) no se ofrecen.
+- Comisiones de loterías en el IVA: en 1T-3T la unidad del módulo se toma como las comisiones del trimestre (instrucción 7 del IVA); en el 4T, las del año.
+- 644.x tienen dos módulos de personal asalariado: el incentivo al empleo usa el primero (motor de la Renta); el porcentaje del 131 suma los dos. NO CONFIRMADO.
+- DPA del 131: se escriben unidades e importes de cada módulo, incentivos e índices; las horas de personal quedan a cero. Ningún fichero 131 ni 303 simplificado se ha importado aún en la sede.
+- Reducción de módulos autorizada por la AEAT (incendios, IT): solo en el IVA (D, en %); en el IRPF no se pide.
