@@ -16,6 +16,7 @@ import {
   type RentaInput,
   type FullMinimums,
 } from '@modules/tools/domain/rentaCalc';
+import { emptySavingsDetail } from '@modules/tools/domain/rentaGains';
 import type { Deduction, RentaCcaa, RentaState, TaxBracket } from '@modules/tools/domain/rentaData';
 
 const scale: TaxBracket[] = [
@@ -377,6 +378,26 @@ describe('computeRenta', () => {
     expect(r.otherReductions).toBe(2200);
     expect(r.taxBase).toBe(28000 - 2200);
     expect(computeRenta(input({ gross: 3000, compensatoryPension: 9999 })).taxBase).toBe(0);
+  });
+
+  it('works the savings out of the detail and puts the other gains in the general base', () => {
+    const savingsDetail = {
+      ...emptySavingsDetail(),
+      capital: { interest: 1000, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+      otherGains: [-1050],
+      generalGains: [500],
+    };
+    // The net amount typed is not used when there is a detail.
+    const r = computeRenta(input({ savings: 99999, savingsDetail }));
+    expect(r.savingsDetail?.boxes['0446']).toBe(250);
+    expect(r.savingsBase).toBe(750);
+    // 32,000 − 2,000 − 2,000 = 28,000 of work, + 500 of a prize.
+    expect(r.generalBase).toBe(28500);
+    expect(r.generalGains).toMatchObject({ base: 28500, '0433': 0 });
+    const plain = computeRenta(input({ savings: 750 }));
+    expect(plain.savingsDetail).toBeNull();
+    expect(plain.generalGains).toBeNull();
+    expect(plain.savingsBase).toBe(750);
   });
 
   it('takes what is left of the compensatory pension off the savings base (LIRPF art. 50.2)', () => {

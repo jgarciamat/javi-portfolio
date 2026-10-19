@@ -1,4 +1,5 @@
 import type { RentaWorkExtras } from './rentaExtras';
+import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
 import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
 import { round2 } from './round';
 
@@ -342,6 +343,12 @@ export interface RentaInput {
   imputedValues: { standard: number; revised: number };
   /** Interest, dividends and capital gains (net), taxed on the savings base. */
   savings: number;
+  /**
+   * The savings income in detail (see rentaGains.ts): when given, it is worked out from it (FIFO,
+   * integration and compensation) and `savings` is not used; its gains that do not come from a
+   * transmission go to the general base.
+   */
+  savingsDetail?: SavingsDetail;
   family: Family;
   state: RentaState;
   ccaa: RentaCcaa;
@@ -388,6 +395,10 @@ export interface RentaResult {
   pensionReduction: number;
   /** Other reductions of the general base: spouse plan and compensatory pension. */
   otherReductions: number;
+  /** The savings income worked out in detail (null when only the net amount was given). */
+  savingsDetail: SavingsBreakdown | null;
+  /** The general base with the gains that do not come from a transmission (boxes 0431-0434). */
+  generalGains: ReturnType<typeof generalBaseOf> | null;
   /** The part of the compensatory pension that did not fit in the general base: off the savings one. */
   savingsReduction: number;
   /** Reduction for the joint return (0 in an individual one). */
@@ -571,18 +582,25 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
       positive(input.imputedValues.revised) * input.imputationRates.revised) /
       100
   );
-  const savingsTotal = round2(positive(input.savings) + positive(partner?.savings ?? 0));
+  const detail = input.savingsDetail ? savingsOf(input.savingsDetail, state.year) : null;
+  const ownSavings = detail ? detail.boxes['0460'] : positive(input.savings);
+  const savingsTotal = round2(ownSavings + positive(partner?.savings ?? 0));
+  const generalGains = detail?.general.positive ?? 0;
   // The reduction for low pay only applies when the other income does not pass 6,500 euros; in a
   // joint return it is one, on the net pay and the other income of the whole unit (AEAT Manual
   // práctico de Renta 2025, "Fase 3.ª: rendimiento neto reducido", checked 19-10-2026).
-  const otherIncome = Math.max(0, rentNet) + imputed + savingsTotal;
+  const otherIncome = Math.max(0, rentNet) + imputed + savingsTotal + generalGains;
   const reduction = round2(
     otherIncome > OTHER_INCOME_LIMIT
       ? 0
       : Math.min(work.netIncome, positive(input.workReduction(work.reductionBase)))
   );
 
-  const beforeReductions = work.netIncome - reduction + rentNet + imputed;
+  // Box 0432 (work, capital and property income and imputations), and the gains that do not come
+  // from a transmission on top of it (LIRPF art. 48).
+  const income = work.netIncome - reduction + rentNet + imputed;
+  const general = detail ? generalBaseOf(income, detail.general, state.year) : null;
+  const beforeReductions = general ? general.base : income;
   // Joint return (LIRPF art. 84.2.4.º; AEAT Manual 2025, "Reducción por tributación conjunta" and the
   // order of the reductions of the general base, checked 19-10-2026): it goes first, lowers the
   // general base down to zero and what is left lowers the savings base, also down to zero.
@@ -630,6 +648,9 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
+    ownSavings,
+    detail,
+    general,
     savingsReduction: compensatorySavings,
     savingsBase: round2(savingsTotal - jointSavings - compensatorySavings),
   };
@@ -719,6 +740,9 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherReductions,
     taxBase,
     savingsIncome,
+    ownSavings,
+    detail,
+    general,
     savingsReduction,
     savingsBase,
   } = basesOf(input, earners, work);
@@ -763,7 +787,11 @@ export function computeRenta(input: RentaInput): RentaResult {
   const appliedState = Math.min(stateQuota, stateDeductions);
   const appliedRegional = Math.min(regionalQuota, regionalDeductions);
   const quotaLeft = stateQuota - appliedState + (regionalQuota - appliedRegional);
-  const low = lowPayOf(input, Math.max(0, rentNet) + imputed + positive(input.savings), quotaLeft);
+  const low = lowPayOf(
+    input,
+    Math.max(0, rentNet) + imputed + ownSavings + (detail?.general.positive ?? 0),
+    quotaLeft
+  );
   const lowPay = low.amount;
   if (lowPay > 0) {
     lines.push({
@@ -787,6 +815,8 @@ export function computeRenta(input: RentaInput): RentaResult {
     pensionReduction,
     otherReductions,
     savingsReduction,
+    savingsDetail: detail,
+    generalGains: general,
     jointReduction,
     lowPayLeftOut: !low.clear,
     generalBase: round2(Math.max(0, beforeReductions)),
