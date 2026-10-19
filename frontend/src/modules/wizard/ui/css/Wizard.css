@@ -464,8 +464,15 @@ html.wiz-big-text {
 }
 
 /* ── High contrast ───────────────────────────── */
+/* The grey text of every piece inside the assistant (hints, notes) is made as strong as the body. */
 html.wiz-contrast .wiz {
   --text-secondary: var(--slate-200);
+  --slate-400: var(--slate-200);
+  --slate-500: var(--slate-300);
+}
+html.wiz-contrast .wiz .renta-group > summary span,
+html.wiz-contrast .wiz .renta-campaign-past {
+  opacity: 1;
 }
 html.wiz-contrast .wiz-step,
 html.wiz-contrast .wiz-choice,
