@@ -144,9 +144,33 @@ Todos los fallos de la tabla anterior están corregidos en `frontend/src/modules
 | Renta WEB (casilla a la derecha) | Lectura del modelo 100: casillas de 4 cifras, y el lado (derecha o izquierda) se decide por mayoría de líneas. |
 | Etiqueta encima (030, 840) | Un campo sin número en su línea se empareja con el número justo encima (máx. 16 pt). El 030 y el 840 no se importan en la app: solo se ha generalizado el emparejamiento. |
 | 115 antiguo | Título con espacios y saltos normalizados y casillas de 1 dígito («1»…«5»). |
-| Ida y vuelta de las vistas previas | `npm run taxforms:verify`: 130 19/19, 111 30/30, 115 5/5 y 303 **185/185**. (El 100 llegó a leer 838/838; su vista previa se retiró después por decisión del dueño.) |
+| Ida y vuelta de las vistas previas | `npm run taxforms:verify`: 130 19/19, 111 30/30, 115 5/5 y 303 **185/185**; desde el 19-10-2026 también 131 15/15, 390 **376/376**, 190 3/3, 180 3/3, 347 4/4, 309 27/27, 123 14/14 y el 349 con sus 27 operadores y rectificaciones de prueba (§2.2). (El 100 llegó a leer 838/838; su vista previa se retiró después por decisión del dueño.) |
 
 El facsímil del 100 (BOE-A-2026-7041, pág. 32) imprime un «0543» fantasma encima de las casillas 1608, 0592, 0593, 0594 y 0600; `extract-layout.mjs` lo descarta con `GHOSTS` si se vuelve a medir. La entrada 0543 de [renta-casillas.json](renta-casillas.json) arrastra el mismo error: su etiqueta real es el tipo medio de gravamen autonómico (pág. 42 del BOE).
+
+### 2.2 Vistas previas añadidas (19-10-2026)
+
+Misma maquetación que el facsímil, casillas rellenables con pdf-lib y la marca «SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso». Medidas con `frontend/scripts/taxforms/extract-layout.mjs` (fuentes en `SOURCES`) sobre los PDF del BOE descargados fuera del repositorio; en el repositorio solo quedan los JSON medidos, sin logos, escudos, códigos de barras ni nombre, teléfono o web de la AEAT. La marca va ahora pegada al impreso: la página se recorta por arriba (`topOf` en `formPdf.ts`) y las posiciones del impreso no cambian.
+
+| Modelo | Facsímil medido | Fidelidad | Se rellena con | Casillas sin dato de la app |
+|---|---|---|---|---|
+| **131** | BOE-A-2015-1656 (Orden HAP/258/2015), anexo II, pág. 8 | Exacta al facsímil de 2015 | `module131.ts form131` (01-15) | La tabla de actividades (epígrafe, rendimiento y porcentaje de cada una) no tiene casillas numeradas: queda vacía. **La app no tiene pantalla del 131**: `Model131FormPreview` (en `taxforms/ui/FormPreviews.tsx`) está listo para ponerlo bajo el resultado de `form131` cuando exista esa pantalla. |
+| **390** | BOE-A-2026-1761 (Orden HAC/27/2026), anexo IV, págs. 18-26 | Exacta; las 375 casillas de `dr390e2025` más la 112 de 2026 (vacía en 2025) | `draft.m390` (todas las secciones) con el 4.º trimestre | Las que el borrador no calcula (simplificado, sectores diferenciados, grupos, foral) |
+| **349** | BOE-A-2010-5098 (Orden EHA/769/2010), págs. 13 (resumen), 15 (operadores, 15 por hoja) y 17 (rectificaciones, 10 por hoja) | Exacta al facsímil de 2010 (letras sueltas unidas al medir); la hoja se repite las veces necesarias | `draft.m349`: 01-04, país, NIF-IVA sin prefijo, nombre, clave y base; rectificaciones con ejercicio y periodo | — (el facsímil de 2010 no lista las claves R, D y C, pero se escriben igual) |
+| **190** | BOE-A-2009-18567 (Orden EHA/3127/2009), págs. 21 (resumen) y 23 (3 percepciones por hoja) | Exacta al facsímil de 2009 (único con texto; hoy el 190 solo se presenta por internet) | `summary190`: 01-03; NIF, nombre, clave, subclave, percepción íntegra, valoración en especie y retenciones; totales de cada hoja | Representante, provincia, ejercicio de devengo, Ceuta/Melilla y todos los datos adicionales de las claves A-D |
+| **180** | Solo hay escaneo: Orden de 20-11-2000 (BOE-A-2000-21430), anexo V, págs. 28-29 | **Aproximada**: reconstruida sobre la del 190 (`scripts/taxforms/derive-180.mjs`), con el contenido del 180 escaneado; la vista previa lo dice | `summary180`: 01-03; NIF, nombre, base, % y retenciones de cada arrendador (8 por hoja) | Representante, provincia, modalidad y ejercicio de devengo |
+| **347** | BOE-A-2014-9740 (Orden HAP/1732/2014), anexo I, págs. 5 (resumen) y 7 (3 declarados por hoja) | Exacta al facsímil de 2014 | `summary347`: 01-02; NIF, nombre, clave A/B, marca de arrendamiento de local y de inversión del sujeto pasivo, importe anual y los 4 trimestres | 03-04 (inmuebles del declarante), provincia, país, metálico, transmisiones de inmuebles, criterio de caja y la hoja de inmuebles |
+| **309** | BOE-A-2022-21458 (Orden HFP/1245/2022), págs. 3-4 | Exacta; las letras que el BOE dibuja como trazos («N» de NIF, «V» de Vehículos y VALOR) se reponen en `LETTERS` | Solo maquetación y ida y vuelta: la app no calcula el 309 (sin pantalla) | Todas |
+| **123** | BOE-A-2024-1772 (Orden HAC/56/2024), anexo I, pág. 23 | Exacta (ídem «N» de NIF y Nombre) | Ídem: la app no calcula el 123 | Todas |
+| **115** | Sigue derivada del 111 (`derive-115.mjs`): no hay orden posterior a la de 20-11-2000 que publique el 115 con texto (según el análisis del BOE de BOE-A-2000-21430, ninguna de sus modificaciones de 2005, 2014, 2015, 2020, 2021 y 2023 sustituye el anexo del 115: tocan el articulado o el anexo VI, el diseño del 180) | **Aproximada**: ahora la vista previa lo dice | Igual que antes | — |
+
+**No hechas, y por qué:**
+- **322 y 353** (grupos de entidades, BOE-A-2026-1761 anexos I-II): el anexo dibuja como trazos, no como texto, muchas letras (la «c» minúscula, la «O», la «N», la «q»): «dedu ión», «Informa ión adi ional», «úmero». Repararlo exige un diccionario de casi todas sus líneas; además la app no los calcula.
+- **121, 122 y 143** (BOE-A-2017-1334 y BOE-A-2018-10064): los facsímiles sí sirven, pero son impresos de datos personales (NIF, nombres, domicilio, títulos de familia numerosa) sin importes que calcule la app, y sus casillas van dentro de la celda (el detector solo halló 4 de 27 en el 121). Fuera de alcance por ahora; los de la Renta (100) siguen sin vista previa por decisión del dueño.
+
+**Lector (ida y vuelta).** `taxModelDetect.ts` reconoce también 123, 180, 190, 309 y 347 por el número grande de la cabecera (`INFORMATIVE`: se leen, pero no se importan en el borrador; la importación lo dice). `taxModelPdf.ts`: lo tecleado en un campo manda sobre lo impreso a su lado (el 390 imprime «1,75», «0,62», «0,26» junto a las casillas 41, 665 y 691); el año se busca junto a cada «Ejercicio» (los resúmenes lo imprimen dos veces); el 349 une el código de país y el NIF-IVA de celdas distintas y lee las rectificaciones escritas en dos líneas. Pruebas: `src/__tests__/taxforms/{roundTrip,annualForms,formPdf}.test.ts` y `src/__tests__/finances/taxModelDetect.test.ts`.
+
+**Descargas de esta revisión** (fuera del repositorio, cada una en su carpeta): BOE-A-2009-18567, BOE-A-2014-9740, BOE-A-2015-1656, BOE-A-2010-5098, BOE-A-2026-1761, BOE-A-2024-1772, BOE-A-2022-21458, BOE-A-2017-1334, BOE-A-2018-10064, la Orden de 20-11-2000 (`A41078-41132.pdf`) y la Orden EHA/3061/2005 (`A32741-32748.pdf`, sin facsímil).
 
 ## 3. Plan para las vistas previas idénticas
 
@@ -167,7 +191,8 @@ Regla general. Si hay un **AcroForm oficial**, se toman las coordenadas exactas 
 | **030, 840** | /Rect de los AcroForm oficiales (vigentes). | El lector necesita «etiqueta encima». |
 | **036** | BOE-A-2025-410, págs. 7-18, y un PDF de la predeclaración BU36-M036 con datos ficticios. | Generarlo. |
 | **718** | DR718_2025.xlsx más medición a mano del anexo de BOE-A-2026-14011 (trazados sin texto). | OCR o medición. |
-| **720, 721, 196, 180, 184, 200, 217** | No hay impreso con casillas: la vista previa será un resumen propio, no una copia. | — |
+| **720, 721, 196, 184, 200, 217** | No hay impreso con casillas: la vista previa será un resumen propio, no una copia. | — |
+| **180** | Hecha, aproximada (§2.2): el único facsímil es el escaneo de 2000. | Medirla sobre un PDF del formulario de la AEAT (con identificación, §4.2). |
 | **Forales** | Bizkaia 303: BOB, págs. 7-8. Álava 303 y 130: BOTHA. Gipuzkoa 300 y 130: página renderizada del BOG. Navarra: solo diseño de registro. | Bizkaia 130: orden vigente sin localizar. |
 | **RETA** | No hay impreso vigente: resumen propio con los datos de Import@ss. | — |
 
