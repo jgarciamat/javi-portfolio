@@ -92,6 +92,7 @@ interface Persona {
     borrador?: { exercise: number; sections: Section[] } | null;
     pagadores?: Payer[];
     ahorro?: string[];
+    actividad?: string[];
     emitidas?: Invoice[];
     recibidas?: Invoice[];
     banco?: { date: string; concept: string; amount: number }[];
@@ -414,6 +415,14 @@ async function savingsPdf(p: Persona): Promise<Uint8Array> {
   return d.doc.save();
 }
 
+/** The data of the farm or business of the year (sales, grants, withholdings, expenses), as the owner hands them over. */
+async function activityPdf(p: Persona, lines: string[]): Promise<Uint8Array> {
+  const title = 'Datos de la actividad 2025 (libros, liquidaciones y ayudas)';
+  const d = await start(title, `Titular: ${p.nombre} · NIF ${p.nif}`);
+  for (const line of lines) para(d, `- ${line}`, title);
+  return d.doc.save();
+}
+
 async function invoicePdf(p: Persona, inv: Invoice): Promise<Uint8Array> {
   const d = await start(`FACTURA ${inv.number}`, `Fecha de expedición: ${spanishDate(inv.date)}`);
   const put = (text: string, x: number, size = 9, bold = false) =>
@@ -698,17 +707,22 @@ function leeme(p: Persona, shown: string, figures: Figure[], files: string[]): s
   ].join('\n');
 }
 
+/** The number of a persona from its slug (p3-100-… → 100). */
+const numberOf = (slug: string) => Number((/^p\d+-(\d+)-/.exec(slug) as RegExpExecArray)[1]);
+
 async function main() {
-  const names: Record<string, string> = existsSync(join(PRIVATE, 'nombres-p2.json'))
-    ? JSON.parse(readFileSync(join(PRIVATE, 'nombres-p2.json'), 'utf8'))
+  // CASOS_PREFIX=p3 builds the third batch the same way (default: p2).
+  const prefix = process.env.CASOS_PREFIX ?? 'p2';
+  const names: Record<string, string> = existsSync(join(PRIVATE, `nombres-${prefix}.json`))
+    ? JSON.parse(readFileSync(join(PRIVATE, `nombres-${prefix}.json`), 'utf8'))
     : {};
   const slugs = readdirSync(PEOPLE).filter(
-    (s) => s.startsWith('p2-') && existsSync(join(PEOPLE, s, 'persona.json'))
+    (s) => s.startsWith(`${prefix}-`) && existsSync(join(PEOPLE, s, 'persona.json'))
   );
   const problems: string[] = [];
   const index: string[] = [];
   let count = 0;
-  for (const slug of slugs.sort()) {
+  for (const slug of slugs.sort((a, b) => numberOf(a) - numberOf(b))) {
     const dir = join(PEOPLE, slug);
     const p = JSON.parse(readFileSync(join(dir, 'persona.json'), 'utf8')) as Persona;
     const figures = (
@@ -730,6 +744,8 @@ async function main() {
     const job = (doc.pagadores ?? []).find((x) => !x.nif.startsWith('Q') && x.ss > 0);
     if (job) out['nomina-diciembre-2025.pdf'] = await payslipPdf(p, job);
     if (doc.ahorro?.length) out['informacion-fiscal-banco-2025.pdf'] = await savingsPdf(p);
+    if (doc.actividad?.length)
+      out['datos-actividad-agraria-2025.pdf'] = await activityPdf(p, doc.actividad);
     if (doc.pagadores?.length)
       out['extracto-banco-2025.xlsx'] = bankBook(p, payrollMoves(doc.pagadores));
     const issued = doc.emitidas ?? [];
@@ -771,7 +787,7 @@ async function main() {
       }
     }
     out['resumen-casillas.pdf'] = await summaryPdf(p, figures);
-    const n = slug.slice(3, 5);
+    const n = String(numberOf(slug));
     const shown = names[String(Number(n))] ?? p.nombre;
     const copy = join(PRIVATE, `${n} - ${shown}`);
     mkdirSync(copy, { recursive: true });
@@ -787,14 +803,15 @@ async function main() {
     writeFileSync(join(copy, 'INDICE.txt'), text);
     index.push(`${n} - ${shown}   [${files.length} archivos]  — ${p.titulo}`);
   }
-  // The owner's index of every persona: the second batch is appended (or refreshed) at the end.
+  // The owner's index of every persona: each batch has its own block, replaced on every run.
   const all = join(PRIVATE, 'INDICE.txt');
   if (existsSync(all)) {
-    const marker = '\n--- Segunda tanda (p2) ---\n';
-    const before = readFileSync(all, 'utf8').split(marker)[0].replace(/\s+$/, '');
-    writeFileSync(all, `${before}\n${marker}${index.join('\n')}\n`);
+    const marker = prefix === 'p2' ? '--- Segunda tanda (p2) ---' : `--- Tanda ${prefix} ---`;
+    const blocks = readFileSync(all, 'utf8').split(/\n(?=--- )/);
+    const kept = blocks.filter((b) => !b.startsWith(marker)).map((b) => b.replace(/\s+$/, ''));
+    writeFileSync(all, `${[...kept, `${marker}\n${index.join('\n')}`].join('\n\n')}\n`);
   }
-  console.log(`${count} documentos para ${slugs.length} personas p2; copia en ${PRIVATE}`);
+  console.log(`${count} documentos para ${slugs.length} personas ${prefix}; copia en ${PRIVATE}`);
   if (problems.length) {
     console.error(problems.join('\n'));
     process.exitCode = 1;
