@@ -1,5 +1,6 @@
 {
   "model": "115",
+  "approx": true,
   "source": "Maquetación del 111 (https://www.boe.es/boe/dias/2011/03/18/pdfs/BOE-A-2011-4948.pdf (Orden EHA/586/2011, anexo I, pág. 14)) con la liquidación del 115 (DR115e15v13, casillas 01-05)",
   "colors": [
     [0, 68, 122],

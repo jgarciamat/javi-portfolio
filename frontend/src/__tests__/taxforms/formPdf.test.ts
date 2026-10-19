@@ -1,6 +1,12 @@
 import { PDFDocument, type PDFTextField } from 'pdf-lib';
-import { buildFormPdf, type PreviewText } from '@modules/taxforms/application/formPdf';
-import { boxesOf, loadLayout, type FormLayout } from '@modules/taxforms/domain/layout';
+import { buildFormPdf, topOf, type PreviewText } from '@modules/taxforms/application/formPdf';
+import {
+  boxesOf,
+  loadLayout,
+  slotOf,
+  type FormLayout,
+  type FormModel,
+} from '@modules/taxforms/domain/layout';
 import { sampleForm } from '@modules/taxforms/domain/samples';
 import type { FilledForm } from '@modules/taxforms/domain/values';
 
@@ -46,8 +52,44 @@ describe('The layouts measured on the BOE', () => {
     expect(boxesOf(m303)).toEqual(expect.arrayContaining(['01', '27', '46', '71', '112', '73']));
   });
 
+  it('has the numbered boxes of the new forms and their sheets of records', async () => {
+    const numbered = async (model: FormModel) =>
+      boxesOf(await loadLayout(model)).filter((id) => /^\d+$/.test(id));
+    expect(await numbered('131')).toEqual(
+      Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, '0'))
+    );
+    for (const model of ['190', '180'] as const)
+      expect(await numbered(model)).toEqual(['01', '02', '03']);
+    expect(await numbered('347')).toEqual(['01', '02', '03', '04']);
+    expect(await numbered('349')).toEqual(['01', '02', '03', '04']);
+    expect(await numbered('123')).toHaveLength(14);
+    expect(await numbered('309')).toHaveLength(27);
+    // Some boxes of the 390 repeat (the prorrata of each activity, 114-118).
+    const m390 = [...new Set(await numbered('390'))];
+    expect(m390).toHaveLength(376);
+    expect(m390).toEqual(expect.arrayContaining(['05', '06', '41', '87', '112', '665', '691']));
+    // The blocks of a sheet: 3 payees of the 190, 8 landlords of the 180, 15 operators of the 349.
+    const rows = async (model: FormModel) => (await loadLayout(model)).pages.map((p) => p.rows);
+    expect(await rows('190')).toEqual([undefined, 3]);
+    expect(await rows('180')).toEqual([undefined, 8]);
+    expect(await rows('347')).toEqual([undefined, 3]);
+    expect(await rows('349')).toEqual([undefined, 15, 10]);
+    expect(boxesOf(await loadLayout('349')).filter((id) => slotOf(id)?.slot === 15)).toEqual([
+      '15.pais',
+      '15.nif',
+      '15.nombre',
+      '15.clave',
+      '15.base',
+    ]);
+    // The layouts rebuilt from a scan say so.
+    expect((await loadLayout('180')).approx).toBe(true);
+    expect((await loadLayout('115')).approx).toBe(true);
+    expect((await loadLayout('190')).approx).toBeUndefined();
+  });
+
   it('keeps none of the Tax Agency branding', async () => {
-    for (const model of ['130', '111', '115', '303'] as const) {
+    const models = ['130', '111', '115', '303', '131', '390', '349', '190', '180', '347'];
+    for (const model of [...models, '309', '123'] as FormModel[]) {
       const texts = (await loadLayout(model)).pages.flatMap((p) => p.t.map((t) => t[4]));
       expect(
         texts.filter((t) => /^Agencia Tributaria$|agenciatributaria|^MINISTERIO/.test(t))
@@ -66,6 +108,40 @@ describe('The PDF of a preview', () => {
     expect(fields['casilla.01']).toBe('1.234,57');
     expect(fields['casilla.07']).toBe('-8.641,99');
     expect(Object.keys(fields)).toHaveLength(21);
+  });
+
+  it('cuts the page just above the form, so the mark sits on it', async () => {
+    const layout = await loadLayout('130');
+    const doc = await PDFDocument.load(await buildFormPdf(layout, sampleForm('130', layout), TEXT));
+    const { width, height } = doc.getPage(0).getSize();
+    expect(width).toBeCloseTo(595.28);
+    // The top of the 130 (the cells of its header, 707.4) + 8 of gap + 30 of mark + 20 of margin.
+    expect(topOf(layout.pages[0])).toBeCloseTo(707.4, 0);
+    expect(height).toBeCloseTo(topOf(layout.pages[0]) + 58, 0);
+  });
+
+  it('writes the words of the records and says when the layout is approximate', async () => {
+    const layout = await loadLayout('180');
+    const form: FilledForm = {
+      model: '180',
+      year: 2026,
+      period: null,
+      values: { '01': 1, '1.base': 1000, '1.pct': 19 },
+      texts: { '1.nif': '00000003A', '1.nombre': 'LOCAL DE PRUEBA' },
+      pending: [],
+    };
+    const bytes = await buildFormPdf(layout, form, { ...TEXT, approx: 'Aproximada.' });
+    const fields = await fieldsOf(bytes);
+    expect(fields).toMatchObject({
+      ejercicio: '2026',
+      ejercicio_2: '2026',
+      'casilla.01': '1',
+      'casilla.1.nif': '00000003A',
+      'casilla.1.nombre': 'LOCAL DE PRUEBA',
+      'casilla.1.pct': '19,00',
+      'casilla.hoja1.base': '1.000,00',
+      'casilla.2.base': '',
+    });
   });
 
   it('leaves empty the boxes the app does not give', async () => {
@@ -130,5 +206,15 @@ describe('The PDF of a preview', () => {
       'casilla.0150': '',
       'casilla.0151': '',
     });
+  });
+});
+
+describe('Where a page is cut', () => {
+  it('counts the length of a turned text and never goes above the A4', () => {
+    const page = { t: [], r: [], l: [], b: [] };
+    expect(topOf({ ...page, t: [[50, 600, 6, 2, 'Turned', 40]] })).toBe(640);
+    expect(topOf({ ...page, t: [[50, 600, 6, 2, 'Turned', null]] })).toBe(600);
+    expect(topOf({ ...page, l: [[0, 500, 10, 520, 0, 1, 0]] })).toBe(520);
+    expect(topOf({ ...page, r: [[0, 800, 10, 40, 0, -1, 0, 0]] })).toBeCloseTo(783.89);
   });
 });

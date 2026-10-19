@@ -14,10 +14,11 @@ import {
   type FormLayout,
   type LayoutBox,
   type LayoutCell,
+  type LayoutPage,
   type LayoutRule,
   type LayoutText,
 } from '../domain/layout';
-import { formatBox, kindOf, type FilledForm } from '../domain/values';
+import { boxValue, sheetsOf, type FilledForm } from '../domain/values';
 
 /** The words of the preview that are not on the official form, in the language of the person. */
 export interface PreviewText {
@@ -33,6 +34,8 @@ export interface PreviewText {
   page: string;
   /** The title of the document («Modelo 303 · 2026 3T»). */
   title: string;
+  /** Under the mark of a layout rebuilt from a scan: its places are approximate. */
+  approx?: string;
 }
 
 export const A4: [number, number] = [595.28, 841.89];
@@ -121,8 +124,8 @@ function drawRule(page: PDFPage, layout: FormLayout, rule: LayoutRule) {
 }
 
 /** The facsimile of one page: its cells and rules first, then its texts on top. */
-function drawPage(page: PDFPage, layout: FormLayout, n: number, fonts: Fonts) {
-  const { r: cells, l: rules, t: texts } = layout.pages[n];
+function drawPage(page: PDFPage, layout: FormLayout, sheet: LayoutPage, fonts: Fonts) {
+  const { r: cells, l: rules, t: texts } = sheet;
   // Cells and rules in the order the facsimile paints them (a white cell can hide a rule).
   const shapes = [
     ...cells.map((c) => ({ z: c[7], draw: () => drawCell(page, layout, c) })),
@@ -144,28 +147,55 @@ function drawPage(page: PDFPage, layout: FormLayout, n: number, fonts: Fonts) {
   });
 }
 
+/** Room between the top of the form and the mark, and above the mark. */
+const GAP = 8;
+const MARK_HEIGHT = 30;
+const MARGIN = 20;
+
+/**
+ * Where the drawing of a page ends at the top: the facsimile leaves the BOE's own header out, so the
+ * page is cut just above the form and the mark sits right on it (the places of the form stay).
+ */
+export function topOf(sheet: LayoutPage): number {
+  const tops = [
+    ...sheet.t.map(([, y, size, flags, , width]) => (flags & TURNED ? y + (width ?? 0) : y + size)),
+    ...sheet.r.map(([, y, , h]) => y + h),
+    ...sheet.l.map(([, y1, , y2]) => Math.max(y1, y2)),
+  ];
+  return Math.min(A4[1] - MARK_HEIGHT - GAP - MARGIN, Math.max(...tops));
+}
+
 /** The mark of a simulation on top and the legend at the foot, on every page. */
-function drawMarks(page: PDFPage, text: PreviewText, n: number, total: number, fonts: Fonts) {
+function drawMarks(
+  page: PDFPage,
+  text: PreviewText,
+  at: { n: number; total: number; y: number },
+  fonts: Fonts
+) {
+  const { n, total, y } = at;
   page.drawRectangle({
     x: 36,
-    y: 786,
+    y,
     width: 523,
-    height: 30,
+    height: MARK_HEIGHT,
     color: MARK_FILL,
     borderColor: MARK,
     borderWidth: 0.6,
   });
   page.drawText(writable(text.banner, fonts.bold), {
     x: 44,
-    y: 803,
+    y: y + 17,
     size: 8.5,
     font: fonts.bold,
     color: MARK,
   });
-  const notice = writable(text.notice, fonts.regular);
+  const notice = writable(
+    text.approx ? `${text.notice} ${text.approx}` : text.notice,
+    fonts.regular
+  );
   page.drawText(notice, {
     x: 44,
-    y: 792,
+    y: y + 6,
     size: fitted(notice, 6.2, 505, fonts.regular),
     font: fonts.regular,
     color: INK,
@@ -191,13 +221,6 @@ function drawMarks(page: PDFPage, text: PreviewText, n: number, total: number, f
   });
 }
 
-/** What goes in a box: the year, the period or the figure, written as the form expects it. */
-function valueOf(form: FilledForm, id: string): string | null {
-  if (id === 'ejercicio') return String(form.year);
-  if (id === 'periodo') return form.period;
-  return id in form.values ? formatBox(form.values[id], kindOf(form.model, id)) : null;
-}
-
 interface FieldContext {
   acro: PDFForm;
   page: PDFPage;
@@ -207,6 +230,8 @@ interface FieldContext {
 }
 
 const isPeriod = (id: string) => id === 'ejercicio' || id === 'periodo';
+/** Written from the left: the period, and the words of a record (tax id, name, key). */
+const isWords = (form: FilledForm, id: string) => isPeriod(id) || id in (form.texts ?? {});
 
 /**
  * The fillable field of a box, with the app's figure the first time the box appears; an empty box
@@ -216,7 +241,8 @@ function addField({ acro, page, fonts, form, text }: FieldContext, box: LayoutBo
   const [id, x, y, width, height] = box;
   const name = `${isPeriod(id) ? id : `casilla.${id}`}${times ? `_${times + 1}` : ''}`;
   const field = acro.createTextField(name);
-  const value = times === 0 ? valueOf(form, id) : null;
+  // Every sheet says its year and period; any other box repeated has its value once.
+  const value = times === 0 || isPeriod(id) ? boxValue(form, id) : null;
   if (value !== null) field.setText(value);
   else if (times === 0 && form.pending.includes(id)) {
     page.drawText(writable(text.pending, fonts.regular), {
@@ -227,7 +253,7 @@ function addField({ acro, page, fonts, form, text }: FieldContext, box: LayoutBo
       color: MARK,
     });
   }
-  field.setAlignment(isPeriod(id) ? TextAlignment.Left : TextAlignment.Right);
+  field.setAlignment(isWords(form, id) ? TextAlignment.Left : TextAlignment.Right);
   field.addToPage(page, {
     x,
     y,
@@ -261,15 +287,23 @@ export async function buildFormPdf(
   };
   const acro = doc.getForm();
   const seen = new Map<string, number>();
-  layout.pages.forEach((_, n) => {
-    const page = doc.addPage(A4);
-    drawPage(page, layout, n, fonts);
-    drawMarks(page, text, n, layout.pages.length, fonts);
-    for (const box of layout.pages[n].b) {
+  const sheets = sheetsOf(layout, form);
+  sheets.forEach(({ page: sheet, boxes, totals }, n) => {
+    const top = topOf(sheet) + GAP;
+    const page = doc.addPage([A4[0], top + MARK_HEIGHT + MARGIN]);
+    drawPage(page, layout, sheet, fonts);
+    drawMarks(
+      page,
+      { ...text, approx: layout.approx ? text.approx : undefined },
+      { n, total: sheets.length, y: top },
+      fonts
+    );
+    const withTotals = { ...form, values: { ...form.values, ...totals } };
+    for (const box of boxes) {
       // A box printed twice (a table of several properties…) has one field per cell, its value once.
       const times = seen.get(box[0]) ?? 0;
       seen.set(box[0], times + 1);
-      addField({ acro, page, fonts, form, text }, box, times);
+      addField({ acro, page, fonts, form: withTotals, text }, box, times);
     }
   });
   acro.updateFieldAppearances(fonts.regular);

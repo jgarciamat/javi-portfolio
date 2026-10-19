@@ -2,8 +2,15 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithI18n } from '@test-utils/render';
 import { autonomoDraft } from '@test-utils/fixtures';
 import { FormPreview, fileName, previewText } from '@modules/taxforms/ui/FormPreview';
-import { AutonomoFormPreviews, WithholdingFormPreviews } from '@modules/taxforms/ui/FormPreviews';
+import {
+  AnnualFormPreviews,
+  AutonomoFormPreviews,
+  Model131FormPreview,
+  WithholdingFormPreviews,
+} from '@modules/taxforms/ui/FormPreviews';
 import type { FilledForm } from '@modules/taxforms/domain/values';
+import type { Summary347, YearSummary } from '@modules/finances/domain/annualSummaries';
+import type { Result131 } from '@modules/finances/domain/module131';
 import type { WithholdingResult } from '@modules/finances/domain/withholdings';
 
 const draw = jest.fn(async (..._args: unknown[]) => undefined);
@@ -175,5 +182,103 @@ describe('The previews of each screen', () => {
       <WithholdingFormPreviews result={result('none', 'none')} year={2026} />
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('The previews of the yearly summaries and of the modules', () => {
+  const summary = (records: number) =>
+    ({
+      model: '190',
+      records: Array.from({ length: records }, () => ({
+        nif: '00000001R',
+        name: 'PERSONA DE PRUEBA',
+        key: 'G',
+        subkey: '01',
+        paid: 1000,
+        inKind: 0,
+        withheld: 150,
+        rate: null,
+        typed: false,
+      })),
+      boxes: [
+        { box: '01', label: 'Percepciones', amount: records },
+        { box: '02', label: 'Importe', amount: 1000 * records },
+        { box: '03', label: 'Retenciones', amount: 150 * records },
+      ],
+      warnings: [],
+    } as unknown as YearSummary);
+  const m347 = (records: number) =>
+    ({
+      known: true,
+      threshold: 3005.06,
+      records: Array.from({ length: records }, () => ({
+        key: 'B',
+        nif: null,
+        name: 'CLIENTE DE PRUEBA',
+        total: 5000,
+        quarters: [5000, 0, 0, 0],
+        premises: false,
+        withheld: false,
+        reverse: false,
+      })),
+      boxes: [
+        { box: '', label: 'Personas', amount: records },
+        { box: '', label: 'Importe', amount: 5000 * records },
+      ],
+      warnings: [],
+      left: 0,
+    } as unknown as Summary347);
+
+  it('shows the summaries that have someone in them, and none when empty', () => {
+    const { unmount } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(1)} m180={summary(0)} m347={m347(1)} year={2026} />
+    );
+    expect(screen.getByRole('heading', { name: /resúmenes anuales de 2026/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 190/ })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Modelo 180/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 347/ })).toBeInTheDocument();
+    // The words of the records are listed with the figures.
+    expect(screen.getByText('CLIENTE DE PRUEBA')).toBeInTheDocument();
+    unmount();
+    const { container } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(0)} m180={summary(2)} m347={m347(0)} year={2026} />
+    );
+    expect(screen.getByRole('heading', { name: /Modelo 180/ })).toBeInTheDocument();
+    expect(container).not.toBeEmptyDOMElement();
+  });
+
+  it('shows nothing when no summary has anyone', () => {
+    const { container } = renderWithI18n(
+      <AnnualFormPreviews m190={summary(0)} m180={summary(0)} m347={m347(0)} year={2026} />
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows the 131 of a quarter of modules', () => {
+    const result = {
+      boxes: [{ box: '15', label: 'Resultado', amount: 100 }],
+      due: 100,
+      result: 'pay',
+    } as Result131;
+    renderWithI18n(<Model131FormPreview result={result} year={2026} quarter={2} />);
+    expect(screen.getByRole('heading', { name: /Modelo 131/ })).toBeInTheDocument();
+  });
+
+  it('adds the 349 and the 390 to the forms of the quarter when the draft has them', () => {
+    const draft = autonomoDraft({
+      quarter: 4,
+      m349: {
+        required: true,
+        monthly: false,
+        operators: [{ key: 'S', vatId: 'FR12345678901', name: 'Client', base: 900 }],
+        rectifications: [],
+        boxes: [{ box: 'importe', label: 'Importe', amount: 900 }],
+        warnings: [],
+      },
+      m390: { sections: [], prorrata: 100, reconciliation: [], warnings: [] },
+    });
+    renderWithI18n(<AutonomoFormPreviews draft={draft} />);
+    expect(screen.getByRole('heading', { name: /Modelo 349/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Modelo 390/ })).toBeInTheDocument();
   });
 });

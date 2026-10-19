@@ -5,7 +5,7 @@ import { shareImage } from '@shared/utils/shareImage';
 import type { PreviewText } from '../application/formPdf';
 import { canvasPng, openFormView, type FormView } from '../application/formView';
 import { loadLayout } from '../domain/layout';
-import { formatBox, kindOf, type FilledForm } from '../domain/values';
+import { boxValue, type FilledForm } from '../domain/values';
 import './TaxForms.css';
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -21,6 +21,7 @@ export function previewText(t: Translate, form: FilledForm): PreviewText {
     notice: t('taxforms.mark.notice'),
     legend: t('taxforms.mark.legend'),
     pending: t('taxforms.mark.pending'),
+    approx: t('taxforms.mark.approx'),
     page: t('taxforms.mark.page', { n: '{n}', total: '{total}' }),
     title: t('taxforms.preview.docTitle', { model: form.model, period: `${form.year}${period}` }),
   };
@@ -39,7 +40,8 @@ const shareMode = (): 'share' | 'download' =>
 /** The figures typed in the preview, as a table that a screen reader can go through. */
 function FilledBoxes({ form }: { form: FilledForm }) {
   const { t } = useI18n();
-  const ids = Object.keys(form.values);
+  // The words of the records (tax ids, names, keys) go with the figures.
+  const ids = [...Object.keys(form.values), ...Object.keys(form.texts ?? {})];
   return (
     <details className="taxform-boxes">
       <summary>{t('taxforms.preview.boxes', { n: ids.length })}</summary>
@@ -54,7 +56,7 @@ function FilledBoxes({ form }: { form: FilledForm }) {
           {ids.map((id) => (
             <tr key={id}>
               <td>{id}</td>
-              <td>{formatBox(form.values[id], kindOf(form.model, id))}</td>
+              <td>{boxValue(form, id)}</td>
             </tr>
           ))}
         </tbody>

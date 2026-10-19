@@ -13,6 +13,7 @@ import {
 } from '../../domain/annualSummaries';
 import { figuresFor } from '../../domain/fiscalFigures';
 import { wealthWarnings, type AbroadBlock, type WealthWarning } from '../../domain/wealthWarnings';
+import { AnnualFormPreviews } from '@modules/taxforms/ui/FormPreviews';
 import { Boxes } from './AutonomoDraftResult';
 import { SedeFiles, sedeSourcesOfYear } from './SedeFiles';
 import { toWithholdingQuarter, withholdingsOf } from './withholdingForm';
@@ -194,6 +195,7 @@ export function AnnualPanel({ form, year }: { form: ManualForm; year: number }) 
       <Withholding summary={s190} year={year} />
       <Withholding summary={s180} year={year} />
       <Operations summary={s347} year={year} />
+      <AnnualFormPreviews m190={s190} m180={s180} m347={s347} year={year} />
       <SedeFiles sources={sedeSourcesOfYear(year, s190, s180, s347)} />
       <Wealth year={year} />
       <p className="section-hint">{t(key('note'))}</p>

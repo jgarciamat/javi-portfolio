@@ -15,6 +15,7 @@ import {
 import { parseTaxModelTokens, type PdfToken } from '../../src/modules/finances/domain/taxModelPdf';
 import { buildFormPdf, type PreviewText } from '../../src/modules/taxforms/application/formPdf';
 import { loadLayout, type FormModel } from '../../src/modules/taxforms/domain/layout';
+import { expected349, readableBoxes, YEARLY } from '../../src/modules/taxforms/domain/roundTrip';
 import { sampleForm } from '../../src/modules/taxforms/domain/samples';
 
 const frontend = process.cwd();
@@ -29,7 +30,10 @@ const TEXT: PreviewText = {
   title: 'Vista previa',
 };
 
-const MODELS: FormModel[] = ['130', '303', '111', '115'];
+const MODELS: FormModel[] = [
+  ...['130', '303', '111', '115', '131', '390', '349', '190', '180', '347'],
+  ...['309', '123'],
+] as FormModel[];
 
 void (async () => {
   const require = createRequire(join(frontend, 'package.json'));
@@ -57,8 +61,8 @@ void (async () => {
         }
       }
     }
-    const wanted = Object.keys(form.values);
-    const readable = wanted;
+    const wanted = [...Object.keys(form.values), ...Object.keys(form.texts ?? {})];
+    const readable = readableBoxes(form);
     const fieldMisses = wanted.filter((id) => !(`casilla.${id}` in typed));
     let line = `${model}: ${pdf.numPages} págs., ${wanted.length} casillas rellenadas, ${
       wanted.length - fieldMisses.length
@@ -80,9 +84,17 @@ void (async () => {
     const read = parseTaxModelTokens(pages);
     if (!read.ok) {
       failures++;
-      line += ` · LECTOR: ${read.reason}`;
+      line += ` · LECTOR: ${read.reason}${'periods' in read ? ` ${read.periods.join(', ')}` : ''}`;
     } else {
-      const { boxes, year, quarter } = read.data;
+      const { boxes, year, quarter, operators } = read.data;
+      if (model === '349') {
+        const want = JSON.stringify(expected349(form));
+        const got = JSON.stringify(operators);
+        if (want !== got) {
+          failures++;
+          line += ` · OPERADORES MAL: ${got}`;
+        } else line += ` · ${operators?.length} operadores iguales`;
+      }
       const same = readable.filter((id) => boxes[id] === form.values[id]);
       const wrong = readable.filter((id) => id in boxes && boxes[id] !== form.values[id]);
       const unread = readable.filter((id) => !(id in boxes));
@@ -96,10 +108,12 @@ void (async () => {
         wrong.length ||
         extra.length ||
         read.data.model !== model ||
-        year !== form.year
+        year !== form.year ||
+        quarter !== (YEARLY.includes(model) ? null : 3)
       ) {
         failures++;
-        line += ` · MAL ${wrong.join(' ')} · DE MÁS ${extra.join(' ')}`;
+        line += ` · MAL ${wrong.map((id) => `${id}=${boxes[id]}≠${form.values[id]}`).join(' ')}`;
+        line += ` · DE MÁS ${extra.join(' ')}`;
       }
     }
     console.log(line);

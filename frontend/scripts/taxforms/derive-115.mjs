@@ -63,6 +63,8 @@ const boxes = rows.map(([id, y]) => [id, 440.5, y - 2.7, 73, 10.1]);
 
 const out = {
   model: '115',
+  // Rebuilt on the 111: the preview says its places are approximate.
+  approx: true,
   source: `Maquetación del 111 (${m111.source}) con la liquidación del 115 (DR115e15v13, casillas 01-05)`,
   colors: m111.colors,
   pages: [

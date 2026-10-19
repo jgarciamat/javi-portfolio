@@ -55,7 +55,11 @@ describe('The yearly summaries of the self-employed screen', () => {
     });
     expect(within(panel).getByText(tr('app.autonomo.model', { model: '190' }))).toBeInTheDocument();
     expect(within(panel).getByText(tr('app.autonomo.model', { model: '180' }))).toBeInTheDocument();
-    expect(within(panel).getByText('Ana Diseño')).toBeInTheDocument();
+    // Once in the list of the 190 and once in the table of its preview.
+    expect(within(panel).getAllByText('Ana Diseño')).toHaveLength(2);
+    expect(
+      within(panel).getByRole('heading', { name: tr('taxforms.title.annual', { year: 2026 }) })
+    ).toBeInTheDocument();
     expect(within(panel).getByText(tr('app.autonomo.annual.typed'))).toBeInTheDocument();
     expect(
       within(panel).getByText(tr('app.autonomo.annual.key.B', { who: 'Cliente Uno' }))

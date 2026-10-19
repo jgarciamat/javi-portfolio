@@ -5,6 +5,7 @@
  * no fonts, and none of the Tax Agency's own branding texts.
  *
  *   node scripts/taxforms/extract-layout.mjs <boe.pdf> <model> <first page> <last page>
+ *   node scripts/taxforms/extract-layout.mjs <boe.pdf> <model> <page,page,…>
  *
  * The PDF is downloaded by hand from the URL in SOURCES (see docs/fiscalidad/documentos-oficiales.md)
  * and the result is written to src/modules/taxforms/data/<model>.json (then `npx prettier --write` it).
@@ -19,7 +20,120 @@ const SOURCES = {
   111: 'https://www.boe.es/boe/dias/2011/03/18/pdfs/BOE-A-2011-4948.pdf (Orden EHA/586/2011, anexo I, pág. 14)',
   303: 'https://www.boe.es/boe/dias/2026/01/26/pdfs/BOE-A-2026-1761.pdf (Orden HAC/27/2026, anexo III, págs. 12-17)',
   100: 'https://www.boe.es/boe/dias/2026/03/27/pdfs/BOE-A-2026-7041.pdf (Orden HAC/277/2026, anexo I, págs. 21-45)',
+  131: 'https://www.boe.es/boe/dias/2015/02/19/pdfs/BOE-A-2015-1656.pdf (Orden HAP/258/2015, anexo II, pág. 8)',
+  190: 'https://www.boe.es/boe/dias/2009/11/23/pdfs/BOE-A-2009-18567.pdf (Orden EHA/3127/2009, anexo I, págs. 21 y 23)',
+  347: 'https://www.boe.es/boe/dias/2014/09/26/pdfs/BOE-A-2014-9740.pdf (Orden HAP/1732/2014, anexo I, págs. 5 y 7)',
+  349: 'https://www.boe.es/boe/dias/2010/03/29/pdfs/BOE-A-2010-5098.pdf (Orden EHA/769/2010, anexo I, págs. 13, 15 y 17)',
+  390: 'https://www.boe.es/boe/dias/2026/01/26/pdfs/BOE-A-2026-1761.pdf (Orden HAC/27/2026, anexo IV, págs. 18-26)',
+  123: 'https://www.boe.es/boe/dias/2024/01/31/pdfs/BOE-A-2024-1772.pdf (Orden HAC/56/2024, anexo I, pág. 23)',
+  309: 'https://www.boe.es/boe/dias/2022/12/19/pdfs/BOE-A-2022-21458.pdf (Orden HFP/1245/2022, anexo, pág. 3)',
+  121: 'https://www.boe.es/boe/dias/2017/02/10/pdfs/BOE-A-2017-1334.pdf (Orden HFP/105/2017, anexo I, pág. 7)',
+  122: 'https://www.boe.es/boe/dias/2018/07/18/pdfs/BOE-A-2018-10064.pdf (Orden HAC/763/2018, anexo II, págs. 8-9)',
+  143: 'https://www.boe.es/boe/dias/2018/07/18/pdfs/BOE-A-2018-10064.pdf (Orden HAC/763/2018, anexo I, págs. 6-7)',
 };
+
+/**
+ * Pages that list people or operations, one block after another (the payees of the 190, the persons
+ * of the 347, the operators of the 349): model → page (1-based in the range) → the blocks it holds.
+ * The preview repeats the page as many times as the records need.
+ */
+const ROWS = { 190: { 2: 3 }, 347: { 2: 3 }, 349: { 2: 15, 3: 10 } };
+
+/**
+ * Cells without a number (the record of a payee, a person, an operator): model → page (1-based in the
+ * range) → [label printed on the facsimile, id, where the cell is from it (`below` or `right`), which
+ * of the labels of a line when a line prints it twice (0: the leftmost), the width of the cell when
+ * the facsimile draws none]. On a page of blocks the n-th label from the top is the block n: «n.id».
+ * Ids that start with «hoja.» are the totals of the page.
+ */
+const FIELDS = {
+  190: {
+    2: [
+      ['NIF del perceptor', 'nif', 'below'],
+      [
+        'Apellidos y nombre del perceptor o denominación de la entidad perceptora',
+        'nombre',
+        'below',
+      ],
+      ['Provincia', 'provincia', 'below'],
+      ['Clave:', 'clave', 'right'],
+      ['Subclave:', 'subclave', 'right'],
+      ['Percepción íntegra', 'integra', 'below'],
+      ['Retenciones practicadas', 'retenciones', 'below'],
+      ['Valoración', 'especie', 'below'],
+      ['Ingresos a cuenta efectuados', 'ingresos', 'below'],
+      ['Percepciones', 'hoja.percepciones', 'below', -1],
+      ['Retenciones e ingresos a cuenta', 'hoja.retenciones', 'below'],
+    ],
+  },
+  347: {
+    2: [
+      ['NIF declarado', 'nif', 'below'],
+      ['Apellidos y nombre, razón social o denominación del declarado', 'nombre', 'below'],
+      ['Provincia (Código)', 'provincia', 'below'],
+      ['Clave operación', 'clave', 'below'],
+      ['Arrendamiento', 'local', 'below'],
+      ['Op. con inversión', 'isp', 'below'],
+      ['Importe anual de las operaciones', 'total', 'below'],
+      ['1 T', 't1', 'right', 0],
+      ['2 T', 't2', 'right', 0],
+      ['3 T', 't3', 'right', 0],
+      ['4 T', 't4', 'right', 0],
+    ],
+  },
+  349: {
+    2: [
+      ['Código país', 'pais', 'below', 0, 23],
+      ['NIF comunitario', 'nif', 'below', 0, 62],
+      ['Apellidos y nombre, denominación o razón social', 'nombre', 'below', 0, 238],
+      ['Clave', 'clave', 'below', 0, 10],
+      ['Base imponible', 'base', 'below', 0, 63],
+      ['Base imponible', 'hoja.base', 'below', -1, 63],
+    ],
+    // The corrections of earlier periods: other records than the operators of page 2.
+    3: [
+      ['Código país', 'rpais', 'below', 0, 23],
+      ['NIF comunitario', 'rnif', 'below', 0, 62],
+      ['Apellidos y nombre, denominación o razón social', 'rnombre', 'below', 0, 200],
+      ['Clave', 'rclave', 'below', 0, 10],
+      ['Ejercicio', 'rejercicio', 'below', 0, 30, 1],
+      ['Período', 'rperiodo', 'below', 0, 15, 1],
+      ['Base imponible rectificada', 'rbase', 'below', 0, 63],
+      ['Base imponible rectificada', 'hoja.rbase', 'below', -1, 63],
+      ['Base imponible declarada anteriormente', 'ranterior', 'below', 0, 63],
+    ],
+  },
+};
+
+/** Facsimiles whose words come cut in pieces (the 349 of 2010 sets every few letters apart). */
+const JOIN = new Set(['349']);
+
+/** The pieces of a word or a line printed one after the other as one text. */
+function joinFragments(texts) {
+  const out = [];
+  const sorted = [...texts].sort((a, b) => b.y - a.y || a.x - b.x);
+  for (const t of sorted) {
+    const prev = out[out.length - 1];
+    const gap = prev ? t.x - (prev.x + prev.w) : Infinity;
+    if (
+      prev &&
+      !prev.rotated &&
+      !t.rotated &&
+      Math.abs(prev.y - t.y) < 0.3 &&
+      Math.abs(prev.size - t.size) < 0.2 &&
+      prev.bold === t.bold &&
+      gap > -1.5 &&
+      gap < t.size * 0.4
+    ) {
+      out[out.length - 1] = {
+        ...prev,
+        str: `${prev.str}${gap > t.size * 0.12 ? ' ' : ''}${t.str}`,
+        w: t.x + t.w - prev.x,
+      };
+    } else out.push({ ...t });
+  }
+  return out;
+}
 
 /** The BOE's own header and footer, the annex captions and the Tax Agency's name, phone and site. */
 const DROP = [
@@ -50,7 +164,7 @@ const DROP = [
 /** Where the barcode goes on the official form, the preview says what it is instead. */
 const REPLACE = [
   [
-    /^Espacio reservado para (la )?numeraci[oó]n por c[oó]digo de barras$/,
+    /^Espacio reservado para (la )?(numeraci[oó]n por|n[uú]mero identificativo y) c[oó]digo de barras$/,
     'Vista previa: no sirve para presentar',
   ],
   // The «T» of «Total» is drawn as a shape on the 303, not as a letter.
@@ -82,7 +196,64 @@ const OVERRIDES = {
     },
     6: { 72: [151.6, 645.8, 93.6, 11.1], 73: [195.3, 475.9, 93.6, 11.1] },
   },
+  // The year and the period where the summaries and their sheets have their cell (not after the
+  // title of their section, nor after «(con 4 cifras)»).
+  190: { 1: { ejercicio: [474.5, 567.9, 33.5, 9.6] }, 2: { ejercicio: [176, 672, 32.5, 9.6] } },
+  347: { 1: { ejercicio: [501, 551.2, 37.3, 10.9] }, 2: { ejercicio: [163.7, 634.8, 35, 10.3] } },
+  349: {
+    1: { ejercicio: [472.5, 576.4, 33, 9.6], periodo: [489.8, 557.3, 16, 9.6] },
+    2: { ejercicio: [164.5, 667, 30, 8.6], periodo: [209, 667, 16, 8.6] },
+    3: { ejercicio: [164.5, 667, 30, 8.6], periodo: [209, 667, 16, 8.6] },
+  },
 };
+
+/**
+ * The emblem, the ministry and the Tax Agency's logo, drawn with lines or set in pieces that the
+ * lists above do not catch: model → page → area whose drawings and texts are left out.
+ */
+const LOGOS = {
+  190: { 1: [60, 640, 125, 760] },
+  349: { 1: [60, 640, 125, 760] },
+  123: { 1: [55, 635, 200, 700] },
+  309: { 1: [70, 640, 130, 700], 2: [70, 675, 130, 700] },
+};
+
+/**
+ * Letters some facsimiles draw as outlines, not as text (the «O» of «Operaciones» on the 390, the
+ * «N» of «NIF» on the 309 and the 123): model → [the text as read, the text as printed].
+ */
+const LETTERS = {
+  390: [[/^peraciones/, 'Operaciones']],
+  309: [
+    [/^ehículos$/, 'Vehículos'],
+    [/^º /, 'N.º '],
+    [/^º contrucción\)$/, 'N.º construcción)'],
+    [/^ombre$/, 'Nombre'],
+    [/^IF(-IVA)?$/, (s) => `N${s}`],
+    [/^ALOR AÑADIDO$/, 'VALOR AÑADIDO'],
+    [/^Código IBA$/, 'Código IBAN'],
+  ],
+  123: [
+    [/^ombre o Razón social$/, 'Nombre o Razón social'],
+    [/^IF$/, 'NIF'],
+    [/^úmero de rentas$/, 'Número de rentas'],
+    [/^º de justificante$/, 'N.º de justificante'],
+  ],
+};
+
+/**
+ * Boxes whose cell the facsimile draws as a bare outline right after the number (the shares of
+ * each territory, in %): model → page (1-based in the range) → box → width of the cell.
+ */
+const AFTER = {
+  390: { 7: { 87: 28, 88: 28, 89: 28, 90: 28, 91: 28 } },
+};
+
+/**
+ * Forms whose rows repeat one column of cells: a number left without a cell takes the cell of the
+ * column its number is in (the 390 cuts some rules of its rows where the detection needs them whole).
+ */
+const COLUMNS = new Set(['390']);
 
 /**
  * Box numbers the facsimile prints by mistake on top of the right ones: model → page (1-based) →
@@ -217,10 +388,16 @@ async function textsOf(page) {
 }
 
 const pages = [];
-for (let n = Number(from); n <= Number(to); n++) {
+// The pages: a range («21 26») or a list («21,23»: the summary and one inner sheet).
+const list = from.includes(',')
+  ? from.split(',').map(Number)
+  : Array.from({ length: Number(to) - Number(from) + 1 }, (_, i) => Number(from) + i);
+for (const [i, n] of list.entries()) {
+  const k = i + 1;
   const page = await pdf.getPage(n);
   const { rects, lines } = await graphicsOf(page);
-  const texts = (await textsOf(page))
+  const read = await textsOf(page);
+  const texts = (JOIN.has(model) ? joinFragments(read) : read)
     .filter((t) => t.y < 750 && t.y > 64 && !DROP.some((re) => re.test(t.str)))
     .filter((t) => !(GHOSTS[model]?.[n] ?? []).includes(t.str))
     .flatMap((t) => {
@@ -233,8 +410,12 @@ for (let n = Number(from); n <= Number(to); n++) {
         { ...t, x: t.x + share, str: m[2].trim(), w: t.w - share, bold: false },
       ];
     })
+    .filter((t) => {
+      const logo = LOGOS[model]?.[k];
+      return !logo || !(t.x >= logo[0] && t.x <= logo[2] && t.y >= logo[1] && t.y <= logo[3]);
+    })
     .map((t) => {
-      const r = REPLACE.find(([re]) => re.test(t.str));
+      const r = [...REPLACE, ...(LETTERS[model] ?? [])].find(([re]) => re.test(t.str));
       if (!r) return t;
       return { ...t, str: typeof r[1] === 'function' ? r[1](t.str) : r[1] };
     });
@@ -257,7 +438,18 @@ for (let n = Number(from); n <= Number(to); n++) {
   const inside = (r, t) =>
     t.x >= r[0] - 0.5 && t.x <= r[0] + r[2] && t.y >= r[1] - 1 && t.y <= r[1] + r[3];
   const empty = (r) => !texts.some((t) => inside(r, t) && t.x > r[0] + 1);
-  const flat = lines.filter((l) => Math.abs(l[1] - l[3]) < 0.3);
+  // Flat rules, the pieces of one rule drawn end to end joined (the 390 cuts the rule under a box
+  // at its number).
+  const flat = [];
+  for (const l of lines
+    .filter((l) => Math.abs(l[1] - l[3]) < 0.3)
+    .map((l) => [Math.min(l[0], l[2]), l[1], Math.max(l[0], l[2]), l[3], ...l.slice(4)])
+    .sort((p, q) => p[1] - q[1] || p[0] - q[0])) {
+    const prev = flat[flat.length - 1];
+    if (prev && Math.abs(prev[1] - l[1]) < 0.3 && l[0] <= prev[2] + 1)
+      prev[2] = Math.max(prev[2], l[2]);
+    else flat.push([...l]);
+  }
   const upright = lines.filter((l) => Math.abs(l[0] - l[2]) < 0.3);
   const isNumber = (o) => !o.rotated && /^\d{2,4}$/.test(o.str);
   // The cell of a box: the empty cell that starts after its number (or holds it with room to its
@@ -308,18 +500,85 @@ for (let n = Number(from); n <= Number(to); n++) {
     return [end + 1.5, y, right - end - 2.5, h];
   };
   const boxes = [];
+  const columns = [];
   for (const t of texts) {
     if (!isNumber(t)) continue;
     const field = fieldOf(t);
-    if (field) boxes.push([t.str, ...field.map(round)]);
+    if (field) {
+      boxes.push([t.str, ...field.map(round)]);
+      columns.push([t.x, field[0], field[2]]);
+    }
   }
-  for (const [id, field] of Object.entries(OVERRIDES[model]?.[n - Number(from) + 1] ?? {})) {
+  for (const t of texts) {
+    if (!isNumber(t) || boxes.some((b) => b[0] === t.str)) continue;
+    const after = AFTER[model]?.[k]?.[t.str];
+    const column = COLUMNS.has(model) && columns.find(([x]) => Math.abs(x - t.x) < 1.5);
+    if (after) boxes.push([t.str, ...[t.x + t.w + 2, t.y - 2.6, after, 9.6].map(round)]);
+    else if (column) boxes.push([t.str, ...[column[1], t.y - 2.6, column[2], 9.6].map(round)]);
+  }
+  for (const [id, field] of Object.entries(OVERRIDES[model]?.[k] ?? {})) {
     if (!boxes.some((b) => b[0] === id)) boxes.push([id, ...field]);
+  }
+  // The cells of a record: under or after their label (the nearest drawn cell or rule).
+  const slots = ROWS[model]?.[k];
+  const cellNear = (t, at, width) => {
+    if (at === 'right') {
+      const end = t.x + t.w;
+      const cell = rects
+        .filter((r) => r[0] >= end - 1 && r[0] <= end + 25 && r[3] >= 5 && r[3] <= 20)
+        .filter((r) => r[1] <= t.y + 2 && r[1] + r[3] >= t.y + 2)
+        .sort((p, q) => p[0] - q[0])[0];
+      if (cell) return [cell[0] + 1, cell[1], cell[2] - 2, cell[3]];
+      // Or the rule the amount is written on, from the label to its end.
+      const rule = flat
+        .filter((l) => l[1] <= t.y + 1 && l[1] >= t.y - 4)
+        .filter((l) => Math.min(l[0], l[2]) <= end + 8 && Math.max(l[0], l[2]) >= end + 20)
+        .sort((p, q) => q[1] - p[1])[0];
+      if (!rule) return null;
+      const right = Math.max(rule[0], rule[2]);
+      return [end + 2, rule[1] + 0.4, right - end - 3, 8];
+    }
+    const top = (r) => r[1] + r[3];
+    const cell = rects
+      .filter((r) => r[3] >= 5 && r[3] <= 20 && r[2] >= 8)
+      .filter((r) => top(r) <= t.y + 1 && top(r) >= t.y - 16)
+      .filter((r) => r[0] <= t.x + 12 && r[0] + r[2] >= t.x + 4)
+      .sort((p, q) => top(q) - top(p))[0];
+    if (cell) return [cell[0] + 1, cell[1], cell[2] - 2, cell[3]];
+    if (!width) return null;
+    return [t.x, t.y - 8.8, width, 7.6];
+  };
+  for (const [label, id, at, col = 0, width, skip = 0] of FIELDS[model]?.[k] ?? []) {
+    const found = texts
+      .filter((t) => t.str === label && !t.rotated)
+      .sort((p, q) => (Math.abs(p.y - q.y) > 2 ? q.y - p.y : p.x - q.x));
+    // Only the label of the column asked for on each line (the leftmost, or the last one: -1).
+    const lines = [];
+    for (const t of found) {
+      const line = lines.find((l) => Math.abs(l[0].y - t.y) <= 2);
+      if (line) line.push(t);
+      else lines.push([t]);
+    }
+    const picked = lines
+      .map((l) => l[col < 0 ? l.length + col : col])
+      .filter(Boolean)
+      .slice(skip);
+    const page = id.startsWith('hoja.');
+    // A total of the page is its last label; a field of a record, one per block.
+    const used =
+      page || !slots ? picked.slice(col < 0 ? -1 : 0).slice(0, 1) : picked.slice(0, slots);
+    used.forEach((t, i) => {
+      const cell = cellNear(t, at, width);
+      if (!cell) throw new Error(`${model} p${n}: no cell for «${label}»`);
+      boxes.push([slots && !page ? `${i + 1}.${id}` : id, ...cell.map(round)]);
+    });
   }
   // Year and period: the cell after the word, or the dotted room up to the next text of the line.
   // The Renta prints its year: only the quarterly forms are given one to fill in.
   for (const word of model === '100' ? [] : ['Ejercicio', 'Período']) {
-    const t = texts.find((o) => o.str === word);
+    if (boxes.some((b) => b[0] === (word === 'Ejercicio' ? 'ejercicio' : 'periodo'))) continue;
+    // The 309 writes «Periodo» without the accent.
+    const t = texts.find((o) => o.str === word || (word === 'Período' && o.str === 'Periodo'));
     if (!t) continue;
     const field = fieldOf(t);
     if (field) boxes.push([word === 'Ejercicio' ? 'ejercicio' : 'periodo', ...field.map(round)]);
@@ -338,6 +597,9 @@ for (let n = Number(from); n <= Number(to); n++) {
       ]);
     }
   }
+  const logo = LOGOS[model]?.[k];
+  const inLogo = (x, y, w, h) =>
+    Boolean(logo) && x >= logo[0] && y >= logo[1] && x + w <= logo[2] && y + h <= logo[3];
   // Reading order: top to bottom, and left to right along a row.
   boxes.sort((p, q) => (Math.abs(p[2] - q[2]) > 3 ? q[2] - p[2] : p[1] - q[1]));
   pages.push({
@@ -349,9 +611,20 @@ for (let n = Number(from); n <= Number(to); n++) {
       t.str,
       round(t.w),
     ]),
-    r: rects.filter((r) => r[1] < 750 && r[1] + r[3] < 760),
-    l: lines.filter((l) => l[1] < 750 && l[3] < 750),
+    r: rects.filter((r) => r[1] < 750 && r[1] + r[3] < 760 && !inLogo(r[0], r[1], r[2], r[3])),
+    l: lines.filter(
+      (l) =>
+        l[1] < 750 &&
+        l[3] < 750 &&
+        !inLogo(
+          Math.min(l[0], l[2]),
+          Math.min(l[1], l[3]),
+          Math.abs(l[2] - l[0]),
+          Math.abs(l[3] - l[1])
+        )
+    ),
     b: boxes,
+    ...(slots ? { rows: slots } : {}),
   });
 }
 
