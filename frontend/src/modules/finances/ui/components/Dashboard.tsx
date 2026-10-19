@@ -13,6 +13,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
+import { useScrollToStart, useStickyBarHeight } from '@shared/hooks/useStickyBar';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import { usageLimit } from './AutonomoLimit';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
@@ -262,6 +263,9 @@ export function Dashboard() {
 
   // A section chosen in the menu takes the focus (after the menu gives it back to its button).
   const sectionRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  useStickyBarHeight(stickyRef);
+  useScrollToStart(dash.tab, finances.year, finances.month);
   const [menuPicks, setMenuPicks] = useState(0);
   useEffect(() => {
     if (menuPicks > 0) sectionRef.current!.focus();
@@ -282,7 +286,7 @@ export function Dashboard() {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-sticky">
+      <div className="dashboard-sticky" ref={stickyRef}>
         <Header
           dash={dash}
           sectionLabel={

@@ -5,6 +5,11 @@
   color: var(--slate-100);
 }
 
+/* Whatever is scrolled into view (anchors, scrollIntoView, focus) stops under the fixed bar. */
+html {
+  scroll-padding-top: calc(var(--sticky-bar-height, 0px) + 0.75rem);
+}
+
 /* ─── Sticky wrapper: header + sub-nav ──────── */
 .dashboard-sticky {
   position: sticky;
