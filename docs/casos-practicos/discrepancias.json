@@ -14,7 +14,9 @@
       "severidad": "media",
       "causa": "La casilla 28 del 303 suma las bases de los gastos sin IVA (nóminas y Seguridad Social a cargo de la empresa, tipo 0 %): bucket() en backend/src/domain/services/autonomo.ts añade a expenseBase todo gasto, también los de IVA 0. La 28 solo debe llevar la base de las cuotas soportadas deducibles. El resultado (71) no cambia.",
       "fuente": "Instrucciones del modelo 303 (AEAT), casillas 28-29",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -27,7 +29,9 @@
       "severidad": "media",
       "causa": "La casilla 28 del 303 suma las bases de los gastos sin IVA (nóminas y Seguridad Social a cargo de la empresa, tipo 0 %): bucket() en backend/src/domain/services/autonomo.ts añade a expenseBase todo gasto, también los de IVA 0. La 28 solo debe llevar la base de las cuotas soportadas deducibles. El resultado (71) no cambia.",
       "fuente": "Instrucciones del modelo 303 (AEAT), casillas 28-29",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -40,7 +44,9 @@
       "severidad": "media",
       "causa": "La casilla 28 del 303 suma las bases de los gastos sin IVA (nóminas y Seguridad Social a cargo de la empresa, tipo 0 %): bucket() en backend/src/domain/services/autonomo.ts añade a expenseBase todo gasto, también los de IVA 0. La 28 solo debe llevar la base de las cuotas soportadas deducibles. El resultado (71) no cambia.",
       "fuente": "Instrucciones del modelo 303 (AEAT), casillas 28-29",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -53,7 +59,9 @@
       "severidad": "media",
       "causa": "La casilla 28 del 303 suma las bases de los gastos sin IVA (nóminas y Seguridad Social a cargo de la empresa, tipo 0 %): bucket() en backend/src/domain/services/autonomo.ts añade a expenseBase todo gasto, también los de IVA 0. La 28 solo debe llevar la base de las cuotas soportadas deducibles. El resultado (71) no cambia.",
       "fuente": "Instrucciones del modelo 303 (AEAT), casillas 28-29",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -66,7 +74,9 @@
       "severidad": "media",
       "causa": "No se autorrepercute el IVA de la adquisición intracomunitaria (casillas 10-11 y 36-37): falta la inversión del sujeto pasivo. El resultado no cambia (se devenga y se deduce lo mismo), pero las casillas 27 y 45 quedan cortas en 630 € por trimestre.",
       "fuente": "Art. 84.Uno.2.º y 85 Ley 37/1992; Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -79,7 +89,9 @@
       "severidad": "media",
       "causa": "La compra intracomunitaria (factura sin IVA) suma su base a la casilla 28 de operaciones interiores; debería ir a la 36.",
       "fuente": "Instrucciones del modelo 303",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -92,7 +104,9 @@
       "severidad": "media",
       "causa": "Igual que la 27: falta la deducción del IVA autorrepercutido de la adquisición intracomunitaria (casillas 36-37).",
       "fuente": "Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -105,7 +119,9 @@
       "severidad": "alta",
       "causa": "Las entregas intracomunitarias y las exportaciones (IVA 0 %) van a la casilla 150 («tipo 0 %») en vez de a la 59 y la 60: el motor no distingue operaciones exentas con derecho a deducción de las de tipo cero. Además la 59 debe cuadrar con el modelo 349.",
       "fuente": "Instrucciones del modelo 303; Manual práctico IVA 2025, cap. 9 (casos oficiales 303-01 y 303-02)",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: Las entregas intracomunitarias van a la 59 y las exportaciones a la 60 (caso oficial 303-02); la 150 es solo para el tipo 0 %. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -118,7 +134,9 @@
       "severidad": "media",
       "causa": "No se autorrepercute el IVA de la adquisición intracomunitaria (casillas 10-11 y 36-37): falta la inversión del sujeto pasivo. El resultado no cambia (se devenga y se deduce lo mismo), pero las casillas 27 y 45 quedan cortas en 630 € por trimestre.",
       "fuente": "Art. 84.Uno.2.º y 85 Ley 37/1992; Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -131,7 +149,9 @@
       "severidad": "media",
       "causa": "La compra intracomunitaria (factura sin IVA) suma su base a la casilla 28 de operaciones interiores; debería ir a la 36.",
       "fuente": "Instrucciones del modelo 303",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -144,7 +164,9 @@
       "severidad": "media",
       "causa": "Igual que la 27: falta la deducción del IVA autorrepercutido de la adquisición intracomunitaria (casillas 36-37).",
       "fuente": "Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -157,7 +179,9 @@
       "severidad": "alta",
       "causa": "Las entregas intracomunitarias y las exportaciones (IVA 0 %) van a la casilla 150 («tipo 0 %») en vez de a la 59 y la 60: el motor no distingue operaciones exentas con derecho a deducción de las de tipo cero. Además la 59 debe cuadrar con el modelo 349.",
       "fuente": "Instrucciones del modelo 303; Manual práctico IVA 2025, cap. 9 (casos oficiales 303-01 y 303-02)",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: Las entregas intracomunitarias van a la 59 y las exportaciones a la 60 (caso oficial 303-02); la 150 es solo para el tipo 0 %. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -170,7 +194,9 @@
       "severidad": "media",
       "causa": "No se autorrepercute el IVA de la adquisición intracomunitaria (casillas 10-11 y 36-37): falta la inversión del sujeto pasivo. El resultado no cambia (se devenga y se deduce lo mismo), pero las casillas 27 y 45 quedan cortas en 630 € por trimestre.",
       "fuente": "Art. 84.Uno.2.º y 85 Ley 37/1992; Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -183,7 +209,9 @@
       "severidad": "media",
       "causa": "La compra intracomunitaria (factura sin IVA) suma su base a la casilla 28 de operaciones interiores; debería ir a la 36.",
       "fuente": "Instrucciones del modelo 303",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -196,7 +224,9 @@
       "severidad": "media",
       "causa": "Igual que la 27: falta la deducción del IVA autorrepercutido de la adquisición intracomunitaria (casillas 36-37).",
       "fuente": "Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -209,7 +239,9 @@
       "severidad": "alta",
       "causa": "Las entregas intracomunitarias y las exportaciones (IVA 0 %) van a la casilla 150 («tipo 0 %») en vez de a la 59 y la 60: el motor no distingue operaciones exentas con derecho a deducción de las de tipo cero. Además la 59 debe cuadrar con el modelo 349.",
       "fuente": "Instrucciones del modelo 303; Manual práctico IVA 2025, cap. 9 (casos oficiales 303-01 y 303-02)",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: Las entregas intracomunitarias van a la 59 y las exportaciones a la 60 (caso oficial 303-02); la 150 es solo para el tipo 0 %. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -222,7 +254,9 @@
       "severidad": "media",
       "causa": "No se autorrepercute el IVA de la adquisición intracomunitaria (casillas 10-11 y 36-37): falta la inversión del sujeto pasivo. El resultado no cambia (se devenga y se deduce lo mismo), pero las casillas 27 y 45 quedan cortas en 630 € por trimestre.",
       "fuente": "Art. 84.Uno.2.º y 85 Ley 37/1992; Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -235,7 +269,9 @@
       "severidad": "media",
       "causa": "La compra intracomunitaria (factura sin IVA) suma su base a la casilla 28 de operaciones interiores; debería ir a la 36.",
       "fuente": "Instrucciones del modelo 303",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La casilla 28 solo suma las bases con IVA deducible (las nóminas y la Seguridad Social al 0 % no). npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -248,7 +284,9 @@
       "severidad": "media",
       "causa": "Igual que la 27: falta la deducción del IVA autorrepercutido de la adquisición intracomunitaria (casillas 36-37).",
       "fuente": "Manual práctico IVA 2025, caso oficial 303-01",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: La adquisición intracomunitaria se autorrepercute (10-11) y se deduce (36-37), como en el caso oficial 303-01. npm run casos: 0 discrepancias."
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -261,7 +299,9 @@
       "severidad": "alta",
       "causa": "Las entregas intracomunitarias y las exportaciones (IVA 0 %) van a la casilla 150 («tipo 0 %») en vez de a la 59 y la 60: el motor no distingue operaciones exentas con derecho a deducción de las de tipo cero. Además la 59 debe cuadrar con el modelo 349.",
       "fuente": "Instrucciones del modelo 303; Manual práctico IVA 2025, cap. 9 (casos oficiales 303-01 y 303-02)",
-      "origenEsperado": "calculo-a-mano"
+      "origenEsperado": "calculo-a-mano",
+      "estado": "corregida",
+      "corregida": "2026-10-19: Las entregas intracomunitarias van a la 59 y las exportaciones a la 60 (caso oficial 303-02); la 150 es solo para el tipo 0 %. npm run casos: 0 discrepancias."
     }
   ],
   "oficiales": []

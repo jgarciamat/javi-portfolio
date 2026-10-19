@@ -856,10 +856,21 @@ def build_autonomo(a):
         # Movimientos para el motor (IVA incluido, en céntimos)
         for e in issued:
             if e['date'] in dates:
-                movements.append(dict(date=e['date'], type='INCOME', amountCents=round(e['base'] * (100 + e['rate'])), vatRate=e['rate']))
+                if e.get('kind') in ('eu', 'export'):
+                    # Sin IVA español: el importe es la base y la operación dice su casilla (59 o 60 y el 349).
+                    m = dict(date=e['date'], type='INCOME', amountCents=round(e['base'] * 100), vatRate=0, op='intraEU' if e['kind'] == 'eu' else 'export')
+                    if e['kind'] == 'eu':
+                        m['intra'] = dict(key='E', vatId=e['nif'], name=e['client'])
+                    movements.append(m)
+                else:
+                    movements.append(dict(date=e['date'], type='INCOME', amountCents=round(e['base'] * (100 + e['rate'])), vatRate=e['rate']))
         for e in received:
             if e['date'] in dates:
-                movements.append(dict(date=e['date'], type='EXPENSE', amountCents=round(e['base'] * (100 + e['rate'])), vatRate=e['rate']))
+                if e.get('eu'):
+                    # Adquisición intracomunitaria: se autorrepercute al 21 % (10-11) y se deduce (36-37).
+                    movements.append(dict(date=e['date'], type='EXPENSE', amountCents=round(e['base'] * 100), vatRate=21, op='intraGoods', intra=dict(key='A', vatId=e['nif'], name=e['supplier'])))
+                else:
+                    movements.append(dict(date=e['date'], type='EXPENSE', amountCents=round(e['base'] * (100 + e['rate'])), vatRate=e['rate']))
         if staff_q:
             for d in dates:
                 movements.append(dict(date=d, type='EXPENSE', amountCents=round(staff['monthly'] * 100), vatRate=0))

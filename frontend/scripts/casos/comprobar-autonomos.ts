@@ -51,22 +51,30 @@ for (const slug of readdirSync(PEOPLE).sort()) {
     const draft = prepareDraft(2026, q, movements, inputs);
     const boxes: Record<string, Record<string, number>> = {
       '303': Object.fromEntries(
-        [...draft.vat.accrued, ...draft.vat.deductible, ...draft.vat.settlement].map((b) => [
-          b.box,
-          b.amount,
-        ])
+        [
+          ...draft.vat.accrued,
+          ...draft.vat.deductible,
+          ...draft.vat.info,
+          ...draft.vat.settlement,
+        ].map((b) => [b.box, b.amount])
       ),
       '130': Object.fromEntries(draft.irpf.boxes.map((b) => [b.box, b.amount])),
+      // The 349 has no boxes: each figure is the base of a key («Clave E, …»).
+      '349': Object.fromEntries(
+        (draft.m349?.operators ?? []).map((o) => [`Clave ${o.key}`, o.base])
+      ),
     };
     for (const f of figures) {
       if (!(f.modelo in boxes) || f.periodo !== `${q}T` || f.origen === 'pendiente') continue;
-      const got = boxes[f.modelo][f.casilla as string];
+      const id =
+        f.modelo === '349' ? /^Clave [A-Z]/.exec(f.concepto)?.[0] ?? '' : (f.casilla as string);
+      const got = boxes[f.modelo][id];
       const expected = f.importe as number;
       rows.push({
         caso: slug,
         modelo: f.modelo,
         periodo: f.periodo,
-        casilla: f.casilla as string,
+        casilla: id,
         concepto: f.concepto,
         esperado: expected,
         obtenido: got ?? null,
@@ -83,7 +91,12 @@ for (const slug of readdirSync(PEOPLE).sort()) {
       const listed = figures.some(
         (f) => f.modelo === '303' && f.periodo === `${q}T` && f.casilla === box
       );
-      if (!listed && amount !== 0 && !['02', '05', '08'].includes(box)) {
+      // The rates and the 100 % of box 65 are not amounts.
+      if (
+        !listed &&
+        amount !== 0 &&
+        !['02', '05', '08', '151', '157', '169', '20', '23', '65'].includes(box)
+      ) {
         rows.push({
           caso: slug,
           modelo: '303',

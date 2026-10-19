@@ -1,9 +1,9 @@
 {
   "motor": "backend/src/domain/services/autonomo.ts (prepareDraft)",
   "resumen": {
-    "coincide": 272,
-    "discrepancia": 20,
-    "noSoportado": 24
+    "coincide": 320,
+    "discrepancia": 0,
+    "noSoportado": 0
   },
   "filas": [
     {
@@ -43,8 +43,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 5400,
-      "obtenido": 12500.01,
-      "estado": "discrepancia"
+      "obtenido": 5400,
+      "estado": "coincide"
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -283,8 +283,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 5400,
-      "obtenido": 12500.01,
-      "estado": "discrepancia"
+      "obtenido": 5400,
+      "estado": "coincide"
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -523,8 +523,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 5400,
-      "obtenido": 12500.01,
-      "estado": "discrepancia"
+      "obtenido": 5400,
+      "estado": "coincide"
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -763,8 +763,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 5400,
-      "obtenido": 12500.01,
-      "estado": "discrepancia"
+      "obtenido": 5400,
+      "estado": "coincide"
     },
     {
       "caso": "22-autonomo-ed-empleado-local-madrid",
@@ -993,8 +993,8 @@
       "casilla": "10",
       "concepto": "Adquisiciones intracomunitarias: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1003,8 +1003,8 @@
       "casilla": "11",
       "concepto": "Adquisiciones intracomunitarias: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1013,8 +1013,8 @@
       "casilla": "27",
       "concepto": "Total cuota devengada",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1023,8 +1023,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 9000,
-      "obtenido": 12000,
-      "estado": "discrepancia"
+      "obtenido": 9000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1043,8 +1043,8 @@
       "casilla": "36",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1053,8 +1053,8 @@
       "casilla": "37",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1063,8 +1063,8 @@
       "casilla": "45",
       "concepto": "Total a deducir",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1083,8 +1083,8 @@
       "casilla": "59",
       "concepto": "Entregas intracomunitarias de bienes",
       "esperado": 8100,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 8100,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1093,8 +1093,8 @@
       "casilla": "60",
       "concepto": "Exportaciones y operaciones asimiladas",
       "esperado": 5100,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 5100,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1268,13 +1268,23 @@
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
-      "modelo": "303",
+      "modelo": "349",
       "periodo": "1T",
-      "casilla": "150",
-      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
-      "esperado": 0,
-      "obtenido": 13200,
-      "estado": "discrepancia"
+      "casilla": "Clave E",
+      "concepto": "Clave E, entregas intracomunitarias (FR00000000001)",
+      "esperado": 8100,
+      "obtenido": 8100,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "349",
+      "periodo": "1T",
+      "casilla": "Clave A",
+      "concepto": "Clave A, adquisiciones intracomunitarias (DE000000001)",
+      "esperado": 3000,
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1303,8 +1313,8 @@
       "casilla": "10",
       "concepto": "Adquisiciones intracomunitarias: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1313,8 +1323,8 @@
       "casilla": "11",
       "concepto": "Adquisiciones intracomunitarias: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1323,8 +1333,8 @@
       "casilla": "27",
       "concepto": "Total cuota devengada",
       "esperado": 3150,
-      "obtenido": 2520,
-      "estado": "discrepancia"
+      "obtenido": 3150,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1333,8 +1343,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 9000,
-      "obtenido": 12000,
-      "estado": "discrepancia"
+      "obtenido": 9000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1353,8 +1363,8 @@
       "casilla": "36",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1363,8 +1373,8 @@
       "casilla": "37",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1373,8 +1383,8 @@
       "casilla": "45",
       "concepto": "Total a deducir",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1393,8 +1403,8 @@
       "casilla": "59",
       "concepto": "Entregas intracomunitarias de bienes",
       "esperado": 6000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 6000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1403,8 +1413,8 @@
       "casilla": "60",
       "concepto": "Exportaciones y operaciones asimiladas",
       "esperado": 5100,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 5100,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1578,13 +1588,23 @@
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
-      "modelo": "303",
+      "modelo": "349",
       "periodo": "2T",
-      "casilla": "150",
-      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
-      "esperado": 0,
-      "obtenido": 11100,
-      "estado": "discrepancia"
+      "casilla": "Clave E",
+      "concepto": "Clave E, entregas intracomunitarias (FR00000000001)",
+      "esperado": 6000,
+      "obtenido": 6000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "349",
+      "periodo": "2T",
+      "casilla": "Clave A",
+      "concepto": "Clave A, adquisiciones intracomunitarias (DE000000001)",
+      "esperado": 3000,
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1613,8 +1633,8 @@
       "casilla": "10",
       "concepto": "Adquisiciones intracomunitarias: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1623,8 +1643,8 @@
       "casilla": "11",
       "concepto": "Adquisiciones intracomunitarias: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1633,8 +1653,8 @@
       "casilla": "27",
       "concepto": "Total cuota devengada",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1643,8 +1663,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 9000,
-      "obtenido": 12000,
-      "estado": "discrepancia"
+      "obtenido": 9000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1663,8 +1683,8 @@
       "casilla": "36",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1673,8 +1693,8 @@
       "casilla": "37",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1683,8 +1703,8 @@
       "casilla": "45",
       "concepto": "Total a deducir",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1703,8 +1723,8 @@
       "casilla": "59",
       "concepto": "Entregas intracomunitarias de bienes",
       "esperado": 7200,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 7200,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1713,8 +1733,8 @@
       "casilla": "60",
       "concepto": "Exportaciones y operaciones asimiladas",
       "esperado": 3900,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3900,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1888,13 +1908,23 @@
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
-      "modelo": "303",
+      "modelo": "349",
       "periodo": "3T",
-      "casilla": "150",
-      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
-      "esperado": 0,
-      "obtenido": 11100,
-      "estado": "discrepancia"
+      "casilla": "Clave E",
+      "concepto": "Clave E, entregas intracomunitarias (FR00000000001)",
+      "esperado": 7200,
+      "obtenido": 7200,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "349",
+      "periodo": "3T",
+      "casilla": "Clave A",
+      "concepto": "Clave A, adquisiciones intracomunitarias (DE000000001)",
+      "esperado": 3000,
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1923,8 +1953,8 @@
       "casilla": "10",
       "concepto": "Adquisiciones intracomunitarias: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1933,8 +1963,8 @@
       "casilla": "11",
       "concepto": "Adquisiciones intracomunitarias: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1943,8 +1973,8 @@
       "casilla": "27",
       "concepto": "Total cuota devengada",
       "esperado": 3150,
-      "obtenido": 2520,
-      "estado": "discrepancia"
+      "obtenido": 3150,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1953,8 +1983,8 @@
       "casilla": "28",
       "concepto": "Base de cuotas soportadas en operaciones interiores corrientes",
       "esperado": 9000,
-      "obtenido": 12000,
-      "estado": "discrepancia"
+      "obtenido": 9000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1973,8 +2003,8 @@
       "casilla": "36",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: base",
       "esperado": 3000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1983,8 +2013,8 @@
       "casilla": "37",
       "concepto": "Adquisiciones intracomunitarias de bienes corrientes: cuota",
       "esperado": 630,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 630,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -1993,8 +2023,8 @@
       "casilla": "45",
       "concepto": "Total a deducir",
       "esperado": 2520,
-      "obtenido": 1890,
-      "estado": "discrepancia"
+      "obtenido": 2520,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -2013,8 +2043,8 @@
       "casilla": "59",
       "concepto": "Entregas intracomunitarias de bienes",
       "esperado": 9000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 9000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -2023,8 +2053,8 @@
       "casilla": "60",
       "concepto": "Exportaciones y operaciones asimiladas",
       "esperado": 6000,
-      "obtenido": null,
-      "estado": "no-soportado"
+      "obtenido": 6000,
+      "estado": "coincide"
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
@@ -2198,13 +2228,23 @@
     },
     {
       "caso": "23-autonomo-intracomunitario-exportador-cataluna",
-      "modelo": "303",
+      "modelo": "349",
       "periodo": "4T",
-      "casilla": "150",
-      "concepto": "Casilla que el motor rellena y el cálculo a mano deja vacía",
-      "esperado": 0,
-      "obtenido": 15000,
-      "estado": "discrepancia"
+      "casilla": "Clave E",
+      "concepto": "Clave E, entregas intracomunitarias (FR00000000001)",
+      "esperado": 9000,
+      "obtenido": 9000,
+      "estado": "coincide"
+    },
+    {
+      "caso": "23-autonomo-intracomunitario-exportador-cataluna",
+      "modelo": "349",
+      "periodo": "4T",
+      "casilla": "Clave A",
+      "concepto": "Clave A, adquisiciones intracomunitarias (DE000000001)",
+      "esperado": 3000,
+      "obtenido": 3000,
+      "estado": "coincide"
     },
     {
       "caso": "24-autonomo-tarifa-plana-comunitat-valenciana",

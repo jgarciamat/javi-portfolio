@@ -41,37 +41,58 @@
         "date": "2026-01-15",
         "type": "INCOME",
         "amountCents": 270000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-01-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-02-15",
         "type": "INCOME",
         "amountCents": 270000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-02-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-03-15",
         "type": "INCOME",
         "amountCents": 270000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-03-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-01-15",
@@ -83,7 +104,13 @@
         "date": "2026-01-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-02-15",
@@ -95,7 +122,13 @@
         "date": "2026-02-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-03-15",
@@ -107,7 +140,13 @@
         "date": "2026-03-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-04-15",
@@ -131,37 +170,58 @@
         "date": "2026-04-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-04-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-05-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-05-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-06-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-06-15",
         "type": "INCOME",
         "amountCents": 170000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-04-15",
@@ -173,7 +233,13 @@
         "date": "2026-04-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-05-15",
@@ -185,7 +251,13 @@
         "date": "2026-05-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-06-15",
@@ -197,7 +269,13 @@
         "date": "2026-06-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-07-15",
@@ -221,37 +299,58 @@
         "date": "2026-07-15",
         "type": "INCOME",
         "amountCents": 240000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-07-15",
         "type": "INCOME",
         "amountCents": 130000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-08-15",
         "type": "INCOME",
         "amountCents": 240000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-08-15",
         "type": "INCOME",
         "amountCents": 130000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-09-15",
         "type": "INCOME",
         "amountCents": 240000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-09-15",
         "type": "INCOME",
         "amountCents": 130000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-07-15",
@@ -263,7 +362,13 @@
         "date": "2026-07-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-08-15",
@@ -275,7 +380,13 @@
         "date": "2026-08-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-09-15",
@@ -287,7 +398,13 @@
         "date": "2026-09-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-10-15",
@@ -311,37 +428,58 @@
         "date": "2026-10-15",
         "type": "INCOME",
         "amountCents": 300000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-10-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-11-15",
         "type": "INCOME",
         "amountCents": 300000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-11-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-12-15",
         "type": "INCOME",
         "amountCents": 300000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "intraEU",
+        "intra": {
+          "key": "E",
+          "vatId": "FR00000000001",
+          "name": "Client Fictif SARL (Francia)"
+        }
       },
       {
         "date": "2026-12-15",
         "type": "INCOME",
         "amountCents": 200000,
-        "vatRate": 0
+        "vatRate": 0,
+        "op": "export"
       },
       {
         "date": "2026-10-15",
@@ -353,7 +491,13 @@
         "date": "2026-10-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-11-15",
@@ -365,7 +509,13 @@
         "date": "2026-11-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       },
       {
         "date": "2026-12-15",
@@ -377,7 +527,13 @@
         "date": "2026-12-15",
         "type": "EXPENSE",
         "amountCents": 100000,
-        "vatRate": 0
+        "vatRate": 21,
+        "op": "intraGoods",
+        "intra": {
+          "key": "A",
+          "vatId": "DE000000001",
+          "name": "Fiktiver Lieferant GmbH (Alemania)"
+        }
       }
     ],
     "inputs": {
