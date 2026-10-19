@@ -218,3 +218,38 @@ La libertad de amortización en módulos es para bienes de hasta 601,01 €, con
 - La libertad de amortización con creación de empleo (art. 102 LIS) y la de vehículos eléctricos y puntos de recarga (DA 18.ª LIS, prorrogada a 2026).
 - La regla de que el 5 % no se aplica si se opta por la reducción del art. 26.1 RIRPF (TRADE o único cliente).
 - La deducción por vivienda del 130 (casilla 16) y las complementarias.
+
+## 9. Cómo pasarlo al motor de la Renta (`rentaActivity.ts`)
+
+El motor (`frontend/src/modules/tools/domain/rentaActivity.ts`, de otro bloque) recibe una `ActivityInput`. Esta es la correspondencia propuesta para escribir el adaptador en el lado de la Renta. Cada gasto se pasa ya en su importe deducible, para que el motor no aplique dos veces los límites.
+
+**`kind: 'direct'`**, con `data.method = modality === 'N' ? 'normal' : 'simplified'`:
+
+| Campo del motor | Del contrato |
+|---|---|
+| `income.sales` | `income.sales` |
+| `income.grants` | `income.currentSubsidies + income.capitalSubsidies` |
+| `income.ownUse` | `income.selfConsumption` |
+| `income.other` | `income.compensations + income.stockIncrease` |
+| `expenses.purchases` | `byKind.material + expenses.stockDecrease` |
+| `expenses.staff` | `byKind.staff` |
+| `expenses.ownSocialSecurity` | `max(0, expenses.reta + retaFix.paid − retaFix.refunded)`. Si queda negativo, ese exceso va a `income.other`, como en la casilla 0178. |
+| `expenses.rent` | `byKind.rent` |
+| `expenses.supplies` | `byKind.supplies` (ya con el 30 % de la parte afecta), con `home` a 0 |
+| `expenses.insurance` | `byKind.health` (ya con el límite de 500 € por persona), con `health.premiums = 0` |
+| `expenses.meals` | `byKind.meals` |
+| `expenses.services` | `byKind.management + vehicle + clients + training + software + advertising + other` |
+| `expenses.depreciation` | `expenses.depreciation.total`, con `assets = []` y `lowValue = []` |
+| `provisions` | `expenses.provisions` |
+| `withheld` | `withholdings` |
+| `payments` | `payments130.total` |
+
+**Comprobación:** la 0224 del motor debe coincidir con `net`. El 5 % se calcula sobre la misma diferencia en los dos lados.
+
+**`kind: 'agrarian'`:** el contrato ya da las casillas 1536-1553 y `net`. Hay una diferencia de modelo entre los dos lados:
+- Aquí, los correctores c) y f) se aplican al porcentaje del rendimiento total que escribe el usuario.
+- En el motor, se aplican por producto.
+
+Con un solo producto el resultado es el mismo. Con varios, el reparto no tiene caso oficial (NO CONFIRMADO en los dos lados).
+
+**`kind: 'modules'` (no agrario):** el contrato no lo calcula (`net = null`, aviso `objective`).
