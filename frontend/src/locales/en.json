@@ -3678,5 +3678,6 @@
   "app.autonomo.activity.product.flowers": "Flowers and ornamental plants",
   "app.autonomo.activity.product.tobacco": "Tobacco",
   "app.autonomo.activity.product.otherServices": "Other accessory work and services",
-  "app.autonomo.activity.product.mussels": "Mussels on rafts"
+  "app.autonomo.activity.product.mussels": "Mussels on rafts",
+  "app.autonomo.explain.irpf.agrarian": "Income tax (130, farming section): {due} to pay: 2 % of the income of the quarter ({volume}) less its withholdings ({withheld}). Each quarter stands alone, nothing is added up."
 }

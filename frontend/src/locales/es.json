@@ -3678,5 +3678,6 @@
   "app.autonomo.activity.product.flowers": "Flores y plantas ornamentales",
   "app.autonomo.activity.product.tobacco": "Tabaco",
   "app.autonomo.activity.product.otherServices": "Otros trabajos y servicios accesorios",
-  "app.autonomo.activity.product.mussels": "Mejillón en batea"
+  "app.autonomo.activity.product.mussels": "Mejillón en batea",
+  "app.autonomo.explain.irpf.agrarian": "IRPF (130, sección agraria): a pagar {due}: el 2 % de los ingresos del trimestre ({volume}) menos sus retenciones ({withheld}). Cada trimestre va solo, sin acumular."
 }

@@ -164,6 +164,20 @@ describe('The draft in plain words', () => {
     expect(explain({ vat: vat({ accrued: [] }), irpf: irpf() }).vat).toContain('0,00');
   });
 
+  it('explains section II of a farming activity, quarter by quarter', () => {
+    const farm = {
+      required: true,
+      result: 'pay' as const,
+      amountDue: 310,
+      boxes: boxes({ '08': 23000, '09': 460, '10': 150, '11': 310, '12': 310, '19': 310 }),
+    };
+    expect(nb(explain({ vat: vat(), irpf: farm }).irpf)).toBe(
+      'IRPF (130, sección agraria): a pagar 310,00 €: el 2 % de los ingresos del trimestre (23.000,00 €) menos sus retenciones (150,00 €). Cada trimestre va solo, sin acumular.'
+    );
+    const nothing = { ...farm, result: 'zero' as const, amountDue: 0 };
+    expect(nb(explain({ vat: vat(), irpf: nothing }, 'en').irpf)).toContain('€0.00 to pay');
+  });
+
   it('is shown above the boxes of the result', () => {
     renderWithProviders(<DraftResult draft={f.autonomoDraft()} inputs={null} />);
     const title = screen.getByRole('heading', { name: tr('app.autonomo.explain.title') });

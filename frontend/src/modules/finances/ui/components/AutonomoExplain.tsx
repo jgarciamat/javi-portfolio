@@ -46,6 +46,14 @@ function irpfSentence(t: Translate, money: Money, irpf: AutonomoDraft['irpf']): 
   const key = (k: string) => `app.autonomo.explain.irpf.${k}`;
   if (!irpf.required) return t(key('notRequired'));
   const b = (id: string) => box(irpf.boxes, id);
+  // Farming fills in section II only: 2 % of the income of the quarter less its withholdings.
+  if (irpf.boxes.some((x) => x.box === '08')) {
+    return t(key('agrarian'), {
+      due: money(Math.max(0, irpf.amountDue)),
+      volume: money(b('08')),
+      withheld: money(b('10')),
+    });
+  }
   if (b('01') === 0 && b('02') === 0) return t(key('noActivity'));
   const parts = (
     [
