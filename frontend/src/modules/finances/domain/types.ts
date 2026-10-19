@@ -1,4 +1,7 @@
 // ─── Finances domain types (amounts are decimal numbers in the user currency) ──
+import type { Asset as FixedAsset } from './depreciation';
+import type { Subsidy } from './subsidies';
+import type { AgrarianModulesInput } from './agrarianModules';
 
 export type TransactionType = 'INCOME' | 'EXPENSE' | 'SAVING';
 
@@ -753,10 +756,50 @@ export interface QuarterExtras {
   withheld: number;
   socialSecurity: number;
   vatNotDeductible: number;
+  /** Worked out on the device from the activity (depreciation.ts, subsidies.ts), euros. */
+  depreciation?: number;
+  provisions?: number;
+  /** Current grants of the quarter (with the young farmers' aid) and capital grants imputed. */
+  subsidies?: number;
+  capitalSubsidies?: number;
+  /** Flat-rate compensations of the special agricultural regime received (art. 130 LIVA). */
+  compensations?: number;
+}
+
+/** How the activity is taxed: direct estimation (simplified or normal) or modules. */
+export type ActivityMethod = 'simplified' | 'normal' | 'objective';
+
+/** The activity of the year beyond the quarters: assets, grants and the other annual figures. */
+export interface ActivityInputs {
+  method: ActivityMethod;
+  /** Farming, livestock, forestry or fishing: section II of the 130 instead of section I. */
+  agrarian: boolean;
+  assets: FixedAsset[];
+  subsidies: Subsidy[];
+  /** Provisions that can be deducted (normal modality only), euros of the year. */
+  provisions: number;
+  /** Regularisation of the RETA fees: paid (+) or refunded (−) this year (Renta 0196/0197). */
+  retaFix: number;
+  /** REAGP compensations received in each quarter. */
+  compensations: [number, number, number, number];
+  /** Result (box 19) of each modelo 130 filed (null: not filed or not known). */
+  paid130: [number | null, number | null, number | null, number | null];
+  /** Goods or services of the activity taken for personal use, at market value (Renta 0175). */
+  selfConsumption?: number;
+  /** Change of stock in the year: increase (+, box 0177) or decrease (−, box 0182). */
+  stockChange?: number;
+  /** Farming in modules: products, CAP aid and correctors (the depreciation comes from the assets). */
+  modules?: Omit<AgrarianModulesInput, 'depreciation'> | null;
 }
 
 export interface AutonomoInputs {
   quarters: [QuarterExtras, QuarterExtras, QuarterExtras, QuarterExtras];
+  /** Normal modality: no hard-to-justify expenses (the server checks it too). */
+  modality?: 'simplified' | 'normal';
+  /** Section II of the 130 (farming, livestock, forestry, fishing). */
+  agrarian?: boolean;
+  /** The activity as typed (assets, grants…): for the annual summary; the server ignores it. */
+  activity?: ActivityInputs | null;
   hardToJustify: boolean;
   priorYearNet: number | null;
   exempt130: boolean;

@@ -75,7 +75,7 @@ const NO_VAT: ManualExpense['kind'][] = ['quota', 'staff', 'health', 'fines'];
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** The income of a quarter as the 130 takes it: with VAT by rate and the sales without it. */
-const incomeOf = (q: ManualData['quarters'][number]): number =>
+export const incomeOf = (q: ManualData['quarters'][number]): number =>
   q.income.r21 +
   q.income.r10 +
   q.income.r4 +
