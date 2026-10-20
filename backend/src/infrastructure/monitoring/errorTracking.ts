@@ -46,8 +46,15 @@ export function parseDsn(dsn: string | null | undefined): { url: string; key: st
   }
 }
 
-function frames(stack: string | undefined) {
-  const out = [];
+interface Frame {
+  function: string;
+  filename: string;
+  lineno: number;
+  colno: number;
+}
+
+function frames(stack: string | undefined): Frame[] {
+  const out: Frame[] = [];
   for (const line of (stack ?? '').split('\n')) {
     const m = /^\s*at (?:(.*?) \()?(.*?):(\d+):(\d+)\)?$/.exec(line);
     if (m) {
@@ -92,7 +99,7 @@ export function createErrorTracker(
   const dedupeMs = options.dedupeMs ?? 60_000;
   const last = new Map<string, number>();
   return {
-    capture(error, context) {
+    capture(error: unknown, context?: { method?: string; path?: string }): void {
       const err = error instanceof Error ? error : new Error(String(error));
       const message = scrub(err.message.trim() || err.name);
       if (IGNORED.test(err.message)) return;
