@@ -132,3 +132,30 @@ un abogado.**
     con el UTM y el referrer de la petición. Texto propuesto: quitar de la política (s8) cualquier
     mención a `mm_acq` o al origen del alta guardado en el navegador antes del registro, y dar por
     resuelta la duda 2 (ya no hace falta banner por esto). No se ha editado ningún texto legal.
+
+## Cambio propuesto: analítica propia del embudo (decisión D2)
+
+Desde el 20/10/2026 el servidor cuenta, por día, los pasos del embudo (visitas, vistas de guía,
+registros, primeros pasos, pagos, bajas) y, para los primeros pasos, el origen (`utm_source` o el
+sitio que enlaza, normalizado). Solo contadores: sin IP, user-agent, cookies, almacenamiento en el
+dispositivo ni vínculo con la cuenta. Respeta *Global Privacy Control* y *Do Not Track*. Detalle en
+`docs/analitica.md`. **No se ha editado ningún texto legal.** Texto propuesto:
+
+16. **s8.p2** (sustituir): «Para saber cómo se usa el servicio y de dónde llegan las visitas
+    llevamos contadores diarios agregados en nuestro propio servidor: por ejemplo, cuántas veces
+    se abrió una guía, cuántos registros hubo y desde qué web o campaña (el valor `utm_source` del
+    enlace o el sitio que te enlazó). No usamos cookies ni guardamos nada en tu dispositivo para
+    ello, no guardamos tu IP ni tu navegador, no los asociamos a tu cuenta y no usamos herramientas
+    de analítica de terceros. Si tu navegador envía la señal *Global Privacy Control* o *Do Not
+    Track*, no se envía nada.»
+17. **s8.item6** (quitar): ya lo propone el punto 15.
+18. **s3.item10** (sustituir): «Medir de forma agregada y anónima las visitas, los registros y su
+    origen (ver el apartado 8) y proteger el servicio con límites de intentos y registros técnicos:
+    interés legítimo (art. 6.1.f).»
+19. **s5** (añadir un punto): «Contadores agregados de visitas y registros: 25 meses; no contienen
+    datos personales.»
+20. **Duda para el abogado.** Los contadores no guardan datos personales, pero el servidor recibe
+    de forma transitoria la IP (límite de peticiones en memoria durante un minuto) y el
+    user-agent (para descartar bots, sin guardarlo). Confirmar que basta con el interés legítimo
+    y con esta mención en la política, y que no hace falta consentimiento al no haber acceso ni
+    almacenamiento en el dispositivo (art. 22.2 LSSI).
