@@ -125,7 +125,7 @@
 .tx-day-count {
   font-size: 0.65rem;
   font-weight: 500;
-  color: var(--slate-700);
+  color: var(--slate-400);
   letter-spacing: 0;
   text-transform: none;
 }

@@ -93,3 +93,15 @@
 .forecast-locked .btn-primary {
   width: auto;
 }
+
+/* While the forecast loads, the panel keeps the height it will have (measured: ~725 px on a
+   phone, ~510 px on a desktop) so the content below does not jump when the data arrives. */
+.forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
+  min-height: 735px;
+}
+
+@media (min-width: 768px) {
+  .forecast-panel--loading .collapsible-body--open .collapsible-body-inner {
+    min-height: 520px;
+  }
+}
