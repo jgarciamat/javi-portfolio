@@ -9,6 +9,9 @@ const WEB_PORT = Number(process.env.E2E_WEB_PORT ?? 5186);
 // One database per run, shared with the workers (and the teardown) through the environment.
 process.env.E2E_DATABASE ??= join(tmpdir(), `money-manager-e2e-${Date.now()}.db`);
 
+/** The API the tests talk to directly when the screen is not what they are about. */
+export const API_URL = `http://localhost:${API_PORT}/api`;
+
 export const DEMO_USER = { email: 'demo@moneymanager.local', password: 'e2e-Password-1' };
 
 export default defineConfig({
@@ -23,6 +26,8 @@ export default defineConfig({
     baseURL: `http://localhost:${WEB_PORT}`,
     locale: 'es-ES',
     trace: 'retain-on-failure',
+    // A step that cannot be done fails in seconds, not when the whole test times out.
+    actionTimeout: 15_000,
   },
   // The installed Chrome (also preinstalled on GitHub runners): no browser download.
   projects: [{ name: 'chrome', use: { ...devices['Desktop Chrome'], channel: 'chrome' } }],
