@@ -82,7 +82,6 @@ export function errorHandler(
   logger: Pick<Console, 'error'> = console,
   tracker: ErrorTracker = noopTracker
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: unknown, req: Request, res: Response, _next: NextFunction): void => {
     if (err instanceof DomainError) {
       res.status(statusFor(err)).json({ error: err.message, code: err.code, details: err.details });
