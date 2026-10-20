@@ -1,4 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { ErrorTracker, noopTracker } from '../monitoring/errorTracking';
 import rateLimit, { Options as RateLimitOptions } from 'express-rate-limit';
 import { ZodError } from 'zod';
 import {
@@ -77,9 +78,12 @@ function statusFor(error: DomainError): number {
   return 400;
 }
 
-export function errorHandler(logger: Pick<Console, 'error'> = console) {
+export function errorHandler(
+  logger: Pick<Console, 'error'> = console,
+  tracker: ErrorTracker = noopTracker
+) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return (err: unknown, _req: Request, res: Response, _next: NextFunction): void => {
+  return (err: unknown, req: Request, res: Response, _next: NextFunction): void => {
     if (err instanceof DomainError) {
       res.status(statusFor(err)).json({ error: err.message, code: err.code, details: err.details });
       return;
@@ -105,6 +109,7 @@ export function errorHandler(logger: Pick<Console, 'error'> = console) {
       return;
     }
     logger.error('[http] unexpected error', err);
+    tracker.capture(err, { method: req.method, path: req.originalUrl });
     res.status(500).json({ error: 'Error interno del servidor', code: 'INTERNAL_ERROR' });
   };
 }

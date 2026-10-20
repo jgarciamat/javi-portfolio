@@ -3,3 +3,5 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:30
 export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';
 /** Public SDK key of RevenueCat (Google Play purchases in the Android app). Empty = purchases off. */
 export const REVENUECAT_ANDROID_KEY: string = import.meta.env.VITE_REVENUECAT_ANDROID_KEY ?? '';
+/** Error tracking (Sentry EU / GlitchTip). Empty = off: nothing is loaded or sent. */
+export const SENTRY_DSN: string = import.meta.env.VITE_SENTRY_DSN ?? '';
