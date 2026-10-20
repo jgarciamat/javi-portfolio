@@ -36,6 +36,11 @@ export interface LandingOrigin {
   ref?: string;
 }
 
+/** What goes with a sign-up: the landing origin, or nothing when there is none. */
+export interface SignupOrigin extends LandingOrigin {
+  app?: boolean;
+}
+
 let landing: LandingOrigin | null = null;
 
 function clip(value: string | null): string | undefined {
@@ -70,6 +75,16 @@ export function landingOrigin(): LandingOrigin {
 function optedOut(): boolean {
   const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
   return nav.globalPrivacyControl === true || nav.doNotTrack === '1' || nav.webdriver === true;
+}
+
+/**
+ * The origin to send with the sign-up request (`origin` in `/auth/register` and `/auth/google`),
+ * so the server counts the new account by origin without anything stored on the device.
+ */
+export function signupOrigin(): SignupOrigin | undefined {
+  if (optedOut()) return undefined;
+  const origin: SignupOrigin = { ...landingOrigin(), ...(isNativeApp() ? { app: true } : {}) };
+  return Object.values(origin).some((value) => value !== undefined) ? origin : undefined;
 }
 
 /** Counts one funnel event. Fire and forget: never throws, never blocks. */

@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useResource } from '@shared/hooks/useResource';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
+import { track } from '@core/analytics';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { DEFAULT_CATALOG, comparisonRows, formatPrice, yearlySavingPct } from './pricing';
 import './css/Billing.css';
@@ -12,6 +14,7 @@ export function PricingPage() {
   const { billingApi } = useApi();
   const navigate = useNavigate();
   const { data } = useResource(() => billingApi.plans(), [billingApi]);
+  useEffect(() => track('pricing_view'), []);
 
   // Without the API (a crawler cannot call it) the page still shows the plans and the comparison.
   const catalog = data ?? DEFAULT_CATALOG;

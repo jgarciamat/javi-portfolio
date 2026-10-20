@@ -1,3 +1,4 @@
+import { signupOrigin } from '@core/analytics';
 import { clearReferral, pendingReferral } from '@core/referral';
 import type {
   AuthResult,
@@ -27,7 +28,7 @@ export const authApi = {
   async register(dto: { email: string; password: string; name: string; locale?: Locale }) {
     const result = await publicRequest<RegisterResult>('/auth/register', {
       method: 'POST',
-      body: jsonBody({ ...dto, referralCode: pendingReferral() }),
+      body: jsonBody({ ...dto, referralCode: pendingReferral(), origin: signupOrigin() }),
     });
     clearReferral();
     return result;
@@ -72,7 +73,7 @@ export const authApi = {
   async googleLogin(token: string, locale?: Locale) {
     const result = await publicRequest<SignInResult>('/auth/google', {
       method: 'POST',
-      body: jsonBody({ token, locale, referralCode: pendingReferral() }),
+      body: jsonBody({ token, locale, referralCode: pendingReferral(), origin: signupOrigin() }),
     });
     clearReferral();
     return result;

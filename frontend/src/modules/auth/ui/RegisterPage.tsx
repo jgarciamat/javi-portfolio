@@ -1,6 +1,7 @@
-import { useRef, useState, type FormEvent, type RefObject } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
+import { track } from '@core/analytics';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleSignIn } from './GoogleButton';
@@ -128,6 +129,7 @@ export function RegisterPage({ onSwitch }: Props) {
   const [oldEnough, setOldEnough] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmRef = useRef<HTMLInputElement>(null);
+  useEffect(() => track('signup_view'), []);
 
   // A refused submit takes focus to the field to fix.
   const submit = async (e: FormEvent) => {

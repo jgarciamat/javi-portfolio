@@ -1,4 +1,10 @@
-import { landingOrigin, resetAnalyticsForTests, track, TRACK_EVENTS } from '@core/analytics';
+import {
+  landingOrigin,
+  resetAnalyticsForTests,
+  signupOrigin,
+  track,
+  TRACK_EVENTS,
+} from '@core/analytics';
 
 const native = jest.fn(() => false);
 jest.mock('@shared/utils/platform', () => ({ isNativeApp: () => native() }));
@@ -110,5 +116,22 @@ describe('track', () => {
       throw new Error('no fetch');
     });
     expect(() => track('signup_view')).not.toThrow();
+  });
+});
+
+describe('signupOrigin', () => {
+  it('is the landing origin, marked in the app, or nothing when there is none', () => {
+    expect(signupOrigin()).toBeUndefined();
+    resetAnalyticsForTests();
+    window.history.replaceState(null, '', '/?utm_source=youtube&utm_content=v7');
+    expect(signupOrigin()).toEqual({ utm_source: 'youtube', utm_content: 'v7' });
+    native.mockReturnValue(true);
+    expect(signupOrigin()).toEqual({ utm_source: 'youtube', utm_content: 'v7', app: true });
+  });
+
+  it('is not sent when the visitor opted out', () => {
+    window.history.replaceState(null, '', '/?utm_source=youtube');
+    setNavigator('globalPrivacyControl', true);
+    expect(signupOrigin()).toBeUndefined();
   });
 });
