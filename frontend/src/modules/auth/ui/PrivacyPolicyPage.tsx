@@ -51,7 +51,7 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s3.title')}</h2>
           <p>{t('app.privacy.s3.intro')}</p>
-          <Items section="s3" count={10} />
+          <Items section="s3" count={11} />
           <p>{t('app.privacy.s3.withdraw')}</p>
           <p>
             <em>{t('app.privacy.s3.noMarketing')}</em>
@@ -70,7 +70,7 @@ export function PrivacyPolicyPage() {
         <section className="privacy-section">
           <h2 className="privacy-section-title">{t('app.privacy.s5.title')}</h2>
           <p>{t('app.privacy.s5.p1')}</p>
-          <Items section="s5" count={9} />
+          <Items section="s5" count={10} />
         </section>
 
         {/* Section 6 */}

@@ -160,22 +160,22 @@ dispositivo ni vínculo con la cuenta. Respeta *Global Privacy Control* y *Do No
     y con esta mención en la política, y que no hace falta consentimiento al no haber acceso ni
     almacenamiento en el dispositivo (art. 22.2 LSSI).
 
-## Cambio propuesto: avisos del fin de la prueba (decisión D5)
+## Avisos del fin de la prueba (decisión D5): puntos 21-23 aprobados e incorporados
 
 Se envían hasta tres mensajes por usuario (2 días antes, el último día y uno después) por email y
-push sobre el estado de su prueba de 14 días. **No se ha editado ningún texto legal.** Como no
+push sobre el estado de su prueba de 14 días. **Los puntos 21-23 fueron aprobados por el dueño y están incorporados a la política (`s3.item11`, `s5.item10`, es/en, fecha de última actualización sin cambios: 20/10/2026).** Decisión del dueño: el aviso `ended` se envía **solo como push**, nunca por email (opción prudente del punto 23); `ends_soon` y `last_day` siguen por email y push. Como no
 existe consentimiento para comunicaciones comerciales, se tratan como mensajes de servicio sobre el
 contrato en vigor (art. 6.1.b RGPD): informan de la fecha de fin, de lo que se conserva y de lo que
 pasa a ser de Premium, con un enlace a la página de planes y sin ofertas ni presión. Texto propuesto:
 
-21. **s3** (añadir un punto): «Avisarte por correo o notificación, hasta tres veces, de que tu prueba
-    gratuita de Premium está a punto de terminar o ha terminado y de lo que cambia: ejecución del
+21. **s3** (APROBADO E INCORPORADO) (añadir un punto): «Avisarte por correo o notificación, hasta tres veces, de que tu prueba
+    gratuita de Premium está a punto de terminar o ha terminado y de lo que cambia (texto final: el aviso posterior al fin se envía solo como push): ejecución del
     contrato (art. 6.1.b). Puedes desactivarlo en Ajustes («Avisos sobre mi prueba de Premium»).»
-22. **s5** (añadir): «Registro de qué aviso de la prueba se envió a cada cuenta: mientras la cuenta
+22. **s5** (APROBADO E INCORPORADO) (añadir): «Registro de qué aviso de la prueba se envió a cada cuenta: mientras la cuenta
     exista.»
-23. **Duda para el abogado.** Confirmar que estos mensajes, que incluyen un enlace a los planes de
+23. **Duda para el abogado** (APROBADO E INCORPORADO; adoptada la opción de limitar `ended` a push). Confirmar que estos mensajes, que incluyen un enlace a los planes de
     pago, son de servicio y no comunicaciones comerciales (art. 21 LSSI). Si se prefiere la
     prudencia, añadir una casilla de consentimiento explícito en el registro y enviar solo a quien la
-    marque; o limitar el último mensaje (`ended`) a la notificación push. Hoy el email del aviso
-    `ended` es el más cercano a una comunicación comercial.
+    marque; o limitar el último mensaje (`ended`) a la notificación push. Con la decisión del dueño, `ended`
+    ya no se envía por email.
 

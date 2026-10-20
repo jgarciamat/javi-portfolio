@@ -49,7 +49,8 @@ const COPY = {
 
 /**
  * Service messages about the end of the 14-day trial, by e-mail (verified address) and push
- * (devices that allowed it): two days before, on the last day and once after it ended. Only
+ * (devices that allowed it) two days before and on the last day, and once after it ended by
+ * push only (never by e-mail). Only
  * to people on the trial (not Premium, not cancelling) who have not turned the notices off;
  * each message goes out once per user. Called every hour; it acts in the morning window.
  */
@@ -107,7 +108,8 @@ export class TrialNoticeService {
     kind: TrialNoticeKind
   ): Promise<number> {
     let delivered = 0;
-    if (user.emailVerified) {
+    // The notice after the end goes only as a push: no e-mail and no e-mail retry.
+    if (user.emailVerified && kind !== 'ended') {
       try {
         await this.email.sendTrialNotice(
           user.email,

@@ -48,19 +48,18 @@ describe('Trial end notices', () => {
     at('2026-03-29T10:00:00Z');
     expect(await run()).toBe(0);
 
+    // After the end there is no e-mail (push only), so nothing goes out and nothing is retried.
     at('2026-03-30T08:00:00Z');
-    expect(await run()).toBe(1);
+    expect(await run()).toBe(0);
     at('2026-03-31T08:00:00Z');
     expect(await run()).toBe(0);
 
     expect(mails().map((m) => [m.to, m.trial?.kind])).toEqual([
       [user.email, 'ends_soon'],
       [user.email, 'last_day'],
-      [user.email, 'ended'],
     ]);
     expect(mails()[0].trial?.endsAt).toBe('2026-03-29T12:00:00.000Z');
     expect(funnel()).toEqual([
-      { detail: 'ended:email', count: 1 },
       { detail: 'ends_soon:email', count: 1 },
       { detail: 'last_day:email', count: 1 },
     ]);
