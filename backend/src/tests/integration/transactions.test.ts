@@ -19,6 +19,35 @@ describe('Transactions API', () => {
   const month = async (year: number, m: number) =>
     (await request(ctx.app).get(`/api/months/${year}/${m}`).set(user.auth).expect(200)).body;
 
+  it('sends the movements once: the summary does not repeat them', async () => {
+    for (let i = 0; i < 5; i++) {
+      await addTransaction(ctx, user, {
+        category: 'Mascotas',
+        amount: 10 + i,
+        description: `Pienso ${i}`,
+      });
+    }
+    const body = await month(2026, 3);
+    expect(body.transactions).toHaveLength(5);
+    expect(Object.keys(body.summary).sort()).toEqual([
+      'balance',
+      'expensesByCategory',
+      'incomeByCategory',
+      'month',
+      'savingByCategory',
+      'totalExpenses',
+      'totalIncome',
+      'totalSaving',
+      'transactionCount',
+      'year',
+    ]);
+    expect(body.summary).toMatchObject({ year: 2026, month: 3, transactionCount: 5 });
+    // The payload is about the size of the movements alone, not twice that.
+    const total = JSON.stringify(body).length;
+    const movements = JSON.stringify(body.transactions).length;
+    expect(total).toBeLessThan(movements * 1.6);
+  });
+
   it('creates a movement, resolving the category by name and creating it when missing', async () => {
     const res = await addTransaction(ctx, user, {
       category: 'Mascotas',
