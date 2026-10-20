@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { PublicHeader } from '@shared/components/PublicHeader';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { brandTitle } from '@shared/utils/pageTitle';
 import { findGuide, type Guide } from '../domain/guides';
 import { categoryOf } from '../domain/guideCategories';
-import { guideTeaser } from '../domain/signupWall';
+import { guideTeaser, isOpenGuide } from '../domain/signupWall';
 import { GuideCatalog } from './GuideCatalog';
 import { GuideBody, GuideHeader, GuideSectionView } from './GuideBody';
 import { SignupWall, TeaserOutline, TeaserPreview, useGate } from './SignupWall';
@@ -13,6 +14,7 @@ import { PublicGuideLink } from './GuideLinks';
 import { HACIENDA_PATH } from '../domain/hacienda';
 import { VIDEOS_PATH, youtubeUrl } from '../domain/videos';
 import { guideVideo } from '../domain/guideLinks';
+import { track } from '@core/analytics';
 import { useI18n } from '@core/i18n/I18nContext';
 import './css/Hacienda.css';
 import '@modules/tools/ui/css/Tools.css';
@@ -89,6 +91,13 @@ export function GuidePage() {
   const { t } = useI18n();
   const guide = findGuide(slug);
   const video = guide && guideVideo(guide.slug);
+  const signedIn = gate === 'open';
+  // Open guides (OPEN_GUIDES) are read whole by everybody; the rest, only with an account.
+  const whole = signedIn || isOpenGuide(guide?.slug);
+  const countView = !!guide && isOpenGuide(guide.slug);
+  useEffect(() => {
+    if (countView) track('guide_view', { guide: slug as string });
+  }, [countView, slug]);
   usePageMeta(
     guide ? brandTitle(guide.title) : 'Guías | Finanverso',
     guide ? guide.description : 'Guías de finanzas personales',
@@ -106,14 +115,14 @@ export function GuidePage() {
             ← Todas las guías
           </Link>
         </p>
-        {gate === 'open' ? (
+        {whole ? (
           <>
             <article className="guide-article">
               <h1 className="pricing-title">{guide.title}</h1>
               <GuideBody
                 guide={guide}
                 renderLink={(to, label) => (
-                  <PublicGuideLink to={to} authenticated>
+                  <PublicGuideLink to={to} authenticated={signedIn}>
                     {label}
                   </PublicGuideLink>
                 )}
@@ -121,13 +130,17 @@ export function GuidePage() {
             </article>
             {guide.tool && (
               <p className="guide-tool">
-                <PublicGuideLink className="btn-secondary" to={guide.tool.to} authenticated>
+                <PublicGuideLink
+                  className="btn-secondary"
+                  to={guide.tool.to}
+                  authenticated={signedIn}
+                >
                   🧮 {guide.tool.label}
                 </PublicGuideLink>
               </p>
             )}
-            {video && <VideoEmbed video={video} />}
-            {video && (
+            {signedIn && video && <VideoEmbed video={video} />}
+            {signedIn && video && (
               <p className="guide-tool">
                 <a
                   className="btn-secondary"
@@ -138,6 +151,12 @@ export function GuidePage() {
                   🎬 Ver en YouTube: {video.title}
                 </a>
               </p>
+            )}
+            {!signedIn && gate === 'closed' && (
+              <SignupWall
+                variant="soft"
+                onRegister={() => track('guide_cta_click', { guide: guide.slug })}
+              />
             )}
           </>
         ) : (

@@ -3,8 +3,14 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
 import { GUIDES, findGuide, inlineParts } from '@modules/guides/domain/guides';
 import { GuidePage, GuidesIndexPage } from '@modules/guides/ui/GuidePages';
-import { guideTeaser } from '@modules/guides/domain/signupWall';
+import { OPEN_GUIDES, guideTeaser, isOpenGuide } from '@modules/guides/domain/signupWall';
+import { track } from '@core/analytics';
 import { renderWithProviders, tr } from '@test-utils/render';
+
+jest.mock('@core/analytics', () => ({ track: jest.fn() }));
+
+const GATED = GUIDES.filter((g) => !isOpenGuide(g.slug));
+const OPEN = GUIDES.filter((g) => isOpenGuide(g.slug));
 
 const Where = () => <p data-testid="where">{useLocation().pathname}</p>;
 
@@ -192,10 +198,10 @@ describe('links of the guides to the app', () => {
   )!.slug;
 
   it('sends visitors through the login to the section of the app from the preview', () => {
-    const [first] = GUIDES[0].sections;
+    const [first] = GATED[0].sections;
     const original = first.paragraphs;
     first.paragraphs = ['Usa la [calculadora de la Renta](/calculadora-renta).', ...original];
-    renderAt(`/guias/${GUIDES[0].slug}`, false);
+    renderAt(`/guias/${GATED[0].slug}`, false);
     expect(screen.getByRole('link', { name: 'calculadora de la Renta' })).toHaveAttribute(
       'href',
       '/login?next=%2F%3Ftab%3Drenta'
@@ -227,7 +233,7 @@ describe('links of the guides to the app', () => {
 describe('guides for visitors without an account', () => {
   beforeEach(() => localStorage.clear());
 
-  it.each(GUIDES.map((g) => [g.slug, g] as const))(
+  it.each(GATED.map((g) => [g.slug, g] as const))(
     '%s shows its beginning, what follows and the wall, never the rest',
     (_slug, guide) => {
       renderAt(`/guias/${guide.slug}`, false);
@@ -264,4 +270,63 @@ describe('guides for visitors without an account', () => {
       }
     }
   );
+});
+
+describe('open guides (experiment D3)', () => {
+  beforeEach(() => localStorage.clear());
+  beforeEach(() => jest.mocked(track).mockClear());
+
+  it('lists only real guides', () => {
+    for (const slug of OPEN_GUIDES) expect(findGuide(slug)).toBeDefined();
+    expect(OPEN).toHaveLength(OPEN_GUIDES.length);
+    expect(isOpenGuide(undefined)).toBe(false);
+    expect(isOpenGuide('no-existe')).toBe(false);
+  });
+
+  it.each(OPEN.map((g) => [g.slug, g] as const))(
+    '%s is read whole without an account, with a soft invitation and no wall',
+    (_slug, guide) => {
+      renderAt(`/guias/${guide.slug}`, false);
+      for (const s of guide.sections) {
+        expect(screen.getByRole('heading', { level: 2, name: s.heading })).toBeVisible();
+      }
+      // Nothing locked, no outline, no kicker of the wall; the invitation is at the end.
+      expect(screen.queryByRole('heading', { name: tr('wall.outline.guide') })).toBeNull();
+      expect(screen.queryByText(tr('wall.kicker.guide'))).toBeNull();
+      expect(screen.getByRole('heading', { name: tr('wall.soft.title') })).toBeInTheDocument();
+      expect(screen.queryByRole('list', { name: tr('wall.benefitsLabel') })).toBeNull();
+      expect(screen.getByRole('link', { name: tr('wall.register') })).toHaveAttribute(
+        'href',
+        `/login?mode=register&next=${encodeURIComponent(`/guias/${guide.slug}`)}`
+      );
+      // The tool is still behind the account: visitors go through the login.
+      if (guide.tool) {
+        expect(
+          screen.getByRole('link', { name: new RegExp(`🧮.*${guide.tool.label}`) })
+        ).toBeTruthy();
+      }
+      expect(document.querySelector('iframe')).toBeNull();
+      expect(screen.queryByRole('link', { name: /Ver en YouTube/ })).toBeNull();
+    }
+  );
+
+  it('shows no invitation to people with an account', () => {
+    renderAt(`/guias/${OPEN[0].slug}`);
+    expect(screen.queryByRole('heading', { name: tr('wall.soft.title') })).toBeNull();
+  });
+
+  it('counts anonymously the views and the clicks on «Crear cuenta», nothing else', () => {
+    const { unmount } = renderAt(`/guias/${OPEN[0].slug}`, false);
+    expect(track).toHaveBeenCalledTimes(1);
+    expect(track).toHaveBeenCalledWith('guide_view', { guide: OPEN[0].slug });
+    const register = screen.getByRole('link', { name: tr('wall.register') });
+    register.addEventListener('click', (e) => e.preventDefault());
+    register.click();
+    expect(track).toHaveBeenLastCalledWith('guide_cta_click', { guide: OPEN[0].slug });
+    unmount();
+    // A guide behind the wall is not part of the experiment.
+    jest.mocked(track).mockClear();
+    renderAt(`/guias/${GATED[0].slug}`, false);
+    expect(track).not.toHaveBeenCalled();
+  });
 });

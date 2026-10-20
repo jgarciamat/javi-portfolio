@@ -35,7 +35,9 @@ export async function load(entry) {
   return import(pathToFileURL(outfile).href);
 }
 
-const { GUIDES, inlineParts, longDate } = await load('src/modules/guides/domain/guides.ts');
+const { GUIDES, GUIDE_NOTICE, inlineParts, longDate } = await load(
+  'src/modules/guides/domain/guides.ts'
+);
 const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts');
 const { TOOL_PAGES, faqOf, guidesOfTool } = await load('src/modules/tools/domain/toolPages.ts');
 const wall = await load('src/modules/guides/domain/signupWall.ts');
@@ -130,21 +132,26 @@ function pagesIn(lang) {
   // `wall` in place of a guide or a calculator, with the welcome video; `cta` under the lists.
   const numbers = wall.wallNumbers();
   const signupWall = (path, { kicker, variant = 'wall' } = {}) => {
+    const soft = variant === 'soft';
     const back = wall.isGatedPath(path);
     const video = variant === 'wall' ? wall.welcomeVideo(videos.VIDEOS) : undefined;
     const thumbnail = video && videos.videoThumbnail(video);
     return `<section aria-labelledby="signup-wall-title">${
       kicker ? `<p>${esc(kicker)}</p>` : ''
-    }<h2 id="signup-wall-title">${esc(t('wall.title'))}</h2><p>${esc(
-      t(variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
+    }<h2 id="signup-wall-title">${esc(t(soft ? 'wall.soft.title' : 'wall.title'))}</h2><p>${esc(
+      t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')
     )}</p><p>${link(
       back ? wall.registerHref(path) : '/login?mode=register',
       t('wall.register')
     )} ${link(back ? wall.loginHref(path) : '/login', t('wall.login'))}</p><p>${esc(
       t('wall.note')
-    )}</p><ul aria-label="${esc(t('wall.benefitsLabel'))}">${wall.WALL_BENEFITS.map(
-      (id) => `<li>${esc(t(`wall.benefit.${id}`, { n: numbers[id] ?? '' }))}</li>`
-    ).join('')}</ul>${
+    )}</p>${
+      soft
+        ? ''
+        : `<ul aria-label="${esc(t('wall.benefitsLabel'))}">${wall.WALL_BENEFITS.map(
+            (id) => `<li>${esc(t(`wall.benefit.${id}`, { n: numbers[id] ?? '' }))}</li>`
+          ).join('')}</ul>`
+    }${
       video
         ? `<p>${esc(t('wall.video', { min: wall.minutesOf(video) }))}</p><figure>${
             thumbnail
@@ -417,11 +424,12 @@ function pagesIn(lang) {
       inlineParts(text)
         .map((part) => (typeof part === 'string' ? esc(part) : link(part.to, part.label)))
         .join('');
-    // Without an account: the beginning of the guide and the titles of the rest (signupWall.ts).
+    // Open guides (OPEN_GUIDES) whole; the rest, the beginning and the titles of the rest (signupWall.ts).
     for (const g of GUIDES) {
       const path = `/guias/${g.slug}`;
       const url = urlOf(path);
       const category = categoryOf(g.slug);
+      const open = wall.isOpenGuide(g.slug);
       const teaser = wall.guideTeaser(g);
       const related = g.related.map((slug) => GUIDES.find((r) => r.slug === slug)).filter(Boolean);
       add({
@@ -433,14 +441,31 @@ function pagesIn(lang) {
           g.title
         )}</h1><p>${esc(g.intro)}</p><p>${esc('Actualizado')}: <time datetime="${g.updated}">${esc(
           longDate(g.updated)
-        )}</time></p><h2>${esc(teaser.preview.heading)}</h2>${teaser.preview.paragraphs
-          .map((p) => `<p>${paragraph(p)}</p>`)
-          .join('')}${outline(t('wall.outline.guide'), teaser.outline)}</article>${signupWall(
-          path,
-          {
-            kicker: t('wall.kicker.guide'),
-          }
-        )}<section><h2>Sigue leyendo</h2><ul>${related
+        )}</time></p>${
+          open
+            ? // Open guide: the whole text, as the app shows it to everybody.
+              `${g.sections
+                .map(
+                  (s) =>
+                    `<section><h2>${esc(s.heading)}</h2>${s.paragraphs.map((p) => `<p>${paragraph(p)}</p>`).join('')}</section>`
+                )
+                .join('')}${
+                g.sources && g.checked
+                  ? `<section><h2>${esc(wall.SOURCES_HEADING)}</h2><p>Consultadas el ${esc(
+                      longDate(g.checked)
+                    )}.</p><ul>${g.sources
+                      .map((x) => `<li>${external(x.url, x.label)}</li>`)
+                      .join('')}</ul><p>${esc(GUIDE_NOTICE)}</p></section>`
+                  : ''
+              }`
+            : `<h2>${esc(teaser.preview.heading)}</h2>${teaser.preview.paragraphs
+                .map((p) => `<p>${paragraph(p)}</p>`)
+                .join('')}${outline(t('wall.outline.guide'), teaser.outline)}`
+        }</article>${
+          open
+            ? signupWall(path, { variant: 'soft' })
+            : signupWall(path, { kicker: t('wall.kicker.guide') })
+        }<section><h2>Sigue leyendo</h2><ul>${related
           .map((r) => `<li>${link(`/guias/${r.slug}`, r.title)}</li>`)
           .join('')}</ul><p>${link(VIDEOS_PATH, `🎬 ${t('videos.title')}`)} · ${link(
           HACIENDA_PATH,
@@ -457,6 +482,8 @@ function pagesIn(lang) {
             url,
             mainEntityOfPage: url,
             articleSection: category.label,
+            // Open guides are whole for everybody; the others show a teaser (never marked free).
+            ...(open ? { isAccessibleForFree: true } : {}),
             dateModified: g.updated,
             image: `${ORIGIN}/og-image.png`,
             author: { '@type': 'Person', name: 'Javi García' },

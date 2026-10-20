@@ -3737,6 +3737,8 @@
   "wall.title": "Crea tu cuenta gratis para ver todas las guías, calculadoras y vídeos",
   "wall.lead": "Te lleva un minuto y vuelves justo aquí, para seguir donde lo has dejado.",
   "wall.leadCta": "Te lleva un minuto y es gratis. Con tu cuenta tienes:",
+  "wall.soft.title": "Guarda tus cuentas y tus cálculos con una cuenta gratis",
+  "wall.soft.lead": "Esta guía es de libre acceso. Si quieres llevar tus gastos, presupuestos y la Renta con tus propios datos, crear la cuenta te lleva un minuto.",
   "wall.benefitsLabel": "Lo que tienes con tu cuenta",
   "wall.benefit.guides": "Las {n} guías completas de ahorro, Renta, autónomos, ayudas y trámites, con sus fuentes oficiales.",
   "wall.benefit.hacienda": "Hacienda paso a paso: {n} guías con cada pantalla y casilla de Renta WEB, el 303 y el 130, con su checklist.",

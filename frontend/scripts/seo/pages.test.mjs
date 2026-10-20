@@ -1,6 +1,6 @@
 // What search engines get of the public pages (`npm run test:seo`, also run by the build):
-// people without an account, and search engines with them, only get the teaser of the guides
-// and calculators, and the structured data only describes what the page shows.
+// people without an account, and search engines with them, get the whole of the open guides
+// (OPEN_GUIDES), only the teaser of the other guides and of the calculators, and the structured data only describes what the page shows.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { MESSAGES, NOT_FOUND, PAGES, esc, load, pathIn } from './pages.mjs';
@@ -35,8 +35,35 @@ const deepTypes = (value) =>
     ?.map((m) => m.slice(9, -1)) ?? [];
 const langs = ['es', 'en'];
 
-test('a guide shows its beginning, the titles of the rest and the wall; never the rest', () => {
-  for (const g of GUIDES) {
+test('an open guide is whole, with its sources and a soft invitation; no wall', () => {
+  assert.equal(wall.OPEN_GUIDES.length, 13);
+  for (const slug of wall.OPEN_GUIDES) {
+    const g = GUIDES.find((x) => x.slug === slug);
+    assert.ok(g, `${slug} exists`);
+    const page = pageOf(`/guias/${slug}`);
+    const { body } = page;
+    const plain = body.replace(/<[^>]+>/g, '');
+    const plainOf = (p) => esc(p.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'));
+    assert.ok(body.includes(`<h1>${esc(g.title)}</h1>`), slug);
+    for (const s of g.sections) {
+      assert.ok(body.includes(`<h2>${esc(s.heading)}</h2>`), slug);
+      for (const p of s.paragraphs) assert.ok(plain.includes(plainOf(p)), `${slug} ${plainOf(p)}`);
+    }
+    for (const source of g.sources ?? []) assert.ok(body.includes(esc(source.url)), slug);
+    assert.ok(body.includes(esc(MESSAGES.es['wall.soft.title'])), slug);
+    assert.ok(body.includes(esc(wall.registerHref(`/guias/${slug}`))), slug);
+    // No wall: no outline of locked sections, no kicker, no benefits, no video.
+    assert.ok(!body.includes(esc(MESSAGES.es['wall.outline.guide'])), slug);
+    assert.ok(!body.includes(esc(MESSAGES.es['wall.kicker.guide'])), slug);
+    assert.ok(!body.includes('aria-label="' + esc(MESSAGES.es['wall.benefitsLabel'])), slug);
+    assert.ok(!/youtube/.test(body), `${slug} has no video`);
+    const article = page.nodes.find((n) => n['@type'] === 'Article');
+    assert.equal(article.isAccessibleForFree, true, slug);
+  }
+});
+
+test('a guide behind the account shows its beginning and the titles of the rest; never the rest', () => {
+  for (const g of GUIDES.filter((x) => !wall.isOpenGuide(x.slug))) {
     const { body } = pageOf(`/guias/${g.slug}`);
     const teaser = wall.guideTeaser(g);
     assert.ok(body.includes(`<h1>${esc(g.title)}</h1>`), g.slug);
@@ -115,7 +142,7 @@ test('the wall brings people back to the page they were on, in their language', 
   // The welcome video is only named: no player, no link to YouTube.
   const video = wall.welcomeVideo();
   assert.ok(video && !video.premium);
-  assert.ok(pageOf('/guias/metodo-50-30-20').body.includes(esc(video.title)));
+  assert.ok(pageOf('/guias/deducciones-renta-castilla-y-leon').body.includes(esc(video.title)));
 });
 
 test('structured data only describes what the gated pages show', () => {
@@ -136,6 +163,10 @@ test('structured data only describes what the gated pages show', () => {
       page.path
     );
     assert.deepEqual(page.videos ?? [], [], `${page.path} lists no video in the sitemap`);
+    const article = page.nodes.find((n) => n['@type'] === 'Article');
+    if (article && !wall.isOpenGuide(page.path.replace('/guias/', ''))) {
+      assert.equal(article.isAccessibleForFree, undefined, `${page.path} is not marked free`);
+    }
   }
   // The Videoteca keeps its public videos.
   assert.ok(deepTypes(pageOf('/videoteca').nodes).includes('VideoObject'));

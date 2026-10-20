@@ -56,14 +56,18 @@ export function TeaserOutline({ title, items }: { title: string; items: string[]
 /**
  * The invitation to create an account. `wall`: in place of a guide or a calculator, with the
  * welcome video; `cta`: at the end of the lists (guides, Hacienda, Videoteca). Nothing with a
- * session, nor while it is being restored.
+ * session, nor while it is being restored. `soft`: the quiet invitation at the end of a guide that
+ * is open to everybody (no kicker, no benefits, no video).
  */
 export function SignupWall({
   kicker,
   variant = 'wall',
+  onRegister,
 }: {
   kicker?: string;
-  variant?: 'wall' | 'cta';
+  variant?: 'wall' | 'cta' | 'soft';
+  /** Called when «Crear cuenta» is clicked (to count it anonymously). */
+  onRegister?: () => void;
 }) {
   const { t } = useI18n();
   const { pathname } = useLocation();
@@ -76,6 +80,7 @@ export function SignupWall({
       </p>
     );
   }
+  const soft = variant === 'soft';
   const back = isGatedPath(pathname);
   const numbers = wallNumbers();
   const video = variant === 'wall' ? welcomeVideo() : undefined;
@@ -88,13 +93,16 @@ export function SignupWall({
       )}
       {kicker && <p className="signup-wall-kicker">{kicker}</p>}
       <h2 id="signup-wall-title" className="signup-wall-title">
-        {t('wall.title')}
+        {t(soft ? 'wall.soft.title' : 'wall.title')}
       </h2>
-      <p className="signup-wall-lead">{t(variant === 'wall' ? 'wall.lead' : 'wall.leadCta')}</p>
+      <p className="signup-wall-lead">
+        {t(soft ? 'wall.soft.lead' : variant === 'wall' ? 'wall.lead' : 'wall.leadCta')}
+      </p>
       <div className="signup-wall-actions">
         <Link
           className="signup-wall-register"
           to={back ? registerHref(pathname) : '/login?mode=register'}
+          onClick={onRegister}
         >
           {t('wall.register')}
         </Link>
@@ -106,26 +114,30 @@ export function SignupWall({
         </Link>
       </div>
       <p className="signup-wall-note">{t('wall.note')}</p>
-      <div className="signup-wall-body">
-        <ul className="signup-wall-benefits" aria-label={t('wall.benefitsLabel')}>
-          {WALL_BENEFITS.map((id) => (
-            <li key={id}>
-              <span className="signup-wall-check" aria-hidden="true">
-                <Icon name="check" size={14} />
-              </span>
-              <span>
-                {t(`wall.benefit.${id}`, { n: numbers[id as keyof typeof numbers] ?? '' })}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {video && (
-          <div className="signup-wall-video">
-            <p className="signup-wall-video-title">{t('wall.video', { min: minutesOf(video) })}</p>
-            <VideoEmbed video={video} />
-          </div>
-        )}
-      </div>
+      {!soft && (
+        <div className="signup-wall-body">
+          <ul className="signup-wall-benefits" aria-label={t('wall.benefitsLabel')}>
+            {WALL_BENEFITS.map((id) => (
+              <li key={id}>
+                <span className="signup-wall-check" aria-hidden="true">
+                  <Icon name="check" size={14} />
+                </span>
+                <span>
+                  {t(`wall.benefit.${id}`, { n: numbers[id as keyof typeof numbers] ?? '' })}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {video && (
+            <div className="signup-wall-video">
+              <p className="signup-wall-video-title">
+                {t('wall.video', { min: minutesOf(video) })}
+              </p>
+              <VideoEmbed video={video} />
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
