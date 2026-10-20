@@ -66,9 +66,7 @@ export function LandingPage() {
                 width="360"
                 height="640"
                 decoding="async"
-                {...(i === 0
-                  ? { fetchPriority: 'high' as const }
-                  : { loading: 'lazy' as const })}
+                {...(i === 0 ? { fetchPriority: 'high' as const } : { loading: 'lazy' as const })}
               />
             </figure>
           ))}
