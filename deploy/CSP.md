@@ -30,6 +30,12 @@ que la política antigua no tenía y que sí hacen falta:
 - `worker-src 'self' blob:` (worker del OCR).
 - `blob:` en `img-src` (vista previa del resumen para compartir).
 
+## Seguimiento de errores (Sentry)
+
+`connect-src` incluye `https://*.ingest.de.sentry.io` (Sentry, región UE). Si usas GlitchTip u otro
+host, añade su origen a `connect-src` en el `Caddyfile` (ver `MONITORIZACION.md`). Sin DSN la app no
+hace ninguna conexión a ese servicio.
+
 ## Qué NO se pudo verificar (por eso la completa sigue en Report-Only)
 
 - Inicio de sesión con Google (ventana emergente real con cuenta real).
