@@ -8,6 +8,7 @@ import {
 } from '@domain/services/autonomo-vat-data';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
+import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
 export const money = z
@@ -50,6 +51,8 @@ export const registerBody = z.object({
   locale,
   /** Code of the user who invited this one. */
   referralCode: z.string().trim().max(32).optional(),
+  /** Origin of the visit (funnel, anonymous): checked apart, so a bad one never blocks a sign-up. */
+  origin: z.unknown().optional(),
 });
 export const loginBody = z.object({
   email: z.string().trim().min(1).max(254),
@@ -64,6 +67,7 @@ export const googleBody = z
     idToken: z.string().min(1).max(5000).optional(),
     locale,
     referralCode: z.string().trim().max(32).optional(),
+    origin: z.unknown().optional(),
   })
   .refine((b) => b.token || b.idToken, { message: 'token requerido' });
 export const resetBody = z.object({
@@ -900,6 +904,30 @@ export const ruleSuggestQuery = z.object({ description: z.string().trim().min(1)
 export const offerParams = z.object({ id: z.string().regex(/^[a-z0-9-]{2,40}$/) });
 
 // ---------- Client error reports ----------
+// ─── Funnel analytics (docs/analitica.md) ────────────────────────────────────
+
+const originText = z.string().max(80).optional();
+/** Where the page load came from, as the browser read it: normalised on the server. */
+export const funnelOrigin = z
+  .object({
+    utm_source: originText,
+    utm_campaign: originText,
+    utm_content: originText,
+    ref: originText,
+    app: z.boolean().optional(),
+  })
+  .strict();
+/** One anonymous funnel event from the browser: a closed list, no free text, no identifiers. */
+export const funnelBody = funnelOrigin
+  .extend({
+    event: z.enum(CLIENT_FUNNEL_EVENTS),
+    guide: z
+      .string()
+      .regex(/^[a-z0-9-]{1,80}$/)
+      .optional(),
+  })
+  .strict();
+
 export const clientErrorBody = z.object({
   kind: z.enum(['render', 'error', 'unhandledrejection']),
   message: z.string().trim().min(1).max(500),

@@ -249,7 +249,7 @@ describe('migrations', () => {
     const expected = { ...avatars, png: null, jpeg: null, link: null };
 
     migrate(db, migrations);
-    expect(db.pragma('user_version', { simple: true })).toBe(dropUploadedPictures.version);
+    expect(db.pragma('user_version', { simple: true })).toBe(migrations.length);
     expect(read()).toEqual(expected);
 
     dropUploadedPictures.up(db);

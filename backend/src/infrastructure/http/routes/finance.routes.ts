@@ -105,11 +105,15 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
       const body = importBody.parse(req.body);
       const rows = body.rows.map((r) => ({ ...r, amountCents: r.amount }));
       const options = { accountId: body.accountId, dryRun: body.dryRun, useAi: body.useAi };
+      const before = c.activation.before(req.dataUserId, 'movements');
       const result =
         body.source === 'capture'
           ? await c.importer.importCaptured(req.dataUserId, rows, options)
           : await c.importer.import(req.dataUserId, rows, options);
-      if (!body.dryRun) c.repos.metrics.record('import_done');
+      if (!body.dryRun) {
+        c.repos.metrics.record('import_done');
+        c.activation.after(req.dataUserId, 'movements', before);
+      }
       res.status(body.dryRun ? 200 : 201).json({
         ...result,
         rows: result.rows.map((r) => ({
@@ -129,7 +133,9 @@ export function financeRoutes(c: Container, limiter: RateLimiterFactory): Router
         .status(201)
         .json(
           presentTransaction(
-            c.transactions.create(req.dataUserId, { ...body, amountCents: body.amount })
+            c.activation.around(req.dataUserId, 'movements', () =>
+              c.transactions.create(req.dataUserId, { ...body, amountCents: body.amount })
+            )
           )
         );
     })

@@ -9,6 +9,7 @@ import { billingRoutes, billingWebhookRoute, publicBillingRoutes } from './route
 import { inboundMailRoute } from './routes/inbox.routes';
 import { clientErrorRoutes } from './routes/client.routes';
 import { financeRoutes } from './routes/finance.routes';
+import { funnelRoutes } from './routes/funnel.routes';
 import { householdRoutes } from './routes/household.routes';
 import { learnRoutes } from './routes/learn.routes';
 import { planningRoutes } from './routes/planning.routes';
@@ -57,6 +58,7 @@ export function createApp(c: Container): Express {
   api.use('/auth', authRoutes(c, limiter));
   api.use(publicBillingRoutes(c));
   api.use(clientErrorRoutes(limiter));
+  api.use(funnelRoutes(c, limiter));
   api.use(requireAuth(c.auth, (userId) => c.household.dataOwner(userId)));
   api.use(billingRoutes(c, limiter));
   api.use(householdRoutes(c, limiter));

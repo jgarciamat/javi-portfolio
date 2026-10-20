@@ -95,6 +95,13 @@ export class PlayBillingService {
     }
     const next = this.next(current, event);
     if (!next) return;
+    const stopsRenewing =
+      event.type === 'CANCELLATION' &&
+      !current.lifetime &&
+      !isLifetimeProduct(event.product_id) &&
+      LIVE.has(current.status) &&
+      !current.cancelAtPeriodEnd;
+    if (stopsRenewing) this.metrics.record('subscription_cancelled');
     this.subscriptions.save({ ...next, updatedAt: now.toISOString() });
     if (event.type === 'INITIAL_PURCHASE' || event.type === 'NON_RENEWING_PURCHASE') {
       this.metrics.record('purchase');

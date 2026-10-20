@@ -95,6 +95,9 @@ import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetReposito
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqlitePersonalDataReader } from './sqlite/repositories/SqlitePersonalDataReader';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
+import { SqliteFunnelRepository } from './sqlite/repositories/SqliteFunnelRepository';
+import { ActivationTracker } from '@application/analytics/ActivationTracker';
+import type { FirstStepId } from '@application/referrals/ReferralService';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
@@ -141,7 +144,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   const clock = overrides.clock ?? systemClock;
   const uow = new SqliteUnitOfWork(db);
 
+  const funnel = new SqliteFunnelRepository(db, clock);
   const repos = {
+    funnel,
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     twoFactor: new SqliteTwoFactorRepository(db),
@@ -171,7 +176,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     billingEvents: new SqliteBillingEventRepository(db),
     aiUsage: new SqliteAiUsageRepository(db),
     affiliateClicks: new SqliteAffiliateClickRepository(db),
-    metrics: new SqliteMetricsRepository(db, clock),
+    metrics: new SqliteMetricsRepository(db, clock, funnel),
     referrals: new SqliteReferralRepository(db),
     household: new SqliteHouseholdRepository(db),
   };
@@ -314,6 +319,20 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       ? new AesSecretBox(config.twoFactor.encryptionKey, 'autonomo-data')
       : null;
 
+  // What counts for the first steps (invitations and the activation funnel).
+  const firstStepCount = (userId: string, step: FirstStepId): number => {
+    switch (step) {
+      case 'movements':
+        return repos.transactions.count(userId);
+      case 'budgets':
+        return repos.budgets.listByUser(userId).length;
+      case 'goals':
+        return repos.goals.listByUser(userId).length;
+      case 'automations':
+        return repos.rules.listByUser(userId).length;
+    }
+  };
+
   return {
     db,
     config,
@@ -333,12 +352,13 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       // First steps: 3 movements, a budget, a goal and an automation (FIRST_STEPS_GOALS).
       (userId) => ({
-        movements: repos.transactions.count(userId),
-        budgets: repos.budgets.listByUser(userId).length,
-        goals: repos.goals.listByUser(userId).length,
-        automations: repos.rules.listByUser(userId).length,
+        movements: firstStepCount(userId, 'movements'),
+        budgets: firstStepCount(userId, 'budgets'),
+        goals: firstStepCount(userId, 'goals'),
+        automations: firstStepCount(userId, 'automations'),
       })
     ),
+    activation: new ActivationTracker(funnel, firstStepCount),
     household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
     payments,

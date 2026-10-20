@@ -80,7 +80,11 @@ async function main(): Promise<void> {
   backups?.start(config.backup.intervalHours);
 
   const cleanup = setInterval(
-    () => container.repos.refreshTokens.deleteExpired(new Date()),
+    () => {
+      container.repos.refreshTokens.deleteExpired(new Date());
+      // Funnel counters older than the retention period (docs/analitica.md).
+      container.repos.funnel.purgeExpired();
+    },
     6 * 60 * 60 * 1000
   );
   cleanup.unref();

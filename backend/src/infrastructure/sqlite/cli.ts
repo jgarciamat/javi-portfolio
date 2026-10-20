@@ -2,11 +2,15 @@
  *   npm run db:migrate   → applies pending migrations (the server also does it on start)
  *   npm run db:backup    → writes a consistent copy to BACKUP_DIR (or ./data/backups)
  *   npm run stats        → anonymous product counters for the last N days (default 30)
+ *   npm run funnel       → anonymous funnel (by step, origin, campaign, guide and day), N days
+ *   In the production image (no ts-node): node dist/infrastructure/sqlite/cli.js funnel 30
  */
 import dotenv from 'dotenv';
 import { loadConfig } from '@config/env';
 import { systemClock } from '@domain/ports/services';
 import { formatStats } from './stats';
+import { formatFunnel } from './funnelReport';
+import { SqliteFunnelRepository } from './repositories/SqliteFunnelRepository';
 import { BackupService } from '../backup/BackupService';
 import { openDatabase } from './database';
 import { SqliteMetricsRepository } from './repositories/SqliteMetricsRepository';
@@ -30,8 +34,10 @@ async function run(command: string | undefined, arg?: string): Promise<void> {
       console.info(`[db] backup written to ${file}`);
     } else if (command === 'stats') {
       console.info(formatStats(new SqliteMetricsRepository(db, systemClock), Number(arg) || 30));
+    } else if (command === 'funnel') {
+      console.info(formatFunnel(new SqliteFunnelRepository(db, systemClock), Number(arg) || 30));
     } else {
-      console.error('Usage: cli.ts <migrate|backup|stats [days]>');
+      console.error('Usage: cli.ts <migrate|backup|stats [days]|funnel [days]>');
       process.exitCode = 1;
     }
   } finally {

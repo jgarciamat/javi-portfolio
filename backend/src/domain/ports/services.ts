@@ -202,11 +202,54 @@ export type MetricName =
   | 'import_done'
   | 'referral_joined'
   | 'household_joined'
+  /** A paid subscription stops renewing (scheduled or immediate cancellation). */
+  | 'subscription_cancelled'
   /** Where a new user came from (`signup:reddit`, `signup:google.com`…): a counter, never a person. */
   | `signup:${string}`;
 
 export interface MetricsRecorder {
   record(name: MetricName): void;
+}
+
+/** Funnel events the browser may send (`POST /api/funnel`). Closed list, as in the frontend. */
+export const CLIENT_FUNNEL_EVENTS = [
+  'visit',
+  'signup_view',
+  'guide_view',
+  'guide_cta_click',
+  'pricing_view',
+  'paywall_view',
+] as const;
+
+/** Funnel events only the server records, when the thing really happens. */
+export const SERVER_FUNNEL_EVENTS = [
+  'signup',
+  'trial_start',
+  'email_verified',
+  'first_transaction',
+  'activation_step',
+  'activation_done',
+  'checkout_start',
+  'premium',
+  'cancel',
+] as const;
+
+export type ClientFunnelEvent = (typeof CLIENT_FUNNEL_EVENTS)[number];
+export type FunnelEvent = ClientFunnelEvent | (typeof SERVER_FUNNEL_EVENTS)[number];
+
+/** Dimensions of a funnel counter: never a person, an IP or a device. */
+export interface FunnelDimensions {
+  /** Normalised origin (`tiktok`, `google`, `(direct)`, `(app)`); `(unknown)` when not known. */
+  source?: string;
+  /** `utm_campaign`, plus `/utm_content` when there is one (`renta2026/v041`). */
+  campaign?: string;
+  /** Guide slug or activation step. */
+  detail?: string;
+}
+
+/** Anonymous daily funnel counters, by origin (docs/analitica.md). */
+export interface FunnelRecorder {
+  record(event: FunnelEvent, dimensions?: FunnelDimensions): void;
 }
 
 /** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */

@@ -440,6 +440,14 @@ export class BillingService {
         if (replacesAnother && event.status === 'canceled' && LIVE_STATUSES.has(sub.status)) {
           return {};
         }
+        // A paying subscription that stops renewing: scheduled at the period end or right away.
+        const stopsRenewing =
+          !sub.lifetime &&
+          sub.stripeSubscriptionId === event.subscriptionId &&
+          LIVE_STATUSES.has(sub.status) &&
+          !sub.cancelAtPeriodEnd &&
+          (event.cancelAtPeriodEnd || event.status === 'canceled');
+        if (stopsRenewing) this.options.metrics.record('subscription_cancelled');
         this.subscriptions.save({
           ...sub,
           source: sub.lifetime ? 'lifetime' : 'stripe',

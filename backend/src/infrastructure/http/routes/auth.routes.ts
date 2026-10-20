@@ -22,6 +22,7 @@ import {
   twoFactorVerifyBody,
   verifyQuery,
 } from '../schemas';
+import { recordSignup } from './funnel.routes';
 
 const GENERIC_EMAIL_SENT =
   'Si el email corresponde a una cuenta, recibirás un mensaje en unos minutos.';
@@ -62,12 +63,13 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     '/register',
     registerLimiter,
     asyncHandler(async (req, res) => {
-      const { referralCode, ...input } = registerBody.parse(req.body);
+      const { referralCode, origin, ...input } = registerBody.parse(req.body);
       const { message, createdUserId } = await c.auth.register(input);
       // An e-mail that already had an account gets the same answer and nothing else.
       if (createdUserId) {
         if (referralCode) c.referrals.attach(createdUserId, referralCode);
         c.repos.metrics.record('signup');
+        recordSignup(c, origin);
       }
       res.status(201).json({ message });
     })
@@ -89,11 +91,14 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     loginLimiter,
     asyncHandler(async (req, res) => {
       const body = googleBody.parse(req.body);
-      const { referralCode } = body;
+      const { referralCode, origin } = body;
       res.json(
         await c.auth.loginWithGoogle((body.token ?? body.idToken)!, body.locale, (userId) => {
           // Only a brand-new account can be an invited friend.
           if (referralCode) c.referrals.attach(userId, referralCode);
+          recordSignup(c, origin);
+          // Google has already checked the address.
+          c.repos.funnel.record('email_verified');
         })
       );
     })
