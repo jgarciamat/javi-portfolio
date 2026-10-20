@@ -34,7 +34,9 @@ test('imports a bank statement: preview first, then the movements, and a second 
   await dialog.getByRole('button', { name: 'Previsualizar' }).click();
   await expect(dialog.getByText(/Se importarán 3 movimientos · 0 ya existían/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Importar 3' }).click();
-  await expect(dialog.getByText(/Importados 3 movimientos \(0 duplicados omitidos\)/)).toBeVisible();
+  await expect(
+    dialog.getByText(/Importados 3 movimientos \(0 duplicados omitidos\)/)
+  ).toBeVisible();
 
   // The same file again: everything is recognised as already imported.
   await dialog.getByRole('button', { name: 'Cerrar', exact: true }).last().click();

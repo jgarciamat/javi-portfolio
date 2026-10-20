@@ -29,11 +29,15 @@ test('the Renta assistant goes through the nine steps, in order, to the official
   await expect(model.locator('canvas')).toBeVisible();
 
   const [download] = await Promise.all([
-    page.waitForEvent('download'),
+    page.waitForEvent('download', { timeout: 15_000 }),
     model.getByRole('button', { name: 'Descargar PDF' }).click(),
   ]);
   expect(download.suggestedFilename()).toBe('modelo-100-2025-vista-previa.pdf');
-  expect(readFileSync((await download.path())!).subarray(0, 5).toString()).toBe('%PDF-');
+  expect(
+    readFileSync((await download.path())!)
+      .subarray(0, 5)
+      .toString()
+  ).toBe('%PDF-');
 
   await last.click();
   await expect(steps.getByRole('button', { name: /^Paso 9:/ })).toBeEnabled();
