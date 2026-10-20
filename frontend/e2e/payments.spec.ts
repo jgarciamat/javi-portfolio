@@ -1,4 +1,5 @@
 import type { Page, Route } from '@playwright/test';
+import type { BillingOverview } from '../src/modules/billing/domain/types';
 import { expect, openSection, signIn, test } from './fixtures';
 
 /**
@@ -10,14 +11,12 @@ const CHECKOUT_PAGE = '**/__stripe-test/**';
 const WEB = `http://localhost:${process.env.E2E_WEB_PORT ?? 5186}`;
 
 /** The real answer of the API with what Stripe would change in it. */
-async function withPayments(
-  page: Page,
-  change: (overview: Record<string, any>) => void = () => {}
-) {
+async function withPayments(page: Page, change: (overview: BillingOverview) => void = () => {}) {
   const patch = async (route: Route) => {
     const response = await route.fetch();
-    const body = await response.json();
-    const catalog = body.catalog ?? body;
+    // /billing answers the overview (with the catalog inside); /billing/plans the catalog itself.
+    const body = (await response.json()) as BillingOverview;
+    const catalog = body.catalog ?? (body as unknown as BillingOverview['catalog']);
     catalog.paymentsEnabled = true;
     change(body);
     await route.fulfill({ response, json: body });
@@ -82,6 +81,7 @@ test('a failed checkout keeps the person on the page, with a message and the way
 
 test('a Stripe subscriber manages the plan in the customer portal', async ({ page }) => {
   await withPayments(page, (overview) => {
+    // /billing/plans has no subscription: only the overview is changed.
     if (!overview.subscription) return;
     overview.plan = 'premium';
     overview.trialDaysLeft = 0;
