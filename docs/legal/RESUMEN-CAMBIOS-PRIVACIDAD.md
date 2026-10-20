@@ -87,3 +87,40 @@ un abogado.**
 10. **Stripe y RevenueCat tras la baja.** No se borran por API; la política dice que se
     conservan por obligaciones fiscales y de facturación. Confirmar si conviene borrar o
     anonimizar el cliente de Stripe y el registro de RevenueCat cuando no haya obligación.
+
+# Cambios del 20/10/2026
+
+## Qué ha cambiado en la política
+
+- **Avatar (s2.item3, s8.item1, s11.p2)**: ya no se suben fotos de perfil; solo se elige un
+  emoticono. Las fotos subidas antes se han borrado con la migración `033` (siguen solo en las
+  copias de seguridad, que se borran a los 14 días, como dice s5.item2).
+- **Invitaciones (s2.item8, s3.item6)**: la regla actual: el invitado recibe 30 días de Premium
+  al completar los primeros pasos (3 movimientos, 1 presupuesto, 1 meta, 1 automatización) y
+  quien invita gana hasta 5 meses (1, 5, 20, 40 y 50 amigos). Se guarda quién invitó y si el
+  invitado completó los pasos.
+- **Autónomos en la cuenta (s2.item17, s3.item1, s5.item9, s6.item8, s8.item3, s11.p2)**: copia
+  opcional, cifrada con AES-256-GCM, de facturas, trimestres, retenciones, actividad, modelos
+  importados, opciones y avance del asistente; se puede borrar. La Renta sigue solo en el
+  dispositivo.
+- **Verificación en dos pasos (s2.item16, s3.item1, s5.item9, s6.item8, s11.p2)**: clave cifrada,
+  códigos de recuperación como hash.
+- **Lectura en el dispositivo (s6.item9)**: borrador de la Renta, archivos de inversiones y PDF de
+  Autónomos. **Tipos del BCE (s4.item8)**: la importación de inversiones usa un fichero servido
+  desde finanverso.app.
+- **IA (s3.item3, s4.item3)**: ya no es solo Premium: el plan Gratuito tiene 1 análisis al mes.
+- **Datos de uso (s2.item15, s5.item4)**: se añaden los contadores de Autónomos e importaciones.
+- **Eliminación (s11.step2-4)**: el botón está ahora al final del perfil, que se abre desde el menú.
+
+## Dudas abiertas nuevas
+
+11. **Base jurídica de la copia de Autónomos y de la verificación en dos pasos.** Se han añadido a
+    «ejecución del contrato» (art. 6.1.b) porque son funciones que activa el usuario. Confirmar.
+12. **Datos de terceros en la copia de Autónomos.** Las facturas llevan nombres y, a veces, NIF de
+    clientes y proveedores del autónomo. Para esos datos Finanverso podría ser encargado del
+    tratamiento del autónomo (art. 28): valorar una cláusula de encargo en las condiciones.
+13. **Condiciones del programa de invitaciones.** Las condiciones de contratación no lo
+    mencionan; si se quieren reglas vinculantes (30 días, meses por tramos, límites, abusos),
+    habría que añadirlas a `terms.*` y pedir de nuevo la aceptación. No se han tocado.
+14. **Aviso de cambios (s10).** La política promete avisar en la app cuando cambie, pero solo hay
+    aviso para las condiciones (`terms.update`). Decidir si se avisa de esta versión.

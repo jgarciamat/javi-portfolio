@@ -141,7 +141,7 @@ function LockedVideoCard({
 }
 
 /** One video: the whole card opens it on YouTube in a new tab (locked when it is Premium). */
-function VideoCard({ video, premium }: { video: VideoEntry; premium: PremiumVideos }) {
+export function VideoCard({ video, premium }: { video: VideoEntry; premium: PremiumVideos }) {
   const { t } = useI18n();
   const duration = video.durationSeconds ? formatDuration(video.durationSeconds) : null;
   const id = watchId(video, premium.ids);

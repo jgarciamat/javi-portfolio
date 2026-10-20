@@ -34,7 +34,7 @@ export function importSummary(ledger: LedgerResult, year: number): ImportSummary
   for (const s of ledger.sales) byType[TYPE[s.kind] ?? 'other'] += s.gain + s.deferred;
   for (const d of ledger.direct) byType.derivatives += d.gain;
   const c = ledger.imported.capital;
-  byType.income = c.interest + c.dividends + c.assets - c.expenses;
+  byType.income = c.interest + c.dividends + c.bills + c.assets - c.expenses;
   byType.other += ledger.imported.generalGains.reduce((s, g) => s + g, 0);
   for (const key of Object.keys(byType) as InvestType[]) byType[key] = round2(byType[key]);
   const total = round2(Object.values(byType).reduce((s, v) => s + v, 0));

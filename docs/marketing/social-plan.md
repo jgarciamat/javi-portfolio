@@ -4,6 +4,9 @@ Objetivo: conseguir usuarios para Money Manager con vídeos cortos útiles (90 v
 pongan en riesgo las cuentas. Los vídeos, guiones, pies de foto y calendario están en `/Users/javi/money-manager-videos/`
 (`GUIONES.md`, `CALENDARIO.md`, `calendario.csv`).
 
+**Informe de audiencia y crecimiento (oct-2026):** qué busca la gente, hashtags, referentes, 30 ideas con ganchos,
+embudo con UTM, anuncios y plan de 30 días en [`informe-tiktok-instagram.md`](informe-tiktok-instagram.md).
+
 ## 1. Crear las cuentas (lo hace el propietario, una sola vez)
 
 Las cuentas las tiene que crear una persona con su correo y su teléfono: yo no puedo crearlas ni verificarlas.
@@ -64,8 +67,9 @@ Lo que funciona y no pone en riesgo la cuenta:
 3. **Responder a todos los comentarios** de los primeros 60 minutos de cada vídeo.
 4. **Reutilizar cada vídeo** en Instagram Reels, TikTok y YouTube Shorts el mismo día.
 5. **Enlace en la biografía** con una página que lleve a Play Store; en cada vídeo, «enlace en mi perfil».
-6. **Sistema de invitaciones de la app:** 1 mes de Premium para quien invita y para quien se registra; mencionarlo en
-   un vídeo al mes.
+6. **Sistema de invitaciones de la app:** 1 mes de Premium para quien se registra (al completar los primeros pasos) y,
+   para quien invita, hasta 5 meses (1 mes con 1 amigo, 2 con 5, 3 con 20, 4 con 40, 5 con 50); mencionarlo en un
+   vídeo al mes.
 7. **Directos o respuestas** a preguntas habituales (¿cuánto IVA pago?, ¿me compensa la tarifa plana?) con los
    mismos temas de los vídeos.
 

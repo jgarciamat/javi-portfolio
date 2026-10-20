@@ -1,13 +1,9 @@
-import { ForbiddenError, NotFoundError, ValidationError } from '@domain/errors';
+import { ForbiddenError, NotFoundError } from '@domain/errors';
 import { User } from '@domain/model/User';
 import { RefreshTokenRepository, UnitOfWork, UserRepository } from '@domain/ports/repositories';
 import { PasswordHasher } from '@domain/ports/services';
 import { assertStrongPassword } from '@domain/shared/password-policy';
 import { AuthService, SessionTokens } from '@application/auth/AuthService';
-
-const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
-const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
-const DATA_URL = /^data:(image\/[a-z+]+);base64,([A-Za-z0-9+/=]+)$/;
 
 export class ProfileService {
   constructor(
@@ -65,23 +61,10 @@ export class ProfileService {
     });
   }
 
-  updateAvatar(userId: string, dataUrl: string | null): { avatarUrl: string | null } {
-    const user = this.requireUser(userId);
-    if (dataUrl !== null) {
-      const match = DATA_URL.exec(dataUrl);
-      if (!match || !AVATAR_TYPES.includes(match[1])) {
-        throw new ValidationError(
-          'Formato de imagen no válido (PNG, JPEG, WebP o GIF)',
-          'INVALID_IMAGE'
-        );
-      }
-      const bytes = Buffer.from(match[2], 'base64').length;
-      if (bytes > AVATAR_MAX_BYTES) {
-        throw new ValidationError('La imagen es demasiado grande (máx. 2 MB)', 'IMAGE_TOO_LARGE');
-      }
-    }
-    this.users.save(user.withAvatar(dataUrl));
-    return { avatarUrl: dataUrl };
+  /** Sets the emoji avatar (null: the default one). Pictures are no longer accepted. */
+  updateAvatar(userId: string, avatar: string | null): { avatar: string | null } {
+    this.users.save(this.requireUser(userId).withAvatar(avatar));
+    return { avatar };
   }
 
   /** Deletes the user; every owned row goes with it (ON DELETE CASCADE). */

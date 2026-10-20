@@ -249,6 +249,12 @@ function jointItem(form: RentaForm, data: OptimizerData): Opportunity | null {
   };
 }
 
+/** What the form saves against the same form with `patch` (e.g. an amount typed, taken away). */
+export function savingOver(form: RentaForm, data: RentaData, patch: Partial<RentaForm>): number {
+  const without = computeRenta(toInput({ ...form, ...patch }, data)).result;
+  return round2(without - computeRenta(toInput(form, data)).result);
+}
+
 /**
  * Everything that could lower the tax, the highest saving first: the personal and family data, the
  * reductions, the property and savings, the joint return and the deductions that could apply

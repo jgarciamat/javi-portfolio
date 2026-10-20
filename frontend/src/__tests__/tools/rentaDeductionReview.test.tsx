@@ -37,11 +37,30 @@ const render = (p: ReviewProps) =>
   renderWithProviders(<DeductionReview {...p} />, { authenticated: false });
 
 describe('the review, on its own', () => {
-  it('says when a deduction saves nothing, and the limit of one without a note', () => {
-    render(props());
+  it('says when a marked deduction saves nothing, and the limit of one without a note', () => {
+    const { unmount } = render(
+      props({ savings: { 'estado-a': { saving: 9, blocked: false, example: null } } })
+    );
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.review.start') }));
+    // Not marked yet: a question, without what it would save.
+    expect(screen.queryByText(tr('tools.renta.review.saving'), { exact: false })).toBeNull();
+    unmount();
+    const { unmount: unmount2 } = render(
+      props({ choices: { 'estado-a': { on: true, amount: '', units: '' } }, dismissed: [] })
+    );
     expect(screen.getByText(/Tu base supera el límite de 20.000/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.review.start') }));
     expect(screen.getByText(tr('tools.renta.saving.none'))).toBeInTheDocument();
+    unmount2();
+    // Marked, worked out on an example amount: it says so.
+    render(
+      props({
+        choices: { 'estado-a': { on: true, amount: '', units: '' } },
+        savings: { 'estado-a': { saving: 9, blocked: false, example: 100 } },
+      })
+    );
+    fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.review.start') }));
+    expect(screen.getByText(/de ejemplo/)).toBeInTheDocument();
     // While going through them, the ones out of reach are not in the way.
     expect(screen.queryByText(/Tu base supera/)).toBeNull();
   });

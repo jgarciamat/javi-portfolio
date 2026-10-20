@@ -2,6 +2,7 @@ import { storage } from '@shared/utils/storage';
 import type { AnnualActivity } from '@modules/finances/domain/annualActivity';
 import { NO_EXTRAS, emptyManual, type Extras, type ManualForm } from './AutonomoManual';
 import { annualOf } from './autonomoInputs';
+import { filingQuarter, type Quarter } from '../../domain/autonomoQuarters';
 
 /**
  * The self-employed year for the Renta: which year the data on this device is of, and the annual
@@ -30,6 +31,26 @@ export function preferredYear(
   fallback: number
 ): number {
   return invoiceYears(manual).find((y) => years.includes(y)) ?? fallback;
+}
+
+/**
+ * The year and quarter to open the screen with on `now`: the quarter just ended during its filing
+ * window, else the current one (`filingQuarter`); or, when the invoices are of another year, that
+ * year and its last quarter with invoices.
+ */
+export function openingPeriod(
+  manual: Pick<ManualForm, 'invoices'>,
+  years: readonly number[],
+  now: Date
+): { year: number; quarter: Quarter } {
+  const filing = filingQuarter(now);
+  const year = preferredYear(manual, years, filing.year);
+  if (year === filing.year) return filing;
+  const quarters = manual.invoices
+    .filter((i) => i.date.startsWith(`${year}-`))
+    .map((i) => Math.ceil(Number(i.date.slice(5, 7)) / 3))
+    .filter((q) => q >= 1 && q <= 4);
+  return { year, quarter: (quarters.length ? Math.max(...quarters) : 4) as Quarter };
 }
 
 /** Whether something was typed or imported in the form. */

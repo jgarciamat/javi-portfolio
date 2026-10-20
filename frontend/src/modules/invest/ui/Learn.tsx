@@ -12,6 +12,7 @@ import {
 } from '../domain/content';
 import type { ChapterInfo, ChapterTopic } from '../domain/types';
 import { ChapterBody } from './ChapterBody';
+import { ChapterVideos } from './ChapterVideos';
 import { LearnLocked } from './LearnLocked';
 
 const LEVEL_KEY = { 1: 'starter', 2: 'medium', 3: 'advanced' } as const;
@@ -138,6 +139,7 @@ export function Learn({
         </h2>
         {en && <p className="inv-note">{t('app.invest.learn.spanishOnly')}</p>}
         <ChapterText chapter={chapter} premium={premium} onUpgrade={onUpgrade} />
+        <ChapterVideos numbers={chapter.videos} />
         <nav className="inv-pager" aria-label={t('app.invest.learn.pager')}>
           {prev ? (
             <button type="button" className="btn-secondary" onClick={() => onOpen(prev.id)}>

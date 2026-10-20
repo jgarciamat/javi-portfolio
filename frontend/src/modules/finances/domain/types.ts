@@ -48,6 +48,23 @@ export interface UpdateTransactionDTO {
   notes?: string | null;
 }
 
+/** One change applied to many movements at once (PATCH /transactions/bulk). */
+export interface BulkTransactionChanges {
+  categoryId?: string;
+  type?: TransactionType;
+  accountId?: string;
+  date?: string;
+  notes?: string | null;
+  /** `append` adds the text after the current notes of each movement. */
+  notesMode?: 'replace' | 'append';
+}
+
+/** What a bulk operation did: the ids changed and the ones left alone, with the reason. */
+export interface BulkResult {
+  applied: string[];
+  skipped: { id: string; code: string; reason: string }[];
+}
+
 export interface Category {
   id: string;
   name: string;

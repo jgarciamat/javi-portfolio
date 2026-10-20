@@ -77,3 +77,11 @@ export function withAutonomoActivity(form: RentaForm | null, activity: ActivityI
   const others = (base.activities ?? []).filter((a) => a.name !== AUTONOMO_ACTIVITY);
   return { ...base, activities: [...others, activity] };
 }
+
+/** The form without the activity brought from the self-employed screen (the rest stays as it was). */
+export function withoutAutonomoActivity(form: RentaForm): RentaForm {
+  return {
+    ...form,
+    activities: (form.activities ?? []).filter((a) => a.name !== AUTONOMO_ACTIVITY),
+  };
+}

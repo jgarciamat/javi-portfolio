@@ -3,9 +3,11 @@ import {
   ReferralService,
   MAX_INVITED_PER_USER,
   REFERRAL_REWARD_DAYS,
+  firstStepsProgress,
   friendsForReward,
   rewardsEarned,
 } from '@application/referrals/ReferralService';
+import { referralSummaryResponse } from '@infrastructure/http/schemas';
 import {
   TestContext,
   TestUser,
@@ -16,11 +18,52 @@ import {
 } from '../helpers/testApp';
 
 describe('reward tiers', () => {
-  it('rewards each of the first 3 friends, then needs 6, 16, 31… in total', () => {
-    expect([0, 1, 2, 3, 4, 5, 6, 7].map(friendsForReward)).toEqual([0, 1, 2, 3, 6, 16, 31, 51]);
-    expect([0, 1, 2, 3, 5, 6, 15, 16, 30, 31, 50, 51].map(rewardsEarned)).toEqual([
-      0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7,
+  it('gives the months at 1, 5, 20, 40 and 50 friends in total, and no more', () => {
+    expect([0, 1, 2, 3, 4, 5, 6].map(friendsForReward)).toEqual([0, 1, 5, 20, 40, 50, null]);
+    expect([0, 1, 4, 5, 19, 20, 39, 40, 49, 50, 51, 100].map(rewardsEarned)).toEqual([
+      0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5,
     ]);
+  });
+
+  it('lets friends who never finish leave room for the last tier', () => {
+    expect(MAX_INVITED_PER_USER).toBeGreaterThan(50);
+  });
+
+  it('caps each step at its goal', () => {
+    expect(firstStepsProgress({ movements: 7, budgets: 0, goals: 2, automations: 1 })).toEqual([
+      { id: 'movements', count: 3, goal: 3, done: true },
+      { id: 'budgets', count: 0, goal: 1, done: false },
+      { id: 'goals', count: 1, goal: 1, done: true },
+      { id: 'automations', count: 1, goal: 1, done: true },
+    ]);
+  });
+});
+
+describe('referral response', () => {
+  const valid = {
+    code: 'ABCD2345',
+    qualified: 0,
+    pending: 0,
+    rewardDays: 30,
+    rewardsEarned: 0,
+    missing: 1,
+    nextAt: 1,
+    maxed: false,
+    maxRewards: 5,
+    tiers: [1, 5, 20, 40, 50],
+    invited: null,
+  };
+
+  it('accepts the summary and rejects anything extra, such as who invited the user', () => {
+    expect(referralSummaryResponse.parse(valid)).toEqual(valid);
+    expect(() => referralSummaryResponse.parse({ ...valid, referrerId: 'u1' })).toThrow();
+    expect(() =>
+      referralSummaryResponse.parse({
+        ...valid,
+        invited: { rewarded: false, steps: [], inviter: 'Ana' },
+      })
+    ).toThrow();
+    expect(() => referralSummaryResponse.parse({ ...valid, missing: -1 })).toThrow();
   });
 });
 
@@ -74,6 +117,11 @@ describe('Invite a friend', () => {
       rewardDays: 30,
       rewardsEarned: 0,
       missing: 1,
+      nextAt: 1,
+      maxed: false,
+      maxRewards: 5,
+      tiers: [1, 5, 20, 40, 50],
+      invited: null,
     });
     expect((await summary()).code).toBe(first.code);
     expect((await summary(await createUser(ctx))).code).not.toBe(first.code);
@@ -95,7 +143,8 @@ describe('Invite a friend', () => {
       qualified: 1,
       pending: 0,
       rewardsEarned: 1,
-      missing: 1,
+      missing: 4, // the second month comes with 5 friends
+      nextAt: 5,
     });
     expect(await trialDays(host)).toBe(44);
     expect(ctx.container.repos.metrics.totals('2026-03-01', '2026-03-31')).toContainEqual({
@@ -136,35 +185,67 @@ describe('Invite a friend', () => {
     expect(await trialDays(host)).toBe(30);
   });
 
-  it('gives a month for each of the first 3 friends, then at 6 and 16 friends', async () => {
-    // Same rules, with the first-steps check answered "done" so friends need no data.
-    const service = new ReferralService(
+  const instantService = () =>
+    // Same rules, with every first step answered "done" so friends need no data.
+    new ReferralService(
       ctx.container.repos.referrals,
       ctx.container.entitlements,
       ctx.container.repos.metrics,
       ctx.container.clock,
-      () => true
+      () => ({ movements: 3, budgets: 1, goals: 1, automations: 1 })
     );
+
+  it('gives the months at 1, 5, 20, 40 and 50 friends, and says when the maximum is reached', async () => {
+    const service = instantService();
     const { code } = await summary();
     const friends: TestUser[] = [];
-    for (let i = 0; i < 16; i++) friends.push(await createUser(ctx, undefined, code));
+    for (let i = 0; i < 52; i++) friends.push(await createUser(ctx, undefined, code));
     const days = () => trialDays(host);
     const qualify = (count: number) => friends.slice(0, count).forEach((f) => service.reward(f.id));
 
-    for (const n of [1, 2, 3]) {
-      qualify(n);
-      expect(await days()).toBe(14 + n * REFERRAL_REWARD_DAYS);
-    }
-    qualify(5); // 5 qualified: the fourth month needs 6
+    qualify(1);
+    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
+    qualify(4); // the second month needs 5
+    expect(await days()).toBe(14 + REFERRAL_REWARD_DAYS);
+    expect(await summary()).toMatchObject({ qualified: 4, rewardsEarned: 1, missing: 1 });
+    qualify(5);
+    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
+    qualify(19);
+    expect(await days()).toBe(14 + 2 * REFERRAL_REWARD_DAYS);
+    qualify(20);
     expect(await days()).toBe(14 + 3 * REFERRAL_REWARD_DAYS);
-    qualify(6);
+    qualify(40);
     expect(await days()).toBe(14 + 4 * REFERRAL_REWARD_DAYS);
-    qualify(15); // the fifth needs 16
-    expect(await days()).toBe(14 + 4 * REFERRAL_REWARD_DAYS);
-    qualify(16);
+    expect(await summary()).toMatchObject({ rewardsEarned: 4, missing: 10, nextAt: 50 });
+    qualify(50);
+    expect(await days()).toBe(14 + 5 * REFERRAL_REWARD_DAYS);
+    expect(await summary()).toMatchObject({
+      qualified: 50,
+      pending: 2,
+      rewardsEarned: 5,
+      missing: 0,
+      nextAt: null,
+      maxed: true,
+    });
+    qualify(52); // past the maximum the friends still get their month, the inviter nothing more
     expect(await days()).toBe(14 + 5 * REFERRAL_REWARD_DAYS);
     expect(ctx.container.repos.referrals.rewardsGranted(host.id)).toBe(5);
-    expect(await summary()).toMatchObject({ qualified: 16, rewardsEarned: 5, missing: 15 });
+    expect(await trialDays(friends[51])).toBe(14 + REFERRAL_REWARD_DAYS);
+  });
+
+  it('keeps the months granted under the old tiers and adds only those over them', async () => {
+    const service = instantService();
+    const { code } = await summary();
+    const friends: TestUser[] = [];
+    for (let i = 0; i < 6; i++) friends.push(await createUser(ctx, undefined, code));
+    friends.slice(0, 3).forEach((f) => ctx.container.repos.referrals.markRewarded(f.id, 'x'));
+    // Old rule: 3 friends, 3 months already given.
+    ctx.container.repos.referrals.setRewardsGranted(host.id, 3);
+    service.reward(friends[3].id);
+    service.reward(friends[4].id); // 5 friends: 2 months with the new table, fewer than 3
+    expect(ctx.container.repos.referrals.rewardsGranted(host.id)).toBe(3);
+    expect(await trialDays(host)).toBe(14);
+    expect(await summary()).toMatchObject({ qualified: 5, rewardsEarned: 2, nextAt: 20 });
   });
 
   it('skips lifetime users', async () => {
@@ -196,6 +277,29 @@ describe('Invite a friend', () => {
     await googleSignup('lu', (await summary(await createUser(ctx))).code);
     await googleSignup('pau');
     expect(await summary()).toMatchObject({ pending: 1 });
+  });
+
+  it('tells an invited user what is missing for their month, and nothing about the inviter', async () => {
+    const { code } = await summary();
+    const friend = await createUser(ctx, undefined, code);
+    const steps = async () => (await summary(friend)).invited;
+    expect(await steps()).toEqual({
+      rewarded: false,
+      steps: [
+        { id: 'movements', count: 0, goal: 3, done: false },
+        { id: 'budgets', count: 0, goal: 1, done: false },
+        { id: 'goals', count: 0, goal: 1, done: false },
+        { id: 'automations', count: 0, goal: 1, done: false },
+      ],
+    });
+    await addTransaction(ctx, friend, { amount: 1 });
+    expect((await steps()).steps[0]).toEqual({ id: 'movements', count: 1, goal: 3, done: false });
+    await doFirstSteps(friend);
+    const done = await steps();
+    expect(done.rewarded).toBe(true);
+    expect(done.steps.every((s: { done: boolean }) => s.done)).toBe(true);
+    expect(JSON.stringify(await summary(friend))).not.toContain(host.id);
+    expect(await trialDays(friend)).toBe(44);
   });
 
   it('stops attaching invitations to a user over the cap', async () => {

@@ -37,7 +37,9 @@ import type { AssetClass, InvestOp, InvestWarning } from './types';
  *   each; the app says so next to each one.
  * - Mining (and trading as an organised business): an economic activity, left out of the savings.
  * - Derivatives (CFDs, leveraged positions): gains of the savings base (art. 46.b) — NO CONFIRMADO.
- * - Treasury bills and bonds: capital mobiliario (art. 25.2.b), box 0031 (0030 for bills).
+ * - Letras del Tesoro, bonds and other fixed income: what a sale or the amortization gives is
+ *   capital mobiliario (art. 25.2.b), not a gain: box 0030 for the Letras, 0031 for the rest; their
+ *   coupons are interest (box 0027, 19 % withheld).
  * - Dividends and interest: boxes 0029 and 0027; withholding in Spain, box 0597; tax paid abroad,
  *   deduction of art. 80 (box 0588); custody fees, the only expense, box 0037 (art. 26.1.a).
  */
@@ -118,11 +120,20 @@ const KIND: Record<AssetClass, AssetKind> = {
   shares: 'listed',
   etf: 'listed',
   fund: 'fund',
+  bill: 'other',
   bond: 'other',
   derivative: 'other',
   commodity: 'other',
   fiat: 'other',
 };
+
+/**
+ * Letras del Tesoro (box 0030 of the modelo 100 of 2025): the class, an ISIN of the Letras (ES0L...)
+ * or a name that says «Letra(s)»; any other bond or fixed income goes to box 0031.
+ */
+export const isTreasuryBill = (cls: AssetClass, code: string, name: string) =>
+  cls === 'bill' || (cls === 'bond' && (/^ES0L/i.test(code) || /\bletras?\b/i.test(name)));
+const fixedIncome = (cls: AssetClass) => cls === 'bill' || cls === 'bond';
 
 /** Platforms that keep the assets in Spain, or where the person keeps them (models 720/721). */
 export const SPANISH =
@@ -447,9 +458,14 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
       case 'sell': {
         const { missing } = book.sell(op, op.units, value - op.feeEur);
         if (missing) once(warnings, { code: 'missingPurchase', asset: op.asset, opId: op.id });
-        // A fund repayment withholds 19 % of the gain in Spain (box 0603).
+        // A fund repayment withholds 19 % of the gain in Spain (box 0603); a bond, of the income
+        // (box 0597; Letras and listed bonds have none, RIRPF art. 75.3.b and e).
         if (op.withholding && inYear(op.date))
-          withheld.gains += euros(op.withholding, op.currency, op.date);
+          withheld[fixedIncome(op.assetClass) ? 'capital' : 'gains'] += euros(
+            op.withholding,
+            op.currency,
+            op.date
+          );
         break;
       }
       case 'swap': {
@@ -589,7 +605,8 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
     once(warnings, { code: 'switchWithoutPair', asset: s.op.asset, opId: s.op.id });
   pairTransfers(ops, warnings);
 
-  // Treasury bills and bonds: what the FIFO gives is capital mobiliario (box 0031), not a gain.
+  // Letras and bonds: what the FIFO gives is capital mobiliario (art. 25.2), not a gain (boxes 0030
+  // and 0031).
   const assets: AssetOps[] = [];
   const history: LedgerResult['history'] = [];
   for (const entry of book.assets.values()) {
@@ -598,12 +615,13 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
     for (const s of sales) {
       if (s.unmatched > 1e-9) once(warnings, { code: 'missingPurchase', asset: asset.name });
       if (s.checkRepurchase) once(warnings, { code: 'repurchase', asset: asset.name });
-      if (cls !== 'bond') year(s.date).savings += s.gain + s.deferred;
+      if (!fixedIncome(cls)) year(s.date).savings += s.gain + s.deferred;
     }
-    if (cls === 'bond') {
+    if (fixedIncome(cls)) {
+      const box = isTreasuryBill(cls, asset.code as string, asset.name) ? 'bills' : 'assets';
       for (const s of sales) {
         year(s.date).savings += s.gain;
-        if (inYear(s.date)) capital.assets += s.gain;
+        if (inYear(s.date)) capital[box] += s.gain;
       }
       continue;
     }
@@ -641,6 +659,7 @@ export function buildLedger(input: InvestOp[], options: LedgerOptions): LedgerRe
       capital: {
         interest: r(capital.interest),
         dividends: r(capital.dividends),
+        bills: r(capital.bills),
         assets: r(capital.assets),
         insurance: 0,
         expenses: r(capital.expenses),

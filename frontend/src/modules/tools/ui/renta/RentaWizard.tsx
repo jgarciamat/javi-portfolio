@@ -394,13 +394,7 @@ function reviewScreen(ctx: Ctx): WizardScreen {
           resultLink={false}
           invest={<InvestLink form={p.form} onGo={() => ctx.goStep(INVEST_STEP)} />}
         />
-        <Optimizer
-          form={p.form}
-          set={p.set}
-          ccaa={p.ccaa}
-          found={p.found.candidates}
-          savings={p.savings}
-        />
+        <Optimizer form={p.form} set={p.set} ccaa={p.ccaa} found={p.missing} />
       </>
     ),
   };

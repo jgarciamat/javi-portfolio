@@ -3,7 +3,7 @@ import { useApi } from '@core/context/ApiContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { errorMessage } from '@shared/utils/errors';
 import { storage } from '@shared/utils/storage';
-import type { ImportResult, ImportRowDTO } from '@modules/finances/domain/types';
+import type { ImportResult, ImportRowDTO, TransactionType } from '@modules/finances/domain/types';
 import {
   type BankId,
   bankMapping,
@@ -16,6 +16,7 @@ import {
   parseCSV,
   parseNorma43,
   rowsFromCSV,
+  withType,
 } from '@modules/finances/domain/importParsers';
 
 import { readSpreadsheet, sheetAsText } from '../spreadsheet';
@@ -32,6 +33,8 @@ const NO_MAPPING: ColumnMapping = {
   debit: -1,
   credit: -1,
   category: -1,
+  type: -1,
+  notes: -1,
 };
 
 /** Banks often export Latin-1: fall back to it when UTF-8 decoding produces garbage. */
@@ -68,7 +71,10 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   const [table, setTable] = useState<string[][]>([]);
   const [bank, setBank] = useState<BankId | null>(null);
   const [mapping, setMapping] = useState<ColumnMapping>(NO_MAPPING);
-  const [rows, setRows] = useState<ImportRowDTO[]>([]);
+  const [parsedRows, setRows] = useState<ImportRowDTO[]>([]);
+  /** Types the person corrected row by row (index in the read rows). */
+  const [typeOverrides, setTypeOverrides] = useState<Record<number, TransactionType>>({});
+  const [review, setReview] = useState<number[]>([]);
   const [skipped, setSkipped] = useState<number[]>([]);
   /** '' = the API's default account. */
   const [accountId, setAccountId] = useState(defaultAccountId ?? '');
@@ -83,11 +89,15 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     storage.set(AI_KEY, on ? '1' : null);
   };
 
+  const rows = parsedRows.map((r, i) => (typeOverrides[i] ? withType(r, typeOverrides[i]) : r));
+
   const applyMapping = (tableRows: string[][], next: ColumnMapping) => {
     setMapping(next);
     const parsed = rowsFromCSV(tableRows, next);
     setRows(parsed.rows);
     setSkipped(parsed.skipped);
+    setReview(parsed.review);
+    setTypeOverrides({});
   };
 
   /** A statement as a table of text: find the bank, the header row and the columns. */
@@ -120,6 +130,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         setFormat('norma43');
         setRows(parsed.rows);
         setSkipped(parsed.skipped);
+        setReview([]);
+        setTypeOverrides({});
       } else {
         loadTable(parseCSV(text));
       }
@@ -163,6 +175,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setMapping(NO_MAPPING);
     setRows([]);
     setSkipped([]);
+    setReview([]);
+    setTypeOverrides({});
     setPreview(null);
     setResult(null);
     setError(null);
@@ -177,6 +191,9 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     mapping,
     rows,
     skipped,
+    review,
+    setRowType: (index: number, type: TransactionType) =>
+      setTypeOverrides((prev) => ({ ...prev, [index]: type })),
     accountId,
     setAccountId,
     useAi,

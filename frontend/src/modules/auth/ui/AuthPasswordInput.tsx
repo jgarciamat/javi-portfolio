@@ -1,5 +1,6 @@
 import { useState, type Ref } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { Icon } from '@shared/components/Icon';
 
 interface AuthPasswordInputProps {
   /** Set when a visible <label htmlFor> names the field; otherwise the placeholder does. */
@@ -55,7 +56,7 @@ export function AuthPasswordInput({
         onClick={() => setVisible((v) => !v)}
         aria-label={t(visible ? 'app.auth.login.hidePassword' : 'app.auth.login.showPassword')}
       >
-        {visible ? '🙈' : '👁️'}
+        <Icon name={visible ? 'eyeOff' : 'eye'} size={18} />
       </button>
     </div>
   );

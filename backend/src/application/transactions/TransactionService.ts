@@ -1,4 +1,4 @@
-import { BusinessRuleError, NotFoundError } from '@domain/errors';
+import { BusinessRuleError, DomainError, NotFoundError } from '@domain/errors';
 import { Transaction } from '@domain/model/Transaction';
 import { TransactionType, balanceEffect } from '@domain/model/TransactionType';
 import {
@@ -68,6 +68,27 @@ export interface NewTransactionInput extends CategoryRef {
 }
 
 export type TransactionUpdateInput = Partial<NewTransactionInput>;
+
+/** The same change for many movements; notes can replace or be appended to the current ones. */
+export interface BulkChanges extends CategoryRef {
+  type?: TransactionType | string;
+  accountId?: string;
+  date?: string;
+  notes?: string | null;
+  notesMode?: 'replace' | 'append';
+}
+
+export interface BulkSkip {
+  id: string;
+  code: string;
+  reason: string;
+}
+
+/** What a bulk operation did: the movements it changed and the ones it left alone (and why). */
+export interface BulkResult {
+  applied: string[];
+  skipped: BulkSkip[];
+}
 
 export class TransactionService {
   constructor(
@@ -213,6 +234,58 @@ export class TransactionService {
       const tx = this.require(userId, id);
       if (tx.recurringRuleId) this.rules.addSkip(tx.recurringRuleId, tx.period);
       this.transactions.delete(userId, id);
+    });
+  }
+
+  /**
+   * Runs `work` for every distinct id inside one SQLite transaction. A movement that breaks a
+   * domain rule (or no longer exists) is skipped with its reason; any other error rolls back all.
+   */
+  private bulk(ids: string[], work: (id: string) => void): BulkResult {
+    return this.uow.run(() => {
+      const result: BulkResult = { applied: [], skipped: [] };
+      for (const id of new Set(ids)) {
+        try {
+          work(id);
+          result.applied.push(id);
+        } catch (e) {
+          if (!(e instanceof DomainError)) throw e;
+          result.skipped.push({ id, code: e.code, reason: e.message });
+        }
+      }
+      return result;
+    });
+  }
+
+  /** Deletes many movements; ids already gone are reported as skipped (idempotent). */
+  bulkDelete(userId: string, ids: string[]): BulkResult {
+    return this.bulk(ids, (id) => this.delete(userId, id));
+  }
+
+  /** Applies the same change to many movements, with the same rules as editing one. */
+  bulkUpdate(userId: string, ids: string[], changes: BulkChanges): BulkResult {
+    return this.uow.run(() => {
+      // Resolved once: an unknown category or account rejects the whole request.
+      const categoryId = this.categoryResolver.resolveOptional(userId, changes)?.id;
+      const accountId = changes.accountId
+        ? this.accountResolver.resolveForMovement(userId, changes.accountId).id
+        : undefined;
+      return this.bulk(ids, (id) => {
+        let notes = changes.notes;
+        if (changes.notesMode === 'append') {
+          // Appending nothing leaves the notes as they are.
+          const extra = (changes.notes ?? '').trim();
+          const current = this.require(userId, id).notes;
+          notes = extra ? (current ? `${current} ${extra}` : extra) : undefined;
+        }
+        this.update(userId, id, {
+          categoryId,
+          accountId,
+          type: changes.type,
+          date: changes.date,
+          notes,
+        });
+      });
     });
   }
 

@@ -811,6 +811,48 @@
   font-weight: 600;
 }
 
+.burger-nav-item--wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin: 1rem 0.4rem 0.4rem;
+  padding: 0.7rem 0.9rem;
+  text-align: center;
+  /* Rainbow frame: the panel colour inside, the gradient on the border. */
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: linear-gradient(var(--slate-900), var(--slate-900)) padding-box,
+    linear-gradient(90deg, #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6) border-box;
+}
+
+.burger-nav-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+/* The gift sits at the left edge so the two lines are centred in the whole frame. */
+.burger-nav-item--wide .burger-nav-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.burger-nav-item--wide .burger-nav-text {
+  flex: 1;
+  padding: 0 2.4rem;
+}
+
+.burger-nav-sub {
+  font-size: 0.68rem;
+  color: var(--slate-500);
+}
+
 .burger-nav-icon {
   color: var(--section-color, inherit);
   font-size: 1.2rem;
@@ -818,12 +860,18 @@
   text-align: center;
 }
 
+/* The emoji avatar of the user, in a thin ring like the profile one. */
 .burger-nav-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--section-color);
+  border: 1px solid var(--slate-700);
+  background: var(--slate-800);
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .burger-nav-label {
@@ -1218,4 +1266,45 @@ button.entity-item {
   display: grid;
   gap: 0.5rem;
   justify-items: start;
+}
+
+.import-rows-scroll {
+  max-height: 45vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.import-skipped-scroll {
+  max-height: 6rem;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.import-badge-saving {
+  background: color-mix(in srgb, var(--blue-400) 22%, var(--slate-900));
+  color: var(--blue-400);
+}
+
+.import-type-select {
+  width: auto;
+  min-width: 6.5rem;
+}
+
+.import-review {
+  color: var(--amber-400, #fbbf24);
+}
+
+/* Search results with a checkbox before each movement. */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 10px;
+}
+
+.search-row > .entity-item {
+  flex: 1;
+  min-width: 0;
 }

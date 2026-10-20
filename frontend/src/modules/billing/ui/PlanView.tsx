@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { useApi } from '@core/context/ApiContext';
-import { inviteLink } from '@core/referral';
-import { useResource } from '@shared/hooks/useResource';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { errorMessage } from '@shared/utils/errors';
 import { isNativeApp } from '@shared/utils/platform';
 import { PLAY_SUBSCRIPTIONS_URL } from '@core/billing/playStore';
 import { usePlan } from '../application/PlanContext';
-import type { BillingOverview, HouseholdPerson, LimitedResource } from '../domain/types';
+import type {
+  BillingOverview,
+  FirstStepId,
+  HouseholdPerson,
+  LimitedResource,
+} from '../domain/types';
+import { InviteCard } from './InviteCard';
+import { InviteeGoal } from './InviteeGoal';
 import { PlanOptions } from './PlanOptions';
 import { PREMIUM_BENEFITS, RESOURCE_KEYS } from './pricing';
 import './css/Billing.css';
@@ -200,58 +204,11 @@ function UpgradeCard({ overview }: { overview: BillingOverview }) {
   );
 }
 
-/** "Invite a friend": a link that gives both a free month of Premium. */
-function InviteCard() {
-  const { billingApi } = useApi();
-  const { t } = useI18n();
-  const { data } = useResource(() => billingApi.referral(), [billingApi]);
-  const [copied, setCopied] = useState(false);
-  if (!data) return null;
-  const link = inviteLink(data.code);
-  const share = typeof navigator.share === 'function' ? navigator.share.bind(navigator) : null;
-  const copy = async () => {
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
-  };
-
-  return (
-    <div className="card invite-card">
-      <h2 className="section-title">
-        <Icon name="gift" /> {t('billing.invite.title')}
-      </h2>
-      <p className="section-hint">{t('billing.invite.hint', { days: data.rewardDays })}</p>
-      <p className="invite-link">
-        <code>{link}</code>
-      </p>
-      <div className="button-row">
-        <button className="btn-secondary" onClick={copy}>
-          {copied ? t('billing.invite.copied') : t('billing.invite.copy')}
-        </button>
-        {share && (
-          <button
-            className="btn-secondary"
-            onClick={() =>
-              share({ title: 'Finanverso', text: t('billing.invite.shareText'), url: link })
-            }
-          >
-            {t('billing.invite.share')}
-          </button>
-        )}
-      </div>
-      <p className="plan-note">
-        {t('billing.invite.stats', {
-          qualified: data.qualified,
-          pending: data.pending,
-          earned: data.rewardsEarned,
-          missing: data.missing,
-        })}
-      </p>
-    </div>
-  );
-}
-
-/** "Tu plan": status, usage against the limits and the way to upgrade or manage it. */
-export function PlanView() {
+/**
+ * "Tu plan": status, usage against the limits and the way to upgrade or manage it; for an invited
+ * user, also what is missing for their free month (`onOpenStep` opens where each step is done).
+ */
+export function PlanView({ onOpenStep }: { onOpenStep?: (id: FirstStepId) => void }) {
   const { t } = useI18n();
   const { overview, loading } = usePlan();
 
@@ -269,6 +226,7 @@ export function PlanView() {
       ) : (
         <PlanCard overview={overview} />
       )}
+      {onOpenStep && <InviteeGoal onOpenStep={onOpenStep} />}
       <UsageCard overview={overview} />
       {!member && <InviteCard />}
       {!paying && !member && <UpgradeCard overview={overview} />}

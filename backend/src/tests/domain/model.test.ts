@@ -5,7 +5,7 @@ import { computeGoalProgress, Goal } from '@domain/model/Goal';
 import { RecurringRule } from '@domain/model/RecurringRule';
 import { Transaction } from '@domain/model/Transaction';
 import { Transfer } from '@domain/model/Transfer';
-import { User } from '@domain/model/User';
+import { isEmojiAvatar, User } from '@domain/model/User';
 import { applySettingsChanges, defaultSettings } from '@domain/model/UserSettings';
 
 const base = {
@@ -164,6 +164,16 @@ describe('User', () => {
     expect(unverified.dropUnverifiedPassword().passwordHash).toBeNull();
     const verified = unverified.markEmailVerified();
     expect(verified.dropUnverifiedPassword().passwordHash).toBe('h');
+  });
+
+  it('takes one emoji as avatar, with skin tones and joined emoji, and nothing else', () => {
+    for (const ok of ['🦊', '⛰️', '👩‍💼', '👍🏽']) expect(isEmojiAvatar(ok)).toBe(true);
+    for (const bad of ['', 'a', '🦊🐼', '🦊a', '🇪🇸', '🦊'.repeat(9), 'data:image/png;base64,AA']) {
+      expect(isEmojiAvatar(bad)).toBe(false);
+    }
+    const user = User.register({ email: 'a@b.co', name: 'x', passwordHash: 'h' });
+    expect(user.withAvatar('🦉').toPublic().avatar).toBe('🦉');
+    expect(() => user.withAvatar('🦊🐼')).toThrow('emoji');
   });
 });
 

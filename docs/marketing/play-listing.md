@@ -61,17 +61,17 @@ For people in Spain: an income tax (Renta) calculator with state and regional de
 Free to start. Optional Premium adds the forecast, import, unlimited tax drafts and an AI financial advisor.
 
 ## Capturas y gráfico
-- Capturas: docs/marketing/play-screenshots/. Orden recomendado (el beneficio escrito arriba en cada una):
-  1. Resumen del mes → «Sabe a dónde va tu dinero»
-  2. Previsión → «¿Llegas a fin de mes?»
-  3. Presupuestos → «Ponle límite a cada categoría»
-  4. Renta (borrador importado) → «Descubre las deducciones que te faltan»
-  5. Autónomos (modelo 303/130) → «Tu borrador trimestral, en PDF»
-  6. Metas → «Ahorra para lo que importa»
-  7. Suscripciones → «Descubre lo que pagas sin usar»
-  8. Modo hogar → «Finanzas en pareja»
-  Las de Renta y Autónomos aún hay que capturarlas (ver tools/capture.mjs y compose.mjs).
-- Gráfico de cabecera: docs/marketing/play-store-header.png
+- Capturas: docs/marketing/play-screenshots/ (teléfono 1080x1920) y tablet/ (1600x2560, valen para 7" y 10"). Orden y titular de cada una:
+  1. Resumen del mes → «Sabe a dónde va tu dinero» (01-home)
+  2. Previsión → «¿Llegas a fin de mes?» (02-forecast)
+  3. Presupuestos → «Ponle límite a cada categoría» (03-budgets)
+  4. Renta guiada → «Haz tu Renta paso a paso» (04-renta)
+  5. Autónomos (modelos 130 y 303) → «Tus modelos 130 y 303 listos para copiar» (05-autonomos)
+  6. Inversiones y cripto → «Cripto y fondos: ganancias listas para Renta WEB» (06-investments)
+  7. Metas → «Ahorra para lo que importa» (07-goals)
+  8. Invita a un amigo → «Invita a un amigo y gana Premium» (08-invite)
+- Cómo regenerarlas: pila local de demo (BD temporal, usuario demo y datos inventados) → `node scripts/playshots.mjs` (y `TABLET=1`) → `python3 scripts/playcompose.py`. La captura falla si la página dice «Money Manager» (la marca antigua) o «NO CONFIRMADO».
+- Gráfico de cabecera (1024x500): play-screenshots/feature-graphic-1024x500.png; variante con etiquetas: assets/play-store-header.png. Los genera también scripts/playcompose.py.
 
 ## Plantillas de respuesta a reseñas
 - 5★: «¡Gracias por tu valoración! Si echas algo en falta, escríbenos a support@finanverso.app y lo tendremos en cuenta.»

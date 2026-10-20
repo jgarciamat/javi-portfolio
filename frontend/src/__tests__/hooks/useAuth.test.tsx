@@ -153,6 +153,31 @@ describe('useAuth / AuthProvider', () => {
     expect(screen.getByTestId('auth').textContent).toBe('true');
   });
 
+  test('removes an old profile picture from the stored user on mount', () => {
+    localStorage.setItem('mm_token', FAKE_ACCESS_TOKEN);
+    localStorage.setItem('mm_refresh_token', FAKE_REFRESH_TOKEN);
+    localStorage.setItem(
+      'mm_user',
+      JSON.stringify({
+        id: 'u3',
+        name: 'Persisted',
+        email: 'p@b',
+        avatarUrl: 'data:image/png;base64,AAAA',
+      })
+    );
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+    expect(screen.getByTestId('user').textContent).toBe('Persisted');
+    expect(JSON.parse(localStorage.getItem('mm_user')!)).toEqual({
+      id: 'u3',
+      name: 'Persisted',
+      email: 'p@b',
+    });
+  });
+
   test('ignores an expired access token on mount (loadToken returns null)', () => {
     // JWT with exp in the past: { userId:'u1', exp: 1 }
     const expired = 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJ1MSIsImV4cCI6MX0.sig';

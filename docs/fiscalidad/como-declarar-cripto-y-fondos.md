@@ -223,35 +223,37 @@ La sede permite presentar una declaración hecha con un programa ajeno: «Import
 
 ## 6. Recomendación de producto: qué debe generar Finanverso
 
-### 6.1 Entregable principal: `Finanverso-Renta-<año>-copiar-en-Renta-WEB.xlsx`
+### 6.1 Entregable principal: `Finanverso-Renta-<año>-copiar-en-Renta-WEB.pdf`
 
-**Una pestaña por ventana de Renta WEB**, en el orden en que aparecen en el apartado F2. Cada pestaña tiene:
+> Hasta octubre de 2026 el entregable principal era un Excel (`.xlsx`) con el mismo contenido. **El dueño decidió retirarlo** («ya está en PDF, quita lo del Excel»): ahora solo se genera el PDF (ver `inversiones.md`).
+
+**Una sección por ventana de Renta WEB**, en el orden en que aparecen en el apartado F2. Cada sección tiene:
 - una fila por alta;
 - las columnas con **la etiqueta literal de la ventana**, en su orden;
 - después, en gris, «lo que verás en Renta WEB», para comprobar.
 
-| Pestaña | Columnas (literales de la ventana y en su orden) | Columnas de comprobación |
+| Sección | Columnas (literales de la ventana y en su orden) | Columnas de comprobación |
 |---|---|---|
-| `0 Cómo usar` | Pasos: entrar en Renta WEB → F2 → cada ventana → «Alta» → copiar fila → Aceptar → marcar «Hecho» | — |
+| `0 Empieza aquí` | Resumen en recuadros (filas por ventana, tiempo, totales por casilla), un ejemplo resuelto y los pasos: entrar en Renta WEB → F2 → cada ventana → «Alta» → copiar fila → Aceptar → marcar «Hecho» | — |
 | `1 Fondos (0310)` | Nº de alta · NIF de la sociedad o fondo de inversión · Valor de transmisión · Valor de adquisición · Retenciones · Pérdida no computable por recompra (Sí/No) | Nombre del fondo (solo para ti) · Ganancia [0316] · Pérdida [0321] · Pérdida que cuenta [0322] · Reembolsos incluidos · ¿Puede venir ya en tus datos fiscales? · Hecho |
 | `2 ETF (2225)` | Nº de alta · NIF del fondo cotizado (ETF) o SICAV índice cotizada · Denominación del fondo (ETF) o SICAV índice cotizada · Código ISIN de las acciones o participaciones · Valor de transmisión · Valor de adquisición · Pérdida no computable por recompra | Ganancia [2230] · Pérdida [2233] · Pérdida que cuenta [2234] · Ventas incluidas · Hecho |
 | `3 Acciones (0326)` | Nº de alta · Entidad Emisora · Transacción · Valor de transmisión · Valor de adquisición · Pérdida con recompra en dos meses (Sí/No) | Ganancia [0332] · Pérdida [0337] · Pérdida que cuenta [0338] · Ventas incluidas · Hecho |
 | `4 Monedas virtuales (1800)` | Nº de alta · Denominación de la moneda virtual · Tipo de contraprestación recibida a cambio (`F - Moneda de curso legal`, `N - Otra moneda virtual`, `O - Otro activo virtual`, `B - Bienes o servicios`) · Importe de la transmisión · Gastos de la transmisión · Importe de la adquisición · Gastos de la adquisición | Valor de transmisión [1804] · Valor de adquisición [1806] · Pérdida [1807] · Ganancia [1809] · Operaciones incluidas · Hecho |
 | `5 Otros elementos (1624)` | Nº de alta · Tipo de elemento patrimonial (`4 - Otros elementos patrimoniales no afectos`) · Transmisión intervivos onerosa (Sí) · Fecha de transmisión · Fecha de adquisición · Importe de la transmisión · Gastos de la transmisión · Importe de la adquisición · Gastos de la adquisición · Amortizaciones (0) | Pérdida [1638] · Ganancia [1640] · Posiciones incluidas · Hecho |
-| `6 Totales por casilla` | Casilla · Concepto · Importe: 0324, 0325, 2235, 2236, 0339, 0340, 1813, 1814, 0385, 0386; rendimientos 0027, 0029, 0031, 0037; retenciones 0597, 0603; doble imposición 0588 | Saldo de ganancias y pérdidas del ahorro |
+| `6 Totales por casilla` | Casilla · Concepto · Importe: 0324, 0325, 2235, 2236, 0339, 0340, 1813, 1814, 0385, 0386; rendimientos 0027 (intereses y cupones), 0029, 0030 (Letras del Tesoro), 0031 (bonos y otros activos financieros), 0037; retenciones 0597, 0603; doble imposición 0588 | Saldo de ganancias y pérdidas del ahorro |
 | `7 Detalle por operación` | Justificante: cada venta con fecha, plataforma, unidades, valor de transmisión y adquisición, compras FIFO usadas y en qué alta va | Lo que se guarda 4 años (LGT art. 66) |
 | `8 Rendimientos` | Lo de hoy (intereses, dividendos, staking) con su casilla | — |
 
 **Formato de los datos:**
-- Importes como número con 2 decimales.
+- Importes con 2 decimales, coma decimal y sin separador de miles (`1234,56`), como en §6.3.
 - Fechas `dd/mm/aaaa`.
 - Textos recortados a la longitud de la casilla: 20 en Entidad Emisora, 25 en moneda, 40 en denominación de ETF.
 - Una columna «Hecho» para marcar.
-- Las filas vacías no se generan. Una pestaña sin altas no se genera.
+- Las filas vacías no se generan. Una sección sin altas no se genera.
 
-### 6.2 Mismo contenido en PDF: `…-copiar-en-Renta-WEB.pdf`
+### 6.2 Diseño del PDF
 
-Una sección por ventana, tabla con casillas de verificación y totales al final. Para quien rellena con el portátil y una tableta al lado. Sustituye a la tabla «Lo que tienes que copiar en tu Renta» del informe actual.
+A4 apaisado, cabecera «Renta <año>: lo que tienes que copiar en Renta WEB» con la marca «Preparado con Finanverso · no es un documento oficial» y pie «Página X de Y». Una sección por ventana con su tabla (columnas a copiar en amarillo suave, las de comprobación en gris con el rótulo «No copiar», un cuadradito «Hecho» por fila y la cabecera repetida en cada página), los totales de la ventana al final, una página «Totales que debes ver en Renta WEB» y el detalle FIFO como anexo en letra pequeña. Para quien rellena con el portátil y una tableta al lado.
 
 ### 6.3 En la app: modo «Copiar a Renta WEB»
 

@@ -1,7 +1,8 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { buildLedger } from '@modules/tools/domain/invest/ledger';
 import type { InvestOp } from '@modules/tools/domain/invest/types';
-import { forRentaWeb, RentaWebPanel } from '@modules/tools/ui/renta/invest/RentaWebPanel';
+import { RentaWebPanel } from '@modules/tools/ui/renta/invest/RentaWebPanel';
+import { fieldText } from '@modules/tools/domain/invest/rentaWeb';
 import { DeclarationTable } from '@modules/tools/ui/renta/invest/InvestTables';
 import { declarationRows } from '@modules/tools/domain/invest/report';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -65,10 +66,22 @@ const ledger = buildLedger(
 beforeEach(() => localStorage.clear());
 
 describe('«Cópialo en Renta WEB»', () => {
-  it('formats amounts as Renta WEB takes them', () => {
-    expect(forRentaWeb(1234.5)).toBe('1234,50');
-    expect(forRentaWeb(0)).toBe('0,00');
-    expect(forRentaWeb('F - Moneda de curso legal')).toBe('F - Moneda de curso legal');
+  it('writes amounts as Renta WEB takes them, and every other field as it is', () => {
+    expect(fieldText('proceeds', 1234.5)).toBe('1234,50');
+    expect(fieldText('cost', 0)).toBe('0,00');
+    expect(fieldText('withheld', 19)).toBe('19,00');
+    expect(fieldText('amortization', 0)).toBe('0,00');
+    expect(fieldText('proceeds', '')).toBe('');
+    // Not amounts: a transaction number, a mark, a key, a type, an ISIN, a NIF.
+    expect(fieldText('transaction', 1)).toBe('1');
+    expect(fieldText('onerous', 'Sí')).toBe('Sí');
+    expect(fieldText('blocked', 'No')).toBe('No');
+    expect(fieldText('key', 'F - Moneda de curso legal')).toBe('F - Moneda de curso legal');
+    expect(fieldText('type', '4 - Otros elementos patrimoniales no afectos')).toBe(
+      '4 - Otros elementos patrimoniales no afectos'
+    );
+    expect(fieldText('isin', 'IE00B4L5Y983')).toBe('IE00B4L5Y983');
+    expect(fieldText('nif', '')).toBe('');
   });
 
   it('downloads the file and the checklist with their names', async () => {
@@ -83,15 +96,12 @@ describe('«Cópialo en Renta WEB»', () => {
     renderWithProviders(<RentaWebPanel ledger={ledger} />, { authenticated: false });
     expect(screen.getByText(tr(`${k}.warn.fiscalData`))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.warn.carteraValores`))).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.xlsx`) }));
+    expect(screen.queryByRole('button', { name: /Excel/ })).toBeNull();
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: tr(`${k}.pdf`) }));
     });
-    await waitFor(() => expect(names).toHaveLength(2));
-    expect(names).toEqual([
-      'Finanverso-Renta-2025-copiar-en-Renta-WEB.xlsx',
-      'Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf',
-    ]);
+    await waitFor(() => expect(names).toHaveLength(1));
+    expect(names).toEqual(['Finanverso-Renta-2025-copiar-en-Renta-WEB.pdf']);
     click.mockRestore();
   });
 
@@ -125,6 +135,13 @@ describe('«Cópialo en Renta WEB»', () => {
       );
     });
     expect(writeText).toHaveBeenLastCalledWith('Ficticia Inc');
+    // The transaction is a number of order, not an amount.
+    await act(async () => {
+      fireEvent.click(
+        screen.getByRole('button', { name: tr(`${k}.copyOf`, { label: 'Transacción' }) })
+      );
+    });
+    expect(writeText).toHaveBeenLastCalledWith('1');
     fireEvent.click(screen.getByRole('button', { name: tr(`${k}.back`) }));
     expect(screen.getByText(new RegExp(tr(`${k}.doneMark`)))).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: tr(`${k}.next`) }));
@@ -200,7 +217,7 @@ describe('«Cópialo en Renta WEB»', () => {
         )}
       />
     );
-    expect(screen.getByRole('button', { name: tr(`${k}.xlsx`) })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: tr(`${k}.pdf`) })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr(`${k}.start`) })).toBeNull();
   });
 });

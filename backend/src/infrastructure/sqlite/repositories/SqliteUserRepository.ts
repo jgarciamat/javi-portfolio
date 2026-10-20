@@ -32,7 +32,7 @@ function toUser(row: UserRow): User {
     emailVerified: row.email_verified === 1,
     verificationTokenHash: row.verification_token_hash,
     verificationTokenExpiresAt: row.verification_token_expires_at,
-    avatarUrl: row.avatar_url,
+    avatar: row.avatar_url,
     resetTokenHash: row.reset_token_hash,
     resetTokenExpiresAt: row.reset_token_expires_at,
     googleId: row.google_id,
@@ -79,7 +79,7 @@ export class SqliteUserRepository implements UserRepository {
            verification_token_hash, verification_token_expires_at, avatar_url, reset_token_hash,
            reset_token_expires_at, google_id, session_version)
          VALUES (@id, @email, @name, @passwordHash, @createdAt, @emailVerified, @verificationTokenHash,
-           @verificationTokenExpiresAt, @avatarUrl, @resetTokenHash, @resetTokenExpiresAt, @googleId,
+           @verificationTokenExpiresAt, @avatar, @resetTokenHash, @resetTokenExpiresAt, @googleId,
            @sessionVersion)
          ON CONFLICT(id) DO UPDATE SET
            email = excluded.email,

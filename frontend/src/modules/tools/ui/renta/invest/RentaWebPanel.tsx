@@ -8,18 +8,16 @@ import {
   APARTADO,
   OTHER_GROUPINGS,
   rentaWebKit,
-  webValue,
+  fieldText,
   WINDOWS,
   type Alta,
   type KitWarning,
   type OtherGrouping,
   type RentaWebKit,
 } from '../../../domain/invest/rentaWeb';
-import { download, reportPdf, xlsxBlob, xlsxOf } from '../../../application/investImport';
+import { download } from '../../../application/investImport';
+import { reportPdf } from '../../../application/reportPdf';
 import { useMoney } from '../shared';
-
-/** What is copied into Renta WEB: an amount with a decimal comma and no thousands separator. */
-export const forRentaWeb = webValue;
 
 /** The id of the panel in the result, for the link under the amount. */
 export const RENTA_WEB_RESULT_ID = 'invest-web-result';
@@ -46,16 +44,18 @@ const stepsOf = (kit: RentaWebKit): Step[] =>
 
 /** One field of the window: its official label, the value and a button to copy it. */
 function Field({
+  field,
   label,
   value,
   onCopied,
 }: {
+  field: string;
   label: string;
   value: string | number;
   onCopied: () => void;
 }) {
   const { t } = useI18n();
-  const text = forRentaWeb(value);
+  const text = fieldText(field, value);
   return (
     <div className="invest-copy-field">
       <span className="invest-copy-label">{label}</span>
@@ -132,6 +132,7 @@ export function CopyMode({ kit, grouping }: { kit: RentaWebKit; grouping: OtherG
             <div key={i} className="invest-copy-alta">
               {step.alta.transactions && i === 0 && (
                 <Field
+                  field="entity"
                   label={fields[0].label}
                   value={step.alta.values.entity}
                   onCopied={() => setCopied(fields[0].label)}
@@ -142,6 +143,7 @@ export function CopyMode({ kit, grouping }: { kit: RentaWebKit; grouping: OtherG
                 .map((f) => (
                   <Field
                     key={f.key}
+                    field={f.key}
                     label={f.label}
                     value={line.values[f.key]}
                     onCopied={() => setCopied(f.label)}
@@ -350,8 +352,8 @@ function Grouping({
 /**
  * «Qué tienes que copiar en Renta WEB»: how many rows go in each window and the totals to see, the
  * step by step mode first (the big button), the three steps, the way to the window drawn, one row
- * worked out, and the Excel and the PDF. `compact` (the end of the assistant) keeps the numbers and
- * the buttons.
+ * worked out, and the PDF to copy from (the other big button). `compact` (the end of the assistant)
+ * keeps the numbers and the buttons.
  */
 export function RentaWebPanel({
   ledger,
@@ -372,41 +374,35 @@ export function RentaWebPanel({
   const [copying, setCopying] = useState(false);
   if (!hasRentaWebCopy(ledger)) return null;
   const plan = copyPlan(kit);
-  const tables = () => reportTables(ledger, kit);
   const group = (g: OtherGrouping) => {
     setGrouping(g);
     storage.setJSON(GROUPING_KEY, g);
   };
-  const start = kit.windows.length > 0 && (
-    <button
-      type="button"
-      className="btn-primary invest-web-start"
-      aria-expanded={copying}
-      onClick={() => setCopying(!copying)}
-    >
-      <Icon name="clipboard" /> {t(`${k}.start`)}
-    </button>
-  );
-  const files = (
-    <div className="button-row">
-      <button
-        type="button"
-        className={compact ? 'btn-primary' : 'btn-secondary'}
-        onClick={() => download(copyFileName(ledger.year, 'xlsx'), xlsxBlob(xlsxOf(tables())))}
-      >
-        <Icon name="download" /> {t(`${k}.xlsx`)}
-      </button>
-      <button
-        type="button"
-        className="btn-secondary"
-        onClick={async () =>
-          download(
-            copyFileName(ledger.year, 'pdf'),
-            await reportPdf(t(`${k}.pdfTitle`, { year: ledger.year }), tables())
-          )
-        }
-      >
-        <Icon name="file" /> {t(`${k}.pdf`)}
+  const pdf = async () =>
+    download(
+      copyFileName(ledger.year),
+      await reportPdf({
+        title: t(`${k}.pdfTitle`, { year: ledger.year }),
+        year: ledger.year,
+        plan,
+        sheets: reportTables(ledger, kit),
+      })
+    );
+  // The two ways to copy, side by side: step by step in the app, or the PDF.
+  const actions = (
+    <div className="button-row invest-web-actions">
+      {kit.windows.length > 0 && (
+        <button
+          type="button"
+          className="btn-primary invest-web-start"
+          aria-expanded={copying}
+          onClick={() => setCopying(!copying)}
+        >
+          <Icon name="clipboard" /> {t(`${k}.start`)}
+        </button>
+      )}
+      <button type="button" className="btn-primary invest-web-pdf" onClick={pdf}>
+        <Icon name="download" /> {t(`${k}.pdf`)}
       </button>
     </div>
   );
@@ -425,7 +421,8 @@ export function RentaWebPanel({
       ) : (
         <p className="invest-web-lead">{t(`${k}.onlyBoxes`)}</p>
       )}
-      {start}
+      {actions}
+      {!compact && <p className="section-hint">{t(`${k}.filesHint`)}</p>}
       {copying && <CopyMode kit={kit} grouping={grouping} />}
       <PlanWindows plan={plan} />
       {!compact && <Grouping ledger={ledger} value={grouping} onChange={group} />}
@@ -443,8 +440,6 @@ export function RentaWebPanel({
         </>
       )}
       {!compact && <KitWarnings warnings={kit.warnings} />}
-      {files}
-      {!compact && <p className="section-hint">{t(`${k}.filesHint`)}</p>}
     </section>
   );
 }

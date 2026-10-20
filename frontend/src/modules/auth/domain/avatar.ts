@@ -1,35 +1,32 @@
-/** Emoji avatars offered in the profile. */
-export const PRESET_AVATARS = [
-  '🧑',
-  '👩',
-  '👨',
-  '🧔',
-  '👩‍🦰',
-  '👩‍🦱',
-  '👩‍🦳',
-  '👩‍🦲',
-  '🧑‍💼',
-  '👩‍💼',
-  '🧑‍🎨',
-  '👩‍🎨',
-  '🧑‍🚀',
+/** Emoji avatars offered in the profile: calm animals and nature symbols. */
+export const AVATAR_CHOICES = [
   '🦊',
+  '🐻',
   '🐼',
   '🐨',
   '🦁',
   '🐯',
-  '🐸',
-  '🦄',
-  '🐙',
-  '🤖',
-  '👾',
-  '🎃',
+  '🦉',
+  '🐧',
+  '🐢',
+  '🐬',
+  '🌿',
+  '🌻',
+  '🌊',
+  '⛰️',
+  '🌙',
+  '⭐',
 ];
 
-/** SVG data URL that draws an emoji, stored like an uploaded picture. */
-export function emojiAvatar(emoji: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="50" x="8" font-size="48">${emoji}</text></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
+/** Shown while the user has not picked one (or had an uploaded picture, no longer shown). */
+export const DEFAULT_AVATAR = '👤';
 
-export const AVATAR_MAX_BYTES = 2_000_000;
+/**
+ * The choices for a user: an avatar saved before that is no longer offered stays first, so
+ * it still shows as the selected one.
+ */
+export function avatarChoices(current: string | null | undefined): string[] {
+  return current && !AVATAR_CHOICES.includes(current)
+    ? [current, ...AVATAR_CHOICES]
+    : AVATAR_CHOICES;
+}

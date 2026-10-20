@@ -33,7 +33,7 @@ const BINANCE = `Date(UTC),Pair,Side,Price,Executed,Amount,Fee
 /** Two sales of one asset in two years: a gain in 2024 and a loss in 2025. */
 const IMPORTED: ImportedSavings = {
   files: ['broker.csv'],
-  capital: { interest: 0, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+  capital: { interest: 0, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
   assets: [
     {
       name: 'Fondo Ficticio',

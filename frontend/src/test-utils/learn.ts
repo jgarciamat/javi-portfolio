@@ -22,6 +22,17 @@ const CONTENT: Record<string, Omit<ChapterContent, 'id'>> = {
     ],
     glossary: [{ term: 'Cupón', def: 'El interés que paga un bono.' }],
   },
+  'letras-del-tesoro': {
+    blocks: [
+      { k: 'key', t: 'Pagas menos de 1.000 € y cobras 1.000 €.' },
+      { k: 'calc', id: 'letra' },
+    ],
+    glossary: [{ term: 'Letra del Tesoro', def: 'Deuda del Estado a un año o menos.' }],
+  },
+  'deuda-publica-renta': {
+    blocks: [{ k: 'calc', id: 'tax' }],
+    glossary: [],
+  },
   'cuanto-tributa': {
     blocks: [{ k: 'calc', id: 'tax' }],
     glossary: [],

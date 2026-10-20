@@ -155,10 +155,17 @@ describe('what came from the investment files', () => {
   it('is added to what was typed and summed by part of the modelo', () => {
     const r = savingsOf(
       detail({
-        capital: { interest: 100, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 100, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         imported: {
           files: ['x.csv'],
-          capital: { interest: 50, dividends: 200, assets: 0, insurance: 0, expenses: 10 },
+          capital: {
+            interest: 50,
+            dividends: 200,
+            bills: 0,
+            assets: 0,
+            insurance: 0,
+            expenses: 10,
+          },
           assets: [shares, fund],
           generalGains: [30],
           otherGains: [-15],
@@ -280,7 +287,7 @@ describe('the savings base (LIRPF art. 49)', () => {
   it('nets the gains among themselves and adds the capital (case 17)', () => {
     const r = savingsOf(
       detail({
-        capital: { interest: 300, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 300, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         assets: [shares, fund],
       }),
       2025
@@ -312,7 +319,7 @@ describe('the savings base (LIRPF art. 49)', () => {
     };
     const r = savingsOf(
       detail({
-        capital: { interest: 1000, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 1000, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         assets: [btc, eth],
       }),
       2025
@@ -322,10 +329,28 @@ describe('the savings base (LIRPF art. 49)', () => {
     expect(r.carryForward.gains).toEqual([{ year: 2025, amount: 800 }]);
   });
 
+  it('puts the Letras del Tesoro in box 0030 and the bonds in 0031 (modelo 100 of 2025)', () => {
+    // A Letra bought at 970 € and amortized at 1,000 €; a bond with a 25 € coupon sold 12 € up.
+    const r = savingsOf(
+      detail({
+        capital: { interest: 25, dividends: 0, bills: 30, assets: 12, insurance: 0, expenses: 0 },
+      }),
+      2025
+    );
+    expect(r.boxes).toMatchObject({ '0027': 25, '0030': 30, '0031': 12, '0036': 67, '0041': 67 });
+  });
+
   it('takes a negative capital off the gains up to 25 %, after the expenses', () => {
     const r = savingsOf(
       detail({
-        capital: { interest: 100, dividends: 200, assets: -1500, insurance: 50, expenses: 50 },
+        capital: {
+          interest: 100,
+          dividends: 200,
+          bills: 0,
+          assets: -1500,
+          insurance: 50,
+          expenses: 50,
+        },
         otherGains: [2000],
       }),
       2025
@@ -345,7 +370,7 @@ describe('the savings base (LIRPF art. 49)', () => {
     const r = savingsOf(
       detail({
         otherGains: [1000],
-        capital: { interest: 400, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 400, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         pending: {
           gains: [
             { year: 2024, amount: 300 },
@@ -365,7 +390,7 @@ describe('the savings base (LIRPF art. 49)', () => {
     const more = savingsOf(
       detail({
         otherGains: [1000],
-        capital: { interest: 400, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 400, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         pending: {
           gains: [
             { year: 2021, amount: 1050 },
@@ -385,7 +410,7 @@ describe('the savings base (LIRPF art. 49)', () => {
     const capital = savingsOf(
       detail({
         otherGains: [2000],
-        capital: { interest: 100, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+        capital: { interest: 100, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
         pending: { gains: [], capital: [{ year: 2022, amount: 1000 }], general: [] },
       }),
       2025
@@ -428,6 +453,7 @@ describe('figures that are not numbers', () => {
         capital: {
           interest: Number.NaN,
           dividends: 0,
+          bills: Number.NaN,
           assets: Number.NaN,
           insurance: 0,
           expenses: 0,

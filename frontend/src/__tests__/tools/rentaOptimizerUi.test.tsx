@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { emptyForm, type RentaForm } from '@modules/tools/domain/rentaForm';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
-import type { DeductionSaving } from '@modules/tools/domain/rentaSavings';
 import { loadCcaa } from '@modules/tools/data/renta';
 import { Optimizer } from '@modules/tools/ui/renta/Optimizer';
 import { renderWithProviders, tr } from '@test-utils/render';
@@ -18,23 +17,25 @@ function Harness({
   start,
   region = ccaa,
   candidates = [],
-  savings = {},
 }: {
   start: Partial<RentaForm>;
   region?: RentaCcaa | null;
   candidates?: Deduction[];
-  savings?: Record<string, DeductionSaving>;
 }) {
   const [form, setForm] = useState<RentaForm>({ ...emptyForm('30000'), ...start });
   last = form;
   return (
-    <Optimizer
-      form={form}
-      set={(patch) => setForm((f) => ({ ...f, ...patch }))}
-      ccaa={region}
-      found={candidates}
-      savings={savings}
-    />
+    <>
+      <button type="button" onClick={() => setForm((f) => ({ ...f, disability: 0 }))}>
+        undo
+      </button>
+      <Optimizer
+        form={form}
+        set={(patch) => setForm((f) => ({ ...f, ...patch }))}
+        ccaa={region}
+        found={candidates}
+      />
+    </>
   );
 }
 
@@ -49,47 +50,122 @@ const worker: Partial<RentaForm> = {
 
 describe('Renta: the reviewer on screen', () => {
   it('shows nothing without a community', () => {
-    const { container } = renderWithProviders(<Harness start={{}} region={null} />);
-    expect(container).toBeEmptyDOMElement();
+    renderWithProviders(<Harness start={{}} region={null} />);
+    expect(screen.queryByRole('region')).toBeNull();
+    expect(screen.queryByText(tr(`${k}.title`))).toBeNull();
   });
 
-  it('lists the possibilities by saving, asks the amounts and applies or dismisses the rest', () => {
-    const deduction = ccaa.deductions[0];
-    renderWithProviders(
-      <Harness
-        start={worker}
-        candidates={[deduction]}
-        savings={{ [deduction.id]: { saving: 5, blocked: false, example: null } }}
-      />
+  const row = (key: string) =>
+    screen.getByText(tr(`${k}.${key}.title`)).closest('li') as HTMLElement;
+  const reply = (key: string, a: 'yes' | 'no' | 'unknown') =>
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: `${tr(`${k}.answer.${a}`)}: ${tr(`${k}.${key}.title`)}`,
+      })
     );
-    expect(screen.getByText(tr(`${k}.pensionPlan.title`))).toBeInTheDocument();
-    expect(screen.getByText(tr(`${k}.joint.how`))).toBeInTheDocument();
+  const euros = /\d+,\d{2}\s€|€\s?\d/;
+
+  it('asks first and shows a saving only for what the person confirms', () => {
+    const deduction = ccaa.deductions[0];
+    renderWithProviders(<Harness start={worker} candidates={[deduction]} />);
+    // Questions, without a figure: the joint return comes from the data given, so it is confirmed.
+    const questions = screen.getByRole('list', { name: tr(`${k}.toAsk`) });
+    expect(within(questions).queryByText(euros)).toBeNull();
+    expect(within(questions).queryByText(tr(`${k}.saves`), { exact: false })).toBeNull();
+    expect(within(row('joint')).getByText(tr(`${k}.joint.how`))).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      tr(`${k}.total`, { count: 1, amount: '' }).split('(')[0].trim()
+    );
+    expect(screen.getByText(tr(`${k}.deductions.left`, { count: 1 }))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.deductions.how`))).toBeInTheDocument();
+
+    // A plan: yes asks the amount; the example amount until one is typed.
+    reply('pensionPlan', 'yes');
+    expect(within(row('pensionPlan')).getByText(/de ejemplo/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(tr(`${k}.pensionPlan.amount`)), {
       target: { value: '800' },
     });
     expect(last.pension).toBe('800');
+    reply('spousePlan', 'yes');
     fireEvent.change(screen.getByLabelText(tr(`${k}.spousePlan.amount`)), {
       target: { value: '500' },
     });
     expect(last.spousePlan).toBe('500');
+    reply('unionFees', 'yes');
     fireEvent.change(screen.getByLabelText(tr(`${k}.unionFees.amount`)), {
       target: { value: '90' },
     });
     expect(last.workExpenses['cuotas-sindicales']).toBe('90');
-    const row = (key: string) =>
-      screen.getByText(tr(`${k}.${key}.title`)).closest('li') as HTMLElement;
-    fireEvent.click(within(row('mobility')).getByRole('button', { name: tr(`${k}.yes`) }));
+    expect(within(row('pensionPlan')).queryByText(/de ejemplo/)).toBeNull();
+    expect(within(row('pensionPlan')).getByText(euros)).toBeInTheDocument();
+
+    // A yes/no: applied to the form, with what it saves.
+    reply('mobility', 'yes');
     expect(last.mobility).toBe(true);
-    fireEvent.click(within(row('ascendant')).getByRole('button', { name: tr(`${k}.no`) }));
-    expect(screen.queryByText(tr(`${k}.ascendant.title`))).toBeNull();
+    expect(within(row('mobility')).getByText(tr(`${k}.applied`))).toBeInTheDocument();
+    expect(within(row('mobility')).getByText(euros)).toBeInTheDocument();
+
+    // No and «I do not know»: put aside without a figure, and they can be asked again.
+    reply('ascendant', 'no');
+    reply('disability', 'unknown');
     expect(last.ascendants).toEqual([]);
+    expect(last.disability).toBe(0);
+    const aside = screen
+      .getByText(tr(`${k}.archived`, { count: 2 }))
+      .closest('details') as HTMLElement;
+    expect(within(aside).queryByText(euros)).toBeNull();
+    fireEvent.click(within(aside).getAllByRole('button', { name: tr(`${k}.askAgain`) })[0]);
+    expect(
+      screen.getByRole('button', {
+        name: `${tr(`${k}.answer.yes`)}: ${tr(`${k}.ascendant.title`)}`,
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('asks again a change applied and undone later in the form', () => {
+    renderWithProviders(<Harness start={worker} />);
+    reply('disability', 'yes');
+    expect(last.disability).toBe(33);
+    expect(within(row('disability')).getByText(tr(`${k}.applied`))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'undo' }));
+    expect(
+      screen.getByRole('button', {
+        name: `${tr(`${k}.answer.yes`)}: ${tr(`${k}.disability.title`)}`,
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('says when no suggestion is left to review', () => {
+    renderWithProviders(
+      <Harness
+        start={{ ...worker, joint: 'none', retired: true, nonSalary: '30000', pension: '1500' }}
+      />
+    );
+    for (const key of ['disability', 'ascendant']) reply(key, 'no');
+    expect(screen.getByText(tr(`${k}.noneLeft`))).toBeInTheDocument();
+    expect(screen.queryByText(tr(`${k}.none`))).toBeNull();
   });
 
   it('says where to type the value of a rented flat and what is missing', () => {
     renderWithProviders(
-      <Harness start={{ ...worker, joint: '', age: '', rentalOn: true, rentalIncome: '9000' }} />
+      <Harness
+        start={{
+          ...worker,
+          joint: '',
+          age: '',
+          rentalOn: true,
+          rentalIncome: '9000',
+          savings: '2000',
+        }}
+      />
     );
+    expect(screen.queryByText(tr(`${k}.rentalDepreciation.how`))).toBeNull();
+    reply('rentalDepreciation', 'yes');
+    reply('earlierLosses', 'yes');
+    expect(
+      within(row('earlierLosses')).getByText(tr(`${k}.earlierLosses.how`))
+    ).toBeInTheDocument();
+    expect(within(row('earlierLosses')).getByText(/de ejemplo/)).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.missing.jointKind`))).toBeInTheDocument();
     // Typed in the property itself (its cost or the cadastral value of the building).
     expect(screen.getByText(tr(`${k}.rentalDepreciation.how`))).toBeInTheDocument();

@@ -19,6 +19,7 @@ interface BurgerMenuProps {
   tab: DashboardTab;
   onSelectTab: (tab: DashboardTab) => void;
   onOpenProfile: () => void;
+  onOpenInvite: () => void;
   onClose: () => void;
 }
 
@@ -41,7 +42,14 @@ function MenuFocus({
 }
 
 /** Side menu with every section; the offers entry hides when the user turned offers off. */
-export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: BurgerMenuProps) {
+export function BurgerMenu({
+  open,
+  tab,
+  onSelectTab,
+  onOpenProfile,
+  onOpenInvite,
+  onClose,
+}: BurgerMenuProps) {
   const { t } = useI18n();
   const { user } = useAuth();
   const showOffers = useOptionalSettings()?.settings?.showOffers !== false;
@@ -119,8 +127,10 @@ export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: B
                   }
                 >
                   <span className="burger-nav-icon">
-                    {user?.avatarUrl ? (
-                      <img src={user.avatarUrl} alt="" className="burger-nav-avatar" />
+                    {user?.avatar ? (
+                      <span className="burger-nav-avatar" aria-hidden="true">
+                        {user.avatar}
+                      </span>
                     ) : (
                       <Icon name="user" />
                     )}
@@ -148,6 +158,25 @@ export function BurgerMenu({ open, tab, onSelectTab, onOpenProfile, onClose }: B
                     {tab === id && <span className="burger-nav-dot" aria-hidden="true" />}
                   </button>
                 ))}
+              {group === 'account' && (
+                <button
+                  className="burger-nav-item burger-nav-item--wide"
+                  onClick={() => {
+                    onOpenInvite();
+                    onClose();
+                  }}
+                  style={{ '--section-color': GROUP_COLORS.account } as CSSProperties}
+                  data-testid="menu-invite"
+                >
+                  <span className="burger-nav-icon">
+                    <Icon name="gift" />
+                  </span>
+                  <span className="burger-nav-text">
+                    <span className="burger-nav-label">{t('app.menu.invite')}</span>
+                    <span className="burger-nav-sub">{t('app.menu.inviteSub')}</span>
+                  </span>
+                </button>
+              )}
             </div>
           ))}
         </nav>

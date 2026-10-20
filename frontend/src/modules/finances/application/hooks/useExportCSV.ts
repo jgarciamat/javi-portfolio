@@ -110,14 +110,18 @@ export function useExportCSV() {
     );
   }
 
-  /** Every movement ever recorded (used by the data export in Settings). */
-  function exportAllCSV(transactions: ExportableTransaction[]): void {
+  const exportList = (transactions: ExportableTransaction[], name: string) =>
     downloadFile(
       toCSV([header(), ...rowsOf(transactions)]),
-      `finanverso_movimientos_${todayDateOnly()}.csv`,
+      `finanverso_${name}_${todayDateOnly()}.csv`,
       CSV_TYPE
     );
-  }
+  /** Every movement ever recorded (used by the data export in Settings). */
+  const exportAllCSV = (transactions: ExportableTransaction[]) =>
+    exportList(transactions, 'movimientos');
+  /** The movements selected in a list. */
+  const exportSelectionCSV = (transactions: ExportableTransaction[]) =>
+    exportList(transactions, 'seleccion');
 
   /** One row per month plus totals. */
   function exportAnnualCSV(months: (MonthData & { month: number })[], year: number): void {
@@ -201,5 +205,5 @@ export function useExportCSV() {
     downloadFile(toCSV(rows), `finanverso_informe_${report.year}.csv`, CSV_TYPE);
   }
 
-  return { exportMonthCSV, exportAnnualCSV, exportAllCSV, exportReportCSV };
+  return { exportMonthCSV, exportAnnualCSV, exportAllCSV, exportReportCSV, exportSelectionCSV };
 }

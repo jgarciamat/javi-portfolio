@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { User } from '@domain/model/User';
 import {
   STRONG_PASSWORD,
   TestContext,
@@ -139,8 +140,8 @@ describe('Profile', () => {
     user = await createUser(ctx);
   });
 
-  const avatar = (avatarDataUrl: string | null) =>
-    request(ctx.app).patch('/api/profile/avatar').set(user.auth).send({ avatarDataUrl });
+  const avatar = (value: unknown) =>
+    request(ctx.app).patch('/api/profile/avatar').set(user.auth).send({ avatar: value });
 
   it('returns the profile with its settings and renames it', async () => {
     const profile = await request(ctx.app).get('/api/profile').set(user.auth).expect(200);
@@ -153,18 +154,32 @@ describe('Profile', () => {
       .expect(200, { name: 'Ana' });
   });
 
-  it('accepts small images, rejects other formats and big files, and removes the avatar', async () => {
+  it('keeps an emoji avatar, rejects pictures and anything else, and goes back to the default', async () => {
+    await avatar('🦊').expect(200, { avatar: '🦊' });
+    await avatar('👩‍💼').expect(200, { avatar: '👩‍💼' });
+    expect((await request(ctx.app).get('/api/profile').set(user.auth)).body.avatar).toBe('👩‍💼');
+    for (const bad of ['ab', '🦊🐼', '1', '🦊 ', '']) {
+      expect((await avatar(bad).expect(400)).body.code).toBe('INVALID_AVATAR');
+    }
     const png = `data:image/png;base64,${Buffer.from('png').toString('base64')}`;
-    await avatar(png).expect(200, { avatarUrl: png });
-    expect((await avatar('data:image/svg+xml;base64,AAAA').expect(400)).body.code).toBe(
-      'INVALID_IMAGE'
-    );
-    expect((await avatar('not a data url').expect(400)).body.code).toBe('INVALID_IMAGE');
-    const big = Buffer.alloc(2 * 1024 * 1024 + 1).toString('base64');
-    expect((await avatar(`data:image/jpeg;base64,${big}`).expect(400)).body.code).toBe(
-      'IMAGE_TOO_LARGE'
-    );
-    await avatar(null).expect(200, { avatarUrl: null });
+    await avatar(png).expect(400);
+    await request(ctx.app)
+      .patch('/api/profile/avatar')
+      .set(user.auth)
+      .send({ avatarDataUrl: png })
+      .expect(400);
+    await avatar(null).expect(200, { avatar: null });
+  });
+
+  it('never serves a picture uploaded before pictures were dropped, and keeps it stored', async () => {
+    const png = `data:image/png;base64,${Buffer.from('png').toString('base64')}`;
+    const users = ctx.container.repos.users;
+    const stored = users.findById(user.id)!;
+    users.save(User.reconstitute({ ...stored.toPrimitives(), avatar: png }));
+    const profile = await request(ctx.app).get('/api/profile').set(user.auth).expect(200);
+    expect(profile.body.avatar).toBeNull();
+    expect(JSON.stringify(profile.body)).not.toContain('data:image');
+    expect(users.findById(user.id)!.toPrimitives().avatar).toBe(png);
   });
 
   it('rejects the tokens of a deleted account at once', async () => {

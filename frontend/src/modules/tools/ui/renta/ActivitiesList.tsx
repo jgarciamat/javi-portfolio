@@ -1,6 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { ActivitiesResult } from '../../domain/rentaActivity';
-import { AUTONOMO_ACTIVITY } from '../../domain/rentaFromAutonomo';
+import { AUTONOMO_ACTIVITY, withoutAutonomoActivity } from '../../domain/rentaFromAutonomo';
 import { ActivityBoxes } from './ActivityBoxes';
 import { RemoveActivity } from './AutonomoBring';
 import { useMoney, type StepProps } from './shared';
@@ -28,7 +28,7 @@ export function ActivitiesList({
               {t('tools.renta.activities.line', { name: a.name, net: money(result.each[i].net) })}
             </span>
             {a.name === AUTONOMO_ACTIVITY ? (
-              <RemoveActivity form={form} set={set} />
+              <RemoveActivity onRemove={() => set(withoutAutonomoActivity(form))} />
             ) : (
               <button
                 type="button"

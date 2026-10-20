@@ -358,3 +358,32 @@
 .tx-cell-amount {
   font-weight: 700;
 }
+
+/* ─── Multiple selection ────────────────────── */
+.tx-table th.tx-cell-select,
+.tx-table td.tx-cell-select,
+.tx-day-separator td.tx-cell-select {
+  width: 2.5rem;
+  padding-right: 0;
+  padding-left: 0.5rem;
+}
+
+.tx-card .select-check {
+  flex-shrink: 0;
+  margin-top: -0.35rem;
+}
+
+.tx-card.is-selected {
+  border-radius: 8px;
+}
+
+.tx-day-select {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tx-day-select .tx-day-toggle {
+  flex: 1;
+  min-width: 0;
+}

@@ -32,6 +32,9 @@ commit y copia de seguridad previa (`VACUUM INTO`) si la BD ya tenía datos.
 - `002` modelo v2: céntimos, categorías por id, cuentas, ajustes, presupuestos, metas y tokens hasheados.
 - `003` desactiva el usuario `admin@admin.com` sembrado por la v1 si aún tenía la contraseña `admin`.
 - `004` periodos omitidos de las reglas recurrentes.
+- `033` borra las fotos de perfil subidas antes (`users.avatar_url` con `data:` o enlace de imagen); los
+  emoticonos elegidos se quedan. Recuperables solo desde la copia previa a la migración (14 días),
+  ver `deploy/RESTORE.md`.
 
 ## Tests
 
@@ -48,10 +51,11 @@ commit y copia de seguridad previa (`VACUUM INTO`) si la BD ya tenía datos.
 | `GET/POST /api/auth/verify-email · resend-verification · forgot-password · reset-password` | Emails |
 | `GET /api/months/:year/:month` | Mes completo: movimientos, resumen, saldo arrastrado, presupuestos y alertas |
 | `GET·POST /api/transactions` · `PUT·PATCH·DELETE /api/transactions/:id` | Movimientos |
+| `POST /api/transactions/bulk-delete` · `PATCH /api/transactions/bulk` | Operaciones en lote (máx. 500 ids, una transacción SQLite; responde `applied` y `skipped` con motivo) |
 | `GET /api/transactions/search` · `GET /api/transactions/annual/:year` · `POST /api/transactions/import` | Búsqueda, anual, importación |
 | `/api/categories` (`PATCH` renombra, `DELETE ?reassignTo=`) | Categorías |
 | `/api/accounts`, `/api/transfers` | Cuentas y transferencias |
 | `/api/budgets`, `/api/goals`, `/api/recurring-rules`, `/api/custom-alerts` | Planificación |
-| `/api/settings`, `/api/profile/*`, `GET /api/export` | Ajustes, perfil y exportación |
+| `/api/settings`, `/api/profile/*`, `GET /api/export` | Ajustes, perfil y exportación. El avatar es un emoticono: `PATCH /api/profile/avatar {avatar: emoji \| null}`; no se suben fotos |
 | `GET /api/stats/trends/:year/:month`, `GET /api/stats/net-worth`, `POST /api/ai/advice` | Análisis |
 | `GET /api/health` | Healthcheck (comprueba la BD) |

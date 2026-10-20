@@ -12,7 +12,11 @@ export interface UserProps {
   /** SHA-256 of the e-mail verification token (the raw token only travels by e-mail). */
   verificationTokenHash: string | null;
   verificationTokenExpiresAt: string | null;
-  avatarUrl: string | null;
+  /**
+   * Stored in the `avatar_url` column: an emoji avatar. Pictures uploaded before were erased by
+   * migration 033; anything that is not an emoji is still never served.
+   */
+  avatar: string | null;
   /** SHA-256 of the password reset token. */
   resetTokenHash: string | null;
   resetTokenExpiresAt: string | null;
@@ -22,6 +26,19 @@ export interface UserProps {
 }
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+const EMOJI_PARTS = /^[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}]+$/u;
+/** The joiner and the emoji presentation selector that glue the parts of an emoji. */
+const GLUE = /\u200d|\ufe0f/g;
+
+/** A single emoji (skin tones and joined emoji included): the only avatar the app offers. */
+export function isEmojiAvatar(value: string): boolean {
+  if (value.length > 16 || !PICTOGRAPHIC.test(value) || !EMOJI_PARTS.test(value.replace(GLUE, '')))
+    return false;
+  const segmenter = new Intl.Segmenter('es', { granularity: 'grapheme' });
+  return [...segmenter.segment(value)].length === 1;
+}
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -58,7 +75,7 @@ export class User {
       emailVerified: input.emailVerified ?? false,
       verificationTokenHash: null,
       verificationTokenExpiresAt: null,
-      avatarUrl: null,
+      avatar: null,
       resetTokenHash: null,
       resetTokenExpiresAt: null,
       googleId: input.googleId ?? null,
@@ -103,8 +120,12 @@ export class User {
     });
   }
 
-  withAvatar(avatarUrl: string | null): User {
-    return this.with({ avatarUrl });
+  /** Chooses an emoji avatar (null goes back to the default one). */
+  withAvatar(avatar: string | null): User {
+    if (avatar !== null && !isEmojiAvatar(avatar)) {
+      throw new ValidationError('El avatar debe ser un emoji', 'INVALID_AVATAR');
+    }
+    return this.with({ avatar });
   }
 
   startPasswordReset(tokenHash: string, expiresAt: Date): User {
@@ -171,14 +192,15 @@ export class User {
     id: string;
     email: string;
     name: string;
-    avatarUrl: string | null;
+    avatar: string | null;
     hasPassword: boolean;
   } {
     return {
       id: this.props.id,
       email: this.props.email,
       name: this.props.name,
-      avatarUrl: this.props.avatarUrl,
+      // An old uploaded picture is not served: the app shows the default emoji instead.
+      avatar: this.props.avatar && isEmojiAvatar(this.props.avatar) ? this.props.avatar : null,
       hasPassword: !!this.props.passwordHash,
     };
   }

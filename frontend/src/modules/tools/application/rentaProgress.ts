@@ -9,9 +9,11 @@ import {
 } from '../domain/rentaForm';
 import { NO_REVIEW, type ReviewState } from '../domain/rentaReview';
 import type { ActivityInput } from '../domain/rentaActivity';
-import type { SavingsDetail } from '../domain/rentaGains';
+import { emptyCapital, type SavingsDetail } from '../domain/rentaGains';
+import { importedFrom } from '../domain/invest/sources';
 import { emptyProperty } from '../domain/rentaRentals';
 import { emptyResidence } from '../domain/rentaResidence';
+import { withoutAutonomoActivity } from '../domain/rentaFromAutonomo';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -88,6 +90,26 @@ const isDetail = (d: unknown): d is SavingsDetail =>
   isObject(d.pending) &&
   ['assets', 'properties', 'otherGains', 'generalGains'].every((k) => Array.isArray(d[k]));
 
+/**
+ * A detail saved before the Letras del Tesoro had their own box (0030, apart from the 0031): the
+ * typed amounts get the new field at 0, and an import with its files is worked out again so that
+ * the Letras go to their box.
+ */
+function reviveDetail(detail: SavingsDetail): SavingsDetail {
+  const capital = { ...emptyCapital(), ...detail.capital };
+  const imported = detail.imported;
+  if (!imported || Object.prototype.hasOwnProperty.call(imported.capital, 'bills'))
+    return { ...detail, capital };
+  return {
+    ...detail,
+    capital,
+    imported:
+      imported.sources && imported.options
+        ? importedFrom(imported.sources, imported.options, imported.files)
+        : { ...imported, capital: { ...emptyCapital(), ...imported.capital } },
+  };
+}
+
 const isActivity = (a: unknown): a is ActivityInput =>
   isObject(a) &&
   ['direct', 'modules', 'agrarian', 'given'].includes(a.kind as string) &&
@@ -98,7 +120,7 @@ function withOptional(form: RentaForm, saved: Record<string, unknown>): RentaFor
   for (const key of OPTIONAL_TEXT)
     if (typeof saved[key] === 'string') form[key] = saved[key] as string;
   if (saved.assistance === true) form.assistance = true;
-  if (isDetail(saved.savingsDetail)) form.savingsDetail = saved.savingsDetail;
+  if (isDetail(saved.savingsDetail)) form.savingsDetail = reviveDetail(saved.savingsDetail);
   if (Array.isArray(saved.activities)) form.activities = saved.activities.filter(isActivity);
   if (isObject(saved.residence)) form.residence = over(emptyResidence(), saved.residence);
   if (isObject(saved.donations)) form.donations = over(emptyDonations(), saved.donations);
@@ -173,4 +195,10 @@ export function saveProgress(progress: RentaProgress): void {
 
 export function clearProgress(): void {
   storage.set(PROGRESS_KEY, null);
+}
+
+/** Takes the activity brought from Autónomos out of the saved Renta (nothing else changes). */
+export function removeSavedAutonomo(): void {
+  const saved = loadProgress();
+  if (saved) saveProgress({ ...saved, form: withoutAutonomoActivity(saved.form) });
 }

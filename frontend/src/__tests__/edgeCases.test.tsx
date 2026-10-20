@@ -1,6 +1,7 @@
 /**
  * Less common paths: failures, empty data, unusual data and race conditions.
  */
+import type { RowSelection } from '@shared/hooks/useRowSelection';
 import { StrictMode } from 'react';
 import {
   act,
@@ -162,7 +163,7 @@ describe('auth edge cases', () => {
       authenticated: false,
       finances: false,
     });
-    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.profile.name.label')) }));
+    fireEvent.click(screen.getByRole('button', { name: tr('app.profile.name.edit') }));
     fireEvent.change(screen.getByRole('textbox', { name: tr('app.profile.name.label') }), {
       target: { value: 'Ana' },
     });
@@ -409,7 +410,8 @@ describe('finances edge cases', () => {
   });
 
   it('renders the empty week view and category charts without totals', () => {
-    renderWithI18n(<TransactionWeekView weekGroups={[]} />);
+    // Nothing to select in an empty week view.
+    renderWithI18n(<TransactionWeekView weekGroups={[]} selection={{} as RowSelection} />);
     expect(screen.getByText(tr('app.transaction.table.empty'))).toBeInTheDocument();
     renderWithI18n(
       <CategoryChart
@@ -460,9 +462,9 @@ describe('dashboard edge cases', () => {
     api.categoryApi.create.mockResolvedValue(f.category({ id: 'c2', name: 'Viajes' }));
     api.categoryApi.update.mockResolvedValue(f.category({ id: 'c1', name: 'Diversión' }));
     api.billingApi.get.mockResolvedValue(f.billing({ trialDaysLeft: 2, subscription: { ...sub } }));
-    renderWithProviders(<Dashboard />, { api, plan: true, user: f.user({ avatarUrl: 'data:x' }) });
+    renderWithProviders(<Dashboard />, { api, plan: true, user: f.user({ avatar: '🦊' }) });
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
-    expect(document.querySelector('img.burger-nav-avatar')).not.toBeNull();
+    expect(document.querySelector('.burger-nav-avatar')).toHaveTextContent('🦊');
     fireEvent.click(screen.getByRole('button', { name: tr('app.menu.close') }));
 
     // Trial reminder → plan section.
@@ -738,7 +740,16 @@ describe('more edge cases', () => {
 
   it('reads short CSV rows and odd Norma 43 movements', async () => {
     const { rowsFromCSV, parseNorma43 } = await import('@modules/finances/domain/importParsers');
-    const mapping = { date: 0, description: 1, amount: 2, debit: -1, credit: -1, category: 5 };
+    const mapping = {
+      date: 0,
+      description: 1,
+      amount: 2,
+      debit: -1,
+      credit: -1,
+      category: 5,
+      type: -1,
+      notes: -1,
+    };
     expect(rowsFromCSV([['h'], ['01/03/2026', 'Pan', '-1']], mapping).rows).toEqual([
       { date: '2026-03-01', description: 'Pan', amount: -1, category: null },
     ]);
@@ -765,6 +776,7 @@ describe('more edge cases', () => {
       line('88'),
     ].join('\n');
     expect(parseNorma43(text)).toEqual({
+      review: [],
       rows: [
         { date: '2026-03-03', description: 'REFERENCIA', amount: 10 },
         { date: '2026-03-03', description: 'Movimiento', amount: 20 },

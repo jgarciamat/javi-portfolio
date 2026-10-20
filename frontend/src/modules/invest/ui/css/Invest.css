@@ -1257,3 +1257,26 @@ textarea.tx-input {
 .inv-h {
   scroll-margin-top: 7rem;
 }
+
+/* Videoteca videos at the end of a chapter. */
+.inv-videos {
+  margin-top: 1.5rem;
+}
+
+/* The other chapters of an asset class in the map. */
+.inv-more-chapters {
+  margin: 0.25rem 0 1rem;
+}
+
+.inv-more-chapters ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.inv-more-chapters li {
+  margin-bottom: 0.3rem;
+}
+
+.inv-more-chapters .inv-link {
+  text-align: left;
+}

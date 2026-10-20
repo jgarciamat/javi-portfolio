@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import type { AssetClass } from '../domain/types';
+import { findChapter } from '../domain/content';
+import type { AssetClass, ChapterInfo } from '../domain/types';
 
 export const RISK_COLORS = [
   '#22c55e',
@@ -94,6 +95,24 @@ export function AssetCard({
             >
               📖 {t('app.invest.map.goChapter')}
             </button>
+          )}
+          {asset.moreChapters && (
+            <nav className="inv-more-chapters" aria-label={t('app.invest.map.moreChapters')}>
+              <strong>{t('app.invest.map.moreChapters')}</strong>
+              <ul>
+                {asset.moreChapters.map((id) => {
+                  const c = findChapter(id) as ChapterInfo;
+                  return (
+                    <li key={id}>
+                      <button type="button" className="inv-link" onClick={() => onOpenChapter(id)}>
+                        <span aria-hidden="true">{c.emoji}</span>{' '}
+                        {locale === 'en' ? c.titleEn : c.title}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
           )}
           <Section title={t('app.invest.map.what')}>
             <p>{asset.what}</p>

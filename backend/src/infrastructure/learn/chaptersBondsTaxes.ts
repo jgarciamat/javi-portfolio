@@ -79,7 +79,7 @@ export const CHAPTERS_BONDS_TAXES: CourseChapter[] = [
       {
         k: 'tip',
         title: 'Letras, bonos y obligaciones',
-        t: 'En España el Tesoro emite Letras (6 y 12 meses, sin cupón: compras por debajo del nominal), Bonos (3 y 5 años) y Obligaciones (10, 15 y 30 años). Las Letras se pueden comprar en subasta o en el mercado secundario con un bróker o un banco.',
+        t: 'En España el Tesoro emite Letras (3, 6, 9 y 12 meses, sin cupón: compras por debajo del nominal), Bonos (3 y 5 años) y Obligaciones (10, 15, 30 y 50 años). Se compran en subasta (en la web del Tesoro, en el Banco de España o en tu banco) o en el mercado secundario. Los capítulos siguientes lo explican paso a paso.',
       },
     ],
     glossary: [

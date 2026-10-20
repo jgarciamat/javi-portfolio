@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import type { AnnualActivity } from '@modules/finances/domain/annualActivity';
-import { loadProgress, saveProgress } from '../../application/rentaProgress';
+import { loadProgress, removeSavedAutonomo, saveProgress } from '../../application/rentaProgress';
 import { NO_DRAFT } from '../../domain/rentaDraft';
-import { activityFromAnnual, withAutonomoActivity } from '../../domain/rentaFromAutonomo';
+import {
+  AUTONOMO_ACTIVITY,
+  activityFromAnnual,
+  withAutonomoActivity,
+} from '../../domain/rentaFromAutonomo';
 import { NO_REVIEW } from '../../domain/rentaReview';
 import { AnnualFigures } from './AutonomoBring';
 
@@ -13,19 +17,22 @@ function Confirm({
   savedYear,
   onTake,
   onCancel,
+  onRemove,
 }: {
   annual: AnnualActivity;
   /** The year of the Renta half done on this device, if any. */
   savedYear: number | null;
   onTake: () => void;
   onCancel: () => void;
+  /** Set when the activity of this year is already in the saved Renta. */
+  onRemove?: () => void;
 }) {
   const { t } = useI18n();
   const k = 'tools.renta.prepare';
   return (
     <div className="renta-bring-confirm">
       <p>{t(`${k}.summary`, { year: annual.year })}</p>
-      <AnnualFigures annual={annual} />
+      <AnnualFigures annual={annual} onRemove={onRemove} />
       {annual.payments130.source.includes('estimated') && (
         <p className="section-hint">{t(`${k}.estimated`)}</p>
       )}
@@ -45,7 +52,7 @@ function Confirm({
   );
 }
 
-type State = 'idle' | 'confirm' | 'done' | 'modules' | 'empty' | 'otherYear';
+type State = 'idle' | 'confirm' | 'removed' | 'done' | 'modules' | 'empty' | 'otherYear';
 
 /**
  * «Preparar mi declaración de la renta»: takes the year of the self-employed screen to the Renta of
@@ -77,6 +84,13 @@ export function PrepareRenta({
     if (years.length > 0 && !years.includes(annual.year)) return setState('otherYear');
     setState(activityFromAnnual(annual) ? 'confirm' : 'modules');
   };
+  const inRenta =
+    saved?.year === annual.year &&
+    (saved.form.activities ?? []).some((a) => a.name === AUTONOMO_ACTIVITY);
+  const remove = () => {
+    removeSavedAutonomo();
+    setState('removed');
+  };
   const take = () => {
     const activity = activityFromAnnual(annual)!;
     const same = saved?.year === annual.year ? saved : null;
@@ -102,6 +116,7 @@ export function PrepareRenta({
           savedYear={saved?.year ?? null}
           onTake={take}
           onCancel={() => setState('idle')}
+          onRemove={inRenta ? remove : undefined}
         />
       )}
       {state === 'otherYear' && (
@@ -120,6 +135,11 @@ export function PrepareRenta({
             </button>
           )}
         </div>
+      )}
+      {state === 'removed' && (
+        <p className="renta-recovered" role="status">
+          {t('tools.renta.removeActivity.removed')}
+        </p>
       )}
       {(state === 'done' || state === 'modules' || state === 'empty') && (
         <p className={state === 'done' ? 'renta-recovered' : 'form-error'} role="status">

@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { ApiProvider } from '@core/context/ApiContext';
 import type { Locale } from '@core/i18n/I18nContext';
 import { CHAPTERS, FREE_CHAPTERS, TOPICS, freeContent } from '@modules/invest/domain/content';
@@ -10,9 +11,17 @@ import { createFakeApi } from '@test-utils/fakeApi';
 import { chartsOf, premiumContent } from '@test-utils/learn';
 import { literal, renderWithI18n, tr } from '@test-utils/render';
 
-/** The Premium chapters come from the (fake) API; outside the plan provider nothing is locked. */
+/**
+ * The Premium chapters come from the (fake) API; outside the plan provider nothing is locked (the
+ * Premium videos of a chapter lead to the pricing page, hence the router).
+ */
 const renderInvest = (ui: ReactElement, locale?: Locale) =>
-  renderWithI18n(<ApiProvider value={createFakeApi()}>{ui}</ApiProvider>, locale);
+  renderWithI18n(
+    <MemoryRouter>
+      <ApiProvider value={createFakeApi()}>{ui}</ApiProvider>
+    </MemoryRouter>,
+    locale
+  );
 
 const tab = (id: string) =>
   screen.getByRole('tab', { name: literal(tr(`app.invest.section.${id}`)) });

@@ -602,15 +602,399 @@
   margin: 0;
 }
 
-.invite-link {
-  margin: 0.4rem 0 0.8rem;
-  word-break: break-all;
-  font-size: 0.9rem;
+/* ─── Invite a friend (card in "Your plan", content of the menu dialog) ───── */
+.invite {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  color: var(--slate-200);
 }
 
-.invite-link code {
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  background: var(--slate-900);
+.invite--card {
+  margin-bottom: 1.25rem;
+}
+
+.invite--dialog {
+  padding: 1.5rem 1.25rem 1.25rem;
+  animation: invite-in 0.22s ease-out both;
+}
+
+@keyframes invite-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.invite-panel {
+  overflow-y: auto;
+  max-width: 440px;
+}
+
+.invite-x {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--slate-400);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.invite-x:hover {
+  background: var(--slate-800);
+  color: var(--slate-100);
+}
+
+.invite-head {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+/* Soft rainbow ring around the gift: panel colour inside, gradient on the border. */
+.invite-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin-bottom: 0.25rem;
+  border: 2px solid transparent;
+  border-radius: 50%;
   color: var(--accent-300);
+  background: linear-gradient(var(--slate-800), var(--slate-800)) padding-box,
+    linear-gradient(135deg, #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6)
+      border-box;
+}
+
+.invite-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--slate-100);
+}
+
+.invite-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--slate-400);
+}
+
+.invite-steps {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: invite-step;
+}
+
+.invite-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  counter-increment: invite-step;
+  overflow-wrap: anywhere;
+}
+
+.invite-steps li::before {
+  content: counter(invite-step);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--accent-600);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.invite-linkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.35rem 0.35rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: var(--slate-950);
+}
+
+.invite-link {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--slate-100);
+  user-select: all;
+}
+
+.invite-copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 8px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.invite-copy:hover {
+  background: var(--slate-700);
+}
+
+.invite-copy.is-copied {
+  color: var(--green-400);
+  border-color: var(--green-400);
+}
+
+.invite-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.invite-share:hover {
+  filter: brightness(1.12);
+}
+
+.invite-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.invite-stats li {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.65rem 0.3rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 10px;
+  background: var(--slate-950);
+  text-align: center;
+  color: var(--slate-400);
+}
+
+.invite-stats strong {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--slate-100);
+}
+
+.invite-stats span {
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.invite-progress {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.invite-progress-text {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.invite-bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--slate-800);
+}
+
+.invite-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb 0%, #6366f1 60%, #22c55e 100%);
+  transition: width 0.4s ease;
+}
+
+.invite-months {
+  font-size: 0.8rem;
+  color: var(--slate-400);
+}
+
+.invite-months summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+}
+
+.invite-months summary::-webkit-details-marker {
+  display: none;
+}
+
+.invite-months summary::before {
+  content: '▸';
+  transition: transform 0.15s;
+}
+
+.invite-months[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.invite-months p {
+  margin: 0 0 0.25rem;
+  line-height: 1.5;
+}
+
+.invite-tiers {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: var(--slate-200);
+}
+
+.invite-tiers th,
+.invite-tiers td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--slate-800);
+  text-align: left;
+}
+
+.invite-tiers th {
+  font-weight: 600;
+  color: var(--slate-400);
+}
+
+.invite-tiers tr.is-earned td {
+  color: var(--green-400, #4ade80);
+  font-weight: 600;
+}
+
+.invite-tiers tr.is-earned td:last-child::after {
+  content: ' ✓';
+}
+
+/* ─── The invited user's free month: what is missing for it ──────────────── */
+.invitee-goal {
+  border: 1px solid var(--accent-500, #6366f1);
+}
+
+.invitee-goal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.invitee-goal-head .section-title {
+  margin: 0;
+}
+
+.invitee-goal .getting-started-list li {
+  flex-wrap: wrap;
+}
+
+.invitee-goal .getting-started-text {
+  min-width: 10rem;
+}
+
+.invitee-goal-done {
+  border-color: var(--green-500);
+}
+
+.invitee-goal-done p {
+  margin: 0.3rem 0 0;
+}
+
+.invite-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* High contrast: solid edges and the strongest text tone. */
+html.wiz-contrast .invite-linkbox,
+html.wiz-contrast .invite-stats li,
+html.wiz-contrast .invite-copy,
+html.wiz-contrast .invite-bar,
+html.wiz-contrast .invitee-goal,
+html.wiz-contrast .invitee-goal .getting-started-bar {
+  border: 2px solid var(--slate-300);
+}
+
+html.wiz-contrast .invite-subtitle,
+html.wiz-contrast .invite-stats li,
+html.wiz-contrast .invite-months,
+html.wiz-contrast .invite-tiers th,
+html.wiz-contrast .invitee-goal .getting-started-text {
+  color: var(--slate-100);
+  text-decoration: none;
+}
+
+html.wiz-contrast .invite-bar span {
+  background: var(--accent-600);
+}
+
+@media (max-width: 480px) {
+  .invite--dialog {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .invite-linkbox {
+    flex-wrap: wrap;
+    padding: 0.7rem;
+  }
+
+  .invite-link {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .invite-copy {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .invitee-goal .getting-started-list .btn-secondary {
+    flex: 1 1 100%;
+  }
 }

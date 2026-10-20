@@ -126,10 +126,11 @@ export const authApi = {
       body: jsonBody({ currentPassword, newPassword }),
     });
   },
-  updateAvatar(avatarDataUrl: string | null) {
-    return apiRequest<{ avatarUrl: string | null }>('/profile/avatar', {
+  /** The avatar is one emoji (null: the default one). */
+  updateAvatar(avatar: string | null) {
+    return apiRequest<{ avatar: string | null }>('/profile/avatar', {
       method: 'PATCH',
-      body: jsonBody({ avatarDataUrl }),
+      body: jsonBody({ avatar }),
     });
   },
   /** Needs the current password (or, for Google-only accounts, a recent Google sign-in). */

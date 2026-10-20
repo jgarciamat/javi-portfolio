@@ -100,7 +100,7 @@ export const twoFactorVerifyBody = z.object({
   challengeToken: z.string().min(1).max(200),
   code: twoFactorCode,
 });
-export const avatarBody = z.object({ avatarDataUrl: z.string().max(3_000_000).nullable() });
+export const avatarBody = z.object({ avatar: z.string().max(16).nullable() });
 export const settingsBody = z
   .object({
     currency: z.string().length(3).toUpperCase(),
@@ -135,6 +135,36 @@ export const transactionBody = z.object({
 });
 
 export const transactionPatchBody = transactionBody.partial();
+
+/** Most movements a bulk operation accepts at once. */
+export const BULK_MAX = 500;
+const bulkIds = z.array(id).min(1).max(BULK_MAX);
+
+export const bulkDeleteBody = z.object({ ids: bulkIds }).strict();
+
+export const bulkUpdateBody = z
+  .object({
+    ids: bulkIds,
+    changes: z
+      .object({
+        category: categoryName.optional(),
+        categoryId: id.optional(),
+        type: transactionType.optional(),
+        accountId: id.optional(),
+        date: date.optional(),
+        notes: z.string().max(1000).nullable().optional(),
+        notesMode: z.enum(['replace', 'append']).default('replace'),
+      })
+      .strict()
+      .refine(
+        (c) =>
+          [c.category, c.categoryId, c.type, c.accountId, c.date, c.notes].some(
+            (v) => v !== undefined
+          ),
+        'Indica al menos un cambio'
+      ),
+  })
+  .strict();
 
 export const searchQuery = z.object({
   q: z.string().max(100).optional(),
@@ -934,3 +964,42 @@ export const inboundMailBody = z
     to: Array.isArray(to) ? to.join(',') : to,
     text: (text.trim() ? text : html ? stripTags(html) : '').slice(0, 50_000),
   }));
+
+const count = z.number().int().min(0);
+
+/**
+ * `GET /api/referral`, checked on the way out: strict, so nothing else (and nothing about who
+ * invited the user) can slip into the response.
+ */
+export const referralSummaryResponse = z
+  .object({
+    code: z.string().regex(/^[A-Z0-9]{4,32}$/),
+    qualified: count,
+    pending: count,
+    rewardDays: count,
+    rewardsEarned: count,
+    missing: count,
+    nextAt: count.nullable(),
+    maxed: z.boolean(),
+    maxRewards: count,
+    tiers: z.array(count).max(20),
+    invited: z
+      .object({
+        rewarded: z.boolean(),
+        steps: z
+          .array(
+            z
+              .object({
+                id: z.enum(['movements', 'budgets', 'goals', 'automations']),
+                count,
+                goal: count,
+                done: z.boolean(),
+              })
+              .strict()
+          )
+          .length(4),
+      })
+      .strict()
+      .nullable(),
+  })
+  .strict();

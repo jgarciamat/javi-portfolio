@@ -48,13 +48,23 @@ interface AuthContextValue {
   logoutEverywhere: () => Promise<void>;
   updateName: (name: string) => Promise<void>;
   updatePassword: (currentPassword: string | undefined, newPassword: string) => Promise<void>;
-  updateAvatar: (avatarDataUrl: string | null) => Promise<void>;
+  updateAvatar: (avatar: string | null) => Promise<void>;
 }
 
 const AuthContext = stableContext<AuthContextValue | null>('AuthContext', null);
 const USER_KEY = 'mm_user';
 
-const loadUser = (): AuthUser | null => storage.getJSON<AuthUser | null>(USER_KEY, null);
+/**
+ * The stored user. Copies saved before pictures were dropped may still carry the old photo
+ * (`avatarUrl`, a data URL): it is removed from the device the first time it is read.
+ */
+function loadUser(): AuthUser | null {
+  const stored = storage.getJSON<(AuthUser & { avatarUrl?: unknown }) | null>(USER_KEY, null);
+  if (!stored || !('avatarUrl' in stored)) return stored;
+  const { avatarUrl: _picture, ...user } = stored;
+  saveUser(user);
+  return user;
+}
 
 function saveUser(user: AuthUser | null): void {
   if (user) storage.setJSON(USER_KEY, user);
@@ -235,8 +245,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const updateAvatar = useCallback(
-    async (avatarDataUrl: string | null) =>
-      updateUser({ avatarUrl: (await authApi.updateAvatar(avatarDataUrl)).avatarUrl }),
+    async (avatar: string | null) =>
+      updateUser({ avatar: (await authApi.updateAvatar(avatar)).avatar }),
     [updateUser]
   );
 

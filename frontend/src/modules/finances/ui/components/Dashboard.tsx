@@ -13,6 +13,7 @@ import { useAuth } from '@shared/hooks/useAuth';
 import { Icon } from '@shared/components/Icon';
 import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
+import { useScrollToStart, useStickyBarHeight } from '@shared/hooks/useStickyBar';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import { usageLimit } from './AutonomoLimit';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
@@ -27,6 +28,8 @@ import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
 import { BurgerMenu } from './BurgerMenu';
+import { InviteDialog } from './InviteDialog';
+import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
 import { EditTransactionModal } from './EditTransactionModal';
 import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
@@ -77,9 +80,14 @@ const SIMPLE_VIEWS: Partial<
   learn: (open) => <LearnView onOpenTab={open} />,
   invest: () => <InvestView />,
   videos: () => <VideosView />,
-  plan: () => <PlanView />,
+  plan: (open) => <PlanWithSteps onOpenTab={open} />,
   offers: () => <OffersView />,
 };
+
+/** "Your plan", whose first steps for an invited user open the right section. */
+function PlanWithSteps({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => void }) {
+  return <PlanView onOpenStep={useOpenFirstStep(onOpenTab)} />;
+}
 
 function SectionLoading() {
   const { t } = useI18n();
@@ -192,7 +200,19 @@ function DashboardModals({ dash }: { dash: UseDashboardReturn }) {
           onDelete={finances.removeCategory}
         />
       )}
-      {dash.showProfile && <ProfilePage onClose={dash.closeProfile} />}
+      {dash.showProfile && (
+        <ProfilePage
+          onClose={dash.closeProfile}
+          onOpenSettings={() => {
+            dash.closeProfile();
+            dash.setTab('settings');
+          }}
+          onOpenPlan={() => {
+            dash.closeProfile();
+            dash.setTab('plan');
+          }}
+        />
+      )}
       {dash.showImport && (
         <ImportModal
           accounts={finances.accounts}
@@ -261,10 +281,14 @@ export function Dashboard() {
 
   // A section chosen in the menu takes the focus (after the menu gives it back to its button).
   const sectionRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  useStickyBarHeight(stickyRef);
+  useScrollToStart(dash.tab, finances.year, finances.month);
   const [menuPicks, setMenuPicks] = useState(0);
   useEffect(() => {
     if (menuPicks > 0) sectionRef.current!.focus();
   }, [menuPicks]);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const selectFromMenu = (next: DashboardTab) => {
     dash.setTab(next);
     setMenuPicks((n) => n + 1);
@@ -280,7 +304,7 @@ export function Dashboard() {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-sticky">
+      <div className="dashboard-sticky" ref={stickyRef}>
         <Header
           dash={dash}
           sectionLabel={
@@ -327,8 +351,10 @@ export function Dashboard() {
         tab={dash.tab}
         onSelectTab={selectFromMenu}
         onOpenProfile={dash.openProfile}
+        onOpenInvite={() => setInviteOpen(true)}
         onClose={() => dash.setMenuOpen(false)}
       />
+      {inviteOpen && <InviteDialog onClose={() => setInviteOpen(false)} />}
       <Suspense fallback={null}>
         <DashboardModals dash={dash} />
       </Suspense>

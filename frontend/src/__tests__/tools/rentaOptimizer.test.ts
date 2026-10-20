@@ -130,7 +130,7 @@ describe('the reviewer of the return', () => {
       worker({
         joint: 'none',
         savingsDetail: {
-          capital: { interest: 500, dividends: 0, assets: 0, insurance: 0, expenses: 0 },
+          capital: { interest: 500, dividends: 0, bills: 0, assets: 0, insurance: 0, expenses: 0 },
           assets: [],
           properties: [],
           otherGains: [],

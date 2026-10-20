@@ -653,6 +653,8 @@ describe('AnalysisView', () => {
 // ─── Settings ────────────────────────────────────────────────────────────────
 
 describe('the self-employed draft', () => {
+  // 10 April 2026: the screen opens on the first quarter, the one to file (free in its window).
+  beforeEach(() => freezeTime('2026-04-10T12:00:00'));
   const free = (usage = 0, pdfs = 0) => {
     const api = createFakeApi();
     const overview = f.billing({ plan: 'free' });
@@ -1079,8 +1081,8 @@ describe('the self-employed draft', () => {
   it('keeps other quarters for Premium on the free plan', async () => {
     const api = open();
     expect(await screen.findByText(tr('app.autonomo.freeOne'))).toBeInTheDocument();
-    // 15 March 2026: the first quarter is the current one.
-    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
+    // 10 April 2026: the first quarter (to file) and the second (current) are free.
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '3' } });
     expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
     fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
@@ -1094,17 +1096,16 @@ describe('the self-employed draft', () => {
   });
 
   it('lets the free plan draft the quarter just ended while it can be filed', async () => {
-    freezeTime('2026-04-10T12:00:00');
     open();
     expect(await screen.findByText(tr('app.autonomo.freeOne'))).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
+    expect(screen.getByLabelText(tr('app.autonomo.quarter'))).toHaveValue('1');
+    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
     expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '4' } });
     expect(screen.getByText(tr('app.autonomo.otherQuarterLocked'))).toBeInTheDocument();
   });
 
   it('counts the free draft of each quarter on its own', async () => {
-    freezeTime('2026-04-10T12:00:00');
     const api = createFakeApi();
     const overview = f.billing({ plan: 'free', limits: f.catalog().limits.free });
     api.billingApi.get.mockResolvedValue({
@@ -1116,9 +1117,8 @@ describe('the self-employed draft', () => {
       ],
     });
     open(api);
-    expect(await screen.findByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();
-    fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '1' } });
-    expect(screen.getByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
+    // It opens on the first quarter, already drafted.
+    expect(await screen.findByText(tr('app.autonomo.usedFree'))).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: tr('app.autonomo.prepare') })).toBeNull();
     fireEvent.change(screen.getByLabelText(tr('app.autonomo.quarter')), { target: { value: '2' } });
     expect(screen.getByRole('button', { name: tr('app.autonomo.prepare') })).toBeVisible();

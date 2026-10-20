@@ -54,6 +54,18 @@ copiar el fichero más reciente de `api_backups`:
 ls -lt "$(docker volume inspect --format '{{.Mountpoint}}' "$(docker volume ls --format '{{.Name}}' | grep -E '(^|_)api_backups$')")"
 ```
 
+## Fotos de perfil antiguas (migración 033)
+
+Desde la v1.52 el avatar es un emoticono y no se suben fotos. La migración `033` vacía
+`users.avatar_url` cuando guardaba una foto (`data:` o enlace de imagen) y deja los emoticonos.
+Las fotos solo siguen en las copias anteriores a esa migración (la `pre-migration-v32-*.db` de
+`/data`, con el número de esquema que tuviera la base, y las diarias), que se borran solas a los 14 días. Para recuperar la de un usuario
+dentro de ese plazo (solo si hay un motivo legal o lo pide el propio usuario):
+
+```bash
+sqlite3 "$DATA"/pre-migration-v32-*.db "SELECT avatar_url FROM users WHERE email = 'correo@ejemplo.com';"
+```
+
 ## Prueba de restauración (una vez al mes)
 
 Haz los pasos 1 a 3 (sin parar nada). Si `integrity_check` dice `ok` y el número de usuarios

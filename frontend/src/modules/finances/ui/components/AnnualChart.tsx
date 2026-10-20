@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
-import { OptionsDropdown } from '@shared/components/OptionsDropdown';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { buildAnnualChartData, type AnnualMonthEntry } from '@modules/finances/domain/annual';
 import { isBeyondHorizon } from '@modules/finances/domain/nextMonthLogic';
@@ -11,6 +10,7 @@ import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
 import { AnnualReportDialog } from './AnnualReportDialog';
 import '../css/AnnualChart.css';
+import '../css/MonthActions.css';
 import { Icon } from '@shared/components/Icon';
 
 interface AnnualChartProps {
@@ -156,19 +156,6 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
         </button>
         <h2 className="annual-title">
           {t('app.annual.title')} {year}
-          {months.length > 0 && (
-            <OptionsDropdown
-              ariaLabel={t('app.export.options')}
-              options={[
-                {
-                  icon: '📥',
-                  label: t('app.export.annual'),
-                  onClick: () => exportAnnualCSV(months, year),
-                },
-                { icon: '📄', label: t('app.report.open'), onClick: openReport },
-              ]}
-            />
-          )}
         </h2>
         <button
           className="btn-nav"
@@ -179,6 +166,21 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
           {year + 1} ›
         </button>
       </nav>
+
+      {months.length > 0 && (
+        <div className="month-actions" role="group" aria-label={t('app.export.options')}>
+          <button
+            type="button"
+            className="month-action"
+            onClick={() => exportAnnualCSV(months, year)}
+          >
+            <Icon name="download" /> {t('app.export.annual')}
+          </button>
+          <button type="button" className="month-action" onClick={openReport}>
+            <Icon name="file" /> {t('app.report.open')}
+          </button>
+        </div>
+      )}
 
       <div className="annual-legend">
         {SERIES.map((s) => (

@@ -123,8 +123,33 @@ export interface ReferralSummary {
   rewardDays: number;
   /** Free months earned so far. */
   rewardsEarned: number;
-  /** Friends still needed for the next free month. */
+  /** Friends still needed for the next free month (0 once every month has been earned). */
   missing: number;
+  /** Friends needed in total for the next month; null once every month has been earned. */
+  nextAt: number | null;
+  /** Every month the invitations can give has been earned. */
+  maxed: boolean;
+  maxRewards: number;
+  /** Friends needed in total for each month: 1 → 1 month, 5 → 2 months… */
+  tiers: number[];
+  /** Set when the user was invited: their own free month and its first steps. */
+  invited: InviteeStatus | null;
+}
+
+export type FirstStepId = 'movements' | 'budgets' | 'goals' | 'automations';
+
+export interface FirstStepProgress {
+  id: FirstStepId;
+  /** What the user has (up to the goal) and what is asked for. */
+  count: number;
+  goal: number;
+  done: boolean;
+}
+
+/** An invited user's free month: whether it arrived and what is missing for it. */
+export interface InviteeStatus {
+  rewarded: boolean;
+  steps: FirstStepProgress[];
 }
 
 /** Why the paywall was opened. */

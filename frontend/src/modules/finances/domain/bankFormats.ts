@@ -133,5 +133,7 @@ export function normalizeBankTable(table: string[][], bank: BankId | null): stri
 /** Column mapping for a table; ING's own categories do not match ours, so they are ignored. */
 export function bankMapping(headers: string[], bank: BankId | null): ColumnMapping {
   const mapping = detectColumns(headers);
-  return bank === 'ing' ? { ...mapping, category: -1 } : mapping;
+  // Known banks have no «Tipo» of their own (their "Type"/"Movimiento" columns are not it).
+  const plain = bank ? { ...mapping, type: -1 } : mapping;
+  return bank === 'ing' ? { ...plain, category: -1 } : plain;
 }

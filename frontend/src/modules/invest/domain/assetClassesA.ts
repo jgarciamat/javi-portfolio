@@ -52,6 +52,13 @@ export const ASSET_CLASSES_A: AssetClass[] = [
   {
     id: 'renta-fija',
     chapterId: 'renta-fija-bonos',
+    moreChapters: [
+      'letras-del-tesoro',
+      'bonos-obligaciones-estado',
+      'comprar-deuda-publica',
+      'deuda-publica-renta',
+      'letras-depositos-monetarios',
+    ],
     num: '02',
     emoji: '🏛️',
     color: '#0ea5e9',
@@ -64,11 +71,13 @@ export const ASSET_CLASSES_A: AssetClass[] = [
     risk: 3,
     liquidity: 4,
     liquidityNote:
-      'Letras y bonos del Estado se venden en el mercado secundario en días; la deuda corporativa pequeña puede costar más de vender.',
-    horizon: 'Medio plazo: de 3 meses (Letras) a 10 años o más.',
+      'Letras, Bonos y Obligaciones del Estado se pueden vender antes del vencimiento en el mercado secundario (desde la web del Tesoro o tu banco), al precio del día y con comisión; la deuda corporativa pequeña puede costar más de vender.',
+    horizon:
+      'De 3 meses (Letras) a 50 años (Obligaciones); lo que más usa un ahorrador va de 3 meses a 10 años.',
     subtypes: [
-      'Letras del Tesoro (6, 12 meses)',
-      'Bonos del Estado (3 y 5 años) y Obligaciones (10, 15, 30 años)',
+      'Letras del Tesoro (3, 6, 9 y 12 meses, al descuento)',
+      'Bonos del Estado (3 y 5 años) y Obligaciones (10, 15, 30 y 50 años), con cupón anual',
+      'Se compran en subasta (web del Tesoro, Banco de España o tu banco) o en el mercado secundario',
       'Deuda corporativa: grado de inversión y high yield',
       'Bonos ligados a la inflación y bonos verdes',
     ],
@@ -76,20 +85,23 @@ export const ASSET_CLASSES_A: AssetClass[] = [
       'Ingresos previsibles si mantienes hasta el vencimiento.',
       'Menos volátil que la bolsa; sirve para amortiguar caídas de la cartera.',
       'El Tesoro español es de los emisores más sólidos de la zona euro.',
+      'Puedes comprar Letras, Bonos y Obligaciones directamente al Tesoro, desde 1.000 €, sin comisión de compra ni de custodia.',
     ],
     cons: [
       'Rentabilidad menor que la renta variable a largo plazo.',
       'Si suben los tipos de interés, el precio de los bonos ya emitidos baja.',
       'La inflación puede dejar la rentabilidad real en cero o negativa.',
       'El emisor puede no pagar (riesgo de crédito), sobre todo en deuda corporativa de baja calidad.',
+      'La deuda pública no está cubierta por el Fondo de Garantía de Depósitos: la respalda el Estado.',
     ],
     example:
-      'Compras una Letra a 12 meses por 970 € por cada 1.000 € de nominal. Dentro de un año el Tesoro te devuelve 1.000 €: ganas 30 € (3,09 % sobre lo que pusiste). No hay cupones; todo el rendimiento es esa diferencia.',
+      'Compras una Letra a 12 meses por 970 € por cada 1.000 € de nominal. Dentro de un año el Tesoro te devuelve 1.000 €: ganas 30 € (3,09 % sobre lo que pusiste). No hay cupones; todo el rendimiento es esa diferencia. Cifras de ejemplo: el tipo real es el de cada subasta (tesoro.es).',
     taxKind: 'savings',
     taxShort: 'Base del ahorro 19-30 %',
     tax: [
       'Cupones e intereses: rendimientos del capital mobiliario, base del ahorro (19-30 %).',
-      'Letras del Tesoro: la ganancia (nominal menos precio pagado) es rendimiento del capital mobiliario y, según la norma, no lleva retención: tributas al hacer la renta. Los cupones de bonos del Estado y de deuda corporativa suelen llevar retención del 19 %; confirma el detalle con tu entidad.',
+      'Letras del Tesoro: el rendimiento (lo que cobras menos lo que pagaste) es rendimiento del capital mobiliario sin retención (art. 75.3 b del Reglamento del IRPF): se paga al hacer la Renta, en la casilla 0030 del año en que vence o la vendes.',
+      'Cupones de Bonos y Obligaciones del Estado: rendimiento del capital mobiliario con retención del 19 % (casilla 0027). Venta o amortización de Bonos y Obligaciones: casilla 0031, sin retención en general.',
       'Venta antes del vencimiento: la diferencia entre el precio de venta y el de compra también es rendimiento del capital mobiliario (el cupón corrido se trata aparte). Una pérdida se compensa con rendimientos del capital mobiliario y, con límite del 25 %, con ganancias de ventas.',
       'IVA: exento, igual que el resto de servicios financieros. Sin ITP ni AJD.',
       'Los bonos de emisores extranjeros pueden tener retención en origen y, si los custodia un bróker fuera de España, afectan al modelo 720.',

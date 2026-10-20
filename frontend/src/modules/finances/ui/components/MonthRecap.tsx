@@ -98,7 +98,7 @@ export function MonthRecapDialog({
               : t('app.recap.balanceDown', { balance: money(-summary.balance) })}
           </p>
         </div>
-        <RecapShare summary={summary} month={month} preview />
+        <RecapShare summary={summary} month={month} />
       </div>
       <div className="modal-footer">
         <button className="btn-secondary" onClick={onClose}>
@@ -146,7 +146,6 @@ export function MonthRecap() {
         </button>
       </div>
       <RecapLines summary={summary} />
-      <RecapShare summary={summary} month={monthLabel(previous.year, previous.month)} />
     </section>
   );
 }

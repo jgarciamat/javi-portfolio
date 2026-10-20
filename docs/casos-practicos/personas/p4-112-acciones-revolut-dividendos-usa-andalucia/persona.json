@@ -73,6 +73,7 @@
               "capital": {
                 "interest": 0,
                 "dividends": 20,
+                "bills": 0,
                 "assets": 0,
                 "insurance": 0,
                 "expenses": 1

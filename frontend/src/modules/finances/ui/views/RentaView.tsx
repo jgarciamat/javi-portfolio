@@ -4,7 +4,11 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { RentaAssistant } from '@modules/tools/ui/renta/RentaWizard';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { YEAR_ACTIONS_ID } from '@modules/tools/ui/renta/NewReturn';
-import { loadProgress, PROGRESS_EVENT } from '@modules/tools/application/rentaProgress';
+import {
+  loadProgress,
+  PROGRESS_EVENT,
+  removeSavedAutonomo,
+} from '@modules/tools/application/rentaProgress';
 import { rentaState } from '@modules/tools/data/renta/state';
 import { AUTONOMO_ACTIVITY } from '@modules/tools/domain/rentaFromAutonomo';
 import { AnnualFigures } from '@modules/tools/ui/renta/AutonomoBring';
@@ -26,7 +30,7 @@ const CHECKLIST = ['data', 'certificate', 'receipts', 'review'] as const;
  * The self-employed activity brought to the Renta of this year (from «Preparar mi declaración de la
  * renta» or step 6): what came, so the person sees at once that the Renta has it.
  */
-function BroughtActivity({ year }: { year: number }) {
+function BroughtActivity({ year, onRemoved }: { year: number; onRemoved: () => void }) {
   const { t } = useI18n();
   // Read again whenever the planner saves (the activity can be taken out there).
   const [, refresh] = useReducer((n: number) => n + 1, 0);
@@ -39,7 +43,13 @@ function BroughtActivity({ year }: { year: number }) {
   return (
     <div className="renta-recovered renta-brought" role="status">
       <p>{t('app.renta.brought', { year })}</p>
-      <AnnualFigures annual={annual} />
+      <AnnualFigures
+        annual={annual}
+        onRemove={() => {
+          removeSavedAutonomo();
+          onRemoved();
+        }}
+      />
     </div>
   );
 }
@@ -64,6 +74,8 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
     const saved = loadProgress()?.year;
     return saved !== undefined && years.includes(saved) ? saved : currentPeriod.year - 1;
   });
+  // Bumped when the activity is taken out of the saved Renta: the planner reads it again.
+  const [removals, setRemovals] = useState(0);
   const { data } = useAnnualSummary(year);
   const months = Object.values(data?.months ?? {});
   const income = months.reduce((sum, m) => sum + m.income, 0);
@@ -108,10 +120,15 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             {t('app.renta.provisional', { year })}
           </p>
         )}
-        <BroughtActivity year={year} />
+        <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
+        {removals > 0 && !broughtActivity(year) && (
+          <p className="renta-recovered" role="status">
+            {t('tools.renta.removeActivity.removed')}
+          </p>
+        )}
         <div className="tools-main renta-tools">
           <RentaAssistant
-            key={`${year}-${Math.round(income)}`}
+            key={`${year}-${Math.round(income)}-${removals}`}
             mode="account"
             year={year}
             // The money that came into the accounts is not a salary of a self-employed person.

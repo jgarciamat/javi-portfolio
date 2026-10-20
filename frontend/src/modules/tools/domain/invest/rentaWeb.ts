@@ -92,8 +92,24 @@ export type OtherGrouping = 'position' | 'month' | 'sign';
 export const OTHER_GROUPINGS: OtherGrouping[] = ['position', 'month', 'sign'];
 
 /** What is copied into Renta WEB: an amount with a decimal comma and no thousands separator. */
-export const webValue = (value: string | number) =>
-  typeof value === 'number' ? value.toFixed(2).replace('.', ',') : value;
+export const webValue = (value: number) => value.toFixed(2).replace('.', ',');
+
+/** The fields of the windows that hold euros; the others are texts, marks, keys or numbers. */
+export const MONEY_FIELDS = new Set([
+  'proceeds',
+  'proceedsCosts',
+  'cost',
+  'costCosts',
+  'amortization',
+  'withheld',
+]);
+
+/**
+ * What is written in a field of a window: the euros with two decimals and a decimal comma; any
+ * other value as it is (a transaction number «1», a mark «Sí», a key «F - …», an ISIN or a NIF).
+ */
+export const fieldText = (key: string, value: string | number): string =>
+  MONEY_FIELDS.has(key) && typeof value === 'number' ? webValue(value) : String(value);
 
 /** Cut a text to a field's length without cutting a word in two when it can. */
 export function cut(text: string, max?: number): string {
@@ -432,6 +448,11 @@ export function rentaWebKit(
       box: '0029',
       label: 'Dividendos y demás rendimientos por la participación en fondos propios',
       amount: c.dividends,
+    },
+    {
+      box: '0030',
+      label: 'Rendimientos procedentes de la transmisión o amortización de Letras del Tesoro',
+      amount: c.bills,
     },
     {
       box: '0031',

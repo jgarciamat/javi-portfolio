@@ -286,7 +286,7 @@ describe('The withholdings on the self-employed screen', () => {
     localStorage.clear();
     // Everything together (the assistant has its own suite).
     localStorage.setItem('mm_autonomo_assistant', 'expert');
-    freezeTime('2026-07-10T12:00:00');
+    freezeTime('2026-10-10T12:00:00');
   });
   afterEach(() => restoreTime());
 

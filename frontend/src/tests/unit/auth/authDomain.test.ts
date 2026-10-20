@@ -1,5 +1,5 @@
 import { validatePassword } from '@modules/auth/domain/passwordValidation';
-import { PRESET_AVATARS, emojiAvatar } from '@modules/auth/domain/avatar';
+import { AVATAR_CHOICES, avatarChoices } from '@modules/auth/domain/avatar';
 
 describe('validatePassword', () => {
   it('lists every rule that fails, as i18n keys', () => {
@@ -28,10 +28,11 @@ describe('validatePassword', () => {
   });
 });
 
-describe('emojiAvatar', () => {
-  it('draws the emoji in an SVG data URL', () => {
-    const url = emojiAvatar(PRESET_AVATARS[0]);
-    expect(url.startsWith('data:image/svg+xml;charset=utf-8,')).toBe(true);
-    expect(decodeURIComponent(url)).toContain(PRESET_AVATARS[0]);
+describe('avatarChoices', () => {
+  it('offers the calm set, keeping first a saved avatar that is no longer offered', () => {
+    expect(AVATAR_CHOICES).toHaveLength(16);
+    expect(avatarChoices(null)).toBe(AVATAR_CHOICES);
+    expect(avatarChoices('🦊')).toBe(AVATAR_CHOICES);
+    expect(avatarChoices('🤖')).toEqual(['🤖', ...AVATAR_CHOICES]);
   });
 });

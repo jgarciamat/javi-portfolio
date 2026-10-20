@@ -7,6 +7,7 @@ import { InvestGuide } from '@modules/tools/ui/renta/invest/InvestGuide';
 import { readPdf } from '@modules/tools/application/readPdf';
 import { resetBundledRates } from '@modules/tools/application/investImport';
 import { renderWithProviders, tr } from '@test-utils/render';
+import { buildXlsx } from '../../../../scripts/xlsx';
 
 jest.mock('@modules/tools/application/readPdf', () => ({ readPdf: jest.fn() }));
 const pdf = readPdf as jest.MockedFunction<typeof readPdf>;
@@ -203,11 +204,10 @@ describe('Importar mis inversiones', () => {
     expect(screen.getByText('[0588] 12,00 €')).toBeInTheDocument();
     Object.assign(URL, { createObjectURL: jest.fn(() => 'blob:x'), revokeObjectURL: jest.fn() });
     const save = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.web.xlsx`) }));
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: tr(`${k}.web.pdf`) }));
     });
-    await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
     save.mockRestore();
     fireEvent.click(screen.getByLabelText(tr(`${k}.professional`)));
     fireEvent.click(screen.getByRole('button', { name: tr(`${k}.apply`) }));
@@ -363,8 +363,7 @@ describe('taking a file out, and the pages of the table', () => {
   });
 
   it('says which sheets of a workbook are only information', async () => {
-    const { xlsxOf } = await import('@modules/tools/application/investImport');
-    const book = xlsxOf([
+    const book = buildXlsx([
       {
         name: 'Customer Information',
         rows: [

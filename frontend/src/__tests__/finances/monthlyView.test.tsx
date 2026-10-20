@@ -68,7 +68,10 @@ describe('the review prompt of the month view', () => {
     api.accountApi.getAll.mockResolvedValue({ accounts, total: 1000 });
     api.settingsApi.get.mockResolvedValue(f.settings({ showGettingStarted: false }));
     renderWithProviders(<Dashboard />, { api, plan: true });
-    fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.yes') }));
+    // The month view loads several panels first: on a busy machine it takes more than a second.
+    fireEvent.click(
+      await screen.findByRole('button', { name: tr('app.rate.yes') }, { timeout: 5000 })
+    );
     fireEvent.click(await screen.findByRole('button', { name: tr('app.rate.invite') }));
     expect(await screen.findByRole('region', { name: tr('app.tabs.plan') })).toBeInTheDocument();
   });

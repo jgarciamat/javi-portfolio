@@ -653,3 +653,12 @@ button.tx-calendar-cell:focus-visible {
 .tx-week-items {
   display: block;
 }
+
+.tx-week-item .select-check {
+  flex-shrink: 0;
+  margin: -0.4rem -0.35rem;
+}
+
+.tx-day-header .select-check {
+  margin: -0.5rem 0;
+}
