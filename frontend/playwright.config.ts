@@ -2,9 +2,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
-/** Ports apart from `npm run dev` (3000 / 5176), so both can run at once. */
-const API_PORT = 3100;
-const WEB_PORT = 5186;
+/** Ports apart from `npm run dev` (3000 / 5176), so both can run at once (overridable for parallel runs). */
+const API_PORT = Number(process.env.E2E_API_PORT ?? 3100);
+const WEB_PORT = Number(process.env.E2E_WEB_PORT ?? 5186);
 
 // One database per run, shared with the workers (and the teardown) through the environment.
 process.env.E2E_DATABASE ??= join(tmpdir(), `money-manager-e2e-${Date.now()}.db`);
