@@ -20,10 +20,16 @@
     Referrer-Policy "strict-origin-when-cross-origin"
     X-Frame-Options "DENY"
     Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
-    # Report-only first: the Google sign-in popup and the click-to-load YouTube player
-    # (youtube-nocookie.com, only after a click) need these origins. Switch the
-    # header name to Content-Security-Policy once the browser console shows no reports.
-    Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://accounts.google.com https://apis.google.com; frame-src https://accounts.google.com https://www.youtube-nocookie.com; connect-src 'self' https://accounts.google.com https://www.googleapis.com https://oauth2.googleapis.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    # CSP, in two layers (see deploy/CSP.md):
+    #  1. Enforced now: the directives that cannot break the app (no plugins, fixed <base>, forms
+    #     only to ourselves, nobody frames us, http sub-resources upgraded).
+    #  2. The full policy (scripts, styles, connections, images...) stays Report-Only until the
+    #     reports at /api/csp-report show no violation from real users; then move it, as it is,
+    #     to Content-Security-Policy. Google sign-in and the click-to-load YouTube player
+    #     (youtube-nocookie.com, only after a click) are the only third-party origins.
+    Reporting-Endpoints `csp-endpoint="/api/csp-report"`
+    Content-Security-Policy "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com https://apis.google.com; worker-src 'self' blob:; frame-src https://accounts.google.com https://www.youtube-nocookie.com; connect-src 'self' https://accounts.google.com https://www.googleapis.com https://oauth2.googleapis.com; img-src 'self' data: blob: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; report-uri /api/csp-report; report-to csp-endpoint"
     -Server
   }
 
