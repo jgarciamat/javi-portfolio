@@ -522,6 +522,62 @@ export interface ReferralRepository {
   setRewardsGranted(userId: string, count: number): void;
 }
 
+// ─── Creator affiliate program (docs/afiliacion) ─────────────────────────────
+
+export type CreatorPlan = 'monthly' | 'yearly' | 'lifetime';
+export type CreatorSaleProvider = 'stripe' | 'google';
+
+export interface CreatorAffiliateRecord {
+  /** Upper case, what goes in `?aff=`. */
+  code: string;
+  /** A handle or alias: the creator's legal name, tax id and bank details stay out of here. */
+  name: string;
+  /** Own cap per calendar year; null uses the program's. */
+  capCents: number | null;
+  active: boolean;
+  createdAt: string;
+}
+
+/** A first Premium payment of a user who signed up with a creator's code (and agreed to it). */
+export interface CreatorSaleRecord {
+  id: number;
+  code: string;
+  plan: CreatorPlan;
+  provider: CreatorSaleProvider;
+  /** Commission in force when it was sold. */
+  commissionCents: number;
+  soldAt: string;
+  /** Refunded or charged back. */
+  reversedAt: string | null;
+  paidAt: string | null;
+  /** What was paid for it (after the caps). */
+  paidCents: number | null;
+  /** A reversal after paying, deducted from a later payment. */
+  clawedAt: string | null;
+}
+
+export interface CreatorRepository {
+  affiliate(code: string): CreatorAffiliateRecord | null;
+  affiliates(): CreatorAffiliateRecord[];
+  /** False when the code already exists. */
+  addAffiliate(record: CreatorAffiliateRecord): boolean;
+  /** False when the code does not exist. */
+  setActive(code: string, active: boolean): boolean;
+  /** A user is attributed once, at sign-up. */
+  attribute(userId: string, code: string, at: string): boolean;
+  attributionOf(userId: string): { code: string; createdAt: string } | null;
+  /** Users attributed to each code (accounts deleted since are not counted). */
+  signupsByCode(): Record<string, number>;
+  /** Only the first sale of a user counts: false when there was one already. */
+  addSale(userId: string, sale: Omit<CreatorSaleRecord, 'id'>): boolean;
+  saleOf(userId: string): CreatorSaleRecord | null;
+  markReversed(id: number, at: string): void;
+  sales(): CreatorSaleRecord[];
+  markPaid(paid: { id: number; cents: number }[], clawed: number[], at: string): void;
+  /** Consent withdrawn: the attribution goes, a sale stays only as an anonymous record. */
+  forget(userId: string): void;
+}
+
 // ─── Household ───────────────────────────────────────────────────────────────
 
 export interface HouseholdMemberRecord {

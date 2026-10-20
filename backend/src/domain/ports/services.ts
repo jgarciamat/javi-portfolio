@@ -174,6 +174,24 @@ export type BillingEvent =
       userId: string | null;
       customerId: string | null;
     }
+  /** A subscription invoice paid with real money (not a trial, not a 100 % discount). */
+  | {
+      id: string;
+      type: 'premium_paid';
+      userId: string | null;
+      customerId: string | null;
+      plan: 'monthly' | 'yearly';
+    }
+  /**
+   * A Premium payment refunded in full or charged back. Only the creator program uses it:
+   * the access itself follows the subscription events.
+   */
+  | {
+      id: string;
+      type: 'premium_reversed';
+      userId: string | null;
+      customerId: string | null;
+    }
   | { id: string; type: 'ignored' };
 
 export interface PaymentGateway {

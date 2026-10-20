@@ -101,6 +101,8 @@ import { SqliteFunnelRepository } from './sqlite/repositories/SqliteFunnelReposi
 import { ActivationTracker } from '@application/analytics/ActivationTracker';
 import type { FirstStepId } from '@application/referrals/ReferralService';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
+import { SqliteCreatorRepository } from './sqlite/repositories/SqliteCreatorRepository';
+import { CreatorProgram } from '@application/creators/CreatorProgram';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
   SqliteRefreshTokenRepository,
@@ -181,6 +183,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     affiliateClicks: new SqliteAffiliateClickRepository(db),
     metrics: new SqliteMetricsRepository(db, clock, funnel),
     referrals: new SqliteReferralRepository(db),
+    creators: new SqliteCreatorRepository(db),
     household: new SqliteHouseholdRepository(db),
   };
 
@@ -236,6 +239,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     config.ai.dailyNeuronBudget
   );
 
+  const creators = new CreatorProgram(repos.creators, clock, config.creators);
   const categoryResolver = new CategoryResolver(repos.categories);
   const categoryRules = new CategoryRuleService(
     repos.categoryRules,
@@ -362,6 +366,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       })
     ),
     activation: new ActivationTracker(funnel, firstStepCount),
+    creators,
     household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
     payments,
@@ -480,6 +485,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
           ? !!config.billing.stripe.prices.rentaPass
           : true,
         metrics: repos.metrics,
+        creators,
       }
     ),
     playBilling: new PlayBillingService(
@@ -490,7 +496,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       repos.metrics,
       entitlements,
-      config.billing.revenueCatWebhookAuth
+      config.billing.revenueCatWebhookAuth,
+      creators
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,

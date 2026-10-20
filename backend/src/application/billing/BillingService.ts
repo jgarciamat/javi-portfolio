@@ -27,6 +27,7 @@ import { LimitedResource, PLAN_LIMITS, serializableLimits } from '@domain/servic
 import { AiAllowance, AiQuota } from '@application/ai/AiAllowance';
 import type { QuarterDraftUsage } from '@application/tax/TaxService';
 import { EntitlementService } from './EntitlementService';
+import type { CreatorPlan } from '@domain/ports/repositories';
 
 /** How many of each limited resource a user has (active ones). */
 /** What the user has created so far (`movements` is informational: it is not limited). */
@@ -68,6 +69,14 @@ export interface BillingOptions {
   lifetimeConfigured: boolean;
   rentaPassConfigured: boolean;
   metrics: MetricsRecorder;
+  /** Creator affiliate program: counts first payments and takes back refunded ones. */
+  creators?: CreatorSales;
+}
+
+/** What billing tells the creator affiliate program (docs/afiliacion). */
+export interface CreatorSales {
+  recordSale(userId: string, plan: CreatorPlan, provider: 'stripe' | 'google'): void;
+  reverseSale(userId: string): void;
 }
 
 export interface PlanCatalog {
@@ -392,8 +401,19 @@ export class BillingService {
         if (sub) this.entitlements.revokeRentaPass(sub.userId);
         return {};
       }
+      case 'premium_paid': {
+        const sub = find(event.userId, event.customerId);
+        if (sub) this.options.creators?.recordSale(sub.userId, event.plan, 'stripe');
+        return {};
+      }
+      case 'premium_reversed': {
+        const sub = find(event.userId, event.customerId);
+        if (sub) this.options.creators?.reverseSale(sub.userId);
+        return {};
+      }
       case 'lifetime_refunded': {
         const sub = find(event.userId, event.customerId);
+        if (sub) this.options.creators?.reverseSale(sub.userId);
         if (sub?.lifetime) {
           this.subscriptions.save({
             ...sub,
@@ -419,6 +439,7 @@ export class BillingService {
           stripeCustomerId: sub.stripeCustomerId ?? event.customerId,
           updatedAt: stamp,
         });
+        this.options.creators?.recordSale(sub.userId, 'lifetime', 'stripe');
         const live =
           sub.stripeSubscriptionId && LIVE_STATUSES.has(sub.status) && !sub.cancelAtPeriodEnd;
         return {

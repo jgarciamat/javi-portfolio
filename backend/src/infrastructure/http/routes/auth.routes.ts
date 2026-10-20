@@ -9,6 +9,7 @@ import {
   requireAuth,
 } from '../middleware';
 import {
+  creatorAttribution,
   emailBody,
   googleBody,
   loginBody,
@@ -23,6 +24,12 @@ import {
   verifyQuery,
 } from '../schemas';
 import { recordSignup } from './funnel.routes';
+
+/** Attributes a brand-new account to a creator, only with the user's explicit agreement. */
+function attachCreator(c: Container, userId: string, creator: unknown): void {
+  const parsed = creatorAttribution.safeParse(creator);
+  if (parsed.success) c.creators.attach(userId, parsed.data.code, parsed.data.consent);
+}
 
 const GENERIC_EMAIL_SENT =
   'Si el email corresponde a una cuenta, recibirás un mensaje en unos minutos.';
@@ -63,11 +70,12 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     '/register',
     registerLimiter,
     asyncHandler(async (req, res) => {
-      const { referralCode, origin, ...input } = registerBody.parse(req.body);
+      const { referralCode, origin, creator, ...input } = registerBody.parse(req.body);
       const { message, createdUserId } = await c.auth.register(input);
       // An e-mail that already had an account gets the same answer and nothing else.
       if (createdUserId) {
         if (referralCode) c.referrals.attach(createdUserId, referralCode);
+        attachCreator(c, createdUserId, creator);
         c.repos.metrics.record('signup');
         recordSignup(c, origin);
       }
@@ -91,11 +99,12 @@ export function authRoutes(c: Container, limiter: RateLimiterFactory): Router {
     loginLimiter,
     asyncHandler(async (req, res) => {
       const body = googleBody.parse(req.body);
-      const { referralCode, origin } = body;
+      const { referralCode, origin, creator } = body;
       res.json(
         await c.auth.loginWithGoogle((body.token ?? body.idToken)!, body.locale, (userId) => {
-          // Only a brand-new account can be an invited friend.
+          // Only a brand-new account can be an invited friend (or come from a creator).
           if (referralCode) c.referrals.attach(userId, referralCode);
+          attachCreator(c, userId, creator);
           recordSignup(c, origin);
           // Google has already checked the address.
           c.repos.funnel.record('email_verified');

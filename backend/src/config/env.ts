@@ -1,9 +1,12 @@
 import { z } from 'zod';
+import type { CreatorProgramConfig } from '@application/creators/CreatorProgram';
 
 const booleanish = z
   .enum(['true', 'false', '1', '0', ''])
   .optional()
   .transform((v) => v === 'true' || v === '1');
+
+const cents = (euros: number): number => Math.round(euros * 100);
 
 const PRODUCTION_URL = 'https://finanverso.app';
 
@@ -61,6 +64,16 @@ const envSchema = z.object({
   PRICE_RENTA_PASS: z.coerce.number().positive().default(10),
   FOUNDER_LIMIT: z.coerce.number().int().nonnegative().default(100),
   AFFILIATES_FILE: z.string().optional(),
+  /** Creator affiliate program (docs/afiliacion): off unless set to true. */
+  CREATOR_PROGRAM: booleanish,
+  CREATOR_COMMISSION_MONTHLY_EUR: z.coerce.number().nonnegative().default(2),
+  CREATOR_COMMISSION_YEARLY_EUR: z.coerce.number().nonnegative().default(7),
+  CREATOR_COMMISSION_LIFETIME_EUR: z.coerce.number().nonnegative().default(10),
+  /** Caps per calendar year: per creator and for the whole program. */
+  CREATOR_CAP_EUR: z.coerce.number().nonnegative().default(300),
+  CREATOR_GLOBAL_CAP_EUR: z.coerce.number().nonnegative().default(1500),
+  CREATOR_WINDOW_DAYS: z.coerce.number().int().positive().default(90),
+  CREATOR_HOLD_DAYS: z.coerce.number().int().nonnegative().default(45),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().default('onboarding@resend.dev'),
   EMAIL_FROM_NAME: z.string().optional(),
@@ -124,6 +137,7 @@ export interface AppConfig {
   /** Web Push keys; null leaves push notifications off. */
   push: { publicKey: string; privateKey: string; subject: string } | null;
   affiliatesFile: string | null;
+  creators: CreatorProgramConfig;
   email: { resendApiKey: string | null; fromEmail: string; fromName: string };
   backup: { dir: string | null; intervalHours: number; retentionDays: number };
   rateLimitDisabled: boolean;
@@ -263,6 +277,18 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       founderLimit: raw.FOUNDER_LIMIT,
     },
     affiliatesFile: raw.AFFILIATES_FILE || null,
+    creators: {
+      enabled: raw.CREATOR_PROGRAM,
+      commissionCents: {
+        monthly: cents(raw.CREATOR_COMMISSION_MONTHLY_EUR),
+        yearly: cents(raw.CREATOR_COMMISSION_YEARLY_EUR),
+        lifetime: cents(raw.CREATOR_COMMISSION_LIFETIME_EUR),
+      },
+      creatorCapCents: cents(raw.CREATOR_CAP_EUR),
+      globalCapCents: cents(raw.CREATOR_GLOBAL_CAP_EUR),
+      windowDays: raw.CREATOR_WINDOW_DAYS,
+      holdDays: raw.CREATOR_HOLD_DAYS,
+    },
     email: {
       resendApiKey: raw.RESEND_API_KEY || null,
       fromEmail: raw.RESEND_FROM_EMAIL,

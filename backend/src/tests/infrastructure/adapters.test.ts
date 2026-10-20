@@ -124,6 +124,30 @@ describe('config', () => {
       rentaPass: 10,
     });
   });
+
+  it('keeps the creator program off by default, with the proposed figures', () => {
+    expect(loadConfig({}).creators).toEqual({
+      enabled: false,
+      commissionCents: { monthly: 200, yearly: 700, lifetime: 1000 },
+      creatorCapCents: 30000,
+      globalCapCents: 150000,
+      windowDays: 90,
+      holdDays: 45,
+    });
+    const on = loadConfig({
+      CREATOR_PROGRAM: 'true',
+      CREATOR_COMMISSION_YEARLY_EUR: '7.5',
+      CREATOR_CAP_EUR: '100',
+      CREATOR_HOLD_DAYS: '0',
+    }).creators;
+    expect(on).toMatchObject({
+      enabled: true,
+      commissionCents: { yearly: 750 },
+      creatorCapCents: 10000,
+      holdDays: 0,
+    });
+    expect(() => loadConfig({ CREATOR_CAP_EUR: '-1' })).toThrow(ConfigError);
+  });
 });
 
 describe('e-mail templates', () => {
@@ -751,7 +775,13 @@ describe('StripeGateway', () => {
       userId: 'u1',
       customerId: 'cus_1',
     });
-    await expect(refund('evt_r2', {})).resolves.toEqual({ id: 'evt_r2', type: 'ignored' });
+    // A subscription payment: only the creator program takes it back.
+    await expect(refund('evt_r2', {})).resolves.toEqual({
+      id: 'evt_r2',
+      type: 'premium_reversed',
+      userId: null,
+      customerId: 'cus_1',
+    });
     await expect(refund('evt_r3', { payment_intent: { id: 'pi_2' } })).resolves.toMatchObject({
       type: 'lifetime_refunded',
       userId: null,
@@ -771,6 +801,98 @@ describe('StripeGateway', () => {
       customerId: 'cus_1',
     });
     expect(retrieve).toHaveBeenCalledTimes(4);
+  });
+
+  it('reports paid subscription invoices with their plan, for the creator program', async () => {
+    const stripe = new Stripe('sk_test_x');
+    const gateway = new StripeGateway(config, { webhooks: stripe.webhooks } as unknown as Stripe);
+    const paid = (id: string, invoice: object) => {
+      const { body, signature } = signed(stripe, {
+        id,
+        type: 'invoice.paid',
+        data: {
+          object: {
+            amount_paid: 2999,
+            customer: 'cus_1',
+            parent: { subscription_details: { subscription: 'sub_1', metadata: { userId: 'u1' } } },
+            lines: { data: [{ pricing: { price_details: { price: 'price_y' } } }] },
+            ...invoice,
+          },
+        },
+      });
+      return gateway.parseWebhook(body, signature);
+    };
+    await expect(paid('evt_i1', {})).resolves.toEqual({
+      id: 'evt_i1',
+      type: 'premium_paid',
+      userId: 'u1',
+      customerId: 'cus_1',
+      plan: 'yearly',
+    });
+    // Older API versions: the price on the line itself; no metadata snapshot.
+    await expect(
+      paid('evt_i2', {
+        customer: { id: 'cus_2' },
+        parent: { subscription_details: { subscription: 'sub_2', metadata: null } },
+        lines: { data: [{ pricing: null }, { pricing: null, price: { id: 'price_m' } }] },
+      })
+    ).resolves.toEqual({
+      id: 'evt_i2',
+      type: 'premium_paid',
+      userId: null,
+      customerId: 'cus_2',
+      plan: 'monthly',
+    });
+    // A trial or a 100 % discount, a one-off invoice and an unknown price are not sales.
+    await expect(paid('evt_i3', { amount_paid: 0 })).resolves.toEqual({
+      id: 'evt_i3',
+      type: 'ignored',
+    });
+    await expect(paid('evt_i4', { parent: null })).resolves.toEqual({
+      id: 'evt_i4',
+      type: 'ignored',
+    });
+    await expect(
+      paid('evt_i5', { lines: { data: [{ pricing: { price_details: { price: { id: 'x' } } } }] } })
+    ).resolves.toEqual({ id: 'evt_i5', type: 'ignored' });
+    await expect(paid('evt_i6', { lines: undefined })).resolves.toEqual({
+      id: 'evt_i6',
+      type: 'ignored',
+    });
+  });
+
+  it('reports chargebacks, except for the Renta pass', async () => {
+    const stripe = new Stripe('sk_test_x');
+    const retrieve = jest
+      .fn()
+      .mockResolvedValueOnce({ customer: 'cus_1', metadata: { userId: 'u1', kind: 'lifetime' } })
+      .mockResolvedValueOnce({ customer: { id: 'cus_2' }, metadata: {} })
+      .mockResolvedValueOnce({ customer: null, metadata: { kind: 'renta_pass' } });
+    const client = { webhooks: stripe.webhooks, paymentIntents: { retrieve } } as unknown as Stripe;
+    const gateway = new StripeGateway(config, client);
+    const dispute = (id: string, paymentIntent: unknown) => {
+      const { body, signature } = signed(stripe, {
+        id,
+        type: 'charge.dispute.created',
+        data: { object: { charge: 'ch_1', payment_intent: paymentIntent } },
+      });
+      return gateway.parseWebhook(body, signature);
+    };
+    await expect(dispute('evt_d1', 'pi_1')).resolves.toEqual({
+      id: 'evt_d1',
+      type: 'premium_reversed',
+      userId: 'u1',
+      customerId: 'cus_1',
+    });
+    await expect(dispute('evt_d2', { id: 'pi_2' })).resolves.toEqual({
+      id: 'evt_d2',
+      type: 'premium_reversed',
+      userId: null,
+      customerId: 'cus_2',
+    });
+    await expect(dispute('evt_d3', 'pi_3')).resolves.toEqual({ id: 'evt_d3', type: 'ignored' });
+    await expect(dispute('evt_d4', null)).resolves.toEqual({ id: 'evt_d4', type: 'ignored' });
+    expect(retrieve).toHaveBeenCalledTimes(3);
   });
 
   it('builds its own Stripe client from the secret key', () => {

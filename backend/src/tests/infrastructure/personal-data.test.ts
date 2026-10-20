@@ -63,6 +63,11 @@ function seed(db: Db): void {
     INSERT INTO ai_advice_cache (user_id, cache_key, advice_json, created_at)
       VALUES ('ana', 'k1', '{"tip":"ahorra"}', '${NOW}'), ('ana', 'k2', 'not json', '${NOW}');
     INSERT INTO affiliate_clicks (user_id, offer_id, clicked_at) VALUES ('ana', 'bank-x', '${NOW}');
+    INSERT INTO creator_affiliates (code, name, created_at) VALUES ('LOLA', 'Lola', '${NOW}');
+    INSERT INTO creator_attributions (user_id, code, created_at)
+      VALUES ('ana', 'LOLA', '${NOW}'), ('bea', 'LOLA', '${NOW}');
+    INSERT INTO creator_sales (user_id, code, plan, provider, commission_cents, sold_at)
+      VALUES ('ana', 'LOLA', 'yearly', 'stripe', 700, '${NOW}');
   `);
   db.prepare(
     'INSERT INTO autonomo_data (user_id, payload_enc, updated_at, version) VALUES (?, ?, ?, ?)'
@@ -156,6 +161,11 @@ describe('SqlitePersonalDataReader', () => {
         { key: 'k2', advice: 'not json' },
       ],
       affiliateClicks: [{ offerId: 'bank-x', clickedAt: NOW }],
+      creator: {
+        code: 'LOLA',
+        consentedAt: NOW,
+        sale: { plan: 'yearly', soldAt: NOW, reversedAt: null },
+      },
       autonomoData: {
         data: { extras: { priorNet: '-300' } },
         unreadable: false,
@@ -182,9 +192,11 @@ describe('SqlitePersonalDataReader', () => {
         referredBy: null,
       },
       household: { role: 'member', joinedAt: NOW },
+      creator: { code: 'LOLA', consentedAt: NOW, sale: null },
       autonomoData: null,
     });
     expect(new SqlitePersonalDataReader(db).sectionsFor('carl').household).toEqual({ role: null });
+    expect(new SqlitePersonalDataReader(db).sectionsFor('carl').creator).toBeNull();
   });
 
   it('says the saved self-employed form cannot be opened without its key', () => {

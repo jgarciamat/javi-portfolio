@@ -53,7 +53,16 @@ export const registerBody = z.object({
   referralCode: z.string().trim().max(32).optional(),
   /** Origin of the visit (funnel, anonymous): checked apart, so a bad one never blocks a sign-up. */
   origin: z.unknown().optional(),
+  /** Creator code the user agreed to be attributed to (checked apart, like `origin`). */
+  creator: z.unknown().optional(),
 });
+/**
+ * `{ code, consent: true }`: the creator code of an `?aff=` link that the user ticked at
+ * sign-up. Without an explicit `consent: true` nothing is attributed.
+ */
+export const creatorAttribution = z
+  .object({ code: z.string().max(32), consent: z.literal(true) })
+  .strict();
 export const loginBody = z.object({
   email: z.string().trim().min(1).max(254),
   password: z.string().min(1).max(128),
@@ -68,6 +77,7 @@ export const googleBody = z
     locale,
     referralCode: z.string().trim().max(32).optional(),
     origin: z.unknown().optional(),
+    creator: z.unknown().optional(),
   })
   .refine((b) => b.token || b.idToken, { message: 'token requerido' });
 export const resetBody = z.object({
