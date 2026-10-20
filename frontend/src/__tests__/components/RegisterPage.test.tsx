@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import { RegisterPage } from '@modules/auth/ui/RegisterPage';
 import esJson from '@locales/es.json';
+import { captureCreatorCode, clearCreatorCode, creatorAttribution } from '@core/creatorCode';
 
 const translations = esJson as Record<string, string>;
 const t = (key: string) => translations[key] ?? key;
@@ -180,5 +181,38 @@ describe('RegisterPage', () => {
     );
     fireEvent.click(screen.getByText(t('app.auth.register.subtitleLink')));
     expect(mockOnSwitch).toHaveBeenCalled();
+  });
+});
+
+describe('RegisterPage with a creator link', () => {
+  const renderPage = () =>
+    render(
+      <MemoryRouter>
+        <RegisterPage onSwitch={jest.fn()} />
+      </MemoryRouter>
+    );
+  const box = () => screen.queryByRole('checkbox', { name: /Me ha recomendado Finanverso/ });
+
+  afterEach(() => clearCreatorCode());
+
+  test('shows nothing without a creator code', () => {
+    renderPage();
+    expect(box()).toBeNull();
+  });
+
+  test('asks first, unticked, and sends the code only once ticked', () => {
+    captureCreatorCode('?aff=lola');
+    const { unmount } = renderPage();
+    expect(box()).not.toBeChecked();
+    expect(creatorAttribution()).toBeUndefined();
+    fireEvent.click(box()!);
+    expect(box()).toBeChecked();
+    expect(creatorAttribution()).toEqual({ code: 'LOLA', consent: true });
+    fireEvent.click(box()!);
+    expect(creatorAttribution()).toBeUndefined();
+    fireEvent.click(box()!);
+    // Leaving the page withdraws the tick.
+    unmount();
+    expect(creatorAttribution()).toBeUndefined();
   });
 });

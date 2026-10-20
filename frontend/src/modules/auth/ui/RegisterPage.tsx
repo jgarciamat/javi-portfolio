@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type RefObject } from 'rea
 import { Link } from 'react-router-dom';
 import { useI18n } from '@core/i18n/I18nContext';
 import { track } from '@core/analytics';
+import { landingCreatorCode, setCreatorConsent } from '@core/creatorCode';
 import { useRegisterForm } from '../application/useRegisterForm';
 import { AuthPasswordInput } from './AuthPasswordInput';
 import { GoogleSignIn } from './GoogleButton';
@@ -122,6 +123,32 @@ function LegalNotice({ textKey }: { textKey: string }) {
   );
 }
 
+/**
+ * Only for visits that came through a creator's link (`?aff=`): unticked by default, and the
+ * code is sent with the sign-up (by e-mail or with Google) only when it is ticked.
+ */
+function CreatorConsent() {
+  const { t } = useI18n();
+  const [code] = useState(landingCreatorCode);
+  const [checked, setChecked] = useState(false);
+  // Leaving the page withdraws the tick: it never carries over to another sign-up.
+  useEffect(() => () => setCreatorConsent(false), []);
+  if (!code) return null;
+  return (
+    <label className="auth-remember">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          setChecked(e.target.checked);
+          setCreatorConsent(e.target.checked);
+        }}
+      />
+      <span>{t('app.auth.register.creator', { code })}</span>
+    </label>
+  );
+}
+
 export function RegisterPage({ onSwitch }: Props) {
   const { t } = useI18n();
   const form = useRegisterForm();
@@ -150,6 +177,7 @@ export function RegisterPage({ onSwitch }: Props) {
         </button>
       </p>
 
+      <CreatorConsent />
       <GoogleSignIn
         label={t('app.auth.register.google')}
         onToken={form.handleGoogleToken}

@@ -4,6 +4,7 @@
  */
 
 import { captureReferral } from '@core/referral';
+import { captureCreatorCode, setCreatorConsent } from '@core/creatorCode';
 import { authApi } from '@core/api/authApi';
 import {
   ApiError,
@@ -84,6 +85,33 @@ describe('public auth endpoints', () => {
     await authApi.googleLogin('tok', 'es');
     expect(JSON.parse(mockFetch.mock.calls[1][1].body)).not.toHaveProperty('referralCode');
     window.history.replaceState(null, '', '/');
+  });
+
+  test('sends a creator code only when the person agreed, once', async () => {
+    mockFetch.mockResolvedValue(makeResponse({ message: 'ok' }, 201));
+    captureCreatorCode('?aff=lola');
+    await authApi.register({ email: 'a@b.co', password: 'pw', name: 'A' });
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body)).not.toHaveProperty('creator');
+
+    captureCreatorCode('?aff=lola');
+    setCreatorConsent(true);
+    await authApi.register({ email: 'a@b.co', password: 'pw', name: 'A' });
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body).creator).toEqual({
+      code: 'LOLA',
+      consent: true,
+    });
+    await authApi.register({ email: 'c@d.co', password: 'pw', name: 'B' });
+    expect(JSON.parse(mockFetch.mock.calls[2][1].body)).not.toHaveProperty('creator');
+
+    captureCreatorCode('?aff=lola');
+    setCreatorConsent(true);
+    await authApi.googleLogin('tok', 'es');
+    expect(JSON.parse(mockFetch.mock.calls[3][1].body).creator).toEqual({
+      code: 'LOLA',
+      consent: true,
+    });
+    await authApi.googleLogin('tok', 'es');
+    expect(JSON.parse(mockFetch.mock.calls[4][1].body)).not.toHaveProperty('creator');
   });
 
   test('login returns the tokens', async () => {

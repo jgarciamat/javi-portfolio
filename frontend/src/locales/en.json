@@ -184,6 +184,7 @@
   "app.auth.register.loading": "Creating account...",
   "app.auth.register.passwordOk": "✓ Strong password",
   "app.auth.register.age": "I am 14 or older",
+  "app.auth.register.creator": "The creator with the code {code} recommended Finanverso to me. I agree that my account is recorded as coming from that code, so they can earn a commission if I buy Premium. The creator will not see my name or my e-mail.",
   "app.auth.register.legal.email": "By creating your account you accept the {terms} and the {privacy}.",
   "app.auth.register.legal.google": "If you continue with Google, you accept the {terms} and the {privacy} and confirm you are 14 or older.",
   "app.auth.register.legal.terms": "Terms",
