@@ -107,6 +107,15 @@ async function main(): Promise<void> {
   );
   reminders.unref();
 
+  // Notices about the end of the 14-day trial: hourly, sent only in the morning, once per user.
+  const trialNotices = setInterval(
+    () => {
+      container.trialNotices.run().catch((e) => console.error('[trial] notices failed', e));
+    },
+    60 * 60 * 1000
+  );
+  trialNotices.unref();
+
   const server = createApp(container).listen(config.port, () => {
     console.info(`Finanverso API listening on :${config.port} (${config.env})`);
   });

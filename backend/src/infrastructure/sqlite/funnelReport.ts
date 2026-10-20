@@ -17,6 +17,7 @@ const STEPS: { event: string; label: string; chain?: boolean }[] = [
   { event: 'checkout_start', label: 'Pagos iniciados', chain: true },
   { event: 'premium', label: 'Compras confirmadas (Premium)', chain: true },
   { event: 'cancel', label: 'Bajas de Premium' },
+  { event: 'trial_notice', label: 'Avisos del fin de la prueba enviados' },
 ];
 
 const STEP_LABELS: Record<string, string> = {

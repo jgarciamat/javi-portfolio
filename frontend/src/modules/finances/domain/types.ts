@@ -569,6 +569,8 @@ export interface UserSettings {
   showGettingStarted: boolean;
   /** A summary of the week by e-mail every Monday. */
   weeklyDigest: boolean;
+  /** Service messages about the end of the free trial (on unless the user turned them off). */
+  trialNotices: boolean;
   currentPeriod: { year: number; month: number; start: string; end: string };
 }
 
@@ -584,6 +586,7 @@ export type SettingsChanges = Partial<
     | 'showTour'
     | 'showGettingStarted'
     | 'weeklyDigest'
+    | 'trialNotices'
   >
 >;
 

@@ -116,6 +116,7 @@ export const settingsBody = z
     showTour: z.boolean(),
     showGettingStarted: z.boolean(),
     weeklyDigest: z.boolean(),
+    trialNotices: z.boolean(),
   })
   .partial()
   .strict();

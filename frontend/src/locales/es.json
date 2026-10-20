@@ -1201,6 +1201,8 @@
   "app.assets.remove": "Quitar {name}",
   "app.assets.total": "Total (bienes − deudas)",
   "app.settings.weeklyDigest": "Resumen semanal por correo",
+  "app.settings.trialNotices": "Avisos sobre mi prueba de Premium",
+  "app.settings.trialNoticesHint": "Un aviso 2 días antes, otro el último día y uno al terminar los 14 días de prueba, con lo que sigue gratis. Solo si sigues en la prueba; sin tarjeta y sin cobros.",
   "app.settings.weeklyDigestHint": "Cada lunes: lo que gastaste la semana pasada, dónde más y las operaciones automáticas que se cobrarán pronto.",
   "app.currency.other": "Otra moneda",
   "app.currency.which": "Moneda del gasto",

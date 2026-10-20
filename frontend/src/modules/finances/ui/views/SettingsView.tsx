@@ -194,6 +194,19 @@ function PreferencesCard({
           onChange={(e) => save({ weeklyDigest: e.target.checked })}
         />
       </label>
+      <label className="setting-row">
+        <span>
+          <strong>{t('app.settings.trialNotices')}</strong>
+          <small>{t('app.settings.trialNoticesHint')}</small>
+        </span>
+        <input
+          type="checkbox"
+          className="toggle"
+          disabled={saving}
+          checked={settings.trialNotices}
+          onChange={(e) => save({ trialNotices: e.target.checked })}
+        />
+      </label>
       <PushSetting />
       {notificationsSupported() && (
         <label className="setting-row">

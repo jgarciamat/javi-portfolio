@@ -314,7 +314,7 @@ Regla: **no se aumenta el gasto** hasta que el pago real (no el registro) cubra 
 - [ ] Eventos del embudo y panel semanal
 - [ ] UTM distintos por vídeo, bio y descripción
 - [ ] Decisión del muro (D3) y experimento de 4 semanas
-- [ ] Recuperación de la prueba (emails/push) activa
+- [x] Recuperación de la prueba (emails/push) activa en `develop` (D5; ver `docs/analitica.md`, «Avisos del fin de la prueba»); pendiente de publicar
 - [ ] Recordatorios de plazos activos antes del 1-01-2027
 - [ ] Playlists públicas y títulos de los largos corregidos (Premium oculto sigue oculto)
 - [ ] Ficha de Play actualizada y respuesta a todas las reseñas

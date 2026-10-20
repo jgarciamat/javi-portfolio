@@ -437,6 +437,29 @@ export interface DigestRepository {
   markSent(userId: string, at: string): void;
 }
 
+// ─── Trial end notices ───────────────────────────────────────────────────────
+
+export interface TrialNoticeCandidate {
+  userId: string;
+  email: string;
+  name: string;
+  locale: 'es' | 'en';
+  emailVerified: boolean;
+  trialEndsAt: string;
+}
+
+export interface TrialNoticeRepository {
+  /**
+   * Users still on the free trial (no paid plan, not lifetime, not cancelling) whose trial ends
+   * between `from` and `to`, and who have not turned the notices off.
+   */
+  candidates(from: string, to: string): TrialNoticeCandidate[];
+  /** Marks a notice as sent; false when that notice already went out to the user. */
+  claim(userId: string, kind: string, at: string): boolean;
+  /** Takes the mark back when nothing could be delivered, so the next run tries again. */
+  release(userId: string, kind: string): void;
+}
+
 // ─── Monetization ────────────────────────────────────────────────────────────
 
 export interface SubscriptionRepository {

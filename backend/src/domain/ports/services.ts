@@ -47,6 +47,23 @@ export type SecurityNotice =
   | 'recovery_codes_regenerated'
   | 'recovery_code_used';
 
+export type TrialNoticeKind = 'ends_soon' | 'last_day' | 'ended';
+
+/** What the user has created that the free plan limits (counts only, never amounts or names). */
+export interface TrialUsage {
+  accounts: number;
+  budgets: number;
+  goals: number;
+  recurringRules: number;
+}
+
+export interface TrialNotice {
+  kind: TrialNoticeKind;
+  /** When the trial ends (ISO). */
+  endsAt: string;
+  usage: TrialUsage;
+}
+
 export interface EmailSender {
   sendVerification(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
   sendPasswordReset(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
@@ -71,6 +88,13 @@ export interface EmailSender {
     locale: EmailLocale,
     digest: DigestData,
     currency: string
+  ): Promise<void>;
+  /** A service message about the end of the free trial (see TrialNoticeService). */
+  sendTrialNotice(
+    to: string,
+    name: string,
+    notice: TrialNotice,
+    locale: EmailLocale
   ): Promise<void>;
 }
 
@@ -232,6 +256,8 @@ export const SERVER_FUNNEL_EVENTS = [
   'checkout_start',
   'premium',
   'cancel',
+  /** A trial notice went out (detail: `ends_soon:email`, `last_day:push`, `ended:email`…). */
+  'trial_notice',
 ] as const;
 
 export type ClientFunnelEvent = (typeof CLIENT_FUNNEL_EVENTS)[number];

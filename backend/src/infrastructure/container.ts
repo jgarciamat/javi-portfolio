@@ -21,6 +21,7 @@ import { OfferService } from '@application/offers/OfferService';
 import { PushService } from '@application/push/PushService';
 import { ReminderService } from '@application/push/ReminderService';
 import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
+import { TrialNoticeService } from '@application/billing/TrialNoticeService';
 import { SplitService } from '@application/split/SplitService';
 import { TaxService } from '@application/tax/TaxService';
 import { AutonomoDataService } from '@application/tax/AutonomoDataService';
@@ -91,6 +92,7 @@ import { SqliteRentaPassRepository } from './sqlite/repositories/SqliteMonetizat
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
+import { SqliteTrialNoticeRepository } from './sqlite/repositories/SqliteTrialNoticeRepository';
 import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqlitePersonalDataReader } from './sqlite/repositories/SqlitePersonalDataReader';
@@ -155,6 +157,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     categoryRules: new SqliteCategoryRuleRepository(db),
     assets: new SqliteAssetRepository(db),
     digests: new SqliteDigestRepository(db),
+    trialNotices: new SqliteTrialNoticeRepository(db),
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
     push: new SqlitePushRepository(db),
@@ -415,6 +418,20 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     weeklyDigest,
     push: pushService,
     reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
+    trialNotices: new TrialNoticeService(
+      repos.trialNotices,
+      repos.subscriptions,
+      email,
+      pushService,
+      (userId) => ({
+        accounts: repos.accounts.listByUser(userId).length,
+        budgets: firstStepCount(userId, 'budgets'),
+        goals: firstStepCount(userId, 'goals'),
+        recurringRules: firstStepCount(userId, 'automations'),
+      }),
+      funnel,
+      clock
+    ),
     split: new SplitService(repos.splits, uow, clock),
     tax,
     assetService: new AssetService(repos.assets, entitlements, uow, clock),

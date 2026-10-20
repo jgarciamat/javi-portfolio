@@ -1,11 +1,12 @@
 import { Resend } from 'resend';
-import { EmailLocale, EmailSender, SecurityNotice } from '@domain/ports/services';
+import { EmailLocale, EmailSender, SecurityNotice, TrialNotice } from '@domain/ports/services';
 import { DigestData } from '@domain/services/digest';
 import {
   accountExistsEmail,
   passwordResetEmail,
   purchaseEmail,
   securityNoticeEmail,
+  trialNoticeEmail,
   verificationEmail,
   weeklyDigestEmail,
 } from './templates';
@@ -66,16 +67,26 @@ export class ResendEmailSender implements EmailSender {
   ): Promise<void> {
     return this.send(to, weeklyDigestEmail(locale, name, digest, currency, this.appUrl));
   }
+
+  sendTrialNotice(
+    to: string,
+    name: string,
+    notice: TrialNotice,
+    locale: EmailLocale
+  ): Promise<void> {
+    return this.send(to, trialNoticeEmail(locale, name, notice, this.appUrl));
+  }
 }
 
 /** Used when no e-mail provider is configured (local development): prints the links. */
 export class ConsoleEmailSender implements EmailSender {
   readonly sent: {
-    kind: 'verify' | 'reset' | 'exists' | 'purchase' | 'digest' | 'security';
+    kind: 'verify' | 'reset' | 'exists' | 'purchase' | 'digest' | 'security' | 'trial';
     to: string;
     token: string;
     digest?: DigestData;
     notice?: SecurityNotice;
+    trial?: TrialNotice;
   }[] = [];
 
   constructor(
@@ -118,5 +129,10 @@ export class ConsoleEmailSender implements EmailSender {
   ): Promise<void> {
     this.sent.push({ kind: 'digest', to, token: '', digest });
     if (!this.silent) console.info(`[email] weekly digest ${to}`);
+  }
+
+  async sendTrialNotice(to: string, _name: string, notice: TrialNotice): Promise<void> {
+    this.sent.push({ kind: 'trial', to, token: '', trial: notice });
+    if (!this.silent) console.info(`[email] trial notice ${notice.kind} ${to}`);
   }
 }

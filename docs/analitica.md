@@ -21,6 +21,7 @@ Contadores **diarios y agregados** en la tabla `funnel_daily` (migración 034): 
 | `activation_step` | servidor | se alcanza un paso: `movements` (3), `budgets`, `goals`, `automations` | no |
 | `activation_done` | servidor | se completan los cuatro primeros pasos | no |
 | `checkout_start`, `premium`, `cancel` | servidor | pago iniciado, compra confirmada (web o Play) y baja de una suscripción | no |
+| `trial_notice` | servidor | aviso del fin de la prueba enviado (detalle = `ends_soon`, `last_day` o `ended`, más `:email` o `:push`) | no |
 
 - **Origen**: el servidor lo normaliza a partir de `utm_source` o, si no hay, del dominio que
   enlaza (`google`, `tiktok`, `youtube`, `x`…); sin nada, `(direct)`; en la app, `(app)`.
@@ -84,3 +85,24 @@ WHERE event = 'signup' AND day >= date('now', '-30 day') GROUP BY source ORDER B
 ```
 
 No hay panel web ni endpoint de administración: así no hay una superficie nueva que proteger.
+
+## Avisos del fin de la prueba (D5)
+
+Mensajes de **servicio** sobre la propia prueba de 14 días, por email (dirección verificada) y por
+push (solo dispositivos que ya lo permitieron). Código: `TrialNoticeService`, tarea horaria en
+`main.ts`; envía solo entre las 07 y las 11 UTC (8-13 h en España).
+
+| Mensaje | Cuándo (día natural en España) | Contenido |
+|---|---|---|
+| `ends_soon` | 2 días antes de que acabe | cuándo termina, que no hay tarjeta ni cobro, lo que sigue gratis y lo que pasa a Premium, enlace a `/pricing` |
+| `last_day` | el día en que acaba (si aún no ha acabado) | lo mismo, más corto |
+| `ended` | de 1 a 3 días después de acabar | lo que sigue gratis, cómo ver los planes; «no te escribiremos más sobre la prueba» |
+
+Condiciones: solo a quien sigue en la prueba (origen `trial`, no vitalicio, sin suscripción de pago ni
+de Google Play, sin baja programada) y no ha desactivado «Avisos sobre mi prueba de Premium» (Ajustes;
+activo por defecto). Cada mensaje sale una vez por usuario (`trial_notice_log`); si el proveedor
+falla y no llegó por ningún canal, se reintenta a la hora siguiente. El email lleva solo recuentos
+(cuentas, presupuestos, metas, automáticos) frente al límite gratuito, nunca importes ni nombres.
+Se cuenta cada envío en `funnel_daily` (`trial_notice`, sin datos personales). Un usuario cuya
+prueba ya terminó hace más de 3 días no recibe nada (no hay envío retroactivo).
+
