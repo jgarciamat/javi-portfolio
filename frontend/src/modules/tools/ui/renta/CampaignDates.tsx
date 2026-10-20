@@ -34,8 +34,8 @@ export function CampaignDates({ exercise }: { exercise: number }) {
           count: days(campaign.start),
         })
       : phase === 'open'
-      ? t('tools.renta.campaign.open', { date: date(campaign.end), count: days(campaign.end) })
-      : t('tools.renta.campaign.closed', { date: date(campaign.end) });
+        ? t('tools.renta.campaign.open', { date: date(campaign.end), count: days(campaign.end) })
+        : t('tools.renta.campaign.closed', { date: date(campaign.end) });
 
   return (
     <section className="renta-campaign" aria-label={title}>

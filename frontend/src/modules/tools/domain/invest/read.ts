@@ -76,13 +76,13 @@ export class RowReader {
 
   cell(field: Field): Cell {
     const i = this.index[field];
-    return i === undefined ? null : this.cells[i] ?? null;
+    return i === undefined ? null : (this.cells[i] ?? null);
   }
 
   /** The cell under a header found by its exact (normalised) name. */
   byHeader(name: string): Cell {
     const i = this.header.indexOf(name);
-    return i < 0 ? null : this.cells[i] ?? null;
+    return i < 0 ? null : (this.cells[i] ?? null);
   }
 
   text(field: Field): string {
@@ -404,8 +404,8 @@ function tradeOps(legs: Leg[]): InvestOp[] {
         currency: FIAT.has(g.base.asset)
           ? g.base.asset
           : FIAT.has(r.base.asset)
-          ? r.base.asset
-          : null,
+            ? r.base.asset
+            : null,
         eur: g.base.eur ?? r.base.eur,
         toEur: r.base.eur,
         ...feeOf,

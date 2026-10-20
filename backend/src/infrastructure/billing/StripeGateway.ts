@@ -17,7 +17,7 @@ export interface StripeConfig {
 const MIN_TRIAL_MS = 48 * 60 * 60 * 1000 + 5 * 60 * 1000;
 
 const idOf = (value: string | { id: string } | null | undefined): string | null =>
-  typeof value === 'string' ? value : value?.id ?? null;
+  typeof value === 'string' ? value : (value?.id ?? null);
 
 function mapStatus(status: string): 'trialing' | 'active' | 'past_due' | 'canceled' {
   if (status === 'active' || status === 'trialing' || status === 'past_due') return status;
@@ -29,7 +29,10 @@ export class StripeGateway implements PaymentGateway {
   readonly enabled = true;
   private readonly stripe: Stripe;
 
-  constructor(private readonly config: StripeConfig, client?: Stripe) {
+  constructor(
+    private readonly config: StripeConfig,
+    client?: Stripe
+  ) {
     this.stripe =
       client ??
       new Stripe(config.secretKey, {

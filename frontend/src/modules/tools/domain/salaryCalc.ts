@@ -164,8 +164,8 @@ export function familyMinimum(
     input.disability >= 65
       ? m.disability65 + m.assistance
       : input.disability >= 33
-      ? m.disability33
-      : 0;
+        ? m.disability33
+        : 0;
   if (disability > 0) parts.push({ key: 'disability', amount: disability });
   return { total: round2(parts.reduce((s, p) => s + p.amount, 0)), parts };
 }

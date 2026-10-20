@@ -25,7 +25,7 @@ function placeTarget(id: string, top: number, height: number, left = 40, width =
   const rect = { top, height, left, width, bottom: top + height, right: left + width };
   jest
     .spyOn(element, 'getBoundingClientRect')
-    .mockImplementation(() => ({ ...rect, x: left, y: top, toJSON: () => rect } as DOMRect));
+    .mockImplementation(() => ({ ...rect, x: left, y: top, toJSON: () => rect }) as DOMRect);
   return { element, rect };
 }
 
@@ -149,13 +149,13 @@ describe('GuidedTour', () => {
     const small = placeTarget('near-top', 100, 50).element;
     const big = placeTarget('tall', 100, 600).element;
     const real = Element.prototype.getBoundingClientRect;
-    jest
-      .spyOn(Element.prototype, 'getBoundingClientRect')
-      .mockImplementation(function (this: Element) {
-        return this.getAttribute('role') === 'dialog'
-          ? ({ height: 200, width: 300, top: 0, left: 0, bottom: 200, right: 300 } as DOMRect)
-          : real.call(this);
-      });
+    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element
+    ) {
+      return this.getAttribute('role') === 'dialog'
+        ? ({ height: 200, width: 300, top: 0, left: 0, bottom: 200, right: 300 } as DOMRect)
+        : real.call(this);
+    });
     const centre = jest.spyOn(small, 'scrollIntoView');
     const start = jest.spyOn(big, 'scrollIntoView');
     const view = renderTour();

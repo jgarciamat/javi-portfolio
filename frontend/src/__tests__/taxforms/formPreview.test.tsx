@@ -171,7 +171,7 @@ describe('The previews of each screen', () => {
         m111: { result: m111, boxes: [{ box: '28', label: 'Suma', amount: 150 }] },
         m115: { result: m115, boxes: [{ box: '03', label: 'Ret.', amount: 57 }] },
         warnings: [],
-      } as unknown as WithholdingResult);
+      }) as unknown as WithholdingResult;
     const { unmount } = renderWithI18n(
       <WithholdingFormPreviews result={result('pay', 'zero')} year={2026} />
     );
@@ -206,7 +206,7 @@ describe('The previews of the yearly summaries and of the modules', () => {
         { box: '03', label: 'Retenciones', amount: 150 * records },
       ],
       warnings: [],
-    } as unknown as YearSummary);
+    }) as unknown as YearSummary;
   const m347 = (records: number) =>
     ({
       known: true,
@@ -227,7 +227,7 @@ describe('The previews of the yearly summaries and of the modules', () => {
       ],
       warnings: [],
       left: 0,
-    } as unknown as Summary347);
+    }) as unknown as Summary347;
 
   it('shows the summaries that have someone in them, and none when empty', () => {
     const { unmount } = renderWithI18n(

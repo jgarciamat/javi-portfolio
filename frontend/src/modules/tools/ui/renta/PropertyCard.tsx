@@ -110,8 +110,8 @@ function ReductionQuestions({
         {reductionMissing(p)
           ? t(k('reductionMissing'))
           : reduction
-          ? t(k('reductionIs'), { percent: reduction.percent })
-          : t(k('reductionNone'))}
+            ? t(k('reductionIs'), { percent: reduction.percent })
+            : t(k('reductionNone'))}
       </p>
       <Check
         id={`renta-prop-${n}-irregular`}

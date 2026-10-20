@@ -6,8 +6,7 @@ export class SqliteImportUsageRepository implements ImportUsageRepository {
 
   count(userId: string): number {
     const row = this.db.prepare('SELECT uses FROM import_uses WHERE user_id = ?').get(userId) as
-      | { uses: number }
-      | undefined;
+      { uses: number } | undefined;
     return row?.uses ?? 0;
   }
 

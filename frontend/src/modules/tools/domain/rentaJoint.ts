@@ -136,8 +136,8 @@ const reductionOf = (
   couple
     ? options.rules.coupleReduction
     : options.livesWithOtherParent
-    ? 0
-    : options.rules.singleParentReduction;
+      ? 0
+      : options.rules.singleParentReduction;
 
 const bestOf = (saving: number): JointComparison['best'] =>
   saving > 0 ? 'joint' : saving < 0 ? 'individual' : 'same';

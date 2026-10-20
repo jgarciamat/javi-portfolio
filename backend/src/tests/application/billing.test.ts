@@ -298,7 +298,7 @@ describe('BillingService', () => {
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
         ...extra,
-      } as BillingEvent);
+      }) as BillingEvent;
 
     it('ignores events without a known user', async () => {
       const { webhook, logger, mails, subs } = setup();

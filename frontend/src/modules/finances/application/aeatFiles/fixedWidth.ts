@@ -15,7 +15,10 @@ export class FieldError extends Error {
   /** The box of the field, when it is one (set by the writer). */
   box: string | null = null;
 
-  constructor(readonly code: 'overflow' | 'negative', readonly pos: number) {
+  constructor(
+    readonly code: 'overflow' | 'negative',
+    readonly pos: number
+  ) {
     super(`${code} at ${pos}`);
   }
 }

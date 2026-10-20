@@ -191,6 +191,6 @@ export function parseCategorization(
   const known = new Map(categories.map((c) => [c.trim().toLowerCase(), c]));
   return Array.from({ length: count }, (_, i) => {
     const value = answers[i];
-    return typeof value === 'string' ? known.get(value.trim().toLowerCase()) ?? null : null;
+    return typeof value === 'string' ? (known.get(value.trim().toLowerCase()) ?? null) : null;
   });
 }

@@ -590,12 +590,12 @@ function quarter303(c: QuarterContext): { draft: Draft303; detail: QuarterDetail
   const result: Draft303['result'] = noActivity
     ? 'noActivity'
     : c71 > 0
-    ? 'pay'
-    : box73 > 0
-    ? 'refund'
-    : box72 > 0
-    ? 'offset'
-    : 'zero';
+      ? 'pay'
+      : box73 > 0
+        ? 'refund'
+        : box72 > 0
+          ? 'offset'
+          : 'zero';
   // What was applied comes first from the oldest VAT to offset (the years before).
   const fromPrior = Math.min(c.pending.prior, c78);
   let rest = c78 - fromPrior;
@@ -698,8 +698,8 @@ export function vatYear(
       provisional !== null
         ? provisional
         : exemptSales
-        ? prorrataOf(soFar.withRight, soFar.total)
-        : 100;
+          ? prorrataOf(soFar.withRight, soFar.total)
+          : 100;
     pcts.push(pct);
     let annual: QuarterContext['annual'] = null;
     if (q === 3) {

@@ -38,12 +38,7 @@ export interface AssetClass {
 }
 
 export type ChartId =
-  | 'volatility'
-  | 'drawdown'
-  | 'horizon'
-  | 'bondCurve'
-  | 'leverage'
-  | 'stockVsIndex';
+  'volatility' | 'drawdown' | 'horizon' | 'bondCurve' | 'leverage' | 'stockVsIndex';
 export type CalcId = 'compound' | 'crypto' | 'bond' | 'tax' | 'stock' | 'letra';
 
 export type Block =
@@ -81,11 +76,10 @@ export interface Chapter {
 }
 
 /** What the catalogue shows of a chapter; Premium chapters get their text from the API. */
-export interface ChapterInfo
-  extends Pick<
-    Chapter,
-    'id' | 'emoji' | 'color' | 'title' | 'titleEn' | 'summary' | 'summaryEn' | 'level' | 'topic'
-  > {
+export interface ChapterInfo extends Pick<
+  Chapter,
+  'id' | 'emoji' | 'color' | 'title' | 'titleEn' | 'summary' | 'summaryEn' | 'level' | 'topic'
+> {
   minutes: number;
   withCalc: boolean;
   premium: boolean;

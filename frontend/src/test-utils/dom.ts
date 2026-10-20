@@ -7,11 +7,11 @@ export function captureDownloads() {
     return 'blob:test';
   });
   Object.assign(URL, { createObjectURL, revokeObjectURL: jest.fn() });
-  const click = jest
-    .spyOn(HTMLAnchorElement.prototype, 'click')
-    .mockImplementation(function (this: HTMLAnchorElement) {
-      names.push(this.download);
-    });
+  const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement
+  ) {
+    names.push(this.download);
+  });
   return {
     names,
     /** Contents of every saved file (jsdom's Blob has no text()). */

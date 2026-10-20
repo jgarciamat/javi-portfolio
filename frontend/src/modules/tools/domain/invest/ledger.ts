@@ -143,7 +143,7 @@ const SELF = /ledger live|etherscan/i;
 /** The key that makes units homogeneous: the ISIN of a security, the ticker of a coin. */
 const keyOf = (op: { asset: string; isin?: string; assetClass: AssetClass }, asset: string) =>
   `${op.assetClass === 'crypto' ? 'crypto' : op.assetClass}|${
-    op.assetClass === 'crypto' ? asset : op.isin ?? asset
+    op.assetClass === 'crypto' ? asset : (op.isin ?? asset)
   }`;
 
 interface Queue {
@@ -192,7 +192,7 @@ function valueOf(op: InvestOp, rates: RateTable, warnings: InvestWarning[]): Val
   const feeIsMoney =
     feeCurrency !== null &&
     (FIAT.has(feeCurrency) || USD_STABLE.has(feeCurrency) || EUR_STABLE.has(feeCurrency));
-  const feeEur = op.fee > 0 && feeIsMoney ? money(op.fee, feeCurrency) ?? 0 : 0;
+  const feeEur = op.fee > 0 && feeIsMoney ? (money(op.fee, feeCurrency) ?? 0) : 0;
   return {
     ...op,
     toEur: op.toEur ?? got,
@@ -228,8 +228,8 @@ class Book {
     let entry = this.assets.get(key);
     if (!entry) {
       entry = {
-        name: op.assetClass === 'crypto' ? asset : op.name ?? asset,
-        code: op.assetClass === 'crypto' ? asset : op.isin ?? asset,
+        name: op.assetClass === 'crypto' ? asset : (op.name ?? asset),
+        code: op.assetClass === 'crypto' ? asset : (op.isin ?? asset),
         kind: KIND[op.assetClass],
         section: op.assetClass === 'etf' ? 'etf' : undefined,
         buys: [],
@@ -251,7 +251,7 @@ class Book {
   }
 
   buy(op: ValuedOp, asset: string, units: number, cost: number, date = op.date) {
-    const cls = asset === op.asset ? op.assetClass : op.toClass ?? op.assetClass;
+    const cls = asset === op.asset ? op.assetClass : (op.toClass ?? op.assetClass);
     const { entry, queue } = this.asset({ ...op, assetClass: cls }, asset);
     entry.buys.push({ date, units, cost: round2(cost) });
     queue.lots.push({ date, units, cost });
@@ -393,7 +393,7 @@ export function inEuros(input: InvestOp[], rates: RateTable): InvestOp[] {
     amount: value,
     currency: 'EUR',
     fee: feeEur > 0 ? feeEur : op.fee,
-    feeCurrency: feeEur > 0 ? 'EUR' : op.feeCurrency ?? op.currency,
+    feeCurrency: feeEur > 0 ? 'EUR' : (op.feeCurrency ?? op.currency),
     withholding: op.withholding && euros(op.withholding, op.currency, op.date),
     cost: op.cost === undefined ? undefined : euros(op.cost, op.currency, op.acquired ?? op.date),
   }));

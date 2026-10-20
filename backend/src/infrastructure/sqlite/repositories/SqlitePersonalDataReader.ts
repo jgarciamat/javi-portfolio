@@ -129,9 +129,7 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
   private security(userId: string): Row {
     const enabledAt =
       (this.one('SELECT enabled_at FROM user_two_factor WHERE user_id = ?', userId)?.enabled_at as
-        | string
-        | null
-        | undefined) ?? null;
+        string | null | undefined) ?? null;
     return {
       twoFactorEnabled: enabledAt !== null,
       twoFactorEnabledAt: enabledAt,

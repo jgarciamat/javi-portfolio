@@ -104,8 +104,8 @@ export function reportLines(r: ValidationReport): string[] {
           t.info
             ? 'hoja informativa, sin operaciones'
             : t.format
-            ? `${t.format}${t.confirmed ? '' : ' (columnas por comprobar)'}`
-            : `no reconocida; columnas: ${t.columns.join(' | ') || '—'}`
+              ? `${t.format}${t.confirmed ? '' : ' (columnas por comprobar)'}`
+              : `no reconocida; columnas: ${t.columns.join(' | ') || '—'}`
         } → ${t.operations} operaciones · filas ${t.rows} · no entendidas ${t.skipped}`
     ),
     '',

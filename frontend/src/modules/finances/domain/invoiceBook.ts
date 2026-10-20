@@ -71,8 +71,7 @@ export interface BookResult {
 }
 
 export type BookParse =
-  | { ok: true; result: BookResult }
-  | { ok: false; reason: 'noHeader' | 'noColumns' };
+  { ok: true; result: BookResult } | { ok: false; reason: 'noHeader' | 'noColumns' };
 
 const RATES: VatRate[] = [0, 4, 10, 21];
 

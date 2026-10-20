@@ -376,13 +376,11 @@ export async function reportPdfBytes(
   };
 
   const totalsSheet = report.sheets.find((s) => s.kind === 'totals');
-  const totalCards = (totalsSheet?.rows.slice(1) ?? []).map(
-    ([box, label, amount]): Card => ({
-      label: `Casilla ${box}`,
-      value: euros(Number(amount)),
-      note: String(label),
-    })
-  );
+  const totalCards = (totalsSheet?.rows.slice(1) ?? []).map(([box, label, amount]): Card => ({
+    label: `Casilla ${box}`,
+    value: euros(Number(amount)),
+    note: String(label),
+  }));
 
   // ─── Empieza aquí ───────────────────────────────────────────────────────────
   const start = report.sheets.find((s) => s.kind === 'start');

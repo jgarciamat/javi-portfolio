@@ -23,13 +23,7 @@ import { round2 } from './round';
 const LIRPF = 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764';
 
 export type OpportunityGroup =
-  | 'family'
-  | 'work'
-  | 'reductions'
-  | 'property'
-  | 'savings'
-  | 'joint'
-  | 'deductions';
+  'family' | 'work' | 'reductions' | 'property' | 'savings' | 'joint' | 'deductions';
 
 /**
  * Whether the AEAT's draft usually has it: `yes` when a third party reports it to the Tax Agency

@@ -41,8 +41,8 @@ export function summarize(items: Iterable<SummaryItem>): Summary {
       item.type === 'INCOME'
         ? s.incomeByCategory
         : item.type === 'EXPENSE'
-        ? s.expensesByCategory
-        : s.savingByCategory;
+          ? s.expensesByCategory
+          : s.savingByCategory;
     bucket[item.categoryName] = (bucket[item.categoryName] ?? 0) + item.amountCents;
     if (item.type === 'INCOME') s.incomeCents += item.amountCents;
     else if (item.type === 'EXPENSE') s.expenseCents += item.amountCents;

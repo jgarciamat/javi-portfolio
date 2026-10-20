@@ -15,13 +15,7 @@ export type LimitedResource =
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature =
-  | 'insights'
-  | 'aiAdvisor'
-  | 'forecast'
-  | 'household'
-  | 'inbox'
-  | 'capture'
-  | 'investCourse';
+  'insights' | 'aiAdvisor' | 'forecast' | 'household' | 'inbox' | 'capture' | 'investCourse';
 
 /** Months of the outlook the free plan sees (Premium sees up to 12 and tries «what if…»). */
 export const FREE_FORECAST_MONTHS = 1;

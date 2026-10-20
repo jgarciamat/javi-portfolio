@@ -49,7 +49,7 @@ const STATE_BOXES: { boxes: string[]; id: string; label: string }[] = [
 export function stateApplied(boxes: Record<string, number>): AppliedDeduction[] {
   return STATE_BOXES.flatMap(({ boxes: ids, id, label }) => {
     // Half and half (LIRPF arts. 67.1.b and 77.1.b): a text with only the State part has both.
-    const regional = ids.length > 1 ? boxes[ids[1]] ?? boxes[ids[0]] ?? 0 : 0;
+    const regional = ids.length > 1 ? (boxes[ids[1]] ?? boxes[ids[0]] ?? 0) : 0;
     const amount = Math.round(((boxes[ids[0]] ?? 0) + regional) * 100) / 100;
     return amount > 0 ? [{ label, amount, box: ids[0], id }] : [];
   });

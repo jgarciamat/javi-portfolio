@@ -236,8 +236,8 @@ export function directNet(a: DirectActivity, noFivePercent = false): DirectResul
     a.method === 'normal'
       ? round2(positive(a.provisions))
       : noFivePercent
-      ? 0
-      : round2(Math.min(2000, Math.max(0, difference) * 0.05));
+        ? 0
+        : round2(Math.min(2000, Math.max(0, difference) * 0.05));
   return {
     income,
     expenses,

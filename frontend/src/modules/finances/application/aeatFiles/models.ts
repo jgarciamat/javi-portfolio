@@ -33,16 +33,7 @@ import {
 } from './modules';
 
 export type SedeModel =
-  | '111'
-  | '115'
-  | '130'
-  | '131'
-  | '303'
-  | '349'
-  | '390'
-  | '190'
-  | '180'
-  | '347';
+  '111' | '115' | '130' | '131' | '303' | '349' | '390' | '190' | '180' | '347';
 
 /** What the files need about the person. Typed on the device; never sent to the server. */
 export interface Declarant {

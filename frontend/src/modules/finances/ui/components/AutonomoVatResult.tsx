@@ -30,8 +30,8 @@ const value = (b: TaxBox, money: Money, model: Model): string =>
   PERCENT[model].has(b.box)
     ? `${b.amount} %`
     : COUNTS.has(b.box)
-    ? String(b.amount)
-    : money(b.amount);
+      ? String(b.amount)
+      : money(b.amount);
 
 /**
  * The boxes worth showing first (with an amount) and the ones that are zero, folded. A rate shows

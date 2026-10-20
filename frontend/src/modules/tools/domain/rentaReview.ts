@@ -60,8 +60,8 @@ export function situationOf(
       form.joint === 'couple'
         ? form.partner.disability > 0
         : form.joint === 'single'
-        ? false
-        : null,
+          ? false
+          : null,
     mortgage: known(form.answers.housing, { mortgage: true, both: true, no: false, rent: false }),
     landlord: form.rentalOn || form.unrented.length > 0,
     // Pay from a job: more gross than pensions and benefits, and not retired.

@@ -391,8 +391,8 @@ export function GoalCalculatorPage() {
             {months === null
               ? t('tools.goal.never')
               : months === 0
-              ? t('tools.goal.already')
-              : t('tools.goal.result', { years, months: rest, total: months })}
+                ? t('tools.goal.already')
+                : t('tools.goal.result', { years, months: rest, total: months })}
           </p>
         </section>
       </div>

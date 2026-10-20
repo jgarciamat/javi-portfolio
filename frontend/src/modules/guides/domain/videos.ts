@@ -25,13 +25,7 @@ export const YOUTUBE_SUBSCRIBE_URL = `${YOUTUBE_CHANNEL_URL}?sub_confirmation=1`
 export const VIDEOS_PATH = '/videoteca';
 
 export type VideoSectionId =
-  | 'start'
-  | 'app'
-  | 'hacienda'
-  | 'autonomos'
-  | 'renta'
-  | 'invest'
-  | 'home';
+  'start' | 'app' | 'hacienda' | 'autonomos' | 'renta' | 'invest' | 'home';
 
 export interface VideoSection {
   id: VideoSectionId;

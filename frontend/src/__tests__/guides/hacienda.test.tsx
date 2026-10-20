@@ -36,7 +36,15 @@ const guide = (slug: string) => findHaciendaGuide(slug)!;
 const m303 = guide('modelo-303');
 const title = (g = m303) => tr(guideKey(g, 'title'));
 const checkbox = (g: typeof m303, step: string, n: number) =>
-  screen.getByLabelText(tr(stepKey(g, g.steps.find((s) => s.id === step)!, `c${n}`)));
+  screen.getByLabelText(
+    tr(
+      stepKey(
+        g,
+        g.steps.find((s) => s.id === step)!,
+        `c${n}`
+      )
+    )
+  );
 
 beforeEach(() => {
   localStorage.clear();

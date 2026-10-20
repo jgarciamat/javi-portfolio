@@ -158,7 +158,7 @@ describe('the new-movement form with a scanned receipt', () => {
       handleCategoryChange: jest.fn(),
       invalid: [],
       errorId: 'tx-error',
-    } as unknown as UseTransactionFormReturn);
+    }) as unknown as UseTransactionFormReturn;
 
   const scan = async (form: UseTransactionFormReturn, text: string) => {
     worker.recognize.mockResolvedValueOnce({ data: { text } });

@@ -100,7 +100,7 @@ describe('The sources of each screen', () => {
         m111: { result: a, boxes: [], due: 0, staff: {}, pros: {} },
         m115: { result: c, boxes: [], due: 0, people: 0, base: 0 },
         warnings: [],
-      } as unknown as WithholdingResult);
+      }) as unknown as WithholdingResult;
     expect(sedeSourcesOfWithholdings(r('pay', 'zero'), 2026).map((s) => s.model)).toEqual([
       '111',
       '115',

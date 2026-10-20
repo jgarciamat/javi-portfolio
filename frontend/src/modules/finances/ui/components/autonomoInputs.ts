@@ -43,14 +43,12 @@ export function buildInputs(
   const goods = investmentGoodsOf(activity.assets, year, modalityOf(activity.method));
   const investments = [...(vat.investments ?? []), ...goods];
   return {
-    quarters: manual.quarters.map(
-      (q, i): QuarterExtras => ({
-        withheld: number(q.withheld),
-        socialSecurity: 0,
-        vatNotDeductible: 0,
-        ...added[i],
-      })
-    ) as AutonomoInputs['quarters'],
+    quarters: manual.quarters.map((q, i): QuarterExtras => ({
+      withheld: number(q.withheld),
+      socialSecurity: 0,
+      vatNotDeductible: 0,
+      ...added[i],
+    })) as AutonomoInputs['quarters'],
     ...(typed
       ? {
           modality: activity.method === 'normal' ? 'normal' : 'simplified',

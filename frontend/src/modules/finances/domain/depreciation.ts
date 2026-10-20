@@ -186,8 +186,8 @@ export const tableOf = (modality: Modality): AssetGroup[] =>
   modality === 'simplified'
     ? SIMPLIFIED_TABLE
     : modality === 'modules'
-    ? MODULES_TABLE
-    : NORMAL_TABLE;
+      ? MODULES_TABLE
+      : NORMAL_TABLE;
 const freeUnit = (m: Modality) => (m === 'modules' ? MODULES_FREE_UNIT_MAX : FREE_UNIT_MAX);
 const freeYear = (m: Modality) => (m === 'modules' ? MODULES_FREE_YEAR_MAX : FREE_YEAR_MAX);
 

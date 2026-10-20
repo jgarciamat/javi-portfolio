@@ -38,7 +38,7 @@ const savingsDetail = (over: Partial<Record<string, number>> = {}) =>
       pendingGainsOnGains: 5,
       ...over,
     },
-  } as unknown as RentaResult['savingsDetail']);
+  }) as unknown as RentaResult['savingsDetail'];
 
 const direct = { income: 30000, expenses: 8000, difference: 22000, net: 21000 };
 
@@ -55,7 +55,7 @@ const activities = (each: unknown[]) =>
     withheld: 1500,
     payments: 2000,
     each,
-  } as unknown as RentaResult['activities']);
+  }) as unknown as RentaResult['activities'];
 
 describe('The Renta (modelo 100) with the figures of the planner', () => {
   it('fills the boxes compared with the draft and marks the main ones it does not give', async () => {

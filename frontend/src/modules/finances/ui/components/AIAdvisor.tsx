@@ -38,8 +38,8 @@ function FallbackNotice({ advice, t }: Pick<AIAdviceContentProps, 'advice' | 't'
   const fallbackKey = spentFree
     ? 'app.ai.fallback.quotaFree'
     : reason
-    ? FALLBACK_KEYS[reason]
-    : null;
+      ? FALLBACK_KEYS[reason]
+      : null;
   if (!fallbackKey) return null;
   return (
     <div className="ai-fallback">

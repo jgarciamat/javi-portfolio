@@ -47,8 +47,8 @@ function ruleInput(body: RecurringBody) {
       endYear === undefined && endMonth === undefined
         ? undefined
         : endYear && endMonth
-        ? { year: endYear, month: endMonth }
-        : null,
+          ? { year: endYear, month: endMonth }
+          : null,
   };
 }
 

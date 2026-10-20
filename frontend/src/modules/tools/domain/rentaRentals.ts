@@ -203,7 +203,7 @@ export function propertyResult(
 
   const net = round2(income - pendingApplied - cappedApplied - otherExpenses - amortization);
   const red = reductionOf(p);
-  const reductionPercent = net > 0 ? red?.percent ?? 0 : 0;
+  const reductionPercent = net > 0 ? (red?.percent ?? 0) : 0;
   const reduction = round2((net * reductionPercent) / 100);
   // Art. 23.3: 30 % of what is left, only on a positive net (Manual 2025, c04).
   const irregularReduction = p.irregular && net > 0 ? round2((net - reduction) * 0.3) : 0;

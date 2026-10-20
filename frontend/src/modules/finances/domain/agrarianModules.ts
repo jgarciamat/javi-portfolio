@@ -147,7 +147,7 @@ export function indexOf(row: ModuleRow, year: number): { index: number; warning?
     if (product.transformed === null) return { index: product.index, warning: 'noTransformed' };
     return { index: product.transformed };
   }
-  const base = year === 2025 ? REDUCED_2025[product.id] ?? product.index : product.index;
+  const base = year === 2025 ? (REDUCED_2025[product.id] ?? product.index) : product.index;
   return { index: row.reduced && row.reduced > 0 ? Math.min(base, row.reduced) : base };
 }
 

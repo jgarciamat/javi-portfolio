@@ -198,8 +198,8 @@ const PATCH: Partial<Record<QuestionId | 'active', Patch>> = {
       option === 'pension' || option === 'benefits'
         ? form.gross
         : option === 'work' || option === 'workSelf' || option === 'self'
-        ? ''
-        : form.nonSalary,
+          ? ''
+          : form.nonSalary,
     retired: retiredAfter(form, option, form.answers.active),
   }),
   disability: (form, option) => ({

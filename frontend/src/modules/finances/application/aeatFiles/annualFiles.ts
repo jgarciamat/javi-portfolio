@@ -69,7 +69,7 @@ function plan190(source: Extract<Informative, { model: '190' }>, d: Declarant): 
     if (r.subkey === null) checks.push(error('subkey190', { who: r.name || '—' }));
   }
   const payees = people.map(
-    (r) => ({ ...r, province: extraOf(d, recordId('190', r)).province } as Payee190)
+    (r) => ({ ...r, province: extraOf(d, recordId('190', r)).province }) as Payee190
   );
   return { checks, kind: null, period: '', write: () => write190(headOf(source, d), payees) };
 }

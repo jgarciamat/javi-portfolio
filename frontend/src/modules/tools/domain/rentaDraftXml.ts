@@ -358,7 +358,7 @@ export function readDraftXml(
     return bases ? { ...a, bases } : a;
   });
   // In a joint return the spouse's withholdings are theirs.
-  const theirs = joint && partner ? workWithheld(partner) ?? 0 : 0;
+  const theirs = joint && partner ? (workWithheld(partner) ?? 0) : 0;
   return {
     format: 'xml',
     ccaaId: CCAA_CODES[code] ?? null,
