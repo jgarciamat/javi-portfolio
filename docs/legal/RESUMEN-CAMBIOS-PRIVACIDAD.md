@@ -179,3 +179,49 @@ pasa a ser de Premium, con un enlace a la página de planes y sin ofertas ni pre
     marque; o limitar el último mensaje (`ended`) a la notificación push. Con la decisión del dueño, `ended`
     ya no se envía por email.
 
+## Cambio propuesto: programa de afiliación para creadores (decisión D7)
+
+Desde el 20/10/2026 el código incluye un programa de comisiones para creadores
+(`docs/afiliacion/programa.md`), **apagado por defecto** (`CREATOR_PROGRAM=false`). Cuando se encienda,
+quien llegue con un enlace `finanverso.app/?aff=CODIGO` verá en el registro una casilla **sin marcar**:
+«Me ha recomendado Finanverso el creador con el código CODIGO. Acepto que se guarde que mi cuenta viene de
+ese código, para que pueda cobrar una comisión si contrato Premium. El creador no verá mi nombre ni mi
+email.» Antes del registro **no se guarda nada en el dispositivo** (el código está solo en memoria durante
+la visita). Solo si se marca, se guarda en la cuenta el código y la fecha y, si la persona paga Premium,
+el plan, el canal (web o Google Play), la fecha del primer pago y si se devolvió. El creador solo recibe
+cifras agregadas. **No se ha editado ningún texto legal.** Hay que publicar estos textos **antes** de
+encender el programa:
+
+24. **s2** (añadir un punto): «Si te registras desde el enlace de un creador y marcas la casilla que lo
+    indica, guardamos el código de ese creador y la fecha. Si después contratas Premium, guardamos también
+    el plan, si pagaste en la web o en Google Play, la fecha de tu primer pago y si se devolvió, para
+    calcular su comisión. El creador no recibe tu nombre, tu email ni ningún otro dato tuyo: solo cuántas
+    altas y ventas ha conseguido.»
+25. **s3** (añadir un punto): «Atribuir tu alta y tu primer pago de Premium al creador que te recomendó la
+    app, para pagarle su comisión: consentimiento (art. 6.1.a), que das al marcar la casilla del registro y
+    puedes retirar cuando quieras escribiendo a support@finanverso.app.» Y, si el abogado lo ve necesario:
+    «Conservar el registro contable de las comisiones pagadas, sin vincularlo a tu cuenta: obligación legal
+    (art. 6.1.c).»
+26. **s4**: sin proveedores nuevos (todo queda en nuestro servidor). Añadir, si se quiere ser explícito:
+    «No compartimos tus datos con los creadores del programa de afiliación.»
+27. **s5** (añadir un punto): «Código del creador que te recomendó la app: hasta que elimines la cuenta o
+    retires el consentimiento. Si ya había generado una comisión, se conserva solo como registro contable
+    anónimo, sin relación con tu cuenta.»
+28. **s7**: la exportación JSON ya incluye la sección `creator` (código, fecha del consentimiento y venta,
+    si la hay). Se puede añadir: «Para retirar el consentimiento del programa de creadores, escríbenos a
+    support@finanverso.app.»
+29. **s8**: añadir: «Si llegas con un enlace de un creador (`?aff=`), su código se lee de la dirección y se
+    mantiene solo en la memoria de la página mientras dura la visita; no se guarda en tu dispositivo.»
+30. **Dudas para el abogado.**
+    - ¿Basta la casilla (consentimiento de mayores de 14 años) o conviene otra base (por ejemplo, interés
+      legítimo con oposición)? Se ha elegido consentimiento por ser lo más prudente, dado que
+      `docs/analitica.md` dice que el origen no se asocia a la cuenta.
+    - Si alguien retira el consentimiento **después** de una venta, ¿debe anularse la comisión del creador?
+      Hoy la venta se mantiene como registro anónimo.
+    - Registro de actividades (RAT): añadir un tratamiento «Programa de creadores» (usuarios atribuidos:
+      cuenta → código, fechas y plan; creadores: datos identificativos, fiscales y bancarios, fuera de la
+      app, base 6.1.b y 6.1.c).
+    - Responsabilidad de Finanverso como **anunciante** por lo que publiquen los creadores (Ley General de
+      Publicidad y Ley de Competencia Desleal): ver la plantilla `docs/afiliacion/condiciones-creadores.md`.
+    - Las condiciones de contratación (`terms.*`) no necesitan cambios para los usuarios; el programa se
+      rige por un contrato aparte con cada creador.

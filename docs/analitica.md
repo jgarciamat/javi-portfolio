@@ -48,6 +48,9 @@ track('guide_view', { guide: 'modelo-303' }); // nunca lanza un error ni bloquea
 - No se cruza con la cuenta: los pasos posteriores al registro no tienen origen. Para saber qué
   campaña trae usuarios **que pagan** habría que guardar el origen en la cuenta (decisión del
   dueño pendiente; exige cambiar la política).
+- Única excepción, aparte de esta analítica: el **programa de creadores** (`docs/afiliacion/programa.md`)
+  guarda en la cuenta el código de un creador, pero solo si la persona marca la casilla del registro
+  (consentimiento) y solo para pagarle su comisión. Está apagado por defecto.
 - Si el navegador envía *Global Privacy Control* o *Do Not Track*, o es un navegador automatizado,
   no se envía nada. El servidor tampoco cuenta los bots conocidos (por su user-agent, que lee y
   descarta).
