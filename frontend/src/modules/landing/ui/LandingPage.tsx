@@ -58,14 +58,17 @@ export function LandingPage() {
         </section>
 
         <section className="landing-shots" aria-label={t('landing.shots.title')}>
-          {SHOTS.map((s) => (
+          {SHOTS.map((s, i) => (
             <figure key={s}>
               <img
                 src={`/landing/${s}.webp`}
                 alt={t(`landing.shots.${s}`)}
                 width="360"
                 height="640"
-                loading="lazy"
+                decoding="async"
+                {...(i === 0
+                  ? { fetchPriority: 'high' as const }
+                  : { loading: 'lazy' as const })}
               />
             </figure>
           ))}
