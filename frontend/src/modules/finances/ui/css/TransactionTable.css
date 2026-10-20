@@ -125,7 +125,7 @@
 .tx-day-count {
   font-size: 0.65rem;
   font-weight: 500;
-  color: var(--slate-700);
+  color: var(--slate-400);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -386,4 +386,12 @@
 .tx-day-select .tx-day-toggle {
   flex: 1;
   min-width: 0;
+}
+
+.tx-pager-note {
+  margin: 0;
+  padding: 0.5rem 0.75rem 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--slate-400);
 }

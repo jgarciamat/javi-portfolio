@@ -179,7 +179,7 @@ export function estimate130(
   const reduction =
     options.priorYearNet === null
       ? 0
-      : LOW_INCOME.find((r) => (options.priorYearNet as number) <= r.upTo)?.amount ?? 0;
+      : (LOW_INCOME.find((r) => (options.priorYearNet as number) <= r.upTo)?.amount ?? 0);
   let previous = 0;
   let negative = 0;
   const out: number[] = [];
@@ -396,12 +396,12 @@ function paymentsOf(
   const estimated = with131
     ? estimate131(year, inputs, activity, figures)
     : none
-    ? [0, 0, 0, 0]
-    : estimate130(figures, {
-        hardRate: activity.method === 'simplified' && inputs.hardToJustify ? hardRateOf(year) : 0,
-        agrarian: activity.agrarian,
-        priorYearNet: inputs.priorYearNet,
-      });
+      ? [0, 0, 0, 0]
+      : estimate130(figures, {
+          hardRate: activity.method === 'simplified' && inputs.hardToJustify ? hardRateOf(year) : 0,
+          agrarian: activity.agrarian,
+          priorYearNet: inputs.priorYearNet,
+        });
   const source = activity.paid130.map((p, i): 'filed' | 'estimated' | 'none' => {
     if (p !== null) return 'filed';
     return !none && estimated[i] > 0 ? 'estimated' : 'none';

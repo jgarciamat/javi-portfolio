@@ -67,6 +67,8 @@ export interface BulkResult {
 
 export interface Category {
   id: string;
+  /** Owner (the API sends it; the app does not use it). */
+  userId?: string;
   name: string;
   color: string;
   icon: string;
@@ -95,6 +97,9 @@ export interface FinancialSummary {
   incomeByCategory: Record<string, number>;
   savingByCategory: Record<string, number>;
   transactionCount: number;
+  /** The period the figures cover (the month summaries carry it). */
+  year?: number;
+  month?: number;
 }
 
 // ─── Month overview (GET /months/:year/:month) ─────────────────────────────────
@@ -549,6 +554,8 @@ export interface AIAdvice {
 export type Currency = 'EUR' | 'USD' | 'GBP' | 'MXN' | 'ARS' | 'COP' | 'CLP' | 'CHF';
 
 export interface UserSettings {
+  /** Owner (the API sends it; the app does not use it). */
+  userId?: string;
   currency: Currency;
   locale: 'es' | 'en';
   monthStartDay: number;

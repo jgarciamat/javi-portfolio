@@ -65,8 +65,8 @@ function SavingLine({
       {saving.saving <= 0
         ? t('tools.renta.saving.none')
         : on
-        ? t('tools.renta.saving.on', { amount })
-        : t('tools.renta.saving.off', { amount })}
+          ? t('tools.renta.saving.on', { amount })
+          : t('tools.renta.saving.off', { amount })}
       {saving.example !== null && (
         <em> {t('tools.renta.saving.example', { amount: money(saving.example) })}</em>
       )}

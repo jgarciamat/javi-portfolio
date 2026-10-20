@@ -86,15 +86,21 @@ async function main(): Promise<void> {
   cleanup.unref();
 
   // The optional Monday summary: checked every hour, sent only on Monday mornings.
-  const digest = setInterval(() => {
-    container.weeklyDigest.run().catch((e) => console.error('[digest] run failed', e));
-  }, 60 * 60 * 1000);
+  const digest = setInterval(
+    () => {
+      container.weeklyDigest.run().catch((e) => console.error('[digest] run failed', e));
+    },
+    60 * 60 * 1000
+  );
   digest.unref();
 
   // Push notifications (bills due tomorrow, Monday summary): hourly, each goes out once.
-  const reminders = setInterval(() => {
-    container.reminders.run().catch((e) => console.error('[push] reminders failed', e));
-  }, 60 * 60 * 1000);
+  const reminders = setInterval(
+    () => {
+      container.reminders.run().catch((e) => console.error('[push] reminders failed', e));
+    },
+    60 * 60 * 1000
+  );
   reminders.unref();
 
   const server = createApp(container).listen(config.port, () => {

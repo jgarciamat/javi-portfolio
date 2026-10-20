@@ -13,8 +13,7 @@ export class SqliteAutonomoDataRepository implements AutonomoDataRepository {
 
   find(userId: string): AutonomoDataRecord | null {
     const row = this.db.prepare('SELECT * FROM autonomo_data WHERE user_id = ?').get(userId) as
-      | Row
-      | undefined;
+      Row | undefined;
     return row
       ? {
           userId: row.user_id,

@@ -339,8 +339,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
 
   get(userId: string): UserSettingsProps {
     const row = this.db.prepare('SELECT * FROM user_settings WHERE user_id = ?').get(userId) as
-      | SettingsRow
-      | undefined;
+      SettingsRow | undefined;
     if (!row) return defaultSettings(userId);
     return {
       userId: row.user_id,

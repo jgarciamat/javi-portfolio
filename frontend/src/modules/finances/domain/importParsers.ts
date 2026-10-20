@@ -209,7 +209,7 @@ export interface ParsedRows {
   review: number[];
 }
 
-const cellAt = (cells: string[], index: number): string => (index >= 0 ? cells[index] ?? '' : '');
+const cellAt = (cells: string[], index: number): string => (index >= 0 ? (cells[index] ?? '') : '');
 
 const TYPE_WORDS: Record<TransactionType, string[]> = {
   EXPENSE: ['gasto', 'gastos', 'expense', 'expenses', 'cargo', 'debito', 'debit'],

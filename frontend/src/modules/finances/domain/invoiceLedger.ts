@@ -104,7 +104,7 @@ export function toInvoices(
     const kind: ExpenseKind =
       book === 'issued'
         ? 'other'
-        : old?.kind ?? preferences[supplierKey(entry.concept)] ?? guessExpenseKind(entry.concept);
+        : (old?.kind ?? preferences[supplierKey(entry.concept)] ?? guessExpenseKind(entry.concept));
     return {
       ...entry,
       id,
@@ -165,7 +165,7 @@ export function toPdfInvoices(
       ...entry,
       id: n === 1 ? hash(key) : `${hash(key)}-${n}`,
       book,
-      kind: book === 'issued' ? 'other' : preferences[supplierKey(entry.concept)] ?? guessed,
+      kind: book === 'issued' ? 'other' : (preferences[supplierKey(entry.concept)] ?? guessed),
       excluded: missing.length > 0,
       source: 'pdf',
       review,

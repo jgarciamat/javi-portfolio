@@ -58,12 +58,12 @@ export function StepBar({
       e.key === 'ArrowRight' || e.key === 'ArrowDown'
         ? Math.min(last, index + 1)
         : e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-        ? Math.max(0, index - 1)
-        : e.key === 'Home'
-        ? 0
-        : e.key === 'End'
-        ? last
-        : null;
+          ? Math.max(0, index - 1)
+          : e.key === 'Home'
+            ? 0
+            : e.key === 'End'
+              ? last
+              : null;
     if (to === null) return;
     e.preventDefault();
     buttons.current[to]?.focus();

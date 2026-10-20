@@ -157,7 +157,7 @@ export function computeMinimum(
 ): { total: number; items: MinimumItem[] } {
   const share = family.sharedChildren ? 0.5 : 1;
   // A community can raise the general amount only from 65 (Illes Balears, see `personalOver65`).
-  const personal = family.age >= 65 ? m.personalOver65 ?? m.personal : m.personal;
+  const personal = family.age >= 65 ? (m.personalOver65 ?? m.personal) : m.personal;
   const items: MinimumItem[] = [{ key: 'personal', amount: personal }];
   // LIRPF art. 57.2 ("edad superior a 65/75 años"), with the age at the accrual date, 31 December
   // (art. 61.1.ª). The AEAT Manual práctico de Renta 2025 applies it to taxpayers "de edad igual o
@@ -620,8 +620,8 @@ const disabilityExpense = (
   e.disability >= 65 || (e.disability >= 33 && e.assistance)
     ? state.workExpenses.disability65
     : e.disability >= 33
-    ? state.workExpenses.disability33
-    : 0;
+      ? state.workExpenses.disability33
+      : 0;
 
 /**
  * Net pay from work after the "other expenses" of art. 19.2.f (2,000 euros, more for an active
@@ -901,7 +901,7 @@ function deductionsOf(input: RentaInput, limitBase: (d: Deduction) => number, li
     if (check?.status === 'missing') unconfirmed.push(d.id);
     const checked = check && check.status !== 'ok' ? { ...marked, on: false } : marked;
     // Held with the rest of its group to a share of the tax base (regional donations).
-    const cap = d.baseCap ? caps[d.baseCap.group] ?? 1 : 1;
+    const cap = d.baseCap ? (caps[d.baseCap.group] ?? 1) : 1;
     const choice = cap < 1 ? { ...checked, amount: positive(checked.amount ?? 0) * cap } : checked;
     const amount = capped(d, choice, deductionAmount(d, choice, factor), input);
     return {

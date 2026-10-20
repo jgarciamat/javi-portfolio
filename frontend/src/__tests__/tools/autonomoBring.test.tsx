@@ -116,7 +116,7 @@ describe('taking an activity out of the Renta', () => {
       data: { area: 'direct', net: 100 },
       withheld: 0,
       payments: 0,
-    } as const);
+    }) as const;
   const result: ActivitiesResult = {
     direct: 200,
     dependentReduction: 0,

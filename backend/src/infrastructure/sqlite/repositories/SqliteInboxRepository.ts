@@ -16,15 +16,13 @@ export class SqliteInboxRepository implements InboxRepository {
 
   tokenOf(userId: string): string | null {
     const row = this.db.prepare('SELECT token FROM inbox_tokens WHERE user_id = ?').get(userId) as
-      | { token: string }
-      | undefined;
+      { token: string } | undefined;
     return row?.token ?? null;
   }
 
   userOf(token: string): string | null {
     const row = this.db.prepare('SELECT user_id FROM inbox_tokens WHERE token = ?').get(token) as
-      | { user_id: string }
-      | undefined;
+      { user_id: string } | undefined;
     return row?.user_id ?? null;
   }
 

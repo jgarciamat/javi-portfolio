@@ -46,7 +46,7 @@ export function SelectCheckbox({ state, label, onToggle, className = '' }: Selec
 export function handleRowGesture(
   e: MouseEvent<HTMLElement>,
   id: string,
-  selection: RowSelection
+  selection: Pick<RowSelection, 'toggle'>
 ): boolean {
   const target = e.target as HTMLElement;
   const own = target.closest('input, select, textarea, a, button') ?? e.currentTarget;

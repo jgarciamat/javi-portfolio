@@ -252,38 +252,36 @@ function quarterScreens(ctx: Ctx): WizardScreen[] {
   // One quarter per screen: the 130 still adds up the whole year from the same data.
   const quarters = Array.from({ length: s.quarter - from }, (_, i) => from + i + 1);
   return [
-    ...quarters.map(
-      (n): WizardScreen => ({
-        id: `amounts-${n}`,
-        title: t(w('q.amounts'), { n }),
-        hint: t(w(n === quarters[0] ? 'hint.amounts' : 'hint.amountsNext'), { n, prev: n - 1 }),
-        help: t(w('help.amounts')),
-        ready: true,
-        noSkip: true,
-        body: (
-          <>
-            <QuarterPanels
-              form={s.manual}
-              onChange={s.changeManual}
-              upTo={s.quarter}
-              year={s.year}
-              vatExtras={s.extras.vat}
-              only={n}
-            />
-            {n === s.quarter && (
-              <details className="renta-group">
-                <summary>{t(w('advanced'))}</summary>
-                <ExtrasPanel
-                  extras={s.extras}
-                  quarter={s.quarter}
-                  onChange={(patch) => s.setExtras({ ...s.extras, ...patch })}
-                />
-              </details>
-            )}
-          </>
-        ),
-      })
-    ),
+    ...quarters.map((n): WizardScreen => ({
+      id: `amounts-${n}`,
+      title: t(w('q.amounts'), { n }),
+      hint: t(w(n === quarters[0] ? 'hint.amounts' : 'hint.amountsNext'), { n, prev: n - 1 }),
+      help: t(w('help.amounts')),
+      ready: true,
+      noSkip: true,
+      body: (
+        <>
+          <QuarterPanels
+            form={s.manual}
+            onChange={s.changeManual}
+            upTo={s.quarter}
+            year={s.year}
+            vatExtras={s.extras.vat}
+            only={n}
+          />
+          {n === s.quarter && (
+            <details className="renta-group">
+              <summary>{t(w('advanced'))}</summary>
+              <ExtrasPanel
+                extras={s.extras}
+                quarter={s.quarter}
+                onChange={(patch) => s.setExtras({ ...s.extras, ...patch })}
+              />
+            </details>
+          )}
+        </>
+      ),
+    })),
     {
       id: 'prepare',
       title: t(w('q.prepare')),

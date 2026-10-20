@@ -78,14 +78,7 @@ export function readQuantfury(lines: string[]): InvestOp[] {
 
 /** The figures a certificate (información fiscal, modelo 189/193/187 data) can give. */
 export type CertificateField =
-  | 'interest'
-  | 'dividends'
-  | 'withheld'
-  | 'gains'
-  | 'losses'
-  | 'proceeds'
-  | 'cost'
-  | 'expenses';
+  'interest' | 'dividends' | 'withheld' | 'gains' | 'losses' | 'proceeds' | 'cost' | 'expenses';
 
 export interface CertificateLine {
   field: CertificateField;

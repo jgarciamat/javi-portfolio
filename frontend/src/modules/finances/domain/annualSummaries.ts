@@ -148,7 +148,7 @@ export function summary190(
         .filter((r) => r.subkey === null)
         .map((r) => ({ code: 'subkey' as const, who: r.name })),
       ...typed.map(
-        (r) => ({ code: 'typed' as const, part: r.key === 'A' ? 'staff' : 'pros' } as const)
+        (r) => ({ code: 'typed' as const, part: r.key === 'A' ? 'staff' : 'pros' }) as const
       ),
     ],
   };

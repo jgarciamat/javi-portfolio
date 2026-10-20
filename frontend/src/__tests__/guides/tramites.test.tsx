@@ -168,9 +168,25 @@ describe('public videos of the Hacienda guides', () => {
 describe('Content-Security-Policy', () => {
   it('lets pages embed only Google sign-in and youtube-nocookie', () => {
     const caddy = readFileSync('../deploy/Caddyfile', 'utf8');
-    const csp = /Content-Security-Policy[^"\n]* "([^"]+)"/.exec(caddy)![1];
+    const csp = /Content-Security-Policy-Report-Only "([^"]+)"/.exec(caddy)![1];
     const frameSrc = /frame-src ([^;]+);/.exec(csp)![1].split(' ');
     expect(frameSrc).toEqual(['https://accounts.google.com', 'https://www.youtube-nocookie.com']);
     expect(csp).not.toContain('youtube.com ');
+  });
+
+  it('enforces the safe directives and reports the violations of the full policy', () => {
+    const caddy = readFileSync('../deploy/Caddyfile', 'utf8');
+    const enforced = /\n\s*Content-Security-Policy "([^"]+)"/.exec(caddy)![1];
+    for (const d of [
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ]) {
+      expect(enforced).toContain(d);
+    }
+    expect(caddy).toContain('Reporting-Endpoints');
+    expect(caddy).toContain('report-uri /api/csp-report');
+    expect(caddy).toContain('report-to csp-endpoint');
   });
 });

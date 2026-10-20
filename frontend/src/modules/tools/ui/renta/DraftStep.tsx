@@ -332,7 +332,7 @@ function DraftReader({
   const [error, setError] = useState<'read' | 'locked' | null>(null);
 
   /** A reading of the draft, from any format: into the planner, its deductions marked next. */
-  const use = (result: DraftReading) => {
+  const takeReading = (result: DraftReading) => {
     onDraft({
       ...draft,
       reading: result,
@@ -351,7 +351,7 @@ function DraftReader({
   };
   const analyse = async (text: string, lines?: string[]) => {
     if (!(await allowed())) return;
-    use(readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines }));
+    takeReading(readDraft(text, { year: DRAFT_EXERCISE, communities: CCAA_OPTIONS, lines }));
   };
   /** The PDF of the draft, or the Agency's file (the «.txt» of Renta WEB, an XML), by its content. */
   const fromFile = async (file: File) => {
@@ -362,7 +362,7 @@ function DraftReader({
       else if (read.kind === 'text') await analyse(read.text);
       else if (await allowed()) {
         const map = await loadXmlMap(read.exercise);
-        use(readDraftXml(read.text, { year: DRAFT_EXERCISE, map }));
+        takeReading(readDraftXml(read.text, { year: DRAFT_EXERCISE, map }));
       }
     } catch {
       setError('read');

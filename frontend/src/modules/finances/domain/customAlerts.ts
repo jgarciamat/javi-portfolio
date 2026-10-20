@@ -74,7 +74,7 @@ const METRIC_COMPUTERS: Record<CustomAlertMetric, MetricComputer> = {
   balance_amount: (_a, i) => i.balance,
   category_pct: (a, i) =>
     a.category ? percentOf(i.expensesByCategory[a.category] ?? 0, available(i)) : null,
-  category_amount: (a, i) => (a.category ? i.expensesByCategory[a.category] ?? 0 : null),
+  category_amount: (a, i) => (a.category ? (i.expensesByCategory[a.category] ?? 0) : null),
 };
 
 /** Figures of the month the alerts are evaluated against. */

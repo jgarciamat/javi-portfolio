@@ -12,12 +12,14 @@ import { financeRoutes } from './routes/finance.routes';
 import { householdRoutes } from './routes/household.routes';
 import { learnRoutes } from './routes/learn.routes';
 import { planningRoutes } from './routes/planning.routes';
+import { createErrorTracker } from '../monitoring/errorTracking';
 import { userRoutes } from './routes/user.routes';
 import { videoRoutes } from './routes/videos.routes';
 
 export function createApp(c: Container): Express {
   const app = express();
   const { config } = c;
+  const errorTracker = createErrorTracker(config.sentryDsn, { environment: config.env });
   const limiter = rateLimiterFactory(config.rateLimitDisabled || config.env === 'test');
 
   app.disable('x-powered-by');
@@ -67,6 +69,6 @@ export function createApp(c: Container): Express {
   api.use(notFoundHandler);
 
   app.use('/api', api);
-  app.use(errorHandler());
+  app.use(errorHandler(console, errorTracker));
   return app;
 }

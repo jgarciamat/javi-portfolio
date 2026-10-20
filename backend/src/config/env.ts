@@ -24,6 +24,8 @@ const envSchema = z.object({
   CORS_ORIGINS: z.string().optional(),
   TRUST_PROXY: z.coerce.number().int().min(0).default(1),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  /** Error tracking (Sentry EU / GlitchTip). Empty or missing = off. */
+  SENTRY_DSN: z.string().optional(),
   /** cloudflare (default when configured) | gemini (paid key only: the free tier is not allowed for EEA users) | none */
   AI_PROVIDER: z.enum(['cloudflare', 'gemini', 'none']).optional(),
   CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
@@ -86,6 +88,7 @@ export interface AppConfig {
   appUrl: string;
   corsOrigins: string[];
   trustProxy: number;
+  sentryDsn: string | null;
   google: { clientId: string | null };
   ai: {
     provider: 'cloudflare' | 'gemini' | 'none';
@@ -219,6 +222,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     corsOrigins: [...new Set([appUrl, ...NATIVE_APP_ORIGINS, ...devOrigins, ...extraOrigins])],
     trustProxy: raw.TRUST_PROXY,
     google: { clientId: raw.GOOGLE_CLIENT_ID ?? null },
+    sentryDsn: raw.SENTRY_DSN?.trim() || null,
     ai: resolveAi(raw),
     inbox: {
       domain: raw.INBOUND_EMAIL_DOMAIN?.trim().toLowerCase() || null,

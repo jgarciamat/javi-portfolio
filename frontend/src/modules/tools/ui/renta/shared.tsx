@@ -33,7 +33,7 @@ export const resultLabel = (result: number) =>
     pay: 'tools.renta.toPay',
     refund: 'tools.renta.refund',
     zero: 'tools.renta.zeroResult',
-  }[resultTone(result)]);
+  })[resultTone(result)];
 
 /** The amount of a result: red to pay, green to be refunded, neutral at zero (Renta.css). */
 export function ResultAmount({ result, money }: { result: number; money: (n: number) => string }) {

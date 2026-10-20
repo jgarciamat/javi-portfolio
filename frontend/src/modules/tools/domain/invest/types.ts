@@ -10,15 +10,7 @@
  * commodity: gold or silver of an app; fiat: euros, dollars... (never taxed as an asset).
  */
 export type AssetClass =
-  | 'crypto'
-  | 'shares'
-  | 'etf'
-  | 'fund'
-  | 'bill'
-  | 'bond'
-  | 'derivative'
-  | 'commodity'
-  | 'fiat';
+  'crypto' | 'shares' | 'etf' | 'fund' | 'bill' | 'bond' | 'derivative' | 'commodity' | 'fiat';
 
 /**
  * buy/sell: for money; swap: one asset for another (each crypto swap is a transmission, LIRPF art.
@@ -52,14 +44,7 @@ export type OpKind =
  * an economic activity when it is organised; fork: new coins without a cost (NO CONFIRMADO).
  */
 export type RewardKind =
-  | 'staking'
-  | 'lending'
-  | 'airdrop'
-  | 'cashback'
-  | 'referral'
-  | 'learn'
-  | 'mining'
-  | 'fork';
+  'staking' | 'lending' | 'airdrop' | 'cashback' | 'referral' | 'learn' | 'mining' | 'fork';
 
 /** One operation as read from a file. Amounts are positive; the kind says which way they go. */
 export interface InvestOp {

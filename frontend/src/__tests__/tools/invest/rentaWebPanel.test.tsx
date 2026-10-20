@@ -88,11 +88,11 @@ describe('«Cópialo en Renta WEB»', () => {
     const create = jest.fn(() => 'blob:x');
     Object.assign(URL, { createObjectURL: create, revokeObjectURL: jest.fn() });
     const names: string[] = [];
-    const click = jest
-      .spyOn(HTMLAnchorElement.prototype, 'click')
-      .mockImplementation(function (this: HTMLAnchorElement) {
-        names.push(this.download);
-      });
+    const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement
+    ) {
+      names.push(this.download);
+    });
     renderWithProviders(<RentaWebPanel ledger={ledger} />, { authenticated: false });
     expect(screen.getByText(tr(`${k}.warn.fiscalData`))).toBeInTheDocument();
     expect(screen.getByText(tr(`${k}.warn.carteraValores`))).toBeInTheDocument();

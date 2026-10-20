@@ -8,7 +8,10 @@ export interface MetricRow {
 
 /** Daily counters stored in SQLite. */
 export class SqliteMetricsRepository implements MetricsRecorder {
-  constructor(private readonly db: Db, private readonly clock: Clock) {}
+  constructor(
+    private readonly db: Db,
+    private readonly clock: Clock
+  ) {}
 
   record(name: MetricName): void {
     const day = this.clock.now().toISOString().slice(0, 10);

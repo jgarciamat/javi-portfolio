@@ -13,7 +13,11 @@ import {
 export class ResendEmailSender implements EmailSender {
   private readonly resend: Resend;
 
-  constructor(apiKey: string, private readonly from: string, private readonly appUrl: string) {
+  constructor(
+    apiKey: string,
+    private readonly from: string,
+    private readonly appUrl: string
+  ) {
     this.resend = new Resend(apiKey);
   }
 
@@ -74,7 +78,10 @@ export class ConsoleEmailSender implements EmailSender {
     notice?: SecurityNotice;
   }[] = [];
 
-  constructor(private readonly appUrl: string, private readonly silent = false) {}
+  constructor(
+    private readonly appUrl: string,
+    private readonly silent = false
+  ) {}
 
   async sendVerification(to: string, _name: string, token: string): Promise<void> {
     this.sent.push({ kind: 'verify', to, token });

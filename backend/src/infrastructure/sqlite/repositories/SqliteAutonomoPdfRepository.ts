@@ -6,8 +6,7 @@ export class SqliteAutonomoPdfRepository implements AutonomoPdfRepository {
 
   count(userId: string): number {
     const row = this.db.prepare('SELECT uses FROM autonomo_pdfs WHERE user_id = ?').get(userId) as
-      | { uses: number }
-      | undefined;
+      { uses: number } | undefined;
     return row?.uses ?? 0;
   }
 

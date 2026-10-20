@@ -240,8 +240,8 @@ export class ImportService {
         const type = row.type
           ? parseTransactionType(row.type)
           : row.amountCents > 0
-          ? 'INCOME'
-          : 'EXPENSE';
+            ? 'INCOME'
+            : 'EXPENSE';
         const baseKey = `${userId}|${date}|${row.amountCents}|${normalizeText(description)}`;
         const nth = (occurrences.get(baseKey) ?? 0) + 1;
         occurrences.set(baseKey, nth);

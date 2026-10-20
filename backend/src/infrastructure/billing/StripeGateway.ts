@@ -17,11 +17,9 @@ export interface StripeConfig {
 const MIN_TRIAL_MS = 48 * 60 * 60 * 1000 + 5 * 60 * 1000;
 
 const idOf = (value: string | { id: string } | null | undefined): string | null =>
-  typeof value === 'string' ? value : value?.id ?? null;
+  typeof value === 'string' ? value : (value?.id ?? null);
 
-function mapStatus(
-  status: Stripe.Subscription.Status
-): 'trialing' | 'active' | 'past_due' | 'canceled' {
+function mapStatus(status: string): 'trialing' | 'active' | 'past_due' | 'canceled' {
   if (status === 'active' || status === 'trialing' || status === 'past_due') return status;
   // incomplete, incomplete_expired, unpaid, paused, canceled: no access.
   return 'canceled';
@@ -31,11 +29,14 @@ export class StripeGateway implements PaymentGateway {
   readonly enabled = true;
   private readonly stripe: Stripe;
 
-  constructor(private readonly config: StripeConfig, client?: Stripe) {
+  constructor(
+    private readonly config: StripeConfig,
+    client?: Stripe
+  ) {
     this.stripe =
       client ??
       new Stripe(config.secretKey, {
-        apiVersion: '2025-08-27.basil',
+        apiVersion: '2026-09-30.endive',
         maxNetworkRetries: 2,
         timeout: 20_000,
         appInfo: { name: 'money-manager' },

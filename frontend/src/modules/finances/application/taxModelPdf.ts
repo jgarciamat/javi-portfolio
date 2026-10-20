@@ -78,8 +78,7 @@ export async function tokensFromPdf(pdf: PdfDocument): Promise<PdfToken[][]> {
 
 /** What a PDF dropped in the import is: a filed modelo 130/303, or else an invoice (or neither). */
 export type ImportPdf =
-  | { kind: 'model'; parsed: TaxModelParse }
-  | { kind: 'invoice'; parsed: InvoicePdfParse };
+  { kind: 'model'; parsed: TaxModelParse } | { kind: 'invoice'; parsed: InvoicePdfParse };
 
 /** The pieces of a PDF given as bytes, read with pdf.js: the file never leaves the device. */
 async function openPdf(file: File): Promise<PdfToken[][]> {

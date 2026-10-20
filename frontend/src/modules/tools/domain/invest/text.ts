@@ -75,7 +75,7 @@ export function parseMoney(cell: Cell, locale: NumberLocale): Money {
   const code = (m[1] || m[3] || '').toUpperCase();
   return {
     value: sign * toNumber(m[2], locale),
-    currency: code ? SYMBOLS[code] ?? code : null,
+    currency: code ? (SYMBOLS[code] ?? code) : null,
   };
 }
 

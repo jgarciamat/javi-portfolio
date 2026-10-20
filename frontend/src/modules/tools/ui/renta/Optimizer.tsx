@@ -25,8 +25,8 @@ const amountOf = (form: RentaForm, id: string): string =>
   id === 'pensionPlan'
     ? form.pension
     : id === 'spousePlan'
-    ? form.spousePlan
-    : form.workExpenses['cuotas-sindicales'] ?? '';
+      ? form.spousePlan
+      : (form.workExpenses['cuotas-sindicales'] ?? '');
 
 /** Items that, once confirmed, only explain where to type it. */
 const INFO = ['earlierLosses', 'rentalDepreciation'];

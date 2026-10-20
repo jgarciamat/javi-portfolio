@@ -41,6 +41,17 @@ describe('LandingPage', () => {
     expect(screen.getAllByRole('link', { name: tr('landing.learn.guides') }).length).toBe(2);
   });
 
+  it('loads the first screenshot (the LCP) with priority and the rest lazily', () => {
+    const { container } = renderWithProviders(<LandingPage />, { authenticated: false });
+    const shots = container.querySelectorAll('.landing-shots img');
+    expect(shots[0]).toHaveAttribute('fetchpriority', 'high');
+    expect(shots[0]).not.toHaveAttribute('loading');
+    expect(shots[0]).toHaveAttribute('decoding', 'async');
+    expect(shots[0]).toHaveAttribute('width');
+    expect(shots[0]).toHaveAttribute('height');
+    expect(shots[1]).toHaveAttribute('loading', 'lazy');
+  });
+
   it('takes the Premium prices from the API', async () => {
     renderWithProviders(<LandingPage />, { authenticated: false });
     const price = tr('landing.plans.price', {

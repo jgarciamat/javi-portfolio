@@ -53,11 +53,11 @@ describe('reading the file of a draft', () => {
     expect(await readDraftFile(modern)).toEqual({ kind: 'text', text: 'adios' });
     const broken = file('x', 'a.txt');
     Object.defineProperty(broken, 'arrayBuffer', { value: undefined });
-    const spy = jest
-      .spyOn(FileReader.prototype, 'readAsArrayBuffer')
-      .mockImplementation(function (this: FileReader) {
-        this.onerror?.(new ProgressEvent('error') as ProgressEvent<FileReader>);
-      });
+    const spy = jest.spyOn(FileReader.prototype, 'readAsArrayBuffer').mockImplementation(function (
+      this: FileReader
+    ) {
+      this.onerror?.(new ProgressEvent('error') as ProgressEvent<FileReader>);
+    });
     await expect(readDraftFile(broken)).rejects.toBeNull();
     spy.mockRestore();
   });

@@ -63,13 +63,11 @@ export function importBook(
   if (!parsed.ok)
     return { lines: [{ tone: 'error', key: `app.autonomo.import.error.${parsed.reason}` }] };
   const { entries, skipped } = parsed.result;
-  const skippedLines = SKIPPED.filter((k) => skipped[k] > 0).map(
-    (k): Line => ({
-      tone: 'note',
-      key: `app.autonomo.import.skipped.${k}`,
-      values: { n: skipped[k], year },
-    })
-  );
+  const skippedLines = SKIPPED.filter((k) => skipped[k] > 0).map((k): Line => ({
+    tone: 'note',
+    key: `app.autonomo.import.skipped.${k}`,
+    values: { n: skipped[k], year },
+  }));
   if (entries.length === 0) {
     return {
       lines: [

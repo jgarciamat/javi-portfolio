@@ -190,6 +190,7 @@ export function ForecastPanel() {
         </>
       }
       tourId="forecast"
+      className={data || error ? undefined : 'forecast-panel--loading'}
     >
       {error && <p className="form-error">{error}</p>}
       {!data && !error && <p className="section-hint">{t('app.common.loading')}</p>}

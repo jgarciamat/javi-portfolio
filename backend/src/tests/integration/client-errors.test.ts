@@ -56,3 +56,16 @@ describe('Client error reports', () => {
     expect(warn).not.toHaveBeenCalled();
   });
 });
+
+describe('Unexpected server errors', () => {
+  it('are reported to the tracker (when there is one) without the query string', async () => {
+    const { errorHandler } = await import('../../infrastructure/http/middleware');
+    const capture = jest.fn();
+    const handler = errorHandler({ error: jest.fn() }, { capture });
+    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    const err = new Error('boom');
+    handler(err, { method: 'GET', originalUrl: '/api/x?t=1' } as never, res as never, jest.fn());
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(capture).toHaveBeenCalledWith(err, { method: 'GET', path: '/api/x?t=1' });
+  });
+});

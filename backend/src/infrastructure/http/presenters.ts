@@ -91,7 +91,7 @@ export function presentMonth(o: MonthOverview) {
     end: o.end,
     isCurrent: o.isCurrent,
     transactions: o.transactions.map(presentTransaction),
-    summary: presentSummary(o.summary, o),
+    summary: presentSummary(o.summary, { year: o.year, month: o.month }),
     carryover: m(o.carryoverCents),
     available: m(o.availableCents),
     budgets: o.budgets.map(presentBudgetLine),

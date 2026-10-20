@@ -172,6 +172,7 @@ function MovementsPanel({
             onPatch={f.patchTransaction}
             onEdit={onEdit}
             selection={selection}
+            pageKey={`${f.year}-${f.month}|${accountId ?? ''}`}
           />
         )}
         {view.mode === 'week' && (
@@ -200,7 +201,7 @@ const quickAddOf = (param: string | null): TransactionType | null => QUICK_ADD[p
 function defaultDateOf(f: ReturnType<typeof useFinances>): string {
   return f.isCurrentPeriod
     ? todayDateOnly()
-    : f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`;
+    : (f.periodStart ?? `${f.year}-${String(f.month).padStart(2, '0')}-01`);
 }
 
 /** Only for the current period: first steps or the recap, the rate prompt and the forecast. */

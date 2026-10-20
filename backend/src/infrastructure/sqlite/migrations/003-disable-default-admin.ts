@@ -17,8 +17,7 @@ export const disableDefaultAdmin: Migration = {
     const row = db
       .prepare('SELECT id, password_hash FROM users WHERE id = ? OR email = ?')
       .get(DEFAULT_ADMIN_ID, 'admin@admin.com') as
-      | { id: string; password_hash: string | null }
-      | undefined;
+      { id: string; password_hash: string | null } | undefined;
     if (!row?.password_hash) return;
     if (!bcrypt.compareSync('admin', row.password_hash)) return;
     db.prepare(

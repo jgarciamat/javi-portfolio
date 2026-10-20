@@ -3,9 +3,9 @@ import { activityBoxes } from '@modules/tools/domain/rentaActivityBoxes';
 
 /** Invented activities; each result is written by hand as the engine gives it. */
 const direct = (method: 'normal' | 'simplified'): ActivityInput =>
-  ({ kind: 'direct', name: 'Tienda', data: { method }, withheld: 0, payments: 0 } as never);
+  ({ kind: 'direct', name: 'Tienda', data: { method }, withheld: 0, payments: 0 }) as never;
 const other = (kind: string, name: string, data: object = {}): ActivityInput =>
-  ({ kind, name, data, withheld: 0, payments: 0 } as never);
+  ({ kind, name, data, withheld: 0, payments: 0 }) as never;
 
 const directResult = {
   income: 30000,

@@ -421,7 +421,7 @@ function ScreenCard({
       <Notes screen={screen} unknown={unknown} ok={ok} />
       <ScreenNav
         canBack={n > 1 || index > 0}
-        skip={!screen.noSkip && !screen.ready ? screen.skipLabel ?? t('wizard.skip') : null}
+        skip={!screen.noSkip && !screen.ready ? (screen.skipLabel ?? t('wizard.skip')) : null}
         ok={ok}
         missing={Boolean(screen.missing)}
         label={nextLabel(t, last, lastStep, n)}

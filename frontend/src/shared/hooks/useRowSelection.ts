@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type HeaderState = 'none' | 'some' | 'all';
 
@@ -49,8 +49,16 @@ export function useRowSelection(rowIds: string[]): RowSelection {
     });
   }, []);
 
+  // The latest rows and selection, so `toggle` keeps one identity and memoized rows
+  // that receive it are not drawn again on every click.
+  const latest = useRef({ rowIds, visible });
+  useEffect(() => {
+    latest.current = { rowIds, visible };
+  });
+
   const toggle = useCallback(
     (id: string, gesture: SelectGesture) => {
+      const { rowIds, visible } = latest.current;
       const on = !visible.has(id);
       const from = rowIds.indexOf(anchor.current);
       const to = rowIds.indexOf(id);
@@ -62,7 +70,7 @@ export function useRowSelection(rowIds: string[]): RowSelection {
       }
       setMany([id], on);
     },
-    [rowIds, visible, setMany]
+    [setMany]
   );
 
   const stateOf = useCallback(

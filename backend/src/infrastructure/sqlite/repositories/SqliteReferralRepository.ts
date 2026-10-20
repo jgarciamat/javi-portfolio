@@ -6,8 +6,7 @@ export class SqliteReferralRepository implements ReferralRepository {
 
   codeOf(userId: string): string | null {
     const row = this.db.prepare('SELECT code FROM referral_codes WHERE user_id = ?').get(userId) as
-      | { code: string }
-      | undefined;
+      { code: string } | undefined;
     return row?.code ?? null;
   }
 
@@ -21,8 +20,7 @@ export class SqliteReferralRepository implements ReferralRepository {
 
   userByCode(code: string): string | null {
     const row = this.db.prepare('SELECT user_id FROM referral_codes WHERE code = ?').get(code) as
-      | { user_id: string }
-      | undefined;
+      { user_id: string } | undefined;
     return row?.user_id ?? null;
   }
 

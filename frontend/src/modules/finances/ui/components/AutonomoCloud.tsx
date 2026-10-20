@@ -141,8 +141,8 @@ function SyncStatus({ cloud, onChoose }: { cloud: AutonomoCloud; onChoose: () =>
       ? savedAt === null
         ? t('app.autonomo.cloud.status.ready')
         : Date.now() - new Date(savedAt).getTime() < MOMENT
-        ? t('app.autonomo.cloud.status.savedNow')
-        : t('app.autonomo.cloud.status.savedAt', { time: time(savedAt) })
+          ? t('app.autonomo.cloud.status.savedNow')
+          : t('app.autonomo.cloud.status.savedAt', { time: time(savedAt) })
       : t(`app.autonomo.cloud.status.${status}`);
   return (
     <p className={`autonomo-sync autonomo-sync--${status}`} role="status">

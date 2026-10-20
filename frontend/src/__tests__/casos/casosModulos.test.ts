@@ -75,7 +75,7 @@ function valueOf(f: Figure, m: NonNullable<Persona['modulos']>): number | null {
   const [model, box] = (f.campo as string).split('.');
   if (model === 'renta') {
     const annual = annualOf(manual, extras, m.ejercicio);
-    return box === '0604' ? annual.payments130.total : annual.boxes[box] ?? null;
+    return box === '0604' ? annual.payments130.total : (annual.boxes[box] ?? null);
   }
   const q = Number((f.periodo as string).slice(0, 1)) as 1 | 2 | 3 | 4;
   const view = modulesView(manual, extras, m.ejercicio, q);
@@ -83,8 +83,8 @@ function valueOf(f: Figure, m: NonNullable<Persona['modulos']>): number | null {
     model === 'm131'
       ? view?.result131.boxes
       : view?.vat && view.vat !== 'none'
-      ? view.vat.result.boxes
-      : undefined;
+        ? view.vat.result.boxes
+        : undefined;
   return boxes?.find((b) => b.box === box)?.amount ?? null;
 }
 

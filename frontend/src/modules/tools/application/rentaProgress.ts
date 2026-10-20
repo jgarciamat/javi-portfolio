@@ -58,8 +58,8 @@ function unrentedRow(row: Record<string, unknown>): UnrentedForm {
     typeof row.days === 'string'
       ? row.days
       : months === ''
-      ? ''
-      : String(Math.round((Math.min(12, Math.max(0, Number(months) || 0)) * 365) / 12));
+        ? ''
+        : String(Math.round((Math.min(12, Math.max(0, Number(months) || 0)) * 365) / 12));
   return { value: text(row.value), revised: row.revised === true, days };
 }
 

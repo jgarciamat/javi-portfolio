@@ -1,10 +1,22 @@
-import { API_BASE_URL } from '@core/config/api.config';
+import { API_BASE_URL, SENTRY_DSN } from '@core/config/api.config';
 
 export type ErrorKind = 'render' | 'error' | 'unhandledrejection';
 export type ErrorReporter = (kind: ErrorKind, error: unknown) => void;
 
+/** A failed report is not worth another error. */
+const ignore = (): void => undefined;
+
 /** Enough to diagnose a page; more would only repeat the same failure. */
 const MAX_REPORTS = 5;
+
+/**
+ * Also hands the error to the opt-in tracker (see errorTracking.ts). With no DSN nothing is
+ * loaded; with one, the tracker's chunk is fetched on the first error.
+ */
+export function forwardToTracker(dsn: string, kind: ErrorKind, error: unknown): void {
+  if (!dsn) return;
+  import('./errorTracking').then((m) => m.track(dsn, kind, error)).catch(ignore);
+}
 
 /** Sends browser errors to the API log: each message once, a few per page load. */
 export function createErrorReporter(endpoint: string): ErrorReporter {
@@ -14,6 +26,7 @@ export function createErrorReporter(endpoint: string): ErrorReporter {
     const message = (err.message.trim() || err.name).slice(0, 500);
     if (seen.size >= MAX_REPORTS || seen.has(message)) return;
     seen.add(message);
+    forwardToTracker(SENTRY_DSN, kind, err);
     const body = JSON.stringify({
       kind,
       message,
@@ -26,7 +39,7 @@ export function createErrorReporter(endpoint: string): ErrorReporter {
       headers: { 'Content-Type': 'application/json' },
       body,
       keepalive: true,
-    }).catch(() => undefined);
+    }).catch(ignore);
   };
 }
 

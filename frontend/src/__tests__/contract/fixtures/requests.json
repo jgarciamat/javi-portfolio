@@ -1,0 +1,858 @@
+[
+  {
+    "name": "register",
+    "method": "POST",
+    "path": "/auth/register",
+    "auth": false,
+    "body": {
+      "email": "nueva@example.com",
+      "password": "Sup3r-secret!",
+      "name": "Nueva",
+      "locale": "es"
+    }
+  },
+  {
+    "name": "login",
+    "method": "POST",
+    "path": "/auth/login",
+    "auth": false,
+    "body": {
+      "email": "ana@example.com",
+      "password": "Sup3r-secret!"
+    }
+  },
+  {
+    "name": "twoFactorSetup",
+    "method": "POST",
+    "path": "/auth/2fa/setup",
+    "auth": true,
+    "body": {
+      "password": "Sup3r-secret!"
+    }
+  },
+  {
+    "name": "twoFactorEnable",
+    "method": "POST",
+    "path": "/auth/2fa/enable",
+    "auth": true,
+    "body": {
+      "code": "{totp}"
+    }
+  },
+  {
+    "name": "twoFactorVerify",
+    "method": "POST",
+    "path": "/auth/2fa/verify",
+    "auth": false,
+    "body": {
+      "challengeToken": "{challenge}",
+      "code": "{totp}"
+    }
+  },
+  {
+    "name": "twoFactorRecoveryCodes",
+    "method": "POST",
+    "path": "/auth/2fa/recovery-codes",
+    "auth": true,
+    "body": {
+      "code": "{totp}"
+    }
+  },
+  {
+    "name": "twoFactorDisable",
+    "method": "POST",
+    "path": "/auth/2fa/disable",
+    "auth": true,
+    "body": {
+      "password": "Sup3r-secret!"
+    }
+  },
+  {
+    "name": "profileName",
+    "method": "PATCH",
+    "path": "/profile/name",
+    "auth": true,
+    "body": {
+      "name": "Ana Inventada"
+    }
+  },
+  {
+    "name": "profileAvatar",
+    "method": "PATCH",
+    "path": "/profile/avatar",
+    "auth": true,
+    "body": {
+      "avatar": "🦊"
+    }
+  },
+  {
+    "name": "transactionCreate",
+    "method": "POST",
+    "path": "/transactions",
+    "auth": true,
+    "body": {
+      "description": "Cena",
+      "amount": 12.5,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "date": "2026-03-10",
+      "notes": null
+    }
+  },
+  {
+    "name": "transactionUpdate",
+    "method": "PUT",
+    "path": "/transactions/{transaction}",
+    "auth": true,
+    "body": {
+      "description": "Cena con amigos",
+      "amount": 20,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "accountId": null,
+      "date": "2026-03-11",
+      "notes": "Nota"
+    }
+  },
+  {
+    "name": "transactionNotes",
+    "method": "PATCH",
+    "path": "/transactions/{transaction}",
+    "auth": true,
+    "body": {
+      "notes": "Una nota"
+    }
+  },
+  {
+    "name": "transactionBulkUpdate",
+    "method": "PATCH",
+    "path": "/transactions/bulk",
+    "auth": true,
+    "body": {
+      "ids": ["{transaction}"],
+      "changes": {
+        "categoryId": "{category:Ocio}",
+        "notes": "Revisado",
+        "notesMode": "append"
+      }
+    }
+  },
+  {
+    "name": "transactionBulkDelete",
+    "method": "POST",
+    "path": "/transactions/bulk-delete",
+    "auth": true,
+    "body": {
+      "ids": ["{transaction}"]
+    }
+  },
+  {
+    "name": "importPreview",
+    "method": "POST",
+    "path": "/transactions/import",
+    "auth": true,
+    "body": {
+      "rows": [
+        {
+          "date": "2026-03-02",
+          "description": "Mercadona",
+          "amount": -23.4
+        },
+        {
+          "date": "2026-03-03",
+          "description": "Nómina",
+          "amount": 1500,
+          "category": "Salario"
+        }
+      ],
+      "dryRun": true,
+      "useAi": false
+    }
+  },
+  {
+    "name": "importCommit",
+    "method": "POST",
+    "path": "/transactions/import",
+    "auth": true,
+    "body": {
+      "rows": [
+        {
+          "date": "2026-03-04",
+          "description": "Gasolina",
+          "amount": -40,
+          "type": "EXPENSE",
+          "notes": null
+        }
+      ],
+      "accountId": null,
+      "dryRun": false,
+      "useAi": false,
+      "source": "statement"
+    }
+  },
+  {
+    "name": "categoryCreate",
+    "method": "POST",
+    "path": "/categories",
+    "auth": true,
+    "body": {
+      "name": "Mascotas",
+      "icon": "🐶",
+      "color": "#aabbcc"
+    }
+  },
+  {
+    "name": "accountCreate",
+    "method": "POST",
+    "path": "/accounts",
+    "auth": true,
+    "body": {
+      "name": "Cuenta nómina",
+      "type": "checking",
+      "initialBalance": 100
+    }
+  },
+  {
+    "name": "budgetSet",
+    "method": "PUT",
+    "path": "/budgets",
+    "auth": true,
+    "body": {
+      "categoryId": "{category:Ocio}",
+      "amount": 150
+    }
+  },
+  {
+    "name": "goalCreate",
+    "method": "POST",
+    "path": "/goals",
+    "auth": true,
+    "body": {
+      "name": "Viaje",
+      "target": 500,
+      "targetDate": "2027-01-01"
+    }
+  },
+  {
+    "name": "recurringCreate",
+    "method": "POST",
+    "path": "/recurring-rules",
+    "auth": true,
+    "body": {
+      "description": "Alquiler",
+      "amount": 700,
+      "type": "EXPENSE",
+      "category": "Ocio",
+      "startYear": 2026,
+      "startMonth": 1,
+      "frequency": "monthly"
+    }
+  },
+  {
+    "name": "customAlertCreate",
+    "method": "POST",
+    "path": "/custom-alerts",
+    "auth": true,
+    "body": {
+      "name": "Ocio alto",
+      "metric": "category_amount",
+      "operator": "gte",
+      "threshold": 100,
+      "category": "Ocio"
+    }
+  },
+  {
+    "name": "settingsUpdate",
+    "method": "PATCH",
+    "path": "/settings",
+    "auth": true,
+    "body": {
+      "currency": "EUR",
+      "monthStartDay": 1
+    }
+  },
+  {
+    "name": "businessSetCategory",
+    "method": "PUT",
+    "path": "/business/categories/{category:Salario}",
+    "auth": true,
+    "body": {
+      "vatRate": 21
+    }
+  },
+  {
+    "name": "autonomoSaveEmpty",
+    "method": "PUT",
+    "path": "/business/data",
+    "auth": true,
+    "body": {
+      "data": {
+        "manual": {
+          "profile": {
+            "workArea": "",
+            "homeArea": "",
+            "vehicleExclusive": false,
+            "healthPeople": "",
+            "healthDisability": false
+          },
+          "prior": {
+            "on": false,
+            "income": "",
+            "expenses": "",
+            "payments": "",
+            "withheld": ""
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            }
+          ],
+          "invoices": [],
+          "model130": null,
+          "withholdings": [
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            }
+          ]
+        },
+        "extras": {
+          "hardToJustify": false,
+          "exempt": false,
+          "priorNet": "",
+          "toOffset": ""
+        },
+        "kinds": {}
+      },
+      "baseVersion": null
+    }
+  },
+  {
+    "name": "autonomoSaveTyped",
+    "method": "PUT",
+    "path": "/business/data",
+    "auth": true,
+    "body": {
+      "data": {
+        "manual": {
+          "profile": {
+            "workArea": "12",
+            "homeArea": "90",
+            "vehicleExclusive": false,
+            "healthPeople": "2",
+            "healthDisability": false
+          },
+          "prior": {
+            "on": false,
+            "income": "",
+            "expenses": "",
+            "payments": "",
+            "withheld": ""
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": "4321.5",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "648.23",
+              "expenses": [
+                {
+                  "kind": "software",
+                  "amount": "121",
+                  "vatRate": 21,
+                  "days": ""
+                }
+              ]
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            }
+          ],
+          "invoices": [
+            {
+              "id": "abc123",
+              "book": "issued",
+              "kind": "other",
+              "excluded": false,
+              "date": "2026-02-10",
+              "quarter": 1,
+              "base": 4321.5,
+              "vatRate": 21,
+              "vat": 907.52,
+              "total": 5229.02,
+              "withheld": 648.23,
+              "concept": "Cliente inventado SL",
+              "period": null
+            }
+          ],
+          "model130": null,
+          "withholdings": [
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            }
+          ]
+        },
+        "extras": {
+          "hardToJustify": true,
+          "exempt": false,
+          "priorNet": "",
+          "toOffset": ""
+        },
+        "kinds": {
+          "proveedor x": "software"
+        }
+      },
+      "baseVersion": 1
+    }
+  },
+  {
+    "name": "autonomoDraftEmpty",
+    "method": "POST",
+    "path": "/business/draft",
+    "auth": true,
+    "body": {
+      "year": 2026,
+      "quarter": 1,
+      "inputs": {
+        "quarters": [
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          }
+        ],
+        "hardToJustify": false,
+        "priorYearNet": null,
+        "exempt130": false,
+        "vatToOffset": 0,
+        "vat": {
+          "offsetStart": 0
+        },
+        "manual": {
+          "profile": {
+            "workArea": 0,
+            "homeArea": 0,
+            "vehicleExclusive": false,
+            "healthPeople": 0,
+            "healthDisability": false
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            }
+          ]
+        },
+        "prior": null
+      }
+    }
+  },
+  {
+    "name": "autonomoDraftTyped",
+    "method": "POST",
+    "path": "/business/draft",
+    "auth": true,
+    "body": {
+      "year": 2026,
+      "quarter": 1,
+      "inputs": {
+        "quarters": [
+          {
+            "withheld": 648.23,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0
+          }
+        ],
+        "hardToJustify": true,
+        "priorYearNet": null,
+        "exempt130": false,
+        "vatToOffset": 0,
+        "vat": {
+          "offsetStart": 0
+        },
+        "manual": {
+          "profile": {
+            "workArea": 12,
+            "homeArea": 90,
+            "vehicleExclusive": false,
+            "healthPeople": 2,
+            "healthDisability": false
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": 4321.5,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": [
+                {
+                  "kind": "software",
+                  "amount": 121,
+                  "vatRate": 21,
+                  "days": 0
+                }
+              ]
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            }
+          ]
+        },
+        "prior": null
+      }
+    }
+  },
+  {
+    "name": "checkoutMonthly",
+    "method": "POST",
+    "path": "/billing/checkout",
+    "auth": true,
+    "body": {
+      "kind": "monthly",
+      "acceptTerms": true,
+      "waiveWithdrawal": true
+    }
+  },
+  {
+    "name": "checkoutRentaPass",
+    "method": "POST",
+    "path": "/billing/checkout",
+    "auth": true,
+    "body": {
+      "kind": "renta_pass",
+      "acceptTerms": true,
+      "waiveWithdrawal": true
+    }
+  },
+  {
+    "name": "rentaCalculation",
+    "method": "POST",
+    "path": "/renta/calculation",
+    "auth": true,
+    "body": null
+  }
+]

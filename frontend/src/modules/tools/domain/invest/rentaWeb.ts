@@ -214,7 +214,7 @@ function altasOf(
       });
     } else {
       // The withholding of a fund goes once, with its first alta.
-      const tax = usedWithholding.has(first.code) ? 0 : withheld.get(first.code) ?? 0;
+      const tax = usedWithholding.has(first.code) ? 0 : (withheld.get(first.code) ?? 0);
       usedWithholding.add(first.code);
       Object.assign(values, {
         nif: '',
@@ -415,8 +415,8 @@ export function rentaWebKit(
       section === 'other'
         ? othersOf(ledger, warnings, altaOfSale, altaOfDirect, other)
         : section === 'shares'
-        ? sharesOf(own, ledger, altaOfSale)
-        : altasOf(section, own, ledger, warnings, altaOfSale);
+          ? sharesOf(own, ledger, altaOfSale)
+          : altasOf(section, own, ledger, warnings, altaOfSale);
     if (altas.length === 0) continue;
     const sales = altas.reduce((s, a) => s + a.sales, 0);
     if (sales > altas.length)

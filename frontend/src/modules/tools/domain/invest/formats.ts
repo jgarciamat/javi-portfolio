@@ -302,14 +302,14 @@ const bitpanda: FormatSpec = {
     const assetClass = /fiat/.test(cls)
       ? 'fiat'
       : /crypto/.test(cls)
-      ? 'crypto'
-      : /metal|commodit/.test(cls)
-      ? 'commodity'
-      : /deriv/.test(cls)
-      ? 'derivative'
-      : /etf/.test(cls)
-      ? 'etf'
-      : 'shares';
+        ? 'crypto'
+        : /metal|commodit/.test(cls)
+          ? 'commodity'
+          : /deriv/.test(cls)
+            ? 'derivative'
+            : /etf/.test(cls)
+              ? 'etf'
+              : 'shares';
     const next = { ...op, assetClass } as InvestOp;
     if (assetClass === 'fiat') return [];
     if (/buy/.test(type)) return one({ ...next, kind: 'buy' });
@@ -1032,10 +1032,10 @@ const etoroClosed: FormatSpec = {
       /cfd/.test(type) || leverage > 1 || short
         ? 'derivative'
         : /crypto/.test(type)
-        ? 'crypto'
-        : /etf/.test(type)
-        ? 'etf'
-        : 'shares';
+          ? 'crypto'
+          : /etf/.test(type)
+            ? 'etf'
+            : 'shares';
     const asset = (r.text('name').replace(/^(buy|sell)\s+/i, '') || op.asset).toUpperCase();
     return realized({
       ...op,
@@ -1718,7 +1718,7 @@ const binanceConvert: FormatSpec = {
         toUnits: Math.abs(to.value),
         amount: null,
         currency: null,
-        feeCurrency: op.fee ? op.feeCurrency ?? toAsset : null,
+        feeCurrency: op.fee ? (op.feeCurrency ?? toAsset) : null,
       })
     );
   },
@@ -1798,12 +1798,12 @@ const binanceRewards: FormatSpec = {
     const reward = /staking|stake/.test(word)
       ? 'staking'
       : /airdrop|distribution/.test(word)
-      ? 'airdrop'
-      : /referral|commission/.test(word)
-      ? 'referral'
-      : /cashback/.test(word)
-      ? 'cashback'
-      : 'lending';
+        ? 'airdrop'
+        : /referral|commission/.test(word)
+          ? 'referral'
+          : /cashback/.test(word)
+            ? 'cashback'
+            : 'lending';
     return one({ ...op, kind: 'reward', reward, amount: null, currency: null });
   },
 };

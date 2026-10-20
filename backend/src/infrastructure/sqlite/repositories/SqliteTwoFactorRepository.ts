@@ -27,8 +27,7 @@ export class SqliteTwoFactorRepository implements TwoFactorRepository {
 
   find(userId: string): TwoFactorRecord | null {
     const row = this.db.prepare('SELECT * FROM user_two_factor WHERE user_id = ?').get(userId) as
-      | TwoFactorRow
-      | undefined;
+      TwoFactorRow | undefined;
     return row
       ? {
           userId: row.user_id,

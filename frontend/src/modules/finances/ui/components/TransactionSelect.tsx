@@ -8,8 +8,11 @@ import {
 import type { RowSelection } from '@shared/hooks/useRowSelection';
 import type { Transaction } from '@modules/finances/domain/types';
 
+/** What a row needs of the selection: whether it is chosen and how to toggle it. */
+export type RowChoice = Pick<RowSelection, 'isSelected' | 'toggle'>;
+
 /** Checkbox of one movement. */
-export function RowCheckbox({ tx, selection }: { tx: Transaction; selection: RowSelection }) {
+export function RowCheckbox({ tx, selection }: { tx: Transaction; selection: RowChoice }) {
   const { t } = useI18n();
   return (
     <SelectCheckbox
@@ -43,7 +46,7 @@ export function DayCheckbox({
 }
 
 /** Props of a selectable row: Shift/Ctrl/Cmd click selects, and it is marked when selected. */
-export function selectableRow(tx: Transaction, selection: RowSelection, base = '') {
+export function selectableRow(tx: Transaction, selection: RowChoice, base = '') {
   return {
     className: `${base}${selection.isSelected(tx.id) ? ' is-selected' : ''}`.trim(),
     onMouseDown: preventShiftTextSelection,

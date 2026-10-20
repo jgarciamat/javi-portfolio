@@ -93,7 +93,7 @@ function UnitFields({
 }) {
   const { t } = useI18n();
   const set = (list: string[], i: number, v: string) =>
-    labels.map((_, j) => (j === i ? v : list[j] ?? ''));
+    labels.map((_, j) => (j === i ? v : (list[j] ?? '')));
   return (
     <table className="autonomo-modules-units">
       <caption>{group}</caption>

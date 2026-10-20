@@ -137,7 +137,7 @@ function vatOf(
     number,
     number,
     number,
-    number
+    number,
   ];
   const quarters = vatSimplifiedQuarters(
     {

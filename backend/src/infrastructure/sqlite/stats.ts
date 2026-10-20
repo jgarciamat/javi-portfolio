@@ -24,7 +24,7 @@ export function formatStats(
     .slice(0, 10);
   const rows = repo.totals(from, to);
   const label = (name: string): string =>
-    name.startsWith('signup:') ? `  Registros desde ${name.slice(7)}` : LABELS[name] ?? name;
+    name.startsWith('signup:') ? `  Registros desde ${name.slice(7)}` : (LABELS[name] ?? name);
   const lines = rows.map((r) => `${label(r.name).padEnd(28)}${r.count}`);
   return [
     `Contadores anónimos · ${from} → ${to}`,

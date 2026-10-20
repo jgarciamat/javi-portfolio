@@ -46,8 +46,7 @@ export class SqliteUserRepository implements UserRepository {
 
   private findOne(where: string, value: string): User | null {
     const row = this.db.prepare(`SELECT * FROM users WHERE ${where} = ?`).get(value) as
-      | UserRow
-      | undefined;
+      UserRow | undefined;
     return row ? toUser(row) : null;
   }
 

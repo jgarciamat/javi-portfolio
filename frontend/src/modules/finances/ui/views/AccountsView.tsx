@@ -122,8 +122,8 @@ function TransferForm({
   const [description, setDescription] = useState('');
   // Accounts may arrive after the first render: default to the first two active ones.
   const isActive = (id: string) => active.some((a) => a.id === id);
-  const from = isActive(fromChoice) ? fromChoice : active[0]?.id ?? '';
-  const to = isActive(toChoice) ? toChoice : active.find((a) => a.id !== from)?.id ?? '';
+  const from = isActive(fromChoice) ? fromChoice : (active[0]?.id ?? '');
+  const to = isActive(toChoice) ? toChoice : (active.find((a) => a.id !== from)?.id ?? '');
 
   if (active.length < 2)
     return <p className="section-hint">{t('app.accounts.transferNeedsTwo')}</p>;

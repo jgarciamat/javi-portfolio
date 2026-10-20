@@ -161,3 +161,25 @@ function indexByDay(transactions: Transaction[]): Map<string, Transaction[]> {
   }
   return byDay;
 }
+
+// ─── Paging ───────────────────────────────────────────────────────────────────
+
+/** Movements of the month shown on each page of the day view. */
+export const TX_PAGE_SIZE = 20;
+
+/**
+ * The day groups of one page: `size` movements counted in screen order. A day that
+ * spans two pages shows on both with its own part of the movements.
+ */
+export function pageOfGroups(groups: DayGroup[], page: number, size: number): DayGroup[] {
+  const first = (page - 1) * size;
+  const last = first + size;
+  const out: DayGroup[] = [];
+  let seen = 0;
+  for (const group of groups) {
+    const items = group.items.slice(Math.max(0, first - seen), Math.max(0, last - seen));
+    seen += group.items.length;
+    if (items.length > 0) out.push({ ...group, items });
+  }
+  return out;
+}

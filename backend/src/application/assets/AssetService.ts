@@ -75,8 +75,8 @@ export class AssetService {
       userId,
       name,
       kind: input.kind,
-      interestRate: input.kind === 'debt' ? input.interestRate ?? null : null,
-      minPaymentCents: input.kind === 'debt' ? input.minPaymentCents ?? null : null,
+      interestRate: input.kind === 'debt' ? (input.interestRate ?? null) : null,
+      minPaymentCents: input.kind === 'debt' ? (input.minPaymentCents ?? null) : null,
       createdAt: this.clock.now().toISOString(),
     };
     this.uow.run(() => {

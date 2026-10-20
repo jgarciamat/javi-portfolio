@@ -52,8 +52,7 @@ export class SqliteSubscriptionRepository implements SubscriptionRepository {
 
   private one(where: string, value: string): SubscriptionProps | null {
     const row = this.db.prepare(`SELECT * FROM subscriptions WHERE ${where} = ?`).get(value) as
-      | SubscriptionRow
-      | undefined;
+      SubscriptionRow | undefined;
     return row ? toSubscription(row) : null;
   }
 
@@ -122,8 +121,7 @@ export class SqliteAiUsageRepository implements AiUsageRepository {
 
   neuronsOn(day: string): number {
     const row = this.db.prepare('SELECT neurons FROM ai_daily_usage WHERE day = ?').get(day) as
-      | { neurons: number }
-      | undefined;
+      { neurons: number } | undefined;
     return row?.neurons ?? 0;
   }
 
