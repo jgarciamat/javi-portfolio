@@ -124,3 +124,11 @@ un abogado.**
     habría que añadirlas a `terms.*` y pedir de nuevo la aceptación. No se han tocado.
 14. **Aviso de cambios (s10).** La política promete avisar en la app cuando cambie, pero solo hay
     aviso para las condiciones (`terms.update`). Decidir si se avisa de esta versión.
+
+## Cambio propuesto: `mm_acq` eliminado (decisión D4)
+
+15. **Origen del alta (s8 y duda 2).** La app ya no guarda `mm_acq` en el navegador (borra la
+    clave que hubiera en cada arranque) ni envía el origen desde el cliente; el servidor lo mide
+    con el UTM y el referrer de la petición. Texto propuesto: quitar de la política (s8) cualquier
+    mención a `mm_acq` o al origen del alta guardado en el navegador antes del registro, y dar por
+    resuelta la duda 2 (ya no hace falta banner por esto). No se ha editado ningún texto legal.

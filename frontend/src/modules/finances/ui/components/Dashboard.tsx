@@ -21,7 +21,6 @@ import { PlanBanner } from '@modules/billing/ui/PlanBanner';
 import { HouseholdJoinPrompt } from './HouseholdJoinPrompt';
 import { useFinances } from '../../application/FinancesContext';
 import { useAlertNotifications } from '../../application/hooks/useAlertNotifications';
-import { useAcquisition } from '../../application/hooks/useAcquisition';
 import { useBillReminders } from '../../application/hooks/useBillReminders';
 import { useDashboard, type UseDashboardReturn } from '../../application/hooks/useDashboard';
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
@@ -267,7 +266,6 @@ export function Dashboard() {
   const sectionLabel = t(section.labelKey);
   const tour = useWelcomeTour(dash.tab, dash.setTab);
   useBudgetAlertNotifications();
-  useAcquisition();
 
   // The browser tab names the open section: "Presupuestos · Finanverso".
   const appName = t('app.header.title');

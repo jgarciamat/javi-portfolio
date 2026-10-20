@@ -872,13 +872,6 @@ export const pushSubscribeBody = z.object({
   keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
 });
 export const pushUnsubscribeBody = z.object({ endpoint: z.string().url().max(1000) });
-export const acquisitionBody = z.object({
-  source: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(/^[a-z0-9][a-z0-9._-]{0,39}$/),
-});
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });
