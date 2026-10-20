@@ -9,6 +9,7 @@
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { authApi } from '@core/api/authApi';
+import { captureCreatorCode, setCreatorConsent } from '@core/creatorCode';
 import { billingApi } from '@core/api/billingApi';
 import {
   accountApi,
@@ -82,6 +83,21 @@ add(
       name: 'Nueva',
       locale: 'es',
     }),
+  false
+);
+add(
+  'registerCreator',
+  () => {
+    // A visit from a creator's link whose box was ticked at sign-up.
+    captureCreatorCode('?aff=lola');
+    setCreatorConsent(true);
+    return authApi.register({
+      email: 'creadora@example.com',
+      password: PASSWORD,
+      name: 'Lola',
+      locale: 'es',
+    });
+  },
   false
 );
 add('login', () => authApi.login({ email: 'ana@example.com', password: PASSWORD }), false);

@@ -255,6 +255,7 @@ describe('API contract', () => {
   describe('requests (the bodies the app sends are accepted by the routes)', () => {
     it('sign-up, sign-in and profile', async () => {
       await accepted(replay(ctx, 'register', null));
+      await accepted(replay(ctx, 'registerCreator', null));
       await accepted(replay(ctx, 'login', null));
       await send('profileName');
       await send('profileAvatar');

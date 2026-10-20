@@ -1,4 +1,6 @@
+import { signupOrigin } from '@core/analytics';
 import { clearReferral, pendingReferral } from '@core/referral';
+import { clearCreatorCode, creatorAttribution } from '@core/creatorCode';
 import type {
   AuthResult,
   RegisterResult,
@@ -24,16 +26,18 @@ export interface DeleteAccountProof {
 }
 
 export const authApi = {
-  /** Tells the server, anonymously, where a new user came from (it ignores old accounts). */
-  acquisition(source: string) {
-    return apiRequest<void>('/acquisition', { method: 'POST', body: jsonBody({ source }) });
-  },
   async register(dto: { email: string; password: string; name: string; locale?: Locale }) {
     const result = await publicRequest<RegisterResult>('/auth/register', {
       method: 'POST',
-      body: jsonBody({ ...dto, referralCode: pendingReferral() }),
+      body: jsonBody({
+        ...dto,
+        referralCode: pendingReferral(),
+        origin: signupOrigin(),
+        creator: creatorAttribution(),
+      }),
     });
     clearReferral();
+    clearCreatorCode();
     return result;
   },
   login(dto: { email: string; password: string }) {
@@ -76,9 +80,16 @@ export const authApi = {
   async googleLogin(token: string, locale?: Locale) {
     const result = await publicRequest<SignInResult>('/auth/google', {
       method: 'POST',
-      body: jsonBody({ token, locale, referralCode: pendingReferral() }),
+      body: jsonBody({
+        token,
+        locale,
+        referralCode: pendingReferral(),
+        origin: signupOrigin(),
+        creator: creatorAttribution(),
+      }),
     });
     clearReferral();
+    clearCreatorCode();
     return result;
   },
   logout(refreshToken: string) {

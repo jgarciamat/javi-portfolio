@@ -79,6 +79,7 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       },
       imports: this.uses('import_uses', userId),
       referrals: this.referrals(userId),
+      creator: this.creator(userId),
       household: this.household(userId),
       pushSubscriptions: this.all(
         'SELECT endpoint, created_at AS createdAt FROM push_subscriptions WHERE user_id = ? ORDER BY created_at',
@@ -252,6 +253,20 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
           userId
         ) ?? null,
     };
+  }
+
+  /** The creator code the user agreed to at sign-up, and whether a first payment counted for it. */
+  private creator(userId: string): Row | null {
+    const attribution = this.one(
+      'SELECT code, created_at AS consentedAt FROM creator_attributions WHERE user_id = ?',
+      userId
+    );
+    if (!attribution) return null;
+    const sale = this.one(
+      'SELECT plan, sold_at AS soldAt, reversed_at AS reversedAt FROM creator_sales WHERE user_id = ?',
+      userId
+    );
+    return { ...attribution, sale: sale ?? null };
   }
 
   private household(userId: string): Row {

@@ -85,7 +85,8 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, #0e7490 55%, var(--slate-700));
   border-radius: 18px;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       120% 70% at 50% 0%,
       color-mix(in srgb, #0e7490 22%, transparent),
       transparent 70%
@@ -220,7 +221,10 @@
   font-weight: 700;
   text-decoration: none;
   box-shadow: 0 4px 16px rgba(14, 116, 144, 0.4);
-  transition: filter 0.15s, box-shadow 0.15s, transform 0.15s;
+  transition:
+    filter 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
 }
 
 .signup-wall-register:hover {
@@ -259,7 +263,8 @@
 }
 
 /* The lists only invite: no lock and no video. */
-.signup-wall--cta {
+.signup-wall--cta,
+.signup-wall--soft {
   padding-top: 2rem;
 }
 

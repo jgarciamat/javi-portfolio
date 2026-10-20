@@ -31,6 +31,9 @@ import { autonomoQuarterDrafts } from './030-autonomo-quarter-drafts';
 import { twoFactor } from './031-two-factor';
 import { autonomoData } from './032-autonomo-data';
 import { dropUploadedPictures } from './033-drop-uploaded-pictures';
+import { funnelDaily } from './034-funnel-daily';
+import { trialNotices } from './035-trial-notices';
+import { creatorAffiliates } from './036-creator-affiliates';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -68,4 +71,7 @@ export const migrations: Migration[] = [
   twoFactor,
   autonomoData,
   dropUploadedPictures,
+  funnelDaily,
+  trialNotices,
+  creatorAffiliates,
 ];

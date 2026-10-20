@@ -332,6 +332,7 @@ interface SettingsRow {
   show_tour: number;
   show_getting_started: number;
   weekly_digest: number;
+  trial_notices: number;
 }
 
 export class SqliteSettingsRepository implements SettingsRepository {
@@ -352,6 +353,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
       showTour: row.show_tour !== 0,
       showGettingStarted: row.show_getting_started !== 0,
       weeklyDigest: row.weekly_digest === 1,
+      trialNotices: row.trial_notices !== 0,
     };
   }
 
@@ -359,14 +361,16 @@ export class SqliteSettingsRepository implements SettingsRepository {
     this.db
       .prepare(
         `INSERT INTO user_settings (user_id, currency, locale, month_start_day, default_account_id,
-           notifications_enabled, show_offers, show_tour, show_getting_started, weekly_digest)
+           notifications_enabled, show_offers, show_tour, show_getting_started, weekly_digest,
+           trial_notices)
          VALUES (@userId, @currency, @locale, @monthStartDay, @defaultAccountId, @notificationsEnabled,
-           @showOffers, @showTour, @showGettingStarted, @weeklyDigest)
+           @showOffers, @showTour, @showGettingStarted, @weeklyDigest,
+           @trialNotices)
          ON CONFLICT(user_id) DO UPDATE SET currency = excluded.currency, locale = excluded.locale,
            month_start_day = excluded.month_start_day, default_account_id = excluded.default_account_id,
            notifications_enabled = excluded.notifications_enabled, show_offers = excluded.show_offers,
            show_tour = excluded.show_tour, show_getting_started = excluded.show_getting_started,
-           weekly_digest = excluded.weekly_digest`
+           weekly_digest = excluded.weekly_digest, trial_notices = excluded.trial_notices`
       )
       .run({
         ...s,
@@ -375,6 +379,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
         showTour: s.showTour ? 1 : 0,
         showGettingStarted: s.showGettingStarted ? 1 : 0,
         weeklyDigest: s.weeklyDigest ? 1 : 0,
+        trialNotices: s.trialNotices ? 1 : 0,
       });
   }
 }

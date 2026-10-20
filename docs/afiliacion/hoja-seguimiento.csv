@@ -1,0 +1,11 @@
+# Creadores,,,,,,,,,
+codigo,alias,red_principal,seguidores,fecha_alta,tipo,retencion_pct,tope_propio_eur,estado,notas
+LOLA,@ejemplo.finanzas,TikTok,12000,2027-02-01,autonomo,15,,activo,fila de ejemplo: borrar
+,,,,,,,,,
+# Piezas,,,,,,,,,
+fecha,codigo,red,enlace,tipo,etiqueta_visible,revisada,incidencias,,
+2027-02-10,LOLA,TikTok,https://www.tiktok.com/@ejemplo/video/0,video,si,si,,,
+,,,,,,,,,
+# Mensual,,,,,,,,,
+mes,codigo,altas,ventas,en_espera,a_pagar_eur,a_descontar_eur,neto_pagado_eur,factura,fecha_pago
+2027-03,LOLA,25,4,1,21.00,0.00,21.00,F-2027-003,2027-04-05

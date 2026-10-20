@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { track } from '@core/analytics';
 import { Modal } from '@shared/components/Modal';
 import { usePlan } from '../application/PlanContext';
 import type { UpgradeReason } from '../domain/types';
@@ -33,6 +35,7 @@ function ReasonText({ reason }: { reason: UpgradeReason }) {
 export function UpgradeModal({ reason }: { reason: UpgradeReason }) {
   const { t } = useI18n();
   const { overview, closeUpgrade, checkout } = usePlan();
+  useEffect(() => track('paywall_view'), []);
 
   const subscribed =
     !!overview && overview.plan === 'premium' && overview.subscription.source !== 'trial';

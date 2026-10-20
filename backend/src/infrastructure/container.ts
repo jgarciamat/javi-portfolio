@@ -21,6 +21,7 @@ import { OfferService } from '@application/offers/OfferService';
 import { PushService } from '@application/push/PushService';
 import { ReminderService } from '@application/push/ReminderService';
 import { WeeklyDigestService } from '@application/digest/WeeklyDigestService';
+import { TrialNoticeService } from '@application/billing/TrialNoticeService';
 import { SplitService } from '@application/split/SplitService';
 import { TaxService } from '@application/tax/TaxService';
 import { AutonomoDataService } from '@application/tax/AutonomoDataService';
@@ -91,11 +92,17 @@ import { SqliteRentaPassRepository } from './sqlite/repositories/SqliteMonetizat
 import { SqliteSplitRepository } from './sqlite/repositories/SqliteSplitRepository';
 import { SqliteBusinessCategoryRepository } from './sqlite/repositories/SqliteBusinessCategoryRepository';
 import { SqliteDigestRepository } from './sqlite/repositories/SqliteDigestRepository';
+import { SqliteTrialNoticeRepository } from './sqlite/repositories/SqliteTrialNoticeRepository';
 import { SqliteAssetRepository } from './sqlite/repositories/SqliteAssetRepository';
 import { SqliteHouseholdRepository } from './sqlite/repositories/SqliteHouseholdRepository';
 import { SqlitePersonalDataReader } from './sqlite/repositories/SqlitePersonalDataReader';
 import { SqliteMetricsRepository } from './sqlite/repositories/SqliteMetricsRepository';
+import { SqliteFunnelRepository } from './sqlite/repositories/SqliteFunnelRepository';
+import { ActivationTracker } from '@application/analytics/ActivationTracker';
+import type { FirstStepId } from '@application/referrals/ReferralService';
 import { SqliteReferralRepository } from './sqlite/repositories/SqliteReferralRepository';
+import { SqliteCreatorRepository } from './sqlite/repositories/SqliteCreatorRepository';
+import { CreatorProgram } from '@application/creators/CreatorProgram';
 import { SqliteTransactionRepository } from './sqlite/repositories/SqliteTransactionRepository';
 import {
   SqliteRefreshTokenRepository,
@@ -141,7 +148,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
   const clock = overrides.clock ?? systemClock;
   const uow = new SqliteUnitOfWork(db);
 
+  const funnel = new SqliteFunnelRepository(db, clock);
   const repos = {
+    funnel,
     users: new SqliteUserRepository(db),
     refreshTokens: new SqliteRefreshTokenRepository(db),
     twoFactor: new SqliteTwoFactorRepository(db),
@@ -150,6 +159,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     categoryRules: new SqliteCategoryRuleRepository(db),
     assets: new SqliteAssetRepository(db),
     digests: new SqliteDigestRepository(db),
+    trialNotices: new SqliteTrialNoticeRepository(db),
     business: new SqliteBusinessCategoryRepository(db),
     splits: new SqliteSplitRepository(db),
     push: new SqlitePushRepository(db),
@@ -171,8 +181,9 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     billingEvents: new SqliteBillingEventRepository(db),
     aiUsage: new SqliteAiUsageRepository(db),
     affiliateClicks: new SqliteAffiliateClickRepository(db),
-    metrics: new SqliteMetricsRepository(db, clock),
+    metrics: new SqliteMetricsRepository(db, clock, funnel),
     referrals: new SqliteReferralRepository(db),
+    creators: new SqliteCreatorRepository(db),
     household: new SqliteHouseholdRepository(db),
   };
 
@@ -228,6 +239,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     config.ai.dailyNeuronBudget
   );
 
+  const creators = new CreatorProgram(repos.creators, clock, config.creators);
   const categoryResolver = new CategoryResolver(repos.categories);
   const categoryRules = new CategoryRuleService(
     repos.categoryRules,
@@ -314,6 +326,20 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       ? new AesSecretBox(config.twoFactor.encryptionKey, 'autonomo-data')
       : null;
 
+  // What counts for the first steps (invitations and the activation funnel).
+  const firstStepCount = (userId: string, step: FirstStepId): number => {
+    switch (step) {
+      case 'movements':
+        return repos.transactions.count(userId);
+      case 'budgets':
+        return repos.budgets.listByUser(userId).length;
+      case 'goals':
+        return repos.goals.listByUser(userId).length;
+      case 'automations':
+        return repos.rules.listByUser(userId).length;
+    }
+  };
+
   return {
     db,
     config,
@@ -333,12 +359,14 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       // First steps: 3 movements, a budget, a goal and an automation (FIRST_STEPS_GOALS).
       (userId) => ({
-        movements: repos.transactions.count(userId),
-        budgets: repos.budgets.listByUser(userId).length,
-        goals: repos.goals.listByUser(userId).length,
-        automations: repos.rules.listByUser(userId).length,
+        movements: firstStepCount(userId, 'movements'),
+        budgets: firstStepCount(userId, 'budgets'),
+        goals: firstStepCount(userId, 'goals'),
+        automations: firstStepCount(userId, 'automations'),
       })
     ),
+    activation: new ActivationTracker(funnel, firstStepCount),
+    creators,
     household: new HouseholdService(repos.household, repos.users, entitlements, clock),
     allowance,
     payments,
@@ -395,6 +423,20 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     weeklyDigest,
     push: pushService,
     reminders: new ReminderService(repos.push, pushService, weeklyDigest, repos.settings, clock),
+    trialNotices: new TrialNoticeService(
+      repos.trialNotices,
+      repos.subscriptions,
+      email,
+      pushService,
+      (userId) => ({
+        accounts: repos.accounts.listByUser(userId).length,
+        budgets: firstStepCount(userId, 'budgets'),
+        goals: firstStepCount(userId, 'goals'),
+        recurringRules: firstStepCount(userId, 'automations'),
+      }),
+      funnel,
+      clock
+    ),
     split: new SplitService(repos.splits, uow, clock),
     tax,
     assetService: new AssetService(repos.assets, entitlements, uow, clock),
@@ -443,6 +485,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
           ? !!config.billing.stripe.prices.rentaPass
           : true,
         metrics: repos.metrics,
+        creators,
       }
     ),
     playBilling: new PlayBillingService(
@@ -453,7 +496,8 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       clock,
       repos.metrics,
       entitlements,
-      config.billing.revenueCatWebhookAuth
+      config.billing.revenueCatWebhookAuth,
+      creators
     ),
     offers: new OfferService(offerCatalog, repos.affiliateClicks, repos.settings, clock),
     importer,

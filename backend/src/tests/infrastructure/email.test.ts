@@ -32,6 +32,48 @@ describe('ResendEmailSender', () => {
     expect(send.mock.calls[0][0].text).toContain('https://app.test/terms');
   });
 
+  it('sends the trial notices with the date, what stays free and a link to the plans', async () => {
+    const usage = { accounts: 3, budgets: 7, goals: 0, recurringRules: 1 };
+    await sender.sendTrialNotice(
+      'a@b.c',
+      'Ana',
+      { kind: 'ends_soon', endsAt: '2026-03-29T12:00:00.000Z', usage },
+      'es'
+    );
+    await sender.sendTrialNotice(
+      'a@b.c',
+      'Ana',
+      { kind: 'last_day', endsAt: '2026-03-29T12:00:00.000Z', usage },
+      'en'
+    );
+    await sender.sendTrialNotice(
+      'a@b.c',
+      'Ana <b>',
+      { kind: 'ended', endsAt: '2026-03-29T12:00:00.000Z', usage },
+      'es'
+    );
+    const [soon, last, ended] = send.mock.calls.map((c) => c[0]);
+    expect(soon.subject).toBe('Tu prueba de Premium termina el 29 de marzo');
+    expect(soon.text).toContain('no hay tarjeta y no se cobra nada');
+    expect(soon.text).toContain('Tienes 3 cuentas; el plan gratuito permite 3');
+    expect(soon.text).toContain('Tienes 7 presupuestos');
+    expect(soon.text).not.toContain('metas;');
+    expect(soon.text).not.toContain('movimientos automáticos;');
+    expect(soon.text).toContain('https://app.test/pricing');
+    expect(soon.html).toContain('href="https://app.test/pricing"');
+    expect(last.subject).toBe('Your Premium trial ends today');
+    expect(last.text).toContain('Nothing is charged');
+    expect(last.text).toContain('You have 3 accounts');
+    expect(ended.subject).toBe('Tu prueba de Premium ha terminado');
+    expect(ended.text).toContain('No te escribiremos más sobre la prueba');
+    expect(ended.html).not.toContain('<b>');
+    for (const m of [soon, last, ended]) {
+      expect(`${m.subject} ${m.text}`).not.toMatch(
+        /gestor|perfect|exact|garantiz|oferta limitada|guarantee|limited[- ]time/i
+      );
+    }
+  });
+
   it('sends the weekly digest with a link back to the app', async () => {
     const digest = {
       from: '2026-03-02',
@@ -90,6 +132,12 @@ describe('ConsoleEmailSender', () => {
     };
     await sender.sendWeeklyDigest('a@b.c', 'Ana', 'es', digest);
     await sender.sendSecurityNotice('a@b.c', 'Ana', 'two_factor_enabled');
+    const trial = {
+      kind: 'ended' as const,
+      endsAt: '2026-03-29T12:00:00.000Z',
+      usage: { accounts: 1, budgets: 0, goals: 0, recurringRules: 0 },
+    };
+    await sender.sendTrialNotice('a@b.c', 'Ana', trial);
     expect(sender.sent).toEqual([
       { kind: 'verify', to: 'a@b.c', token: 'v1' },
       { kind: 'reset', to: 'a@b.c', token: 'r1' },
@@ -97,7 +145,9 @@ describe('ConsoleEmailSender', () => {
       { kind: 'exists', to: 'a@b.c', token: '' },
       { kind: 'digest', to: 'a@b.c', token: '', digest },
       { kind: 'security', to: 'a@b.c', token: '', notice: 'two_factor_enabled' },
+      { kind: 'trial', to: 'a@b.c', token: '', trial },
     ]);
+    expect(info).toHaveBeenCalledWith('[email] trial notice ended a@b.c');
     expect(info).toHaveBeenCalledWith('[email] security notice two_factor_enabled a@b.c');
     expect(info).toHaveBeenCalledWith('[email] weekly digest a@b.c');
     expect(info).toHaveBeenCalledWith('[email] purchase confirmation a@b.c');

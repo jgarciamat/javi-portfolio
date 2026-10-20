@@ -80,7 +80,11 @@ async function main(): Promise<void> {
   backups?.start(config.backup.intervalHours);
 
   const cleanup = setInterval(
-    () => container.repos.refreshTokens.deleteExpired(new Date()),
+    () => {
+      container.repos.refreshTokens.deleteExpired(new Date());
+      // Funnel counters older than the retention period (docs/analitica.md).
+      container.repos.funnel.purgeExpired();
+    },
     6 * 60 * 60 * 1000
   );
   cleanup.unref();
@@ -102,6 +106,15 @@ async function main(): Promise<void> {
     60 * 60 * 1000
   );
   reminders.unref();
+
+  // Notices about the end of the 14-day trial: hourly, sent only in the morning, once per user.
+  const trialNotices = setInterval(
+    () => {
+      container.trialNotices.run().catch((e) => console.error('[trial] notices failed', e));
+    },
+    60 * 60 * 1000
+  );
+  trialNotices.unref();
 
   const server = createApp(container).listen(config.port, () => {
     console.info(`Finanverso API listening on :${config.port} (${config.env})`);

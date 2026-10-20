@@ -21,7 +21,6 @@ import {
   deleteAccountBody,
   forecastQuery,
   nameBody,
-  acquisitionBody,
   assetBody,
   assetTermsBody,
   splitExpenseBody,
@@ -176,16 +175,12 @@ export function userRoutes(c: Container, limiter: RateLimiterFactory): Router {
     })
   );
 
-  // Where a new user came from: counted anonymously, only within the hour after sign-up, so
-  // someone who simply signs in on another browser is not counted as a new user.
+  // Old clients (apps already installed) still report where a new user came from. The browser
+  // no longer keeps that (LSSI art. 22.2; the server measures it from the request), so the body
+  // is optional and ignored: the answer stays 204 to not break them.
   router.post(
     '/acquisition',
-    authed((req, res) => {
-      const { source } = acquisitionBody.parse(req.body);
-      const created = c.repos.users.findById(req.userId)?.toPrimitives().createdAt as string;
-      if (c.clock.now().getTime() - new Date(created).getTime() < 60 * 60 * 1000) {
-        c.repos.metrics.record(`signup:${source}`);
-      }
+    authed((_req, res) => {
       res.status(204).end();
     })
   );

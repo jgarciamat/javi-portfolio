@@ -163,7 +163,11 @@ export function planningRoutes(c: Container): Router {
       res
         .status(201)
         .json(
-          presentRule(c.recurring.create(req.dataUserId, ruleInput(recurringBody.parse(req.body))))
+          presentRule(
+            c.activation.around(req.dataUserId, 'automations', () =>
+              c.recurring.create(req.dataUserId, ruleInput(recurringBody.parse(req.body)))
+            )
+          )
         )
     )
   );
@@ -261,7 +265,10 @@ export function planningRoutes(c: Container): Router {
     '/budgets',
     authed((req, res) => {
       const { amount, ...ref } = budgetBody.parse(req.body);
-      res.json(presentBudget(c.budgets.set(req.dataUserId, ref, amount)));
+      const budget = c.activation.around(req.dataUserId, 'budgets', () =>
+        c.budgets.set(req.dataUserId, ref, amount)
+      );
+      res.json(presentBudget(budget));
     })
   );
   router.delete(
@@ -283,7 +290,13 @@ export function planningRoutes(c: Container): Router {
       const { target, ...rest } = goalBody.parse(req.body);
       res
         .status(201)
-        .json(presentGoal(c.goals.create(req.dataUserId, { ...rest, targetCents: target })));
+        .json(
+          presentGoal(
+            c.activation.around(req.dataUserId, 'goals', () =>
+              c.goals.create(req.dataUserId, { ...rest, targetCents: target })
+            )
+          )
+        );
     })
   );
   router.patch(

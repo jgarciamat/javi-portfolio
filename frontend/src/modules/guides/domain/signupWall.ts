@@ -9,6 +9,31 @@ import { TOOL_PAGES } from '../../tools/domain/toolPages';
 
 export { isGatedPath } from '../../../shared/utils/appLinks';
 
+/**
+ * The guides open to everybody, whole, with or without an account (experiment D3 of
+ * docs/marketing/plan-crecimiento.md §1.1): the nine on procedures with search intent plus four on
+ * saving. They show the same to visitors and to search engines; the account is only invited, softly,
+ * at the end. Calculators, drafts and everything that uses the user's data stay behind an account.
+ */
+export const OPEN_GUIDES: readonly string[] = [
+  'como-hacer-la-renta-2025-paso-a-paso',
+  'plazos-renta-2025',
+  'modelo-303-casillas',
+  'alta-autonomo-paso-a-paso',
+  'tarifa-plana-autonomos-2026',
+  'verifactu-que-es',
+  'ingreso-minimo-vital',
+  'bono-social-electrico',
+  'bono-alquiler-joven',
+  'metodo-50-30-20',
+  'como-ahorrar-el-20-por-ciento',
+  'fondo-de-emergencia',
+  'gastos-hormiga',
+];
+
+export const isOpenGuide = (slug: string | undefined): boolean =>
+  slug !== undefined && OPEN_GUIDES.includes(slug);
+
 /** Paragraphs of the first section (or step) that the teaser shows. */
 export const PREVIEW_PARAGRAPHS = 2;
 

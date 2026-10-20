@@ -1423,6 +1423,12 @@ describe('SettingsView', () => {
     await waitFor(() =>
       expect(api.settingsApi.update).toHaveBeenCalledWith({ weeklyDigest: true })
     );
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: new RegExp(tr('app.settings.trialNotices')) })
+    );
+    await waitFor(() =>
+      expect(api.settingsApi.update).toHaveBeenCalledWith({ trialNotices: false })
+    );
   });
 
   it('turns notifications on and off', async () => {

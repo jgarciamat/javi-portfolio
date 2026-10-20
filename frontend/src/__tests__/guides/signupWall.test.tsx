@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { tokenStore } from '@core/api/http';
 import { VIDEOS, type VideoEntry } from '@modules/guides/domain/videos';
 import { GUIDES } from '@modules/guides/domain/guides';
+import { isOpenGuide } from '@modules/guides/domain/signupWall';
 import { HACIENDA_GUIDES, type HaciendaGuide } from '@modules/guides/domain/hacienda';
 import { TOOL_PAGES } from '@modules/tools/domain/toolPages';
 import {
@@ -49,6 +50,8 @@ describe('the teaser of the guides', () => {
   });
 });
 
+const GATED_GUIDE = GUIDES.find((g) => !isOpenGuide(g.slug))!;
+
 describe('the wall', () => {
   it('signs up or in and comes back to the page', () => {
     expect(registerHref('/guias/x')).toBe('/login?mode=register&next=%2Fguias%2Fx');
@@ -82,7 +85,7 @@ describe('the wall', () => {
       <Routes>
         <Route path="/guias/:slug" element={<GuidePage />} />
       </Routes>,
-      { authenticated, route: `/guias/${GUIDES[0].slug}` }
+      { authenticated, route: `/guias/${GATED_GUIDE.slug}` }
     );
 
   it('is a landmark with a heading, benefits, the video and both ways in', () => {
@@ -109,13 +112,13 @@ describe('the wall', () => {
     renderGuide(false);
     expect(screen.getByRole('status')).toHaveTextContent(tr('wall.checking'));
     expect(screen.queryByRole('heading', { name: tr('wall.title') })).toBeNull();
-    expect(screen.queryByText(GUIDES[0].sections[1].heading, { selector: 'h2' })).toBeNull();
+    expect(screen.queryByText(GATED_GUIDE.sections[1].heading, { selector: 'h2' })).toBeNull();
   });
 
   it('is not there for people with an account, who get the whole guide', () => {
     renderGuide(true);
     expect(screen.queryByRole('heading', { name: tr('wall.title') })).toBeNull();
-    for (const s of GUIDES[0].sections) {
+    for (const s of GATED_GUIDE.sections) {
       expect(screen.getByRole('heading', { level: 2, name: s.heading })).toBeInTheDocument();
     }
   });

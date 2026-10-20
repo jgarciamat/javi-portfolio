@@ -1,5 +1,70 @@
 import type { LimitedResource, PlanCatalog, PremiumFeature } from '../domain/types';
 
+/**
+ * What the pricing page shows before (or without) the API's answer. Search engines render the page
+ * without being allowed to call `/api/` (robots.txt), so the plans and the comparison must not wait
+ * for it: they would see an empty page and treat it as a soft 404. The API only refines these
+ * values (limits, prices, founder places). Same values as the backend's billing config.
+ */
+export const DEFAULT_CATALOG: PlanCatalog = {
+  currency: 'EUR',
+  trialDays: 14,
+  paymentsEnabled: true,
+  prices: { monthly: 3.49, yearly: 29.99, lifetime: 59, rentaPass: 10 },
+  rentaPass: { available: true },
+  lifetime: { available: false, remaining: 0 },
+  limits: {
+    free: {
+      resources: {
+        accounts: 3,
+        budgets: 5,
+        goals: 2,
+        recurringRules: 5,
+        customAlerts: 3,
+        rentaCalculations: 3,
+        autonomoDrafts: 1,
+        autonomoPdfs: 1,
+        assets: 3,
+        imports: 1,
+      },
+      features: {
+        insights: false,
+        aiAdvisor: false,
+        forecast: false,
+        household: false,
+        inbox: false,
+        capture: false,
+        investCourse: false,
+      },
+      aiMonthlyQuota: 1,
+    },
+    premium: {
+      resources: {
+        accounts: null,
+        budgets: null,
+        goals: null,
+        recurringRules: null,
+        customAlerts: null,
+        rentaCalculations: null,
+        autonomoDrafts: null,
+        autonomoPdfs: null,
+        assets: null,
+        imports: null,
+      },
+      features: {
+        insights: true,
+        aiAdvisor: true,
+        forecast: true,
+        household: true,
+        inbox: true,
+        capture: true,
+        investCourse: true,
+      },
+      aiMonthlyQuota: 10,
+    },
+  },
+};
+
 export function formatPrice(amount: number, locale: string): string {
   return new Intl.NumberFormat(locale === 'en' ? 'en-IE' : 'es-ES', {
     style: 'currency',

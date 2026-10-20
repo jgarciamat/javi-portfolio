@@ -123,6 +123,17 @@ export class StripeGateway implements PaymentGateway {
     }
   }
 
+  /** Monthly or yearly, from the price of the invoice lines (the new API and the old one). */
+  private planOf(lines: Stripe.InvoiceLineItem[]): 'monthly' | 'yearly' | null {
+    for (const line of lines) {
+      const legacy = line as unknown as { price?: { id?: string } | null };
+      const price = idOf(line.pricing?.price_details?.price) ?? legacy.price?.id ?? null;
+      if (price === this.config.prices.monthly) return 'monthly';
+      if (price === this.config.prices.yearly) return 'yearly';
+    }
+    return null;
+  }
+
   async parseWebhook(rawBody: Buffer, signature: string | undefined): Promise<BillingEvent> {
     let event: Stripe.Event;
     try {
@@ -157,20 +168,51 @@ export class StripeGateway implements PaymentGateway {
           ? { id: event.id, type: 'checkout_completed', userId, customerId }
           : { id: event.id, type: 'ignored' };
       }
+      case 'invoice.paid': {
+        // Real money for a subscription: the creator program counts it (trials and 100 %
+        // discounts are paid with 0 and do not).
+        const invoice = event.data.object;
+        const details = invoice.parent?.subscription_details;
+        const plan = this.planOf(invoice.lines?.data ?? []);
+        if (invoice.amount_paid <= 0 || !details || !plan) return { id: event.id, type: 'ignored' };
+        return {
+          id: event.id,
+          type: 'premium_paid',
+          userId: details.metadata?.userId ?? null,
+          customerId: idOf(invoice.customer),
+          plan,
+        };
+      }
       case 'charge.refunded': {
         const charge = event.data.object;
         const paymentIntentId = idOf(charge.payment_intent);
-        // Partial refunds keep the purchase; only the founder payment matters here.
+        // Partial refunds keep the purchase.
         if (!charge.refunded || !paymentIntentId) return { id: event.id, type: 'ignored' };
         const { metadata } = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+        const customerId = idOf(charge.customer);
         if (metadata?.kind !== 'lifetime' && metadata?.kind !== 'renta_pass') {
-          return { id: event.id, type: 'ignored' };
+          // A subscription payment: the access follows the subscription, the creator
+          // program takes its commission back.
+          return { id: event.id, type: 'premium_reversed', userId: null, customerId };
         }
         return {
           id: event.id,
           type: metadata.kind === 'renta_pass' ? 'renta_pass_refunded' : 'lifetime_refunded',
           userId: metadata.userId ?? null,
-          customerId: idOf(charge.customer),
+          customerId,
+        };
+      }
+      case 'charge.dispute.created': {
+        // A chargeback: only the creator program reacts (the access is handled by hand).
+        const paymentIntentId = idOf(event.data.object.payment_intent);
+        if (!paymentIntentId) return { id: event.id, type: 'ignored' };
+        const intent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+        if (intent.metadata?.kind === 'renta_pass') return { id: event.id, type: 'ignored' };
+        return {
+          id: event.id,
+          type: 'premium_reversed',
+          userId: intent.metadata?.userId ?? null,
+          customerId: idOf(intent.customer),
         };
       }
       case 'customer.subscription.created':

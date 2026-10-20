@@ -12,6 +12,22 @@
     }
   },
   {
+    "name": "registerCreator",
+    "method": "POST",
+    "path": "/auth/register",
+    "auth": false,
+    "body": {
+      "email": "creadora@example.com",
+      "password": "Sup3r-secret!",
+      "name": "Lola",
+      "locale": "es",
+      "creator": {
+        "code": "LOLA",
+        "consent": true
+      }
+    }
+  },
+  {
     "name": "login",
     "method": "POST",
     "path": "/auth/login",

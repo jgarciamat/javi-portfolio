@@ -10,6 +10,8 @@ import {
 } from '@domain/ports/repositories';
 import { Clock, MetricsRecorder } from '@domain/ports/services';
 import { EntitlementService } from './EntitlementService';
+import type { CreatorSales } from './BillingService';
+import type { CreatorPlan } from '@domain/ports/repositories';
 
 /** What RevenueCat sends for a purchase made in the Android app (only what we use). */
 const playEvent = z.object({
@@ -19,6 +21,12 @@ const playEvent = z.object({
     app_user_id: z.string().default(''),
     product_id: z.string().default(''),
     expiration_at_ms: z.number().nullable().optional(),
+    /** TRIAL, INTRO, NORMAL… (a trial is not a sale). */
+    period_type: z.string().nullable().optional(),
+    /** Price in USD; 0 for trials, null when unknown. */
+    price: z.number().nullable().optional(),
+    /** CUSTOMER_SUPPORT is how RevenueCat reports a refund. */
+    cancel_reason: z.string().nullable().optional(),
   }),
 });
 
@@ -33,6 +41,22 @@ const LIVE = new Set(['active', 'trialing', 'past_due']);
 
 const isLifetimeProduct = (productId: string): boolean => productId.includes('lifetime');
 const isRentaPass = (productId: string): boolean => productId.includes('renta');
+/**
+ * Store payments the creator program looks at. Only the user's first one becomes a sale: a
+ * RENEWAL counts when the purchase began with a free trial.
+ */
+const SALE_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'NON_RENEWING_PURCHASE']);
+
+/** The plan of a store product (`premium_monthly:monthly`, `premium_annual:annual`, …). */
+export function playPlanOf(productId: string): CreatorPlan | null {
+  const id = productId.toLowerCase();
+  if (isLifetimeProduct(id)) return 'lifetime';
+  if (id.includes('month')) return 'monthly';
+  if (id.includes('year') || id.includes('annual')) return 'yearly';
+  return null;
+}
+
+type PlayEvent = z.infer<typeof playEvent>['event'];
 
 /**
  * Purchases made inside the Android app. Google Play charges and RevenueCat verifies the
@@ -49,6 +73,7 @@ export class PlayBillingService {
     private readonly entitlements: EntitlementService,
     /** Value of the Authorization header RevenueCat is configured to send; null = off. */
     private readonly webhookAuth: string | null,
+    private readonly creators: CreatorSales,
     private readonly logger: Pick<Console, 'warn'> = console
   ) {}
 
@@ -76,7 +101,7 @@ export class PlayBillingService {
     return given.length === expected.length && timingSafeEqual(given, expected);
   }
 
-  private apply(event: z.infer<typeof playEvent>['event']): void {
+  private apply(event: PlayEvent): void {
     if (!this.users.findById(event.app_user_id)) {
       // Anonymous purchasers or tests: nobody to give Premium to.
       if (GRANTING.has(event.type)) {
@@ -95,14 +120,34 @@ export class PlayBillingService {
     }
     const next = this.next(current, event);
     if (!next) return;
+    const stopsRenewing =
+      event.type === 'CANCELLATION' &&
+      !current.lifetime &&
+      !isLifetimeProduct(event.product_id) &&
+      LIVE.has(current.status) &&
+      !current.cancelAtPeriodEnd;
+    if (stopsRenewing) this.metrics.record('subscription_cancelled');
     this.subscriptions.save({ ...next, updatedAt: now.toISOString() });
     if (event.type === 'INITIAL_PURCHASE' || event.type === 'NON_RENEWING_PURCHASE') {
       this.metrics.record('purchase');
     }
+    this.tellCreators(event);
+  }
+
+  /** First real payment (no trial, a known price above 0) or a refund, for the creator program. */
+  private tellCreators(event: PlayEvent): void {
+    const plan = playPlanOf(event.product_id);
+    const paid =
+      SALE_EVENTS.has(event.type) && event.period_type !== 'TRIAL' && (event.price ?? 0) > 0;
+    if (paid && plan) this.creators.recordSale(event.app_user_id, plan, 'google');
+    const refunded =
+      event.type === 'CANCELLATION' &&
+      (event.cancel_reason === 'CUSTOMER_SUPPORT' || plan === 'lifetime');
+    if (refunded) this.creators.reverseSale(event.app_user_id);
   }
 
   /** The one-month pass for reading a tax return draft: bought once, never touches the subscription. */
-  private applyRentaPass(event: z.infer<typeof playEvent>['event']): void {
+  private applyRentaPass(event: PlayEvent): void {
     if (event.type === 'CANCELLATION') {
       this.entitlements.revokeRentaPass(event.app_user_id);
     } else if (GRANTING.has(event.type)) {
@@ -111,10 +156,7 @@ export class PlayBillingService {
     }
   }
 
-  private next(
-    sub: SubscriptionProps,
-    event: z.infer<typeof playEvent>['event']
-  ): SubscriptionProps | null {
+  private next(sub: SubscriptionProps, event: PlayEvent): SubscriptionProps | null {
     const lifetime = isLifetimeProduct(event.product_id);
     const end = event.expiration_at_ms ? new Date(event.expiration_at_ms).toISOString() : null;
     const base = { ...sub, source: 'google' as const };

@@ -8,6 +8,7 @@ import {
 } from '@domain/services/autonomo-vat-data';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
+import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
 
 /** Decimal money from the client (e.g. 12.34) → integer cents. */
 export const money = z
@@ -50,7 +51,18 @@ export const registerBody = z.object({
   locale,
   /** Code of the user who invited this one. */
   referralCode: z.string().trim().max(32).optional(),
+  /** Origin of the visit (funnel, anonymous): checked apart, so a bad one never blocks a sign-up. */
+  origin: z.unknown().optional(),
+  /** Creator code the user agreed to be attributed to (checked apart, like `origin`). */
+  creator: z.unknown().optional(),
 });
+/**
+ * `{ code, consent: true }`: the creator code of an `?aff=` link that the user ticked at
+ * sign-up. Without an explicit `consent: true` nothing is attributed.
+ */
+export const creatorAttribution = z
+  .object({ code: z.string().max(32), consent: z.literal(true) })
+  .strict();
 export const loginBody = z.object({
   email: z.string().trim().min(1).max(254),
   password: z.string().min(1).max(128),
@@ -64,6 +76,8 @@ export const googleBody = z
     idToken: z.string().min(1).max(5000).optional(),
     locale,
     referralCode: z.string().trim().max(32).optional(),
+    origin: z.unknown().optional(),
+    creator: z.unknown().optional(),
   })
   .refine((b) => b.token || b.idToken, { message: 'token requerido' });
 export const resetBody = z.object({
@@ -112,6 +126,7 @@ export const settingsBody = z
     showTour: z.boolean(),
     showGettingStarted: z.boolean(),
     weeklyDigest: z.boolean(),
+    trialNotices: z.boolean(),
   })
   .partial()
   .strict();
@@ -872,13 +887,6 @@ export const pushSubscribeBody = z.object({
   keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
 });
 export const pushUnsubscribeBody = z.object({ endpoint: z.string().url().max(1000) });
-export const acquisitionBody = z.object({
-  source: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(/^[a-z0-9][a-z0-9._-]{0,39}$/),
-});
 export const netWorthQuery = z.object({
   months: z.coerce.number().int().min(1).max(120).default(12),
 });
@@ -907,6 +915,30 @@ export const ruleSuggestQuery = z.object({ description: z.string().trim().min(1)
 export const offerParams = z.object({ id: z.string().regex(/^[a-z0-9-]{2,40}$/) });
 
 // ---------- Client error reports ----------
+// ─── Funnel analytics (docs/analitica.md) ────────────────────────────────────
+
+const originText = z.string().max(80).optional();
+/** Where the page load came from, as the browser read it: normalised on the server. */
+export const funnelOrigin = z
+  .object({
+    utm_source: originText,
+    utm_campaign: originText,
+    utm_content: originText,
+    ref: originText,
+    app: z.boolean().optional(),
+  })
+  .strict();
+/** One anonymous funnel event from the browser: a closed list, no free text, no identifiers. */
+export const funnelBody = funnelOrigin
+  .extend({
+    event: z.enum(CLIENT_FUNNEL_EVENTS),
+    guide: z
+      .string()
+      .regex(/^[a-z0-9-]{1,80}$/)
+      .optional(),
+  })
+  .strict();
+
 export const clientErrorBody = z.object({
   kind: z.enum(['render', 'error', 'unhandledrejection']),
   message: z.string().trim().min(1).max(500),

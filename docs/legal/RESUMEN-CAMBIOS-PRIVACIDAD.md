@@ -124,3 +124,104 @@ un abogado.**
     habría que añadirlas a `terms.*` y pedir de nuevo la aceptación. No se han tocado.
 14. **Aviso de cambios (s10).** La política promete avisar en la app cuando cambie, pero solo hay
     aviso para las condiciones (`terms.update`). Decidir si se avisa de esta versión.
+
+## Cambio propuesto: `mm_acq` eliminado (decisión D4)
+
+15. **Origen del alta (s8 y duda 2).** La app ya no guarda `mm_acq` en el navegador (borra la
+    clave que hubiera en cada arranque) ni envía el origen desde el cliente; el servidor lo mide
+    con el UTM y el referrer de la petición. Texto propuesto: quitar de la política (s8) cualquier
+    mención a `mm_acq` o al origen del alta guardado en el navegador antes del registro, y dar por
+    resuelta la duda 2 (ya no hace falta banner por esto). No se ha editado ningún texto legal.
+
+## Cambio propuesto: analítica propia del embudo (decisión D2)
+
+Desde el 20/10/2026 el servidor cuenta, por día, los pasos del embudo (visitas, vistas de guía,
+registros, primeros pasos, pagos, bajas) y, para los primeros pasos, el origen (`utm_source` o el
+sitio que enlaza, normalizado). Solo contadores: sin IP, user-agent, cookies, almacenamiento en el
+dispositivo ni vínculo con la cuenta. Respeta *Global Privacy Control* y *Do Not Track*. Detalle en
+`docs/analitica.md`. **No se ha editado ningún texto legal.** Texto propuesto:
+
+16. **s8.p2** (sustituir): «Para saber cómo se usa el servicio y de dónde llegan las visitas
+    llevamos contadores diarios agregados en nuestro propio servidor: por ejemplo, cuántas veces
+    se abrió una guía, cuántos registros hubo y desde qué web o campaña (el valor `utm_source` del
+    enlace o el sitio que te enlazó). No usamos cookies ni guardamos nada en tu dispositivo para
+    ello, no guardamos tu IP ni tu navegador, no los asociamos a tu cuenta y no usamos herramientas
+    de analítica de terceros. Si tu navegador envía la señal *Global Privacy Control* o *Do Not
+    Track*, no se envía nada.»
+17. **s8.item6** (quitar): ya lo propone el punto 15.
+18. **s3.item10** (sustituir): «Medir de forma agregada y anónima las visitas, los registros y su
+    origen (ver el apartado 8) y proteger el servicio con límites de intentos y registros técnicos:
+    interés legítimo (art. 6.1.f).»
+19. **s5** (añadir un punto): «Contadores agregados de visitas y registros: 25 meses; no contienen
+    datos personales.»
+20. **Duda para el abogado.** Los contadores no guardan datos personales, pero el servidor recibe
+    de forma transitoria la IP (límite de peticiones en memoria durante un minuto) y el
+    user-agent (para descartar bots, sin guardarlo). Confirmar que basta con el interés legítimo
+    y con esta mención en la política, y que no hace falta consentimiento al no haber acceso ni
+    almacenamiento en el dispositivo (art. 22.2 LSSI).
+
+## Avisos del fin de la prueba (decisión D5): puntos 21-23 aprobados e incorporados
+
+Se envían hasta tres mensajes por usuario (2 días antes, el último día y uno después) por email y
+push sobre el estado de su prueba de 14 días. **Los puntos 21-23 fueron aprobados por el dueño y están incorporados a la política (`s3.item11`, `s5.item10`, es/en, fecha de última actualización sin cambios: 20/10/2026).** Decisión del dueño: el aviso `ended` se envía **solo como push**, nunca por email (opción prudente del punto 23); `ends_soon` y `last_day` siguen por email y push. Como no
+existe consentimiento para comunicaciones comerciales, se tratan como mensajes de servicio sobre el
+contrato en vigor (art. 6.1.b RGPD): informan de la fecha de fin, de lo que se conserva y de lo que
+pasa a ser de Premium, con un enlace a la página de planes y sin ofertas ni presión. Texto propuesto:
+
+21. **s3** (APROBADO E INCORPORADO) (añadir un punto): «Avisarte por correo o notificación, hasta tres veces, de que tu prueba
+    gratuita de Premium está a punto de terminar o ha terminado y de lo que cambia (texto final: el aviso posterior al fin se envía solo como push): ejecución del
+    contrato (art. 6.1.b). Puedes desactivarlo en Ajustes («Avisos sobre mi prueba de Premium»).»
+22. **s5** (APROBADO E INCORPORADO) (añadir): «Registro de qué aviso de la prueba se envió a cada cuenta: mientras la cuenta
+    exista.»
+23. **Duda para el abogado** (APROBADO E INCORPORADO; adoptada la opción de limitar `ended` a push). Confirmar que estos mensajes, que incluyen un enlace a los planes de
+    pago, son de servicio y no comunicaciones comerciales (art. 21 LSSI). Si se prefiere la
+    prudencia, añadir una casilla de consentimiento explícito en el registro y enviar solo a quien la
+    marque; o limitar el último mensaje (`ended`) a la notificación push. Con la decisión del dueño, `ended`
+    ya no se envía por email.
+
+## Cambio propuesto: programa de afiliación para creadores (decisión D7)
+
+Desde el 20/10/2026 el código incluye un programa de comisiones para creadores
+(`docs/afiliacion/programa.md`), **apagado por defecto** (`CREATOR_PROGRAM=false`). Cuando se encienda,
+quien llegue con un enlace `finanverso.app/?aff=CODIGO` verá en el registro una casilla **sin marcar**:
+«Me ha recomendado Finanverso el creador con el código CODIGO. Acepto que se guarde que mi cuenta viene de
+ese código, para que pueda cobrar una comisión si contrato Premium. El creador no verá mi nombre ni mi
+email.» Antes del registro **no se guarda nada en el dispositivo** (el código está solo en memoria durante
+la visita). Solo si se marca, se guarda en la cuenta el código y la fecha y, si la persona paga Premium,
+el plan, el canal (web o Google Play), la fecha del primer pago y si se devolvió. El creador solo recibe
+cifras agregadas. **No se ha editado ningún texto legal.** Hay que publicar estos textos **antes** de
+encender el programa:
+
+24. **s2** (añadir un punto): «Si te registras desde el enlace de un creador y marcas la casilla que lo
+    indica, guardamos el código de ese creador y la fecha. Si después contratas Premium, guardamos también
+    el plan, si pagaste en la web o en Google Play, la fecha de tu primer pago y si se devolvió, para
+    calcular su comisión. El creador no recibe tu nombre, tu email ni ningún otro dato tuyo: solo cuántas
+    altas y ventas ha conseguido.»
+25. **s3** (añadir un punto): «Atribuir tu alta y tu primer pago de Premium al creador que te recomendó la
+    app, para pagarle su comisión: consentimiento (art. 6.1.a), que das al marcar la casilla del registro y
+    puedes retirar cuando quieras escribiendo a support@finanverso.app.» Y, si el abogado lo ve necesario:
+    «Conservar el registro contable de las comisiones pagadas, sin vincularlo a tu cuenta: obligación legal
+    (art. 6.1.c).»
+26. **s4**: sin proveedores nuevos (todo queda en nuestro servidor). Añadir, si se quiere ser explícito:
+    «No compartimos tus datos con los creadores del programa de afiliación.»
+27. **s5** (añadir un punto): «Código del creador que te recomendó la app: hasta que elimines la cuenta o
+    retires el consentimiento. Si ya había generado una comisión, se conserva solo como registro contable
+    anónimo, sin relación con tu cuenta.»
+28. **s7**: la exportación JSON ya incluye la sección `creator` (código, fecha del consentimiento y venta,
+    si la hay). Se puede añadir: «Para retirar el consentimiento del programa de creadores, escríbenos a
+    support@finanverso.app.»
+29. **s8**: añadir: «Si llegas con un enlace de un creador (`?aff=`), su código se lee de la dirección y se
+    mantiene solo en la memoria de la página mientras dura la visita; no se guarda en tu dispositivo.»
+30. **Dudas para el abogado.**
+    - ¿Basta la casilla (consentimiento de mayores de 14 años) o conviene otra base (por ejemplo, interés
+      legítimo con oposición)? Se ha elegido consentimiento por ser lo más prudente, dado que
+      `docs/analitica.md` dice que el origen no se asocia a la cuenta.
+    - Si alguien retira el consentimiento **después** de una venta, ¿debe anularse la comisión del creador?
+      Hoy la venta se mantiene como registro anónimo.
+    - Registro de actividades (RAT): añadir un tratamiento «Programa de creadores» (usuarios atribuidos:
+      cuenta → código, fechas y plan; creadores: datos identificativos, fiscales y bancarios, fuera de la
+      app, base 6.1.b y 6.1.c).
+    - Responsabilidad de Finanverso como **anunciante** por lo que publiquen los creadores (Ley General de
+      Publicidad y Ley de Competencia Desleal): ver la plantilla `docs/afiliacion/condiciones-creadores.md`.
+    - Las condiciones de contratación (`terms.*`) no necesitan cambios para los usuarios; el programa se
+      rige por un contrato aparte con cada creador.

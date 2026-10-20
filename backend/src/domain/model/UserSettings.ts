@@ -31,6 +31,8 @@ export interface UserSettingsProps {
   showGettingStarted: boolean;
   /** A summary of the week by e-mail every Monday (opt-in). */
   weeklyDigest: boolean;
+  /** Service messages about the end of the free trial (on by default; the user can turn them off). */
+  trialNotices: boolean;
 }
 
 export type SettingsChanges = Partial<Omit<UserSettingsProps, 'userId'>>;
@@ -47,6 +49,7 @@ export function defaultSettings(userId: string, locale: string = 'es'): UserSett
     showTour: true,
     showGettingStarted: true,
     weeklyDigest: false,
+    trialNotices: true,
   };
 }
 

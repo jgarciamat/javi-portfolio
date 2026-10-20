@@ -1,4 +1,5 @@
-import { EmailLocale, SecurityNotice } from '@domain/ports/services';
+import { EmailLocale, SecurityNotice, TrialNotice } from '@domain/ports/services';
+import { PLAN_LIMITS } from '@domain/services/plans';
 import { DigestData } from '@domain/services/digest';
 
 /** Escapes text before putting it into HTML (user names are user-controlled). */
@@ -473,4 +474,172 @@ export function weeklyDigestEmail(
     c.off,
   ].join('\n');
   return { subject: c.subject, html, text };
+}
+
+const FREE = PLAN_LIMITS.free.resources;
+
+const TRIAL_COPY: Record<
+  EmailLocale,
+  {
+    subject: Record<TrialNotice['kind'], (date: string) => string>;
+    greeting: (name: string) => string;
+    lead: Record<TrialNotice['kind'], (date: string) => string>;
+    keepTitle: string;
+    keep: string[];
+    usage: (
+      key: 'accounts' | 'budgets' | 'goals' | 'recurringRules',
+      n: number,
+      max: number
+    ) => string;
+    lostTitle: string;
+    lost: string[];
+    closing: Record<TrialNotice['kind'], string>;
+    button: string;
+    off: string;
+  }
+> = {
+  es: {
+    subject: {
+      ends_soon: (d) => `Tu prueba de Premium termina el ${d}`,
+      last_day: () => 'Hoy termina tu prueba de Premium',
+      ended: () => 'Tu prueba de Premium ha terminado',
+    },
+    greeting: (n) => `Hola ${n},`,
+    lead: {
+      ends_soon: (d) =>
+        `Tu prueba gratuita de 14 días de Premium termina el ${d}. No hace falta que hagas nada: no hay tarjeta y no se cobra nada.`,
+      last_day: (d) => `Tu prueba gratuita de Premium termina hoy (${d}). No se cobra nada.`,
+      ended: () => 'Tu prueba gratuita de 14 días de Premium ha terminado. No se ha cobrado nada.',
+    },
+    keepTitle: 'Lo que sigue gratis',
+    keep: [
+      'Todos tus datos: no borramos nada de lo que has creado.',
+      `Movimientos sin límite y hasta ${FREE.accounts} cuentas, ${FREE.budgets} presupuestos, ${FREE.goals} metas, ${FREE.recurringRules} movimientos automáticos y ${FREE.customAlerts} alertas.`,
+      'Las calculadoras, las guías y los dos primeros capítulos del curso de inversión.',
+    ],
+    usage: (key, n, max) => {
+      const label = {
+        accounts: 'cuentas',
+        budgets: 'presupuestos',
+        goals: 'metas',
+        recurringRules: 'movimientos automáticos',
+      }[key];
+      return `Tienes ${n} ${label}; el plan gratuito permite ${max} para crear nuevos.`;
+    },
+    lostTitle: 'Lo que pasa a ser de Premium',
+    lost: [
+      'Tendencias, informe anual y previsión a más de un mes.',
+      'Análisis con IA: 1 al mes en el plan gratuito, 10 con Premium.',
+      'Hogar compartido, facturas por email y pagos detectados en las notificaciones del banco (Android).',
+      'El resto del curso «Aprende a invertir» y los vídeos Premium.',
+    ],
+    closing: {
+      ends_soon: 'Si quieres conservar Premium, puedes verlo y elegir plan cuando quieras.',
+      last_day: 'Si quieres seguir con Premium, puedes elegir plan cuando quieras.',
+      ended:
+        'Si más adelante echas de menos algo de Premium, puedes verlo y elegir plan cuando quieras. No te escribiremos más sobre la prueba.',
+    },
+    button: 'Ver qué incluye cada plan',
+    off: 'Es un aviso sobre tu cuenta. Puedes desactivarlo en Ajustes → Preferencias («Avisos sobre mi prueba»).',
+  },
+  en: {
+    subject: {
+      ends_soon: (d) => `Your Premium trial ends on ${d}`,
+      last_day: () => 'Your Premium trial ends today',
+      ended: () => 'Your Premium trial has ended',
+    },
+    greeting: (n) => `Hi ${n},`,
+    lead: {
+      ends_soon: (d) =>
+        `Your free 14-day Premium trial ends on ${d}. You do not need to do anything: there is no card and nothing is charged.`,
+      last_day: (d) => `Your free Premium trial ends today (${d}). Nothing is charged.`,
+      ended: () => 'Your free 14-day Premium trial has ended. Nothing has been charged.',
+    },
+    keepTitle: 'What stays free',
+    keep: [
+      'All your data: we do not delete anything you created.',
+      `Unlimited movements and up to ${FREE.accounts} accounts, ${FREE.budgets} budgets, ${FREE.goals} goals, ${FREE.recurringRules} automatic movements and ${FREE.customAlerts} alerts.`,
+      'The calculators, the guides and the first two chapters of the investing course.',
+    ],
+    usage: (key, n, max) => {
+      const label = {
+        accounts: 'accounts',
+        budgets: 'budgets',
+        goals: 'goals',
+        recurringRules: 'automatic movements',
+      }[key];
+      return `You have ${n} ${label}; the free plan allows ${max} when creating new ones.`;
+    },
+    lostTitle: 'What becomes Premium',
+    lost: [
+      'Trends, the yearly report and the outlook beyond one month.',
+      'AI analyses: 1 a month on the free plan, 10 with Premium.',
+      'Shared household, invoices by e-mail and payments detected from bank notifications (Android).',
+      'The rest of the "Learn to invest" course and the Premium videos.',
+    ],
+    closing: {
+      ends_soon: 'If you want to keep Premium, you can see the plans and choose whenever you like.',
+      last_day: 'If you want to stay on Premium, you can choose a plan whenever you like.',
+      ended:
+        'If you later miss something from Premium, you can see the plans and choose whenever you like. We will not write to you again about the trial.',
+    },
+    button: 'See what each plan includes',
+    off: 'This is a notice about your account. You can turn it off in Settings → Preferences ("Notices about my trial").',
+  },
+};
+
+/**
+ * Service message about the end of the free trial: when it ends, what stays free and what
+ * becomes Premium. Counts only (never names or amounts). No countdown tricks or invented offers.
+ */
+export function trialNoticeEmail(
+  locale: EmailLocale,
+  name: string,
+  notice: TrialNotice,
+  appUrl: string
+): EmailContent {
+  const c = TRIAL_COPY[locale];
+  const date = new Date(notice.endsAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Madrid',
+  });
+  const usage = (['accounts', 'budgets', 'goals', 'recurringRules'] as const)
+    .filter((k) => notice.usage[k] >= FREE[k] && notice.usage[k] > 0)
+    .map((k) => c.usage(k, notice.usage[k], FREE[k]));
+  const keep = [...c.keep, ...usage];
+  const url = `${appUrl}/pricing`;
+  const list = (items: string[]): string =>
+    `      <ul>${items.map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul>`;
+  const html = layout(
+    locale,
+    [
+      `      <p>${c.greeting(`<strong>${safeName(name)}</strong>`)}</p>`,
+      `      <p>${escapeHtml(c.lead[notice.kind](date))}</p>`,
+      `      <p><strong>${c.keepTitle}</strong></p>`,
+      list(keep),
+      `      <p><strong>${c.lostTitle}</strong></p>`,
+      list(c.lost),
+      `      <p>${escapeHtml(c.closing[notice.kind])}</p>`,
+      `      <p style="text-align:center"><a class="btn" href="${escapeHtml(url)}">${c.button}</a></p>`,
+      `      <p>${escapeHtml(c.off)}</p>`,
+    ].join('\n')
+  );
+  const text = [
+    c.greeting(plainName(name)),
+    '',
+    c.lead[notice.kind](date),
+    '',
+    `${c.keepTitle}:`,
+    ...keep.map((l) => `- ${l}`),
+    '',
+    `${c.lostTitle}:`,
+    ...c.lost.map((l) => `- ${l}`),
+    '',
+    c.closing[notice.kind],
+    `${c.button}: ${url}`,
+    '',
+    c.off,
+  ].join('\n');
+  return { subject: c.subject[notice.kind](date), html, text };
 }

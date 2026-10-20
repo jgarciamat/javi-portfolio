@@ -352,5 +352,45 @@ describe('BillingService', () => {
       await webhook({ id: 'evt_life', type: 'lifetime_purchased', userId: 'u1', customerId: null });
       expect(gateway.cancelled).toEqual([]);
     });
+
+    it('tells the creator program about first payments and refunds, when it is wired', async () => {
+      // Without the program nothing breaks.
+      await setup().webhook({
+        id: 'evt_p0',
+        type: 'premium_paid',
+        userId: 'u1',
+        customerId: null,
+        plan: 'yearly',
+      });
+      await setup().webhook({
+        id: 'evt_r0',
+        type: 'premium_reversed',
+        userId: 'u1',
+        customerId: null,
+      });
+      await setup().webhook({
+        id: 'evt_l0',
+        type: 'lifetime_refunded',
+        userId: 'u1',
+        customerId: null,
+      });
+      const creators = { recordSale: jest.fn(), reverseSale: jest.fn() };
+      const { webhook } = setup({ creators });
+      await webhook({
+        id: 'evt_p1',
+        type: 'premium_paid',
+        userId: 'u1',
+        customerId: null,
+        plan: 'monthly',
+      });
+      await webhook({ id: 'evt_l1', type: 'lifetime_purchased', userId: 'u1', customerId: null });
+      await webhook({ id: 'evt_r1', type: 'premium_reversed', userId: 'u1', customerId: null });
+      await webhook({ id: 'evt_l2', type: 'lifetime_refunded', userId: 'u1', customerId: null });
+      expect(creators.recordSale.mock.calls).toEqual([
+        ['u1', 'monthly', 'stripe'],
+        ['u1', 'lifetime', 'stripe'],
+      ]);
+      expect(creators.reverseSale.mock.calls).toEqual([['u1'], ['u1']]);
+    });
   });
 });

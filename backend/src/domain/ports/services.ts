@@ -47,6 +47,23 @@ export type SecurityNotice =
   | 'recovery_codes_regenerated'
   | 'recovery_code_used';
 
+export type TrialNoticeKind = 'ends_soon' | 'last_day' | 'ended';
+
+/** What the user has created that the free plan limits (counts only, never amounts or names). */
+export interface TrialUsage {
+  accounts: number;
+  budgets: number;
+  goals: number;
+  recurringRules: number;
+}
+
+export interface TrialNotice {
+  kind: TrialNoticeKind;
+  /** When the trial ends (ISO). */
+  endsAt: string;
+  usage: TrialUsage;
+}
+
 export interface EmailSender {
   sendVerification(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
   sendPasswordReset(to: string, name: string, token: string, locale: EmailLocale): Promise<void>;
@@ -71,6 +88,13 @@ export interface EmailSender {
     locale: EmailLocale,
     digest: DigestData,
     currency: string
+  ): Promise<void>;
+  /** A service message about the end of the free trial (see TrialNoticeService). */
+  sendTrialNotice(
+    to: string,
+    name: string,
+    notice: TrialNotice,
+    locale: EmailLocale
   ): Promise<void>;
 }
 
@@ -150,6 +174,24 @@ export type BillingEvent =
       userId: string | null;
       customerId: string | null;
     }
+  /** A subscription invoice paid with real money (not a trial, not a 100 % discount). */
+  | {
+      id: string;
+      type: 'premium_paid';
+      userId: string | null;
+      customerId: string | null;
+      plan: 'monthly' | 'yearly';
+    }
+  /**
+   * A Premium payment refunded in full or charged back. Only the creator program uses it:
+   * the access itself follows the subscription events.
+   */
+  | {
+      id: string;
+      type: 'premium_reversed';
+      userId: string | null;
+      customerId: string | null;
+    }
   | { id: string; type: 'ignored' };
 
 export interface PaymentGateway {
@@ -202,11 +244,56 @@ export type MetricName =
   | 'import_done'
   | 'referral_joined'
   | 'household_joined'
+  /** A paid subscription stops renewing (scheduled or immediate cancellation). */
+  | 'subscription_cancelled'
   /** Where a new user came from (`signup:reddit`, `signup:google.com`…): a counter, never a person. */
   | `signup:${string}`;
 
 export interface MetricsRecorder {
   record(name: MetricName): void;
+}
+
+/** Funnel events the browser may send (`POST /api/funnel`). Closed list, as in the frontend. */
+export const CLIENT_FUNNEL_EVENTS = [
+  'visit',
+  'signup_view',
+  'guide_view',
+  'guide_cta_click',
+  'pricing_view',
+  'paywall_view',
+] as const;
+
+/** Funnel events only the server records, when the thing really happens. */
+export const SERVER_FUNNEL_EVENTS = [
+  'signup',
+  'trial_start',
+  'email_verified',
+  'first_transaction',
+  'activation_step',
+  'activation_done',
+  'checkout_start',
+  'premium',
+  'cancel',
+  /** A trial notice went out (detail: `ends_soon:email`, `last_day:push`, `ended:email`…). */
+  'trial_notice',
+] as const;
+
+export type ClientFunnelEvent = (typeof CLIENT_FUNNEL_EVENTS)[number];
+export type FunnelEvent = ClientFunnelEvent | (typeof SERVER_FUNNEL_EVENTS)[number];
+
+/** Dimensions of a funnel counter: never a person, an IP or a device. */
+export interface FunnelDimensions {
+  /** Normalised origin (`tiktok`, `google`, `(direct)`, `(app)`); `(unknown)` when not known. */
+  source?: string;
+  /** `utm_campaign`, plus `/utm_content` when there is one (`renta2026/v041`). */
+  campaign?: string;
+  /** Guide slug or activation step. */
+  detail?: string;
+}
+
+/** Anonymous daily funnel counters, by origin (docs/analitica.md). */
+export interface FunnelRecorder {
+  record(event: FunnelEvent, dimensions?: FunnelDimensions): void;
 }
 
 /** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */

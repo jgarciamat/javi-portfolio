@@ -783,11 +783,15 @@ describe('OffersView', () => {
 });
 
 describe('PricingPage', () => {
-  it('shows an error when the plans cannot be loaded', async () => {
+  it('still shows the plans and the comparison when the plans cannot be loaded', async () => {
     const api = createFakeApi();
     api.billingApi.plans.mockRejectedValue(new Error('x'));
     renderWithProviders(<PricingPage />, { api, authenticated: false });
-    expect(await screen.findByText(tr('billing.loadError'))).toBeInTheDocument();
+    expect(screen.getByText(tr('pricing.cta', { days: 14 }))).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByText(/3,49/)).toBeInTheDocument();
+    await waitFor(() => expect(api.billingApi.plans).toHaveBeenCalled());
+    expect(screen.queryByText(tr('billing.loadError'))).toBeNull();
   });
 
   it('hides the founder line when sold out', async () => {
