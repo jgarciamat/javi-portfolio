@@ -58,6 +58,7 @@ test('Premium checkout asks for both consents, sends them with the plan and leav
 
 test('a failed checkout keeps the person on the page, with a message and the way to try again', async ({
   page,
+  pageErrors,
 }) => {
   await withPayments(page);
   await page.route('**/api/billing/checkout', (route) =>
@@ -75,6 +76,8 @@ test('a failed checkout keeps the person on the page, with a message and the way
   await expect(page.locator('.form-error')).toBeVisible();
   await expect(page).toHaveURL(/localhost/);
   await expect(page.getByRole('button', { name: /Anual/ })).toBeEnabled();
+  // The browser logs the failed request itself: that, and nothing else, is expected here.
+  expect(pageErrors.splice(0)).toEqual([expect.stringContaining('502')]);
 });
 
 test('a Stripe subscriber manages the plan in the customer portal', async ({ page }) => {
