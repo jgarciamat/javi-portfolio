@@ -387,3 +387,11 @@
   flex: 1;
   min-width: 0;
 }
+
+.tx-pager-note {
+  margin: 0;
+  padding: 0.5rem 0.75rem 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--slate-400);
+}

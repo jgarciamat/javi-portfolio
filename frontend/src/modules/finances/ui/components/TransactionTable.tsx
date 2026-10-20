@@ -1,5 +1,5 @@
 import { ScrollRegion } from '@shared/components/ScrollRegion';
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { ConfirmDeleteModal } from '@shared/components/ConfirmDeleteModal';
@@ -7,6 +7,7 @@ import { EmptyState } from '@shared/components/EmptyState';
 import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import type { RowSelection } from '@shared/hooks/useRowSelection';
 import { SelectAllBar, SelectCheckbox } from '@shared/components/BulkSelection';
+import { Pager } from '@shared/components/Pager';
 import { DayCheckbox, RowCheckbox, selectableRow } from './TransactionSelect';
 import type { Transaction } from '@modules/finances/domain/types';
 import { useTransactionTable } from '../../application/hooks/useTransactionTable';
@@ -26,31 +27,46 @@ export interface TransactionTableProps {
   showAccount?: boolean;
   /** Multiple selection shared with the other views of the month. */
   selection: RowSelection;
+  /** Changes with the filter or the month: the table goes back to its first page. */
+  pageKey: string;
 }
 
 type TableState = ReturnType<typeof useTransactionTable>;
+type Handlers = ReturnType<typeof useTransactionTable>['handlers'];
 
+/** What a row needs of the table: kept to primitives and stable functions so `memo` works. */
 interface RowProps {
   tx: Transaction;
-  table: TableState;
+  selected: boolean;
+  toggle: RowSelection['toggle'];
+  handlers: Handlers;
   onEdit: (tx: Transaction) => void;
+  showAccount?: boolean;
+  /** Whether the notes of this row are being edited, and the text while they are. */
+  editing: boolean;
+  notesValue: string;
 }
 
 /** Click on the notes to edit them; Enter or leaving the field saves, Escape cancels. */
-function Notes({ tx, table }: Omit<RowProps, 'onEdit'>) {
+function Notes({
+  tx,
+  editing,
+  notesValue,
+  handlers,
+}: Pick<RowProps, 'tx' | 'editing' | 'notesValue' | 'handlers'>) {
   const { t } = useI18n();
-  if (table.editingNotesId === tx.id) {
+  if (editing) {
     return (
       <input
         className="tx-notes-edit-input"
         autoFocus
         aria-label={t('app.transaction.table.notes')}
-        value={table.notesValue}
-        onChange={(e) => table.setNotesValue(e.target.value)}
-        onBlur={table.commitNotes}
+        value={notesValue}
+        onChange={(e) => handlers.setNotesValue(e.target.value)}
+        onBlur={handlers.commitNotes}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') table.commitNotes();
-          if (e.key === 'Escape') table.cancelEditNotes();
+          if (e.key === 'Enter') handlers.commitNotes();
+          if (e.key === 'Escape') handlers.cancelEditNotes();
         }}
       />
     );
@@ -59,7 +75,7 @@ function Notes({ tx, table }: Omit<RowProps, 'onEdit'>) {
     <button
       type="button"
       className="tx-notes-text"
-      onClick={() => table.startEditNotes(tx)}
+      onClick={() => handlers.startEditNotes(tx)}
       title={t('app.transaction.table.notes.placeholder')}
     >
       {tx.notes ?? (
@@ -69,7 +85,7 @@ function Notes({ tx, table }: Omit<RowProps, 'onEdit'>) {
   );
 }
 
-function RowActions({ tx, table, onEdit }: RowProps) {
+function RowActions({ tx, handlers, onEdit }: Pick<RowProps, 'tx' | 'handlers' | 'onEdit'>) {
   const { t } = useI18n();
   return (
     <span className="tx-row-actions">
@@ -83,7 +99,7 @@ function RowActions({ tx, table, onEdit }: RowProps) {
       </button>
       <button
         className="btn-delete"
-        onClick={() => table.askDelete(tx.id)}
+        onClick={() => handlers.askDelete(tx.id)}
         title={t('app.transaction.table.delete')}
         aria-label={`${t('app.transaction.table.delete')}: ${tx.description}`}
       >
@@ -92,6 +108,65 @@ function RowActions({ tx, table, onEdit }: RowProps) {
     </span>
   );
 }
+
+/** Row of the table; drawn again only when its own movement, selection or editing change. */
+const DesktopRow = memo(function DesktopRow(props: RowProps) {
+  const { tx, selected, toggle, showAccount } = props;
+  const { tCategory } = useI18n();
+  const { date } = useFormat();
+  const choice = { isSelected: () => selected, toggle };
+  return (
+    <tr {...selectableRow(tx, choice)}>
+      <td className="tx-cell-select">
+        <RowCheckbox tx={tx} selection={choice} />
+      </td>
+      <td className="tx-cell-date">{date(tx.date)}</td>
+      <td className="tx-cell-description">{tx.description}</td>
+      {showAccount && <td className="tx-cell-account">{tx.accountName}</td>}
+      <td className="tx-notes-cell">
+        <Notes {...props} />
+      </td>
+      <td>
+        <span className="tx-cat-badge">{tCategory(tx.category)}</span>
+      </td>
+      <td>
+        <TypeBadge type={tx.type} />
+      </td>
+      <td className="tx-cell-amount">
+        <SignedAmount type={tx.type} amount={tx.amount} />
+      </td>
+      <td>
+        <RowActions {...props} />
+      </td>
+    </tr>
+  );
+});
+
+/** Card of a movement on small screens. */
+const CardRow = memo(function CardRow(props: RowProps) {
+  const { tx, selected, toggle, showAccount } = props;
+  const { tCategory } = useI18n();
+  const { date } = useFormat();
+  const choice = { isSelected: () => selected, toggle };
+  return (
+    <div {...selectableRow(tx, choice, 'tx-card')}>
+      <RowCheckbox tx={tx} selection={choice} />
+      <div className="tx-card-left">
+        <div className="tx-card-desc">{tx.description}</div>
+        <div className="tx-card-meta">
+          {date(tx.date)} · {tCategory(tx.category)}
+          {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
+        </div>
+        <Notes {...props} />
+      </div>
+      <div className="tx-card-right">
+        <SignedAmount className="tx-card-amount" type={tx.type} amount={tx.amount} />
+        <TypeBadge type={tx.type} />
+        <RowActions {...props} />
+      </div>
+    </div>
+  );
+});
 
 function DayToggle({
   label,
@@ -122,9 +197,28 @@ interface ListProps {
   selection: RowSelection;
 }
 
+function rowProps(
+  tx: Transaction,
+  table: TableState,
+  selection: RowSelection,
+  onEdit: RowProps['onEdit'],
+  showAccount?: boolean
+): RowProps {
+  const editing = table.editingNotesId === tx.id;
+  return {
+    tx,
+    selected: selection.isSelected(tx.id),
+    toggle: selection.toggle,
+    handlers: table.handlers,
+    onEdit,
+    showAccount,
+    editing,
+    notesValue: editing ? table.notesValue : '',
+  };
+}
+
 function DesktopTable({ table, onEdit, showAccount, selection }: ListProps) {
-  const { t, tCategory } = useI18n();
-  const { date } = useFormat();
+  const { t } = useI18n();
   const headers = [
     'date',
     'description',
@@ -178,29 +272,10 @@ function DesktopTable({ table, onEdit, showAccount, selection }: ListProps) {
                 </tr>
                 {!collapsed &&
                   items.map((tx) => (
-                    <tr key={tx.id} {...selectableRow(tx, selection)}>
-                      <td className="tx-cell-select">
-                        <RowCheckbox tx={tx} selection={selection} />
-                      </td>
-                      <td className="tx-cell-date">{date(tx.date)}</td>
-                      <td className="tx-cell-description">{tx.description}</td>
-                      {showAccount && <td className="tx-cell-account">{tx.accountName}</td>}
-                      <td className="tx-notes-cell">
-                        <Notes tx={tx} table={table} />
-                      </td>
-                      <td>
-                        <span className="tx-cat-badge">{tCategory(tx.category)}</span>
-                      </td>
-                      <td>
-                        <TypeBadge type={tx.type} />
-                      </td>
-                      <td className="tx-cell-amount">
-                        <SignedAmount type={tx.type} amount={tx.amount} />
-                      </td>
-                      <td>
-                        <RowActions tx={tx} table={table} onEdit={onEdit} />
-                      </td>
-                    </tr>
+                    <DesktopRow
+                      key={tx.id}
+                      {...rowProps(tx, table, selection, onEdit, showAccount)}
+                    />
                   ))}
               </Fragment>
             );
@@ -212,8 +287,6 @@ function DesktopTable({ table, onEdit, showAccount, selection }: ListProps) {
 }
 
 function MobileCardList({ table, onEdit, showAccount, selection }: ListProps) {
-  const { tCategory } = useI18n();
-  const { date } = useFormat();
   return (
     <div className="tx-card-list tx-card-list--visible">
       <SelectAllBar selection={selection} />
@@ -233,22 +306,7 @@ function MobileCardList({ table, onEdit, showAccount, selection }: ListProps) {
             </div>
             {!collapsed &&
               items.map((tx) => (
-                <div key={tx.id} {...selectableRow(tx, selection, 'tx-card')}>
-                  <RowCheckbox tx={tx} selection={selection} />
-                  <div className="tx-card-left">
-                    <div className="tx-card-desc">{tx.description}</div>
-                    <div className="tx-card-meta">
-                      {date(tx.date)} · {tCategory(tx.category)}
-                      {showAccount && tx.accountName ? ` · ${tx.accountName}` : ''}
-                    </div>
-                    <Notes tx={tx} table={table} />
-                  </div>
-                  <div className="tx-card-right">
-                    <SignedAmount className="tx-card-amount" type={tx.type} amount={tx.amount} />
-                    <TypeBadge type={tx.type} />
-                    <RowActions tx={tx} table={table} onEdit={onEdit} />
-                  </div>
-                </div>
+                <CardRow key={tx.id} {...rowProps(tx, table, selection, onEdit, showAccount)} />
               ))}
           </div>
         );
@@ -264,10 +322,11 @@ export function TransactionTable({
   onEdit,
   showAccount,
   selection,
+  pageKey,
 }: TransactionTableProps) {
   const { t, locale } = useI18n();
   const mobile = useMediaQuery(MOBILE_QUERY);
-  const table = useTransactionTable({ transactions, locale, onPatch, onDelete });
+  const table = useTransactionTable({ transactions, locale, onPatch, onDelete, pageKey });
 
   if (transactions.length === 0) {
     return <EmptyState icon="💸" text={t('app.transaction.table.empty')} />;
@@ -294,6 +353,18 @@ export function TransactionTable({
           showAccount={showAccount}
           selection={selection}
         />
+      )}
+      {table.paging.pages > 1 && (
+        <>
+          <p className="tx-pager-note">
+            {t('app.transactions.pager.selectionNote', { count: transactions.length })}
+          </p>
+          <Pager
+            paging={table.paging}
+            count={transactions.length}
+            label={t('app.transactions.pager.label')}
+          />
+        </>
       )}
       {table.pendingDeleteId !== null && (
         <ConfirmDeleteModal onConfirm={table.confirmDelete} onCancel={table.cancelDelete} />

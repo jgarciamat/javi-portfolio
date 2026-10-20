@@ -4838,5 +4838,14 @@
   "tools.invest.web.group.hint": "El impuesto y los totales de las casillas {gainsBox} y {lossesBox} son los mismos con las tres opciones: solo cambia cuántas altas escribes. Al agrupar, la fecha de adquisición es la de la primera apertura del grupo y la de transmisión, la del último cierre. Es una práctica habitual, aunque Hacienda no la recoge por escrito: guarda el anexo «Detalle por operación» del PDF por si te piden el detalle.",
   "tools.invest.web.resultLink": "Tus inversiones: qué copiar en Renta WEB",
   "wizard.renta.boxesInvest": "Tus inversiones no van en esta lista: cópialas con el bloque «Qué tienes que copiar en Renta WEB» (botón «Copiar a Renta WEB paso a paso» o el PDF para copiar en Renta WEB), que tienes en el resultado y en el paso 5.",
-  "tools.renta.zeroResult": "Ni a pagar ni a devolver"
+  "tools.renta.zeroResult": "Ni a pagar ni a devolver",
+  "app.pager.label": "Páginas de {what}",
+  "app.pager.previous": "‹ Anterior",
+  "app.pager.next": "Siguiente ›",
+  "app.pager.previousOf": "Página anterior de {what}",
+  "app.pager.nextOf": "Página siguiente de {what}",
+  "app.pager.page": "Página {current} de {pages}",
+  "app.pager.showing": "Mostrando {from}-{to} de {count}",
+  "app.transactions.pager.label": "Movimientos",
+  "app.transactions.pager.selectionNote": "Seleccionar todos marca los {count} movimientos de la lista, no solo los de esta página."
 }

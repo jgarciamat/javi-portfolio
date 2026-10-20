@@ -172,6 +172,7 @@ function MovementsPanel({
             onPatch={f.patchTransaction}
             onEdit={onEdit}
             selection={selection}
+            pageKey={`${f.year}-${f.month}|${accountId ?? ''}`}
           />
         )}
         {view.mode === 'week' && (

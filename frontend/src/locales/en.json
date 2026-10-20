@@ -4838,5 +4838,14 @@
   "tools.invest.web.group.hint": "The tax and the totals of boxes {gainsBox} and {lossesBox} are the same with the three options: only the number of altas you type changes. When grouping, the acquisition date is the first opening of the group and the transfer date the last closing. It is a common practice, although the Tax Agency does not set it out in writing: keep the «Detalle por operación» annex of the PDF in case you are asked for the detail.",
   "tools.invest.web.resultLink": "Your investments: what to copy into Renta WEB",
   "wizard.renta.boxesInvest": "Your investments are not in this list: copy them with the «What to copy into Renta WEB» block («Copy to Renta WEB step by step» button or the PDF to copy into Renta WEB), which you have in the result and in step 5.",
-  "tools.renta.zeroResult": "Nothing to pay or to refund"
+  "tools.renta.zeroResult": "Nothing to pay or to refund",
+  "app.pager.label": "Pages of {what}",
+  "app.pager.previous": "‹ Previous",
+  "app.pager.next": "Next ›",
+  "app.pager.previousOf": "Previous page of {what}",
+  "app.pager.nextOf": "Next page of {what}",
+  "app.pager.page": "Page {current} of {pages}",
+  "app.pager.showing": "Showing {from}-{to} of {count}",
+  "app.transactions.pager.label": "Transactions",
+  "app.transactions.pager.selectionNote": "Select all picks the {count} movements of the list, not only this page."
 }
