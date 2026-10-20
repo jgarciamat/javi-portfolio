@@ -40,7 +40,9 @@ const { categoryOf } = await load('src/modules/guides/domain/guideCategories.ts'
 const { TOOL_PAGES, faqOf, guidesOfTool } = await load('src/modules/tools/domain/toolPages.ts');
 const wall = await load('src/modules/guides/domain/signupWall.ts');
 const { FAQ } = await load('src/modules/landing/domain/landing.ts');
-const { yearlySavingPct } = await load('src/modules/billing/ui/pricing.ts');
+const { yearlySavingPct, comparisonRows, DEFAULT_CATALOG } = await load(
+  'src/modules/billing/ui/pricing.ts'
+);
 const hacienda = await load('src/modules/guides/domain/hacienda.ts');
 const videos = await load('src/modules/guides/domain/videos.ts');
 const { SOCIAL_LINKS } = await load('src/core/config/socials.ts');
@@ -284,6 +286,17 @@ function pagesIn(lang) {
       )}</p><p>${link('/login?mode=register', t('pricing.cta', { days: 14 }))}</p><p>${esc(
         t('pricing.noCard')
       )}</p></section>
+<table><thead><tr><th scope="col">${esc(t('pricing.featureColumn'))}</th><th>${esc(
+        t('billing.free')
+      )}</th><th>${esc(t('billing.premium'))}</th></tr></thead><tbody>${comparisonRows(
+        DEFAULT_CATALOG,
+        t
+      )
+        .map(
+          (r) =>
+            `<tr><td>${esc(r.label)}</td><td>${esc(r.free)}</td><td>${esc(r.premium)}</td></tr>`
+        )
+        .join('')}</tbody></table>
 <p>${link('/terms', t('billing.terms'))} · ${link(
         '/privacy',
         t('app.privacy.link')

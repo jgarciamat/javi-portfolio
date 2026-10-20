@@ -154,3 +154,13 @@ test('every page has a unique title, one h1 and internal links that exist', () =
     }
   }
 });
+
+test('the pricing page already has the plans and the comparison, without calling the API', () => {
+  for (const lang of langs) {
+    const { body } = pageOf('/pricing', lang);
+    assert.match(body, /<table>/);
+    assert.ok((body.match(/<tr>/g) ?? []).length >= 15, `${lang} comparison rows`);
+    assert.match(body, lang === 'en' ? /€3\.49/ : /3,49\s€/);
+    assert.match(body, /\/login\?mode=register/);
+  }
+});
