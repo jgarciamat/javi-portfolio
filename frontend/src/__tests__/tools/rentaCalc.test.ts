@@ -285,6 +285,9 @@ describe('deductionAmount', () => {
     expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: 3 })).toBe(350);
     expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: -1 })).toBe(200);
     expect(deductionAmount(mat, { on: true, units: 1, months: 2 })).toBe(200);
+    // Without a limit of its own, nothing holds the bonus.
+    const open = deduction({ amount: 1200, monthly: 100, startBonus: 150 });
+    expect(deductionAmount(open, { on: true, units: 1, bonusUnits: 1 })).toBe(1350);
     // Without a start bonus the units given do nothing.
     const plain = deduction({ amount: 1200, limit: 1350, monthly: 100 });
     expect(deductionAmount(plain, { on: true, units: 1, months: 2, bonusUnits: 1 })).toBe(200);
