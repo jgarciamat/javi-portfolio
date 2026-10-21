@@ -6,6 +6,8 @@ import type { PreviewText } from '../application/formPdf';
 import { canvasPng, openFormView, type FormView } from '../application/formView';
 import { loadLayout } from '../domain/layout';
 import { boxValue, type FilledForm } from '../domain/values';
+import type { CsvTable } from '@modules/finances/application/hooks/useExportCSV';
+import { ExportButtons } from '@modules/finances/ui/components/ExportButtons';
 import './TaxForms.css';
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -32,6 +34,28 @@ export const fileName = (form: FilledForm, ext: 'pdf' | 'png', page = 1): string
   `modelo-${form.model}-${form.year}${form.period ? `-${form.period}` : ''}-vista-previa${
     ext === 'png' ? `-pag${page}` : ''
   }.${ext}`;
+
+/** The boxes of a form as a table: one row per box with its figure (or its words). */
+export function boxesTable(t: Translate, form: FilledForm): CsvTable {
+  const row = (box: string, value: string | number) => [
+    form.model,
+    form.period ?? String(form.year),
+    box,
+    value,
+  ];
+  return {
+    head: [
+      t('taxforms.export.model'),
+      t('taxforms.export.period'),
+      t('taxforms.preview.box'),
+      t('taxforms.export.value'),
+    ],
+    rows: [
+      ...Object.entries(form.values).map(([box, value]) => row(box, value)),
+      ...Object.entries(form.texts ?? {}).map(([box, value]) => row(box, value)),
+    ],
+  };
+}
 
 /** Phones and the app offer the share sheet; a computer just downloads the file. */
 const shareMode = (): 'share' | 'download' =>
@@ -196,6 +220,12 @@ export function FormPreview({ form, label }: { form: FilledForm; label: string }
           {t('taxforms.preview.png')}
         </button>
       </div>
+      <ExportButtons
+        name={`modelo-${form.model}-${form.year}${form.period ? `-${form.period}` : ''}`}
+        what={label}
+        count={Object.keys(form.values).length + Object.keys(form.texts ?? {}).length}
+        table={() => boxesTable(t, form)}
+      />
       {busy && (
         <p className="section-hint" role="status">
           {t('taxforms.preview.preparing')}

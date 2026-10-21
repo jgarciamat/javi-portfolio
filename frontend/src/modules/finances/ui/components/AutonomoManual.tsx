@@ -1,6 +1,9 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
+import { isClosedQuarter } from '@modules/finances/domain/closedQuarter';
+import { todayDateOnly } from '@shared/utils/format';
 import { AutonomoImport } from './AutonomoImport';
+import { ClosedQuarterNotice } from './AutonomoClosedQuarter';
 import { InvoiceReview, type ReviewFocus } from './InvoiceReview';
 import { StepSection } from './AutonomoSteps';
 import { emptyWithholdings, type WithholdingForm } from './withholdingForm';
@@ -57,6 +60,11 @@ export interface ManualForm {
   withholdings?: WithholdingForm[];
   /** Results (box 71) of the modelos 303 imported, by quarter: the 390 is reconciled with them. */
   filed303?: (number | null)[];
+  /**
+   * Box 07 of each modelo 130 as filed, typed (older data has none; box 19 is `activity.paid130`).
+   * Box 05 of the next quarters takes it instead of the one worked out again.
+   */
+  filed130?: string[];
   /** Assets, grants and the other annual figures of the activity (older data has none). */
   activity?: ActivityForm;
 }
@@ -396,14 +404,18 @@ function ExpenseRow({
   );
 }
 
+/** Box 07 of the 130 filed for a quarter is typed (box 71 of the 303 also comes from imports). */
+const hasFiled = (form: ManualForm, q: number): boolean => (form.filed130?.[q] ?? '').trim() !== '';
+
 /** Income, withholdings and expenses of one quarter (`q` counts from 0). */
 function QuarterPanel({
   quarter,
   q,
   vatExtras,
   year,
-  onChange,
-  onCopyPrevious,
+  onChange: change,
+  onCopyPrevious: copy,
+  closed,
 }: {
   quarter: QuarterForm;
   q: number;
@@ -412,8 +424,22 @@ function QuarterPanel({
   year: number;
   onChange: (patch: Partial<QuarterForm>) => void;
   onCopyPrevious: () => void;
+  /** Its filing period is over: the whole form, to keep what was filed (null: still open). */
+  closed: { form: ManualForm; onChange: (form: ManualForm) => void } | null;
 }) {
   const { t } = useI18n();
+  // The notice comes once the person changes the quarter here (an import is not a change), or when
+  // what was filed is already typed.
+  const [edited, setEdited] = useState(false);
+  const onChange = (patch: Partial<QuarterForm>) => {
+    setEdited(true);
+    change(patch);
+  };
+  const onCopyPrevious = () => {
+    setEdited(true);
+    copy();
+  };
+  const notice = closed !== null && (edited || hasFiled(closed.form, q));
   const setExpense = (e: number, patch: Partial<ExpenseForm>) =>
     onChange({ expenses: quarter.expenses.map((x, i) => (i === e ? { ...x, ...patch } : x)) });
   return (
@@ -483,6 +509,7 @@ function QuarterPanel({
         cashBasis={Boolean(vatExtras?.cashBasis)}
         onChange={(vat) => onChange({ vat })}
       />
+      {notice && <ClosedQuarterNotice q={q} form={closed.form} onChange={closed.onChange} />}
     </section>
   );
 }
@@ -523,6 +550,7 @@ export function QuarterPanels({
       expenses: form.quarters[q - 1].expenses.map((e) => ({ ...e })),
     });
   const from = firstQuarterShown(form, upTo);
+  const today = todayDateOnly();
   return (
     <>
       {form.quarters
@@ -537,6 +565,9 @@ export function QuarterPanels({
               year={year}
               onChange={(patch) => setQuarter(q, patch)}
               onCopyPrevious={() => copyPrevious(q)}
+              closed={
+                isClosedQuarter(year, (q + 1) as 1 | 2 | 3 | 4, today) ? { form, onChange } : null
+              }
             />
           )
         )}

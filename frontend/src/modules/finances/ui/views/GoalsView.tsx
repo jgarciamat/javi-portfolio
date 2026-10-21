@@ -11,6 +11,7 @@ import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
 import { EmojiPickerButton } from '../components/EmojiPickerButton';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from '../components/ExportButtons';
 
 function GoalCard({
   goal,
@@ -187,7 +188,8 @@ function GoalForm({
  */
 export function GoalsView() {
   const { goalApi } = useApi();
-  const { t } = useI18n();
+  const { t, tCategory } = useI18n();
+  const { currency } = useFormat();
   const { categories, refreshCategories } = useFinances();
   const goals = useResource(() => goalApi.getAll(), [goalApi], { initial: [] as Goal[] });
   const action = useAction();
@@ -199,6 +201,35 @@ export function GoalsView() {
   useEffect(() => {
     if (reached) recordPositiveMoment();
   }, [reached]);
+
+  /** Every goal, archived ones included, with how far along it is. */
+  const table = () => {
+    const unit = (key: string) => `${t(key)} (${currency})`;
+    return {
+      head: [
+        t('app.goals.export.name'),
+        t('app.export.csv.category'),
+        unit('app.goals.export.target'),
+        unit('app.goals.export.saved'),
+        unit('app.goals.export.remaining'),
+        t('app.goals.export.percentage'),
+        t('app.goals.export.targetDate'),
+        unit('app.goals.export.monthly'),
+        t('app.accounts.export.archived'),
+      ],
+      rows: all.map((g) => [
+        g.name,
+        tCategory(g.categoryName),
+        g.target,
+        g.progress.saved,
+        g.progress.remaining,
+        g.progress.percentage,
+        g.targetDate,
+        g.progress.monthlyNeeded,
+        t(g.archived ? 'app.export.csv.yes' : 'app.export.csv.no'),
+      ]),
+    };
+  };
 
   const run = (change: () => Promise<unknown>) =>
     action.run(async () => {
@@ -214,6 +245,13 @@ export function GoalsView() {
           <Icon name="flag" /> {t('app.goals.title')}
         </h2>
         <p className="section-hint">{t('app.goals.hint')}</p>
+        <ExportButtons
+          name="metas"
+          what={t('app.goals.title')}
+          count={all.length}
+          table={table}
+          pdf
+        />
         {(action.error ?? goals.error) && (
           <p className="form-error">{action.error ?? goals.error}</p>
         )}

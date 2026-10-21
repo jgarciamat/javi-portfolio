@@ -15,6 +15,7 @@ import '@modules/billing/ui/css/Billing.css';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from '../components/ExportButtons';
 
 function Change({ pct }: { pct: number | null }) {
   const { percent } = useFormat();
@@ -160,13 +161,31 @@ export function AnalysisView() {
 function TrendsCard() {
   const { insightsApi } = useApi();
   const { t, tCategory } = useI18n();
-  const { money, monthLabel } = useFormat();
+  const { money, monthLabel, currency } = useFormat();
   const { year, month } = useFinances();
   const { data: trends, error } = useResource(
     () => insightsApi.trends(year, month).then((r) => r.categories),
     [insightsApi, year, month]
   );
   const columns = ['category', 'thisMonth', 'previous', 'vsPrevious', 'average3', 'vsAverage'];
+  const table = () => ({
+    head: [
+      t('app.analysis.category'),
+      `${t('app.analysis.thisMonth')} (${currency})`,
+      `${t('app.analysis.previous')} (${currency})`,
+      `${t('app.analysis.vsPrevious')} (%)`,
+      `${t('app.analysis.average3')} (${currency})`,
+      `${t('app.analysis.vsAverage')} (%)`,
+    ],
+    rows: trends!.map((row) => [
+      tCategory(row.categoryName),
+      row.current,
+      row.previous,
+      row.changeVsPreviousPct,
+      row.average3,
+      row.changeVsAveragePct,
+    ]),
+  });
 
   return (
     <div className="card">
@@ -174,6 +193,13 @@ function TrendsCard() {
         <Icon name="trend" /> {t('app.analysis.trendsTitle', { month: monthLabel(year, month) })}
       </h2>
       <p className="section-hint">{t('app.analysis.trendsHint')}</p>
+      <ExportButtons
+        name={`tendencias_${year}-${String(month).padStart(2, '0')}`}
+        what={t('app.analysis.trendsName')}
+        count={trends?.length ?? 0}
+        table={table}
+        pdf={{ range: monthLabel(year, month) }}
+      />
       {error && <p className="form-error">{error}</p>}
       {trends?.length === 0 && <p className="empty-state">{t('app.analysis.noData')}</p>}
       {trends && trends.length > 0 && (
@@ -217,13 +243,20 @@ const RANGES = [6, 12, 24];
 function NetWorthCard() {
   const { insightsApi } = useApi();
   const { t } = useI18n();
-  const { money } = useFormat();
+  const { money, currency } = useFormat();
   const [months, setMonths] = useState(12);
   const { data: points, error } = useResource(
     () => insightsApi.netWorth(months),
     [insightsApi, months]
   );
   const last: NetWorthPoint | undefined = points?.[points.length - 1];
+  const table = () => ({
+    head: [t('app.analysis.month'), ...SERIES.map((s) => `${t(s.labelKey)} (${currency})`)],
+    rows: points!.map((p) => [
+      `${p.year}-${String(p.month).padStart(2, '0')}`,
+      ...SERIES.map((s) => p[s.key]),
+    ]),
+  });
 
   return (
     <div className="card">
@@ -245,6 +278,13 @@ function NetWorthCard() {
         </select>
       </div>
       <p className="section-hint">{t('app.analysis.netWorthHint')}</p>
+      <ExportButtons
+        name="patrimonio_evolucion"
+        what={t('app.analysis.netWorthTitle')}
+        count={points?.length ?? 0}
+        table={table}
+        pdf={{ range: `${months} ${t('app.analysis.months')}` }}
+      />
       {error && <p className="form-error">{error}</p>}
       {points && last && (
         <>
@@ -288,9 +328,23 @@ function SubscriptionRow({ item }: { item: DetectedSubscription }) {
 function SubscriptionsCard() {
   const { insightsApi } = useApi();
   const { t } = useI18n();
-  const { money } = useFormat();
+  const { money, currency } = useFormat();
   const { data, error } = useResource(() => insightsApi.subscriptions(), [insightsApi]);
   const columns = ['name', 'cadence', 'amount', 'perYear', 'next'];
+  const table = () => ({
+    head: columns.map((c) =>
+      c === 'amount' || c === 'perYear'
+        ? `${t(`app.subscriptions.col.${c}`)} (${currency})`
+        : t(`app.subscriptions.col.${c}`)
+    ),
+    rows: data!.subscriptions.map((item) => [
+      item.description,
+      t(`app.subscriptions.${item.cadence}`),
+      item.amount,
+      item.annualCost,
+      item.nextDate.slice(0, 10),
+    ]),
+  });
 
   return (
     <div className="card">
@@ -298,6 +352,13 @@ function SubscriptionsCard() {
         <Icon name="repeat" /> {t('app.subscriptions.title')}
       </h2>
       <p className="section-hint">{t('app.subscriptions.hint')}</p>
+      <ExportButtons
+        name="suscripciones"
+        what={t('app.subscriptions.title')}
+        count={data?.subscriptions.length ?? 0}
+        table={table}
+        pdf
+      />
       {error && <p className="form-error">{error}</p>}
       {data?.subscriptions.length === 0 && (
         <p className="empty-state">{t('app.subscriptions.none')}</p>

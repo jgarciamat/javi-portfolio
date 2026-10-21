@@ -197,6 +197,8 @@ describe('The self-employed form saved in the account', () => {
     expect((await get(ana).expect(200)).body.data.manual.activity).toEqual(activity);
     const wrong = { ...data, manual: { ...data.manual, activity: { ...activity, extra: 1 } } };
     await put(ana, { data: wrong, baseVersion: 1 }).expect(400);
+    const tooMany = { ...data, manual: { ...data.manual, filed130: ['1', '2', '3', '4', '5'] } };
+    await put(ana, { data: tooMany, baseVersion: 1 }).expect(400);
 
     // A taxi in non-farming modules (frontend activityForm.ts, ObjectiveForm): kept as it is.
     const objective = {
@@ -314,6 +316,7 @@ describe('The self-employed form saved in the account', () => {
           },
         ],
         filed303: [472, null, null, null],
+        filed130: ['', '', '-1000', ''],
       },
       extras: {
         ...base.extras,

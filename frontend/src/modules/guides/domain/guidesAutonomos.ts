@@ -3,6 +3,150 @@ import type { Guide } from './guides';
 const CHECK =
   'Las cifras de esta guía son orientativas y corresponden a las reglas vigentes en 2026 según la información pública de la Agencia Tributaria y la Seguridad Social. Pueden cambiar o tener excepciones según tu caso, así que contrástalas siempre en la sede de la AEAT o con tu gestor antes de presentar nada.';
 
+const FIX_CHECK =
+  'Esta guía es orientativa: resume las reglas de la Agencia Tributaria vigentes en octubre de 2026 y no sustituye el consejo de un profesional. Cada caso puede tener matices; si dudas, consulta con un profesional o con la propia Agencia Tributaria antes de presentar nada.';
+
+/**
+ * Correcting a modelo 130 or 303 already filed (docs/fiscalidad/corregir-un-modelo.md §10, sources
+ * checked 2026-10-21). Open to everybody (signupWall.ts, OPEN_GUIDES).
+ */
+export const FIX_GUIDE: Guide = {
+  slug: 'corregir-modelo-130-303',
+  updated: '2026-10-21',
+  title: 'Me equivoqué en el modelo 130 o 303: cómo corregirlo',
+  description:
+    'Presentaste el 130 o el 303 con un error: complementaria o rectificativa, por qué sale «duplicada», si esperar al siguiente trimestre y qué recargo hay.',
+  intro:
+    'Equivocarse en un modelo trimestral es más normal de lo que parece, y tiene arreglo. Lo importante es corregir el trimestre en el que está el error, no el siguiente, y hacerlo cuanto antes: si te toca pagar algo, el recargo empieza siendo del 1 %.',
+  sections: [
+    {
+      heading: 'Primero: ¿qué modelo y hacia qué lado es el error?',
+      paragraphs: [
+        'Mira dos cosas. La primera, qué modelo es: el 130 es el adelanto del IRPF y el 303 es el IVA. Se corrigen de forma distinta.',
+        'La segunda, hacia qué lado va el error. Si pusiste gastos de más o ingresos de menos, pagaste menos de lo que tocaba. Si pusiste gastos de menos o ingresos de más, pagaste de más.',
+        'Ten a mano el justificante del modelo que presentaste: vas a necesitar su número.',
+      ],
+    },
+    {
+      heading: 'Modelo 130: si pagaste de menos, presenta una complementaria',
+      paragraphs: [
+        '1. Entra en la sede de la Agencia Tributaria, en el modelo 130 del mismo año y trimestre del error.',
+        '2. Rellena todas las casillas con las cifras correctas, acumuladas desde el 1 de enero. Las nuevas sustituyen a las que pusiste.',
+        '3. Marca la casilla «Complementaria» y escribe el número de justificante de 13 cifras del 130 que presentaste.',
+        '4. En la casilla 18 pon lo que pagaste con ese 130. Si te salió cero o negativo, pon 0.',
+        '5. Paga la diferencia que sale en la casilla 19.',
+        'Un ejemplo: en el tercer trimestre pusiste gastos de más y te salió 0. Con los gastos bien puestos te sale 200 € a pagar. La complementaria sale a 200 €. Si la presentas antes del 20 de noviembre de 2026, el recargo es del 1 %, es decir, 2 €, y baja a 1,50 € si pagas todo a tiempo.',
+        'Si quieres repasar qué va en cada casilla, tienes el [modelo 130 paso a paso](/guias/modelo-130-paso-a-paso).',
+      ],
+    },
+    {
+      heading: 'Modelo 303: el error se corrige con una rectificativa',
+      paragraphs: [
+        'Desde el tercer trimestre de 2024, en el 303 ya no hay complementaria. Cualquier error, a favor o en contra, se corrige con una autoliquidación rectificativa del mismo trimestre.',
+        '1. Entra en el 303 de ese trimestre y elige «Modificar declaración».',
+        '2. Corrige las cifras.',
+        '3. En el apartado «Resultado», marca «Autoliquidación rectificativa», escribe el número de justificante de la declaración que corriges y marca el motivo «Rectificaciones».',
+        '4. Si la declaración anterior salió a pagar, pon ese importe en la casilla 70. Si salió a compensar o a cero, déjala en blanco. Si te devolvieron dinero con ella, ese importe va en la casilla 109.',
+        '5. Revisa el resultado de la casilla 71 y presenta.',
+        'Si el error dejaba un saldo «a compensar» más alto de lo debido y ya lo usaste en un trimestre posterior, ese trimestre también hay que corregirlo. Las casillas del 303 están explicadas en [el modelo 303 casilla a casilla](/guias/modelo-303-casillas).',
+      ],
+    },
+    {
+      heading: 'Si pagaste de más',
+      paragraphs: [
+        'En el 130, si sigues en el mismo año, pon bien los acumulados en el siguiente trimestre: normalmente lo que pagaste de más se descuenta ahí, porque la casilla 05 resta lo que ya pagaste. Y lo que no se descuente lo recuperas en la Renta, donde se resta todo lo pagado con el 130. Si prefieres, también puedes pedir la rectificación a la Agencia Tributaria, con un plazo de cuatro años.',
+        'En el 303 se hace una rectificativa del trimestre. Hay una excepción sencilla: si olvidaste una factura de gasto, puedes deducir su IVA en un 303 posterior, siempre que no hayan pasado cuatro años.',
+      ],
+    },
+    {
+      heading: 'Qué recargo hay',
+      paragraphs: [
+        'Si corriges por tu cuenta, sin que Hacienda te lo haya pedido, no hay multa: solo un recargo sobre lo que te toca pagar. Es del 1 % más otro 1 % por cada mes completo de retraso desde el fin del plazo. Pasados 12 meses es del 15 %, más intereses.',
+        'El recargo baja un 25 % si pagas a tiempo lo que sale y el propio recargo.',
+        'Si la corrección no sale a pagar (por ejemplo, solo baja el IVA a compensar), no hay recargo.',
+        'Si Hacienda ya te ha enviado una carta o un requerimiento sobre ese modelo, esto cambia: contesta a lo que te piden y consulta con un profesional.',
+      ],
+    },
+    // Questions as headings: the guide renderer has no bold, and each question reads on its own.
+    {
+      heading: '¿Complementaria o declaración normal?',
+      paragraphs: [
+        'Nunca otra normal: ya hay una presentada para ese trimestre. En el 130 se hace una complementaria; en el 303 del tercer trimestre de 2024 en adelante, una rectificativa.',
+      ],
+    },
+    {
+      heading: 'La sede me dice que está duplicada',
+      paragraphs: [
+        'Suele pasar al presentar una segunda declaración normal del mismo trimestre. Vuelve a hacerla marcando «Complementaria» (130) o «Autoliquidación rectificativa» (303) y escribe el número de justificante de la anterior.',
+      ],
+    },
+    {
+      heading: 'No me deja hacer la complementaria del 130',
+      paragraphs: [
+        'La complementaria solo se admite si sale más a pagar que en la anterior. Si con los gastos bien puestos sigue saliendo 0, no hay nada que pagar por ese trimestre: pon las cifras correctas en el siguiente y guarda las facturas.',
+        'Si es un 303, búscalo como rectificativa, no como complementaria. Revisa también que el número de justificante sea el de la última declaración de ese trimestre.',
+      ],
+    },
+    {
+      heading: '¿Puedo esperar al siguiente trimestre y restar los gastos que puse de más?',
+      paragraphs: [
+        'No es lo recomendable. En el 130, si con las cifras correctas te tocaba pagar, ese dinero se pagaría tarde, y Hacienda puede poner una multa del 50 % de lo que se pagó tarde: mucho más que el recargo de una complementaria.',
+        'En el 303 tampoco se lleva al trimestre siguiente: se corrige el trimestre del error.',
+        'Lo que sí debes hacer siempre es poner las cifras reales en el siguiente 130, porque son acumuladas desde enero.',
+      ],
+    },
+    {
+      heading: '¿Y si me di cuenta en el cuarto trimestre o ya hice la Renta?',
+      paragraphs: [
+        'El 130 del cuarto trimestre se corrige igual, con una complementaria. En la Renta van siempre las cifras reales del año; si ya la presentaste con el error, se corrige con una rectificativa en Renta WEB.',
+        'Si el error es de hace más de un año, consulta con un profesional o con la Agencia Tributaria.',
+      ],
+    },
+    {
+      heading: '¿Me van a multar por corregir?',
+      paragraphs: [
+        'No, si lo corriges tú antes de que Hacienda te pregunte: solo pagas el recargo, si sale algo a pagar.',
+      ],
+    },
+    {
+      heading: 'Cómo te ayuda Finanverso',
+      paragraphs: [
+        'En la sección Autónomos puedes corregir los gastos del trimestre y ver qué habría salido con las cifras buenas. Si cambias un trimestre ya cerrado, te avisamos y puedes escribir lo que presentaste: así el siguiente 130 resta lo que de verdad pagaste. Finanverso no presenta ni corrige nada en la Agencia Tributaria: la complementaria o la rectificativa las presentas tú en la sede.',
+        FIX_CHECK,
+      ],
+    },
+  ],
+  related: [
+    'modelo-130-paso-a-paso',
+    'modelo-303-casillas',
+    'fechas-modelos-trimestrales-autonomos-2026',
+    'iva-para-autonomos-modelo-303',
+  ],
+  checked: '2026-10-21',
+  sources: [
+    {
+      label: 'AEAT: instrucciones del modelo 130',
+      url: 'https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/impuesto-sobre-renta-personas-fisicas/modelo-130-irpf______esionales-estimacion-directa-fraccionado_/instrucciones.html',
+    },
+    {
+      label: 'AEAT: errores en el modelo 303',
+      url: 'https://sede.agenciatributaria.gob.es/Sede/iva/presentar-declaracion-iva-modelo-303/errores-declaracion.html',
+    },
+    {
+      label: 'AEAT: preguntas frecuentes de la rectificativa del 303',
+      url: 'https://sede.agenciatributaria.gob.es/Sede/todas-gestiones/impuestos-tasas/iva/modelo-303-iva-autoliquidacion_/autoliquidacion-rectificativa/preguntas-frecuentes-sobre-autoliquidacion-rectificativa-303.html',
+    },
+    {
+      label: 'AEAT: recargos aplicables',
+      url: 'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/regularizacion-situaciones-tributarias/recargos-aplicables.html',
+    },
+    {
+      label: 'BOE: Ley General Tributaria (artículos 27, 120, 122 y 191)',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186',
+    },
+  ],
+};
+
 /** Guides for the self-employed: quarterly tax drafts, contributions and deductible expenses. */
 export const GUIDES_AUTONOMOS: Guide[] = [
   {
@@ -70,6 +214,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
       'gastos-deducibles-autonomo',
       'fechas-modelos-trimestrales-autonomos-2026',
       'cuota-autonomos-2026-por-tramos',
+      'corregir-modelo-130-303',
     ],
   },
   {
@@ -289,4 +434,5 @@ export const GUIDES_AUTONOMOS: Guide[] = [
       'cuota-autonomos-2026-por-tramos',
     ],
   },
+  FIX_GUIDE,
 ];

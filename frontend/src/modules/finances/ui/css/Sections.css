@@ -823,7 +823,8 @@
   /* Rainbow frame: the panel colour inside, the gradient on the border. */
   border: 2px solid transparent;
   border-radius: 14px;
-  background: linear-gradient(var(--slate-900), var(--slate-900)) padding-box,
+  background:
+    linear-gradient(var(--slate-900), var(--slate-900)) padding-box,
     linear-gradient(90deg, #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6) border-box;
 }
 
@@ -986,7 +987,9 @@ button.entity-item {
   border: 1px solid var(--slate-700);
   border-radius: 12px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .split-group:hover {
@@ -1307,4 +1310,15 @@ button.entity-item {
 .search-row > .entity-item {
   flex: 1;
   min-width: 0;
+}
+
+/* ─── Import: the movements template ─── */
+.import-template-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* 44 px: big enough to tap. */
+  min-height: 2.75rem;
+  margin-top: 0.35rem;
+  text-decoration: none;
 }

@@ -66,6 +66,7 @@ export const GUIDE_CATEGORIES: GuideCategory[] = [
       'gastos-deducibles-autonomo',
       'fechas-modelos-trimestrales-autonomos-2026',
       'modelo-303-casillas',
+      'corregir-modelo-130-303',
       'alta-autonomo-paso-a-paso',
       'tarifa-plana-autonomos-2026',
       'verifactu-que-es',

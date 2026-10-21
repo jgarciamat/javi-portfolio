@@ -1,7 +1,8 @@
 import { parseDecimal } from '@shared/utils/numbers';
 import { annualActivity, type AnnualActivity } from '@modules/finances/domain/annualActivity';
 import { investmentGoodsOf } from '@modules/finances/domain/depreciation';
-import type { AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
+import { typedAmount } from '@modules/finances/domain/closedQuarter';
+import type { ActivityInputs, AutonomoInputs, QuarterExtras } from '@modules/finances/domain/types';
 import { toManualData, type Extras, type ManualForm } from './AutonomoManual';
 import { activityExtras, isEmptyActivity, modalityOf, toActivityInputs } from './activityForm';
 import { toVatOptions } from './vatForm';
@@ -25,6 +26,18 @@ const priorOf = (manual: ManualForm, quarter: Quarter): AutonomoInputs['prior'] 
     : null;
 
 /**
+ * The modelo 130 of each quarter as filed: box 07 typed, box 19 what was paid with it (the activity
+ * keeps it for the Renta). Null when nothing was typed, so the draft is sent as before.
+ */
+function filedOf(manual: ManualForm, activity: ActivityInputs): AutonomoInputs['filed130'] {
+  const list = [0, 1, 2, 3].map((i) => {
+    const box07 = typedAmount(manual.filed130?.[i]);
+    return box07 === null ? null : { box07, box19: activity.paid130[i] };
+  });
+  return list.some((f) => f !== null) ? list : null;
+}
+
+/**
  * What the server takes to prepare the draft of a quarter, and what the annual summary reads: the
  * quarters, the options and the activity (its depreciation and grants worked out here, by quarter).
  */
@@ -42,6 +55,7 @@ export function buildInputs(
   // The assets of earlier years with VAT are investment goods of the 303 too (arts. 107-109 LIVA).
   const goods = investmentGoodsOf(activity.assets, year, modalityOf(activity.method));
   const investments = [...(vat.investments ?? []), ...goods];
+  const filed130 = filedOf(manual, activity);
   return {
     quarters: manual.quarters.map((q, i): QuarterExtras => ({
       withheld: number(q.withheld),
@@ -65,6 +79,7 @@ export function buildInputs(
     vat: investments.length > 0 ? { ...vat, investments } : vat,
     manual: toManualData(manual),
     prior: priorOf(manual, quarter),
+    ...(filed130 ? { filed130 } : {}),
   };
 }
 

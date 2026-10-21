@@ -61,6 +61,37 @@ const SOURCE_MARK: Partial<Record<NonNullable<ImportedRow['categorySource']>, st
   ai: ' ✨',
 };
 
+/** A CSV with the columns the import expects, and invented movements, to fill in. */
+const TEMPLATE_HREF = '/plantillas/movimientos.csv';
+
+/** The movements template, with the columns it has. */
+function TemplateLink() {
+  const { t } = useI18n();
+  return (
+    <p className="section-hint import-template">
+      {t('app.import.template.columns')}{' '}
+      <a
+        className="btn-secondary import-template-link"
+        href={TEMPLATE_HREF}
+        download
+        aria-label={t('app.import.template.downloadAria')}
+      >
+        <Icon name="download" /> {t('app.import.template.download')}
+      </a>
+    </p>
+  );
+}
+
+/** The columns a CSV must have that could not be found (an amount, or a debit and a credit). */
+function missingColumns(mapping: ColumnMapping): string[] {
+  const missing: string[] = [];
+  if (mapping.date < 0) missing.push('app.import.col.date');
+  if (mapping.description < 0) missing.push('app.import.col.description');
+  if (mapping.amount < 0 && mapping.debit < 0 && mapping.credit < 0)
+    missing.push('app.import.col.amount');
+  return missing;
+}
+
 const FORMAT_NAMES = { csv: 'CSV', norma43: 'Norma 43', pdf: 'PDF' } as const;
 
 const IMPORT_ACCEPT =
@@ -75,6 +106,7 @@ function FileStep({ imp }: { imp: ImportState }) {
       onFiles={(list) => void imp.loadFile(list[0])}
     >
       <p className="section-hint">{t('app.import.hint')}</p>
+      <TemplateLink />
       <label className="file-drop">
         <input
           type="file"
@@ -93,26 +125,40 @@ function FileStep({ imp }: { imp: ImportState }) {
 function ColumnMappingFields({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
   const { mapping } = imp;
+  const missing = missingColumns(mapping);
   return (
-    <div className="form-grid">
-      {MAPPING_FIELDS.map(({ key, labelKey, optional }) => (
-        <label key={key} className="field">
-          <span className="field-label">{t(labelKey)}</span>
-          <select
-            className="tx-input"
-            value={mapping[key]}
-            onChange={(e) => imp.updateMapping(key, Number(e.target.value))}
-          >
-            {optional && <option value={-1}>—</option>}
-            {imp.headers.map((h, i) => (
-              <option key={i} value={i}>
-                {h || `#${i + 1}`}
-              </option>
-            ))}
-          </select>
-        </label>
-      ))}
-    </div>
+    <>
+      {missing.length > 0 && (
+        <div className="form-error" role="alert">
+          <p>
+            {t('app.import.error.columns', {
+              missing: missing.map((key) => t(key)).join(', '),
+              found: imp.headers.filter(Boolean).join(', '),
+            })}
+          </p>
+          <TemplateLink />
+        </div>
+      )}
+      <div className="form-grid">
+        {MAPPING_FIELDS.map(({ key, labelKey, optional }) => (
+          <label key={key} className="field">
+            <span className="field-label">{t(labelKey)}</span>
+            <select
+              className="tx-input"
+              value={mapping[key]}
+              onChange={(e) => imp.updateMapping(key, Number(e.target.value))}
+            >
+              {optional && <option value={-1}>—</option>}
+              {imp.headers.map((h, i) => (
+                <option key={i} value={i}>
+                  {h || `#${i + 1}`}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
+      </div>
+    </>
   );
 }
 

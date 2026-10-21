@@ -2,10 +2,14 @@ import { useRef } from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
+import { useAction } from '@shared/hooks/useAction';
 import { useDialog } from '@shared/hooks/useDialog';
 import { useResource } from '@shared/hooks/useResource';
 import type { AnnualReport, ReportTotals } from '@modules/finances/domain/types';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { useTablePdf } from '../../application/hooks/useTablePdf';
+import { buildAnnualReportPdf, type AnnualPdfText } from '../../application/annualReportPdf';
+import { pdfFileName, savePdf } from '../../application/tablePdf';
 import '../css/AnnualReportDialog.css';
 import { Icon } from '@shared/components/Icon';
 
@@ -99,15 +103,63 @@ function CategoryTable({
   );
 }
 
-/** Printable yearly summary (months, quarters, categories): for the accountant or the tax return. */
-export function AnnualReportDialog({ year, onClose }: { year: number; onClose: () => void }) {
-  const { insightsApi } = useApi();
+/** The words of the PDF, in the language of the app. */
+function usePdfText(): AnnualPdfText {
   const { t } = useI18n();
   const { monthName } = useFormat();
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  return {
+    summary: t('app.report.summary'),
+    chart: t('app.report.chart'),
+    byMonth: t('app.report.byMonth'),
+    quarters: t('app.report.quarters'),
+    quarter: t('app.report.quarter'),
+    expensesByCategory: t('app.report.expensesByCategory'),
+    incomeByCategory: t('app.report.incomeByCategory'),
+    noData: t('app.report.noData'),
+    disclaimer: t('app.report.disclaimer'),
+    total: t('app.export.csv.total'),
+    month: t('app.annual.table.month'),
+    income: t('app.annual.table.income'),
+    expenses: t('app.annual.table.expenses'),
+    saving: t('app.annual.table.saving'),
+    balance: t('app.annual.table.balance'),
+    category: t('app.export.csv.category'),
+    amount: t('app.export.csv.amount'),
+    monthNames: months.map((m) => monthName(m)),
+    monthShort: months.map((m) => monthName(m, 'short')),
+  };
+}
+
+/** Yearly summary (months, quarters, categories) as a PDF to keep or send, or to print. */
+export function AnnualReportDialog({ year, onClose }: { year: number; onClose: () => void }) {
+  const { insightsApi } = useApi();
+  const { t, tCategory } = useI18n();
+  const { monthName, locale } = useFormat();
   const dialog = useRef<HTMLDivElement>(null);
   useDialog(dialog, onClose, true);
   const { exportReportCSV } = useExportCSV();
+  const { words, header } = useTablePdf();
+  const text = usePdfText();
+  const pdf = useAction(t('app.exportButtons.error'));
   const { data, error } = useResource(() => insightsApi.report(year), [insightsApi, year]);
+  const title = `${t('app.report.title')} ${year}`;
+
+  /** Free on every plan: it does not count as one of the self-employed PDFs. */
+  const downloadPdf = (report: AnnualReport) =>
+    pdf.run(async () => {
+      const named = (list: AnnualReport['expensesByCategory']) =>
+        list.map((c) => ({ ...c, categoryName: tCategory(c.categoryName) }));
+      const blob = await buildAnnualReportPdf(
+        {
+          ...report,
+          expensesByCategory: named(report.expensesByCategory),
+          incomeByCategory: named(report.incomeByCategory),
+        },
+        { header: header(title, String(year)), words, text, locale }
+      );
+      await savePdf(blob, pdfFileName(`informe-anual_${year}`), title);
+    });
 
   return (
     <div className="report-overlay">
@@ -116,7 +168,7 @@ export function AnnualReportDialog({ year, onClose }: { year: number; onClose: (
         className="report-sheet"
         role="dialog"
         aria-modal="true"
-        aria-label={`${t('app.report.title')} ${year}`}
+        aria-label={title}
         tabIndex={-1}
       >
         <header className="report-head">
@@ -126,6 +178,16 @@ export function AnnualReportDialog({ year, onClose }: { year: number; onClose: (
           <div className="report-actions">
             {data && (
               <>
+                <button
+                  className="btn-primary"
+                  disabled={pdf.pending}
+                  aria-busy={pdf.pending}
+                  aria-label={t('app.exportButtons.pdfFor', { what: title })}
+                  onClick={() => void downloadPdf(data)}
+                >
+                  <Icon name="file" />{' '}
+                  {pdf.pending ? t('app.report.preparing') : t('app.report.pdf')}
+                </button>
                 <button className="btn-secondary" onClick={() => window.print()}>
                   <Icon name="print" /> {t('app.report.print')}
                 </button>
@@ -140,6 +202,11 @@ export function AnnualReportDialog({ year, onClose }: { year: number; onClose: (
           </div>
         </header>
         {error && <p className="form-error">{error}</p>}
+        {pdf.error && (
+          <p className="form-error" role="alert">
+            {pdf.error}
+          </p>
+        )}
         {!data && !error && <p>{t('app.common.loading')}</p>}
         {data && (
           <>

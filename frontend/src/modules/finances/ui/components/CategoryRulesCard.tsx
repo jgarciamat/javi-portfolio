@@ -6,6 +6,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { useFinances } from '../../application/FinancesContext';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from './ExportButtons';
 
 /** "When the description contains … use this category": applied to imports and kept private. */
 export function CategoryRulesCard() {
@@ -35,6 +36,15 @@ export function CategoryRulesCard() {
         <Icon name="wand" /> {t('app.rules.title')}
       </h2>
       <p className="section-hint">{t('app.rules.hint')}</p>
+      <ExportButtons
+        name="reglas"
+        what={t('app.rules.title')}
+        count={rules.length}
+        table={() => ({
+          head: [t('app.rules.pattern'), t('app.rules.category')],
+          rows: rules.map((r) => [r.pattern, tCategory(r.categoryName)]),
+        })}
+      />
       {action.error && <p className="form-error">{action.error}</p>}
       <div className="form-grid">
         <label className="field">

@@ -7,8 +7,7 @@ import { round2 } from '../round';
  * «¿Puedo recuperar ese dinero?»: for each year with losses, whether they can still be used and how
  * (LIRPF art. 49: offset in the four following years, also up to 25 % of the capital income of the
  * savings base; LGT arts. 66 and 67: four years from the end of the filing period to correct a
- * return; LGT art. 120.3 and 122: corrective return, also out of time). BOE-A-2006-20764 and
- * BOE-A-2003-23186, checked 19-10-2026.
+ * return). BOE-A-2006-20764 and BOE-A-2003-23186, checked 19-10-2026.
  */
 export interface RecoverYear {
   year: number;
@@ -23,7 +22,22 @@ export interface RecoverYear {
   now: number | null;
   /** The most a corrective return of that year could give back (tax of the savings on it). */
   correctUpTo: number;
+  /** How that Renta is corrected: see `correctionOf`. */
+  correctBy: Correction;
 }
+
+/**
+ * From the Renta 2024 a single corrective return (autoliquidación rectificativa: LGT art. 120.4,
+ * RIRPF art. 67 bis). The Renta 2023 and earlier keep the older system: a loss
+ * left out lowers the tax, so it is a request for rectification (LGT art. 120.3, RGAT arts.
+ * 126-128), filed with that year's return form; the complementaria (LGT art. 122.2) only fits when
+ * more is due. AEAT, Manual Renta 2025 «A. En general» and Manual Renta 2023 «Iniciación del
+ * procedimiento», checked 21-10-2026.
+ */
+export type Correction = 'rectificativa' | 'rectificacion';
+export const RECTIFICATIVA_FROM = 2024;
+export const correctionOf = (year: number): Correction =>
+  year >= RECTIFICATIVA_FROM ? 'rectificativa' : 'rectificacion';
 
 /** The losses of earlier years to look at: from the files and typed, one per year (the larger). */
 export function lossesToRecover(
@@ -73,6 +87,7 @@ export function recoverOptions(
       correctable: today <= correctUntil,
       now,
       correctUpTo,
+      correctBy: correctionOf(year),
     };
   });
 }

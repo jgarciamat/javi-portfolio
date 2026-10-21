@@ -46,7 +46,7 @@ export function RecoverPanel({ list }: { list: RecoverYear[] }) {
           {r.correctable ? (
             <>
               <p>
-                {t(`${k}.correct`, {
+                {t(r.correctBy === 'rectificativa' ? `${k}.correct` : `${k}.correctOld`, {
                   year: r.year,
                   date: date(r.correctUntil),
                   amount: money(r.correctUpTo),

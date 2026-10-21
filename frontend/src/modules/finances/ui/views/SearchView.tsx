@@ -20,8 +20,13 @@ import {
   preventShiftTextSelection,
 } from '@shared/components/BulkSelection';
 import { BULK_MAX } from '@modules/finances/domain/transactionBulk';
+import { totalsByType } from '@modules/finances/domain/transactionTypes';
 import { useFinances } from '../../application/FinancesContext';
 import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
+import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { useTablePdf } from '../../application/hooks/useTablePdf';
+import type { PdfTable } from '../../application/tablePdf';
+import { ExportButtons } from '../components/ExportButtons';
 import { SignedAmount } from '../components/TransactionBits';
 import { TransactionBulkActions } from '../components/TransactionBulkActions';
 import { RowCheckbox } from '../components/TransactionSelect';
@@ -170,6 +175,8 @@ function SearchResults({
   showAccount,
   onEdit,
   onMore,
+  onExport,
+  range,
   selection,
 }: {
   result: TransactionSearchResult;
@@ -177,6 +184,10 @@ function SearchResults({
   showAccount: boolean;
   onEdit: (tx: Transaction) => void;
   onMore: () => void;
+  /** Every match of the filters as a table, not only the loaded pages. */
+  onExport: () => Promise<PdfTable>;
+  /** The dates of the filters, printed under the title of the PDF. */
+  range?: string;
   selection: RowSelection;
 }) {
   const { t, tCategory } = useI18n();
@@ -191,6 +202,13 @@ function SearchResults({
           <span className="amount-saving">🐷 {money(result.totals.saving)}</span>
         )}
       </div>
+      <ExportButtons
+        name="busqueda"
+        what={t('app.search.title')}
+        count={result.total}
+        table={onExport}
+        pdf={{ range }}
+      />
       {result.items.length === 0 ? (
         <p className="empty-state">{t('app.search.empty')}</p>
       ) : (
@@ -304,6 +322,20 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
       }));
     });
 
+  const { transactionTable } = useExportCSV();
+  const { dateRange } = useTablePdf();
+  /** Reads every match page by page, leaving out the ones waiting for an undo. */
+  const exportMatching = async () => {
+    const all: Transaction[] = [];
+    for (let offset = 0; offset < firstPage.data!.total; offset += FULL_PAGE) {
+      const page = await transactionApi.search({ ...filters, limit: FULL_PAGE, offset });
+      all.push(...page.items);
+    }
+    const hidden = new Set(bulk.hidden);
+    const shown = all.filter((tx) => !hidden.has(tx.id));
+    return transactionTable(shown, totalsByType(shown));
+  };
+
   const set: SetFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value || undefined }));
   const error = firstPage.error ?? loadingMore.error;
 
@@ -330,6 +362,8 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
           showAccount={accounts.length > 1}
           onEdit={onEdit}
           onMore={() => loadMore(firstPage.data!.items.length + extra.length)}
+          onExport={exportMatching}
+          range={dateRange(filters.from, filters.to)}
           selection={selection}
         />
       )}

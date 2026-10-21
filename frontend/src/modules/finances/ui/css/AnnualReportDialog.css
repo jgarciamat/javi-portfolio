@@ -39,6 +39,14 @@
   gap: 0.5rem;
 }
 
+/* 44 px: big enough to tap. */
+.report-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+}
+
 .report-actions .btn-secondary {
   width: auto;
 }
