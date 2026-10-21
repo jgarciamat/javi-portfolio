@@ -7,6 +7,7 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { todayDateOnly } from '@shared/utils/format';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from '../components/ExportButtons';
 
 const ACCOUNT_TYPES: { value: AccountType; icon: string }[] = [
   { value: 'checking', icon: '🏦' },
@@ -283,9 +284,44 @@ function AccountRow({
 
 export function AccountsView() {
   const { t } = useI18n();
-  const { money, date } = useFormat();
+  const { money, date, currency } = useFormat();
   const acc = useAccounts();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const yesNo = (v: boolean) => t(v ? 'app.export.csv.yes' : 'app.export.csv.no');
+  const accountsTable = () => ({
+    head: [
+      t('app.accounts.export.name'),
+      t('app.accounts.export.type'),
+      `${t('app.accounts.export.initial')} (${currency})`,
+      `${t('app.accounts.export.balance')} (${currency})`,
+      t('app.accounts.export.default'),
+      t('app.accounts.export.archived'),
+    ],
+    rows: acc.accounts.map((a) => [
+      a.name,
+      t(`app.accounts.type.${a.type}`),
+      a.initialBalance,
+      a.balance,
+      yesNo(a.isDefault),
+      yesNo(a.archived),
+    ]),
+  });
+  const transfersTable = () => ({
+    head: [
+      t('app.export.csv.date'),
+      t('app.accounts.export.from'),
+      t('app.accounts.export.to'),
+      `${t('app.export.csv.amount')} (${currency})`,
+      t('app.export.csv.description'),
+    ],
+    rows: acc.transfers.map((tr) => [
+      tr.date.slice(0, 10),
+      tr.fromAccountName,
+      tr.toAccountName,
+      tr.amount,
+      tr.description,
+    ]),
+  });
 
   return (
     <div className="section-view">
@@ -297,6 +333,12 @@ export function AccountsView() {
           <span className="section-total">{money(acc.total)}</span>
         </div>
         <p className="section-hint">{t('app.accounts.hint')}</p>
+        <ExportButtons
+          name="cuentas"
+          what={t('app.accounts.title')}
+          count={acc.accounts.length}
+          table={accountsTable}
+        />
         {acc.error && <p className="form-error">{acc.error}</p>}
         <ul className="entity-list">
           {acc.accounts.map((a) => (
@@ -334,6 +376,12 @@ export function AccountsView() {
           <Icon name="repeat" /> {t('app.accounts.transfers')}
         </h2>
         <TransferForm accounts={acc.accounts} onSubmit={(input) => acc.createTransfer(input)} />
+        <ExportButtons
+          name="transferencias"
+          what={t('app.accounts.transfers')}
+          count={acc.transfers.length}
+          table={transfersTable}
+        />
         {acc.transfers.length > 0 && (
           <ul className="entity-list">
             {acc.transfers.map((tr) => (

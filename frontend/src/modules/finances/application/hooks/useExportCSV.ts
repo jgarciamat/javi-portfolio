@@ -35,6 +35,29 @@ export function downloadFile(content: string, filename: string, type: string): v
   URL.revokeObjectURL(url);
 }
 
+export type CsvValue = string | number | null | undefined;
+
+/** A table to export: one header per column and the rows below. */
+export interface CsvTable {
+  head: string[];
+  rows: CsvValue[][];
+}
+
+/**
+ * Semicolon-separated rows, which Excel in Spanish opens as columns. Numbers use
+ * `decimal` as separator and are never treated as formulas (a minus sign stays).
+ */
+export function tableToCSV({ head, rows }: CsvTable, decimal: ',' | '.' = ','): string {
+  const cell = (value: CsvValue) =>
+    typeof value === 'number' ? `"${String(value).replace('.', decimal)}"` : csvCell(value);
+  return [head, ...rows].map((r) => r.map(cell).join(';')).join('\r\n');
+}
+
+/** Downloads any table as `finanverso_<name>_<today>.csv` (UTF-8 with BOM, for Excel). */
+export function exportRowsCSV(name: string, table: CsvTable, decimal: ',' | '.'): void {
+  downloadFile(tableToCSV(table, decimal), `finanverso_${name}_${todayDateOnly()}.csv`, CSV_TYPE);
+}
+
 export interface ExportableTransaction {
   date: string;
   description: string;
@@ -46,34 +69,50 @@ export interface ExportableTransaction {
   accountName?: string;
 }
 
-/** CSV exports in the user's language and currency. */
-export function useExportCSV() {
-  const { t, tCategory } = useI18n();
-  const format = useFormat();
+type Translate = (key: string) => string;
+
+/** Movements as a table, in the language and currency given. */
+function movementsTable(
+  transactions: ExportableTransaction[],
+  t: Translate,
+  tCategory: Translate,
+  currency: string
+): CsvTable {
   const typeLabel = (type: string): string =>
     type in TYPE_LABEL_KEYS ? t(TYPE_LABEL_KEYS[type as keyof typeof TYPE_LABEL_KEYS]) : type;
-
-  const header = (): string[] =>
-    [
+  return {
+    head: [
       t('app.export.csv.date'),
       t('app.export.csv.description'),
       t('app.export.csv.category'),
       t('app.export.csv.type'),
       t('app.export.csv.account'),
-      `${t('app.export.csv.amount')} (${format.currency})`,
+      `${t('app.export.csv.amount')} (${currency})`,
       t('app.export.csv.notes'),
-    ].map(csvCell);
+    ],
+    rows: transactions.map((tx) => [
+      tx.date.slice(0, 10),
+      tx.description,
+      tCategory(tx.category),
+      typeLabel(tx.type),
+      tx.accountName ?? tx.account ?? '',
+      tx.amount,
+      tx.notes,
+    ]),
+  };
+}
 
-  const rowsOf = (transactions: ExportableTransaction[]): string[][] =>
-    transactions.map((tx) => [
-      csvCell(tx.date.slice(0, 10)),
-      csvCell(tx.description),
-      csvCell(tCategory(tx.category)),
-      csvCell(typeLabel(tx.type)),
-      csvCell(tx.accountName ?? tx.account ?? ''),
-      csvCell(tx.amount),
-      csvCell(tx.notes),
-    ]);
+/** CSV exports in the user's language and currency. */
+export function useExportCSV() {
+  const { t, tCategory } = useI18n();
+  const format = useFormat();
+  const transactionTable = (transactions: ExportableTransaction[]) =>
+    movementsTable(transactions, t, tCategory, format.currency);
+  /** The same table quoted for the comma-separated exports. */
+  const quoted = (transactions: ExportableTransaction[]): string[][] => {
+    const { head, rows } = transactionTable(transactions);
+    return [head, ...rows].map((r) => r.map(csvCell));
+  };
 
   /** Movements of the viewed month plus a summary footer. */
   function exportMonthCSV(
@@ -82,7 +121,7 @@ export function useExportCSV() {
     year: number,
     month: number
   ): void {
-    const rows = rowsOf(transactions);
+    const rows = quoted(transactions);
     if (summary) {
       const total = (key: string, value: number) => [
         csvCell(t(key)),
@@ -104,7 +143,7 @@ export function useExportCSV() {
     }
     const name = format.monthName(month).toLowerCase();
     downloadFile(
-      toCSV([header(), ...rows]),
+      toCSV(rows),
       `finanverso_${year}-${String(month).padStart(2, '0')}_${name}.csv`,
       CSV_TYPE
     );
@@ -112,7 +151,7 @@ export function useExportCSV() {
 
   const exportList = (transactions: ExportableTransaction[], name: string) =>
     downloadFile(
-      toCSV([header(), ...rowsOf(transactions)]),
+      toCSV(quoted(transactions)),
       `finanverso_${name}_${todayDateOnly()}.csv`,
       CSV_TYPE
     );
@@ -205,5 +244,12 @@ export function useExportCSV() {
     downloadFile(toCSV(rows), `finanverso_informe_${report.year}.csv`, CSV_TYPE);
   }
 
-  return { exportMonthCSV, exportAnnualCSV, exportAllCSV, exportReportCSV, exportSelectionCSV };
+  return {
+    exportMonthCSV,
+    exportAnnualCSV,
+    exportAllCSV,
+    exportReportCSV,
+    exportSelectionCSV,
+    transactionTable,
+  };
 }

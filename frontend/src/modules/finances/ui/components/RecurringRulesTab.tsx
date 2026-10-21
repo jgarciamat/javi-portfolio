@@ -12,6 +12,7 @@ import { useFinances } from '../../application/FinancesContext';
 import { DeleteRuleModal, type DeleteScope } from './DeleteRuleModal';
 import '../css/RecurringRulesTab.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from './ExportButtons';
 
 const TYPE_CLASS: Record<TransactionType, string> = {
   INCOME: 'recurring-type--income',
@@ -295,8 +296,12 @@ function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
 
 // ─── Tab ──────────────────────────────────────────────────────────────────────
 
+const yearMonth = (year: number | null, month: number | null) =>
+  year && month ? `${year}-${String(month).padStart(2, '0')}` : '';
+
 export function RecurringRulesTab({ categories }: { categories: Category[] }) {
-  const { t } = useI18n();
+  const { t, tCategory } = useI18n();
+  const { currency } = useFormat();
   const { rules, loading, error, createRule, updateRule, deleteRule, toggleActive } =
     useRecurringRules();
   const { refresh } = useFinances();
@@ -319,6 +324,28 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
   };
 
   const listError = error ?? toggling.error;
+  const table = () => ({
+    head: [
+      t('app.export.csv.description'),
+      t('app.export.csv.category'),
+      t('app.export.csv.type'),
+      `${t('app.export.csv.amount')} (${currency})`,
+      t('app.recurring.form.frequency'),
+      t('app.recurring.export.start'),
+      t('app.recurring.export.end'),
+      t('app.recurring.export.active'),
+    ],
+    rows: rules.map((r) => [
+      r.description,
+      tCategory(r.category),
+      t(typeKey(r.type)),
+      r.amount,
+      t(`app.recurring.form.frequency.${r.frequency}`),
+      yearMonth(r.startYear, r.startMonth),
+      yearMonth(r.endYear, r.endMonth),
+      t(r.active ? 'app.export.csv.yes' : 'app.export.csv.no'),
+    ]),
+  });
 
   return (
     <div className="recurring-tab">
@@ -334,6 +361,12 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
             {t('app.recurring.new')}
           </button>
         </div>
+        <ExportButtons
+          name="gastos-fijos"
+          what={t('app.recurring.title')}
+          count={rules.length}
+          table={table}
+        />
       </div>
 
       {editor.showForm && (

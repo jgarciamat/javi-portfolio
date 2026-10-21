@@ -22,6 +22,8 @@ import {
 import { BULK_MAX } from '@modules/finances/domain/transactionBulk';
 import { useFinances } from '../../application/FinancesContext';
 import { useTransactionBulk } from '../../application/hooks/useTransactionBulk';
+import { useExportCSV, type CsvTable } from '../../application/hooks/useExportCSV';
+import { ExportButtons } from '../components/ExportButtons';
 import { SignedAmount } from '../components/TransactionBits';
 import { TransactionBulkActions } from '../components/TransactionBulkActions';
 import { RowCheckbox } from '../components/TransactionSelect';
@@ -170,6 +172,7 @@ function SearchResults({
   showAccount,
   onEdit,
   onMore,
+  onExport,
   selection,
 }: {
   result: TransactionSearchResult;
@@ -177,6 +180,8 @@ function SearchResults({
   showAccount: boolean;
   onEdit: (tx: Transaction) => void;
   onMore: () => void;
+  /** Every match of the filters as a table, not only the loaded pages. */
+  onExport: () => Promise<CsvTable>;
   selection: RowSelection;
 }) {
   const { t, tCategory } = useI18n();
@@ -191,6 +196,12 @@ function SearchResults({
           <span className="amount-saving">🐷 {money(result.totals.saving)}</span>
         )}
       </div>
+      <ExportButtons
+        name="busqueda"
+        what={t('app.search.title')}
+        count={result.total}
+        table={onExport}
+      />
       {result.items.length === 0 ? (
         <p className="empty-state">{t('app.search.empty')}</p>
       ) : (
@@ -304,6 +315,18 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
       }));
     });
 
+  const { transactionTable } = useExportCSV();
+  /** Reads every match page by page, leaving out the ones waiting for an undo. */
+  const exportMatching = async () => {
+    const all: Transaction[] = [];
+    for (let offset = 0; offset < firstPage.data!.total; offset += FULL_PAGE) {
+      const page = await transactionApi.search({ ...filters, limit: FULL_PAGE, offset });
+      all.push(...page.items);
+    }
+    const hidden = new Set(bulk.hidden);
+    return transactionTable(all.filter((tx) => !hidden.has(tx.id)));
+  };
+
   const set: SetFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value || undefined }));
   const error = firstPage.error ?? loadingMore.error;
 
@@ -330,6 +353,7 @@ export function SearchView({ onEdit, refreshKey = 0 }: SearchViewProps) {
           showAccount={accounts.length > 1}
           onEdit={onEdit}
           onMore={() => loadMore(firstPage.data!.items.length + extra.length)}
+          onExport={exportMatching}
           selection={selection}
         />
       )}

@@ -5,6 +5,7 @@ import { CATEGORY_COLORS, EMOJI_GROUPS } from '@modules/finances/domain/category
 import { useCategoryManager, type PendingDelete } from '../../application/hooks/useCategoryManager';
 import '../css/CategoryManager.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from './ExportButtons';
 
 export interface CategoryManagerProps {
   onClose: () => void;
@@ -232,7 +233,7 @@ export function CategoryManager({
   onUpdate,
   onDelete,
 }: CategoryManagerProps) {
-  const { t } = useI18n();
+  const { t, tCategory } = useI18n();
   const cm = useCategoryManager({ onAdd, onUpdate, onDelete });
 
   return (
@@ -272,6 +273,19 @@ export function CategoryManager({
             <h3 className="cat-section-title">
               {t('app.category.manager.list.title')} ({categories.length})
             </h3>
+            <ExportButtons
+              name="categorias"
+              what={t('app.category.manager.list.title')}
+              count={categories.length}
+              table={() => ({
+                head: [
+                  t('app.category.export.name'),
+                  t('app.category.export.icon'),
+                  t('app.category.export.color'),
+                ],
+                rows: categories.map((c) => [tCategory(c.name), c.icon, c.color]),
+              })}
+            />
             {categories.length === 0 ? (
               <p className="cat-empty">{t('app.category.manager.list.empty')}</p>
             ) : (

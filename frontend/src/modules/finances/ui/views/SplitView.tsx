@@ -9,6 +9,7 @@ import type { SplitGroup } from '@modules/finances/domain/types';
 import { simplifyPayments } from '@modules/finances/domain/splitSimplify';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from '../components/ExportButtons';
 
 function NewGroup({
   onCreate,
@@ -229,7 +230,7 @@ function GroupDetail({
 }) {
   const { splitApi } = useApi();
   const { t } = useI18n();
-  const { money, date } = useFormat();
+  const { money, date, currency } = useFormat();
   const action = useAction();
   const { data: group, setData } = useResource(() => splitApi.get(id), [splitApi, id]);
   if (!group) return <div className="card">{t('app.common.loading')}</div>;
@@ -237,6 +238,23 @@ function GroupDetail({
   const name = (memberId: string): string =>
     (group.members.find((m) => m.id === memberId) as { name: string }).name;
   const update = (job: () => Promise<SplitGroup>) => action.run(async () => setData(await job()));
+  /** One row per expense or payment, with what each member pays of it. */
+  const table = () => ({
+    head: [
+      t('app.export.csv.date'),
+      t('app.export.csv.description'),
+      t('app.split.export.paidBy'),
+      `${t('app.export.csv.amount')} (${currency})`,
+      ...group.members.map((m) => `${m.name} (${currency})`),
+    ],
+    rows: group.expenses.map((e) => [
+      e.date.slice(0, 10),
+      e.settlement ? t('app.split.payment') : e.description,
+      name(e.paidBy),
+      e.amount,
+      ...group.members.map((m) => e.shares.find((sh) => sh.memberId === m.id)?.share ?? 0),
+    ]),
+  });
 
   return (
     <>
@@ -269,6 +287,12 @@ function GroupDetail({
         <h2 className="section-title">
           <Icon name="receipt" /> {t('app.split.expenses')}
         </h2>
+        <ExportButtons
+          name="gastos-compartidos"
+          what={t('app.split.expenses')}
+          count={group.expenses.length}
+          table={table}
+        />
         <ExpenseForm group={group} onAdd={(e) => update(() => splitApi.addExpense(id, e))} />
         {group.expenses.length > 0 && (
           <ul className="split-expenses">

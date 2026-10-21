@@ -7,8 +7,10 @@ import { useAction } from '@shared/hooks/useAction';
 import { useResource } from '@shared/hooks/useResource';
 import { parseDecimal } from '@shared/utils/numbers';
 import type { Asset, AssetKind } from '@modules/finances/domain/types';
+import type { CsvTable } from '../../application/hooks/useExportCSV';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
+import { ExportButtons } from './ExportButtons';
 import { DebtPlanCard } from './DebtPlanCard';
 import { PremiumGate } from '@modules/billing/ui/PremiumGate';
 
@@ -110,10 +112,34 @@ function LimitGate({ onUpgrade }: { onUpgrade: () => void }) {
 }
 
 /** Investments, property and debts valued by hand: they are part of the net worth. */
+/** The investments, goods and debts as a table, with their latest value. */
+function assetsTable(assets: Asset[], t: (key: string) => string, currency: string): CsvTable {
+  return {
+    head: [
+      t('app.assets.name'),
+      t('app.assets.kind'),
+      `${t('app.assets.value')} (${currency})`,
+      t('app.assets.export.valueDate'),
+      `${t('app.assets.export.previous')} (${currency})`,
+      t('app.assets.export.rate'),
+      `${t('app.assets.export.minPayment')} (${currency})`,
+    ],
+    rows: assets.map((a) => [
+      a.name,
+      t(`app.assets.kind.${a.kind}`),
+      a.value,
+      a.valueDate?.slice(0, 10),
+      a.previousValue,
+      a.interestRate,
+      a.minPayment,
+    ]),
+  };
+}
+
 export function AssetsCard() {
   const { assetApi } = useApi();
   const { t } = useI18n();
-  const { money } = useFormat();
+  const { money, currency } = useFormat();
   const plan = useOptionalPlan();
   const action = useAction();
   const { data: assets, reload } = useResource(() => assetApi.getAll(), [assetApi], {
@@ -145,6 +171,12 @@ export function AssetsCard() {
           <Icon name="bank" /> {t('app.assets.title')}
         </h2>
         <p className="section-hint">{t('app.assets.hint')}</p>
+        <ExportButtons
+          name="patrimonio"
+          what={t('app.assets.title')}
+          count={assets.length}
+          table={() => assetsTable(assets, t, currency)}
+        />
         {action.error && <p className="form-error">{action.error}</p>}
         {assets.length > 0 && (
           <>

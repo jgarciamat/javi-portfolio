@@ -30,6 +30,8 @@ import { RetentionCell } from './InvoiceRetention';
 import { VatOpCell } from './InvoiceVatCell';
 import type { ManualForm } from './AutonomoManual';
 import { INVOICE_PAGE, InvoicePager, pageOfIndex, validPage } from './InvoicePager';
+import { ExportButtons } from './ExportButtons';
+import { invoiceBookTable } from './invoiceBookTable';
 
 /** An invoice to show: `n` changes on every request, so asking twice for the same one works. */
 export interface ReviewFocus {
@@ -271,6 +273,7 @@ export function InvoiceReview({
   focus: ReviewFocus | null;
 }) {
   const { t } = useI18n();
+  const { currency } = useFormat();
   const [open, setOpen] = useState(true);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [offer, setOffer] = useState<Offer | null>(null);
@@ -382,6 +385,15 @@ export function InvoiceReview({
         {t('app.autonomo.review.summary', { n: invoices.length })}
         {excluded > 0 && ` ${t('app.autonomo.review.excluded', { n: excluded })}`}
       </p>
+      {books.map(({ book, list }) => (
+        <ExportButtons
+          key={book}
+          name={`facturas-${book === 'issued' ? 'emitidas' : 'recibidas'}`}
+          what={t(`app.autonomo.export.${book}`)}
+          count={list.length}
+          table={() => invoiceBookTable(book, list, t, currency)}
+        />
+      ))}
       {open && (
         <div id="autonomo-review-body">
           <p className="section-hint">{t('app.autonomo.review.hint')}</p>
