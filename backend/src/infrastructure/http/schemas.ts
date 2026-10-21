@@ -818,6 +818,8 @@ const autonomoSaved = z
         hardToJustify: z.boolean(),
         exempt: z.boolean(),
         priorNet: formText,
+        /** No activity last year: box 13 of the 130 takes 0 € (frontend AutonomoManual.tsx, Extras). */
+        noPriorActivity: z.boolean().optional(),
         toOffset: formText,
         /** The VAT of the year (frontend vatForm.ts, VatExtras). */
         vat: z

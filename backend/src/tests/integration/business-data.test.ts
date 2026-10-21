@@ -138,7 +138,11 @@ describe('The self-employed form saved in the account', () => {
     });
 
     ctx.clock.set('2026-03-15T12:05:00Z');
-    const next = { ...form(), extras: { ...form().extras, priorNet: '-300' } };
+    // «No activity last year» is kept apart from an empty field (box 13 of the 130).
+    const next = {
+      ...form(),
+      extras: { ...form().extras, priorNet: '-300', noPriorActivity: true },
+    };
     expect((await put(ana, { data: next, baseVersion: 1 }).expect(200)).body).toEqual({
       version: 2,
       updatedAt: '2026-03-15T12:05:00.000Z',

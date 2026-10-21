@@ -103,16 +103,33 @@ export function ExtrasPanel({
         </label>
       </div>
       <div className="autonomo-grid autonomo-grid--top">
-        <label className="field">
-          <span className="field-label">{t('app.autonomo.priorNet')}</span>
-          <input
-            className="tx-input"
-            inputMode="decimal"
-            value={extras.priorNet}
-            onChange={(e) => onChange({ priorNet: e.target.value })}
-          />
-          <small className="autonomo-hint">{t('app.autonomo.priorNetHint')}</small>
-        </label>
+        <div>
+          <label className="field">
+            <span className="field-label">{t('app.autonomo.priorNet')}</span>
+            <input
+              className="tx-input"
+              inputMode="decimal"
+              value={extras.noPriorActivity ? '' : extras.priorNet}
+              disabled={extras.noPriorActivity === true}
+              onChange={(e) => onChange({ priorNet: e.target.value })}
+            />
+          </label>
+          <label className="autonomo-option">
+            <input
+              type="checkbox"
+              checked={extras.noPriorActivity === true}
+              onChange={(e) => onChange({ noPriorActivity: e.target.checked })}
+            />
+            <span>{t('app.autonomo.noPriorActivity')}</span>
+          </label>
+          <small className="autonomo-hint">
+            {t(
+              extras.noPriorActivity
+                ? 'app.autonomo.noPriorActivityHint'
+                : 'app.autonomo.priorNetHint'
+            )}
+          </small>
+        </div>
         <label className="field">
           <span className="field-label">{t('app.autonomo.toOffset')}</span>
           <input

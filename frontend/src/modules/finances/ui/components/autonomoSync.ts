@@ -206,6 +206,7 @@ export function toSaved(
       hardToJustify: options.hardToJustify,
       exempt: options.exempt,
       priorNet: options.priorNet,
+      ...(options.noPriorActivity ? { noPriorActivity: true } : {}),
       toOffset: options.toOffset,
       ...(JSON.stringify(vatExtrasOf(options.vat)) === JSON.stringify(NO_VAT_EXTRAS)
         ? {}

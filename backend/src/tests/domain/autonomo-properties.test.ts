@@ -147,6 +147,35 @@ describe('Modelo 130: properties over 150 invented years (2023-2025)', () => {
       [-500, 0, 9000, 9000.01, 10000, 10000.01, 11000, 11000.01, 12000, 12000.01, null].map(box13)
     ).toEqual([100, 100, 100, 75, 75, 50, 50, 25, 25, 0, 0]);
   });
+
+  it("takes 0 € as last year's net income when there was no activity: 100 € in every quarter", () => {
+    // Instructions of the 130, box 13 (checked 2026-10-22): «En el supuesto de que en el ejercicio
+    // anterior no se hubiese ejercido actividad económica alguna, se considerará que la cuantía de
+    // los rendimientos netos del ejercicio anterior, son cero». The screen sends 0 for it.
+    // By hand: 3,000 € billed and 1,000 € spent each quarter → 04 = 20 % × 2,000 = 400 in the 1T;
+    // 12 = 400, 13 = 100, 19 = 300. The 2T: 04 = 20 % × 4,000 = 800, 05 = 400, 19 = 400 − 100 = 300.
+    const movements: VatMovement[] = [1, 4, 7, 10].flatMap((month) => {
+      const date = `2025-${String(month).padStart(2, '0')}-15`;
+      return [
+        { date, type: 'INCOME' as const, amountCents: 300000, vatRate: 0 as VatRate },
+        { date, type: 'EXPENSE' as const, amountCents: 100000, vatRate: 0 as VatRate },
+      ];
+    });
+    const inputs: DraftInputs = {
+      quarters: [zero, zero, zero, zero],
+      hardToJustify: false,
+      priorYearNet: 0,
+      exempt130: false,
+      vatToOffset: 0,
+    };
+    for (const q of [1, 2, 3, 4] as const) {
+      const boxes = prepareDraft(2025, q, movements, inputs).irpf.boxes;
+      expect([at(boxes, '13'), at(boxes, '19')]).toEqual([100, 300]);
+    }
+    // Unknown (not typed): no reduction, as before.
+    const unknown = prepareDraft(2025, 1, movements, { ...inputs, priorYearNet: null });
+    expect([at(unknown.irpf.boxes, '13'), at(unknown.irpf.boxes, '19')]).toEqual([0, 400]);
+  });
 });
 
 describe('Modelo 303: properties over 150 invented years (2023-2025)', () => {

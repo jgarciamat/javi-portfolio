@@ -344,6 +344,12 @@ describe('The activity as the draft and the summary take it', () => {
       2
     );
     expect([prior.priorYearNet, prior.prior?.income]).toEqual([9000, 100]);
+    // No activity last year: 0 € (instructions of the 130, box 13), whatever was typed; empty: unknown.
+    const none = { ...NO_EXTRAS, priorNet: '9000', noPriorActivity: true };
+    expect(buildInputs(emptyManual(), none, 2026, 1).priorYearNet).toBe(0);
+    expect(buildInputs(emptyManual(), NO_EXTRAS, 2026, 1).priorYearNet).toBeNull();
+    expect(toSaved(emptyManual(), none, {}).extras).toMatchObject({ noPriorActivity: true });
+    expect('noPriorActivity' in toSaved(emptyManual(), NO_EXTRAS, {}).extras).toBe(false);
   });
 });
 

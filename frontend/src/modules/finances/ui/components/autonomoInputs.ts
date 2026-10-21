@@ -14,6 +14,17 @@ const number = (text: string): number => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 };
 
+/**
+ * Last year's net income for box 13 of the 130 (and box 09 of the 131): 0 when there was no
+ * activity (instructions of the 130, box 13, checked 2026-10-22:
+ * https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/impuesto-sobre-renta-personas-fisicas/modelo-130-irpf______esionales-estimacion-directa-fraccionado_/instrucciones.html),
+ * null when it was not typed (unknown: no reduction).
+ */
+export const priorNetOf = (extras: Extras): number | null => {
+  if (extras.noPriorActivity) return 0;
+  return extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet);
+};
+
 /** The totals of the 130 already filed for the quarters before the viewed one. */
 const priorOf = (manual: ManualForm, quarter: Quarter): AutonomoInputs['prior'] =>
   manual.prior.on && quarter > 1
@@ -72,7 +83,7 @@ export function buildInputs(
       : {}),
     // The 5 % of hard-to-justify expenses is only for the simplified modality (art. 30.2.4.ª RIRPF).
     hardToJustify: extras.hardToJustify && activity.method === 'simplified',
-    priorYearNet: extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet),
+    priorYearNet: priorNetOf(extras),
     exempt130: extras.exempt,
     // The VAT left to offset is the one at the start of the year: the quarters carry it on.
     vatToOffset: 0,

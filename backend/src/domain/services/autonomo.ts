@@ -58,7 +58,10 @@ export interface DraftInputs {
   modality?: 'simplified' | 'normal';
   /** Farming, livestock, forestry or fishing: section II of the 130 (2 % of the quarter's income). */
   agrarian?: boolean;
-  /** Net income of last year, for the low-income reduction (null: unknown, none applied). */
+  /**
+   * Net income of last year, for the low-income reduction (null: unknown, none applied). With no
+   * activity last year it is 0 (instructions of the 130, box 13), so the 100 € apply.
+   */
   priorYearNet: number | null;
   /** Professional whose clients withheld at least 70 % of last year's income: no modelo 130. */
   exempt130: boolean;
@@ -182,6 +185,7 @@ function withoutNotDeductible(q: Quarter, extras: QuarterExtras): VatBucket {
   return { ...q.vat, items: items.filter((i) => i.vat > 0) };
 }
 
+/** Box 13 (art. 110.3.c RIRPF): by last year's net income; no activity then counts as 0 €. */
 const lowIncomeReduction = (priorYearNet: number | null): number => {
   if (priorYearNet === null) return 0;
   return LOW_INCOME_REDUCTIONS.find((r) => priorYearNet <= r.upTo)?.amount ?? 0;

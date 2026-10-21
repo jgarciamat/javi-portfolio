@@ -82,6 +82,11 @@ export interface Extras {
   hardToJustify: boolean;
   exempt: boolean;
   priorNet: string;
+  /**
+   * No activity last year: box 13 of the 130 takes 0 € of net income, so the 100 € reduction applies
+   * (instructions of the 130, box 13). Unset in older data: an empty `priorNet` stays «unknown».
+   */
+  noPriorActivity?: boolean;
   /** VAT left to offset at the start of the year (box 110 of the first quarter). */
   toOffset: string;
   /** The VAT of the year: prorrata, investment goods, refund… (older data has none). */

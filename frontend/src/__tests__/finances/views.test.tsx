@@ -876,6 +876,29 @@ describe('the self-employed draft', () => {
     expect(localStorage.getItem('mm_autonomo_manual2')).toContain('"workArea":"20"');
   });
 
+  it('tells «no activity last year» (0 €, box 13 of the 130) apart from an empty field', async () => {
+    const api = open();
+    const net = (await screen.findByLabelText(
+      new RegExp(tr('app.autonomo.priorNet'))
+    )) as HTMLInputElement;
+    expect(screen.getByText(tr('app.autonomo.priorNetHint'))).toBeInTheDocument();
+    fireEvent.change(net, { target: { value: '15000' } });
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.noPriorActivity')));
+    // The amount typed no longer counts: the instructions of the 130 take 0 €.
+    expect(net.disabled).toBe(true);
+    expect(net.value).toBe('');
+    expect(screen.getByText(tr('app.autonomo.noPriorActivityHint'))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.prepare') }));
+    await waitFor(() =>
+      expect(api.businessApi.draft).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.objectContaining({ priorYearNet: 0 })
+      )
+    );
+    expect(localStorage.getItem('mm_autonomo_extras')).toContain('"noPriorActivity":true');
+  });
+
   it('copies the data of the previous quarter into the next one', async () => {
     open();
     fireEvent.change(await screen.findByLabelText(tr('app.autonomo.quarter')), {

@@ -26,6 +26,7 @@ import {
 import type { VatModuleActivity } from '../../domain/vatModules2025';
 import { toManualData, type Extras, type ManualForm } from './AutonomoManual';
 import { activityOf, toActivityInputs, type ObjectiveForm } from './activityForm';
+import { priorNetOf } from './autonomoInputs';
 import { vatExtrasOf } from './vatForm';
 
 /**
@@ -189,10 +190,10 @@ const auxVat = (a: VatModuleActivity) =>
 
 /**
  * Last year's net income for box 09: not typed, no reduction (as the 130 of the app does); the
- * reduction is only for 12,000 € or less (art. 110.3.c RIRPF), which the person must say.
+ * reduction is only for 12,000 € or less (art. 110.3.c RIRPF), which the person must say. No
+ * activity last year counts as 0 € (priorNetOf).
  */
-const lastYearOf = (extras: Extras): number =>
-  extras.priorNet.trim() === '' ? Number.POSITIVE_INFINITY : parseDecimal(extras.priorNet);
+const lastYearOf = (extras: Extras): number => priorNetOf(extras) ?? Number.POSITIVE_INFINITY;
 
 /** The quarter of an activity in módulos, or null when the form has none (or no known activity). */
 export function modulesView(
@@ -241,7 +242,7 @@ export function modulesView(
       seasonLastYear: input.seasonLastYear,
       ceutaMelilla: input.ceutaMelilla,
       quarterDays: quarterDays(input, year, quarter),
-      lastYearNet: extras.priorNet.trim() === '' ? null : parseDecimal(extras.priorNet),
+      lastYearNet: priorNetOf(extras),
     },
     vat: vatOf(manual, extras, activityOf(manual.activity).objective, {
       year,
