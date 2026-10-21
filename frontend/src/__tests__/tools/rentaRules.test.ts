@@ -233,6 +233,33 @@ describe('Renta 2026 (BOE only)', () => {
   });
 });
 
+describe('the tables of the módulos of the year', () => {
+  const activity = {
+    kind: 'given' as const,
+    name: 'A',
+    withheld: 0,
+    payments: 0,
+    data: { area: 'direct' as const, net: 1 },
+  };
+  const inputOf = (year: number, tables?: null) => {
+    const r = rentaRules(year);
+    const data = {
+      state: r.state,
+      ccaa: { id: '', name: '', regime: 'common' as const, deductions: [], source: '' },
+      extras: r.extras,
+      property: r.property,
+      workReduction: workReductionOf(r.state),
+    };
+    const form = { ...emptyForm(''), activities: [activity] };
+    return toInput(form, tables === undefined ? data : { ...data, activityTables: tables });
+  };
+
+  it('are those of 2025 unless the year says otherwise; a year without them gives none', () => {
+    expect(inputOf(2025)?.activities?.modules).toBe(rentaRules(2025).activityTables?.modules);
+    expect(inputOf(2024, null).activities).toEqual({ list: [activity], modules: [], farm: [] });
+  });
+});
+
 describe('what each year has of the communities', () => {
   it('2025 has them all; 2024 and 2026 only Ceuta, Melilla and the foral ones', async () => {
     expect(hasRegion(rentaRules(2025), 'madrid')).toBe(true);
