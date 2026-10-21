@@ -168,6 +168,30 @@ describe('computeMinimum', () => {
     expect(descendantBreakdown(adopted, minimums)[0].under3).toBe(2800);
   });
 
+  it('leaves out a child with income of their own, and orders only those who count (art. 58.1)', () => {
+    // 22 with more than 8,000 €, 15 with a return of 2,500 €, 10 with none: only the 10-year-old
+    // counts, and as the first (2,400 €). In the joint return of the unit (minors under 18), the
+    // 15-year-old with his own income counts whole, as the first; the 10-year-old is second.
+    const kids = [
+      { age: 22, disability: 0 as const, income: 'over8000' as const },
+      { age: 15, disability: 0 as const, income: 'ownReturn' as const },
+      { age: 10, disability: 0 as const },
+    ];
+    expect(computeMinimum({ ...alone, children: kids }, minimums).total).toBe(5550 + 2400);
+    const shared = { ...alone, children: kids, sharedChildren: true };
+    expect(computeMinimum(shared, minimums).total).toBe(5550 + 1200);
+    expect(computeMinimum({ ...shared, jointUnder: 18 }, minimums).total).toBe(
+      5550 + 2400 + 2700 / 2
+    );
+    expect(descendantBreakdown({ ...shared, jointUnder: 18 }, minimums)).toEqual([
+      { age: 15, amount: 2400, under3: 0, disability: 0 },
+      { age: 10, amount: 1350, under3: 0, disability: 0 },
+    ]);
+    // More than 8,000 € leaves the child out of the joint return too.
+    const rich = [{ age: 12, disability: 0 as const, income: 'over8000' as const }];
+    expect(computeMinimum({ ...alone, children: rich, jointUnder: 18 }, minimums).total).toBe(5550);
+  });
+
   it('adds the extra for age from 65 and from 75 years turned by 31 December', () => {
     const total = (age: number) => computeMinimum({ ...alone, age }, minimums).total;
     expect(total(64)).toBe(5550);

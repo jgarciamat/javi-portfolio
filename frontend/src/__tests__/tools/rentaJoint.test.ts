@@ -308,6 +308,15 @@ describe('joint return of one parent', () => {
     expect(c?.best).toBe('same');
   });
 
+  it('gives the parent of the joint return the whole minimum of a child with his own income', () => {
+    // The 5-year-old has 3,000 € and files the joint return with this parent: in the individual
+    // returns he counts for no one (8 is the first, 2,400 €); in the joint one, whole, as the second.
+    const withIncome = [kids[0], { ...kids[1], income: 'ownReturn' as const }];
+    const c = single(input({ family: { ...input().family, children: withIncome } }));
+    expect(c?.you.minimum.total).toBe(5550 + 2400);
+    expect(c?.joint.minimum.total).toBe(5550 + 2400 + 2700);
+  });
+
   it('needs a minor child to make a family unit', () => {
     const adults = [{ age: 20, disability: 0 as const }];
     expect(single(input({ family: { ...input().family, children: adults } }))).toBeNull();

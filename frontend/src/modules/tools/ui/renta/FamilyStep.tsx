@@ -1,13 +1,19 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { CCAA_OPTIONS } from '../../data/renta';
+import type { ChildIncome } from '../../domain/rentaCalc';
 import type { RentaCcaa } from '../../domain/rentaData';
+import type { ChildForm } from '../../domain/rentaForm';
 import { DisabilitySelect, Field, Step, type StepProps } from './shared';
 import { JointSection } from './JointStep';
 import { ResidenceQuestions } from './Residence';
 
+const CHILD_INCOME: (ChildIncome | '')[] = ['', 'ownReturn', 'over8000'];
+
 /** The children of the person, and whether the minimum is shared with the other parent. */
 export function ChildrenSection({ form, set }: StepProps) {
   const { t } = useI18n();
+  const change = (i: number, patch: Partial<ChildForm>) =>
+    set({ children: form.children.map((c, j) => (j === i ? { ...c, ...patch } : c)) });
   return (
     <>
       <h3>{t('tools.renta.children')}</h3>
@@ -56,6 +62,29 @@ export function ChildrenSection({ form, set }: StepProps) {
               />
               <span>{t('tools.renta.childAdopted', { n: i + 1 })}</span>
             </label>
+            <div className="tools-field">
+              <label htmlFor={`child-income-${i}`}>
+                {t('tools.renta.childIncome', { n: i + 1 })}
+              </label>
+              <select
+                id={`child-income-${i}`}
+                className="tx-input"
+                aria-describedby={`child-income-${i}-hint`}
+                value={child.income ?? ''}
+                onChange={(e) =>
+                  change(i, { income: (e.target.value || undefined) as ChildIncome | undefined })
+                }
+              >
+                {CHILD_INCOME.map((v) => (
+                  <option key={v} value={v}>
+                    {t(`tools.renta.childIncomeOpt.${v || 'none'}`)}
+                  </option>
+                ))}
+              </select>
+              <small id={`child-income-${i}-hint`} className="renta-field-hint">
+                {t(`tools.renta.childIncomeHint.${child.income ?? 'none'}`)}
+              </small>
+            </div>
             <button
               type="button"
               className="btn-secondary"

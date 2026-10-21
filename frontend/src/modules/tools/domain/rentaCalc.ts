@@ -42,7 +42,14 @@ export interface Child {
   disability: Disability;
   /** Adopted or fostered, registered this year or in the two before: the under-3 increase at any age. */
   adopted?: boolean;
+  /**
+   * The child's own income (art. 58.1): 'over8000' more than 8,000 € a year (the exempt left out);
+   * 'ownReturn' files a return with more than 1,800 €. Unset: neither.
+   */
+  income?: ChildIncome;
 }
+
+export type ChildIncome = 'over8000' | 'ownReturn';
 
 /**
  * The increase for a child under 3 (2,800 €): LIRPF art. 58.2 (BOE-A-2006-20764, checked 21-10-2026)
@@ -66,6 +73,11 @@ export interface Family {
   ascendants: Ascendant[];
   /** The children are claimed together with the other parent: each one takes half. */
   sharedChildren: boolean;
+  /**
+   * The return is the joint one of the taxpayer's unit, which takes the children under this age:
+   * that is the return of a child with more than 1,800 € (see {@link descendantShare}).
+   */
+  jointUnder?: number;
   /**
    * The taxpayer needs the help of third parties or has reduced mobility: the 3,000 € of "gastos de
    * asistencia" also below 65 % (LIRPF art. 60.1, second paragraph).
@@ -108,6 +120,30 @@ export function mergeMinimums(state: FullMinimums, own?: MinimumAmounts): FullMi
 
 /** Whether a child counts for the minimum: under 25, or with a disability of 33 % or more. */
 export const countsAsDescendant = (c: Child): boolean => c.age < 25 || c.disability >= 33;
+
+/**
+ * The part of a child's minimum that is the taxpayer's: 0, half (shared with the other parent) or
+ * all. LIRPF art. 58.1 (BOE-A-2006-20764): none with "rentas anuales, excluidas las exentas,
+ * superiores a 8.000 euros", nor when the child files a return with more than 1,800 €. Manual
+ * 2025, c14, «Concepto y requisitos» and ejemplo 2 (checked 22-10-2026): a child in the joint
+ * return of one parent with more than 1,800 € gives that parent the whole minimum, and the other
+ * none; with 1,800 € or less it is shared between both, even in the joint return.
+ */
+export function descendantShare(c: Child, family: Pick<Family, 'sharedChildren' | 'jointUnder'>) {
+  if (!countsAsDescendant(c) || c.income === 'over8000') return 0;
+  if (c.income === 'ownReturn') return c.age < (family.jointUnder ?? 0) ? 1 : 0;
+  return family.sharedChildren ? 0.5 : 1;
+}
+
+/**
+ * The children that give the minimum, with their part, the oldest first: the order (first, second…)
+ * counts only them (Manual 2025, c14, «Cuantías aplicables», checked 22-10-2026).
+ */
+export const countedChildren = (family: Family): { child: Child; share: number }[] =>
+  family.children
+    .map((child) => ({ child, share: descendantShare(child, family) }))
+    .filter((c) => c.share > 0)
+    .sort((a, b) => b.child.age - a.child.age);
 
 const nth = (list: number[], index: number): number => list[Math.min(index, list.length - 1)];
 /**
@@ -166,7 +202,6 @@ export function computeMinimum(
   family: Family,
   m: FullMinimums
 ): { total: number; items: MinimumItem[] } {
-  const share = family.sharedChildren ? 0.5 : 1;
   // A community can raise the general amount only from 65 (Illes Balears, see `personalOver65`).
   const personal = family.age >= 65 ? (m.personalOver65 ?? m.personal) : m.personal;
   const items: MinimumItem[] = [{ key: 'personal', amount: personal }];
@@ -176,9 +211,8 @@ export function computeMinimum(
   const ageExtra = ageAmount(family.age, m);
   if (ageExtra > 0) items.push({ key: 'age', amount: ageExtra });
 
-  const children = family.children.filter(countsAsDescendant).sort((a, b) => b.age - a.age);
   // The order is by date of birth: the oldest is the first.
-  const descendants = children.reduce((sum, child, i) => {
+  const descendants = countedChildren(family).reduce((sum, { child, share }, i) => {
     const base = nth(m.descendants, i) + under3Of(child, m);
     return sum + (base + disabilityAmount(child.disability, m, true)) * share;
   }, 0);
@@ -202,20 +236,16 @@ export function descendantBreakdown(
   family: Family,
   m: FullMinimums
 ): { age: number; amount: number; under3: number; disability: number }[] {
-  const share = family.sharedChildren ? 0.5 : 1;
-  return family.children
-    .filter(countsAsDescendant)
-    .sort((a, b) => b.age - a.age)
-    .map((child, i) => {
-      const under3 = under3Of(child, m);
-      const disability = disabilityAmount(child.disability, m, true);
-      return {
-        age: child.age,
-        amount: round2((nth(m.descendants, i) + under3 + disability) * share),
-        under3: round2(under3 * share),
-        disability: round2(disability * share),
-      };
-    });
+  return countedChildren(family).map(({ child, share }, i) => {
+    const under3 = under3Of(child, m);
+    const disability = disabilityAmount(child.disability, m, true);
+    return {
+      age: child.age,
+      amount: round2((nth(m.descendants, i) + under3 + disability) * share),
+      under3: round2(under3 * share),
+      disability: round2(disability * share),
+    };
+  });
 }
 
 /** Quota of a scale for a base, once the minimum is lowered from it (never below zero). */

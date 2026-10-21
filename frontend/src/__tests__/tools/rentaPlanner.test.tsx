@@ -87,6 +87,12 @@ describe('Renta planner: the steps', () => {
     const adopted = screen.getByLabelText(tr('tools.renta.childAdopted', { n: 2 }));
     fireEvent.click(adopted);
     expect(adopted).toBeChecked();
+    // A child with income of their own (art. 58.1): the hint says what it does to the minimum.
+    const income = screen.getByLabelText(tr('tools.renta.childIncome', { n: 2 }));
+    fireEvent.change(income, { target: { value: 'over8000' } });
+    expect(screen.getByText(tr('tools.renta.childIncomeHint.over8000'))).toBeInTheDocument();
+    fireEvent.change(income, { target: { value: '' } });
+    expect(screen.getAllByText(tr('tools.renta.childIncomeHint.none'))).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeChild', { n: 2 }) }));
     expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
 

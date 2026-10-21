@@ -1,5 +1,5 @@
 import {
-  countsAsDescendant,
+  countedChildren,
   disabilityAmount,
   mergeMinimums,
   type FullMinimums,
@@ -74,10 +74,10 @@ const ROUNDING = 1;
 
 /** The minimum for disabilities: the person's own, the children's and the ascendants' (box 0517). */
 export function disabilityMinimum(family: Family, m: FullMinimums): number {
-  const share = family.sharedChildren ? 0.5 : 1;
-  const children = family.children
-    .filter(countsAsDescendant)
-    .reduce((sum, c) => sum + disabilityAmount(c.disability, m, true) * share, 0);
+  const children = countedChildren(family).reduce(
+    (sum, { child, share }) => sum + disabilityAmount(child.disability, m, true) * share,
+    0
+  );
   const ascendants = family.ascendants.reduce(
     (sum, a) => sum + disabilityAmount(a.disability, m),
     0

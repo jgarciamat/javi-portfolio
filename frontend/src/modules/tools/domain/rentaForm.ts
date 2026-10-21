@@ -2,6 +2,7 @@ import { parseDecimal } from '@shared/utils/numbers';
 import type {
   Ascendant,
   Child,
+  ChildIncome,
   DeductionChoice,
   Disability,
   Family,
@@ -24,6 +25,8 @@ export interface ChildForm {
   disability: Disability;
   /** Adopted or fostered and registered this year or in the two before (LIRPF art. 58.2). */
   adopted?: boolean;
+  /** Their own income (art. 58.1): more than 8,000 €, or a return of theirs with more than 1,800 €. */
+  income?: ChildIncome;
 }
 
 export interface AscendantForm {
@@ -216,6 +219,7 @@ export function familyOf(form: RentaForm): Family {
     age: number(c.age),
     disability: c.disability,
     ...(c.adopted ? { adopted: true } : {}),
+    ...(c.income ? { income: c.income } : {}),
   }));
   const ascendants: Ascendant[] = form.ascendants.map((a) => ({ ...a }));
   return {

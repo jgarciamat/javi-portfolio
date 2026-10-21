@@ -394,20 +394,27 @@ const CHECKS: Record<string, () => void> = {
     );
   },
   'renta-c14-02': () => {
-    // Individual returns: the 6-year-old files his own with more than 1,800 € (art. 58.1), so he
-    // does not count; the other two are shared between the parents.
-    const two = family(
-      [
-        { age: 18, disability: 0 },
-        { age: 12, disability: 0 },
-      ],
-      true
-    );
-    expect(computeMinimum(two, rentaState.minimums).total).toBe(
+    // The 6-year-old has 4,050 € and files a return (art. 58.1): in the individual returns he counts
+    // for no one and the other two are shared. In the joint return of one parent with the minors he
+    // counts whole for that parent (the third, 4,000 €); the 18 and 12-year-olds stay at half.
+    const kids: Child[] = [
+      { age: 18, disability: 0 },
+      { age: 12, disability: 0 },
+      { age: 6, disability: 0, income: 'ownReturn' },
+    ];
+    const individual = family(kids, true);
+    const joint = { ...individual, jointUnder: 18 };
+    expect(computeMinimum(individual, rentaState.minimums).total).toBe(
       figure('renta-c14-02', 'Total mínimo individual estatal')
     );
-    expect(computeMinimum(two, regional(comunitatValenciana)).total).toBe(
+    expect(computeMinimum(individual, regional(comunitatValenciana)).total).toBe(
       figure('renta-c14-02', 'Total mínimo individual autonómico')
+    );
+    expect(computeMinimum(joint, rentaState.minimums).total).toBe(
+      figure('renta-c14-02', 'Total mínimo conjunta estatal')
+    );
+    expect(computeMinimum(joint, regional(comunitatValenciana)).total).toBe(
+      figure('renta-c14-02', 'Total mínimo conjunta autonómico')
     );
   },
   'renta-c14-03': () => {
