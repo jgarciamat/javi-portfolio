@@ -61,8 +61,10 @@ const SOURCE_MARK: Partial<Record<NonNullable<ImportedRow['categorySource']>, st
   ai: ' ✨',
 };
 
+const FORMAT_NAMES = { csv: 'CSV', norma43: 'Norma 43', pdf: 'PDF' } as const;
+
 const IMPORT_ACCEPT =
-  '.csv,.xlsx,.txt,.n43,.q43,.aeb,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  '.csv,.xlsx,.pdf,.txt,.n43,.q43,.aeb,application/pdf,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 function FileStep({ imp }: { imp: ImportState }) {
   const { t } = useI18n();
@@ -114,13 +116,31 @@ function ColumnMappingFields({ imp }: { imp: ImportState }) {
   );
 }
 
+/** What the person should know about a PDF statement before importing it. */
+function PdfNotes({ imp }: { imp: ImportState }) {
+  const { t } = useI18n();
+  return (
+    <>
+      <p className="section-success">
+        <Icon name="checkCircle" />{' '}
+        {imp.pdfBank ? t('app.import.pdfBank', { bank: imp.pdfBank }) : t('app.import.pdfGeneric')}
+      </p>
+      {imp.balanceMismatches > 0 && (
+        <p className="form-error" role="alert">
+          {t('app.import.pdfBalance', { count: imp.balanceMismatches })}
+        </p>
+      )}
+    </>
+  );
+}
+
 function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] }) {
   const { t } = useI18n();
   const { money, date } = useFormat();
   return (
     <div className="modal-body">
       <p className="section-hint">
-        {imp.fileName} · {imp.format === 'norma43' ? 'Norma 43' : 'CSV'} ·{' '}
+        {imp.fileName} · {FORMAT_NAMES[imp.format]} ·{' '}
         {t('app.import.rowsFound', { count: imp.rows.length })}
         {imp.skipped.length > 0 &&
           ` · ${t('app.import.rowsSkipped', { count: imp.skipped.length })}`}
@@ -130,6 +150,7 @@ function MappingStep({ imp, accounts }: { imp: ImportState; accounts: Account[] 
           <Icon name="checkCircle" /> {t('app.import.bankDetected', { bank: BANK_NAMES[imp.bank] })}
         </p>
       )}
+      {imp.format === 'pdf' && <PdfNotes imp={imp} />}
       {imp.format === 'csv' && <ColumnMappingFields imp={imp} />}
       {accounts.length > 1 && (
         <label className="field">
