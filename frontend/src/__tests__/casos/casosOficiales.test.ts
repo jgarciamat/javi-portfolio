@@ -138,8 +138,8 @@ const CHECKS: Record<string, () => void> = {
         income: '5850',
         expenses: {
           'intereses-financiacion': '200',
-          // A repair is typed as what belongs to the months let (the Manual prorates it, 210 x 9/12).
-          'reparacion-conservacion': '157.5',
+          // The repair of the façade has no date: prorated by the months let, 210 x 9/12 = 157.50.
+          'reparacion-conservacion': '210',
           'tributos-tasas': '260',
           'comunidad-servicios-personales': '850',
           // Furniture of 6,900 € at 10 %: the engine prorates it by the time let (517.50).
@@ -153,6 +153,9 @@ const CHECKS: Record<string, () => void> = {
       12
     );
     expect(p.income).toBe(figure('renta-c04-02', 'Ingresos íntegros'));
+    expect(p.repairsProrated).toBe(true);
+    // Interest 200 x 9/12 + repair 210 x 9/12 (the Manual's 150 + 157.50).
+    expect(p.capped).toBe(307.5);
     expect(p.amortization).toBe(figure('renta-c04-02', 'Amortización vivienda'));
     expect(p.reductionPercent).toBe(90);
     // Erratum of the source: it prints 388.13 for the furniture, 690 x 9/12 x 9/12 (prorated twice);

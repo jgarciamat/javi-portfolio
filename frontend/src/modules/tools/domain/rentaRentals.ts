@@ -69,7 +69,17 @@ export interface PropertyForm {
   irregular: boolean;
   /** Let to a relative up to the third degree (art. 24). */
   relative: boolean;
+  /**
+   * When the repairs were made, for a property let part of the year: '' no date (prorated by the
+   * days let, as the Manual does), 'let' all while let, 'empty' all while empty (not deductible),
+   * 'mixed' with the part while let in `repairsLet`.
+   */
+  repairWhen?: RepairWhen;
+  repairsLet?: string;
 }
+
+/** When the repairs of a property let part of the year were made. */
+export type RepairWhen = '' | 'let' | 'empty' | 'mixed';
 
 export const emptyProperty = (n: number): PropertyForm => ({
   label: `Inmueble ${n}`,
@@ -105,6 +115,12 @@ export const CAPPED_EXPENSE = /interes|financiaci|reparaci|conservaci/;
 const YEARLY_EXPENSE = /interes|financiaci|tributos|comunidad|seguros|amortizacion/;
 /** Information cards of the catalogue, not amounts. */
 const NOT_AN_EXPENSE = /no-deducibles/;
+/**
+ * Repairs count only if made while let: «los gastos generados mientras no estaba arrendado no son
+ * deducibles» (Manual 2025, c04, caso práctico 2, checked 22-10-2026; STS 270/2021). Without a
+ * date, the Manual prorates them by the time let (210 x 9/12 = 157.50).
+ */
+export const REPAIR_EXPENSE = 'reparacion-conservacion';
 
 /** The reduction of art. 23.2 that the answers give, with its id in inmuebles.ts. */
 export function reductionOf(p: PropertyForm): { id: string; percent: number } | null {
@@ -153,6 +169,8 @@ export interface PropertyResult {
   reducedNet: number;
   /** 0153. */
   withheld: number;
+  /** The repairs had no date and were prorated by the days let (shown as a warning). */
+  repairsProrated: boolean;
   /** Cadastral value of the days at disposal (the person's share), and whether revised (0083-0089). */
   imputedValue: number;
   revised: boolean;
@@ -182,10 +200,24 @@ export function propertyResult(
 
   let capped = 0;
   let other = 0;
+  let repairsProrated = false;
+  /** The part of the repairs made while let (the whole year let: all of them). */
+  const repairsOf = (whole: number): number => {
+    if (rentedDays === full) return whole;
+    const when = p.repairWhen ?? '';
+    if (when === 'let') return whole;
+    if (when === 'empty') return 0;
+    if (when === 'mixed') return Math.min(whole, Math.max(0, v(p.repairsLet)));
+    repairsProrated = whole > 0;
+    return whole * days;
+  };
   for (const item of property.rental.expenses) {
     if (NOT_AN_EXPENSE.test(item.id)) continue;
     const whole = Math.max(0, v(p.expenses[item.id]));
-    const amount = whole * share * (YEARLY_EXPENSE.test(item.id) ? days : 1);
+    const amount =
+      item.id === REPAIR_EXPENSE
+        ? repairsOf(whole) * share
+        : whole * share * (YEARLY_EXPENSE.test(item.id) ? days : 1);
     if (CAPPED_EXPENSE.test(item.id)) capped += amount;
     else other += amount;
   }
@@ -239,6 +271,7 @@ export function propertyResult(
     relativeMinimum,
     reducedNet,
     withheld: round2(Math.max(0, v(p.withheld))),
+    repairsProrated,
     imputedValue: round2((cadastral * share * disposalDays) / full),
     revised: p.revised,
   };

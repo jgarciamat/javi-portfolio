@@ -123,6 +123,13 @@ describe('Renta planner: property', () => {
     fill(p('field.rentedDays'), '200');
     fill(p('field.cadastral'), '50000');
     expect(screen.getByText(tr(p('imputed'), { days: 165 }))).toBeInTheDocument();
+    // Let part of the year: with no date the repairs are prorated (and it says so); with a date, not.
+    expect(screen.getByText(tr(p('repairProrated'), { days: 200, full: 365 }))).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(tr(p('repairWhenOpt.mixed'))));
+    expect(screen.queryByText(tr(p('repairProrated'), { days: 200, full: 365 }))).toBeNull();
+    fill(p('field.repairsLet'), '300');
+    fireEvent.click(screen.getByLabelText(tr(p('repairWhenOpt.let'))));
+    expect(screen.queryByLabelText(tr(p('field.repairsLet')))).toBeNull();
     // A second property, then taken out again.
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr(p('add'))) }));
     expect(screen.getByText(tr(p('legend'), { n: 2, label: 'Inmueble 2' }))).toBeInTheDocument();
