@@ -204,6 +204,21 @@ describe('GuidedTour', () => {
     expect(document.querySelector('.tour-spotlight')).not.toBeNull();
   });
 
+  it('ignores a malformed published top-bar height and sits above a target near the bottom edge', () => {
+    document.documentElement.style.setProperty('--sticky-bar-height', 'abc');
+    placeTarget('near-top', 300, 50);
+    placeTarget('near-bottom', 748, 20);
+    placeTarget('tall', 10, 758);
+    renderTour();
+
+    next();
+    next(); // summary: no room below the element, but room above it
+    expect(document.querySelector('.tour-spotlight')).not.toBeNull();
+    next(); // movements: no room on either side, the card takes the bottom
+    expect(card()).toHaveClass('tour-card--bottom');
+    document.documentElement.style.removeProperty('--sticky-bar-height');
+  });
+
   it('follows the element when it changes size after it appeared', () => {
     const observed: Array<() => void> = [];
     const disconnect = jest.fn();
