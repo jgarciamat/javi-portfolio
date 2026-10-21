@@ -27,10 +27,18 @@ const TOP_GAP = 12;
 const CARD_MARGIN = 24;
 /** Pinned bars are looked for in this top part of the screen. */
 const PINNED_ZONE = 250;
-const CARD_WIDTH = 360;
+/** Size of the card before it is shown (as wide as the stylesheet makes it). */
+const CARD_WIDTH = 380;
 const CARD_HEIGHT = 340;
+/** Room kept between the card and the sides of the screen. */
+const EDGE = 16;
 /** Narrower screens always get the card at the bottom. */
 const MOBILE_WIDTH = 640;
+
+/** Width the page can use: without the vertical scroll bar, which would hide the card's edge. */
+function screenWidth(): number {
+  return document.documentElement.clientWidth || window.innerWidth;
+}
 
 /** Part of the element inside the free area (big sections are clipped to what the card leaves). */
 function visibleRect(element: Element, inset: number): Rect {
@@ -38,7 +46,7 @@ function visibleRect(element: Element, inset: number): Rect {
   const top = Math.max(r.top, 0);
   const left = Math.max(r.left, 0);
   const bottom = Math.min(r.bottom, window.innerHeight - inset);
-  const right = Math.min(r.right, window.innerWidth);
+  const right = Math.min(r.right, screenWidth());
   return { top, left, width: Math.max(right - left, 0), height: Math.max(bottom - top, 0) };
 }
 
@@ -131,6 +139,8 @@ function useTargetRect(
         if (typeof ResizeObserver !== 'undefined') {
           observer = new ResizeObserver(measure);
           observer.observe(element);
+          // The card too: its size changes with the text of the step and with the contrast mode.
+          observer.observe(card.current as HTMLDivElement);
         }
       } else if (Date.now() - started < WAIT_MS) {
         timer = window.setTimeout(find, POLL_MS);
@@ -154,10 +164,18 @@ function useTargetRect(
   return rect;
 }
 
+/** The real size of the card (its text changes from step to step); a guess before it is shown. */
+function cardSize(card: HTMLDivElement | null): { width: number; height: number } {
+  const size = card?.getBoundingClientRect();
+  return { width: size?.width || CARD_WIDTH, height: size?.height || CARD_HEIGHT };
+}
+
 /** Next to the highlighted element when it fits; otherwise the stylesheet places the card. */
-function anchoredStyle(rect: Rect | null, cardHeight: number): CSSProperties | undefined {
+function anchoredStyle(rect: Rect | null, card: HTMLDivElement | null): CSSProperties | undefined {
   if (!rect || window.innerWidth < MOBILE_WIDTH) return undefined;
-  const left = Math.min(Math.max(rect.left, 16), window.innerWidth - CARD_WIDTH - 16);
+  const { width: cardWidth, height: cardHeight } = cardSize(card);
+  // Lined up with the element, but always whole on the screen, on both sides.
+  const left = Math.max(Math.min(rect.left, screenWidth() - cardWidth - EDGE), EDGE);
   const below = rect.top + rect.height + PADDING + GAP;
   if (below + cardHeight <= window.innerHeight) return { top: below, left };
   const above = rect.top - PADDING - GAP - cardHeight;
@@ -208,9 +226,7 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
   const next = () => (last ? close() : setIndex(index + 1));
   const prev = () => setIndex(Math.max(index - 1, 0));
 
-  // The real height of the card (its text changes from step to step); a guess before it is shown.
-  const cardHeight = card.current?.getBoundingClientRect().height || CARD_HEIGHT;
-  const style = anchoredStyle(rect, cardHeight);
+  const style = anchoredStyle(rect, card.current);
   const placement = style ? '' : rect ? ' tour-card--bottom' : ' tour-card--center';
   // On phones the «don't show again» box only shows on the first and last steps (room for the element).
   const edge = index === 0 || last ? ' tour-card--edge' : '';
