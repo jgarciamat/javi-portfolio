@@ -115,6 +115,10 @@ function WorkLines({ result, money }: { result: RentaResult; money: (n: number) 
   );
 }
 
+/** What the pension plans leave for the next five years (a result saved before has none). */
+const excessOf = (r: RentaResult) =>
+  (r.pensionExcessNext?.plans ?? 0) + (r.pensionExcessNext?.dependency ?? 0);
+
 /** The lines of the calculation, from the net income to the withholdings. */
 function ResultLines({ result, money }: { result: RentaResult; money: (n: number) => string }) {
   const { t } = useI18n();
@@ -143,6 +147,11 @@ function ResultLines({ result, money }: { result: RentaResult; money: (n: number
         )}
       />
       <Line show label={line('base')} value={money(result.taxBase)} />
+      <Line
+        show={excessOf(result) > 0}
+        label={line('pensionExcessNext')}
+        value={money(excessOf(result))}
+      />
       <Line
         show={result.savingsBase > 0}
         label={line('savingsBase')}

@@ -4,6 +4,8 @@ import {
   lowPayDeduction,
   computeMinimum,
   computeRenta,
+  employmentTableMax,
+  pensionOf,
   generalQuota,
   countsAsDescendant,
   deductionAmount,
@@ -59,7 +61,23 @@ const state: RentaState = {
   minimums,
   workExpenses: { general: 2000, disability33: 3500, disability65: 7750 },
   workReduction: { maxReduction: 0, fullUntil: 0, zeroFrom: 0, notes: '' },
-  baseReductions: { pensionPlanLimit: 1500, pensionPlanEmployerLimit: 8500, notes: '' },
+  baseReductions: {
+    pensionPlanLimit: 1500,
+    pensionPlanEmployerLimit: 8500,
+    employmentTable: {
+      lowUpTo: 500,
+      lowTimes: 2.5,
+      midUpTo: 1500,
+      midBase: 1250,
+      midTimes: 0.25,
+      highTimes: 1,
+      highPayFrom: 60000,
+    },
+    dependencyLimit: 5000,
+    percentLimit: 30,
+    excessYears: 5,
+    notes: '',
+  },
   deductions: [
     deduction({ id: 'estado-maternidad', kind: 'fixed', perChild: [1200], refundable: true }),
     deduction({ id: 'estado-donativos', kind: 'percent', percent: 80, baseLimit: 250 }),
@@ -421,6 +439,49 @@ describe('computeRenta', () => {
     ).toBe(3000);
     expect(computeRenta(input({ gross: 100, workReduction: () => 5000 })).netIncome).toBe(0);
     expect(computeRenta(input({ gross: 2500, pensionPlan: 900 })).pensionReduction).toBe(0);
+  });
+
+  it('lets own contributions to the employer plan use the 8,500 € by the table of art. 52.1', () => {
+    const table = state.baseReductions.employmentTable;
+    // Up to 500 € of the employer: 2.5 times; 500.01 to 1,500: 1,250 + 25 % of the rest; more: 1.
+    expect(employmentTableMax(400, 30000, table)).toBe(1000);
+    expect(employmentTableMax(1400, 30000, table)).toBe(1475);
+    expect(employmentTableMax(2000, 30000, table)).toBe(2000);
+    // Pay over 60,000 € from that employer: always 1.
+    expect(employmentTableMax(400, 60000.01, table)).toBe(400);
+    // 400 € of the employer and 3,000 € own to its plan: 1,000 in the table + 1,500 + 400.
+    expect(
+      computeRenta(input({ pensionPlanEmployer: 400, pensionEmploymentOwn: 3000 })).pensionReduction
+    ).toBe(2900);
+  });
+
+  it('takes the excess of the years before first and carries what the 30 % leaves out', () => {
+    // 30 % of 28,000 = 8,400. Excess: 7,000 of plans and 6,000 of dependency (only 5,000 a year).
+    const r = computeRenta(
+      input({
+        pensionPlan: 1500,
+        dependencyPremiums: 6000,
+        pensionExcess: { plans: 7000, dependency: 6000 },
+      })
+    );
+    expect(r.pensionReduction).toBe(8400);
+    // Plans 7,000 + dependency 1,400 of the excess; this year's 1,500 and 5,000 (the 1,000 over the
+    // 5,000 € do not carry), and 4,600 of the old dependency excess left.
+    expect(r.pensionExcessNext).toEqual({ plans: 1500, dependency: 4600 + 5000 });
+    // The activity counts for the 30 %: 28,000 + 10,000 of net activity gives 11,400.
+    const withActivity = pensionOf(
+      {
+        gross: 32000,
+        pensionPlan: 1500,
+        pensionEmployer: 8500,
+        employmentOwn: 0,
+        dependency: 0,
+        excess: { plans: 0, dependency: 0 },
+      },
+      0.3 * (28000 + 10000),
+      state.baseReductions
+    );
+    expect(withActivity.reduction).toBe(10000);
   });
 
   it('allows more work expenses with a disability, a move and union fees', () => {

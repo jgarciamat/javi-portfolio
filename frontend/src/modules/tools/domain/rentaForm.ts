@@ -117,6 +117,12 @@ export interface RentaForm {
   mobility: boolean;
   pension: string;
   pensionEmployer: string;
+  /** Own contributions to the employer's plan (art. 52.1.b.1.º) and its dependency premiums. */
+  pensionEmploymentOwn?: string;
+  dependencyPremiums?: string;
+  /** What did not fit in the five years before (art. 52.2): plans and dependency insurance. */
+  pensionExcess?: string;
+  dependencyExcess?: string;
   spousePlan: string;
   compensatory: string;
   /** Maintenance paid to the children by a court decision (they do not live with the person). */
@@ -406,6 +412,9 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     geographicMobility: form.mobility,
     pensionPlan: number(form.pension),
     pensionPlanEmployer: number(form.pensionEmployer),
+    pensionEmploymentOwn: number(form.pensionEmploymentOwn),
+    dependencyPremiums: number(form.dependencyPremiums),
+    pensionExcess: { plans: number(form.pensionExcess), dependency: number(form.dependencyExcess) },
     spousePlan: number(form.spousePlan),
     compensatoryPension: number(form.compensatory),
     childSupport: number(form.childSupport),

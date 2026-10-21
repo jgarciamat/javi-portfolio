@@ -40,6 +40,14 @@ describe('Renta planner: work, contributions and savings', () => {
     fill('tools.renta.spousePlan', '1000');
     fill('tools.renta.compensatory', '1200');
     expect(resultText()).not.toBe(afterMobility);
+    // The employer plan by the table of art. 52.1, dependency premiums and the excess of years before:
+    // what passes the 30 % is kept for the next five years.
+    expect(screen.queryByText(tr('tools.renta.line.pensionExcessNext'))).toBeNull();
+    fill('tools.renta.pensionEmploymentOwn', '300');
+    fill('tools.renta.dependencyPremiums', '200');
+    fill('tools.renta.dependencyExcess', '100');
+    fill('tools.renta.pensionExcess', '20000');
+    expect(screen.getByText(tr('tools.renta.line.pensionExcessNext'))).toBeInTheDocument();
   });
 
   it('takes pensions out of the low-pay deduction and drops the disability expenses of a pensioner', async () => {

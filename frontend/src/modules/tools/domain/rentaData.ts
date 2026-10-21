@@ -210,7 +210,7 @@ export interface RentaState {
   /** Reduction of the net income from work for low incomes. */
   workReduction: { maxReduction: number; fullUntil: number; zeroFrom: number; notes: string };
   /** Reductions of the tax base. */
-  baseReductions: { pensionPlanLimit: number; pensionPlanEmployerLimit: number; notes: string };
+  baseReductions: BaseReductions;
   /** The deductions of the State on the tax (maternity, large family, donations...). */
   deductions: Deduction[];
   /**
@@ -219,4 +219,32 @@ export interface RentaState {
    */
   lowPay?: LowPayRule | null;
   source: string;
+}
+
+/** Reductions of the tax base for pension plans and similar (LIRPF arts. 51 and 52). */
+export interface BaseReductions {
+  pensionPlanLimit: number;
+  pensionPlanEmployerLimit: number;
+  /**
+   * Art. 52.1.b.1.º: the worker's own contributions to the employer's plan that can use the increase,
+   * by the employer's contribution: up to `lowUpTo`, × `lowTimes`; up to `midUpTo`, `midBase` +
+   * `midTimes` × (contribution − `lowUpTo`); above, × `highTimes`, and always × `highTimes` with a pay
+   * from that employer of more than `highPayFrom`.
+   */
+  employmentTable: {
+    lowUpTo: number;
+    lowTimes: number;
+    midUpTo: number;
+    midBase: number;
+    midTimes: number;
+    highTimes: number;
+    highPayFrom: number;
+  };
+  /** Art. 51.5: the own limit of the premiums the employer pays to a collective dependency insurance. */
+  dependencyLimit: number;
+  /** Art. 52.1.a: percent of the net income from work and activities of each person. */
+  percentLimit: number;
+  /** Art. 52.2: years in which what did not fit can still be reduced. */
+  excessYears: number;
+  notes: string;
 }

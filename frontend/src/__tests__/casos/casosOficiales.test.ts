@@ -12,6 +12,7 @@ import {
   computeMinimum,
   computeRenta,
   deductionAmount,
+  employmentTableMax,
   generalQuota,
   incomeFactor,
   lowPayDeduction,
@@ -472,6 +473,35 @@ const CHECKS: Record<string, () => void> = {
     );
     expect(r.pensionReduction).toBe(figure('renta-c13-01', 'Reducción plan de empleo'));
   },
+  'renta-c13-02': () => {
+    // Pay of 35,000 € with 2,500 € of social security: 30,500 € net, the general base. Excesses of
+    // 2024: 3,500 € of plans and 1,500 € of dependency insurance.
+    const r = computeRenta(
+      workReturn({
+        gross: '35000',
+        socialSecurity: '2500',
+        pension: '500',
+        pensionEmployer: '1400',
+        pensionEmploymentOwn: '2300',
+        dependencyPremiums: '1000',
+        pensionExcess: '3500',
+        dependencyExcess: '1500',
+      })
+    );
+    expect(round2(r.netIncome * 0.3)).toBe(figure('renta-c13-02', 'Límite 30 %'));
+    expect(employmentTableMax(1400, 35000, rentaState.baseReductions.employmentTable)).toBe(
+      figure('renta-c13-02', 'Máximo aportación trabajador')
+    );
+    expect(r.pensionReduction).toBe(
+      figure('renta-c13-02', 'Reducción excesos 2024') +
+        figure('renta-c13-02', 'Reducción aportaciones 2025')
+    );
+    expect(r.taxBase).toBe(figure('renta-c13-02', 'Base liquidable general'));
+    expect(r.pensionExcessNext).toEqual({
+      plans: figure('renta-c13-02', 'Exceso pendiente aportaciones'),
+      dependency: figure('renta-c13-02', 'Exceso pendiente dependencia'),
+    });
+  },
   'renta-c14-01': () => {
     const children = [
       { age: 27, disability: 33 as const },
@@ -620,8 +650,6 @@ const PENDING: Record<string, string> = {
     'Agraria con PAC repartida entre cultivos: pendiente de pasar por agrarianModules (siguiente oleada).',
   'renta-c11-08':
     'Exención por reinversión en renta vitalicia de mayores de 65 (art. 38.3): solo hay una ficha informativa.',
-  'renta-c13-02':
-    'Excesos de años anteriores y cuadro del art. 52.1 (aportación del trabajador al plan de empleo): el motor no los pide.',
   'renta-c16-02':
     'Comprobación del aumento de patrimonio en la deducción por vivienda (régimen transitorio): la base la escribe la persona.',
 };

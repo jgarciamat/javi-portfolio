@@ -8,6 +8,7 @@ import {
 } from './rentaActivity';
 import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
 import type {
+  BaseReductions,
   Deduction,
   LowPayRule,
   MinimumAmounts,
@@ -451,6 +452,15 @@ export interface RentaInput {
   /** Own contributions to pension plans, and those the employer makes (euros). */
   pensionPlan: number;
   pensionPlanEmployer: number;
+  /**
+   * The worker's own contributions to the employer's plan (flexible pay put into it too): within the
+   * table of art. 52.1.b.1.º they use the 8,500 € of the employer.
+   */
+  pensionEmploymentOwn?: number;
+  /** Premiums the employer pays to a collective dependency insurance (art. 51.5: 5,000 € of its own). */
+  dependencyPremiums?: number;
+  /** What did not fit in the five years before (art. 52.2): of plans and of dependency insurance. */
+  pensionExcess?: { plans: number; dependency: number };
   /** Contributions to the plan of a spouse with low income. */
   spousePlan: number;
   /** Compensatory pension paid to an ex-spouse. */
@@ -515,6 +525,8 @@ export interface RentaResult {
   rentalNet: number;
   imputedIncome: number;
   pensionReduction: number;
+  /** What does not fit this year, for the next five (art. 52.2): of plans and of dependency. */
+  pensionExcessNext: { plans: number; dependency: number };
   /** Other reductions of the general base: spouse plan and compensatory pension. */
   otherReductions: number;
   /** The economic activities and the reductions of art. 32 (null when there are none). */
@@ -642,6 +654,10 @@ interface Earner {
   /** Own contributions to pension plans, and the employer's. */
   pensionPlan: number;
   pensionEmployer: number;
+  /** Own contributions to the employer's plan, dependency premiums and the excess of years before. */
+  employmentOwn: number;
+  dependency: number;
+  excess: { plans: number; dependency: number };
   /** The person: their 2,000 € always count, as in an individual return. */
   main: boolean;
 }
@@ -661,6 +677,12 @@ function earnersOf(input: RentaInput): Earner[] {
     assistance: input.family.assistance === true,
     pensionPlan: positive(input.pensionPlan),
     pensionEmployer: positive(input.pensionPlanEmployer),
+    employmentOwn: positive(input.pensionEmploymentOwn ?? 0),
+    dependency: positive(input.dependencyPremiums ?? 0),
+    excess: {
+      plans: positive(input.pensionExcess?.plans ?? 0),
+      dependency: positive(input.pensionExcess?.dependency ?? 0),
+    },
     main: true,
   };
   const partner = input.joint?.partner;
@@ -676,6 +698,9 @@ function earnersOf(input: RentaInput): Earner[] {
       assistance: false,
       pensionPlan: positive(partner.pensionPlan),
       pensionEmployer: 0,
+      employmentOwn: 0,
+      dependency: 0,
+      excess: { plans: 0, dependency: 0 },
       main: false,
     },
   ];
@@ -775,6 +800,64 @@ function activityRunner(input: RentaInput, otherIncome: number) {
       : null;
 }
 
+/**
+ * The most the worker's own contributions to the employer's plan can use of the 8,500 €, by what the
+ * employer puts in (the table of LIRPF art. 52.1.b.1.º, BOE-A-2006-20764, checked 22-10-2026).
+ * `pay`: the gross pay, taken as from that employer.
+ */
+export function employmentTableMax(
+  employer: number,
+  pay: number,
+  t: BaseReductions['employmentTable']
+): number {
+  if (pay > t.highPayFrom || employer > t.midUpTo) return round2(employer * t.highTimes);
+  if (employer <= t.lowUpTo) return round2(employer * t.lowTimes);
+  return round2(t.midBase + t.midTimes * (employer - t.lowUpTo));
+}
+
+type PensionPart = 'gross' | 'pensionPlan' | 'pensionEmployer' | 'employmentOwn' | 'dependency';
+
+/**
+ * The pension plans and dependency insurance of one person (LIRPF arts. 51.5 and 52; Manual práctico
+ * de Renta 2025, c13, «Límites y exceso de aportaciones» and its example, checked 22-10-2026). The
+ * excess of the years before goes first and, like this year's, «con sujeción a los límites máximos»;
+ * then the plans, then the dependency premiums (the Manual's choice, the better one). `room`: the 30 %
+ * of the net work and activity income, and the base left.
+ */
+export function pensionOf(
+  e: Pick<Earner, PensionPart | 'excess'>,
+  room: number,
+  r: BaseReductions
+): { reduction: number; next: { plans: number; dependency: number } } {
+  const table = employmentTableMax(e.pensionEmployer, e.gross, r.employmentTable);
+  const inTable = Math.min(e.employmentOwn, table);
+  const plansCap = r.pensionPlanLimit + r.pensionPlanEmployerLimit;
+  // 1,500 € for all, raised by the employer's contributions and the own ones within the table.
+  const plans = Math.min(
+    e.pensionPlan + e.employmentOwn + e.pensionEmployer,
+    r.pensionPlanLimit + Math.min(r.pensionPlanEmployerLimit, e.pensionEmployer + inTable)
+  );
+  const dependency = Math.min(e.dependency, r.dependencyLimit);
+  let left = Math.max(0, room);
+  const take = (amount: number, cap: number) => {
+    const used = Math.min(amount, cap, left);
+    left -= used;
+    return used;
+  };
+  const oldPlans = take(e.excess.plans, plansCap);
+  const oldDependency = take(e.excess.dependency, r.dependencyLimit);
+  const newPlans = take(plans, plansCap - oldPlans);
+  const newDependency = take(dependency, r.dependencyLimit - oldDependency);
+  return {
+    reduction: round2(oldPlans + oldDependency + newPlans + newDependency),
+    // Only what the 30 % or the base left out carries (art. 52.2), not what passes the caps.
+    next: {
+      plans: round2(e.excess.plans - oldPlans + plans - newPlans),
+      dependency: round2(e.excess.dependency - oldDependency + dependency - newDependency),
+    },
+  };
+}
+
 /** From the net pay to the general and savings bases: other income, the reductions of the base. */
 function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof workIncome>) {
   const { state } = input;
@@ -815,24 +898,18 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   const jointGeneral = Math.min(jointAmount, Math.max(0, beforeReductions));
   const jointSavings = Math.min(jointAmount - jointGeneral, savingsTotal);
   const afterJoint = beforeReductions - jointGeneral;
-  // Pension plans (LIRPF art. 52.1.b; AEAT Manual práctico de Renta 2025, c13, checked 19-10-2026):
-  // own contributions up to 1,500 €, and the employer's up to 8,500 € more, so 10,000 € in all; and
-  // up to 30 % of the net work income, for each member of the unit on their own (art. 84.2.1.º).
-  // Own contributions to the employer's plan that can also use the 8,500 € (the table of art. 52)
-  // are not asked: all own contributions are held to 1,500 €.
-  const { pensionPlanLimit, pensionPlanEmployerLimit } = state.baseReductions;
-  const pensionOf = (e: Earner, i: number) =>
-    Math.min(
-      Math.min(e.pensionPlan, pensionPlanLimit) +
-        Math.min(e.pensionEmployer, pensionPlanEmployerLimit),
-      work.each[i] * 0.3
-    );
-  const pensionReduction = round2(
-    Math.min(
-      earners.reduce((sum, e, i) => sum + pensionOf(e, i), 0),
-      Math.max(0, afterJoint)
-    )
-  );
+  // Pension plans: up to 30 % of the net work and activity income (the activities before the
+  // reductions of art. 32, Manual 2025, c13), for each member of the unit on their own (art.
+  // 84.2.1.º), and never more than the base left.
+  const r = state.baseReductions;
+  let baseLeft = Math.max(0, afterJoint);
+  const plans = earners.map((e, i) => {
+    const own = work.each[i] + (i === 0 ? activityNet : 0);
+    const p = pensionOf(e, Math.min((Math.max(0, own) * r.percentLimit) / 100, baseLeft), r);
+    baseLeft -= p.reduction;
+    return p;
+  });
+  const pensionReduction = round2(plans.reduce((sum, p) => sum + p.reduction, 0));
   // The spouse's plan (art. 51.7) goes with the pension plans, before the compensatory pension.
   const leftAfterPlans = Math.max(0, afterJoint - pensionReduction);
   const spouse = Math.min(Math.min(positive(input.spousePlan), 1000), leftAfterPlans);
@@ -852,6 +929,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     beforeReductions,
     jointReduction: round2(jointGeneral + jointSavings),
     pensionReduction,
+    pensionExcessNext: plans[0].next,
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
@@ -1058,6 +1136,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     beforeReductions,
     jointReduction,
     pensionReduction,
+    pensionExcessNext,
     otherReductions,
     taxBase,
     savingsIncome,
@@ -1171,6 +1250,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     rentalNet: rentNet,
     imputedIncome: imputed,
     pensionReduction,
+    pensionExcessNext,
     otherReductions,
     savingsReduction,
     activities,

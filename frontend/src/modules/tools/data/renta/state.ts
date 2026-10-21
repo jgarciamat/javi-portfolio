@@ -514,9 +514,23 @@ export const rentaState: RentaState = {
     notes:
       'Se aplica al rendimiento neto del trabajo (tras restar los gastos de las letras a a e del art. 19.2, no los 2.000 euros). Hasta 14.852 euros: 7.302. De 14.852 a 17.673,52: 7.302 - 1,75 x (rendimiento - 14.852). De 17.673,52 a 19.747,5: 2.364,34 - 1,14 x (rendimiento - 17.673,52). Desde 19.747,5: nada. Solo si las otras rentas (sin exentas) no pasan de 6.500 euros. El saldo no puede quedar negativo.',
   },
+  // LIRPF arts. 51.5 and 52 (BOE-A-2006-20764, wording of Ley 31/2022, in force since 2023; checked
+  // 22-10-2026) and Manual práctico de Renta 2025, c13, «Límites y exceso de aportaciones».
   baseReductions: {
     pensionPlanLimit: 1500,
     pensionPlanEmployerLimit: 8500,
+    employmentTable: {
+      lowUpTo: 500,
+      lowTimes: 2.5,
+      midUpTo: 1500,
+      midBase: 1250,
+      midTimes: 0.25,
+      highTimes: 1,
+      highPayFrom: 60000,
+    },
+    dependencyLimit: 5000,
+    percentLimit: 30,
+    excessYears: 5,
     notes:
       'Límite conjunto por planes de pensiones, mutualidades, planes de previsión asegurados, planes de previsión social empresarial y seguros de dependencia: 1.500 euros, más hasta 8.500 si el aumento viene de contribuciones de la empresa o de aportaciones tuyas al mismo plan dentro de la tabla del art. 52. Los autónomos pueden sumar 4.250 por aportaciones propias, y entre ambos aumentos el tope es 8.500 (10.000 en total). Aparte, 5.000 por primas pagadas por la empresa a seguros colectivos de dependencia. Además no puede pasar del 30 % de los rendimientos netos del trabajo y de actividades (criterio del manual de la AEAT) ni dejar la base general negativa. Lo que sobre se puede reducir en los 5 años siguientes.',
   },

@@ -112,6 +112,33 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             onChange={(v) => set({ pensionEmployer: v })}
           />
           <Field
+            id="renta-pension-employment-own"
+            label={t('tools.renta.pensionEmploymentOwn')}
+            hint={t('tools.renta.pensionEmploymentOwnHint')}
+            value={form.pensionEmploymentOwn ?? ''}
+            onChange={(v) => set({ pensionEmploymentOwn: v })}
+          />
+          <Field
+            id="renta-dependency-premiums"
+            label={t('tools.renta.dependencyPremiums')}
+            hint={t('tools.renta.dependencyPremiumsHint')}
+            value={form.dependencyPremiums ?? ''}
+            onChange={(v) => set({ dependencyPremiums: v })}
+          />
+          <Field
+            id="renta-pension-excess"
+            label={t('tools.renta.pensionExcess')}
+            hint={t('tools.renta.pensionExcessHint')}
+            value={form.pensionExcess ?? ''}
+            onChange={(v) => set({ pensionExcess: v })}
+          />
+          <Field
+            id="renta-dependency-excess"
+            label={t('tools.renta.dependencyExcess')}
+            value={form.dependencyExcess ?? ''}
+            onChange={(v) => set({ dependencyExcess: v })}
+          />
+          <Field
             id="renta-spouse-plan"
             label={t('tools.renta.spousePlan')}
             value={form.spousePlan}
