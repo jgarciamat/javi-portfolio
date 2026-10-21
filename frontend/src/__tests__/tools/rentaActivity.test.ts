@@ -409,7 +409,7 @@ describe('the reductions of art. 32', () => {
     // Missing years count as 0; the excess is held to 150,000 €.
     expect(artisticReduction(400000, [], rule)).toBe(45000);
     // After the start reduction of art. 32.3: the designer's 26,647.50 − 5,329.50 = 21,318 and, with
-    // three years of 5,000 € (130 % = 6,500), 30 % of 20,147.50 = 6,044.25 off the total.
+    // three years of 5,000 € (130 % = 6,500), 30 % of 20,147.50 = 6,044.25 (box 0237) off 0235.
     const artist = {
       kind: 'direct' as const,
       name: 'Ilustración',
@@ -421,8 +421,8 @@ describe('the reductions of art. 32', () => {
       artistic: { previous: [5000, 5000, 5000] },
     };
     const r = activitiesOf([artist], ctx({ artistic: rule }), modules2025, farm2025);
-    expect(r).toMatchObject({ directTotal: 21318, artisticReduction: 6044.25 });
-    expect(r.total).toBe(21318 - 6044.25);
+    expect(r).toMatchObject({ artisticReduction: 6044.25, directTotal: 15273.75 });
+    expect(r.total).toBe(15273.75);
     // A year with no such reduction (2024), or a reduction bigger than what is left: none or capped.
     expect(activitiesOf([artist], ctx(), modules2025, farm2025).artisticReduction).toBe(0);
     // A single client, net 12,050: 8,498 € of art. 32.2.1.º leave 3,552, less than the 3,615 of the

@@ -547,8 +547,8 @@ export interface ActivitiesResult {
   smallIncomeReduction: number;
   startReduction: number;
   /**
-   * The reduction for artistic activities (DA 60.ª.2), after the others: off the total, not off box
-   * 0235 (its box in the modelo 100 of 2025 is not confirmed). A result saved before has none.
+   * Box 0237: the reduction for artistic activities (DA 60.ª.2), after the others ([0235] = [0231] −
+   * [0232] − [0233] − [0234] − [0237], Orden HAC/277/2026). A result saved before has none.
    */
   artisticReduction?: number;
   /** Box 0235. */
@@ -681,9 +681,10 @@ export function activitiesOf(
   // Art. 32.3: 20 % of the positive net income, after the reductions of 32.2, up to 100,000 €.
   const startBase = Math.max(0, Math.min(start, direct) - dependentAmount - smallDirect);
   const startReduction = round2(Math.min(startBase, 100000) * 0.2);
-  const directTotal = round2(direct - dependentAmount - smallDirect - startReduction);
+  const afterOthers = direct - dependentAmount - smallDirect - startReduction;
   // DA 60.ª.2: «con posterioridad ... a las reducciones previstas en los apartados 2 y 3 del artículo 32».
-  const artistic = round2(Math.min(totals.artistic, Math.max(0, directTotal)));
+  const artistic = round2(Math.min(totals.artistic, Math.max(0, afterOthers)));
+  const directTotal = round2(afterOthers - artistic);
   const modulesTotal = round2(modules - smallModules);
   const agrarianTotal = round2(agrarian - smallFarm);
   return {
@@ -695,7 +696,7 @@ export function activitiesOf(
     directTotal,
     modules: modulesTotal,
     agrarian: agrarianTotal,
-    total: round2(directTotal + modulesTotal + agrarianTotal - artistic),
+    total: round2(directTotal + modulesTotal + agrarianTotal),
     withheld: round2(sum(list.map((a) => positive(a.withheld)))),
     payments: round2(sum(list.map((a) => positive(a.payments)))),
     each,
