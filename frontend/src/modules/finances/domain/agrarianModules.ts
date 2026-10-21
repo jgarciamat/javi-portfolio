@@ -127,7 +127,8 @@ export interface AgrarianModulesInput {
   extraordinary: number;
 }
 
-export type ModuleWarning = 'year' | 'limit' | 'noTransformed' | 'unknownProduct';
+export type ModuleWarning =
+  'year' | 'limit' | 'noTransformed' | 'unknownProduct' | 'aidWithoutCrops';
 
 export interface AgrarianModulesResult {
   boxes: Record<string, number>;
@@ -138,6 +139,13 @@ export interface AgrarianModulesResult {
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const FORESTRY = ['forestLong', 'forestShort', 'resin'];
+/**
+ * Works, services and accessory activities: the decoupled CAP aid goes «a los ingresos procedentes
+ * de los cultivos o explotaciones» (anexo I, instrucción 2.1, BOE-A-2024-24949, checked 22-10-2026),
+ * not to them. The Manual práctico de Renta 2025 (c09, caso práctico) leaves the works for other
+ * farmers out of the spread.
+ */
+export const SERVICES = ['otherServices', 'livestockServices', 'accessory'];
 
 /** The index of a product in a year, with the reductions of the year that apply everywhere. */
 export function indexOf(row: ModuleRow, year: number): { index: number; warning?: ModuleWarning } {
@@ -170,18 +178,26 @@ function corrected(input: AgrarianModulesInput, reduced: number): number {
 
 /** Phase 1: the income of each product by its index, with the CAP aid (instrucción 2.1). */
 function previousYield(input: AgrarianModulesInput, year: number, warnings: Set<ModuleWarning>) {
-  const crops = input.rows.reduce((s, r) => s + Math.max(0, r.income), 0);
+  const income = (r: ModuleRow) => Math.max(0, r.income);
+  const all = input.rows.reduce((s, r) => s + income(r), 0);
+  const crops = input.rows
+    .filter((r) => !SERVICES.includes(r.product))
+    .reduce((s, r) => s + income(r), 0);
   const aid = Math.max(0, input.pacAid);
-  const total = crops + aid;
+  const total = all + aid;
   // The aid goes with each crop by its income, unless the rest of the income is under 25 %.
-  const aidApart = total > 0 && crops < total * AID_SHARE;
+  // With only services, the order has no crop to put it with: 0,56 and a warning (not confirmed).
+  const noCrops = aid > 0 && crops === 0 && all >= total * AID_SHARE;
+  if (noCrops) warnings.add('aidWithoutCrops');
+  const aidApart = total > 0 && (all < total * AID_SHARE || noCrops);
   let previous = aidApart ? aid * AID_INDEX : 0;
   for (const row of input.rows) {
     const { index, warning } = indexOf(row, year);
     if (warning) warnings.add(warning);
-    const income = Math.max(0, row.income);
-    const share = aidApart || crops === 0 ? 0 : (aid * income) / crops;
-    previous += (income + share) * index;
+    const own = income(row);
+    const service = SERVICES.includes(row.product);
+    const share = aidApart || crops === 0 || service ? 0 : (aid * own) / crops;
+    previous += (own + share) * index;
   }
   return { total, previous };
 }

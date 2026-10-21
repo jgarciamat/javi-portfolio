@@ -23,6 +23,7 @@ import {
 } from '@modules/tools/domain/rentaCalc';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { donationResult } from '@modules/tools/domain/rentaDonations';
+import { agrarianModules } from '@modules/finances/domain/agrarianModules';
 import { artisticReduction } from '@modules/tools/domain/rentaActivity';
 import { emptyForm, rentalOf, toInput } from '@modules/tools/domain/rentaForm';
 import {
@@ -270,6 +271,49 @@ const CHECKS: Record<string, () => void> = {
       figure('renta-c07-02', 'Reducción (30 % de 150.000)')
     );
     expect(round2(390000 - (125000 * rule.over) / 100)).toBe(figure('renta-c07-02', 'Exceso'));
+  },
+  'renta-c09-01': () => {
+    // Maize, lambs (sheep meat: 0.09, Orden HAC/484/2026) and horticulture with their VAT
+    // compensation, and works for other farmers (0.56), which get none of the 6,250 € of CAP aid.
+    // Staff: 18,000 / 114,765 = 15.68 % (0.90). Depreciation of the case: 11,185 €.
+    const r = agrarianModules(
+      {
+        rows: [
+          { product: 'cereals', income: 54880 },
+          { product: 'sheepMeat', income: 29835 },
+          { product: 'horticulture', income: 19040 },
+          { product: 'otherServices', income: 4760 },
+        ],
+        pacAid: 6250,
+        depreciation: 11185,
+        correctors: {
+          externalMeans: false,
+          staffShare: round2((18000 / 114765) * 100),
+          rentedShare: 0,
+          irrigatedShare: 0,
+          boughtFeed: false,
+          organic: false,
+          forestPlan: false,
+        },
+        youngFarmer: false,
+        refunds: 0,
+        extraordinary: 0,
+      },
+      2025
+    );
+    expect(r.boxes['1538']).toBe(figure('renta-c09-01', 'Amortizaciones'));
+    // The Manual cuts the maize's aid to 3,305.86 (54,880 / 103,755 × 6,250 = 3,305.867): its
+    // figures are a cent below the engine's, which does not round the share.
+    expect(round2(r.boxes['1537'] - figure('renta-c09-01', 'Rendimiento neto previo'))).toBe(0.01);
+    expect(round2(r.boxes['1539'] - figure('renta-c09-01', 'Rendimiento neto minorado'))).toBe(
+      0.01
+    );
+    expect(round2(r.boxes['1548'] - figure('renta-c09-01', 'Rendimiento neto de módulos'))).toBe(
+      0.01
+    );
+    expect(r.boxes['1549']).toBe(figure('renta-c09-01', 'Reducción general 5 %'));
+    expect(round2(r.net - figure('renta-c09-01', 'Rendimiento neto reducido total'))).toBe(0.01);
+    expect(r.warnings).toEqual([]);
   },
   'renta-c10-01': () => {
     expect((40800 * rentaProperty.imputation.revisedRate) / 100).toBeCloseTo(
@@ -656,8 +700,6 @@ const PENDING: Record<string, string> = {
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',
-  'renta-c09-01':
-    'Agraria con PAC repartida entre cultivos: pendiente de pasar por agrarianModules (siguiente oleada).',
   'renta-c11-08':
     'Exención por reinversión en renta vitalicia de mayores de 65 (art. 38.3): solo hay una ficha informativa.',
   'renta-c16-02':
