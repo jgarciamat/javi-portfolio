@@ -338,6 +338,7 @@ export function AccountsView() {
           what={t('app.accounts.title')}
           count={acc.accounts.length}
           table={accountsTable}
+          pdf
         />
         {acc.error && <p className="form-error">{acc.error}</p>}
         <ul className="entity-list">
@@ -381,6 +382,7 @@ export function AccountsView() {
           what={t('app.accounts.transfers')}
           count={acc.transfers.length}
           table={transfersTable}
+          pdf
         />
         {acc.transfers.length > 0 && (
           <ul className="entity-list">

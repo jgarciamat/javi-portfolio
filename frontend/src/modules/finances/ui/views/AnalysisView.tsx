@@ -198,6 +198,7 @@ function TrendsCard() {
         what={t('app.analysis.trendsName')}
         count={trends?.length ?? 0}
         table={table}
+        pdf={{ range: monthLabel(year, month) }}
       />
       {error && <p className="form-error">{error}</p>}
       {trends?.length === 0 && <p className="empty-state">{t('app.analysis.noData')}</p>}
@@ -282,6 +283,7 @@ function NetWorthCard() {
         what={t('app.analysis.netWorthTitle')}
         count={points?.length ?? 0}
         table={table}
+        pdf={{ range: `${months} ${t('app.analysis.months')}` }}
       />
       {error && <p className="form-error">{error}</p>}
       {points && last && (
@@ -355,6 +357,7 @@ function SubscriptionsCard() {
         what={t('app.subscriptions.title')}
         count={data?.subscriptions.length ?? 0}
         table={table}
+        pdf
       />
       {error && <p className="form-error">{error}</p>}
       {data?.subscriptions.length === 0 && (

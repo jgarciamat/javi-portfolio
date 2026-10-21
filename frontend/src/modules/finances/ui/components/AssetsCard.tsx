@@ -176,6 +176,7 @@ export function AssetsCard() {
           what={t('app.assets.title')}
           count={assets.length}
           table={() => assetsTable(assets, t, currency)}
+          pdf
         />
         {action.error && <p className="form-error">{action.error}</p>}
         {assets.length > 0 && (

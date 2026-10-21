@@ -16,6 +16,9 @@ import { emptyManual } from '@modules/finances/ui/components/AutonomoManual';
 import { invoiceBookTable } from '@modules/finances/ui/components/invoiceBookTable';
 import { ImportModal } from '@modules/finances/ui/components/ImportModal';
 import { FormPreview } from '@modules/taxforms/ui/FormPreview';
+import { MonthActions } from '@modules/finances/ui/components/MonthActions';
+import { AnnualChart } from '@modules/finances/ui/components/AnnualChart';
+import autoTable from 'jspdf-autotable';
 import { tableToCSV } from '@modules/finances/application/hooks/useExportCSV';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import type { FilledForm } from '@modules/taxforms/domain/values';
@@ -26,6 +29,12 @@ import { freezeTime, restoreTime } from '@test-utils/time';
 import { captureDownloads } from '@test-utils/dom';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+
+// The real table of the PDF, watched to count the rows of each screen.
+jest.mock('jspdf-autotable', () => {
+  const actual = jest.requireActual('jspdf-autotable');
+  return { __esModule: true, ...actual, default: jest.fn(actual.default) };
+});
 
 jest.mock('@modules/taxforms/application/formView', () => ({
   openFormView: jest.fn(),
@@ -67,6 +76,25 @@ const header = (locale: Locale, cells: string[]) =>
     .join(';');
 const money = (locale: Locale, key: string) => `=${translate(locale, key)} (EUR)`;
 
+/** The PDF button of a table, by what it exports. */
+const pdfButton = (locale: Locale, whatKey: string) =>
+  screen.findByRole('button', {
+    name: translate(locale, 'app.exportButtons.pdfFor', { what: translate(locale, whatKey) }),
+  });
+const tables = autoTable as unknown as jest.Mock;
+
+/** Presses a PDF button and reads the file: its name, that it is a PDF, and the rows of its table. */
+async function downloadPdf(button: HTMLElement) {
+  const saved = captureDownloads();
+  const before = tables.mock.calls.length;
+  fireEvent.click(button);
+  await waitFor(() => expect(saved.names).toHaveLength(1));
+  const [text] = await saved.text();
+  saved.restore();
+  const options = tables.mock.calls[before][1] as { body: string[][]; foot?: string[][] };
+  return { name: saved.names[0], text, body: options.body, foot: options.foot };
+}
+
 describe('the CSV writer', () => {
   it('separates with semicolons, writes the decimal mark asked and keeps negatives as numbers', () => {
     const table = { head: ['A', 'B'], rows: [[-12.5, '=SUM(A1)'], [null, undefined], []] };
@@ -85,12 +113,34 @@ describe('ExportButtons', () => {
     expect(button).toHaveAccessibleDescription(translate('es', 'app.exportButtons.empty'));
   });
 
-  it('offers the PDF of the same table when the screen has one', () => {
-    const onPdf = jest.fn();
-    renderWithI18n(<ExportButtons name="x" what="Cosas" count={1} table={table} onPdf={onPdf} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Exportar PDF: Cosas' }));
-    expect(onPdf).toHaveBeenCalled();
+  it('offers the PDF of the same table when the screen has one', async () => {
+    renderWithI18n(<ExportButtons name="x" what="Cosas" count={1} table={table} pdf />);
     expect(screen.getByRole('group', { name: 'Exportar' })).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: 'Descargar PDF: Cosas' });
+    expect(button).toHaveTextContent('Descargar PDF');
+    const file = await downloadPdf(button);
+    expect(file.name).toBe(`finanverso_x_${TODAY}.pdf`);
+    expect(file.text.startsWith('%PDF-')).toBe(true);
+    expect(file.body).toEqual([['1']]);
+  });
+
+  it('has no PDF where the screen does not ask for one, and none to make without rows', () => {
+    const { unmount } = renderWithI18n(
+      <ExportButtons name="x" what="Cosas" count={1} table={table} />
+    );
+    expect(screen.queryByRole('button', { name: /PDF/ })).toBeNull();
+    unmount();
+    renderWithI18n(<ExportButtons name="x" what="Cosas" count={0} table={table} pdf />);
+    const pdf = screen.getByRole('button', { name: 'Descargar PDF: Cosas' });
+    expect(pdf).toBeDisabled();
+    expect(pdf).toHaveAccessibleDescription(translate('es', 'app.exportButtons.empty'));
+  });
+
+  it('says so when the PDF cannot be made', async () => {
+    const failing = () => Promise.reject(new Error('Sin conexión'));
+    renderWithI18n(<ExportButtons name="x" what="Cosas" count={1} table={failing} pdf />);
+    fireEvent.click(screen.getByRole('button', { name: 'Descargar PDF: Cosas' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sin conexión');
   });
 
   it('says so when the table cannot be read', async () => {
@@ -134,6 +184,43 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(api.transactionApi.search).toHaveBeenCalledWith(
       expect.objectContaining({ limit: 200, offset: 200 })
     );
+    // The PDF: the same four rows, signed, and the totals of what was found at the end.
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.search.title'));
+    expect(pdf.name).toBe(`finanverso_busqueda_${TODAY}.pdf`);
+    expect(pdf.text.startsWith('%PDF-')).toBe(true);
+    expect(pdf.body).toHaveLength(4);
+    expect(pdf.body[0][5]).toBe(locale === 'es' ? '-40,00' : '-40.00');
+    expect(pdf.foot!.map((r) => r[0])).toEqual(
+      [
+        'app.summary.income',
+        'app.summary.expenses',
+        'app.summary.saving',
+        'app.annual.table.balance',
+      ].map((k) => translate(locale, k))
+    );
+    expect(pdf.foot![1][5]).toBe(locale === 'es' ? '160,00' : '160.00');
+  });
+
+  it('Search: the dates of the filters go under the title of the PDF', async () => {
+    const api = createFakeApi();
+    api.transactionApi.search.mockResolvedValue({
+      items: [f.transaction({ id: 't1', type: 'INCOME' })],
+      total: 1,
+      totals: { income: 40, expenses: 0, saving: 0 },
+    });
+    render(<SearchView onEdit={jest.fn()} />, api);
+    const pdf = await pdfButton(locale, 'app.search.title');
+    const [from, to] = screen.getAllByLabelText(/./, { selector: 'input[type="date"]' });
+    for (const [field, value] of [
+      [from, '2026-03-01'],
+      [to, '2026-03-31'],
+    ] as const) {
+      fireEvent.change(field, { target: { value } });
+      const file = await downloadPdf(await pdfButton(locale, 'app.search.title'));
+      expect(file.body[0][5]).toBe(locale === 'es' ? '+40,00' : '+40.00');
+    }
+    fireEvent.change(from, { target: { value: '' } });
+    expect((await downloadPdf(pdf)).text.startsWith('%PDF-')).toBe(true);
   });
 
   it('Accounts: the accounts and the transfers', async () => {
@@ -161,6 +248,13 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(transfers.name).toBe(`finanverso_transferencias_${TODAY}.csv`);
     expect(transfers.head.startsWith(header(locale, ['app.export.csv.date']))).toBe(true);
     expect(transfers.rows).toEqual(['"2026-03-05";"Principal";"Ahorro";"100";"Paga"']);
+    const accountsPdf = await downloadPdf(await pdfButton(locale, 'app.accounts.title'));
+    expect(accountsPdf.name).toBe(`finanverso_cuentas_${TODAY}.pdf`);
+    expect(accountsPdf.text.startsWith('%PDF-')).toBe(true);
+    expect(accountsPdf.body).toHaveLength(2);
+    const transfersPdf = await downloadPdf(await pdfButton(locale, 'app.accounts.transfers'));
+    expect(transfersPdf.name).toBe(`finanverso_transferencias_${TODAY}.pdf`);
+    expect(transfersPdf.body).toHaveLength(1);
   });
 
   it('Budgets: each limit next to what was spent of it', async () => {
@@ -190,6 +284,10 @@ describe.each(LOCALES)('exports in %s', (locale) => {
       `"${translate(locale, 'app.categories.Ocio')}";"400";"300";"100";"75"`,
       `"Casa";"${decimal}";"0";"${decimal}";"0"`,
     ]);
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.budgets.title'));
+    expect(pdf.name).toBe(`finanverso_presupuestos_2026-03_${TODAY}.pdf`);
+    expect(pdf.text.startsWith('%PDF-')).toBe(true);
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Goals: every goal, archived ones included', async () => {
@@ -212,6 +310,9 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(file.head).toContain(translate(locale, 'app.goals.export.targetDate'));
     expect(file.rows).toHaveLength(2);
     expect(file.rows[1]).toContain(`"";"";"${translate(locale, 'app.export.csv.yes')}"`);
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.goals.title'));
+    expect(pdf.name).toBe(`finanverso_metas_${TODAY}.pdf`);
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Fixed expenses: the automatic movements with their period', async () => {
@@ -231,6 +332,9 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(file.rows[1]).toContain(
       `"2026-01";"2026-06";"${translate(locale, 'app.export.csv.no')}"`
     );
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.recurring.title'));
+    expect(pdf.name).toBe(`finanverso_gastos-fijos_${TODAY}.pdf`);
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Analysis: trends, net worth and subscriptions', async () => {
@@ -284,6 +388,16 @@ describe.each(LOCALES)('exports in %s', (locale) => {
       ])
     );
     expect(subs.rows).toHaveLength(2);
+    const trendsPdf = await downloadPdf(await pdfButton(locale, 'app.analysis.trendsName'));
+    expect(trendsPdf.name).toBe(`finanverso_tendencias_2026-03_${TODAY}.pdf`);
+    expect(trendsPdf.body).toHaveLength(1);
+    const worthPdf = await downloadPdf(await pdfButton(locale, 'app.analysis.netWorthTitle'));
+    expect(worthPdf.name).toBe(`finanverso_patrimonio_evolucion_${TODAY}.pdf`);
+    expect(worthPdf.body).toHaveLength(2);
+    const subsPdf = await downloadPdf(await pdfButton(locale, 'app.subscriptions.title'));
+    expect(subsPdf.name).toBe(`finanverso_suscripciones_${TODAY}.pdf`);
+    expect(subsPdf.text.startsWith('%PDF-')).toBe(true);
+    expect(subsPdf.body).toHaveLength(2);
   });
 
   it('Net worth: investments, goods and debts', async () => {
@@ -300,6 +414,9 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     expect(file.head.startsWith(header(locale, ['app.assets.name', 'app.assets.kind']))).toBe(true);
     expect(file.rows).toHaveLength(2);
     expect(file.rows[0]).toContain('"2026-03-01"');
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.assets.title'));
+    expect(pdf.name).toBe(`finanverso_patrimonio_${TODAY}.pdf`);
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Shared expenses: what each member pays of every expense', async () => {
@@ -355,6 +472,10 @@ describe.each(LOCALES)('exports in %s', (locale) => {
       '"2026-03-10";"Cena";"Ana";"40";"20";"20"',
       `"2026-03-11";"${translate(locale, 'app.split.payment')}";"Ben";"10";"10";"0"`,
     ]);
+    const pdf = await downloadPdf(await pdfButton(locale, 'app.split.expenses'));
+    expect(pdf.name).toBe(`finanverso_gastos-compartidos_${TODAY}.pdf`);
+    expect(pdf.text.startsWith('%PDF-')).toBe(true);
+    expect(pdf.body).toHaveLength(2);
   });
 
   it('Categories: name, icon and colour', async () => {
@@ -370,6 +491,8 @@ describe.each(LOCALES)('exports in %s', (locale) => {
     );
     const file = await download(await csvButton(locale, 'app.category.manager.list.title'));
     expect(file.name).toBe(`finanverso_categorias_${TODAY}.csv`);
+    // Settings lists: CSV only (to keep or edit), not a table to print.
+    expect(screen.queryByRole('button', { name: /PDF/ })).toBeNull();
     expect(file.head).toBe(
       header(locale, [
         'app.category.export.name',
@@ -443,6 +566,85 @@ describe.each(LOCALES)('exports in %s', (locale) => {
       '"303";"1T";"03";"210"',
       '"303";"1T";"nif";"B00000000"',
     ]);
+  });
+});
+
+describe.each(LOCALES)('the PDF of the month and of the year in %s', (locale) => {
+  const render = (ui: React.ReactElement, api: FakeApi) => {
+    api.settingsApi.get.mockResolvedValue(f.settings({ locale }));
+    return renderWithProviders(ui, { api, locale });
+  };
+  const button = (key: string) =>
+    screen.findByRole('button', {
+      name: new RegExp(translate(locale, key).replace(/[()]/g, '\\$&')),
+    });
+
+  it('Month: its movements, signed, and its totals', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({
+        transactions: [
+          f.transaction({ type: 'INCOME', amount: 2000, description: 'Nómina' }),
+          f.transaction(),
+          f.transaction({ type: 'SAVING', amount: 200 }),
+        ],
+      })
+    );
+    render(<MonthActions />, api);
+    const pdfButton = await button('app.export.monthPdf');
+    await waitFor(() => expect(pdfButton).toBeEnabled());
+    const pdf = await downloadPdf(pdfButton);
+    expect(pdf.name).toBe(`finanverso_mes_2026-03_${TODAY}.pdf`);
+    expect(pdf.text.startsWith('%PDF-')).toBe(true);
+    expect(pdf.body).toHaveLength(3);
+    expect(pdf.body.map((r) => r[5])).toEqual(
+      locale === 'es' ? ['+2000,00', '-40,00', '200,00'] : ['+2,000.00', '-40.00', '200.00']
+    );
+    expect(pdf.foot).toHaveLength(4);
+  });
+
+  it('Month: without its summary there are no totals, and a failure is said', async () => {
+    const api = createFakeApi();
+    api.monthApi.get.mockResolvedValue(
+      f.overview({ transactions: [f.transaction()], summary: null as never })
+    );
+    render(<MonthActions />, api);
+    const pdfButton = await button('app.export.monthPdf');
+    await waitFor(() => expect(pdfButton).toBeEnabled());
+    const pdf = await downloadPdf(pdfButton);
+    expect(pdf.foot).toBeUndefined();
+    tables.mockImplementationOnce(() => {
+      throw new Error('Sin memoria');
+    });
+    fireEvent.click(pdfButton);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sin memoria');
+  });
+
+  it('Year: one row per month and the total of the year', async () => {
+    const api = createFakeApi();
+    api.transactionApi.getAnnual.mockResolvedValue({
+      year: 2026,
+      months: { 1: { income: 2000, expenses: 100, saving: 0, balance: 1900 } },
+    });
+    render(<AnnualChart initialYear={2026} />, api);
+    const pdf = await downloadPdf(await button('app.export.annualPdf'));
+    expect(pdf.name).toBe(`finanverso_balance-anual_2026_${TODAY}.pdf`);
+    expect(pdf.text.startsWith('%PDF-')).toBe(true);
+    // The months with movements, as in the CSV.
+    expect(pdf.body).toHaveLength(1);
+    expect(pdf.foot).toEqual([
+      [
+        translate(locale, 'app.export.csv.total'),
+        ...(locale === 'es'
+          ? ['2000,00', '100,00', '0,00', '1900,00']
+          : ['2,000.00', '100.00', '0.00', '1,900.00']),
+      ],
+    ]);
+    tables.mockImplementationOnce(() => {
+      throw new Error('Sin memoria');
+    });
+    fireEvent.click(await button('app.export.annualPdf'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sin memoria');
   });
 });
 

@@ -155,6 +155,17 @@ P0 = ya y barato, alto impacto. P1 = siguiente. P2 = después. P3 = cuando haya 
 - Sustituir `window.print` por PDF real; mantener la impresión como atajo.
 - Cuidado con límites de plan (`autonomoPdfs` ya cuenta PDF de autónomos): decidir qué PDF son libres y cuáles de pago.
 
+*Hecho (ola 1B: T5 y T6).* `finances/application/tablePdf.ts` hace el PDF de cualquier tabla con las mismas filas que su CSV (cabecera con Finanverso, título, fecha de generación y periodo, «Página X de Y», importes con signo y color que se leen también en blanco y negro, apaisado con más de seis columnas); `annualReportPdf.ts` hace el del informe anual (totales, gráfico de barras, meses, trimestres y categorías) y la impresión queda como botón secundario. Estos PDF son libres en todos los planes y no cuentan en `autonomoPdfs`. Ficheros `finanverso_<pantalla>_<fecha>.pdf`.
+
+| Pantalla | PDF | Por qué |
+|---|---|---|
+| Mes (movimientos y totales), Balance anual, Informe anual | Sí | Lo que se imprime o se envía |
+| Búsqueda (todo lo filtrado, con totales y fechas del filtro) | Sí | Igual que su CSV, no solo la página |
+| Cuentas, Transferencias, Presupuestos, Metas, Gastos fijos | Sí | Listados que se leen como tabla |
+| Tendencias, Evolución del patrimonio, Suscripciones, Inversiones y deudas, Gastos compartidos | Sí | Tablas de consulta |
+| Categorías y Reglas | No, solo CSV | Son ajustes para guardar o editar, no para imprimir |
+| Facturas, libros de IVA y casillas de los modelos | No (sin cambios) | Son de Autónomos, que ya tiene sus PDF y su límite |
+
 **Ola 3. Importar PDF de otros bancos y de facturas** (T13, T4, T18)
 - Reutilizar: `readPdf.ts` (pdfjs), `taxModelPdf.ts` (`tokensFromPdf`, `classifyPdf`), `bankPdf/` (patrón `generic.ts` y `ibercaja.ts` y la comprobación de saldo `balance.ts`).
 - Cada banco nuevo = un parser y un fichero de prueba con datos inventados.

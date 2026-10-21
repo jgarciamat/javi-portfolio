@@ -245,7 +245,13 @@ export function GoalsView() {
           <Icon name="flag" /> {t('app.goals.title')}
         </h2>
         <p className="section-hint">{t('app.goals.hint')}</p>
-        <ExportButtons name="metas" what={t('app.goals.title')} count={all.length} table={table} />
+        <ExportButtons
+          name="metas"
+          what={t('app.goals.title')}
+          count={all.length}
+          table={table}
+          pdf
+        />
         {(action.error ?? goals.error) && (
           <p className="form-error">{action.error ?? goals.error}</p>
         )}

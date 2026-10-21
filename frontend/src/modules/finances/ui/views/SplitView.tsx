@@ -292,6 +292,7 @@ function GroupDetail({
           what={t('app.split.expenses')}
           count={group.expenses.length}
           table={table}
+          pdf
         />
         <ExpenseForm group={group} onAdd={(e) => update(() => splitApi.addExpense(id, e))} />
         {group.expenses.length > 0 && (

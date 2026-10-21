@@ -4,10 +4,12 @@ import { useFormat } from '@core/settings/SettingsContext';
 import { useOptionalPlan } from '@modules/billing/application/PlanContext';
 import { buildAnnualChartData, type AnnualMonthEntry } from '@modules/finances/domain/annual';
 import { isBeyondHorizon } from '@modules/finances/domain/nextMonthLogic';
+import { useAction } from '@shared/hooks/useAction';
 import { useFinances } from '../../application/FinancesContext';
 import { useAnnualChart } from '../../application/hooks/useAnnualChart';
 import { useAnnualSummary } from '../../application/hooks/useAnnualSummary';
 import { useExportCSV } from '../../application/hooks/useExportCSV';
+import { useTablePdf } from '../../application/hooks/useTablePdf';
 import { AnnualReportDialog } from './AnnualReportDialog';
 import '../css/AnnualChart.css';
 import '../css/MonthActions.css';
@@ -136,7 +138,19 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
   const { months, maxVal, totals } = useMemo(() => buildAnnualChartData(data), [data]);
   const { t } = useI18n();
   const format = useFormat();
-  const { exportAnnualCSV } = useExportCSV();
+  const { exportAnnualCSV, annualTable } = useExportCSV();
+  const { downloadTablePdf } = useTablePdf();
+  const pdf = useAction(t('app.exportButtons.error'));
+  /** The yearly balance as a PDF, free on every plan (the full report is the premium one). */
+  const exportAnnualPdf = () =>
+    pdf.run(() =>
+      downloadTablePdf(
+        `balance-anual_${year}`,
+        annualTable(months),
+        t('app.export.annualTitle', { year }),
+        String(year)
+      )
+    );
   const plan = useOptionalPlan();
   const [reportOpen, setReportOpen] = useState(false);
   const openReport = () =>
@@ -176,9 +190,24 @@ export function AnnualChart({ initialYear, onMonthClick }: AnnualChartProps) {
           >
             <Icon name="download" /> {t('app.export.annual')}
           </button>
+          <button
+            type="button"
+            className="month-action"
+            disabled={pdf.pending}
+            aria-busy={pdf.pending}
+            onClick={() => void exportAnnualPdf()}
+          >
+            <Icon name="file" />{' '}
+            {pdf.pending ? t('app.report.preparing') : t('app.export.annualPdf')}
+          </button>
           <button type="button" className="month-action" onClick={openReport}>
             <Icon name="file" /> {t('app.report.open')}
           </button>
+          {pdf.error && (
+            <p className="form-error month-actions-error" role="alert">
+              {pdf.error}
+            </p>
+          )}
         </div>
       )}
 

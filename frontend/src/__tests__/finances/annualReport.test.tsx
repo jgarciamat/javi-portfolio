@@ -1,10 +1,11 @@
-import { fireEvent, screen, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { AnnualChart } from '@modules/finances/ui/components/AnnualChart';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { literal, renderWithProviders, tr } from '@test-utils/render';
 import { freezeTime, restoreTime } from '@test-utils/time';
-import { captureDownloads } from '@test-utils/dom';
+import { captureDownloads, mockMatchMedia } from '@test-utils/dom';
+import * as annualPdf from '@modules/finances/application/annualReportPdf';
 
 beforeEach(() => {
   localStorage.clear();
@@ -62,6 +63,50 @@ describe('Annual report', () => {
     expect(csv).toContain(`"${tr('app.categories.Ocio')}","100"`);
     expect(csv).toContain(`"${tr('app.categories.Salario')}","2000"`);
     downloads.restore();
+  });
+
+  it('downloads a real PDF of the report', async () => {
+    const downloads = captureDownloads();
+    const build = jest.spyOn(annualPdf, 'buildAnnualReportPdf');
+    await openReport();
+    await screen.findAllByRole('table');
+    const button = screen.getByRole('button', {
+      name: tr('app.exportButtons.pdfFor', { what: `${tr('app.report.title')} 2026` }),
+    });
+    expect(button).toHaveTextContent(tr('app.report.pdf'));
+    fireEvent.click(button);
+    await waitFor(() =>
+      expect(downloads.names).toEqual(['finanverso_informe-anual_2026_2026-03-15.pdf'])
+    );
+    const [pdf] = await downloads.text();
+    expect(pdf.startsWith('%PDF-')).toBe(true);
+    // Category names in the language of the app, months by name.
+    const [report, options] = build.mock.calls[0];
+    expect(report.expensesByCategory[0].categoryName).toBe(tr('app.categories.Ocio'));
+    expect(options.text.monthNames[0]).toMatch(/^enero$/i);
+    expect(options.header).toEqual(
+      expect.objectContaining({ title: `${tr('app.report.title')} 2026`, range: '2026' })
+    );
+    downloads.restore();
+  });
+
+  it('shares the PDF on a phone and says when it cannot be made', async () => {
+    const restoreMedia = mockMatchMedia(true);
+    const share = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { canShare: () => true, share });
+    await openReport();
+    await screen.findAllByRole('table');
+    const button = screen.getByRole('button', { name: new RegExp(tr('app.report.pdf')) });
+    fireEvent.click(button);
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(share.mock.calls[0][0].files[0].name).toBe(
+      'finanverso_informe-anual_2026_2026-03-15.pdf'
+    );
+    jest.spyOn(annualPdf, 'buildAnnualReportPdf').mockRejectedValueOnce(new Error('Sin memoria'));
+    fireEvent.click(button);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sin memoria');
+    Object.assign(navigator, { canShare: undefined, share: undefined });
+    restoreMedia();
   });
 
   it('closes with the button and with Escape', async () => {

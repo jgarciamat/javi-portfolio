@@ -82,6 +82,7 @@ export function BudgetsView() {
           what={t('app.budgets.title')}
           count={budgets.data.length}
           table={table}
+          pdf={{ range: monthLabel(year, month) }}
         />
         {(action.error ?? budgets.error) && (
           <p className="form-error">{action.error ?? budgets.error}</p>

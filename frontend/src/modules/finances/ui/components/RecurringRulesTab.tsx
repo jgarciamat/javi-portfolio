@@ -9,6 +9,7 @@ import { TRANSACTION_TYPES } from '@modules/finances/domain/transactionTypes';
 import { useRecurringRules } from '../../application/hooks/useRecurringRules';
 import { useRecurringRuleForm } from '../../application/hooks/useRecurringRuleForm';
 import { useFinances } from '../../application/FinancesContext';
+import { typeTone } from '../../application/tablePdf';
 import { DeleteRuleModal, type DeleteScope } from './DeleteRuleModal';
 import '../css/RecurringRulesTab.css';
 import { Icon } from '@shared/components/Icon';
@@ -345,6 +346,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
       yearMonth(r.endYear, r.endMonth),
       t(r.active ? 'app.export.csv.yes' : 'app.export.csv.no'),
     ]),
+    tones: rules.map((r) => typeTone(r.type)),
   });
 
   return (
@@ -366,6 +368,7 @@ export function RecurringRulesTab({ categories }: { categories: Category[] }) {
           what={t('app.recurring.title')}
           count={rules.length}
           table={table}
+          pdf
         />
       </div>
 

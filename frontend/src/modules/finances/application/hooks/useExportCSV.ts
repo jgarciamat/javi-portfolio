@@ -8,6 +8,7 @@ import { TYPE_LABEL_KEYS } from '@modules/finances/domain/transactionTypes';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useFormat } from '@core/settings/SettingsContext';
 import { todayDateOnly } from '@shared/utils/format';
+import { typeTone, type PdfTable } from '../tablePdf';
 
 /**
  * Wraps a cell in double quotes, escaping inner quotes. Text starting with
@@ -71,13 +72,21 @@ export interface ExportableTransaction {
 
 type Translate = (key: string) => string;
 
-/** Movements as a table, in the language and currency given. */
+/** Totals of income, expenses, saving and balance (the month, or what a search found). */
+export interface MovementTotals {
+  income: number;
+  expenses: number;
+  saving: number;
+  balance: number;
+}
+
+/** Movements as a table, in the language and currency given (the PDF colours each by its type). */
 function movementsTable(
   transactions: ExportableTransaction[],
   t: Translate,
   tCategory: Translate,
   currency: string
-): CsvTable {
+): PdfTable {
   const typeLabel = (type: string): string =>
     type in TYPE_LABEL_KEYS ? t(TYPE_LABEL_KEYS[type as keyof typeof TYPE_LABEL_KEYS]) : type;
   return {
@@ -99,6 +108,46 @@ function movementsTable(
       tx.amount,
       tx.notes,
     ]),
+    tones: transactions.map((tx) => typeTone(tx.type)),
+  };
+}
+
+/** The totals at the foot of the movements, in the amount column. */
+function withTotals(table: PdfTable, t: Translate, totals?: MovementTotals): PdfTable {
+  if (!totals) return table;
+  const total = (key: string, value: number) => [t(key), '', '', '', '', value, ''];
+  return {
+    ...table,
+    foot: [
+      total('app.summary.income', totals.income),
+      total('app.summary.expenses', totals.expenses),
+      total('app.summary.saving', totals.saving),
+      total('app.annual.table.balance', totals.balance),
+    ],
+  };
+}
+
+/** One row per month and the totals of the year at the end (the PDF of the yearly balance). */
+function yearTable(
+  months: (MonthData & { month: number })[],
+  t: Translate,
+  monthName: (month: number) => string,
+  currency: string
+): PdfTable {
+  const money = (key: string) => `${t(key)} (${currency})`;
+  const sum = (key: keyof MonthData) => round2(months.reduce((s, m) => s + m[key], 0));
+  return {
+    head: [
+      t('app.annual.table.month'),
+      money('app.annual.table.income'),
+      money('app.annual.table.expenses'),
+      money('app.annual.table.saving'),
+      money('app.annual.table.balance'),
+    ],
+    rows: months.map((m) => [monthName(m.month), m.income, m.expenses, m.saving, m.balance]),
+    foot: [
+      [t('app.export.csv.total'), sum('income'), sum('expenses'), sum('saving'), sum('balance')],
+    ],
   };
 }
 
@@ -106,8 +155,9 @@ function movementsTable(
 export function useExportCSV() {
   const { t, tCategory } = useI18n();
   const format = useFormat();
-  const transactionTable = (transactions: ExportableTransaction[]) =>
-    movementsTable(transactions, t, tCategory, format.currency);
+  /** The movements; with `totals`, the PDF ends with them (the CSV leaves them out). */
+  const transactionTable = (transactions: ExportableTransaction[], totals?: MovementTotals) =>
+    withTotals(movementsTable(transactions, t, tCategory, format.currency), t, totals);
   /** The same table quoted for the comma-separated exports. */
   const quoted = (transactions: ExportableTransaction[]): string[][] => {
     const { head, rows } = transactionTable(transactions);
@@ -251,5 +301,7 @@ export function useExportCSV() {
     exportReportCSV,
     exportSelectionCSV,
     transactionTable,
+    annualTable: (months: (MonthData & { month: number })[]) =>
+      yearTable(months, t, (m) => format.monthName(m), format.currency),
   };
 }
