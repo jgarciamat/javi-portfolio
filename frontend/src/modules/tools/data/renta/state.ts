@@ -1,3 +1,4 @@
+import { LOW_PAY_2025 } from '../../domain/rentaCalc';
 import type { Deduction, RentaState, TaxBracket } from '../../domain/rentaData';
 
 /**
@@ -520,5 +521,6 @@ export const rentaState: RentaState = {
       'Límite conjunto por planes de pensiones, mutualidades, planes de previsión asegurados, planes de previsión social empresarial y seguros de dependencia: 1.500 euros, más hasta 8.500 si el aumento viene de contribuciones de la empresa o de aportaciones tuyas al mismo plan dentro de la tabla del art. 52. Los autónomos pueden sumar 4.250 por aportaciones propias, y entre ambos aumentos el tope es 8.500 (10.000 en total). Aparte, 5.000 por primas pagadas por la empresa a seguros colectivos de dependencia. Además no puede pasar del 30 % de los rendimientos netos del trabajo y de actividades (criterio del manual de la AEAT) ni dejar la base general negativa. Lo que sobre se puede reducir en los 5 años siguientes.',
   },
   deductions,
+  lowPay: LOW_PAY_2025,
   source: 'https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Manual/100.html',
 };

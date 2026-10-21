@@ -9,6 +9,7 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { computeRenta, type RentaInput, type RentaResult } from '@modules/tools/domain/rentaCalc';
 import { ourBoxes } from '@modules/tools/domain/rentaCompare';
+import type { RentaCcaa } from '@modules/tools/domain/rentaData';
 import {
   emptyForm,
   emptyPartner,
@@ -18,11 +19,7 @@ import {
 } from '@modules/tools/domain/rentaForm';
 import { compareJoint, jointInputOf, type JointKind } from '@modules/tools/domain/rentaJoint';
 import { workReductionOf } from '@modules/tools/domain/rentaWork';
-import { loadCcaa } from '@modules/tools/data/renta';
-import { rentaJoint } from '@modules/tools/data/renta/conjunta';
-import { rentaWorkExtras } from '@modules/tools/data/renta/estado-extra';
-import { rentaProperty } from '@modules/tools/data/renta/inmuebles';
-import { rentaState } from '@modules/tools/data/renta/state';
+import { loadCcaaFor, rentaRules } from '@modules/tools/data/renta/ejercicios';
 
 const PEOPLE = join(__dirname, '..', '..', '..', '..', 'docs', 'casos-practicos', 'personas');
 
@@ -61,17 +58,19 @@ function figures(result: RentaResult, input: RentaInput): Record<string, number>
 }
 
 it('the case bank gives the same figures of 2025 to the cent', async () => {
+  const rules = rentaRules(2025);
   const all: Record<string, Record<string, number>> = {};
   for (const persona of people) {
     const renta = persona.renta as NonNullable<Persona['renta']>;
     for (const decl of renta.declaraciones) {
       const form = formOf(decl.form);
       const input = toInput(form, {
-        state: rentaState,
-        ccaa: await loadCcaa(form.ccaaId),
-        extras: rentaWorkExtras,
-        property: rentaProperty,
-        workReduction: workReductionOf(rentaState),
+        state: rules.state,
+        ccaa: (await loadCcaaFor(2025, form.ccaaId)) as RentaCcaa,
+        extras: rules.extras,
+        property: rules.property,
+        workReduction: workReductionOf(rules.state),
+        activityTables: rules.activityTables,
       });
       const result = computeRenta(input);
       all[`${persona.slug}|${decl.id}`] = figures(result, input);
@@ -79,7 +78,7 @@ it('the case bank gives the same figures of 2025 to the cent', async () => {
         const spouse = renta.conjunta.kind === 'couple' ? partnerOf(form) : null;
         const joint = compareJoint(input, renta.conjunta.kind, spouse, {
           livesWithOtherParent: renta.conjunta.livesWithOtherParent,
-          rules: rentaJoint,
+          rules: rules.joint,
         });
         const unit = (joint as NonNullable<typeof joint>).joint;
         all[`${persona.slug}|conjunta`] = figures(

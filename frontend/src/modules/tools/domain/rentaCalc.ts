@@ -7,7 +7,14 @@ import {
   type ModuleActivity,
 } from './rentaActivity';
 import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
-import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
+import type {
+  Deduction,
+  LowPayRule,
+  MinimumAmounts,
+  RentaCcaa,
+  RentaState,
+  TaxBracket,
+} from './rentaData';
 import { round2 } from './round';
 import type { PropertyResult } from './rentaRentals';
 import { checkDeduction, type CheckAnswers } from './rentaRequirements';
@@ -584,16 +591,31 @@ export interface DeductionLine {
   amount: number;
 }
 
+/** Other income (not exempt) over which there is no reduction of art. 20 (the same in 2024-2026). */
 const OTHER_INCOME_LIMIT = 6500;
-const LOW_PAY_FULL = 16576;
-const LOW_PAY_END = 18276;
-const LOW_PAY_AMOUNT = 340;
 
-/** Deduction for low pay (Renta 2025): 340 euros up to 16,576 of gross pay, falling by 20 cents per euro to zero at 18,276. */
-export function lowPayDeduction(grossPay: number, otherIncome: number): number {
-  if (otherIncome > OTHER_INCOME_LIMIT || grossPay >= LOW_PAY_END || grossPay <= 0) return 0;
-  if (grossPay < LOW_PAY_FULL) return LOW_PAY_AMOUNT;
-  return round2(LOW_PAY_AMOUNT - 0.2 * (grossPay - LOW_PAY_FULL));
+/**
+ * The deduction for low pay of 2025 (LIRPF DA 61.ª as added by Ley 5/2025, BOE-A-2025-15424, with
+ * effect from 1-1-2025; checked 22-10-2026): 340 € up to 16,576 € of gross pay, falling by 20 cents
+ * per euro to nothing at 18,276 €. Each year has its own in its rules (data/renta/ejercicios).
+ */
+export const LOW_PAY_2025: LowPayRule = {
+  amount: 340,
+  fullUntil: 16576,
+  end: 18276,
+  slope: 0.2,
+  otherIncomeLimit: OTHER_INCOME_LIMIT,
+};
+
+/** Deduction for low pay from work (DA 61.ª): the full amount, then down by the slope to nothing. */
+export function lowPayDeduction(
+  grossPay: number,
+  otherIncome: number,
+  rule: LowPayRule = LOW_PAY_2025
+): number {
+  if (otherIncome > rule.otherIncomeLimit || grossPay >= rule.end || grossPay <= 0) return 0;
+  if (grossPay < rule.fullUntil) return rule.amount;
+  return round2(rule.amount - rule.slope * (grossPay - rule.fullUntil));
 }
 
 /** Rent after expenses, depreciation and the reduction (it can be negative). */
@@ -843,7 +865,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
 }
 
 /**
- * The 340 € deduction for low pay (Renta 2025), held to the tax that is left. The AEAT Manual 2025
+ * The deduction for low pay of the year (DA 61.ª: 340 € in 2025), held to the tax that is left. The AEAT Manual 2025
  * (c18, "Deducción por obtención de rendimientos del trabajo", checked 19-10-2026) says nothing of
  * joint returns: when all the pay and other income belong to one member every reading gives the
  * same; otherwise it is left out (`clear` false) and the result says so.
@@ -857,10 +879,14 @@ function lowPayOf(input: RentaInput, otherIncome: number, quotaLeft: number) {
   const partnerOther = positive(partner?.savings ?? 0);
   const clear =
     !partner || (partnerPay === 0 && partnerOther === 0) || (ownPay === 0 && otherIncome === 0);
-  const amount = clear
-    ? Math.min(quotaLeft, lowPayDeduction(ownPay + partnerPay, otherIncome + partnerOther))
-    : 0;
-  return { amount, clear };
+  // A State made by hand without the field is of 2025; null: the year has no such deduction.
+  const rule = input.state.lowPay === undefined ? LOW_PAY_2025 : input.state.lowPay;
+  const amount =
+    clear && rule
+      ? Math.min(quotaLeft, lowPayDeduction(ownPay + partnerPay, otherIncome + partnerOther, rule))
+      : 0;
+  // Without the deduction in the year there is nothing left out of a joint return.
+  return { amount, clear: clear || !rule };
 }
 
 /** The refundable deductions marked that were collected in advance (modelos 140 and 143). */

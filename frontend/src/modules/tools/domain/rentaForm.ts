@@ -12,7 +12,7 @@ import type {
 import type { RentaCcaa, RentaState } from './rentaData';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
-import type { ActivityInput } from './rentaActivity';
+import type { ActivityInput, FarmIndex, ModuleActivity } from './rentaActivity';
 import { farm2025 } from '../data/renta/agrario-2025';
 import { modules2025 } from '../data/renta/modulos-2025';
 import { round2 } from './round';
@@ -238,6 +238,8 @@ export interface RentaData {
   extras: RentaWorkExtras;
   property: RentaProperty;
   workReduction: (netIncome: number) => number;
+  /** The tables of the módulos of the year; missing: those of 2025, null: the year has none. */
+  activityTables?: { modules: ModuleActivity[]; farm: FarmIndex[] } | null;
 }
 
 /** Social security used when the person leaves it empty: a share of the pay. */
@@ -384,6 +386,11 @@ export function obligationIncome(form: RentaForm): { mainIncome: number; otherIn
   return { mainIncome: gross - others, otherIncome: others };
 }
 
+const tablesOf = (data: RentaData) =>
+  data.activityTables === undefined
+    ? { modules: modules2025, farm: farm2025 }
+    : (data.activityTables ?? { modules: [], farm: [] });
+
 /** The calculation input for what is in the form. */
 export function toInput(form: RentaForm, data: RentaData): RentaInput {
   const rental = rentalOf(form, data.property, data.state.year);
@@ -407,10 +414,9 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     imputedValues: unrentedOf(form, data.state.year, rental),
     savings: number(form.savings),
     savingsDetail: form.savingsDetail,
-    // The tables of the módulos of 2025 (Orden HAC/1347/2024): the year of the return.
-    activities: form.activities?.length
-      ? { list: form.activities, modules: modules2025, farm: farm2025 }
-      : undefined,
+    // The tables of the módulos of the year of the return (2025: Orden HAC/1347/2024); a year without
+    // them gives none, and the result is not shown (rentaRules.ts, blockersOf).
+    activities: form.activities?.length ? { list: form.activities, ...tablesOf(data) } : undefined,
     family: familyOf(form),
     state: data.state,
     ccaa: data.ccaa,

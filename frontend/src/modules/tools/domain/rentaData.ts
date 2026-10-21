@@ -170,6 +170,19 @@ export interface StateReduction {
   detail: string;
 }
 
+/**
+ * Deduction for low pay from work (LIRPF DA 61.ª): `amount` with gross pay from a job up to
+ * `fullUntil`, then `amount − slope × (pay − fullUntil)`, nothing from `end`; only with other income
+ * (not exempt) up to `otherIncomeLimit`.
+ */
+export interface LowPayRule {
+  amount: number;
+  fullUntil: number;
+  end: number;
+  slope: number;
+  otherIncomeLimit: number;
+}
+
 /** The rules of the State for a tax year. */
 export interface RentaState {
   year: number;
@@ -200,5 +213,10 @@ export interface RentaState {
   baseReductions: { pensionPlanLimit: number; pensionPlanEmployerLimit: number; notes: string };
   /** The deductions of the State on the tax (maternity, large family, donations...). */
   deductions: Deduction[];
+  /**
+   * The deduction for low pay of the year (DA 61.ª); null: the year has none (2024). Left out only in
+   * the States made by hand in the tests, which take the one of 2025.
+   */
+  lowPay?: LowPayRule | null;
   source: string;
 }
