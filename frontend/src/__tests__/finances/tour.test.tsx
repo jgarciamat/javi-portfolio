@@ -94,6 +94,34 @@ describe('GuidedTour', () => {
     expect(onClose).toHaveBeenCalledWith(false);
   });
 
+  it('keeps the card whole on the screen for elements at its right edge, scroll bar aside', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 1280, configurable: true });
+    placeTarget('near-top', 100, 50, 1000, 230); // a button at the right of the screen
+    placeTarget('near-bottom', 100, 50, 0, 100); // and one at the left
+    renderTour();
+
+    next(); // before it is shown, the card is guessed as wide as the stylesheet makes it
+    expect(card()).toHaveStyle({ left: '884px' }); // 1280 - 380 - 16
+
+    // Its real width, and the page without its vertical scroll bar.
+    jest.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1265);
+    const real = Element.prototype.getBoundingClientRect;
+    jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element
+    ) {
+      return this.getAttribute('role') === 'dialog'
+        ? ({ height: 200, width: 390, top: 0, left: 0, bottom: 200, right: 390 } as DOMRect)
+        : real.call(this);
+    });
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    expect(card()).toHaveStyle({ left: '859px' }); // 1265 - 390 - 16
+
+    next(); // never off the left edge either
+    expect(card()).toHaveStyle({ left: '16px' });
+  });
+
   it('remembers "don\'t show again" when skipped or closed with Escape', () => {
     const { onClose } = renderTour(true);
     const checkbox = screen.getByRole('checkbox', { name: tr('app.tour.dontShowAgain') });
