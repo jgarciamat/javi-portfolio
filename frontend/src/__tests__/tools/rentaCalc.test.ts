@@ -7,6 +7,7 @@ import {
   generalQuota,
   countsAsDescendant,
   deductionAmount,
+  descendantBreakdown,
   disabilityAmount,
   incomeFactor,
   isRefundable,
@@ -159,6 +160,14 @@ describe('computeMinimum', () => {
     });
   });
 
+  it('gives the under-3 increase to an adopted child at any age (art. 58.2, Manual c14 ej. 6)', () => {
+    const child = { age: 5, disability: 0 as const };
+    expect(computeMinimum({ ...alone, children: [child] }, minimums).total).toBe(5550 + 2400);
+    const adopted = { ...alone, children: [{ ...child, adopted: true }] };
+    expect(computeMinimum(adopted, minimums).total).toBe(5550 + 2400 + 2800);
+    expect(descendantBreakdown(adopted, minimums)[0].under3).toBe(2800);
+  });
+
   it('adds the extra for age from 65 and from 75 years turned by 31 December', () => {
     const total = (age: number) => computeMinimum({ ...alone, age }, minimums).total;
     expect(total(64)).toBe(5550);
@@ -267,6 +276,20 @@ describe('computeMinimum', () => {
 });
 
 describe('deductionAmount', () => {
+  it('adds the 150 € of maternity once per child, within 1,350 € each (art. 81.1)', () => {
+    const mat = deduction({ amount: 1200, limit: 1350, monthly: 100, startBonus: 150 });
+    // 8 months and the bonus: 950 €; a whole year and the bonus: 1,350 €, never more.
+    expect(deductionAmount(mat, { on: true, units: 1, months: 8, bonusUnits: 1 })).toBe(950);
+    expect(deductionAmount(mat, { on: true, units: 1, bonusUnits: 1 })).toBe(1350);
+    // No more bonuses than children, none below zero.
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: 3 })).toBe(350);
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: -1 })).toBe(200);
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2 })).toBe(200);
+    // Without a start bonus the units given do nothing.
+    const plain = deduction({ amount: 1200, limit: 1350, monthly: 100 });
+    expect(deductionAmount(plain, { on: true, units: 1, months: 2, bonusUnits: 1 })).toBe(200);
+  });
+
   it('does nothing when it does not apply', () => {
     expect(deductionAmount(deduction({ amount: 100 }), { on: false })).toBe(0);
   });

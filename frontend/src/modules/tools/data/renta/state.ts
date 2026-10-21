@@ -62,6 +62,9 @@ const deductions: Deduction[] = [
     limit: 1350,
     // LIRPF art. 81.3: "de forma proporcional al número de meses" (100 € each).
     monthly: 100,
+    // Art. 81.1: "podrá incrementarse en 150 euros" when the 30 days are reached after the birth
+    // (Manual 2025, c18, caso a): once per child, up to 1,350 € each.
+    startBonus: 150,
     requirements:
       'Madre con derecho al mínimo por descendientes que cobre paro o esté de alta en la Seguridad Social al nacer el hijo, o después con 30 días cotizados. No cuentan los meses con complemento de ayuda a la infancia. Solo la madre (salvo fallecimiento o custodia del padre).',
     url: `${MATERNIDAD}/deduccion-maternidad/cuantia-limite-deduccion.html`,

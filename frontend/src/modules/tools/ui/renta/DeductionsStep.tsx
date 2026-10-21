@@ -205,16 +205,30 @@ function MonthsInput({
   const { t } = useI18n();
   if (!deduction.monthly) return null;
   return (
-    <label className="tools-field">
-      <span>{t('tools.renta.months')}</span>
-      <input
-        className="tx-input"
-        inputMode="numeric"
-        value={choice.months ?? ''}
-        placeholder="12"
-        onChange={(e) => onChange({ ...choice, months: e.target.value })}
-      />
-    </label>
+    <>
+      <label className="tools-field">
+        <span>{t('tools.renta.months')}</span>
+        <input
+          className="tx-input"
+          inputMode="numeric"
+          value={choice.months ?? ''}
+          placeholder="12"
+          onChange={(e) => onChange({ ...choice, months: e.target.value })}
+        />
+      </label>
+      {deduction.startBonus !== undefined && (
+        <label className="tools-field">
+          <span>{t('tools.renta.startBonus')}</span>
+          <input
+            className="tx-input"
+            inputMode="numeric"
+            value={choice.bonusUnits ?? ''}
+            placeholder="0"
+            onChange={(e) => onChange({ ...choice, bonusUnits: e.target.value })}
+          />
+        </label>
+      )}
+    </>
   );
 }
 

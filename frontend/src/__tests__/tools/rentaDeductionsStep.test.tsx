@@ -120,6 +120,36 @@ describe('Renta deductions: by months', () => {
     );
     fireEvent.change(screen.getByLabelText(tr('tools.renta.months')), { target: { value: '10' } });
     expect(onChange).toHaveBeenCalledWith('mat', { on: true, amount: '', units: '', months: '10' });
+    // Without a start bonus it is not asked.
+    expect(screen.queryByLabelText(tr('tools.renta.startBonus'))).toBeNull();
+  });
+
+  it('asks the children with the 150 € of maternity', () => {
+    const monthly = other('mat', { monthly: 100, startBonus: 150 });
+    const onChange = jest.fn();
+    renderWithProviders(
+      <DeductionsStep
+        state={{ ...rentaState, deductions: [monthly] }}
+        ccaa={null}
+        loadError={false}
+        choices={{ mat: { on: true, amount: '', units: '', bonusUnits: '1' } }}
+        family={familyOf(emptyForm(''))}
+        blocked={[]}
+        hints={{}}
+        savings={{}}
+        markedSaving={0}
+        onChange={onChange}
+      />
+    );
+    const input = screen.getByLabelText(tr('tools.renta.startBonus'));
+    expect(input).toHaveValue('1');
+    fireEvent.change(input, { target: { value: '2' } });
+    expect(onChange).toHaveBeenCalledWith('mat', {
+      on: true,
+      amount: '',
+      units: '',
+      bonusUnits: '2',
+    });
   });
 });
 

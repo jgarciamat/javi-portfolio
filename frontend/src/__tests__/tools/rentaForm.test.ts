@@ -127,4 +127,26 @@ describe('the months of a deduction', () => {
     expect(choicesOf(form(' ')).mat.months).toBeUndefined();
     expect(choicesOf(form()).mat.months).toBeUndefined();
   });
+
+  it('send the children with the 150 € of maternity only when typed', async () => {
+    const { choicesOf } = await import('@modules/tools/domain/rentaForm');
+    const form = (bonusUnits?: string) => ({
+      ...emptyForm(''),
+      choices: { mat: { on: true, amount: '', units: '1', bonusUnits } },
+    });
+    expect(choicesOf(form('2')).mat.bonusUnits).toBe(2);
+    expect(choicesOf(form('')).mat.bonusUnits).toBeUndefined();
+    expect(choicesOf(form()).mat.bonusUnits).toBeUndefined();
+  });
+});
+
+describe('an adopted child', () => {
+  it('reaches the engine only when marked', async () => {
+    const { familyOf } = await import('@modules/tools/domain/rentaForm');
+    const of = (adopted?: boolean) =>
+      familyOf({ ...emptyForm(''), children: [{ age: '5', disability: 0, adopted }] }).children[0];
+    expect(of(true)).toEqual({ age: 5, disability: 0, adopted: true });
+    expect(of(false)).toEqual({ age: 5, disability: 0 });
+    expect(of()).toEqual({ age: 5, disability: 0 });
+  });
 });

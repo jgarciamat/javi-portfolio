@@ -40,7 +40,18 @@ export interface Child {
   /** Age at 31 December of the tax year. */
   age: number;
   disability: Disability;
+  /** Adopted or fostered, registered this year or in the two before: the under-3 increase at any age. */
+  adopted?: boolean;
 }
+
+/**
+ * The increase for a child under 3 (2,800 €): LIRPF art. 58.2 (BOE-A-2006-20764, checked 21-10-2026)
+ * gives it, for an adoption or a fostering, "con independencia de la edad del menor, en el período
+ * impositivo en que se inscriba en el Registro Civil y en los dos siguientes" (Manual 2025, c14,
+ * ejemplo 6: a child adopted at 5).
+ */
+const under3Of = (child: Child, m: FullMinimums): number =>
+  child.age < 3 || child.adopted === true ? m.under3 : 0;
 
 export interface Ascendant {
   over75: boolean;
@@ -168,7 +179,7 @@ export function computeMinimum(
   const children = family.children.filter(countsAsDescendant).sort((a, b) => b.age - a.age);
   // The order is by date of birth: the oldest is the first.
   const descendants = children.reduce((sum, child, i) => {
-    const base = nth(m.descendants, i) + (child.age < 3 ? m.under3 : 0);
+    const base = nth(m.descendants, i) + under3Of(child, m);
     return sum + (base + disabilityAmount(child.disability, m, true)) * share;
   }, 0);
   if (descendants > 0) items.push({ key: 'descendants', amount: round2(descendants) });
@@ -196,7 +207,7 @@ export function descendantBreakdown(
     .filter(countsAsDescendant)
     .sort((a, b) => b.age - a.age)
     .map((child, i) => {
-      const under3 = child.age < 3 ? m.under3 : 0;
+      const under3 = under3Of(child, m);
       const disability = disabilityAmount(child.disability, m, true);
       return {
         age: child.age,
@@ -243,6 +254,8 @@ export interface DeductionChoice {
   advance?: number;
   /** For a deduction by months (maternity): the months with the right to it, of all the children. */
   months?: number;
+  /** For a deduction with a `startBonus` (maternity): the children that get it this year. */
+  bonusUnits?: number;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
 }
@@ -310,9 +323,16 @@ export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 
       d.monthly && choice.months !== undefined
         ? Math.min(d.monthly * Math.max(0, choice.months), full)
         : full;
-    return round2(value * factor);
+    return round2(withStartBonus(d, choice, units, value) * factor);
   }
   return round2(loweredValue(d, choice, factor));
+}
+
+/** The 150 € of art. 81.1, once for each child that has it, within the limit of each (1,350 €). */
+function withStartBonus(d: Deduction, choice: DeductionChoice, units: number, value: number) {
+  const children = Math.min(units, Math.max(0, Math.floor(choice.bonusUnits ?? 0)));
+  if (!d.startBonus || children === 0) return value;
+  return Math.min(value + d.startBonus * children, (d.limit ?? Infinity) * units);
 }
 
 /** A percent or special deduction with the income limit's `factor` on what the law lowers. */

@@ -86,6 +86,11 @@ export interface Deduction {
   /** Euros per month with the right to it (maternity: 100 €, LIRPF art. 81.3): the months are asked. */
   monthly?: number;
   /**
+   * Once per child, on top of the months (maternity: 150 € when the mother reaches 30 days of social
+   * security after the birth, LIRPF art. 81.1): the children with it are asked.
+   */
+  startBonus?: number;
+  /**
    * Held to the person's social security contributions of the year (LIRPF art. 81 bis.2): `each`
    * deduction (and each relative) on its own, or only its first 1,200 € (`base`: the increase of a
    * large family of the special category is not held, art. 81 bis.1.c).

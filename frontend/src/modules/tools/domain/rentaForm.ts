@@ -22,6 +22,8 @@ import { emptyProperty, fromLegacy, propertyResult, type PropertyForm } from './
 export interface ChildForm {
   age: string;
   disability: Disability;
+  /** Adopted or fostered and registered this year or in the two before (LIRPF art. 58.2). */
+  adopted?: boolean;
 }
 
 export interface AscendantForm {
@@ -80,6 +82,8 @@ export interface Choice {
   advance?: string;
   /** Months with the right to a deduction by months (maternity), of all the children. */
   months?: string;
+  /** Children with the 150 € of maternity for the 30 days of social security after the birth. */
+  bonusUnits?: string;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
 }
@@ -211,6 +215,7 @@ export function familyOf(form: RentaForm): Family {
   const children: Child[] = form.children.map((c) => ({
     age: number(c.age),
     disability: c.disability,
+    ...(c.adopted ? { adopted: true } : {}),
   }));
   const ascendants: Ascendant[] = form.ascendants.map((a) => ({ ...a }));
   return {
@@ -361,6 +366,7 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         units: c.units === '' ? Math.max(1, form.children.length) : number(c.units),
         advance: number(c.advance),
         ...(c.months !== undefined && c.months.trim() !== '' ? { months: number(c.months) } : {}),
+        ...(c.bonusUnits ? { bonusUnits: number(c.bonusUnits) } : {}),
         ...(c.checks ? { checks: c.checks } : {}),
       },
     ])

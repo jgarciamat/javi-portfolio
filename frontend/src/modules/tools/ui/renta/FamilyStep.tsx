@@ -42,6 +42,20 @@ export function ChildrenSection({ form, set }: StepProps) {
                 }
               />
             </label>
+            <label className="renta-check">
+              <input
+                type="checkbox"
+                checked={child.adopted === true}
+                onChange={(e) =>
+                  set({
+                    children: form.children.map((c, j) =>
+                      j === i ? { ...c, adopted: e.target.checked } : c
+                    ),
+                  })
+                }
+              />
+              <span>{t('tools.renta.childAdopted', { n: i + 1 })}</span>
+            </label>
             <button
               type="button"
               className="btn-secondary"

@@ -83,6 +83,10 @@ describe('Renta planner: the steps', () => {
       target: { value: '33' },
     });
     fireEvent.click(screen.getByLabelText(tr('tools.renta.shared')));
+    // An adopted child: the increase of the under-3 at any age (art. 58.2).
+    const adopted = screen.getByLabelText(tr('tools.renta.childAdopted', { n: 2 }));
+    fireEvent.click(adopted);
+    expect(adopted).toBeChecked();
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeChild', { n: 2 }) }));
     expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
 
