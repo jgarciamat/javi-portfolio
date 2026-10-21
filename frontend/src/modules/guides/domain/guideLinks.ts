@@ -33,6 +33,7 @@ const GUIDE_VIDEOS: Record<string, number> = {
   'como-hacer-la-renta-2025-paso-a-paso': 13,
   'plazos-renta-2025': 34,
   'modelo-303-casillas': 22,
+  'corregir-modelo-130-303': 23,
   'alta-autonomo-paso-a-paso': 25,
   'tarifa-plana-autonomos-2026': 12,
   'verifactu-que-es': 30,

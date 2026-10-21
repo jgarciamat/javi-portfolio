@@ -211,6 +211,7 @@ export const GUIDES_TRAMITES: Guide[] = [
       'iva-para-autonomos-modelo-303',
       'modelo-130-paso-a-paso',
       'fechas-modelos-trimestrales-autonomos-2026',
+      'corregir-modelo-130-303',
     ],
     checked: TRAMITES_CHECKED,
     sources: [

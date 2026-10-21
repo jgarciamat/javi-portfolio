@@ -36,7 +36,7 @@ const deepTypes = (value) =>
 const langs = ['es', 'en'];
 
 test('an open guide is whole, with its sources and a soft invitation; no wall', () => {
-  assert.equal(wall.OPEN_GUIDES.length, 13);
+  assert.equal(wall.OPEN_GUIDES.length, 14);
   for (const slug of wall.OPEN_GUIDES) {
     const g = GUIDES.find((x) => x.slug === slug);
     assert.ok(g, `${slug} exists`);
