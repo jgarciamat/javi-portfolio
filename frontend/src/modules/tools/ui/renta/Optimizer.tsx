@@ -9,10 +9,7 @@ import {
   type OptimizerData,
 } from '../../domain/rentaOptimizer';
 import { workReductionOf } from '../../domain/rentaWork';
-import { rentaJoint } from '../../data/renta/conjunta';
-import { rentaWorkExtras } from '../../data/renta/estado-extra';
-import { rentaProperty } from '../../data/renta/inmuebles';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
 import { Field, useMoney, type StepProps } from './shared';
 
 /** The items whose real amount is asked once the person says yes, and the form field it goes to. */
@@ -124,18 +121,20 @@ export function Optimizer({
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   // What a confirmed one saved when the person said yes (its change is in the form since then).
   const [kept, setKept] = useState<Record<string, Opportunity>>({});
-  const reduction = useMemo(() => workReductionOf(rentaState), []);
+  const rules = useRentaRules();
+  const reduction = useMemo(() => workReductionOf(rules.state), [rules]);
   const data = useMemo<OptimizerData | null>(
     () =>
       ccaa && {
-        state: rentaState,
+        state: rules.state,
         ccaa,
-        extras: rentaWorkExtras,
-        property: rentaProperty,
+        extras: rules.extras,
+        property: rules.property,
         workReduction: reduction,
-        joint: rentaJoint,
+        joint: rules.joint,
+        activityTables: rules.activityTables,
       },
-    [ccaa, reduction]
+    [rules, ccaa, reduction]
   );
   const result = useMemo(
     // The deductions have their own review (with their savings once marked): only their count here.

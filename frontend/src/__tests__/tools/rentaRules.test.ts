@@ -20,8 +20,11 @@ import {
   DEFAULT_RENTA_YEAR,
   hasRules,
   loadCcaaFor,
+  openingYear,
+  ownSnapshot,
   RENTA_YEARS,
   rentaRules,
+  yearsUpTo,
 } from '@modules/tools/data/renta/ejercicios';
 import { LOW_PAY_2026 } from '@modules/tools/data/renta/ejercicios/2026';
 import { patched, withManualOf } from '@modules/tools/data/renta/ejercicios/shared';
@@ -227,9 +230,11 @@ describe('Renta 2026 (BOE only)', () => {
 
   it('the rented homes and the imputed income of 2026 wait for the RDL 29/2026', () => {
     expect(rentaRules(2026).missing).toEqual(
-      expect.arrayContaining(['rentals', 'imputation', 'regions', 'modules'])
+      expect.arrayContaining(['rentals', 'imputation', 'regions'])
     );
     expect(rentaRules(2026).sources.some((s) => s.what.includes('29/2026'))).toBe(true);
+    // The módulos of 2026 are those of 2025 (Orden HAC/1425/2025).
+    expect(rentaRules(2026).activityTables).toEqual(rentaRules(2025).activityTables);
   });
 });
 
@@ -309,5 +314,30 @@ describe('helpers to build a year', () => {
     const list = [{ id: 'a', n: 1 }];
     expect(patched(list, { a: { n: 2 } })).toEqual([{ id: 'a', n: 2 }]);
     expect(() => patched(list, { b: { n: 2 } })).toThrow('Unknown ids: b');
+  });
+});
+
+describe('the year a Renta opens on', () => {
+  it('offers the years with rules up to the running one, the newest first', () => {
+    expect(yearsUpTo(2026)).toEqual([2026, 2025, 2024]);
+    expect(yearsUpTo(2030)).toEqual([2026, 2025, 2024]);
+    expect(yearsUpTo(2024)).toEqual([2024]);
+    expect(yearsUpTo(2023)).toEqual([]);
+  });
+
+  it('opens on what was left half done, else last year, else the newest with rules', () => {
+    expect(openingYear(2026, 2024)).toBe(2024);
+    expect(openingYear(2026)).toBe(2025);
+    expect(openingYear(2026, 2019)).toBe(2025);
+    expect(openingYear(2024)).toBe(2024);
+    expect(openingYear(2023)).toBe(DEFAULT_RENTA_YEAR);
+  });
+
+  it('shows a saved result only in its year; one saved without a year is of 2025', () => {
+    expect(ownSnapshot(null, 2025)).toBeNull();
+    expect(ownSnapshot({}, 2025)).toEqual({});
+    expect(ownSnapshot({}, 2024)).toBeNull();
+    expect(ownSnapshot({ year: 2024 }, 2024)).toEqual({ year: 2024 });
+    expect(ownSnapshot({ year: 2026 }, 2025)).toBeNull();
   });
 });

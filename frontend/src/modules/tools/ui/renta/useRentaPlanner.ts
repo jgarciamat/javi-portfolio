@@ -19,12 +19,10 @@ import {
 } from '../../domain/rentaForm';
 import { workReductionOf } from '../../domain/rentaWork';
 import { compareJoint } from '../../domain/rentaJoint';
-import { rentaJoint } from '../../data/renta/conjunta';
 import { useRentaAccess, type RentaMode } from '../../application/useRentaAccess';
-import { loadCcaa } from '../../data/renta';
-import { rentaWorkExtras } from '../../data/renta/estado-extra';
-import { rentaProperty } from '../../data/renta/inmuebles';
-import { rentaState } from '../../data/renta/state';
+import { CCAA_OPTIONS } from '../../data/renta';
+import { loadCcaaFor, ownSnapshot, rentaRules } from '../../data/renta/ejercicios';
+import { blockersOf, type RentaRules } from '../../domain/rentaRules';
 import { mentionedIn, NO_DRAFT, type DraftState } from '../../domain/rentaDraft';
 import {
   decide,
@@ -51,6 +49,7 @@ const NO_CCAA: RentaCcaa = { id: '', name: '', regime: 'common', deductions: [],
  * go through, the ones the income leaves out, and the ones pending an amount.
  */
 function useDeductionHints(
+  rules: RentaRules,
   form: RentaForm,
   ccaa: RentaCcaa | null,
   draft: DraftState,
@@ -58,7 +57,10 @@ function useDeductionHints(
   live: Snapshot,
   savings: Record<string, DeductionSaving>
 ) {
-  const all = useMemo(() => [...rentaState.deductions, ...(ccaa?.deductions ?? [])], [ccaa]);
+  const all = useMemo(
+    () => [...rules.state.deductions, ...(ccaa?.deductions ?? [])],
+    [rules, ccaa]
+  );
   const mentioned = useMemo(
     () =>
       draft.reading
@@ -174,6 +176,7 @@ function useSavedPlanner(year: number, initialIncome: string) {
  * with them added (rentaDraftGaps.ts): what they explain of the difference.
  */
 function gapsOf(
+  rules: RentaRules,
   reading: DraftState['reading'],
   input: RentaInput,
   form: RentaForm,
@@ -182,7 +185,7 @@ function gapsOf(
   if (!reading) return { gaps: [], withGaps: 0 };
   const gaps = draftGaps(
     reading.applied,
-    [...rentaState.deductions, ...(ccaa?.deductions ?? [])],
+    [...rules.state.deductions, ...(ccaa?.deductions ?? [])],
     form.choices
   );
   const choices = choicesOf({ ...form, choices: withGaps(form.choices, gaps) });
@@ -191,6 +194,7 @@ function gapsOf(
 
 /** What each deduction saves with the data as it is, and the draft's boxes next to ours. */
 function useInsights(
+  rules: RentaRules,
   input: RentaInput,
   result: RentaResult,
   ccaa: RentaCcaa | null,
@@ -198,8 +202,8 @@ function useInsights(
   reading: DraftState['reading']
 ) {
   const savings = useMemo(
-    () => deductionSavings(input, [...rentaState.deductions, ...(ccaa?.deductions ?? [])], result),
-    [input, ccaa, result]
+    () => deductionSavings(input, [...rules.state.deductions, ...(ccaa?.deductions ?? [])], result),
+    [rules, input, ccaa, result]
   );
   const saved = useMemo(() => markedSaving(input, result), [input, result]);
   const comparison = useMemo(
@@ -214,15 +218,16 @@ function useInsights(
           })
         : [],
       result: result.result,
-      ...gapsOf(reading, input, form, ccaa),
+      ...gapsOf(rules, reading, input, form, ccaa),
     }),
-    [reading, result, input, form, ccaa]
+    [rules, reading, result, input, form, ccaa]
   );
   return { savings, saved, comparison };
 }
 
 /** The result as the data is now, with the joint return compared when the person can file one. */
 function useLive(
+  rules: RentaRules,
   input: RentaInput,
   family: ReturnType<typeof familyOf>,
   form: RentaForm
@@ -230,16 +235,16 @@ function useLive(
   return useMemo(
     () => ({
       result: computeRenta(input),
-      kids: descendantBreakdown(family, rentaState.minimums),
+      kids: descendantBreakdown(family, rules.state.minimums),
       joint:
         form.joint === 'couple' || form.joint === 'single'
           ? compareJoint(input, form.joint, partnerOf(form), {
               livesWithOtherParent: form.otherParent,
-              rules: rentaJoint,
+              rules: rules.joint,
             })
           : null,
     }),
-    [input, family, form]
+    [rules, input, family, form]
   );
 }
 
@@ -248,12 +253,14 @@ function useLive(
  * marked with what they give (rentaDraftApply.ts), so the planner starts from the draft's result.
  */
 function useDraftDeductions({
+  rules,
   form,
   set,
   draft,
   setDraft,
   ccaa,
 }: {
+  rules: RentaRules;
   form: RentaForm;
   set: (patch: Partial<RentaForm>) => void;
   draft: DraftState;
@@ -265,15 +272,15 @@ function useDraftDeductions({
     if (!draft.pending || !reading) return;
     // The community's deductions are needed to know which ones they are.
     if (reading.ccaaId && ccaa?.id !== reading.ccaaId) return;
-    const all = [...rentaState.deductions, ...(ccaa?.deductions ?? [])];
+    const all = [...rules.state.deductions, ...(ccaa?.deductions ?? [])];
     const { choices, donations } = withDraftDeductions(form, reading.applied, all);
     set(donations ? { choices, donations } : { choices });
     setDraft({ ...draft, pending: false });
-  }, [draft, ccaa, form, set, setDraft]);
+  }, [rules, draft, ccaa, form, set, setDraft]);
 }
 
-/** The community's data, loaded when it is chosen. */
-function useCcaa(id: string) {
+/** The community's data of the year, loaded when it is chosen (null: that year has none of it). */
+function useCcaa(year: number, id: string) {
   const [ccaa, setCcaa] = useState<RentaCcaa | null>(null);
   const [loadError, setLoadError] = useState(false);
   useEffect(() => {
@@ -281,13 +288,13 @@ function useCcaa(id: string) {
     setCcaa(null);
     setLoadError(false);
     if (!id) return undefined;
-    loadCcaa(id)
+    loadCcaaFor(year, id)
       .then((data) => !cancelled && setCcaa(data))
       .catch(() => !cancelled && setLoadError(true));
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [year, id]);
   return { ccaa, loadError };
 }
 
@@ -308,8 +315,9 @@ export function useRentaPlanner({
     useSavedPlanner(year, initialIncome);
   // Bumped from the guided summary: the review of the deductions starts.
   const [reviewStart, setReviewStart] = useState(0);
-  const { ccaa, loadError } = useCcaa(form.ccaaId);
-  useDraftDeductions({ form, set, draft, setDraft, ccaa });
+  const rules = useMemo(() => rentaRules(year), [year]);
+  const { ccaa, loadError } = useCcaa(year, form.ccaaId);
+  useDraftDeductions({ rules, form, set, draft, setDraft, ccaa });
   const access = useRentaAccess(mode);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(() =>
     storage.getJSON<Snapshot | null>(SNAPSHOT_KEY, null)
@@ -318,23 +326,45 @@ export function useRentaPlanner({
   // Bumped when the data is wiped, so the draft reader forgets its pasted text and messages too.
   const [wipes, setWipes] = useState(0);
 
-  const reduction = useMemo(() => workReductionOf(rentaState), []);
+  const reduction = useMemo(() => workReductionOf(rules.state), [rules]);
   const family = useMemo(() => familyOf(form), [form]);
   const input = useMemo(
     () =>
       toInput(form, {
-        state: rentaState,
+        state: rules.state,
         ccaa: ccaa ?? NO_CCAA,
-        extras: rentaWorkExtras,
-        property: rentaProperty,
+        extras: rules.extras,
+        property: rules.property,
         workReduction: reduction,
+        activityTables: rules.activityTables,
       }),
-    [form, ccaa, reduction]
+    [rules, form, ccaa, reduction]
   );
-  const live = useLive(input, family, form);
-  const { savings, saved, comparison } = useInsights(input, live.result, ccaa, form, draft.reading);
+  // What the return needs and the year has no official figure for: no result is shown.
+  const blockers = useMemo(
+    () =>
+      blockersOf(rules, {
+        ccaaId: form.ccaaId,
+        rents: input.rental !== null,
+        imputes: input.imputedValues.standard + input.imputedValues.revised > 0,
+        objective: (form.activities ?? []).some(
+          (a) => a.kind === 'modules' || a.kind === 'agrarian'
+        ),
+      }),
+    [rules, form, input]
+  );
+  const live = useLive(rules, input, family, form);
+  const { savings, saved, comparison } = useInsights(
+    rules,
+    input,
+    live.result,
+    ccaa,
+    form,
+    draft.reading
+  );
 
   const { all, found, dismissed, missing, pending, marked, hints } = useDeductionHints(
+    rules,
     form,
     ccaa,
     draft,
@@ -343,14 +373,16 @@ export function useRentaPlanner({
     savings
   );
 
-  const shown = access.premium ? live : snapshot;
+  // A result saved for another year is not this year's, and a year missing figures shows none.
+  const shown = blockers.length > 0 ? null : access.premium ? live : ownSnapshot(snapshot, year);
   const calculate = async () => {
     setBusy(true);
     const allowed = await access.consume();
     setBusy(false);
     if (allowed) {
-      storage.setJSON(SNAPSHOT_KEY, live);
-      setSnapshot(live);
+      const kept = { ...live, year };
+      storage.setJSON(SNAPSHOT_KEY, kept);
+      setSnapshot(kept);
     }
   };
   const wipeNow = () => {
@@ -372,6 +404,10 @@ export function useRentaPlanner({
   };
 
   return {
+    rules,
+    blockers,
+    /** The community's name, also when the year has none of its data. */
+    ccaaName: CCAA_OPTIONS.find((o) => o.id === form.ccaaId)?.name ?? '',
     form,
     set,
     setChoice,

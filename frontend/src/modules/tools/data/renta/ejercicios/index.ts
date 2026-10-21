@@ -17,6 +17,27 @@ export const DEFAULT_RENTA_YEAR = 2025;
 
 export const hasRules = (year: number): boolean => year in RULES;
 
+/** The years with rules up to the running one, the newest first. */
+export const yearsUpTo = (current: number): number[] =>
+  RENTA_YEARS.filter((y) => y <= current).reverse();
+
+/**
+ * The year a Renta opens on: the one left half done, else the return filed in spring (the previous
+ * year's), else the newest one with rules.
+ */
+export function openingYear(current: number, saved?: number): number {
+  const years = yearsUpTo(current);
+  if (saved !== undefined && years.includes(saved)) return saved;
+  if (years.includes(current - 1)) return current - 1;
+  return years[0] ?? DEFAULT_RENTA_YEAR;
+}
+
+/** A result saved for the year (one saved before the years had rules is of 2025), or nothing. */
+export const ownSnapshot = <T extends { year?: number }>(
+  saved: T | null,
+  year: number
+): T | null => (saved && (saved.year ?? DEFAULT_RENTA_YEAR) === year ? saved : null);
+
 export function rentaRules(year: number): RentaRules {
   const rules = RULES[year];
   if (!rules) throw new Error(`No Renta rules for ${year}`);

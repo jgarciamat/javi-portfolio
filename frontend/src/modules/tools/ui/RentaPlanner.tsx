@@ -7,9 +7,9 @@ import { OutOfScope, scopeOf } from './renta/Residence';
 import type { ResidenceScope } from '../domain/rentaResidence';
 import { storage } from '@shared/utils/storage';
 import type { RentaAccess, RentaMode } from '../application/useRentaAccess';
-import { rentaWorkExtras } from '../data/renta/estado-extra';
-import { rentaProperty } from '../data/renta/inmuebles';
-import { rentaState } from '../data/renta/state';
+import { DEFAULT_RENTA_YEAR } from '../data/renta/ejercicios';
+import type { MissingPart } from '../domain/rentaRules';
+import { RentaRulesProvider, useRentaRules, YearNotice } from './renta/RentaRulesContext';
 import { DeductionReview } from './renta/DeductionReview';
 import { DeductionsStep, PendingNotice } from './renta/DeductionsStep';
 import { DraftStep } from './renta/DraftStep';
@@ -117,8 +117,11 @@ export function ResultSection({
   imported,
   input,
   scope,
+  blockers,
 }: {
   n: number;
+  /** What the year has no official figure for and this return needs: no result (rentaRules.ts). */
+  blockers: MissingPart[];
   /** Residence: a return filed elsewhere shows where instead of a result (rentaResidence.ts). */
   scope?: ResidenceScope;
   input?: RentaInput;
@@ -134,11 +137,16 @@ export function ResultSection({
   mode: RentaMode;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const inApp = mode === 'account';
   return (
     <Step n={n} titleKey="tools.renta.step4" className="renta-result">
       {scope?.kind === 'out' ? (
         <OutOfScope scope={scope} />
+      ) : blockers.length > 0 ? (
+        <p className="section-hint" role="status">
+          {t('tools.renta.year.noResult', { year })}
+        </p>
       ) : (
         <ResultBody
           access={access}
@@ -153,7 +161,7 @@ export function ResultSection({
           residencePending={scope?.kind === 'pending'}
         />
       )}
-      <p className="plan-note">{t('tools.renta.disclaimerFull', { year: rentaState.year })}</p>
+      <p className="plan-note">{t('tools.renta.disclaimerFull', { year })}</p>
     </Step>
   );
 }
@@ -257,7 +265,7 @@ function ViewSwitch({ expert, onChange }: { expert: boolean; onChange: (on: bool
 export function RentaPlanner({
   initialIncome = '',
   mode,
-  year = rentaState.year,
+  year = DEFAULT_RENTA_YEAR,
 }: {
   initialIncome?: string;
   mode: RentaMode;
@@ -265,6 +273,9 @@ export function RentaPlanner({
   year?: number;
 }) {
   const {
+    rules,
+    blockers,
+    ccaaName,
     form,
     set,
     setChoice,
@@ -303,115 +314,119 @@ export function RentaPlanner({
   const scope = scopeOf(form);
 
   return (
-    <div className="renta-planner">
-      <div className="renta-wipe">
-        {recovered && (
-          <p className="renta-recovered" role="status">
-            {t('tools.renta.recovered')}
-          </p>
-        )}
-        <UnderYear>
-          <NewReturn
-            year={year}
-            hasActivity={(form.activities?.length ?? 0) > 0}
-            onConfirm={startNew}
-          />
-        </UnderYear>
-      </div>
-      <ViewSwitch expert={expert} onChange={switchView} />
-      <DraftStep
-        key={wipes}
-        form={form}
-        set={set}
-        missing={missing}
-        marked={marked}
-        access={access.draft}
-        local={mode === 'local'}
-        upgrade={<UpgradeCta access={access} />}
-        draft={draft}
-        onDraft={setDraft}
-        accept={accept}
-        comparison={comparison}
-      />
-      {expert ? (
-        <>
-          <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
-          <IncomeStep form={form} set={set} extras={rentaWorkExtras} />
-          <PropertyStep form={form} set={set} property={rentaProperty} />
-        </>
-      ) : (
-        <GuidedInterview
+    <RentaRulesProvider value={rules}>
+      <div className="renta-planner">
+        <YearNotice blockers={blockers} ccaaName={ccaaName} />
+        <div className="renta-wipe">
+          {recovered && (
+            <p className="renta-recovered" role="status">
+              {t('tools.renta.recovered')}
+            </p>
+          )}
+          <UnderYear>
+            <NewReturn
+              year={year}
+              hasActivity={(form.activities?.length ?? 0) > 0}
+              onConfirm={startNew}
+            />
+          </UnderYear>
+        </div>
+        <ViewSwitch expert={expert} onChange={switchView} />
+        <DraftStep
           key={wipes}
           form={form}
           set={set}
+          missing={missing}
+          marked={marked}
+          access={access.draft}
+          local={mode === 'local'}
+          upgrade={<UpgradeCta access={access} />}
+          draft={draft}
+          onDraft={setDraft}
+          accept={accept}
+          comparison={comparison}
+        />
+        {expert ? (
+          <>
+            <FamilyStep form={form} set={set} ccaa={ccaa} loadError={loadError} />
+            <IncomeStep form={form} set={set} extras={rules.extras} />
+            <PropertyStep form={form} set={set} property={rules.property} />
+          </>
+        ) : (
+          <GuidedInterview
+            key={wipes}
+            form={form}
+            set={set}
+            ccaa={ccaa}
+            loadError={loadError}
+            deductions={all}
+            property={rules.property}
+            reading={draft.reading}
+            onReview={startReview}
+          />
+        )}
+        <ActivitiesList form={form} set={set} result={live.result.activities} />
+        <DeductionReview
+          // A new community is a new list: the review starts again.
+          key={ccaa?.id ?? ''}
+          n={expert ? 4 : 2}
+          ccaa={ccaa}
+          deductions={all}
+          candidates={found.candidates}
+          outOfReach={found.outOfReach}
+          dismissed={dismissed}
+          review={review}
+          choices={form.choices}
+          savings={savings}
+          markedSaving={saved}
+          onDecide={decideOn}
+          startSignal={reviewStart}
+          invest={<InvestLink form={form} />}
+        />
+        <Optimizer form={form} set={set} ccaa={ccaa} found={missing} />
+        <DeductionsStep
+          state={rules.state}
           ccaa={ccaa}
           loadError={loadError}
-          deductions={all}
-          property={rentaProperty}
-          reading={draft.reading}
-          onReview={startReview}
+          choices={form.choices}
+          family={family}
+          blocked={live.result.blocked}
+          hints={hints}
+          savings={savings}
+          markedSaving={saved}
+          onChange={setChoice}
+          n={expert ? 5 : 3}
+          lead={
+            <>
+              <InvestCard form={form} set={set} input={input} />
+              <h3>{t('tools.renta.donations.title')}</h3>
+              <DonationsFields
+                form={form}
+                set={set}
+                taxBase={live.result.taxBase + live.result.savingsBase}
+              />
+            </>
+          }
         />
-      )}
-      <ActivitiesList form={form} set={set} result={live.result.activities} />
-      <DeductionReview
-        // A new community is a new list: the review starts again.
-        key={ccaa?.id ?? ''}
-        n={expert ? 4 : 2}
-        ccaa={ccaa}
-        deductions={all}
-        candidates={found.candidates}
-        outOfReach={found.outOfReach}
-        dismissed={dismissed}
-        review={review}
-        choices={form.choices}
-        savings={savings}
-        markedSaving={saved}
-        onDecide={decideOn}
-        startSignal={reviewStart}
-        invest={<InvestLink form={form} />}
-      />
-      <Optimizer form={form} set={set} ccaa={ccaa} found={missing} />
-      <DeductionsStep
-        state={rentaState}
-        ccaa={ccaa}
-        loadError={loadError}
-        choices={form.choices}
-        family={family}
-        blocked={live.result.blocked}
-        hints={hints}
-        savings={savings}
-        markedSaving={saved}
-        onChange={setChoice}
-        n={expert ? 5 : 3}
-        lead={
-          <>
-            <InvestCard form={form} set={set} input={input} />
-            <h3>{t('tools.renta.donations.title')}</h3>
-            <DonationsFields
-              form={form}
-              set={set}
-              taxBase={live.result.taxBase + live.result.savingsBase}
-            />
-          </>
-        }
-      />
 
-      <ResultSection
-        access={access}
-        shown={shown}
-        busy={busy}
-        pending={pending}
-        calculate={calculate}
-        mode={mode}
-        n={expert ? 6 : 4}
-        invest={<InvestLink form={form} />}
-        imported={form.savingsDetail?.imported}
-        input={input}
-        scope={scope}
-      />
-      {shown && scope.kind !== 'out' && (
-        <RentaFormPreview result={shown.result} input={input} year={year} />
-      )}
-    </div>
+        <ResultSection
+          access={access}
+          shown={shown}
+          busy={busy}
+          pending={pending}
+          calculate={calculate}
+          mode={mode}
+          n={expert ? 6 : 4}
+          invest={<InvestLink form={form} />}
+          imported={form.savingsDetail?.imported}
+          input={input}
+          scope={scope}
+          blockers={blockers}
+        />
+        {shown && scope.kind !== 'out' && (
+          <RentaFormPreview result={shown.result} input={input} year={year} />
+        )}
+      </div>
+    </RentaRulesProvider>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Icon } from '@shared/components/Icon';
 import { scrollBehavior } from '@shared/utils/motion';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
 import { emptySavingsDetail, fifo, type ImportedSavings } from '../../domain/rentaGains';
 import { choose } from '../../domain/rentaGuide';
 import { withoutFile } from '../../domain/invest/sources';
@@ -44,6 +44,7 @@ export function importedSummary(imported: ImportedSavings) {
  */
 export function InvestCard({ form, set, input }: StepProps & { input?: RentaInput }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const money = useMoney();
   const detail = form.savingsDetail;
   const imported = detail?.imported;
@@ -62,7 +63,7 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
   /** What the losses of earlier years found in the files can still give. */
   const recoverOf = (sum: ImportSummary) =>
     recoverOptions(
-      lossesToRecover(sum.years, detail?.pending.gains ?? [], rentaState.year),
+      lossesToRecover(sum.years, detail?.pending.gains ?? [], year),
       input ?? null,
       today()
     );
@@ -142,10 +143,10 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
       {!open && ledger && <RentaWebPanel ledger={ledger} />}
       {!open && ledger && (
         <InvestSummary
-          summary={importSummary(ledger, rentaState.year)}
-          year={rentaState.year}
+          summary={importSummary(ledger, year)}
+          year={year}
           effect={input && imported ? rentaEffect(input, imported) : null}
-          recover={recoverOf(importSummary(ledger, rentaState.year))}
+          recover={recoverOf(importSummary(ledger, year))}
           onPending={toPending}
         />
       )}
@@ -160,7 +161,7 @@ export function InvestCard({ form, set, input }: StepProps & { input?: RentaInpu
       )}
       {open && (
         <InvestImport
-          year={rentaState.year}
+          year={year}
           autoApply
           effectOf={input && ((next) => rentaEffect(input, next))}
           recoverOf={recoverOf}

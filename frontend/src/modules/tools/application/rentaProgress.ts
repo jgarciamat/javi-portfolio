@@ -14,6 +14,7 @@ import { importedFrom } from '../domain/invest/sources';
 import { emptyProperty } from '../domain/rentaRentals';
 import { emptyResidence } from '../domain/rentaResidence';
 import { withoutAutonomoActivity } from '../domain/rentaFromAutonomo';
+import { DEFAULT_RENTA_YEAR } from '../data/renta/ejercicios';
 
 /** What was typed in the planner, kept on this device until it is wiped (or the person signs out). */
 export const PROGRESS_KEY = 'mm_renta_progress';
@@ -168,17 +169,19 @@ function reviveDraft(saved: unknown): DraftState {
   };
 }
 
-/** What was saved, when it is of this version; null when there is nothing (or nothing readable). */
+/**
+ * What was saved, when it is of this version; null when there is nothing (or nothing readable).
+ * Data saved without a year is of the Renta 2025, the only year the app had rules for then.
+ */
 export function loadProgress(): RentaProgress | null {
   const saved = storage.getJSON<unknown>(PROGRESS_KEY, null);
-  if (!isObject(saved) || saved.version !== PROGRESS_VERSION || typeof saved.year !== 'number') {
-    return null;
-  }
+  if (!isObject(saved) || saved.version !== PROGRESS_VERSION) return null;
+  if (saved.year !== undefined && typeof saved.year !== 'number') return null;
   const review = isObject(saved.review)
     ? { dismissed: strings(saved.review.dismissed), later: strings(saved.review.later) }
     : NO_REVIEW;
   return {
-    year: saved.year,
+    year: (saved.year as number | undefined) ?? DEFAULT_RENTA_YEAR,
     form: reviveForm(saved.form),
     draft: reviveDraft(saved.draft),
     review,

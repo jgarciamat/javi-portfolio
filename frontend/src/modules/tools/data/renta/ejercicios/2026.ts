@@ -1,9 +1,11 @@
 import type { Deduction, LowPayRule, RentaState } from '../../../domain/rentaData';
 import type { PropertyNote, RentaProperty, RentaWorkExtras } from '../../../domain/rentaExtras';
 import type { RentaRules } from '../../../domain/rentaRules';
+import { farm2025 } from '../agrario-2025';
 import { rentaJoint } from '../conjunta';
 import { rentaWorkExtras } from '../estado-extra';
 import { rentaProperty } from '../inmuebles';
+import { modules2025 } from '../modulos-2025';
 import { rentaState } from '../state';
 import { patched } from './shared';
 
@@ -164,10 +166,11 @@ export const rules2026: RentaRules = {
   extras,
   property,
   joint: { ...rentaJoint, year: 2026 },
-  // The Orden HAC/1425/2025 (módulos of 2026) is not in the tables of the Renta yet.
-  activityTables: null,
+  // Orden HAC/1425/2025 (BOE-A-2025-25272): its annex II (módulos) and annex I (farming indexes)
+  // are those of 2025 figure by figure (compared on 19-10-2026, see objectiveModules.ts).
+  activityTables: { modules: modules2025, farm: farm2025 },
   regions: ['ceuta', 'melilla', 'navarra', 'pais-vasco'],
-  missing: ['manual', 'regions', 'modules', 'rentals', 'imputation'],
+  missing: ['manual', 'regions', 'rentals', 'imputation'],
   sources: [
     {
       what: 'Ley 35/2006 del IRPF, texto consolidado y versiones de cada artículo',
@@ -183,6 +186,11 @@ export const rules2026: RentaRules = {
       what: 'Eficiencia energética, vehículos eléctricos y autoconsumo renovable (DA 50.ª, 58.ª y 62.ª, Real Decreto-ley 7/2026)',
       url: `${BOE}BOE-A-2026-6544`,
       checkedOn: '2026-10-22',
+    },
+    {
+      what: 'Módulos e índices agrarios de 2026 (Orden HAC/1425/2025), iguales a los de 2025',
+      url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2025-25272',
+      checkedOn: '2026-10-19',
     },
     {
       what: 'La Palma en 2026 (DA 57.ª, Real Decreto-ley 23/2026)',

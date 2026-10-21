@@ -5,7 +5,7 @@ import type { DraftReading } from '../../domain/rentaDraft';
 import type { Deduction } from '../../domain/rentaData';
 import { verdictOf, type DraftGap, type Verdict } from '../../domain/rentaDraftGaps';
 import type { Choice } from '../../domain/rentaForm';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
 import { resultTone, useMoney } from './shared';
 import { InvestGuide } from './invest/InvestGuide';
 
@@ -121,6 +121,7 @@ export function DraftComparison({
   onAdd: (id: string, choice: Choice) => void;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const money = useMoney();
   const label = (box: string) => `${t(`tools.renta.compare.box.${box}`)} (${box})`;
   const theirs = draftResult(reading.boxes);
@@ -129,11 +130,11 @@ export function DraftComparison({
   return (
     <section className="renta-compare" aria-label={t('tools.renta.compare.title')}>
       <h3>{t('tools.renta.compare.title')}</h3>
-      {reading.exercise !== null && reading.exercise !== rentaState.year && (
+      {reading.exercise !== null && reading.exercise !== year && (
         <p className="renta-compare-warning" role="alert">
           {t('tools.renta.compare.otherYear', {
             exercise: reading.exercise,
-            year: rentaState.year,
+            year,
           })}
         </p>
       )}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { rentaAbatement } from '../../data/renta/abatimiento';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
 import {
   emptySavingsDetail,
   savingsOf,
@@ -28,7 +28,8 @@ const CAPITAL: (keyof CapitalIncome)[] = [
   'expenses',
 ];
 /** The four years before the return, whose negative balances can still be used. */
-const YEARS = [1, 2, 3, 4].map((n) => rentaState.year - n).sort();
+/** The four years before the return's. */
+const yearsBefore = (year: number) => [4, 3, 2, 1].map((n) => year - n);
 
 /** An amount typed as text (decimal comma), kept as a number: the text stays while it is typed. */
 function Amount({
@@ -318,12 +319,13 @@ function PendingEditor({
   onChange: (list: PendingBalance[]) => void;
 }) {
   const { t } = useI18n();
+  const rules = useRentaRules();
   const amountOf = (year: number) => list.find((p) => p.year === year)?.amount ?? 0;
   const set = (year: number, amount: number) =>
     onChange([...list.filter((p) => p.year !== year), { year, amount }]);
   return (
     <div className="tools-form">
-      {YEARS.map((year) => (
+      {yearsBefore(rules.year).map((year) => (
         <Amount
           key={year}
           label={t(`tools.renta.gains.pending.${kind}`, { year })}
@@ -339,7 +341,8 @@ function PendingEditor({
 function Summary({ detail }: { detail: SavingsDetail }) {
   const { t } = useI18n();
   const money = useMoney();
-  const r = savingsOf(detail, rentaState.year);
+  const { year } = useRentaRules();
+  const r = savingsOf(detail, year);
   const k = 'tools.renta.gains';
   const carried = [...r.carryForward.gains, ...r.carryForward.capital].reduce(
     (s, p) => s + p.amount,
@@ -414,6 +417,7 @@ export function SavingsDetailSection({
   onImport?: () => void;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const [importing, setImporting] = useState(false);
   const detail = form.savingsDetail;
   const k = 'tools.renta.gains';
@@ -444,7 +448,7 @@ export function SavingsDetailSection({
       )}
       {importing && (
         <InvestImport
-          year={rentaState.year}
+          year={year}
           onApply={(imported) =>
             set({
               savingsDetail: {
@@ -525,7 +529,7 @@ export function SavingsDetailSection({
           </button>
           <div className="tools-form">
             <Amount
-              label={t(`${k}.abatementPrior`, { last: rentaState.year - 1 })}
+              label={t(`${k}.abatementPrior`, { last: year - 1 })}
               value={detail.abatementPrior ?? 0}
               onChange={(n) => update({ abatementPrior: n })}
             />

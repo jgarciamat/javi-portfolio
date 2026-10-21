@@ -157,7 +157,7 @@ describe('Autónomos 2026 → Renta 2026, in one tap', () => {
     // The Renta opens on 2026, says it is provisional and what it brought.
     const year = await screen.findByLabelText(tr('app.renta.year'));
     expect(year).toHaveValue('2026');
-    expect(screen.getByText(tr('app.renta.provisional', { year: 2026 }))).toBeVisible();
+    expect(screen.getByText(tr('tools.renta.year.provisional', { year: 2026 }))).toBeVisible();
     const brought = screen.getByText(tr('app.renta.brought', { year: 2026 })).parentElement!;
     expect(
       within(brought).getByText(tr('tools.renta.bring.fig.net')).closest('li')
@@ -222,7 +222,7 @@ describe('Autónomos 2025 → Renta 2025', () => {
     fireEvent.click(button(tr('tools.renta.prepare.button', { year: 2025 })));
     fireEvent.click(button(tr('tools.renta.prepare.take', { year: 2025 })));
     expect(await screen.findByLabelText(tr('app.renta.year'))).toHaveValue('2025');
-    expect(screen.queryByText(tr('app.renta.provisional', { year: 2025 }))).toBeNull();
+    expect(screen.queryByText(tr('tools.renta.year.provisional', { year: 2025 }))).toBeNull();
     expect(screen.getByText(tr('app.renta.brought', { year: 2025 }))).toBeVisible();
     expect(loadProgress()).toMatchObject({ year: 2025 });
   });
