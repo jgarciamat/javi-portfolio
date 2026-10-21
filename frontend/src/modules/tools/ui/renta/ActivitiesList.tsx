@@ -1,9 +1,65 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import type { ActivitiesResult } from '../../domain/rentaActivity';
+import { parseDecimal } from '@shared/utils/numbers';
+import type { ActivitiesResult, ActivityInput } from '../../domain/rentaActivity';
 import { AUTONOMO_ACTIVITY, withoutAutonomoActivity } from '../../domain/rentaFromAutonomo';
 import { ActivityBoxes } from './ActivityBoxes';
 import { RemoveActivity } from './AutonomoBring';
-import { useMoney, type StepProps } from './shared';
+import { Field, useMoney, type StepProps } from './shared';
+
+/**
+ * An activity in direct estimation that may be artistic (LIRPF DA 60.ª.2, from 2025): the tick and
+ * the net income of the three years before.
+ */
+function ArtisticQuestion({
+  a,
+  n,
+  onChange,
+}: {
+  a: ActivityInput;
+  n: number;
+  onChange: (a: ActivityInput) => void;
+}) {
+  const { t } = useI18n();
+  if (a.kind !== 'direct') return null;
+  const previous = a.artistic?.previous ?? [];
+  const k = 'tools.renta.activities.artistic';
+  return (
+    <div className="renta-block">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={a.artistic !== undefined}
+          onChange={(e) => {
+            const { artistic: _, ...rest } = a;
+            onChange(e.target.checked ? { ...rest, artistic: { previous: [0, 0, 0] } } : rest);
+          }}
+        />
+        <span>{t(k)}</span>
+      </label>
+      {a.artistic && (
+        <>
+          <p className="section-hint">{t(`${k}Hint`)}</p>
+          <div className="tools-form">
+            {[1, 2, 3].map((ago) => (
+              <Field
+                key={ago}
+                id={`renta-activity-${n}-previous-${ago}`}
+                label={t(`${k}Previous`, { ago })}
+                value={previous[ago - 1] ? String(previous[ago - 1]).replace('.', ',') : ''}
+                onChange={(v) => {
+                  const next = [0, 1, 2].map((i) => previous[i] ?? 0);
+                  const value = parseDecimal(v);
+                  next[ago - 1] = Number.isFinite(value) ? value : 0;
+                  onChange({ ...a, artistic: { previous: next } });
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 /**
  * The economic activities of the return (brought from the self-employed screen or the case bank):
@@ -38,9 +94,21 @@ export function ActivitiesList({
                 {t('tools.renta.activities.remove', { name: a.name })}
               </button>
             )}
+            <ArtisticQuestion
+              a={a}
+              n={i + 1}
+              onChange={(next) => set({ activities: list.map((x, j) => (j === i ? next : x)) })}
+            />
           </li>
         ))}
       </ul>
+      {(result.artisticReduction ?? 0) > 0 && (
+        <p className="section-hint" role="status">
+          {t('tools.renta.activities.artisticReduction', {
+            amount: money(result.artisticReduction as number),
+          })}
+        </p>
+      )}
       <p className="section-hint">
         {t('tools.renta.activities.total', {
           total: money(result.total),

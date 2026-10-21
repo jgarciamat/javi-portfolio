@@ -68,6 +68,8 @@ const state: RentaState = {
   deductions,
   // LIRPF DA 61.ª starts in 2025 (Ley 5/2025).
   lowPay: null,
+  // LIRPF DA 60.ª (artistic activities) starts in 2025 (Ley 7/2024).
+  artistic: null,
   source: 'https://sede.agenciatributaria.gob.es/Sede/Ayuda/24Manual/100.html',
 };
 

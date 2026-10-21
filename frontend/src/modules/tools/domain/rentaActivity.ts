@@ -1,4 +1,5 @@
 import { round2 } from './round';
+import type { ArtisticRule } from './rentaData';
 
 /**
  * Income from economic activities (rendimientos de actividades económicas) for the modelo 100 of
@@ -514,6 +515,11 @@ export type ActivityInput = (
       newActivity: boolean;
       withheld: number;
       payments: number;
+      /**
+       * An artistic activity of DA 60.ª (IAE groups 851-869, agrupaciones 01-05 of section 3): the
+       * net income of the three years before, for the reduction of what passes 130 % of their average.
+       */
+      artistic?: { previous: number[] };
     }
   | { kind: 'modules'; name: string; data: ModulesActivity; withheld: number; payments: number }
   | { kind: 'agrarian'; name: string; data: FarmActivity; withheld: number; payments: number }
@@ -540,6 +546,11 @@ export interface ActivitiesResult {
   dependentReduction: number;
   smallIncomeReduction: number;
   startReduction: number;
+  /**
+   * The reduction for artistic activities (DA 60.ª.2), after the others: off the total, not off box
+   * 0235 (its box in the modelo 100 of 2025 is not confirmed). A result saved before has none.
+   */
+  artisticReduction?: number;
   /** Box 0235. */
   directTotal: number;
   /** Box 1482 / 1484 and 1558 / 1560 (the 32.2.3.º reduction goes on the direct ones first). */
@@ -596,6 +607,19 @@ export interface ActivityContext {
   workReduction: number;
   disability: number;
   assistance: boolean;
+  /** The rule of the year for artistic activities (DA 60.ª); none: no reduction. */
+  artistic?: ArtisticRule | null;
+}
+
+/**
+ * DA 60.ª.2 LIRPF (BOE-A-2006-20764, checked 22-10-2026): 30 % of what the net income passes 130 % of
+ * the average of the three years before (a negative one as 0), on at most 150,000 €. Measured on the
+ * net of the activity, as the Manual 2025 does (c07, example: 390,000 − 162,500 = 227,500).
+ */
+export function artisticReduction(net: number, previous: number[], rule: ArtisticRule): number {
+  const average = [0, 1, 2].reduce((sum, i) => sum + Math.max(0, finite(previous[i] ?? 0)), 0) / 3;
+  const excess = Math.max(0, net - (average * rule.over) / 100);
+  return round2((Math.min(excess, rule.cap) * rule.percent) / 100);
 }
 
 /** The net income of each activity, by kind, and whether the single-client reduction applies. */
@@ -609,7 +633,7 @@ function netsOf(
   indices: FarmIndex[]
 ) {
   const each: ActivitiesResult['each'] = [];
-  const totals = { direct: 0, modules: 0, agrarian: 0, start: 0 };
+  const totals = { direct: 0, modules: 0, agrarian: 0, start: 0, artistic: 0 };
   let dependent = false;
   for (const a of list) {
     if (a.kind === 'direct') {
@@ -619,6 +643,8 @@ function netsOf(
       const net = shareOf(a, r.net);
       totals.direct += net;
       if (a.newActivity && net > 0) totals.start += net;
+      if (a.artistic && ctx.artistic)
+        totals.artistic += artisticReduction(net, a.artistic.previous, ctx.artistic);
       each.push({ name: a.name, net, detail: r });
     } else if (a.kind === 'given') {
       const net = shareOf(a, round2(finite(a.data.net)));
@@ -656,6 +682,8 @@ export function activitiesOf(
   const startBase = Math.max(0, Math.min(start, direct) - dependentAmount - smallDirect);
   const startReduction = round2(Math.min(startBase, 100000) * 0.2);
   const directTotal = round2(direct - dependentAmount - smallDirect - startReduction);
+  // DA 60.ª.2: «con posterioridad ... a las reducciones previstas en los apartados 2 y 3 del artículo 32».
+  const artistic = round2(Math.min(totals.artistic, Math.max(0, directTotal)));
   const modulesTotal = round2(modules - smallModules);
   const agrarianTotal = round2(agrarian - smallFarm);
   return {
@@ -663,10 +691,11 @@ export function activitiesOf(
     dependentReduction: dependentAmount,
     smallIncomeReduction: round2(small),
     startReduction,
+    artisticReduction: artistic,
     directTotal,
     modules: modulesTotal,
     agrarian: agrarianTotal,
-    total: round2(directTotal + modulesTotal + agrarianTotal),
+    total: round2(directTotal + modulesTotal + agrarianTotal - artistic),
     withheld: round2(sum(list.map((a) => positive(a.withheld)))),
     payments: round2(sum(list.map((a) => positive(a.payments)))),
     each,

@@ -23,6 +23,7 @@ import {
 } from '@modules/tools/domain/rentaCalc';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { donationResult } from '@modules/tools/domain/rentaDonations';
+import { artisticReduction } from '@modules/tools/domain/rentaActivity';
 import { emptyForm, rentalOf, toInput } from '@modules/tools/domain/rentaForm';
 import {
   emptySavingsDetail,
@@ -258,6 +259,17 @@ const CHECKS: Record<string, () => void> = {
     ).boxes;
     expect(boxes['0036']).toBe(figure('renta-c05-01', 'Total ingresos íntegros'));
     expect(boxes['0041']).toBe(figure('renta-c05-01', 'Rendimiento neto base del ahorro'));
+  },
+  'renta-c07-02': () => {
+    // A content creator (IAE group 869): 500,000 − 110,000 = 390,000 € of net income in 2025.
+    const rule = rentaState.artistic as NonNullable<typeof rentaState.artistic>;
+    expect(rule.groups).toContain('869');
+    const previous = [125000, 145000, 105000];
+    expect(previous.reduce((a, b) => a + b, 0) / 3).toBe(figure('renta-c07-02', 'Media 3 años'));
+    expect(artisticReduction(390000, previous, rule)).toBe(
+      figure('renta-c07-02', 'Reducción (30 % de 150.000)')
+    );
+    expect(round2(390000 - (125000 * rule.over) / 100)).toBe(figure('renta-c07-02', 'Exceso'));
   },
   'renta-c10-01': () => {
     expect((40800 * rentaProperty.imputation.revisedRate) / 100).toBeCloseTo(
@@ -643,8 +655,6 @@ const PENDING: Record<string, string> = {
     'Préstamo a vinculada con exceso a la base general (art. 46.a) y bonificadas: el motor no lo recoge.',
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
-  'renta-c07-02':
-    'Reducción del 30 % de actividades artísticas (novedad 2025): el motor no la calcula.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',
   'renta-c09-01':
     'Agraria con PAC repartida entre cultivos: pendiente de pasar por agrarianModules (siguiente oleada).',

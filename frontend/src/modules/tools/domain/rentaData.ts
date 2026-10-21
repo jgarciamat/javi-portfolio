@@ -218,6 +218,8 @@ export interface RentaState {
    * the States made by hand in the tests, which take the one of 2025.
    */
   lowPay?: LowPayRule | null;
+  /** The reduction for artistic activities of the year (DA 60.ª); null: the year has none (2024). */
+  artistic?: ArtisticRule | null;
   source: string;
 }
 
@@ -247,4 +249,17 @@ export interface BaseReductions {
   /** Art. 52.2: years in which what did not fit can still be reduced. */
   excessYears: number;
   notes: string;
+}
+
+/**
+ * LIRPF DA 60.ª.2 (Ley 7/2024, from 2025): 30 % off the net income of artistic activities that
+ * exceeds 130 % of the average of the three years before, on at most 150,000 € a year.
+ */
+export interface ArtisticRule {
+  /** IAE groups (section 2) and agrupaciones (section 3) it applies to. */
+  groups: string[];
+  percent: number;
+  /** Percent of the average of the three years before that is not reduced. */
+  over: number;
+  cap: number;
 }

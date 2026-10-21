@@ -536,5 +536,14 @@ export const rentaState: RentaState = {
   },
   deductions,
   lowPay: LOW_PAY_2025,
+  // LIRPF DA 60.ª.2, added by Ley 7/2024 (BOE-A-2024-26694) from 1-1-2025 (BOE-A-2006-20764,
+  // checked 22-10-2026); Manual práctico de Renta 2025, c07, «Reducción por rendimientos de
+  // actividades artísticas» and its example.
+  artistic: {
+    groups: ['851', '852', '853', '861', '862', '864', '869', 'S3-01', 'S3-02', 'S3-03', 'S3-05'],
+    percent: 30,
+    over: 130,
+    cap: 150000,
+  },
   source: 'https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Manual/100.html',
 };

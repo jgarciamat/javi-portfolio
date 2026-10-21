@@ -788,6 +788,7 @@ function activityRunner(input: RentaInput, otherIncome: number) {
       !(positive(input.gross) <= 4000 && positive(input.nonSalaryIncome ?? 0) >= input.gross),
     disability: input.family.disability,
     assistance: input.family.assistance === true,
+    artistic: input.state.artistic,
   };
   return (workReduction: number) =>
     activities
