@@ -120,7 +120,7 @@ Fuentes: Ley 37/1992 del IVA ([BOE-A-1992-28740](https://www.boe.es/buscar/act.p
 8. **Complementarias en la vista previa en papel:** el fichero lleva la marca, la vista previa del 111 y del 115 no.
 4. **Tipos de IVA de 2023-2024** (5 % y 2 %, con sus recargos): sin soporte.
 5. **720:** pedir por separado el saldo a 31-12 y el saldo medio del 4T de cada bloque.
-6. **Versionado por ejercicio de la Renta** (P0-1): sigue pendiente; es lo más urgente antes de abril de 2027.
+6. **Versionado por ejercicio de la Renta** (P0-1): hecho el 22-10-2026 para 2024, 2025 y 2026 ([reglas-por-ejercicio.md](reglas-por-ejercicio.md)). Faltan las comunidades de 2024 y 2026 y lo que dependa del RDL 29/2026.
 
 ## 7. Siguiente ola propuesta
 
