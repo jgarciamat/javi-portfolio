@@ -17,6 +17,11 @@ import type {
   TaxBracket,
 } from './rentaData';
 import { round2 } from './round';
+import {
+  generalCapitalOf,
+  type GeneralCapitalItem,
+  type GeneralCapitalResult,
+} from './rentaCapitalGeneral';
 import type { PropertyResult } from './rentaRentals';
 import { checkDeduction, type CheckAnswers } from './rentaRequirements';
 import { donationChoices, type DonationInput } from './rentaDonations';
@@ -467,6 +472,8 @@ export interface RentaInput {
   compensatoryPension: number;
   /** Rented properties, all together. */
   rental: RentalInput | null;
+  /** Capital mobiliario of the general base (boxes 0046-0060): business leases and the like. */
+  generalCapital?: GeneralCapitalItem[];
   /** Cadastral value of properties that are not rented, with revised and not revised values. */
   imputedValues: { standard: number; revised: number };
   /** Interest, dividends and capital gains (net), taxed on the savings base. */
@@ -531,6 +538,8 @@ export interface RentaResult {
   otherReductions: number;
   /** The economic activities and the reductions of art. 32 (null when there are none). */
   activities: ActivitiesResult | null;
+  /** Capital mobiliario of the general base, box 0060 (null when there is none). */
+  generalCapital?: GeneralCapitalResult | null;
   /** The savings income worked out in detail (null when only the net amount was given). */
   savingsDetail: SavingsBreakdown | null;
   /** The general base with the gains that do not come from a transmission (boxes 0431-0434). */
@@ -869,11 +878,19 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
       positive(input.imputedValues.revised) * input.imputationRates.revised) /
       100
   );
-  const { detail, ownSavings, savingsTotal, generalGains } = savingsPart(input, partner);
+  const parts = savingsPart(input, partner);
+  const { detail, ownSavings, generalGains } = parts;
+  const capital = input.generalCapital?.length ? generalCapitalOf(input.generalCapital) : null;
+  const capitalNet = capital?.total ?? 0;
+  // Art. 46.a: the interest of a related loan up to three times the own funds stays in the savings
+  // base (added after its compensations; the box where it goes is not confirmed).
+  const relatedSavings = round2(capital?.items.reduce((sum, i) => sum + i.savings, 0) ?? 0);
+  const savingsTotal = round2(parts.savingsTotal + relatedSavings);
   // The reduction for low pay only applies when the other income does not pass 6,500 euros; in a
   // joint return it is one, on the net pay and the other income of the whole unit (AEAT Manual
   // práctico de Renta 2025, "Fase 3.ª: rendimiento neto reducido", checked 19-10-2026).
-  const nonWork = Math.max(0, rentNet) + imputed + savingsTotal + generalGains;
+  const nonWork =
+    Math.max(0, rentNet) + Math.max(0, capitalNet) + imputed + savingsTotal + generalGains;
   const activityOf = activityRunner(input, work.netIncome + nonWork);
   // The net income of the activities, before the reductions of art. 32, is other income for art. 20.
   const raw = activityOf(0);
@@ -889,7 +906,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   // from a transmission on top of it (LIRPF art. 48).
   // The reductions of art. 32.2.3.º and art. 20 together up to 3,700 €.
   const act = activityOf(reduction);
-  const income = work.netIncome - reduction + rentNet + imputed + (act?.total ?? 0);
+  const income = work.netIncome - reduction + capitalNet + rentNet + imputed + (act?.total ?? 0);
   const general = detail ? generalBaseOf(income, detail.general, state.year) : null;
   const beforeReductions = general ? general.base : income;
   // Joint return (LIRPF art. 84.2.4.º; AEAT Manual 2025, "Reducción por tributación conjunta" and the
@@ -926,6 +943,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   return {
     rentNet,
     imputed,
+    capital,
     reduction,
     beforeReductions,
     jointReduction: round2(jointGeneral + jointSavings),
@@ -1133,6 +1151,7 @@ export function computeRenta(input: RentaInput): RentaResult {
   const {
     rentNet,
     imputed,
+    capital,
     reduction,
     beforeReductions,
     jointReduction,
@@ -1255,6 +1274,7 @@ export function computeRenta(input: RentaInput): RentaResult {
     otherReductions,
     savingsReduction,
     activities,
+    generalCapital: capital,
     savingsDetail: detail,
     generalGains: general,
     jointReduction,

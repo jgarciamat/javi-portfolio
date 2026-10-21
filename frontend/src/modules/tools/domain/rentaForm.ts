@@ -10,6 +10,7 @@ import type {
   RentaInput,
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
+import type { GeneralCapitalItem } from './rentaCapitalGeneral';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
 import type { ActivityInput, FarmIndex, ModuleActivity } from './rentaActivity';
@@ -129,6 +130,8 @@ export interface RentaForm {
   childSupport?: string;
   /** Pension plan collected as a lump sum, the part from contributions up to 2006 (DT 12.ª). */
   pensionCapital2006?: string;
+  /** Capital mobiliario of the general base (business leases, a loan to a related company…). */
+  generalCapital?: GeneralCapitalItem[];
   rentalOn: boolean;
   rentalIncome: string;
   /** Amount per deductible rental expense, by id. */
@@ -420,6 +423,7 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     childSupport: number(form.childSupport),
     pensionCapital2006: number(form.pensionCapital2006),
     rental,
+    ...(form.generalCapital?.length ? { generalCapital: form.generalCapital } : {}),
     imputedValues: unrentedOf(form, data.state.year, rental),
     savings: number(form.savings),
     savingsDetail: form.savingsDetail,

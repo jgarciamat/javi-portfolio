@@ -23,6 +23,7 @@ import {
 } from '@modules/tools/domain/rentaCalc';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { donationResult } from '@modules/tools/domain/rentaDonations';
+import { generalCapitalOf, relatedLoanSplit } from '@modules/tools/domain/rentaCapitalGeneral';
 import { agrarianModules } from '@modules/finances/domain/agrarianModules';
 import { artisticReduction } from '@modules/tools/domain/rentaActivity';
 import { emptyForm, rentalOf, toInput } from '@modules/tools/domain/rentaForm';
@@ -271,6 +272,80 @@ const CHECKS: Record<string, () => void> = {
       figure('renta-c07-02', 'Reducción (30 % de 150.000)')
     );
     expect(round2(390000 - (125000 * rule.over) / 100)).toBe(figure('renta-c07-02', 'Exceso'));
+  },
+  'renta-c05-02': () => {
+    // The café let with its premises, fittings and furniture: a business lease, box 0046 of the
+    // general base. Expenses of the case: IBI 800, repair 1,100, administration 360, depreciation
+    // of the premises 900 and of the furniture 10 % of 15,000.
+    const lease = {
+      box: '0046' as const,
+      label: 'Cafetería',
+      income: 1300 * 12,
+      expenses: 800 + 1100 + 360 + 900 + 1500,
+    };
+    const r = generalCapitalOf([lease]);
+    expect(r.items[0].income).toBe(figure('renta-c05-02', 'Ingresos íntegros'));
+    expect(r.items[0].expenses).toBe(figure('renta-c05-02', 'Total gastos deducibles'));
+    expect(r.total).toBe(figure('renta-c05-02', 'Rendimiento neto reducido'));
+    // It goes to the general base, next to the pay.
+    const base = computeRenta(workReturn({ gross: '30000', socialSecurity: '2000' }));
+    const withLease = computeRenta(
+      workReturn({ gross: '30000', socialSecurity: '2000', generalCapital: [lease] })
+    );
+    expect(round2(withLease.taxBase - base.taxBase)).toBe(r.total);
+    // The tenant withholds 19 % of the rent (box 0597): typed with the other withholdings.
+    expect(round2(lease.income * 0.19)).toBe(figure('renta-c05-02', 'Retenciones'));
+  },
+  'renta-c05-03': () => {
+    // Loan of 70,000 € to a company with 50,000 € of own funds, 40 % of it the taxpayer's.
+    const split = relatedLoanSplit({ interest: 5000, loan: 70000, ownFunds: 50000, share: 40 });
+    // The Manual rounds the share to 14.29 % first (5,000 × 14.29 % = 714.50); exactly,
+    // 5,000 × 10,000 / 70,000 = 714.29: 0.21 € less in the general base and more in the savings.
+    expect(split).toEqual({ general: 714.29, savings: 4285.71 });
+    expect(
+      round2(figure('renta-c05-03', 'Intereses vinculada a base general') - split.general)
+    ).toBe(0.21);
+    // The rest of the savings: deposit 400, bonified bonds 210 (box 0028, typed with the interest),
+    // the bonds M (370) and the State debt (2,450); custody 41. The loss of the bonds T with the
+    // repurchase (−605) does not count this year and is not typed.
+    const s = savingsOf(
+      {
+        ...emptySavingsDetail(),
+        capital: {
+          interest: 400 + 210,
+          dividends: 0,
+          bills: 0,
+          assets: 370 + 2450,
+          insurance: 0,
+          expenses: 41,
+        },
+      },
+      2025
+    );
+    expect(round2(s.boxes['0036'] + split.savings)).toBe(
+      round2(figure('renta-c05-03', 'Rendimientos íntegros base ahorro') + 0.21)
+    );
+    expect(round2(s.boxes['0041'] + split.savings)).toBe(
+      round2(figure('renta-c05-03', 'Rendimiento neto base ahorro') + 0.21)
+    );
+    // In a return, the part of the savings is added to its base and the excess to the general one.
+    const loan = {
+      box: '0051' as const,
+      label: 'Préstamo a Z',
+      income: 0,
+      expenses: 0,
+      related: { interest: 5000, loan: 70000, ownFunds: 50000, share: 40 },
+    };
+    const r = computeRenta(
+      workReturn({ gross: '30000', socialSecurity: '2000', generalCapital: [loan] })
+    );
+    expect(r.generalCapital?.total).toBe(714.29);
+    expect(r.savingsBase).toBe(4285.71);
+    // Not worked out: the withholding not practised on the bonified bonds (22.8 % × 210 = 47.88),
+    // typed with the withholdings.
+    expect(round2(210 * 0.24 * 0.95)).toBe(
+      figure('renta-c05-03', 'Retenciones no practicadas deducibles')
+    );
   },
   'renta-c09-01': () => {
     // Maize, lambs (sheep meat: 0.09, Orden HAC/484/2026) and horticulture with their VAT
@@ -693,10 +768,6 @@ const CHECKS: Record<string, () => void> = {
 const PENDING: Record<string, string> = {
   'renta-c04-05':
     'Usufructo temporal (coste / años, hasta los ingresos): el motor amortiza el 3 % de un inmueble, no un derecho.',
-  'renta-c05-02':
-    'Arrendamiento de negocio: capital mobiliario de la base general (0046-0060), que el motor no recoge.',
-  'renta-c05-03':
-    'Préstamo a vinculada con exceso a la base general (art. 46.a) y bonificadas: el motor no lo recoge.',
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',

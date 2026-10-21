@@ -8,6 +8,7 @@ import {
 } from '../../domain/rentaForm';
 import type { RentaWorkExtras } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
+import { GeneralCapitalSection } from './GeneralCapital';
 
 /** Step 2: pay, withholdings, expenses of the job and contributions that lower the base. */
 export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWorkExtras }) {
@@ -94,6 +95,8 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
           </label>
         )}
       </details>
+
+      <GeneralCapitalSection form={form} set={set} />
 
       <details className="renta-group">
         <summary>{t('tools.renta.contributions')}</summary>
