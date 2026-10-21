@@ -71,6 +71,9 @@ const form = (concept = 'Cliente Secreto SL') => ({
         source: 'pdf',
         review: ['rate', 'issuer'],
         missing: ['date'],
+        // Under cash accounting: what was paid, for the 347 (invented).
+        cash: true,
+        collections: [{ date: '2026-03-01', amount: 848 }],
       },
     ],
     withholdings: [withholding(), withholding(), withholding(), withholding()],

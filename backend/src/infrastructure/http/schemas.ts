@@ -640,6 +640,13 @@ const savedInvoice = z
     vatId: z.string().max(20).optional(),
     key349: z.enum(KEYS_349).optional(),
     cash: z.boolean().optional(),
+    /** Collections or payments of a cash-accounting invoice, VAT included (the 347). */
+    collections: z
+      .array(
+        z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), amount: invoiceAmount }).strict()
+      )
+      .max(50)
+      .optional(),
     rateGuessed: z.boolean().optional(),
     /** The person corrected its VAT operation: a new import keeps it. */
     opFix: z.boolean().optional(),

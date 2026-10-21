@@ -51,8 +51,20 @@ export interface BookEntry {
   key349?: Key349;
   /** Under cash accounting (key 07): the VAT is due when collected or paid. */
   cash?: boolean;
+  /**
+   * The collections (issued) or payments (received) of an invoice under cash accounting, VAT
+   * included, when the book has those columns (an empty list: not collected yet). The 347 reports
+   * them apart (RGAT art. 34.1.j).
+   */
+  collections?: Collection[];
   /** The book gave no VAT rate for a purchase that self-assesses it: 21 % was assumed. */
   rateGuessed?: boolean;
+}
+
+/** A collection or payment of an invoice: its date and amount (VAT included). */
+export interface Collection {
+  date: string;
+  amount: number;
 }
 
 /** Rows that did not make it into the result, and why. */
@@ -129,6 +141,9 @@ interface Columns {
   vatId: number;
   country: number;
   idNumber: number;
+  /** The collection (issued) or payment (received) of a cash-accounting invoice: date and amount. */
+  collectionDate: number;
+  collectionAmount: number;
 }
 
 type Matcher = { include: RegExp[]; exclude?: RegExp };
@@ -208,6 +223,18 @@ const MATCHERS: Record<keyof Columns, Matcher[]> = {
   vatId: [{ include: [/nif.?iva/, /vat (id|number)/, /nif intracomunitario/] }],
   country: [{ include: [/codigo pais/] }],
   idNumber: [{ include: [/^identificacion$/] }],
+  // «Fecha cobro», «Importe pagado», or the AEAT layout: «Cobro (Operación Criterio de Caja…)» over
+  // «Fecha» and «Importe» (the lone «Importe» next to it is taken in columnsOf).
+  collectionDate: [{ include: [/fecha (de )?(cobro|pago)/, /\b(cobro|pago)\b.*\bfecha\b/] }],
+  collectionAmount: [
+    {
+      include: [
+        /importe (cobrado|pagado)/,
+        /importe (del )?(cobro|pago)/,
+        /\b(cobro|pago)\b.*\bimporte\b/,
+      ],
+    },
+  ],
 };
 
 function pick(headers: string[], matchers: Matcher[]): number {
@@ -260,6 +287,11 @@ function columnsOf(rows: BookCell[][], headerRow: number): Columns {
   const found = {} as Columns;
   for (const key of Object.keys(MATCHERS) as (keyof Columns)[])
     found[key] = pick(headers, MATCHERS[key]);
+  // The AEAT layout puts «Importe» on its own right after the date of the collection.
+  if (found.collectionDate >= 0 && found.collectionAmount < 0) {
+    const next = found.collectionDate + 1;
+    if (headers[next] === 'importe') found.collectionAmount = next;
+  }
   return found;
 }
 
@@ -359,7 +391,25 @@ function entryOf(
     ...periodOf(row, col),
     ...vatInfo,
     ...guessed,
+    ...collectionsOf(row, col, vatInfo.cash === true, round2(base + vat)),
   };
+}
+
+/**
+ * The collection or payment of a cash-accounting invoice, when the book has its columns: one per
+ * row (its amount, or the whole invoice when only the date is there); none yet without a date.
+ */
+function collectionsOf(
+  row: BookCell[],
+  col: Columns,
+  cash: boolean,
+  total: number
+): Pick<BookEntry, 'collections'> {
+  if (!cash || col.collectionDate < 0) return {};
+  const date = parseBookDate(row[col.collectionDate]);
+  if (!date) return { collections: [] };
+  const amount = col.collectionAmount >= 0 ? bookNumber(row[col.collectionAmount]) : NaN;
+  return { collections: [{ date, amount: Number.isFinite(amount) ? round2(amount) : total }] };
 }
 
 /**

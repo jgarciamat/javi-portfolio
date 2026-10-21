@@ -2,7 +2,7 @@
  * Files of the informative returns 190, 180 and 347, written from their record designs and read
  * back field by field. Every person, tax id, address and amount here is invented.
  */
-import { recordId } from '@modules/finances/application/aeatFiles/annualFiles';
+import { recordId, recordsOf } from '@modules/finances/application/aeatFiles/annualFiles';
 import { readText } from '@modules/finances/application/aeatFiles/fixedWidth';
 import {
   euros,
@@ -274,6 +274,8 @@ const rec = (over: Partial<Record347>): Record347 => ({
   premises: false,
   withheld: false,
   reverse: false,
+  cash: false,
+  cashTotal: null,
   ...over,
 });
 
@@ -341,6 +343,27 @@ describe('Modelo 347', () => {
     const [one] = built.file!.text.split('\r\n');
     expect(one[144]).toBe('N');
     expect(euros(one, 145, 16, true)).toBe(-4000);
+  });
+
+  it('writes the cash operations apart: «X» at 281, the cash amount at 284-299, no quarters', () => {
+    // Case 347-03 (a), first year: 4,000.00 by the general rule and 2,500.00 collected.
+    const cash = rec({ total: 4000, quarters: [0, 0, 0, 0], cash: true, cashTotal: 2500 });
+    const dd = { ...base, records: { [recordId('347', cash)]: { province: '08' } } };
+    const sum = { ...summary, records: [cash], warnings: [] };
+    const built = buildSedeFile({ model: '347', year: 2025, summary: sum }, dd);
+    expect(built.checks).toEqual([]);
+    const [r] = readInformative(built.file!.text).details;
+    expect(r[280]).toBe('X');
+    expect(euros(r, 83, 16, true)).toBe(4000);
+    expect(euros(r, 284, 16, true)).toBe(2500);
+    expect([136, 168, 200, 232].map((p) => euros(r, p, 16, true))).toEqual([0, 0, 0, 0]);
+    // The same person with operations by the general rule too: its data is asked once.
+    const both = { ...sum, records: [rec({}), cash] };
+    expect(recordsOf({ model: '347', year: 2025, summary: both })).toHaveLength(1);
+    // Without the collections the cash amount is not known: no file.
+    const unknown = { ...sum, records: [{ ...cash, cashTotal: null }] };
+    const stopped = buildSedeFile({ model: '347', year: 2025, summary: unknown }, dd);
+    expect([errors(stopped), stopped.file]).toEqual([['cash347'], null]);
   });
 
   it('asks for the NIF and province of each person and warns of withholdings and unknown figures', () => {

@@ -106,6 +106,8 @@ describe('Withholdings you make, in step 2', () => {
       receipt: '1150000000001',
     });
     expect('complement111' in (latest.withholdings?.[1] ?? {})).toBe(false);
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.wh.complement.on.111')));
+    expect(latest.withholdings?.[1].complement111).toEqual({ result: '', receipt: '' });
     fireEvent.click(screen.getByLabelText(tr('app.autonomo.wh.complement.on.115')));
     expect(latest.withholdings?.[1].complement115).toBeUndefined();
   });

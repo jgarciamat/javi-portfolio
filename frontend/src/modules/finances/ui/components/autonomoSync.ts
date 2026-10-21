@@ -229,6 +229,10 @@ function vatOfInvoice(i: ManualForm['invoices'][number]): Partial<ManualForm['in
     ...(i.vatId ? { vatId: i.vatId } : {}),
     ...(i.key349 ? { key349: i.key349 } : {}),
     ...Object.fromEntries(flags.map((f) => [f, true])),
+    // The collections of a cash-accounting invoice, for the 347 (an empty list: none yet).
+    ...(i.collections
+      ? { collections: i.collections.map((c) => ({ date: c.date, amount: c.amount })) }
+      : {}),
   };
 }
 

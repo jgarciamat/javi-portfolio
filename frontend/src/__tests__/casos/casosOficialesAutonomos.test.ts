@@ -149,14 +149,50 @@ const CHECKS: Record<string, () => void> = {
     ]);
   },
   '347-03': () => {
-    // (b) The tenant of business premises: key A, marked as the rent of premises, 10,000 € a year.
+    // (a) The supplier under the cash regime bills 4,000 € in February, collects 2,500 € in November
+    // and 1,500 € the next year: the general rule gives 4,000 € and then 0 €; the cash rule 2,500 €
+    // and 1,500 € (RGAT arts. 34.1.j and 35.1; LIVA art. 163 terdecies).
+    const sold = invoice({
+      book: 'issued',
+      base: 3305.79,
+      vat: 694.21,
+      date: '2025-02-14',
+      cash: true,
+      concept: 'Cliente Ficticio',
+      collections: [
+        { date: '2025-11-20', amount: 2500 },
+        { date: '2026-03-10', amount: 1500 },
+      ],
+    });
+    const cash = (year: number) =>
+      summary347(year, [sold]).records.map((r) => [r.key, r.cash, r.total, r.cashTotal]);
+    expect(cash(2025)).toEqual([
+      ['B', true, figure('347-03', '(a) Año 1 clave B'), figure('347-03', '(a) Año 1 – importe')],
+    ]);
+    expect(cash(2026)).toEqual([
+      ['B', true, figure('347-03', '(a) Año 2 clave B'), figure('347-03', '(a) Año 2 – importe')],
+    ]);
+    // (b) The tenant of business premises of a landlord under the cash regime: key A, marked as the
+    // rent of premises and as cash, 10,000 € a year by both rules (paid within the year).
     const s = summary347(2026, [
-      invoice({ kind: 'rent', base: 10000, vat: 0, concept: 'Arrendador Ficticio' }),
+      invoice({
+        kind: 'rent',
+        base: 10000,
+        vat: 0,
+        cash: true,
+        concept: 'Arrendador Ficticio',
+        collections: [{ date: '2026-12-01', amount: 10000 }],
+      }),
     ]);
-    expect(s.records.map((r) => [r.key, r.premises, r.total])).toEqual([
-      ['A', true, figure('347-03', '(b) Arrendatario')],
+    expect(s.records.map((r) => [r.key, r.premises, r.cash, r.total, r.cashTotal])).toEqual([
+      [
+        'A',
+        true,
+        true,
+        figure('347-03', '(b) Arrendatario'),
+        figure('347-03', '(b) Importe criterio de caja'),
+      ],
     ]);
-    // (a) The amounts of the cash-accounting regime (2,500 and 1,500 €) are not worked out: see todo.
   },
   '347-04': () => {
     // The supplier invoices on 20 March (1T); the client records it on 30 April (2T): each one in its quarter.
@@ -312,9 +348,6 @@ describe('casos oficiales de autónomos (303 simplificado, 347, 720, RETA; 111, 
     if (check) it(label, check);
     else it.todo(`${label} — ${TODO[c.id]}`);
   }
-  it.todo(
-    '347-03 (a) — PENDIENTE: el importe por criterio de caja (art. 34.1 RGAT, 2.500 y 1.500 €) no se calcula'
-  );
   it.todo(
     'RETA-01 y RETA-02, cuota de 2023 — PENDIENTE: la app solo tiene la tabla de 2026 (Orden PJC/297/2026)'
   );

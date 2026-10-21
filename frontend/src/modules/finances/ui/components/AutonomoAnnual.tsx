@@ -6,6 +6,7 @@ import {
   summary180,
   summary190,
   summary347,
+  type Record347,
   type Summary347,
   type SummaryWarning,
   type Warning347,
@@ -95,6 +96,14 @@ function Withholding({ summary, year }: { summary: YearSummary; year: number }) 
   );
 }
 
+/** A person of the 347, with the amount accrued by the cash rule when the record is a cash one. */
+function whoOf347(t: Translate, money: Money, r: Record347): string {
+  const who = t(key(`key.${r.key}`), { who: r.name });
+  if (!r.cash) return who;
+  if (r.cashTotal === null) return t(key('cash347Unknown'), { who });
+  return t(key('cash347'), { who, amount: money(r.cashTotal) });
+}
+
 function Operations({ summary, year }: { summary: Summary347; year: number }) {
   const { t } = useI18n();
   const { money } = useFormat();
@@ -108,7 +117,7 @@ function Operations({ summary, year }: { summary: Summary347; year: number }) {
           <Boxes title={t(key('summary'))} boxes={summary.boxes} />
           <Records
             rows={summary.records.map((r) => ({
-              who: t(key(`key.${r.key}`), { who: r.name }),
+              who: whoOf347(t, money, r),
               nif: r.nif,
               amount: r.total,
             }))}

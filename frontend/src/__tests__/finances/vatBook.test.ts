@@ -273,6 +273,48 @@ describe('Books with the VAT columns of the AEAT layout', () => {
     expect(service.rateGuessed).toBeUndefined();
   });
 
+  it('reads the collections of the cash-accounting invoices, for the 347', () => {
+    // The AEAT layout: «Cobro (Operación Criterio de Caja…)» over «Fecha» and «Importe». Key 07 is
+    // the cash regime; an empty date means not collected yet; a plain invoice keeps no collections.
+    const book: BookCell[][] = [
+      [
+        'Fecha Expedición',
+        'Nombre Destinatario',
+        'Clave de Operación',
+        'Base Imponible',
+        'Tipo de IVA',
+        'Cuota IVA Repercutida',
+        'Cobro (Operación Criterio de Caja de IVA y/o artículo 7.2.1º de Reglamento del IRPF)',
+        null,
+      ],
+      [null, null, null, null, null, null, 'Fecha', 'Importe'],
+      ['14/02/2026', 'Cliente Caja', '07', 1000, 21, 210, '20/11/2026', '605,00'],
+      ['15/02/2026', 'Pendiente', '07', 1000, 21, 210, null, null],
+      ['16/02/2026', 'General', '01', 1000, 21, 210, '16/02/2026', 1210],
+    ];
+    const parsed = parseInvoiceBook(book, 'issued', 2026);
+    if (!parsed.ok) throw new Error('no');
+    const [paid, open, plain] = parsed.result.entries;
+    expect(paid).toMatchObject({ cash: true, collections: [{ date: '2026-11-20', amount: 605 }] });
+    expect(open).toMatchObject({ cash: true, collections: [] });
+    expect(plain.collections).toBeUndefined();
+    // A simple sheet: «Fecha de pago» alone takes the whole invoice; «Importe pagado» its own amount.
+    const simple = (headings: string[], cells: (string | number)[]) =>
+      parseInvoiceBook(
+        [
+          ['Fecha', 'Proveedor', 'Base imponible', 'Tipo IVA', 'Clave de operación', ...headings],
+          ['10/03/2026', 'Proveedor Caja', 1000, 21, '07', ...cells],
+        ],
+        'received',
+        2026
+      );
+    const whole = simple(['Fecha de pago'], ['30/04/2026']);
+    const part = simple(['Fecha de pago', 'Importe pagado'], ['30/04/2026', 500]);
+    if (!whole.ok || !part.ok) throw new Error('no');
+    expect(whole.result.entries[0].collections).toEqual([{ date: '2026-04-30', amount: 1210 }]);
+    expect(part.result.entries[0].collections).toEqual([{ date: '2026-04-30', amount: 500 }]);
+  });
+
   it('keeps the plain domestic invoices as they were (no VAT fields)', () => {
     const parsed = parseInvoiceBook(
       [

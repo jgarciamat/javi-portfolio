@@ -134,6 +134,8 @@ function plan347(source: Extract<Informative, { model: '347' }>, d: Declarant): 
   for (const r of summary.records) {
     checks.push(...personChecks('347', r, extraOf(d, recordId('347', r))));
     if (r.withheld) checks.push(warn('withheld347', { who: r.name }));
+    // The amount by the cash rule cannot be guessed: without the collections, no file.
+    if (r.cash && r.cashTotal === null) checks.push(error('cash347', { who: r.name }));
   }
   for (const w of summary.warnings)
     if (w.code === 'notSubject') checks.push(warn('notSubject347', { who: w.who }));
@@ -158,7 +160,7 @@ export function recordsOf(
 ): { id: string; who: string; nif: string | null; key: string | null }[] {
   const list: { key?: string | null; nif: string | null; name: string; typed?: boolean }[] =
     source.summary.records;
-  return list
+  const rows = list
     .filter((r) => !r.typed)
     .map((r) => ({
       id: recordId(source.model, r),
@@ -167,4 +169,6 @@ export function recordsOf(
       // Only the 347 shows its key (A purchases, B sales): every record of it has one.
       key: source.model === '347' ? (r.key as string) : null,
     }));
+  // One person may have two records of the 347 (cash operations apart): their data is asked once.
+  return rows.filter((r, i) => rows.findIndex((x) => x.id === r.id) === i);
 }

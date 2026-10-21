@@ -164,6 +164,39 @@ describe('The yearly summaries of the self-employed screen', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows what the cash invoices accrued by the cash rule, or that their collections are missing', () => {
+    // 4,000 € billed under the cash regime, 2,500 € collected (case 347-03); another client without
+    // its collections.
+    show({
+      ...emptyManual(),
+      invoices: [
+        invoice({
+          concept: 'Caja Uno',
+          book: 'issued',
+          base: 4000,
+          vat: 0,
+          cash: true,
+          collections: [{ date: '2026-11-20', amount: 2500 }],
+        }),
+        invoice({ concept: 'Caja Dos', book: 'issued', base: 5000, vat: 0, cash: true }),
+      ],
+    });
+    const who = (name: string) => tr('app.autonomo.annual.key.B', { who: name });
+    expect(
+      screen.getByText(
+        spaced(tr('app.autonomo.annual.cash347', { who: who('Caja Uno'), amount: money(2500) }))
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(tr('app.autonomo.annual.cash347Unknown', { who: who('Caja Dos') }))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(tr('app.autonomo.annual.warn347.cashUnknown', { who: 'Caja Dos' }), {
+        exact: false,
+      })
+    ).toBeInTheDocument();
+  });
+
   it('warns of the 714 when the assets pass 2,000,000 €', () => {
     show(emptyManual());
     fireEvent.click(screen.getByText(tr('app.autonomo.annual.wealth.title')));

@@ -187,7 +187,11 @@ export interface Declared347 extends Record347 {
   province: string;
 }
 
-/** The 347: type 1, then one type 2 «declarado» per person and key [DR347]. */
+/**
+ * The 347: type 1, then one type 2 «declarado» per person and key [DR347]; the operations under the
+ * cash regime of VAT in a record of their own, marked at 281 with their cash amount at 284-299
+ * (their quarters come at zero from the summary).
+ */
 export function write347(h: InformativeHead, people: Declared347[]): string {
   const one = head(h).number(136, 9, people.length);
   signed(one, 145, 16, total(people.map((p) => p.total)));
@@ -203,6 +207,7 @@ export function write347(h: InformativeHead, people: Declared347[]): string {
       .put(100, p.premises ? 'X' : ' ')
       .number(101, 15, 0)
       .number(132, 4, 0)
+      .put(281, p.cash ? 'X' : ' ')
       .put(282, p.reverse ? 'X' : ' ')
       .number(300, 6, 0);
     signed(line, 83, 16, p.total);
@@ -211,7 +216,7 @@ export function write347(h: InformativeHead, people: Declared347[]): string {
       signed(line, 136 + i * 32, 16, q);
       signed(line, 152 + i * 32, 16, 0);
     });
-    signed(line, 284, 16, 0);
+    signed(line, 284, 16, p.cashTotal ?? 0);
     return line;
   });
   return join([one, ...twos]);
