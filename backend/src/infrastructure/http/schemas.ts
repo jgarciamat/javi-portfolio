@@ -647,6 +647,7 @@ const savedInvoice = z
   .strict();
 const filedResult = z.number().finite().min(-100_000_000).max(100_000_000).nullable();
 const savedPayees = z.object({ people: formText, paid: formText, withheld: formText }).strict();
+const savedComplement = z.object({ result: formText, receipt: formText }).strict();
 const savedWithholding = z
   .object({
     staff: z
@@ -663,6 +664,9 @@ const savedWithholding = z
     rent: savedPayees,
     filed111: z.boolean(),
     filed115: z.boolean(),
+    /** A complementaria: result and 13-digit number of the form filed before (frontend withholdingForm.ts). */
+    complement111: savedComplement.optional(),
+    complement115: savedComplement.optional(),
   })
   .strict();
 // The activity of the year as typed (frontend activityForm.ts): assets, grants, modules.

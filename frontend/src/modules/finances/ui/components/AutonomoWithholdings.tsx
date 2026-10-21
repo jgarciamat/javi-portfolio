@@ -10,10 +10,12 @@ import { Boxes } from './AutonomoDraftResult';
 import { WithholdingFormPreviews } from '@modules/taxforms/ui/FormPreviews';
 import { SedeFiles, sedeSourcesOfWithholdings } from './SedeFiles';
 import {
+  emptyComplement,
   emptyWithholding,
   withWithholding,
   withholdingsOf,
   withholdingsOfForm,
+  type ComplementForm,
   type WithholdingForm,
 } from './withholdingForm';
 import type { ManualForm } from './AutonomoManual';
@@ -57,19 +59,22 @@ export function explainWithholdings(
         ]
       : []),
   ];
+  // A complementaria says what was already paid with the form it completes.
+  const paid = (r: WithholdingResult['m111'] | WithholdingResult['m115']) =>
+    r.previous ? ` ${t(key('explain.complement'), { paid: money(r.previous.result) })}` : '';
   return {
     m111:
-      m111.result === 'pay'
+      (m111.result === 'pay'
         ? t(key('explain.111.pay'), { due: money(m111.due), parts: both(t, parts) })
-        : t(key(`explain.111.${m111.result}`)),
+        : t(key(`explain.111.${m111.result}`))) + paid(m111),
     m115:
-      m115.result === 'pay'
+      (m115.result === 'pay'
         ? t(key('explain.115.pay'), {
             due: money(m115.due),
             base: money(m115.base),
             who: people(t, 'landlords', m115.people),
           })
-        : t(key(`explain.115.${m115.result}`)),
+        : t(key(`explain.115.${m115.result}`))) + paid(m115),
   };
 }
 
@@ -85,6 +90,7 @@ function warningText(t: Translate, w: WithholdingWarning): string {
       : {}),
     ...(w.code === 'rentNoRetention' ? { year: w.year } : {}),
     ...('part' in w ? { part: t(key(`part.${w.part}`)) } : {}),
+    ...('model' in w ? { model: w.model } : {}),
   });
 }
 
@@ -152,6 +158,53 @@ function PartFields({
         onChange={(withheld) => onChange({ withheld })}
       />
     </div>
+  );
+}
+
+/**
+ * A complementaria of the 111 or the 115 already filed for the quarter: its result goes to box 29
+ * (04 in the 115) and its 13-digit number to the file (instructions of the 111).
+ */
+function ComplementFields({
+  model,
+  q,
+  value,
+  onChange,
+}: {
+  model: '111' | '115';
+  q: number;
+  value: ComplementForm | undefined;
+  onChange: (value: ComplementForm | undefined) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <>
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={value !== undefined}
+          onChange={(e) => onChange(e.target.checked ? emptyComplement() : undefined)}
+        />
+        <span>{t(key(`complement.on.${model}`))}</span>
+      </label>
+      {value && (
+        <div className="autonomo-grid">
+          <Amount
+            label={t(key(`complement.result.${model}`))}
+            q={q}
+            value={value.result}
+            onChange={(result) => onChange({ ...value, result })}
+          />
+          <Amount
+            label={t(key('complement.receipt'))}
+            q={q}
+            numeric
+            value={value.receipt}
+            onChange={(receipt) => onChange({ ...value, receipt })}
+          />
+        </div>
+      )}
+    </>
   );
 }
 
@@ -263,6 +316,21 @@ function QuarterWithholdings({
             q={q}
             values={value.rent}
             onChange={(patch) => onChange({ rent: { ...value.rent, ...patch } })}
+          />
+
+          <h4>{t(key('complement.title'))}</h4>
+          <p className="section-hint">{t(key('complement.hint'))}</p>
+          <ComplementFields
+            model="111"
+            q={q}
+            value={value.complement111}
+            onChange={(complement111) => onChange({ complement111 })}
+          />
+          <ComplementFields
+            model="115"
+            q={q}
+            value={value.complement115}
+            onChange={(complement115) => onChange({ complement115 })}
           />
         </>
       )}

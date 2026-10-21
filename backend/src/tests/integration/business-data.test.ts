@@ -93,6 +93,8 @@ const withholding = () => ({
   rent: { people: '', paid: '', withheld: '' },
   filed111: false,
   filed115: true,
+  // A complementaria of the 115 of the quarter (invented receipt number).
+  complement115: { result: '150', receipt: '1150000000001' },
 });
 
 describe('The self-employed form saved in the account', () => {

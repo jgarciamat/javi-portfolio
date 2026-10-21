@@ -9,7 +9,10 @@ import {
   WithholdingsPanel,
   explainWithholdings,
 } from '@modules/finances/ui/components/AutonomoWithholdings';
-import { withWithholding } from '@modules/finances/ui/components/withholdingForm';
+import {
+  withWithholding,
+  withholdingsOfForm,
+} from '@modules/finances/ui/components/withholdingForm';
 import { withholdingsFor, type WithholdingQuarter } from '@modules/finances/domain/withholdings';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
 import { createFakeApi } from '@test-utils/fakeApi';
@@ -88,6 +91,23 @@ describe('Withholdings you make, in step 2', () => {
     expect(
       screen.getByText(spaced(tr('app.autonomo.wh.totals', { m111: money(930), m115: money(0) })))
     ).toBeInTheDocument();
+  });
+
+  it('takes a complementaria of the 111 or the 115 already filed, and can take it back', () => {
+    renderWithProviders(<FormHarness start={emptyManual()} />, { authenticated: false });
+    expect(
+      screen.queryByLabelText(new RegExp(tr('app.autonomo.wh.complement.receipt')))
+    ).toBeNull();
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.wh.complement.on.115')));
+    type('app.autonomo.wh.complement.result.115', '150');
+    type('app.autonomo.wh.complement.receipt', '1150000000001');
+    expect(latest.withholdings?.[1].complement115).toEqual({
+      result: '150',
+      receipt: '1150000000001',
+    });
+    expect('complement111' in (latest.withholdings?.[1] ?? {})).toBe(false);
+    fireEvent.click(screen.getByLabelText(tr('app.autonomo.wh.complement.on.115')));
+    expect(latest.withholdings?.[1].complement115).toBeUndefined();
   });
 
   it('says which quarters came from a filed form, and can take that back', () => {
@@ -267,6 +287,30 @@ describe('The panel of the modelos 111 and 115, in step 3', () => {
       within(tables[0]).getByText('Actividades económicas dinerarios · N.º perceptores').nextSibling
     ).toHaveTextContent(/^2$/);
     expect(within(tables[1]).getAllByText(spaced(money(76)))).toHaveLength(2);
+  });
+
+  it('takes off what the form filed before paid, and warns when it is not more', () => {
+    // 1,000 € of rent at 19 % = 190 €; 150 € filed before → 40 € (case 115-01). The 111: 200 € at
+    // 15 % = 30 €, 30 € filed before → nothing more to pay: not a complementaria.
+    let form = withWithholding(emptyManual(), 2, {
+      rent: { people: '1', paid: '1000', withheld: '190' },
+      complement115: { result: '150', receipt: '1150000000001' },
+    });
+    form = withWithholding(form, 2, {
+      pros: { people: '1', paid: '200', withheld: '30' },
+      complement111: { result: '30', receipt: ' 1110000000001 ' },
+    });
+    expect(withholdingsOfForm(form, 2026, 2).m111.previous?.receipt).toBe('1110000000001');
+    renderWithProviders(
+      <WithholdingsPanel form={form} year={2026} quarter={2} onFocus={jest.fn()} />,
+      { authenticated: false }
+    );
+    const panel = screen.getByRole('region', { name: tr('app.autonomo.wh.title') });
+    expect(panel).toHaveTextContent(
+      spaced(tr('app.autonomo.wh.explain.complement', { paid: money(150) }))
+    );
+    expect(panel).toHaveTextContent(tr('app.autonomo.wh.warn.notHigher', { model: '111' }));
+    expect(within(panel).getAllByText(spaced(money(40))).length).toBeGreaterThan(0);
   });
 
   it('has no boxes and no warnings for a quarter without withholdings', () => {

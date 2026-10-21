@@ -10,6 +10,14 @@ import { quarterFrom111, quarterFrom115, type TaxModelPdf } from '../../domain/t
 import type { ManualForm } from './AutonomoManual';
 import type { Applied, Line } from './importFiles';
 
+/** The form filed before, when the one of the quarter is its complementaria (as typed). */
+export interface ComplementForm {
+  /** Its result: box 30 of the 111, box 05 of the 115. */
+  result: string;
+  /** The 13-digit number printed next to its barcode. */
+  receipt: string;
+}
+
 /** The withholdings of a quarter typed by hand, as text so the fields can be edited freely. */
 export interface WithholdingForm {
   /** Employees (modelo 111, boxes 01-06), from their payslips. */
@@ -28,7 +36,12 @@ export interface WithholdingForm {
   /** Filled from a filed modelo 111 / 115: the invoices of the quarter do not add to it. */
   filed111: boolean;
   filed115: boolean;
+  /** This 111 / 115 completes one already filed for the quarter (absent: an ordinary one). */
+  complement111?: ComplementForm;
+  complement115?: ComplementForm;
 }
+
+export const emptyComplement = (): ComplementForm => ({ result: '', receipt: '' });
 
 export const emptyWithholding = (): WithholdingForm => ({
   staff: { people: '', paid: '', withheld: '', kindPeople: '', kindPaid: '', kindWithheld: '' },
@@ -65,8 +78,24 @@ export function normalWithholding(form: Partial<WithholdingForm> | undefined): W
     rent: { people: rent.people, paid: rent.paid, withheld: rent.withheld },
     filed111: form?.filed111 === true,
     filed115: form?.filed115 === true,
+    ...complementOf('complement111', form?.complement111),
+    ...complementOf('complement115', form?.complement115),
   };
 }
+
+/** A complementaria of the form, only when the person marked it (older data has none). */
+function complementOf(
+  name: 'complement111' | 'complement115',
+  value: Partial<ComplementForm> | undefined
+): Partial<WithholdingForm> {
+  if (!value) return {};
+  const c = { ...emptyComplement(), ...value };
+  return { [name]: { result: c.result, receipt: c.receipt } };
+}
+
+/** The form filed before as numbers: its result and its number without blanks. */
+const previousOf = (c: ComplementForm | undefined) =>
+  c ? { result: num(c.result), receipt: c.receipt.replace(/\s/g, '') } : null;
 
 /** The four quarters, whatever was stored. */
 export const withholdingsOf = (manual: Pick<ManualForm, 'withholdings'>): WithholdingForm[] =>
@@ -92,6 +121,8 @@ export function toWithholdingQuarter(form: WithholdingForm): WithholdingQuarter 
     rent: payee(form.rent),
     filed111: form.filed111,
     filed115: form.filed115,
+    previous111: previousOf(form.complement111),
+    previous115: previousOf(form.complement115),
   };
 }
 

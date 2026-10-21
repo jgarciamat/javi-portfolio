@@ -254,7 +254,17 @@ const CHECKS: Record<string, () => void> = {
     });
     for (const id of ['01', '02', '03'])
       expect(r.m115.boxes.find((b) => b.box === id)!.amount).toBe(boxFigure('115-01', id));
-    // Boxes 04-05 of the complementaria (150 € filed before, 40 € to pay) are not worked out: see todo.
+    // The complementaria: 150 € filed before (15 % by mistake) go to box 04; box 05 = 03 − 04.
+    const c = withholdingsFor({
+      year: 2026,
+      quarter: 1,
+      invoices: [invoice({ kind: 'rent', base: 1000, retention: 190, concept: 'Local Ficticio' })],
+      data: { ...noTyped, previous115: { result: 150, receipt: '1150000000001' } },
+      income: 5000,
+    });
+    for (const id of ['01', '02', '03', '04', '05'])
+      expect(c.m115.boxes.find((b) => b.box === id)!.amount).toBe(boxFigure('115-01', id));
+    expect([c.m115.due, c.m115.result, c.warnings]).toEqual([boxFigure('115-01', '05'), 'pay', []]);
   },
   '190-01': () => {
     // 15,000 € paid to a designer through the year with 15 %: key G, subkey 01.
@@ -304,9 +314,6 @@ describe('casos oficiales de autónomos (303 simplificado, 347, 720, RETA; 111, 
   }
   it.todo(
     '347-03 (a) — PENDIENTE: el importe por criterio de caja (art. 34.1 RGAT, 2.500 y 1.500 €) no se calcula'
-  );
-  it.todo(
-    '115-01 complementaria — PENDIENTE: la casilla 04 (resultado de la declaración anterior) no se rellena'
   );
   it.todo(
     'RETA-01 y RETA-02, cuota de 2023 — PENDIENTE: la app solo tiene la tabla de 2026 (Orden PJC/297/2026)'

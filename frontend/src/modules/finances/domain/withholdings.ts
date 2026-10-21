@@ -15,6 +15,12 @@ import type { TaxBox } from './types';
  *   and the order that approved it, https://www.boe.es/boe/dias/2000/11/28/pdfs/A41078-41132.pdf
  * - Rates and exemptions: RIRPF (Real Decreto 439/2007) arts. 75.3.g, 95.1, 100 and 101,
  *   https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820, and LIRPF art. 101.
+ * - The complementaria (checked 22 October 2026): instructions of the 111, boxes 29 and 30 and
+ *   «Complementaria» (box 29 = result of the form filed before for the same period; box 30 always
+ *   positive; the 13-digit number of that form), the record designs (111: 538 «X», 539 number;
+ *   115: 192 and 193, boxes 04 and 05 = 03 − 04) and LGT art. 122.2 (only when more is to be paid;
+ *   otherwise a rectification, arts. 120.3 and 221.4),
+ *   https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186
  * - Deadlines and the «negativa»: RIRPF art. 108.1 and the 2026 calendar of the AEAT,
  *   https://sede.agenciatributaria.gob.es/Sede/ayuda/calendario-contribuyente/calendario-contribuyente-2026/plazos-presentacion-autoliquidaciones-domiciliacion-bancaria.html
  *
@@ -44,6 +50,14 @@ export interface PayeeFigures {
   withheld: number;
 }
 
+/** The form filed before for the same quarter, when this one is a complementaria. */
+export interface PreviousFiling {
+  /** Its result: box 30 of the 111, box 05 of the 115. */
+  result: number;
+  /** The 13-digit number printed next to its barcode (the receipt of the sede). */
+  receipt: string;
+}
+
 export interface WithholdingQuarter {
   staff: StaffFigures;
   pros: PayeeFigures;
@@ -51,6 +65,9 @@ export interface WithholdingQuarter {
   /** A filed modelo 111 / 115 was imported: its figures stand and the invoices do not add to them. */
   filed111: boolean;
   filed115: boolean;
+  /** A complementaria of a form already filed for the quarter (older data: none). */
+  previous111?: PreviousFiling | null;
+  previous115?: PreviousFiling | null;
 }
 
 export type WithholdingWarning =
@@ -65,7 +82,9 @@ export type WithholdingWarning =
   /** More withheld than paid. */
   | { code: 'over'; part: 'staff' | 'pros' | 'rent' }
   /** Withholdings in a quarter without income: they are paid all the same. */
-  | { code: 'noIncome' };
+  | { code: 'noIncome' }
+  /** A complementaria that does not pay more than the form filed before (LGT art. 122.2). */
+  | { code: 'notHigher'; model: '111' | '115' };
 
 export interface ModelResult {
   boxes: TaxBox[];
@@ -76,6 +95,8 @@ export interface ModelResult {
    * `zero`: paid but nothing withheld, a «negativa» is filed; `pay`: there is something to pay.
    */
   result: 'none' | 'zero' | 'pay';
+  /** The form filed before, when this one is its complementaria. */
+  previous?: PreviousFiling | null;
 }
 
 export interface Result111 extends ModelResult {
@@ -153,9 +174,21 @@ const box = (id: string, label: string, amount: number): TaxBox => ({ box: id, l
 const resultOf = (payees: number, due: number): ModelResult['result'] =>
   due > 0 ? 'pay' : payees > 0 ? 'zero' : 'none';
 
+/** The result less the form filed before (boxes 29-30 / 04-05); nothing to pay below zero. */
+function complementOf(total: number, previous: PreviousFiling | null | undefined) {
+  const before = previous ? previous.result : 0;
+  const box = round2(total - before);
+  return { before, box, due: Math.max(0, box), previous: previous ?? null };
+}
+
 /** The modelo 111 of the quarter: employees (01-06) and professionals (07-09), then the result. */
-function form111(staff: StaffFigures, pros: Result111['pros']): Result111 {
+function form111(
+  staff: StaffFigures,
+  pros: Result111['pros'],
+  previous?: PreviousFiling | null
+): Result111 {
   const total = round2(staff.withheld + staff.kindWithheld + pros.withheld);
+  const c = complementOf(total, previous);
   const boxes = [
     box('01', 'Rendimientos del trabajo dinerarios · N.º perceptores', staff.people),
     box('02', 'Rendimientos del trabajo dinerarios · Importe de las percepciones', staff.paid),
@@ -175,13 +208,14 @@ function form111(staff: StaffFigures, pros: Result111['pros']): Result111 {
     box('08', 'Actividades económicas dinerarios · Importe de las percepciones', pros.base),
     box('09', 'Actividades económicas dinerarios · Importe de las retenciones', pros.withheld),
     box('28', 'Suma retenciones e ingresos a cuenta', total),
-    box('29', 'Resultado de anteriores declaraciones (complementaria)', 0),
-    box('30', 'Resultado a ingresar (28 - 29)', total),
+    box('29', 'Resultado de anteriores declaraciones (complementaria)', c.before),
+    box('30', 'Resultado a ingresar (28 - 29)', c.box),
   ];
   return {
     boxes,
-    due: total,
-    result: resultOf(staff.people + staff.kindPeople + pros.people, total),
+    due: c.due,
+    result: resultOf(staff.people + staff.kindPeople + pros.people, c.due),
+    previous: c.previous,
     staff: {
       people: staff.people + staff.kindPeople,
       withheld: round2(staff.withheld + staff.kindWithheld),
@@ -191,16 +225,33 @@ function form111(staff: StaffFigures, pros: Result111['pros']): Result111 {
 }
 
 /** The modelo 115 of the quarter: the landlords, the base, the withholdings and the result. */
-function form115(people: number, base: number, withheld: number): Result115 {
+function form115(
+  people: number,
+  base: number,
+  withheld: number,
+  previous?: PreviousFiling | null
+): Result115 {
+  const c = complementOf(withheld, previous);
   const boxes = [
     box('01', 'Número perceptores', people),
     box('02', 'Base retenciones e ingresos a cuenta', base),
     box('03', 'Retenciones e ingresos a cuenta', withheld),
-    box('04', 'Resultado de anteriores declaraciones (complementaria)', 0),
-    box('05', 'Resultado a ingresar (03 - 04)', withheld),
+    box('04', 'Resultado de anteriores declaraciones (complementaria)', c.before),
+    box('05', 'Resultado a ingresar (03 - 04)', c.box),
   ];
-  return { boxes, due: withheld, result: resultOf(people, withheld), people, base };
+  return {
+    boxes,
+    due: c.due,
+    result: resultOf(people, c.due),
+    previous: c.previous,
+    people,
+    base,
+  };
 }
+
+/** A complementaria must pay more than the form it completes (LGT art. 122.2). */
+const notHigher = (model: '111' | '115', r: ModelResult): WithholdingWarning[] =>
+  r.previous && r.due <= 0 ? [{ code: 'notHigher', model }] : [];
 
 /** A rent of premises: by its kind or because the person sent its withholding to the 115. */
 const isRent = (i: ImportedInvoice) =>
@@ -282,15 +333,20 @@ export function withholdingsFor({
   };
   const pros = sum('professional', data.filed111);
   const rent = sum('rent', data.filed115);
-  const m111 = form111(data.staff, {
-    people: pros.people + data.pros.people,
-    base: round2(pros.base + data.pros.paid),
-    withheld: round2(pros.withheld + data.pros.withheld),
-  });
+  const m111 = form111(
+    data.staff,
+    {
+      people: pros.people + data.pros.people,
+      base: round2(pros.base + data.pros.paid),
+      withheld: round2(pros.withheld + data.pros.withheld),
+    },
+    data.previous111
+  );
   const m115 = form115(
     rent.people + data.rent.people,
     round2(rent.base + data.rent.paid),
-    round2(rent.withheld + data.rent.withheld)
+    round2(rent.withheld + data.rent.withheld),
+    data.previous115
   );
   const warnings = [
     // A filed form stands: the invoices it replaces are not checked.
@@ -304,6 +360,8 @@ export function withholdingsFor({
     ),
     ...typedWarnings(data),
     ...(income === 0 && m111.due + m115.due > 0 ? [{ code: 'noIncome' as const }] : []),
+    ...notHigher('111', m111),
+    ...notHigher('115', m115),
   ];
   return { quarter, m111, m115, warnings };
 }

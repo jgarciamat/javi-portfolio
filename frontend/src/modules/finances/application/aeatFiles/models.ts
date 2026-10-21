@@ -246,6 +246,30 @@ const ident = (d: Declarant, year: number, quarter: number, kind: string): Put[]
   [107, 2, `${quarter}T`],
 ];
 
+/**
+ * A complementaria of the 111 or the 115: the mark and the 13-digit number of the form filed before
+ * (111: positions 538 and 539; 115: 192 and 193, record designs), and its result, which must be
+ * positive (instructions of the 111, box 30; LGT art. 122.2).
+ */
+function complementPlan(
+  model: '111' | '115',
+  result: Result111 | Result115,
+  at: number
+): { puts: Put[]; checks: Check[] } {
+  const previous = result.previous;
+  if (!previous) return { puts: [], checks: [] };
+  const checks: Check[] = [];
+  if (!/^\d{13}$/.test(previous.receipt)) checks.push(error('receipt', { model }));
+  if (result.due <= 0) checks.push(error('notHigher', { model }));
+  return {
+    puts: [
+      [at, 1, 'X'],
+      [at + 1, 13, previous.receipt.slice(0, 13)],
+    ],
+    checks,
+  };
+}
+
 interface Plan {
   tags: string[];
   values: Record<string, BoxValue>;
@@ -273,7 +297,9 @@ function plan111(source: Extract<SedeSource, { model: '111' }>, d: Declarant): P
   const rate = base > 0 ? (get(v, '09') * 100) / base : null;
   if (rate !== null && (rate < 6.5 || rate > 15.5))
     checks.push(warn('rate111', { rate: Math.round(rate * 100) / 100 }));
-  const puts = ident(d, source.year, source.quarter, kind);
+  const complement = complementPlan('111', source.result, 538);
+  checks.push(...complement.checks);
+  const puts = [...ident(d, source.year, source.quarter, kind), ...complement.puts];
   if (debit) puts.push([553, 34, normalIban(d.iban)]);
   return { tags: ['01000'], values: record(v), fills: [{ tag: '01000', puts }], checks, kind };
 }
@@ -288,7 +314,9 @@ function plan115(source: Extract<SedeSource, { model: '115' }>, d: Declarant): P
   const rate = base > 0 ? (get(v, '03') * 100) / base : null;
   if (rate !== null && Math.abs(rate - 19) > 0.5)
     checks.push(warn('rate115', { rate: Math.round(rate * 100) / 100 }));
-  const puts = ident(d, source.year, source.quarter, kind);
+  const complement = complementPlan('115', source.result, 192);
+  checks.push(...complement.checks);
+  const puts = [...ident(d, source.year, source.quarter, kind), ...complement.puts];
   if (debit) puts.push([206, 34, normalIban(d.iban)]);
   return { tags: ['01000'], values: record(v), fills: [{ tag: '01000', puts }], checks, kind };
 }
