@@ -843,6 +843,391 @@
     }
   },
   {
+    "name": "autonomoSaveFiled",
+    "method": "PUT",
+    "path": "/business/data",
+    "auth": true,
+    "body": {
+      "data": {
+        "manual": {
+          "profile": {
+            "workArea": "12",
+            "homeArea": "90",
+            "vehicleExclusive": false,
+            "healthPeople": "2",
+            "healthDisability": false
+          },
+          "prior": {
+            "on": false,
+            "income": "",
+            "expenses": "",
+            "payments": "",
+            "withheld": ""
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": "4321.5",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "648.23",
+              "expenses": [
+                {
+                  "kind": "software",
+                  "amount": "121",
+                  "vatRate": 21,
+                  "days": ""
+                }
+              ]
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": "",
+                "r10": "",
+                "r4": "",
+                "r0": ""
+              },
+              "withheld": "",
+              "expenses": []
+            }
+          ],
+          "invoices": [
+            {
+              "id": "abc123",
+              "book": "issued",
+              "kind": "other",
+              "excluded": false,
+              "date": "2026-02-10",
+              "quarter": 1,
+              "base": 4321.5,
+              "vatRate": 21,
+              "vat": 907.52,
+              "total": 5229.02,
+              "withheld": 648.23,
+              "concept": "Cliente inventado SL",
+              "period": null
+            }
+          ],
+          "model130": null,
+          "withholdings": [
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            },
+            {
+              "staff": {
+                "people": "",
+                "paid": "",
+                "withheld": "",
+                "kindPeople": "",
+                "kindPaid": "",
+                "kindWithheld": ""
+              },
+              "pros": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "rent": {
+                "people": "",
+                "paid": "",
+                "withheld": ""
+              },
+              "filed111": false,
+              "filed115": false
+            }
+          ],
+          "filed130": ["-1000", "", "", ""],
+          "activity": {
+            "method": "simplified",
+            "agrarian": false,
+            "assets": [],
+            "subsidies": [],
+            "provisions": "",
+            "retaFix": "",
+            "selfConsumption": "",
+            "stockChange": "",
+            "compensations": ["", "", "", ""],
+            "paid130": ["0", "", "", ""],
+            "modules": {
+              "rows": [],
+              "pacAid": "",
+              "staffShare": "",
+              "rentedShare": "",
+              "irrigatedShare": "",
+              "externalMeans": false,
+              "boughtFeed": false,
+              "organic": false,
+              "forestPlan": false,
+              "youngFarmer": false,
+              "refunds": "",
+              "extraordinary": ""
+            },
+            "objective": {
+              "activityId": "",
+              "unitsStart": [],
+              "unitsYear": [],
+              "staffLastYear": "",
+              "special": "",
+              "small": "",
+              "seasonDays": "",
+              "seasonLastYear": "",
+              "seasonQuarters": ["", "", "", ""],
+              "newYear": "",
+              "disabled": false,
+              "startDate": "",
+              "endDate": "",
+              "noData": false,
+              "extraordinary": "",
+              "otherIncome": "",
+              "ceutaMelilla": false,
+              "vatActivity": "",
+              "vatStart": [],
+              "vatYear": [],
+              "vatReduction": "",
+              "vatSupported": "",
+              "vatCompensations": "",
+              "vatRefundsAbroad": ""
+            }
+          }
+        },
+        "extras": {
+          "hardToJustify": false,
+          "exempt": false,
+          "priorNet": "",
+          "toOffset": ""
+        },
+        "kinds": {}
+      },
+      "baseVersion": 2
+    }
+  },
+  {
+    "name": "autonomoDraftFiled",
+    "method": "POST",
+    "path": "/business/draft",
+    "auth": true,
+    "body": {
+      "year": 2026,
+      "quarter": 2,
+      "inputs": {
+        "quarters": [
+          {
+            "withheld": 648.23,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0,
+            "depreciation": 0,
+            "provisions": 0,
+            "subsidies": 0,
+            "capitalSubsidies": 0,
+            "compensations": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0,
+            "depreciation": 0,
+            "provisions": 0,
+            "subsidies": 0,
+            "capitalSubsidies": 0,
+            "compensations": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0,
+            "depreciation": 0,
+            "provisions": 0,
+            "subsidies": 0,
+            "capitalSubsidies": 0,
+            "compensations": 0
+          },
+          {
+            "withheld": 0,
+            "socialSecurity": 0,
+            "vatNotDeductible": 0,
+            "depreciation": 0,
+            "provisions": 0,
+            "subsidies": 0,
+            "capitalSubsidies": 0,
+            "compensations": 0
+          }
+        ],
+        "modality": "simplified",
+        "agrarian": false,
+        "activity": {
+          "method": "simplified",
+          "agrarian": false,
+          "assets": [],
+          "subsidies": [],
+          "provisions": 0,
+          "retaFix": 0,
+          "selfConsumption": 0,
+          "stockChange": 0,
+          "compensations": [0, 0, 0, 0],
+          "paid130": [0, null, null, null],
+          "modules": null,
+          "objective": null
+        },
+        "hardToJustify": false,
+        "priorYearNet": null,
+        "exempt130": false,
+        "vatToOffset": 0,
+        "vat": {
+          "offsetStart": 0
+        },
+        "manual": {
+          "profile": {
+            "workArea": 12,
+            "homeArea": 90,
+            "vehicleExclusive": false,
+            "healthPeople": 2,
+            "healthDisability": false
+          },
+          "quarters": [
+            {
+              "income": {
+                "r21": 4321.5,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": [
+                {
+                  "kind": "software",
+                  "amount": 121,
+                  "vatRate": 21,
+                  "days": 0
+                }
+              ]
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            },
+            {
+              "income": {
+                "r21": 0,
+                "r10": 0,
+                "r4": 0,
+                "r0": 0
+              },
+              "expenses": []
+            }
+          ]
+        },
+        "prior": null,
+        "filed130": [
+          {
+            "box07": -1000,
+            "box19": 0
+          },
+          null,
+          null,
+          null
+        ]
+      }
+    }
+  },
+  {
     "name": "checkoutMonthly",
     "method": "POST",
     "path": "/billing/checkout",

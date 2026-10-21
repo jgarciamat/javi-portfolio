@@ -104,6 +104,12 @@ export function hashOf(text: string): string {
   return `${(h >>> 0).toString(36)}.${text.length}`;
 }
 
+/** Box 07 of the 130 filed, only when something was typed (older copies have none). */
+function filed130Of(typed: (string | undefined)[] | undefined): Pick<ManualForm, 'filed130'> {
+  const filed = typed ?? [];
+  return filed.join('').trim() === '' ? {} : { filed130: [0, 1, 2, 3].map((i) => filed[i] ?? '') };
+}
+
 type Partialish<T> = { [K in keyof T]?: T[K] extends object ? Partialish<T[K]> : T[K] };
 
 /**
@@ -190,6 +196,7 @@ export function toSaved(
       ...(manual.filed303?.some((f) => f !== null)
         ? { filed303: [0, 1, 2, 3].map((i) => manual.filed303?.[i] ?? null) }
         : {}),
+      ...filed130Of(manual.filed130),
       // The activity of the year (assets, grants…), only when something was typed.
       ...(isEmptyActivity(manual.activity as ActivityForm | undefined)
         ? {}

@@ -25,6 +25,7 @@ import {
 } from '@core/api/financeApi';
 import { tokenStore } from '@core/api/http';
 import { buildInputs } from '@modules/finances/ui/components/autonomoInputs';
+import { emptyActivity } from '@modules/finances/ui/components/activityForm';
 import { NO_EXTRAS, emptyManual } from '@modules/finances/ui/components/AutonomoManual';
 import { toSaved } from '@modules/finances/ui/components/autonomoSync';
 import saved from './fixtures/requests.json';
@@ -194,6 +195,14 @@ add('autonomoDraftEmpty', () =>
 add('autonomoDraftTyped', () =>
   businessApi.draft(2026, 1, buildInputs(typed, { ...NO_EXTRAS, hardToJustify: true }, 2026, 1))
 );
+// A 1T filed at −1,000 and corrected later: box 07 and 19 as filed go to the draft and the account.
+const filed = {
+  ...typed,
+  filed130: ['-1000', '', '', ''],
+  activity: { ...emptyActivity(), paid130: ['0', '', '', ''] },
+};
+add('autonomoSaveFiled', () => businessApi.saveData(toSaved(filed, NO_EXTRAS, {}), 2));
+add('autonomoDraftFiled', () => businessApi.draft(2026, 2, buildInputs(filed, NO_EXTRAS, 2026, 2)));
 add('checkoutMonthly', () =>
   billingApi.checkout('monthly', { acceptTerms: true, waiveWithdrawal: true })
 );

@@ -841,8 +841,13 @@ export interface AutonomoInputs {
   vat?: VatOptions | null;
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
-  /** Totals of the modelo 130 already filed for the earlier quarters. */
+  /**
+   * Totals up to the quarter before the viewed one: income, expenses and withholdings real (corrected
+   * if that 130 had an error), the payments as filed (box 05 of the viewed quarter).
+   */
   prior?: { income: number; expenses: number; previousPayments: number; withheld: number } | null;
+  /** Boxes 07 and 19 of each modelo 130 as filed (null: not given): only box 05 and 15 use them. */
+  filed130?: ({ box07: number; box19: number | null } | null)[] | null;
 }
 
 /** The self-employed form saved in the account (the app checks its shape when it reads it). */

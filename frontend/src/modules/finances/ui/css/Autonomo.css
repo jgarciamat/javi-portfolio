@@ -1051,3 +1051,40 @@ button.autonomo-sum-warn {
     opacity: 0.8;
   }
 }
+
+/* A closed quarter that was changed: what was filed stays, and how to correct it. */
+.autonomo-closed {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--amber-500);
+  background: rgba(245, 158, 11, 0.08);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+.autonomo-closed h4 {
+  margin: 0 0 0.5rem;
+  color: var(--amber-400);
+}
+.autonomo-closed p {
+  margin: 0 0 0.6rem;
+}
+.autonomo-closed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+.autonomo-closed-actions > * {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.autonomo-closed-fields {
+  margin-top: 0.8rem;
+}
+.autonomo-closed-saved {
+  margin-top: 0.6rem;
+  font-weight: 600;
+}
