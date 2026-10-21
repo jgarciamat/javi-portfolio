@@ -1,16 +1,18 @@
-import * as navigation from '@modules/finances/ui/navigation';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { authApi } from '@core/api/authApi';
 import { useAuth } from '@shared/hooks/useAuth';
 import { Dashboard } from '@modules/finances/ui/components/Dashboard';
 import { GuidedTour } from '@modules/finances/ui/tour/GuidedTour';
-import { tourSteps, type TourStep } from '@modules/finances/ui/tour/tourSteps';
+import { TOUR_VERSION, tourSteps, type TourStep } from '@modules/finances/ui/tour/tourSteps';
+import { TOUR_SEEN_KEY } from '@modules/finances/application/hooks/useWelcomeTour';
 import { createFakeApi } from '@test-utils/fakeApi';
 import * as f from '@test-utils/fixtures';
 import { fakeAccessToken, renderWithI18n, renderWithProviders, tr } from '@test-utils/render';
 
 afterEach(() => {
   jest.restoreAllMocks();
+  localStorage.clear();
+  delete (window as { ResizeObserver?: unknown }).ResizeObserver;
   jest.useRealTimers();
   document.body.innerHTML = '';
   Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
@@ -75,7 +77,7 @@ describe('GuidedTour', () => {
 
     fireEvent.keyDown(card(), { key: 'ArrowRight' }); // fits above it
     expect(screen.getByRole('heading', { name: tr('app.tour.summary.title') })).toBeInTheDocument();
-    expect(card()).toHaveStyle({ top: '288px' });
+    expect(card()).toHaveStyle({ top: '238px' });
 
     next(); // taller than the screen: clipped spotlight, card at the bottom
     expect(card()).toHaveClass('tour-card--bottom');
@@ -161,8 +163,8 @@ describe('GuidedTour', () => {
     const view = renderTour();
 
     next(); // fits in the free area: centred between the header and the card
-    expect(small.style.scrollMarginTop).toBe('12px');
-    expect(document.body.style.paddingBottom).toBe('314px'); // room to scroll short pages
+    expect(small.style.scrollMarginTop).toBe('12px'); // no scroll-padding in jsdom
+    expect(document.body.style.paddingBottom).toBe('364px'); // room to scroll short pages
     expect(small.style.scrollMarginBottom).toBe('224px');
     expect(centre).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' });
 
@@ -202,6 +204,29 @@ describe('GuidedTour', () => {
     expect(document.querySelector('.tour-spotlight')).not.toBeNull();
   });
 
+  it('follows the element when it changes size after it appeared', () => {
+    const observed: Array<() => void> = [];
+    const disconnect = jest.fn();
+    (window as { ResizeObserver?: unknown }).ResizeObserver = class {
+      constructor(callback: () => void) {
+        observed.push(callback);
+      }
+      observe() {}
+      disconnect() {
+        disconnect();
+      }
+    };
+    const { rect } = placeTarget('near-top', 100, 50);
+    const view = renderTour();
+    next();
+    rect.height = 120;
+    rect.bottom = 220;
+    act(() => observed.forEach((callback) => callback()));
+    expect(document.querySelector('.tour-spotlight')).toHaveStyle({ height: '136px' });
+    view.unmount();
+    expect(disconnect).toHaveBeenCalled();
+  });
+
   it('centres the card when the highlighted element is not shown (hidden on this screen)', () => {
     jest.useFakeTimers();
     placeTarget('near-top', 100, 50, 40, 0); // no width
@@ -223,10 +248,24 @@ describe('GuidedTour', () => {
 });
 
 describe('tour steps', () => {
-  it('covers every section and skips the hidden offers', () => {
-    const all = tourSteps(true);
-    expect(all.map((s) => s.id)).toContain('offers');
-    expect(tourSteps(false)).toHaveLength(all.length - 1);
+  it('explains the month, the menu, the Renta and the self-employed, adapted to the plan', () => {
+    const free = tourSteps(false).map((s) => s.id);
+    const premium = tourSteps(true).map((s) => s.id);
+    expect(free).toHaveLength(premium.length);
+    expect(free).toEqual(expect.arrayContaining(['monthNav', 'selection', 'import', 'invite']));
+    expect(free).toEqual(expect.arrayContaining(['rentaSteps', 'autoQuarter', 'autoFiles']));
+    expect(free).toEqual(expect.arrayContaining(['rentaPlanFree', 'autoPlanFree']));
+    expect(premium).toEqual(expect.arrayContaining(['rentaPlanPremium', 'autoPlanPremium']));
+    expect(premium).not.toContain('rentaPlanFree');
+  });
+
+  it('has a text in every language for every step', () => {
+    for (const premium of [false, true]) {
+      for (const step of tourSteps(premium)) {
+        expect(tr(`app.tour.${step.id}.title`)).not.toBe(`app.tour.${step.id}.title`);
+        expect(tr(`app.tour.${step.id}.body`)).not.toBe(`app.tour.${step.id}.body`);
+      }
+    }
   });
 });
 
@@ -253,7 +292,6 @@ describe('Welcome tour in the dashboard', () => {
   };
 
   it('opens after signing in and visits every section on the way', async () => {
-    jest.spyOn(navigation, 'offersEnabled').mockReturnValue(true);
     const { api } = renderWithProviders(
       <>
         <SignInButton />
@@ -262,7 +300,7 @@ describe('Welcome tour in the dashboard', () => {
     );
     await screen.findByText(tr('app.nav.currentMonth'));
     signInAgain();
-    const total = tourSteps(true).length;
+    const total = tourSteps(false).length;
     expect(
       await screen.findByRole('heading', { name: tr('app.tour.welcome.title') })
     ).toBeInTheDocument();
@@ -316,6 +354,24 @@ describe('Welcome tour in the dashboard', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: tr('app.tour.dontShowAgain') }));
     fireEvent.click(screen.getByRole('button', { name: tr('app.tour.skip') }));
     expect(api.settingsApi.update).toHaveBeenCalledWith({ showTour: false });
+    expect(localStorage.getItem(TOUR_SEEN_KEY)).toBe(String(TOUR_VERSION));
+  });
+
+  it('shows the Premium wording of the plan steps to Premium users', async () => {
+    const api = createFakeApi();
+    api.billingApi.get.mockResolvedValue(f.billing({ plan: 'premium' }));
+    renderWithProviders(<Dashboard />, { api, plan: true });
+    await screen.findByText(tr('app.nav.currentMonth'));
+    fireEvent.click(screen.getByRole('button', { name: tr('app.menu.open') }));
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(tr('app.tabs.settings')) }));
+    fireEvent.click(await screen.findByRole('button', { name: /Ver el tour ahora/ }));
+    const dialog = await screen.findByRole('dialog');
+    const ids = tourSteps(true).map((s) => s.id);
+    const at = ids.indexOf('rentaPlanPremium');
+    for (let step = 0; step < at; step++) next();
+    expect(
+      within(dialog).getByRole('heading', { name: tr('app.tour.rentaPlanPremium.title') })
+    ).toBeInTheDocument();
   });
 
   it('does not open when the user asked not to see it', async () => {
@@ -332,7 +388,49 @@ describe('Welcome tour in the dashboard', () => {
     signInAgain();
     await waitFor(() => expect(authApi.login).toHaveBeenCalled());
     await act(async () => undefined);
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('dialog', { name: tr('app.tour.welcome.title') })).toBeNull();
+  });
+
+  describe('the renewed tour is offered once to whoever turned it off', () => {
+    async function signInWithTourOff() {
+      const api = createFakeApi();
+      api.settingsApi.get.mockResolvedValue(f.settings({ showTour: false }));
+      renderWithProviders(
+        <>
+          <SignInButton />
+          <Dashboard />
+        </>,
+        { api }
+      );
+      await screen.findByText(tr('app.nav.currentMonth'));
+      signInAgain();
+    }
+
+    it('shows a notice that does not block, and «not now» hides it for good', async () => {
+      await signInWithTourOff();
+      const notice = await screen.findByRole('region', { name: tr('app.tour.offer.title') });
+      expect(screen.queryByRole('dialog', { name: tr('app.tour.welcome.title') })).toBeNull();
+      fireEvent.click(within(notice).getByRole('button', { name: tr('app.tour.offer.dismiss') }));
+      expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
+      expect(localStorage.getItem(TOUR_SEEN_KEY)).toBe(String(TOUR_VERSION));
+    });
+
+    it('«see the tour» starts it from the first step', async () => {
+      await signInWithTourOff();
+      fireEvent.click(await screen.findByRole('button', { name: tr('app.tour.offer.view') }));
+      expect(
+        await screen.findByRole('heading', { name: tr('app.tour.welcome.title') })
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
+    });
+
+    it('is not offered again once this version was seen', async () => {
+      localStorage.setItem(TOUR_SEEN_KEY, String(TOUR_VERSION));
+      await signInWithTourOff();
+      await waitFor(() => expect(authApi.login).toHaveBeenCalled());
+      await act(async () => undefined);
+      expect(screen.queryByRole('region', { name: tr('app.tour.offer.title') })).toBeNull();
+    });
   });
 
   it('replays from Settings and returns there, saving a changed preference', async () => {

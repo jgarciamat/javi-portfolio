@@ -20,14 +20,16 @@
 .tour-spotlight {
   position: fixed;
   border-radius: 12px;
-  box-shadow: 0 0 0 2px var(--accent-400), 0 0 0 9999px rgba(2, 6, 23, 0.72);
+  box-shadow:
+    0 0 0 2px var(--accent-400),
+    0 0 0 9999px rgba(2, 6, 23, 0.72);
   pointer-events: none;
   /* No transition: it would lag behind the page while it scrolls and look misaligned. */
 }
 
 .tour-card {
   position: fixed;
-  width: min(360px, calc(100vw - 32px));
+  width: min(380px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
@@ -63,8 +65,17 @@
   }
 
   .tour-card .tour-body {
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    margin-bottom: 0.6rem;
+  }
+
+  .tour-card .tour-title {
+    font-size: 1.1rem;
+  }
+
+  .tour-card:not(.tour-card--edge) .tour-dont-show {
+    display: none;
   }
 }
 
@@ -97,14 +108,15 @@
 
 .tour-title {
   margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  line-height: 1.3;
 }
 
 .tour-body {
   margin: 0 0 0.9rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--slate-300);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--slate-200);
 }
 
 .tour-dont-show {
@@ -112,8 +124,8 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.9rem;
-  font-size: 0.82rem;
-  color: var(--slate-400);
+  font-size: 0.9rem;
+  color: var(--slate-300);
   cursor: pointer;
 }
 
@@ -132,13 +144,25 @@
 }
 
 .tour-skip {
-  padding: 0.4rem 0;
+  padding: 0.4rem 0.6rem;
   border: none;
   background: none;
-  color: var(--slate-400);
-  font-size: 0.85rem;
+  color: var(--slate-300);
+  font-size: 0.95rem;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* Big buttons: easy to hit with a thumb or a mouse. */
+.tour-btn {
+  min-height: 48px;
+  font-size: 1rem;
+}
+
+.tour-card button:focus-visible,
+.tour-offer button:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
 }
 
 .tour-nav {
@@ -156,7 +180,54 @@
   cursor: not-allowed;
 }
 
-/* Highlighted elements scroll into view below the sticky header. */
-[data-tour] {
-  scroll-margin-top: 7rem;
+/* Contrast mode: stronger edges and text. */
+html.wiz-contrast .tour-card {
+  border: 3px solid var(--slate-200);
+}
+
+html.wiz-contrast .tour-card .tour-body,
+html.wiz-contrast .tour-card .tour-progress,
+html.wiz-contrast .tour-card .tour-dont-show {
+  color: var(--slate-200);
+}
+
+/* The notice offered once to whoever turned the tour off: small and out of the way. */
+.tour-offer {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 1500;
+  width: min(360px, calc(100vw - 32px));
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
+  color: var(--slate-200);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.tour-offer-title {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+}
+
+.tour-offer-body {
+  margin: 0 0 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tour-offer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.tour-offer-actions .btn-primary {
+  width: auto;
+}
+
+html.wiz-contrast .tour-offer {
+  border: 3px solid var(--slate-200);
 }

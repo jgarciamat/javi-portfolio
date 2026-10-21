@@ -26,6 +26,7 @@ import { useDashboard, type UseDashboardReturn } from '../../application/hooks/u
 import { useWelcomeTour } from '../../application/hooks/useWelcomeTour';
 import { SECTION_BY_ID, type DashboardTab } from '../navigation';
 import { GuidedTour } from '../tour/GuidedTour';
+import { TourOffer } from '../tour/TourOffer';
 import { BurgerMenu } from './BurgerMenu';
 import { InviteDialog } from './InviteDialog';
 import { useOpenFirstStep } from '../../application/hooks/useOpenFirstStep';
@@ -165,6 +166,7 @@ function Header({ dash, sectionLabel }: { dash: UseDashboardReturn; sectionLabel
       <button
         type="button"
         className="header-learn-btn"
+        data-tour="learn-btn"
         onClick={() => dash.setTab('videos')}
         aria-label={t('app.header.learn')}
         aria-current={dash.tab === 'videos' ? 'page' : undefined}
@@ -357,6 +359,7 @@ export function Dashboard() {
         <DashboardModals dash={dash} />
       </Suspense>
       {/* The terms dialog cannot be dismissed: the tour waits until they are accepted. */}
+      {tour.offer && !plan?.overview?.terms.mustAccept && <TourOffer onAnswer={tour.answerOffer} />}
       {tour.open && !plan?.overview?.terms.mustAccept && (
         <GuidedTour
           steps={tour.steps}

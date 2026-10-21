@@ -72,7 +72,12 @@ function Toolbar({ onExpert, onRestart }: { onExpert: () => void; onRestart?: ()
     return () => document.documentElement.classList.remove('wiz-big-text', 'wiz-contrast');
   }, [prefs]);
   return (
-    <div className="wiz-tools" role="toolbar" aria-label={t('wizard.tools')}>
+    <div
+      className="wiz-tools"
+      data-tour="wizard-tools"
+      role="toolbar"
+      aria-label={t('wizard.tools')}
+    >
       <button
         type="button"
         className="wiz-tool"
@@ -167,7 +172,7 @@ function Route({
   const { t } = useI18n();
   const [refused, setRefused] = useState<number | null>(null);
   return (
-    <nav className="wiz-route-nav" aria-label={t('wizard.route')}>
+    <nav className="wiz-route-nav" data-tour="wizard-route" aria-label={t('wizard.route')}>
       <ol className="wiz-route">
         {steps.map((s, i) => {
           const finished = done.includes(s.id);
