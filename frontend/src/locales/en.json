@@ -2751,6 +2751,7 @@
   "app.autonomo.settlement": "Modelo 303: result",
   "app.autonomo.irpfBoxes": "Modelo 130: income tax advance (cumulative figures of the year)",
   "app.autonomo.retaTitle": "Estimated self-employed contribution",
+  "app.autonomo.retaLatest": "The contribution order of {year} is not published yet: these are the bases of the latest one.",
   "app.autonomo.retaText": "With what you have this year, your monthly net income would be about {net} (after the 7 % general expenses). You fall in bracket {bracket}: contribution base between {baseMin} and {baseMax}.",
   "app.autonomo.retaNote": "The contribution is {rate} % of the base. It is a forecast: Social Security settles the next year with your real income. If you are on the flat rate, you pay the reduced fee of your sign-up.",
   "app.autonomo.deadlines": "Deadlines",

@@ -39,7 +39,9 @@ const year = (...over: Partial<WithholdingQuarter>[]) => [0, 1, 2, 3].map((i) =>
 
 describe('The figures of each year', () => {
   it('keeps the thresholds of the law and says which ones it could not confirm', () => {
-    expect(FIGURE_YEARS).toEqual([2025, 2026, 2027]);
+    expect(FIGURE_YEARS).toEqual([2024, 2025, 2026, 2027]);
+    // 2024: the same articles as 2025 (none changed after 2023) and the 80 € of 2023-2025.
+    expect({ ...figuresFor(2024), year: 2025 }).toEqual(figuresFor(2025));
     expect(figuresFor(2026)).toMatchObject({
       m347: { threshold: 3005.06, cash: 6000 },
       abroad: { threshold: 50000, rise: 20000 },

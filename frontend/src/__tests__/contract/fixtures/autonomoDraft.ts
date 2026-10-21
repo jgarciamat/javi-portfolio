@@ -203,6 +203,8 @@ export const autonomoDraft = {
     feeMin: 302.65,
     feeMax: 472.5,
     rate: 0.315,
+    year: 2026,
+    known: true,
   },
   deadlines: [
     { model: '303', label: 'IVA trimestral', date: '2026-04-20' },

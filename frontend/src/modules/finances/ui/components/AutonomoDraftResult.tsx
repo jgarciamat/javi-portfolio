@@ -98,13 +98,18 @@ function Deductible({ lines }: { lines: NonNullable<AutonomoDraft['expenses']> }
 }
 
 /** The contribution sentence, shared by the screen and the PDF. */
-const retaText = (t: Translate, money: Format['money'], reta: AutonomoDraft['reta']): string =>
-  t('app.autonomo.retaText', {
+const retaText = (t: Translate, money: Format['money'], reta: AutonomoDraft['reta']): string => {
+  const text = t('app.autonomo.retaText', {
     net: money(reta.monthlyNet),
     bracket: reta.bracket,
     baseMin: money(reta.baseMin),
     baseMax: money(reta.baseMax),
   });
+  // A year whose order of contributions is not out yet: the bases are those of the latest one.
+  return reta.known === false
+    ? `${text} ${t('app.autonomo.retaLatest', { year: String(reta.year) })}`
+    : text;
+};
 
 /** Every text of the PDF, in the language of the app. */
 function pdfText(

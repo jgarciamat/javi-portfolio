@@ -618,7 +618,7 @@ describe('Annual activity: other activities in modules (annex II)', () => {
       inputsOf(four(quarter()), { method: 'objective', objective: bar })
     );
     expect(later.warnings).toContain('modules');
-    // Without the figures of the year (2024) the 131 is not estimated.
+    // Without the table of módulos of the year (2024) the 131 is not estimated.
     const old = annualActivity(
       2024,
       inputsOf(four(quarter()), { method: 'objective', objective: bar })

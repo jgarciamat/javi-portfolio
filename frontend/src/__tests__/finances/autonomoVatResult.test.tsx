@@ -184,6 +184,23 @@ describe('The whole VAT family in the result', () => {
     expect(screen.queryByText(r('m390.prorrata', { pct: 100 }))).toBeNull();
   });
 
+  it('says when the RETA bases are of the latest order because the year has none yet', () => {
+    const reta = { ...f.autonomoDraft().reta, year: 2027, known: false };
+    const { unmount } = renderWithProviders(
+      <DraftResult draft={f.autonomoDraft({ reta })} inputs={null} />
+    );
+    expect(
+      screen.getByText(tr('app.autonomo.retaLatest', { year: 2027 }), { exact: false })
+    ).toBeInTheDocument();
+    unmount();
+    renderWithProviders(
+      <DraftResult draft={f.autonomoDraft({ reta: { ...reta, known: true } })} inputs={null} />
+    );
+    expect(
+      screen.queryByText(tr('app.autonomo.retaLatest', { year: 2027 }), { exact: false })
+    ).toBeNull();
+  });
+
   it('says when a group has nothing at all', () => {
     renderWithProviders(
       <DraftResult

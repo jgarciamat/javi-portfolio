@@ -894,6 +894,9 @@ export interface AutonomoDraft {
     feeMin: number;
     feeMax: number;
     rate: number;
+    /** The year of the table and false when that year has no order yet (the latest one is used). */
+    year?: number;
+    known?: boolean;
   };
   deadlines: { model: string; label: string; date: string }[];
   /** Breakdown of the expenses typed by hand (null when the movements were used). */

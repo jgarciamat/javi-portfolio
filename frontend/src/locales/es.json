@@ -2751,6 +2751,7 @@
   "app.autonomo.settlement": "Modelo 303: resultado",
   "app.autonomo.irpfBoxes": "Modelo 130: pago fraccionado del IRPF (cifras acumuladas del año)",
   "app.autonomo.retaTitle": "Cuota de autónomos estimada",
+  "app.autonomo.retaLatest": "La orden de cotización de {year} aún no se ha publicado: son las bases de la última publicada.",
   "app.autonomo.retaText": "Con lo que llevas este año, tu rendimiento neto mensual sería de unos {net} (ya descontado el 7 % de gastos genéricos). Te corresponde el tramo {bracket}: base de cotización entre {baseMin} y {baseMax}.",
   "app.autonomo.retaNote": "La cuota es el {rate} % de la base. Es una previsión: la Seguridad Social regulariza al año siguiente con tus rendimientos reales. Si estás en tarifa plana, pagas la cuota reducida de tu alta.",
   "app.autonomo.deadlines": "Fechas límite",

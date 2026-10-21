@@ -78,7 +78,12 @@ const BASE: Omit<FiscalFigures, 'year' | 'provisional' | 'retaFlatRate'> = {
   wealth: { mustFileAbove: 2000000, exemptMinimum: 700000, homeExempt: 300000 },
 };
 
+/**
+ * 2024 has the same figures: none of the articles above changed between 2024 and 2025 (BOE,
+ * consolidated texts, checked 22-10-2026), and the 80 € of the RETA are those of 2023-2025.
+ */
 const YEARS: Record<number, FiscalFigures> = {
+  2024: { ...BASE, year: 2024, provisional: false, retaFlatRate: 80 },
   2025: { ...BASE, year: 2025, provisional: false, retaFlatRate: 80 },
   2026: { ...BASE, year: 2026, provisional: false, retaFlatRate: null },
   2027: { ...BASE, year: 2027, provisional: true, retaFlatRate: null },
