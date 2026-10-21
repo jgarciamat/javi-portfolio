@@ -2,7 +2,7 @@
 
 > Datos INVENTADOS. Simulación orientativa: no es el modelo oficial. Comprobado el 2026-10-19.
 
-Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición: da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.
+Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición (la reparación se hizo con el piso alquilado, así que cuenta entera): da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.
 
 NIF ficticio 00000120M · Calle Ficticia 120, 47001 Valladolid (dirección inventada) · comunidad: castilla-y-leon
 

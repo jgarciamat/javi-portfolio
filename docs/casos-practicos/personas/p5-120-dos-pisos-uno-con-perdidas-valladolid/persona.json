@@ -8,7 +8,7 @@
   "ejercicio": 2025,
   "comunidad": "castilla-y-leon",
   "titulo": "Dos pisos alquilados: uno con beneficio y otro, a medias con su hermana, con pérdidas",
-  "descripcion": "Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición: da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.",
+  "descripcion": "Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición (la reparación se hizo con el piso alquilado, así que cuenta entera): da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.",
   "prueba": [
     "alquileres inmueble a inmueble",
     "cotitularidad 50 %",
@@ -82,6 +82,7 @@
               "label": "Piso heredado",
               "share": "50",
               "rentedDays": "181",
+              "repairWhen": "let",
               "otherDays": "",
               "cadastral": "80000",
               "cadastralBuilding": "48000",
@@ -145,6 +146,7 @@
         "label": "Piso heredado",
         "share": 50,
         "rentedDays": 181,
+        "repairWhen": "let",
         "income": 3600,
         "expenses": {
           "intereses-financiacion": 0,

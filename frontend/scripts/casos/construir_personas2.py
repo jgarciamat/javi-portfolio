@@ -1153,6 +1153,7 @@ def property_form(pr):
     """Un inmueble como lo escribe la persona (PropertyForm de rentaRentals.ts): importes del inmueble entero."""
     t = lambda v: '' if v is None else str(v)  # noqa: E731
     return dict(label=pr['label'], share=t(pr.get('share')), rentedDays='' if pr.get('rentedDays', 365) == 365 else str(pr['rentedDays']),
+                **({'repairWhen': pr['repairWhen']} if pr.get('repairWhen') else {}),
                 otherDays=t(pr.get('otherDays') or None), cadastral=t(pr.get('cadastral')), cadastralBuilding=t(pr.get('building')),
                 revised=bool(pr.get('revised')), cost=t(pr.get('cost')), income=str(pr['income']),
                 expenses={k: str(v) for k, v in pr['expenses'].items()}, pendingExcess=t(pr.get('pending') or None), withheld='',

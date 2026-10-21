@@ -2,7 +2,7 @@
 
 > Datos INVENTADOS. Simulación orientativa: no es el modelo oficial. Comprobado el 2026-10-19.
 
-Pensionista de 67 años en Málaga. Alquila un apartamento por temporadas (sin reducción: no es la vivienda permanente del inquilino) 120 días; el resto del año lo usa ella (a su disposición). La plaza de garaje la alquila todo el año a un particular. Le quedan 600 € de reparaciones de 2024 del apartamento sin deducir.
+Pensionista de 67 años en Málaga. Alquila un apartamento por temporadas (sin reducción: no es la vivienda permanente del inquilino) 120 días; el resto del año lo usa ella (a su disposición); la reparación de este año la hizo con el apartamento alquilado. La plaza de garaje la alquila todo el año a un particular. Le quedan 600 € de reparaciones de 2024 del apartamento sin deducir.
 
 NIF ficticio 00000121Y · Calle Ficticia 121, 29001 Málaga (dirección inventada) · comunidad: andalucia
 

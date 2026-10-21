@@ -8,7 +8,7 @@
   "ejercicio": 2025,
   "comunidad": "cataluna",
   "titulo": "Dos viviendas en zona tensionada: bajada de renta (90 %) y primer alquiler a un joven (70 %)",
-  "descripcion": "Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: 70 %. En el piso B, intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.",
+  "descripcion": "Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: 70 %. En el piso B (las reparaciones, hechas con el piso ya alquilado), intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.",
   "prueba": [
     "reducción 90 % (zona tensionada, bajada > 5 %)",
     "reducción 70 % (primer alquiler a joven de 18 a 35)",
@@ -79,6 +79,7 @@
               "label": "Piso B",
               "share": "",
               "rentedDays": "214",
+              "repairWhen": "let",
               "otherDays": "151",
               "cadastral": "90000",
               "cadastralBuilding": "50000",
@@ -142,6 +143,7 @@
       {
         "label": "Piso B",
         "rentedDays": 214,
+        "repairWhen": "let",
         "otherDays": 151,
         "income": 6300,
         "expenses": {

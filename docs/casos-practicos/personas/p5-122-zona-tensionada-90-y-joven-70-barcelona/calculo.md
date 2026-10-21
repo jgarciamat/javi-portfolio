@@ -2,7 +2,7 @@
 
 > Datos INVENTADOS. Simulación orientativa: no es el modelo oficial. Comprobado el 2026-10-19.
 
-Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: 70 %. En el piso B, intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.
+Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: 70 %. En el piso B (las reparaciones, hechas con el piso ya alquilado), intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.
 
 NIF ficticio 00000122F · Calle Ficticia 122, 08001 Barcelona (dirección inventada) · comunidad: cataluna
 

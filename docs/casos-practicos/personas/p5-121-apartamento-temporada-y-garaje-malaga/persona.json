@@ -8,7 +8,7 @@
   "ejercicio": 2025,
   "comunidad": "andalucia",
   "titulo": "Apartamento de temporada y una plaza de garaje alquilada a una empresa vecina",
-  "descripcion": "Pensionista de 67 años en Málaga. Alquila un apartamento por temporadas (sin reducción: no es la vivienda permanente del inquilino) 120 días; el resto del año lo usa ella (a su disposición). La plaza de garaje la alquila todo el año a un particular. Le quedan 600 € de reparaciones de 2024 del apartamento sin deducir.",
+  "descripcion": "Pensionista de 67 años en Málaga. Alquila un apartamento por temporadas (sin reducción: no es la vivienda permanente del inquilino) 120 días; el resto del año lo usa ella (a su disposición); la reparación de este año la hizo con el apartamento alquilado. La plaza de garaje la alquila todo el año a un particular. Le quedan 600 € de reparaciones de 2024 del apartamento sin deducir.",
   "prueba": [
     "alquiler de temporada sin reducción",
     "local/garaje sin reducción",
@@ -51,6 +51,7 @@
               "label": "Apartamento playa",
               "share": "",
               "rentedDays": "120",
+              "repairWhen": "let",
               "otherDays": "",
               "cadastral": "70000",
               "cadastralBuilding": "42000",
@@ -123,6 +124,7 @@
       {
         "label": "Apartamento playa",
         "rentedDays": 120,
+        "repairWhen": "let",
         "income": 6000,
         "pending": 600,
         "expenses": {
