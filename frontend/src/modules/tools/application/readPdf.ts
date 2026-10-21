@@ -4,7 +4,7 @@ export interface PdfText {
   lines: string[];
 }
 
-interface Piece {
+export interface Piece {
   x: number;
   y: number;
   str: string;
@@ -13,8 +13,8 @@ interface Piece {
 /** Pieces whose baselines are this close (in PDF points) are on the same printed line. */
 const SAME_LINE = 2;
 
-/** Pieces of text grouped into lines: top to bottom, and left to right inside each line. */
-export function linesOf(pieces: Piece[]): string[] {
+/** Pieces of text grouped into printed rows: top to bottom, and left to right inside each row. */
+export function rowsOf(pieces: Piece[]): Piece[][] {
   const rows: { y: number; pieces: Piece[] }[] = [];
   for (const piece of pieces) {
     if (!piece.str.trim()) continue;
@@ -23,14 +23,12 @@ export function linesOf(pieces: Piece[]): string[] {
     else rows.push({ y: piece.y, pieces: [piece] });
   }
   // PDF coordinates grow upwards: the top line has the highest y.
-  return rows
-    .sort((a, b) => b.y - a.y)
-    .map((r) =>
-      r.pieces
-        .sort((a, b) => a.x - b.x)
-        .map((p) => p.str.trim())
-        .join('   ')
-    );
+  return rows.sort((a, b) => b.y - a.y).map((r) => r.pieces.sort((a, b) => a.x - b.x));
+}
+
+/** Pieces of text grouped into lines: top to bottom, and left to right inside each line. */
+export function linesOf(pieces: Piece[]): string[] {
+  return rowsOf(pieces).map((row) => row.map((p) => p.str.trim()).join('   '));
 }
 
 /** Reads a PDF in the browser: the file never leaves the device. */
@@ -64,4 +62,22 @@ export async function readPdf(file: File): Promise<PdfText> {
 /** The text of a PDF, read in the browser. */
 export async function readPdfText(file: File): Promise<string> {
   return (await readPdf(file)).text;
+}
+
+/** What a PDF is made of: for every page, each piece of text with its position. */
+export async function readPdfPages(file: File): Promise<Piece[][]> {
+  const pdfjs = await import('pdfjs-dist');
+  const worker = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+  pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
+  const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+  const pages: Piece[][] = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const content = await (await pdf.getPage(i)).getTextContent();
+    const pieces: Piece[] = [];
+    for (const item of content.items) {
+      if ('str' in item) pieces.push({ x: item.transform[4], y: item.transform[5], str: item.str });
+    }
+    pages.push(pieces);
+  }
+  return pages;
 }

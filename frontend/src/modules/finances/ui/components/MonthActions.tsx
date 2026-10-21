@@ -18,7 +18,12 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
   const hasSummary = !!f.summary && f.summary.transactionCount > 0;
 
   return (
-    <div className="month-actions" role="group" aria-label={t('app.monthActions.ariaLabel')}>
+    <div
+      className="month-actions"
+      data-tour="month-actions"
+      role="group"
+      aria-label={t('app.monthActions.ariaLabel')}
+    >
       <button
         type="button"
         className="month-action"
@@ -36,7 +41,7 @@ export function MonthActions({ onImport }: { onImport?: () => void }) {
         <Icon name="sparkles" /> {t('app.recap.open')}
       </button>
       {onImport && (
-        <button type="button" className="month-action" onClick={onImport}>
+        <button type="button" className="month-action" data-tour="import" onClick={onImport}>
           <Icon name="upload" /> {t('app.import.open')}
         </button>
       )}

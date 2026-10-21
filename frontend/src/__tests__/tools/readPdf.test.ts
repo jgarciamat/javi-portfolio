@@ -1,4 +1,4 @@
-import { linesOf, readPdf, readPdfText } from '@modules/tools/application/readPdf';
+import { linesOf, readPdf, readPdfPages, readPdfText } from '@modules/tools/application/readPdf';
 
 const at = (str: string, x: number, y: number) => ({ str, transform: [1, 0, 0, 1, x, y] });
 const pages = [
@@ -35,6 +35,16 @@ describe('reading a PDF', () => {
 
   it('gives the printed lines too', async () => {
     expect((await readPdf(file)).lines).toEqual(['Retribuciones   dinerarias', '30.000,00']);
+  });
+
+  it('gives the pieces of every page with their position', async () => {
+    expect(await readPdfPages(file)).toEqual([
+      [
+        { x: 10, y: 700, str: 'Retribuciones' },
+        { x: 60, y: 700, str: 'dinerarias' },
+      ],
+      [{ x: 10, y: 500, str: '30.000,00' }],
+    ]);
   });
 
   it('groups pieces by their height, top to bottom and left to right, without blanks', () => {

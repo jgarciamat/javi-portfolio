@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useDialog } from '@shared/hooks/useDialog';
+import { STICKY_BAR_HEIGHT } from '@shared/hooks/useStickyBar';
 import type { DashboardTab } from '../navigation';
 import type { TourStep } from './tourSteps';
 import '../css/GuidedTour.css';
@@ -27,7 +28,7 @@ const CARD_MARGIN = 24;
 /** Pinned bars are looked for in this top part of the screen. */
 const PINNED_ZONE = 250;
 const CARD_WIDTH = 360;
-const CARD_HEIGHT = 290;
+const CARD_HEIGHT = 340;
 /** Narrower screens always get the card at the bottom. */
 const MOBILE_WIDTH = 640;
 
@@ -52,7 +53,11 @@ function isPinned(element: Element): boolean {
 
 /** Bottom edge of what the page pins to the top of the screen (header, month bar…). */
 function pinnedTop(): number {
-  let bottom = 0;
+  // The app publishes the height of its fixed top bar; the scan below also finds other pinned bars.
+  const published = parseFloat(
+    document.documentElement.style.getPropertyValue(STICKY_BAR_HEIGHT) || '0'
+  );
+  let bottom = Number.isFinite(published) ? published : 0;
   document.body.querySelectorAll('*').forEach((node) => {
     const { position } = window.getComputedStyle(node);
     if ((position !== 'fixed' && position !== 'sticky') || node.closest('.tour-root')) return;
@@ -64,15 +69,26 @@ function pinnedTop(): number {
   return bottom;
 }
 
-/** Space the card takes at the bottom of a phone screen (0 when it sits next to the element). */
-function bottomInset(card: RefObject<HTMLDivElement | null>): number {
-  if (window.innerWidth >= MOBILE_WIDTH) return 0;
-  return (card.current as HTMLDivElement).getBoundingClientRect().height + CARD_MARGIN;
+/**
+ * Space the card takes at the bottom of the screen: always on phones; on larger screens only when
+ * the element leaves no room next to it (then the card goes to the bottom and the element is
+ * clipped above it). 0 when the card sits right below or above the element.
+ */
+function bottomInset(card: RefObject<HTMLDivElement | null>, element: Element): number {
+  const height = (card.current as HTMLDivElement).getBoundingClientRect().height;
+  if (window.innerWidth < MOBILE_WIDTH) return height + CARD_MARGIN;
+  const r = element.getBoundingClientRect();
+  const room = PADDING + GAP + height;
+  const fitsBelow = Math.min(r.bottom, window.innerHeight) + room <= window.innerHeight;
+  const fitsAbove = Math.max(r.top, 0) - room >= 0;
+  return fitsBelow || fitsAbove ? 0 : height + CARD_MARGIN;
 }
 
 /** Rectangle of the step's target, followed through scrolls, resizes and lazy loading. */
 function useTargetRect(
   target: string | undefined,
+  /** Measured again on every step, even when two steps share the target (their cards differ in height). */
+  stepId: string,
   card: RefObject<HTMLDivElement | null>
 ): Rect | null {
   const [rect, setRect] = useState<Rect | null>(null);
@@ -83,9 +99,10 @@ function useTargetRect(
     const selector = target;
     let element: Element | null = null;
     let timer = 0;
+    let observer: ResizeObserver | null = null;
     const started = Date.now();
     const measure = () => {
-      if (element) setRect(visibleRect(element, bottomInset(card)));
+      if (element) setRect(visibleRect(element, bottomInset(card, element)));
     };
     const find = () => {
       element = document.querySelector(selector);
@@ -95,9 +112,13 @@ function useTargetRect(
         if (!isPinned(element)) {
           const html = element as HTMLElement;
           const top = pinnedTop() + TOP_GAP;
-          const inset = bottomInset(card);
+          const inset = bottomInset(card, element);
           const free = window.innerHeight - top - inset;
-          html.style.scrollMarginTop = `${top}px`;
+          // The page already keeps `scroll-padding-top` under its fixed bar: only add the rest.
+          const padding = parseFloat(
+            window.getComputedStyle(document.documentElement).scrollPaddingTop
+          );
+          html.style.scrollMarginTop = `${Math.max(top - (padding || 0), 0)}px`;
           html.style.scrollMarginBottom = `${inset}px`;
           html.scrollIntoView({
             block: size.height > free * 0.9 ? 'start' : 'center',
@@ -106,6 +127,11 @@ function useTargetRect(
         }
         measure();
         timer = window.setTimeout(measure, SETTLE_MS);
+        // Sections fill in after they open: follow the element when it grows or shrinks.
+        if (typeof ResizeObserver !== 'undefined') {
+          observer = new ResizeObserver(measure);
+          observer.observe(element);
+        }
       } else if (Date.now() - started < WAIT_MS) {
         timer = window.setTimeout(find, POLL_MS);
       }
@@ -115,6 +141,7 @@ function useTargetRect(
     window.addEventListener('scroll', measure, true);
     return () => {
       window.clearTimeout(timer);
+      observer?.disconnect();
       window.removeEventListener('resize', measure);
       window.removeEventListener('scroll', measure, true);
       if (element) {
@@ -122,18 +149,18 @@ function useTargetRect(
         (element as HTMLElement).style.scrollMarginBottom = '';
       }
     };
-  }, [target, card]);
+  }, [target, stepId, card]);
 
   return rect;
 }
 
 /** Next to the highlighted element when it fits; otherwise the stylesheet places the card. */
-function anchoredStyle(rect: Rect | null): CSSProperties | undefined {
+function anchoredStyle(rect: Rect | null, cardHeight: number): CSSProperties | undefined {
   if (!rect || window.innerWidth < MOBILE_WIDTH) return undefined;
   const left = Math.min(Math.max(rect.left, 16), window.innerWidth - CARD_WIDTH - 16);
   const below = rect.top + rect.height + PADDING + GAP;
-  if (below + CARD_HEIGHT <= window.innerHeight) return { top: below, left };
-  const above = rect.top - PADDING - GAP - CARD_HEIGHT;
+  if (below + cardHeight <= window.innerHeight) return { top: below, left };
+  const above = rect.top - PADDING - GAP - cardHeight;
   if (above >= 0) return { top: above, left };
   return undefined;
 }
@@ -160,7 +187,7 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
   const bodyId = useId();
   const step = steps[index];
   const last = index === steps.length - 1;
-  const rect = useTargetRect(step.target, card);
+  const rect = useTargetRect(step.target, step.id, card);
   const close = () => onClose(dontShowAgain);
   useDialog(card, close, true);
 
@@ -181,8 +208,12 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
   const next = () => (last ? close() : setIndex(index + 1));
   const prev = () => setIndex(Math.max(index - 1, 0));
 
-  const style = anchoredStyle(rect);
+  // The real height of the card (its text changes from step to step); a guess before it is shown.
+  const cardHeight = card.current?.getBoundingClientRect().height || CARD_HEIGHT;
+  const style = anchoredStyle(rect, cardHeight);
   const placement = style ? '' : rect ? ' tour-card--bottom' : ' tour-card--center';
+  // On phones the «don't show again» box only shows on the first and last steps (room for the element).
+  const edge = index === 0 || last ? ' tour-card--edge' : '';
 
   return (
     <div className="tour-root">
@@ -201,7 +232,7 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
       )}
       <div
         ref={card}
-        className={`tour-card${placement}`}
+        className={`tour-card${placement}${edge}`}
         style={style}
         role="dialog"
         aria-modal="true"
@@ -235,15 +266,20 @@ export function GuidedTour({ steps, onShowTab, onClose, initialDontShowAgain }: 
         </label>
         <div className="tour-actions">
           {!last && (
-            <button type="button" className="tour-skip" onClick={close}>
+            <button type="button" className="tour-skip tour-btn" onClick={close}>
               {t('app.tour.skip')}
             </button>
           )}
           <div className="tour-nav">
-            <button type="button" className="btn-secondary" onClick={prev} disabled={index === 0}>
+            <button
+              type="button"
+              className="btn-secondary tour-btn"
+              onClick={prev}
+              disabled={index === 0}
+            >
               {t('app.tour.prev')}
             </button>
-            <button type="button" className="btn-primary" onClick={next}>
+            <button type="button" className="btn-primary tour-btn" onClick={next}>
               {last ? t('app.tour.finish') : t('app.tour.next')}
             </button>
           </div>

@@ -19,6 +19,7 @@ import {
   withType,
 } from '@modules/finances/domain/importParsers';
 
+import { BankPdfError, readBankPdf } from '../bankPdf';
 import { readSpreadsheet, sheetAsText } from '../spreadsheet';
 
 export type ImportStep = 'file' | 'mapping' | 'preview' | 'done';
@@ -58,7 +59,7 @@ export function changeMapping(
 }
 
 /**
- * Bank statement import: read the file (CSV or Norma 43), map the CSV columns,
+ * Bank statement import: read the file (CSV, Excel, Norma 43 or PDF), map the CSV columns,
  * preview what the API would import and import it. `error` is an i18n key or an
  * API message.
  */
@@ -67,9 +68,12 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
   const plan = useOptionalPlan();
   const [step, setStep] = useState<ImportStep>('file');
   const [fileName, setFileName] = useState('');
-  const [format, setFormat] = useState<'csv' | 'norma43'>('csv');
+  const [format, setFormat] = useState<'csv' | 'norma43' | 'pdf'>('csv');
   const [table, setTable] = useState<string[][]>([]);
   const [bank, setBank] = useState<BankId | null>(null);
+  /** PDF statements: the bank when its format is known, and the movements whose balance does not follow. */
+  const [pdfBank, setPdfBank] = useState<string | null>(null);
+  const [balanceMismatches, setBalanceMismatches] = useState(0);
   const [mapping, setMapping] = useState<ColumnMapping>(NO_MAPPING);
   const [parsedRows, setRows] = useState<ImportRowDTO[]>([]);
   /** Types the person corrected row by row (index in the read rows). */
@@ -108,6 +112,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     const bankTable = normalizeBankTable(parsedTable.slice(found.headerRow), found.bank);
     setFormat('csv');
     setBank(found.bank);
+    setPdfBank(null);
+    setBalanceMismatches(0);
     setTable(bankTable);
     applyMapping(bankTable, bankMapping(bankTable[0], found.bank));
   };
@@ -124,10 +130,24 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         setStep('mapping');
         return;
       }
+      if (/\.pdf$/i.test(file.name) || file.type === 'application/pdf') {
+        const parsed = await readBankPdf(file);
+        setFormat('pdf');
+        setPdfBank(parsed.bank);
+        setBalanceMismatches(parsed.balanceMismatches);
+        setRows(parsed.rows);
+        setSkipped(parsed.skipped);
+        setReview([]);
+        setTypeOverrides({});
+        setStep('mapping');
+        return;
+      }
       const text = await readStatement(file);
       if (looksLikeNorma43(text)) {
         const parsed = parseNorma43(text);
         setFormat('norma43');
+        setPdfBank(null);
+        setBalanceMismatches(0);
         setRows(parsed.rows);
         setSkipped(parsed.skipped);
         setReview([]);
@@ -136,8 +156,10 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
         loadTable(parseCSV(text));
       }
       setStep('mapping');
-    } catch {
-      setError('app.import.error.read');
+    } catch (e) {
+      setError(
+        e instanceof BankPdfError ? `app.import.error.pdf.${e.code}` : 'app.import.error.read'
+      );
     }
   };
 
@@ -172,6 +194,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     setFileName('');
     setTable([]);
     setBank(null);
+    setPdfBank(null);
+    setBalanceMismatches(0);
     setMapping(NO_MAPPING);
     setRows([]);
     setSkipped([]);
@@ -187,6 +211,8 @@ export function useImport(onImported: () => void, defaultAccountId: string | nul
     fileName,
     format,
     bank,
+    pdfBank,
+    balanceMismatches,
     headers: table[0] ?? [],
     mapping,
     rows,

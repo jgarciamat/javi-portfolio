@@ -9,46 +9,56 @@ export interface TourStep {
   target?: string;
 }
 
-const SECTION = '[data-tour="section"]';
+/**
+ * Version of the tour. Raise it when the tour changes a lot: whoever turned the tour off is then
+ * offered the new one once (discreetly), and the «seen» mark is kept per version.
+ */
+export const TOUR_VERSION = 2;
 
-/** Every part of the app, in the order a new user meets it. */
+const SECTION = '[data-tour="section"]';
+const WIZARD_ROUTE = '[data-tour="wizard-route"]';
+
+/** What the app looks like today, in the order a person meets it. */
 const STEPS: TourStep[] = [
   { id: 'welcome', tab: 'monthly' },
   { id: 'monthNav', tab: 'monthly', target: '[data-tour="month-nav"]' },
-  { id: 'options', tab: 'monthly', target: '.month-nav .options-dropdown' },
+  { id: 'monthActions', tab: 'monthly', target: '[data-tour="month-actions"]' },
+  { id: 'import', tab: 'monthly', target: '[data-tour="import"]' },
   { id: 'summary', tab: 'monthly', target: '[data-tour="summary"]' },
   { id: 'forecast', tab: 'monthly', target: '[data-tour="forecast"]' },
   { id: 'aiAdvisor', tab: 'monthly', target: '.ai-advisor' },
   { id: 'newTransaction', tab: 'monthly', target: '[data-tour="new-transaction"]' },
   { id: 'movements', tab: 'monthly', target: '[data-tour="movements"]' },
-  { id: 'menu', tab: 'monthly', target: '.burger-btn' },
-  { id: 'annual', tab: 'annual', target: SECTION },
-  { id: 'analysis', tab: 'analysis', target: SECTION },
-  { id: 'health', tab: 'health', target: SECTION },
-  { id: 'search', tab: 'search', target: SECTION },
-  { id: 'accounts', tab: 'accounts', target: SECTION },
+  { id: 'selection', tab: 'monthly', target: '[data-tour="movements"]' },
   { id: 'budgets', tab: 'budgets', target: SECTION },
   { id: 'goals', tab: 'goals', target: SECTION },
-  { id: 'split', tab: 'split', target: SECTION },
-  { id: 'assets', tab: 'assets', target: SECTION },
-  { id: 'business', tab: 'business', target: SECTION },
-  { id: 'autonomoDraft', tab: 'business', target: '.autonomo-card' },
-  { id: 'autonomoManual', tab: 'business', target: '.autonomo-manual' },
-  { id: 'autonomoShortcuts', tab: 'business', target: '.autonomo-manual' },
-  { id: 'renta', tab: 'renta', target: SECTION },
-  { id: 'rentaDraft', tab: 'renta', target: '.renta-draft' },
-  { id: 'automations', tab: 'automations', target: SECTION },
-  { id: 'alerts', tab: 'custom-alerts', target: SECTION },
-  { id: 'learn', tab: 'learn', target: SECTION },
-  { id: 'invest', tab: 'invest', target: SECTION },
-  { id: 'plan', tab: 'plan', target: SECTION },
-  { id: 'offers', tab: 'offers', target: SECTION },
+  { id: 'menu', tab: 'monthly', target: '.burger-btn' },
+  { id: 'invite', tab: 'monthly', target: '.burger-btn' },
+  { id: 'profile', tab: 'monthly', target: '.burger-btn' },
+  { id: 'learn', tab: 'monthly', target: '[data-tour="learn-btn"]' },
+  { id: 'rentaIntro', tab: 'renta' },
+  { id: 'rentaSteps', tab: 'renta', target: WIZARD_ROUTE },
+  { id: 'rentaTools', tab: 'renta', target: '[data-tour="wizard-tools"]' },
+  { id: 'rentaResult', tab: 'renta', target: WIZARD_ROUTE },
+  { id: 'rentaLimits', tab: 'renta' },
+  { id: 'rentaPlan', tab: 'renta' },
+  { id: 'autoIntro', tab: 'business' },
+  { id: 'autoSteps', tab: 'business', target: WIZARD_ROUTE },
+  { id: 'autoInvoices', tab: 'business', target: WIZARD_ROUTE },
+  { id: 'autoQuarter', tab: 'business', target: WIZARD_ROUTE },
+  { id: 'autoModels', tab: 'business', target: WIZARD_ROUTE },
+  { id: 'autoFiles', tab: 'business', target: WIZARD_ROUTE },
+  { id: 'autoLimits', tab: 'business' },
+  { id: 'autoPlan', tab: 'business' },
   { id: 'settings', tab: 'settings', target: SECTION },
-  { id: 'language', target: '.header-actions .lang-switcher' },
   { id: 'done', tab: 'monthly' },
 ];
 
-/** The tour skips the offers section when the user has hidden it. */
-export function tourSteps(showOffers: boolean): TourStep[] {
-  return STEPS.filter((step) => step.id !== 'offers' || showOffers);
+/** Steps whose text depends on the plan: `<id>Free` or `<id>Premium`. Nothing pushes to buy. */
+const BY_PLAN = new Set(['rentaPlan', 'autoPlan']);
+
+export function tourSteps(premium: boolean): TourStep[] {
+  return STEPS.map((step) =>
+    BY_PLAN.has(step.id) ? { ...step, id: `${step.id}${premium ? 'Premium' : 'Free'}` } : step
+  );
 }
