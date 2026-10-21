@@ -147,6 +147,19 @@ describe('a rented property on its own', () => {
     expect(run(prop({ use: 'business', irregular: true, income: 'x' })).irregularReduction).toBe(0);
   });
 
+  it('prorates the furniture depreciation by the days let (Manual 2025, c04, caso 2)', () => {
+    // 10 % of 6,900 € of furniture, let 9 of 12 months: 690 × 9/12 = 517.50.
+    const p = propertyResult(
+      prop({ rentedDays: '9', otherDays: '0', income: '5850', expenses: { amortizacion: '690' } }),
+      rentaProperty,
+      12,
+      parseDecimal,
+      RATES
+    );
+    expect(p.otherExpenses).toBe(517.5);
+    expect(p.net).toBe(5332.5);
+  });
+
   it('keeps the days that do not impute out of the days at disposal', () => {
     expect(run(prop({ rentedDays: '100', otherDays: '65', cadastral: '1000' }))).toMatchObject({
       disposalDays: 200,

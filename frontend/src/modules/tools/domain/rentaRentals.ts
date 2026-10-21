@@ -97,8 +97,12 @@ export const emptyProperty = (n: number): PropertyForm => ({
 
 /** Interest and repairs: together up to the income of the property (art. 23.1.a.1.º). */
 export const CAPPED_EXPENSE = /interes|financiaci|reparaci|conservaci/;
-/** Expenses of the whole year that only count for the days let (IBI, community, insurance, interest). */
-const YEARLY_EXPENSE = /interes|financiaci|tributos|comunidad|seguros/;
+/**
+ * Expenses of the whole year that only count for the days let (IBI, community, insurance, interest),
+ * and the yearly depreciation of the furniture typed apart: the Manual 2025 (c04, caso práctico 2,
+ * checked 21-10-2026) takes "10 % x 6.900 x 9/12" for a home let 9 months.
+ */
+const YEARLY_EXPENSE = /interes|financiaci|tributos|comunidad|seguros|amortizacion/;
 /** Information cards of the catalogue, not amounts. */
 const NOT_AN_EXPENSE = /no-deducibles/;
 
