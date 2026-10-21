@@ -6,7 +6,7 @@
 
 Este documento nace de una pregunta real de una usuaria: «hice la declaración, me dio negativo (cero a pagar), pero me equivoqué en los gastos. No me deja hacer la complementaria, y si la hago normal me dice que está duplicada. ¿Espero al trimestre siguiente y resto los gastos que puse de más?».
 
-Al final están las **discrepancias de la app** (§9), un **borrador de guía pública** (§10) y el **texto del aviso** para el asistente de Autónomos (§11). Nada de eso está en el código todavía.
+Al final están las **discrepancias de la app** (§9), la **guía pública** (§10) y el **texto del aviso** para el asistente de Autónomos (§11). Las cuatro decisiones del dueño están implementadas desde el 21-10-2026 (ver «Estado» en §9).
 
 ## 1. Fuentes
 
@@ -201,7 +201,15 @@ Ninguna página oficial consultada recoge el texto exacto de esos mensajes (**NO
 
 Propuesta para C1 y C2: al marcar un trimestre como presentado, guardar su casilla 07 (y la 19) **tal como se presentó**. La casilla 05 debe salir de esos valores, y la 01 y la 02 de los movimientos reales. Si el usuario cambia un trimestre ya presentado, mostrar el aviso de §11 y recalcular lo que habría salido, para decirle si toca complementaria o rectificativa y cuánto.
 
-## 10. Borrador de guía pública (no implementado)
+**Estado (21-10-2026):**
+
+- **C1 y C2, corregidas.** El borrador acepta `filed130` (casillas 07 y 19 de cada 130 tal como se presentó). La 07 presentada, solo si es positiva, alimenta la casilla 05 de los trimestres siguientes y la 19 negativa («a deducir») la 15; las 01 y 02 y el resto del trimestre salen siempre de las cifras reales (`backend/src/domain/services/autonomo.ts`, `carryOf`). Sin esos datos, la app sigue usando la 07 recalculada. Con `prior` (totales del último 130), los ingresos, gastos y retenciones son los reales (corregidos si hubo error) y los pagos, los presentados. Tests: `backend/src/tests/domain/autonomo-filed130.test.ts` (caso de §4.2: 4T a 600 con el 3T presentado a 0, frente a 400 sin él) y `tax.test.ts`.
+- **C5 (nueva, media), corregida.** El campo «Pagos de trimestres anteriores (casilla 05)» de los totales del 130 ya presentado se usaba como casilla 05 del trimestre que se prepara, pero quien copiaba la 05 de su último 130 dejaba fuera la 07 de ese 130 (y pagaba de más en el borrador). Ahora pide «la 05 más la 07 de tu último 130, la 07 solo si es positiva», como ya hacía la importación del PDF (`priorFrom130`).
+- **C3, corregida.** `recover.ts` distingue la rectificativa (Renta 2024 en adelante; LGT art. 120.4 y RIRPF art. 67 bis) de la solicitud de rectificación con la declaración de ese año (2023 y antes; LGT art. 120.3; Manual Renta 2023, «Iniciación del procedimiento», casilla 127, comprobado el 21-10-2026).
+- **C4, corregida.** `hacienda.m130.receipt.p2` dice que la complementaria solo se admite si sale más a pagar y que lo pagado de más se descuenta después o en la Renta.
+- **§10:** guía publicada y abierta (`corregir-modelo-130-303`, en `OPEN_GUIDES`). **§11:** aviso en el panel de cada trimestre cerrado (`AutonomoClosedQuarter.tsx`), al cambiarlo o si ya se escribió lo presentado; los dos textos («más» y «menos») se muestran siempre, porque la app no compara todavía el resultado nuevo con el presentado.
+
+## 10. Guía pública (publicada el 21-10-2026; texto de partida)
 
 Para `frontend/src/modules/guides/domain/guidesAutonomos.ts` o `guidesTramites.ts`, con la interfaz `Guide` de `guides.ts`. Cumple las normas de estilo: lenguaje llano, sin «gestor», sin «perfecto», «exacto» ni «garantizado», sin decir que la app presenta. Antes de publicar habría que:
 
@@ -344,7 +352,7 @@ const FIX_CHECK =
 - El texto evita decir que en el 130 «no existe» otra vía (lo que no está confirmado, §8.3).
 - El ejemplo es el de §4.2.
 
-## 11. Aviso dentro del asistente de Autónomos (propuesta)
+## 11. Aviso dentro del asistente de Autónomos (implementado el 21-10-2026)
 
 **Cuándo sale:** al editar ingresos, gastos o retenciones de un trimestre cuyo plazo ya terminó (o que el usuario marcó como presentado).
 
