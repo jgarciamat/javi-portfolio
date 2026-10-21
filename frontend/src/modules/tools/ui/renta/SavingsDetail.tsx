@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
+import { rentaAbatement } from '../../data/renta/abatimiento';
 import { rentaState } from '../../data/renta/state';
 import {
   emptySavingsDetail,
@@ -79,6 +80,9 @@ function DateField({
   );
 }
 
+/** Bought before 31-12-1994: the abatement coefficients may apply (LIRPF DT 9.ª). */
+const pre1995 = (date: string) => date !== '' && date <= rentaAbatement.acquiredUntil;
+
 const replace = <T,>(list: T[], i: number, item: T) => list.map((x, j) => (j === i ? item : x));
 const without = <T,>(list: T[], i: number) => list.filter((_, j) => j !== i);
 
@@ -147,6 +151,15 @@ function AssetEditor({
               onChange({ ...asset, buys: replace(asset.buys, i, { ...b, cost }) })
             }
           />
+          {pre1995(b.date) && (asset.kind === 'listed' || asset.kind === 'fund') && (
+            <Amount
+              label={t(`${k}.ip2005`)}
+              value={b.ip2005 ?? 0}
+              onChange={(ip2005) =>
+                onChange({ ...asset, buys: replace(asset.buys, i, { ...b, ip2005 }) })
+              }
+            />
+          )}
           <button
             className="btn-secondary"
             onClick={() => onChange({ ...asset, buys: without(asset.buys, i) })}
@@ -245,6 +258,16 @@ function PropertyEditor({
           value={sale.amortization}
           onChange={(amortization) => onChange({ ...sale, amortization })}
         />
+        <DateField
+          label={t(`${k}.acquired`)}
+          value={sale.acquired ?? ''}
+          onChange={(acquired) => onChange({ ...sale, acquired })}
+        />
+        <DateField
+          label={t(`${k}.sold`)}
+          value={sale.sold ?? ''}
+          onChange={(sold) => onChange({ ...sale, sold })}
+        />
         <label className="tools-field">
           <span>{t(`${k}.exemption`)}</span>
           <select
@@ -276,6 +299,7 @@ function PropertyEditor({
           </>
         )}
       </div>
+      {pre1995(sale.acquired ?? '') && <p className="section-hint">{t(`${k}.abatementHint`)}</p>}
       <button className="btn-secondary" onClick={onRemove}>
         {t(`${k}.removeProperty`)}
       </button>
@@ -324,6 +348,8 @@ function Summary({ detail }: { detail: SavingsDetail }) {
   const unmatched = r.sales.filter((s) => s.unmatched > 0);
   const deferred = r.sales.filter((s) => s.deferred > 0);
   const check = r.sales.filter((s) => s.checkRepurchase);
+  const needsIp = r.sales.filter((s) => s.needsIp2005);
+  const reduced = [...r.sales, ...r.properties].reduce((sum, x) => sum + (x.reduction ?? 0), 0);
   return (
     <div className="renta-block" role="status">
       <ul className="renta-minimum">
@@ -339,6 +365,12 @@ function Summary({ detail }: { detail: SavingsDetail }) {
             <strong>{money(p.taxable)}</strong>
           </li>
         ))}
+        {reduced > 0 && (
+          <li>
+            <span>{t(`${k}.abatement`)}</span>
+            <strong>{money(-reduced)}</strong>
+          </li>
+        )}
         <li>
           <span>{t(`${k}.base`)}</span>
           <strong>{money(r.boxes['0460'])}</strong>
@@ -358,6 +390,9 @@ function Summary({ detail }: { detail: SavingsDetail }) {
       )}
       {deferred.length > 0 && (
         <p className="section-hint">{t(`${k}.deferred`, { name: deferred[0].name })}</p>
+      )}
+      {needsIp.length > 0 && (
+        <p className="form-error">{t(`${k}.needsIp2005`, { name: needsIp[0].name })}</p>
       )}
       {check.length > 0 && (
         <p className="section-hint">{t(`${k}.checkRepurchase`, { name: check[0].name })}</p>
@@ -489,6 +524,11 @@ export function SavingsDetailSection({
             {t(`${k}.addProperty`)}
           </button>
           <div className="tools-form">
+            <Amount
+              label={t(`${k}.abatementPrior`, { last: rentaState.year - 1 })}
+              value={detail.abatementPrior ?? 0}
+              onChange={(n) => update({ abatementPrior: n })}
+            />
             <Amount
               label={t(`${k}.other`)}
               value={detail.otherGains[0] ?? 0}

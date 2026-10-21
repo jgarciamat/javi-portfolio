@@ -36,6 +36,7 @@ import {
   type PropertyForm,
 } from '@modules/tools/domain/rentaRentals';
 import { workReductionOf } from '@modules/tools/domain/rentaWork';
+import { daysOf, reductionOf } from '@modules/tools/domain/rentaAbatement';
 import { aragon } from '@modules/tools/data/renta/ccaa/aragon';
 import { cantabria } from '@modules/tools/data/renta/ccaa/cantabria';
 import { comunitatValenciana } from '@modules/tools/data/renta/ccaa/comunitat-valenciana';
@@ -274,15 +275,107 @@ const CHECKS: Record<string, () => void> = {
   },
   'renta-c11-02': () => {
     // Price 150,000 less the municipal tax; cost 90,000 + 8,000 less the depreciation of 1995-1996.
+    // Bought on 20-12-1994 and sold on 01-07-2025: 4,049 days up to 19-01-2006 (both inclusive)
+    // of 11,151, and 3 years up to 31-12-1996 (rounded up): 11.11 % (DT 9.ª).
     const p = propertyGain({
       name: 'Piso',
       proceeds: 150000 - 1900,
       cost: 98000,
       amortization: 1620,
       exemption: 'none',
+      acquired: '1994-12-20',
+      sold: '2025-07-01',
     });
+    expect(daysOf('1994-12-20', '2025-07-01')).toEqual({ before: 4049, held: 11151 });
     expect(p.gain).toBe(figure('renta-c11-02', 'Ganancia patrimonial'));
-    // The reduction of the DT 9.ª (abatement coefficients) is not worked out: see its todo below.
+    expect(p.before).toBe(figure('renta-c11-02', 'Ganancia generada hasta'));
+    expect(p.reduction).toBe(figure('renta-c11-02', 'Reducción por abatimiento'));
+    expect(p.taxable).toBe(figure('renta-c11-02', 'Ganancia patrimonial reducida'));
+  },
+  'renta-c11-04': () => {
+    // The chalet bought on 10-10-1992 (5 years up to 1996: 33.33 %) and the improvement of 2012,
+    // each with its part of the price (rule 3.ª); the municipal tax off the chalet's part.
+    const chalet = { name: 'Chalet', proceeds: 335000, cost: 108000, amortization: 0 };
+    const sold = '2025-02-03';
+    const c = propertyGain({ ...chalet, exemption: 'none', acquired: '1992-10-10', sold });
+    const improvement = propertyGain({
+      name: 'Mejora',
+      proceeds: 150000,
+      cost: 75000,
+      amortization: 0,
+      exemption: 'none',
+      acquired: '2012-07-15',
+      sold,
+    });
+    expect(c.gain).toBe(figure('renta-c11-04', 'Ganancia chalet'));
+    expect(improvement.gain).toBe(figure('renta-c11-04', 'Ganancia de la mejora'));
+    expect(improvement.reduction).toBe(0);
+    // The Manual counts 4,849 and 11,803 days; from its dates the law («ambos inclusive», as in the
+    // caso práctico 2) gives 4,850 and 11,804. With its days, its figures to the cent:
+    expect(daysOf('1992-10-10', sold)).toEqual({ before: 4850, held: 11804 });
+    const item = { kind: 'property' as const, acquired: '1992-10-10', sold, proceeds: 335000 };
+    const manual = reductionOf({ ...item, gain: 227000 }, round2((227000 * 4849) / 11803), 0);
+    expect(manual.reducible).toBe(figure('renta-c11-04', 'Ganancia anterior a 20-01-2006'));
+    expect(manual.reduction).toBe(figure('renta-c11-04', 'Reducción 33,33 %'));
+    // Erratum of the source: its later part (227,000 / 11,803 x 6,952 = 133,703.64) and its earlier
+    // one do not add up to the gain (38.46 € are lost). The law reduces only the earlier part, so
+    // the rest of the gain is 227,000 − 93,257.90 = 133,742.10, and the total 38.46 € higher.
+    const engine = round2(227000 - manual.reduction + improvement.taxable);
+    expect(round2(engine - figure('renta-c11-04', 'Ganancia patrimonial computable'))).toBe(38.46);
+    // With the dates (4,850 / 11,804): 93,269.23 before 2006 and 31,086.63 of reduction.
+    expect(c).toMatchObject({ before: 93269.23, reduction: 31086.63, taxable: 195913.37 });
+  },
+  'renta-c11-05': () => {
+    // The same taxpayer, after the chalet of example 1 (335,000 € of the 400,000 €): shares bought on
+    // 31-05-1991 (6 years: 100 %) and sold on 30-10-2025, worth 66,000 € for the Wealth Tax of 2005.
+    const s = savingsOf(
+      {
+        ...emptySavingsDetail(),
+        properties: [
+          {
+            name: 'Chalet',
+            proceeds: 335000,
+            cost: 108000,
+            amortization: 0,
+            exemption: 'none',
+            acquired: '1992-10-10',
+            sold: '2025-02-03',
+          },
+        ],
+        assets: [
+          {
+            name: 'TASA',
+            kind: 'listed',
+            buys: [{ date: '1991-05-31', units: 300, cost: 57000, ip2005: 66000 }],
+            sells: [{ date: '2025-10-30', units: 300, proceeds: 75000 }],
+          },
+        ],
+      },
+      2025
+    );
+    const [sale] = s.sales;
+    expect(sale.gain).toBe(figure('renta-c11-05', 'Ganancia total'));
+    expect(sale.reduction).toBe(figure('renta-c11-05', 'Reducción 100 %'));
+    expect(round2(sale.gain - (sale.reduction as number))).toBe(
+      figure('renta-c11-05', 'Ganancia patrimonial computable')
+    );
+    // The same with the 335,000 € typed as used in an earlier year.
+    const alone = savingsOf(
+      {
+        ...emptySavingsDetail(),
+        abatementPrior: 335000,
+        assets: [
+          {
+            name: 'TASA',
+            kind: 'listed',
+            buys: [{ date: '1991-05-31', units: 300, cost: 57000, ip2005: 66000 }],
+            sells: [{ date: '2025-10-30', units: 300, proceeds: 75000 }],
+          },
+        ],
+      },
+      2025
+    );
+    expect(alone.boxes['0424']).toBe(figure('renta-c11-05', 'Ganancia patrimonial computable'));
   },
   'renta-c11-03': () => {
     // Sold at a loss and the homogeneous shares bought back the next month (dates inside the window).
@@ -525,10 +618,6 @@ const PENDING: Record<string, string> = {
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',
   'renta-c09-01':
     'Agraria con PAC repartida entre cultivos: pendiente de pasar por agrarianModules (siguiente oleada).',
-  'renta-c11-04':
-    'Coeficientes de abatimiento (DT 9.ª) y límite de 400.000 €: el motor no los calcula.',
-  'renta-c11-05':
-    'Coeficientes de abatimiento de acciones cotizadas (valor del IP 2005, DT 9.ª): el motor no los calcula.',
   'renta-c11-08':
     'Exención por reinversión en renta vitalicia de mayores de 65 (art. 38.3): solo hay una ficha informativa.',
   'renta-c13-02':

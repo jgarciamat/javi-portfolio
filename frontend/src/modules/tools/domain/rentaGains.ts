@@ -1,6 +1,8 @@
 import type { CertificateLine } from './invest/pdfReports';
 import type { InvestOp } from './invest/types';
 import { round2 } from './round';
+import { rentaAbatement } from '../data/renta/abatimiento';
+import { abate, type AbatementItem, type AbatementKind } from './rentaAbatement';
 
 /**
  * Savings income in detail (capital mobiliario, capital gains and losses) and its integration and
@@ -45,6 +47,11 @@ export interface Lot {
   date: string;
   units: number;
   cost: number;
+  /**
+   * Bought before 31-12-1994, listed shares or fund units: the value of the whole lot for the
+   * Wealth Tax of 2005 (LIRPF DT 9.ª, rule 2.ª), for the abatement coefficients.
+   */
+  ip2005?: number;
 }
 
 /** A sale: the date, the units and what was obtained less its expenses (art. 35.2). */
@@ -90,6 +97,12 @@ export interface PropertySale {
   reinvested?: number;
   /** reinvested: the loan on the old home paid off with the sale (RIRPF art. 41.2). */
   pendingLoan?: number;
+  /**
+   * Dates (YYYY-MM-DD) of the purchase and of the sale: bought before 31-12-1994, the abatement
+   * coefficients of the DT 9.ª. An improvement made later goes as a sale of its own (rule 3.ª).
+   */
+  acquired?: string;
+  sold?: string;
 }
 
 /** Capital mobiliario of the savings base (LIRPF art. 25.1 to 25.3): gross amounts of the year. */
@@ -127,6 +140,11 @@ export interface SavingsDetail {
   generalGains: number[];
   /** Negative balances of the 4 years before: of gains (savings), of capital and of the general gains. */
   pending: { gains: PendingBalance[]; capital: PendingBalance[]; general: PendingBalance[] };
+  /**
+   * Transmission values of the sales of the years before since 2015 that had the abatement
+   * coefficients (DT 9.ª.1.1.ª b): they use up the 400,000 €.
+   */
+  abatementPrior?: number;
   /** What came from the files of brokers and exchanges (investImport): replaced on each import. */
   imported?: ImportedSavings;
 }
@@ -201,6 +219,12 @@ export interface SaleResult {
   deferred: number;
   /** Units sold that no purchase covers: the data is missing a purchase. */
   unmatched: number;
+  /** The parts of lots bought before 31-12-1994 that can have the abatement (DT 9.ª). */
+  pre1995?: AbatementItem[];
+  /** A listed share or fund unit of before 1995 without its 2005 value: no reduction until given. */
+  needsIp2005?: boolean;
+  /** The abatement of the DT 9.ª on this sale (set by `savingsOf`, with the 400,000 €). */
+  reduction?: number;
   /** A loss with homogeneous purchases near the sale that the app does not judge (crypto). */
   checkRepurchase: boolean;
   section: GainSection;
@@ -239,6 +263,44 @@ interface OpenLot extends Lot {
   left: number;
 }
 
+/** The coefficient of each kind (DT 9.ª.1.1.ª c): ETFs and funds are fund units, not shares. */
+function abatementKindOf(kind: AssetKind, section: GainSection): AbatementKind | null {
+  if (kind === 'crypto') return null;
+  return kind === 'listed' && section === 'shares' ? 'listed' : 'other';
+}
+
+/** Rule 2.ª (the 2005 value) is for securities admitted to trading and fund units. */
+const ruleTwo = (kind: AssetKind) => kind === 'listed' || kind === 'fund';
+
+/** The parts of a sale from lots bought before 1995, each with its share of the proceeds. */
+function pre1995Of(
+  asset: AssetOps,
+  section: GainSection,
+  sale: Disposal,
+  used: Lot[]
+): { items: AbatementItem[]; needsIp2005: boolean } {
+  const kind = abatementKindOf(asset.kind, section);
+  const units = positive(sale.units);
+  const old = used.filter((part) => part.date <= rentaAbatement.acquiredUntil);
+  if (!kind || old.length === 0) return { items: [], needsIp2005: false };
+  const needsIp2005 = ruleTwo(asset.kind) && old.some((part) => part.ip2005 === undefined);
+  const items = old
+    .filter((part) => !ruleTwo(asset.kind) || part.ip2005 !== undefined)
+    .map((part): AbatementItem => {
+      const proceeds = round2((positive(sale.proceeds) * part.units) / units);
+      return {
+        kind,
+        acquired: part.date,
+        sold: sale.date,
+        proceeds,
+        gain: round2(proceeds - part.cost),
+        cost: part.cost,
+        ...(part.ip2005 !== undefined ? { ip2005: part.ip2005 } : {}),
+      };
+    });
+  return { items, needsIp2005 };
+}
+
 /** The sales of one asset matched with its purchases, the oldest first (LIRPF art. 37.2). */
 export function fifo(asset: AssetOps): SaleResult[] {
   const lots: OpenLot[] = byDate(asset.buys).map((b) => ({
@@ -258,7 +320,12 @@ export function fifo(asset: AssetOps): SaleResult[] {
       const take = Math.min(lot.left, units);
       const share = (lot.cost * take) / lot.units;
       cost += share;
-      used.push({ date: lot.date, units: take, cost: round2(share) });
+      used.push({
+        date: lot.date,
+        units: take,
+        cost: round2(share),
+        ...(lot.ip2005 !== undefined ? { ip2005: round2((lot.ip2005 * take) / lot.units) } : {}),
+      });
       lot.left -= take;
       units -= take;
     }
@@ -282,6 +349,7 @@ export function fifo(asset: AssetOps): SaleResult[] {
     }
     const checkRepurchase =
       gain < 0 && asset.kind === 'crypto' && near(WARN_MONTHS).some((l) => l.left > 0);
+    const old = pre1995Of(asset, section, sale, used);
     return [
       {
         name: asset.name,
@@ -297,6 +365,8 @@ export function fifo(asset: AssetOps): SaleResult[] {
         section,
         lots: used,
         counterpart: sale.counterpart,
+        ...(old.items.length > 0 ? { pre1995: old.items } : {}),
+        ...(old.needsIp2005 ? { needsIp2005: true } : {}),
       },
     ];
   });
@@ -309,12 +379,15 @@ export interface PropertyResult {
   gain: number;
   /** The exempt part of the gain (art. 33.4.b or 38.1). */
   exempt: number;
+  /** The abatement of the DT 9.ª on the part not exempt, and the gain generated up to 19-01-2006. */
+  reduction: number;
+  before: number;
   /** What goes to the savings base. */
   taxable: number;
 }
 
-/** The gain of a property sold, with the exemption of the main home when it applies. */
-export function propertyGain(p: PropertySale): PropertyResult {
+/** The gain of a property sold and its exempt part, before the abatement. */
+function propertyBase(p: PropertySale): { gain: number; exempt: number; item: AbatementItem } {
   const cost = Math.max(0, positive(p.cost) - positive(p.amortization));
   const gain = round2(positive(p.proceeds) - cost);
   let exempt = 0;
@@ -326,7 +399,40 @@ export function propertyGain(p: PropertySale): PropertyResult {
     const share = obtained > 0 ? Math.min(1, positive(p.reinvested ?? 0) / obtained) : 1;
     exempt = round2(gain * share);
   }
-  return { name: p.name, gain, exempt, taxable: round2(gain - exempt) };
+  // The exempt part neither has the reduction nor counts towards the 400,000 € (Manual 2025, c11,
+  // «Cálculo del valor de transmisión», checked 22-10-2026: the reinvested value is left out).
+  const free = gain > 0 ? (gain - exempt) / gain : 1;
+  const item: AbatementItem = {
+    kind: 'property',
+    acquired: p.acquired ?? '',
+    sold: p.sold ?? '',
+    proceeds: round2(positive(p.proceeds) * free),
+    gain: round2(gain - exempt),
+  };
+  return { gain, exempt, item };
+}
+
+/** A property sold with its abatement worked out (`abatement` from {@link abate}). */
+const propertyOf = (
+  p: PropertySale,
+  base: ReturnType<typeof propertyBase>,
+  abatement: { before: number; reduction: number }
+): PropertyResult => ({
+  name: p.name,
+  gain: base.gain,
+  exempt: base.exempt,
+  reduction: abatement.reduction,
+  before: abatement.before,
+  taxable: round2(base.gain - base.exempt - abatement.reduction),
+});
+
+/**
+ * The gain of a property sold, with the exemption of the main home when it applies and the
+ * abatement of the DT 9.ª after `prior` € of transmission values that used up the 400,000 €.
+ */
+export function propertyGain(p: PropertySale, prior = 0): PropertyResult {
+  const base = propertyBase(p);
+  return propertyOf(p, base, abate([base.item], prior)[0]);
 }
 
 // ─── Integration and compensation ─────────────────────────────────────────────
@@ -473,6 +579,25 @@ function withImported(detail: SavingsDetail): SavingsDetail {
 }
 
 /**
+ * The abatement of the DT 9.ª on the sales and properties of the year, in the order they were sold:
+ * one 400,000 € for all of them, after what the years before used up.
+ */
+function abated(sales: SaleResult[], list: PropertySale[], prior: number) {
+  const bases = list.map(propertyBase);
+  const items = [...bases.map((b) => b.item), ...sales.flatMap((s) => s.pre1995 ?? [])];
+  const results = abate(items, prior);
+  const properties = list.map((p, i) => propertyOf(p, bases[i], results[i]));
+  let next = list.length;
+  const withReduction = sales.map((s) => {
+    if (!s.pre1995) return s;
+    const mine = results.slice(next, next + s.pre1995.length);
+    next += s.pre1995.length;
+    return { ...s, reduction: round2(mine.reduce((sum, r) => sum + r.reduction, 0)) };
+  });
+  return { sales: withReduction, properties };
+}
+
+/**
  * The savings base (LIRPF art. 49; modelo 100 of 2025, page 19, in the order of its boxes): each
  * balance with itself, a negative one against the other up to 25 % of it, then the balances of the
  * four years before, the oldest first.
@@ -480,11 +605,14 @@ function withImported(detail: SavingsDetail): SavingsDetail {
 export function savingsOf(typed: SavingsDetail, year: number): SavingsBreakdown {
   const detail = withImported(typed);
   const inYear = (date: string) => date.startsWith(`${year}-`);
-  const sales = detail.assets.flatMap((a) => fifo(a)).filter((s) => inYear(s.date));
-  const properties = detail.properties.map(propertyGain);
+  const { sales, properties } = abated(
+    detail.assets.flatMap((a) => fifo(a)).filter((s) => inYear(s.date)),
+    detail.properties,
+    detail.abatementPrior ?? 0
+  );
   const capital = capitalOf(detail.capital);
   const gainsList = [
-    ...sales.map((s) => round2(s.gain + s.deferred)),
+    ...sales.map((s) => round2(s.gain + s.deferred - (s.reduction ?? 0))),
     ...properties.map((p) => p.taxable),
     ...detail.otherGains.map(finite),
   ];

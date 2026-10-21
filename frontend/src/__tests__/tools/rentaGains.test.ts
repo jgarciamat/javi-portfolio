@@ -204,6 +204,8 @@ describe('the sale of a property', () => {
       name: 'Piso',
       gain: 24500,
       exempt: 0,
+      reduction: 0,
+      before: 0,
       taxable: 24500,
     });
     expect(

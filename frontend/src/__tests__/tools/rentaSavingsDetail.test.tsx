@@ -135,4 +135,52 @@ describe('Renta: the savings in detail', () => {
     fireEvent.click(sale.getByRole('button', { name: tr(`${k}.removeProperty`) }));
     expect(last.savingsDetail?.properties).toEqual([]);
   });
+
+  it('reduces a property and shares bought before 1995 by the abatement coefficients (DT 9.ª)', () => {
+    renderWithProviders(<Harness />);
+    fireEvent.click(screen.getByLabelText(tr(`${k}.on`)));
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.addProperty`) }));
+    const sale = within(screen.getByRole('group', { name: tr(`${k}.property`, { n: 1 }) }));
+    // Manual 2025, c11, caso práctico 2: 51,720 € of gain, 2,086.44 € of reduction.
+    type(sale.getByLabelText(tr(`${k}.propertyProceeds`)), '148100');
+    type(sale.getByLabelText(tr(`${k}.propertyCost`)), '98000');
+    type(sale.getByLabelText(tr(`${k}.amortization`)), '1620');
+    expect(sale.queryByText(tr(`${k}.abatementHint`))).toBeNull();
+    type(sale.getByLabelText(tr(`${k}.acquired`)), '1994-12-20');
+    type(sale.getByLabelText(tr(`${k}.sold`)), '2025-07-01');
+    expect(sale.getByText(tr(`${k}.abatementHint`))).toBeInTheDocument();
+    expect(statusText()).toContain(money(-2086.44));
+    expect(statusText()).toContain(money(49633.56));
+    // Listed shares of 1991 without their 2005 value: a warning; with it, the reduction.
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.addAsset`) }));
+    const asset = within(screen.getByRole('group', { name: tr(`${k}.asset`, { n: 1 }) }));
+    type(asset.getByLabelText(tr(`${k}.name`)), 'TASA');
+    fireEvent.click(asset.getByRole('button', { name: tr(`${k}.addBuy`) }));
+    fireEvent.click(asset.getByRole('button', { name: tr(`${k}.addSell`) }));
+    const dates = asset.getAllByLabelText(tr(`${k}.date`));
+    const units = asset.getAllByLabelText(tr(`${k}.units`));
+    expect(asset.queryByLabelText(tr(`${k}.ip2005`))).toBeNull();
+    type(dates[0], '1991-05-31');
+    type(units[0], '300');
+    type(asset.getByLabelText(tr(`${k}.cost`)), '57000');
+    type(dates[1], '2025-10-30');
+    type(units[1], '300');
+    type(asset.getByLabelText(tr(`${k}.proceeds`)), '75000');
+    expect(screen.getByText(tr(`${k}.needsIp2005`, { name: 'TASA' }))).toBeInTheDocument();
+    type(asset.getByLabelText(tr(`${k}.ip2005`)), '66000');
+    expect(screen.queryByText(tr(`${k}.needsIp2005`, { name: 'TASA' }))).toBeNull();
+    // With 335,000 € used before, the flat (sold first) takes the 65,000 € left: 18,779.87 ×
+    // 65,000 / 148,100 = 8,242.39, × 11.11 % = 915.73; nothing is left for the shares.
+    type(screen.getByLabelText(tr(`${k}.abatementPrior`, { last: 2024 })), '335000');
+    expect(statusText()).toContain(money(-915.73));
+    expect(last.savingsDetail?.abatementPrior).toBe(335000);
+    // Without the flat, the shares take them (Manual 2025, c11, ejemplo 2): 7,800 € of reduction.
+    fireEvent.click(sale.getByRole('button', { name: tr(`${k}.removeProperty`) }));
+    expect(statusText()).toContain(money(-7800));
+    // Fund units also have their 2005 value; unlisted shares go by days and do not ask for it.
+    fireEvent.change(asset.getByLabelText(tr(`${k}.kind`)), { target: { value: 'fund' } });
+    expect(asset.getByLabelText(tr(`${k}.ip2005`))).toBeInTheDocument();
+    fireEvent.change(asset.getByLabelText(tr(`${k}.kind`)), { target: { value: 'unlisted' } });
+    expect(asset.queryByLabelText(tr(`${k}.ip2005`))).toBeNull();
+  });
 });
