@@ -206,6 +206,18 @@ const CHECKS: Record<string, () => void> = {
     expect(p.amortizationBase).toBe(figure('renta-c04-04', 'Coste de adquisición sin suelo'));
     expect(p.amortization).toBe(figure('renta-c04-04', 'Amortización anual máxima'));
   },
+  'renta-c04-05': () => {
+    // A usufruct of 10 years bought for 100,000 € and let for 20,000 € a year.
+    const p = property({
+      usufruct: true,
+      usufructYears: '10',
+      cost: '100000',
+      income: '20000',
+      use: 'other',
+    });
+    expect(p.amortization).toBe(figure('renta-c04-05', 'Amortización anual del usufructo'));
+    expect(p.income).toBe(figure('renta-c04-05', 'Límite'));
+  },
   'renta-c04-06': () => {
     // The depreciation of each one is given by the source (3 % of the cadastral value): typed.
     const home = (income: string, repair: string, ibi: string, community: string, amort: string) =>
@@ -766,8 +778,6 @@ const CHECKS: Record<string, () => void> = {
 
 /** Why each case of the Renta has no check here (21-10-2026). */
 const PENDING: Record<string, string> = {
-  'renta-c04-05':
-    'Usufructo temporal (coste / años, hasta los ingresos): el motor amortiza el 3 % de un inmueble, no un derecho.',
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',

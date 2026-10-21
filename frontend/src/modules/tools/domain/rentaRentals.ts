@@ -34,6 +34,8 @@ export interface PropertyForm {
   /** % of the property that is theirs (0063, or 0064 for a usufruct); empty: 100. */
   share: string;
   usufruct?: boolean;
+  /** A usufruct for a number of years (empty: for life): its cost depreciates over them. */
+  usufructYears?: string;
   /** Days let in the year (0101); empty: the whole year. */
   rentedDays: string;
   /** Days that do not impute rent (their home, works, not usable): the rest of the year does (0085). */
@@ -182,6 +184,29 @@ const num = (text: string | undefined, parse: (t: string) => number): number => 
 };
 const clampDays = (d: number, full: number) => Math.min(full, Math.max(0, Math.floor(d)));
 
+/**
+ * A usufruct bought: its cost (no land, no cadastral value) over the years it lasts, or 3 % a year
+ * for life, and never more than the rent of the right (RIRPF arts. 13.h and 14; Manual práctico de
+ * Renta 2025, c04, «Cantidades destinadas a la amortización», checked 22-10-2026: 100,000 € for 10
+ * years gives 10,000 € a year). By the days let, like the rest of the depreciation.
+ */
+function usufructDepreciation(
+  p: PropertyForm,
+  share: number,
+  days: number,
+  income: number,
+  property: RentaProperty,
+  v: (t: string | undefined) => number
+): { amortizationBase: number; amortization: number } {
+  const amortizationBase = round2(Math.max(0, v(p.cost)) * share);
+  const years = Math.floor(v(p.usufructYears));
+  const yearly =
+    years > 0
+      ? amortizationBase / years
+      : (amortizationBase * property.rental.amortizationRate) / 100;
+  return { amortizationBase, amortization: round2(Math.min(yearly * days, income)) };
+}
+
 /** A property worked out (`parse` reads the typed amounts; `full`: the days of the year). */
 export function propertyResult(
   p: PropertyForm,
@@ -234,8 +259,16 @@ export function propertyResult(
   const cadastral = Math.max(0, v(p.cadastral));
   const building = Math.max(0, v(p.cadastralBuilding));
   const ratio = cadastral > 0 && building > 0 ? Math.min(1, building / cadastral) : 1;
-  const amortizationBase = round2(Math.max(Math.max(0, v(p.cost)) * ratio, building) * share);
-  const amortization = round2((amortizationBase * property.rental.amortizationRate * days) / 100);
+  const ownedDepreciation = (): { amortizationBase: number; amortization: number } => {
+    const base = round2(Math.max(Math.max(0, v(p.cost)) * ratio, building) * share);
+    return {
+      amortizationBase: base,
+      amortization: round2((base * property.rental.amortizationRate * days) / 100),
+    };
+  };
+  const { amortizationBase, amortization } = p.usufruct
+    ? usufructDepreciation(p, share, days, income, property, v)
+    : ownedDepreciation();
 
   const net = round2(income - pendingApplied - cappedApplied - otherExpenses - amortization);
   const red = reductionOf(p);

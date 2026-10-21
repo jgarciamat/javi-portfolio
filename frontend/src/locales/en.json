@@ -2232,6 +2232,8 @@
   "tools.renta.property.field.income": "Rent charged in the year (whole property)",
   "tools.renta.property.hint.income": "Everything charged without VAT, with what you pass on to the tenant (box 0102 for your share).",
   "tools.renta.property.usufruct": "I hold it in usufruct (the depreciation is that of the usufruct right: type what it cost you)",
+  "tools.renta.property.field.usufructYears": "Years the usufruct lasts",
+  "tools.renta.property.hint.usufructYears": "Empty if it is for life (3 % a year). If it is for some years, what it cost is shared out over them. Never more than the rent received.",
   "tools.renta.property.expenses": "Expenses of the whole property in the year",
   "tools.renta.property.expensesHint": "IBI, community fees, insurance and interest count for the days let. Interest and repairs together cannot pass the rent of this property: the excess is kept for 4 years.",
   "tools.renta.property.furniture": "Depreciation of the furniture let with the home (box 0117)",

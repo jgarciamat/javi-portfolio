@@ -2232,6 +2232,8 @@
   "tools.renta.property.field.income": "Alquiler cobrado en el año (inmueble entero)",
   "tools.renta.property.hint.income": "Todo lo cobrado sin IVA, con lo que repercutas al inquilino (casilla 0102 en tu parte).",
   "tools.renta.property.usufruct": "Lo tengo en usufructo (la amortización es la del derecho de usufructo: escribe lo que te costó)",
+  "tools.renta.property.field.usufructYears": "Años que dura el usufructo",
+  "tools.renta.property.hint.usufructYears": "Vacío si es vitalicio (se amortiza el 3 % al año). Si es temporal, lo que costó se reparte entre sus años. Nunca más que lo cobrado por el alquiler.",
   "tools.renta.property.expenses": "Gastos del inmueble entero en el año",
   "tools.renta.property.expensesHint": "IBI, comunidad, seguro e intereses se cuentan por los días alquilados. Intereses y reparaciones juntos no pasan del alquiler de este inmueble: el exceso se guarda 4 años.",
   "tools.renta.property.furniture": "Amortización de los muebles cedidos con la vivienda (casilla 0117)",

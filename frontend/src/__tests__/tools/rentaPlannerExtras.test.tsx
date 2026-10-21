@@ -120,6 +120,8 @@ describe('Renta planner: property', () => {
     expect(screen.getByText(tr(p('reductionNone')))).toBeInTheDocument();
     for (const box of ['usufruct', 'irregular', 'relative'])
       fireEvent.click(screen.getByLabelText(tr(p(box))));
+    // A usufruct: how many years it lasts (empty: for life).
+    fill(p('field.usufructYears'), '10');
     fireEvent.click(screen.getAllByLabelText(tr('tools.renta.revised', { rate: 1.1 }))[0]);
     fill(p('field.label'), 'Piso centro');
     expect(screen.getByText(tr(p('legend'), { n: 1, label: 'Piso centro' }))).toBeInTheDocument();

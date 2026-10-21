@@ -190,6 +190,24 @@ describe('a rented property on its own', () => {
     expect(repairs({ expenses: {} }).repairsProrated).toBe(false);
   });
 
+  it('depreciates a usufruct bought over its years, or 3 % for life, up to its rent', () => {
+    // 100,000 € for 10 years: 10,000 a year (Manual 2025, c04); for life, 3 % = 3,000.
+    const u = (patch: Partial<PropertyForm>) =>
+      run(prop({ usufruct: true, cost: '100000', income: '20000', use: 'other', ...patch }));
+    expect(u({ usufructYears: '10' })).toMatchObject({
+      amortizationBase: 100000,
+      amortization: 10000,
+    });
+    expect(u({}).amortization).toBe(3000);
+    // Never more than the rent of the right, and by the days let (half the year: 5,000).
+    expect(u({ usufructYears: '2', income: '30000' }).amortization).toBe(30000);
+    expect(u({ usufructYears: '10', rentedDays: '73' }).amortization).toBe(2000);
+    // The cadastral value of the building plays no part.
+    expect(
+      u({ usufructYears: '10', cadastral: '500000', cadastralBuilding: '400000' }).amortization
+    ).toBe(10000);
+  });
+
   it('keeps the days that do not impute out of the days at disposal', () => {
     expect(run(prop({ rentedDays: '100', otherDays: '65', cadastral: '1000' }))).toMatchObject({
       disposalDays: 200,

@@ -272,6 +272,7 @@ export function PropertyCard({
         checked={p.usufruct === true}
         onChange={(on) => update({ usufruct: on })}
       />
+      {p.usufruct && <div className="tools-form">{field('usufructYears')}</div>}
       <h4>{t(k('expenses'))}</h4>
       <p className="section-hint">{t(k('expensesHint'))}</p>
       <div className="tools-form">
