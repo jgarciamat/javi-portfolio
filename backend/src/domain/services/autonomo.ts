@@ -72,10 +72,23 @@ export interface DraftInputs {
   /** Income and expenses typed by hand: they replace the movements. */
   manual?: ManualData | null;
   /**
-   * Totals of the modelo 130 already filed for the quarters before the viewed one (boxes 01, 02, 05 and
-   * 06 of the last one), so the earlier quarters need not be typed again.
+   * Totals up to the quarter before the viewed one, so the earlier quarters need not be typed again:
+   * the real cumulative income, expenses and withholdings (boxes 01, 02 and 06, corrected if that 130
+   * had an error) and the payments as filed (box 05 of the viewed quarter: 05 + 07 of the last 130).
    */
   prior?: PriorTotals | null;
+  /**
+   * The modelo 130 of each quarter as it was filed (null: not given). Only the payments carried to the
+   * next quarters come from it; boxes 01 and 02 always follow the real figures (C1-C2 of
+   * docs/fiscalidad/corregir-un-modelo.md).
+   */
+  filed130?: (Filed130 | null)[] | null;
+}
+
+/** Boxes 07 and 19 of a modelo 130 as filed, in euros. */
+export interface Filed130 {
+  box07: number;
+  box19?: number | null;
 }
 
 export interface PriorTotals {
@@ -174,8 +187,7 @@ const lowIncomeReduction = (priorYearNet: number | null): number => {
   return LOW_INCOME_REDUCTIONS.find((r) => priorYearNet <= r.upTo)?.amount ?? 0;
 };
 
-/** Modelo 130 up to a quarter: cumulative figures, with the payments of the earlier quarters. */
-/** Where the cumulative figures start: the first quarter, or the quarter after the filed totals. */
+/** Where the cumulative figures start: the first quarter, or the quarter after the prior totals. */
 interface CumulativeWindow {
   prior: NonNullable<DraftInputs['prior']> | null;
   start: number;
@@ -251,6 +263,28 @@ function agrarianSection(q: Quarter, e: QuarterExtras): { box11: number; boxes: 
   };
 }
 
+/**
+ * Box 05 adds the positive boxes 07 «consignadas» in the 130 filed this year, less their boxes 16
+ * (instructions of the modelo 130, box 05, AEAT, checked 2026-10-21). A quarter whose filed 130 was
+ * typed carries what was filed, so a correction made later in the app does not take off payments that
+ * were never made; the others carry the box 07 worked out here. A negative box 19 («a deducir», only
+ * after the low-income reduction) goes to box 15 of the next quarters.
+ */
+function carryOf(
+  filed: Filed130 | null | undefined,
+  worked: { box07: number; box14: number; box15: number },
+  carried: number
+): { payment: number; carried: number } {
+  const box07 = filed ? filed.box07 : worked.box07;
+  const box19 = filed?.box19 ?? null;
+  const negative = box19 === null ? worked.box14 : box19;
+  return {
+    payment: Math.max(0, round2(box07)),
+    carried: negative < 0 ? carried + -negative : Math.max(0, carried - worked.box15),
+  };
+}
+
+/** Modelo 130 up to a quarter: real cumulative figures, with the payments of the earlier quarters. */
 function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): Draft130 {
   if (inputs.exempt130) return { required: false, result: 'notRequired', amountDue: 0, boxes: [] };
   const reduction = lowIncomeReduction(inputs.priorYearNet);
@@ -306,8 +340,11 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
       { box: '19', label: 'Resultado de la autoliquidación', amount: box17 },
     ];
     amountDue = box17;
-    previousPayments += box07 > 0 ? box07 : 0;
-    carriedNegative = box14 < 0 ? carriedNegative + -box14 : Math.max(0, carriedNegative - box15);
+    // The viewed quarter carries nothing; the earlier ones carry what was filed when it is known.
+    const filed = n < upTo ? inputs.filed130?.[n - 1] : null;
+    const carry = carryOf(filed, { box07, box14, box15 }, carriedNegative);
+    previousPayments = round2(previousPayments + carry.payment);
+    carriedNegative = carry.carried;
   }
   const result: Draft130['result'] = amountDue > 0 ? 'pay' : amountDue < 0 ? 'negative' : 'zero';
   return { required: true, result, amountDue, boxes: last };

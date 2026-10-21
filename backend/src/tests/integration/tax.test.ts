@@ -517,6 +517,25 @@ describe('Self-employed: professional categories and quarterly tax', () => {
       await draft(1, { vat: { prorrata: { provisional: 120, special: false } } }).expect(400);
     });
 
+    it('takes off in box 05 what the earlier 130 filed, with boxes 01 and 02 real', async () => {
+      // 2T: 1,000 more of income. Real cumulative 2,100 − 200 → 04 = 380. The 1T worked out here
+      // is 180, but it was filed at −50 (0 paid): box 05 is 0 and the 2T comes to 380, not 200.
+      await add({ type: 'INCOME', category: 'Salario', amount: 1210, date: '2026-05-10' });
+      const recomputed = (await draft(2).expect(201)).body;
+      expect(box(recomputed.irpf.boxes, '05')).toBe(180);
+      expect(recomputed.irpf.amountDue).toBe(200);
+      const filed = (
+        await draft(2, { filed130: [{ box07: -50, box19: 0 }, null, null, null] }).expect(201)
+      ).body;
+      expect(box(filed.irpf.boxes, '01')).toBe(2100);
+      expect(box(filed.irpf.boxes, '02')).toBe(200);
+      expect(box(filed.irpf.boxes, '05')).toBe(0);
+      expect(filed.irpf.amountDue).toBe(380);
+      // Only numbers, and four quarters at most.
+      await draft(2, { filed130: [{ box07: 'x' }] }).expect(400);
+      await draft(2, { filed130: [null, null, null, null, null] }).expect(400);
+    });
+
     it('ignores the filed totals in the first quarter', async () => {
       const { body } = await draft(1, {
         prior: { income: 9999, expenses: 0, previousPayments: 0, withheld: 0 },

@@ -509,6 +509,11 @@ export const autonomoDraftBody = z.object({
         withheld: euroAmount.default(0),
       })
       .nullish(),
+    /** Boxes 07 and 19 of each modelo 130 as filed (null: not given). */
+    filed130: z
+      .array(z.object({ box07: signedAmount, box19: signedAmount.nullish() }).nullable())
+      .max(4)
+      .nullish(),
   }),
 });
 // The self-employed form saved in the account: the same fields the app keeps on the device, as
@@ -802,6 +807,8 @@ const autonomoSaved = z
         ]),
         /** Results (box 71) of the 303 imported, by quarter. */
         filed303: z.tuple([filedResult, filedResult, filedResult, filedResult]).optional(),
+        /** Box 07 of each modelo 130 as filed, typed (box 19 is `activity.paid130`). */
+        filed130: z.array(formText).max(4).optional(),
         /** Assets, grants and the annual figures of the activity. */
         activity: savedActivity.optional(),
       })
