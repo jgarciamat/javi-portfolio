@@ -18,7 +18,7 @@ export interface WealthInput {
   abroad: Partial<Record<AbroadBlock, number>>;
   /** The values of each block in the last 720 / 721 filed (none: never filed). */
   lastFiled?: Partial<Record<AbroadBlock, number>>;
-  /** Blocks with an asset that stopped being the person's during the year (it must be reported). */
+  /** Blocks with an asset that stopped being the person's during the year (reported if filed before). */
   ended?: AbroadBlock[];
   /** All the assets and rights, valued as the wealth tax says, the main home and the debts. */
   wealth?: { assets: number; home: number; debts: number };
@@ -38,9 +38,11 @@ function abroadWarning(input: WealthInput, block: AbroadBlock, f: Figures): Weal
   const model = block === 'crypto' ? '721' : '720';
   const value = input.abroad[block] ?? 0;
   const last = input.lastFiled?.[block];
-  if (input.ended?.includes(block)) return { model, block, value, reason: 'ended' };
   if (last === undefined)
     return value > f.abroad.threshold ? { model, block, value, reason: 'first' } : null;
+  // An asset that ended must be reported only when an earlier 720 / 721 included it (RGAT art. 42 bis.5
+  // «en todo caso» of the years after the first; AEAT FAQ of the 720, «Forma de calcular el límite»).
+  if (input.ended?.includes(block)) return { model, block, value, reason: 'ended' };
   return value - last > f.abroad.rise ? { model, block, value, reason: 'rise' } : null;
 }
 

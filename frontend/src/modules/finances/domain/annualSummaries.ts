@@ -20,7 +20,7 @@ import { payeeKeys, retentionOf, roleOf, type WithholdingQuarter } from './withh
  * - [RGAT] Real Decreto 1065/2007, arts. 31-35, https://www.boe.es/buscar/act.php?id=BOE-A-2007-15984 :
  *   the 347 by person and year, purchases (key A) and sales (key B) apart, broken down by quarter
  *   (33.1), VAT included (34.2.a; «IVA incluido» in the AEAT folleto, 8.2), net of credit notes
- *   (34.2); without imports and exports (33.2.g) nor what another declaration with the same content
+ *   (34.2), the threshold in absolute value; without imports and exports (33.2.g) nor what another declaration with the same content
  *   gives (33.2.i: the intra-EU operations of the 349); the rent of business premises apart (34.1.d).
  *
  * NO CONFIRMADO: whether invoices with an IRPF withholding (already in the 190 or the 180) leave the
@@ -275,7 +275,9 @@ export function summary347(year: number, invoices: ImportedInvoice[]): Summary34
   const notSubject: string[] = [];
   for (const items of groups.values()) {
     const total = sum(items.map(amountOf347));
-    if (total <= threshold) continue;
+    // In absolute value: a credit note of a sale of another year goes with its sign (AEAT FAQ of the
+    // 347, «Devoluciones, descuentos o modificaciones de la base imponible», checked 2026-10-21).
+    if (Math.abs(total) <= threshold) continue;
     const first = items[0];
     const quarters = [1, 2, 3, 4].map((q) =>
       sum(items.filter((i) => i.quarter === q).map(amountOf347))

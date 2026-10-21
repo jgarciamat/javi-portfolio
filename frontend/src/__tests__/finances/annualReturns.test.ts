@@ -395,9 +395,16 @@ describe('Warnings of the 720, 721 and 714', () => {
       { model: '720', block: 'accounts', value: 50000.01, reason: 'first' },
       { model: '721', block: 'crypto', value: 70000, reason: 'rise' },
     ]);
-    expect(wealthWarnings({ year: 2026, abroad: {}, ended: ['securities'] })).toEqual([
-      { model: '720', block: 'securities', value: 0, reason: 'ended' },
-    ]);
+    // An asset that ended is reported only when an earlier 720 included it (AEAT FAQ of the 720).
+    expect(
+      wealthWarnings({
+        year: 2026,
+        abroad: {},
+        lastFiled: { securities: 60000 },
+        ended: ['securities'],
+      })
+    ).toEqual([{ model: '720', block: 'securities', value: 0, reason: 'ended' }]);
+    expect(wealthWarnings({ year: 2026, abroad: {}, ended: ['securities'] })).toEqual([]);
     // A year without figures gives nothing.
     expect(wealthWarnings({ year: 2022, abroad: { crypto: 99999 } })).toEqual([]);
     expect(wealthWarnings({ year: 2019, abroad: { accounts: 99999 } })).toEqual([]);
