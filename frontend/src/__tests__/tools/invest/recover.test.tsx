@@ -4,7 +4,11 @@
  * Made-up figures.
  */
 import { fireEvent, screen } from '@testing-library/react';
-import { lossesToRecover, recoverOptions } from '@modules/tools/domain/invest/recover';
+import {
+  correctionOf,
+  lossesToRecover,
+  recoverOptions,
+} from '@modules/tools/domain/invest/recover';
 import { importedFrom } from '@modules/tools/domain/invest/sources';
 import type { InvestOp } from '@modules/tools/domain/invest/types';
 import { emptyForm, toInput, type RentaForm } from '@modules/tools/domain/rentaForm';
@@ -135,6 +139,25 @@ describe('what they can still give', () => {
   });
 });
 
+describe('how the Renta of that year is corrected', () => {
+  it('a corrective return from the Renta 2024, a request for rectification up to the 2023', () => {
+    // LGT art. 120.4 and RIRPF art. 67 bis from 2024; LGT art. 120.3 before (Manual Renta 2025).
+    expect(correctionOf(2024)).toBe('rectificativa');
+    expect(correctionOf(2025)).toBe('rectificativa');
+    expect(correctionOf(2023)).toBe('rectificacion');
+    expect(correctionOf(2022)).toBe('rectificacion');
+    const [old, recent] = recoverOptions(
+      [
+        { year: 2023, amount: 100 },
+        { year: 2024, amount: 100 },
+      ],
+      null,
+      '2026-10-21'
+    );
+    expect([old.correctBy, recent.correctBy]).toEqual(['rectificacion', 'rectificativa']);
+  });
+});
+
 describe('on the screen', () => {
   it('says what can still be done, and what cannot', () => {
     renderWithProviders(
@@ -142,6 +165,7 @@ describe('on the screen', () => {
         list={[
           {
             year: 2023,
+            correctBy: 'rectificacion',
             loss: 400,
             offsetUntil: 2027,
             offsettable: true,
@@ -152,6 +176,7 @@ describe('on the screen', () => {
           },
           {
             year: 2022,
+            correctBy: 'rectificacion',
             loss: 50,
             offsetUntil: 2026,
             offsettable: true,
@@ -162,6 +187,7 @@ describe('on the screen', () => {
           },
           {
             year: 2024,
+            correctBy: 'rectificativa',
             loss: 10,
             offsetUntil: 2028,
             offsettable: true,
@@ -172,6 +198,7 @@ describe('on the screen', () => {
           },
           {
             year: 2019,
+            correctBy: 'rectificacion',
             loss: 30,
             offsetUntil: 2023,
             offsettable: false,
@@ -194,6 +221,14 @@ describe('on the screen', () => {
       screen.getByText(tr(`${k}.gone`, { year: 2019, date: '30/06/2024' }))
     ).toBeInTheDocument();
     expect(screen.getByText(new RegExp('01/07/2028'))).toBeInTheDocument();
+    // 2023 and 2022: the older system; 2024: the corrective return.
+    expect(
+      screen.getAllByText(new RegExp(tr(`${k}.correctOld`, { year: 2022 }).slice(0, 40)))
+    ).toHaveLength(1);
+    expect(
+      screen.getByText(new RegExp(tr(`${k}.correct`, { year: 2024 }).slice(0, 60)))
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Solicitud de rectificación de autoliquidación/)).toHaveLength(2);
     expect(screen.getByText(tr(`${k}.nobody`))).toBeInTheDocument();
   });
 
