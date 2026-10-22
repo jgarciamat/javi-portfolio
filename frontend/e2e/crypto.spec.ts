@@ -153,6 +153,57 @@ test('shows dollars, a layer and the guide', async ({ page }) => {
   await expect(guide.getByRole('tablist')).toBeHidden();
 });
 
+test('says when a coin comes from USDT, shows its dollars as they are and warns of little volume', async ({
+  page,
+}) => {
+  // The demo invents prices in euros: the answers of NEAR are dressed as the real source's for a
+  // coin quoted in USDT, converted at a made-up rate, with half its candles empty (no trades).
+  await page.route('**/api/crypto/candles?*', async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    if (body.symbol === 'NEAR') {
+      body.quote = 'USDT';
+      body.market = { ...body.market, source: 'binance', usdPerEur: 1.25 };
+      body.candles = body.candles.map((c: Record<string, number>, i: number) =>
+        i % 2 ? { ...c, high: c.open, low: c.open, close: c.open, volume: 0 } : c
+      );
+    }
+    await route.fulfill({ response, json: body });
+  });
+  await page.evaluate(() =>
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'NEAR', interval: '5m' }))
+  );
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  await expect(page.getByRole('img', { name: /Gráfica de NEAR Protocol/ })).toBeVisible();
+  await expect(
+    page.getByText(
+      /NEAR: precio convertido desde USDT al cambio de referencia del BCE de hoy \(1 € = 1,25 US\$; tomamos 1 USDT = 1 US\$\)/
+    )
+  ).toBeVisible();
+  const thin = page.locator('.cc-chart-thin');
+  await expect(thin).toHaveText(
+    'Poco volumen en esta moneda: prueba una temporalidad mayor (1 h o 4 h).'
+  );
+  // The dollars use the rate of the data: the price in USDT again (euros × 1,25).
+  const euros = await page.locator('.cc-quote-price').textContent();
+  await page.getByRole('radio', { name: '$ USD' }).check();
+  await expect(
+    page.getByText(/NEAR: precio en USDT mostrado en dólares sin más conversión/)
+  ).toBeVisible();
+  await expect(page.getByText(/\(1 € = 1,25 US\$\); el simulador guarda/)).toBeVisible();
+  const value = (text: string | null) => Number(text!.replace(/[^\d,]/g, '').replace(',', '.'));
+  const dollars = await page.locator('.cc-quote-price').textContent();
+  expect(value(dollars)).toBeCloseTo(value(euros) * 1.25, 1);
+  // In full screen too.
+  await page.locator('.cc-zoom--full').click();
+  await expect(
+    page.getByRole('dialog', { name: 'Gráfica en pantalla completa' }).locator('.cc-chart-thin')
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Gráfica en pantalla completa' })).toBeHidden();
+});
+
 test('pages the coins, zooms from the bar and opens the words of the console', async ({ page }) => {
   // As many whole rows as fit beside the chart, in pages: no scroll inside, no row cut in half.
   const coins = page.getByRole('navigation', { name: 'Monedas' });

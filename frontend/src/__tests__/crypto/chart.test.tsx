@@ -129,6 +129,44 @@ describe('PriceChart', () => {
     expect(count()).toBe('Velas a la vista: 0');
   });
 
+  it('says there is little volume when over 30 % of the candles on screen have no trades', () => {
+    // 40 candles: the last 15 are empty (one price, or no volume); nothing is filled in.
+    const thin = candleList(40).map((c, i) =>
+      i < 25 ? c : i % 2 ? { ...c, volume: 0 } : { ...c, high: c.open, low: c.open, close: c.open }
+    );
+    const note = () => document.querySelector('.cc-chart-thin');
+    const { chart, rerender } = draw({ candles: thin, interval: '5m' });
+    // Before the chart says what is on screen, the recent candles count (15 of 40 > 30 %).
+    expect(note()).toHaveTextContent(
+      'Poco volumen en esta moneda: prueba una temporalidad mayor (1 h o 4 h).'
+    );
+    expect(note()).toHaveAttribute('role', 'note');
+    expect(series(chart, 'Candlestick').data).toHaveLength(40);
+    act(() => chart.show({ from: 0, to: 24 }));
+    expect(note()).toBeNull();
+    act(() => chart.show({ from: 20, to: 39 }));
+    expect(note()).not.toBeNull();
+    // Too few candles to judge.
+    act(() => chart.show({ from: 35, to: 39 }));
+    expect(note()).toBeNull();
+    act(() => chart.show({ from: 20, to: 39 }));
+    const props = {
+      label: 'Gráfica de Bitcoin',
+      lines: [],
+      layers: [],
+      onToggleLayer,
+      onVisibleChange,
+    };
+    rerender(<PriceChart {...props} candles={thin} viewKey="BTC:1h" interval="1h" />);
+    expect(note()).toHaveTextContent('(4 h o 1 día)');
+    rerender(<PriceChart {...props} candles={thin} viewKey="BTC:1h" interval="1d" />);
+    expect(note()).toHaveTextContent('prueba una temporalidad mayor (1 sem.).');
+    rerender(<PriceChart {...props} candles={thin} viewKey="BTC:1h" interval="1w" />);
+    expect(note()).toHaveTextContent(
+      'Poco volumen en esta moneda: muchas velas de este tramo no tienen operaciones.'
+    );
+  });
+
   it('shows the candle under the pointer in one short line with the full names on hover', () => {
     draw();
     const open = screen.getByTitle('Apertura');

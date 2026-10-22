@@ -12,7 +12,15 @@ import type { LogicalRange } from 'lightweight-charts';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { storage } from '@shared/utils/storage';
-import { formatCountdown, summarize, untilClose } from '../domain/chart';
+import {
+  RECENT_CANDLES,
+  THIN_SHARE,
+  flatShare,
+  formatCountdown,
+  largerSizes,
+  summarize,
+  untilClose,
+} from '../domain/chart';
 import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/format';
 import type { LayerId } from '../domain/indicators';
 import { layerLevels, layerLines, legend } from '../domain/layers';
@@ -296,6 +304,34 @@ function trapFocus(event: globalThis.KeyboardEvent, box: HTMLElement) {
   }
 }
 
+/**
+ * «Little volume on this coin»: more than 30 % of the candles on screen have no trades (the coin
+ * barely trades at this size). A discreet note with larger sizes to try; nothing is filled in.
+ */
+function ThinNote({
+  candles,
+  shown,
+  interval,
+}: {
+  candles: Candle[];
+  shown: { from: number; to: number } | null;
+  interval: CryptoInterval;
+}) {
+  const { t } = useI18n();
+  const range = shown ?? { from: candles.length - RECENT_CANDLES, to: candles.length - 1 };
+  const share = flatShare(candles, range.from, range.to);
+  if (share === null || share <= THIN_SHARE) return null;
+  const [a, b] = largerSizes(interval).map((i) => t(`app.crypto.intervals.short.${i}`));
+  const text = !a
+    ? t('app.crypto.chart.thinLong')
+    : t('app.crypto.chart.thin', { sizes: b ? t('app.crypto.chart.thinOr', { a, b }) : a });
+  return (
+    <p className="cc-chart-thin" role="note">
+      {text}
+    </p>
+  );
+}
+
 /** The compact bar of the full screen, or the hint to turn the phone otherwise. */
 function ChartTop({
   expanded,
@@ -486,6 +522,7 @@ export function PriceChart({
             })
           : t('app.crypto.chart.empty')}
       </p>
+      <ThinNote candles={candles} shown={shown} interval={interval} />
       <LinesKey id={linesId} lines={lines} />
       <Tools chart={chart} expanded={full.expanded} onExpand={full.toggle} />
       <p id={helpId} className="cc-chart-help">

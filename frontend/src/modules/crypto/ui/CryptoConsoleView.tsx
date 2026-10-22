@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
@@ -223,6 +223,26 @@ function SeasonExtras({
 const statusOf = (market: ReturnType<typeof useCryptoMarket>) =>
   market.candles?.market ?? market.coins?.market ?? null;
 
+/**
+ * The ECB rate the server converted the USDT prices with (the coin list's covers every coin),
+ * taken for the dollars so a coin quoted in USDT shows its USDT price again.
+ */
+function useServerRate(market: ReturnType<typeof useCryptoMarket>, currency: DisplayChoice) {
+  const rate = market.coins?.market.usdPerEur ?? market.candles?.market.usdPerEur ?? null;
+  const { adopt } = currency;
+  useEffect(() => {
+    if (rate !== null) adopt(rate);
+  }, [rate, adopt]);
+  return rate;
+}
+
+/** The coin on screen and the market its prices come from, for the note (null while loading). */
+function quotedCoin(market: ReturnType<typeof useCryptoMarket>, symbol: string) {
+  const quote =
+    market.candles?.quote ?? market.coins?.coins.find((c) => c.symbol === symbol)?.quote;
+  return quote ? { symbol, quote } : null;
+}
+
 function Console({ currency }: { currency: DisplayChoice }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -234,6 +254,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
   // Asked for once the portfolio of the month is there (the server starts it on the first visit).
   const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
+  const rate = useServerRate(market, currency);
   const premium = !!sim.portfolio?.plan.premium;
   const lines = useMemo(
     () => chartLines(sim.portfolio, view.symbol, t, money),
@@ -249,7 +270,12 @@ function Console({ currency }: { currency: DisplayChoice }) {
   return (
     <div className="section-view cc">
       <RiskBanner />
-      <DataNotice market={statusOf(market)} unavailable={currency.unavailable} />
+      <DataNotice
+        market={statusOf(market)}
+        unavailable={currency.unavailable}
+        coin={quotedCoin(market, view.symbol)}
+        usdPerEur={rate}
+      />
       <RankingIntro ranking={ranking.ranking} />
       {sim.portfolio && <SeasonPanel portfolio={sim.portfolio} sim={sim} />}
       <SimulatorHead sim={sim} />

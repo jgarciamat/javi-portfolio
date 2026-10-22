@@ -1,6 +1,9 @@
 import {
   CHART_INTERVALS,
+  flatShare,
   formatCountdown,
+  isFlat,
+  largerSizes,
   summarize,
   untilClose,
 } from '@modules/crypto/domain/chart';
@@ -317,3 +320,32 @@ function exitOf(positionId: string | null) {
     currentPrice: null,
   };
 }
+
+describe('empty candles (little volume)', () => {
+  const base = { time: 0, open: 1, high: 1.2, low: 0.9, close: 1.1, volume: 5 };
+
+  it('counts a candle without trades: no volume, or one single price', () => {
+    expect(isFlat(base)).toBe(false);
+    expect(isFlat({ ...base, volume: 0 })).toBe(true);
+    expect(isFlat({ ...base, high: 1, low: 1, close: 1 })).toBe(true);
+    expect(isFlat({ ...base, high: 1, low: 1 })).toBe(false);
+  });
+
+  it('gives the share of empty candles in a stretch, or null with too few to judge', () => {
+    const list = Array.from({ length: 20 }, (_, i) => (i < 5 ? { ...base, volume: 0 } : base));
+    expect(flatShare(list)).toBe(0.25);
+    expect(flatShare(list, 0, 9)).toBe(0.5);
+    expect(flatShare(list, -4.5, 9.5)).toBe(0.5);
+    expect(flatShare(list, 15, 19)).toBeNull();
+    expect(flatShare([])).toBeNull();
+  });
+
+  it('suggests up to two larger sizes of an hour or more', () => {
+    expect(largerSizes('5m')).toEqual(['1h', '4h']);
+    expect(largerSizes('30m')).toEqual(['1h', '4h']);
+    expect(largerSizes('1h')).toEqual(['4h', '1d']);
+    expect(largerSizes('1d')).toEqual(['1w']);
+    expect(largerSizes('1w')).toEqual([]);
+    expect(largerSizes('1m')).toEqual(['1h', '4h']);
+  });
+});

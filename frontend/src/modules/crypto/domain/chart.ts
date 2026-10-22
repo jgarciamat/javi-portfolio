@@ -36,6 +36,33 @@ export function summarize(
   };
 }
 
+/**
+ * An empty candle: nobody traded during it (no volume, or one price for open, high, low and
+ * close). The chart never fills them in; with many on screen it suggests a larger size.
+ */
+export const isFlat = (c: Candle): boolean =>
+  c.volume === 0 || (c.open === c.high && c.high === c.low && c.low === c.close);
+
+/** Above this share of empty candles on screen the chart shows the «little volume» note. */
+export const THIN_SHARE = 0.3;
+/** Fewer candles than this on screen say too little to judge. */
+export const THIN_MIN_CANDLES = 10;
+
+/** Share (0-1) of empty candles between two indexes; null with too few candles to judge. */
+export function flatShare(candles: Candle[], from = 0, to = candles.length - 1): number | null {
+  const part = candles.slice(Math.max(0, Math.ceil(from)), Math.max(0, Math.floor(to) + 1));
+  if (part.length < THIN_MIN_CANDLES) return null;
+  return part.filter(isFlat).length / part.length;
+}
+
+/** Up to two larger sizes of at least one hour to suggest when there is little volume. */
+export function largerSizes(interval: CryptoInterval): CryptoInterval[] {
+  const at = CHART_INTERVALS.indexOf(interval);
+  return CHART_INTERVALS.slice(at + 1)
+    .filter((i) => INTERVAL_MS[i] >= INTERVAL_MS['1h'])
+    .slice(0, 2);
+}
+
 const MINUTE = 60_000;
 export const INTERVAL_MS: Record<CryptoInterval, number> = {
   '1m': MINUTE,

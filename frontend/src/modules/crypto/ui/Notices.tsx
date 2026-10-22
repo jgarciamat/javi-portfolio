@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
 import { formatDateTime } from '../domain/format';
-import type { MarketStatus } from '../domain/types';
+import type { MarketStatus, Quote } from '../domain/types';
 import { BookIcon } from './Learn';
 import { useMoney } from './money';
 
@@ -30,29 +30,50 @@ function freshness(market: MarketStatus | null, t: Translate, locale: Locale) {
   return { text: t('app.crypto.data.fresh', { when }), warn: false };
 }
 
+/** Where the prices of the coin on screen come from, in the currency they are shown in. */
+function sourceText(
+  market: MarketStatus | null,
+  coin: { symbol: string; quote: Quote } | null,
+  usd: boolean,
+  usdPerEur: string | null,
+  t: Translate
+): string {
+  if (market?.source === 'demo') return t('app.crypto.data.demo');
+  if (coin?.quote !== 'USDT')
+    return t(usd ? 'app.crypto.data.sourceUsd' : 'app.crypto.data.source');
+  if (usd) return t('app.crypto.data.sourceUsdtUsd', { coin: coin.symbol });
+  const rate = usdPerEur
+    ? t('app.crypto.data.usdtRate', { rate: usdPerEur })
+    : t('app.crypto.data.usdtParity');
+  return t('app.crypto.data.sourceUsdt', { coin: coin.symbol, rate });
+}
+
 /**
- * One discreet note: where the prices come from, how fresh they are and, in dollars, that they are
- * a conversion. Binance quotes real euro pairs, so euros are never converted; dollars are the
- * euro price at the European Central Bank's rate of the day.
+ * One discreet note: where the prices come from, how fresh they are and, when they are a
+ * conversion, at which rate. Coins with a liquid euro pair (BTC, ETH) are not converted; the
+ * rest come from their USDT pair converted to euros at the European Central Bank's rate of the
+ * day (1 USDT taken as 1 US$), and in dollars those are shown as they are.
  */
 export function DataNotice({
   market,
   unavailable,
+  coin,
+  usdPerEur,
 }: {
   market: MarketStatus | null;
   unavailable: boolean;
+  /** The coin on screen and the market its prices come from (null while it loads). */
+  coin: { symbol: string; quote: Quote } | null;
+  /** The ECB rate the server converted the USDT prices with. */
+  usdPerEur: number | null;
 }) {
   const { t, locale } = useI18n();
   const { display } = useMoney();
   const { text, warn } = freshness(market, t, locale);
   const usd = display.currency === 'USD';
-  const source =
-    market?.source === 'demo'
-      ? t('app.crypto.data.demo')
-      : t(usd ? 'app.crypto.data.sourceUsd' : 'app.crypto.data.source');
-  const rate = display.rate.toLocaleString(locale, {
-    maximumFractionDigits: 4,
-  });
+  const digits = (value: number) => value.toLocaleString(locale, { maximumFractionDigits: 4 });
+  const source = sourceText(market, coin, usd, usdPerEur ? digits(usdPerEur) : null, t);
+  const rate = digits(display.rate);
   return (
     <p className={`cc-data${warn || unavailable ? ' cc-data--warn' : ''}`}>
       <span>{t('app.crypto.data.delayed')}</span> <span>{source}</span>{' '}

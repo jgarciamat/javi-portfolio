@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
 import { useOptionalSettings } from '@core/settings/SettingsContext';
@@ -69,13 +77,19 @@ export interface DisplayChoice {
   /** What the person chose (it may not be shown yet while the rate loads or if it failed). */
   chosen: DisplayCurrency;
   choose: (currency: DisplayCurrency) => void;
+  /**
+   * Takes the rate the market data was converted with (USDT → euros), so the dollars shown of a
+   * coin quoted in USDT are its USDT price again, with no second conversion.
+   */
+  adopt: (usdPerEur: number) => void;
   /** Dollars were chosen but the rate could not be loaded: euros are shown. */
   unavailable: boolean;
 }
 
 /**
  * The currency the console is shown in: remembered on this device, the app's currency the first
- * time. Dollars use the European Central Bank's rate of the day from our API.
+ * time. Dollars use the European Central Bank's rate of the day: the one the market data was
+ * converted with when there is one, else the one of our rates API.
  */
 export function useDisplayCurrency(): DisplayChoice {
   const { ratesApi } = useApi();
@@ -109,9 +123,14 @@ export function useDisplayCurrency(): DisplayChoice {
     () => (chosen === 'USD' && rate !== null ? { currency: 'USD', rate } : EURO),
     [chosen, rate]
   );
+  const adopt = useCallback((usdPerEur: number) => {
+    setRate(usdPerEur);
+    setFailed(false);
+  }, []);
   return {
     display,
     chosen,
+    adopt,
     unavailable: chosen === 'USD' && failed,
     choose: (currency) => {
       setChosen(currency);

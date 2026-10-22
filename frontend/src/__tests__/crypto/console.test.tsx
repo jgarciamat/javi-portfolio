@@ -6,6 +6,7 @@ import type {
   ClosedTrade,
   CryptoCandles,
   CryptoCoins,
+  CryptoInterval,
   OpenTrade,
   PendingOrder,
   SimFill,
@@ -629,6 +630,67 @@ describe('Crypto console: layers, guide and currency', () => {
     );
     failing.unmount();
     await act(async () => reject(new Error('late')));
+  });
+});
+
+describe('Crypto console: coins quoted in USDT', () => {
+  const usdtList = (usdPerEur: number | null) => {
+    const list = fx.coins();
+    list.coins[2] = { ...list.coins[2], price: 0.00001 };
+    list.market = { ...list.market, usdPerEur };
+    return list;
+  };
+
+  it('says the price is converted from USDT, and shows its dollars as they are with the server rate', async () => {
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'SHIB', interval: '1h' }));
+    const { api } = setup((a) => a.cryptoApi.coins.mockResolvedValue(usdtList(1.25)));
+    expect(
+      await screen.findByText(
+        /SHIB: precio convertido desde USDT al cambio de referencia del BCE de hoy \(1 € = 1,25 US\$; tomamos 1 USDT = 1 US\$\)/
+      )
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: '$ USD' }));
+    expect(
+      await screen.findByText(/SHIB: precio en USDT mostrado en dólares sin más conversión/)
+    ).toBeInTheDocument();
+    // The dollars are the USDT price again (0,00001 € × 1,25): no second conversion.
+    expect(nb(document.querySelector('.cc-quote-price')!.textContent)).toMatch(
+      /^0,0000125\d* US\$/
+    );
+    expect(screen.getByText(/\(1 € = 1,25 US\$\); el simulador guarda/)).toBeInTheDocument();
+    expect(api.ratesApi.get).not.toHaveBeenCalled();
+  });
+
+  it('only says 1 USDT is taken as 1 US$ when no rate came with the data', async () => {
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'SHIB', interval: '1h' }));
+    setup((a) => {
+      a.cryptoApi.coins.mockResolvedValue(usdtList(null));
+      a.cryptoApi.candles.mockImplementation((symbol: string, interval: CryptoInterval) =>
+        Promise.resolve({ ...fx.candles(symbol, interval), market: fx.MARKET })
+      );
+    });
+    expect(
+      await screen.findByText(
+        /SHIB: precio convertido desde USDT .* hoy \(tomamos 1 USDT = 1 US\$\)/
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('says nothing about USDT with the invented prices of the demo, nor for coins in euros', async () => {
+    const demo = { ...fx.MARKET, source: 'demo' as const };
+    const { unmount } = setup();
+    await screen.findByRole('img', { name: /Bitcoin/ });
+    expect(screen.queryByText(/desde USDT/)).toBeNull();
+    unmount();
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'SHIB', interval: '1h' }));
+    setup((a) => {
+      a.cryptoApi.coins.mockResolvedValue({ ...usdtList(null), market: demo });
+      a.cryptoApi.candles.mockImplementation((symbol: string, interval: CryptoInterval) =>
+        Promise.resolve({ ...fx.candles(symbol, interval), market: demo })
+      );
+    });
+    expect(await screen.findByText(/Precios inventados de demostración/)).toBeInTheDocument();
+    expect(screen.queryByText(/desde USDT/)).toBeNull();
   });
 });
 
