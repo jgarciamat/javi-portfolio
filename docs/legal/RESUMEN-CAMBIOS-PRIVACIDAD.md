@@ -225,3 +225,48 @@ encender el programa:
       Publicidad y Ley de Competencia Desleal): ver la plantilla `docs/afiliacion/condiciones-creadores.md`.
     - Las condiciones de contratación (`terms.*`) no necesitan cambios para los usuarios; el programa se
       rige por un contrato aparte con cada creador.
+
+# Cambios del 22/10/2026: «Consola crypto» (simulador educativo con dinero ficticio)
+
+Nueva sección del menú **Aprender** (`docs/consola-crypto.md`): una gráfica de las principales
+criptomonedas y un simulador de compras y ventas **manuales** con dinero ficticio. Nunca se mueve
+dinero real, no hay cuentas de exchange, claves, enlaces de afiliado, señales ni recomendaciones.
+**No se ha editado ningún texto legal.** Textos propuestos:
+
+31. **s2** (añadir un punto): «Si usas la Consola crypto, guardamos tu simulación con dinero ficticio:
+    el saldo inicial elegido y el disponible, la comisión simulada, y cada operación (moneda, cantidad,
+    precio y fecha de compra y de venta, importe, comisiones y resultado) y cada orden pendiente (tipo,
+    precio, importe y fecha). No son datos de tu patrimonio real ni movimientos de dinero.»
+32. **s3** (añadir al punto de ejecución del contrato, art. 6.1.b): «Guardar tu simulación de la
+    Consola crypto para que la encuentres en cualquier dispositivo.»
+33. **s4** (añadir un punto): «Binance (datos públicos de mercado): nuestro servidor descarga precios
+    y velas públicos de criptomonedas en euros (`data-api.binance.vision`, y `api.binance.com` si la
+    primera no responde), sin clave ni cuenta, y los guarda unos segundos en caché. No se envía ningún
+    dato tuyo y tu navegador nunca se conecta a Binance.» Revisar si el apartado de transferencias
+    (s4.p2) necesita mencionarlo: no hay datos personales en esas consultas.
+34. **s5** (añadir un punto): «Simulación de la Consola crypto: hasta que pulses «Empezar de nuevo»
+    (se borra al momento) o elimines la cuenta. Las órdenes pendientes caducan a los 30 días.»
+35. **s7**: la exportación JSON ya incluye la sección `cryptoSimulator` (saldo, comisión,
+    operaciones y órdenes pendientes). Al eliminar la cuenta se borra todo (borrado en cascada).
+36. **s8** (almacenamiento local, añadir): «`mm_crypto_view`: la moneda y el tamaño de vela que
+    viste por última vez en la Consola crypto (solo una preferencia de este dispositivo).»
+37. **Avisos legales y de licencias (página de licencias de terceros o «Acerca de», si existe)**:
+    la gráfica usa **TradingView Lightweight Charts™** (licencia Apache 2.0, «Copyright (c) 2025
+    TradingView, Inc.»), que exige atribución y un enlace a https://www.tradingview.com/. Ya se cumple
+    en la propia gráfica (logo de TradingView) y con el texto «Gráfica dibujada con TradingView
+    Lightweight Charts™ · Copyright © 2025 TradingView, Inc.» bajo ella. Si se publica una lista de
+    licencias, añadirla.
+38. **Condiciones (`terms.*`)** (propuesta, añadir un punto en la descripción del servicio): «La
+    Consola crypto es un simulador educativo con dinero ficticio. No es asesoramiento financiero ni una
+    recomendación de inversión, no ejecuta operaciones reales y sus precios son públicos, con retraso
+    y solo orientativos. Rentabilidades pasadas no garantizan rentabilidades futuras. Invertir en
+    criptoactivos conlleva riesgo de perder todo lo invertido.»
+39. **Dudas para el abogado.**
+    - Confirmar que un simulador con dinero ficticio, sin señales ni recomendaciones y con este aviso
+      fijo, no es «asesoramiento en materia de inversión» (MiFID II / Ley del Mercado de Valores) ni
+      publicidad de criptoactivos sujeta a la Circular 1/2022 de la CNMV (no se promociona ningún
+      criptoactivo ni proveedor, y no hay enlaces a exchanges).
+    - Confirmar que mostrar precios públicos de Binance (y su nombre como fuente) no requiere
+      licencia de datos ni atribución adicional para un uso no comercial en la app; revisar sus
+      condiciones de uso de la API pública antes de publicar.
+    - Si en el futuro se añaden ventas en corto o apalancamiento simulados, revisar los avisos.
