@@ -164,8 +164,10 @@ function SimulatorBody({
       <OpenPanel
         trades={portfolio.open}
         pending={portfolio.pending}
+        bps={portfolio.account.feeBps}
         busy={busy}
         onPlace={sim.place}
+        onSetExits={sim.setExits}
       />
       <PendingPanel
         orders={portfolio.pending}

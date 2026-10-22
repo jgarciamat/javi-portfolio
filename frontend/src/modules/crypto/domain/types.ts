@@ -224,6 +224,15 @@ export type OrderRequest =
     }
   | { action: 'sell'; positionId: string; type: TradeType; price?: number };
 
+/**
+ * Take profit and stop loss of an open position: a price sets or moves it, null removes it and
+ * leaving it out keeps it as it is.
+ */
+export interface ExitsRequest {
+  takeProfit?: number | null;
+  stopLoss?: number | null;
+}
+
 /** An order for a given portfolio (the official one of the month when missing). */
 export type PortfolioOrder = OrderRequest & { portfolioId?: string };
 

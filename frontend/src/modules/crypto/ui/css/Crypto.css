@@ -1258,10 +1258,63 @@
   margin-bottom: 0.5rem;
 }
 
-.cc-scheduled {
+/* ─── Take profit and stop loss of an open trade ───
+   Green take profit and red stop loss with the result colours (the words say which is which):
+   price, distance to the current price and what closing there would give, «—» when there is none. */
+.cc-exits {
+  display: grid;
+  gap: 0.3rem;
   margin: 0 0 0.5rem;
+}
+
+.cc-exit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-left: 3px solid var(--cc-line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--cc-surface) 55%, transparent);
+}
+
+.cc-exit dt {
+  min-width: 6.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cc-exit dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.85rem;
+  margin: 0;
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
   color: var(--cc-text);
-  font-size: 0.8125rem;
+}
+
+.cc-exit--takeProfit {
+  border-left-color: var(--pnl-pos);
+}
+
+.cc-exit--stopLoss {
+  border-left-color: var(--pnl-neg);
+}
+
+.cc-exit--takeProfit dt,
+.cc-exit--takeProfit .cc-exit-price,
+.cc-exits-fields .cc-exit--takeProfit .cc-label {
+  color: var(--pnl-pos);
+}
+
+.cc-exit--stopLoss dt,
+.cc-exit--stopLoss .cc-exit-price,
+.cc-exits-fields .cc-exit--stopLoss .cc-label {
+  color: var(--pnl-neg);
 }
 
 .cc-trade .button-row {
@@ -1273,45 +1326,77 @@
   min-height: 36px;
 }
 
-.cc-schedule {
+/* «Close trade»: a quiet button that turns red while it waits for the confirming press. */
+.cc-close--armed,
+.cc-close--armed:hover:not(:disabled) {
+  border-color: var(--pnl-neg);
+  background: color-mix(in srgb, var(--red-500) 14%, var(--cc-raised));
+  color: var(--pnl-neg);
+}
+
+.cc-exits-form {
   margin-top: 0.5rem;
   border-top: 1px dashed var(--cc-line);
   padding-top: 0.5rem;
   display: grid;
   gap: 0.45rem;
-  justify-items: start;
 }
 
-.cc-schedule .cc-types {
-  border: 0;
-  padding: 0;
+.cc-exits-form .cc-hint {
   margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
 }
 
-.cc-schedule .cc-type {
-  position: relative;
-  display: inline-flex;
+.cc-exits-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.5rem 0.75rem;
+}
+
+.cc-exits-form .form-error {
+  margin: 0;
+}
+
+.cc-done {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text);
+}
+
+.cc-done:not(:empty) {
+  margin: 0.25rem 0 0.4rem;
+}
+
+/* «Prev. / Page X of Y / Next» at the foot of each panel, small, like the coins' one. */
+.cc-pager {
+  display: flex;
   align-items: center;
-  min-height: 32px;
-  padding: 0.2rem 0.7rem;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-family: var(--cc-num);
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+}
+
+.cc-pager button {
+  min-height: 26px;
+  padding: 0 0.6rem;
   border: 1px solid var(--cc-line);
-  border-radius: 999px;
+  border-radius: 6px;
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font: inherit;
+  font-weight: 500;
   cursor: pointer;
 }
 
-.cc-schedule .cc-type--on {
-  background: var(--accent-600);
+.cc-pager button:hover:not(:disabled) {
   border-color: var(--accent-400);
-  color: #fff;
 }
 
-.cc-schedule .cc-type input {
-  position: absolute;
-  opacity: 0;
-  inset: 0;
+.cc-pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .cc-fills {
@@ -1379,6 +1464,7 @@
 @media (max-width: 719px), (pointer: coarse) {
   .cc-layer,
   .cc-coins-pager button,
+  .cc-pager button,
   .cc-table-details summary {
     min-height: 32px;
   }
@@ -1566,6 +1652,7 @@ html.wiz-contrast .cc-unit-input,
 html.wiz-contrast .cc-coins,
 html.wiz-contrast .cc-layer,
 html.wiz-contrast .cc-coins-pager button,
+html.wiz-contrast .cc-pager button,
 html.wiz-contrast .cc-glossary-open,
 html.wiz-contrast .cc-coin[aria-pressed='true'] {
   border-width: 2px;
@@ -1586,6 +1673,7 @@ html.wiz-contrast .cc-facts dt,
 html.wiz-contrast .cc-coin small:not(.pnl),
 html.wiz-contrast .cc-coins-title,
 html.wiz-contrast .cc-coins-pager,
+html.wiz-contrast .cc-pager,
 html.wiz-contrast .cc-layer,
 html.wiz-contrast .cc-quote-changes {
   color: var(--slate-100);

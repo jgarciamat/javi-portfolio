@@ -310,6 +310,7 @@ describe('API contract', () => {
         'cryptoBuyWithExits',
         'cryptoShort',
         'cryptoSellLimit',
+        'cryptoExits',
         'cryptoSellMarket',
         'cryptoBuyLimit',
       ]) {

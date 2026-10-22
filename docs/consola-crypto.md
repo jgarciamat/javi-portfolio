@@ -145,14 +145,52 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
   opcionales (largo: TP encima y SL debajo de la entrada; corto: al revés), guardados como órdenes
   de cierre vinculadas; una orden pendiente los deja al ejecutarse. Validación en vivo («Antes de
   abrir», `aria-live`, con la comisión simulada en euros pero sin aviso del porcentaje) y en el
-  servidor.
+  servidor. Las órdenes vinculadas **no caducan** ni la garantía de un short: duran lo que dure la
+  posición (`findFill` recibe `Infinity` como fin); solo caducan las órdenes de entrada.
 - **Ejecución determinista sin procesos en segundo plano**: al abrir o refrescar la consola (cada
   30 s a la vista) el servidor revisa órdenes y cortos con las velas desde su creación y con el
   último precio. Con hueco, al precio de apertura. Si en una vela se tocan varias salidas gana la
   más prudente: garantía agotada, stop y después límite.
-- Límites por cartera: **20 órdenes pendientes en el plan gratuito y 100 con Premium**, 50
-  posiciones abiertas y 1.000 operaciones; las pendientes caducan a los 30 días; rate limit por
-  usuario.
+- Límites por cartera: **20 órdenes pendientes en el plan gratuito y 100 con Premium** (solo
+  cuentan las de entrada; el TP y el SL van con su posición, como mucho 2 por cada una de las 50),
+  50 posiciones abiertas y 1.000 operaciones; las pendientes de entrada caducan a los 30 días; rate
+  limit por usuario.
+
+## Paneles de operaciones (Abiertas, Pendientes, Cerradas)
+
+Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (`exitResult`,
+`exitProblem`); backend `CryptoSimService.setExits`.
+
+- **Pendientes** solo muestra las **órdenes de entrada** que aún no se han ejecutado (límite o
+  stop para abrir un long o un short, `positionId === null`): esperan a que el precio llegue y
+  entonces pasan a «Abiertas». El TP y el SL de una posición abierta **ya no salen ahí**: el
+  backend los sigue guardando como órdenes vinculadas (y la API los sigue devolviendo en
+  `pending`, para las apps antiguas), pero el frontend los muestra en la tarjeta de su operación.
+  El texto del panel y los «¿Qué es…?» (orden pendiente, take profit, stop loss) lo explican.
+- **Tarjeta de cada operación abierta**: debajo de sus datos, el **take profit en verde** y el
+  **stop loss en rojo** (tokens `--pnl-pos` / `--pnl-neg`, con borde del mismo color), cada uno con
+  su precio, la **distancia en %** respecto al precio actual y el **resultado estimado si se
+  alcanza** (mismas cuentas que el servidor, comisión incluida, en verde o rojo con `.pnl-pos` /
+  `.pnl-neg`); «—» si no hay.
+- **«Editar TP/SL»** abre un formulario con las dos casillas rellenas: cambiar el precio lo mueve
+  y dejarla vacía lo quita. Se comprueba en vivo contra el **precio actual** (long: TP por encima
+  y SL por debajo; short: al revés; sin precio decide el servidor) y solo se envía lo que cambió.
+  `PUT /crypto/sim/positions/:id/exits` con `{ takeProfit?, stopLoss? }` (número para poner o
+  mover, `null` para quitar, ausente para dejarlo igual) repite la comprobación
+  (`CRYPTO_TAKE_PROFIT_SIDE`, `CRYPTO_STOP_LOSS_SIDE`, `CRYPTO_PRICE_OUT_OF_RANGE`), resuelve antes
+  las órdenes alcanzadas (si la posición se acaba de cerrar responde `CRYPTO_POSITION_NOT_FOUND`)
+  y lo guarda todo o nada; uno sin cambios conserva su orden y su fecha.
+- **«Cerrar operación»** cierra al instante a precio de mercado (último precio) con la venta a
+  mercado de siempre (`POST /crypto/sim/orders` con `type: 'market'`): aplica la comisión, cancela
+  sus TP/SL y la pasa a «Cerradas». Confirmación ligera de un paso: el primer toque convierte el
+  botón en **«¿Seguro? Sí, cerrar»** (en rojo) durante 4 s y lo anuncia por `aria-live`; el
+  segundo cierra y un `role="status"` dice «Operación de BTC cerrada al precio de mercado». Sustituye
+  a «Cerrar ahora (simulado)» y a «Programar el cierre» (que hacía lo mismo que el TP/SL).
+- **Paginación** en los tres paneles: 10 operaciones por página, en el cliente (el backend no
+  pagina y el límite de operaciones lo permite), con «Ant. / Página X de Y / Sig.» pequeños al
+  pie (`nav` con nombre por panel), solo si hay más de 10. La página se conserva al refrescar los
+  datos y, si desaparecen filas, vuelve a la última que exista (`usePage`). Sustituye a «Ver más»
+  de «Cerradas».
 - **Lo que se quitó de la interfaz** (decisión del dueño): el selector de comisión
   (0/0,1/0,25/0,5/1 %), el selector de saldo (1.000/10.000/100.000 €) y el botón «Empezar de
   nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece. Después se quitan
@@ -295,6 +333,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `GET /crypto/sim?portfolio=<id>`                                         | Cartera (la oficial si falta o ya no existe), temporada, plan, insignias, estadísticas (Premium) |
 | `POST /crypto/sim/orders`                                                | Comprar o vender; `portfolioId` opcional (por defecto la oficial)                                |
 | `DELETE /crypto/sim/orders/:id`                                          | Cancelar una orden pendiente                                                                     |
+| `PUT /crypto/sim/positions/:id/exits`                                    | Poner, mover o quitar el TP y el SL de una posición abierta (`null` quita)                       |
 | `POST /crypto/sim/practice`                                              | Nueva cartera de prácticas (1 gratis, 5 Premium)                                                 |
 | `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
 | `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
@@ -340,7 +379,8 @@ al 100 % (`src/__tests__/crypto/*`, con un doble de Lightweight Charts) y E2E
 y, de la escala compacta, en `/tmp/gf66-shots/` (1440, 1920, 390 vertical y 844x390; claro, oscuro
 y Contraste). Chips de capas encima de la gráfica, monedas en páginas y panel «Aprende antes de
 jugar» (cerrado y abierto en dos pestañas) en `/tmp/gf67-shots/` (1440, 390 y 844x390; claro,
-oscuro y Contraste).
+oscuro y Contraste). Paneles con TP/SL en la tarjeta, formulario de edición y «¿Seguro? Sí,
+cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste).
 
 Temporadas y ranking (datos inventados):
 

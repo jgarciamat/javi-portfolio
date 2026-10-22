@@ -1334,6 +1334,16 @@
     }
   },
   {
+    "name": "cryptoExits",
+    "method": "PUT",
+    "path": "/crypto/sim/positions/{position}/exits",
+    "auth": true,
+    "body": {
+      "takeProfit": 61000,
+      "stopLoss": null
+    }
+  },
+  {
     "name": "cryptoPractice",
     "method": "POST",
     "path": "/crypto/sim/practice",

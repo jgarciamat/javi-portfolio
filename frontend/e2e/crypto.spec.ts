@@ -1,20 +1,31 @@
+import type { Page } from '@playwright/test';
+import { API_URL, DEMO_USER } from '../playwright.config';
 import { test, expect, openSection, signIn } from './fixtures';
 
 /**
  * «Consola crypto» with the server's invented prices (CRYPTO_MARKET=demo in the config): the
- * chart and its layer chips, a long opened and closed with play money, a pending short cancelled,
+ * chart and its layer chips, a long opened with its take profit and stop loss on its card, both
+ * changed and the trade closed at once, a pending short cancelled, the panels in pages,
  * dollars, the panel «Learn before playing» with its tabs, the coins in pages, the zoom bar, the
  * words of the console in the guide and the layout on phones; the monthly season, a practice
  * portfolio, the ranking (everybody is in, with an alias) and the Premium comforts.
  */
 const LEARN = 'Antes de empezar a jugar, aprende todo sobre el análisis de criptomonedas';
 
+/** A panel of operations by the start of its title («Abiertas», «Pendientes», «Cerradas»). */
+const panel = (page: Page, title: string) =>
+  page.locator('section.cc-panel', {
+    has: page.getByRole('heading', { name: new RegExp(`^${title} \\(`) }),
+  });
+
 test.beforeEach(async ({ page }) => {
   await signIn(page);
   await openSection(page, 'Consola crypto');
 });
 
-test('opens and closes a long with play money', async ({ page }) => {
+test('opens a long with take profit and stop loss, changes them and closes it at once', async ({
+  page,
+}) => {
   await expect(page.getByRole('note', { name: 'Aviso importante' })).toContainText(
     'No es asesoramiento financiero'
   );
@@ -24,11 +35,44 @@ test('opens and closes a long with play money', async ({ page }) => {
   await page.getByRole('radio', { name: '1 día' }).check();
   await expect(page.getByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 día' })).toBeVisible();
 
+  // The invented BTC price moves around 60.000 €: far from both.
   await page.getByLabel('Capital por operación').fill('100');
+  await page.getByLabel('Take profit (opcional)').fill('100000');
+  await page.getByLabel('Stop loss (opcional)').fill('30000');
   await expect(page.getByText('Todo listo. Revisa las cifras de abajo.')).toBeVisible();
   await page.getByRole('button', { name: 'Abrir long' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
-  await page.getByRole('button', { name: 'Cerrar ahora (simulado)' }).click();
+
+  // On the card, green and red; not among the pending orders.
+  const open = panel(page, 'Abiertas');
+  const takeProfit = open.locator('.cc-exit--takeProfit');
+  const stopLoss = open.locator('.cc-exit--stopLoss');
+  await expect(takeProfit).toContainText('100.000,00 €');
+  await expect(takeProfit).toContainText(/\+\d+,\d\d\s*% del precio actual/);
+  await expect(takeProfit.locator('.pnl-pos')).toBeVisible();
+  await expect(stopLoss).toContainText('30.000,00 €');
+  await expect(stopLoss.locator('.pnl-neg')).toBeVisible();
+  const colour = (part: typeof takeProfit) =>
+    part.locator('dt').evaluate((el) => getComputedStyle(el).color);
+  expect(await colour(takeProfit)).not.toEqual(await colour(stopLoss));
+  await expect(page.getByRole('heading', { name: 'Pendientes (0)' })).toBeVisible();
+
+  // Moved and removed, checked against the current price first.
+  await open.getByRole('button', { name: /^Editar TP\/SL/ }).click();
+  await open.getByLabel('Take profit (€)').fill('20000');
+  await expect(open.getByText(/el take profit tiene que estar por encima/)).toBeVisible();
+  await expect(open.getByRole('button', { name: 'Guardar TP/SL' })).toBeDisabled();
+  await open.getByLabel('Take profit (€)').fill('110000');
+  await open.getByLabel('Stop loss (€)').fill('');
+  await open.getByRole('button', { name: 'Guardar TP/SL' }).click();
+  await expect(takeProfit).toContainText('110.000,00 €');
+  await expect(stopLoss).toHaveText(/^Stop loss\s*—$/);
+  await expect(page.getByRole('heading', { name: 'Pendientes (0)' })).toBeVisible();
+
+  // «Close trade» asks once more on the same button, then closes at the market price.
+  await open.getByRole('button', { name: /^Cerrar operación/ }).click();
+  await open.getByRole('button', { name: /^¿Seguro\? Sí, cerrar/ }).click();
+  await expect(page.getByText(/Operación de BTC cerrada al precio de mercado/)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Cerradas (1)' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Abiertas (0)' })).toBeVisible();
 });
@@ -40,6 +84,11 @@ test('keeps a pending short until it is cancelled', async ({ page }) => {
   await page.getByLabel('Abrir si el precio sube a').fill('200000');
   await page.getByRole('button', { name: 'Abrir short' }).click();
   await expect(page.getByRole('heading', { name: 'Pendientes (1)' })).toBeVisible();
+  // Only the orders that open a trade wait there, until the price reaches them.
+  await expect(
+    panel(page, 'Pendientes').getByText('Abrir short (límite)', { exact: true })
+  ).toBeVisible();
+  await expect(panel(page, 'Pendientes').getByText(/pasan a «Abiertas»/)).toBeVisible();
   await page.getByRole('button', { name: 'Cancelar Abrir short (límite) BTC' }).click();
   await expect(page.getByRole('heading', { name: 'Pendientes (0)' })).toBeVisible();
 });
@@ -175,4 +224,53 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await expect(alerts.getByText(/sube a/)).toBeVisible();
   await alerts.getByRole('button', { name: /Borrar el aviso de BTC/ }).click();
   await expect(alerts.getByText('Todavía no tienes avisos.')).toBeVisible();
+});
+
+test('pages the open trades ten at a time and goes back a page when the last row goes', async ({
+  page,
+  request,
+}) => {
+  // Eleven small purchases through the API, then the console shows them in pages.
+  const login = await request.post(`${API_URL}/auth/login`, { data: DEMO_USER });
+  const { accessToken } = await login.json();
+  const headers = { Authorization: `Bearer ${accessToken}` };
+  for (let i = 0; i < 11; i++) {
+    const bought = await request.post(`${API_URL}/crypto/sim/orders`, {
+      headers,
+      data: { action: 'buy', symbol: 'ETH', type: 'market', amount: 10 },
+    });
+    expect(bought.ok()).toBe(true);
+  }
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  const open = panel(page, 'Abiertas');
+  await expect(open.getByRole('heading')).toHaveText(/^Abiertas \(\d+\)$/);
+  const count = Number((await open.getByRole('heading').textContent())!.replace(/\D/g, ''));
+  expect(count).toBeGreaterThan(10);
+  const rows = open.locator('.cc-trades > li');
+  const pager = open.getByRole('navigation', { name: 'Páginas de operaciones abiertas' });
+  await expect(rows).toHaveCount(10);
+  await expect(pager).toContainText(`Página 1 de ${Math.ceil(count / 10)}`);
+  await expect(pager.getByRole('button', { name: /^Ant\./ })).toBeDisabled();
+  const last = Math.ceil(count / 10);
+  for (let p = 2; p <= last; p++) await pager.getByRole('button', { name: /^Sig\./ }).click();
+  await expect(pager).toContainText(`Página ${last} de ${last}`);
+  await expect(rows).toHaveCount(count - (last - 1) * 10);
+
+  // Closing every trade of the last page goes back to the page before.
+  const onLast = count - (last - 1) * 10;
+  for (let i = 0; i < onLast; i++) {
+    await rows
+      .first()
+      .getByRole('button', { name: /^Cerrar operación/ })
+      .click();
+    await rows
+      .first()
+      .getByRole('button', { name: /^¿Seguro\? Sí, cerrar/ })
+      .click();
+    await expect(open.getByRole('heading')).toHaveText(`Abiertas (${count - i - 1})`);
+  }
+  await expect(rows).toHaveCount(10);
+  if (last > 2) await expect(pager).toContainText(`Página ${last - 1} de ${last - 1}`);
+  else await expect(pager).toHaveCount(0);
 });

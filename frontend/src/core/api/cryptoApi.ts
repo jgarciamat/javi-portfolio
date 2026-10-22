@@ -3,6 +3,7 @@ import type {
   CryptoCoins,
   CryptoInterval,
   CryptoRanking,
+  ExitsRequest,
   PortfolioOrder,
   PriceAlerts,
   SeasonReport,
@@ -37,6 +38,13 @@ export const cryptoApi = {
     return apiRequest<SimPortfolio>(`/crypto/sim/orders/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
+  },
+  /** Sets, moves or removes the take profit and stop loss of an open position. */
+  setExits(positionId: string, exits: ExitsRequest) {
+    return apiRequest<SimPortfolio>(
+      `/crypto/sim/positions/${encodeURIComponent(positionId)}/exits`,
+      { method: 'PUT', body: jsonBody(exits) }
+    );
   },
   /** «Start again» of a practice portfolio: 10.000 € again. */
   resetPractice(portfolioId: string) {

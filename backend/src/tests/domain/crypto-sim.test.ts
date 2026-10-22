@@ -116,6 +116,14 @@ describe('finding when a pending order was reached', () => {
     expect(findFill(order, [candle(late, 90, 90, 80)], { price: 80, at: late })).toBeNull();
   });
 
+  it('keeps looking for ever for an order that does not expire (take profit, stop loss)', () => {
+    const late = t(created) + PENDING_MS + 60_000;
+    expect(findFill(order, [candle(late, 90, 90, 80)], null, Infinity)).toEqual({
+      price: 90,
+      at: new Date(late).toISOString(),
+    });
+  });
+
   it('picks the earliest of several fills, and the stop when they happen at once', () => {
     const at = (iso: string) => ({ price: 1, at: iso });
     const limit = { type: 'limit' as const, fill: at('2026-03-15T10:05:00.000Z') };

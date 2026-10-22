@@ -395,6 +395,13 @@ const cases: Case[] = [
     { action: 'buy', symbol: 'BTC', type: 'market', amount: 100 },
   ],
   ['crypto cancel', () => cryptoApi.cancelOrder('o 1'), 'DELETE', '/crypto/sim/orders/o%201'],
+  [
+    'crypto exits',
+    () => cryptoApi.setExits('p 1', { takeProfit: 60_000, stopLoss: null }),
+    'PUT',
+    '/crypto/sim/positions/p%201/exits',
+    { takeProfit: 60_000, stopLoss: null },
+  ],
   ['crypto portfolio', () => cryptoApi.portfolio('p 1'), 'GET', '/crypto/sim?portfolio=p+1'],
   [
     'crypto practice reset',

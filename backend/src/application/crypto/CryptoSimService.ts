@@ -88,6 +88,12 @@ export type CryptoOrderInput =
     }
   | { action: 'sell'; positionId: string; type: OrderType; price?: number };
 
+/** New take profit and stop loss of an open position: a price sets or moves it, null removes it. */
+export interface CryptoExitsInput {
+  takeProfit?: number | null;
+  stopLoss?: number | null;
+}
+
 export interface CryptoFillView {
   /** The order, or the position closed because its guarantee ran out. */
   orderId: string;
@@ -325,6 +331,57 @@ export class CryptoSimService {
       const fresh = this.fresh(portfolio);
       if (input.action === 'buy') this.buy(fresh, input, priceOf(prices, input.symbol), at);
       else this.sell(fresh, input, prices, at);
+    });
+    return this.view(userId, portfolio.id, tickers, fills);
+  }
+
+  /**
+   * Sets, moves or removes the take profit and the stop loss of an open position (its linked
+   * limit and stop orders, which are not shown among the pending ones). Checked against the
+   * current price: a long's take profit above it and its stop loss below; a short's, the other
+   * way round.
+   */
+  async setExits(
+    userId: string,
+    positionId: string,
+    input: CryptoExitsInput
+  ): Promise<CryptoSimView> {
+    await this.ensureSeason(userId);
+    const found = this.repo.position(userId, positionId);
+    if (!found || found.closedAt) {
+      throw new NotFoundError('Esa posición ya no está abierta', 'CRYPTO_POSITION_NOT_FOUND');
+    }
+    const portfolio = this.writable(userId, found.portfolioId);
+    const tickers = await this.tickers();
+    const fills = await this.resolve(portfolio, tickers);
+    if (!tickers || tickers.stale) {
+      throw new UnavailableError(
+        'Los precios no están al día ahora mismo. Inténtalo en unos minutos.',
+        'CRYPTO_PRICES_STALE'
+      );
+    }
+    const prices = priceMap(tickers);
+    const at = this.clock.now().toISOString();
+    this.uow.run(() => {
+      // The price may have just reached one of its exits while resolving.
+      const position = this.repo.position(userId, positionId)!;
+      if (position.closedAt) {
+        throw new NotFoundError('Esa posición ya no está abierta', 'CRYPTO_POSITION_NOT_FOUND');
+      }
+      const current = priceOf(prices, position.symbol);
+      const orders = this.repo.orders(portfolio.id).filter((o) => o.positionId === position.id);
+      const changes: [PendingType, number | null | undefined][] = [
+        ['limit', input.takeProfit],
+        ['stop', input.stopLoss],
+      ];
+      for (const [type, price] of changes) {
+        if (price === undefined) continue;
+        const existing = orders.find((o) => o.type === type);
+        if (existing?.price === price) continue;
+        if (price !== null) this.checkExit(position.direction, type, price, current);
+        if (existing) this.repo.deleteOrder(userId, existing.id);
+        if (price !== null) this.insertExits(position, [{ type, price }], at);
+      }
     });
     return this.view(userId, portfolio.id, tickers, fills);
   }
@@ -642,7 +699,6 @@ export class CryptoSimService {
     const entry = input.type === 'market' ? current : input.price!;
     const exits = this.exitPrices(input, direction, entry, current);
     if (input.type === 'market') {
-      this.checkPendingRoom(portfolio, this.repo.orders(portfolio.id).length, exits.length);
       const position = openPosition(
         portfolio,
         input.symbol,
@@ -703,7 +759,6 @@ export class CryptoSimService {
         'Esta posición ya tiene una orden de ese tipo. Cancélala antes de poner otra.'
       );
     }
-    this.checkPendingRoom(portfolio, orders.length);
     this.repo.insertOrder({
       id: randomUUID(),
       userId: portfolio.userId,
@@ -806,6 +861,28 @@ export class CryptoSimService {
     }
   }
 
+  /** The take profit or stop loss of an open position must not be reached by the price now. */
+  private checkExit(direction: Direction, type: PendingType, price: number, current: number): void {
+    this.checkRange(price, current);
+    if (!fillsNow(sideOf(direction, false), type, price, current)) return;
+    const long = direction === 'long';
+    throw type === 'limit'
+      ? new BusinessRuleError(
+          'CRYPTO_TAKE_PROFIT_SIDE',
+          long
+            ? 'En un long, el take profit tiene que estar por encima del precio actual.'
+            : 'En un short, el take profit tiene que estar por debajo del precio actual.',
+          { current }
+        )
+      : new BusinessRuleError(
+          'CRYPTO_STOP_LOSS_SIDE',
+          long
+            ? 'En un long, el stop loss tiene que estar por debajo del precio actual.'
+            : 'En un short, el stop loss tiene que estar por encima del precio actual.',
+          { current }
+        );
+  }
+
   private pendingPrice(
     side: 'buy' | 'sell',
     type: PendingType,
@@ -836,13 +913,14 @@ export class CryptoSimService {
     return this.plan.isPremium(userId) ? PENDING_MAX.premium : PENDING_MAX.free;
   }
 
-  private checkPendingRoom(
-    portfolio: CryptoSimPortfolio,
-    count = this.repo.orders(portfolio.id).length,
-    adding = 1
-  ): void {
+  /** Orders waiting to open a position (take profit and stop loss do not count: they go with one). */
+  private entryOrders(portfolioId: string): number {
+    return this.repo.orders(portfolioId).filter((o) => o.positionId === null).length;
+  }
+
+  private checkPendingRoom(portfolio: CryptoSimPortfolio): void {
     const max = this.pendingMax(portfolio.userId);
-    if (adding > 0 && count + adding > max) {
+    if (this.entryOrders(portfolio.id) + 1 > max) {
       throw new BusinessRuleError(
         'CRYPTO_TOO_MANY_PENDING',
         max < PENDING_MAX.premium
@@ -946,17 +1024,20 @@ export class CryptoSimService {
   ): CryptoFillView[] {
     const { userId } = portfolio;
     const events: CryptoFillView[] = [];
-    const fillOf = (o: PendingLike & { symbol: string }): Fill | null => {
+    // Only the orders that open a position expire; its take profit, stop loss and guarantee last.
+    const fillOf = (o: PendingLike & { symbol: string }, lasting: boolean): Fill | null => {
       const series = candles.get(o.symbol);
       const price = prices.get(o.symbol);
       if (!series && price === undefined) return null;
       return findFill(
         o,
         series ?? [],
-        price === undefined || stalePrice(priceAt, now) ? null : { price, at: priceAt }
+        price === undefined || stalePrice(priceAt, now) ? null : { price, at: priceAt },
+        lasting ? Infinity : undefined
       );
     };
-    const expired = (o: CryptoSimOrder): boolean => now - Date.parse(o.createdAt) > PENDING_MS;
+    const expired = (o: CryptoSimOrder): boolean =>
+      o.positionId === null && now - Date.parse(o.createdAt) > PENDING_MS;
 
     type Exit = { order: CryptoSimOrder | null; fill: Fill; type: CloseType };
     const exits = new Map<string, Exit[]>();
@@ -965,7 +1046,7 @@ export class CryptoSimService {
     };
 
     for (const order of orders) {
-      const fill = fillOf(order);
+      const fill = fillOf(order, order.positionId !== null);
       if (fill && order.positionId === null) {
         if (!this.repo.deleteOrder(userId, order.id)) continue;
         this.openFromOrder(portfolio, order, fill);
@@ -979,13 +1060,16 @@ export class CryptoSimService {
     }
     // A short whose price doubled has used up its guarantee: it closes by itself.
     for (const position of shorts) {
-      const fill = fillOf({
-        symbol: position.symbol,
-        side: 'buy',
-        type: 'stop',
-        price: liquidationPrice(position.entryPrice),
-        createdAt: position.openedAt,
-      });
+      const fill = fillOf(
+        {
+          symbol: position.symbol,
+          side: 'buy',
+          type: 'stop',
+          price: liquidationPrice(position.entryPrice),
+          createdAt: position.openedAt,
+        },
+        true
+      );
       if (fill) addExit(position.id, { order: null, fill, type: 'liquidation' });
     }
     for (const [positionId, list] of exits) {

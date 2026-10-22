@@ -3,7 +3,7 @@ import { useApi } from '@core/context/ApiContext';
 import { useAction, type Action } from '@shared/hooks/useAction';
 import { errorMessage } from '@shared/utils/errors';
 import { storage } from '@shared/utils/storage';
-import type { OrderRequest, SimFill, SimPortfolio } from '../domain/types';
+import type { ExitsRequest, OrderRequest, SimFill, SimPortfolio } from '../domain/types';
 import { MARKET_REFRESH_MS } from './useCryptoMarket';
 import { usePolling } from './usePolling';
 
@@ -18,6 +18,8 @@ export interface Simulator {
   action: Action;
   place: (order: OrderRequest) => Promise<boolean>;
   cancel: (id: string) => Promise<boolean>;
+  /** Take profit and stop loss of an open position (null removes it). */
+  setExits: (positionId: string, exits: ExitsRequest) => Promise<boolean>;
   /** Shows another portfolio (the official season or a practice one). */
   select: (portfolioId: string) => Promise<boolean>;
   createPractice: () => Promise<boolean>;
@@ -86,6 +88,7 @@ export function useSimulator(fallback: string): Simulator {
         )
       ),
     cancel: (id) => run(() => cryptoApi.cancelOrder(id)),
+    setExits: (id, exits) => run(() => cryptoApi.setExits(id, exits)),
     select: (id) => run(() => cryptoApi.portfolio(id)),
     createPractice: () => run(() => cryptoApi.createPractice()),
     resetPractice: () => run(() => cryptoApi.resetPractice(current())),

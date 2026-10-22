@@ -85,6 +85,7 @@ function fakeCryptoApi(): FakeApi['cryptoApi'] {
     portfolio: ok(crypto.portfolio()),
     placeOrder: ok(crypto.portfolio()),
     cancelOrder: ok(crypto.portfolio()),
+    setExits: ok(crypto.portfolio()),
     resetPractice: ok(
       crypto.portfolio({
         portfolio: crypto.PRACTICE_REF,

@@ -245,6 +245,7 @@ add('cryptoSellLimit', () =>
 add('cryptoSellMarket', () =>
   cryptoApi.placeOrder({ action: 'sell', positionId: '{position}', type: 'market' })
 );
+add('cryptoExits', () => cryptoApi.setExits('{position}', { takeProfit: 61000, stopLoss: null }));
 add('cryptoPractice', () => cryptoApi.createPractice());
 add('cryptoBuyPractice', () =>
   cryptoApi.placeOrder({

@@ -1,4 +1,4 @@
-import type { Direction, PendingType, TradeType } from './types';
+import type { Direction, OpenTrade, PendingType, TradeType } from './types';
 
 /** The commission is fixed: 0,10 % when opening and again when closing (10 basis points). */
 export const FIXED_FEE_BPS = 10;
@@ -135,4 +135,36 @@ export function checkOpen(i: OpenCheck) {
     takeProfit: exit(i.takeProfit),
     stopLoss: exit(i.stopLoss),
   };
+}
+
+/** What closing an open position at `price` would give: the same sums as the API. */
+export function exitResult(
+  trade: Pick<OpenTrade, 'direction' | 'quantity' | 'entryPrice' | 'invested' | 'entryFee'>,
+  price: number,
+  bps: number
+) {
+  const short =
+    trade.direction === 'short' ? { entry: trade.entryPrice, amount: trade.invested } : undefined;
+  return saleEstimate(trade.quantity, price, trade.invested + trade.entryFee, bps, short);
+}
+
+export type ExitKind = 'takeProfit' | 'stopLoss';
+export type ExitProblem = 'price' | 'side';
+
+/**
+ * Check of a new take profit or stop loss of an open position (null when empty: it is removed;
+ * NaN when it is not a number). Against the current price, like the API: a long's take profit above it and its stop loss below;
+ * a short's, the other way round. Without a price only the server can tell.
+ */
+export function exitProblem(
+  direction: Direction,
+  kind: ExitKind,
+  price: number | null,
+  current: number | null
+): ExitProblem | null {
+  if (price === null) return null;
+  if (!(price > 0)) return 'price';
+  if (current === null) return null;
+  const side = direction === 'long' ? 'sell' : 'buy';
+  return fillsNow(side, kind === 'takeProfit' ? 'limit' : 'stop', price, current) ? 'side' : null;
 }

@@ -4,6 +4,7 @@ import { RateLimiterFactory, authed } from '../middleware';
 import {
   cryptoAlertBody,
   cryptoCandlesQuery,
+  cryptoExitsBody,
   cryptoOrderBody,
   cryptoOrderParams,
   cryptoPortfolioParams,
@@ -80,6 +81,20 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
     writes,
     authed(async (req, res) =>
       res.json(await c.cryptoSim.cancel(req.userId, cryptoOrderParams.parse(req.params).id))
+    )
+  );
+  // Take profit and stop loss of an open position (its linked orders, not shown as pending).
+  router.put(
+    '/crypto/sim/positions/:id/exits',
+    writes,
+    authed(async (req, res) =>
+      res.json(
+        await c.cryptoSim.setExits(
+          req.userId,
+          cryptoOrderParams.parse(req.params).id,
+          cryptoExitsBody.parse(req.body)
+        )
+      )
     )
   );
   // «Start again» only exists for practice portfolios: the official season never restarts.

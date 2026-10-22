@@ -379,9 +379,9 @@ describe('Crypto console', () => {
       const full = await buy({ type: 'limit', price: 30_000, amount: 10 }).expect(400);
       expect(full.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
       expect(full.body.error).toContain('con Premium, hasta 100');
-      const position = (await buy({ amount: 10 }).expect(201)).body.open[0];
-      const sale = await sell(position.id, { type: 'limit', price: 60_000 }).expect(400);
-      expect(sale.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
+      // A take profit or stop loss goes with its position: it is not a pending order.
+      const position = (await buy({ amount: 10, takeProfit: 60_000 }).expect(201)).body.open[0];
+      await sell(position.id, { type: 'stop', price: 45_000 }).expect(201);
 
       for (let i = 0; i < 49; i++) await buy({ amount: 10 }).expect(201);
       expect((await buy({ amount: 10 }).expect(400)).body.code).toBe('CRYPTO_TOO_MANY_OPEN');
@@ -513,14 +513,119 @@ describe('Crypto console', () => {
       expect((await get('/crypto/sim').expect(200)).body.open).toEqual([]);
     });
 
-    it('counts them among the pending orders', async () => {
+    it('does not count them among the pending orders, and they do not expire', async () => {
       expireTrial(ctx, user);
-      for (let i = 0; i < MAX_PENDING_ORDERS - 1; i++) {
+      for (let i = 0; i < MAX_PENDING_ORDERS; i++) {
         await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
       }
-      const full = await buy({ amount: 10, takeProfit: 60_000, stopLoss: 45_000 }).expect(400);
-      expect(full.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
-      expect((await get('/crypto/sim').expect(200)).body.open).toEqual([]);
+      await buy({ amount: 10, takeProfit: 60_000, stopLoss: 45_000 }).expect(201);
+      // A practice portfolio does not end with the month: 40 days later they are still there.
+      ctx.clock.set('2026-01-01T12:00:00Z');
+      const fresh = await createUser(ctx);
+      const as = (path: string, body: unknown) =>
+        request(ctx.app)
+          .post(`/api${path}`)
+          .set(fresh.auth)
+          .send(body as object);
+      const practice = (await as('/crypto/sim/practice', {}).expect(201)).body.portfolio.id;
+      await as('/crypto/sim/orders', {
+        action: 'buy',
+        portfolioId: practice,
+        symbol: 'BTC',
+        type: 'market',
+        amount: 100,
+        takeProfit: 60_000,
+      }).expect(201);
+      later(40 * 24 * 60 * 60_000);
+      const read = () =>
+        request(ctx.app).get(`/api/crypto/sim?portfolio=${practice}`).set(fresh.auth).expect(200);
+      expect((await read()).body.pending).toHaveLength(1);
+      ctx.market.prices.set('BTC', 61_000);
+      const { body } = await read();
+      expect(body.closed[0]).toMatchObject({ closeType: 'limit', exitPrice: 61_000 });
+    });
+
+    describe('of an open position', () => {
+      const put = (id: string, body: unknown) =>
+        request(ctx.app)
+          .put(`/api/crypto/sim/positions/${id}/exits`)
+          .set(user.auth)
+          .send(body as object);
+      const exits = (body: { pending: { type: string; price: number }[] }) =>
+        body.pending.map((o) => [o.type, o.price]).sort();
+
+      it('sets, moves and removes them, keeping an unchanged one as it was', async () => {
+        const position = (await buy({ takeProfit: 60_000 }).expect(201)).body.open[0].id;
+        const before = (await get('/crypto/sim').expect(200)).body.pending[0];
+        later(60_000);
+        const set = await put(position, { takeProfit: 60_000, stopLoss: 45_000 }).expect(200);
+        expect(exits(set.body)).toEqual([
+          ['limit', 60_000],
+          ['stop', 45_000],
+        ]);
+        expect(set.body.pending.find((o: { type: string }) => o.type === 'limit')).toEqual(before);
+        const moved = await put(position, { takeProfit: 58_000 }).expect(200);
+        expect(exits(moved.body)).toEqual([
+          ['limit', 58_000],
+          ['stop', 45_000],
+        ]);
+        const removed = await put(position, { takeProfit: null, stopLoss: null }).expect(200);
+        expect(removed.body.pending).toEqual([]);
+        await put(position, { stopLoss: null }).expect(200);
+        expect(removed.body.account.cash).toBe(8999);
+      });
+
+      it('checks the side against the current price, for a long and for a short', async () => {
+        const long = (await buy({}).expect(201)).body.open[0].id;
+        const code = async (id: string, body: unknown) => (await put(id, body).expect(400)).body;
+        expect((await code(long, { takeProfit: 49_000 })).code).toBe('CRYPTO_TAKE_PROFIT_SIDE');
+        expect((await code(long, { stopLoss: 51_000 })).error).toContain('por debajo');
+        expect((await code(long, { stopLoss: 1 })).code).toBe('CRYPTO_PRICE_OUT_OF_RANGE');
+        await put(long, {}).expect(400);
+        await put(long, { takeProfit: -1 }).expect(400);
+        await put(long, { takeProfit: 60_000, other: 1 }).expect(400);
+        const short = (await buy({ direction: 'short' }).expect(201)).body.open.find(
+          (p: { direction: string }) => p.direction === 'short'
+        ).id;
+        expect((await code(short, { takeProfit: 51_000 })).error).toContain('por debajo');
+        expect((await code(short, { stopLoss: 49_000 })).code).toBe('CRYPTO_STOP_LOSS_SIDE');
+        // Nothing is half saved when one of the two is wrong.
+        await put(short, { takeProfit: 45_000, stopLoss: 49_000 }).expect(400);
+        const ok = await put(short, { takeProfit: 45_000, stopLoss: 55_000 }).expect(200);
+        expect(exits(ok.body)).toEqual([
+          ['limit', 45_000],
+          ['stop', 55_000],
+        ]);
+      });
+
+      it('only for open positions of the person, with prices up to date', async () => {
+        const position = (await buy({}).expect(201)).body.open[0].id;
+        const other = await createUser(ctx);
+        const foreign = await request(ctx.app)
+          .put(`/api/crypto/sim/positions/${position}/exits`)
+          .set(other.auth)
+          .send({ takeProfit: 60_000 })
+          .expect(404);
+        expect(foreign.body.code).toBe('CRYPTO_POSITION_NOT_FOUND');
+        await put('nope', { takeProfit: 60_000 }).expect(400);
+        ctx.market.stale = true;
+        expect((await put(position, { takeProfit: 60_000 }).expect(503)).body.code).toBe(
+          'CRYPTO_PRICES_STALE'
+        );
+        ctx.market.stale = false;
+        await sell(position).expect(201);
+        await put(position, { takeProfit: 60_000 }).expect(404);
+      });
+
+      it('says so when the price has just closed the position', async () => {
+        const position = (await buy({ stopLoss: 45_000 }).expect(201)).body.open[0].id;
+        later(60_000);
+        ctx.market.prices.set('BTC', 44_000);
+        const gone = await put(position, { takeProfit: 60_000 }).expect(404);
+        expect(gone.body.code).toBe('CRYPTO_POSITION_NOT_FOUND');
+        const { body } = await get('/crypto/sim').expect(200);
+        expect(body.closed[0]).toMatchObject({ closeType: 'stop' });
+      });
     });
 
     it('a pending purchase keeps them and leaves them once filled', async () => {

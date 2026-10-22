@@ -90,15 +90,17 @@ export interface Fill {
 /**
  * The first moment the price reached a pending order: the candles that opened after it was
  * placed (in order), then the current price. Null when it was not reached before expiring.
- * The candle in which the order was placed is skipped: part of it happened before.
+ * The candle in which the order was placed is skipped: part of it happened before. The take
+ * profit and stop loss of an open position (and the guarantee of a short) never expire:
+ * `expires` is then `Infinity`.
  */
 export function findFill(
   order: PendingLike,
   candles: MarketCandle[],
-  current: { price: number; at: number } | null
+  current: { price: number; at: number } | null,
+  expires = Date.parse(order.createdAt) + PENDING_MS
 ): Fill | null {
   const created = Date.parse(order.createdAt);
-  const expires = created + PENDING_MS;
   for (const candle of candles) {
     if (candle.time < created || candle.time > expires) continue;
     const price = fillPrice(order.side, order.type, order.price, candle);

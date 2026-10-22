@@ -1113,6 +1113,17 @@ export const cryptoOrderBody = z
 
 export const cryptoOrderParams = z.object({ id: z.string().uuid() }).strict();
 
+/** Take profit and stop loss of an open position: a price sets or moves it, null removes it. */
+export const cryptoExitsBody = z
+  .object({
+    takeProfit: cryptoPrice.nullable().optional(),
+    stopLoss: cryptoPrice.nullable().optional(),
+  })
+  .strict()
+  .refine((body) => body.takeProfit !== undefined || body.stopLoss !== undefined, {
+    message: 'Indica el take profit, el stop loss o los dos',
+  });
+
 /** The portfolio to look at (the official one of the month when missing). */
 export const cryptoSimQuery = z.object({ portfolio: z.string().uuid().optional() }).strict();
 
