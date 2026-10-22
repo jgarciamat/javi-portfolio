@@ -23,7 +23,7 @@ const FIXTURE = join(frontend, 'src', '__tests__', 'taxforms', 'fixtures', 'form
 
 const TEXT: PreviewText = {
   banner: 'SIMULACIÓN ORIENTATIVA, NO OFICIAL · Finanverso',
-  notice: 'Vista previa para copiar al modelo oficial. Revísala con un gestor colegiado.',
+  notice: 'Vista previa para copiar al modelo oficial. Revísala con un profesional.',
   legend: 'Casillas vacías: la app no las calcula.',
   pending: 'no calculada',
   page: 'Página {n} de {total}',

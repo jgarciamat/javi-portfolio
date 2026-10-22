@@ -1,7 +1,7 @@
 import type { Guide } from './guides';
 
 const CHECK =
-  'Las cifras de esta guía son orientativas y corresponden al ejercicio 2025 (la campaña de la Renta de 2026), según el manual de la Agencia Tributaria y la normativa de cada comunidad. Las deducciones tienen requisitos y límites de renta que cambian cada año, así que contrástalas siempre en la sede de la AEAT o con tu gestor antes de presentar tu declaración.';
+  'Las cifras de esta guía son orientativas y corresponden al ejercicio 2025 (la campaña de la Renta de 2026), según el manual de la Agencia Tributaria y la normativa de cada comunidad. Las deducciones tienen requisitos y límites de renta que cambian cada año, así que contrástalas siempre en la sede de la AEAT o con un profesional antes de presentar tu declaración.';
 
 /** Guides about regional and housing deductions and pension plans in the income tax return. */
 export const GUIDES_RENTA_DEDUCCIONES: Guide[] = [

@@ -66,7 +66,7 @@ export const CHAPTERS_FUNDS: CourseChapter[] = [
         k: 'ul',
         items: [
           'Diversificación inmediata: cientos o miles de empresas en un solo producto reducen el riesgo de que una sola quiebra te arruine.',
-          'Costes bajos: cada euro que no se queda el gestor sigue trabajando para ti por interés compuesto.',
+          'Costes bajos: cada euro que no se queda la gestora sigue trabajando para ti por interés compuesto.',
           'Sencillez: no hay que elegir acciones ni momentos de compra.',
           'Evidencia histórica: informes como el SPIVA de S&P Dow Jones Indices muestran que, a 10 o 15 años, la mayoría de los fondos de gestión activa no supera a su índice de referencia una vez descontadas las comisiones.',
           'Ventaja fiscal en España: los fondos (no los ETF) permiten traspasar a otro fondo sin pagar impuestos hasta que retiras el dinero.',

@@ -127,7 +127,7 @@ export const ASSET_CLASSES_A: AssetClass[] = [
       'Largo plazo: 5-10 años o más (renta variable); 1-3 años (monetarios y renta fija corta).',
     subtypes: [
       'Fondos indexados (replican un índice, comisión muy baja)',
-      'Fondos activos (un gestor elige los valores)',
+      'Fondos activos (un profesional elige los valores)',
       'ETF (índices, sectores, bonos, materias primas)',
       'Fondos monetarios y de renta fija a corto',
       'Fondos mixtos y perfilados (mezclan bolsa y bonos)',
@@ -199,7 +199,7 @@ export const ASSET_CLASSES_A: AssetClass[] = [
     tax: [
       'Vender cripto por euros, cambiarla por otra cripto (permuta) o pagar con ella: es una transmisión y genera ganancia o pérdida patrimonial en la base del ahorro (19-30 %). Comprar cripto con euros no tributa; cambiarla por otra, sí.',
       'Método FIFO: se considera que transmites primero las monedas más antiguas de cada tipo. Las comisiones de compra y venta se pueden restar.',
-      'Staking, préstamos y airdrops: suelen tratarse como rendimientos (del capital mobiliario o como ganancias, según el caso y el criterio de Hacienda). Conviene guardar el historial y consultar con un gestor.',
+      'Staking, préstamos y airdrops: suelen tratarse como rendimientos (del capital mobiliario o como ganancias, según el caso y el criterio de Hacienda). Conviene guardar el historial y consultar con un profesional.',
       'Retención: normalmente no hay; el exchange no retiene, tú declaras en la renta (modelo 100).',
       'Modelo 721: obligación de informar si tienes monedas virtuales custodiadas en plataformas del extranjero por más de 50.000 € a 31 de diciembre; se presenta entre el 1 de enero y el 31 de marzo, y después solo si el saldo sube más de 20.000 €. Si además tienes cuentas, valores o inmuebles fuera, aplica el modelo 720 por separado.',
       'Desde 2026, con la directiva DAC8, los proveedores de servicios cripto comunican datos de sus clientes a las haciendas europeas: la información de tus operaciones estará en manos de Hacienda.',
