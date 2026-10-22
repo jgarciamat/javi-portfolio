@@ -1,5 +1,6 @@
 /** Data of the income tax return (IRPF) for Spain, by tax year, taken from the Tax Agency manual. */
 import type { Check } from './rentaRequirements';
+import type { DisabilityLimits } from './rentaDisability';
 
 /** A bracket of a progressive scale: the rate (%) applies from `from` euros up to the next bracket. */
 export interface TaxBracket {
@@ -76,6 +77,12 @@ export interface Deduction {
    */
   regionalShare?: number;
   /**
+   * The base is held to the increase of the person's wealth in the year plus the interest (the
+   * main home of the transitional regime, LIRPF DT 18.ª with art. 70 as worded on 31-12-2012): see
+   * rentaHousing.ts. Asked only when the person types the wealth at the start and at the end.
+   */
+  wealthCheck?: boolean;
+  /**
    * Paid out even when there is no tax to pay: it lowers the differential quota, not the quota (LIRPF
    * arts. 81 and 81 bis: maternity and its increase for nursery, large family, and people with a
    * disability or the separated parent with two children in their care).
@@ -85,6 +92,11 @@ export interface Deduction {
   advance?: AdvancePayment;
   /** Euros per month with the right to it (maternity: 100 €, LIRPF art. 81.3): the months are asked. */
   monthly?: number;
+  /**
+   * Once per child, on top of the months (maternity: 150 € when the mother reaches 30 days of social
+   * security after the birth, LIRPF art. 81.1): the children with it are asked.
+   */
+  startBonus?: number;
   /**
    * Held to the person's social security contributions of the year (LIRPF art. 81 bis.2): `each`
    * deduction (and each relative) on its own, or only its first 1,200 € (`base`: the increase of a
@@ -158,11 +170,26 @@ export interface RentaCcaa {
   deductions: Deduction[];
   /** The Tax Agency page of the community's deductions. */
   source: string;
+  /** Deductions of the year that the app does not calculate (copied from the draft, if they apply). */
+  notInApp?: string[];
 }
 
 export interface StateReduction {
   title: string;
   detail: string;
+}
+
+/**
+ * Deduction for low pay from work (LIRPF DA 61.ª): `amount` with gross pay from a job up to
+ * `fullUntil`, then `amount − slope × (pay − fullUntil)`, nothing from `end`; only with other income
+ * (not exempt) up to `otherIncomeLimit`.
+ */
+export interface LowPayRule {
+  amount: number;
+  fullUntil: number;
+  end: number;
+  slope: number;
+  otherIncomeLimit: number;
 }
 
 /** The rules of the State for a tax year. */
@@ -192,8 +219,72 @@ export interface RentaState {
   /** Reduction of the net income from work for low incomes. */
   workReduction: { maxReduction: number; fullUntil: number; zeroFrom: number; notes: string };
   /** Reductions of the tax base. */
-  baseReductions: { pensionPlanLimit: number; pensionPlanEmployerLimit: number; notes: string };
+  baseReductions: BaseReductions;
   /** The deductions of the State on the tax (maternity, large family, donations...). */
   deductions: Deduction[];
+  /**
+   * The deduction for low pay of the year (DA 61.ª); null: the year has none (2024). Left out only in
+   * the States made by hand in the tests, which take the one of 2025.
+   */
+  lowPay?: LowPayRule | null;
+  /** The reduction for artistic activities of the year (DA 60.ª); null: the year has none (2024). */
+  artistic?: ArtisticRule | null;
+  /** The higher rates of the activities in Ceuta (DA 64.ª, only 2026); unset: the year has none. */
+  ceutaActivities?: CeutaActivityRule;
   source: string;
+}
+
+/** Reductions of the tax base for pension plans and similar (LIRPF arts. 51 and 52). */
+export interface BaseReductions {
+  pensionPlanLimit: number;
+  pensionPlanEmployerLimit: number;
+  /**
+   * Art. 52.1.b.1.º: the worker's own contributions to the employer's plan that can use the increase,
+   * by the employer's contribution: up to `lowUpTo`, × `lowTimes`; up to `midUpTo`, `midBase` +
+   * `midTimes` × (contribution − `lowUpTo`); above, × `highTimes`, and always × `highTimes` with a pay
+   * from that employer of more than `highPayFrom`.
+   */
+  employmentTable: {
+    lowUpTo: number;
+    lowTimes: number;
+    midUpTo: number;
+    midBase: number;
+    midTimes: number;
+    highTimes: number;
+    highPayFrom: number;
+  };
+  /** Art. 51.5: the own limit of the premiums the employer pays to a collective dependency insurance. */
+  dependencyLimit: number;
+  /** Art. 52.1.a: percent of the net income from work and activities of each person. */
+  percentLimit: number;
+  /** Art. 52.2: years in which what did not fit can still be reduced. */
+  excessYears: number;
+  /** Arts. 53 and 54 (a person with a disability); unset: the limits of 2025 (rentaDisability.ts). */
+  disability?: DisabilityLimits;
+  notes: string;
+}
+
+/**
+ * LIRPF DA 64.ª (Real Decreto-ley 22/2026, BOE-A-2026-18429; convalidated, BOE-A-2026-19420): in 2026
+ * the activities carried out in Ceuta whose income has the deduction of art. 68.4 take, instead of
+ * 5 %, `hardPercent` of provisions and hard-to-justify expenses (simplified direct estimation; the
+ * 2,000 € cap of RIRPF art. 30 is not changed) and `modulesPercent` off the net income of módulos
+ * (DA 1.ª of the Orden HAC/1425/2025, módulos and farming).
+ */
+export interface CeutaActivityRule {
+  hardPercent: number;
+  modulesPercent: number;
+}
+
+/**
+ * LIRPF DA 60.ª.2 (Ley 7/2024, from 2025): 30 % off the net income of artistic activities that
+ * exceeds 130 % of the average of the three years before, on at most 150,000 € a year.
+ */
+export interface ArtisticRule {
+  /** IAE groups (section 2) and agrupaciones (section 3) it applies to. */
+  groups: string[];
+  percent: number;
+  /** Percent of the average of the three years before that is not reduced. */
+  over: number;
+  cap: number;
 }

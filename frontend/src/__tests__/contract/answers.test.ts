@@ -28,7 +28,22 @@ import type {
   YearTax,
 } from '@modules/finances/domain/types';
 import type { AutonomoSaved } from '@modules/finances/ui/components/autonomoSync';
+import type {
+  CryptoCandles,
+  CryptoCoins,
+  CryptoRanking,
+  PriceAlerts,
+  SeasonReport,
+  SimPortfolio,
+} from '@modules/crypto/domain/types';
+import { cryptoAlerts } from './fixtures/cryptoAlerts';
+import { cryptoRanking } from './fixtures/cryptoRanking';
+import { cryptoReport } from './fixtures/cryptoReport';
 import { contract } from './exact';
+import { cryptoCandles } from './fixtures/cryptoCandles';
+import { cryptoCoins } from './fixtures/cryptoCoins';
+import { cryptoSim } from './fixtures/cryptoSim';
+import { cryptoSimFilled } from './fixtures/cryptoSimFilled';
 import { accounts } from './fixtures/accounts';
 import { annualSummary } from './fixtures/annualSummary';
 import { authResult } from './fixtures/authResult';
@@ -99,5 +114,17 @@ describe('API answers fit the types of the app', () => {
     contract<YearTax>()(yearTax);
     contract<AutonomoDraft>()(autonomoDraft);
     expect(autonomoData.version).toBe(2);
+  });
+
+  it('crypto console', () => {
+    contract<CryptoCoins>()(cryptoCoins);
+    contract<CryptoCandles>()(cryptoCandles);
+    contract<SimPortfolio>()(cryptoSim);
+    contract<SimPortfolio>()(cryptoSimFilled);
+    contract<CryptoRanking>()(cryptoRanking);
+    contract<PriceAlerts>()(cryptoAlerts);
+    contract<SeasonReport>()(cryptoReport);
+    expect(cryptoSim.pending.length).toBeGreaterThan(0);
+    expect(cryptoSimFilled.fills).toHaveLength(1);
   });
 });

@@ -179,6 +179,10 @@ const REPLACE = [
  * measured by hand on the facsimile: model → page (1-based) → box → [x, y, width, height].
  */
 const OVERRIDES = {
+  // The square of «Autoliquidación complementaria» and the cell of its «Nº de justificante».
+  111: {
+    1: { complementaria: [372.6, 121.8, 8.9, 10.5], justificante: [401.6, 82.5, 111.2, 11.3] },
+  },
   303: {
     1: {
       150: [304.5, 357.2, 63.5, 8.3],

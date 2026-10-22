@@ -71,6 +71,9 @@ const form = (concept = 'Cliente Secreto SL') => ({
         source: 'pdf',
         review: ['rate', 'issuer'],
         missing: ['date'],
+        // Under cash accounting: what was paid, for the 347 (invented).
+        cash: true,
+        collections: [{ date: '2026-03-01', amount: 848 }],
       },
     ],
     withholdings: [withholding(), withholding(), withholding(), withholding()],
@@ -93,6 +96,8 @@ const withholding = () => ({
   rent: { people: '', paid: '', withheld: '' },
   filed111: false,
   filed115: true,
+  // A complementaria of the 115 of the quarter (invented receipt number).
+  complement115: { result: '150', receipt: '1150000000001' },
 });
 
 describe('The self-employed form saved in the account', () => {
@@ -138,7 +143,11 @@ describe('The self-employed form saved in the account', () => {
     });
 
     ctx.clock.set('2026-03-15T12:05:00Z');
-    const next = { ...form(), extras: { ...form().extras, priorNet: '-300' } };
+    // «No activity last year» is kept apart from an empty field (box 13 of the 130).
+    const next = {
+      ...form(),
+      extras: { ...form().extras, priorNet: '-300', noPriorActivity: true },
+    };
     expect((await put(ana, { data: next, baseVersion: 1 }).expect(200)).body).toEqual({
       version: 2,
       updatedAt: '2026-03-15T12:05:00.000Z',

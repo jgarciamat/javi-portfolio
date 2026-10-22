@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { authApi } from '@core/api/authApi';
 import { captureCreatorCode, setCreatorConsent } from '@core/creatorCode';
 import { billingApi } from '@core/api/billingApi';
+import { cryptoApi } from '@core/api/cryptoApi';
 import {
   accountApi,
   budgetApi,
@@ -210,6 +211,58 @@ add('checkoutRentaPass', () =>
   billingApi.checkout('renta_pass', { acceptTerms: true, waiveWithdrawal: true })
 );
 add('rentaCalculation', () => rentaApi.register());
+// Crypto console (play money): purchases, sales of the purchase {position} and the settings.
+add('cryptoBuyMarket', () =>
+  cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'market', amount: 1000 })
+);
+add('cryptoBuyWithExits', () =>
+  cryptoApi.placeOrder({
+    action: 'buy',
+    symbol: 'BTC',
+    type: 'market',
+    amount: 500,
+    takeProfit: 60000,
+    stopLoss: 45000,
+  })
+);
+add('cryptoShort', () =>
+  cryptoApi.placeOrder({
+    action: 'buy',
+    symbol: 'ETH',
+    direction: 'short',
+    type: 'market',
+    amount: 300,
+    takeProfit: 1500,
+    stopLoss: 2500,
+  })
+);
+add('cryptoBuyLimit', () =>
+  cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'limit', amount: 250.5, price: 40000 })
+);
+add('cryptoSellLimit', () =>
+  cryptoApi.placeOrder({ action: 'sell', positionId: '{position}', type: 'limit', price: 60000 })
+);
+add('cryptoSellMarket', () =>
+  cryptoApi.placeOrder({ action: 'sell', positionId: '{position}', type: 'market' })
+);
+add('cryptoExits', () => cryptoApi.setExits('{position}', { takeProfit: 61000, stopLoss: null }));
+add('cryptoPractice', () => cryptoApi.createPractice());
+add('cryptoBuyPractice', () =>
+  cryptoApi.placeOrder({
+    action: 'buy',
+    portfolioId: '{practice}',
+    symbol: 'ETH',
+    type: 'market',
+    amount: 100,
+  })
+);
+add('cryptoResetPractice', () => cryptoApi.resetPractice('{practice}'));
+add('cryptoDeletePractice', () => cryptoApi.deletePractice('{practice}'));
+add('cryptoRanking', () => cryptoApi.setRanking({ alias: 'Lince' }));
+add('cryptoAlert', () =>
+  cryptoApi.createAlert({ symbol: 'BTC', condition: 'above', price: 60000 })
+);
+add('cryptoDeleteAlert', () => cryptoApi.deleteAlert('{alert}'));
 
 describe('what the app sends', () => {
   const mockFetch = jest.fn();
@@ -232,7 +285,8 @@ describe('what the app sends', () => {
       captured.push({
         name,
         method: init.method ?? 'GET',
-        path: url.replace('http://localhost:3000/api', ''),
+        // Placeholders survive encodeURIComponent: «%7Bpractice%7D» is «{practice}».
+        path: url.replace('http://localhost:3000/api', '').replace(/%7B([\w:]+)%7D/g, '{$1}'),
         auth,
         body: init.body === undefined ? null : JSON.parse(init.body as string),
       });

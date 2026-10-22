@@ -3,6 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { emptyDonations, number, type DonationForm } from '../../domain/rentaForm';
 import { donationResult } from '../../domain/rentaDonations';
 import { Field, RadioOptions, useMoney, type StepProps } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 const k = (key: string) => `tools.renta.donations.${key}`;
 const URL =
@@ -23,6 +24,7 @@ export function DonationsFields({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  const held = useHeld();
   const d = form.donations ?? emptyDonations();
   const [recurrent, setRecurrent] = useState<string | null>(
     d.recurrent.trim() === '' ? null : 'yes'
@@ -96,12 +98,13 @@ export function DonationsFields({
           />
         </div>
       </details>
-      {total > 0 && (
+      {total > 0 && held && <HeldNote />}
+      {total > 0 && !held && (
         <p className="renta-gives" role="status">
           {t(k('gives'), { amount: money(total) })}
         </p>
       )}
-      {r.overLimit > 0 && (
+      {r.overLimit > 0 && !held && (
         <p className="section-hint" role="note">
           {t(k('overLimit'), { amount: money(r.overLimit) })}
         </p>

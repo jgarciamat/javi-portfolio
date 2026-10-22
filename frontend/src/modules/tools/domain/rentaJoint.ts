@@ -1,6 +1,6 @@
 import {
   computeRenta,
-  countsAsDescendant,
+  countedChildren,
   type Child,
   type JointMember,
   type RentaInput,
@@ -83,7 +83,7 @@ export function partnerInput(
 /** All the children with one parent and none with the other: the better of the two ways. */
 function childrenToOneOf(input: RentaInput, spouse: JointMember): JointComparison['childrenToOne'] {
   const { family } = input;
-  if (!family.children.some(countsAsDescendant)) return null;
+  if (countedChildren(family).length === 0) return null;
   const toYou =
     computeRenta({ ...input, family: { ...family, sharedChildren: false } }).result +
     computeRenta(partnerInput(input, spouse, [], false)).result;
@@ -95,16 +95,21 @@ function childrenToOneOf(input: RentaInput, spouse: JointMember): JointCompariso
     : { to: 'partner', individual: round2(toPartner) };
 }
 
-/** The input of the joint return: the unit, with the reduction of the base. */
+/**
+ * The input of the joint return: the unit, with the reduction of the base. The children under
+ * `minorUntil` are in the unit: it is the return of one of them with more than 1,800 €.
+ */
 export function jointInputOf(
   input: RentaInput,
   spouse: JointMember | null,
-  reduction: number
+  reduction: number,
+  minorUntil?: number
 ): RentaInput {
+  const family = { ...input.family, jointUnder: minorUntil };
   return {
     ...input,
     // In a couple's return the children are part of the unit: their whole minimum is there.
-    family: spouse ? { ...input.family, sharedChildren: false } : input.family,
+    family: spouse ? { ...family, sharedChildren: false } : family,
     joint: { partner: spouse, reduction },
   };
 }
@@ -113,9 +118,10 @@ export function jointInputOf(
 function jointOf(
   input: RentaInput,
   spouse: JointMember | null,
-  reduction: number
+  reduction: number,
+  minorUntil: number
 ): { joint: RentaResult; oneGeneralExpense: number | null } {
-  const jointInput = jointInputOf(input, spouse, reduction);
+  const jointInput = jointInputOf(input, spouse, reduction, minorUntil);
   const twoEarners = spouse !== null && input.gross > 0 && spouse.gross > 0;
   return {
     joint: computeRenta(jointInput),
@@ -145,7 +151,8 @@ const bestOf = (saving: number): JointComparison['best'] =>
 /**
  * Two individual returns against the joint one. The deductions marked and the properties stay in the
  * person's own return; the children's minimum is split between the parents in the individual returns
- * and whole in the joint one, where they are part of the unit. The children are taken to have no income.
+ * and whole in a couple's joint one, where they are part of the unit. A child with income of their
+ * own counts as `descendantShare` says (art. 58.1).
  */
 export function compareJoint(
   input: RentaInput,
@@ -166,7 +173,7 @@ export function compareJoint(
     : null;
   const individual = round2(you.result + (partnerResult?.result ?? 0));
   const reduction = reductionOf(spouse !== null, options);
-  const { joint, oneGeneralExpense } = jointOf(input, spouse, reduction);
+  const { joint, oneGeneralExpense } = jointOf(input, spouse, reduction, rules.minorUntil);
   const saving = round2(individual - joint.result);
   return {
     kind,

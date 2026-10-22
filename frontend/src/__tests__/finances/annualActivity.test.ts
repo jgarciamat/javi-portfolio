@@ -478,6 +478,20 @@ describe('Farming in modules (Orden HAC/1425/2025, anexo I)', () => {
     expect([r.boxes['1537'], r.boxes['1551'], r.net]).toEqual([12500, 2968.75, 8906.25]);
   });
 
+  it('leaves the works for others out of the CAP aid, and warns when there is no crop for it', () => {
+    // Aid 1,000 over the cereals only: (4,000 + 1,000) × 0.26 + 1,000 × 0.56 = 1,860.
+    const services = { product: 'otherServices', income: 1000 };
+    const r = agrarianModules(
+      { ...base, rows: [{ product: 'cereals', income: 4000 }, services], pacAid: 1000 },
+      2026
+    );
+    expect(r.boxes['1537']).toBe(1860);
+    // Only services and the aid: 0.56 for both, with a warning.
+    const alone = agrarianModules({ ...base, rows: [services], pacAid: 1000 }, 2026);
+    expect(alone.boxes['1537']).toBe(1120);
+    expect(alone.warnings).toEqual(['aidWithoutCrops']);
+  });
+
   it('applies the other correctors', () => {
     const one = (c: Partial<typeof none>, product = 'cereals') =>
       agrarianModules(
@@ -618,7 +632,7 @@ describe('Annual activity: other activities in modules (annex II)', () => {
       inputsOf(four(quarter()), { method: 'objective', objective: bar })
     );
     expect(later.warnings).toContain('modules');
-    // Without the figures of the year (2024) the 131 is not estimated.
+    // Without the table of módulos of the year (2024) the 131 is not estimated.
     const old = annualActivity(
       2024,
       inputsOf(four(quarter()), { method: 'objective', objective: bar })

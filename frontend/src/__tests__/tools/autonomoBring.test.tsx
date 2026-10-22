@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import { annualActivity, NO_ACTIVITY } from '@modules/finances/domain/annualActivity';
 import type { AutonomoInputs } from '@modules/finances/domain/types';
-import type { ActivitiesResult } from '@modules/tools/domain/rentaActivity';
+import type { ActivitiesResult, ActivityInput } from '@modules/tools/domain/rentaActivity';
 import { emptyForm } from '@modules/tools/domain/rentaForm';
 import { withoutAutonomoActivity } from '@modules/tools/domain/rentaFromAutonomo';
 import { ActivitiesList } from '@modules/tools/ui/renta/ActivitiesList';
@@ -146,6 +146,76 @@ describe('taking an activity out of the Renta', () => {
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(set).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('an artistic activity (DA 60.ª)', () => {
+  it('asks for the net income of the three years before and says the reduction', () => {
+    const direct = {
+      kind: 'direct' as const,
+      name: 'Ilustración',
+      data: {} as never,
+      dependent: false,
+      newActivity: false,
+      withheld: 0,
+      payments: 0,
+    };
+    const other = {
+      kind: 'given' as const,
+      name: 'Otra',
+      data: { area: 'direct' as const, net: 0 },
+      withheld: 0,
+      payments: 0,
+    };
+    let form = { ...emptyForm(''), activities: [direct, other] as ActivityInput[] };
+    const result: ActivitiesResult = {
+      direct: 0,
+      dependentReduction: 0,
+      smallIncomeReduction: 0,
+      startReduction: 0,
+      directTotal: 0,
+      modules: 0,
+      agrarian: 0,
+      total: 0,
+      withheld: 0,
+      payments: 0,
+      each: [
+        { name: 'Ilustración', net: 0, detail: { net: 0 } },
+        { name: 'Otra', net: 0, detail: { net: 0 } },
+      ],
+    };
+    const set = (patch: Partial<typeof form>) => {
+      form = { ...form, ...patch };
+    };
+    const k = 'tools.renta.activities.artistic';
+    const view = renderWithProviders(<ActivitiesList form={form} set={set} result={result} />);
+    const again = (r = result) =>
+      view.rerender(<ActivitiesList form={form} set={set} result={r} />);
+    expect(screen.queryByLabelText(tr(`${k}Previous`, { ago: 1 }))).toBeNull();
+    fireEvent.click(screen.getByLabelText(tr(k)));
+    again();
+    expect(form.activities?.[0]).toMatchObject({ artistic: { previous: [0, 0, 0] } });
+    fireEvent.change(screen.getByLabelText(tr(`${k}Previous`, { ago: 2 })), {
+      target: { value: '125000,5' },
+    });
+    again();
+    fireEvent.change(screen.getByLabelText(tr(`${k}Previous`, { ago: 3 })), {
+      target: { value: 'x' },
+    });
+    again({ ...result, artisticReduction: 45000 });
+    expect(form.activities?.[0]).toMatchObject({ artistic: { previous: [0, 125000.5, 0] } });
+    expect(screen.getByLabelText(tr(`${k}Previous`, { ago: 2 }))).toHaveValue('125000,5');
+    expect(screen.getByRole('status')).toHaveTextContent('45.000');
+    fireEvent.click(screen.getByLabelText(tr(k)));
+    expect(form.activities?.[0]).not.toHaveProperty('artistic');
+    // A saved activity with fewer years than three: the missing ones are 0.
+    form = { ...form, activities: [{ ...direct, artistic: { previous: [] } }, other] };
+    again();
+    fireEvent.change(screen.getByLabelText(tr(`${k}Previous`, { ago: 1 })), {
+      target: { value: '1000' },
+    });
+    expect(form.activities?.[0]).toMatchObject({ artistic: { previous: [1000, 0, 0] } });
+    expect(form.activities?.[1]).toBe(other);
   });
 });
 

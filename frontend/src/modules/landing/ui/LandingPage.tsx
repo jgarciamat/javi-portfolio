@@ -5,6 +5,7 @@ import { useResource } from '@shared/hooks/useResource';
 import { formatPrice } from '@modules/billing/ui/pricing';
 import { Icon } from '@shared/components/Icon';
 import { PublicHeader } from '@shared/components/PublicHeader';
+import { IosInstallHint } from '@shared/components/IosInstallHint';
 import { usePageMeta } from '@shared/hooks/usePageMeta';
 import { FAQ, PLAY_URL, faqJsonLd } from '../domain/landing';
 import './css/Landing.css';
@@ -135,6 +136,7 @@ export function LandingPage() {
         <Link to="/pricing">{t('pricing.link')}</Link>
         <Link to="/guias">{t('landing.learn.guides')}</Link>
       </footer>
+      <IosInstallHint />
     </div>
   );
 }

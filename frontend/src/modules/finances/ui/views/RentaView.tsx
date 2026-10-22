@@ -9,7 +9,7 @@ import {
   PROGRESS_EVENT,
   removeSavedAutonomo,
 } from '@modules/tools/application/rentaProgress';
-import { rentaState } from '@modules/tools/data/renta/state';
+import { openingYear, yearsUpTo } from '@modules/tools/data/renta/ejercicios';
 import { AUTONOMO_ACTIVITY } from '@modules/tools/domain/rentaFromAutonomo';
 import { AnnualFigures } from '@modules/tools/ui/renta/AutonomoBring';
 import { autonomoOnDevice } from '../components/autonomoForRenta';
@@ -67,13 +67,10 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
   const { t } = useI18n();
   const { money } = useFormat();
   const { currentPeriod } = useFinances();
-  // Only the last return and the one of the running year: older campaigns are closed.
-  const years = [currentPeriod.year, currentPeriod.year - 1];
+  // The years with rules up to the running one, the newest first (2024 can still be corrected).
+  const years = yearsUpTo(currentPeriod.year);
   // The year of what was left half done; else the return filed in spring, the previous year's.
-  const [year, setYear] = useState(() => {
-    const saved = loadProgress()?.year;
-    return saved !== undefined && years.includes(saved) ? saved : currentPeriod.year - 1;
-  });
+  const [year, setYear] = useState(() => openingYear(currentPeriod.year, loadProgress()?.year));
   // Bumped when the activity is taken out of the saved Renta: the planner reads it again.
   const [removals, setRemovals] = useState(0);
   const { data } = useAnnualSummary(year);
@@ -115,11 +112,6 @@ export function RentaView({ onOpenTab }: { onOpenTab?: (tab: DashboardTab) => vo
             {t('app.renta.figures', { year, income: money(income), expenses: money(expenses) })}
           </p>
         </MobileFold>
-        {year > rentaState.year && (
-          <p className="section-hint renta-provisional" role="note">
-            {t('app.renta.provisional', { year })}
-          </p>
-        )}
         <BroughtActivity year={year} onRemoved={() => setRemovals((n) => n + 1)} />
         {removals > 0 && !broughtActivity(year) && (
           <p className="renta-recovered" role="status">

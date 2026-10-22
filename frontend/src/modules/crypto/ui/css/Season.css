@@ -1,0 +1,650 @@
+/* ─── Consola crypto: temporadas, prácticas, ranking y Premium ────────────────
+   Same tokens as Crypto.css (theme colours and the `.cc` text greys), so light, dark and the
+   contrast mode work. Every card here sits inside `.cc`. */
+
+.cc-portfolios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-portfolio .icon,
+.cc-portfolio-new .icon {
+  margin-right: 0.3rem;
+}
+
+.cc-portfolio-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-portfolio[aria-selected='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+  cursor: default;
+}
+
+/* Only one portfolio: an informative label, not a button. */
+.cc-portfolio-single {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--cc-muted, inherit);
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.cc-portfolio-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8125rem;
+  opacity: 0.8;
+}
+
+.cc-season .section-title .icon,
+.cc-ranking .section-title .icon,
+.cc-alerts-card .section-title .icon {
+  vertical-align: -3px;
+  color: var(--accent-300);
+}
+
+.cc-countdown {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-season-warning {
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--amber-500);
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.cc-season-warning .icon {
+  vertical-align: -3px;
+}
+
+/* The prize shines like «Invite a friend» in the menu: the same rainbow on the border, here
+   drifting slowly along it, and the gift in a soft ring. The text sits on the card colour. */
+.cc-prize {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.6rem 0;
+  padding: 0.7rem 0.95rem;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--cc-surface), var(--cc-surface)) padding-box,
+    linear-gradient(90deg, var(--rainbow-stops), #ff5c5c) 0 0 / 200% 100% border-box;
+  box-shadow: 0 0 22px -8px color-mix(in srgb, #8b7bff 55%, transparent);
+  color: var(--cc-strong);
+  line-height: 1.5;
+  animation: cc-prize-shine 8s linear infinite;
+}
+
+.cc-prize .icon {
+  flex: none;
+  box-sizing: content-box;
+  padding: 0.45rem;
+  border-radius: 50%;
+  color: var(--accent-300);
+  background: color-mix(in srgb, var(--accent-600) 22%, transparent);
+}
+
+@keyframes cc-prize-shine {
+  to {
+    background-position:
+      0 0,
+      200% 0;
+  }
+}
+
+.cc-history summary,
+.cc-rules summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--cc-text);
+}
+
+.cc-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.cc-history-table th,
+.cc-history-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--slate-700);
+  text-align: left;
+}
+
+.cc-history-table th {
+  font-weight: 500;
+}
+
+.cc-history-table td {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-practice-actions,
+.cc-report,
+.cc-report-locked {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.cc-practice-actions button,
+.cc-practice-offer button,
+.cc-premium-cta {
+  min-height: 48px;
+}
+
+.cc-report .cc-label {
+  width: 100%;
+  margin: 0;
+}
+
+.cc-last-season {
+  border: 2px solid var(--accent-400);
+}
+
+.cc-practice-offer {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  margin-top: 0.5rem;
+}
+
+/* Badges: earned in colour, the rest grey (with what is missing). */
+.cc-badges ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.6rem;
+}
+
+.cc-badges li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  opacity: 0.75;
+}
+
+.cc-badges li.is-earned {
+  opacity: 1;
+  border-color: var(--accent-400);
+}
+
+.cc-badges li > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.cc-badge-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--slate-800);
+  color: var(--slate-400);
+  flex: none;
+}
+
+.is-earned .cc-badge-icon {
+  background: color-mix(in srgb, var(--accent-600) 25%, transparent);
+  color: var(--accent-300);
+}
+
+/* «Free and Premium»: two columns, one under the other on phones. */
+.cc-plans-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.cc-plan {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.cc-plan--premium {
+  border-color: var(--accent-400);
+}
+
+.cc-plan h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-plan ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  line-height: 1.4;
+}
+
+.cc-plan li .icon {
+  vertical-align: -3px;
+  margin-right: 0.35rem;
+  color: var(--accent-300);
+}
+
+.cc-plan--free li .icon {
+  color: var(--green-400);
+}
+
+.cc-plans-fair {
+  line-height: 1.5;
+}
+
+.cc-plans-fair .icon {
+  vertical-align: -3px;
+  color: var(--green-400);
+}
+
+.cc-premium-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.cc-premium-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent-400);
+  color: var(--accent-300);
+  vertical-align: middle;
+}
+
+/* A Premium feature for free users: the example is greyed and cannot be used. */
+.cc-locked {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.cc-example-tag {
+  margin: 0;
+  font-weight: 600;
+  color: var(--amber-400);
+}
+
+.cc-locked-preview {
+  width: 100%;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+  border: 1px dashed var(--slate-600);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.cc-subtitle {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-equity {
+  margin: 0;
+}
+
+.cc-equity svg {
+  display: block;
+  width: 100%;
+  height: 120px;
+  background: var(--slate-800);
+  border-radius: 10px;
+}
+
+.cc-equity polyline {
+  fill: none;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.cc-equity polyline.pnl-pos {
+  stroke: var(--pnl-pos);
+}
+
+.cc-equity polyline.pnl-neg {
+  stroke: var(--pnl-neg);
+}
+
+.cc-equity polyline.pnl-zero {
+  stroke: var(--pnl-zero);
+}
+
+/* Price alerts. */
+.cc-alerts {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-alerts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.cc-alerts li > span:first-child {
+  flex: 1 1 12rem;
+  font-weight: 500;
+}
+
+.cc-alert-form,
+.cc-alias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.cc-alert-form label,
+.cc-alias label {
+  flex: 1 1 10rem;
+}
+
+.cc-alert-form select,
+.cc-alert-form input,
+.cc-alias input {
+  width: 100%;
+  min-height: 44px;
+}
+
+.cc-alert-form button,
+.cc-alias button {
+  min-height: 44px;
+}
+
+/* «Save alias» and «Create alert»: the accent outline of the console's secondary actions. */
+.cc .cc-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--accent-400);
+  border-radius: 8px;
+  background: var(--cc-soft);
+  color: var(--accent-200);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.cc .cc-save:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-600) 26%, var(--cc-surface));
+}
+
+.cc .cc-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ranking: a podium of five with medals. */
+.cc-podium {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cc-podium-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  grid-template-areas:
+    'medal alias percent'
+    'medal alias trades';
+  gap: 0 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--cc-line, var(--slate-700));
+  border-radius: 10px;
+  background: var(--cc-raised, var(--slate-800));
+}
+
+.cc-medal {
+  grid-area: medal;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-family: var(--cc-num);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  background: var(--slate-800);
+  color: var(--cc-strong);
+  border: 2px solid var(--slate-500);
+}
+
+.cc-medal--gold .cc-medal {
+  border-color: #d4a017;
+  background: color-mix(in srgb, #d4a017 30%, transparent);
+}
+
+.cc-medal--silver .cc-medal {
+  border-color: #a8a9ad;
+  background: color-mix(in srgb, #a8a9ad 30%, transparent);
+}
+
+.cc-medal--bronze .cc-medal {
+  border-color: #b26b2c;
+  background: color-mix(in srgb, #b26b2c 30%, transparent);
+}
+
+.cc-podium-alias {
+  grid-area: alias;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--cc-strong);
+  overflow-wrap: anywhere;
+}
+
+.cc-premium-mark {
+  margin-left: 0.35rem;
+  color: var(--accent-300);
+}
+
+.cc-premium-mark .icon {
+  vertical-align: -3px;
+}
+
+.cc-podium-percent {
+  grid-area: percent;
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+.cc-podium-row .cc-hint {
+  grid-area: trades;
+  text-align: right;
+}
+
+/* «You this month»: the person's own figures, with an accent bar. */
+.cc-ranking-me {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--cc-line);
+  border-left: 3px solid var(--accent-400);
+  border-radius: 10px;
+  background: var(--cc-raised);
+  margin: 0.5rem 0;
+}
+
+.cc-ranking-me p {
+  margin: 0.2rem 0;
+}
+
+.cc-ranking-me .pnl {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* The alias: the field and its button on one row, and what others see, in plain words. */
+.cc-ranking-settings {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cc-raised) 50%, transparent);
+}
+
+.cc-alias-notice {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: var(--cc-soft);
+  color: var(--cc-text);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cc-alias-notice .icon {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--accent-300);
+}
+
+/* The first time in the console: everybody is in the ranking now, with which alias. */
+.cc-ranking-intro {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent-400);
+  border-radius: var(--cc-radius);
+  background: var(--cc-soft);
+  color: var(--cc-text);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cc-ranking-intro h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-ranking-intro h2 .icon {
+  color: var(--accent-300);
+}
+
+.cc-ranking-intro p {
+  margin: 0;
+}
+
+.cc-ranking-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-ranking-intro-actions button {
+  min-height: 36px;
+}
+
+.cc-rules ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+  line-height: 1.5;
+}
+
+html.wiz-contrast .cc-podium-row,
+html.wiz-contrast .cc-badges li,
+html.wiz-contrast .cc-plan,
+html.wiz-contrast .cc-alerts li,
+html.wiz-contrast .cc-locked-preview,
+html.wiz-contrast .cc-season-warning,
+html.wiz-contrast .cc-ranking-me,
+html.wiz-contrast .cc-ranking-settings,
+html.wiz-contrast .cc-ranking-intro,
+html.wiz-contrast .cc .cc-save {
+  border-width: 2px;
+  border-color: var(--slate-100);
+}
+
+/* Contrast: a plain light frame instead of the rainbow. */
+html.wiz-contrast .cc-prize {
+  border-color: var(--slate-100);
+  background: var(--cc-surface);
+  box-shadow: none;
+  animation: none;
+}
+
+html.wiz-contrast .cc .cc-save,
+html.wiz-contrast .cc-alias-notice {
+  color: var(--slate-50);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-prize {
+    animation: none;
+  }
+
+  .cc .cc-save {
+    transition: none;
+  }
+}
+
+html.wiz-contrast .cc-locked-preview,
+html.wiz-contrast .cc-badges li {
+  opacity: 1;
+}

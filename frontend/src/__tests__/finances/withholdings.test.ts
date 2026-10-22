@@ -175,6 +175,41 @@ describe('The modelos 111 and 115 of a quarter', () => {
   });
 });
 
+describe('The complementaria of the 111 and the 115', () => {
+  // Instructions of the 111 (sede AEAT, checked 2026-10-22): box 29 is the result of the form filed
+  // before for the same period, box 30 = 28 − 29 and «habrá de ser siempre una cantidad positiva»;
+  // the 115 has the same boxes 04 and 05 = 03 − 04 (record design DR115e15v13) and LGT art. 122.2.
+  const pro = invoice({ base: 2000, retention: 300, concept: 'Diseño Ficticio' });
+  const rent = invoice({ kind: 'rent', base: 1000, retention: 190, concept: 'Local Ficticio' });
+
+  it('take off what was filed before: 300 − 120 = 180 € (111), 190 − 150 = 40 € (115)', () => {
+    const r = run([pro, rent], {
+      ...nothing(),
+      previous111: { result: 120, receipt: '1110000000001' },
+      previous115: { result: 150, receipt: '1150000000001' },
+    });
+    expect(boxes(r.m111.boxes)).toMatchObject({ '28': 300, '29': 120, '30': 180 });
+    expect([r.m111.due, r.m111.result]).toEqual([180, 'pay']);
+    expect(boxes(r.m115.boxes)).toMatchObject({ '03': 190, '04': 150, '05': 40 });
+    expect(r.warnings).toEqual([]);
+  });
+
+  it('warn when the new result is not higher: that is a rectification, not a complementaria', () => {
+    const r = run([pro, rent], {
+      ...nothing(),
+      previous111: { result: 300, receipt: '1110000000001' },
+      previous115: { result: 200, receipt: '1150000000001' },
+    });
+    // 300 − 300 = 0 and 190 − 200 = −10: nothing to pay, and each form is flagged.
+    expect([boxes(r.m111.boxes)['30'], r.m111.due, r.m111.result]).toEqual([0, 0, 'zero']);
+    expect([boxes(r.m115.boxes)['05'], r.m115.due, r.m115.result]).toEqual([-10, 0, 'zero']);
+    expect(r.warnings).toEqual([
+      { code: 'notHigher', model: '111' },
+      { code: 'notHigher', model: '115' },
+    ]);
+  });
+});
+
 describe('Who each withholding is paid to', () => {
   it('counts one payee per tax id, also when the name is written differently', () => {
     const result = run([

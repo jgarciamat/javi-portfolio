@@ -11,6 +11,7 @@ type Details = Record<string, unknown>;
 /** Translation variables the API sends in another shape. */
 const DERIVED_VARS: Record<string, (details: Details, locale: Locale) => Vars> = {
   INSUFFICIENT_BALANCE: (d) => ({ available: (Number(d.availableCents) / 100).toFixed(2) }),
+  CRYPTO_COIN_FULL: (d) => ({ symbol: String(d.symbol), limit: Number(d.limit) }),
   PLAN_LIMIT: (d, locale) => ({
     resource: translate(locale, `billing.resource.${String(d.resource)}`),
     limit: Number(d.limit),

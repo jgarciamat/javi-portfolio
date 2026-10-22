@@ -1,9 +1,111 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import type { ActivitiesResult } from '../../domain/rentaActivity';
+import { parseDecimal } from '@shared/utils/numbers';
+import type { ActivitiesResult, ActivityInput } from '../../domain/rentaActivity';
 import { AUTONOMO_ACTIVITY, withoutAutonomoActivity } from '../../domain/rentaFromAutonomo';
 import { ActivityBoxes } from './ActivityBoxes';
 import { RemoveActivity } from './AutonomoBring';
-import { useMoney, type StepProps } from './shared';
+import { useRentaRules } from './RentaRulesContext';
+import { Field, useMoney, type StepProps } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
+
+/**
+ * An activity of a resident of Ceuta in a year with higher rates there (LIRPF DA 64.ª, 2026): the
+ * tick says it is carried out in Ceuta, with the deduction of art. 68.4.
+ */
+function CeutaQuestion({
+  a,
+  ccaaId,
+  onChange,
+}: {
+  a: ActivityInput;
+  ccaaId: string;
+  onChange: (a: ActivityInput) => void;
+}) {
+  const { t } = useI18n();
+  const { year, state } = useRentaRules();
+  const rule = state.ceutaActivities;
+  if (!rule || ccaaId !== 'ceuta') return null;
+  // DA 64.ª.1 is for the simplified direct estimation; 64.ª.2, for the módulos and farming ones.
+  const applies =
+    a.kind === 'modules' ||
+    a.kind === 'agrarian' ||
+    (a.kind === 'direct' && a.data.method === 'simplified');
+  if (!applies) return null;
+  const k = 'tools.renta.activities.ceuta';
+  return (
+    <div className="renta-block">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={a.ceuta === true}
+          onChange={(e) => {
+            const { ceuta: _, ...rest } = a;
+            onChange(e.target.checked ? { ...rest, ceuta: true } : rest);
+          }}
+        />
+        <span>{t(k)}</span>
+      </label>
+      <p className="section-hint">
+        {t(`${k}Hint`, { year, hard: rule.hardPercent, modules: rule.modulesPercent })}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * An activity in direct estimation that may be artistic (LIRPF DA 60.ª.2, from 2025): the tick and
+ * the net income of the three years before.
+ */
+function ArtisticQuestion({
+  a,
+  n,
+  onChange,
+}: {
+  a: ActivityInput;
+  n: number;
+  onChange: (a: ActivityInput) => void;
+}) {
+  const { t } = useI18n();
+  if (a.kind !== 'direct') return null;
+  const previous = a.artistic?.previous ?? [];
+  const k = 'tools.renta.activities.artistic';
+  return (
+    <div className="renta-block">
+      <label className="renta-check">
+        <input
+          type="checkbox"
+          checked={a.artistic !== undefined}
+          onChange={(e) => {
+            const { artistic: _, ...rest } = a;
+            onChange(e.target.checked ? { ...rest, artistic: { previous: [0, 0, 0] } } : rest);
+          }}
+        />
+        <span>{t(k)}</span>
+      </label>
+      {a.artistic && (
+        <>
+          <p className="section-hint">{t(`${k}Hint`)}</p>
+          <div className="tools-form">
+            {[1, 2, 3].map((ago) => (
+              <Field
+                key={ago}
+                id={`renta-activity-${n}-previous-${ago}`}
+                label={t(`${k}Previous`, { ago })}
+                value={previous[ago - 1] ? String(previous[ago - 1]).replace('.', ',') : ''}
+                onChange={(v) => {
+                  const next = [0, 1, 2].map((i) => previous[i] ?? 0);
+                  const value = parseDecimal(v);
+                  next[ago - 1] = Number.isFinite(value) ? value : 0;
+                  onChange({ ...a, artistic: { previous: next } });
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 /**
  * The economic activities of the return (brought from the self-employed screen or the case bank):
@@ -16,6 +118,8 @@ export function ActivitiesList({
 }: StepProps & { result: ActivitiesResult | null }) {
   const { t } = useI18n();
   const money = useMoney();
+  // Without the módulos of the year the figures of an activity by módulos would be partial.
+  const held = useHeld(['modules']);
   const list = form.activities ?? [];
   if (list.length === 0 || !result) return null;
   return (
@@ -25,7 +129,12 @@ export function ActivitiesList({
         {list.map((a, i) => (
           <li key={`${a.name}-${i}`}>
             <span>
-              {t('tools.renta.activities.line', { name: a.name, net: money(result.each[i].net) })}
+              {held
+                ? a.name
+                : t('tools.renta.activities.line', {
+                    name: a.name,
+                    net: money(result.each[i].net),
+                  })}
             </span>
             {a.name === AUTONOMO_ACTIVITY ? (
               <RemoveActivity onRemove={() => set(withoutAutonomoActivity(form))} />
@@ -38,17 +147,40 @@ export function ActivitiesList({
                 {t('tools.renta.activities.remove', { name: a.name })}
               </button>
             )}
+            <ArtisticQuestion
+              a={a}
+              n={i + 1}
+              onChange={(next) => set({ activities: list.map((x, j) => (j === i ? next : x)) })}
+            />
+            <CeutaQuestion
+              a={a}
+              ccaaId={form.ccaaId}
+              onChange={(next) => set({ activities: list.map((x, j) => (j === i ? next : x)) })}
+            />
           </li>
         ))}
       </ul>
-      <p className="section-hint">
-        {t('tools.renta.activities.total', {
-          total: money(result.total),
-          withheld: money(result.withheld),
-          payments: money(result.payments),
-        })}
-      </p>
-      <ActivityBoxes list={list} result={result} />
+      {held ? (
+        <HeldNote parts={['modules']} />
+      ) : (
+        <>
+          {(result.artisticReduction ?? 0) > 0 && (
+            <p className="section-hint" role="status">
+              {t('tools.renta.activities.artisticReduction', {
+                amount: money(result.artisticReduction as number),
+              })}
+            </p>
+          )}
+          <p className="section-hint">
+            {t('tools.renta.activities.total', {
+              total: money(result.total),
+              withheld: money(result.withheld),
+              payments: money(result.payments),
+            })}
+          </p>
+          <ActivityBoxes list={list} result={result} />
+        </>
+      )}
     </section>
   );
 }

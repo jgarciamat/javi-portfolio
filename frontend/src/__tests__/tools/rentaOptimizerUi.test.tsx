@@ -4,6 +4,7 @@ import { emptyForm, type RentaForm } from '@modules/tools/domain/rentaForm';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { loadCcaa } from '@modules/tools/data/renta';
 import { Optimizer } from '@modules/tools/ui/renta/Optimizer';
+import { RentaHeldProvider } from '@modules/tools/ui/renta/RentaRulesContext';
 import { renderWithProviders, tr } from '@test-utils/render';
 
 const k = 'tools.renta.opt';
@@ -187,5 +188,20 @@ describe('Renta: the reviewer on screen', () => {
       />
     );
     expect(screen.getByText(tr(`${k}.none`))).toBeInTheDocument();
+  });
+});
+
+describe('the reviewer in a year missing figures', () => {
+  it('confirms without a figure: it says what is missing instead', () => {
+    renderWithProviders(
+      <RentaHeldProvider value={{ blockers: ['imputation'], ccaaName: '' }}>
+        <Harness start={worker} />
+      </RentaHeldProvider>
+    );
+    const euros = /\d+,\d{2}\s€|€\s?\d/;
+    // The joint return is confirmed from the data: no total and no figure, the notice instead.
+    expect(screen.queryByText(tr(`${k}.saves`), { exact: false })).toBeNull();
+    expect(screen.getByText(tr('tools.renta.year.heldOther', { year: 2025 }))).toBeInTheDocument();
+    expect(screen.queryByText(euros)).toBeNull();
   });
 });

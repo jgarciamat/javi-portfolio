@@ -57,6 +57,8 @@ const shared = prop({
     'reparacion-conservacion': '1000',
     'tributos-tasas': '500',
   },
+  // The repairs were made while let: they count in full.
+  repairWhen: 'let',
   cadastral: '100000',
   cadastralBuilding: '50000',
   cost: '120000',
@@ -145,6 +147,65 @@ describe('a rented property on its own', () => {
       reducedNet: 7000,
     });
     expect(run(prop({ use: 'business', irregular: true, income: 'x' })).irregularReduction).toBe(0);
+  });
+
+  it('prorates the furniture depreciation by the days let (Manual 2025, c04, caso 2)', () => {
+    // 10 % of 6,900 € of furniture, let 9 of 12 months: 690 × 9/12 = 517.50.
+    const p = propertyResult(
+      prop({ rentedDays: '9', otherDays: '0', income: '5850', expenses: { amortizacion: '690' } }),
+      rentaProperty,
+      12,
+      parseDecimal,
+      RATES
+    );
+    expect(p.otherExpenses).toBe(517.5);
+    expect(p.net).toBe(5332.5);
+  });
+
+  it('counts the repairs by when they were made, and prorates them with no date (Manual 2025, c04)', () => {
+    // Let 9 of 12 months, repairs of 210 € (Manual c04, caso 2): with no date, 210 × 9/12 = 157.50.
+    const repairs = (patch: Partial<PropertyForm>) =>
+      propertyResult(
+        prop({
+          rentedDays: '9',
+          otherDays: '0',
+          income: '5850',
+          expenses: { 'reparacion-conservacion': '210' },
+          ...patch,
+        }),
+        rentaProperty,
+        12,
+        parseDecimal,
+        RATES
+      );
+    expect(repairs({})).toMatchObject({ capped: 157.5, repairsProrated: true });
+    expect(repairs({ repairWhen: 'let' })).toMatchObject({ capped: 210, repairsProrated: false });
+    expect(repairs({ repairWhen: 'empty' }).capped).toBe(0);
+    // Mixed: the part while let, never more than the whole; half owned, so half of it.
+    expect(repairs({ repairWhen: 'mixed', repairsLet: '80' }).capped).toBe(80);
+    expect(repairs({ repairWhen: 'mixed', repairsLet: '900', share: '50' }).capped).toBe(105);
+    expect(repairs({ repairWhen: 'mixed' }).capped).toBe(0);
+    // Let the whole year, the date does not matter; no repairs, nothing to warn of.
+    expect(repairs({ rentedDays: '', repairWhen: 'empty' }).capped).toBe(210);
+    expect(repairs({ expenses: {} }).repairsProrated).toBe(false);
+  });
+
+  it('depreciates a usufruct bought over its years, or 3 % for life, up to its rent', () => {
+    // 100,000 € for 10 years: 10,000 a year (Manual 2025, c04); for life, 3 % = 3,000.
+    const u = (patch: Partial<PropertyForm>) =>
+      run(prop({ usufruct: true, cost: '100000', income: '20000', use: 'other', ...patch }));
+    expect(u({ usufructYears: '10' })).toMatchObject({
+      amortizationBase: 100000,
+      amortization: 10000,
+    });
+    expect(u({}).amortization).toBe(3000);
+    // Never more than the rent of the right, and by the days let (half the year: 5,000).
+    expect(u({ usufructYears: '2', income: '30000' }).amortization).toBe(30000);
+    expect(u({ usufructYears: '10', rentedDays: '73' }).amortization).toBe(2000);
+    // The cadastral value of the building plays no part.
+    expect(
+      u({ usufructYears: '10', cadastral: '500000', cadastralBuilding: '400000' }).amortization
+    ).toBe(10000);
   });
 
   it('keeps the days that do not impute out of the days at disposal', () => {

@@ -39,6 +39,9 @@ describe('apiErrorMessage in English', () => {
     expect(apiErrorMessage('PLAN_LIMIT', 'x', { resource: 'goals', limit: 2 })).toBe(
       en('app.apiError.PLAN_LIMIT', { resource: en('billing.resource.goals'), limit: 2 })
     );
+    expect(apiErrorMessage('CRYPTO_COIN_FULL', 'x', { symbol: 'SOL', limit: 2 })).toBe(
+      'You already have 2 SOL trades: close or cancel one to open another.'
+    );
   });
 
   it('falls back to a generic message for unknown or missing codes', () => {

@@ -37,10 +37,13 @@ describe('The layouts measured on the BOE', () => {
       'periodo',
       ...Array.from({ length: 19 }, (_, i) => String(i + 1).padStart(2, '0')),
     ]);
-    expect(boxesOf(await loadLayout('111'))).toHaveLength(32);
+    // 30 numbered boxes, the period and the two marks of a complementaria.
+    expect(boxesOf(await loadLayout('111'))).toHaveLength(34);
     expect(boxesOf(await loadLayout('115'))).toEqual([
       'ejercicio',
       'periodo',
+      'complementaria',
+      'justificante',
       '01',
       '02',
       '03',

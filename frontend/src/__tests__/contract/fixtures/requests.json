@@ -145,7 +145,9 @@
     "path": "/transactions/bulk",
     "auth": true,
     "body": {
-      "ids": ["{transaction}"],
+      "ids": [
+        "{transaction}"
+      ],
       "changes": {
         "categoryId": "{category:Ocio}",
         "notes": "Revisado",
@@ -159,7 +161,9 @@
     "path": "/transactions/bulk-delete",
     "auth": true,
     "body": {
-      "ids": ["{transaction}"]
+      "ids": [
+        "{transaction}"
+      ]
     }
   },
   {
@@ -1021,7 +1025,12 @@
               "filed115": false
             }
           ],
-          "filed130": ["-1000", "", "", ""],
+          "filed130": [
+            "-1000",
+            "",
+            "",
+            ""
+          ],
           "activity": {
             "method": "simplified",
             "agrarian": false,
@@ -1031,8 +1040,18 @@
             "retaFix": "",
             "selfConsumption": "",
             "stockChange": "",
-            "compensations": ["", "", "", ""],
-            "paid130": ["0", "", "", ""],
+            "compensations": [
+              "",
+              "",
+              "",
+              ""
+            ],
+            "paid130": [
+              "0",
+              "",
+              "",
+              ""
+            ],
             "modules": {
               "rows": [],
               "pacAid": "",
@@ -1056,7 +1075,12 @@
               "small": "",
               "seasonDays": "",
               "seasonLastYear": "",
-              "seasonQuarters": ["", "", "", ""],
+              "seasonQuarters": [
+                "",
+                "",
+                "",
+                ""
+              ],
               "newYear": "",
               "disabled": false,
               "startDate": "",
@@ -1148,8 +1172,18 @@
           "retaFix": 0,
           "selfConsumption": 0,
           "stockChange": 0,
-          "compensations": [0, 0, 0, 0],
-          "paid130": [0, null, null, null],
+          "compensations": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "paid130": [
+            0,
+            null,
+            null,
+            null
+          ],
           "modules": null,
           "objective": null
         },
@@ -1253,6 +1287,156 @@
     "name": "rentaCalculation",
     "method": "POST",
     "path": "/renta/calculation",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "cryptoBuyMarket",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "market",
+      "amount": 1000
+    }
+  },
+  {
+    "name": "cryptoBuyWithExits",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "market",
+      "amount": 500,
+      "takeProfit": 60000,
+      "stopLoss": 45000
+    }
+  },
+  {
+    "name": "cryptoShort",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "ETH",
+      "direction": "short",
+      "type": "market",
+      "amount": 300,
+      "takeProfit": 1500,
+      "stopLoss": 2500
+    }
+  },
+  {
+    "name": "cryptoBuyLimit",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "limit",
+      "amount": 250.5,
+      "price": 40000
+    }
+  },
+  {
+    "name": "cryptoSellLimit",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "sell",
+      "positionId": "{position}",
+      "type": "limit",
+      "price": 60000
+    }
+  },
+  {
+    "name": "cryptoSellMarket",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "sell",
+      "positionId": "{position}",
+      "type": "market"
+    }
+  },
+  {
+    "name": "cryptoExits",
+    "method": "PUT",
+    "path": "/crypto/sim/positions/{position}/exits",
+    "auth": true,
+    "body": {
+      "takeProfit": 61000,
+      "stopLoss": null
+    }
+  },
+  {
+    "name": "cryptoPractice",
+    "method": "POST",
+    "path": "/crypto/sim/practice",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "cryptoBuyPractice",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "portfolioId": "{practice}",
+      "symbol": "ETH",
+      "type": "market",
+      "amount": 100
+    }
+  },
+  {
+    "name": "cryptoResetPractice",
+    "method": "POST",
+    "path": "/crypto/sim/reset",
+    "auth": true,
+    "body": {
+      "portfolioId": "{practice}"
+    }
+  },
+  {
+    "name": "cryptoDeletePractice",
+    "method": "DELETE",
+    "path": "/crypto/sim/practice/{practice}",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "cryptoRanking",
+    "method": "PUT",
+    "path": "/crypto/ranking/settings",
+    "auth": true,
+    "body": {
+      "alias": "Lince"
+    }
+  },
+  {
+    "name": "cryptoAlert",
+    "method": "POST",
+    "path": "/crypto/alerts",
+    "auth": true,
+    "body": {
+      "symbol": "BTC",
+      "condition": "above",
+      "price": 60000
+    }
+  },
+  {
+    "name": "cryptoDeleteAlert",
+    "method": "DELETE",
+    "path": "/crypto/alerts/{alert}",
     "auth": true,
     "body": null
   }

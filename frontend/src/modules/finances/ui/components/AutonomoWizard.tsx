@@ -400,7 +400,7 @@ function downloadScreens(ctx: Ctx): WizardScreen[] {
           ) : (
             <p className="section-hint">{t(w('noDraft'))}</p>
           )}
-          <AnnualPanel form={s.manual} year={s.year} />
+          <AnnualPanel form={s.manual} year={s.year} onChange={s.changeManual} />
         </>
       ),
     },

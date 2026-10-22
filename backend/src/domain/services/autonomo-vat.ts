@@ -17,8 +17,10 @@ import {
   RE_RATES,
   RE_TOBACCO,
   REAL_ESTATE_YEARS,
+  reHalfBoxes,
   type SaleOp,
   SPECIAL_PRORRATA_EXCESS,
+  temporaryRatesIn,
   type VatOptions,
 } from './autonomo-vat-data';
 import { BusinessMovement, splitVat } from './tax';
@@ -220,7 +222,9 @@ export type VatWarning =
   | 'simplified'
   | 'reagp'
   | 'reverseIssued'
-  | 'exemptNoProrrata';
+  | 'exemptNoProrrata'
+  /** A quarter of 2023 or 2024 with temporary rates (5 %, 2 %, 7.5 %) the draft does not work out. */
+  | 'temporaryRates';
 
 /** The 303 of a quarter: the boxes as the form groups them, and what the 390 needs of it. */
 export interface Draft303 {
@@ -339,6 +343,7 @@ const cashMoney = (
 };
 
 interface QuarterContext {
+  year: number;
   q: number;
   bucket: VatBucket;
   extras: QuarterVat;
@@ -409,8 +414,10 @@ function accruedOf(c: QuarterContext): Accrued {
   };
   // Box 27 = 152 + 167 + 03 + 155 + 06 + 09 + 11 + 13 + 15 + 158 + 170 + 18 + 21 + 24 + 26 [DR303].
   const c27 = sum(Object.values(lines));
-  const reBoxes = RE_RATES.flatMap(({ vat, rate: pct, boxes }) => {
+  const reBoxes = RE_RATES.flatMap(({ vat, rate: pct, boxes: fixed }) => {
     const base = vat === 21 ? re.r52 : vat === 10 ? re.r14 : re.r05;
+    // The 0.5 % surcharge moved from 16-18 to 168-170 in the fourth quarter of 2024.
+    const boxes = vat === 4 ? reHalfBoxes(c.year, c.q) : fixed;
     return [
       box(boxes[0], `Recargo de equivalencia al ${pct} %: base`, base),
       rate(boxes[1], `Tipo del recargo ${pct} %`, pct),
@@ -611,6 +618,7 @@ function quarter303(c: QuarterContext): { draft: Draft303; detail: QuarterDetail
   if (o.refund && !last) warnings.push('refundNotLast');
   if (skip && c110 > 0 && c66 + box77 > 0) warnings.push('offsetNotApplied');
   if (b.other.reverse > 0) warnings.push('reverseIssued');
+  if (temporaryRatesIn(c.year, c.q).length > 0) warnings.push('temporaryRates');
   const detail: QuarterDetail = {
     ordinary: a.ordinary,
     cash: a.cash,
@@ -717,6 +725,7 @@ export function vatYear(
       pending.year = pending.year.map(() => 0);
     }
     const result = quarter303({
+      year,
       q,
       bucket: buckets[q],
       extras: extras[q] ?? {},

@@ -20,8 +20,22 @@ import { payeeKeys, retentionOf, roleOf, type WithholdingQuarter } from './withh
  * - [RGAT] Real Decreto 1065/2007, arts. 31-35, https://www.boe.es/buscar/act.php?id=BOE-A-2007-15984 :
  *   the 347 by person and year, purchases (key A) and sales (key B) apart, broken down by quarter
  *   (33.1), VAT included (34.2.a; «IVA incluido» in the AEAT folleto, 8.2), net of credit notes
- *   (34.2); without imports and exports (33.2.g) nor what another declaration with the same content
+ *   (34.2), the threshold in absolute value; without imports and exports (33.2.g) nor what another declaration with the same content
  *   gives (33.2.i: the intra-EU operations of the 349); the rent of business premises apart (34.1.d).
+ * - [CAJA] The cash regime of VAT (checked 22 October 2026): RGAT arts. 33.1, 34.1.j and 35.1 (the
+ *   operations apart from the rest with the same person, by the general rule of accrual and also by
+ *   the amounts accrued in the year under LIVA art. 163 terdecies.Uno: when collected, or on 31
+ *   December of the year after the operation; on an annual basis, every record of a person who bills
+ *   under it); record design 347.pdf, positions 281 («X») and 284-299 (the cash amount), the
+ *   quarters left at zero; AEAT FAQ of the 347, «¿Cómo se declaran las operaciones acogidas al
+ *   régimen especial del criterio de caja…?» (case 347-03: 4,000 € billed, 2,500 € collected; the
+ *   next year 0 € and 1,500 €), https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740 .
+ *   Taken from that example, not written in the RGAT: the next year's record is made when the
+ *   person was above the threshold the year of the invoice.
+ *   The screen of a year only has the invoices of that year: what was still to collect on 31
+ *   December of the year before, of the cash invoices of that year, is typed by hand (`Carried347`).
+ *   All of it accrues in this year (LIVA art. 163 terdecies.Uno: collected now, or accrued on 31
+ *   December), so it adds to the cash amount of the person, or makes a record of its own.
  *
  * NO CONFIRMADO: whether invoices with an IRPF withholding (already in the 190 or the 180) leave the
  * 347. Neither the RGAT nor the AEAT instructions say it: they stay in and are flagged.
@@ -235,13 +249,33 @@ export interface Record347 {
   withheld: boolean;
   /** Domestic reverse charge (LIVA 84.Uno.2.º), reported apart [RGAT 34.1.k]. */
   reverse: boolean;
+  /** Operations under the cash regime of VAT, reported apart and without quarters [CAJA]. */
+  cash: boolean;
+  /** Cash records: the amount accrued in the year by the cash rule; null when not known. */
+  cashTotal: number | null;
 }
 
 export type Warning347 =
   | { code: 'nif'; who: string }
   | { code: 'withheld'; who: string }
   /** Services to a client abroad not subject to Spanish VAT: whether they go in is NO CONFIRMADO. */
-  | { code: 'notSubject'; who: string };
+  | { code: 'notSubject'; who: string }
+  /** A cash invoice without its collections: the amount by the cash rule is not known [CAJA]. */
+  | { code: 'cashUnknown'; who: string }
+  /** Typed by hand and also in the book with an invoice of the year before: it may count twice. */
+  | { code: 'carriedTwice'; who: string };
+
+/**
+ * What was still to collect on 31 December of the year before, of the cash invoices of that year
+ * with one person (typed by hand): it accrues in this year by the cash rule [CAJA].
+ */
+export interface Carried347 {
+  /** B: sales (the person billed under the cash regime); A: purchases from someone who did. */
+  key: 'A' | 'B';
+  nif: string | null;
+  name: string;
+  amount: number;
+}
 
 export interface Summary347 {
   /** The figures of the year are confirmed; false when the app has none for it. */
@@ -256,41 +290,140 @@ export interface Summary347 {
 
 const amountOf347 = (i: ImportedInvoice) => round2(i.base + i.vat);
 
+const yearOf = (i: ImportedInvoice) => Number(i.date.slice(0, 4));
+
+/** A person or company of a book: by tax id, or by name when the book has none. */
+const party = (book: ImportedInvoice['book'], nif: string | null | undefined, name: string) =>
+  `${book}|${nif ? `nif:${nif}` : `name:${supplierKey(name)}`}`;
+
+/**
+ * What a cash invoice accrues in `year` [CAJA]: its collections of that year and, for one of the year
+ * before, what is still not collected on 31 December; null when its collections are not known.
+ */
+function cashAccrued(i: ImportedInvoice, year: number): number | null {
+  if (!i.collections) return null;
+  const paid = (upTo: string) =>
+    sum(i.collections!.filter((c) => c.date <= upTo).map((c) => c.amount));
+  const inYear = round2(paid(`${year}-12-31`) - paid(`${year - 1}-12-31`));
+  if (yearOf(i) === year) return inYear;
+  // The year after: what is collected, plus the rest at its end (never more than the invoice).
+  const total = amountOf347(i);
+  const left = round2(total - paid(`${year}-12-31`));
+  return round2(inYear + (Math.sign(left) === Math.sign(total) ? left : 0));
+}
+
+/** The group of a person typed by hand: always one of cash operations [CAJA]. */
+const typedKey = (c: Carried347) =>
+  `${party(c.key === 'A' ? 'received' : 'issued', c.nif, c.name)}|cash`;
+
+/** What was typed by hand, by person and key: it adds to their cash record [CAJA]. */
+function typedByParty(typed: Carried347[]): Map<string, number> {
+  const byHand = new Map<string, number>();
+  for (const c of typed.filter((x) => x.amount !== 0))
+    byHand.set(typedKey(c), round2((byHand.get(typedKey(c)) ?? 0) + c.amount));
+  return byHand;
+}
+
+const TYPED_347: Record347 = {
+  key: 'B',
+  nif: null,
+  name: '',
+  total: 0,
+  quarters: [0, 0, 0, 0],
+  premises: false,
+  withheld: false,
+  reverse: false,
+  cash: true,
+  cashTotal: 0,
+};
+
+/**
+ * The record of one person and key from its invoices (of the year, and the cash ones of the year
+ * before), plus what was typed by hand; null when a carried invoice has nothing left this year.
+ */
+function record347(
+  all: ImportedInvoice[],
+  year: number,
+  annual: boolean,
+  hand: number
+): Record347 | null {
+  const first = all[0];
+  const items = all.filter((i) => yearOf(i) === year);
+  const cash = first.cash === true;
+  const accrued = cash ? [...all.map((i) => cashAccrued(i, year)), hand] : [];
+  const cashTotal = accrued.includes(null) ? null : sum(accrued as number[]);
+  // A carried invoice with nothing left to accrue this year makes no record.
+  if (items.length === 0 && cashTotal === 0) return null;
+  const quarters = [1, 2, 3, 4].map((q) =>
+    cash || annual ? 0 : sum(items.filter((i) => i.quarter === q).map(amountOf347))
+  ) as Record347['quarters'];
+  return {
+    key: first.book === 'received' ? 'A' : 'B',
+    nif: all.find((i) => i.nif)?.nif ?? null,
+    name: first.concept,
+    total: sum(items.map(amountOf347)),
+    quarters,
+    premises: first.book === 'received' && all.some((i) => i.kind === 'rent'),
+    withheld: items.some((i) => (i.book === 'issued' ? i.withheld : retentionOf(i)) !== 0),
+    reverse: items.some((i) => i.op === 'reverse'),
+    cash,
+    cashTotal: cash ? cashTotal : null,
+  };
+}
+
 /**
  * The modelo 347 of the year: by person or company (tax id, or the name when the book has none) and
  * by key, the ones above the threshold, with the four quarters. A person who files the VAT books
  * through the SII does not file it (AEAT folleto 8.2): the app does not know it, the screen says so.
  */
-export function summary347(year: number, invoices: ImportedInvoice[]): Summary347 {
+export function summary347(
+  year: number,
+  invoices: ImportedInvoice[],
+  typed: Carried347[] = []
+): Summary347 {
   const figures = figuresFor(year);
   const threshold = figures?.m347.threshold ?? 3005.06;
-  const inYear = invoices.filter((i) => !i.excluded && i.date.startsWith(String(year)));
+  const usable = invoices.filter((i) => !i.excluded && !OUT_347.has(i.op ?? 'domestic'));
+  const inYear = invoices.filter((i) => !i.excluded && yearOf(i) === year);
   const counted = inYear.filter((i) => !OUT_347.has(i.op ?? 'domestic'));
-  const keyOf = (i: ImportedInvoice) =>
-    `${i.book}|${i.nif ? `nif:${i.nif}` : `name:${supplierKey(i.concept)}`}`;
+  const partyOf = (i: ImportedInvoice) => party(i.book, i.nif, i.concept);
+  // In absolute value: a credit note of a sale of another year goes with its sign (AEAT FAQ of the
+  // 347, «Devoluciones, descuentos o modificaciones de la base imponible», checked 2026-10-21).
+  const above = (party: string, y: number) =>
+    Math.abs(sum(usable.filter((i) => yearOf(i) === y && partyOf(i) === party).map(amountOf347))) >
+    threshold;
+  // The cash invoices of the year before still accrue in this one [CAJA].
+  const carried = usable.filter(
+    (i) => i.cash && yearOf(i) === year - 1 && above(partyOf(i), year - 1)
+  );
   const groups = new Map<string, ImportedInvoice[]>();
-  for (const i of counted) groups.set(keyOf(i), [...(groups.get(keyOf(i)) ?? []), i]);
+  for (const i of [...counted.filter((x) => above(partyOf(x), year)), ...carried]) {
+    const k = `${partyOf(i)}|${i.cash ? 'cash' : ''}`;
+    groups.set(k, [...(groups.get(k) ?? []), i]);
+  }
+  // A person who bills under the cash regime gives everything on an annual basis [CAJA].
+  const annual = counted.some((i) => i.book === 'issued' && i.cash);
 
+  const byHand = typedByParty(typed);
   const records: Record347[] = [];
   const notSubject: string[] = [];
-  for (const items of groups.values()) {
-    const total = sum(items.map(amountOf347));
-    if (total <= threshold) continue;
-    const first = items[0];
-    const quarters = [1, 2, 3, 4].map((q) =>
-      sum(items.filter((i) => i.quarter === q).map(amountOf347))
-    ) as Record347['quarters'];
-    if (items.some((i) => i.op === 'notSubject')) notSubject.push(first.concept);
-    records.push({
-      key: first.book === 'received' ? 'A' : 'B',
-      nif: items.find((i) => i.nif)?.nif ?? null,
-      name: first.concept,
-      total,
-      quarters,
-      premises: first.book === 'received' && items.some((i) => i.kind === 'rent'),
-      withheld: items.some((i) => (i.book === 'issued' ? i.withheld : retentionOf(i)) !== 0),
-      reverse: items.some((i) => i.op === 'reverse'),
-    });
+  const twice: string[] = [];
+  for (const [k, all] of groups) {
+    const hand = byHand.get(k);
+    byHand.delete(k);
+    if (hand !== undefined && all.some((i) => yearOf(i) === year - 1)) twice.push(all[0].concept);
+    const record = record347(all, year, annual, hand ?? 0);
+    if (!record) continue;
+    if (all.some((i) => yearOf(i) === year && i.op === 'notSubject')) notSubject.push(record.name);
+    records.push(record);
+  }
+  // Someone with nothing in the book this year: a cash record of their own, 0 € by the general
+  // rule (the AEAT example of the 347: «0 €» and the cash amount the next year).
+  for (const c of typed) {
+    const amount = byHand.get(typedKey(c));
+    if (amount === undefined) continue;
+    byHand.delete(typedKey(c));
+    records.push({ ...TYPED_347, key: c.key, nif: c.nif, name: c.name, cashTotal: amount });
   }
   return {
     known: figures !== null,
@@ -304,6 +437,10 @@ export function summary347(year: number, invoices: ImportedInvoice[]): Summary34
       ...records.filter((r) => r.nif === null).map((r) => ({ code: 'nif' as const, who: r.name })),
       ...records.filter((r) => r.withheld).map((r) => ({ code: 'withheld' as const, who: r.name })),
       ...notSubject.map((who) => ({ code: 'notSubject' as const, who })),
+      ...records
+        .filter((r) => r.cash && r.cashTotal === null)
+        .map((r) => ({ code: 'cashUnknown' as const, who: r.name })),
+      ...twice.map((who) => ({ code: 'carriedTwice' as const, who })),
     ],
     left: inYear.length - counted.length,
   };

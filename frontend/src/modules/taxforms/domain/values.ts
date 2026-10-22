@@ -108,14 +108,30 @@ export function form130(draft: AutonomoDraft): FilledForm | null {
   };
 }
 
-/** The modelo 111 or 115 of a quarter, as the withholdings worked out on the device give them. */
+/**
+ * The modelo 111 or 115 of a quarter, as the withholdings worked out on the device give them. A
+ * complementaria marks its box with an «X» and gives the 13-digit number of the form it completes
+ * (instructions of the 111, «Complementaria»; the file carries the same, see aeatFiles/models.ts).
+ */
 export function formWithholding(
   model: '111' | '115',
   result: Result111 | Result115,
   year: number,
   q: 1 | 2 | 3 | 4
 ): FilledForm {
-  return { model, year, period: quarter(q), values: valuesOf(result.boxes), pending: [] };
+  const filled: FilledForm = {
+    model,
+    year,
+    period: quarter(q),
+    values: valuesOf(result.boxes),
+    pending: [],
+  };
+  if (!result.previous) return filled;
+  const receipt = result.previous.receipt.trim();
+  return {
+    ...filled,
+    texts: { complementaria: 'X', ...(receipt ? { justificante: receipt } : {}) },
+  };
 }
 
 /** The modelo 131 of a quarter (objective estimation), as module131 works it out. */
@@ -401,6 +417,9 @@ function optionalBoxes(result: RentaResult): Record<string, number> {
     ...(gains ? { '0431': gains['0431'], '0433': gains['0433'], '0434': gains['0434'] } : {}),
     // I and J: the pension plan and what the compensatory pension takes off the savings base.
     '0492': result.pensionReduction,
+    // Arts. 53 and 54 (a person with a disability): plans and protected patrimony.
+    '0494': result.disability?.plans ?? 0,
+    '0495': result.disability?.patrimony ?? 0,
     '0507': result.savingsReduction,
     // K: the minimums for descendants and ascendants.
     '0513': minimum('descendants'),

@@ -1,3 +1,4 @@
+import { LOW_PAY_2025 } from '../../domain/rentaCalc';
 import type { Deduction, RentaState, TaxBracket } from '../../domain/rentaData';
 
 /**
@@ -62,6 +63,9 @@ const deductions: Deduction[] = [
     limit: 1350,
     // LIRPF art. 81.3: "de forma proporcional al número de meses" (100 € each).
     monthly: 100,
+    // Art. 81.1: "podrá incrementarse en 150 euros" when the 30 days are reached after the birth
+    // (Manual 2025, c18, caso a): once per child, up to 1,350 € each.
+    startBonus: 150,
     requirements:
       'Madre con derecho al mínimo por descendientes que cobre paro o esté de alta en la Seguridad Social al nacer el hijo, o después con 30 días cotizados. No cuentan los meses con complemento de ayuda a la infancia. Solo la madre (salvo fallecimiento o custodia del padre).',
     url: `${MATERNIDAD}/deduccion-maternidad/cuantia-limite-deduccion.html`,
@@ -318,6 +322,7 @@ const deductions: Deduction[] = [
     baseLimit: 9040,
     limit: 1356,
     regionalShare: 0.5,
+    wealthCheck: true,
     requirements:
       'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. Tu patrimonio debe subir al menos lo invertido. En Cataluña el tramo autonómico puede ser del 9 % (compras antes del 30-7-2011 y otros requisitos): aquí se cuenta el 7,5 %.',
     url: `${VIVIENDA}/regimen-transitorio.html`,
@@ -510,12 +515,39 @@ export const rentaState: RentaState = {
     notes:
       'Se aplica al rendimiento neto del trabajo (tras restar los gastos de las letras a a e del art. 19.2, no los 2.000 euros). Hasta 14.852 euros: 7.302. De 14.852 a 17.673,52: 7.302 - 1,75 x (rendimiento - 14.852). De 17.673,52 a 19.747,5: 2.364,34 - 1,14 x (rendimiento - 17.673,52). Desde 19.747,5: nada. Solo si las otras rentas (sin exentas) no pasan de 6.500 euros. El saldo no puede quedar negativo.',
   },
+  // LIRPF arts. 51.5 and 52 (BOE-A-2006-20764, wording of Ley 31/2022, in force since 2023; checked
+  // 22-10-2026) and Manual práctico de Renta 2025, c13, «Límites y exceso de aportaciones».
   baseReductions: {
     pensionPlanLimit: 1500,
     pensionPlanEmployerLimit: 8500,
+    employmentTable: {
+      lowUpTo: 500,
+      lowTimes: 2.5,
+      midUpTo: 1500,
+      midBase: 1250,
+      midTimes: 0.25,
+      highTimes: 1,
+      highPayFrom: 60000,
+    },
+    dependencyLimit: 5000,
+    percentLimit: 30,
+    excessYears: 5,
+    // LIRPF arts. 53.1 and 54 (BOE-A-2006-20764, checked 22-10-2026): 10,000 € a relative, 24,250 €
+    // the person's own plan and everything given to one person or patrimony; 5 and 4 years.
+    disability: { perContributor: 10000, joint: 24250, planYears: 5, patrimonyYears: 4 },
     notes:
       'Límite conjunto por planes de pensiones, mutualidades, planes de previsión asegurados, planes de previsión social empresarial y seguros de dependencia: 1.500 euros, más hasta 8.500 si el aumento viene de contribuciones de la empresa o de aportaciones tuyas al mismo plan dentro de la tabla del art. 52. Los autónomos pueden sumar 4.250 por aportaciones propias, y entre ambos aumentos el tope es 8.500 (10.000 en total). Aparte, 5.000 por primas pagadas por la empresa a seguros colectivos de dependencia. Además no puede pasar del 30 % de los rendimientos netos del trabajo y de actividades (criterio del manual de la AEAT) ni dejar la base general negativa. Lo que sobre se puede reducir en los 5 años siguientes.',
   },
   deductions,
+  lowPay: LOW_PAY_2025,
+  // LIRPF DA 60.ª.2, added by Ley 7/2024 (BOE-A-2024-26694) from 1-1-2025 (BOE-A-2006-20764,
+  // checked 22-10-2026); Manual práctico de Renta 2025, c07, «Reducción por rendimientos de
+  // actividades artísticas» and its example.
+  artistic: {
+    groups: ['851', '852', '853', '861', '862', '864', '869', 'S3-01', 'S3-02', 'S3-03', 'S3-05'],
+    percent: 30,
+    over: 130,
+    cap: 150000,
+  },
   source: 'https://sede.agenciatributaria.gob.es/Sede/Ayuda/25Manual/100.html',
 };

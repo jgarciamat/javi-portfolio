@@ -44,6 +44,8 @@
   --primary: var(--accent);
   /* Mixed into a category colour so text in that colour stays readable on the surfaces. */
   --tint-ink: #fff;
+  /* The rainbow of «Invite a friend» and the prizes (borders only: text never sits on it). */
+  --rainbow-stops: #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6;
   /* Chevron of the drop-downs (an image cannot read the colour tokens). */
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
@@ -101,7 +103,10 @@ html {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--slate-950);
   color: var(--slate-100);
   -webkit-text-size-adjust: 100%;
@@ -207,7 +212,9 @@ html.wiz-contrast .renta-amount.renta-amount--refund {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .btn-secondary:hover {
@@ -230,7 +237,9 @@ html.wiz-contrast .renta-amount.renta-amount--refund {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .back-btn:hover {
@@ -247,7 +256,9 @@ html.wiz-contrast .renta-amount.renta-amount--refund {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .btn-danger:hover {

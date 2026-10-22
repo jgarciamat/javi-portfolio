@@ -387,7 +387,7 @@ export const CHAPTERS_STOCKS: Chapter[] = [
       {
         k: 'key',
         title: 'Recuerda',
-        t: 'Contenido educativo, sin recomendaciones ni previsiones. Consulta con un asesor financiero independiente antes de decidir, y con un gestor para tus impuestos.',
+        t: 'Contenido educativo, sin recomendaciones ni previsiones. Consulta con un asesor financiero independiente antes de decidir, y con un profesional para tus impuestos.',
       },
     ],
     glossary: [

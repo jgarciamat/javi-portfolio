@@ -435,6 +435,8 @@ Padre que aporta a su plan de empleo, al plan de pensiones de su hijo con discap
 | — | Reducción patrimonio protegido (padre) | 5.773,81 |
 | — | Base liquidable general padre | 41.476,19 |
 | — | Exceso pendiente padre | 476,19 |
+| — | Reducción patrimonio protegido (cada hermano) | 4.619,05 |
+| — | Exceso pendiente cada hermano | 380,95 |
 
 Notas: Límites 2025: 1.500 € general + 8.500 € por contribuciones de empresa; 24.250 € discapacidad.
 

@@ -8,6 +8,8 @@ import {
 } from '../../domain/rentaForm';
 import type { RentaWorkExtras } from '../../domain/rentaExtras';
 import { Field, Step, type StepProps } from './shared';
+import { GeneralCapitalSection } from './GeneralCapital';
+import { DisabilityPlans, ExcessByYear } from './PlanExtras';
 
 /** Step 2: pay, withholdings, expenses of the job and contributions that lower the base. */
 export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWorkExtras }) {
@@ -95,6 +97,8 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
         )}
       </details>
 
+      <GeneralCapitalSection form={form} set={set} />
+
       <details className="renta-group">
         <summary>{t('tools.renta.contributions')}</summary>
         <p className="section-hint">{t('tools.renta.contributionsHint')}</p>
@@ -110,6 +114,20 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             label={t('tools.renta.pensionEmployer')}
             value={form.pensionEmployer}
             onChange={(v) => set({ pensionEmployer: v })}
+          />
+          <Field
+            id="renta-pension-employment-own"
+            label={t('tools.renta.pensionEmploymentOwn')}
+            hint={t('tools.renta.pensionEmploymentOwnHint')}
+            value={form.pensionEmploymentOwn ?? ''}
+            onChange={(v) => set({ pensionEmploymentOwn: v })}
+          />
+          <Field
+            id="renta-dependency-premiums"
+            label={t('tools.renta.dependencyPremiums')}
+            hint={t('tools.renta.dependencyPremiumsHint')}
+            value={form.dependencyPremiums ?? ''}
+            onChange={(v) => set({ dependencyPremiums: v })}
           />
           <Field
             id="renta-spouse-plan"
@@ -138,6 +156,8 @@ export function IncomeStep({ form, set, extras }: StepProps & { extras: RentaWor
             onChange={(v) => set({ pensionCapital2006: v })}
           />
         </div>
+        <ExcessByYear form={form} set={set} />
+        <DisabilityPlans form={form} set={set} />
         <ul className="renta-notes">
           {extras.baseReductions.map((r) => (
             <li key={r.id}>

@@ -15,7 +15,8 @@ import { CalculatorLayout, NumberField, number, useMoney } from './CalculatorLay
 import { RentaAssistant } from './renta/RentaWizard';
 import { MobileFold } from '@shared/components/MobileFold';
 import { CampaignDates } from './renta/CampaignDates';
-import { rentaState } from '../data/renta/state';
+import { openingYear, yearsUpTo } from '../data/renta/ejercicios';
+import { loadProgress } from '../application/rentaProgress';
 
 /** 50/30/20: how to split a net monthly income. */
 export function BudgetRulePage() {
@@ -401,10 +402,17 @@ export function GoalCalculatorPage() {
   );
 }
 
-/** Public page of the income tax return calculator; signed-in people go to the section of the app. */
+/**
+ * Public page of the income tax return calculator, with the year of the return to pick as in the
+ * app (the years with rules up to this one); signed-in people go to the section of the app.
+ */
 export function RentaCalculatorPage() {
   const { isAuthenticated } = useAuth();
   const { t } = useI18n();
+  const current = new Date().getFullYear();
+  const years = yearsUpTo(current);
+  // The year left half done on this device; else the return filed this spring.
+  const [year, setYear] = useState(() => openingYear(current, loadProgress()?.year));
   if (isAuthenticated) return <Navigate to={appTabPath('renta')} replace />;
   return (
     <CalculatorLayout
@@ -412,12 +420,28 @@ export function RentaCalculatorPage() {
       titleKey="tools.renta.title"
       descriptionKey="tools.renta.description"
       lead={
-        <MobileFold summary={t('tools.renta.campaign.fold')}>
-          <CampaignDates exercise={rentaState.year} />
-        </MobileFold>
+        <>
+          <label className="tools-field renta-public-year">
+            <span>{t('app.renta.year')}</span>
+            <select
+              className="tx-input select-compact"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+            >
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </label>
+          <MobileFold summary={t('tools.renta.campaign.fold')}>
+            <CampaignDates exercise={year} />
+          </MobileFold>
+        </>
       }
     >
-      <RentaAssistant mode="local" />
+      <RentaAssistant key={year} mode="local" year={year} />
     </CalculatorLayout>
   );
 }

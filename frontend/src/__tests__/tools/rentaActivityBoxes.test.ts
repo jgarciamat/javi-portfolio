@@ -39,6 +39,31 @@ const pairs = (groups: ReturnType<typeof activityBoxes>) =>
   groups.map((g) => [g.name, g.boxes.map((b) => [b.box, b.amount])]);
 
 describe('the boxes of the activities, box by box', () => {
+  it('puts the reduction of an artistic activity in box 0237, inside 0235', () => {
+    const result: ActivitiesResult = {
+      direct: 19500,
+      dependentReduction: 0,
+      smallIncomeReduction: 0,
+      startReduction: 0,
+      artisticReduction: 1500,
+      directTotal: 18000,
+      modules: 0,
+      agrarian: 0,
+      total: 18000,
+      withheld: 0,
+      payments: 0,
+      each: [{ name: 'Tienda', net: 19500, detail: directResult }],
+    };
+    expect(pairs(activityBoxes([direct('normal')], result))[1]).toEqual([
+      null,
+      [
+        ['0231', 19500],
+        ['0237', 1500],
+        ['0235', 18000],
+      ],
+    ]);
+  });
+
   it('gives the direct estimation by its modality and the totals with the reductions', () => {
     const result: ActivitiesResult = {
       direct: 19500,

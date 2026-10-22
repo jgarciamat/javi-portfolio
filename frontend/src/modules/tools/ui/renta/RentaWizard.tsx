@@ -5,8 +5,8 @@ import { Wizard, type WizardScreen, type WizardStepView } from '@modules/wizard/
 import { useAssistantMode, useWizardProgress } from '@modules/wizard/application/useWizard';
 import type { WizardStep } from '@modules/wizard/domain/wizard';
 import type { RentaMode } from '../../application/useRentaAccess';
-import { rentaProperty } from '../../data/renta/inmuebles';
-import { rentaState } from '../../data/renta/state';
+import { DEFAULT_RENTA_YEAR } from '../../data/renta/ejercicios';
+import { HeldNote, RentaHeldProvider, RentaRulesProvider, YearNotice } from './RentaRulesContext';
 import { COMPARED_BOXES, ourBoxes } from '../../domain/rentaCompare';
 import { answerOf, choose, noPay, OPTIONS, type QuestionId } from '../../domain/rentaGuide';
 import { number, propertiesOf } from '../../domain/rentaForm';
@@ -107,7 +107,7 @@ function guided(ctx: Ctx, q: QuestionId, extra?: Partial<WizardScreen>): WizardS
         ccaa={p.ccaa}
         loadError={p.loadError}
         deductions={p.all}
-        property={rentaProperty}
+        property={p.rules.property}
         reading={p.draft.reading}
         onReview={p.startReview}
         onePerScreen
@@ -135,8 +135,8 @@ function propertyScreens(ctx: Ctx): WizardScreen[] {
           form={p.form}
           set={p.set}
           index={i}
-          property={rentaProperty}
-          year={rentaState.year}
+          property={p.rules.property}
+          year={p.rules.year}
         />
         {i === list.length - 1 && <AddProperty form={p.form} set={p.set} />}
       </>
@@ -343,7 +343,7 @@ function deductionScreens(ctx: Ctx): WizardScreen[] {
       ctx,
       'others',
       <DeductionsStep
-        state={rentaState}
+        state={p.rules.state}
         ccaa={p.ccaa}
         loadError={p.loadError}
         choices={p.form.choices}
@@ -407,6 +407,8 @@ function BoxesToCopy({ p }: { p: RentaPlannerState }) {
   const [copied, setCopied] = useState<string | null>(null);
   // Filed elsewhere (not resident, foral...): no boxes of the State's return to copy.
   if (scopeOf(p.form).kind === 'out') return <p className="section-hint">{t(w('boxesOut'))}</p>;
+  // The year keeps the result back: say what is missing, not «work it out first».
+  if (p.blockers.length > 0) return <HeldNote />;
   if (!p.shown) return <p className="section-hint">{t(w('boxesFirst'))}</p>;
   const boxes = ourBoxes(p.shown.result, p.input);
   const copy = (box: string, value: number) => {
@@ -481,7 +483,7 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
       hint: t(w('hint.result')),
       help: t(w('help.result')),
       // Filed elsewhere: nothing to work out here, the official links are the answer.
-      ready: p.shown !== null || scopeOf(p.form).kind === 'out',
+      ready: p.shown !== null || scopeOf(p.form).kind === 'out' || p.blockers.length > 0,
       skipLabel: t(w('skip.result')),
       body: (
         <ResultSection
@@ -496,6 +498,7 @@ function resultScreens(ctx: Ctx): WizardScreen[] {
           imported={p.form.savingsDetail?.imported}
           input={p.input}
           scope={scopeOf(p.form)}
+          blockers={p.blockers}
         />
       ),
     },
@@ -586,7 +589,7 @@ interface RentaWizardProps {
 export function RentaWizard({
   mode,
   initialIncome = '',
-  year = rentaState.year,
+  year = DEFAULT_RENTA_YEAR,
   onExpert,
   onOpenAutonomo,
   onHowToFile,
@@ -610,24 +613,29 @@ export function RentaWizard({
     year,
   };
   return (
-    <Wizard
-      flow="renta"
-      defs={RENTA_STEPS}
-      steps={rentaSteps(ctx)}
-      controls={controls}
-      onExpert={onExpert}
-      screenAction={
-        <NewReturn
-          year={year}
-          hasActivity={(p.form.activities?.length ?? 0) > 0}
-          onConfirm={(alsoActivity) => {
-            p.startNew(alsoActivity);
-            controls.restart();
-          }}
+    <RentaRulesProvider value={p.rules}>
+      <RentaHeldProvider value={{ blockers: p.blockers, ccaaName: p.ccaaName }}>
+        <YearNotice blockers={p.blockers} ccaaName={p.ccaaName} notInApp={p.ccaa?.notInApp} />
+        <Wizard
+          flow="renta"
+          defs={RENTA_STEPS}
+          steps={rentaSteps(ctx)}
+          controls={controls}
+          onExpert={onExpert}
+          screenAction={
+            <NewReturn
+              year={year}
+              hasActivity={(p.form.activities?.length ?? 0) > 0}
+              onConfirm={(alsoActivity) => {
+                p.startNew(alsoActivity);
+                controls.restart();
+              }}
+            />
+          }
+          finale={<Finale p={p} money={money} />}
         />
-      }
-      finale={<Finale p={p} money={money} />}
-    />
+      </RentaHeldProvider>
+    </RentaRulesProvider>
   );
 }
 

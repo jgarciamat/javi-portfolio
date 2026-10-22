@@ -416,7 +416,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Cómo ayuda Finanverso',
         paragraphs: [
-          'En la sección Autónomos marcas qué categorías son de tu actividad y su tipo de IVA, y ves una estimación por trimestre. Es solo orientativa: no incluye deducciones ni regímenes especiales, así que contrástala con tu gestor.',
+          'En la sección Autónomos marcas qué categorías son de tu actividad y su tipo de IVA, y ves una estimación por trimestre. Es solo orientativa: no incluye deducciones ni regímenes especiales, así que contrástala con un profesional.',
         ],
       },
     ],

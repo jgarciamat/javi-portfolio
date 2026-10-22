@@ -225,3 +225,188 @@ encender el programa:
       Publicidad y Ley de Competencia Desleal): ver la plantilla `docs/afiliacion/condiciones-creadores.md`.
     - Las condiciones de contratación (`terms.*`) no necesitan cambios para los usuarios; el programa se
       rige por un contrato aparte con cada creador.
+
+# Cambios del 22/10/2026: «Consola crypto» (simulador educativo con dinero ficticio)
+
+Nueva sección del menú **Aprender** (`docs/consola-crypto.md`): una gráfica de las principales
+criptomonedas y un simulador de compras y ventas **manuales** con dinero ficticio. Nunca se mueve
+dinero real, no hay cuentas de exchange, claves, enlaces de afiliado, señales ni recomendaciones.
+**No se ha editado ningún texto legal.** Textos propuestos:
+
+31. **s2** (añadir un punto): «Si usas la Consola crypto, guardamos tu simulación con dinero ficticio:
+    el saldo inicial elegido y el disponible, la comisión simulada, y cada operación (moneda, cantidad,
+    precio y fecha de compra y de venta, importe, comisiones y resultado) y cada orden pendiente (tipo,
+    precio, importe y fecha). No son datos de tu patrimonio real ni movimientos de dinero.»
+32. **s3** (añadir al punto de ejecución del contrato, art. 6.1.b): «Guardar tu simulación de la
+    Consola crypto para que la encuentres en cualquier dispositivo.»
+33. **s4** (añadir un punto): «Binance (datos públicos de mercado): nuestro servidor descarga precios
+    y velas públicos de criptomonedas en euros (`data-api.binance.vision`, y `api.binance.com` si la
+    primera no responde), sin clave ni cuenta, y los guarda unos segundos en caché. No se envía ningún
+    dato tuyo y tu navegador nunca se conecta a Binance.» Revisar si el apartado de transferencias
+    (s4.p2) necesita mencionarlo: no hay datos personales en esas consultas.
+34. **s5** (añadir un punto): «Simulación de la Consola crypto: hasta que pulses «Empezar de nuevo»
+    (se borra al momento) o elimines la cuenta. Las órdenes pendientes caducan a los 30 días.»
+35. **s7**: la exportación JSON ya incluye la sección `cryptoSimulator` (saldo, comisión,
+    operaciones y órdenes pendientes). Al eliminar la cuenta se borra todo (borrado en cascada).
+36. **s8** (almacenamiento local, añadir): «En la Consola crypto guardamos en este dispositivo,
+    solo como preferencias: la moneda y el tamaño de vela que viste por última vez
+    (`mm_crypto_view`), las capas de la gráfica que tienes encendidas (`mm_crypto_layers`), si ves
+    los importes en euros o en dólares (`mm_crypto_currency`) y si ya viste el aviso de girar el
+    móvil (`mm_crypto_rotate_hint`).»
+37. **Avisos legales y de licencias (página de licencias de terceros o «Acerca de», si existe)**:
+    la gráfica usa **TradingView Lightweight Charts™** (licencia Apache 2.0, «Copyright (c) 2025
+    TradingView, Inc.»), que exige atribución y un enlace a https://www.tradingview.com/. Ya se cumple
+    en la propia gráfica (logo de TradingView) y con el texto «Gráfica dibujada con TradingView
+    Lightweight Charts™ · Copyright © 2025 TradingView, Inc.» bajo ella. Si se publica una lista de
+    licencias, añadirla.
+38. **Condiciones (`terms.*`)** (propuesta, añadir un punto en la descripción del servicio): «La
+    Consola crypto es un simulador educativo con dinero ficticio. No es asesoramiento financiero ni una
+    recomendación de inversión, no ejecuta operaciones reales y sus precios son públicos, con retraso
+    y solo orientativos. Rentabilidades pasadas no garantizan rentabilidades futuras. Invertir en
+    criptoactivos conlleva riesgo de perder todo lo invertido.»
+39. **Dudas para el abogado.**
+    - Confirmar que un simulador con dinero ficticio, sin señales ni recomendaciones y con este aviso
+      fijo, no es «asesoramiento en materia de inversión» (MiFID II / Ley del Mercado de Valores) ni
+      publicidad de criptoactivos sujeta a la Circular 1/2022 de la CNMV (no se promociona ningún
+      criptoactivo ni proveedor, y no hay enlaces a exchanges).
+    - Confirmar que mostrar precios públicos de Binance (y su nombre como fuente) no requiere
+      licencia de datos ni atribución adicional para un uso no comercial en la app; revisar sus
+      condiciones de uso de la API pública antes de publicar.
+    - Si en el futuro se añaden ventas en corto o apalancamiento simulados, revisar los avisos.
+
+# Cambios del 22/10/2026 (segunda tanda): cortos, take profit y stop loss, euros/dólares
+
+El dueño autoriza adaptar los textos de la consola por ser contenido didáctico. Lo marcado como
+«propuesta» sigue pendiente de revisión legal. **No se ha editado ningún texto legal de la app.**
+
+40. **Aviso fijo de la consola** (ya en la app, `app.crypto.risk.body`): se amplía con «Operar en
+    corto o con apalancamiento en el mercado real puede hacer perder más de lo invertido; esto es
+    solo un simulador».
+41. **s2** (propuesta, completar el punto 31): «…cada operación (dirección long o short, moneda,
+    cantidad, precio y fecha de entrada y de salida, importe, comisiones, resultado y si se cerró
+    a mercado, por take profit, por stop loss o por garantía agotada) y cada orden pendiente (tipo,
+    dirección, precio, importe, y el take profit y el stop loss que dejará al ejecutarse).»
+42. **s4** (propuesta, completar el punto 33): «Para ver los importes en dólares usamos el tipo de
+    cambio del BCE que ya consulta nuestro servidor (Frankfurter); no se envía ningún dato tuyo.»
+43. **Condiciones** (propuesta, completar el punto 38): «La Consola crypto permite simular
+    posiciones largas y cortas siempre a 1x, sin préstamos ni apalancamiento: en un corto el
+    importe queda como garantía y la posición se cierra sola si el precio llega al doble. La guía
+    explica el apalancamiento solo con fines didácticos; Finanverso no lo ofrece.»
+44. **Dudas para el abogado**: confirmar que explicar cortos y apalancamiento con ejemplos
+    inventados, sin recomendar operar ni enlazar a plataformas, sigue siendo contenido educativo
+    y no publicidad de productos apalancados (CNMV); revisar la redacción del aviso fijo.
+
+# Cambios del 22/10/2026 (tercera tanda): temporadas, ranking voluntario y carteras de prácticas
+
+**Propuesta, pendiente de revisión legal; no se han cambiado los textos publicados.** El dueño
+autoriza adaptar los textos de la consola (contenido didáctico). Detalle técnico y **bases del
+ranking** en `docs/consola-crypto.md`.
+
+45. **Qué cambia**: la consola pasa a tener temporadas mensuales (del día 1 al último día, hora
+    peninsular española) con 10.000 € virtuales para todos, carteras de prácticas separadas y un
+    **ranking mensual voluntario** (top 5) cuyo ganador recibe 1 mes de Premium. La comisión
+    simulada es fija (0,10 %) y ya no se elige el saldo.
+46. **Datos nuevos** (todo con dinero virtual, ninguno es patrimonio real):
+    - **alias** del ranking y la preferencia **«Aparecer en el ranking»** (desactivada por
+      defecto);
+    - **resultado de cada temporada**: saldo inicial y final, operaciones cerradas, operaciones
+      ganadas, días con actividad, si participaba, el alias de ese momento, si tenía Premium, el
+      puesto (1-5) y los días de Premium ganados;
+    - **insignias** (primera operación, primer take profit, 10 operaciones, mes en positivo) con
+      su fecha;
+    - **patrimonio de cada día** de cada cartera (para la gráfica de Premium);
+    - **alertas de precio** (moneda, por encima o por debajo, precio, fecha y cuándo se envió);
+    - **contador diario** de carteras de prácticas creadas o reiniciadas (anti-abuso).
+47. **Finalidad**: mostrar tu evolución y tu historial de temporadas, calcular y publicar el
+    ranking mensual, dar el premio al ganador, enviar las alertas de precio que pidas y evitar
+    abusos.
+48. **Base jurídica propuesta**:
+    - simulación, temporadas, insignias, historial, alertas y contador anti-abuso: ejecución del
+      servicio (art. 6.1.b);
+    - aparecer en el ranking con tu alias: **acción voluntaria / consentimiento** (art. 6.1.a), que
+      se da al activar el interruptor y se retira desactivándolo;
+    - el premio: ejecución de las bases del ranking (art. 6.1.b).
+49. **Quién ve qué**: los demás usuarios solo ven, de quien se apunta, el **alias**, la
+    **rentabilidad**, el **número de operaciones** y una **insignia Premium** si la tiene. Nunca el
+    correo, el nombre completo ni identificadores. Tu posición y tus cifras solo las ves tú. Quien
+    no se apunta no aparece.
+50. **Conservación**:
+    - operaciones de cada temporada: **12 meses** después de terminar, luego se borran;
+    - resultados de temporada, insignias y top 5 histórico: **mientras exista la cuenta**;
+    - alertas de precio ya enviadas: **30 días**;
+    - carteras de prácticas: hasta que la persona la borre o la reinicie, o elimine la cuenta.
+51. **Borrado y exportación**: todo se borra al eliminar la cuenta (borrado en cascada), también
+    su alias y sus puestos en los top 5 anteriores. La exportación JSON (`cryptoSimulator`)
+    incluye `portfolios` (operaciones, órdenes pendientes y patrimonio diario), `ranking`
+    (participación y alias), `seasonResults`, `badges` y `priceAlerts`.
+52. **Textos propuestos** (sin editar todavía):
+    - **s2**: «Si usas la Consola crypto guardamos tus carteras con dinero ficticio (la oficial de
+      cada mes y las de prácticas), el resultado de cada temporada, tus insignias, el valor de cada
+      día de tus carteras y las alertas de precio que crees. Si activas "Aparecer en el ranking",
+      guardamos también tu alias.»
+    - **s3**: añadir el ranking como acción voluntaria/consentimiento, retirable desactivándolo.
+    - **s5**: añadir los plazos del punto 50.
+    - **s7**: mencionar las nuevas secciones de la exportación.
+    - **Condiciones**: enlazar las bases del ranking.
+53. **A REVISAR POR UN ABOGADO**:
+    - **Premio promocional**: si el ranking con premio de 1 mes de Premium es un concurso o sorteo
+      promocional con requisitos propios (bases, comunicación, territorialidad) y la fiscalidad de
+      un premio en especie para el ganador y para Finanverso.
+    - **Edad mínima** para participar y recibir el premio (las cuentas se admiten desde 14 años).
+    - **Alias por defecto con el nombre de pila**: es un dato personal que se hace visible si la
+      persona activa el ranking; valorar proponer un alias neutro en su lugar.
+    - **Insignia Premium junto al alias**: revela públicamente que esa persona paga Premium;
+      valorar quitarla o hacerla opcional.
+    - **Retención** de resultados y del top 5 histórico mientras exista la cuenta.
+    - **Territorialidad** del concurso (España, UE o todos los usuarios).
+    - Que las alertas de precio, con el texto «Es solo un aviso, no una recomendación», sigan
+      siendo un aviso de servicio y no publicidad de criptoactivos.
+
+# Cambios del 22/10/2026 (cuarta tanda): todos aparecen en el ranking de la consola crypto
+
+**Propuesta, pendiente de revisión legal; no se han cambiado los textos publicados.** Por
+decisión del dueño se quita el interruptor «Aparecer en el ranking»: los puntos 45 a 52 de la
+tanda anterior quedan así (detalle en `docs/consola-crypto.md`, «Ranking mensual»).
+
+54. **Qué cambia**: participan **todas las temporadas oficiales** del mes que cumplan los
+    mínimos (5 operaciones cerradas y 3 días con actividad), sin activar nada. Cada persona
+    aparece con un **alias**: el que haya elegido; si no, su **nombre de pila** del perfil; si no
+    se puede usar, «Jugador» y cuatro cifras estables. Solo puede **cambiar el alias** (3 a 20
+    caracteres, sin correos, enlaces ni teléfonos); no puede salir del ranking.
+55. **Datos**: deja de usarse la preferencia «Aparecer en el ranking» (la columna sigue en la
+    base de datos por compatibilidad, sin leerse ni escribirse, y ya no sale en la exportación).
+    El alias solo se guarda cuando la persona lo cambia; el nombre de pila se usa al vuelo. El
+    resultado congelado de cada temporada guarda el alias de ese momento.
+56. **Quién ve qué** (sustituye al punto 49): los demás usuarios ven, de quien esté en el top 5,
+    el **alias** (por defecto, el nombre de pila), la **rentabilidad**, el **número de
+    operaciones** y la **insignia Premium** si la tiene. Nunca el correo, el nombre completo ni
+    identificadores. Tu posición y lo que te falta para puntuar solo los ves tú.
+57. **Información en la app**: junto al alias se muestra siempre «Tu alias aparece en el ranking
+    del mes con tu rentabilidad y tu número de operaciones. Puedes cambiarlo cuando quieras;
+    nunca se muestra tu correo ni tu nombre completo». La primera vez que se entra en la consola
+    sale un aviso descartable con el alias con el que aparece y un botón para cambiarlo.
+    Para el punto s8 (almacenamiento local) se añaden dos marcas del dispositivo: si ya se
+    descartó ese aviso (`mm_crypto_ranking_intro`) y si ya se abrió «Aprende antes de jugar»
+    (`mm_crypto_learn_seen`, que deja de parpadear).
+58. **Textos propuestos** (sin editar todavía; sustituyen a los del punto 52 sobre el ranking):
+    - **s2**: «Si usas la Consola crypto guardamos tus carteras con dinero ficticio (la oficial de
+      cada mes y las de prácticas), el resultado de cada temporada, tus insignias, el valor de cada
+      día de tus carteras y las alertas de precio que crees. Tu temporada oficial participa en el
+      ranking del mes con tu alias (al empezar, tu nombre de pila), que puedes cambiar.»
+    - **s3**: el ranking pasa de consentimiento a la base que confirme el abogado (punto 59).
+    - **s7**: la sección `ranking` de la exportación lleva el alias elegido, ya no la preferencia.
+59. **PUNTO PARA ABOGADO**:
+    - **Base del tratamiento**: la participación automática con un alias sacado del **nombre de
+      pila** cambia la base del tratamiento de **consentimiento** (art. 6.1.a, el interruptor) a
+      **ejecución del servicio** (art. 6.1.b) o **interés legítimo** (art. 6.1.f). Hay que
+      confirmar cuál aplica, hacer la ponderación si es interés legítimo y **explicarlo con
+      claridad en la política de privacidad** (qué se publica, a quién, con qué alias por defecto
+      y cómo cambiarlo).
+    - **Derecho de oposición**: si la base es el interés legítimo, valorar si hace falta una
+      forma de oponerse (salir del ranking o un alias neutro por defecto en lugar del nombre de
+      pila).
+    - **Personas que ya habían elegido no aparecer** (solo en entornos de prueba: la función no
+      ha llegado a producción) y **menores** (cuentas desde 14 años) que aparezcan con su nombre de
+      pila.
+    - Siguen abiertos los puntos del 53 (premio promocional, edad mínima, insignia Premium,
+      retención y territorialidad).

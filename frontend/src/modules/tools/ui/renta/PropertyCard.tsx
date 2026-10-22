@@ -12,10 +12,13 @@ import {
   propertyResult,
   reductionMissing,
   reductionOf,
+  REPAIR_EXPENSE,
   type PropertyForm,
   type PropertyUse,
+  type RepairWhen,
 } from '../../domain/rentaRentals';
 import { Field, RadioOptions, useMoney, type StepProps } from './shared';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 const USES: PropertyUse[] = ['home', 'season', 'tourist', 'business', 'other'];
 /** Information cards of the catalogue, not amounts. */
@@ -129,8 +132,61 @@ function ReductionQuestions({
   );
 }
 
+const REPAIR_WHEN: RepairWhen[] = ['let', 'empty', 'mixed', ''];
+
+/**
+ * Let part of the year: when the repairs were made. Only those made while let count; without a
+ * date they are prorated by the days let, as the Manual 2025 does (c04, caso práctico 2).
+ */
+function RepairTiming({
+  p,
+  n,
+  full,
+  update,
+}: {
+  p: PropertyForm;
+  n: number;
+  full: number;
+  update: (patch: Partial<PropertyForm>) => void;
+}) {
+  const { t } = useI18n();
+  const k = (key: string) => `tools.renta.property.${key}`;
+  const days = parseDecimal(p.rentedDays);
+  const repairs = parseDecimal(p.expenses[REPAIR_EXPENSE] ?? '');
+  if (!(days < full) || !(repairs > 0)) return null;
+  const when = p.repairWhen ?? '';
+  return (
+    <fieldset className="renta-block">
+      <legend className="renta-question">{t(k('repairWhen'))}</legend>
+      <RadioOptions
+        name={`renta-prop-${n}-repairWhen`}
+        options={REPAIR_WHEN.map((value) => ({
+          value,
+          label: t(k(`repairWhenOpt.${value || 'unknown'}`)),
+        }))}
+        value={when}
+        onChange={(v) => update({ repairWhen: v as RepairWhen })}
+      />
+      {when === 'mixed' && (
+        <Field
+          id={`renta-prop-${n}-repairsLet`}
+          label={t(k('field.repairsLet'))}
+          hint={t(k('hint.repairsLet'))}
+          value={p.repairsLet ?? ''}
+          onChange={(v) => update({ repairsLet: v })}
+        />
+      )}
+      {when === '' && (
+        <p className="renta-gives" role="note">
+          {t(k('repairProrated'), { days, full })}
+        </p>
+      )}
+    </fieldset>
+  );
+}
+
 /** What the property gives, in one line: net, reduction, the reduced net and the imputed rent. */
-function PropertySummary({
+export function PropertySummary({
   p,
   property,
   year,
@@ -146,13 +202,17 @@ function PropertySummary({
     revised: property.imputation.revisedRate,
   });
   const rate = p.revised ? property.imputation.revisedRate : property.imputation.standardRate;
+  // The year misses the reductions of the rent or the imputation rate: those figures are not given.
+  const rentals = useHeld(['rentals']);
+  const imputation = useHeld(['imputation']);
   return (
     <ul className="renta-property-summary" aria-label={t('tools.renta.property.summary')}>
       <li>
         {t('tools.renta.property.net')} <strong>{money(r.net)}</strong>
       </li>
       <li>
-        {t('tools.renta.property.reducedNet')} <strong>{money(r.reducedNet)}</strong>
+        {t('tools.renta.property.reducedNet')}{' '}
+        {rentals ? <HeldNote parts={['rentals']} /> : <strong>{money(r.reducedNet)}</strong>}
       </li>
       {r.excessCarry > 0 && (
         <li>
@@ -162,7 +222,11 @@ function PropertySummary({
       {r.disposalDays > 0 && (
         <li>
           {t('tools.renta.property.imputed', { days: r.disposalDays })}{' '}
-          <strong>{money(Math.round(r.imputedValue * rate) / 100)}</strong>
+          {imputation ? (
+            <HeldNote parts={['imputation']} />
+          ) : (
+            <strong>{money(Math.round(r.imputedValue * rate) / 100)}</strong>
+          )}
         </li>
       )}
     </ul>
@@ -217,6 +281,7 @@ export function PropertyCard({
         checked={p.usufruct === true}
         onChange={(on) => update({ usufruct: on })}
       />
+      {p.usufruct && <div className="tools-form">{field('usufructYears')}</div>}
       <h4>{t(k('expenses'))}</h4>
       <p className="section-hint">{t(k('expensesHint'))}</p>
       <div className="tools-form">
@@ -235,6 +300,7 @@ export function PropertyCard({
         {field('pendingExcess')}
         {field('withheld')}
       </div>
+      <RepairTiming p={p} n={n} full={daysInYear(year)} update={update} />
       <h4>{t(k('depreciation'))}</h4>
       <p className="section-hint">{property.rental.amortizationNote}</p>
       <div className="tools-form">

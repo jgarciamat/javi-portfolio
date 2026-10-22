@@ -612,3 +612,182 @@ export interface HouseholdRepository {
 export interface PersonalDataReader {
   sectionsFor(userId: string): Record<string, unknown>;
 }
+
+// ─── Crypto simulator (play money) ───────────────────────────────────────────
+
+/** A play-money portfolio: the official one of a monthly season, or a practice one. */
+export interface CryptoSimPortfolio {
+  id: string;
+  userId: string;
+  kind: 'season' | 'practice';
+  /** YYYY-MM (Spain) of an official portfolio; null for practice. */
+  season: string | null;
+  initialCents: Cents;
+  cashCents: Cents;
+  feeBps: number;
+  startedAt: string;
+  /** When its season ended (frozen); always null for practice. */
+  closedAt: string | null;
+}
+
+/** One purchase of the simulator: open while `closedAt` is null. */
+export interface CryptoSimPosition {
+  id: string;
+  userId: string;
+  portfolioId: string;
+  symbol: string;
+  /** `long`: bought; `short`: sold, with the amount kept as its guarantee (1x). */
+  direction: 'long' | 'short';
+  quantity: number;
+  entryPrice: number;
+  amountCents: Cents;
+  entryFeeCents: Cents;
+  openType: 'market' | 'limit' | 'stop';
+  openedAt: string;
+  exitPrice: number | null;
+  exitFeeCents: Cents | null;
+  proceedsCents: Cents | null;
+  pnlCents: Cents | null;
+  /** `season`: closed at the last price when its season ended. */
+  closeType: 'market' | 'limit' | 'stop' | 'liquidation' | 'season' | null;
+  closedAt: string | null;
+  /** Its number among the operations of the coin (#1, #2); null on the oldest closed ones. */
+  slot: number | null;
+}
+
+/** An order waiting for a price: a purchase (`amountCents`) or the sale of `positionId`. */
+export interface CryptoSimOrder {
+  id: string;
+  userId: string;
+  portfolioId: string;
+  symbol: string;
+  side: 'buy' | 'sell';
+  /** Direction of the position it opens or closes. */
+  direction: 'long' | 'short';
+  type: 'limit' | 'stop';
+  price: number;
+  amountCents: Cents | null;
+  reservedCents: Cents;
+  positionId: string | null;
+  createdAt: string;
+  /** Take profit and stop loss to leave once a pending purchase is filled. */
+  takeProfit: number | null;
+  stopLoss: number | null;
+  /** Number of a pending purchase among the operations of the coin; null on take profit and stop loss. */
+  slot: number | null;
+}
+
+/** The ranking alias (null until the person changes it) and the daily practice restarts. */
+export interface CryptoSimProfile {
+  userId: string;
+  alias: string | null;
+  practiceDay: string | null;
+  practiceActions: number;
+  updatedAt: string;
+}
+
+/** The frozen result of a finished season. */
+export interface CryptoSeasonResult {
+  userId: string;
+  season: string;
+  initialCents: Cents;
+  finalCents: Cents;
+  trades: number;
+  wins: number;
+  activeDays: number;
+  reachedAt: string | null;
+  /** The person had asked to appear in the ranking when the season ended. */
+  ranked: boolean;
+  alias: string | null;
+  premium: boolean;
+  /** 1-5 when it entered the top 5 of the month. */
+  place: number | null;
+  prizeDays: number;
+  createdAt: string;
+}
+
+export interface CryptoPriceAlert {
+  id: string;
+  userId: string;
+  symbol: string;
+  condition: 'above' | 'below';
+  price: number;
+  createdAt: string;
+  triggeredAt: string | null;
+}
+
+export interface CryptoSimRepository {
+  // Portfolios
+  portfolio(userId: string, id: string): CryptoSimPortfolio | null;
+  /** The ones in use (not frozen): the official one of the season and the practice ones. */
+  portfolios(userId: string): CryptoSimPortfolio[];
+  seasonPortfolio(userId: string, season: string): CryptoSimPortfolio | null;
+  insertPortfolio(portfolio: CryptoSimPortfolio): void;
+  savePortfolio(portfolio: CryptoSimPortfolio): void;
+  deletePortfolio(userId: string, id: string): boolean;
+  /** Official portfolios not frozen yet whose season is before `season` (or exactly it). */
+  seasonPortfoliosBefore(season: string): CryptoSimPortfolio[];
+  seasonPortfoliosOf(season: string): CryptoSimPortfolio[];
+  /** Deletes the frozen official portfolios (and their operations) of seasons before `season`. */
+  purgeSeasonsBefore(season: string): number;
+
+  // Operations
+  positions(portfolioId: string): CryptoSimPosition[];
+  position(userId: string, id: string): CryptoSimPosition | null;
+  countPositions(portfolioId: string): { open: number; total: number };
+  insertPosition(position: CryptoSimPosition): void;
+  /** Closes an open position; false when it was already closed (or is not the user's). */
+  closePosition(
+    userId: string,
+    id: string,
+    close: Pick<
+      CryptoSimPosition,
+      'exitPrice' | 'exitFeeCents' | 'proceedsCents' | 'pnlCents' | 'closeType' | 'closedAt'
+    >
+  ): boolean;
+  orders(portfolioId: string): CryptoSimOrder[];
+  order(userId: string, id: string): CryptoSimOrder | null;
+  insertOrder(order: CryptoSimOrder): void;
+  /** Removes a pending order; false when it is no longer there. */
+  deleteOrder(userId: string, id: string): boolean;
+  deleteOrdersOfPosition(userId: string, positionId: string): number;
+  /** «Start again» of a practice portfolio: every position and order goes. */
+  clear(portfolioId: string): void;
+
+  // Ranking, seasons and badges
+  profile(userId: string): CryptoSimProfile | null;
+  saveProfile(profile: CryptoSimProfile): void;
+  /**
+   * Everybody with an official portfolio of `season` (all of them are in the ranking), with the
+   * alias they chose (null when they never changed it) and the name of their profile.
+   */
+  rankingCandidates(
+    season: string
+  ): { portfolio: CryptoSimPortfolio; alias: string | null; name: string }[];
+  /** The alias the person chose (null when they never changed it) and the name of their profile. */
+  rankingIdentity(userId: string): { alias: string | null; name: string };
+  /** False when the result of that season was already frozen. */
+  insertResult(result: CryptoSeasonResult): boolean;
+  results(userId: string, limit: number): CryptoSeasonResult[];
+  seasonResults(season: string): CryptoSeasonResult[];
+  setPlace(userId: string, season: string, place: number, prizeDays: number): void;
+  /** Finished seasons with frozen results whose ranking is not closed yet. */
+  seasonsToClose(before: string): string[];
+  /** Marks the ranking of a season as closed; false when it already was. */
+  claimSeasonClose(season: string, at: string): boolean;
+  badges(userId: string): { badge: string; earnedAt: string }[];
+  addBadge(userId: string, badge: string, at: string): void;
+  /** Operations of every portfolio of the user: opened, closed and closed at a take profit. */
+  badgeFacts(userId: string): { opened: number; closed: number; takeProfit: number };
+  saveEquityDay(portfolioId: string, day: string, equityCents: Cents): void;
+  equityDays(portfolioId: string): { day: string; equityCents: Cents }[];
+
+  // Price alerts
+  alerts(userId: string): CryptoPriceAlert[];
+  insertAlert(alert: CryptoPriceAlert): void;
+  deleteAlert(userId: string, id: string): boolean;
+  waitingAlerts(): CryptoPriceAlert[];
+  /** Marks an alert as sent; false when another run already did. */
+  triggerAlert(id: string, at: string): boolean;
+  purgeAlerts(triggeredBefore: string): number;
+}

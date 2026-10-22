@@ -116,6 +116,26 @@ async function main(): Promise<void> {
   );
   trialNotices.unref();
 
+  // Crypto console: on the 1st (Madrid) the seasons are frozen, the top 5 is kept and the winner
+  // gets a month of Premium; every hour it also keeps today's equity. Idempotent.
+  const cryptoSeasons = setInterval(
+    () => {
+      container.cryptoRanking.run().catch((e) => console.error('[crypto] season job failed', e));
+    },
+    60 * 60 * 1000
+  );
+  cryptoSeasons.unref();
+  container.cryptoRanking.run().catch((e) => console.error('[crypto] season job failed', e));
+
+  // Price alerts of the crypto console (Premium): checked every five minutes, each sent once.
+  const cryptoAlerts = setInterval(
+    () => {
+      container.cryptoAlerts.run().catch((e) => console.error('[crypto] alerts failed', e));
+    },
+    5 * 60 * 1000
+  );
+  cryptoAlerts.unref();
+
   const server = createApp(container).listen(config.port, () => {
     console.info(`Finanverso API listening on :${config.port} (${config.env})`);
   });

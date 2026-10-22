@@ -1,7 +1,11 @@
 import { prepareDraft, type DraftInputs, type DraftResult } from '@domain/services/autonomo';
 import type { ManualData } from '@domain/services/autonomo-expenses';
 import { prorrataOf, type VatMovement } from '@domain/services/autonomo-vat';
-import type { QuarterVat, VatOptions } from '@domain/services/autonomo-vat-data';
+import {
+  temporaryRatesIn,
+  type QuarterVat,
+  type VatOptions,
+} from '@domain/services/autonomo-vat-data';
 
 /**
  * The boxes of the 303, 349 and 390 that the worked case of the manual does not reach, each one with
@@ -154,6 +158,59 @@ describe('prorrata (arts. 102-106 LIVA)', () => {
     );
     expect(boxes(general)['29']).toBe(504);
     expect(general.vat.warnings).toContain('specialMandatory');
+  });
+});
+
+describe('the temporary rates of 2023 and 2024 (RDL 20/2022, 8/2023 and 4/2024)', () => {
+  // A 500 € sale at 4 % to a retailer in the surcharge: 500 × 0.5 % = 2.50 €. Up to the third
+  // quarter of 2024 it goes in 16-18 with the 0 % and 0.62 % ones; from the fourth, in 168-170
+  // (AEAT, instructions of the 303 for 09-12/3T-4T 2024).
+  const sold = (year: number, q: 1 | 2 | 3 | 4) => {
+    const date = `${year}-${String(q * 3 - 1).padStart(2, '0')}-15`;
+    const movement = { ...sale(q, 500, 4, 're'), date };
+    return prepareDraft(year, q, [movement], inputs());
+  };
+
+  it('puts the 0.5 % surcharge in 16-18 up to 3T 2024 and in 168-170 after', () => {
+    for (const [year, q] of [
+      [2023, 1],
+      [2024, 3],
+    ] as const) {
+      const d = boxes(sold(year, q));
+      expect([d['16'], d['17'], d['18'], d['168']]).toEqual([500, 0.5, 2.5, undefined]);
+    }
+    for (const [year, q] of [
+      [2024, 4],
+      [2026, 1],
+    ] as const) {
+      const d = boxes(sold(year, q));
+      expect([d['168'], d['169'], d['170'], d['16']]).toEqual([500, 0.5, 2.5, undefined]);
+    }
+    // 27 = 500 × 4 % + 2.50 in every period.
+    expect(boxes(sold(2023, 1))['27']).toBe(22.5);
+  });
+
+  it('knows the periods of each temporary rate and its surcharge, as the BOE gives them', () => {
+    const rates = (year: number, q: number) => temporaryRatesIn(year, q).map((t) => [t.vat, t.re]);
+    // RDL 20/2022 art. 72 (as RDL 8/2023 worded it): 5 % (0.62 %) from 1-1-2023 to 30-6-2024.
+    expect(rates(2023, 0)).toEqual([[5, 0.62]]);
+    expect(rates(2024, 1)).toEqual([[5, 0.62]]);
+    // RDL 4/2024 art. 1: 5 % (0.62 %) in 3T 2024; 2 % (0.26 %) and 7.5 % (1 %) in 4T 2024.
+    expect(rates(2024, 2)).toEqual([[5, 0.62]]);
+    expect(rates(2024, 3)).toEqual([
+      [2, 0.26],
+      [7.5, 1],
+    ]);
+    expect(rates(2022, 3)).toEqual([]);
+    expect(rates(2025, 0)).toEqual([]);
+  });
+
+  it('warns that the temporary rates are not worked out, in the 303 and the 390 of those years', () => {
+    expect(sold(2023, 2).vat.warnings).toContain('temporaryRates');
+    expect(sold(2024, 4).vat.warnings).toContain('temporaryRates');
+    expect(sold(2024, 4).m390?.warnings).toContainEqual({ code: 'temporaryRates' });
+    expect(sold(2025, 1).vat.warnings).not.toContain('temporaryRates');
+    expect(sold(2026, 4).m390?.warnings).not.toContainEqual({ code: 'temporaryRates' });
   });
 });
 

@@ -4,7 +4,8 @@ import { descendantBreakdown } from '../../domain/rentaCalc';
 import type { JointComparison } from '../../domain/rentaJoint';
 import { JointTable } from './JointResult';
 import { InvestInResult } from './invest/InvestSummary';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
+import { ExcessExpiry } from './PlanExtras';
 import type { ImportedSavings } from '../../domain/rentaGains';
 import { Icon } from '@shared/components/Icon';
 import { scrollBehavior } from '@shared/utils/motion';
@@ -17,6 +18,8 @@ export interface Snapshot {
   kids: ReturnType<typeof descendantBreakdown>;
   /** Individual against joint, when the person can file with a family unit. */
   joint?: JointComparison | null;
+  /** The year of the return it was worked out for (missing: saved before 2026-10, so 2025). */
+  year?: number;
 }
 
 /** An amount that is taken off, shown with a minus sign unless it is zero. */
@@ -113,6 +116,10 @@ function WorkLines({ result, money }: { result: RentaResult; money: (n: number) 
   );
 }
 
+/** What the pension plans leave for the next five years (a result saved before has none). */
+const excessOf = (r: RentaResult) =>
+  (r.pensionExcessNext?.plans ?? 0) + (r.pensionExcessNext?.dependency ?? 0);
+
 /** The lines of the calculation, from the net income to the withholdings. */
 function ResultLines({ result, money }: { result: RentaResult; money: (n: number) => string }) {
   const { t } = useI18n();
@@ -141,6 +148,11 @@ function ResultLines({ result, money }: { result: RentaResult; money: (n: number
         )}
       />
       <Line show label={line('base')} value={money(result.taxBase)} />
+      <Line
+        show={excessOf(result) > 0}
+        label={line('pensionExcessNext')}
+        value={money(excessOf(result))}
+      />
       <Line
         show={result.savingsBase > 0}
         label={line('savingsBase')}
@@ -178,6 +190,7 @@ export function ResultCard({
   input?: RentaInput;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const { result, kids } = shown;
   // What to copy of the investments is further down, in the panel of InvestInResult.
   const toCopy = !!result.savingsDetail && !!imported && hasRentaWebCopy(ledgerOf(imported));
@@ -207,11 +220,12 @@ export function ResultCard({
         </p>
       )}
       <ResultLines result={result} money={money} />
+      <ExcessExpiry result={result} />
       {result.savingsDetail && (
         <InvestInResult
           breakdown={result.savingsDetail}
           imported={imported}
-          year={rentaState.year}
+          year={year}
           input={input}
         />
       )}

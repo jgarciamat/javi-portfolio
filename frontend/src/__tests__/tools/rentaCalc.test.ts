@@ -4,9 +4,12 @@ import {
   lowPayDeduction,
   computeMinimum,
   computeRenta,
+  employmentTableMax,
+  pensionOf,
   generalQuota,
   countsAsDescendant,
   deductionAmount,
+  descendantBreakdown,
   disabilityAmount,
   incomeFactor,
   isRefundable,
@@ -58,7 +61,23 @@ const state: RentaState = {
   minimums,
   workExpenses: { general: 2000, disability33: 3500, disability65: 7750 },
   workReduction: { maxReduction: 0, fullUntil: 0, zeroFrom: 0, notes: '' },
-  baseReductions: { pensionPlanLimit: 1500, pensionPlanEmployerLimit: 8500, notes: '' },
+  baseReductions: {
+    pensionPlanLimit: 1500,
+    pensionPlanEmployerLimit: 8500,
+    employmentTable: {
+      lowUpTo: 500,
+      lowTimes: 2.5,
+      midUpTo: 1500,
+      midBase: 1250,
+      midTimes: 0.25,
+      highTimes: 1,
+      highPayFrom: 60000,
+    },
+    dependencyLimit: 5000,
+    percentLimit: 30,
+    excessYears: 5,
+    notes: '',
+  },
   deductions: [
     deduction({ id: 'estado-maternidad', kind: 'fixed', perChild: [1200], refundable: true }),
     deduction({ id: 'estado-donativos', kind: 'percent', percent: 80, baseLimit: 250 }),
@@ -157,6 +176,38 @@ describe('computeMinimum', () => {
       total: 5550,
       items: [{ key: 'personal', amount: 5550 }],
     });
+  });
+
+  it('gives the under-3 increase to an adopted child at any age (art. 58.2, Manual c14 ej. 6)', () => {
+    const child = { age: 5, disability: 0 as const };
+    expect(computeMinimum({ ...alone, children: [child] }, minimums).total).toBe(5550 + 2400);
+    const adopted = { ...alone, children: [{ ...child, adopted: true }] };
+    expect(computeMinimum(adopted, minimums).total).toBe(5550 + 2400 + 2800);
+    expect(descendantBreakdown(adopted, minimums)[0].under3).toBe(2800);
+  });
+
+  it('leaves out a child with income of their own, and orders only those who count (art. 58.1)', () => {
+    // 22 with more than 8,000 €, 15 with a return of 2,500 €, 10 with none: only the 10-year-old
+    // counts, and as the first (2,400 €). In the joint return of the unit (minors under 18), the
+    // 15-year-old with his own income counts whole, as the first; the 10-year-old is second.
+    const kids = [
+      { age: 22, disability: 0 as const, income: 'over8000' as const },
+      { age: 15, disability: 0 as const, income: 'ownReturn' as const },
+      { age: 10, disability: 0 as const },
+    ];
+    expect(computeMinimum({ ...alone, children: kids }, minimums).total).toBe(5550 + 2400);
+    const shared = { ...alone, children: kids, sharedChildren: true };
+    expect(computeMinimum(shared, minimums).total).toBe(5550 + 1200);
+    expect(computeMinimum({ ...shared, jointUnder: 18 }, minimums).total).toBe(
+      5550 + 2400 + 2700 / 2
+    );
+    expect(descendantBreakdown({ ...shared, jointUnder: 18 }, minimums)).toEqual([
+      { age: 15, amount: 2400, under3: 0, disability: 0 },
+      { age: 10, amount: 1350, under3: 0, disability: 0 },
+    ]);
+    // More than 8,000 € leaves the child out of the joint return too.
+    const rich = [{ age: 12, disability: 0 as const, income: 'over8000' as const }];
+    expect(computeMinimum({ ...alone, children: rich, jointUnder: 18 }, minimums).total).toBe(5550);
   });
 
   it('adds the extra for age from 65 and from 75 years turned by 31 December', () => {
@@ -267,6 +318,23 @@ describe('computeMinimum', () => {
 });
 
 describe('deductionAmount', () => {
+  it('adds the 150 € of maternity once per child, within 1,350 € each (art. 81.1)', () => {
+    const mat = deduction({ amount: 1200, limit: 1350, monthly: 100, startBonus: 150 });
+    // 8 months and the bonus: 950 €; a whole year and the bonus: 1,350 €, never more.
+    expect(deductionAmount(mat, { on: true, units: 1, months: 8, bonusUnits: 1 })).toBe(950);
+    expect(deductionAmount(mat, { on: true, units: 1, bonusUnits: 1 })).toBe(1350);
+    // No more bonuses than children, none below zero.
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: 3 })).toBe(350);
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2, bonusUnits: -1 })).toBe(200);
+    expect(deductionAmount(mat, { on: true, units: 1, months: 2 })).toBe(200);
+    // Without a limit of its own, nothing holds the bonus.
+    const open = deduction({ amount: 1200, monthly: 100, startBonus: 150 });
+    expect(deductionAmount(open, { on: true, units: 1, bonusUnits: 1 })).toBe(1350);
+    // Without a start bonus the units given do nothing.
+    const plain = deduction({ amount: 1200, limit: 1350, monthly: 100 });
+    expect(deductionAmount(plain, { on: true, units: 1, months: 2, bonusUnits: 1 })).toBe(200);
+  });
+
   it('does nothing when it does not apply', () => {
     expect(deductionAmount(deduction({ amount: 100 }), { on: false })).toBe(0);
   });
@@ -371,6 +439,98 @@ describe('computeRenta', () => {
     ).toBe(3000);
     expect(computeRenta(input({ gross: 100, workReduction: () => 5000 })).netIncome).toBe(0);
     expect(computeRenta(input({ gross: 2500, pensionPlan: 900 })).pensionReduction).toBe(0);
+  });
+
+  it('lets own contributions to the employer plan use the 8,500 € by the table of art. 52.1', () => {
+    const table = state.baseReductions.employmentTable;
+    // Up to 500 € of the employer: 2.5 times; 500.01 to 1,500: 1,250 + 25 % of the rest; more: 1.
+    expect(employmentTableMax(400, 30000, table)).toBe(1000);
+    expect(employmentTableMax(1400, 30000, table)).toBe(1475);
+    expect(employmentTableMax(2000, 30000, table)).toBe(2000);
+    // Pay over 60,000 € from that employer: always 1.
+    expect(employmentTableMax(400, 60000.01, table)).toBe(400);
+    // 400 € of the employer and 3,000 € own to its plan: 1,000 in the table + 1,500 + 400.
+    expect(
+      computeRenta(input({ pensionPlanEmployer: 400, pensionEmploymentOwn: 3000 })).pensionReduction
+    ).toBe(2900);
+  });
+
+  it('takes the excess of the years before first and carries what the 30 % leaves out', () => {
+    // 30 % of 28,000 = 8,400. Excess: 7,000 of plans and 6,000 of dependency (only 5,000 a year).
+    const r = computeRenta(
+      input({
+        pensionPlan: 1500,
+        dependencyPremiums: 6000,
+        pensionExcess: { plans: 7000, dependency: 6000 },
+      })
+    );
+    expect(r.pensionReduction).toBe(8400);
+    // Plans 7,000 + dependency 1,400 of the excess; this year's 1,500 and 5,000 (the 1,000 over the
+    // 5,000 € do not carry), and 4,600 of the old dependency excess left.
+    expect(r.pensionExcessNext).toEqual({ plans: 1500, dependency: 4600 + 5000 });
+    // The activity counts for the 30 %: 28,000 + 10,000 of net activity gives 11,400.
+    const withActivity = pensionOf(
+      {
+        gross: 32000,
+        pensionPlan: 1500,
+        pensionEmployer: 8500,
+        employmentOwn: 0,
+        dependency: 0,
+        excess: { plans: 0, dependency: 0 },
+      },
+      0.3 * (28000 + 10000),
+      state.baseReductions
+    );
+    expect(withActivity.reduction).toBe(10000);
+  });
+
+  it('uses the excess of each year the oldest first and says when each one runs out', () => {
+    // 30 % of 28,000 = 8,400. Excess of 2020 (its last year is 2025), 2023 and 2022, typed out of
+    // order; 2019 is too old and 2025 is this year: both are left out.
+    const r = computeRenta(
+      input({
+        pensionPlan: 1500,
+        pensionExcess: {
+          plans: 0,
+          dependency: 0,
+          byYear: [
+            { year: 2023, plans: 6000, dependency: 0 },
+            { year: 2020, plans: 1000, dependency: 500 },
+            { year: 2022, plans: 2000, dependency: 0 },
+            { year: 2019, plans: 900, dependency: 0 },
+            { year: 2025, plans: 700, dependency: 0 },
+          ],
+        },
+      })
+    );
+    // 1,000 (2020) + 2,000 (2022) + 5,400 of 2023 = 8,400; then the 500 of dependency of 2020 has
+    // no room left and is lost, as 2025 was its last year.
+    expect(r.pensionReduction).toBe(8400);
+    expect(r.pensionExcessYears).toEqual({
+      left: [
+        { year: 2023, plans: 600, dependency: 0, lastYear: 2028 },
+        { year: 2025, plans: 1500, dependency: 0, lastYear: 2030 },
+      ],
+      lost: { plans: 0, dependency: 500 },
+    });
+    expect(r.pensionExcessNext).toEqual({ plans: 2100, dependency: 0 });
+  });
+
+  it('keeps an excess of no known year first, as before the years were asked', () => {
+    const r = computeRenta(
+      input({
+        pensionExcess: {
+          plans: 8000,
+          dependency: 0,
+          byYear: [{ year: 2021, plans: 1000, dependency: 0 }],
+        },
+      })
+    );
+    // The 8,000 of no year go first; 400 of 2021 fit in the 8,400 and 600 carry to 2026.
+    expect(r.pensionReduction).toBe(8400);
+    expect(r.pensionExcessYears?.left).toEqual([
+      { year: 2021, plans: 600, dependency: 0, lastYear: 2026 },
+    ]);
   });
 
   it('allows more work expenses with a disability, a move and union fees', () => {

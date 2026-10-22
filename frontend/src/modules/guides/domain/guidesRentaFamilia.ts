@@ -1,7 +1,7 @@
 import type { Guide } from './guides';
 
 const CHECK =
-  'Las cifras de esta guía son orientativas y corresponden al ejercicio 2025 (la campaña de la Renta de 2026), según los datos publicados por la Agencia Tributaria. Pueden tener excepciones según tu caso, así que contrástalas siempre en la sede de la AEAT o con tu gestor antes de presentar tu declaración.';
+  'Las cifras de esta guía son orientativas y corresponden al ejercicio 2025 (la campaña de la Renta de 2026), según los datos publicados por la Agencia Tributaria. Pueden tener excepciones según tu caso, así que contrástalas siempre en la sede de la AEAT o con un profesional antes de presentar tu declaración.';
 
 /** Guides about the income tax return for families: child deductions, reading the draft and the result. */
 export const GUIDES_RENTA_FAMILIA: Guide[] = [

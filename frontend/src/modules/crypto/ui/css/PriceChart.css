@@ -1,0 +1,452 @@
+.cc-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* The candle under the pointer in one small line, and the countdown pill at its right. */
+.cc-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.75rem;
+  min-height: 1.5rem;
+}
+
+.cc-chart-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.75rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-chart-readout abbr {
+  text-decoration: none;
+  cursor: help;
+}
+
+.cc-chart-readout b {
+  color: var(--cc-strong);
+  font-weight: 500;
+}
+
+.cc-chart-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 0.6rem;
+  margin: 0;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: var(--slate-800);
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-chart-pill > span + span {
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--slate-700);
+}
+
+.cc-chart-canvas {
+  height: 420px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--slate-700);
+  touch-action: pan-y;
+}
+
+.cc-chart-canvas:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+/* «− Alejar», «+ Acercar», «Reciente», «Todo» and full screen: a small bar below the chart. */
+.cc-chart-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.cc-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 28px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 6px;
+  background: var(--slate-800);
+  color: var(--cc-text);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cc-zoom:hover {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-600) 18%, var(--slate-800));
+}
+
+.cc-zoom--full {
+  margin-left: auto;
+  border-color: var(--accent-400);
+  color: var(--accent-300);
+}
+
+.cc-zoom[aria-pressed='true'] {
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.cc-chart-thin {
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  border-left: 2px solid var(--amber-400);
+  font-size: 0.75rem;
+  color: var(--cc-text);
+  line-height: 1.4;
+}
+
+.cc-chart-help,
+.cc-chart-credit {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+  line-height: 1.4;
+}
+
+.cc-chart-credit a {
+  color: var(--accent-300);
+}
+
+/* How the lines of each operation are drawn: #1 solid, #2 dashed and lighter. */
+.cc-chart-slots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.85rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+}
+
+.cc-chart-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: var(--blue-300);
+}
+
+.cc-chart-slot i {
+  width: 1.75rem;
+  border-top: 2px solid var(--blue-400);
+}
+
+.cc-chart-slot--even i {
+  border-top-style: dashed;
+  border-top-color: var(--blue-300);
+}
+
+/* «Turn the phone»: a phone outline that tilts sideways, then rests. */
+.cc-rotate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--accent-400);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent-600) 12%, var(--slate-900));
+}
+
+.cc-rotate p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-rotate-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-rotate-actions button {
+  min-height: 48px;
+}
+
+.cc-rotate-phone {
+  width: 3rem;
+  height: 3rem;
+  color: var(--accent-300);
+  animation: cc-rotate 2.4s ease-in-out infinite;
+}
+
+@keyframes cc-rotate {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  50%,
+  80% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-rotate-phone {
+    animation: none;
+    transform: rotate(-90deg);
+  }
+}
+
+/*
+ * Full screen (the browser's own or, without it, the page layout filling the view): a compact
+ * bar on top (coin, price, candle sizes, currency), the layer chips, the chart taking what is
+ * left and the zoom bar at the foot, so nothing covers the drawing.
+ */
+.cc-chart--expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  margin: 0;
+  gap: 0.3rem;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+    max(0.5rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  background: var(--slate-950);
+  overflow: hidden;
+}
+
+.cc-chart--expanded .cc-chart-canvas {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 140px;
+}
+
+.cc-chart--expanded .cc-chart-help,
+.cc-chart--expanded .cc-chart-slots,
+.cc-chart--expanded .cc-rotate {
+  display: none;
+}
+
+.cc-chart--expanded .cc-chart-credit {
+  margin: 0;
+  font-size: 0.625rem;
+}
+
+.cc-chart--expanded .cc-chart-tools {
+  flex: 0 0 auto;
+}
+
+.cc-full-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.6rem;
+}
+
+.cc-full-bar .cc-quote-main {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.1rem 0.5rem;
+}
+
+.cc-full-bar .cc-quote-main .cc-coin-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.5625rem;
+}
+
+.cc-full-bar .cc-quote-line {
+  grid-column: auto;
+  gap: 0 0.6rem;
+}
+
+.cc-full-bar .cc-quote-price {
+  font-size: 1.0625rem;
+}
+
+.cc-full-bar .cc-quote-changes {
+  font-size: 0.75rem;
+}
+
+.cc-full-coin select {
+  min-height: 32px;
+  max-width: 11rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--cc-line, var(--slate-700));
+  border-radius: 6px;
+  background: var(--cc-raised, var(--slate-800));
+  color: var(--cc-strong, var(--slate-50));
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.cc-full-bar .cc-intervals {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.cc-full-bar .cc-segmented label {
+  min-width: 0;
+  min-height: 30px;
+  padding: 0.1rem 0.5rem;
+}
+
+/* The way out, the clearest button of the bar. */
+.cc-chart--expanded .cc-zoom--full {
+  border-color: var(--accent-400);
+  color: var(--cc-strong, var(--slate-50));
+  font-weight: 600;
+}
+
+@media (max-width: 719px), (pointer: coarse) {
+  .cc-zoom {
+    min-height: 32px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .cc-chart-canvas {
+    height: 480px;
+  }
+}
+
+@media (max-width: 719px) {
+  .cc-chart-canvas {
+    height: 320px;
+  }
+
+  /* Full screen on a phone held upright: three short rows on top, the chips in one row. */
+  .cc-chart--expanded .cc-chart-head,
+  .cc-chart--expanded .cc-full-bar .cc-quote-changes span + span {
+    display: none;
+  }
+
+  .cc-chart--expanded .cc-layers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    flex: 0 0 auto;
+  }
+
+  .cc-full-bar .cc-intervals {
+    order: 1;
+  }
+
+  .cc-full-coin {
+    flex: 1 1 0;
+    min-width: 0;
+    order: 2;
+  }
+
+  .cc-full-coin select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .cc-full-bar .cc-currency {
+    order: 2;
+  }
+
+  .cc-zoom {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0 0.4rem;
+  }
+
+  .cc-zoom--full {
+    margin-left: 0;
+  }
+}
+
+/* A phone on its side: the chart takes nearly all the height. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-chart-canvas {
+    height: calc(100dvh - 6.5rem);
+    min-height: 200px;
+  }
+
+  .cc-chart--expanded .cc-chart-head {
+    display: none;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-main {
+    flex: 0 1 auto;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-name small,
+  .cc-chart--expanded .cc-full-bar .cc-quote-changes span + span {
+    display: none;
+  }
+
+  .cc-full-bar {
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-main {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-coin-icon {
+    display: none;
+  }
+
+  .cc-full-bar .cc-segmented {
+    flex-wrap: nowrap;
+  }
+
+  .cc-full-coin select {
+    max-width: 8.5rem;
+  }
+
+  .cc-full-bar .cc-segmented label {
+    padding: 0.1rem 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  .cc-chart--expanded .cc-layers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .cc-chart-help {
+    display: none;
+  }
+
+  .cc-chart-tools {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+
+html.wiz-contrast .cc-chart-canvas,
+html.wiz-contrast .cc-chart-pill,
+html.wiz-contrast .cc-zoom {
+  border: 2px solid var(--slate-100);
+}
+
+html.wiz-contrast .cc-chart-readout,
+html.wiz-contrast .cc-chart-slots,
+html.wiz-contrast .cc-chart-pill,
+html.wiz-contrast .cc-chart-help,
+html.wiz-contrast .cc-chart-credit {
+  color: var(--slate-100);
+}

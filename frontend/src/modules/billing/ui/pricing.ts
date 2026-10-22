@@ -35,6 +35,7 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         inbox: false,
         capture: false,
         investCourse: false,
+        cryptoPro: false,
       },
       aiMonthlyQuota: 1,
     },
@@ -59,6 +60,7 @@ export const DEFAULT_CATALOG: PlanCatalog = {
         inbox: true,
         capture: true,
         investCourse: true,
+        cryptoPro: true,
       },
       aiMonthlyQuota: 10,
     },
@@ -101,6 +103,7 @@ export const FEATURE_KEYS: Record<PremiumFeature, string> = {
   inbox: 'billing.feature.inbox',
   capture: 'billing.feature.capture',
   investCourse: 'billing.feature.investCourse',
+  cryptoPro: 'billing.feature.cryptoPro',
 };
 
 export const PREMIUM_BENEFITS = [
@@ -116,6 +119,7 @@ export const PREMIUM_BENEFITS = [
   'billing.benefit.receipts',
   'billing.benefit.course',
   'billing.benefit.videos',
+  'billing.benefit.crypto',
   'billing.benefit.ai',
   'billing.benefit.support',
 ];
@@ -164,6 +168,11 @@ const STATIC_ROWS: { key: string; free: string; premium: string }[] = [
   { key: 'renta', free: 'pricing.row.renta.free', premium: 'pricing.row.renta.premium' },
   { key: 'course', free: 'pricing.row.course.free', premium: 'pricing.row.course.premium' },
   { key: 'videos', free: 'pricing.row.videos.free', premium: 'pricing.row.videos.premium' },
+  {
+    key: 'cryptoConsole',
+    free: 'pricing.row.cryptoConsole.free',
+    premium: 'pricing.row.cryptoConsole.premium',
+  },
 ];
 
 /** The whole comparison of the pricing page: the API's limits plus the fixed rows. */

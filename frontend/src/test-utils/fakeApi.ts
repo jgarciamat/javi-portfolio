@@ -1,6 +1,8 @@
 import type { IApiContext } from '@core/context/ApiContext';
 import * as f from './fixtures';
 import { PREMIUM_TERMS, premiumContent } from './learn';
+import * as crypto from './crypto';
+import type { CryptoInterval } from '@modules/crypto/domain/types';
 
 type Mocked<T> = {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R ? jest.Mock<R, A> : T[K];
@@ -70,6 +72,58 @@ function fakeBusinessApi(): FakeApi['businessApi'] {
         irpfAdvance: 0,
       },
     }),
+  };
+}
+
+/** The crypto console answered with made-up prices and a portfolio with one purchase. */
+function fakeCryptoApi(): FakeApi['cryptoApi'] {
+  return {
+    coins: ok(crypto.coins()),
+    candles: jest.fn((symbol: string, interval: CryptoInterval) =>
+      Promise.resolve(crypto.candles(symbol, interval))
+    ),
+    portfolio: ok(crypto.portfolio()),
+    placeOrder: ok(crypto.portfolio()),
+    cancelOrder: ok(crypto.portfolio()),
+    setExits: ok(crypto.portfolio()),
+    resetPractice: ok(
+      crypto.portfolio({
+        portfolio: crypto.PRACTICE_REF,
+        portfolios: [crypto.SEASON_REF, crypto.PRACTICE_REF],
+        open: [],
+      })
+    ),
+    createPractice: ok(
+      crypto.portfolio({
+        portfolio: crypto.PRACTICE_REF,
+        portfolios: [crypto.SEASON_REF, crypto.PRACTICE_REF],
+        open: [],
+      })
+    ),
+    deletePractice: ok(crypto.portfolio()),
+    ranking: ok(crypto.ranking()),
+    setRanking: ok(crypto.ranking()),
+    report: ok({
+      season: '2026-03',
+      finished: false,
+      initial: 10_000,
+      result: null,
+      closed: [],
+      stats: {
+        winRate: null,
+        wins: 0,
+        losses: 0,
+        best: null,
+        worst: null,
+        averageWin: null,
+        averageLoss: null,
+        equityDays: [],
+        hold: null,
+      },
+    }),
+    alerts: ok(crypto.alerts()),
+    createAlert: ok(crypto.alerts()),
+    deleteAlert: ok(crypto.alerts()),
   };
 }
 
@@ -217,5 +271,6 @@ export function createFakeApi(): FakeApi {
       chapter: jest.fn((id: string) => Promise.resolve(premiumContent(id))),
       glossary: ok(PREMIUM_TERMS),
     },
+    cryptoApi: fakeCryptoApi(),
   } as unknown as FakeApi;
 }

@@ -555,6 +555,59 @@ describe('Modelo 115', () => {
   });
 });
 
+describe('The complementaria of the 111 and the 115', () => {
+  // 111: 1,200.00 due, 900.00 filed before → box 29 = 900.00, box 30 = 300.00; mark «X» at 538 and
+  // the 13 digits at 539-551 (dr111e16v18). 115 (case 115-01): 190 − 150 = 40; 192 and 193-205.
+  const m111: Result111 = {
+    ...result111,
+    boxes: result111.boxes.map((x) =>
+      x.box === '29' ? b('29', 900) : x.box === '30' ? b('30', 300) : x
+    ),
+    due: 300,
+    previous: { result: 900, receipt: '1110000000001' },
+  };
+  const m115: Result115 = {
+    ...result115,
+    boxes: [b('01', 1), b('02', 1000), b('03', 190), b('04', 150), b('05', 40)],
+    due: 40,
+    base: 1000,
+    previous: { result: 150, receipt: '1150000000001' },
+  };
+
+  it('marks it, gives the number of the one filed and reads back boxes 29-30 and 04-05', () => {
+    const one = buildSedeFile({ model: '111', year: 2026, quarter: 3, result: m111 }, person);
+    expect([one.checks, one.kind]).toEqual([[], 'I']);
+    const page111 = pageOf(one.file!.text, '111', '01000');
+    expect(page111.slice(537, 551)).toBe('X1110000000001');
+    const read111 = readSelfAssessment('111', one.file!.text);
+    expect([read111.values['29'], read111.values['30']]).toEqual([900, 300]);
+    const rent = buildSedeFile({ model: '115', year: 2026, quarter: 1, result: m115 }, person);
+    expect(rent.checks).toEqual([]);
+    const page115 = pageOf(rent.file!.text, '115', '01000');
+    expect(page115.slice(191, 205)).toBe('X1150000000001');
+    const read115 = readSelfAssessment('115', rent.file!.text);
+    expect([read115.values['04'], read115.values['05']]).toEqual([150, 40]);
+  });
+
+  it('stops without the 13 digits of the one filed, or when it does not pay more', () => {
+    const bad = { ...m111, previous: { result: 900, receipt: '12345' } };
+    const noNumber = buildSedeFile({ model: '111', year: 2026, quarter: 3, result: bad }, person);
+    expect([errors(noNumber), noNumber.file]).toEqual([['receipt'], null]);
+    expect(noNumber.checks[0].values).toEqual({ model: '111' });
+    const lower: Result115 = {
+      ...m115,
+      boxes: [b('01', 1), b('02', 1000), b('03', 190), b('04', 200), b('05', -10)],
+      due: 0,
+      result: 'zero',
+    };
+    const notHigher = buildSedeFile(
+      { model: '115', year: 2026, quarter: 1, result: lower },
+      person
+    );
+    expect([errors(notHigher), notHigher.file]).toEqual([['notHigher'], null]);
+  });
+});
+
 /** A 130 of the 3T: 30,000.00 income and 10,000.00 expenses so far → 20 % of 20,000.00 = 4,000.00;
  * 2,000.00 paid in the 1T-2T and 300.00 withheld → 1,700.00 to pay. */
 const boxes130 = [
@@ -1010,6 +1063,7 @@ describe('Modelo 390', () => {
         { code: 'exonerated' },
         { code: 'filedDiffers' },
         { code: 'identity' },
+        { code: 'temporaryRates' },
       ],
     };
     const later = autonomoDraft({ year: 2026, quarter: 4, m390: warned });
@@ -1027,6 +1081,7 @@ describe('Modelo 390', () => {
       'exonerated390',
       'filed390',
       'identity390',
+      'temporaryRates390',
     ]);
     expect(built.checks[4].values).toEqual({ quarter: 2, difference: 72 });
     expect(built.checks[7].values).toEqual({ quarter: 0, difference: 0 });

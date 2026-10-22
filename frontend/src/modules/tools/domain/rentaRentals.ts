@@ -34,6 +34,8 @@ export interface PropertyForm {
   /** % of the property that is theirs (0063, or 0064 for a usufruct); empty: 100. */
   share: string;
   usufruct?: boolean;
+  /** A usufruct for a number of years (empty: for life): its cost depreciates over them. */
+  usufructYears?: string;
   /** Days let in the year (0101); empty: the whole year. */
   rentedDays: string;
   /** Days that do not impute rent (their home, works, not usable): the rest of the year does (0085). */
@@ -69,7 +71,17 @@ export interface PropertyForm {
   irregular: boolean;
   /** Let to a relative up to the third degree (art. 24). */
   relative: boolean;
+  /**
+   * When the repairs were made, for a property let part of the year: '' no date (prorated by the
+   * days let, as the Manual does), 'let' all while let, 'empty' all while empty (not deductible),
+   * 'mixed' with the part while let in `repairsLet`.
+   */
+  repairWhen?: RepairWhen;
+  repairsLet?: string;
 }
+
+/** When the repairs of a property let part of the year were made. */
+export type RepairWhen = '' | 'let' | 'empty' | 'mixed';
 
 export const emptyProperty = (n: number): PropertyForm => ({
   label: `Inmueble ${n}`,
@@ -97,10 +109,20 @@ export const emptyProperty = (n: number): PropertyForm => ({
 
 /** Interest and repairs: together up to the income of the property (art. 23.1.a.1.º). */
 export const CAPPED_EXPENSE = /interes|financiaci|reparaci|conservaci/;
-/** Expenses of the whole year that only count for the days let (IBI, community, insurance, interest). */
-const YEARLY_EXPENSE = /interes|financiaci|tributos|comunidad|seguros/;
+/**
+ * Expenses of the whole year that only count for the days let (IBI, community, insurance, interest),
+ * and the yearly depreciation of the furniture typed apart: the Manual 2025 (c04, caso práctico 2,
+ * checked 21-10-2026) takes "10 % x 6.900 x 9/12" for a home let 9 months.
+ */
+const YEARLY_EXPENSE = /interes|financiaci|tributos|comunidad|seguros|amortizacion/;
 /** Information cards of the catalogue, not amounts. */
 const NOT_AN_EXPENSE = /no-deducibles/;
+/**
+ * Repairs count only if made while let: «los gastos generados mientras no estaba arrendado no son
+ * deducibles» (Manual 2025, c04, caso práctico 2, checked 22-10-2026; STS 270/2021). Without a
+ * date, the Manual prorates them by the time let (210 x 9/12 = 157.50).
+ */
+export const REPAIR_EXPENSE = 'reparacion-conservacion';
 
 /** The reduction of art. 23.2 that the answers give, with its id in inmuebles.ts. */
 export function reductionOf(p: PropertyForm): { id: string; percent: number } | null {
@@ -149,6 +171,8 @@ export interface PropertyResult {
   reducedNet: number;
   /** 0153. */
   withheld: number;
+  /** The repairs had no date and were prorated by the days let (shown as a warning). */
+  repairsProrated: boolean;
   /** Cadastral value of the days at disposal (the person's share), and whether revised (0083-0089). */
   imputedValue: number;
   revised: boolean;
@@ -159,6 +183,29 @@ const num = (text: string | undefined, parse: (t: string) => number): number => 
   return Number.isFinite(n) ? n : 0;
 };
 const clampDays = (d: number, full: number) => Math.min(full, Math.max(0, Math.floor(d)));
+
+/**
+ * A usufruct bought: its cost (no land, no cadastral value) over the years it lasts, or 3 % a year
+ * for life, and never more than the rent of the right (RIRPF arts. 13.h and 14; Manual práctico de
+ * Renta 2025, c04, «Cantidades destinadas a la amortización», checked 22-10-2026: 100,000 € for 10
+ * years gives 10,000 € a year). By the days let, like the rest of the depreciation.
+ */
+function usufructDepreciation(
+  p: PropertyForm,
+  share: number,
+  days: number,
+  income: number,
+  property: RentaProperty,
+  v: (t: string | undefined) => number
+): { amortizationBase: number; amortization: number } {
+  const amortizationBase = round2(Math.max(0, v(p.cost)) * share);
+  const years = Math.floor(v(p.usufructYears));
+  const yearly =
+    years > 0
+      ? amortizationBase / years
+      : (amortizationBase * property.rental.amortizationRate) / 100;
+  return { amortizationBase, amortization: round2(Math.min(yearly * days, income)) };
+}
 
 /** A property worked out (`parse` reads the typed amounts; `full`: the days of the year). */
 export function propertyResult(
@@ -178,10 +225,24 @@ export function propertyResult(
 
   let capped = 0;
   let other = 0;
+  let repairsProrated = false;
+  /** The part of the repairs made while let (the whole year let: all of them). */
+  const repairsOf = (whole: number): number => {
+    if (rentedDays === full) return whole;
+    const when = p.repairWhen ?? '';
+    if (when === 'let') return whole;
+    if (when === 'empty') return 0;
+    if (when === 'mixed') return Math.min(whole, Math.max(0, v(p.repairsLet)));
+    repairsProrated = whole > 0;
+    return whole * days;
+  };
   for (const item of property.rental.expenses) {
     if (NOT_AN_EXPENSE.test(item.id)) continue;
     const whole = Math.max(0, v(p.expenses[item.id]));
-    const amount = whole * share * (YEARLY_EXPENSE.test(item.id) ? days : 1);
+    const amount =
+      item.id === REPAIR_EXPENSE
+        ? repairsOf(whole) * share
+        : whole * share * (YEARLY_EXPENSE.test(item.id) ? days : 1);
     if (CAPPED_EXPENSE.test(item.id)) capped += amount;
     else other += amount;
   }
@@ -198,8 +259,16 @@ export function propertyResult(
   const cadastral = Math.max(0, v(p.cadastral));
   const building = Math.max(0, v(p.cadastralBuilding));
   const ratio = cadastral > 0 && building > 0 ? Math.min(1, building / cadastral) : 1;
-  const amortizationBase = round2(Math.max(Math.max(0, v(p.cost)) * ratio, building) * share);
-  const amortization = round2((amortizationBase * property.rental.amortizationRate * days) / 100);
+  const ownedDepreciation = (): { amortizationBase: number; amortization: number } => {
+    const base = round2(Math.max(Math.max(0, v(p.cost)) * ratio, building) * share);
+    return {
+      amortizationBase: base,
+      amortization: round2((base * property.rental.amortizationRate * days) / 100),
+    };
+  };
+  const { amortizationBase, amortization } = p.usufruct
+    ? usufructDepreciation(p, share, days, income, property, v)
+    : ownedDepreciation();
 
   const net = round2(income - pendingApplied - cappedApplied - otherExpenses - amortization);
   const red = reductionOf(p);
@@ -235,6 +304,7 @@ export function propertyResult(
     relativeMinimum,
     reducedNet,
     withheld: round2(Math.max(0, v(p.withheld))),
+    repairsProrated,
     imputedValue: round2((cadastral * share * disposalDays) / full),
     revised: p.revised,
   };

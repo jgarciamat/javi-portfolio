@@ -1,5 +1,6 @@
 import {
   addMonths,
+  annuityExempt,
   emptySavingsDetail,
   fifo,
   generalBaseOf,
@@ -204,6 +205,8 @@ describe('the sale of a property', () => {
       name: 'Piso',
       gain: 24500,
       exempt: 0,
+      reduction: 0,
+      before: 0,
       taxable: 24500,
     });
     expect(
@@ -498,5 +501,39 @@ describe('gains of the general base (LIRPF art. 48)', () => {
       '0434': 1000,
       carry: [],
     });
+  });
+});
+
+describe('a gain put in a life annuity at 65 or more (art. 38.3)', () => {
+  it('exempts the share reinvested, within the 240,000 € of all the annuities', () => {
+    // Half of the 100,000 € obtained: half of the 40,000 € gain.
+    expect(annuityExempt(40000, 100000, 50000)).toBe(20000);
+    // More than obtained counts as all of it; after 240,000 € of earlier annuities, nothing.
+    expect(annuityExempt(40000, 100000, 120000)).toBe(40000);
+    expect(annuityExempt(40000, 100000, 100000, 240000)).toBe(0);
+    // Nothing to exempt without a gain or without a sale price.
+    expect(annuityExempt(-500, 100000, 100000)).toBe(0);
+    expect(annuityExempt(500, 0, 100000)).toBe(0);
+  });
+
+  it('applies to a property sold, without the abatement on the exempt part', () => {
+    const p = propertyGain({
+      name: 'Piso',
+      proceeds: 100000,
+      cost: 60000,
+      amortization: 0,
+      exemption: 'annuity',
+      reinvested: 25000,
+    });
+    expect(p).toMatchObject({ gain: 40000, exempt: 10000, taxable: 30000 });
+    // Marked, but nothing typed as put in the annuity yet: nothing exempt.
+    const none = propertyGain({
+      name: 'Piso',
+      proceeds: 100000,
+      cost: 60000,
+      amortization: 0,
+      exemption: 'annuity',
+    });
+    expect(none.exempt).toBe(0);
   });
 });

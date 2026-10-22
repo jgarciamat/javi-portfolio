@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
-import { rentaState } from '../../data/renta/state';
+import { rentaAbatement } from '../../data/renta/abatimiento';
+import { useRentaRules } from './RentaRulesContext';
 import {
   emptySavingsDetail,
   savingsOf,
@@ -17,7 +18,7 @@ import { InvestLink } from './InvestCard';
 import { InvestImport } from './invest/InvestImport';
 
 const KINDS: AssetKind[] = ['listed', 'fund', 'crypto', 'unlisted', 'other'];
-const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvested'];
+const EXEMPTIONS: PropertySale['exemption'][] = ['none', 'homeOver65', 'reinvested', 'annuity'];
 const CAPITAL: (keyof CapitalIncome)[] = [
   'interest',
   'dividends',
@@ -27,7 +28,8 @@ const CAPITAL: (keyof CapitalIncome)[] = [
   'expenses',
 ];
 /** The four years before the return, whose negative balances can still be used. */
-const YEARS = [1, 2, 3, 4].map((n) => rentaState.year - n).sort();
+/** The four years before the return's. */
+const yearsBefore = (year: number) => [4, 3, 2, 1].map((n) => year - n);
 
 /** An amount typed as text (decimal comma), kept as a number: the text stays while it is typed. */
 function Amount({
@@ -78,6 +80,9 @@ function DateField({
     </label>
   );
 }
+
+/** Bought before 31-12-1994: the abatement coefficients may apply (LIRPF DT 9.ª). */
+const pre1995 = (date: string) => date !== '' && date <= rentaAbatement.acquiredUntil;
 
 const replace = <T,>(list: T[], i: number, item: T) => list.map((x, j) => (j === i ? item : x));
 const without = <T,>(list: T[], i: number) => list.filter((_, j) => j !== i);
@@ -147,6 +152,15 @@ function AssetEditor({
               onChange({ ...asset, buys: replace(asset.buys, i, { ...b, cost }) })
             }
           />
+          {pre1995(b.date) && (asset.kind === 'listed' || asset.kind === 'fund') && (
+            <Amount
+              label={t(`${k}.ip2005`)}
+              value={b.ip2005 ?? 0}
+              onChange={(ip2005) =>
+                onChange({ ...asset, buys: replace(asset.buys, i, { ...b, ip2005 }) })
+              }
+            />
+          )}
           <button
             className="btn-secondary"
             onClick={() => onChange({ ...asset, buys: without(asset.buys, i) })}
@@ -245,6 +259,16 @@ function PropertyEditor({
           value={sale.amortization}
           onChange={(amortization) => onChange({ ...sale, amortization })}
         />
+        <DateField
+          label={t(`${k}.acquired`)}
+          value={sale.acquired ?? ''}
+          onChange={(acquired) => onChange({ ...sale, acquired })}
+        />
+        <DateField
+          label={t(`${k}.sold`)}
+          value={sale.sold ?? ''}
+          onChange={(sold) => onChange({ ...sale, sold })}
+        />
         <label className="tools-field">
           <span>{t(`${k}.exemption`)}</span>
           <select
@@ -261,6 +285,20 @@ function PropertyEditor({
             ))}
           </select>
         </label>
+        {sale.exemption === 'annuity' && (
+          <>
+            <Amount
+              label={t(`${k}.annuityReinvested`)}
+              value={sale.reinvested ?? 0}
+              onChange={(reinvested) => onChange({ ...sale, reinvested })}
+            />
+            <Amount
+              label={t(`${k}.annuityPrior`)}
+              value={sale.annuityPrior ?? 0}
+              onChange={(annuityPrior) => onChange({ ...sale, annuityPrior })}
+            />
+          </>
+        )}
         {sale.exemption === 'reinvested' && (
           <>
             <Amount
@@ -276,6 +314,8 @@ function PropertyEditor({
           </>
         )}
       </div>
+      {sale.exemption === 'annuity' && <p className="section-hint">{t(`${k}.annuityHint`)}</p>}
+      {pre1995(sale.acquired ?? '') && <p className="section-hint">{t(`${k}.abatementHint`)}</p>}
       <button className="btn-secondary" onClick={onRemove}>
         {t(`${k}.removeProperty`)}
       </button>
@@ -294,12 +334,13 @@ function PendingEditor({
   onChange: (list: PendingBalance[]) => void;
 }) {
   const { t } = useI18n();
+  const rules = useRentaRules();
   const amountOf = (year: number) => list.find((p) => p.year === year)?.amount ?? 0;
   const set = (year: number, amount: number) =>
     onChange([...list.filter((p) => p.year !== year), { year, amount }]);
   return (
     <div className="tools-form">
-      {YEARS.map((year) => (
+      {yearsBefore(rules.year).map((year) => (
         <Amount
           key={year}
           label={t(`tools.renta.gains.pending.${kind}`, { year })}
@@ -315,7 +356,8 @@ function PendingEditor({
 function Summary({ detail }: { detail: SavingsDetail }) {
   const { t } = useI18n();
   const money = useMoney();
-  const r = savingsOf(detail, rentaState.year);
+  const { year } = useRentaRules();
+  const r = savingsOf(detail, year);
   const k = 'tools.renta.gains';
   const carried = [...r.carryForward.gains, ...r.carryForward.capital].reduce(
     (s, p) => s + p.amount,
@@ -324,6 +366,8 @@ function Summary({ detail }: { detail: SavingsDetail }) {
   const unmatched = r.sales.filter((s) => s.unmatched > 0);
   const deferred = r.sales.filter((s) => s.deferred > 0);
   const check = r.sales.filter((s) => s.checkRepurchase);
+  const needsIp = r.sales.filter((s) => s.needsIp2005);
+  const reduced = [...r.sales, ...r.properties].reduce((sum, x) => sum + (x.reduction ?? 0), 0);
   return (
     <div className="renta-block" role="status">
       <ul className="renta-minimum">
@@ -339,6 +383,12 @@ function Summary({ detail }: { detail: SavingsDetail }) {
             <strong>{money(p.taxable)}</strong>
           </li>
         ))}
+        {reduced > 0 && (
+          <li>
+            <span>{t(`${k}.abatement`)}</span>
+            <strong>{money(-reduced)}</strong>
+          </li>
+        )}
         <li>
           <span>{t(`${k}.base`)}</span>
           <strong>{money(r.boxes['0460'])}</strong>
@@ -358,6 +408,9 @@ function Summary({ detail }: { detail: SavingsDetail }) {
       )}
       {deferred.length > 0 && (
         <p className="section-hint">{t(`${k}.deferred`, { name: deferred[0].name })}</p>
+      )}
+      {needsIp.length > 0 && (
+        <p className="form-error">{t(`${k}.needsIp2005`, { name: needsIp[0].name })}</p>
       )}
       {check.length > 0 && (
         <p className="section-hint">{t(`${k}.checkRepurchase`, { name: check[0].name })}</p>
@@ -379,6 +432,7 @@ export function SavingsDetailSection({
   onImport?: () => void;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   const [importing, setImporting] = useState(false);
   const detail = form.savingsDetail;
   const k = 'tools.renta.gains';
@@ -409,7 +463,7 @@ export function SavingsDetailSection({
       )}
       {importing && (
         <InvestImport
-          year={rentaState.year}
+          year={year}
           onApply={(imported) =>
             set({
               savingsDetail: {
@@ -489,6 +543,11 @@ export function SavingsDetailSection({
             {t(`${k}.addProperty`)}
           </button>
           <div className="tools-form">
+            <Amount
+              label={t(`${k}.abatementPrior`, { last: year - 1 })}
+              value={detail.abatementPrior ?? 0}
+              onChange={(n) => update({ abatementPrior: n })}
+            />
             <Amount
               label={t(`${k}.other`)}
               value={detail.otherGains[0] ?? 0}

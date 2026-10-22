@@ -6,6 +6,8 @@ import {
   PURCHASE_OPS,
   SALE_OPS,
 } from '@domain/services/autonomo-vat-data';
+import { CRYPTO_INTERVALS, CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
+import { FEE_OPTIONS_BPS, INITIAL_BALANCES_EUR } from '@domain/services/crypto-sim';
 import { toCents } from '@domain/shared/money';
 import { isAllowedPushEndpoint } from '@domain/shared/push-endpoint';
 import { CLIENT_FUNNEL_EVENTS } from '@domain/ports/services';
@@ -640,6 +642,13 @@ const savedInvoice = z
     vatId: z.string().max(20).optional(),
     key349: z.enum(KEYS_349).optional(),
     cash: z.boolean().optional(),
+    /** Collections or payments of a cash-accounting invoice, VAT included (the 347). */
+    collections: z
+      .array(
+        z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), amount: invoiceAmount }).strict()
+      )
+      .max(50)
+      .optional(),
     rateGuessed: z.boolean().optional(),
     /** The person corrected its VAT operation: a new import keeps it. */
     opFix: z.boolean().optional(),
@@ -647,6 +656,7 @@ const savedInvoice = z
   .strict();
 const filedResult = z.number().finite().min(-100_000_000).max(100_000_000).nullable();
 const savedPayees = z.object({ people: formText, paid: formText, withheld: formText }).strict();
+const savedComplement = z.object({ result: formText, receipt: formText }).strict();
 const savedWithholding = z
   .object({
     staff: z
@@ -663,6 +673,9 @@ const savedWithholding = z
     rent: savedPayees,
     filed111: z.boolean(),
     filed115: z.boolean(),
+    /** A complementaria: result and 13-digit number of the form filed before (frontend withholdingForm.ts). */
+    complement111: savedComplement.optional(),
+    complement115: savedComplement.optional(),
   })
   .strict();
 // The activity of the year as typed (frontend activityForm.ts): assets, grants, modules.
@@ -818,6 +831,8 @@ const autonomoSaved = z
         hardToJustify: z.boolean(),
         exempt: z.boolean(),
         priorNet: formText,
+        /** No activity last year: box 13 of the 130 takes 0 € (frontend AutonomoManual.tsx, Extras). */
+        noPriorActivity: z.boolean().optional(),
         toOffset: formText,
         /** The VAT of the year (frontend vatForm.ts, VatExtras). */
         vat: z
@@ -1041,4 +1056,100 @@ export const referralSummaryResponse = z
       .strict()
       .nullable(),
   })
+  .strict();
+
+// ─── Crypto console (simulator with play money) ─────────────────────────────
+
+const cryptoSymbol = z.enum(CRYPTO_SYMBOLS);
+const cryptoOrderType = z.enum(['market', 'limit', 'stop']);
+const cryptoPrice = z.number().finite().positive().max(1_000_000_000);
+const oneOf = <T extends readonly number[]>(values: T, what: string) =>
+  z
+    .number()
+    .refine((v) => (values as readonly number[]).includes(v), `${what}: ${values.join(', ')}`);
+
+export const cryptoCandlesQuery = z
+  .object({ symbol: cryptoSymbol, interval: z.enum(CRYPTO_INTERVALS) })
+  .strict();
+
+/** A purchase (euros to invest) or the sale of an open purchase; market orders take no price. */
+export const cryptoOrderBody = z
+  .discriminatedUnion('action', [
+    z
+      .object({
+        action: z.literal('buy'),
+        portfolioId: z.string().uuid().optional(),
+        symbol: cryptoSymbol,
+        direction: z.enum(['long', 'short']).optional(),
+        type: cryptoOrderType,
+        amount: z.number().finite().min(1).max(10_000_000).transform(toCents),
+        price: cryptoPrice.optional(),
+        takeProfit: cryptoPrice.optional(),
+        stopLoss: cryptoPrice.optional(),
+      })
+      .strict(),
+    z
+      .object({
+        action: z.literal('sell'),
+        portfolioId: z.string().uuid().optional(),
+        positionId: z.string().uuid(),
+        type: cryptoOrderType,
+        price: cryptoPrice.optional(),
+      })
+      .strict(),
+  ])
+  .superRefine((order, ctx) => {
+    if ((order.type === 'market') !== (order.price === undefined)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['price'],
+        message:
+          order.type === 'market'
+            ? 'Una orden a mercado no lleva precio'
+            : 'Indica el precio de la orden',
+      });
+    }
+  });
+
+export const cryptoOrderParams = z.object({ id: z.string().uuid() }).strict();
+
+/** Take profit and stop loss of an open position: a price sets or moves it, null removes it. */
+export const cryptoExitsBody = z
+  .object({
+    takeProfit: cryptoPrice.nullable().optional(),
+    stopLoss: cryptoPrice.nullable().optional(),
+  })
+  .strict()
+  .refine((body) => body.takeProfit !== undefined || body.stopLoss !== undefined, {
+    message: 'Indica el take profit, el stop loss o los dos',
+  });
+
+/** The portfolio to look at (the official one of the month when missing). */
+export const cryptoSimQuery = z.object({ portfolio: z.string().uuid().optional() }).strict();
+
+/**
+ * «Start again» of a practice portfolio (always 10.000 €, commission fixed at 0,10 %). The
+ * balance and commission that older versions of the app sent are accepted and ignored.
+ */
+export const cryptoResetBody = z
+  .object({
+    portfolioId: z.string().uuid().optional(),
+    initial: oneOf(INITIAL_BALANCES_EUR, 'Saldo inicial').optional(),
+    feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión').optional(),
+  })
+  .strict();
+
+export const cryptoPortfolioParams = z.object({ id: z.string().uuid() }).strict();
+
+/** The alias of the ranking; `optIn`, sent by older versions of the app, is accepted and ignored. */
+export const cryptoRankingBody = z
+  .object({ optIn: z.boolean().optional(), alias: z.string().max(60).optional() })
+  .strict();
+
+export const cryptoSeasonParams = z
+  .object({ season: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Temporada no válida') })
+  .strict();
+
+export const cryptoAlertBody = z
+  .object({ symbol: cryptoSymbol, condition: z.enum(['above', 'below']), price: cryptoPrice })
   .strict();

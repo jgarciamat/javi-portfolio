@@ -270,6 +270,8 @@ const r347: Record347 = {
   premises: false,
   withheld: false,
   reverse: false,
+  cash: false,
+  cashTotal: null,
 };
 const s347: Summary347 = {
   known: true,

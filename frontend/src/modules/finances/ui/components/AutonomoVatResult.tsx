@@ -8,7 +8,7 @@ type Money = ReturnType<typeof useFormat>['money'];
 type Model = '303' | '349' | '390';
 /** Boxes that hold a percentage, not money: the rates of the 303, the prorrata of the 390. */
 const PERCENT: Record<Model, Set<string>> = {
-  '303': new Set(['02', '05', '08', '151', '157', '169', '20', '23', '65']),
+  '303': new Set(['02', '05', '08', '151', '157', '169', '17', '20', '23', '65']),
   '349': new Set(),
   '390': new Set(['118']),
 };
@@ -22,6 +22,8 @@ const RATE_OF: Record<string, string> = {
   '151': '150',
   '157': '156',
   '169': '168',
+  // Up to 3T 2024 the 0.5 % surcharge goes in 16-18 (with the 0 % and the 0.62 % ones).
+  '17': '16',
   '20': '19',
   '23': '22',
 };

@@ -1,3 +1,11 @@
+import type {
+  CryptoInterval,
+  CryptoSymbol,
+  MarketCandle,
+  MarketFeed,
+  MarketQuote,
+  MarketTicker,
+} from '@domain/services/crypto-market';
 import { DigestData } from '@domain/services/digest';
 import { QuestionFacts } from '@domain/services/question-facts';
 import { Advice, AdviceContext } from '@domain/services/rule-based-advisor';
@@ -294,6 +302,19 @@ export interface FunnelDimensions {
 /** Anonymous daily funnel counters, by origin (docs/analitica.md). */
 export interface FunnelRecorder {
   record(event: FunnelEvent, dimensions?: FunnelDimensions): void;
+}
+
+/**
+ * Public crypto market data (no keys) for the educational simulator: candles of a coin and
+ * the last prices, always in euros. Answers come from a cache; when the source is down an older
+ * copy is returned marked `stale`, and with nothing cached it throws UnavailableError.
+ */
+export interface CryptoMarketData {
+  readonly source: 'binance' | 'demo';
+  /** The market a coin's prices come from (fixed for the life of the process). */
+  quoteOf(symbol: CryptoSymbol): MarketQuote;
+  candles(symbol: CryptoSymbol, interval: CryptoInterval): Promise<MarketFeed<MarketCandle[]>>;
+  tickers(): Promise<MarketFeed<MarketTicker[]>>;
 }
 
 /** Reference exchange rates (daily, European Central Bank) to enter foreign-currency movements. */

@@ -7,11 +7,30 @@ import {
   type ModuleActivity,
 } from './rentaActivity';
 import { generalBaseOf, savingsOf, type SavingsBreakdown, type SavingsDetail } from './rentaGains';
-import type { Deduction, MinimumAmounts, RentaCcaa, RentaState, TaxBracket } from './rentaData';
+import type {
+  BaseReductions,
+  Deduction,
+  LowPayRule,
+  MinimumAmounts,
+  RentaCcaa,
+  RentaState,
+  TaxBracket,
+} from './rentaData';
 import { round2 } from './round';
+import {
+  generalCapitalOf,
+  type GeneralCapitalItem,
+  type GeneralCapitalResult,
+} from './rentaCapitalGeneral';
 import type { PropertyResult } from './rentaRentals';
 import { checkDeduction, type CheckAnswers } from './rentaRequirements';
 import { donationChoices, type DonationInput } from './rentaDonations';
+import { housingBaseOf, type WealthCheck } from './rentaHousing';
+import {
+  disabilityReductions,
+  type DisabilityResult,
+  type DisabilitySupport,
+} from './rentaDisability';
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
@@ -40,7 +59,25 @@ export interface Child {
   /** Age at 31 December of the tax year. */
   age: number;
   disability: Disability;
+  /** Adopted or fostered, registered this year or in the two before: the under-3 increase at any age. */
+  adopted?: boolean;
+  /**
+   * The child's own income (art. 58.1): 'over8000' more than 8,000 € a year (the exempt left out);
+   * 'ownReturn' files a return with more than 1,800 €. Unset: neither.
+   */
+  income?: ChildIncome;
 }
+
+export type ChildIncome = 'over8000' | 'ownReturn';
+
+/**
+ * The increase for a child under 3 (2,800 €): LIRPF art. 58.2 (BOE-A-2006-20764, checked 21-10-2026)
+ * gives it, for an adoption or a fostering, "con independencia de la edad del menor, en el período
+ * impositivo en que se inscriba en el Registro Civil y en los dos siguientes" (Manual 2025, c14,
+ * ejemplo 6: a child adopted at 5).
+ */
+const under3Of = (child: Child, m: FullMinimums): number =>
+  child.age < 3 || child.adopted === true ? m.under3 : 0;
 
 export interface Ascendant {
   over75: boolean;
@@ -55,6 +92,11 @@ export interface Family {
   ascendants: Ascendant[];
   /** The children are claimed together with the other parent: each one takes half. */
   sharedChildren: boolean;
+  /**
+   * The return is the joint one of the taxpayer's unit, which takes the children under this age:
+   * that is the return of a child with more than 1,800 € (see {@link descendantShare}).
+   */
+  jointUnder?: number;
   /**
    * The taxpayer needs the help of third parties or has reduced mobility: the 3,000 € of "gastos de
    * asistencia" also below 65 % (LIRPF art. 60.1, second paragraph).
@@ -97,6 +139,30 @@ export function mergeMinimums(state: FullMinimums, own?: MinimumAmounts): FullMi
 
 /** Whether a child counts for the minimum: under 25, or with a disability of 33 % or more. */
 export const countsAsDescendant = (c: Child): boolean => c.age < 25 || c.disability >= 33;
+
+/**
+ * The part of a child's minimum that is the taxpayer's: 0, half (shared with the other parent) or
+ * all. LIRPF art. 58.1 (BOE-A-2006-20764): none with "rentas anuales, excluidas las exentas,
+ * superiores a 8.000 euros", nor when the child files a return with more than 1,800 €. Manual
+ * 2025, c14, «Concepto y requisitos» and ejemplo 2 (checked 22-10-2026): a child in the joint
+ * return of one parent with more than 1,800 € gives that parent the whole minimum, and the other
+ * none; with 1,800 € or less it is shared between both, even in the joint return.
+ */
+export function descendantShare(c: Child, family: Pick<Family, 'sharedChildren' | 'jointUnder'>) {
+  if (!countsAsDescendant(c) || c.income === 'over8000') return 0;
+  if (c.income === 'ownReturn') return c.age < (family.jointUnder ?? 0) ? 1 : 0;
+  return family.sharedChildren ? 0.5 : 1;
+}
+
+/**
+ * The children that give the minimum, with their part, the oldest first: the order (first, second…)
+ * counts only them (Manual 2025, c14, «Cuantías aplicables», checked 22-10-2026).
+ */
+export const countedChildren = (family: Family): { child: Child; share: number }[] =>
+  family.children
+    .map((child) => ({ child, share: descendantShare(child, family) }))
+    .filter((c) => c.share > 0)
+    .sort((a, b) => b.child.age - a.child.age);
 
 const nth = (list: number[], index: number): number => list[Math.min(index, list.length - 1)];
 /**
@@ -155,7 +221,6 @@ export function computeMinimum(
   family: Family,
   m: FullMinimums
 ): { total: number; items: MinimumItem[] } {
-  const share = family.sharedChildren ? 0.5 : 1;
   // A community can raise the general amount only from 65 (Illes Balears, see `personalOver65`).
   const personal = family.age >= 65 ? (m.personalOver65 ?? m.personal) : m.personal;
   const items: MinimumItem[] = [{ key: 'personal', amount: personal }];
@@ -165,10 +230,9 @@ export function computeMinimum(
   const ageExtra = ageAmount(family.age, m);
   if (ageExtra > 0) items.push({ key: 'age', amount: ageExtra });
 
-  const children = family.children.filter(countsAsDescendant).sort((a, b) => b.age - a.age);
   // The order is by date of birth: the oldest is the first.
-  const descendants = children.reduce((sum, child, i) => {
-    const base = nth(m.descendants, i) + (child.age < 3 ? m.under3 : 0);
+  const descendants = countedChildren(family).reduce((sum, { child, share }, i) => {
+    const base = nth(m.descendants, i) + under3Of(child, m);
     return sum + (base + disabilityAmount(child.disability, m, true)) * share;
   }, 0);
   if (descendants > 0) items.push({ key: 'descendants', amount: round2(descendants) });
@@ -191,20 +255,16 @@ export function descendantBreakdown(
   family: Family,
   m: FullMinimums
 ): { age: number; amount: number; under3: number; disability: number }[] {
-  const share = family.sharedChildren ? 0.5 : 1;
-  return family.children
-    .filter(countsAsDescendant)
-    .sort((a, b) => b.age - a.age)
-    .map((child, i) => {
-      const under3 = child.age < 3 ? m.under3 : 0;
-      const disability = disabilityAmount(child.disability, m, true);
-      return {
-        age: child.age,
-        amount: round2((nth(m.descendants, i) + under3 + disability) * share),
-        under3: round2(under3 * share),
-        disability: round2(disability * share),
-      };
-    });
+  return countedChildren(family).map(({ child, share }, i) => {
+    const under3 = under3Of(child, m);
+    const disability = disabilityAmount(child.disability, m, true);
+    return {
+      age: child.age,
+      amount: round2((nth(m.descendants, i) + under3 + disability) * share),
+      under3: round2(under3 * share),
+      disability: round2(disability * share),
+    };
+  });
 }
 
 /** Quota of a scale for a base, once the minimum is lowered from it (never below zero). */
@@ -243,8 +303,12 @@ export interface DeductionChoice {
   advance?: number;
   /** For a deduction by months (maternity): the months with the right to it, of all the children. */
   months?: number;
+  /** For a deduction with a `startBonus` (maternity): the children that get it this year. */
+  bonusUnits?: number;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
+  /** For a deduction with `wealthCheck`: the wealth at the start and end (rentaHousing.ts). */
+  wealth?: WealthCheck;
 }
 
 /** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
@@ -285,7 +349,9 @@ function fixedValue(d: Deduction, units: number): number {
 /** A percent deduction gives a share of what was spent (up to its base); a special one, the amount itself. */
 function spentValue(d: Deduction, choice: DeductionChoice): number {
   if (d.kind === 'percent') {
-    const spent = positive(choice.amount ?? 0);
+    const paid = positive(choice.amount ?? 0);
+    // The main home of the transitional regime: held to the increase of the wealth.
+    const spent = d.wealthCheck && choice.wealth ? housingBaseOf(paid, choice.wealth).base : paid;
     return (Math.min(spent, d.baseLimit ?? Infinity) * (d.percent ?? 0)) / 100;
   }
   return positive(choice.amount ?? 0);
@@ -310,9 +376,16 @@ export function deductionAmount(d: Deduction, choice: DeductionChoice, factor = 
       d.monthly && choice.months !== undefined
         ? Math.min(d.monthly * Math.max(0, choice.months), full)
         : full;
-    return round2(value * factor);
+    return round2(withStartBonus(d, choice, units, value) * factor);
   }
   return round2(loweredValue(d, choice, factor));
+}
+
+/** The 150 € of art. 81.1, once for each child that has it, within the limit of each (1,350 €). */
+function withStartBonus(d: Deduction, choice: DeductionChoice, units: number, value: number) {
+  const children = Math.min(units, Math.max(0, Math.floor(choice.bonusUnits ?? 0)));
+  if (!d.startBonus || children === 0) return value;
+  return Math.min(value + d.startBonus * children, (d.limit ?? Infinity) * units);
 }
 
 /** A percent or special deduction with the income limit's `factor` on what the law lowers. */
@@ -394,12 +467,29 @@ export interface RentaInput {
   /** Own contributions to pension plans, and those the employer makes (euros). */
   pensionPlan: number;
   pensionPlanEmployer: number;
+  /**
+   * The worker's own contributions to the employer's plan (flexible pay put into it too): within the
+   * table of art. 52.1.b.1.º they use the 8,500 € of the employer.
+   */
+  pensionEmploymentOwn?: number;
+  /** Premiums the employer pays to a collective dependency insurance (art. 51.5: 5,000 € of its own). */
+  dependencyPremiums?: number;
+  /**
+   * What did not fit in the five years before (art. 52.2): of plans and of dependency insurance.
+   * `plans`/`dependency` is a total of no known year (saved before the years were asked); `byYear`
+   * says the year each one comes from, so the oldest go first and their last year is known.
+   */
+  pensionExcess?: { plans: number; dependency: number; byYear?: ExcessYear[] };
   /** Contributions to the plan of a spouse with low income. */
   spousePlan: number;
+  /** Plans and protected patrimony of a person with a disability (rentaDisability.ts). */
+  disabilitySupport?: DisabilitySupport;
   /** Compensatory pension paid to an ex-spouse. */
   compensatoryPension: number;
   /** Rented properties, all together. */
   rental: RentalInput | null;
+  /** Capital mobiliario of the general base (boxes 0046-0060): business leases and the like. */
+  generalCapital?: GeneralCapitalItem[];
   /** Cadastral value of properties that are not rented, with revised and not revised values. */
   imputedValues: { standard: number; revised: number };
   /** Interest, dividends and capital gains (net), taxed on the savings base. */
@@ -458,10 +548,24 @@ export interface RentaResult {
   rentalNet: number;
   imputedIncome: number;
   pensionReduction: number;
-  /** Other reductions of the general base: spouse plan and compensatory pension. */
+  /** What does not fit this year, for the next five (art. 52.2): of plans and of dependency. */
+  pensionExcessNext: { plans: number; dependency: number };
+  /**
+   * The same by the year it comes from, with the last return it can still be used in (null: of no
+   * known year), and what is lost because this was its last year. A result saved before has none.
+   */
+  pensionExcessYears?: { left: ExcessLeft[]; lost: { plans: number; dependency: number } };
+  /**
+   * Other reductions of the general base: spouse plan, the plans and patrimony of a person with a
+   * disability (detailed in `disability`) and compensatory pension.
+   */
   otherReductions: number;
+  /** The reductions of arts. 53 and 54 (null when none were typed; a result saved before has none). */
+  disability?: DisabilityResult | null;
   /** The economic activities and the reductions of art. 32 (null when there are none). */
   activities: ActivitiesResult | null;
+  /** Capital mobiliario of the general base, box 0060 (null when there is none). */
+  generalCapital?: GeneralCapitalResult | null;
   /** The savings income worked out in detail (null when only the net amount was given). */
   savingsDetail: SavingsBreakdown | null;
   /** The general base with the gains that do not come from a transmission (boxes 0431-0434). */
@@ -534,16 +638,31 @@ export interface DeductionLine {
   amount: number;
 }
 
+/** Other income (not exempt) over which there is no reduction of art. 20 (the same in 2024-2026). */
 const OTHER_INCOME_LIMIT = 6500;
-const LOW_PAY_FULL = 16576;
-const LOW_PAY_END = 18276;
-const LOW_PAY_AMOUNT = 340;
 
-/** Deduction for low pay (Renta 2025): 340 euros up to 16,576 of gross pay, falling by 20 cents per euro to zero at 18,276. */
-export function lowPayDeduction(grossPay: number, otherIncome: number): number {
-  if (otherIncome > OTHER_INCOME_LIMIT || grossPay >= LOW_PAY_END || grossPay <= 0) return 0;
-  if (grossPay < LOW_PAY_FULL) return LOW_PAY_AMOUNT;
-  return round2(LOW_PAY_AMOUNT - 0.2 * (grossPay - LOW_PAY_FULL));
+/**
+ * The deduction for low pay of 2025 (LIRPF DA 61.ª as added by Ley 5/2025, BOE-A-2025-15424, with
+ * effect from 1-1-2025; checked 22-10-2026): 340 € up to 16,576 € of gross pay, falling by 20 cents
+ * per euro to nothing at 18,276 €. Each year has its own in its rules (data/renta/ejercicios).
+ */
+export const LOW_PAY_2025: LowPayRule = {
+  amount: 340,
+  fullUntil: 16576,
+  end: 18276,
+  slope: 0.2,
+  otherIncomeLimit: OTHER_INCOME_LIMIT,
+};
+
+/** Deduction for low pay from work (DA 61.ª): the full amount, then down by the slope to nothing. */
+export function lowPayDeduction(
+  grossPay: number,
+  otherIncome: number,
+  rule: LowPayRule = LOW_PAY_2025
+): number {
+  if (otherIncome > rule.otherIncomeLimit || grossPay >= rule.end || grossPay <= 0) return 0;
+  if (grossPay < rule.fullUntil) return rule.amount;
+  return round2(rule.amount - rule.slope * (grossPay - rule.fullUntil));
 }
 
 /** Rent after expenses, depreciation and the reduction (it can be negative). */
@@ -570,6 +689,10 @@ interface Earner {
   /** Own contributions to pension plans, and the employer's. */
   pensionPlan: number;
   pensionEmployer: number;
+  /** Own contributions to the employer's plan, dependency premiums and the excess of years before. */
+  employmentOwn: number;
+  dependency: number;
+  excess: { plans: number; dependency: number; byYear?: ExcessYear[] };
   /** The person: their 2,000 € always count, as in an individual return. */
   main: boolean;
 }
@@ -589,6 +712,13 @@ function earnersOf(input: RentaInput): Earner[] {
     assistance: input.family.assistance === true,
     pensionPlan: positive(input.pensionPlan),
     pensionEmployer: positive(input.pensionPlanEmployer),
+    employmentOwn: positive(input.pensionEmploymentOwn ?? 0),
+    dependency: positive(input.dependencyPremiums ?? 0),
+    excess: {
+      plans: positive(input.pensionExcess?.plans ?? 0),
+      dependency: positive(input.pensionExcess?.dependency ?? 0),
+      byYear: input.pensionExcess?.byYear,
+    },
     main: true,
   };
   const partner = input.joint?.partner;
@@ -604,6 +734,9 @@ function earnersOf(input: RentaInput): Earner[] {
       assistance: false,
       pensionPlan: positive(partner.pensionPlan),
       pensionEmployer: 0,
+      employmentOwn: 0,
+      dependency: 0,
+      excess: { plans: 0, dependency: 0 },
       main: false,
     },
   ];
@@ -691,6 +824,8 @@ function activityRunner(input: RentaInput, otherIncome: number) {
       !(positive(input.gross) <= 4000 && positive(input.nonSalaryIncome ?? 0) >= input.gross),
     disability: input.family.disability,
     assistance: input.family.assistance === true,
+    artistic: input.state.artistic,
+    ceuta: input.state.ceutaActivities,
   };
   return (workReduction: number) =>
     activities
@@ -703,6 +838,171 @@ function activityRunner(input: RentaInput, otherIncome: number) {
       : null;
 }
 
+/**
+ * The most the worker's own contributions to the employer's plan can use of the 8,500 €, by what the
+ * employer puts in (the table of LIRPF art. 52.1.b.1.º, BOE-A-2006-20764, checked 22-10-2026).
+ * `pay`: the gross pay, taken as from that employer.
+ */
+export function employmentTableMax(
+  employer: number,
+  pay: number,
+  t: BaseReductions['employmentTable']
+): number {
+  if (pay > t.highPayFrom || employer > t.midUpTo) return round2(employer * t.highTimes);
+  if (employer <= t.lowUpTo) return round2(employer * t.lowTimes);
+  return round2(t.midBase + t.midTimes * (employer - t.lowUpTo));
+}
+
+type PensionPart = 'gross' | 'pensionPlan' | 'pensionEmployer' | 'employmentOwn' | 'dependency';
+
+/** The excess of plans and of dependency insurance of one year before, still to reduce. */
+export interface ExcessYear {
+  year: number;
+  plans: number;
+  dependency: number;
+}
+
+/** What is left of an excess and the last return it can be used in (null: of no known year). */
+export interface ExcessLeft {
+  year: number | null;
+  plans: number;
+  dependency: number;
+  lastYear: number | null;
+}
+
+/**
+ * The excesses in the order they are used: the total of no known year first (it was used first
+ * before the years were asked), then by year, the oldest first; only those of the `span` years before
+ * (five, art. 52.2).
+ */
+function excessQueue(
+  excess: Earner['excess'],
+  year: number,
+  span: number
+): { year: number | null; plans: number; dependency: number }[] {
+  const dated = (excess.byYear ?? [])
+    .filter((x) => x.year < year && x.year >= year - span)
+    .map((x) => ({ year: x.year, plans: positive(x.plans), dependency: positive(x.dependency) }))
+    .sort((a, b) => a.year - b.year);
+  return [{ year: null, plans: excess.plans, dependency: excess.dependency }, ...dated];
+}
+
+const sumOf = (list: number[]) => list.reduce((a, b) => a + b, 0);
+
+/** The excess left of each year: what this was the last year of is lost, the rest carries. */
+function excessAfter(
+  queue: ReturnType<typeof excessQueue>,
+  used: { plans: number[]; dependency: number[] },
+  year: number,
+  own: { plans: number; dependency: number },
+  span: number
+): {
+  next: { plans: number; dependency: number };
+  years: NonNullable<RentaResult['pensionExcessYears']>;
+} {
+  const all: ExcessLeft[] = queue.map((x, i) => ({
+    year: x.year,
+    plans: round2(x.plans - used.plans[i]),
+    dependency: round2(x.dependency - used.dependency[i]),
+    lastYear: x.year === null ? null : x.year + span,
+  }));
+  all.push({ year, ...own, lastYear: year + span });
+  const kept = all.filter((x) => x.lastYear !== year && x.plans + x.dependency > 0);
+  const gone = all.filter((x) => x.lastYear === year);
+  return {
+    next: {
+      plans: round2(sumOf(kept.map((x) => x.plans))),
+      dependency: round2(sumOf(kept.map((x) => x.dependency))),
+    },
+    years: {
+      left: kept,
+      lost: {
+        plans: round2(sumOf(gone.map((x) => x.plans))),
+        dependency: round2(sumOf(gone.map((x) => x.dependency))),
+      },
+    },
+  };
+}
+
+/**
+ * The pension plans and dependency insurance of one person (LIRPF arts. 51.5 and 52; Manual práctico
+ * de Renta 2025, c13, «Límites y exceso de aportaciones» and its example, checked 22-10-2026). The
+ * excess of the years before goes first and, like this year's, «con sujeción a los límites máximos»
+ * (RIRPF art. 51, BOE-A-2007-6820, checked 22-10-2026: «se entenderán reducidas, en primer lugar,
+ * las aportaciones correspondientes a años anteriores»), the oldest first, which are the first to
+ * run out; then the plans, then the dependency premiums (the Manual's choice, the better one). `room`:
+ * the 30 % of the net work and activity income, and the base left. `year`: the year of the return.
+ */
+export function pensionOf(
+  e: Pick<Earner, PensionPart | 'excess'>,
+  room: number,
+  r: BaseReductions,
+  year = 2025
+): {
+  reduction: number;
+  next: { plans: number; dependency: number };
+  years: NonNullable<RentaResult['pensionExcessYears']>;
+} {
+  const table = employmentTableMax(e.pensionEmployer, e.gross, r.employmentTable);
+  const inTable = Math.min(e.employmentOwn, table);
+  const plansCap = r.pensionPlanLimit + r.pensionPlanEmployerLimit;
+  // 1,500 € for all, raised by the employer's contributions and the own ones within the table.
+  const plans = Math.min(
+    e.pensionPlan + e.employmentOwn + e.pensionEmployer,
+    r.pensionPlanLimit + Math.min(r.pensionPlanEmployerLimit, e.pensionEmployer + inTable)
+  );
+  const dependency = Math.min(e.dependency, r.dependencyLimit);
+  let left = Math.max(0, room);
+  const take = (amount: number, cap: number) => {
+    const used = Math.min(amount, cap, left);
+    left -= used;
+    return used;
+  };
+  const queue = excessQueue(e.excess, year, r.excessYears);
+  let plansRoom = plansCap;
+  let dependencyRoom = r.dependencyLimit;
+  const used = {
+    plans: queue.map((x) => {
+      const u = take(x.plans, plansRoom);
+      plansRoom -= u;
+      return u;
+    }),
+    dependency: queue.map((x) => {
+      const u = take(x.dependency, dependencyRoom);
+      dependencyRoom -= u;
+      return u;
+    }),
+  };
+  const newPlans = take(plans, plansRoom);
+  const newDependency = take(dependency, dependencyRoom);
+  // Only what the 30 % or the base left out carries (art. 52.2), not what passes the caps.
+  const after = excessAfter(
+    queue,
+    used,
+    year,
+    {
+      plans: round2(plans - newPlans),
+      dependency: round2(dependency - newDependency),
+    },
+    r.excessYears
+  );
+  return {
+    reduction: round2(sumOf(used.plans) + sumOf(used.dependency) + newPlans + newDependency),
+    next: after.next,
+    years: after.years,
+  };
+}
+
+/** The reductions of arts. 53 and 54 of the person, in the base left after the pension plans. */
+function disabilityOf(input: RentaInput, room: number, plansUsed: number) {
+  const result = disabilityReductions(
+    input.disabilitySupport,
+    { room, plansUsed, disabled: input.family.disability >= 33, year: input.state.year },
+    input.state.baseReductions.disability
+  );
+  return { result, total: result?.total ?? 0 };
+}
+
 /** From the net pay to the general and savings bases: other income, the reductions of the base. */
 function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof workIncome>) {
   const { state } = input;
@@ -713,11 +1013,19 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
       positive(input.imputedValues.revised) * input.imputationRates.revised) /
       100
   );
-  const { detail, ownSavings, savingsTotal, generalGains } = savingsPart(input, partner);
+  const parts = savingsPart(input, partner);
+  const { detail, ownSavings, generalGains } = parts;
+  const capital = input.generalCapital?.length ? generalCapitalOf(input.generalCapital) : null;
+  const capitalNet = capital?.total ?? 0;
+  // Art. 46.a: the interest of a related loan up to three times the own funds stays in the savings
+  // base (added after its compensations; the box where it goes is not confirmed).
+  const relatedSavings = round2(capital?.items.reduce((sum, i) => sum + i.savings, 0) ?? 0);
+  const savingsTotal = round2(parts.savingsTotal + relatedSavings);
   // The reduction for low pay only applies when the other income does not pass 6,500 euros; in a
   // joint return it is one, on the net pay and the other income of the whole unit (AEAT Manual
   // práctico de Renta 2025, "Fase 3.ª: rendimiento neto reducido", checked 19-10-2026).
-  const nonWork = Math.max(0, rentNet) + imputed + savingsTotal + generalGains;
+  const nonWork =
+    Math.max(0, rentNet) + Math.max(0, capitalNet) + imputed + savingsTotal + generalGains;
   const activityOf = activityRunner(input, work.netIncome + nonWork);
   // The net income of the activities, before the reductions of art. 32, is other income for art. 20.
   const raw = activityOf(0);
@@ -733,7 +1041,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   // from a transmission on top of it (LIRPF art. 48).
   // The reductions of art. 32.2.3.º and art. 20 together up to 3,700 €.
   const act = activityOf(reduction);
-  const income = work.netIncome - reduction + rentNet + imputed + (act?.total ?? 0);
+  const income = work.netIncome - reduction + capitalNet + rentNet + imputed + (act?.total ?? 0);
   const general = detail ? generalBaseOf(income, detail.general, state.year) : null;
   const beforeReductions = general ? general.base : income;
   // Joint return (LIRPF art. 84.2.4.º; AEAT Manual 2025, "Reducción por tributación conjunta" and the
@@ -743,43 +1051,49 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   const jointGeneral = Math.min(jointAmount, Math.max(0, beforeReductions));
   const jointSavings = Math.min(jointAmount - jointGeneral, savingsTotal);
   const afterJoint = beforeReductions - jointGeneral;
-  // Pension plans (LIRPF art. 52.1.b; AEAT Manual práctico de Renta 2025, c13, checked 19-10-2026):
-  // own contributions up to 1,500 €, and the employer's up to 8,500 € more, so 10,000 € in all; and
-  // up to 30 % of the net work income, for each member of the unit on their own (art. 84.2.1.º).
-  // Own contributions to the employer's plan that can also use the 8,500 € (the table of art. 52)
-  // are not asked: all own contributions are held to 1,500 €.
-  const { pensionPlanLimit, pensionPlanEmployerLimit } = state.baseReductions;
-  const pensionOf = (e: Earner, i: number) =>
-    Math.min(
-      Math.min(e.pensionPlan, pensionPlanLimit) +
-        Math.min(e.pensionEmployer, pensionPlanEmployerLimit),
-      work.each[i] * 0.3
+  // Pension plans: up to 30 % of the net work and activity income (the activities before the
+  // reductions of art. 32, Manual 2025, c13), for each member of the unit on their own (art.
+  // 84.2.1.º), and never more than the base left.
+  const r = state.baseReductions;
+  let baseLeft = Math.max(0, afterJoint);
+  const plans = earners.map((e, i) => {
+    const own = work.each[i] + (i === 0 ? activityNet : 0);
+    const p = pensionOf(
+      e,
+      Math.min((Math.max(0, own) * r.percentLimit) / 100, baseLeft),
+      r,
+      state.year
     );
-  const pensionReduction = round2(
-    Math.min(
-      earners.reduce((sum, e, i) => sum + pensionOf(e, i), 0),
-      Math.max(0, afterJoint)
-    )
-  );
+    baseLeft -= p.reduction;
+    return p;
+  });
+  const pensionReduction = round2(plans.reduce((sum, p) => sum + p.reduction, 0));
   // The spouse's plan (art. 51.7) goes with the pension plans, before the compensatory pension.
   const leftAfterPlans = Math.max(0, afterJoint - pensionReduction);
   const spouse = Math.min(Math.min(positive(input.spousePlan), 1000), leftAfterPlans);
+  // Then the plans and the patrimony of a person with a disability (arts. 53 and 54).
+  const disability = disabilityOf(input, leftAfterPlans - spouse, plans[0].reduction);
+  const disabilityTotal = disability.total;
   const compensatory = positive(input.compensatoryPension);
-  const compensatoryGeneral = Math.min(compensatory, leftAfterPlans - spouse);
+  const compensatoryGeneral = Math.min(compensatory, leftAfterPlans - spouse - disabilityTotal);
   // What is left of the compensatory pension (art. 55) lowers the savings base, never below zero:
   // LIRPF art. 50.2 (BOE-A-2006-20764, consolidated text, checked 19-10-2026): "disminuir la base
   // imponible del ahorro en el remanente, si lo hubiera, de la reducción prevista en el artículo 55".
   const compensatorySavings = round2(
     Math.min(compensatory - compensatoryGeneral, savingsTotal - jointSavings)
   );
-  const otherReductions = round2(spouse + compensatoryGeneral);
+  const otherReductions = round2(spouse + disabilityTotal + compensatoryGeneral);
   return {
+    disability: disability.result,
     rentNet,
     imputed,
+    capital,
     reduction,
     beforeReductions,
     jointReduction: round2(jointGeneral + jointSavings),
     pensionReduction,
+    pensionExcessNext: plans[0].next,
+    pensionExcessYears: plans[0].years,
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
@@ -793,7 +1107,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
 }
 
 /**
- * The 340 € deduction for low pay (Renta 2025), held to the tax that is left. The AEAT Manual 2025
+ * The deduction for low pay of the year (DA 61.ª: 340 € in 2025), held to the tax that is left. The AEAT Manual 2025
  * (c18, "Deducción por obtención de rendimientos del trabajo", checked 19-10-2026) says nothing of
  * joint returns: when all the pay and other income belong to one member every reading gives the
  * same; otherwise it is left out (`clear` false) and the result says so.
@@ -807,10 +1121,14 @@ function lowPayOf(input: RentaInput, otherIncome: number, quotaLeft: number) {
   const partnerOther = positive(partner?.savings ?? 0);
   const clear =
     !partner || (partnerPay === 0 && partnerOther === 0) || (ownPay === 0 && otherIncome === 0);
-  const amount = clear
-    ? Math.min(quotaLeft, lowPayDeduction(ownPay + partnerPay, otherIncome + partnerOther))
-    : 0;
-  return { amount, clear };
+  // A State made by hand without the field is of 2025; null: the year has no such deduction.
+  const rule = input.state.lowPay === undefined ? LOW_PAY_2025 : input.state.lowPay;
+  const amount =
+    clear && rule
+      ? Math.min(quotaLeft, lowPayDeduction(ownPay + partnerPay, otherIncome + partnerOther, rule))
+      : 0;
+  // Without the deduction in the year there is nothing left out of a joint return.
+  return { amount, clear: clear || !rule };
 }
 
 /** The refundable deductions marked that were collected in advance (modelos 140 and 143). */
@@ -978,11 +1296,15 @@ export function computeRenta(input: RentaInput): RentaResult {
   const {
     rentNet,
     imputed,
+    capital,
     reduction,
     beforeReductions,
     jointReduction,
     pensionReduction,
+    pensionExcessNext,
+    pensionExcessYears,
     otherReductions,
+    disability,
     taxBase,
     savingsIncome,
     activities,
@@ -1095,9 +1417,13 @@ export function computeRenta(input: RentaInput): RentaResult {
     rentalNet: rentNet,
     imputedIncome: imputed,
     pensionReduction,
+    pensionExcessNext,
+    pensionExcessYears,
     otherReductions,
+    disability,
     savingsReduction,
     activities,
+    generalCapital: capital,
     savingsDetail: detail,
     generalGains: general,
     jointReduction,

@@ -43,7 +43,7 @@ def P(n, slug, ccaa, title, story, tests, **kw):
 RENTA = [
     P(120, 'dos-pisos-uno-con-perdidas-valladolid', 'castilla-y-leon', 'Dos pisos alquilados: uno con beneficio y otro, a medias con su hermana, con pérdidas',
       'Asalariado en Valladolid. Piso 1 (suyo al 100 %) alquilado todo el año como vivienda con contrato de 2021: reducción del 60 %. '
-      'Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición: '
+      'Piso 2, heredado a medias con su hermana (50 %), alquilado 181 días con contrato de 2025 y el resto del año vacío a su disposición (la reparación se hizo con el piso alquilado, así que cuenta entera): '
       'da pérdidas, sin reducción, y imputa renta por 184 días. La pérdida de un piso no le quita la reducción al otro.',
       ['alquileres inmueble a inmueble', 'cotitularidad 50 %', 'gastos anuales por días', 'amortización del mayor entre coste y valor catastral',
        'reducción 60 % de contrato anterior al 26-5-2023', 'rendimiento negativo sin reducción', 'imputación por días a disposición'],
@@ -52,20 +52,20 @@ RENTA = [
           dict(label='Piso Delicias', income=8400, expenses={'intereses-financiacion': 900, 'reparacion-conservacion': 350, 'tributos-tasas': 380,
                                                               'comunidad-servicios-personales': 600, 'seguros': 190},
                cost=95000, cadastral=60000, building=36000, use='home', contract='before'),
-          dict(label='Piso heredado', share=50, rentedDays=181, income=3600,
+          dict(label='Piso heredado', share=50, rentedDays=181, repairWhen='let', income=3600,
                expenses={'intereses-financiacion': 0, 'reparacion-conservacion': 2400, 'tributos-tasas': 520, 'comunidad-servicios-personales': 720,
                          'seguros': 240},
                cost=70000, cadastral=80000, building=48000, use='home', contract='after'),
       ]),
     P(121, 'apartamento-temporada-y-garaje-malaga', 'andalucia', 'Apartamento de temporada y una plaza de garaje alquilada a una empresa vecina',
       'Pensionista de 67 años en Málaga. Alquila un apartamento por temporadas (sin reducción: no es la vivienda permanente del inquilino) '
-      '120 días; el resto del año lo usa ella (a su disposición). La plaza de garaje la alquila todo el año a un particular. '
+      '120 días; el resto del año lo usa ella (a su disposición); la reparación de este año la hizo con el apartamento alquilado. La plaza de garaje la alquila todo el año a un particular. '
       'Le quedan 600 € de reparaciones de 2024 del apartamento sin deducir.',
       ['alquiler de temporada sin reducción', 'local/garaje sin reducción', 'pendiente de años anteriores (0103-0104)', 'imputación por días a disposición',
        'valor catastral revisado (1,1 %)'],
       age=67, retired=True, nonSalary=19000, **p2.worker(19000, 900),
       properties=[
-          dict(label='Apartamento playa', rentedDays=120, income=6000, pending=600,
+          dict(label='Apartamento playa', rentedDays=120, repairWhen='let', income=6000, pending=600,
                expenses={'reparacion-conservacion': 300, 'tributos-tasas': 450, 'comunidad-servicios-personales': 480, 'seguros': 200,
                          'suministros': 350},
                cost=0, cadastral=70000, building=42000, revised=True, use='season'),
@@ -75,7 +75,7 @@ RENTA = [
     P(122, 'zona-tensionada-90-y-joven-70-barcelona', 'cataluna', 'Dos viviendas en zona tensionada: bajada de renta (90 %) y primer alquiler a un joven (70 %)',
       'Asalariada en Barcelona (municipio declarado zona de mercado residencial tensionado). Piso A: nuevo contrato de 2025 con la renta inicial '
       'un 8 % más baja que la del contrato anterior: reducción del 90 %. Piso B: lo alquila por primera vez en 2025 a un inquilino de 27 años: '
-      '70 %. En el piso B, intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.',
+      '70 %. En el piso B (las reparaciones, hechas con el piso ya alquilado), intereses y reparaciones pasan de lo cobrado: el exceso va a los 4 años siguientes.',
       ['reducción 90 % (zona tensionada, bajada > 5 %)', 'reducción 70 % (primer alquiler a joven de 18 a 35)', 'límite de intereses y reparaciones por inmueble',
        'exceso para 4 años (0108)'],
       age=52, **p2.worker(48000, 9800),
@@ -83,7 +83,7 @@ RENTA = [
           dict(label='Piso A', income=13200, expenses={'intereses-financiacion': 1500, 'reparacion-conservacion': 400, 'tributos-tasas': 620,
                                                        'comunidad-servicios-personales': 900, 'seguros': 260},
                cost=210000, cadastral=110000, building=55000, use='home', contract='after', tensioned=True, rentDrop=True),
-          dict(label='Piso B', rentedDays=214, otherDays=151, income=6300,
+          dict(label='Piso B', rentedDays=214, repairWhen='let', otherDays=151, income=6300,
                expenses={'intereses-financiacion': 5400, 'reparacion-conservacion': 3900, 'tributos-tasas': 540, 'comunidad-servicios-personales': 840,
                          'seguros': 220},
                cost=180000, cadastral=90000, building=50000, use='home', contract='after', tensioned=True, young=True),

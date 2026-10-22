@@ -1,0 +1,141 @@
+/* «Learn before playing»: a panel that unfolds below the chart (the row of its grid grows from 0
+   to its height), with a large title and its close button. What goes inside, the tabs, comes in
+   GuidePanel.css with the rest of the guide, downloaded on the first opening. */
+
+.cc-learn {
+  --cc-learn-time: 0.32s;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--cc-learn-time) ease,
+    opacity var(--cc-learn-time) ease;
+}
+
+.cc-learn.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.cc-learn-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Closed, it is hidden once it has folded (and inert meanwhile). */
+.cc-learn:not(.is-open) .cc-learn-clip {
+  visibility: hidden;
+  transition: visibility 0s linear var(--cc-learn-time);
+}
+
+.cc-learn-inner {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 1.25rem 1.35rem 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent-400) 45%, var(--cc-line));
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      120% 80% at 0% 0%,
+      color-mix(in srgb, var(--accent-600) 16%, transparent),
+      transparent 60%
+    ),
+    var(--cc-surface);
+  color: var(--cc-text);
+}
+
+.cc-learn-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cc-learn-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.35rem;
+  color: var(--accent-300);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cc .cc-learn-head h2 {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--cc-strong);
+}
+
+.cc .cc-learn-head h2:focus {
+  outline: none;
+}
+
+.cc-learn-sub {
+  margin: 0.45rem 0 0;
+  color: var(--cc-text-2);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.cc-learn-close {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--accent-400);
+  background: var(--cc-raised);
+  color: var(--cc-strong);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cc-learn-close:hover {
+  background: color-mix(in srgb, var(--accent-600) 22%, var(--cc-raised));
+}
+
+.cc-guide-note {
+  margin: 0;
+  border-left: 4px solid var(--amber-500);
+  background: color-mix(in srgb, var(--amber-500) 10%, var(--cc-surface));
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 719px) {
+  .cc-learn-inner {
+    padding: 1rem 0.85rem 1.1rem;
+    border-radius: 14px;
+  }
+
+  .cc-learn-head {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-learn,
+  .cc-learn:not(.is-open) .cc-learn-clip {
+    transition: none;
+  }
+}
+
+html.wiz-contrast .cc-learn-inner,
+html.wiz-contrast .cc-learn-close {
+  border: 2px solid var(--slate-100);
+}
+
+html.wiz-contrast .cc-learn-sub {
+  color: var(--slate-100);
+}

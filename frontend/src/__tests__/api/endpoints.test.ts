@@ -2,6 +2,7 @@ import { authApi } from '@core/api/authApi';
 import { billingApi, householdApi, offersApi } from '@core/api/billingApi';
 import { videosApi } from '@core/api/videosApi';
 import { learnApi } from '@core/api/learnApi';
+import { cryptoApi } from '@core/api/cryptoApi';
 import {
   accountApi,
   assetApi,
@@ -378,6 +379,62 @@ const cases: Case[] = [
     '/learn/chapters/etf-vs-fondos',
   ],
   ['course glossary', () => learnApi.glossary(), 'GET', '/learn/glossary'],
+  ['crypto coins', () => cryptoApi.coins(), 'GET', '/crypto/coins'],
+  [
+    'crypto candles',
+    () => cryptoApi.candles('BTC', '1h'),
+    'GET',
+    '/crypto/candles?symbol=BTC&interval=1h',
+  ],
+  ['crypto portfolio', () => cryptoApi.portfolio(), 'GET', '/crypto/sim'],
+  [
+    'crypto order',
+    () => cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'market', amount: 100 }),
+    'POST',
+    '/crypto/sim/orders',
+    { action: 'buy', symbol: 'BTC', type: 'market', amount: 100 },
+  ],
+  ['crypto cancel', () => cryptoApi.cancelOrder('o 1'), 'DELETE', '/crypto/sim/orders/o%201'],
+  [
+    'crypto exits',
+    () => cryptoApi.setExits('p 1', { takeProfit: 60_000, stopLoss: null }),
+    'PUT',
+    '/crypto/sim/positions/p%201/exits',
+    { takeProfit: 60_000, stopLoss: null },
+  ],
+  ['crypto portfolio', () => cryptoApi.portfolio('p 1'), 'GET', '/crypto/sim?portfolio=p+1'],
+  [
+    'crypto practice reset',
+    () => cryptoApi.resetPractice('p1'),
+    'POST',
+    '/crypto/sim/reset',
+    { portfolioId: 'p1' },
+  ],
+  ['crypto practice', () => cryptoApi.createPractice(), 'POST', '/crypto/sim/practice'],
+  [
+    'crypto practice delete',
+    () => cryptoApi.deletePractice('p 1'),
+    'DELETE',
+    '/crypto/sim/practice/p%201',
+  ],
+  ['crypto ranking', () => cryptoApi.ranking(), 'GET', '/crypto/ranking'],
+  [
+    'crypto ranking settings',
+    () => cryptoApi.setRanking({ alias: 'Lince' }),
+    'PUT',
+    '/crypto/ranking/settings',
+    { alias: 'Lince' },
+  ],
+  ['crypto report', () => cryptoApi.report('2026-03'), 'GET', '/crypto/seasons/2026-03/report'],
+  ['crypto alerts', () => cryptoApi.alerts(), 'GET', '/crypto/alerts'],
+  [
+    'crypto alert',
+    () => cryptoApi.createAlert({ symbol: 'BTC', condition: 'below', price: 1 }),
+    'POST',
+    '/crypto/alerts',
+    { symbol: 'BTC', condition: 'below', price: 1 },
+  ],
+  ['crypto alert delete', () => cryptoApi.deleteAlert('a 1'), 'DELETE', '/crypto/alerts/a%201'],
   ['plans', () => billingApi.plans(), 'GET', '/billing/plans'],
   [
     'checkout',

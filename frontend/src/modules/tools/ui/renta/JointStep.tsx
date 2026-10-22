@@ -6,7 +6,7 @@ import {
   type PartnerForm,
 } from '../../domain/rentaForm';
 import { canFileJointly } from '../../domain/rentaJoint';
-import { rentaJoint } from '../../data/renta/conjunta';
+import { useRentaRules } from './RentaRulesContext';
 import { DisabilitySelect, Field, type StepProps } from './shared';
 
 /** The other person of the joint return: their pay, age, disability and basic income. */
@@ -86,10 +86,11 @@ export function PartnerFields({ form, set }: StepProps) {
 /** Single parent: whether they live with the other parent, and whether the unit exists at all. */
 export function SingleParentFields({ form, set }: StepProps) {
   const { t } = useI18n();
+  const rules = useRentaRules();
   const children = form.children.map((c) => ({ age: number(c.age), disability: c.disability }));
   return (
     <div className="renta-block">
-      {!canFileJointly('single', children, rentaJoint) && (
+      {!canFileJointly('single', children, rules.joint) && (
         <p className="form-error" role="alert">
           {t('tools.renta.joint.noMinor')}
         </p>

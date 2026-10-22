@@ -1,0 +1,359 @@
+/* The tabs of «Learn before playing» and what each one shows: pills that slide sideways on
+   phones and, in each tab, cards with a large drawing beside comfortable text. */
+
+.cc-guide-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.15rem 0.1rem;
+}
+
+.cc-guide-tab {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-raised);
+  color: var(--cc-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.cc-guide-tab .cc-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-300);
+}
+
+.cc-guide-tab:hover {
+  border-color: var(--accent-400);
+  color: var(--cc-strong);
+}
+
+.cc-guide-tab[aria-selected='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+  box-shadow: 0 6px 18px -10px var(--accent-600);
+}
+
+.cc-guide-tab[aria-selected='true'] .cc-icon {
+  color: #fff;
+}
+
+/* ─── Contents of a tab ─── */
+
+.cc-guide-body {
+  display: grid;
+  gap: 1rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  animation: cc-guide-in 0.25s ease;
+}
+
+.cc-guide-body:focus-visible {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+@keyframes cc-guide-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cc-guide-caution {
+  margin: 0;
+  border-left: 4px solid var(--amber-500);
+  background: color-mix(in srgb, var(--amber-500) 10%, var(--cc-surface));
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.cc-guide-section {
+  display: grid;
+  grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+  padding: 1.1rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 14px;
+  background: var(--cc-raised);
+}
+
+.cc-guide-section--wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.cc-guide-section--wide > p {
+  margin: 0;
+  max-width: 72ch;
+}
+
+.cc-guide-section--wide > .cc-plans {
+  margin: 0;
+}
+
+.cc-guide-art {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.cc-guide-text {
+  max-width: 68ch;
+}
+
+.cc .cc-guide-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  color: var(--cc-strong);
+}
+
+.cc-guide-section--wide h4 {
+  margin: 0;
+}
+
+.cc-guide-section h5 {
+  margin: 0.5rem 0 0;
+  font-size: 1.05rem;
+  color: var(--cc-strong);
+}
+
+.cc-guide-text p {
+  margin: 0 0 0.65rem;
+  color: var(--cc-text);
+}
+
+.cc-guide-text p:last-child {
+  margin-bottom: 0;
+}
+
+.cc-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: var(--slate-950);
+  border: 1px solid var(--cc-line);
+}
+
+.cc-art-up {
+  stroke: var(--green-500);
+  fill: var(--green-500);
+}
+
+.cc-art-down {
+  stroke: var(--red-500);
+  fill: var(--red-500);
+}
+
+.cc-art-muted {
+  fill: var(--slate-600);
+}
+
+.cc-art-label {
+  fill: var(--slate-200);
+  font-size: 9px;
+  font-family: inherit;
+}
+
+.cc-art-label--side {
+  font-size: 7px;
+}
+
+.cc-art-price {
+  stroke: var(--slate-200);
+}
+
+.cc-art-ema {
+  stroke: #f59e0b;
+}
+
+.cc-art-ema-slow {
+  stroke: #d946ef;
+}
+
+.cc-art-band {
+  stroke: #14b8a6;
+}
+
+.cc-art-vwap {
+  stroke: #ec4899;
+}
+
+.cc-art-profile {
+  fill: color-mix(in srgb, #eab308 55%, transparent);
+}
+
+.cc-art-poc {
+  stroke: #eab308;
+}
+
+.cc-art-level,
+.cc-art-fib {
+  stroke: #8b5cf6;
+}
+
+.cc-art-support {
+  stroke: var(--green-500);
+}
+
+.cc-art-resistance {
+  stroke: var(--red-500);
+}
+
+.cc-art-level text,
+.cc-art-fib text,
+.cc-art-poc text,
+.cc-art-support text,
+.cc-art-resistance text {
+  stroke: none;
+}
+
+.cc-patterns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.cc-pattern {
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: var(--cc-surface);
+}
+
+.cc-pattern h6 {
+  margin: 0.55rem 0 0.25rem;
+  font-size: 1rem;
+  color: var(--cc-strong);
+}
+
+.cc-pattern p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--cc-text);
+}
+
+/* «Words of the console»: a box to find a word and the terms in compact columns. */
+.cc-glossary-search {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 22rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cc-text-2);
+}
+
+/* The box itself has the look of every field of the console (Crypto.css). */
+.cc-glossary-search input {
+  font-weight: 400;
+}
+
+.cc-glossary {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.cc-glossary > div {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--cc-line);
+  border-left: 3px solid var(--accent-400);
+  border-radius: 8px;
+  background: var(--cc-surface);
+}
+
+.cc-glossary dt {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cc-strong);
+}
+
+.cc-glossary dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--cc-text);
+}
+
+/* Phones and phones on their side: the tabs in one row that slides sideways. */
+@media (max-width: 719px), (orientation: landscape) and (max-height: 500px) {
+  .cc-guide-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    padding-bottom: 0.45rem;
+  }
+}
+
+@media (max-width: 719px) {
+  .cc-guide-tabs {
+    margin: 0 -0.85rem;
+    padding: 0.15rem 0.85rem 0.45rem;
+  }
+
+  .cc-guide-section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-guide-tab {
+    transition: none;
+  }
+
+  .cc-guide-body {
+    animation: none;
+  }
+}
+
+html.wiz-contrast .cc-guide-tab,
+html.wiz-contrast .cc-guide-section,
+html.wiz-contrast .cc-pattern,
+html.wiz-contrast .cc-glossary > div,
+html.wiz-contrast .cc-art {
+  border: 2px solid var(--slate-100);
+}
+
+html.wiz-contrast .cc-guide-tab[aria-selected='true'] {
+  outline: 2px solid var(--slate-50);
+  outline-offset: 1px;
+}
+
+html.wiz-contrast .cc-guide-text p,
+html.wiz-contrast .cc-pattern p,
+html.wiz-contrast .cc-glossary dd {
+  color: var(--slate-100);
+}

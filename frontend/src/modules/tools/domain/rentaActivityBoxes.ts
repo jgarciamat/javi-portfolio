@@ -41,6 +41,7 @@ const LABELS: Record<string, string> = {
   '0232': 'Reducción del artículo 32.2.1.º de la Ley',
   '0233': 'Reducción del artículo 32.2.3.º de la Ley',
   '0234': 'Reducción por inicio de una actividad (artículo 32.3)',
+  '0237': 'Reducción por rendimientos de actividades artísticas (disposición adicional 60.ª)',
   '0235': 'Rendimiento neto reducido total en estimación directa',
   '1465': 'Rendimiento neto previo',
   '1466': 'Minoración por incentivos al empleo',
@@ -148,8 +149,18 @@ function totalBoxes(list: ActivityInput[], r: ActivitiesResult): [string, number
     out.push(
       ['0231', r.direct],
       ['0232', r.dependentReduction],
-      ['0233', round2(r.direct - r.dependentReduction - r.startReduction - r.directTotal)],
+      [
+        '0233',
+        round2(
+          r.direct -
+            r.dependentReduction -
+            r.startReduction -
+            (r.artisticReduction ?? 0) -
+            r.directTotal
+        ),
+      ],
       ['0234', r.startReduction],
+      ...(r.artisticReduction ? [['0237', r.artisticReduction] as [string, number]] : []),
       ['0235', r.directTotal]
     );
   if (has('modules')) {

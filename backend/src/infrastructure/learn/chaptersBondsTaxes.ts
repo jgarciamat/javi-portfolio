@@ -147,7 +147,7 @@ export const CHAPTERS_BONDS_TAXES: CourseChapter[] = [
       {
         k: 'warn',
         title: 'Varía según tu situación',
-        t: 'Navarra y el País Vasco tienen régimen foral. La escala puede cambiar por ley cada año, y tu caso puede tener particularidades (herencias, no residentes, ganancias exentas por reinversión). La calculadora es orientativa; confirma con un gestor o con el programa de la Agencia Tributaria.',
+        t: 'Navarra y el País Vasco tienen régimen foral. La escala puede cambiar por ley cada año, y tu caso puede tener particularidades (herencias, no residentes, ganancias exentas por reinversión). La calculadora es orientativa; confirma con un profesional o con el programa de la Agencia Tributaria.',
       },
     ],
     glossary: [

@@ -4,10 +4,9 @@ import {
   AGRARIAN_ADVANCE,
   IRPF_ADVANCE,
   LOW_INCOME_REDUCTIONS,
-  RETA_BRACKETS_2026,
   RETA_GENERAL_EXPENSES,
   type RetaBracket,
-  RETA_RATE_2026,
+  retaTableOf,
 } from './autonomo-data';
 import { ManualData } from './autonomo-expenses';
 import { draft349, type Draft349 } from './autonomo-349';
@@ -58,7 +57,10 @@ export interface DraftInputs {
   modality?: 'simplified' | 'normal';
   /** Farming, livestock, forestry or fishing: section II of the 130 (2 % of the quarter's income). */
   agrarian?: boolean;
-  /** Net income of last year, for the low-income reduction (null: unknown, none applied). */
+  /**
+   * Net income of last year, for the low-income reduction (null: unknown, none applied). With no
+   * activity last year it is 0 (instructions of the 130, box 13), so the 100 € apply.
+   */
   priorYearNet: number | null;
   /** Professional whose clients withheld at least 70 % of last year's income: no modelo 130. */
   exempt130: boolean;
@@ -117,6 +119,9 @@ export interface RetaEstimate {
   feeMin: number;
   feeMax: number;
   rate: number;
+  /** The year of the table used, and false when that year has no order yet (the latest one is used). */
+  year: number;
+  known: boolean;
 }
 
 export interface Deadline {
@@ -182,6 +187,7 @@ function withoutNotDeductible(q: Quarter, extras: QuarterExtras): VatBucket {
   return { ...q.vat, items: items.filter((i) => i.vat > 0) };
 }
 
+/** Box 13 (art. 110.3.c RIRPF): by last year's net income; no activity then counts as 0 €. */
 const lowIncomeReduction = (priorYearNet: number | null): number => {
   if (priorYearNet === null) return 0;
   return LOW_INCOME_REDUCTIONS.find((r) => priorYearNet <= r.upTo)?.amount ?? 0;
@@ -350,9 +356,10 @@ function draft130(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4)
   return { required: true, result, amountDue, boxes: last };
 }
 
-/** The contribution bracket for a monthly net income (after the 7 % general expenses). */
-export function retaFor(monthlyNet: number): RetaEstimate {
-  const bracket = RETA_BRACKETS_2026.find(
+/** The contribution bracket for a monthly net income (after the 7 % general expenses) in a year. */
+export function retaFor(monthlyNet: number, year = 2026): RetaEstimate {
+  const { table, known } = retaTableOf(year);
+  const bracket = table.brackets.find(
     (b) => b.to === null || (b.toExclusive ? monthlyNet < b.to : monthlyNet <= b.to)
   ) as RetaBracket; // the last bracket has no upper limit
   return {
@@ -360,14 +367,21 @@ export function retaFor(monthlyNet: number): RetaEstimate {
     bracket: bracket.id,
     baseMin: bracket.baseMin,
     baseMax: bracket.baseMax,
-    feeMin: round2(bracket.baseMin * RETA_RATE_2026),
-    feeMax: round2(bracket.baseMax * RETA_RATE_2026),
-    rate: RETA_RATE_2026,
+    feeMin: round2(bracket.baseMin * table.rate),
+    feeMax: round2(bracket.baseMax * table.rate),
+    rate: table.rate,
+    year,
+    known,
   };
 }
 
 /** The contribution a year-to-date result points to: annualised, plus the fees paid, minus 7 %. */
-function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 | 4): RetaEstimate {
+function retaEstimate(
+  year: number,
+  quarters: Quarter[],
+  inputs: DraftInputs,
+  upTo: 1 | 2 | 3 | 4
+): RetaEstimate {
   const window = windowOf(inputs, upTo);
   const sel = quarters.slice(window.start, upTo);
   const extras = inputs.quarters.slice(window.start, upTo);
@@ -382,7 +396,7 @@ function retaEstimate(quarters: Quarter[], inputs: DraftInputs, upTo: 1 | 2 | 3 
   // The fees paid are added back: the contribution is worked out on the net income before them.
   const net = euros(income - expenses);
   const monthly = (Math.max(0, net) / (upTo * 3)) * (1 - RETA_GENERAL_EXPENSES);
-  return retaFor(monthly);
+  return retaFor(monthly, year);
 }
 
 const iso = (d: Date): string => d.toISOString().slice(0, 10);
@@ -464,7 +478,7 @@ export function prepareDraft(
     m349,
     m390: quarter === 4 ? draft390(year303, options) : null,
     irpf: draft130(quarters, inputs, quarter),
-    reta: retaEstimate(quarters, inputs, quarter),
+    reta: retaEstimate(year, quarters, inputs, quarter),
     deadlines: deadlinesFor(year, quarter, m349 !== null),
   };
 }

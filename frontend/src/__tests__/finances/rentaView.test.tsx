@@ -45,10 +45,10 @@ describe('Renta section', () => {
     await waitFor(() => expect(api.transactionApi.getAnnual).toHaveBeenLastCalledWith(2026));
   });
 
-  it('only offers the last return and the running year', async () => {
+  it('offers the years with rules up to the running one, the newest first', async () => {
     renderWithProviders(<RentaView />);
     const years = within(await screen.findByLabelText(tr('app.renta.year'))).getAllByRole('option');
-    expect(years.map((o) => o.textContent)).toEqual(['2026', '2025']);
+    expect(years.map((o) => o.textContent)).toEqual(['2026', '2025', '2024']);
   });
 
   it('wipes everything that was entered once the user confirms', async () => {

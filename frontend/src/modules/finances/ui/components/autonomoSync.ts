@@ -110,6 +110,20 @@ function filed130Of(typed: (string | undefined)[] | undefined): Pick<ManualForm,
   return filed.join('').trim() === '' ? {} : { filed130: [0, 1, 2, 3].map((i) => filed[i] ?? '') };
 }
 
+/** The people of the 347 typed with cash invoices of the year before, only when there are some. */
+function carriedOf(rows: ManualForm['carried347']): Pick<ManualForm, 'carried347'> {
+  if (!rows?.length) return {};
+  return {
+    carried347: rows.map((r) => ({
+      year: r.year,
+      key: r.key,
+      name: r.name,
+      nif: r.nif,
+      amount: r.amount,
+    })),
+  };
+}
+
 type Partialish<T> = { [K in keyof T]?: T[K] extends object ? Partialish<T[K]> : T[K] };
 
 /**
@@ -197,6 +211,7 @@ export function toSaved(
         ? { filed303: [0, 1, 2, 3].map((i) => manual.filed303?.[i] ?? null) }
         : {}),
       ...filed130Of(manual.filed130),
+      ...carriedOf(manual.carried347 as ManualForm['carried347']),
       // The activity of the year (assets, grants…), only when something was typed.
       ...(isEmptyActivity(manual.activity as ActivityForm | undefined)
         ? {}
@@ -206,6 +221,7 @@ export function toSaved(
       hardToJustify: options.hardToJustify,
       exempt: options.exempt,
       priorNet: options.priorNet,
+      ...(options.noPriorActivity ? { noPriorActivity: true } : {}),
       toOffset: options.toOffset,
       ...(JSON.stringify(vatExtrasOf(options.vat)) === JSON.stringify(NO_VAT_EXTRAS)
         ? {}
@@ -228,6 +244,10 @@ function vatOfInvoice(i: ManualForm['invoices'][number]): Partial<ManualForm['in
     ...(i.vatId ? { vatId: i.vatId } : {}),
     ...(i.key349 ? { key349: i.key349 } : {}),
     ...Object.fromEntries(flags.map((f) => [f, true])),
+    // The collections of a cash-accounting invoice, for the 347 (an empty list: none yet).
+    ...(i.collections
+      ? { collections: i.collections.map((c) => ({ date: c.date, amount: c.amount })) }
+      : {}),
   };
 }
 

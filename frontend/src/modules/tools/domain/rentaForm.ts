@@ -2,16 +2,21 @@ import { parseDecimal } from '@shared/utils/numbers';
 import type {
   Ascendant,
   Child,
+  ChildIncome,
   DeductionChoice,
   Disability,
+  ExcessYear,
   Family,
   JointMember,
   RentaInput,
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
+import type { DisabilitySupport } from './rentaDisability';
+import type { WealthCheck } from './rentaHousing';
+import type { GeneralCapitalItem } from './rentaCapitalGeneral';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
-import type { ActivityInput } from './rentaActivity';
+import type { ActivityInput, FarmIndex, ModuleActivity } from './rentaActivity';
 import { farm2025 } from '../data/renta/agrario-2025';
 import { modules2025 } from '../data/renta/modulos-2025';
 import { round2 } from './round';
@@ -22,6 +27,10 @@ import { emptyProperty, fromLegacy, propertyResult, type PropertyForm } from './
 export interface ChildForm {
   age: string;
   disability: Disability;
+  /** Adopted or fostered and registered this year or in the two before (LIRPF art. 58.2). */
+  adopted?: boolean;
+  /** Their own income (art. 58.1): more than 8,000 €, or a return of theirs with more than 1,800 €. */
+  income?: ChildIncome;
 }
 
 export interface AscendantForm {
@@ -80,9 +89,25 @@ export interface Choice {
   advance?: string;
   /** Months with the right to a deduction by months (maternity), of all the children. */
   months?: string;
+  /** Children with the 150 € of maternity for the 30 days of social security after the birth. */
+  bonusUnits?: string;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
+  /** The wealth at the start and end of the year and the interest (the home before 2013). */
+  wealth?: { start: string; end: string; interest: string };
 }
+
+/** The wealth check of a choice, once both the start and the end are typed (else nothing). */
+export const wealthOf = (c: Choice): { wealth?: WealthCheck } =>
+  c.wealth && c.wealth.start.trim() !== '' && c.wealth.end.trim() !== ''
+    ? {
+        wealth: {
+          start: number(c.wealth.start),
+          end: number(c.wealth.end),
+          interest: number(c.wealth.interest),
+        },
+      }
+    : {};
 
 /** Everything the person types, as text, in the order of the steps. */
 export interface RentaForm {
@@ -110,12 +135,28 @@ export interface RentaForm {
   mobility: boolean;
   pension: string;
   pensionEmployer: string;
+  /** Own contributions to the employer's plan (art. 52.1.b.1.º) and its dependency premiums. */
+  pensionEmploymentOwn?: string;
+  dependencyPremiums?: string;
+  /** What did not fit in the five years before (art. 52.2): plans and dependency insurance. */
+  pensionExcess?: string;
+  dependencyExcess?: string;
+  /** The same by the year it comes from (the five years before): the oldest are used first. */
+  pensionExcessYears?: Record<string, { plans?: string; dependency?: string }>;
+  /** The person has a disability: contributions to their own plan of art. 53. */
+  disabledOwnPlan?: string;
+  /** To the plan of a relative with a disability: mine, what that person put in, the others'. */
+  relativePlan?: { mine?: string; theirs?: string; others?: string };
+  /** To the protected patrimony of a relative: mine, the others', the excess by year before. */
+  patrimony?: { mine?: string; others?: string; pending?: Record<string, string> };
   spousePlan: string;
   compensatory: string;
   /** Maintenance paid to the children by a court decision (they do not live with the person). */
   childSupport?: string;
   /** Pension plan collected as a lump sum, the part from contributions up to 2006 (DT 12.ª). */
   pensionCapital2006?: string;
+  /** Capital mobiliario of the general base (business leases, a loan to a related company…). */
+  generalCapital?: GeneralCapitalItem[];
   rentalOn: boolean;
   rentalIncome: string;
   /** Amount per deductible rental expense, by id. */
@@ -211,6 +252,8 @@ export function familyOf(form: RentaForm): Family {
   const children: Child[] = form.children.map((c) => ({
     age: number(c.age),
     disability: c.disability,
+    ...(c.adopted ? { adopted: true } : {}),
+    ...(c.income ? { income: c.income } : {}),
   }));
   const ascendants: Ascendant[] = form.ascendants.map((a) => ({ ...a }));
   return {
@@ -229,6 +272,8 @@ export interface RentaData {
   extras: RentaWorkExtras;
   property: RentaProperty;
   workReduction: (netIncome: number) => number;
+  /** The tables of the módulos of the year; missing: those of 2025, null: the year has none. */
+  activityTables?: { modules: ModuleActivity[]; farm: FarmIndex[] } | null;
 }
 
 /** Social security used when the person leaves it empty: a share of the pay. */
@@ -361,7 +406,9 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         units: c.units === '' ? Math.max(1, form.children.length) : number(c.units),
         advance: number(c.advance),
         ...(c.months !== undefined && c.months.trim() !== '' ? { months: number(c.months) } : {}),
+        ...(c.bonusUnits ? { bonusUnits: number(c.bonusUnits) } : {}),
         ...(c.checks ? { checks: c.checks } : {}),
+        ...wealthOf(c),
       },
     ])
   );
@@ -374,11 +421,59 @@ export function obligationIncome(form: RentaForm): { mainIncome: number; otherIn
   return { mainIncome: gross - others, otherIncome: others };
 }
 
+const tablesOf = (data: RentaData) =>
+  data.activityTables === undefined
+    ? { modules: modules2025, farm: farm2025 }
+    : (data.activityTables ?? { modules: [], farm: [] });
+
+/** The excess of the pension plans typed by year, those with an amount. */
+const excessYearsOf = (typed: NonNullable<RentaForm['pensionExcessYears']>): ExcessYear[] =>
+  Object.entries(typed)
+    .map(([year, x]) => ({
+      year: Number(year),
+      plans: number(x.plans),
+      dependency: number(x.dependency),
+    }))
+    .filter((x) => x.plans + x.dependency > 0);
+
+/** The plans and patrimony of a person with a disability (rentaDisability.ts), if any was typed. */
+export function disabilitySupportOf(form: RentaForm): DisabilitySupport | undefined {
+  const own = number(form.disabledOwnPlan);
+  const rel = form.relativePlan;
+  const pat = form.patrimony;
+  const support: DisabilitySupport = {
+    ...(own > 0 ? { ownPlan: own } : {}),
+    ...(rel && number(rel.mine) > 0
+      ? {
+          relativePlan: {
+            mine: number(rel.mine),
+            theirs: number(rel.theirs),
+            others: number(rel.others),
+          },
+        }
+      : {}),
+  };
+  const pending = Object.entries(pat?.pending ?? {})
+    .map(([year, amount]) => ({ year: Number(year), amount: number(amount) }))
+    .filter((x) => x.amount > 0);
+  if (pat && (number(pat.mine) > 0 || pending.length > 0))
+    support.patrimony = { mine: number(pat.mine), others: number(pat.others), pending };
+  return Object.keys(support).length > 0 ? support : undefined;
+}
+
+/** The excess of the plans of the years before: a total of no year, and by year once asked. */
+const excessOf = (form: RentaForm): NonNullable<RentaInput['pensionExcess']> => ({
+  plans: number(form.pensionExcess),
+  dependency: number(form.dependencyExcess),
+  ...(form.pensionExcessYears ? { byYear: excessYearsOf(form.pensionExcessYears) } : {}),
+});
+
 /** The calculation input for what is in the form. */
 export function toInput(form: RentaForm, data: RentaData): RentaInput {
   const rental = rentalOf(form, data.property, data.state.year);
   // The withholdings on the rent (box 0153) go with the rest to box 0609.
   const rentWithheld = rental?.items?.reduce((s, r) => s + r.withheld, 0) ?? 0;
+  const support = disabilitySupportOf(form);
   return {
     gross: number(form.gross),
     socialSecurity: socialSecurityOf(form),
@@ -389,18 +484,22 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     geographicMobility: form.mobility,
     pensionPlan: number(form.pension),
     pensionPlanEmployer: number(form.pensionEmployer),
+    pensionEmploymentOwn: number(form.pensionEmploymentOwn),
+    dependencyPremiums: number(form.dependencyPremiums),
+    pensionExcess: excessOf(form),
     spousePlan: number(form.spousePlan),
+    ...(support ? { disabilitySupport: support } : {}),
     compensatoryPension: number(form.compensatory),
     childSupport: number(form.childSupport),
     pensionCapital2006: number(form.pensionCapital2006),
     rental,
+    ...(form.generalCapital?.length ? { generalCapital: form.generalCapital } : {}),
     imputedValues: unrentedOf(form, data.state.year, rental),
     savings: number(form.savings),
     savingsDetail: form.savingsDetail,
-    // The tables of the módulos of 2025 (Orden HAC/1347/2024): the year of the return.
-    activities: form.activities?.length
-      ? { list: form.activities, modules: modules2025, farm: farm2025 }
-      : undefined,
+    // The tables of the módulos of the year of the return (2025: Orden HAC/1347/2024); a year without
+    // them gives none, and the result is not shown (rentaRules.ts, blockersOf).
+    activities: form.activities?.length ? { list: form.activities, ...tablesOf(data) } : undefined,
     family: familyOf(form),
     state: data.state,
     ccaa: data.ccaa,

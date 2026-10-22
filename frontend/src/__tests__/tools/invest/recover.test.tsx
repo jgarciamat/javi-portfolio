@@ -334,8 +334,11 @@ describe('the result, as Renta WEB shows the pay', () => {
     // A result saved before these lines existed, or with no pay: no lines.
     const old = { ...result } as Partial<typeof result>;
     delete old.workPay;
+    // Nor the excess of the pension plans for the next years.
+    delete old.pensionExcessNext;
     rerender(<ResultCard shown={{ ...shown, result: old as typeof result }} money={money} />);
     expect(screen.queryByText(tr('tools.renta.line.pay0003'))).toBeNull();
+    expect(screen.queryByText(tr('tools.renta.line.pensionExcessNext'))).toBeNull();
     rerender(
       <ResultCard shown={{ ...shown, result: { ...result, workGross: 0 } }} money={money} />
     );

@@ -1,0 +1,316 @@
+/* ─── Install guide (home screen of iPhone and iPad) ─────────────────────────
+   Large text and buttons: many of the people who follow it are older. Every colour is a theme
+   token, so the drawings follow the light and dark looks; "Contraste" thickens the edges. */
+.install-lead {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--slate-200);
+}
+
+.install-big-btn {
+  min-height: 48px;
+  padding: 0.7rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.install-card .install-big-btn {
+  width: auto;
+}
+
+.install-browsers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.install-browser {
+  flex: 1 1 9rem;
+  min-height: 48px;
+  border-radius: 10px;
+  border: 2px solid var(--slate-700);
+  background: var(--slate-800);
+  color: var(--slate-200);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.install-browser[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.install-browser:focus-visible,
+.install-close:focus-visible,
+.install-big-btn:focus-visible {
+  outline: 3px solid var(--accent-300);
+  outline-offset: 2px;
+}
+
+.install-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.install-step {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem;
+  border: 1px solid var(--slate-800);
+  border-radius: 12px;
+  background: var(--slate-950);
+}
+
+@media (max-width: 480px) {
+  .install-step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.install-step-number {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-400);
+}
+
+.install-step-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  color: var(--slate-100);
+}
+
+.install-step-body {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--slate-300);
+}
+
+.install-note {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--slate-300);
+}
+
+.install-note--done {
+  font-weight: 600;
+  color: var(--slate-100);
+}
+
+.install-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+/* The drawings. */
+.install-art {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.install-art-screen {
+  fill: var(--slate-900);
+  stroke: var(--slate-600);
+  stroke-width: 2;
+}
+
+.install-art-bar,
+.install-art-line {
+  fill: var(--slate-800);
+}
+
+.install-art-row {
+  fill: var(--slate-800);
+  stroke: var(--slate-700);
+}
+
+.install-art-text,
+.install-art-label {
+  fill: var(--slate-100);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 15px;
+}
+
+.install-art-text--row {
+  font-size: 13.5px;
+}
+
+.install-art-label {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.install-art-glyph {
+  fill: none;
+  stroke: var(--accent-400);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.install-art-dots {
+  fill: var(--accent-400);
+}
+
+.install-art-ring {
+  fill: none;
+  stroke: var(--amber-500);
+  stroke-width: 4;
+}
+
+.install-art-soft-ring {
+  fill: none;
+  stroke: var(--amber-500);
+  stroke-width: 3;
+  stroke-dasharray: 6 5;
+}
+
+.install-art-arrow {
+  stroke: var(--amber-500);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.install-art-button {
+  fill: var(--accent-600);
+}
+
+.install-art-button-text {
+  fill: #fff;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* The dialog (also on the public pages, which do not load the app's section styles). */
+.install-overlay {
+  position: fixed;
+  inset: 0;
+  /* Above the sticky headers of the app and of the public pages. */
+  z-index: 1150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.7);
+}
+
+.install-dialog {
+  width: 100%;
+  max-width: 640px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--slate-800);
+  background: var(--slate-900);
+  color: var(--slate-100);
+}
+
+.install-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.install-title {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+
+.install-close {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-800);
+  color: var(--slate-100);
+  cursor: pointer;
+}
+
+.install-dialog-foot {
+  margin-top: 1.25rem;
+}
+
+/* The notice: small, out of the way, above the content but under menus and dialogs. */
+.install-hint {
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 40;
+  width: min(380px, calc(100vw - 32px));
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid var(--slate-700);
+  background: var(--slate-900);
+  color: var(--slate-200);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.install-hint-title {
+  margin: 0 0 0.3rem;
+  font-size: 1.15rem;
+  color: var(--slate-100);
+}
+
+.install-hint-body {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.install-hint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.install-hint-actions .btn-primary {
+  width: auto;
+}
+
+html.wiz-contrast .install-hint,
+html.wiz-contrast .install-dialog,
+html.wiz-contrast .install-step {
+  border: 3px solid var(--slate-200);
+}
+
+html.wiz-contrast .install-art-screen {
+  stroke: var(--slate-200);
+  stroke-width: 3;
+}
+
+html.wiz-contrast .install-step-body,
+html.wiz-contrast .install-note,
+html.wiz-contrast .install-lead {
+  color: var(--slate-100);
+}

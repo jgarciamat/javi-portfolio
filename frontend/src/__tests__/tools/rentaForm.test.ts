@@ -127,4 +127,78 @@ describe('the months of a deduction', () => {
     expect(choicesOf(form(' ')).mat.months).toBeUndefined();
     expect(choicesOf(form()).mat.months).toBeUndefined();
   });
+
+  it('send the children with the 150 € of maternity only when typed', async () => {
+    const { choicesOf } = await import('@modules/tools/domain/rentaForm');
+    const form = (bonusUnits?: string) => ({
+      ...emptyForm(''),
+      choices: { mat: { on: true, amount: '', units: '1', bonusUnits } },
+    });
+    expect(choicesOf(form('2')).mat.bonusUnits).toBe(2);
+    expect(choicesOf(form('')).mat.bonusUnits).toBeUndefined();
+    expect(choicesOf(form()).mat.bonusUnits).toBeUndefined();
+  });
+});
+
+describe('an adopted child', () => {
+  it('reaches the engine only when marked', async () => {
+    const { familyOf } = await import('@modules/tools/domain/rentaForm');
+    const of = (adopted?: boolean) =>
+      familyOf({ ...emptyForm(''), children: [{ age: '5', disability: 0, adopted }] }).children[0];
+    expect(of(true)).toEqual({ age: 5, disability: 0, adopted: true });
+    expect(of(false)).toEqual({ age: 5, disability: 0 });
+    expect(of()).toEqual({ age: 5, disability: 0 });
+  });
+});
+
+describe('the plans and patrimony of a person with a disability', () => {
+  it('reaches the engine only with an amount', async () => {
+    const { disabilitySupportOf } = await import('@modules/tools/domain/rentaForm');
+    const of = (over: Partial<ReturnType<typeof emptyForm>>) =>
+      disabilitySupportOf({ ...emptyForm(''), ...over });
+    expect(of({})).toBeUndefined();
+    expect(of({ relativePlan: { mine: '' }, patrimony: { mine: '0' } })).toBeUndefined();
+    expect(of({ disabledOwnPlan: '1500' })).toEqual({ ownPlan: 1500 });
+    // Only an excess of a year before: this year's is 0.
+    expect(of({ patrimony: { pending: { '2023': '300', '2024': '' } } })).toEqual({
+      patrimony: { mine: 0, others: 0, pending: [{ year: 2023, amount: 300 }] },
+    });
+  });
+
+  it('takes the excess of the plans by year, those with an amount', async () => {
+    const { toInput } = await import('@modules/tools/domain/rentaForm');
+    const { rentaState } = await import('@modules/tools/data/renta/state');
+    const { rentaWorkExtras } = await import('@modules/tools/data/renta/estado-extra');
+    const input = toInput(
+      {
+        ...emptyForm(''),
+        pensionExcessYears: { '2022': { plans: '400' }, '2023': { dependency: '' } },
+      },
+      {
+        state: rentaState,
+        ccaa: { id: '', name: '', regime: 'common', deductions: [], source: '' },
+        extras: rentaWorkExtras,
+        property: rentaProperty,
+        workReduction: () => 0,
+      }
+    );
+    expect(input.pensionExcess?.byYear).toEqual([{ year: 2022, plans: 400, dependency: 0 }]);
+  });
+});
+
+describe('the wealth check of the home bought before 2013', () => {
+  it('reaches the engine only with the start and the end typed', async () => {
+    const { wealthOf } = await import('@modules/tools/domain/rentaForm');
+    const choice = (wealth?: { start: string; end: string; interest: string }) => ({
+      on: true,
+      amount: '9000',
+      units: '',
+      wealth,
+    });
+    expect(wealthOf(choice())).toEqual({});
+    expect(wealthOf(choice({ start: '60700', end: '', interest: '1000' }))).toEqual({});
+    expect(wealthOf(choice({ start: '60700', end: '66000', interest: '' }))).toEqual({
+      wealth: { start: 60700, end: 66000, interest: 0 },
+    });
+  });
 });

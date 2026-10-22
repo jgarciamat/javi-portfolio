@@ -1,4 +1,5 @@
 import { round2 } from './round';
+import type { ArtisticRule, CeutaActivityRule } from './rentaData';
 
 /**
  * Income from economic activities (rendimientos de actividades económicas) for the modelo 100 of
@@ -204,9 +205,9 @@ const homeOf = (h: DirectActivity['home']) =>
  * Net income in direct estimation (box 0224). Simplified: provisions and expenses hard to justify
  * are 5 % of the net income before them, up to 2,000 € (RIRPF art. 30.2.ª, 5 % kept in 2025 per
  * the AEAT Manual 2025, "Principales novedades"), and none when the reduction of art. 32.2.1.º is
- * used (`noFivePercent`).
+ * used (`noFivePercent`). `hardPercent`: the rate when it is not 5 % (DA 64.ª, Ceuta in 2026).
  */
-export function directNet(a: DirectActivity, noFivePercent = false): DirectResult {
+export function directNet(a: DirectActivity, noFivePercent = false, hardPercent = 5): DirectResult {
   const i = a.income;
   const income = round2(
     positive(i.sales) + positive(i.grants) + positive(i.ownUse) + finite(i.other)
@@ -237,7 +238,7 @@ export function directNet(a: DirectActivity, noFivePercent = false): DirectResul
       ? round2(positive(a.provisions))
       : noFivePercent
         ? 0
-        : round2(Math.min(2000, Math.max(0, difference) * 0.05));
+        : round2(Math.min(2000, Math.max(0, difference) * (hardPercent / 100)));
   return {
     income,
     expenses,
@@ -352,7 +353,11 @@ function corrected(reduced: number, a: ModulesActivity, excess: number | undefin
  * not used with the special ones of a.2 to a.5 nor with the excess one; the season one is not used
  * with the one for new activities.
  */
-export function modulesNet(a: ModulesActivity, table: ModuleActivity[]): ModulesResult {
+export function modulesNet(
+  a: ModulesActivity,
+  table: ModuleActivity[],
+  generalPercent = 5
+): ModulesResult {
   const act = table.find((t) => t.id === a.activityId);
   const mods = act?.modules ?? [];
   const previous = round2(sum(mods.map((m, i) => m.amount * positive(a.units[i]))));
@@ -366,7 +371,7 @@ export function modulesNet(a: ModulesActivity, table: ModuleActivity[]): Modules
   );
   const reduced = round2(previous - employment - investment);
   const modules = round2(corrected(reduced, a, act?.excess));
-  const general = modules > 0 ? round2(modules * 0.05) : 0;
+  const general = modules > 0 ? round2(modules * (generalPercent / 100)) : 0;
   return {
     previous,
     employment,
@@ -473,7 +478,7 @@ function farmCorrected(
  * product, in proportion to its base: the order does not say how to split the depreciation among
  * the products (NO CONFIRMADO with an official case when there is more than one product).
  */
-export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
+export function farmNet(a: FarmActivity, indices: FarmIndex[], generalPercent = 5): FarmResult {
   const bases = a.lines.map((l) => {
     const idx = indices.find((x) => x.id === l.indexId);
     const rate = (l.transformed ? idx?.transformed : undefined) ?? idx?.index ?? 0;
@@ -489,7 +494,7 @@ export function farmNet(a: FarmActivity, indices: FarmIndex[]): FarmResult {
   const reduced = round2(previous - dep);
   const value = farmCorrected(a, reduced, bases, forestry);
   const modules = round2(value);
-  const general = modules > 0 ? round2(modules * 0.05) : 0;
+  const general = modules > 0 ? round2(modules * (generalPercent / 100)) : 0;
   const young = a.young ? round2((modules - general) * 0.25) : 0;
   return {
     income,
@@ -514,6 +519,11 @@ export type ActivityInput = (
       newActivity: boolean;
       withheld: number;
       payments: number;
+      /**
+       * An artistic activity of DA 60.ª (IAE groups 851-869, agrupaciones 01-05 of section 3): the
+       * net income of the three years before, for the reduction of what passes 130 % of their average.
+       */
+      artistic?: { previous: number[] };
     }
   | { kind: 'modules'; name: string; data: ModulesActivity; withheld: number; payments: number }
   | { kind: 'agrarian'; name: string; data: FarmActivity; withheld: number; payments: number }
@@ -526,6 +536,8 @@ export type ActivityInput = (
       payments: number;
     }
 ) & {
+  /** Carried out in Ceuta, its income with the deduction of art. 68.4 (for DA 64.ª, in 2026). */
+  ceuta?: boolean;
   /**
    * The share (0-1) of the net income that is the taxpayer's: 0.5 in a farm of shared ownership
    * (Ley 35/2011, art. 5: the income is split in equal parts between the two owners). 1 if unset.
@@ -540,6 +552,11 @@ export interface ActivitiesResult {
   dependentReduction: number;
   smallIncomeReduction: number;
   startReduction: number;
+  /**
+   * Box 0237: the reduction for artistic activities (DA 60.ª.2), after the others ([0235] = [0231] −
+   * [0232] − [0233] − [0234] − [0237], Orden HAC/277/2026). A result saved before has none.
+   */
+  artisticReduction?: number;
   /** Box 0235. */
   directTotal: number;
   /** Box 1482 / 1484 and 1558 / 1560 (the 32.2.3.º reduction goes on the direct ones first). */
@@ -596,11 +613,33 @@ export interface ActivityContext {
   workReduction: number;
   disability: number;
   assistance: boolean;
+  /** The rule of the year for artistic activities (DA 60.ª); none: no reduction. */
+  artistic?: ArtisticRule | null;
+  /** The rates of the year for the activities in Ceuta (DA 64.ª); none: 5 % as everywhere. */
+  ceuta?: CeutaActivityRule;
+}
+
+/**
+ * DA 60.ª.2 LIRPF (BOE-A-2006-20764, checked 22-10-2026): 30 % of what the net income passes 130 % of
+ * the average of the three years before (a negative one as 0), on at most 150,000 €. Measured on the
+ * net of the activity, as the Manual 2025 does (c07, example: 390,000 − 162,500 = 227,500).
+ */
+export function artisticReduction(net: number, previous: number[], rule: ArtisticRule): number {
+  const average = [0, 1, 2].reduce((sum, i) => sum + Math.max(0, finite(previous[i] ?? 0)), 0) / 3;
+  const excess = Math.max(0, net - (average * rule.over) / 100);
+  return round2((Math.min(excess, rule.cap) * rule.percent) / 100);
 }
 
 /** The net income of each activity, by kind, and whether the single-client reduction applies. */
 const shareOf = (a: ActivityInput, net: number) =>
   a.share === undefined ? net : round2(net * Math.min(1, positive(a.share)));
+
+/** The rates of 5 % of everywhere (RIRPF art. 30 and DA 1.ª of the orders of módulos). */
+const FIVE: CeutaActivityRule = { hardPercent: 5, modulesPercent: 5 };
+
+/** DA 64.ª: an activity in Ceuta takes the rates of the year there (10 % in 2026). */
+const ratesOf = (a: ActivityInput, ctx: ActivityContext): CeutaActivityRule =>
+  (a.ceuta && ctx.ceuta) || FIVE;
 
 function netsOf(
   list: ActivityInput[],
@@ -609,23 +648,31 @@ function netsOf(
   indices: FarmIndex[]
 ) {
   const each: ActivitiesResult['each'] = [];
-  const totals = { direct: 0, modules: 0, agrarian: 0, start: 0 };
+  const totals = { direct: 0, modules: 0, agrarian: 0, start: 0, artistic: 0 };
   let dependent = false;
   for (const a of list) {
+    const rates = ratesOf(a, ctx);
     if (a.kind === 'direct') {
       const useDependent = a.dependent && !ctx.hasWork;
       dependent ||= useDependent;
-      const r = directNet(a.data, useDependent && a.data.method === 'simplified');
+      const noFive = useDependent && a.data.method === 'simplified';
+      const r = directNet(a.data, noFive, rates.hardPercent);
       const net = shareOf(a, r.net);
       totals.direct += net;
       if (a.newActivity && net > 0) totals.start += net;
+      if (a.artistic && ctx.artistic)
+        totals.artistic += artisticReduction(net, a.artistic.previous, ctx.artistic);
       each.push({ name: a.name, net, detail: r });
     } else if (a.kind === 'given') {
       const net = shareOf(a, round2(finite(a.data.net)));
       totals[a.data.area] += net;
       each.push({ name: a.name, net, detail: { net } });
     } else {
-      const r = a.kind === 'modules' ? modulesNet(a.data, table) : farmNet(a.data, indices);
+      const percent = rates.modulesPercent;
+      const r =
+        a.kind === 'modules'
+          ? modulesNet(a.data, table, percent)
+          : farmNet(a.data, indices, percent);
       const net = shareOf(a, r.net);
       totals[a.kind] += net;
       each.push({ name: a.name, net, detail: r });
@@ -655,7 +702,10 @@ export function activitiesOf(
   // Art. 32.3: 20 % of the positive net income, after the reductions of 32.2, up to 100,000 €.
   const startBase = Math.max(0, Math.min(start, direct) - dependentAmount - smallDirect);
   const startReduction = round2(Math.min(startBase, 100000) * 0.2);
-  const directTotal = round2(direct - dependentAmount - smallDirect - startReduction);
+  const afterOthers = direct - dependentAmount - smallDirect - startReduction;
+  // DA 60.ª.2: «con posterioridad ... a las reducciones previstas en los apartados 2 y 3 del artículo 32».
+  const artistic = round2(Math.min(totals.artistic, Math.max(0, afterOthers)));
+  const directTotal = round2(afterOthers - artistic);
   const modulesTotal = round2(modules - smallModules);
   const agrarianTotal = round2(agrarian - smallFarm);
   return {
@@ -663,6 +713,7 @@ export function activitiesOf(
     dependentReduction: dependentAmount,
     smallIncomeReduction: round2(small),
     startReduction,
+    artisticReduction: artistic,
     directTotal,
     modules: modulesTotal,
     agrarian: agrarianTotal,

@@ -1,6 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import type { RentaProperty } from '../../domain/rentaExtras';
-import { rentaState } from '../../data/renta/state';
+import { useRentaRules } from './RentaRulesContext';
 import { propertiesOf } from '../../domain/rentaForm';
 import { AddProperty, PropertyCard } from './PropertyCard';
 import { SavingsDetailSection } from './SavingsDetail';
@@ -18,6 +18,7 @@ export function RentalSection({
   toggle?: boolean;
 }) {
   const { t } = useI18n();
+  const { year } = useRentaRules();
   return (
     <>
       {toggle && (
@@ -33,14 +34,7 @@ export function RentalSection({
       {form.rentalOn && (
         <div className="renta-block">
           {propertiesOf(form).map((_, i) => (
-            <PropertyCard
-              key={i}
-              form={form}
-              set={set}
-              index={i}
-              property={rental}
-              year={rentaState.year}
-            />
+            <PropertyCard key={i} form={form} set={set} index={i} property={rental} year={year} />
           ))}
           <AddProperty form={form} set={set} />
           <p className="section-hint">{rental.rental.notes}</p>

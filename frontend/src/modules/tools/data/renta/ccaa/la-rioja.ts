@@ -3,6 +3,9 @@ import type { RentaCcaa } from '../../../domain/rentaData';
 const BASE =
   'https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025-deducciones-autonomicas/comunidad-autonoma-rioja';
 
+// The four donations hang from one page of the guide (checked on 22-10-2026).
+const MECENAZGO = `${BASE}/donaciones-irrevocables-puras-simples-materia-mecenazgo`;
+
 export const laRioja: RentaCcaa = {
   id: 'la-rioja',
   name: 'La Rioja',
@@ -319,7 +322,7 @@ export const laRioja: RentaCcaa = {
       limit: 500,
       requirements:
         'Límite de 500 € compartido con la deducción de bienes de interés cultural; el conjunto de mecenazgo no supera el 30 % de la cuota autonómica. Incompatible con el crédito fiscal de mecenazgo.',
-      url: `${BASE}/donaciones-promocion-estimulo-activs-fomento-mecenazgo.html`,
+      url: `${MECENAZGO}/donaciones-promocion-estimulo-activs-fomento-mecenazgo.html`,
     },
     {
       id: 'la-rioja-donaciones-bienes-interes-cultural',
@@ -332,7 +335,7 @@ export const laRioja: RentaCcaa = {
       limit: 500,
       requirements:
         'Bienes en La Rioja de la Administración regional o declarados de interés cultural. Límite de 500 € conjunto con la de fomento del mecenazgo. Incompatible con las deducciones de empresas culturales y de autores.',
-      url: `${BASE}/donaciones-invest-conserv-restaur-adq-rioja.html`,
+      url: `${MECENAZGO}/donaciones-invest-conserv-restaur-adq-rioja.html`,
     },
     {
       id: 'la-rioja-donaciones-empresas-culturales',
@@ -345,7 +348,7 @@ export const laRioja: RentaCcaa = {
       limit: 500,
       requirements:
         'Empresa con domicilio fiscal en La Rioja y fondos propios inferiores a 300.000 €. Incompatible con las deducciones de fomento del mecenazgo y de bienes de interés cultural.',
-      url: `${BASE}/donaciones-empresas-culturales.html`,
+      url: `${MECENAZGO}/donaciones-empresas-culturales.html`,
     },
     {
       id: 'la-rioja-donacion-bienes-culturales-autores',
@@ -358,7 +361,7 @@ export const laRioja: RentaCcaa = {
       limit: 500,
       requirements:
         'Bienes culturales de calidad garantizada aceptados por la Consejería de Cultura. Vale también usufructo o depósito temporal gratuito. Incompatible con las otras dos deducciones de mecenazgo cultural.',
-      url: `${BASE}/donacion-bienes-culturales-x-autores-herederos.html`,
+      url: `${MECENAZGO}/donacion-bienes-culturales-x-autores-herederos.html`,
     },
     {
       id: 'la-rioja-patrimonio-historico-titulares',

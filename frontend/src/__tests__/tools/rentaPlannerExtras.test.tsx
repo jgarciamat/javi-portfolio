@@ -40,6 +40,26 @@ describe('Renta planner: work, contributions and savings', () => {
     fill('tools.renta.spousePlan', '1000');
     fill('tools.renta.compensatory', '1200');
     expect(resultText()).not.toBe(afterMobility);
+    // The employer plan by the table of art. 52.1, dependency premiums and the excess of years before:
+    // what passes the 30 % is kept for the next five years.
+    expect(screen.queryByText(tr('tools.renta.line.pensionExcessNext'))).toBeNull();
+    fill('tools.renta.pensionEmploymentOwn', '300');
+    fill('tools.renta.dependencyPremiums', '200');
+    // The excess is asked year by year (2020 to 2024 for the return of 2025).
+    fireEvent.change(
+      screen.getByLabelText(tr('tools.renta.plans.excessDependency', { year: 2021 })),
+      {
+        target: { value: '100' },
+      }
+    );
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.plans.excessPlans', { year: 2024 })), {
+      target: { value: '20000' },
+    });
+    expect(screen.getByText(tr('tools.renta.line.pensionExcessNext'))).toBeInTheDocument();
+    // What is left of 2024 can be used until the return of 2029.
+    expect(
+      screen.getByText(new RegExp('de 2024, que puedes reducir hasta la declaración de 2029'))
+    ).toBeInTheDocument();
   });
 
   it('takes pensions out of the low-pay deduction and drops the disability expenses of a pensioner', async () => {
@@ -112,6 +132,8 @@ describe('Renta planner: property', () => {
     expect(screen.getByText(tr(p('reductionNone')))).toBeInTheDocument();
     for (const box of ['usufruct', 'irregular', 'relative'])
       fireEvent.click(screen.getByLabelText(tr(p(box))));
+    // A usufruct: how many years it lasts (empty: for life).
+    fill(p('field.usufructYears'), '10');
     fireEvent.click(screen.getAllByLabelText(tr('tools.renta.revised', { rate: 1.1 }))[0]);
     fill(p('field.label'), 'Piso centro');
     expect(screen.getByText(tr(p('legend'), { n: 1, label: 'Piso centro' }))).toBeInTheDocument();
@@ -123,6 +145,13 @@ describe('Renta planner: property', () => {
     fill(p('field.rentedDays'), '200');
     fill(p('field.cadastral'), '50000');
     expect(screen.getByText(tr(p('imputed'), { days: 165 }))).toBeInTheDocument();
+    // Let part of the year: with no date the repairs are prorated (and it says so); with a date, not.
+    expect(screen.getByText(tr(p('repairProrated'), { days: 200, full: 365 }))).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(tr(p('repairWhenOpt.mixed'))));
+    expect(screen.queryByText(tr(p('repairProrated'), { days: 200, full: 365 }))).toBeNull();
+    fill(p('field.repairsLet'), '300');
+    fireEvent.click(screen.getByLabelText(tr(p('repairWhenOpt.let'))));
+    expect(screen.queryByLabelText(tr(p('field.repairsLet')))).toBeNull();
     // A second property, then taken out again.
     fireEvent.click(screen.getByRole('button', { name: new RegExp(tr(p('add'))) }));
     expect(screen.getByText(tr(p('legend'), { n: 2, label: 'Inmueble 2' }))).toBeInTheDocument();

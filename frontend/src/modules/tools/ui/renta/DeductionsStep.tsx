@@ -9,12 +9,14 @@ import type {
   RentaState,
 } from '../../domain/rentaData';
 import type { Choice } from '../../domain/rentaForm';
-import { number } from '../../domain/rentaForm';
+import { number, wealthOf } from '../../domain/rentaForm';
+import { housingBaseOf } from '../../domain/rentaHousing';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 import { DONATION_IDS } from '../../domain/rentaDonations';
 import { Requirements } from './Requirements';
 import { checkDeduction } from '../../domain/rentaRequirements';
+import { HeldNote, useHeld } from './RentaRulesContext';
 
 const GROUPS: DeductionGroup[] = ['family', 'housing', 'health', 'education', 'donations', 'other'];
 export type Hint = 'inDraft' | 'missing';
@@ -42,6 +44,8 @@ function SavingLine({
 }) {
   const { t } = useI18n();
   const money = useMoney();
+  // The year misses figures for this return: no saving is given (the step says why, once).
+  if (useHeld()) return null;
   if (saving.blocked && !deduction.incomeLimit) {
     // Without an income limit, what leaves it out is a requirement (age, children, disability).
     return (
@@ -205,16 +209,81 @@ function MonthsInput({
   const { t } = useI18n();
   if (!deduction.monthly) return null;
   return (
-    <label className="tools-field">
-      <span>{t('tools.renta.months')}</span>
+    <>
+      <label className="tools-field">
+        <span>{t('tools.renta.months')}</span>
+        <input
+          className="tx-input"
+          inputMode="numeric"
+          value={choice.months ?? ''}
+          placeholder="12"
+          onChange={(e) => onChange({ ...choice, months: e.target.value })}
+        />
+      </label>
+      {deduction.startBonus !== undefined && (
+        <label className="tools-field">
+          <span>{t('tools.renta.startBonus')}</span>
+          <input
+            className="tx-input"
+            inputMode="numeric"
+            value={choice.bonusUnits ?? ''}
+            placeholder="0"
+            onChange={(e) => onChange({ ...choice, bonusUnits: e.target.value })}
+          />
+        </label>
+      )}
+    </>
+  );
+}
+
+/**
+ * The home bought before 2013: the wealth at the start and end of the year, which holds the base
+ * to its increase plus the interest (rentaHousing.ts). Optional: without it nothing is held.
+ */
+function WealthInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  if (!deduction.wealthCheck) return null;
+  const w = choice.wealth ?? { start: '', end: '', interest: '' };
+  const set = (part: keyof typeof w, value: string) =>
+    onChange({ ...choice, wealth: { ...w, [part]: value } });
+  const typed = wealthOf(choice).wealth;
+  const r = typed ? housingBaseOf(number(choice.amount), typed) : null;
+  const field = (part: keyof typeof w) => (
+    <label className="tools-field" key={part}>
+      <span>{t(`tools.renta.wealth.${part}`)}</span>
       <input
         className="tx-input"
-        inputMode="numeric"
-        value={choice.months ?? ''}
-        placeholder="12"
-        onChange={(e) => onChange({ ...choice, months: e.target.value })}
+        inputMode="decimal"
+        value={w[part]}
+        onChange={(e) => set(part, e.target.value)}
       />
     </label>
+  );
+  return (
+    <fieldset className="renta-wealth">
+      <legend>{t('tools.renta.wealth.title')}</legend>
+      <p className="section-hint">{t('tools.renta.wealth.hint')}</p>
+      {field('start')}
+      {field('end')}
+      {field('interest')}
+      {r && (
+        <p className="renta-gives" role="status">
+          {t('tools.renta.wealth.result', {
+            increase: money(r.increase),
+            base: money(r.base),
+          })}
+        </p>
+      )}
+    </fieldset>
   );
 }
 
@@ -312,6 +381,7 @@ function DeductionRow({
       on: choice.on,
       amount: number(choice.amount),
       units: choice.units === '' ? childCount || 1 : number(choice.units),
+      ...wealthOf(choice),
     },
     1
   );
@@ -350,6 +420,7 @@ function DeductionRow({
           />
           <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
           <MonthsInput deduction={deduction} choice={choice} onChange={onChange} />
+          <WealthInput deduction={deduction} choice={choice} onChange={onChange} />
           {!blocked && requirement === 'ok' && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>
@@ -500,12 +571,15 @@ export function DeductionsStep({
   const money = useMoney();
   const foral = ccaa?.regime === 'foral';
   const marked = Object.values(choices).some((c) => c.on);
+  const held = useHeld();
+  // Without the community's figures of the year there is no list to pick: the note says why.
+  const noRegion = useHeld(['regions']);
   return (
     <Step n={n} titleKey="tools.renta.step3">
       {lead}
       <p className="section-hint">{t('tools.renta.deductionsHint')}</p>
-      <p className="section-hint">{t('tools.renta.saving.hint')}</p>
-      {marked && (
+      {held ? <HeldNote /> : <p className="section-hint">{t('tools.renta.saving.hint')}</p>}
+      {marked && !held && (
         <p className="renta-saving-total" role="status">
           {t('tools.renta.saving.total')} <strong>{money(markedSaving)}</strong>
         </p>
@@ -537,7 +611,9 @@ export function DeductionsStep({
           onChange={onChange}
         />
       )}
-      {!ccaa && !loadError && <p className="section-hint">{t('tools.renta.pickCcaa')}</p>}
+      {!ccaa && !loadError && !noRegion && (
+        <p className="section-hint">{t('tools.renta.pickCcaa')}</p>
+      )}
     </Step>
   );
 }

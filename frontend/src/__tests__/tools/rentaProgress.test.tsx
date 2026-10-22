@@ -53,15 +53,26 @@ describe('saving the planner on the device', () => {
     expect(loadProgress()?.review).toEqual(NO_REVIEW);
   });
 
-  it('ignores what is broken, of another version or without a year', () => {
+  it('ignores what is broken, of another version or with a year that is not a number', () => {
     localStorage.setItem(PROGRESS_KEY, '{not json');
     expect(loadProgress()).toBeNull();
     raw('text');
     expect(loadProgress()).toBeNull();
     raw({ version: 0, year: 2025, form: {} });
     expect(loadProgress()).toBeNull();
-    raw({ version: PROGRESS_VERSION, form: {} });
+    raw({ version: PROGRESS_VERSION, year: '2024', form: {} });
     expect(loadProgress()).toBeNull();
+  });
+
+  it('a Renta saved before the years had their own rules is the one of 2025', () => {
+    raw({ version: PROGRESS_VERSION, form: { gross: '21000', ccaaId: 'madrid' } });
+    const saved = loadProgress();
+    expect(saved?.year).toBe(2025);
+    expect(saved?.form.gross).toBe('21000');
+    expect(saved?.form.ccaaId).toBe('madrid');
+    // A year saved since then is kept.
+    raw({ version: PROGRESS_VERSION, year: 2024, form: {} });
+    expect(loadProgress()?.year).toBe(2024);
   });
 
   it('keeps the readable fields of an old or broken form and empties the rest', () => {

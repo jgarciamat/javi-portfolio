@@ -1,7 +1,7 @@
 import type { Guide } from './guides';
 
 const CHECK =
-  'Las cifras de esta guía son orientativas y corresponden a las reglas vigentes en 2026 según la información pública de la Agencia Tributaria y la Seguridad Social. Pueden cambiar o tener excepciones según tu caso, así que contrástalas siempre en la sede de la AEAT o con tu gestor antes de presentar nada.';
+  'Las cifras de esta guía son orientativas y corresponden a las reglas vigentes en 2026 según la información pública de la Agencia Tributaria y la Seguridad Social. Pueden cambiar o tener excepciones según tu caso, así que contrástalas siempre en la sede de la AEAT o con un profesional antes de presentar nada.';
 
 const FIX_CHECK =
   'Esta guía es orientativa: resume las reglas de la Agencia Tributaria vigentes en octubre de 2026 y no sustituye el consejo de un profesional. Cada caso puede tener matices; si dudas, consulta con un profesional o con la propia Agencia Tributaria antes de presentar nada.';
@@ -162,7 +162,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         heading: '¿Qué es el modelo 130 y quién lo presenta?',
         paragraphs: [
           'El modelo 130 es el pago fraccionado del IRPF para empresarios y profesionales que tributan en estimación directa, ya sea normal o simplificada. Los que están en estimación objetiva (módulos) usan en su lugar el modelo 131.',
-          'Hay una excepción importante: no tienes que presentarlo si, en el año anterior, al menos el 70 % de tus ingresos de la actividad llevó retención o ingreso a cuenta. Es lo habitual en profesionales que facturan sobre todo a empresas con retención del 7 % o del 15 %. Si no estás seguro, comprueba tus facturas del último año y consulta con tu gestor.',
+          'Hay una excepción importante: no tienes que presentarlo si, en el año anterior, al menos el 70 % de tus ingresos de la actividad llevó retención o ingreso a cuenta. Es lo habitual en profesionales que facturan sobre todo a empresas con retención del 7 % o del 15 %. Si no estás seguro, comprueba tus facturas del último año y consulta con un profesional o con la Agencia Tributaria.',
           'El modelo se presenta aunque no hayas ganado dinero en el trimestre; en ese caso el resultado simplemente será cero o negativo.',
         ],
       },
@@ -177,7 +177,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
       {
         heading: '¿Qué gastos puedo restar?',
         paragraphs: [
-          'Solo los gastos deducibles de tu actividad: la cuota de autónomos, el alquiler del local, el material, la gestoría, el software, la publicidad o la parte que corresponda de los suministros. Si quieres el detalle, lo tienes en la guía de [gastos deducibles de un autónomo](/guias/gastos-deducibles-autonomo).',
+          'Solo los gastos deducibles de tu actividad: la cuota de autónomos, el alquiler del local, el material, la asesoría, el software, la publicidad o la parte que corresponda de los suministros. Si quieres el detalle, lo tienes en la guía de [gastos deducibles de un autónomo](/guias/gastos-deducibles-autonomo).',
           'En estimación directa simplificada puedes añadir además los gastos de difícil justificación: un 5 % del rendimiento neto, con un máximo de 2.000 € al año. Es una forma de cubrir pequeños gastos que no puedes acreditar con factura, y se aplica de forma automática en el cálculo.',
         ],
       },
@@ -328,7 +328,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
       {
         heading: '¿Qué otros gastos son deducibles al cien por cien?',
         paragraphs: [
-          'La cuota de autónomos, el alquiler del local, los sueldos y la Seguridad Social de los empleados, la formación relacionada con tu actividad, la gestoría, el software y las suscripciones profesionales, la publicidad y el material de trabajo. Todos ellos exigen factura y relación directa con tu negocio.',
+          'La cuota de autónomos, el alquiler del local, los sueldos y la Seguridad Social de los empleados, la formación relacionada con tu actividad, la asesoría, el software y las suscripciones profesionales, la publicidad y el material de trabajo. Todos ellos exigen factura y relación directa con tu negocio.',
           'Hay además los gastos de difícil justificación de la estimación simplificada: un 5 % del rendimiento neto con un máximo de 2.000 € anuales.',
         ],
       },
@@ -343,7 +343,7 @@ export const GUIDES_AUTONOMOS: Guide[] = [
         heading: '¿Qué errores son más frecuentes?',
         paragraphs: [
           'Deducir al cien por cien el móvil, internet o el coche sin una proporción razonable, no guardar las facturas o mezclar gastos personales y profesionales en la misma cuenta. Lo más sencillo es separar una cuenta para la actividad y pagar desde ella todo lo deducible.',
-          'Ante una duda, es mejor no deducir ese gasto o consultarlo antes con tu gestor: una deducción rechazada supone pagar la diferencia más recargos.',
+          'Ante una duda, es mejor no deducir ese gasto o consultarlo antes con un profesional: una deducción rechazada supone pagar la diferencia más recargos.',
         ],
       },
       {

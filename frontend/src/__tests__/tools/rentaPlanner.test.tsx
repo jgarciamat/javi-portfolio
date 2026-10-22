@@ -83,6 +83,16 @@ describe('Renta planner: the steps', () => {
       target: { value: '33' },
     });
     fireEvent.click(screen.getByLabelText(tr('tools.renta.shared')));
+    // An adopted child: the increase of the under-3 at any age (art. 58.2).
+    const adopted = screen.getByLabelText(tr('tools.renta.childAdopted', { n: 2 }));
+    fireEvent.click(adopted);
+    expect(adopted).toBeChecked();
+    // A child with income of their own (art. 58.1): the hint says what it does to the minimum.
+    const income = screen.getByLabelText(tr('tools.renta.childIncome', { n: 2 }));
+    fireEvent.change(income, { target: { value: 'over8000' } });
+    expect(screen.getByText(tr('tools.renta.childIncomeHint.over8000'))).toBeInTheDocument();
+    fireEvent.change(income, { target: { value: '' } });
+    expect(screen.getAllByText(tr('tools.renta.childIncomeHint.none'))).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.removeChild', { n: 2 }) }));
     expect(screen.queryByLabelText(tr('tools.renta.childAge', { n: 2 }))).toBeNull();
 
@@ -327,7 +337,8 @@ describe('Renta planner: free calculations', () => {
       'li'
     ) as HTMLElement;
     fireEvent.click(within(home).getByRole('checkbox'));
-    fireEvent.change(within(home).getByRole('textbox'), { target: { value: '10000' } });
+    // The first field is what was paid; the wealth check below it is optional.
+    fireEvent.change(within(home).getAllByRole('textbox')[0], { target: { value: '10000' } });
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     // 7.5 % + 7.5 % of 9,040 (DT 18.ª LIRPF): 678 € in each quota.
     for (const part of ['state', 'regional']) {

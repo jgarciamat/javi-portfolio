@@ -1,0 +1,2062 @@
+/* ─── Consola crypto ─────────────────────────────────────────────────────────
+   A compact trading desk for learning: small labels over clear numbers, rows of small buttons
+   and segmented controls instead of native selects, and every colour taken from the theme tokens
+   so light, dark and the wizard's contrast mode all work. Quiet type: light greys (never pure
+   white) in three steps (strong, text, faint), weights 400–500 for words and 600 only for key
+   figures and small titles, small labels in discreet capitals and figures in the system's
+   monospaced digits (no web fonts). Text is never smaller than 0.75rem (12 px). Controls are
+   compact with a mouse and at least 32 px tall on phones and touch screens. */
+
+.cc {
+  --cc-radius: 10px;
+  --cc-gap: 0.75rem;
+  --cc-surface: var(--slate-900);
+  --cc-raised: var(--slate-800);
+  --cc-line: var(--slate-700);
+  --cc-soft: color-mix(in srgb, var(--accent-600) 12%, var(--slate-900));
+  /* The dark field of every box to type in. */
+  --cc-field: var(--slate-950);
+  /* Text: strong (selected, key figures, titles), normal, secondary and faint (pairs, notes). */
+  --cc-strong: var(--slate-200);
+  --cc-text: color-mix(in srgb, var(--slate-200) 72%, var(--slate-400));
+  --cc-text-2: var(--slate-400);
+  --cc-text-3: var(--slate-500);
+  --cc-num:
+    ui-monospace, 'SF Mono', SFMono-Regular, 'JetBrains Mono', 'Cascadia Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+  /* Results: green gains, red losses, neutral zero. */
+  --pnl-pos: var(--green-400);
+  --pnl-neg: var(--red-400);
+  --pnl-zero: var(--cc-text-2);
+  gap: var(--cc-gap);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--cc-text);
+}
+
+.cc .card {
+  margin: 0;
+  border-radius: var(--cc-radius);
+  border-color: var(--cc-line);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 8px 24px -16px rgb(0 0 0 / 0.35);
+  padding: 0.85rem 1rem;
+}
+
+.cc .section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--cc-strong);
+  margin-bottom: 0.25rem;
+}
+
+.cc h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--cc-strong);
+}
+
+.cc b,
+.cc strong {
+  font-weight: 600;
+}
+
+/* ─── Results ───
+   One rule for every gain or loss of the console: green with «▲» above zero, red with «▼» below
+   it, neutral at zero. The sign (+ / −) and the arrow say it; the colour only backs them up. The
+   dark-theme tokens are light and the light-theme ones dark (≥ 4.5:1); the contrast mode takes
+   the strongest of each. The arrow is not read aloud (the sign already is). `.cc` makes it win
+   over the colour of the place where the figure sits. */
+.cc .pnl-pos {
+  color: var(--pnl-pos);
+}
+
+.cc .pnl-neg {
+  color: var(--pnl-neg);
+}
+
+.cc .pnl-zero {
+  color: var(--pnl-zero);
+}
+
+.pnl-pos::before,
+.pnl-neg::before {
+  display: inline-block;
+  margin-right: 0.3em;
+  font-size: 0.75em;
+  font-family: system-ui, sans-serif;
+  vertical-align: 0.05em;
+}
+
+.pnl-pos::before {
+  content: '▲';
+  content: '▲' / '';
+}
+
+.pnl-neg::before {
+  content: '▼';
+  content: '▼' / '';
+}
+
+/* Small labels: discreet capitals in the secondary grey. */
+.cc-label,
+.cc-stats dt,
+.cc-strips dt,
+.cc-figures dt,
+.cc-facts dt,
+.cc-check dt,
+.cc-order-asset dt,
+.cc .cc-coins-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-text-2);
+}
+
+.cc-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  padding: 0;
+}
+
+.cc-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text-2);
+  line-height: 1.45;
+}
+
+/* Figures: monospaced digits of the system, all the same width. */
+.cc-num,
+.cc-stats dd,
+.cc-strips dd,
+.cc-figures dd,
+.cc-facts dd,
+.cc-check dd,
+.cc-order-asset dd,
+.cc-coin-price,
+.cc-quote-price,
+.cc-table,
+.cc-chart-readout,
+.cc-chart-pill,
+.cc-coins-pager,
+.cc-unit-input input,
+.cc-auto {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Fields ───
+   One look for every box to type in (capital, prices, alias, alerts, the glossary search): the
+   dark field of the theme, a subtle border, the same radius and a visible focus ring, also when
+   the browser fills it in. :where() keeps it easy to adjust a field's size. */
+.cc :where(input:not([type='radio'], [type='checkbox'], [type='range']), select, textarea),
+.cc-unit-input {
+  min-height: 40px;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background-color: var(--cc-field);
+  color: var(--cc-strong);
+  font: inherit;
+  font-size: 0.9375rem;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.cc :where(input:not([type='radio'], [type='checkbox'], [type='range']), textarea) {
+  padding: 0 0.75rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.cc :where(select) {
+  padding-left: 0.75rem;
+}
+
+.cc :where(input, select, textarea)::placeholder {
+  color: var(--cc-text-3);
+  opacity: 1;
+}
+
+.cc :where(input:not([type='radio'], [type='checkbox']), select, textarea):hover,
+.cc-unit-input:hover {
+  border-color: var(--slate-600);
+}
+
+.cc :where(input:not([type='radio'], [type='checkbox']), select, textarea):focus-visible,
+.cc-unit-input:focus-within {
+  outline: 2px solid transparent;
+  border-color: var(--accent-400);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-400) 40%, transparent);
+}
+
+.cc :where(input):-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--cc-field) inset;
+  box-shadow: 0 0 0 1000px var(--cc-field) inset;
+  -webkit-text-fill-color: var(--cc-strong);
+  caret-color: var(--cc-strong);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.cc :where(input):autofill {
+  box-shadow: 0 0 0 1000px var(--cc-field) inset;
+  -webkit-text-fill-color: var(--cc-strong);
+}
+
+.cc :where(input:disabled, select:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Notices ─── */
+
+.cc-risk {
+  display: grid;
+  gap: 0.25rem;
+  border: 2px solid var(--amber-500);
+  border-radius: var(--cc-radius);
+  background: color-mix(in srgb, var(--amber-500) 10%, var(--cc-surface));
+  padding: 0.55rem 0.85rem;
+  color: var(--cc-text);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.cc-risk strong {
+  color: var(--amber-400);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cc-risk p {
+  margin: 0;
+}
+
+.cc-data {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text-2);
+  line-height: 1.5;
+}
+
+.cc-data:empty {
+  display: none;
+}
+
+.cc-data--warn {
+  color: var(--amber-400);
+}
+
+.cc-reminder {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--amber-400);
+}
+
+.cc-help {
+  display: inline;
+}
+
+.cc-help-toggle {
+  font-size: 0.8125rem;
+  min-height: 32px;
+}
+
+.cc-help-text {
+  display: block;
+  margin: 0.2rem 0 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--accent-400);
+  background: var(--cc-raised);
+  border-radius: 6px;
+  color: var(--cc-text);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.cc-help-text[hidden] {
+  display: none;
+}
+
+.cc-helps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.cc-helps .cc-help-text {
+  flex-basis: 100%;
+}
+
+/* ─── Chips and segmented controls ─── */
+
+.cc-chip,
+.cc-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 32px;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 999px;
+  background: var(--cc-raised);
+  color: var(--cc-text);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.cc-tool {
+  border-radius: 8px;
+}
+
+.cc-tool--strong {
+  border-color: var(--accent-400);
+  color: var(--accent-300);
+}
+
+.cc-chip:hover,
+.cc-tool:hover:not(:disabled) {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-600) 18%, var(--cc-raised));
+}
+
+.cc-chip:active,
+.cc-tool:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.cc-chip[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.cc-tool:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cc button:focus-visible,
+.cc input:is([type='radio'], [type='checkbox']):focus-visible,
+.cc a:focus-visible,
+.cc summary:focus-visible,
+.cc-segmented label:focus-within {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.cc-segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background: var(--cc-raised);
+  min-width: 0;
+}
+
+.cc-segmented legend.cc-label {
+  float: left;
+  width: 100%;
+  margin: 0 0 0.3rem;
+}
+
+.cc-segmented label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  min-width: 2.5rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  color: var(--cc-text-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.cc-segmented label:hover {
+  background: color-mix(in srgb, var(--accent-600) 16%, transparent);
+}
+
+.cc-segmented label.is-on {
+  background: var(--accent-600);
+  color: #fff;
+  box-shadow: 0 2px 6px -2px rgb(0 0 0 / 0.4);
+  font-weight: 600;
+}
+
+.cc-segmented input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cc-segmented[disabled] label {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cc-segmented--wide {
+  display: flex;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.cc-segmented--wide label {
+  flex: 1 1 0;
+  min-height: 40px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-raised);
+  font-size: 0.9375rem;
+}
+
+.cc-direction label.is-on.cc-long {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.cc-direction label.is-on.cc-short {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* «▲ Long» and «▼ Short» badges: words and arrow first, colour as a support. */
+.cc-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+.cc-dir--long {
+  color: var(--green-400);
+  background: color-mix(in srgb, var(--green-500) 12%, transparent);
+}
+
+.cc-dir--short {
+  color: var(--red-400);
+  background: color-mix(in srgb, var(--red-500) 12%, transparent);
+}
+
+/* «#1» / «#2» beside the coin: the number of the operation, as on its chart lines (solid for
+   the first, dashed and lighter for the second). */
+.cc-slot {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.4rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue-300);
+  border: 1px solid var(--blue-400);
+}
+
+.cc-slot--even {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--blue-400) 12%, transparent);
+}
+
+/* Below the open button: which number the new one takes, or why the button is off. */
+.cc-slot-note {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text-2);
+  line-height: 1.45;
+}
+
+.cc-slot-note:empty {
+  display: none;
+}
+
+.cc-slot-note.is-full {
+  color: var(--amber-400);
+  font-weight: 600;
+}
+
+/* ─── Market ─── */
+
+/* Coins at the side of the price and the chart; the panel of the guide below, full width. The
+   coin column takes no height of its own (contain: size): it is as tall as the price and the
+   chart, and shows as many whole rows as fit in that height, in pages. */
+.cc-market-grid {
+  display: grid;
+  grid-template-columns: minmax(13.5rem, 15rem) minmax(0, 1fr);
+  grid-template-areas:
+    'coins top'
+    'coins chart'
+    'below below';
+  gap: 0.6rem 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.cc-market > .section-title {
+  font-size: 0.875rem;
+  color: var(--cc-text-2);
+  margin: 0;
+}
+
+.cc-market-top {
+  grid-area: top;
+  min-width: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-market-chart {
+  grid-area: chart;
+  min-width: 0;
+}
+
+.cc-market-below {
+  grid-area: below;
+  min-width: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-coins {
+  grid-area: coins;
+  contain: size;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--cc-line);
+  border-radius: var(--cc-radius);
+  background: color-mix(in srgb, var(--cc-raised) 45%, transparent);
+  overflow: hidden;
+}
+
+.cc .cc-coins-title {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--cc-line);
+}
+
+.cc-coins-list {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* A coin: the name in a light, thin grey, the pair fainter. The chosen one stands out: a lighter
+   background, the name in the strong grey and an accent bar at its left; the rest stay quiet. */
+.cc-coin {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.35rem 0.55rem 0.35rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cc-text-2);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.cc-coin:hover {
+  background: color-mix(in srgb, var(--cc-raised) 60%, transparent);
+  color: var(--cc-text);
+}
+
+.cc-coin[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--slate-700) 55%, var(--cc-raised));
+  border-color: color-mix(in srgb, var(--accent-400) 45%, transparent);
+  color: var(--cc-strong);
+}
+
+.cc-coin[aria-pressed='true']::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent-400);
+}
+
+.cc-coin[aria-pressed='true'] .cc-coin-name b {
+  font-weight: 500;
+}
+
+.cc-coin-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  flex: 0 0 auto;
+}
+
+.cc-coin-name,
+.cc-coin-price {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cc-coin-name b {
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cc-coin small,
+.cc-quote-name small {
+  color: var(--cc-text-3);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.cc-coin-price {
+  text-align: right;
+  font-size: 0.75rem;
+}
+
+.cc-coin-price b {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cc-text);
+}
+
+.cc-coin[aria-pressed='true'] .cc-coin-price b {
+  color: var(--cc-strong);
+}
+
+/* «Ant.» 1 / 3 «Sig.»: small, at the foot of the column. */
+.cc-coins-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  border-top: 1px solid var(--cc-line);
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+}
+
+.cc-coins-pager button {
+  min-height: 26px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 6px;
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cc-coins-pager button:hover:not(:disabled) {
+  border-color: var(--accent-400);
+}
+
+.cc-coins-pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Price on the left, candle sizes and currency on the right, on one row while it fits. */
+.cc-market-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.cc-market-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cc-quote-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.55rem;
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.cc-quote-main .cc-coin-icon {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.6875rem;
+}
+
+.cc-quote-main p {
+  margin: 0;
+}
+
+.cc-quote-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cc-strong);
+}
+
+.cc-quote-line {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.85rem;
+}
+
+.cc-quote-price {
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--cc-strong);
+}
+
+.cc-quote-changes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--cc-text-2);
+}
+
+.cc-close b {
+  font-weight: 500;
+  color: var(--cc-strong);
+}
+
+/* The figures of the day: one row of small cells that wraps only when it must. */
+.cc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background: var(--cc-line);
+  gap: 1px;
+  overflow: hidden;
+}
+
+.cc-stats > div {
+  flex: 1 1 7.5rem;
+  min-width: 0;
+  padding: 0.25rem 0.55rem;
+  background: var(--cc-raised);
+}
+
+.cc-strips,
+.cc-figures,
+.cc-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.cc-strips > div,
+.cc-figures > div {
+  background: var(--cc-raised);
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  min-width: 0;
+}
+
+.cc-stats dd,
+.cc-strips dd,
+.cc-figures dd,
+.cc-facts dd,
+.cc-check dd,
+.cc-order-asset dd {
+  margin: 0.15rem 0 0;
+  font-weight: 500;
+  color: var(--cc-strong);
+  overflow-wrap: anywhere;
+}
+
+.cc-strips dd,
+.cc-figures dd {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.cc-stats dd {
+  font-size: 0.875rem;
+}
+
+/* ─── Layers ─── */
+
+/* Small chips in one bar just above the chart that wraps: a colour mark and the short name in
+   small capitals. On, the chip takes the layer's colour as border and tint (and shows its value
+   when it has a single one); off, it is quieter but still readable. «Learn before playing» is the
+   wide bar just below them. */
+.cc-layers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cc-layer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 24px;
+  padding: 0 0.5rem 0 0.4rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 6px;
+  background: var(--cc-surface);
+  color: var(--cc-text-2);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.cc-layer i {
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--cc-layer);
+  opacity: 0.7;
+}
+
+.cc-layer small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-layer:hover {
+  border-color: var(--cc-layer);
+}
+
+.cc-layer[aria-pressed='true'] {
+  border-color: var(--cc-layer);
+  background: color-mix(in srgb, var(--cc-layer) 18%, var(--cc-surface));
+  box-shadow: inset 0 0 0 1px var(--cc-layer);
+  color: var(--cc-strong);
+  font-weight: 600;
+}
+
+.cc-layer[aria-pressed='true'] i {
+  opacity: 1;
+}
+
+/* «Learn before playing»: a bar as wide as the chart, just below the layer chips, with the book,
+   the words and an arrow. Until it is opened for the first time it glows softly (one slow pulse
+   every two seconds); without motion it keeps a brighter border instead. */
+.cc-learn-open {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent-400) 70%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent-600) 26%, var(--cc-surface)),
+    color-mix(in srgb, var(--accent-600) 10%, var(--cc-surface))
+  );
+  color: var(--accent-200);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.cc-learn-open .cc-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.cc-learn-open span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cc-learn-open .cc-learn-arrow {
+  transition: transform 0.2s;
+}
+
+.cc-learn-open[aria-expanded='true'] .cc-learn-arrow {
+  transform: rotate(90deg);
+}
+
+.cc-learn-open:hover {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-600) 30%, var(--cc-surface));
+}
+
+.cc-learn-open[aria-expanded='true'] {
+  border-color: var(--accent-400);
+}
+
+.cc-learn-open.is-new {
+  border-color: var(--accent-400);
+  animation: cc-learn-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cc-learn-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-400) 0%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--accent-400) 35%, transparent),
+      0 0 18px 2px color-mix(in srgb, var(--accent-400) 30%, transparent);
+  }
+}
+
+/* «Learn all the key words»: opens the guide on its words. */
+.cc-glossary-open {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--accent-400);
+  border-radius: 999px;
+  background: var(--cc-soft);
+  color: var(--accent-300);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cc-glossary-open:hover {
+  background: color-mix(in srgb, var(--accent-600) 24%, var(--cc-surface));
+}
+
+.cc-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+/* ─── Order box ─── */
+
+.cc-order {
+  border-top: 4px solid var(--accent-400) !important;
+}
+
+.cc-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.cc-order-asset {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  text-align: right;
+}
+
+.cc-order-asset dd {
+  font-size: 0.9375rem;
+}
+
+.cc-order-asset small {
+  color: var(--cc-text-2);
+  font-weight: 400;
+}
+
+.cc-strips {
+  margin-bottom: 0.6rem;
+}
+
+.cc-order-controls,
+.cc-order-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.6rem 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.cc-exits {
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--cc-line);
+}
+
+.cc-field {
+  min-width: 0;
+}
+
+/* A field with its unit (€ or $) at the end: the frame is the field, the input inside is bare. */
+.cc-unit-input {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.cc .cc-unit-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 38px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--cc-strong);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0 0.75rem;
+}
+
+.cc .cc-unit-input input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.cc-unit-input span {
+  padding: 0 0.75rem;
+  color: var(--cc-text-3);
+  font-weight: 500;
+}
+
+.cc-auto {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 0.7rem;
+  border: 1px dashed var(--cc-line);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--cc-strong);
+}
+
+.cc-auto small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--cc-soft);
+  color: var(--accent-300);
+}
+
+.cc-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.cc-positions {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.cc-positions label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 36px;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cc-positions label.is-on {
+  border-color: var(--accent-400);
+  background: var(--cc-soft);
+}
+
+.cc-positions input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent-600);
+}
+
+.cc-check {
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  background: var(--cc-raised);
+  margin: 0.5rem 0 0.75rem;
+}
+
+.cc-check h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.875rem;
+  color: var(--cc-strong);
+  font-weight: 600;
+}
+
+.cc-check ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.cc-check li {
+  padding-left: 1.3rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.cc-check li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+
+.cc-check-bad {
+  color: var(--amber-400);
+}
+
+.cc-check-bad::before {
+  content: '!';
+}
+
+.cc-check-good {
+  color: var(--green-400);
+}
+
+.cc-check-good::before {
+  content: '✓';
+}
+
+.cc-check dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.35rem 0.85rem;
+  margin: 0.5rem 0 0;
+}
+
+.cc-submit {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5);
+}
+
+.cc-submit--long {
+  background: #15803d;
+}
+
+.cc-submit--long:hover:not(:disabled) {
+  background: #166534;
+}
+
+.cc-submit--short {
+  background: #b91c1c;
+}
+
+.cc-submit--short:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.cc-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Panels of operations ─── */
+
+.cc-total {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.2rem 0 0.6rem;
+  line-height: 1.35;
+}
+
+.cc-trades {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ─── One row per operation ───
+   Column headers once over the list; each row is a grid (a table row for the eye, a list item
+   for a screen reader). Narrow panels (container query: the panel, not the window) stack the
+   cells in two or three short lines and show each cell's own label instead of the headers. */
+.cc-table {
+  container-type: inline-size;
+  margin-top: 0.5rem;
+}
+
+.cc-trade {
+  display: grid;
+  grid-template-columns: var(--cc-cols);
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  background: var(--cc-raised);
+  font-size: 0.8125rem;
+}
+
+.cc-trade-cols {
+  display: grid;
+  grid-template-columns: var(--cc-cols);
+  gap: 0 0.85rem;
+  /* Same inset as a row: its border (1px + 5px on the side) and its padding. */
+  padding: 0 calc(0.8rem + 1px) 0.15rem calc(0.8rem + 6px);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-text-2);
+}
+
+/* Open and pending: six columns; closed: five (no buttons). */
+.cc-trade,
+.cc-trade-cols {
+  --cc-cols: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1.2fr) minmax(0, 1.6fr)
+    14rem;
+}
+
+.cc-trade--closed,
+.cc-trade-cols--closed {
+  --cc-cols: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1.2fr) minmax(0, 1.6fr);
+}
+
+.cc-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  color: var(--cc-text);
+}
+
+.cc-cell:not(.cc-cell--actions) > :not(.cc-cell-label) {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Read aloud always; shown only where there are no column headers. */
+.cc-cell-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cc-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  color: var(--cc-strong);
+  font-size: 0.875rem;
+}
+
+.cc-sub,
+.cc-mini small,
+.cc-exit small {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--cc-text-2);
+}
+
+.cc-sub {
+  white-space: nowrap;
+}
+
+.cc-cell--end > .cc-sub,
+.cc-cell--who > .cc-sub {
+  white-space: normal;
+}
+
+.cc-sub .pnl-pos {
+  color: var(--pnl-pos);
+}
+
+.cc-sub .pnl-neg {
+  color: var(--pnl-neg);
+}
+
+/* Only the headline carries the arrow: the small figures keep the colour and the sign. */
+.cc-sub .pnl-pos::before,
+.cc-sub .pnl-neg::before,
+.cc-sub-pct::before {
+  content: none;
+}
+
+.cc-mini {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.cc-cell--end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.cc-trade--pending .cc-cell--end {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cc-big {
+  font-size: 1.125rem;
+  line-height: 1.15;
+}
+
+.cc-sub-pct {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cc-cell--actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.cc-details-toggle .cc-details-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.cc-trade .cc-cell--actions button {
+  min-height: 28px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.cc-exit-way {
+  color: var(--cc-text-2);
+  font-size: 0.75rem;
+}
+
+/* Take profit (green) and stop loss (red) as two short lines. The words (TP/SL) say which is
+   which; the colour only backs them up. */
+.cc-exit-lines {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+}
+
+.cc-exit-lines .cc-exit {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.cc-exit-lines dt {
+  min-width: 1.5rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.cc-exit dd {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0 0.4rem;
+  margin: 0;
+}
+
+.cc-exit--takeProfit dt,
+.cc-exit--takeProfit .cc-exit-price,
+.cc-exits-fields .cc-exit--takeProfit .cc-label {
+  color: var(--pnl-pos);
+}
+
+.cc-exit--stopLoss dt,
+.cc-exit--stopLoss .cc-exit-price,
+.cc-exits-fields .cc-exit--stopLoss .cc-label {
+  color: var(--pnl-neg);
+}
+
+/* The second line of a row: what is secondary. */
+.cc-detail {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.3rem 1rem;
+  margin: 0;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--cc-line);
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-detail > div,
+.cc-detail .cc-exit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.cc-detail dt {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-text-2);
+}
+
+.cc-detail dd {
+  margin: 0;
+  color: var(--cc-text);
+}
+
+.cc-detail .cc-exit dd {
+  display: block;
+}
+
+.cc-detail .cc-exit dd small,
+.cc-detail .cc-exit dd > span {
+  display: block;
+}
+
+.cc-detail .cc-exit--takeProfit dt {
+  color: var(--pnl-pos);
+}
+
+.cc-detail .cc-exit--stopLoss dt {
+  color: var(--pnl-neg);
+}
+
+.cc-detail-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.cc-trade > .cc-exits-form {
+  grid-column: 1 / -1;
+  margin-top: 0.1rem;
+}
+
+@container (max-width: 1100px) {
+  .cc-trade-cols {
+    display: none;
+  }
+
+  /* Two columns, three short lines (open: who | result, prices | amount, TP/SL | buttons). */
+  .cc-trade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'who end'
+      'prices amount'
+      'middle middle'
+      'actions actions';
+    gap: 0.45rem 0.7rem;
+  }
+
+  .cc-trade--open .cc-exit-lines {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 0.7rem;
+  }
+
+  .cc-trade--open .cc-exit-lines .cc-exit {
+    flex-wrap: wrap;
+  }
+
+  .cc-trade--pending {
+    grid-template-areas:
+      'who actions'
+      'prices amount'
+      'middle end';
+  }
+
+  .cc-trade--closed {
+    grid-template-areas:
+      'who end'
+      'prices amount'
+      'middle middle';
+  }
+
+  .cc-cell--who {
+    grid-area: who;
+  }
+
+  .cc-cell--prices {
+    grid-area: prices;
+  }
+
+  .cc-cell--amount {
+    grid-area: amount;
+  }
+
+  .cc-cell--middle {
+    grid-area: middle;
+  }
+
+  .cc-cell--end {
+    grid-area: end;
+  }
+
+  .cc-cell--actions {
+    grid-area: actions;
+    justify-content: flex-start;
+  }
+
+  .cc-trade--pending .cc-cell--end {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .cc-trade--pending .cc-cell--actions {
+    justify-content: flex-end;
+  }
+
+  /* The small subline of the result is in the details; its label shows only where a figure has
+     no words of its own (the amount, the dates, the closing). */
+  .cc-cell--end > .cc-sub {
+    display: none;
+  }
+
+  .cc-cell--amount > .cc-cell-label,
+  .cc-cell--middle > .cc-cell-label,
+  .cc-trade--pending .cc-cell--end > .cc-cell-label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cc-text-2);
+  }
+
+  .cc-trade--open .cc-cell--middle > .cc-cell-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .cc-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-details-toggle .cc-details-text {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+  }
+}
+
+/* «Close trade»: a quiet button that turns red while it waits for the confirming press. */
+.cc-close--armed,
+.cc-close--armed:hover:not(:disabled) {
+  border-color: var(--pnl-neg);
+  background: color-mix(in srgb, var(--red-500) 14%, var(--cc-raised));
+  color: var(--pnl-neg);
+}
+
+.cc-exits-form {
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--cc-line);
+  padding-top: 0.5rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cc-exits-form .cc-hint {
+  margin: 0;
+}
+
+.cc-exits-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.5rem 0.75rem;
+}
+
+.cc-exits-form .form-error {
+  margin: 0;
+}
+
+.cc-done {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text);
+}
+
+.cc-done:not(:empty) {
+  margin: 0.25rem 0 0.4rem;
+}
+
+/* «Prev. / Page X of Y / Next» at the foot of each panel, small, like the coins' one. */
+.cc-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-family: var(--cc-num);
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+}
+
+.cc-pager button {
+  min-height: 26px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 6px;
+  background: var(--cc-surface);
+  color: var(--cc-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cc-pager button:hover:not(:disabled) {
+  border-color: var(--accent-400);
+}
+
+.cc-pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cc-fills {
+  border: 2px solid var(--accent-400);
+  border-radius: var(--cc-radius);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.8125rem;
+  background: var(--cc-soft);
+}
+
+.cc-fills p {
+  margin: 0 0 0.25rem;
+}
+
+.cc-fills ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* ─── Table instead of the chart ─── */
+
+/* A small link at the foot of the chart, closed until it is asked for. */
+.cc-table-details {
+  margin-top: 0.35rem;
+}
+
+.cc-table-details summary {
+  cursor: pointer;
+  width: fit-content;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-300);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cc-table-scroll {
+  overflow-x: auto;
+}
+
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.cc-table th,
+.cc-table td {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--cc-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cc-table th[scope='row'],
+.cc-table thead th:first-child {
+  text-align: left;
+}
+
+/* ─── Phones and touch screens: controls at least 32 px tall ─── */
+
+@media (max-width: 719px), (pointer: coarse) {
+  .cc-layer,
+  .cc-coins-pager button,
+  .cc-pager button,
+  .cc-table-details summary {
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 719px) {
+  .cc .card {
+    padding: 0.75rem;
+  }
+
+  .cc-market-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'coins'
+      'top'
+      'chart'
+      'below';
+  }
+
+  .cc-coins {
+    contain: none;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .cc-coins-title {
+    display: none;
+  }
+
+  .cc-coins-list {
+    flex-direction: row;
+    gap: 0.3rem;
+    padding: 0 0 0.3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+  }
+
+  .cc-coins-list li {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+  }
+
+  .cc-coin {
+    width: auto;
+    min-width: 10.5rem;
+    border-color: var(--cc-line);
+  }
+
+  .cc-market-controls {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .cc-intervals {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    flex: 1 1 100%;
+  }
+
+  .cc-intervals label {
+    min-width: 0;
+    padding: 0.2rem 0.1rem;
+  }
+
+  /* Two cells a row: monospaced figures (a volume of millions) fit without breaking. */
+  .cc-stats > div {
+    flex-basis: 40%;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .cc-stats dd {
+    font-size: 0.8125rem;
+  }
+
+  .cc-order-asset {
+    text-align: left;
+  }
+
+  .cc-strips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cc-strips > div:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* A phone on its side: the chart gets the height, the rest becomes compact rows. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-market-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'coins'
+      'top'
+      'chart'
+      'below';
+  }
+
+  .cc-coins {
+    contain: none;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .cc-coins-title {
+    display: none;
+  }
+
+  .cc-coins-list {
+    flex-direction: row;
+    gap: 0.3rem;
+    padding: 0 0 0.3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .cc-coins-list li {
+    flex: 0 0 auto;
+  }
+
+  .cc-coin {
+    min-width: 10rem;
+    border-color: var(--cc-line);
+  }
+
+  .cc-stats {
+    display: none;
+  }
+
+  .cc-layers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+}
+
+/* ─── Contrast (the wizard's switch): stronger borders and plain text colours ─── */
+
+/* Every grey at its strongest, and the strongest green and red of the theme. */
+html.wiz-contrast .cc {
+  --cc-strong: var(--slate-50);
+  --cc-text: var(--slate-100);
+  --cc-text-2: var(--slate-100);
+  --cc-text-3: var(--slate-200);
+  --cc-line: var(--slate-400);
+  --pnl-pos: var(--green-300);
+  --pnl-neg: var(--red-300);
+}
+
+html.wiz-contrast .cc :where(input:not([type='radio'], [type='checkbox']), select, textarea),
+html.wiz-contrast .cc-unit-input,
+html.wiz-contrast .cc-learn-open {
+  border-width: 2px;
+  border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc .cc-unit-input input {
+  border: 0;
+}
+
+html.wiz-contrast .cc-coin[aria-pressed='true']::before {
+  width: 4px;
+  background: var(--slate-50);
+}
+
+html.wiz-contrast .cc-learn-open {
+  color: var(--slate-50);
+}
+
+html.wiz-contrast .cc .card,
+html.wiz-contrast .cc-risk,
+html.wiz-contrast .cc-trade,
+html.wiz-contrast .cc-chip,
+html.wiz-contrast .cc-tool,
+html.wiz-contrast .cc-segmented,
+html.wiz-contrast .cc-segmented--wide label,
+html.wiz-contrast .cc-stats,
+html.wiz-contrast .cc-strips > div,
+html.wiz-contrast .cc-figures > div,
+html.wiz-contrast .cc-check,
+html.wiz-contrast .cc-unit-input,
+html.wiz-contrast .cc-coins,
+html.wiz-contrast .cc-layer,
+html.wiz-contrast .cc-coins-pager button,
+html.wiz-contrast .cc-pager button,
+html.wiz-contrast .cc-glossary-open,
+html.wiz-contrast .cc-coin[aria-pressed='true'] {
+  border-width: 2px;
+  border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-slot {
+  border-width: 2px;
+  color: var(--slate-50);
+}
+
+html.wiz-contrast .cc-slot-note {
+  color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-slot-note.is-full {
+  color: var(--amber-300);
+}
+
+html.wiz-contrast .cc-layer[aria-pressed='true'] {
+  border-color: var(--slate-50);
+  box-shadow: inset 0 0 0 2px var(--cc-layer);
+}
+
+html.wiz-contrast .cc-data,
+html.wiz-contrast .cc-hint,
+html.wiz-contrast .cc-stats dt,
+html.wiz-contrast .cc-strips dt,
+html.wiz-contrast .cc-figures dt,
+html.wiz-contrast .cc-facts dt,
+html.wiz-contrast .cc-coin small:not(.pnl),
+html.wiz-contrast .cc-coins-title,
+html.wiz-contrast .cc-coins-pager,
+html.wiz-contrast .cc-pager,
+html.wiz-contrast .cc-layer,
+html.wiz-contrast .cc-quote-changes {
+  color: var(--slate-100);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-chip,
+  .cc-tool,
+  .cc-layer,
+  .cc-segmented label,
+  .cc-coin,
+  .cc-learn-open,
+  .cc-learn-open .cc-learn-arrow,
+  .cc :where(input, select, textarea) {
+    transition: none;
+  }
+
+  /* No glow: a brighter border says it has not been opened yet. */
+  .cc-learn-open.is-new {
+    animation: none;
+    box-shadow: 0 0 0 2px var(--accent-400);
+  }
+}
+
+.cc-segmented--wide label > span[aria-hidden='true'] {
+  margin-right: 0.35rem;
+}
+
+.cc-trade.cc-trade--long {
+  border-left: 5px solid var(--green-500);
+}
+
+.cc-trade.cc-trade--short {
+  border-left: 5px solid var(--red-500);
+}
+
+.cc-empty-cash {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--amber-500);
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.cc-empty-cash strong {
+  color: var(--amber-400);
+}

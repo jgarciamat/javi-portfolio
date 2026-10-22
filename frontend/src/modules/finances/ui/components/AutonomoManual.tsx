@@ -67,6 +67,21 @@ export interface ManualForm {
   filed130?: string[];
   /** Assets, grants and the other annual figures of the activity (older data has none). */
   activity?: ActivityForm;
+  /**
+   * Modelo 347: what was still to collect or pay on 31 December of the year before, of the cash
+   * invoices of that year, person by person (older data has none).
+   */
+  carried347?: Carried347Form[];
+}
+
+/** One person of the 347 of `year` with cash invoices of the year before still pending, as typed. */
+export interface Carried347Form {
+  year: number;
+  /** B: sales; A: purchases. */
+  key: 'A' | 'B';
+  name: string;
+  nif: string;
+  amount: string;
 }
 
 /** Accumulated income and expenses (boxes 01 and 02) of a filed modelo 130. */
@@ -82,6 +97,11 @@ export interface Extras {
   hardToJustify: boolean;
   exempt: boolean;
   priorNet: string;
+  /**
+   * No activity last year: box 13 of the 130 takes 0 € of net income, so the 100 € reduction applies
+   * (instructions of the 130, box 13). Unset in older data: an empty `priorNet` stays «unknown».
+   */
+  noPriorActivity?: boolean;
   /** VAT left to offset at the start of the year (box 110 of the first quarter). */
   toOffset: string;
   /** The VAT of the year: prorrata, investment goods, refund… (older data has none). */

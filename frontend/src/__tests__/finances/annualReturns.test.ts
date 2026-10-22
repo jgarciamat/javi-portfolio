@@ -39,7 +39,9 @@ const year = (...over: Partial<WithholdingQuarter>[]) => [0, 1, 2, 3].map((i) =>
 
 describe('The figures of each year', () => {
   it('keeps the thresholds of the law and says which ones it could not confirm', () => {
-    expect(FIGURE_YEARS).toEqual([2025, 2026, 2027]);
+    expect(FIGURE_YEARS).toEqual([2024, 2025, 2026, 2027]);
+    // 2024: the same articles as 2025 (none changed after 2023) and the 80 € of 2023-2025.
+    expect({ ...figuresFor(2024), year: 2025 }).toEqual(figuresFor(2025));
     expect(figuresFor(2026)).toMatchObject({
       m347: { threshold: 3005.06, cash: 6000 },
       abroad: { threshold: 50000, rise: 20000 },
@@ -267,6 +269,156 @@ describe('The modelo 347', () => {
   });
 });
 
+describe('The modelo 347 under the cash regime of VAT', () => {
+  // RGAT arts. 33.1, 34.1.j and 35.1; LIVA art. 163 terdecies.Uno (the VAT is due when collected,
+  // or on 31 December of the year after the operation); DR347, positions 281 and 284-299, with no
+  // quarters for these operations. Every figure below is worked out by hand.
+  const cash = (over: Partial<ImportedInvoice>) => invoice({ cash: true, vat: 0, ...over });
+
+  it('accrues the rest of an invoice not collected on 31 December of the year after', () => {
+    // 5,000 € billed in June 2025, 1,000 € collected in September: 2025 → 1,000 €; 2026 → the
+    // 4,000 € left accrue on 31/12/2026, with no operation that year (annual amount 0 €).
+    const sale = cash({
+      book: 'issued',
+      concept: 'Cliente Caja SL',
+      base: 5000,
+      date: '2025-06-10',
+      quarter: 2,
+      collections: [{ date: '2025-09-15', amount: 1000 }],
+    });
+    const r = (year: number) =>
+      summary347(year, [sale]).records.map((x) => [
+        x.key,
+        x.cash,
+        x.total,
+        x.cashTotal,
+        x.quarters,
+      ]);
+    expect(r(2025)).toEqual([['B', true, 5000, 1000, [0, 0, 0, 0]]]);
+    expect(r(2026)).toEqual([['B', true, 0, 4000, [0, 0, 0, 0]]]);
+    // Collected in full in 2025: nothing left for 2026.
+    const all = { ...sale, collections: [{ date: '2025-09-15', amount: 5000 }] };
+    expect(summary347(2026, [all]).records).toEqual([]);
+    // In 2027 it was all accrued already: a late collection changes nothing.
+    const late = {
+      ...sale,
+      collections: [{ date: '2027-02-01', amount: 4000 }, ...sale.collections!],
+    };
+    expect(summary347(2027, [late]).records).toEqual([]);
+  });
+
+  it('reports the cash operations with a supplier apart from the rest, without quarters', () => {
+    // 2,000 € in the 1T by the general rule and 3,000 € under the cash regime paid in the 3T: one
+    // supplier above 3,005.06 € (5,000 €), two records.
+    const s = summary347(2026, [
+      invoice({ concept: 'Proveedor Mixto SL', base: 2000, vat: 0 }),
+      cash({
+        concept: 'Proveedor Mixto SL',
+        base: 3000,
+        date: '2026-05-04',
+        quarter: 2,
+        collections: [{ date: '2026-08-01', amount: 3000 }],
+      }),
+    ]);
+    expect(s.records.map((x) => [x.key, x.cash, x.total, x.cashTotal, x.quarters])).toEqual([
+      ['A', false, 2000, null, [2000, 0, 0, 0]],
+      ['A', true, 3000, 3000, [0, 0, 0, 0]],
+    ]);
+    expect(s.boxes.map((b) => b.amount)).toEqual([2, 5000]);
+  });
+
+  it('gives no quarters at all when the person bills under the cash regime', () => {
+    const s = summary347(2026, [
+      cash({ book: 'issued', concept: 'Cliente Caja', base: 4000, collections: [] }),
+      invoice({
+        book: 'issued',
+        concept: 'Cliente General',
+        base: 3500,
+        vat: 0,
+        quarter: 2,
+        date: '2026-05-02',
+      }),
+    ]);
+    expect(s.records.map((x) => [x.name, x.cashTotal, x.quarters])).toEqual([
+      ['Cliente Caja', 0, [0, 0, 0, 0]],
+      ['Cliente General', null, [0, 0, 0, 0]],
+    ]);
+  });
+
+  it('says when the collections of a cash invoice are not known, and leaves out small ones', () => {
+    const s = summary347(2026, [cash({ book: 'issued', concept: 'Sin Cobros', base: 4000 })]);
+    expect(s.records.map((x) => x.cashTotal)).toEqual([null]);
+    expect(s.warnings).toContainEqual({ code: 'cashUnknown', who: 'Sin Cobros' });
+    // 2,000 € in 2025 (under the threshold) collected in 2026: that year has nothing to report.
+    const small = cash({
+      book: 'issued',
+      concept: 'Pequeño',
+      base: 2000,
+      date: '2025-10-01',
+      quarter: 4,
+      collections: [{ date: '2026-01-20', amount: 2000 }],
+    });
+    expect(summary347(2026, [small]).records).toEqual([]);
+  });
+
+  it('adds what was typed by hand of the cash invoices of the year before', () => {
+    // 4,000 € still to collect on 31/12/2025 from «Cliente Caja SL», typed by hand; in 2026 it
+    // bills it 3,500 € more under the cash regime and collects 2,000 € of them: 4,000 + 2,000 =
+    // 6,000 € by the cash rule, 3,500 € by the general rule.
+    const typed = [
+      { key: 'B' as const, nif: 'B00000000', name: 'Cliente Caja SL', amount: 4000 },
+      // A supplier under the cash regime with nothing in the book this year: 1,200.50 € alone.
+      { key: 'A' as const, nif: null, name: 'Proveedor Caja', amount: 1200.5 },
+      // Nothing typed: no record.
+      { key: 'A' as const, nif: null, name: 'Vacío', amount: 0 },
+    ];
+    const sale = cash({
+      book: 'issued',
+      nif: 'B00000000',
+      concept: 'Cliente Caja SL',
+      base: 3500,
+      date: '2026-03-01',
+      collections: [{ date: '2026-06-01', amount: 2000 }],
+    });
+    const s = summary347(2026, [sale], typed);
+    expect(s.records.map((x) => [x.key, x.name, x.total, x.cashTotal, x.quarters])).toEqual([
+      ['B', 'Cliente Caja SL', 3500, 6000, [0, 0, 0, 0]],
+      ['A', 'Proveedor Caja', 0, 1200.5, [0, 0, 0, 0]],
+    ]);
+    // Two lines for the same person add up: 700 + 500.50.
+    const split = summary347(
+      2026,
+      [],
+      [
+        { ...typed[1], amount: 700 },
+        { ...typed[1], amount: 500.5 },
+      ]
+    );
+    expect(split.records.map((x) => x.cashTotal)).toEqual([1200.5]);
+    // Typed without a tax id: the form needs it.
+    expect(s.warnings).toEqual([{ code: 'nif', who: 'Proveedor Caja' }]);
+  });
+
+  it('warns when the invoice of the year before is in the book and was typed by hand too', () => {
+    // The 2025 invoice leaves 4,000 € for 2026; the same 4,000 € typed by hand count twice.
+    const old = cash({
+      book: 'issued',
+      concept: 'Cliente Caja SL',
+      base: 5000,
+      date: '2025-06-10',
+      quarter: 2,
+      collections: [{ date: '2025-09-15', amount: 1000 }],
+    });
+    const s = summary347(
+      2026,
+      [old],
+      [{ key: 'B', nif: null, name: 'Cliente Caja SL', amount: 4000 }]
+    );
+    expect(s.records.map((x) => x.cashTotal)).toEqual([8000]);
+    expect(s.warnings).toContainEqual({ code: 'carriedTwice', who: 'Cliente Caja SL' });
+  });
+});
+
 describe('The modelo 131', () => {
   const base = {
     year: 2026,
@@ -395,9 +547,16 @@ describe('Warnings of the 720, 721 and 714', () => {
       { model: '720', block: 'accounts', value: 50000.01, reason: 'first' },
       { model: '721', block: 'crypto', value: 70000, reason: 'rise' },
     ]);
-    expect(wealthWarnings({ year: 2026, abroad: {}, ended: ['securities'] })).toEqual([
-      { model: '720', block: 'securities', value: 0, reason: 'ended' },
-    ]);
+    // An asset that ended is reported only when an earlier 720 included it (AEAT FAQ of the 720).
+    expect(
+      wealthWarnings({
+        year: 2026,
+        abroad: {},
+        lastFiled: { securities: 60000 },
+        ended: ['securities'],
+      })
+    ).toEqual([{ model: '720', block: 'securities', value: 0, reason: 'ended' }]);
+    expect(wealthWarnings({ year: 2026, abroad: {}, ended: ['securities'] })).toEqual([]);
     // A year without figures gives nothing.
     expect(wealthWarnings({ year: 2022, abroad: { crypto: 99999 } })).toEqual([]);
     expect(wealthWarnings({ year: 2019, abroad: { accounts: 99999 } })).toEqual([]);

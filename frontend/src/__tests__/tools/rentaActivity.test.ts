@@ -1,5 +1,6 @@
 import {
   activitiesOf,
+  artisticReduction,
   dependentReduction,
   depreciation,
   directNet,
@@ -15,6 +16,7 @@ import {
 } from '@modules/tools/domain/rentaActivity';
 import { farm2025 } from '@modules/tools/data/renta/agrario-2025';
 import { modules2025 } from '@modules/tools/data/renta/modulos-2025';
+import { rentaState } from '@modules/tools/data/renta/state';
 
 const noExpenses = {
   purchases: 0,
@@ -397,6 +399,51 @@ describe('the reductions of art. 32', () => {
     disability: 0,
     assistance: false,
     ...over,
+  });
+
+  it('takes 30 % off what an artistic activity passes 130 % of its average (DA 60.ª.2)', () => {
+    const rule = rentaState.artistic as NonNullable<typeof rentaState.artistic>;
+    // Average (10,000 + 0 + 20,000) / 3 = 10,000, a loss as 0; 130 % = 13,000; 30 % of 7,000.
+    expect(artisticReduction(20000, [10000, -5000, 20000], rule)).toBe(2100);
+    expect(artisticReduction(12000, [10000, 10000, 10000], rule)).toBe(0);
+    // Missing years count as 0; the excess is held to 150,000 €.
+    expect(artisticReduction(400000, [], rule)).toBe(45000);
+    // After the start reduction of art. 32.3: the designer's 26,647.50 − 5,329.50 = 21,318 and, with
+    // three years of 5,000 € (130 % = 6,500), 30 % of 20,147.50 = 6,044.25 (box 0237) off 0235.
+    const artist = {
+      kind: 'direct' as const,
+      name: 'Ilustración',
+      data: designer(),
+      dependent: false,
+      newActivity: true,
+      withheld: 0,
+      payments: 0,
+      artistic: { previous: [5000, 5000, 5000] },
+    };
+    const r = activitiesOf([artist], ctx({ artistic: rule }), modules2025, farm2025);
+    expect(r).toMatchObject({ artisticReduction: 6044.25, directTotal: 15273.75 });
+    expect(r.total).toBe(15273.75);
+    // A year with no such reduction (2024), or a reduction bigger than what is left: none or capped.
+    expect(activitiesOf([artist], ctx(), modules2025, farm2025).artisticReduction).toBe(0);
+    // A single client, net 12,050: 8,498 € of art. 32.2.1.º leave 3,552, less than the 3,615 of the
+    // artistic reduction (no earlier income): held to what is left.
+    const sales = (n: number) => designer({ income: { sales: n, grants: 0, ownUse: 0, other: 0 } });
+    const single = { ...artist, dependent: true, newActivity: false, data: sales(24000) };
+    const held = activitiesOf(
+      [{ ...single, artistic: { previous: [0, 0, 0] } }],
+      ctx({ artistic: rule }),
+      modules2025,
+      farm2025
+    );
+    expect(held).toMatchObject({ dependentReduction: 8498, artisticReduction: 3552, total: 0 });
+    // A loss has nothing to reduce.
+    const loss = activitiesOf(
+      [{ ...single, data: sales(9000) }],
+      ctx({ artistic: rule }),
+      modules2025,
+      farm2025
+    );
+    expect(loss.artisticReduction).toBe(0);
   });
 
   it('puts the activities together, with the reductions in the order of the boxes', () => {

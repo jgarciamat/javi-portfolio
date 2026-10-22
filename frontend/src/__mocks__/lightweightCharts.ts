@@ -1,0 +1,118 @@
+/**
+ * Stand-in for TradingView Lightweight Charts™ in Jest (jsdom has no canvas). It records what the
+ * app asks for and lets a test move the crosshair or the visible range like a person would.
+ */
+type Listener<T> = (value: T) => void;
+
+export class FakeSeries {
+  data: unknown[] = [];
+  options: Record<string, unknown>;
+  lines: { options: Record<string, unknown>; removed: boolean }[] = [];
+  scaleOptions: Record<string, unknown> = {};
+  constructor(
+    public readonly kind: string,
+    options: Record<string, unknown>
+  ) {
+    this.options = options;
+  }
+  setData(data: unknown[]) {
+    this.data = data;
+  }
+  applyOptions(options: Record<string, unknown>) {
+    this.options = { ...this.options, ...options };
+  }
+  priceScale() {
+    return { applyOptions: (o: Record<string, unknown>) => (this.scaleOptions = o) };
+  }
+  createPriceLine(options: Record<string, unknown>) {
+    const line = { options, removed: false };
+    this.lines.push(line);
+    return line;
+  }
+  removePriceLine(line: { removed: boolean }) {
+    line.removed = true;
+  }
+}
+
+export class FakeChart {
+  series: FakeSeries[] = [];
+  removed = false;
+  options: Record<string, unknown>;
+  crosshair: Listener<{ time?: number }>[] = [];
+  ranges: Listener<{ from: number; to: number } | null>[] = [];
+  visibleRange: { from: number; to: number } | null = null;
+  barSpacing = 6;
+  position = 0;
+  fitted = 0;
+  constructor(
+    public readonly element: HTMLElement,
+    options: Record<string, unknown>
+  ) {
+    this.options = options;
+  }
+  addSeries(definition: { type: string }, options: Record<string, unknown>) {
+    const series = new FakeSeries(definition.type, options);
+    this.series.push(series);
+    return series;
+  }
+  applyOptions(options: Record<string, unknown>) {
+    this.options = { ...this.options, ...options };
+  }
+  removeSeries(series: FakeSeries) {
+    this.series = this.series.filter((s) => s !== series);
+  }
+  subscribeCrosshairMove(fn: Listener<{ time?: number }>) {
+    this.crosshair.push(fn);
+  }
+  unsubscribeCrosshairMove(fn: Listener<{ time?: number }>) {
+    this.crosshair = this.crosshair.filter((f) => f !== fn);
+  }
+  remove() {
+    this.removed = true;
+  }
+  timeScale() {
+    return {
+      subscribeVisibleLogicalRangeChange: (fn: Listener<{ from: number; to: number } | null>) =>
+        this.ranges.push(fn),
+      unsubscribeVisibleLogicalRangeChange: (fn: Listener<{ from: number; to: number } | null>) => {
+        this.ranges = this.ranges.filter((f) => f !== fn);
+      },
+      setVisibleLogicalRange: (range: { from: number; to: number }) => {
+        this.visibleRange = range;
+      },
+      fitContent: () => {
+        this.fitted += 1;
+      },
+      options: () => ({ barSpacing: this.barSpacing }),
+      applyOptions: (o: { barSpacing: number }) => {
+        this.barSpacing = o.barSpacing;
+      },
+      scrollPosition: () => this.position,
+      scrollToPosition: (position: number) => {
+        this.position = position;
+      },
+    };
+  }
+  /** Moves the crosshair to a candle time (seconds), or away from the chart. */
+  hover(time?: number) {
+    this.crosshair.forEach((fn) => fn({ time }));
+  }
+  /** Changes the candles on screen, like a drag or a zoom. */
+  show(range: { from: number; to: number } | null) {
+    this.ranges.forEach((fn) => fn(range));
+  }
+}
+
+export const charts: FakeChart[] = [];
+
+export function createChart(element: HTMLElement, options: Record<string, unknown>) {
+  const chart = new FakeChart(element, options);
+  charts.push(chart);
+  return chart;
+}
+
+export const CandlestickSeries = { type: 'Candlestick' };
+export const HistogramSeries = { type: 'Histogram' };
+export const LineSeries = { type: 'Line' };
+export const ColorType = { Solid: 'solid' };
+export const LineStyle = { Solid: 0, Dotted: 1, Dashed: 2, LargeDashed: 3 };

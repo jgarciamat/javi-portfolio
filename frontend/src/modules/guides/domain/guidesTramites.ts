@@ -182,7 +182,7 @@ export const GUIDES_TRAMITES: Guide[] = [
         heading: 'Resultado: cuánto pagas o cuánto compensas',
         paragraphs: [
           'La casilla 46 es la diferencia entre el IVA devengado y el deducible (27 menos 45). Si es positiva, pagas esa cantidad; si es negativa, tienes IVA a compensar en los trimestres siguientes. Las cuotas pendientes de periodos anteriores van en las casillas 110 y 78, y el resultado final de la liquidación sale en la casilla 71.',
-          'Las operaciones con clientes de otros países o con exenciones van en otras casillas (por ejemplo, 59, 60 o 120). Si es tu caso, consulta las instrucciones oficiales o a tu gestor.',
+          'Las operaciones con clientes de otros países o con exenciones van en otras casillas (por ejemplo, 59, 60 o 120). Si es tu caso, consulta las instrucciones oficiales o a un profesional.',
         ],
       },
       {

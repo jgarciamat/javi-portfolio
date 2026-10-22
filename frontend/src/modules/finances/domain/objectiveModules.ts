@@ -30,6 +30,9 @@ export const MODULE_TABLES: Record<number, ModuleActivity[]> = {
   2026: modules2025,
 };
 
+/** The first year with a table: before it there is none to take (2024 is Orden HFP/1359/2023, not here). */
+export const FIRST_MODULE_YEAR = Math.min(...Object.keys(MODULE_TABLES).map(Number));
+
 /** The table of a year: the latest one known for a later year (said in the warnings). */
 export function moduleTableOf(year: number): { table: ModuleActivity[]; known: boolean } {
   const known = MODULE_TABLES[year];
@@ -288,14 +291,16 @@ export interface Instalment131Inputs {
 
 /**
  * The modelo 131 of each quarter of the year up to `quarter`: the negative results of the earlier
- * quarters are deducted from the next positive ones (box 11). Null when the year has no figures.
+ * quarters are deducted from the next positive ones (box 11). Null when the year has no figures
+ * or no table of módulos.
  */
 export function instalments131(
   input: ObjectiveInput,
   args: Instalment131Inputs
 ): Instalments131 | null {
   const figures = figuresFor(args.year);
-  if (!figures) return null;
+  // A year before the first table has no módulos to work with: none of a later year is used.
+  if (!figures || args.year < FIRST_MODULE_YEAR) return null;
   const net = instalmentNet(input, args.year, args.depreciationAtStart);
   const staff = staffUnits(input, args.year);
   const quarters: Quarter131[] = [];

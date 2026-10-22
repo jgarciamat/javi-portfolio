@@ -6,6 +6,7 @@ import { AppGuideLink } from '@modules/guides/ui/GuideLinks';
 import { isDashboardTab, type DashboardTab } from '../navigation';
 import { GuideBody } from '@modules/guides/ui/GuideBody';
 import { Icon } from '@shared/components/Icon';
+import { InstallGuideCard } from '@shared/components/InstallGuide';
 import '@modules/guides/ui/css/Guides.css';
 import '@modules/guides/ui/css/Hacienda.css';
 import '../css/Sections.css';
@@ -74,6 +75,7 @@ export function LearnView({ onOpenTab }: { onOpenTab: (tab: DashboardTab) => voi
           )}
         />
       </div>
+      <InstallGuideCard />
     </div>
   );
 }
