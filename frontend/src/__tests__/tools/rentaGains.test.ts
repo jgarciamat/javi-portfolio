@@ -526,5 +526,14 @@ describe('a gain put in a life annuity at 65 or more (art. 38.3)', () => {
       reinvested: 25000,
     });
     expect(p).toMatchObject({ gain: 40000, exempt: 10000, taxable: 30000 });
+    // Marked, but nothing typed as put in the annuity yet: nothing exempt.
+    const none = propertyGain({
+      name: 'Piso',
+      proceeds: 100000,
+      cost: 60000,
+      amortization: 0,
+      exemption: 'annuity',
+    });
+    expect(none.exempt).toBe(0);
   });
 });

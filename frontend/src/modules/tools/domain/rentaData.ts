@@ -77,6 +77,12 @@ export interface Deduction {
    */
   regionalShare?: number;
   /**
+   * The base is held to the increase of the person's wealth in the year plus the interest (the
+   * main home of the transitional regime, LIRPF DT 18.ª with art. 70 as worded on 31-12-2012): see
+   * rentaHousing.ts. Asked only when the person types the wealth at the start and at the end.
+   */
+  wealthCheck?: boolean;
+  /**
    * Paid out even when there is no tax to pay: it lowers the differential quota, not the quota (LIRPF
    * arts. 81 and 81 bis: maternity and its increase for nursery, large family, and people with a
    * disability or the separated parent with two children in their care).

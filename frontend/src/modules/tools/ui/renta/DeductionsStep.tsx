@@ -9,7 +9,8 @@ import type {
   RentaState,
 } from '../../domain/rentaData';
 import type { Choice } from '../../domain/rentaForm';
-import { number } from '../../domain/rentaForm';
+import { number, wealthOf } from '../../domain/rentaForm';
+import { housingBaseOf } from '../../domain/rentaHousing';
 import type { DeductionSaving } from '../../domain/rentaSavings';
 import { Step, markedAfter, reveal, rowId, useMoney } from './shared';
 import { DONATION_IDS } from '../../domain/rentaDonations';
@@ -235,6 +236,57 @@ function MonthsInput({
   );
 }
 
+/**
+ * The home bought before 2013: the wealth at the start and end of the year, which holds the base
+ * to its increase plus the interest (rentaHousing.ts). Optional: without it nothing is held.
+ */
+function WealthInput({
+  deduction,
+  choice,
+  onChange,
+}: {
+  deduction: Deduction;
+  choice: Choice;
+  onChange: (choice: Choice) => void;
+}) {
+  const { t } = useI18n();
+  const money = useMoney();
+  if (!deduction.wealthCheck) return null;
+  const w = choice.wealth ?? { start: '', end: '', interest: '' };
+  const set = (part: keyof typeof w, value: string) =>
+    onChange({ ...choice, wealth: { ...w, [part]: value } });
+  const typed = wealthOf(choice).wealth;
+  const r = typed ? housingBaseOf(number(choice.amount), typed) : null;
+  const field = (part: keyof typeof w) => (
+    <label className="tools-field" key={part}>
+      <span>{t(`tools.renta.wealth.${part}`)}</span>
+      <input
+        className="tx-input"
+        inputMode="decimal"
+        value={w[part]}
+        onChange={(e) => set(part, e.target.value)}
+      />
+    </label>
+  );
+  return (
+    <fieldset className="renta-wealth">
+      <legend>{t('tools.renta.wealth.title')}</legend>
+      <p className="section-hint">{t('tools.renta.wealth.hint')}</p>
+      {field('start')}
+      {field('end')}
+      {field('interest')}
+      {r && (
+        <p className="renta-gives" role="status">
+          {t('tools.renta.wealth.result', {
+            increase: money(r.increase),
+            base: money(r.base),
+          })}
+        </p>
+      )}
+    </fieldset>
+  );
+}
+
 /** What was already collected in advance with the modelo 140 or 143, for those that have one. */
 function AdvanceInput({
   deduction,
@@ -329,6 +381,7 @@ function DeductionRow({
       on: choice.on,
       amount: number(choice.amount),
       units: choice.units === '' ? childCount || 1 : number(choice.units),
+      ...wealthOf(choice),
     },
     1
   );
@@ -367,6 +420,7 @@ function DeductionRow({
           />
           <AdvanceInput deduction={deduction} choice={choice} onChange={onChange} />
           <MonthsInput deduction={deduction} choice={choice} onChange={onChange} />
+          <WealthInput deduction={deduction} choice={choice} onChange={onChange} />
           {!blocked && requirement === 'ok' && (
             <p className="renta-gives">
               {t('tools.renta.gives')} <strong>{money(value)}</strong>

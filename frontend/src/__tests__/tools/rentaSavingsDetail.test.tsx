@@ -152,6 +152,16 @@ describe('Renta: the savings in detail', () => {
     expect(last.savingsDetail?.properties).toEqual([]);
   });
 
+  it('asks what was put in the annuity of a new property', () => {
+    renderWithProviders(<Harness />);
+    fireEvent.click(screen.getByLabelText(tr(`${k}.on`)));
+    fireEvent.click(screen.getByRole('button', { name: tr(`${k}.addProperty`) }));
+    const sale = within(screen.getByRole('group', { name: tr(`${k}.property`, { n: 1 }) }));
+    fireEvent.change(sale.getByLabelText(tr(`${k}.exemption`)), { target: { value: 'annuity' } });
+    expect(sale.getByLabelText(tr(`${k}.annuityReinvested`))).toHaveValue('');
+    expect(sale.getByLabelText(tr(`${k}.annuityPrior`))).toHaveValue('');
+  });
+
   it('reduces a property and shares bought before 1995 by the abatement coefficients (DT 9.ª)', () => {
     renderWithProviders(<Harness />);
     fireEvent.click(screen.getByLabelText(tr(`${k}.on`)));

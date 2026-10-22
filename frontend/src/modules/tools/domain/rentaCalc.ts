@@ -25,6 +25,7 @@ import {
 import type { PropertyResult } from './rentaRentals';
 import { checkDeduction, type CheckAnswers } from './rentaRequirements';
 import { donationChoices, type DonationInput } from './rentaDonations';
+import { housingBaseOf, type WealthCheck } from './rentaHousing';
 import {
   disabilityReductions,
   type DisabilityResult,
@@ -306,6 +307,8 @@ export interface DeductionChoice {
   bonusUnits?: number;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
+  /** For a deduction with `wealthCheck`: the wealth at the start and end (rentaHousing.ts). */
+  wealth?: WealthCheck;
 }
 
 /** The base a deduction's income limit is measured on: general + savings, less the minimum when it says so. */
@@ -346,7 +349,9 @@ function fixedValue(d: Deduction, units: number): number {
 /** A percent deduction gives a share of what was spent (up to its base); a special one, the amount itself. */
 function spentValue(d: Deduction, choice: DeductionChoice): number {
   if (d.kind === 'percent') {
-    const spent = positive(choice.amount ?? 0);
+    const paid = positive(choice.amount ?? 0);
+    // The main home of the transitional regime: held to the increase of the wealth.
+    const spent = d.wealthCheck && choice.wealth ? housingBaseOf(paid, choice.wealth).base : paid;
     return (Math.min(spent, d.baseLimit ?? Infinity) * (d.percent ?? 0)) / 100;
   }
   return positive(choice.amount ?? 0);

@@ -24,6 +24,7 @@ import {
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { donationResult } from '@modules/tools/domain/rentaDonations';
 import { patrimonyShare } from '@modules/tools/domain/rentaDisability';
+import { housingBaseOf } from '@modules/tools/domain/rentaHousing';
 import { generalCapitalOf, relatedLoanSplit } from '@modules/tools/domain/rentaCapitalGeneral';
 import { agrarianModules } from '@modules/finances/domain/agrarianModules';
 import { artisticReduction } from '@modules/tools/domain/rentaActivity';
@@ -795,6 +796,23 @@ const CHECKS: Record<string, () => void> = {
     expect(round2(state + savings)).toBe(figure('renta-c15-02', 'Cuota íntegra estatal'));
     expect(round2(region + savings)).toBe(figure('renta-c15-02', 'Cuota íntegra autonómica'));
   },
+  'renta-c16-02': () => {
+    // Home bought in 2006 for 150,000 €: 95,000 € of loan on 1-1-2025, 87,000 € on 31-12-2025
+    // (9,000 € paid, 1,000 € of it interest). The funds and the car are still owned: the change of
+    // their value does not count, so they are left out, as the Manual does.
+    const end = 150000 - 87000 + 3000;
+    const start = 150000 - 95000 + 5700;
+    expect(end).toBe(figure('renta-c16-02', 'Patrimonio final'));
+    expect(start).toBe(figure('renta-c16-02', 'Patrimonio inicial'));
+    const wealth = { start, end, interest: 1000 };
+    const r = housingBaseOf(9000, wealth);
+    expect(r.increase).toBe(figure('renta-c16-02', 'Aumento de patrimonio'));
+    expect(r.base).toBe(figure('renta-c16-02', 'Base de deducción'));
+    // The Manual stops at the base; by hand, 15 % of 6,300 € (7.5 % State, 7.5 % regional).
+    const d = deduction('estado-vivienda-habitual-transitorio');
+    expect(deductionAmount(d, { on: true, amount: 9000, wealth })).toBe(945);
+    expect(deductionAmount(d, { on: true, amount: 9000 })).toBe(1350);
+  },
   'renta-c16-01': () => {
     // 1,000 € to a new NGO and 1,000 € to a priority activity of a foundation given to in 2023 and
     // 2024 for as much or more: 80/40 % and 45 % + 5 points.
@@ -857,8 +875,6 @@ const PENDING: Record<string, string> = {
   'renta-c07-01':
     'Reproducido al céntimo (58.100 €) en finances/annualActivity.test.ts y tools/rentaFromAutonomo.test.ts.',
   'renta-c08-01': 'Reproducido al céntimo (41.173,16 €) en finances/objectiveModules.test.ts.',
-  'renta-c16-02':
-    'Comprobación del aumento de patrimonio en la deducción por vivienda (régimen transitorio): la base la escribe la persona.',
 };
 
 /** Why a case has no automatic check (by model, or by the part of the return). */

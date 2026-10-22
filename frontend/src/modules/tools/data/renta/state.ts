@@ -322,6 +322,7 @@ const deductions: Deduction[] = [
     baseLimit: 9040,
     limit: 1356,
     regionalShare: 0.5,
+    wealthCheck: true,
     requirements:
       'Solo si compraste (o empezaste a pagar) antes del 1-1-2013 y ya te deducías por ella. Tu patrimonio debe subir al menos lo invertido. En Cataluña el tramo autonómico puede ser del 9 % (compras antes del 30-7-2011 y otros requisitos): aquí se cuenta el 7,5 %.',
     url: `${VIVIENDA}/regimen-transitorio.html`,

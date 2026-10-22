@@ -12,6 +12,7 @@ import type {
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
 import type { DisabilitySupport } from './rentaDisability';
+import type { WealthCheck } from './rentaHousing';
 import type { GeneralCapitalItem } from './rentaCapitalGeneral';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
@@ -92,7 +93,21 @@ export interface Choice {
   bonusUnits?: string;
   /** The answers to the questions of its requirements (rentaRequirements.ts). */
   checks?: CheckAnswers;
+  /** The wealth at the start and end of the year and the interest (the home before 2013). */
+  wealth?: { start: string; end: string; interest: string };
 }
+
+/** The wealth check of a choice, once both the start and the end are typed (else nothing). */
+export const wealthOf = (c: Choice): { wealth?: WealthCheck } =>
+  c.wealth && c.wealth.start.trim() !== '' && c.wealth.end.trim() !== ''
+    ? {
+        wealth: {
+          start: number(c.wealth.start),
+          end: number(c.wealth.end),
+          interest: number(c.wealth.interest),
+        },
+      }
+    : {};
 
 /** Everything the person types, as text, in the order of the steps. */
 export interface RentaForm {
@@ -393,6 +408,7 @@ export function choicesOf(form: RentaForm): Record<string, DeductionChoice> {
         ...(c.months !== undefined && c.months.trim() !== '' ? { months: number(c.months) } : {}),
         ...(c.bonusUnits ? { bonusUnits: number(c.bonusUnits) } : {}),
         ...(c.checks ? { checks: c.checks } : {}),
+        ...wealthOf(c),
       },
     ])
   );

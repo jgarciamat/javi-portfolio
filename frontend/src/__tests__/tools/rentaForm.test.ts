@@ -185,3 +185,20 @@ describe('the plans and patrimony of a person with a disability', () => {
     expect(input.pensionExcess?.byYear).toEqual([{ year: 2022, plans: 400, dependency: 0 }]);
   });
 });
+
+describe('the wealth check of the home bought before 2013', () => {
+  it('reaches the engine only with the start and the end typed', async () => {
+    const { wealthOf } = await import('@modules/tools/domain/rentaForm');
+    const choice = (wealth?: { start: string; end: string; interest: string }) => ({
+      on: true,
+      amount: '9000',
+      units: '',
+      wealth,
+    });
+    expect(wealthOf(choice())).toEqual({});
+    expect(wealthOf(choice({ start: '60700', end: '', interest: '1000' }))).toEqual({});
+    expect(wealthOf(choice({ start: '60700', end: '66000', interest: '' }))).toEqual({
+      wealth: { start: 60700, end: 66000, interest: 0 },
+    });
+  });
+});

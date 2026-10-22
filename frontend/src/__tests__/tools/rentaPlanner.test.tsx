@@ -337,7 +337,8 @@ describe('Renta planner: free calculations', () => {
       'li'
     ) as HTMLElement;
     fireEvent.click(within(home).getByRole('checkbox'));
-    fireEvent.change(within(home).getByRole('textbox'), { target: { value: '10000' } });
+    // The first field is what was paid; the wealth check below it is optional.
+    fireEvent.change(within(home).getAllByRole('textbox')[0], { target: { value: '10000' } });
     fireEvent.click(screen.getByRole('button', { name: tr('tools.renta.calculate') }));
     // 7.5 % + 7.5 % of 9,040 (DT 18.ª LIRPF): 678 € in each quota.
     for (const part of ['state', 'regional']) {

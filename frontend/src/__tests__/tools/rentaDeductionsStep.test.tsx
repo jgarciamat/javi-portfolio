@@ -219,3 +219,59 @@ describe('Renta deductions: what each one saves', () => {
     expect(sort(other('z'), other('w'))).toBe(0);
   });
 });
+
+describe('Renta deductions: the wealth check of the home bought before 2013', () => {
+  const home = rentaState.deductions.find(
+    (d) => d.id === 'estado-vivienda-habitual-transitorio'
+  ) as Deduction;
+
+  it('asks the wealth and holds the base to its increase plus the interest', () => {
+    const onChange = jest.fn();
+    const choice: Choice = { on: true, amount: '9000', units: '' };
+    const { rerender } = renderWithProviders(
+      <DeductionsStep
+        state={{ ...rentaState, deductions: [home] }}
+        ccaa={null}
+        loadError={false}
+        choices={{ [home.id]: choice }}
+        family={familyOf(emptyForm(''))}
+        blocked={[]}
+        hints={{}}
+        savings={{}}
+        markedSaving={0}
+        onChange={onChange}
+      />
+    );
+    // Without the wealth: 15 % of 9,000 €.
+    expect(screen.getByText(money(1350))).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(tr('tools.renta.wealth.start')), {
+      target: { value: '60700' },
+    });
+    expect(onChange).toHaveBeenLastCalledWith(home.id, {
+      ...choice,
+      wealth: { start: '60700', end: '', interest: '' },
+    });
+    // The Manual's example (c16): 66,000 − 60,700 = 5,300, plus 1,000 of interest.
+    const wealth = { start: '60700', end: '66000', interest: '1000' };
+    rerender(
+      <DeductionsStep
+        state={{ ...rentaState, deductions: [home] }}
+        ccaa={null}
+        loadError={false}
+        choices={{ [home.id]: { ...choice, wealth } }}
+        family={familyOf(emptyForm(''))}
+        blocked={[]}
+        hints={{}}
+        savings={{}}
+        markedSaving={0}
+        onChange={onChange}
+      />
+    );
+    expect(
+      screen.getByText(
+        tr('tools.renta.wealth.result', { increase: money(5300), base: money(6300) })
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByText(money(945))).toBeInTheDocument();
+  });
+});
