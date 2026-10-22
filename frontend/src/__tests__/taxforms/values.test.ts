@@ -87,4 +87,16 @@ describe('The self-employed forms of a quarter', () => {
     const m111 = { boxes: [{ box: '28', label: 'Suma', amount: 150 }] } as Result111;
     expect(formWithholding('111', m111, 2026, 4).values).toEqual({ '28': 150 });
   });
+
+  it('marks a complementaria of the 111 and the 115 with the number of the form it completes', () => {
+    const previous = { result: 100, receipt: ' 1110000000123 ' };
+    const m111 = { boxes: [{ box: '30', label: 'Resultado', amount: 50 }], previous } as Result111;
+    expect(formWithholding('111', m111, 2026, 1).texts).toEqual({
+      complementaria: 'X',
+      justificante: '1110000000123',
+    });
+    const m115 = { boxes: [], previous: { result: 80, receipt: '' } } as unknown as Result115;
+    expect(formWithholding('115', m115, 2026, 1).texts).toEqual({ complementaria: 'X' });
+    expect(formWithholding('115', { ...m115, previous: null }, 2026, 1).texts).toBeUndefined();
+  });
 });

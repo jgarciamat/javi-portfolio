@@ -66,6 +66,9 @@ const whenOf = (model: FormModel) =>
 
 const SKIPPED = (id: string) => id === 'ejercicio' || id === 'periodo' || id.startsWith('hoja.');
 
+/** The marks of a complementaria of the 111 and the 115: the «X» and a made-up receipt number. */
+const MARKS: Record<string, string> = { complementaria: 'X', justificante: '1110000000001' };
+
 /**
  * A form with a made-up figure in every box of its layout, to check that each one is drawn in its
  * cell and read back as it was typed (the round trip of the previews). Amounts grow with the box
@@ -77,6 +80,10 @@ export function sampleForm(model: FormModel, layout: FormLayout): FilledForm {
   for (const page of layout.pages) {
     for (const [id] of page.b) {
       if (SKIPPED(id) || id in sample.values) continue;
+      if (id in MARKS) {
+        sample.texts[id] = MARKS[id];
+        continue;
+      }
       const slot = slotOf(id);
       if (!slot) sampleBox(sample, id);
       else

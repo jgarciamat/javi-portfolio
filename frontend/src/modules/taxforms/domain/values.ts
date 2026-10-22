@@ -108,14 +108,30 @@ export function form130(draft: AutonomoDraft): FilledForm | null {
   };
 }
 
-/** The modelo 111 or 115 of a quarter, as the withholdings worked out on the device give them. */
+/**
+ * The modelo 111 or 115 of a quarter, as the withholdings worked out on the device give them. A
+ * complementaria marks its box with an «X» and gives the 13-digit number of the form it completes
+ * (instructions of the 111, «Complementaria»; the file carries the same, see aeatFiles/models.ts).
+ */
 export function formWithholding(
   model: '111' | '115',
   result: Result111 | Result115,
   year: number,
   q: 1 | 2 | 3 | 4
 ): FilledForm {
-  return { model, year, period: quarter(q), values: valuesOf(result.boxes), pending: [] };
+  const filled: FilledForm = {
+    model,
+    year,
+    period: quarter(q),
+    values: valuesOf(result.boxes),
+    pending: [],
+  };
+  if (!result.previous) return filled;
+  const receipt = result.previous.receipt.trim();
+  return {
+    ...filled,
+    texts: { complementaria: 'X', ...(receipt ? { justificante: receipt } : {}) },
+  };
 }
 
 /** The modelo 131 of a quarter (objective estimation), as module131 works it out. */
