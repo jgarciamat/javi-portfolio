@@ -360,6 +360,63 @@ describe('The modelo 347 under the cash regime of VAT', () => {
     });
     expect(summary347(2026, [small]).records).toEqual([]);
   });
+
+  it('adds what was typed by hand of the cash invoices of the year before', () => {
+    // 4,000 € still to collect on 31/12/2025 from «Cliente Caja SL», typed by hand; in 2026 it
+    // bills it 3,500 € more under the cash regime and collects 2,000 € of them: 4,000 + 2,000 =
+    // 6,000 € by the cash rule, 3,500 € by the general rule.
+    const typed = [
+      { key: 'B' as const, nif: 'B00000000', name: 'Cliente Caja SL', amount: 4000 },
+      // A supplier under the cash regime with nothing in the book this year: 1,200.50 € alone.
+      { key: 'A' as const, nif: null, name: 'Proveedor Caja', amount: 1200.5 },
+      // Nothing typed: no record.
+      { key: 'A' as const, nif: null, name: 'Vacío', amount: 0 },
+    ];
+    const sale = cash({
+      book: 'issued',
+      nif: 'B00000000',
+      concept: 'Cliente Caja SL',
+      base: 3500,
+      date: '2026-03-01',
+      collections: [{ date: '2026-06-01', amount: 2000 }],
+    });
+    const s = summary347(2026, [sale], typed);
+    expect(s.records.map((x) => [x.key, x.name, x.total, x.cashTotal, x.quarters])).toEqual([
+      ['B', 'Cliente Caja SL', 3500, 6000, [0, 0, 0, 0]],
+      ['A', 'Proveedor Caja', 0, 1200.5, [0, 0, 0, 0]],
+    ]);
+    // Two lines for the same person add up: 700 + 500.50.
+    const split = summary347(
+      2026,
+      [],
+      [
+        { ...typed[1], amount: 700 },
+        { ...typed[1], amount: 500.5 },
+      ]
+    );
+    expect(split.records.map((x) => x.cashTotal)).toEqual([1200.5]);
+    // Typed without a tax id: the form needs it.
+    expect(s.warnings).toEqual([{ code: 'nif', who: 'Proveedor Caja' }]);
+  });
+
+  it('warns when the invoice of the year before is in the book and was typed by hand too', () => {
+    // The 2025 invoice leaves 4,000 € for 2026; the same 4,000 € typed by hand count twice.
+    const old = cash({
+      book: 'issued',
+      concept: 'Cliente Caja SL',
+      base: 5000,
+      date: '2025-06-10',
+      quarter: 2,
+      collections: [{ date: '2025-09-15', amount: 1000 }],
+    });
+    const s = summary347(
+      2026,
+      [old],
+      [{ key: 'B', nif: null, name: 'Cliente Caja SL', amount: 4000 }]
+    );
+    expect(s.records.map((x) => x.cashTotal)).toEqual([8000]);
+    expect(s.warnings).toContainEqual({ code: 'carriedTwice', who: 'Cliente Caja SL' });
+  });
 });
 
 describe('The modelo 131', () => {

@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { formatMoney } from '@shared/utils/format';
-import { AnnualPanel } from '@modules/finances/ui/components/AutonomoAnnual';
+import { AnnualPanel, carriedOfYear } from '@modules/finances/ui/components/AutonomoAnnual';
 import { emptyManual, type ManualForm } from '@modules/finances/ui/components/AutonomoManual';
 import { withWithholding } from '@modules/finances/ui/components/withholdingForm';
 import type { ImportedInvoice } from '@modules/finances/domain/invoiceLedger';
@@ -195,6 +196,123 @@ describe('The yearly summaries of the self-employed screen', () => {
         exact: false,
       })
     ).toBeInTheDocument();
+  });
+
+  it('takes by hand what was pending on 31 December of cash invoices of the year before', () => {
+    // Case 347-03, year 2: 4,000 € billed in 2025, 2,500 € collected that year; the 1,500 € left
+    // are typed and give the record of 2026 (0 € by the general rule, 1,500 € by the cash rule).
+    let saved: ManualForm | null = null;
+    function Kept() {
+      const [form, setForm] = useState<ManualForm>({
+        ...emptyManual(),
+        // A line of another year stays as it is.
+        carried347: [{ year: 2025, key: 'A', name: 'Otro Año', nif: '', amount: '900' }],
+      });
+      return (
+        <AnnualPanel
+          form={form}
+          year={2026}
+          onChange={(f) => {
+            saved = f;
+            setForm(f);
+          }}
+        />
+      );
+    }
+    renderWithProviders(<Kept />, { authenticated: false });
+    expect(
+      screen.getByText(spaced(tr('app.autonomo.annual.none347', { amount: money(3005.06) })))
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.annual.carried.add') }));
+    const row = screen.getByRole('group', {
+      name: tr('app.autonomo.annual.carried.row', { n: 1 }),
+    });
+    // An empty line makes no record.
+    expect(
+      screen.getByText(spaced(tr('app.autonomo.annual.none347', { amount: money(3005.06) })))
+    ).toBeInTheDocument();
+    fireEvent.change(within(row).getByLabelText(tr('app.autonomo.annual.carried.name')), {
+      target: { value: '  Cliente Ficticio ' },
+    });
+    fireEvent.change(within(row).getByLabelText(tr('app.autonomo.annual.nif')), {
+      target: { value: 'b00000000' },
+    });
+    fireEvent.change(
+      within(row).getByLabelText(tr('app.autonomo.annual.carried.amount', { prev: 2025 })),
+      { target: { value: '1500' } }
+    );
+    const who = (key: 'A' | 'B') =>
+      tr(`app.autonomo.annual.key.${key}`, { who: 'Cliente Ficticio' });
+    expect(
+      screen.getByText(
+        spaced(tr('app.autonomo.annual.cash347', { who: who('B'), amount: money(1500) }))
+      )
+    ).toBeInTheDocument();
+    // In the list and in the table of the preview, in capitals.
+    expect(screen.getAllByText('B00000000')).toHaveLength(2);
+    fireEvent.change(within(row).getByLabelText(tr('app.autonomo.annual.carried.key')), {
+      target: { value: 'A' },
+    });
+    expect(
+      screen.getByText(
+        spaced(tr('app.autonomo.annual.cash347', { who: who('A'), amount: money(1500) }))
+      )
+    ).toBeInTheDocument();
+    expect(saved!.carried347).toEqual([
+      { year: 2025, key: 'A', name: 'Otro Año', nif: '', amount: '900' },
+      { year: 2026, key: 'A', name: '  Cliente Ficticio ', nif: 'b00000000', amount: '1500' },
+    ]);
+    // A second person: typing in it leaves the first one as it was.
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.annual.carried.add') }));
+    const second = screen.getByRole('group', {
+      name: tr('app.autonomo.annual.carried.row', { n: 2 }),
+    });
+    fireEvent.change(within(second).getByLabelText(tr('app.autonomo.annual.carried.name')), {
+      target: { value: 'Otra' },
+    });
+    expect(saved!.carried347?.[1].name).toBe('  Cliente Ficticio ');
+    fireEvent.click(
+      within(second).getByRole('button', {
+        name: tr('app.autonomo.annual.carried.remove', { n: 2 }),
+      })
+    );
+    fireEvent.click(
+      within(row).getByRole('button', {
+        name: tr('app.autonomo.annual.carried.remove', { n: 1 }),
+      })
+    );
+    expect(saved!.carried347).toEqual([
+      { year: 2025, key: 'A', name: 'Otro Año', nif: '', amount: '900' },
+    ]);
+  });
+
+  it('leaves out the lines typed for the 347 without amount or without anyone', () => {
+    const row = { year: 2026, key: 'B' as const, name: '', nif: ' b11111111 ', amount: '200,50' };
+    expect(carriedOfYear(undefined, 2026)).toEqual([]);
+    // Older data has no lines: the screen starts with none.
+    const onChange = jest.fn();
+    renderWithProviders(<AnnualPanel form={emptyManual()} year={2026} onChange={onChange} />, {
+      authenticated: false,
+    });
+    fireEvent.click(screen.getByRole('button', { name: tr('app.autonomo.annual.carried.add') }));
+    expect(onChange.mock.calls[0][0].carried347).toEqual([
+      { year: 2026, key: 'B', name: '', nif: '', amount: '' },
+    ]);
+    expect(
+      carriedOfYear(
+        [
+          row,
+          { ...row, nif: '', name: 'Sin NIF' },
+          { ...row, nif: '', name: ' ' },
+          { ...row, amount: '0' },
+          { ...row, year: 2025 },
+        ],
+        2026
+      )
+    ).toEqual([
+      { key: 'B', nif: 'B11111111', name: '', amount: 200.5 },
+      { key: 'B', nif: null, name: 'Sin NIF', amount: 200.5 },
+    ]);
   });
 
   it('warns of the 714 when the assets pass 2,000,000 €', () => {

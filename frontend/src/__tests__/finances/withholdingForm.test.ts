@@ -92,6 +92,20 @@ describe('The withholdings typed in the form', () => {
       {}
     );
     expect(cash.manual.invoices[0].collections).toEqual([{ date: '2026-06-01', amount: 484 }]);
+    // What was pending of the cash invoices of the year before (the 347), as typed.
+    const row = {
+      year: 2026,
+      key: 'B' as const,
+      name: 'Cliente',
+      nif: 'B00000000',
+      amount: '1500',
+    };
+    expect(toSaved({ ...emptyManual(), carried347: [row] }, {}, {}).manual.carried347).toEqual([
+      row,
+    ]);
+    expect(toSaved({ ...emptyManual(), carried347: [] }, {}, {}).manual).not.toHaveProperty(
+      'carried347'
+    );
     expect(cash.manual.withholdings?.[1].complement115).toEqual({
       result: '50',
       receipt: '1150000000001',

@@ -314,7 +314,7 @@ export function AutonomoDraftCard({
           </>
         )}
         <WithholdingsPanel form={manual} year={year} quarter={quarter} onFocus={setFocus} />
-        <AnnualPanel form={manual} year={year} />
+        <AnnualPanel form={manual} year={year} onChange={changeManual} />
         {hasManual && <ActivitySummaryPanel annual={annualOf(manual, extras, year)} />}
         {hasManual && (
           <PrepareRenta

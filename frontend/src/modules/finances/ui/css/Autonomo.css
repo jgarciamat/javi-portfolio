@@ -1003,6 +1003,23 @@ button.autonomo-sum-warn {
   font-size: 0.875rem;
 }
 
+/* The 347: cash invoices of the year before still pending, typed person by person. */
+.autonomo-annual-carried {
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0 0;
+}
+
+.autonomo-annual-carried legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+.autonomo-annual-carried .autonomo-annual-fields {
+  align-items: end;
+}
+
 /* Activities in modules: the units of each module, at 1 January and on average. */
 .autonomo-modules-units {
   width: 100%;

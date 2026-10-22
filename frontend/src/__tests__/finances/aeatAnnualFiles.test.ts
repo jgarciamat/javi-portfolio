@@ -364,6 +364,24 @@ describe('Modelo 347', () => {
     const unknown = { ...sum, records: [{ ...cash, cashTotal: null }] };
     const stopped = buildSedeFile({ model: '347', year: 2025, summary: unknown }, dd);
     expect([errors(stopped), stopped.file]).toEqual([['cash347'], null]);
+    // Case 347-03 (a), second year, typed by hand: 0 € by the general rule and 1,500 € by cash; a
+    // line typed and also in the book is only a warning.
+    const typed = rec({ total: 0, quarters: [0, 0, 0, 0], cash: true, cashTotal: 1500 });
+    const twice = buildSedeFile(
+      {
+        model: '347',
+        year: 2025,
+        summary: {
+          ...sum,
+          records: [typed],
+          warnings: [{ code: 'carriedTwice', who: 'Cliente Inventado' }],
+        },
+      },
+      dd
+    );
+    expect(codes(twice)).toEqual(['carriedTwice347']);
+    const [t] = readInformative(twice.file!.text).details;
+    expect([t[280], euros(t, 83, 16, true), euros(t, 284, 16, true)]).toEqual(['X', 0, 1500]);
   });
 
   it('asks for the NIF and province of each person and warns of withholdings and unknown figures', () => {

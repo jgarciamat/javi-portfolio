@@ -137,8 +137,10 @@ function plan347(source: Extract<Informative, { model: '347' }>, d: Declarant): 
     // The amount by the cash rule cannot be guessed: without the collections, no file.
     if (r.cash && r.cashTotal === null) checks.push(error('cash347', { who: r.name }));
   }
-  for (const w of summary.warnings)
+  for (const w of summary.warnings) {
     if (w.code === 'notSubject') checks.push(warn('notSubject347', { who: w.who }));
+    if (w.code === 'carriedTwice') checks.push(warn('carriedTwice347', { who: w.who }));
+  }
   const people = summary.records.map((r: Record347) => ({
     ...r,
     nif: r.nif as string,

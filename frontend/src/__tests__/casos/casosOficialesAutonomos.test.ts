@@ -172,6 +172,16 @@ const CHECKS: Record<string, () => void> = {
     expect(cash(2026)).toEqual([
       ['B', true, figure('347-03', '(a) Año 2 clave B'), figure('347-03', '(a) Año 2 – importe')],
     ]);
+    // Year 2 without the invoice of year 1 in the book: the 1,500 € still to collect on 31
+    // December of year 1 (4,000 − 2,500) are typed by hand and give the same record.
+    const typed = summary347(
+      2026,
+      [],
+      [{ key: 'B', nif: null, name: 'Cliente Ficticio', amount: 4000 - 2500 }]
+    );
+    expect(typed.records.map((r) => [r.key, r.cash, r.total, r.cashTotal])).toEqual([
+      ['B', true, figure('347-03', '(a) Año 2 clave B'), figure('347-03', '(a) Año 2 – importe')],
+    ]);
     // (b) The tenant of business premises of a landlord under the cash regime: key A, marked as the
     // rent of premises and as cash, 10,000 € a year by both rules (paid within the year).
     const s = summary347(2026, [
