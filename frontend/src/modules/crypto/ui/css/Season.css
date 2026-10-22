@@ -1,0 +1,457 @@
+/* ─── Consola crypto: temporadas, prácticas, ranking y Premium ────────────────
+   Same tokens as Crypto.css (theme colours only), so light, dark and the contrast mode work.
+   Also used inside the guide, which is outside `.cc`: no `.cc` variables here. */
+
+.cc-portfolios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-portfolio .icon,
+.cc-portfolio-new .icon {
+  margin-right: 0.3rem;
+}
+
+.cc-portfolio-new {
+  border-style: dashed;
+}
+
+.cc-season .section-title .icon,
+.cc-ranking .section-title .icon,
+.cc-alerts-card .section-title .icon {
+  vertical-align: -3px;
+  color: var(--accent-300);
+}
+
+.cc-countdown {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.cc-season-warning,
+.cc-prize {
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--amber-500);
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.cc-prize {
+  border-color: var(--accent-500);
+}
+
+.cc-season-warning .icon,
+.cc-prize .icon {
+  vertical-align: -3px;
+}
+
+.cc-history summary,
+.cc-rules summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.cc-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.cc-history-table th,
+.cc-history-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--slate-700);
+  text-align: left;
+}
+
+.cc-practice-actions,
+.cc-report,
+.cc-report-locked {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.cc-practice-actions button,
+.cc-practice-offer button,
+.cc-premium-cta {
+  min-height: 48px;
+}
+
+.cc-report .cc-label {
+  width: 100%;
+  margin: 0;
+}
+
+.cc-last-season {
+  border: 2px solid var(--accent-500);
+}
+
+.cc-practice-offer {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  margin-top: 0.5rem;
+}
+
+/* Badges: earned in colour, the rest grey (with what is missing). */
+.cc-badges ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.6rem;
+}
+
+.cc-badges li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+  opacity: 0.75;
+}
+
+.cc-badges li.is-earned {
+  opacity: 1;
+  border-color: var(--accent-500);
+}
+
+.cc-badges li > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.cc-badge-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--slate-800);
+  color: var(--slate-400);
+  flex: none;
+}
+
+.is-earned .cc-badge-icon {
+  background: color-mix(in srgb, var(--accent-600) 25%, transparent);
+  color: var(--accent-300);
+}
+
+/* «Free and Premium»: two columns, one under the other on phones. */
+.cc-plans-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.cc-plan {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.cc-plan--premium {
+  border-color: var(--accent-500);
+}
+
+.cc-plan h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.cc-plan ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  line-height: 1.4;
+}
+
+.cc-plan li .icon {
+  vertical-align: -3px;
+  margin-right: 0.35rem;
+  color: var(--accent-300);
+}
+
+.cc-plan--free li .icon {
+  color: var(--green-400);
+}
+
+.cc-plans-fair {
+  line-height: 1.5;
+}
+
+.cc-plans-fair .icon {
+  vertical-align: -3px;
+  color: var(--green-400);
+}
+
+.cc-premium-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.cc-premium-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent-500);
+  color: var(--accent-300);
+  vertical-align: middle;
+}
+
+/* A Premium feature for free users: the example is greyed and cannot be used. */
+.cc-locked {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.cc-example-tag {
+  margin: 0;
+  font-weight: 700;
+  color: var(--amber-400);
+}
+
+.cc-locked-preview {
+  width: 100%;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+  border: 1px dashed var(--slate-600);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.cc-subtitle {
+  margin: 1rem 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.cc-equity {
+  margin: 0;
+}
+
+.cc-equity svg {
+  display: block;
+  width: 100%;
+  height: 120px;
+  background: var(--slate-800);
+  border-radius: 10px;
+}
+
+.cc-equity polyline {
+  fill: none;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.cc-equity polyline.cc-up {
+  stroke: var(--green-400);
+}
+
+.cc-equity polyline.cc-down {
+  stroke: var(--red-400);
+}
+
+/* Price alerts. */
+.cc-alerts {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-alerts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.cc-alerts li > span:first-child {
+  flex: 1 1 12rem;
+  font-weight: 600;
+}
+
+.cc-alert-form,
+.cc-alias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.cc-alert-form label,
+.cc-alias label {
+  flex: 1 1 10rem;
+}
+
+.cc-alert-form select,
+.cc-alert-form input,
+.cc-alias input {
+  width: 100%;
+  min-height: 48px;
+  font-size: 1rem;
+}
+
+.cc-alert-form button,
+.cc-alias button {
+  min-height: 48px;
+}
+
+/* Ranking: a podium of five with medals. */
+.cc-podium {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-podium-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  grid-template-areas:
+    'medal alias percent'
+    'medal alias trades';
+  gap: 0 0.75rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 12px;
+}
+
+.cc-medal {
+  grid-area: medal;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  border: 2px solid var(--slate-500);
+}
+
+.cc-medal--gold .cc-medal {
+  border-color: #d4a017;
+  background: color-mix(in srgb, #d4a017 30%, transparent);
+}
+
+.cc-medal--silver .cc-medal {
+  border-color: #a8a9ad;
+  background: color-mix(in srgb, #a8a9ad 30%, transparent);
+}
+
+.cc-medal--bronze .cc-medal {
+  border-color: #b26b2c;
+  background: color-mix(in srgb, #b26b2c 30%, transparent);
+}
+
+.cc-podium-alias {
+  grid-area: alias;
+  font-weight: 700;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.cc-premium-mark {
+  margin-left: 0.35rem;
+  color: var(--accent-300);
+}
+
+.cc-premium-mark .icon {
+  vertical-align: -3px;
+}
+
+.cc-podium-percent {
+  grid-area: percent;
+  font-weight: 800;
+  text-align: right;
+}
+
+.cc-podium-row .cc-hint {
+  grid-area: trades;
+  text-align: right;
+}
+
+.cc-ranking-me {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--slate-800);
+  margin: 0.5rem 0;
+}
+
+.cc-ranking-me p {
+  margin: 0.2rem 0;
+}
+
+.cc-ranking-settings {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.cc-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.cc-switch input {
+  width: 28px;
+  height: 28px;
+  accent-color: var(--accent-500);
+}
+
+.cc-rules ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+  line-height: 1.5;
+}
+
+html.wiz-contrast .cc-podium-row,
+html.wiz-contrast .cc-badges li,
+html.wiz-contrast .cc-plan,
+html.wiz-contrast .cc-alerts li,
+html.wiz-contrast .cc-locked-preview,
+html.wiz-contrast .cc-season-warning,
+html.wiz-contrast .cc-prize {
+  border-width: 2px;
+  border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-locked-preview,
+html.wiz-contrast .cc-badges li {
+  opacity: 1;
+}

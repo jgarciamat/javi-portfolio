@@ -105,7 +105,8 @@ export interface ClosedTrade {
   pnl: number;
   pnlPercent: number;
   openType: TradeType;
-  closeType: TradeType | 'liquidation';
+  /** `season`: closed at the last price when its month ended. */
+  closeType: TradeType | 'liquidation' | 'season';
   openedAt: string;
   closedAt: string;
 }
@@ -120,7 +121,67 @@ export interface SimFill {
   at: string;
 }
 
+/** A play-money portfolio: the official one of a monthly season, or a practice one. */
+export interface PortfolioRef {
+  id: string;
+  kind: 'season' | 'practice';
+  /** YYYY-MM (Spain) of an official portfolio; null for practice. */
+  season: string | null;
+  startedAt: string;
+}
+
+/** A finished season as the person sees it. */
+export interface SeasonResult {
+  season: string;
+  initial: number;
+  final: number;
+  percent: number;
+  trades: number;
+  wins: number;
+  activeDays: number;
+  qualified: boolean;
+  ranked: boolean;
+  place: number | null;
+  prizeDays: number;
+}
+
+export type BadgeId = 'firstTrade' | 'firstTakeProfit' | 'tenTrades' | 'positiveMonth';
+
+export interface TradeHighlight {
+  symbol: string;
+  direction: Direction;
+  pnl: number;
+  pnlPercent: number;
+  closedAt: string;
+}
+
+/** Advanced statistics (Premium). */
+export interface SimStats {
+  winRate: number | null;
+  wins: number;
+  losses: number;
+  best: TradeHighlight | null;
+  worst: TradeHighlight | null;
+  averageWin: number | null;
+  averageLoss: number | null;
+  equityDays: { day: string; equity: number }[];
+  hold: { symbol: string; startPrice: number; price: number; percent: number } | null;
+}
+
 export interface SimPortfolio {
+  portfolio: PortfolioRef;
+  portfolios: PortfolioRef[];
+  season: {
+    month: string;
+    startsAt: string;
+    endsAt: string;
+    daysLeft: number;
+    endingSoon: boolean;
+    history: SeasonResult[];
+  };
+  plan: { premium: boolean; practiceMax: number; practiceActionsLeft: number };
+  badges: { id: BadgeId; earnedAt: string }[];
+  stats: SimStats | null;
   account: {
     initial: number;
     cash: number;
@@ -162,3 +223,65 @@ export type OrderRequest =
       stopLoss?: number;
     }
   | { action: 'sell'; positionId: string; type: TradeType; price?: number };
+
+/** An order for a given portfolio (the official one of the month when missing). */
+export type PortfolioOrder = OrderRequest & { portfolioId?: string };
+
+/** One place of the monthly ranking: only the alias. */
+export interface RankingRow {
+  place: number;
+  alias: string;
+  percent: number;
+  trades: number;
+  premium: boolean;
+}
+
+export interface CryptoRanking {
+  season: { month: string; endsAt: string; daysLeft: number };
+  top: RankingRow[];
+  participants: number;
+  me: {
+    place: number | null;
+    percent: number | null;
+    trades: number;
+    activeDays: number;
+    qualified: boolean;
+    missing: { trades: number; days: number };
+  };
+  settings: { optIn: boolean; alias: string | null; suggestedAlias: string | null };
+  previous: { month: string; top: RankingRow[] } | null;
+  rules: {
+    size: number;
+    minTrades: number;
+    minDays: number;
+    prizeDays: number;
+    initial: number;
+    aliasMin: number;
+    aliasMax: number;
+  };
+}
+
+export interface PriceAlert {
+  id: string;
+  symbol: string;
+  condition: 'above' | 'below';
+  price: number;
+  createdAt: string;
+  triggeredAt: string | null;
+}
+
+export interface PriceAlerts {
+  alerts: PriceAlert[];
+  max: number;
+  pushEnabled: boolean;
+}
+
+/** The full report of a season (Premium). */
+export interface SeasonReport {
+  season: string;
+  finished: boolean;
+  initial: number;
+  result: SeasonResult | null;
+  closed: ClosedTrade[];
+  stats: SimStats;
+}

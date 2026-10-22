@@ -1,15 +1,11 @@
-import { useState } from 'react';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
-import { Modal } from '@shared/components/Modal';
 import type { PdfTable } from '@modules/finances/application/tablePdf';
 import { ExportButtons } from '@modules/finances/ui/components/ExportButtons';
 import { toDisplay, type Display } from '../domain/currency';
-import { formatChange, formatDateTime, formatNumber, formatRate, tone } from '../domain/format';
-import { FEE_OPTIONS_BPS, INITIAL_BALANCES } from '../domain/orders';
+import { formatChange, formatDateTime, formatNumber, tone } from '../domain/format';
 import type { SimPortfolio } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
-import '@shared/components/css/ConfirmDeleteModal.css';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 
@@ -143,130 +139,16 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
   );
 }
 
-/** A row of buttons that behave as one choice (radio buttons with the look of chips). */
-function ChipChoice<T extends number>({
-  name,
-  legend,
-  options,
-  value,
-  label,
-  disabled,
-  onChange,
-}: {
-  name: string;
-  legend: string;
-  options: readonly T[];
-  value: number;
-  label: (option: T) => string;
-  disabled?: boolean;
-  onChange: (option: T) => void;
-}) {
-  return (
-    <fieldset className="cc-segmented cc-choice" disabled={disabled}>
-      <legend className="cc-label">{legend}</legend>
-      {options.map((option) => (
-        <label key={option} className={option === value ? 'is-on' : undefined}>
-          <input
-            type="radio"
-            name={name}
-            checked={option === value}
-            onChange={() => onChange(option)}
-          />
-          {label(option)}
-        </label>
-      ))}
-    </fieldset>
-  );
-}
-
-/** The history to download, the commission, the monthly top-up and «Start again» (Premium). */
-export function SimSettings({
-  portfolio,
-  busy,
-  onFee,
-  onReset,
-}: {
-  portfolio: SimPortfolio;
-  busy: boolean;
-  onFee: (bps: number) => Promise<boolean>;
-  onReset: (initial: number, bps: number) => Promise<boolean>;
-}) {
+/** The basic history as CSV (free on every plan), in the panel of closed operations. */
+export function HistoryExport({ portfolio }: { portfolio: SimPortfolio }) {
   const { t, locale } = useI18n();
   const money = useMoney();
-  const { account } = portfolio;
-  const [confirming, setConfirming] = useState(false);
-  const [initial, setInitial] = useState<number>(account.initial);
-  const close = () => setConfirming(false);
-
   return (
-    <section className="card cc-settings-card" aria-labelledby="cc-settings-title">
-      <h2 id="cc-settings-title" className="section-title">
-        {t('app.crypto.settings.title')}
-      </h2>
-      <ExportButtons
-        name="consola_crypto"
-        what={t('app.crypto.csv.what')}
-        count={portfolio.open.length + portfolio.closed.length}
-        table={() => historyTable(portfolio, t, locale, money.display)}
-      />
-      <ChipChoice
-        name="cc-fee"
-        legend={t('app.crypto.settings.fee')}
-        options={FEE_OPTIONS_BPS}
-        value={account.feeBps}
-        label={(bps) => formatRate(bps, locale)}
-        disabled={busy}
-        onChange={(bps) => void onFee(bps)}
-      />
-      <p className="cc-hint">{t('app.crypto.settings.feeHint')}</p>
-
-      <div className="cc-restart">
-        <ChipChoice
-          name="cc-initial"
-          legend={t('app.crypto.settings.initial')}
-          options={INITIAL_BALANCES}
-          value={initial}
-          label={(value) => money.amount(value)}
-          onChange={setInitial}
-        />
-        <button
-          type="button"
-          className="btn-danger"
-          disabled={busy}
-          onClick={() => setConfirming(true)}
-        >
-          {t('app.crypto.settings.reset')}
-        </button>
-      </div>
-
-      {confirming && (
-        <Modal
-          label={t('app.crypto.settings.confirmTitle')}
-          onClose={close}
-          overlayClassName="confirm-delete-overlay"
-          className="confirm-delete-modal"
-        >
-          <h2 className="confirm-delete-title">{t('app.crypto.settings.confirmTitle')}</h2>
-          <p className="confirm-delete-message">
-            {t('app.crypto.settings.confirmBody', { amount: money.amount(initial) })}
-          </p>
-          <div className="confirm-delete-actions">
-            <button type="button" className="btn-cancel" onClick={close} autoFocus>
-              {t('app.common.cancel')}
-            </button>
-            <button
-              type="button"
-              className="btn-danger"
-              onClick={() => {
-                close();
-                void onReset(initial, account.feeBps);
-              }}
-            >
-              {t('app.crypto.settings.confirm')}
-            </button>
-          </div>
-        </Modal>
-      )}
-    </section>
+    <ExportButtons
+      name="consola_crypto"
+      what={t('app.crypto.csv.what')}
+      count={portfolio.open.length + portfolio.closed.length}
+      table={() => historyTable(portfolio, t, locale, money.display)}
+    />
   );
 }

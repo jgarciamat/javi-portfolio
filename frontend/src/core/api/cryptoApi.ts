@@ -2,7 +2,10 @@ import type {
   CryptoCandles,
   CryptoCoins,
   CryptoInterval,
-  OrderRequest,
+  CryptoRanking,
+  PortfolioOrder,
+  PriceAlerts,
+  SeasonReport,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
 import { apiRequest, jsonBody, query } from './http';
@@ -18,10 +21,13 @@ export const cryptoApi = {
   candles(symbol: string, interval: CryptoInterval) {
     return apiRequest<CryptoCandles>(`/crypto/candles${query({ symbol, interval })}`);
   },
-  portfolio() {
-    return apiRequest<SimPortfolio>('/crypto/sim');
+  /** A portfolio of the person (the official one of the month when not given). */
+  portfolio(portfolioId?: string) {
+    return apiRequest<SimPortfolio>(
+      `/crypto/sim${portfolioId ? query({ portfolio: portfolioId }) : ''}`
+    );
   },
-  placeOrder(order: OrderRequest) {
+  placeOrder(order: PortfolioOrder) {
     return apiRequest<SimPortfolio>('/crypto/sim/orders', {
       method: 'POST',
       body: jsonBody(order),
@@ -32,16 +38,43 @@ export const cryptoApi = {
       method: 'DELETE',
     });
   },
-  reset(initial: number, feeBps: number) {
+  /** «Start again» of a practice portfolio: 10.000 € again. */
+  resetPractice(portfolioId: string) {
     return apiRequest<SimPortfolio>('/crypto/sim/reset', {
       method: 'POST',
-      body: jsonBody({ initial, feeBps }),
+      body: jsonBody({ portfolioId }),
     });
   },
-  setFee(feeBps: number) {
-    return apiRequest<SimPortfolio>('/crypto/sim/settings', {
-      method: 'PATCH',
-      body: jsonBody({ feeBps }),
+  createPractice() {
+    return apiRequest<SimPortfolio>('/crypto/sim/practice', { method: 'POST' });
+  },
+  deletePractice(portfolioId: string) {
+    return apiRequest<SimPortfolio>(`/crypto/sim/practice/${encodeURIComponent(portfolioId)}`, {
+      method: 'DELETE',
+    });
+  },
+  ranking() {
+    return apiRequest<CryptoRanking>('/crypto/ranking');
+  },
+  setRanking(settings: { optIn: boolean; alias?: string }) {
+    return apiRequest<CryptoRanking>('/crypto/ranking/settings', {
+      method: 'PUT',
+      body: jsonBody(settings),
+    });
+  },
+  /** The full report of a season (Premium). */
+  report(season: string) {
+    return apiRequest<SeasonReport>(`/crypto/seasons/${encodeURIComponent(season)}/report`);
+  },
+  alerts() {
+    return apiRequest<PriceAlerts>('/crypto/alerts');
+  },
+  createAlert(alert: { symbol: string; condition: 'above' | 'below'; price: number }) {
+    return apiRequest<PriceAlerts>('/crypto/alerts', { method: 'POST', body: jsonBody(alert) });
+  },
+  deleteAlert(id: string) {
+    return apiRequest<PriceAlerts>(`/crypto/alerts/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
     });
   },
 };

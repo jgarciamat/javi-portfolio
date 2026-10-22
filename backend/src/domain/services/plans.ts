@@ -15,7 +15,15 @@ export type LimitedResource =
 
 /** Capabilities only available in Premium. */
 export type PremiumFeature =
-  'insights' | 'aiAdvisor' | 'forecast' | 'household' | 'inbox' | 'capture' | 'investCourse';
+  | 'insights'
+  | 'aiAdvisor'
+  | 'forecast'
+  | 'household'
+  | 'inbox'
+  | 'capture'
+  | 'investCourse'
+  /** Comforts of the crypto console (statistics, price alerts, season report); no ranking edge. */
+  | 'cryptoPro';
 
 /** Months of the outlook the free plan sees (Premium sees up to 12 and tries «what if…»). */
 export const FREE_FORECAST_MONTHS = 1;
@@ -57,6 +65,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       inbox: false,
       capture: false,
       investCourse: false,
+      cryptoPro: false,
     },
     aiMonthlyQuota: 1,
   },
@@ -81,6 +90,7 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
       inbox: true,
       capture: true,
       investCourse: true,
+      cryptoPro: true,
     },
     aiMonthlyQuota: 10,
   },

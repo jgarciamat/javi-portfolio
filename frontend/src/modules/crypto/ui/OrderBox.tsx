@@ -10,6 +10,17 @@ import { Help } from './Notices';
 const DIRECTIONS: Direction[] = ['long', 'short'];
 const TYPES: TradeType[] = ['market', 'limit', 'stop'];
 
+/** No play money left: the history stays (and the season offers a practice portfolio). */
+function EmptyCash({ practice }: { practice?: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <p className="cc-empty-cash" role="status">
+      <strong>{t('app.crypto.order.emptyCash')}</strong>{' '}
+      {practice ?? t('app.crypto.order.emptyCashHint')}
+    </p>
+  );
+}
+
 interface OrderBoxProps {
   symbol: string;
   coinName: string;
@@ -18,6 +29,8 @@ interface OrderBoxProps {
   portfolio: SimPortfolio;
   busy: boolean;
   onPlace: (order: OrderRequest) => Promise<boolean>;
+  /** What to do when the money ran out (the official season offers a practice portfolio). */
+  practice?: ReactNode;
 }
 
 function Segmented<T extends string>({
@@ -109,15 +122,18 @@ function BeforeOpening({
   problems,
   lines,
   direction,
+  bps,
 }: {
   problems: OrderProblem[];
   lines: Line[];
   direction: Direction;
+  bps: number;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <div className="cc-check" aria-live="polite">
       <h4>{t('app.crypto.order.check.title')}</h4>
+      <p className="cc-hint">{t('app.crypto.order.fixedFee', { rate: formatRate(bps, locale) })}</p>
       <ul>
         {problems.map((p) => (
           <li key={p} className="cc-check-bad">
@@ -287,7 +303,8 @@ function useLines(check: ReturnType<typeof checkOpen>, symbol: string, bps: numb
  * profit and stop loss. Every amount is typed and shown in the chosen currency and sent in euros.
  * Positions are closed from the «Open» panel.
  */
-export function OrderBox({ symbol, coinName, price, portfolio, busy, onPlace }: OrderBoxProps) {
+export function OrderBox(props: OrderBoxProps) {
+  const { symbol, coinName, price, portfolio, busy, onPlace, practice } = props;
   const { t } = useI18n();
   const money = useMoney();
   const [direction, setDirection] = useState<Direction>('long');
@@ -340,11 +357,7 @@ export function OrderBox({ symbol, coinName, price, portfolio, busy, onPlace }: 
     <section className="card cc-order" aria-labelledby="cc-order-title">
       <OrderHead symbol={symbol} coinName={coinName} price={price} />
       <Strips portfolio={portfolio} />
-      {account.cash < 1 && (
-        <p className="cc-empty-cash" role="status">
-          <strong>{t('app.crypto.order.emptyCash')}</strong> {t('app.crypto.order.emptyCashHint')}
-        </p>
-      )}
+      {account.cash < 1 && <EmptyCash practice={practice} />}
 
       <form onSubmit={(e) => void submit(e)} noValidate>
         <div className="cc-order-controls">
@@ -425,7 +438,7 @@ export function OrderBox({ symbol, coinName, price, portfolio, busy, onPlace }: 
           onStopLoss={setStopLoss}
         />
 
-        <BeforeOpening problems={check.problems} lines={lines} direction={direction} />
+        <BeforeOpening problems={check.problems} lines={lines} direction={direction} bps={bps} />
 
         <button
           type="submit"

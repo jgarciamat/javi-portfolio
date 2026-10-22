@@ -2,11 +2,15 @@ import { Router } from 'express';
 import { Container } from '../../container';
 import { RateLimiterFactory, authed } from '../middleware';
 import {
+  cryptoAlertBody,
   cryptoCandlesQuery,
   cryptoOrderBody,
   cryptoOrderParams,
+  cryptoPortfolioParams,
+  cryptoRankingBody,
   cryptoResetBody,
-  cryptoSettingsBody,
+  cryptoSeasonParams,
+  cryptoSimQuery,
 } from '../schemas';
 
 /**
@@ -46,13 +50,15 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
   router.get(
     '/crypto/sim',
     reads,
-    authed(async (req, res) => res.json(await c.cryptoSim.portfolio(req.userId)))
+    authed(async (req, res) =>
+      res.json(await c.cryptoSim.portfolio(req.userId, cryptoSimQuery.parse(req.query).portfolio))
+    )
   );
   router.post(
     '/crypto/sim/orders',
     writes,
     authed(async (req, res) => {
-      const order = cryptoOrderBody.parse(req.body);
+      const { portfolioId, ...order } = cryptoOrderBody.parse(req.body);
       const input =
         order.action === 'buy'
           ? {
@@ -66,7 +72,7 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
               stopLoss: order.stopLoss,
             }
           : order;
-      res.status(201).json(await c.cryptoSim.place(req.userId, input));
+      res.status(201).json(await c.cryptoSim.place(req.userId, input, portfolioId));
     })
   );
   router.delete(
@@ -76,19 +82,71 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
       res.json(await c.cryptoSim.cancel(req.userId, cryptoOrderParams.parse(req.params).id))
     )
   );
+  // «Start again» only exists for practice portfolios: the official season never restarts.
   router.post(
     '/crypto/sim/reset',
     writes,
     authed(async (req, res) => {
-      const { initial, feeBps } = cryptoResetBody.parse(req.body);
-      res.json(await c.cryptoSim.reset(req.userId, initial, feeBps));
+      const { portfolioId } = cryptoResetBody.parse(req.body);
+      res.json(await c.cryptoSim.resetPractice(req.userId, portfolioId));
     })
   );
-  router.patch(
-    '/crypto/sim/settings',
+  router.post(
+    '/crypto/sim/practice',
+    writes,
+    authed(async (req, res) => res.status(201).json(await c.cryptoSim.createPractice(req.userId)))
+  );
+  router.delete(
+    '/crypto/sim/practice/:id',
     writes,
     authed(async (req, res) =>
-      res.json(await c.cryptoSim.setFee(req.userId, cryptoSettingsBody.parse(req.body).feeBps))
+      res.json(
+        await c.cryptoSim.deletePractice(req.userId, cryptoPortfolioParams.parse(req.params).id)
+      )
+    )
+  );
+
+  // The voluntary monthly ranking: only aliases, never e-mails, names or ids.
+  router.get(
+    '/crypto/ranking',
+    reads,
+    authed(async (req, res) => res.json(await c.cryptoRanking.ranking(req.userId)))
+  );
+  router.put(
+    '/crypto/ranking/settings',
+    writes,
+    authed(async (req, res) =>
+      res.json(await c.cryptoRanking.setSettings(req.userId, cryptoRankingBody.parse(req.body)))
+    )
+  );
+
+  // Premium comforts (no edge in the ranking): the season report and price alerts.
+  router.get(
+    '/crypto/seasons/:season/report',
+    reads,
+    authed(async (req, res) => {
+      const { season } = cryptoSeasonParams.parse(req.params);
+      c.entitlements.assertFeature(req.userId, 'cryptoPro');
+      res.json(await c.cryptoSim.report(req.userId, season));
+    })
+  );
+  router.get(
+    '/crypto/alerts',
+    reads,
+    authed(async (req, res) => res.json(c.cryptoAlerts.list(req.userId)))
+  );
+  router.post(
+    '/crypto/alerts',
+    writes,
+    authed(async (req, res) =>
+      res.status(201).json(c.cryptoAlerts.create(req.userId, cryptoAlertBody.parse(req.body)))
+    )
+  );
+  router.delete(
+    '/crypto/alerts/:id',
+    writes,
+    authed(async (req, res) =>
+      res.json(c.cryptoAlerts.remove(req.userId, cryptoPortfolioParams.parse(req.params).id))
     )
   );
   return router;

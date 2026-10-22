@@ -1334,22 +1334,67 @@
     }
   },
   {
-    "name": "cryptoFee",
-    "method": "PATCH",
-    "path": "/crypto/sim/settings",
+    "name": "cryptoPractice",
+    "method": "POST",
+    "path": "/crypto/sim/practice",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "cryptoBuyPractice",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
     "auth": true,
     "body": {
-      "feeBps": 25
+      "action": "buy",
+      "portfolioId": "{practice}",
+      "symbol": "ETH",
+      "type": "market",
+      "amount": 100
     }
   },
   {
-    "name": "cryptoReset",
+    "name": "cryptoResetPractice",
     "method": "POST",
     "path": "/crypto/sim/reset",
     "auth": true,
     "body": {
-      "initial": 1000,
-      "feeBps": 0
+      "portfolioId": "{practice}"
     }
+  },
+  {
+    "name": "cryptoDeletePractice",
+    "method": "DELETE",
+    "path": "/crypto/sim/practice/{practice}",
+    "auth": true,
+    "body": null
+  },
+  {
+    "name": "cryptoRanking",
+    "method": "PUT",
+    "path": "/crypto/ranking/settings",
+    "auth": true,
+    "body": {
+      "optIn": true,
+      "alias": "Lince"
+    }
+  },
+  {
+    "name": "cryptoAlert",
+    "method": "POST",
+    "path": "/crypto/alerts",
+    "auth": true,
+    "body": {
+      "symbol": "BTC",
+      "condition": "above",
+      "price": 60000
+    }
+  },
+  {
+    "name": "cryptoDeleteAlert",
+    "method": "DELETE",
+    "path": "/crypto/alerts/{alert}",
+    "auth": true,
+    "body": null
   }
 ]

@@ -289,6 +289,19 @@ describe('API contract', () => {
       ctx.market.setCandles('BTC', candles);
       ctx.clock.set('2026-03-15T12:05:00Z');
       contract('cryptoSimFilled', (await get('/crypto/sim')).body);
+      await request(ctx.app)
+        .put('/api/crypto/ranking/settings')
+        .set(user.auth)
+        .send({ optIn: true, alias: 'Lince' })
+        .expect(200);
+      contract('cryptoRanking', (await get('/crypto/ranking')).body);
+      await request(ctx.app)
+        .post('/api/crypto/alerts')
+        .set(user.auth)
+        .send({ symbol: 'BTC', condition: 'above', price: 60_000 })
+        .expect(201);
+      contract('cryptoAlerts', (await get('/crypto/alerts')).body);
+      contract('cryptoReport', (await get('/crypto/seasons/2026-03/report')).body);
     });
 
     it('requests (the bodies the app sends are accepted by the routes)', async () => {
@@ -299,11 +312,16 @@ describe('API contract', () => {
         'cryptoSellLimit',
         'cryptoSellMarket',
         'cryptoBuyLimit',
-        'cryptoFee',
-        'cryptoReset',
       ]) {
         await send(name, { position });
       }
+      const practice = (await send('cryptoPractice')).body.portfolio.id as string;
+      for (const name of ['cryptoBuyPractice', 'cryptoResetPractice', 'cryptoDeletePractice']) {
+        await send(name, { practice });
+      }
+      await send('cryptoRanking');
+      const alert = (await send('cryptoAlert')).body.alerts[0].id as string;
+      await send('cryptoDeleteAlert', { alert });
     });
   });
 

@@ -11,8 +11,9 @@ import {
   TestUser,
   createTestApp,
   createUser,
+  expireTrial,
 } from '../helpers/testApp';
-import { nextMonthStart, spanishMonth } from '@application/crypto/CryptoSimService';
+import { madridMonth, nextMonth } from '@domain/services/crypto-season';
 
 // Every price here is made up: the fake market answers what each test sets.
 const candle = (iso: string, open: number, high: number, low: number) => ({
@@ -147,7 +148,17 @@ describe('Crypto console', () => {
         losses: 0,
         winRate: null,
       });
-      expect(body.limits).toEqual({ pending: 20, open: 50, operations: 1000, pendingDays: 30 });
+      // The 14-day trial is Premium: 100 pending orders; the free plan, 20.
+      expect(body.limits).toEqual({ pending: 100, open: 50, operations: 1000, pendingDays: 30 });
+      expect(body.portfolio).toMatchObject({ kind: 'season', season: '2026-03' });
+      expect(body.season).toMatchObject({
+        month: '2026-03',
+        startsAt: '2026-02-28T23:00:00.000Z',
+        endsAt: '2026-03-31T22:00:00.000Z',
+        daysLeft: 16,
+        endingSoon: false,
+        history: [],
+      });
       expect(body.market).toMatchObject({ available: true, stale: false, source: 'binance' });
     });
 
@@ -195,8 +206,7 @@ describe('Crypto console', () => {
     it('refuses a purchase without enough play money or below 1 €', async () => {
       expect((await buy({ amount: 10_000 }).expect(400)).body.code).toBe('CRYPTO_NO_BALANCE');
       await buy({ amount: 0.5 }).expect(400);
-      await post('/crypto/sim/reset', { initial: 1000, feeBps: 0 }).expect(200);
-      expect((await buy({ amount: 1000 }).expect(201)).body.account.cash).toBe(0);
+      expect((await buy({ amount: 9990 }).expect(201)).body.account.cash).toBe(0.01);
     });
 
     it('validates the orders strictly', async () => {
@@ -247,7 +257,7 @@ describe('Crypto console', () => {
         candle('2026-03-15T12:02:00Z', 46_000, 46_000, 44_000),
       ]);
       const { body } = await get('/crypto/sim').expect(200);
-      expect(ctx.market.candleCalls.at(-1)).toBe('BTC:1m');
+      expect(ctx.market.candleCalls).toContain('BTC:1m');
       expect(body.pending).toEqual([]);
       expect(body.fills).toEqual([
         {
@@ -350,37 +360,41 @@ describe('Crypto console', () => {
     });
 
     it('lets a pending order expire after 30 days and returns the money', async () => {
+      // A 31-day month, so the order expires before the season ends.
+      ctx.clock.set('2026-01-01T12:00:00Z');
       await buy({ type: 'limit', price: 40_000 }).expect(201);
       later(PENDING_MS + 60_000);
       const { body } = await get('/crypto/sim').expect(200);
       expect(body.pending).toEqual([]);
       expect(body.fills[0]).toMatchObject({ type: 'expired', price: null });
       expect(body.account.cash).toBe(10_000);
-      expect(ctx.market.candleCalls.at(-1)).toBe('BTC:1h');
+      expect(ctx.market.candleCalls).toContain('BTC:1h');
     });
 
-    it('limits the pending orders and the open purchases', async () => {
+    it('limits the pending orders (20 on the free plan) and the open purchases', async () => {
+      expireTrial(ctx, user);
       for (let i = 0; i < MAX_PENDING_ORDERS; i++) {
         await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
       }
       const full = await buy({ type: 'limit', price: 30_000, amount: 10 }).expect(400);
       expect(full.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
+      expect(full.body.error).toContain('con Premium, hasta 100');
       const position = (await buy({ amount: 10 }).expect(201)).body.open[0];
       const sale = await sell(position.id, { type: 'limit', price: 60_000 }).expect(400);
       expect(sale.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
 
-      await post('/crypto/sim/reset', { initial: 100_000, feeBps: 0 }).expect(200);
-      for (let i = 0; i < 50; i++) await buy({ amount: 10 }).expect(201);
+      for (let i = 0; i < 49; i++) await buy({ amount: 10 }).expect(201);
       expect((await buy({ amount: 10 }).expect(400)).body.code).toBe('CRYPTO_TOO_MANY_OPEN');
     });
 
-    it('stops at 1.000 operations until starting again', async () => {
+    it('stops at 1.000 operations in a month', async () => {
       const repo = ctx.container.repos.cryptoSim;
-      await get('/crypto/sim').expect(200);
+      const portfolioId = (await get('/crypto/sim').expect(200)).body.portfolio.id as string;
       for (let i = 0; i < 1000; i++) {
         repo.insertPosition({
           id: `p${i}`,
           userId: user.id,
+          portfolioId,
           symbol: 'BTC',
           direction: 'long',
           quantity: 1,
@@ -397,28 +411,22 @@ describe('Crypto console', () => {
           closedAt: null,
         });
       }
-      expect((await buy({ amount: 10 }).expect(400)).body.code).toBe('CRYPTO_HISTORY_FULL');
+      const full = await buy({ amount: 10 }).expect(400);
+      expect(full.body.code).toBe('CRYPTO_HISTORY_FULL');
+      expect(full.body.error).toContain('este mes');
     });
 
-    it('starts again with another balance and commission, and changes the commission', async () => {
+    it('never restarts the official season and has no commission setting any more', async () => {
       await buy({}).expect(201);
-      const reset = await post('/crypto/sim/reset', { initial: 100_000, feeBps: 50 }).expect(200);
-      expect(reset.body.account).toMatchObject({ initial: 100_000, cash: 100_000, feeBps: 50 });
-      expect(reset.body.open).toEqual([]);
-      await post('/crypto/sim/reset', { initial: 5000, feeBps: 50 }).expect(400);
-      await post('/crypto/sim/reset', { initial: 1000, feeBps: 7 }).expect(400);
-      const fee = await request(ctx.app)
-        .patch('/api/crypto/sim/settings')
-        .set(user.auth)
-        .send({ feeBps: 100 })
-        .expect(200);
-      expect(fee.body.account.feeBps).toBe(100);
-      expect((await buy({ amount: 1000 }).expect(201)).body.open[0].entryFee).toBe(10);
+      const reset = await post('/crypto/sim/reset', { initial: 100_000, feeBps: 50 }).expect(400);
+      expect(reset.body.code).toBe('CRYPTO_SEASON_NO_RESET');
+      await post('/crypto/sim/reset', { initial: 5000 }).expect(400);
       await request(ctx.app)
         .patch('/api/crypto/sim/settings')
         .set(user.auth)
-        .send({ feeBps: 100, initial: 1 })
-        .expect(400);
+        .send({ feeBps: 100 })
+        .expect(404);
+      expect((await get('/crypto/sim').expect(200)).body.open).toHaveLength(1);
     });
 
     it('does not trade with prices that are not up to date, but still shows the portfolio', async () => {
@@ -506,6 +514,7 @@ describe('Crypto console', () => {
     });
 
     it('counts them among the pending orders', async () => {
+      expireTrial(ctx, user);
       for (let i = 0; i < MAX_PENDING_ORDERS - 1; i++) {
         await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
       }
@@ -645,10 +654,10 @@ describe('Crypto console', () => {
 
   describe('calendar months', () => {
     it('counts months in Spanish time', () => {
-      expect(spanishMonth(new Date('2026-03-31T22:30:00Z'))).toBe('2026-04');
-      expect(spanishMonth(new Date('2026-03-31T21:30:00Z'))).toBe('2026-03');
-      expect(nextMonthStart('2026-12')).toBe('2027-01-01');
-      expect(nextMonthStart('2026-03')).toBe('2026-04-01');
+      expect(madridMonth(new Date('2026-03-31T22:30:00Z'))).toBe('2026-04');
+      expect(madridMonth(new Date('2026-03-31T21:30:00Z'))).toBe('2026-03');
+      expect(nextMonth('2026-12')).toBe('2027-01');
+      expect(nextMonth('2026-03')).toBe('2026-04');
     });
   });
 
@@ -658,11 +667,25 @@ describe('Crypto console', () => {
       await sell(position.id, { type: 'limit', price: 60_000 }).expect(201);
       const exported = await get('/export').expect(200);
       expect(exported.body.cryptoSimulator).toMatchObject({
-        initial: 10_000,
-        cash: 8999,
-        feeBps: 10,
-        operations: [{ symbol: 'BTC', invested: 1000, entryFee: 1, exitFee: null, result: null }],
-        pendingOrders: [{ side: 'sell', type: 'limit', price: 60_000, amount: null, reserved: 0 }],
+        ranking: null,
+        portfolios: [
+          {
+            kind: 'season',
+            season: '2026-03',
+            initial: 10_000,
+            cash: 8999,
+            feeBps: 10,
+            operations: [
+              { symbol: 'BTC', invested: 1000, entryFee: 1, exitFee: null, result: null },
+            ],
+            pendingOrders: [
+              { side: 'sell', type: 'limit', price: 60_000, amount: null, reserved: 0 },
+            ],
+          },
+        ],
+        seasonResults: [],
+        badges: [{ badge: 'firstTrade' }],
+        priceAlerts: [],
       });
 
       await request(ctx.app)
@@ -672,7 +695,9 @@ describe('Crypto console', () => {
         .expect(204);
       const count = (table: string) =>
         (ctx.container.db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
-      expect(count('crypto_sim_accounts')).toBe(0);
+      expect(count('crypto_sim_portfolios')).toBe(0);
+      expect(count('crypto_sim_badges')).toBe(0);
+      expect(count('crypto_sim_equity_days')).toBe(0);
       expect(count('crypto_sim_positions')).toBe(0);
       expect(count('crypto_sim_orders')).toBe(0);
     });

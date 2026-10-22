@@ -115,14 +115,24 @@ export class EntitlementService {
   }
 
   /**
-   * Extra Premium days (invitations): added after the current trial end or from today.
-   * Lifetime users already have everything.
+   * Extra Premium days (invitations, the crypto ranking prize): added after the current trial
+   * end or from today (with `afterPaidPeriod`, also after the paid period). Lifetime users
+   * already have everything.
    */
-  grantDays(userId: string, days: number): boolean {
+  grantDays(userId: string, days: number, options: { afterPaidPeriod?: boolean } = {}): boolean {
     const now = this.clock.now();
     const sub = this.subscriptions.get(userId) ?? emptySubscription(userId, now);
     if (sub.lifetime) return false;
-    const base = Math.max(now.getTime(), sub.trialEndsAt ? new Date(sub.trialEndsAt).getTime() : 0);
+    // A prize is added after the Premium already paid for, so it is never lost in the overlap.
+    const paidUntil =
+      options.afterPaidPeriod && sub.source !== 'trial' && sub.currentPeriodEnd
+        ? new Date(sub.currentPeriodEnd).getTime()
+        : 0;
+    const base = Math.max(
+      now.getTime(),
+      sub.trialEndsAt ? new Date(sub.trialEndsAt).getTime() : 0,
+      paidUntil
+    );
     this.subscriptions.save({
       ...sub,
       status: sub.status === 'none' ? 'trialing' : sub.status,

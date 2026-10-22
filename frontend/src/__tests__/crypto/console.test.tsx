@@ -720,22 +720,15 @@ describe('Crypto console: open, pending and closed', () => {
   });
 });
 
-describe('Crypto console: history and settings', () => {
-  it('changes the commission and starts again after confirming', async () => {
-    const { api } = setup();
+describe('Crypto console: history', () => {
+  it('has no commission or balance settings: the commission is fixed', async () => {
+    setup();
     await screen.findByText('Abiertas (1)');
-    fireEvent.click(screen.getByRole('radio', { name: /^0,25/ }));
-    await waitFor(() => expect(api.cryptoApi.setFee).toHaveBeenCalledWith(25));
-    fireEvent.click(screen.getByRole('radio', { name: /^1\.000,00/ }));
-    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo' }));
-    const dialog = screen.getByRole('dialog');
-    expect(nb(dialog.textContent)).toMatch(/empezarás con 1.000,00 € ficticios/);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
-    expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Sí, empezar de nuevo' }));
-    await waitFor(() => expect(api.cryptoApi.reset).toHaveBeenCalledWith(1000, 10));
-    expect(await screen.findByText('Abiertas (0)')).toBeInTheDocument();
+    expect(screen.queryByText('Tu historial y ajustes')).toBeNull();
+    expect(screen.queryByRole('radio', { name: /^0,25/ })).toBeNull();
+    expect(nb(check().textContent)).toContain(
+      'Comisión fija: 0,1 % al abrir y otro 0,1 % al cerrar'
+    );
   });
 
   it('downloads the history as CSV', async () => {

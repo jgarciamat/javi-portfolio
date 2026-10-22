@@ -4,7 +4,9 @@ import { lazyNamed } from '@shared/utils/lazyNamed';
 import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
+import { useAlerts, useRanking } from '../application/useRanking';
 import { useSimulator, type Simulator } from '../application/useSimulator';
+import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
 import type { GuideSection } from '../domain/guide';
 import type { CryptoCoin, SimFill, SimPortfolio } from '../domain/types';
@@ -18,7 +20,10 @@ import {
 } from './money';
 import { DataNotice, GlossaryButton, RiskBanner } from './Notices';
 import { OrderBox } from './OrderBox';
-import { SimSettings, SimSummary } from './SimSummary';
+import { AlertsCard, PlansCard, StatsCard } from './PremiumPanel';
+import { RankingCard } from './RankingCard';
+import { BadgesCard, PracticeOffer, SeasonPanel } from './SeasonPanel';
+import { HistoryExport, SimSummary } from './SimSummary';
 import { ClosedPanel, OpenPanel, PendingPanel, orderKind } from './TradePanels';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
@@ -155,6 +160,9 @@ function SimulatorBody({
         portfolio={portfolio}
         busy={busy}
         onPlace={sim.place}
+        practice={
+          outOfBalance(portfolio) ? <PracticeOffer portfolio={portfolio} sim={sim} /> : undefined
+        }
       />
       <GlossaryButton onOpen={onGlossary} />
       <OpenPanel
@@ -169,9 +177,46 @@ function SimulatorBody({
         days={portfolio.limits.pendingDays}
         onCancel={sim.cancel}
       />
-      <ClosedPanel trades={portfolio.closed} />
-      <SimSettings portfolio={portfolio} busy={busy} onFee={sim.setFee} onReset={sim.reset} />
+      <ClosedPanel trades={portfolio.closed} extra={<HistoryExport portfolio={portfolio} />} />
+      <StatsCard portfolio={portfolio} />
     </>
+  );
+}
+
+/** The ranking, alerts, badges and «Free and Premium», once the portfolio is known. */
+function SeasonExtras({ portfolio, coins }: { portfolio: SimPortfolio; coins: CryptoCoin[] }) {
+  const { t } = useI18n();
+  const premium = portfolio.plan.premium;
+  const ranking = useRanking(t('app.crypto.ranking.error'));
+  const alerts = useAlerts(t('app.crypto.alerts.error'), premium);
+  return (
+    <>
+      <RankingCard state={ranking} />
+      <AlertsCard premium={premium} alerts={alerts} coins={coins} />
+      <BadgesCard portfolio={portfolio} />
+      <div id="cc-plans">
+        <PlansCard premium={premium} />
+      </div>
+    </>
+  );
+}
+
+/** The freshest word on the market data: the chart's, else the coin list's. */
+const statusOf = (market: ReturnType<typeof useCryptoMarket>) =>
+  market.candles?.market ?? market.coins?.market ?? null;
+
+/** Dollars are only a conversion of what the simulator does in euros. */
+function CurrencyNote({ unavailable }: { unavailable: boolean }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  return (
+    <p className="cc-data">
+      {unavailable
+        ? t('app.crypto.currency.unavailable')
+        : money.display.currency === 'USD'
+          ? t('app.crypto.currency.note')
+          : null}
+    </p>
   );
 }
 
@@ -184,6 +229,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
   const market = useCryptoMarket(view.symbol, view.interval, t('app.crypto.market.error'));
   const sim = useSimulator(t('app.crypto.sim.error'));
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
+  const premium = !!sim.portfolio?.plan.premium;
   const lines = useMemo(
     () => chartLines(sim.portfolio, view.symbol, t, money),
     [sim.portfolio, view.symbol, t, money]
@@ -198,14 +244,9 @@ function Console({ currency }: { currency: DisplayChoice }) {
   return (
     <div className="section-view cc">
       <RiskBanner />
-      <DataNotice market={market.candles?.market ?? market.coins?.market ?? null} />
-      <p className="cc-data">
-        {currency.unavailable
-          ? t('app.crypto.currency.unavailable')
-          : money.display.currency === 'USD'
-            ? t('app.crypto.currency.note')
-            : null}
-      </p>
+      <DataNotice market={statusOf(market)} />
+      <CurrencyNote unavailable={currency.unavailable} />
+      {sim.portfolio && <SeasonPanel portfolio={sim.portfolio} sim={sim} />}
       <SimulatorHead sim={sim} />
       <MarketPanel
         view={view}
@@ -220,18 +261,21 @@ function Console({ currency }: { currency: DisplayChoice }) {
         onGuide={setGuide}
       />
       {sim.portfolio && (
-        <SimulatorBody
-          portfolio={sim.portfolio}
-          sim={sim}
-          symbol={view.symbol}
-          coin={coin}
-          onGlossary={() => setGuide('glossary')}
-        />
+        <>
+          <SimulatorBody
+            portfolio={sim.portfolio}
+            sim={sim}
+            symbol={view.symbol}
+            coin={coin}
+            onGlossary={() => setGuide('glossary')}
+          />
+          <SeasonExtras portfolio={sim.portfolio} coins={market.coins?.coins ?? []} />
+        </>
       )}
       <GlossaryButton onOpen={() => setGuide('glossary')} />
       {guide && (
         <Suspense fallback={null}>
-          <GuideModal section={guide} onClose={() => setGuide(null)} />
+          <GuideModal section={guide} premium={premium} onClose={() => setGuide(null)} />
         </Suspense>
       )}
     </div>

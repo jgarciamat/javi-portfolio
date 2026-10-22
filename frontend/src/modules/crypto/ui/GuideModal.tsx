@@ -29,6 +29,7 @@ import {
   VolumeArt,
   VwapArt,
 } from './guideArt';
+import { PlansCard } from './PremiumPanel';
 import './css/GuideModal.css';
 
 const anchor = (section: GuideSection) => `cc-guide-${section}`;
@@ -147,7 +148,16 @@ function Glossary() {
  * known patterns, with small drawings, and every word of the console at the end. Plain
  * explanations for learning, never advice.
  */
-export function GuideModal({ section, onClose }: { section: GuideSection; onClose: () => void }) {
+export function GuideModal({
+  section,
+  premium = false,
+  onClose,
+}: {
+  section: GuideSection;
+  /** Whether the person has Premium (for the «Free and Premium» section). */
+  premium?: boolean;
+  onClose: () => void;
+}) {
   const { t, locale } = useI18n();
   useEffect(() => {
     // The first section is already at the top, under the note.
@@ -208,6 +218,9 @@ export function GuideModal({ section, onClose }: { section: GuideSection; onClos
         <Section id="fibonacci" art={<FibonacciArt labels={FIB_RATIOS.map(percent)} />} />
         <Patterns />
         <Glossary />
+        <div id={anchor('plans')} className="cc-guide-section">
+          <PlansCard premium={premium} headingLevel={3} />
+        </div>
       </div>
     </Modal>
   );

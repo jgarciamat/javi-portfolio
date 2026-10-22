@@ -111,47 +111,98 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
     };
   }
 
-  /** The play-money simulator of the crypto console: balance, purchases and pending orders. */
+  /**
+   * The play-money simulator of the crypto console: every portfolio (official seasons and
+   * practice) with its operations and pending orders, the frozen season results, the voluntary
+   * ranking settings (alias), badges, daily equity and price alerts.
+   */
   private cryptoSimulator(userId: string): Row | null {
-    const account = this.one(
-      `SELECT initial_cents, cash_cents, fee_bps AS feeBps, started_at AS startedAt
-       FROM crypto_sim_accounts WHERE user_id = ?`,
+    const portfolios = this.all(
+      `SELECT id, kind, season, initial_cents, cash_cents, fee_bps AS feeBps,
+              started_at AS startedAt, closed_at AS closedAt
+       FROM crypto_sim_portfolios WHERE user_id = ? ORDER BY started_at`,
       userId
     );
-    if (!account) return null;
-    const { initial_cents, cash_cents, ...rest } = account;
+    const profile = this.one(
+      `SELECT ranking_opt_in, alias, practice_day AS practiceDay,
+              practice_actions AS practiceActions, updated_at AS updatedAt
+       FROM crypto_sim_profiles WHERE user_id = ?`,
+      userId
+    );
+    const results = this.all(
+      `SELECT season, initial_cents, final_cents, trades, wins, active_days AS activeDays,
+              reached_at AS reachedAt, ranked, alias, premium, place, prize_days AS prizeDays,
+              created_at AS createdAt
+       FROM crypto_sim_season_results WHERE user_id = ? ORDER BY season`,
+      userId
+    );
+    if (!portfolios.length && !profile && !results.length) return null;
     return {
-      ...rest,
-      initial: money(initial_cents),
-      cash: money(cash_cents),
-      operations: this.all(
-        `SELECT id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents, entry_fee_cents,
-                open_type AS openType, opened_at AS openedAt, exit_price AS exitPrice,
-                exit_fee_cents, proceeds_cents, pnl_cents, close_type AS closeType,
-                closed_at AS closedAt
-         FROM crypto_sim_positions WHERE user_id = ? ORDER BY opened_at`,
-        userId
-      ).map(
-        ({ amount_cents, entry_fee_cents, exit_fee_cents, proceeds_cents, pnl_cents, ...p }) => ({
-          ...p,
-          invested: money(amount_cents),
-          entryFee: money(entry_fee_cents),
-          exitFee: money(exit_fee_cents),
-          proceeds: money(proceeds_cents),
-          result: money(pnl_cents),
-        })
-      ),
-      pendingOrders: this.all(
-        `SELECT id, symbol, side, direction, type, price, amount_cents, reserved_cents,
-                position_id AS positionId, take_profit AS takeProfit, stop_loss AS stopLoss,
-                created_at AS createdAt
-         FROM crypto_sim_orders WHERE user_id = ? ORDER BY created_at`,
-        userId
-      ).map(({ amount_cents, reserved_cents, ...o }) => ({
-        ...o,
-        amount: money(amount_cents),
-        reserved: money(reserved_cents),
+      ranking: profile
+        ? {
+            appearInRanking: profile.ranking_opt_in === 1,
+            alias: profile.alias,
+            practiceDay: profile.practiceDay,
+            practiceActions: profile.practiceActions,
+            updatedAt: profile.updatedAt,
+          }
+        : null,
+      portfolios: portfolios.map(({ id, initial_cents, cash_cents, ...p }) => ({
+        id,
+        ...p,
+        initial: money(initial_cents),
+        cash: money(cash_cents),
+        operations: this.all(
+          `SELECT id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents,
+                  entry_fee_cents, open_type AS openType, opened_at AS openedAt,
+                  exit_price AS exitPrice, exit_fee_cents, proceeds_cents, pnl_cents,
+                  close_type AS closeType, closed_at AS closedAt
+           FROM crypto_sim_positions WHERE user_id = ? AND portfolio_id = ? ORDER BY opened_at`,
+          userId,
+          id
+        ).map(
+          ({ amount_cents, entry_fee_cents, exit_fee_cents, proceeds_cents, pnl_cents, ...o }) => ({
+            ...o,
+            invested: money(amount_cents),
+            entryFee: money(entry_fee_cents),
+            exitFee: money(exit_fee_cents),
+            proceeds: money(proceeds_cents),
+            result: money(pnl_cents),
+          })
+        ),
+        pendingOrders: this.all(
+          `SELECT id, symbol, side, direction, type, price, amount_cents, reserved_cents,
+                  position_id AS positionId, take_profit AS takeProfit, stop_loss AS stopLoss,
+                  created_at AS createdAt
+           FROM crypto_sim_orders WHERE user_id = ? AND portfolio_id = ? ORDER BY created_at`,
+          userId,
+          id
+        ).map(({ amount_cents, reserved_cents, ...o }) => ({
+          ...o,
+          amount: money(amount_cents),
+          reserved: money(reserved_cents),
+        })),
+        equityByDay: this.all(
+          `SELECT day, equity_cents FROM crypto_sim_equity_days WHERE portfolio_id = ? ORDER BY day`,
+          id
+        ).map(({ day, equity_cents }) => ({ day, equity: money(equity_cents) })),
       })),
+      seasonResults: results.map(({ initial_cents, final_cents, ranked, premium, ...r }) => ({
+        ...r,
+        appearedInRanking: ranked === 1,
+        premium: premium === 1,
+        initial: money(initial_cents),
+        final: money(final_cents),
+      })),
+      badges: this.all(
+        'SELECT badge, earned_at AS earnedAt FROM crypto_sim_badges WHERE user_id = ? ORDER BY earned_at',
+        userId
+      ),
+      priceAlerts: this.all(
+        `SELECT symbol, condition, price, created_at AS createdAt, triggered_at AS triggeredAt
+         FROM crypto_sim_alerts WHERE user_id = ? ORDER BY created_at`,
+        userId
+      ),
     };
   }
 

@@ -19,7 +19,14 @@ export type LimitedResource =
   | 'assets'
   | 'imports';
 export type PremiumFeature =
-  'insights' | 'aiAdvisor' | 'forecast' | 'household' | 'inbox' | 'capture' | 'investCourse';
+  | 'insights'
+  | 'aiAdvisor'
+  | 'forecast'
+  | 'household'
+  | 'inbox'
+  | 'capture'
+  | 'investCourse'
+  | 'cryptoPro';
 
 export interface PlanLimits {
   /** null = unlimited */

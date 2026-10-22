@@ -1,8 +1,7 @@
 import type { Direction, PendingType, TradeType } from './types';
 
-/** Choices of the simulator, the same as the API accepts. */
-export const INITIAL_BALANCES = [1_000, 10_000, 100_000] as const;
-export const FEE_OPTIONS_BPS = [0, 10, 25, 50, 100] as const;
+/** The commission is fixed: 0,10 % when opening and again when closing (10 basis points). */
+export const FIXED_FEE_BPS = 10;
 export const QUICK_AMOUNTS = [100, 500, 1_000] as const;
 
 const cents = (value: number) => Math.round(value * 100) / 100;

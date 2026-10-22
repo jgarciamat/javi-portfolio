@@ -85,8 +85,44 @@ function fakeCryptoApi(): FakeApi['cryptoApi'] {
     portfolio: ok(crypto.portfolio()),
     placeOrder: ok(crypto.portfolio()),
     cancelOrder: ok(crypto.portfolio()),
-    reset: ok(crypto.portfolio({ open: [] })),
-    setFee: ok(crypto.portfolio()),
+    resetPractice: ok(
+      crypto.portfolio({
+        portfolio: crypto.PRACTICE_REF,
+        portfolios: [crypto.SEASON_REF, crypto.PRACTICE_REF],
+        open: [],
+      })
+    ),
+    createPractice: ok(
+      crypto.portfolio({
+        portfolio: crypto.PRACTICE_REF,
+        portfolios: [crypto.SEASON_REF, crypto.PRACTICE_REF],
+        open: [],
+      })
+    ),
+    deletePractice: ok(crypto.portfolio()),
+    ranking: ok(crypto.ranking()),
+    setRanking: ok(crypto.ranking()),
+    report: ok({
+      season: '2026-03',
+      finished: false,
+      initial: 10_000,
+      result: null,
+      closed: [],
+      stats: {
+        winRate: null,
+        wins: 0,
+        losses: 0,
+        best: null,
+        worst: null,
+        averageWin: null,
+        averageLoss: null,
+        equityDays: [],
+        hold: null,
+      },
+    }),
+    alerts: ok(crypto.alerts()),
+    createAlert: ok(crypto.alerts()),
+    deleteAlert: ok(crypto.alerts()),
   };
 }
 

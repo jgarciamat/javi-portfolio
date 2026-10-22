@@ -3,6 +3,8 @@ import type {
   CryptoCandles,
   CryptoCoins,
   CryptoInterval,
+  CryptoRanking,
+  PriceAlerts,
   SimPortfolio,
 } from '@modules/crypto/domain/types';
 
@@ -70,8 +72,93 @@ export function candles(symbol = 'BTC', interval: CryptoInterval = '1h', count =
   return { symbol, interval, candles: candleList(count), market: MARKET };
 }
 
+/** The official portfolio of March 2026 (made-up ids). */
+export const SEASON_REF = {
+  id: 'f0000000-0000-4000-8000-000000000001',
+  kind: 'season' as const,
+  season: '2026-03',
+  startedAt: '2026-03-01T00:00:00.000Z',
+};
+export const PRACTICE_REF = {
+  id: 'f0000000-0000-4000-8000-000000000002',
+  kind: 'practice' as const,
+  season: null,
+  startedAt: '2026-03-10T10:00:00.000Z',
+};
+
+export function ranking(overrides: Partial<CryptoRanking> = {}): CryptoRanking {
+  return {
+    season: { month: '2026-03', endsAt: '2026-03-31T22:00:00.000Z', daysLeft: 16 },
+    top: [
+      { place: 1, alias: 'Lince', percent: 12.5, trades: 9, premium: true },
+      { place: 2, alias: 'Nube', percent: 8.25, trades: 1, premium: false },
+      { place: 3, alias: 'Roble', percent: -1.5, trades: 6, premium: false },
+    ],
+    participants: 7,
+    me: {
+      place: null,
+      percent: 0.98,
+      trades: 2,
+      activeDays: 1,
+      qualified: false,
+      missing: { trades: 3, days: 2 },
+    },
+    settings: { optIn: false, alias: null, suggestedAlias: 'Ana' },
+    previous: null,
+    rules: {
+      size: 5,
+      minTrades: 5,
+      minDays: 3,
+      prizeDays: 30,
+      initial: 10_000,
+      aliasMin: 3,
+      aliasMax: 20,
+    },
+    ...overrides,
+  };
+}
+
+export function alerts(overrides: Partial<PriceAlerts> = {}): PriceAlerts {
+  return {
+    alerts: [
+      {
+        id: 'a1',
+        symbol: 'BTC',
+        condition: 'above',
+        price: 60_000,
+        createdAt: '2026-03-15T12:00:00.000Z',
+        triggeredAt: null,
+      },
+      {
+        id: 'a2',
+        symbol: 'ETH',
+        condition: 'below',
+        price: 1_500,
+        createdAt: '2026-03-14T12:00:00.000Z',
+        triggeredAt: '2026-03-15T09:00:00.000Z',
+      },
+    ],
+    max: 10,
+    pushEnabled: true,
+    ...overrides,
+  };
+}
+
 export function portfolio(overrides: Partial<SimPortfolio> = {}): SimPortfolio {
   return {
+    portfolio: SEASON_REF,
+    portfolios: [SEASON_REF],
+    season: {
+      month: '2026-03',
+      startsAt: '2026-02-28T23:00:00.000Z',
+      endsAt: '2026-03-31T22:00:00.000Z',
+      daysLeft: 16,
+      endingSoon: false,
+      history: [],
+    },
+    plan: { premium: false, practiceMax: 1, practiceActionsLeft: 5 },
+    badges: [{ id: 'firstTrade', earnedAt: '2026-03-15T12:00:00.000Z' }],
+    stats: null,
     account: {
       initial: 10_000,
       cash: 8_999,

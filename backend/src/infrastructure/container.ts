@@ -56,6 +56,8 @@ import { BinanceMarketData } from './market/BinanceMarketData';
 import { DemoMarketData } from './market/DemoMarketData';
 import { SqliteCryptoSimRepository } from './sqlite/repositories/SqliteCryptoSimRepository';
 import { CryptoMarketService } from '@application/crypto/CryptoMarketService';
+import { CryptoAlertService } from '@application/crypto/CryptoAlertService';
+import { CryptoRankingService } from '@application/crypto/CryptoRankingService';
 import { CryptoSimService } from '@application/crypto/CryptoSimService';
 import { JsonOfferCatalog } from './offers/JsonOfferCatalog';
 import { BcryptPasswordHasher, JwtTokenService } from './auth/JwtTokenService';
@@ -353,6 +355,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     (config.cryptoMarket === 'demo'
       ? new DemoMarketData(() => clock.now().getTime())
       : new BinanceMarketData());
+  const cryptoSim = new CryptoSimService(repos.cryptoSim, market, uow, clock, entitlements);
 
   return {
     db,
@@ -362,7 +365,28 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     email,
     rates: overrides.rates ?? new FrankfurterRates(),
     cryptoMarket: new CryptoMarketService(market),
-    cryptoSim: new CryptoSimService(repos.cryptoSim, market, uow, clock),
+    cryptoSim,
+    cryptoRanking: new CryptoRankingService(
+      repos.cryptoSim,
+      cryptoSim,
+      market,
+      repos.users,
+      repos.settings,
+      entitlements,
+      entitlements,
+      pushService,
+      uow,
+      clock
+    ),
+    cryptoAlerts: new CryptoAlertService(
+      repos.cryptoSim,
+      market,
+      entitlements,
+      pushService,
+      repos.settings,
+      uow,
+      clock
+    ),
     auth,
     twoFactor,
     transactions,

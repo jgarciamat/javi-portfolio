@@ -323,20 +323,6 @@
   background: color-mix(in srgb, var(--red-500) 12%, transparent);
 }
 
-.cc-choice {
-  display: flex;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  gap: 0.5rem;
-}
-
-.cc-choice label {
-  border: 1px solid var(--cc-line);
-  background: var(--cc-raised);
-  border-radius: 999px;
-}
-
 /* ─── Market ─── */
 
 /* Coins at the side of the price and the chart; layers and the table below, full width. The
@@ -1136,11 +1122,6 @@
   padding-left: 1.2rem;
 }
 
-.cc-settings-card {
-  display: grid;
-  gap: 0.5rem;
-}
-
 /* ─── Table instead of the chart ─── */
 
 .cc-table-details summary {
@@ -1405,12 +1386,4 @@ html.wiz-contrast .cc-quote-changes {
 
 .cc-empty-cash strong {
   color: var(--amber-400);
-}
-
-.cc-restart {
-  display: grid;
-  gap: 0.75rem;
-  justify-items: start;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--cc-line);
 }

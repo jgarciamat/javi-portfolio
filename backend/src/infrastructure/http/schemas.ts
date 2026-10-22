@@ -1078,6 +1078,7 @@ export const cryptoOrderBody = z
     z
       .object({
         action: z.literal('buy'),
+        portfolioId: z.string().uuid().optional(),
         symbol: cryptoSymbol,
         direction: z.enum(['long', 'short']).optional(),
         type: cryptoOrderType,
@@ -1090,6 +1091,7 @@ export const cryptoOrderBody = z
     z
       .object({
         action: z.literal('sell'),
+        portfolioId: z.string().uuid().optional(),
         positionId: z.string().uuid(),
         type: cryptoOrderType,
         price: cryptoPrice.optional(),
@@ -1111,11 +1113,31 @@ export const cryptoOrderBody = z
 
 export const cryptoOrderParams = z.object({ id: z.string().uuid() }).strict();
 
+/** The portfolio to look at (the official one of the month when missing). */
+export const cryptoSimQuery = z.object({ portfolio: z.string().uuid().optional() }).strict();
+
+/**
+ * «Start again» of a practice portfolio (always 10.000 €, commission fixed at 0,10 %). The
+ * balance and commission that older versions of the app sent are accepted and ignored.
+ */
 export const cryptoResetBody = z
   .object({
-    initial: oneOf(INITIAL_BALANCES_EUR, 'Saldo inicial').transform(toCents),
-    feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión'),
+    portfolioId: z.string().uuid().optional(),
+    initial: oneOf(INITIAL_BALANCES_EUR, 'Saldo inicial').optional(),
+    feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión').optional(),
   })
   .strict();
 
-export const cryptoSettingsBody = z.object({ feeBps: oneOf(FEE_OPTIONS_BPS, 'Comisión') }).strict();
+export const cryptoPortfolioParams = z.object({ id: z.string().uuid() }).strict();
+
+export const cryptoRankingBody = z
+  .object({ optIn: z.boolean(), alias: z.string().max(60).optional() })
+  .strict();
+
+export const cryptoSeasonParams = z
+  .object({ season: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Temporada no válida') })
+  .strict();
+
+export const cryptoAlertBody = z
+  .object({ symbol: cryptoSymbol, condition: z.enum(['above', 'below']), price: cryptoPrice })
+  .strict();
