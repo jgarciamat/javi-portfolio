@@ -279,48 +279,55 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
   // ─── Ranking, seasons and badges ─────────────────────────────────────────
 
   profile(userId: string): CryptoSimProfile | null {
-    const row = this.db
-      .prepare(
-        `SELECT user_id AS userId, ranking_opt_in AS rankingOptIn, alias, practice_day AS practiceDay,
+    return (
+      (this.db
+        .prepare(
+          `SELECT user_id AS userId, alias, practice_day AS practiceDay,
                 practice_actions AS practiceActions, updated_at AS updatedAt
          FROM crypto_sim_profiles WHERE user_id = ?`
-      )
-      .get(userId) as
-      (Omit<CryptoSimProfile, 'rankingOptIn'> & { rankingOptIn: number }) | undefined;
-    return row ? { ...row, rankingOptIn: row.rankingOptIn === 1 } : null;
+        )
+        .get(userId) as CryptoSimProfile | undefined) ?? null
+    );
   }
 
+  /** `ranking_opt_in` stays in the table for older servers; nobody reads it since everybody is in. */
   saveProfile(p: CryptoSimProfile): void {
     this.db
       .prepare(
-        `INSERT INTO crypto_sim_profiles (user_id, ranking_opt_in, alias, practice_day,
-           practice_actions, updated_at) VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(user_id) DO UPDATE SET ranking_opt_in = excluded.ranking_opt_in,
-           alias = excluded.alias, practice_day = excluded.practice_day,
-           practice_actions = excluded.practice_actions, updated_at = excluded.updated_at`
+        `INSERT INTO crypto_sim_profiles (user_id, alias, practice_day, practice_actions,
+           updated_at) VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT(user_id) DO UPDATE SET alias = excluded.alias,
+           practice_day = excluded.practice_day, practice_actions = excluded.practice_actions,
+           updated_at = excluded.updated_at`
       )
-      .run(
-        p.userId,
-        p.rankingOptIn ? 1 : 0,
-        p.alias,
-        p.practiceDay,
-        p.practiceActions,
-        p.updatedAt
-      );
+      .run(p.userId, p.alias, p.practiceDay, p.practiceActions, p.updatedAt);
   }
 
-  rankingCandidates(season: string): { portfolio: CryptoSimPortfolio; alias: string | null }[] {
+  rankingCandidates(
+    season: string
+  ): { portfolio: CryptoSimPortfolio; alias: string | null; name: string }[] {
     const rows = this.db
       .prepare(
         `SELECT p.id, p.user_id AS userId, p.kind, p.season, p.initial_cents AS initialCents,
                 p.cash_cents AS cashCents, p.fee_bps AS feeBps, p.started_at AS startedAt,
-                p.closed_at AS closedAt, r.alias AS alias
-         FROM crypto_sim_profiles r
-         JOIN crypto_sim_portfolios p ON p.user_id = r.user_id AND p.kind = 'season' AND p.season = ?
-         WHERE r.ranking_opt_in = 1`
+                p.closed_at AS closedAt, r.alias AS alias, u.name AS name
+         FROM crypto_sim_portfolios p
+         JOIN users u ON u.id = p.user_id
+         LEFT JOIN crypto_sim_profiles r ON r.user_id = p.user_id
+         WHERE p.kind = 'season' AND p.season = ?`
       )
-      .all(season) as (CryptoSimPortfolio & { alias: string | null })[];
-    return rows.map(({ alias, ...portfolio }) => ({ portfolio, alias }));
+      .all(season) as (CryptoSimPortfolio & { alias: string | null; name: string })[];
+    return rows.map(({ alias, name, ...portfolio }) => ({ portfolio, alias, name }));
+  }
+
+  rankingIdentity(userId: string): { alias: string | null; name: string } {
+    const row = this.db
+      .prepare(
+        `SELECT r.alias AS alias, u.name AS name FROM users u
+         LEFT JOIN crypto_sim_profiles r ON r.user_id = u.id WHERE u.id = ?`
+      )
+      .get(userId) as { alias: string | null; name: string } | undefined;
+    return { alias: row?.alias ?? null, name: row?.name ?? '' };
   }
 
   insertResult(r: CryptoSeasonResult): boolean {

@@ -1,7 +1,7 @@
 import { useId, useState, type FormEvent } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
-import { formatChange, formatDateTime, formatQuantity, tone } from '../domain/format';
+import { formatChange, formatDateTime, formatQuantity, pnl } from '../domain/format';
 import { fillsNow } from '../domain/orders';
 import type {
   ClosedTrade,
@@ -41,13 +41,13 @@ export function orderKind(
     : t(`app.crypto.trades.kind.close.${o.type}`);
 }
 
-function Result({ pnl, percent }: { pnl: number | null; percent: number | null }) {
+function Result({ pnl: value, percent }: { pnl: number | null; percent: number | null }) {
   const { locale } = useI18n();
   const money = useMoney();
-  if (pnl === null || percent === null) return <b>—</b>;
+  if (value === null || percent === null) return <b className={pnl(null)}>—</b>;
   return (
-    <b className={`cc-${tone(pnl)}`}>
-      {money.amount(pnl, true)} ({formatChange(percent, locale)})
+    <b className={pnl(value)}>
+      {money.amount(value, true)} ({formatChange(percent, locale)})
     </b>
   );
 }

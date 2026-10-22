@@ -257,7 +257,7 @@ add('cryptoBuyPractice', () =>
 );
 add('cryptoResetPractice', () => cryptoApi.resetPractice('{practice}'));
 add('cryptoDeletePractice', () => cryptoApi.deletePractice('{practice}'));
-add('cryptoRanking', () => cryptoApi.setRanking({ optIn: true, alias: 'Lince' }));
+add('cryptoRanking', () => cryptoApi.setRanking({ alias: 'Lince' }));
 add('cryptoAlert', () =>
   cryptoApi.createAlert({ symbol: 'BTC', condition: 'above', price: 60000 })
 );

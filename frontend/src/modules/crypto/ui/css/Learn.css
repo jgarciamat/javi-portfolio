@@ -42,7 +42,7 @@
       transparent 60%
     ),
     var(--cc-surface);
-  color: var(--slate-100);
+  color: var(--cc-text);
 }
 
 .cc-learn-head {
@@ -59,7 +59,7 @@
   margin: 0 0 0.35rem;
   color: var(--accent-300);
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -68,8 +68,9 @@
   margin: 0;
   max-width: 34ch;
   font-size: clamp(1.3rem, 1rem + 1.2vw, 1.75rem);
+  font-weight: 600;
   line-height: 1.25;
-  color: var(--slate-50);
+  color: var(--cc-strong);
 }
 
 .cc .cc-learn-head h2:focus {
@@ -78,7 +79,7 @@
 
 .cc-learn-sub {
   margin: 0.45rem 0 0;
-  color: var(--slate-300);
+  color: var(--cc-text-2);
   font-size: 0.9375rem;
   line-height: 1.5;
 }
@@ -90,10 +91,10 @@
   border-radius: 10px;
   border: 1px solid var(--accent-400);
   background: var(--cc-raised);
-  color: var(--slate-50);
+  color: var(--cc-strong);
   font: inherit;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 

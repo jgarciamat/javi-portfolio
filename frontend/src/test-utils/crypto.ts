@@ -103,7 +103,7 @@ export function ranking(overrides: Partial<CryptoRanking> = {}): CryptoRanking {
       qualified: false,
       missing: { trades: 3, days: 2 },
     },
-    settings: { optIn: false, alias: null, suggestedAlias: 'Ana' },
+    settings: { optIn: true, alias: 'Ana', suggestedAlias: 'Ana' },
     previous: null,
     rules: {
       size: 5,

@@ -4,7 +4,6 @@ import {
   CryptoSimRepository,
   SettingsRepository,
   UnitOfWork,
-  UserRepository,
 } from '@domain/ports/repositories';
 import { Clock, CryptoMarketData } from '@domain/ports/services';
 import {
@@ -23,9 +22,11 @@ import {
   madridMonth,
   missing,
   monthsBefore,
+  playerAlias,
   previousMonth,
   qualifies,
   rank,
+  rankingAlias,
   returnPercent,
   seasonEndsAt,
   suggestedAlias,
@@ -59,7 +60,11 @@ export interface CryptoRankingView {
     qualified: boolean;
     missing: { trades: number; days: number };
   };
-  settings: { optIn: boolean; alias: string | null; suggestedAlias: string | null };
+  /**
+   * The alias shown in the ranking and the one given when the person never chose one. `optIn` is
+   * always true: everybody is in (older versions of the app showed a switch).
+   */
+  settings: { optIn: true; alias: string; suggestedAlias: string };
   previous: { month: string; top: CryptoRankingRow[] } | null;
   rules: {
     size: number;
@@ -100,8 +105,9 @@ const COPY = {
 } as const;
 
 /**
- * The voluntary monthly ranking of the crypto console (top 5, play money): who appears (only
- * those who turned it on, with an alias), the live table of the month, the person's own place
+ * The monthly ranking of the crypto console (top 5, play money): everybody with an official
+ * season appears with an alias (the one they chose, else their first name, else «Jugador» and four
+ * digits), never with their e-mail or full name. The live table of the month, the person's own place
  * and, on the 1st, the frozen top 5 and one month of Premium for the winner. Also the hourly job
  * that closes the seasons and the price alerts' clean-up.
  */
@@ -112,7 +118,6 @@ export class CryptoRankingService {
     private readonly repo: CryptoSimRepository,
     private readonly sim: CryptoSimService,
     private readonly market: CryptoMarketData,
-    private readonly users: UserRepository,
     private readonly settings: SettingsRepository,
     private readonly plan: CryptoPlan,
     private readonly prizes: PrizeGranter,
@@ -127,8 +132,7 @@ export class CryptoRankingService {
     const now = this.clock.now();
     const month = madridMonth(now);
     const entries = await this.live(month);
-    const profile = this.repo.profile(userId);
-    const optIn = !!profile?.rankingOptIn;
+    const who = this.repo.rankingIdentity(userId);
     const place = entries.findIndex((e) => e.userId === userId);
     const counted = this.sim.activityOf(own.id);
     const tickers = await this.tickers();
@@ -143,7 +147,7 @@ export class CryptoRankingService {
       top: entries.slice(0, RANKING_SIZE).map(row),
       participants: entries.length,
       me: {
-        place: optIn && place >= 0 ? place + 1 : null,
+        place: place >= 0 ? place + 1 : null,
         percent: equity === null ? null : returnPercent(equity, own.initialCents),
         trades: counted.trades,
         activeDays: counted.activeDays,
@@ -151,9 +155,9 @@ export class CryptoRankingService {
         missing: missing(counted),
       },
       settings: {
-        optIn,
-        alias: profile?.alias ?? null,
-        suggestedAlias: suggestedAlias(this.users.findById(userId)?.name ?? ''),
+        optIn: true,
+        alias: rankingAlias(who.alias, who.name, userId),
+        suggestedAlias: suggestedAlias(who.name) ?? playerAlias(userId),
       },
       previous: frozen.length ? { month: previous, top: frozen.map(frozenRow) } : null,
       rules: {
@@ -168,34 +172,29 @@ export class CryptoRankingService {
     };
   }
 
-  /** Turns the ranking on or off and changes the alias (checked: no e-mails, links or insults). */
-  async setSettings(
-    userId: string,
-    input: { optIn: boolean; alias?: string }
-  ): Promise<CryptoRankingView> {
-    const profile = this.repo.profile(userId);
-    const typed = input.alias === undefined ? undefined : cleanAlias(input.alias);
-    const alias =
-      typed ??
-      profile?.alias ??
-      (input.optIn ? suggestedAlias(this.users.findById(userId)?.name ?? '') : null);
-    if (typed !== undefined || input.optIn) {
-      const problem = alias === null ? 'length' : aliasProblem(alias);
+  /**
+   * Changes the alias (checked: no e-mails, links or insults). Older versions of the app also send
+   * `optIn`: it is ignored, everybody is in the ranking.
+   */
+  async setSettings(userId: string, input: { alias?: string }): Promise<CryptoRankingView> {
+    if (input.alias !== undefined) {
+      const alias = cleanAlias(input.alias);
+      const problem = aliasProblem(alias);
       if (problem) {
         throw new ValidationError(ALIAS_MESSAGES[problem], 'CRYPTO_ALIAS_INVALID', { problem });
       }
+      const profile = this.repo.profile(userId);
+      this.uow.run(() =>
+        this.repo.saveProfile({
+          userId,
+          practiceDay: profile?.practiceDay ?? null,
+          practiceActions: profile?.practiceActions ?? 0,
+          alias,
+          updatedAt: this.clock.now().toISOString(),
+        })
+      );
+      this.cache = null;
     }
-    this.uow.run(() =>
-      this.repo.saveProfile({
-        userId,
-        practiceDay: profile?.practiceDay ?? null,
-        practiceActions: profile?.practiceActions ?? 0,
-        rankingOptIn: input.optIn,
-        alias,
-        updatedAt: this.clock.now().toISOString(),
-      })
-    );
-    this.cache = null;
     return this.ranking(userId);
   }
 
@@ -279,7 +278,7 @@ export class CryptoRankingService {
     }
   }
 
-  /** Everybody who asked to appear and meets the minimums, in order (cached one minute). */
+  /** Everybody who meets the minimums, in order (cached one minute). */
   private async live(month: string): Promise<LiveEntry[]> {
     const now = this.clock.now().getTime();
     if (this.cache && this.cache.month === month && now - this.cache.at < CACHE_MS) {
@@ -288,15 +287,14 @@ export class CryptoRankingService {
     const tickers = await this.tickers();
     const prices = tickers ? priceMap(tickers) : new Map<string, number>();
     const entries: LiveEntry[] = [];
-    for (const { portfolio, alias } of this.repo.rankingCandidates(month)) {
-      if (!alias) continue;
+    for (const { portfolio, alias, name } of this.repo.rankingCandidates(month)) {
       const equity = this.sim.equityCents(portfolio, prices);
       if (equity === null) continue;
       const counted = this.sim.activityOf(portfolio.id);
       entries.push({
         key: portfolio.id,
         userId: portfolio.userId,
-        alias,
+        alias: rankingAlias(alias, name, portfolio.userId),
         premium: this.plan.isPremium(portfolio.userId),
         finalCents: equity,
         initialCents: portfolio.initialCents,

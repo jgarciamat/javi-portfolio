@@ -4,7 +4,7 @@ import { Icon } from '@shared/components/Icon';
 import { Modal } from '@shared/components/Modal';
 import { storage } from '@shared/utils/storage';
 import type { Simulator } from '../application/useSimulator';
-import { formatChange } from '../domain/format';
+import { formatChange, pnl } from '../domain/format';
 import { BADGE_IDS, counted, lastSeason, monthLabel, monthName } from '../domain/season';
 import type { SimPortfolio } from '../domain/types';
 import { useMoney } from './money';
@@ -140,7 +140,7 @@ function SeasonCard({ portfolio }: { portfolio: SimPortfolio }) {
                 <tr key={r.season}>
                   <th scope="row">{monthLabel(r.season, locale)}</th>
                   <td>{money.amount(r.final)}</td>
-                  <td>{formatChange(r.percent, locale)}</td>
+                  <td className={pnl(r.percent)}>{formatChange(r.percent, locale)}</td>
                   <td>{r.trades}</td>
                   <td>{r.place ? t('app.crypto.ranking.placeShort', { place: r.place }) : '—'}</td>
                 </tr>
@@ -218,11 +218,13 @@ function LastSeason({ portfolio }: { portfolio: SimPortfolio }) {
       </h2>
       {result.prizeDays > 0 && (
         <p className="cc-prize">
-          <Icon name="gift" /> <b>{t('app.crypto.lastSeason.prize')}</b>{' '}
-          {t('app.crypto.lastSeason.prizeBody')}
+          <Icon name="gift" />
+          <span>
+            <b>{t('app.crypto.lastSeason.prize')}</b> {t('app.crypto.lastSeason.prizeBody')}
+          </span>
         </p>
       )}
-      <p>
+      <p className={pnl(result.percent)}>
         {t('app.crypto.lastSeason.result', {
           amount: money.amount(result.final),
           percent: formatChange(result.percent, locale),

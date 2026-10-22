@@ -825,7 +825,7 @@
   border-radius: 14px;
   background:
     linear-gradient(var(--slate-900), var(--slate-900)) padding-box,
-    linear-gradient(90deg, #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6) border-box;
+    linear-gradient(90deg, var(--rainbow-stops)) border-box;
 }
 
 .burger-nav-text {

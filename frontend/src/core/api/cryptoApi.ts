@@ -56,7 +56,8 @@ export const cryptoApi = {
   ranking() {
     return apiRequest<CryptoRanking>('/crypto/ranking');
   },
-  setRanking(settings: { optIn: boolean; alias?: string }) {
+  /** Changes the alias of the ranking (everybody is in). */
+  setRanking(settings: { alias: string }) {
     return apiRequest<CryptoRanking>('/crypto/ranking/settings', {
       method: 'PUT',
       body: jsonBody(settings),

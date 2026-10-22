@@ -248,7 +248,12 @@ export interface CryptoRanking {
     qualified: boolean;
     missing: { trades: number; days: number };
   };
-  settings: { optIn: boolean; alias: string | null; suggestedAlias: string | null };
+  /**
+   * Everybody is in the ranking: the alias shown (the one chosen, else the first name, else
+   * «Jugador» and four digits) and the one given when none is chosen. `optIn` is always true
+   * (older versions of the app showed a switch).
+   */
+  settings: { optIn: true; alias: string; suggestedAlias: string };
   previous: { month: string; top: RankingRow[] } | null;
   rules: {
     size: number;

@@ -60,6 +60,7 @@ import {
   madridMonth,
   monthStartsAt,
   qualifies,
+  rankingAlias,
   returnPercent,
   seasonEndsAt,
 } from '@domain/services/crypto-season';
@@ -549,8 +550,8 @@ export class CryptoSimService {
       this.repo.savePortfolio({ ...final, closedAt: now });
       if (!positions.length) return true;
       const done = this.activityOf(portfolio.id);
-      const profile = this.repo.profile(portfolio.userId);
-      const ranked = !!profile?.rankingOptIn && !!profile.alias;
+      // Everybody is in the ranking, with the alias they chose or the one given to them.
+      const who = this.repo.rankingIdentity(portfolio.userId);
       this.repo.insertResult({
         userId: portfolio.userId,
         season: portfolio.season!,
@@ -560,8 +561,8 @@ export class CryptoSimService {
         wins: done.wins,
         activeDays: done.activeDays,
         reachedAt: done.reachedAt,
-        ranked,
-        alias: ranked ? profile!.alias : null,
+        ranked: true,
+        alias: rankingAlias(who.alias, who.name, portfolio.userId),
         premium,
         place: null,
         prizeDays: 0,
@@ -1074,7 +1075,6 @@ export class CryptoSimService {
     return (
       this.repo.profile(userId) ?? {
         userId,
-        rankingOptIn: false,
         alias: null,
         practiceDay: null,
         practiceActions: 0,

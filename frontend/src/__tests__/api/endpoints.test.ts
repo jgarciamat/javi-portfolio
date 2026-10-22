@@ -413,10 +413,10 @@ const cases: Case[] = [
   ['crypto ranking', () => cryptoApi.ranking(), 'GET', '/crypto/ranking'],
   [
     'crypto ranking settings',
-    () => cryptoApi.setRanking({ optIn: true }),
+    () => cryptoApi.setRanking({ alias: 'Lince' }),
     'PUT',
     '/crypto/ranking/settings',
-    { optIn: true },
+    { alias: 'Lince' },
   ],
   ['crypto report', () => cryptoApi.report('2026-03'), 'GET', '/crypto/seasons/2026-03/report'],
   ['crypto alerts', () => cryptoApi.alerts(), 'GET', '/crypto/alerts'],

@@ -1375,7 +1375,6 @@
     "path": "/crypto/ranking/settings",
     "auth": true,
     "body": {
-      "optIn": true,
       "alias": "Lince"
     }
   },

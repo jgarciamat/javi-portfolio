@@ -370,7 +370,6 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
       repos.cryptoSim,
       cryptoSim,
       market,
-      repos.users,
       repos.settings,
       entitlements,
       entitlements,

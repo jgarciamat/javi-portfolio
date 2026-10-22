@@ -4,7 +4,7 @@ import { lazyNamed } from '@shared/utils/lazyNamed';
 import type { CryptoMarket } from '../application/useCryptoMarket';
 import { CHART_INTERVALS } from '../domain/chart';
 import { DISPLAY_CURRENCIES, convertCandles, type DisplayCurrency } from '../domain/currency';
-import { formatChange, formatDateTime, tone } from '../domain/format';
+import { formatChange, formatDateTime, pnl } from '../domain/format';
 import type { LayerId } from '../domain/indicators';
 import type { Candle, CryptoCoin, CryptoInterval } from '../domain/types';
 import { ChartTable } from './ChartTable';
@@ -109,14 +109,14 @@ function QuoteHead({
         <p className="cc-quote-price">{coin?.price == null ? '—' : money.price(coin.price)}</p>
         <p className="cc-quote-changes">
           {day !== null && (
-            <span className={`cc-${tone(day)}`}>
+            <span className={pnl(day)}>
               {t('app.crypto.market.change24h', { change: formatChange(day, locale) })}
             </span>
           )}
           {change !== null && (
             <span>
               {t('app.crypto.chart.periodChange')}{' '}
-              <b className={`cc-${tone(change)}`}>{formatChange(change, locale)}</b>
+              <b className={pnl(change)}>{formatChange(change, locale)}</b>
             </span>
           )}
         </p>

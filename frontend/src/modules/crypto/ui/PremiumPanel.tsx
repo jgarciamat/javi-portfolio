@@ -7,7 +7,7 @@ import { ExportButtons } from '@modules/finances/ui/components/ExportButtons';
 import { Icon } from '@shared/components/Icon';
 import type { Alerts } from '../application/useRanking';
 import { parseDecimal } from '@shared/utils/numbers';
-import { formatChange, formatDateTime, formatNumber } from '../domain/format';
+import { formatChange, formatDateTime, formatNumber, pnl } from '../domain/format';
 import { EXAMPLE_ALERTS, EXAMPLE_STATS, PLAN_LINES, reportTable } from '../domain/season';
 import type { CryptoCoin, PriceAlert, SimPortfolio, SimStats } from '../domain/types';
 import { useMoney } from './money';
@@ -120,7 +120,7 @@ export function EquityChart({ days }: { days: SimStats['equityDays'] }) {
         })}
         preserveAspectRatio="none"
       >
-        <polyline points={points} className={last >= first ? 'cc-up' : 'cc-down'} />
+        <polyline points={points} className={pnl(last - first)} />
       </svg>
       <figcaption className="cc-hint">
         {t('app.crypto.stats.chartCaption', {
@@ -139,7 +139,7 @@ function StatsBody({ stats }: { stats: SimStats }) {
   const trade = (h: SimStats['best']) =>
     h ? `${h.symbol} · ${money.amount(h.pnl, true)} (${formatChange(h.pnlPercent, locale)})` : '—';
   const amount = (v: number | null) => (v === null ? '—' : money.amount(v, true));
-  const figures: [string, string][] = [
+  const figures: [string, string, string?][] = [
     [
       'winRate',
       stats.winRate === null
@@ -150,25 +150,25 @@ function StatsBody({ stats }: { stats: SimStats }) {
             losses: stats.losses,
           }),
     ],
-    ['best', trade(stats.best)],
-    ['worst', trade(stats.worst)],
-    ['averageWin', amount(stats.averageWin)],
-    ['averageLoss', amount(stats.averageLoss)],
+    ['best', trade(stats.best), pnl(stats.best?.pnl ?? null)],
+    ['worst', trade(stats.worst), pnl(stats.worst?.pnl ?? null)],
+    ['averageWin', amount(stats.averageWin), pnl(stats.averageWin)],
+    ['averageLoss', amount(stats.averageLoss), pnl(stats.averageLoss)],
   ];
   return (
     <>
       <dl className="cc-figures">
-        {figures.map(([key, value]) => (
+        {figures.map(([key, value, className]) => (
           <div key={key}>
             <dt>{t(`app.crypto.stats.${key}`)}</dt>
-            <dd>{value}</dd>
+            <dd className={className}>{value}</dd>
           </div>
         ))}
       </dl>
       <h3 className="cc-subtitle">{t('app.crypto.stats.chartTitle')}</h3>
       <EquityChart days={stats.equityDays} />
       <h3 className="cc-subtitle">{t('app.crypto.stats.holdTitle')}</h3>
-      <p>
+      <p className={stats.hold ? pnl(stats.hold.percent) : undefined}>
         {stats.hold
           ? t('app.crypto.stats.hold', {
               coin: stats.hold.symbol,

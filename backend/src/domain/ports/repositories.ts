@@ -673,10 +673,9 @@ export interface CryptoSimOrder {
   stopLoss: number | null;
 }
 
-/** The voluntary ranking settings and the daily counter of practice restarts. */
+/** The ranking alias (null until the person changes it) and the daily practice restarts. */
 export interface CryptoSimProfile {
   userId: string;
-  rankingOptIn: boolean;
   alias: string | null;
   practiceDay: string | null;
   practiceActions: number;
@@ -754,8 +753,15 @@ export interface CryptoSimRepository {
   // Ranking, seasons and badges
   profile(userId: string): CryptoSimProfile | null;
   saveProfile(profile: CryptoSimProfile): void;
-  /** People who asked to appear in the ranking, with their official portfolio of `season`. */
-  rankingCandidates(season: string): { portfolio: CryptoSimPortfolio; alias: string | null }[];
+  /**
+   * Everybody with an official portfolio of `season` (all of them are in the ranking), with the
+   * alias they chose (null when they never changed it) and the name of their profile.
+   */
+  rankingCandidates(
+    season: string
+  ): { portfolio: CryptoSimPortfolio; alias: string | null; name: string }[];
+  /** The alias the person chose (null when they never changed it) and the name of their profile. */
+  rankingIdentity(userId: string): { alias: string | null; name: string };
   /** False when the result of that season was already frozen. */
   insertResult(result: CryptoSeasonResult): boolean;
   results(userId: string, limit: number): CryptoSeasonResult[];

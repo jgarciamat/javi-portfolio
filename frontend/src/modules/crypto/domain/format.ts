@@ -13,6 +13,9 @@ export function priceDecimals(price: number): number {
   return Math.min(10, Math.ceil(-Math.log10(price)) + 3);
 }
 
+/** «−» (the typographic minus, as wide as «+») instead of the hyphen Intl writes. */
+const minus = (text: string): string => text.replace('-', '\u2212');
+
 /** Money with cents (amounts of the simulator), in euros or the display currency. */
 export function formatEur(
   value: number,
@@ -20,14 +23,16 @@ export function formatEur(
   signed = false,
   currency: DisplayCurrency = 'EUR'
 ): string {
-  return new Intl.NumberFormat(tag(locale), {
-    ...GROUP,
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    signDisplay: signed ? 'exceptZero' : 'auto',
-  }).format(value);
+  return minus(
+    new Intl.NumberFormat(tag(locale), {
+      ...GROUP,
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      signDisplay: signed ? 'exceptZero' : 'auto',
+    }).format(value)
+  );
 }
 
 /** The price of a coin, with as many decimals as it needs. */
@@ -63,14 +68,16 @@ export function formatQuantity(quantity: number, locale: Locale): string {
   );
 }
 
-/** «+1,25 %» (a change, with its sign). */
+/** «+1,25 %» or «−1,25 %» (a change, with its sign). */
 export function formatChange(percent: number, locale: Locale): string {
-  return new Intl.NumberFormat(tag(locale), {
-    style: 'percent',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    signDisplay: 'exceptZero',
-  }).format(percent / 100);
+  return minus(
+    new Intl.NumberFormat(tag(locale), {
+      style: 'percent',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      signDisplay: 'exceptZero',
+    }).format(percent / 100)
+  );
 }
 
 /** Coins traded (volume), shortened: «1,2 mil». */
@@ -106,9 +113,12 @@ export function formatTick(ms: number, kind: number, locale: Locale): string {
   return new Intl.DateTimeFormat(tag(locale), options[Math.min(kind, 3)]).format(new Date(ms));
 }
 
-/** Direction of a number for the colour: up, down or flat. */
-export const tone = (value: number | null): 'up' | 'down' | 'flat' =>
-  value === null || value === 0 ? 'flat' : value > 0 ? 'up' : 'down';
+/**
+ * Classes of a gain, a loss or nothing (see «Results» in Crypto.css): green with «▲» above zero,
+ * red with «▼» below it, neutral at zero or without a value. The same everywhere in the console.
+ */
+export const pnl = (value: number | null): string =>
+  `pnl pnl-${value === null || value === 0 ? 'zero' : value > 0 ? 'pos' : 'neg'}`;
 
 /** A plain number with up to one decimal («66,7»). */
 export function formatNumber(value: number, locale: Locale): string {

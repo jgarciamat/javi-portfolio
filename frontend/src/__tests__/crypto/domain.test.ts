@@ -22,8 +22,8 @@ import {
   formatQuantity,
   formatTick,
   formatVolume,
+  pnl,
   priceDecimals,
-  tone,
 } from '@modules/crypto/domain/format';
 import {
   amountForShare,
@@ -54,9 +54,11 @@ describe('crypto formats', () => {
   it('groups thousands always and signs changes', () => {
     expect(nbsp(formatEur(9499.5, 'es'))).toBe('9.499,50 €');
     expect(nbsp(formatEur(12.5, 'es', true))).toBe('+12,50 €');
-    expect(nbsp(formatEur(-3, 'en', true))).toBe('-€3.00');
+    expect(nbsp(formatEur(-3, 'en', true))).toBe('−€3.00');
     expect(nbsp(formatChange(1.256, 'es'))).toBe('+1,26 %');
     expect(nbsp(formatChange(0, 'es'))).toBe('0,00 %');
+    // The typographic minus, as wide as the plus.
+    expect(nbsp(formatChange(-2.5, 'es'))).toBe('−2,50 %');
     expect(formatQuantity(0.00772747, 'es')).toBe('0,00772747');
     expect(formatVolume(1234, 'en')).toMatch(/^1\.2k$/i);
     expect(formatNumber(66.66, 'es')).toBe('66,7');
@@ -73,11 +75,11 @@ describe('crypto formats', () => {
     expect(formatTick(at, 4, 'es')).toBe('12:30');
   });
 
-  it('tells up, down and flat apart', () => {
-    expect(tone(2)).toBe('up');
-    expect(tone(-1)).toBe('down');
-    expect(tone(0)).toBe('flat');
-    expect(tone(null)).toBe('flat');
+  it('tells gains, losses and nothing apart', () => {
+    expect(pnl(2)).toBe('pnl pnl-pos');
+    expect(pnl(-1)).toBe('pnl pnl-neg');
+    expect(pnl(0)).toBe('pnl pnl-zero');
+    expect(pnl(null)).toBe('pnl pnl-zero');
   });
 });
 

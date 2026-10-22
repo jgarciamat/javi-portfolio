@@ -114,7 +114,9 @@
   border-radius: 12px;
   color: var(--slate-200);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .plan-option:hover:not(:disabled) {
@@ -648,7 +650,9 @@
   background: transparent;
   color: var(--slate-400);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .invite-x:hover {
@@ -674,9 +678,9 @@
   border: 2px solid transparent;
   border-radius: 50%;
   color: var(--accent-300);
-  background: linear-gradient(var(--slate-800), var(--slate-800)) padding-box,
-    linear-gradient(135deg, #ff5c5c, #ffa94d, #ffe14d, #5fdc7a, #4dc3ff, #8b7bff, #ff6bd6)
-      border-box;
+  background:
+    linear-gradient(var(--slate-800), var(--slate-800)) padding-box,
+    linear-gradient(135deg, var(--rainbow-stops)) border-box;
 }
 
 .invite-title {
@@ -761,7 +765,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .invite-copy:hover {

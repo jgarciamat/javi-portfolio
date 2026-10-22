@@ -5,7 +5,7 @@ import { test, expect, openSection, signIn } from './fixtures';
  * chart and its layer chips, a long opened and closed with play money, a pending short cancelled,
  * dollars, the panel «Learn before playing» with its tabs, the coins in pages, the zoom bar, the
  * words of the console in the guide and the layout on phones; the monthly season, a practice
- * portfolio, the voluntary ranking and the Premium comforts.
+ * portfolio, the ranking (everybody is in, with an alias) and the Premium comforts.
  */
 const LEARN = 'Antes de empezar a jugar, aprende todo sobre el análisis de criptomonedas';
 
@@ -55,9 +55,17 @@ test('shows dollars, a layer and the guide', async ({ page }) => {
   await expect(ema).toContainText(/EMA 20 · .*US\$/);
   await expect(page.getByText('Medias móviles')).toHaveCount(0);
 
+  // A bar as wide as the chart, glowing until it is opened for the first time.
   const open = page.getByRole('button', { name: 'Aprende antes de jugar' });
+  await expect(open).toHaveClass(/is-new/);
+  const [bar, canvas] = await Promise.all([
+    open.boundingBox(),
+    page.locator('.cc-chart-canvas').boundingBox(),
+  ]);
+  expect(Math.abs(bar!.width - canvas!.width)).toBeLessThan(2);
   await open.click();
   await expect(open).toHaveAttribute('aria-expanded', 'true');
+  await expect(open).not.toHaveClass(/is-new/);
   const guide = page.getByRole('region', { name: LEARN });
   await expect(guide.getByRole('heading', { name: LEARN })).toBeInViewport();
   await guide.getByRole('tab', { name: 'Toros y osos, Long y Short' }).click();
@@ -142,22 +150,22 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await page.getByRole('button', { name: 'Sí, borrar' }).click();
   await expect(page.getByRole('heading', { name: /^Temporada de / })).toBeVisible();
 
-  // The voluntary ranking: off by default, on with an alias, then off again.
+  // The ranking: everybody is in with an alias (no switch), told once on entering.
   const ranking = page.locator('section.cc-ranking');
-  const toggle = ranking.getByRole('switch', { name: 'Aparecer en el ranking' });
-  await expect(toggle).not.toBeChecked();
+  await expect(ranking.getByRole('switch')).toHaveCount(0);
+  await expect(ranking.getByText(/Tu alias aparece en el ranking del mes/)).toBeVisible();
+  const intro = page.getByRole('complementary', { name: /Apareces en el ranking del mes/ });
+  await intro.getByRole('button', { name: 'Cambiar mi alias' }).click();
+  await expect(intro).toHaveCount(0);
+  await expect(ranking.getByLabel('Tu alias')).toBeFocused();
   await ranking.getByLabel('Tu alias').fill('Lince E2E');
-  await toggle.click();
-  await expect(toggle).toBeChecked();
+  await ranking.getByRole('button', { name: 'Guardar alias' }).click();
   await expect(ranking.getByLabel('Tu alias')).toHaveValue('Lince E2E');
   await ranking.getByLabel('Tu alias').fill('yo@correo.es');
   await ranking.getByRole('button', { name: 'Guardar alias' }).click();
   await expect(ranking.getByRole('alert')).toContainText('correos');
   // The refused alias is the only error the browser logs (the 400 of the API).
   expect(pageErrors.splice(0)).toEqual([expect.stringContaining('400')]);
-  await ranking.getByLabel('Tu alias').fill('Lince E2E');
-  await toggle.click();
-  await expect(toggle).not.toBeChecked();
 
   // Premium (the demo user is on the trial): statistics and a price alert.
   await expect(page.getByRole('heading', { name: /Gratis y Premium en la consola/ })).toBeVisible();

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { LAYERS, LAYER_COLORS, type LayerId } from '../domain/indicators';
 import type { LegendItem } from '../domain/layers';
@@ -8,19 +8,17 @@ import { useMoney } from './money';
  * Small chips just above the chart, one after the other in a bar that wraps: a colour mark and
  * the short name. Pressed, the layer is drawn and the chip takes its colour; an average or the
  * VWAP also shows its value now, and the rest give their values in the tooltip (and to screen
- * readers). Reading aids, never signals. `children` goes at the end of the bar.
+ * readers). Reading aids, never signals.
  */
 export function LayerBar({
   active,
   legend,
   onToggle,
-  children,
 }: {
   active: LayerId[];
   /** Values of the layers that are on. */
   legend: LegendItem[];
   onToggle: (layer: LayerId) => void;
-  children?: ReactNode;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -56,7 +54,6 @@ export function LayerBar({
           </button>
         );
       })}
-      {children}
     </div>
   );
 }

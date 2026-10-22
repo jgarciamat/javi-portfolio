@@ -183,7 +183,8 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
   ningún precio, se **espera hasta 24 h**; pasado ese plazo se usa el precio de entrada (solo
   pierde las comisiones).
 - Se congela el **resultado** (patrimonio final, operaciones, aciertos, días con actividad,
-  si participaba en el ranking, alias en ese momento, insignia Premium). Una cartera sin ninguna
+  alias en ese momento, insignia Premium; desde octubre de 2026 todos los resultados entran en el
+  ranking). Una cartera sin ninguna
   operación se cierra sin generar resultado.
 - La temporada oficial **nunca se recarga a mitad de mes**: quien se queda sin saldo puede seguir
   en una cartera de prácticas hasta el día 1.
@@ -205,14 +206,32 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
 - Si se pide una cartera que ya no existe, la lectura muestra la oficial y las escrituras
   responden `CRYPTO_PORTFOLIO_NOT_FOUND`.
 
-## Ranking mensual (voluntario)
+## Ranking mensual (participan todos)
 
-- **Desactivado por defecto**. Se activa con «Aparecer en el ranking»; el alias se puede editar
-  y por defecto se propone el **nombre de pila** del perfil. Validación: 3 a 20 caracteres,
-  letras, números, espacios, puntos y guiones; sin correos, enlaces, teléfonos ni palabras
-  ofensivas básicas (`CRYPTO_ALIAS_INVALID`).
+- **Sin interruptor** (decisión del dueño, octubre de 2026): participan **todas las carteras
+  oficiales** del mes que cumplan los mínimos, cada una con su alias. Antes era voluntario y
+  apagado por defecto; la columna `crypto_sim_profiles.ranking_opt_in` se conserva en la tabla
+  (compatibilidad con servidores anteriores) pero **ya no se lee ni se escribe**, y no sale en la
+  exportación.
+- **Alias por defecto**: el que haya elegido la persona; si no, el **nombre de pila** del perfil
+  (si es un alias válido); si no, **«Jugador» y cuatro cifras** que salen del id del usuario
+  (parecen al azar pero no cambian y no dicen nada de la persona). Solo se guarda en
+  `crypto_sim_profiles.alias` cuando la persona lo cambia; el resto se calcula al vuelo
+  (`rankingAlias` en `domain/services/crypto-season.ts`), también al congelar el resultado.
+- La persona solo puede **cambiar el alias**. Validación: 3 a 20 caracteres, letras, números,
+  espacios, puntos y guiones; sin correos, enlaces, teléfonos ni palabras ofensivas básicas
+  (`CRYPTO_ALIAS_INVALID`).
+- **Aviso** junto al alias: «Tu alias aparece en el ranking del mes con tu rentabilidad y tu
+  número de operaciones. Puedes cambiarlo cuando quieras; nunca se muestra tu correo ni tu nombre
+  completo». La primera vez que se entra en la consola sale además un aviso descartable arriba
+  («Apareces en el ranking del mes como «…»», con «Cambiar mi alias» y «Entendido»; se recuerda en
+  el dispositivo con `mm_crypto_ranking_intro`).
 - La API del ranking solo devuelve **alias, rentabilidad, nº de operaciones e insignia Premium**:
-  nunca correo, nombre ni identificadores. Tu posición y tus cifras solo te las devuelve a ti.
+  nunca correo, nombre completo ni identificadores. Tu posición y lo que te falta solo te los
+  devuelve a ti.
+- Compatibilidad con versiones antiguas de la app: `PUT /crypto/ranking/settings` acepta y
+  **ignora** `optIn`, y la respuesta trae siempre `settings.optIn: true` (su interruptor sale
+  encendido).
 - **Métrica**: rentabilidad = patrimonio final / saldo inicial − 1 (10.000 €; las posiciones
   abiertas se valoran a mercado).
 - **Mínimos para puntuar**: 5 operaciones cerradas (sin contar las cerradas por el fin de la
@@ -220,7 +239,7 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
 - **Desempates**: más operaciones; después, quien cerró antes su última operación (llegó antes a
   ese resultado); por último, una clave estable interna (nunca se muestra).
 - La tabla en vivo del mes se calcula con los precios actuales y se guarda en caché **60 s**
-  (activar o desactivar la participación la borra).
+  (cambiar el alias la borra).
 - **Cierre el día 1**: cuando todas las carteras oficiales de ese mes están cerradas, se congela
   el **top 5** (una sola vez, tabla `crypto_sim_season_closes`) y el ganador recibe **30 días de
   Premium** con el mecanismo de regalo existente (`grantDays` con `afterPaidPeriod`: se suma
@@ -256,7 +275,8 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - La comisión se **normaliza al 0,10 %** para lo que venga (las operaciones pasadas conservan la
   suya). El saldo inicial existente (por ejemplo 100.000 €) se conserva hasta el día 1 y la
   rentabilidad del ranking se mide sobre él; desde el mes siguiente todos empiezan con 10.000 €.
-- Tablas nuevas: `crypto_sim_profiles` (participación y alias, contador diario de prácticas),
+- Tablas nuevas: `crypto_sim_profiles` (alias elegido, contador diario de prácticas; la columna
+  `ranking_opt_in` ya no se usa),
   `crypto_sim_season_results`, `crypto_sim_season_closes`, `crypto_sim_badges`,
   `crypto_sim_equity_days` y `crypto_sim_alerts`. `close_type` admite `season`.
 
@@ -264,7 +284,8 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
 - La exportación RGPD (`cryptoSimulator`) incluye `portfolios` (con operaciones, órdenes
-  pendientes y patrimonio diario), `ranking` (participación y alias), `seasonResults`, `badges` y
+  pendientes y patrimonio diario), `ranking` (alias elegido y contador de prácticas),
+  `seasonResults`, `badges` y
   `priceAlerts`.
 
 ## API
@@ -278,7 +299,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 | `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
 | `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
 | `GET /crypto/ranking`                                                    | Top 5 del mes, tu posición, reglas, ganadores del mes anterior                                   |
-| `PUT /crypto/ranking/settings`                                           | `{ optIn, alias? }`                                                                              |
+| `PUT /crypto/ranking/settings`                                           | `{ alias }` (cambia el alias; `optIn` de apps antiguas se acepta y se ignora)                    |
 | `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
 | `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium)                                                                      |
 
@@ -289,9 +310,9 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 - **Cuenta atrás** «Nueva temporada en X días», **aviso 3 días antes** y **resumen de tu
   temporada anterior** al empezar la siguiente (con el aviso del premio si se ganó).
 - Aviso **«Te has quedado sin saldo»** en la temporada, que ofrece la cartera de prácticas.
-- Tarjeta **«Ranking del mes»**: podio del top 5 (medallas, alias, %, nº de operaciones),
-  tu posición solo visible para ti, cuenta atrás, premio explicado, ganadores del mes anterior,
-  interruptor «Aparecer en el ranking» y alias.
+- Tarjeta **«Ranking del mes»**: podio del top 5 (medallas, alias, % en verde o rojo, nº de
+  operaciones), tu posición solo visible para ti, cuenta atrás, premio que brilla con el arcoíris
+  de «Invita a un amigo», ganadores del mes anterior y el alias con su aviso (sin interruptor).
 - Tarjeta **«Gratis y Premium en la consola»** (dos columnas, iconos, frases cortas, por qué el
   ranking es justo y botón a Premium), accesible desde la consola y desde la guía.
 - Cada función Premium bloqueada muestra una **maqueta con datos de ejemplo** y qué desbloquea,
@@ -348,14 +369,18 @@ Texto en lenguaje claro para mostrar en la app cuando un abogado lo revise. Los 
 2. **Qué es**: un concurso **gratuito de habilidad** dentro de la Consola crypto, un simulador
    educativo. No hace falta comprar nada ni pagar para participar. Se usa **solo dinero
    virtual**: no se invierte, no se gana ni se pierde dinero real.
-3. **Participación voluntaria**: solo participa quien activa «Aparecer en el ranking». Los demás
-   ven el ranking pero no aparecen. Se puede dejar de participar en cualquier momento.
+3. **Participación**: participan todas las temporadas oficiales del mes que cumplan los mínimos,
+   sin tener que activar nada. Cada persona aparece con su alias y puede cambiarlo cuando quiera.
 4. **Alias**: los demás solo ven tu alias, tu rentabilidad, tu número de operaciones y, si
-   tienes Premium, una pequeña insignia. Nunca tu correo ni tu nombre completo. El alias no puede
+   tienes Premium, una pequeña insignia. Nunca tu correo ni tu nombre completo. Al empezar, el
+   alias es tu nombre de pila (o «Jugador» y cuatro cifras si no se puede usar). El alias no puede
    llevar correos, enlaces, teléfonos ni palabras ofensivas.
-   A REVISAR POR UN ABOGADO: el alias que se propone por defecto es tu nombre de pila (es un dato
-   personal que se vuelve visible si activas el ranking); y la insignia Premium junto al alias
-   revela que pagas Premium.
+   PUNTO PARA ABOGADO: la participación es automática y el alias por defecto es el nombre de pila,
+   un dato personal que se publica sin que la persona haga nada. Esto cambia la base del
+   tratamiento (de consentimiento a ejecución del servicio o interés legítimo) y exige explicarlo
+   con claridad en la política de privacidad (y valorar si hace falta poder salir del ranking).
+   También: la insignia Premium junto al alias revela que pagas Premium. Ver
+   `docs/legal/RESUMEN-CAMBIOS-PRIVACIDAD.md`.
 5. **Quién puede participar**: personas con una cuenta registrada en Finanverso.
    A REVISAR POR UN ABOGADO: edad mínima para participar y recibir el premio (la app admite
    cuentas desde 14 años) y territorialidad (si se limita a residentes en España o en la UE).

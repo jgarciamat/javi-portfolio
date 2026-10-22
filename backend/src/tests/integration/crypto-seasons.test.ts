@@ -103,7 +103,7 @@ describe('Crypto console seasons, practice and ranking', () => {
           wins: 0,
           activeDays: 1,
           qualified: false,
-          ranked: false,
+          ranked: true,
           place: null,
           prizeDays: 0,
         },
@@ -323,10 +323,10 @@ describe('Crypto console seasons, practice and ranking', () => {
     });
   });
 
-  describe('voluntary ranking', () => {
-    it('is off by default and proposes the first name as the alias', async () => {
+  describe('ranking', () => {
+    it('puts everybody in with their first name as the alias', async () => {
       const { body } = await me().get('/crypto/ranking').expect(200);
-      expect(body.settings).toEqual({ optIn: false, alias: null, suggestedAlias: 'Test' });
+      expect(body.settings).toEqual({ optIn: true, alias: 'Test', suggestedAlias: 'Test' });
       expect(body.top).toEqual([]);
       expect(body.previous).toBeNull();
       expect(body.me).toMatchObject({ place: null, trades: 0, qualified: false });
@@ -345,15 +345,20 @@ describe('Crypto console seasons, practice and ranking', () => {
         endsAt: '2026-03-31T22:00:00.000Z',
         daysLeft: 16,
       });
-      const on = await me().put('/crypto/ranking/settings', { optIn: true }).expect(200);
-      expect(on.body.settings).toMatchObject({ optIn: true, alias: 'Test' });
+      // Older versions of the app send the switch: it is accepted and changes nothing.
       const off = await me().put('/crypto/ranking/settings', { optIn: false }).expect(200);
-      expect(off.body.settings).toMatchObject({ optIn: false, alias: 'Test' });
+      expect(off.body.settings).toEqual({ optIn: true, alias: 'Test', suggestedAlias: 'Test' });
+      const renamed = await me().put('/crypto/ranking/settings', { alias: 'Lince' }).expect(200);
+      expect(renamed.body.settings).toEqual({
+        optIn: true,
+        alias: 'Lince',
+        suggestedAlias: 'Test',
+      });
     });
 
     it('checks the alias: length, no e-mails, links, phones or offensive words', async () => {
       const bad = async (alias: string, problem: string) => {
-        const res = await me().put('/crypto/ranking/settings', { optIn: true, alias }).expect(400);
+        const res = await me().put('/crypto/ranking/settings', { alias }).expect(400);
         expect(res.body).toMatchObject({ code: 'CRYPTO_ALIAS_INVALID', details: { problem } });
       };
       await bad('ab', 'length');
@@ -365,17 +370,21 @@ describe('Crypto console seasons, practice and ranking', () => {
       await bad('<b>hola</b>', 'characters');
       await bad('Put4 madre', 'words');
       await bad('gilipollas', 'words');
-      await me().put('/crypto/ranking/settings', { optIn: true, alias: 123 }).expect(400);
+      await me().put('/crypto/ranking/settings', { alias: 123 }).expect(400);
+      await me().put('/crypto/ranking/settings', { alias: 'Lince', other: 1 }).expect(400);
       const ok = await me()
         .put('/crypto/ranking/settings', { optIn: false, alias: '  Lince   Ibérico ' })
         .expect(200);
       expect(ok.body.settings.alias).toBe('Lince Ibérico');
     });
 
-    it('asks for an alias when the name cannot be one', async () => {
+    it('gives «Jugador» and four steady digits when the name cannot be an alias', async () => {
       ctx.container.db.prepare('UPDATE users SET name = ? WHERE id = ?').run('X', user.id);
-      const res = await me().put('/crypto/ranking/settings', { optIn: true }).expect(400);
-      expect(res.body.details).toEqual({ problem: 'length' });
+      const first = (await me().get('/crypto/ranking').expect(200)).body.settings;
+      expect(first.alias).toMatch(/^Jugador\d{4}$/);
+      expect(first.suggestedAlias).toBe(first.alias);
+      const again = (await me().get('/crypto/ranking').expect(200)).body.settings;
+      expect(again.alias).toBe(first.alias);
     });
 
     it('ranks the month live with minimums and ties, showing only aliases', async () => {
@@ -385,13 +394,13 @@ describe('Crypto console seasons, practice and ranking', () => {
         await createUser(ctx),
         await createUser(ctx),
       ];
-      const optIn = (u: TestUser, alias: string) =>
-        as(u).put('/crypto/ranking/settings', { optIn: true, alias }).expect(200);
-      await optIn(ana, 'Alfa');
-      await optIn(bea, 'Beta');
-      await optIn(cris, 'Gamma');
+      const alias = (u: TestUser, name: string) =>
+        as(u).put('/crypto/ranking/settings', { alias: name }).expect(200);
+      await alias(ana, 'Alfa');
+      await alias(bea, 'Beta');
+      await alias(cris, 'Gamma');
       // Ana: +10 % twice (5 trades, 3 days). Bea: the same result, one day later. Cris: 4 trades.
-      // Dani gains most but did not ask to appear.
+      // Dani gains most and never chose an alias: he appears with his first name.
       for (const [u, days] of [
         [ana, [2, 2, 3, 4, 4]],
         [bea, [3, 3, 4, 5, 5]],
@@ -407,11 +416,13 @@ describe('Crypto console seasons, practice and ranking', () => {
       ctx.market.prices.set('BTC', 50_000);
       const { body, text } = await as(bea).get('/crypto/ranking').expect(200);
       expect(body.top).toEqual([
-        { place: 1, alias: 'Alfa', percent: 1.9, trades: 5, premium: true },
-        { place: 2, alias: 'Beta', percent: 1.9, trades: 5, premium: true },
+        { place: 1, alias: 'Test', percent: expect.any(Number), trades: 6, premium: true },
+        { place: 2, alias: 'Alfa', percent: 1.9, trades: 5, premium: true },
+        { place: 3, alias: 'Beta', percent: 1.9, trades: 5, premium: true },
       ]);
-      expect(body.participants).toBe(2);
-      expect(body.me).toMatchObject({ place: 2, percent: 1.9, trades: 5, qualified: true });
+      expect(body.top[0].percent).toBeGreaterThan(1.9);
+      expect(body.participants).toBe(3);
+      expect(body.me).toMatchObject({ place: 3, percent: 1.9, trades: 5, qualified: true });
       for (const secret of [ana.id, bea.id, dani.id, 'example.com', 'Test User']) {
         expect(text).not.toContain(secret);
       }
@@ -421,16 +432,16 @@ describe('Crypto console seasons, practice and ranking', () => {
         qualified: false,
         missing: { trades: 1, days: 0 },
       });
-      // Cached for a minute; turning it off takes effect at once.
-      await as(ana).put('/crypto/ranking/settings', { optIn: false }).expect(200);
-      expect((await as(bea).get('/crypto/ranking').expect(200)).body.top).toHaveLength(1);
+      // Cached for a minute; a new alias shows at once.
+      await alias(ana, 'Alfa Dos');
+      expect((await as(bea).get('/crypto/ranking').expect(200)).body.top[1].alias).toBe('Alfa Dos');
     });
 
     it('on the 1st freezes the top 5 and gives the winner one month of Premium, once', async () => {
       const players = [user, ...(await Promise.all([1, 2, 3, 4, 5].map(() => createUser(ctx))))];
       for (const [i, u] of players.entries()) {
         await as(u)
-          .put('/crypto/ranking/settings', { optIn: true, alias: `Jugador ${i}` })
+          .put('/crypto/ranking/settings', { alias: `Jugador ${i}` })
           .expect(200);
         for (const day of [2, 3, 4, 5, 6]) await trade(u, day, 50_000 + i * 1000);
       }
@@ -481,7 +492,7 @@ describe('Crypto console seasons, practice and ranking', () => {
       ctx = app;
       const winner = await createUser(ctx);
       user = winner;
-      await me().put('/crypto/ranking/settings', { optIn: true, alias: 'Campeón' }).expect(200);
+      await me().put('/crypto/ranking/settings', { alias: 'Campeón' }).expect(200);
       for (const day of [2, 3, 4, 5, 6]) await trade(winner, day, 51_000);
       const sub = ctx.container.repos.subscriptions.get(winner.id)!;
       ctx.container.repos.subscriptions.save({
@@ -500,7 +511,7 @@ describe('Crypto console seasons, practice and ranking', () => {
     });
 
     it('gives nothing more to a lifetime member but keeps the place', async () => {
-      await me().put('/crypto/ranking/settings', { optIn: true, alias: 'Eterno' }).expect(200);
+      await me().put('/crypto/ranking/settings', { alias: 'Eterno' }).expect(200);
       for (const day of [2, 3, 4, 5, 6]) await trade(user, day, 51_000);
       const sub = ctx.container.repos.subscriptions.get(user.id)!;
       ctx.container.repos.subscriptions.save({ ...sub, lifetime: true });
@@ -510,7 +521,7 @@ describe('Crypto console seasons, practice and ranking', () => {
     });
 
     it('does not fail the job when the winner cannot be told', async () => {
-      await me().put('/crypto/ranking/settings', { optIn: true, alias: 'Ganador' }).expect(200);
+      await me().put('/crypto/ranking/settings', { alias: 'Ganador' }).expect(200);
       for (const day of [2, 3, 4, 5, 6]) await trade(user, day, 51_000);
       await me().post('/push/subscribe', PUSH).expect(204);
       const errors = jest.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -709,7 +720,7 @@ describe('Crypto console seasons, practice and ranking', () => {
 
   describe('personal data', () => {
     it('exports the ranking settings, results and alerts, and deletes them with the account', async () => {
-      await me().put('/crypto/ranking/settings', { optIn: true, alias: 'Lince' }).expect(200);
+      await me().put('/crypto/ranking/settings', { alias: 'Lince' }).expect(200);
       await buy(user).expect(201);
       await me()
         .post('/crypto/alerts', { symbol: 'BTC', condition: 'above', price: 90_000 })
@@ -717,7 +728,8 @@ describe('Crypto console seasons, practice and ranking', () => {
       ctx.clock.set(APRIL_FIRST);
       await ctx.container.cryptoRanking.run();
       const exported = (await me().get('/export').expect(200)).body.cryptoSimulator;
-      expect(exported.ranking).toMatchObject({ appearInRanking: true, alias: 'Lince' });
+      expect(exported.ranking).toMatchObject({ alias: 'Lince' });
+      expect(exported.ranking).not.toHaveProperty('appearInRanking');
       expect(exported.seasonResults).toEqual([
         expect.objectContaining({ season: '2026-03', appearedInRanking: true, alias: 'Lince' }),
       ]);

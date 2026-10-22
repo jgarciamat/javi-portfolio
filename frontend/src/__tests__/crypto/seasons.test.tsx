@@ -21,6 +21,7 @@ import { CryptoConsoleView } from '@modules/crypto/ui/CryptoConsoleView';
 import { GuidePanel } from '@modules/crypto/ui/GuidePanel';
 import { MoneyProvider } from '@modules/crypto/ui/money';
 import { EquityChart, PlansCard } from '@modules/crypto/ui/PremiumPanel';
+import { RANKING_INTRO_KEY } from '@modules/crypto/ui/RankingCard';
 import * as fx from '@test-utils/crypto';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
 import { renderWithProviders } from '@test-utils/render';
@@ -161,7 +162,7 @@ describe('Crypto console: the season', () => {
     expect(rows).toHaveLength(3);
     expect(nb(rows[1].textContent)).toContain('2.º');
     expect(nb(rows[2].textContent)).toContain('—');
-    expect(nb(rows[2].textContent)).toContain('-3,00 %');
+    expect(nb(rows[2].textContent)).toContain('−3,00 %');
   });
 
   it('sums up the season that ended once, with the prize when it was won', async () => {
@@ -193,7 +194,7 @@ describe('Crypto console: the season', () => {
     // Here «qualified» but nobody asked to appear: the result is only for the person.
     setup(withPortfolio({ season: season({ history: [result({ ranked: false })] }) }));
     expect(
-      await screen.findByText('No participabas en el ranking: tu resultado es solo para ti.')
+      await screen.findByText('Tu resultado de ese mes no entró en el ranking.')
     ).toBeInTheDocument();
   });
 
@@ -301,54 +302,53 @@ describe('Crypto console: ranking of the month', () => {
       within(rows[0]).getByText('Tiene Premium (no da ventaja en el ranking)')
     ).toBeInTheDocument();
     expect(nb(rows[1].textContent)).toContain('1 operación');
-    expect(rows[2].querySelector('.cc-down')).not.toBeNull();
-    expect(within(ranking).getByText(/No apareces en el ranking/)).toBeInTheDocument();
-    expect(nb(within(ranking).getByText(/Tú este mes/).parentElement!.textContent)).toContain(
-      '+0,98 %'
-    );
+    expect(rows[2].querySelector('.pnl-neg')).toHaveTextContent('−1,50 %');
+    expect(rows[0].querySelector('.pnl-pos')).toHaveTextContent('+12,50 %');
+    const mine = within(ranking).getByText(/Tú este mes/).parentElement!;
+    expect(nb(mine.textContent)).toContain('+0,98 %');
+    expect(mine.querySelector('.pnl-pos')).not.toBeNull();
     expect(
-      within(ranking).getByText('Tu puesto y tus cifras solo los ves tú.')
+      within(ranking).getByText(
+        'Para puntuar te falta 3 operaciones cerradas y 2 días con actividad.'
+      )
+    ).toBeInTheDocument();
+    // Everybody is in: no switch, and what the others see next to the alias.
+    expect(within(ranking).queryByRole('switch')).toBeNull();
+    expect(
+      within(ranking).getByText(/Tu alias aparece en el ranking del mes con tu rentabilidad/)
+    ).toBeInTheDocument();
+    expect(
+      within(ranking).getByText(/nunca se muestra tu correo ni tu nombre completo/)
     ).toBeInTheDocument();
     fireEvent.click(within(ranking).getByText('Cómo funciona el ranking (bases)'));
     expect(
       within(ranking).getByText(/al menos 5 operaciones cerradas y 3 días/)
     ).toBeInTheDocument();
     expect(within(ranking).getByText(/sus 10.000 € virtuales/)).toBeInTheDocument();
+    expect(
+      within(ranking).getByText(/Participan todas las temporadas oficiales del mes/)
+    ).toBeInTheDocument();
     expect(within(ranking).getByLabelText('Tu alias')).toHaveValue('Ana');
   });
 
-  it('turns on with the alias, saves a new alias and shows the place or what is missing', async () => {
+  it('saves a new alias and shows the place, or the error of the server', async () => {
     const { api } = setup();
     const ranking = await card();
     api.cryptoApi.setRanking.mockResolvedValue(
       fx.ranking({
-        settings: { optIn: true, alias: 'Ana', suggestedAlias: 'Ana' },
+        settings: { optIn: true, alias: 'Lince Azul', suggestedAlias: 'Ana' },
         me: { ...fx.ranking().me, place: 2, qualified: true },
       })
-    );
-    fireEvent.click(within(ranking).getByRole('switch', { name: 'Aparecer en el ranking' }));
-    await waitFor(() =>
-      expect(api.cryptoApi.setRanking).toHaveBeenCalledWith({ optIn: true, alias: 'Ana' })
-    );
-    expect(await within(ranking).findByText('Vas en el puesto 2 de 7.')).toBeInTheDocument();
-    api.cryptoApi.setRanking.mockResolvedValue(
-      fx.ranking({ settings: { optIn: true, alias: 'Lince Azul', suggestedAlias: 'Ana' } })
     );
     fireEvent.change(within(ranking).getByLabelText('Tu alias'), {
       target: { value: 'Lince Azul' },
     });
     fireEvent.click(within(ranking).getByRole('button', { name: 'Guardar alias' }));
     await waitFor(() =>
-      expect(api.cryptoApi.setRanking).toHaveBeenLastCalledWith({
-        optIn: true,
-        alias: 'Lince Azul',
-      })
+      expect(api.cryptoApi.setRanking).toHaveBeenCalledWith({ alias: 'Lince Azul' })
     );
-    expect(
-      await within(ranking).findByText(
-        'Para puntuar te falta 3 operaciones cerradas y 2 días con actividad.'
-      )
-    ).toBeInTheDocument();
+    expect(await within(ranking).findByText('Vas en el puesto 2 de 7.')).toBeInTheDocument();
+    expect(within(ranking).getByLabelText('Tu alias')).toHaveValue('Lince Azul');
     api.cryptoApi.setRanking.mockRejectedValue(new Error('El alias no puede llevar correos.'));
     fireEvent.click(within(ranking).getByRole('button', { name: 'Guardar alias' }));
     expect(await within(ranking).findByRole('alert')).toHaveTextContent(
@@ -356,14 +356,38 @@ describe('Crypto console: ranking of the month', () => {
     );
   });
 
-  it('without an alias the switch sends only the choice, and saving needs one', async () => {
-    const { api } = setup(
-      rankingWith({ settings: { optIn: false, alias: null, suggestedAlias: null } })
-    );
+  it('needs something typed to save', async () => {
+    setup();
     const ranking = await card();
+    fireEvent.change(within(ranking).getByLabelText('Tu alias'), { target: { value: '  ' } });
     expect(within(ranking).getByRole('button', { name: 'Guardar alias' })).toBeDisabled();
-    fireEvent.click(within(ranking).getByRole('switch'));
-    await waitFor(() => expect(api.cryptoApi.setRanking).toHaveBeenCalledWith({ optIn: true }));
+  });
+
+  it('tells once, on entering, with which alias the person appears', async () => {
+    setup();
+    const intro = (
+      await screen.findByRole('heading', {
+        name: 'Apareces en el ranking del mes como «Ana»',
+      })
+    ).closest('aside')!;
+    expect(within(intro).getByText(/Puedes cambiarlo cuando quieras/)).toBeInTheDocument();
+    fireEvent.click(within(intro).getByRole('button', { name: 'Cambiar mi alias' }));
+    expect(screen.getByLabelText('Tu alias')).toHaveFocus();
+    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
+    expect(localStorage.getItem(RANKING_INTRO_KEY)).toBe('1');
+  });
+
+  it('closes the first notice with «Entendido» and does not show it again', async () => {
+    const { unmount } = setup();
+    const intro = (await screen.findByRole('heading', { name: /Apareces en el ranking/ })).closest(
+      'aside'
+    )!;
+    fireEvent.click(within(intro).getByRole('button', { name: 'Entendido' }));
+    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
+    unmount();
+    setup();
+    await card();
+    expect(screen.queryByRole('heading', { name: /Apareces en el ranking/ })).toBeNull();
   });
 
   it('shows last month’s winners, an empty month, the last day and one missing of each', async () => {
@@ -430,11 +454,11 @@ describe('Crypto console: Premium comforts', () => {
     expect(within(card).queryByText('Ejemplo con datos inventados')).toBeNull();
     expect(nb(card.textContent)).toContain('66,7 % (2 con ganancia, 1 con pérdida)');
     expect(nb(card.textContent)).toContain('ETH · +120,00 € (+12,00 %)');
-    expect(nb(card.textContent)).toContain('BTC · -40,00 € (-4,00 %)');
+    expect(nb(card.textContent)).toContain('BTC · −40,00 € (−4,00 %)');
     expect(nb(within(card).getByRole('img').getAttribute('aria-label'))).toMatch(
       /en 3 días: de 10.000,00 € a 10.150,00 €/
     );
-    expect(card.querySelector('polyline')).toHaveClass('cc-up');
+    expect(card.querySelector('polyline')).toHaveClass('pnl-pos');
     expect(nb(card.textContent)).toContain('Con BTC desde que empezó esta cartera: +25,00 %');
     expect(within(card).getByText(/No dice nada de lo que pasará/)).toBeInTheDocument();
     expect(screen.getByText('Tienes Premium: todo esto ya está activo.')).toBeInTheDocument();
@@ -486,7 +510,7 @@ describe('Crypto console: Premium comforts', () => {
         />
       </MoneyProvider>
     );
-    expect(view.container.querySelector('polyline')).toHaveClass('cc-down');
+    expect(view.container.querySelector('polyline')).toHaveClass('pnl-neg');
   });
 
   it('price alerts: lists, deletes and creates them', async () => {

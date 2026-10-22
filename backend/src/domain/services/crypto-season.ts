@@ -1,6 +1,6 @@
 /**
- * Monthly seasons, the voluntary ranking and the light badges of the crypto console
- * (docs/consola-crypto.md). Pure functions: play money only, no prizes in money.
+ * Monthly seasons, the ranking (everybody is in, with an alias) and the light badges of the
+ * crypto console (docs/consola-crypto.md). Pure functions: play money only, no prizes in money.
  *
  * Every season is a calendar month in Spain: it starts on the 1st at 00:00 (Europe/Madrid) with
  * 10.000 € of play money for everybody and is never topped up in the middle.
@@ -253,4 +253,21 @@ export function suggestedAlias(name: string): string | null {
   const first = cleanAlias(name).split(' ')[0] ?? '';
   const candidate = [...first].slice(0, ALIAS_MAX).join('');
   return candidate && aliasProblem(candidate) === null ? candidate : null;
+}
+
+/**
+ * «Jugador4821»: the alias of someone whose first name cannot be one. The four digits come from
+ * the user id, so they look random but never change (and say nothing about the person).
+ */
+export function playerAlias(userId: string): string {
+  const hash = [...userId].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 9000, 7);
+  return `Jugador${1000 + hash}`;
+}
+
+/**
+ * The alias shown in the ranking: the one the person chose, else the first name of the profile,
+ * else «Jugador» and four digits. Everybody with an official season appears with it.
+ */
+export function rankingAlias(chosen: string | null, name: string, userId: string): string {
+  return chosen ?? suggestedAlias(name) ?? playerAlias(userId);
 }

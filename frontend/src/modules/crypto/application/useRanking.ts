@@ -4,8 +4,8 @@ import { useAction, type Action } from '@shared/hooks/useAction';
 import { errorMessage } from '@shared/utils/errors';
 import type { CryptoRanking, PriceAlerts } from '../domain/types';
 
-/** Loads once on mount; answers after leaving the console are ignored. */
-function useLoad<T>(load: () => Promise<T>, fallback: string, enabled = true) {
+/** Loads once enabled; answers after leaving the console are ignored. */
+function useLoad<T>(load: () => Promise<T>, fallback: string, enabled: boolean) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
@@ -32,14 +32,17 @@ export interface Ranking {
   ranking: CryptoRanking | null;
   error: string | null;
   action: Action;
-  save: (settings: { optIn: boolean; alias?: string }) => Promise<boolean>;
+  save: (settings: { alias: string }) => Promise<boolean>;
 }
 
-/** The monthly ranking: the top 5, the person's own place and their settings. */
-export function useRanking(fallback: string): Ranking {
+/**
+ * The monthly ranking: the top 5, the person's own place and their alias. Loaded once `enabled`
+ * (when the portfolio of the month is there).
+ */
+export function useRanking(fallback: string, enabled: boolean): Ranking {
   const { cryptoApi } = useApi();
   const load = useCallback(() => cryptoApi.ranking(), [cryptoApi]);
-  const { data, error, set } = useLoad(load, fallback);
+  const { data, error, set } = useLoad(load, fallback, enabled);
   const action = useAction(fallback);
   return {
     ranking: data,

@@ -18,10 +18,10 @@
   border-radius: 999px;
   border: 1px solid var(--cc-line);
   background: var(--cc-raised);
-  color: var(--slate-200);
+  color: var(--cc-text);
   font: inherit;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   scroll-snap-align: start;
   cursor: pointer;
@@ -39,7 +39,7 @@
 
 .cc-guide-tab:hover {
   border-color: var(--accent-400);
-  color: var(--slate-50);
+  color: var(--cc-strong);
 }
 
 .cc-guide-tab[aria-selected='true'] {
@@ -128,7 +128,7 @@
 .cc .cc-guide-section h4 {
   margin: 0 0 0.5rem;
   font-size: 1.2rem;
-  color: var(--slate-50);
+  color: var(--cc-strong);
 }
 
 .cc-guide-section--wide h4 {
@@ -138,12 +138,12 @@
 .cc-guide-section h5 {
   margin: 0.5rem 0 0;
   font-size: 1.05rem;
-  color: var(--slate-100);
+  color: var(--cc-strong);
 }
 
 .cc-guide-text p {
   margin: 0 0 0.65rem;
-  color: var(--slate-200);
+  color: var(--cc-text);
 }
 
 .cc-guide-text p:last-child {
@@ -251,14 +251,14 @@
 .cc-pattern h6 {
   margin: 0.55rem 0 0.25rem;
   font-size: 1rem;
-  color: var(--slate-50);
+  color: var(--cc-strong);
 }
 
 .cc-pattern p {
   margin: 0;
   font-size: 0.9375rem;
   line-height: 1.55;
-  color: var(--slate-200);
+  color: var(--cc-text);
 }
 
 /* «Words of the console»: a box to find a word and the terms in compact columns. */
@@ -267,24 +267,13 @@
   gap: 0.25rem;
   max-width: 22rem;
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--slate-200);
+  font-weight: 500;
+  color: var(--cc-text-2);
 }
 
+/* The box itself has the look of every field of the console (Crypto.css). */
 .cc-glossary-search input {
-  min-height: 40px;
-  padding: 0 0.75rem;
-  border: 1px solid var(--slate-600);
-  border-radius: 8px;
-  background: var(--slate-950);
-  color: var(--slate-50);
-  font: inherit;
   font-weight: 400;
-}
-
-.cc-glossary-search input:focus-visible {
-  outline: 3px solid var(--accent-300);
-  outline-offset: 2px;
 }
 
 .cc-glossary {
@@ -305,15 +294,15 @@
 
 .cc-glossary dt {
   font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--slate-100);
+  font-weight: 600;
+  color: var(--cc-strong);
 }
 
 .cc-glossary dd {
   margin: 0.15rem 0 0;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--slate-200);
+  color: var(--cc-text);
 }
 
 /* Phones and phones on their side: the tabs in one row that slides sideways. */
@@ -354,7 +343,6 @@ html.wiz-contrast .cc-guide-tab,
 html.wiz-contrast .cc-guide-section,
 html.wiz-contrast .cc-pattern,
 html.wiz-contrast .cc-glossary > div,
-html.wiz-contrast .cc-glossary-search input,
 html.wiz-contrast .cc-art {
   border: 2px solid var(--slate-100);
 }

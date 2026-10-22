@@ -3,7 +3,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
-import { useAlerts, useRanking } from '../application/useRanking';
+import { useAlerts, useRanking, type Ranking } from '../application/useRanking';
 import { useSimulator, type Simulator } from '../application/useSimulator';
 import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
@@ -19,7 +19,7 @@ import {
 import { DataNotice, GlossaryButton, RiskBanner } from './Notices';
 import { OrderBox } from './OrderBox';
 import { AlertsCard, PlansCard, StatsCard } from './PremiumPanel';
-import { RankingCard } from './RankingCard';
+import { RankingCard, RankingIntro } from './RankingCard';
 import { BadgesCard, PracticeOffer, SeasonPanel } from './SeasonPanel';
 import { useGuide } from './Learn';
 import { SimSummary } from './SimSummary';
@@ -180,10 +180,17 @@ function SimulatorBody({
 }
 
 /** The ranking, alerts, badges and «Free and Premium», once the portfolio is known. */
-function SeasonExtras({ portfolio, coins }: { portfolio: SimPortfolio; coins: CryptoCoin[] }) {
+function SeasonExtras({
+  portfolio,
+  coins,
+  ranking,
+}: {
+  portfolio: SimPortfolio;
+  coins: CryptoCoin[];
+  ranking: Ranking;
+}) {
   const { t } = useI18n();
   const premium = portfolio.plan.premium;
-  const ranking = useRanking(t('app.crypto.ranking.error'));
   const alerts = useAlerts(t('app.crypto.alerts.error'), premium);
   return (
     <>
@@ -224,6 +231,8 @@ function Console({ currency }: { currency: DisplayChoice }) {
   const [layers, toggleLayer] = useLayers();
   const market = useCryptoMarket(view.symbol, view.interval, t('app.crypto.market.error'));
   const sim = useSimulator(t('app.crypto.sim.error'));
+  // Asked for once the portfolio of the month is there (the server starts it on the first visit).
+  const ranking = useRanking(t('app.crypto.ranking.error'), !!sim.portfolio);
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
   const premium = !!sim.portfolio?.plan.premium;
   const lines = useMemo(
@@ -242,6 +251,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
       <RiskBanner />
       <DataNotice market={statusOf(market)} />
       <CurrencyNote unavailable={currency.unavailable} />
+      <RankingIntro ranking={ranking.ranking} />
       {sim.portfolio && <SeasonPanel portfolio={sim.portfolio} sim={sim} />}
       <SimulatorHead sim={sim} />
       <MarketPanel
@@ -266,7 +276,11 @@ function Console({ currency }: { currency: DisplayChoice }) {
             coin={coin}
             onGlossary={() => guide.show('glossary')}
           />
-          <SeasonExtras portfolio={sim.portfolio} coins={market.coins?.coins ?? []} />
+          <SeasonExtras
+            portfolio={sim.portfolio}
+            coins={market.coins?.coins ?? []}
+            ranking={ranking}
+          />
         </>
       )}
       <GlossaryButton onOpen={() => guide.show('glossary')} />

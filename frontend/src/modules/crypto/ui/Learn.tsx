@@ -10,11 +10,40 @@ const GuidePanel = lazyNamed(() => import('./GuidePanel'), 'GuidePanel');
 /** One panel per console: the button above the chart and the panel below it point to it. */
 const PANEL_ID = 'cc-learn';
 
+/** Set once the guide has been opened on this device: «Learn before playing» stops glowing. */
+export const LEARN_SEEN_KEY = 'mm_crypto_learn_seen';
+const STORES = ['localStorage', 'sessionStorage'] as const;
+
+/** Whether the guide was ever opened here (this device, else this tab). */
+export function learnSeen(): boolean {
+  return STORES.some((name) => {
+    try {
+      return window[name].getItem(LEARN_SEEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+}
+
+/** Remembers it on this device, else in this tab (the hook keeps it in memory meanwhile). */
+function rememberLearnSeen(): void {
+  for (const name of STORES) {
+    try {
+      window[name].setItem(LEARN_SEEN_KEY, '1');
+      return;
+    } catch {
+      /* not available: the next one */
+    }
+  }
+}
+
 export interface Guide {
   open: boolean;
   tab: GuideTab;
   /** Grows every time the panel opens, so it comes into sight again. */
   opened: number;
+  /** The guide has been opened at least once (by any of its buttons): no more glow. */
+  seen: boolean;
   /** Opens the panel on a tab (the glossary buttons, for instance). */
   show: (tab: GuideTab) => void;
   toggle: () => void;
@@ -22,9 +51,10 @@ export interface Guide {
   choose: (tab: GuideTab) => void;
 }
 
-/** Whether «Learn before playing» is open, and on which tab. */
+/** Whether «Learn before playing» is open, on which tab, and whether it was ever opened. */
 export function useGuide(): Guide {
   const [state, setState] = useState({ open: false, tab: 'candles' as GuideTab, opened: 0 });
+  const [seen, setSeen] = useState(learnSeen);
   const show = useCallback(
     (tab: GuideTab) => setState((s) => ({ open: true, tab, opened: s.opened + 1 })),
     []
@@ -38,7 +68,15 @@ export function useGuide(): Guide {
   );
   const close = useCallback(() => setState((s) => ({ ...s, open: false })), []);
   const choose = useCallback((tab: GuideTab) => setState((s) => ({ ...s, tab })), []);
-  return { ...state, show, toggle, close, choose };
+
+  // The first opening, whichever button did it, is remembered.
+  useEffect(() => {
+    if (!state.open || seen) return;
+    setSeen(true);
+    rememberLearnSeen();
+  }, [state.open, seen]);
+
+  return { ...state, seen, show, toggle, close, choose };
 }
 
 /** An open book, drawn with lines. */
@@ -56,20 +94,40 @@ export function BookIcon() {
   );
 }
 
-/** «Learn before playing»: the small accent button at the end of the layer chips. */
+/** An arrow pointing right (it turns down while the panel is open). */
+function ArrowIcon() {
+  return (
+    <svg className="cc-icon cc-learn-arrow" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M6 3.5 10.5 8 6 12.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * «Learn before playing»: a bar as wide as the chart, just below the layer chips. It glows
+ * softly until the guide is opened for the first time.
+ */
 export function LearnButton({ guide }: { guide: Guide }) {
   const { t } = useI18n();
   return (
     <button
       type="button"
-      className="cc-learn-open"
+      className={`cc-learn-open${guide.seen ? '' : ' is-new'}`}
       aria-expanded={guide.open}
       aria-controls={PANEL_ID}
       title={t('app.crypto.layers.note')}
       onClick={guide.toggle}
     >
       <BookIcon />
-      {t('app.crypto.guide.open')}
+      <span>{t('app.crypto.guide.open')}</span>
+      <ArrowIcon />
     </button>
   );
 }

@@ -1,5 +1,5 @@
 import { useI18n } from '@core/i18n/I18nContext';
-import { formatChange, formatDateTime, formatNumber, tone } from '../domain/format';
+import { formatChange, formatDateTime, formatNumber, pnl } from '../domain/format';
 import type { SimPortfolio } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
@@ -19,11 +19,16 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
           wins: summary.wins,
           losses: summary.losses,
         });
+  // The total value is green or red against the money put in, like every other result.
   const figures: [string, string, string?][] = [
-    ['equity', amount(summary.equity)],
+    [
+      'equity',
+      amount(summary.equity),
+      pnl(summary.equity === null ? null : summary.equity - account.initial),
+    ],
     ['initial', amount(account.initial)],
-    ['realized', amount(summary.realized, true), `cc-${tone(summary.realized)}`],
-    ['unrealized', amount(summary.unrealized, true), `cc-${tone(summary.unrealized)}`],
+    ['realized', amount(summary.realized, true), pnl(summary.realized)],
+    ['unrealized', amount(summary.unrealized, true), pnl(summary.unrealized)],
     ['trades', String(summary.trades)],
     ['winRate', winRate],
   ];
@@ -33,7 +38,7 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
       <h2 id="cc-summary-title" className="section-title">
         {t('app.crypto.summary.title')}
       </h2>
-      <p className={`cc-total cc-${tone(summary.total)}`}>
+      <p className={`cc-total ${pnl(summary.total)}`}>
         {summary.total === null || summary.totalPercent === null
           ? t('app.crypto.summary.noPrices')
           : t(

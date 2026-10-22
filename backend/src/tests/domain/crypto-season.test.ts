@@ -10,9 +10,11 @@ import {
   monthStartsAt,
   monthsBefore,
   nextMonth,
+  playerAlias,
   previousMonth,
   qualifies,
   rank,
+  rankingAlias,
   returnPercent,
   seasonEndsAt,
   suggestedAlias,
@@ -132,5 +134,19 @@ describe('ranking alias', () => {
     expect(suggestedAlias('Al')).toBeNull();
     expect(suggestedAlias('')).toBeNull();
     expect(suggestedAlias('Bartolomeoalexandrinopio Ruiz')).toBe('Bartolomeoalexandrin');
+  });
+
+  it('gives «Jugador» and four digits that never change for the same person', () => {
+    const id = '0b6f1c3e-5d2a-4f7b-9c1e-2a3b4c5d6e7f';
+    expect(playerAlias(id)).toMatch(/^Jugador\d{4}$/);
+    expect(playerAlias(id)).toBe(playerAlias(id));
+    expect(playerAlias(id)).not.toBe(playerAlias('another-user'));
+    expect(aliasProblem(playerAlias(id))).toBeNull();
+  });
+
+  it('shows the chosen alias, else the first name, else «Jugador»', () => {
+    expect(rankingAlias('Lince', 'María García', 'u1')).toBe('Lince');
+    expect(rankingAlias(null, 'María García', 'u1')).toBe('María');
+    expect(rankingAlias(null, 'X', 'u1')).toBe(playerAlias('u1'));
   });
 });

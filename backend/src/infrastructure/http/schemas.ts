@@ -1130,8 +1130,9 @@ export const cryptoResetBody = z
 
 export const cryptoPortfolioParams = z.object({ id: z.string().uuid() }).strict();
 
+/** The alias of the ranking; `optIn`, sent by older versions of the app, is accepted and ignored. */
 export const cryptoRankingBody = z
-  .object({ optIn: z.boolean(), alias: z.string().max(60).optional() })
+  .object({ optIn: z.boolean().optional(), alias: z.string().max(60).optional() })
   .strict();
 
 export const cryptoSeasonParams = z

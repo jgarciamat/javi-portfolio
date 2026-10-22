@@ -106,7 +106,7 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
     )
   );
 
-  // The voluntary monthly ranking: only aliases, never e-mails, names or ids.
+  // The monthly ranking (everybody is in): only aliases, never e-mails, full names or ids.
   router.get(
     '/crypto/ranking',
     reads,

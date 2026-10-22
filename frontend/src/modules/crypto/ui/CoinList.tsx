@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { useMediaQuery } from '@shared/hooks/useMediaQuery';
-import { formatChange, tone } from '../domain/format';
+import { formatChange, pnl } from '../domain/format';
 import type { CryptoCoin } from '../domain/types';
 import { useMoney } from './money';
 
@@ -150,7 +150,7 @@ export function CoinList({
               <span className="cc-coin-price">
                 <b>{coin.price === null ? '—' : money.price(coin.price)}</b>
                 {coin.changePercent24h !== null && (
-                  <small className={`cc-${tone(coin.changePercent24h)}`}>
+                  <small className={pnl(coin.changePercent24h)}>
                     {formatChange(coin.changePercent24h, locale)}
                   </small>
                 )}

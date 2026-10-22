@@ -18,6 +18,7 @@ import {
   savedView,
 } from '@modules/crypto/ui/CryptoConsoleView';
 import { FALLBACK_ROWS, rowsThatFit } from '@modules/crypto/ui/CoinList';
+import { LEARN_SEEN_KEY } from '@modules/crypto/ui/Learn';
 import { makeMoney } from '@modules/crypto/ui/money';
 import * as fx from '@test-utils/crypto';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
@@ -413,6 +414,56 @@ describe('Crypto console: layers, guide and currency', () => {
     delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
   });
 
+  it('glows until the guide is opened for the first time, by any of its buttons', async () => {
+    const { unmount } = setup();
+    await ready();
+    expect(opener()).toHaveClass('cc-learn-open', 'is-new');
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Aprende todas las palabras importantes' })[0]
+    );
+    expect(opener()).not.toHaveClass('is-new');
+    expect(localStorage.getItem(LEARN_SEEN_KEY)).toBe('1');
+    unmount();
+    setup();
+    await ready();
+    expect(opener()).not.toHaveClass('is-new');
+  });
+
+  it('remembers the first opening in this tab, or in memory, when storage fails', async () => {
+    const proto = Object.getPrototypeOf(localStorage) as Storage;
+    const { getItem, setItem } = proto;
+    // Only the mark of the guide fails: on this device first, then everywhere.
+    let failing: Storage[] = [localStorage];
+    const fails = (store: Storage, key: string) =>
+      key === LEARN_SEEN_KEY && failing.includes(store);
+    jest.spyOn(proto, 'setItem').mockImplementation(function (this: Storage, key, value) {
+      if (fails(this, key)) throw new Error('blocked');
+      setItem.call(this, key, value);
+    });
+    jest.spyOn(proto, 'getItem').mockImplementation(function (this: Storage, key) {
+      if (fails(this, key)) throw new Error('blocked');
+      return getItem.call(this, key);
+    });
+    try {
+      const first = setup();
+      await ready();
+      fireEvent.click(opener());
+      expect(opener()).not.toHaveClass('is-new');
+      expect(sessionStorage.getItem(LEARN_SEEN_KEY)).toBe('1');
+      first.unmount();
+      sessionStorage.clear();
+      failing = [localStorage, sessionStorage];
+      setup();
+      await ready();
+      expect(opener()).toHaveClass('is-new');
+      fireEvent.click(opener());
+      expect(opener()).not.toHaveClass('is-new');
+    } finally {
+      jest.restoreAllMocks();
+      sessionStorage.clear();
+    }
+  });
+
   it('opens the guide from its button above the chart, moves between tabs and closes it', async () => {
     setup();
     await ready();
@@ -616,7 +667,7 @@ describe('Crypto console: opening positions', () => {
     expect(box).toContain('Todo listo');
     expect(box).toContain('Total que se aparta (importe y comisión)1.001,00 €');
     expect(box).toContain('Si llega al take profit+97,90 €');
-    expect(box).toContain('Si llega al stop loss-101,90 €');
+    expect(box).toContain('Si llega al stop loss−101,90 €');
     fireEvent.click(openButton());
     expect(
       await screen.findByText('Long simulado de Bitcoin abierto. Lo ves en «Abiertas».')

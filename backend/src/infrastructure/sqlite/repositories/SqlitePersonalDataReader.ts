@@ -113,8 +113,8 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
 
   /**
    * The play-money simulator of the crypto console: every portfolio (official seasons and
-   * practice) with its operations and pending orders, the frozen season results, the voluntary
-   * ranking settings (alias), badges, daily equity and price alerts.
+   * practice) with its operations and pending orders, the frozen season results, the alias of
+   * the ranking, badges, daily equity and price alerts.
    */
   private cryptoSimulator(userId: string): Row | null {
     const portfolios = this.all(
@@ -124,7 +124,7 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       userId
     );
     const profile = this.one(
-      `SELECT ranking_opt_in, alias, practice_day AS practiceDay,
+      `SELECT alias, practice_day AS practiceDay,
               practice_actions AS practiceActions, updated_at AS updatedAt
        FROM crypto_sim_profiles WHERE user_id = ?`,
       userId
@@ -140,7 +140,6 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
     return {
       ranking: profile
         ? {
-            appearInRanking: profile.ranking_opt_in === 1,
             alias: profile.alias,
             practiceDay: profile.practiceDay,
             practiceActions: profile.practiceActions,

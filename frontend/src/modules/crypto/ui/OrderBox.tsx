@@ -1,7 +1,7 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
-import { formatChange, formatQuantity, tone } from '../domain/format';
+import { formatChange, formatQuantity, pnl } from '../domain/format';
 import { AMOUNT_SHARES, amountForShare, checkOpen, type OrderProblem } from '../domain/orders';
 import type { Direction, OrderRequest, SimPortfolio, TradeType } from '../domain/types';
 import { useMoney } from './money';
@@ -232,19 +232,25 @@ function Strips({ portfolio }: { portfolio: SimPortfolio }) {
   const { t } = useI18n();
   const money = useMoney();
   const { account, summary } = portfolio;
-  const strips: [string, number | null, boolean][] = [
-    ['initial', account.initial, false],
-    ['cash', account.cash, false],
-    ['reserved', account.reserved, false],
-    ['unrealized', summary.unrealized, true],
-    ['equity', summary.equity, false],
+  // [key, value, signed, the result that colours it (the total value against the capital)]
+  const strips: [string, number | null, boolean, number | null | undefined][] = [
+    ['initial', account.initial, false, undefined],
+    ['cash', account.cash, false, undefined],
+    ['reserved', account.reserved, false, undefined],
+    ['unrealized', summary.unrealized, true, summary.unrealized],
+    [
+      'equity',
+      summary.equity,
+      false,
+      summary.equity === null ? null : summary.equity - account.initial,
+    ],
   ];
   return (
     <dl className="cc-strips">
-      {strips.map(([key, value, signed]) => (
+      {strips.map(([key, value, signed, result]) => (
         <div key={key}>
           <dt>{t(`app.crypto.order.strips.${key}`)}</dt>
-          <dd className={signed ? `cc-${tone(value)}` : undefined}>
+          <dd className={result === undefined ? undefined : pnl(result)}>
             {value === null ? '—' : money.amount(value, signed)}
           </dd>
         </div>
@@ -287,7 +293,7 @@ function useLines(check: ReturnType<typeof checkOpen>, symbol: string): Line[] {
       lines.push({
         label: t(`app.crypto.order.${key}`),
         value: result(exit),
-        tone: `cc-${tone(exit.pnl)}`,
+        tone: pnl(exit.pnl),
       });
     }
   }

@@ -13,7 +13,7 @@ import { useI18n } from '@core/i18n/I18nContext';
 import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { storage } from '@shared/utils/storage';
 import { formatCountdown, summarize, untilClose } from '../domain/chart';
-import { formatChange, formatDateTime, formatVolume, tone } from '../domain/format';
+import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/format';
 import type { LayerId } from '../domain/indicators';
 import { layerLevels, layerLines, legend } from '../domain/layers';
 import type { Candle, CryptoInterval } from '../domain/types';
@@ -37,7 +37,7 @@ interface PriceChartProps {
   /** Visual layers that are on (averages, bands, levels…). */
   layers: LayerId[];
   onToggleLayer: (layer: LayerId) => void;
-  /** What goes at the end of the layer chips (the button of the guide). */
+  /** What goes just below the layer chips (the bar of the guide). */
   layerExtra?: ReactNode;
   /** Change (%) of the candles on screen, for the header; null when there are none. */
   onVisibleChange: (percent: number | null) => void;
@@ -69,7 +69,7 @@ function Readout({ candle }: { candle: Candle | null }) {
       {figure('open', money.shownPrice(candle.open))}
       {figure('high', money.shownPrice(candle.high))}
       {figure('low', money.shownPrice(candle.low))}
-      {figure('close', money.shownPrice(candle.close), `cc-${tone(candle.close - candle.open)}`)}
+      {figure('close', money.shownPrice(candle.close), pnl(candle.close - candle.open))}
       {figure('volume', formatVolume(candle.volume, locale))}
     </p>
   );
@@ -376,9 +376,8 @@ export function PriceChart({
         active={layers}
         legend={legend(lineData, levelData, layers, t)}
         onToggle={onToggleLayer}
-      >
-        {layerExtra}
-      </LayerBar>
+      />
+      {layerExtra}
       <div
         ref={container}
         className="cc-chart-canvas"

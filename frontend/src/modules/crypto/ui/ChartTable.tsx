@@ -1,6 +1,6 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { ScrollRegion } from '@shared/components/ScrollRegion';
-import { formatChange, formatDateTime, formatVolume, tone } from '../domain/format';
+import { formatChange, formatDateTime, formatVolume, pnl } from '../domain/format';
 import type { Candle } from '../domain/types';
 import { useMoney } from './money';
 
@@ -40,7 +40,7 @@ export function ChartTable({ candles, label }: { candles: Candle[]; label: strin
                   <td>{money.shownPrice(c.high)}</td>
                   <td>{money.shownPrice(c.low)}</td>
                   <td>{money.shownPrice(c.close)}</td>
-                  <td className={`cc-${tone(change)}`}>{formatChange(change, locale)}</td>
+                  <td className={pnl(change)}>{formatChange(change, locale)}</td>
                   <td>{formatVolume(c.volume, locale)}</td>
                 </tr>
               );

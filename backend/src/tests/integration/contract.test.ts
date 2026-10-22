@@ -292,7 +292,7 @@ describe('API contract', () => {
       await request(ctx.app)
         .put('/api/crypto/ranking/settings')
         .set(user.auth)
-        .send({ optIn: true, alias: 'Lince' })
+        .send({ alias: 'Lince' })
         .expect(200);
       contract('cryptoRanking', (await get('/crypto/ranking')).body);
       await request(ctx.app)

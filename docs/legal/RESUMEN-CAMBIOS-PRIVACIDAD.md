@@ -361,3 +361,52 @@ ranking** en `docs/consola-crypto.md`.
     - **Territorialidad** del concurso (España, UE o todos los usuarios).
     - Que las alertas de precio, con el texto «Es solo un aviso, no una recomendación», sigan
       siendo un aviso de servicio y no publicidad de criptoactivos.
+
+# Cambios del 22/10/2026 (cuarta tanda): todos aparecen en el ranking de la consola crypto
+
+**Propuesta, pendiente de revisión legal; no se han cambiado los textos publicados.** Por
+decisión del dueño se quita el interruptor «Aparecer en el ranking»: los puntos 45 a 52 de la
+tanda anterior quedan así (detalle en `docs/consola-crypto.md`, «Ranking mensual»).
+
+54. **Qué cambia**: participan **todas las temporadas oficiales** del mes que cumplan los
+    mínimos (5 operaciones cerradas y 3 días con actividad), sin activar nada. Cada persona
+    aparece con un **alias**: el que haya elegido; si no, su **nombre de pila** del perfil; si no
+    se puede usar, «Jugador» y cuatro cifras estables. Solo puede **cambiar el alias** (3 a 20
+    caracteres, sin correos, enlaces ni teléfonos); no puede salir del ranking.
+55. **Datos**: deja de usarse la preferencia «Aparecer en el ranking» (la columna sigue en la
+    base de datos por compatibilidad, sin leerse ni escribirse, y ya no sale en la exportación).
+    El alias solo se guarda cuando la persona lo cambia; el nombre de pila se usa al vuelo. El
+    resultado congelado de cada temporada guarda el alias de ese momento.
+56. **Quién ve qué** (sustituye al punto 49): los demás usuarios ven, de quien esté en el top 5,
+    el **alias** (por defecto, el nombre de pila), la **rentabilidad**, el **número de
+    operaciones** y la **insignia Premium** si la tiene. Nunca el correo, el nombre completo ni
+    identificadores. Tu posición y lo que te falta para puntuar solo los ves tú.
+57. **Información en la app**: junto al alias se muestra siempre «Tu alias aparece en el ranking
+    del mes con tu rentabilidad y tu número de operaciones. Puedes cambiarlo cuando quieras;
+    nunca se muestra tu correo ni tu nombre completo». La primera vez que se entra en la consola
+    sale un aviso descartable con el alias con el que aparece y un botón para cambiarlo.
+    Para el punto s8 (almacenamiento local) se añaden dos marcas del dispositivo: si ya se
+    descartó ese aviso (`mm_crypto_ranking_intro`) y si ya se abrió «Aprende antes de jugar»
+    (`mm_crypto_learn_seen`, que deja de parpadear).
+58. **Textos propuestos** (sin editar todavía; sustituyen a los del punto 52 sobre el ranking):
+    - **s2**: «Si usas la Consola crypto guardamos tus carteras con dinero ficticio (la oficial de
+      cada mes y las de prácticas), el resultado de cada temporada, tus insignias, el valor de cada
+      día de tus carteras y las alertas de precio que crees. Tu temporada oficial participa en el
+      ranking del mes con tu alias (al empezar, tu nombre de pila), que puedes cambiar.»
+    - **s3**: el ranking pasa de consentimiento a la base que confirme el abogado (punto 59).
+    - **s7**: la sección `ranking` de la exportación lleva el alias elegido, ya no la preferencia.
+59. **PUNTO PARA ABOGADO**:
+    - **Base del tratamiento**: la participación automática con un alias sacado del **nombre de
+      pila** cambia la base del tratamiento de **consentimiento** (art. 6.1.a, el interruptor) a
+      **ejecución del servicio** (art. 6.1.b) o **interés legítimo** (art. 6.1.f). Hay que
+      confirmar cuál aplica, hacer la ponderación si es interés legítimo y **explicarlo con
+      claridad en la política de privacidad** (qué se publica, a quién, con qué alias por defecto
+      y cómo cambiarlo).
+    - **Derecho de oposición**: si la base es el interés legítimo, valorar si hace falta una
+      forma de oponerse (salir del ranking o un alias neutro por defecto en lugar del nombre de
+      pila).
+    - **Personas que ya habían elegido no aparecer** (solo en entornos de prueba: la función no
+      ha llegado a producción) y **menores** (cuentas desde 14 años) que aparezcan con su nombre de
+      pila.
+    - Siguen abiertos los puntos del 53 (premio promocional, edad mínima, insignia Premium,
+      retención y territorialidad).
