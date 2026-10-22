@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { campaignFor, campaignPhase, daysUntil } from '@modules/tools/domain/rentaCampaign';
 import { CampaignDates } from '@modules/tools/ui/renta/CampaignDates';
 import { RentaCalculatorPage } from '@modules/tools/ui/CalculatorPages';
@@ -17,6 +17,27 @@ describe('the public page', () => {
     expect(
       await screen.findByRole('region', {
         name: tr('tools.renta.campaign.title', { year: 2025, filed: 2026 }),
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('picks the year of the return, as the app does', async () => {
+    freezeTime('2026-10-22T12:00:00');
+    renderWithProviders(<RentaCalculatorPage />, {
+      authenticated: false,
+      route: '/calculadora-renta',
+    });
+    const select = await screen.findByRole('combobox', { name: tr('app.renta.year') });
+    // The years with rules up to this one, the newest first.
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((o) => o.textContent)
+    ).toEqual(['2026', '2025', '2024']);
+    fireEvent.change(select, { target: { value: '2024' } });
+    expect(
+      screen.getByRole('region', {
+        name: tr('tools.renta.campaign.title', { year: 2024, filed: 2025 }),
       })
     ).toBeInTheDocument();
   });
