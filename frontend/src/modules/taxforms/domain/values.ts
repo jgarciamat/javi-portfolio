@@ -417,6 +417,9 @@ function optionalBoxes(result: RentaResult): Record<string, number> {
     ...(gains ? { '0431': gains['0431'], '0433': gains['0433'], '0434': gains['0434'] } : {}),
     // I and J: the pension plan and what the compensatory pension takes off the savings base.
     '0492': result.pensionReduction,
+    // Arts. 53 and 54 (a person with a disability): plans and protected patrimony.
+    '0494': result.disability?.plans ?? 0,
+    '0495': result.disability?.patrimony ?? 0,
     '0507': result.savingsReduction,
     // K: the minimums for descendants and ascendants.
     '0513': minimum('descendants'),

@@ -90,6 +90,16 @@ describe('The Renta (modelo 100) with the figures of the planner', () => {
     expect(form.values['0515']).toBeGreaterThan(0);
   });
 
+  it('puts the plan and the patrimony of a relative with a disability in 0494 and 0495', async () => {
+    const { input, result } = await renta({
+      relativePlan: { mine: '1000' },
+      patrimony: { mine: '2000', others: '' },
+    });
+    const form = form100(result, input, 2025);
+    expect(form.values['0494']).toBe(1000);
+    expect(form.values['0495']).toBe(2000);
+  });
+
   it('takes the savings, the activities, the gains and the double taxation from the result', async () => {
     const { input, result } = await renta({ withheld: '4200' });
     const full: RentaResult = {

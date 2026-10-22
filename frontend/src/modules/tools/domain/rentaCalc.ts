@@ -25,6 +25,11 @@ import {
 import type { PropertyResult } from './rentaRentals';
 import { checkDeduction, type CheckAnswers } from './rentaRequirements';
 import { donationChoices, type DonationInput } from './rentaDonations';
+import {
+  disabilityReductions,
+  type DisabilityResult,
+  type DisabilitySupport,
+} from './rentaDisability';
 
 const positive = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
@@ -464,10 +469,16 @@ export interface RentaInput {
   pensionEmploymentOwn?: number;
   /** Premiums the employer pays to a collective dependency insurance (art. 51.5: 5,000 € of its own). */
   dependencyPremiums?: number;
-  /** What did not fit in the five years before (art. 52.2): of plans and of dependency insurance. */
-  pensionExcess?: { plans: number; dependency: number };
+  /**
+   * What did not fit in the five years before (art. 52.2): of plans and of dependency insurance.
+   * `plans`/`dependency` is a total of no known year (saved before the years were asked); `byYear`
+   * says the year each one comes from, so the oldest go first and their last year is known.
+   */
+  pensionExcess?: { plans: number; dependency: number; byYear?: ExcessYear[] };
   /** Contributions to the plan of a spouse with low income. */
   spousePlan: number;
+  /** Plans and protected patrimony of a person with a disability (rentaDisability.ts). */
+  disabilitySupport?: DisabilitySupport;
   /** Compensatory pension paid to an ex-spouse. */
   compensatoryPension: number;
   /** Rented properties, all together. */
@@ -534,8 +545,18 @@ export interface RentaResult {
   pensionReduction: number;
   /** What does not fit this year, for the next five (art. 52.2): of plans and of dependency. */
   pensionExcessNext: { plans: number; dependency: number };
-  /** Other reductions of the general base: spouse plan and compensatory pension. */
+  /**
+   * The same by the year it comes from, with the last return it can still be used in (null: of no
+   * known year), and what is lost because this was its last year. A result saved before has none.
+   */
+  pensionExcessYears?: { left: ExcessLeft[]; lost: { plans: number; dependency: number } };
+  /**
+   * Other reductions of the general base: spouse plan, the plans and patrimony of a person with a
+   * disability (detailed in `disability`) and compensatory pension.
+   */
   otherReductions: number;
+  /** The reductions of arts. 53 and 54 (null when none were typed; a result saved before has none). */
+  disability?: DisabilityResult | null;
   /** The economic activities and the reductions of art. 32 (null when there are none). */
   activities: ActivitiesResult | null;
   /** Capital mobiliario of the general base, box 0060 (null when there is none). */
@@ -666,7 +687,7 @@ interface Earner {
   /** Own contributions to the employer's plan, dependency premiums and the excess of years before. */
   employmentOwn: number;
   dependency: number;
-  excess: { plans: number; dependency: number };
+  excess: { plans: number; dependency: number; byYear?: ExcessYear[] };
   /** The person: their 2,000 € always count, as in an individual return. */
   main: boolean;
 }
@@ -691,6 +712,7 @@ function earnersOf(input: RentaInput): Earner[] {
     excess: {
       plans: positive(input.pensionExcess?.plans ?? 0),
       dependency: positive(input.pensionExcess?.dependency ?? 0),
+      byYear: input.pensionExcess?.byYear,
     },
     main: true,
   };
@@ -827,18 +849,94 @@ export function employmentTableMax(
 
 type PensionPart = 'gross' | 'pensionPlan' | 'pensionEmployer' | 'employmentOwn' | 'dependency';
 
+/** The excess of plans and of dependency insurance of one year before, still to reduce. */
+export interface ExcessYear {
+  year: number;
+  plans: number;
+  dependency: number;
+}
+
+/** What is left of an excess and the last return it can be used in (null: of no known year). */
+export interface ExcessLeft {
+  year: number | null;
+  plans: number;
+  dependency: number;
+  lastYear: number | null;
+}
+
+/**
+ * The excesses in the order they are used: the total of no known year first (it was used first
+ * before the years were asked), then by year, the oldest first; only those of the `span` years before
+ * (five, art. 52.2).
+ */
+function excessQueue(
+  excess: Earner['excess'],
+  year: number,
+  span: number
+): { year: number | null; plans: number; dependency: number }[] {
+  const dated = (excess.byYear ?? [])
+    .filter((x) => x.year < year && x.year >= year - span)
+    .map((x) => ({ year: x.year, plans: positive(x.plans), dependency: positive(x.dependency) }))
+    .sort((a, b) => a.year - b.year);
+  return [{ year: null, plans: excess.plans, dependency: excess.dependency }, ...dated];
+}
+
+const sumOf = (list: number[]) => list.reduce((a, b) => a + b, 0);
+
+/** The excess left of each year: what this was the last year of is lost, the rest carries. */
+function excessAfter(
+  queue: ReturnType<typeof excessQueue>,
+  used: { plans: number[]; dependency: number[] },
+  year: number,
+  own: { plans: number; dependency: number },
+  span: number
+): {
+  next: { plans: number; dependency: number };
+  years: NonNullable<RentaResult['pensionExcessYears']>;
+} {
+  const all: ExcessLeft[] = queue.map((x, i) => ({
+    year: x.year,
+    plans: round2(x.plans - used.plans[i]),
+    dependency: round2(x.dependency - used.dependency[i]),
+    lastYear: x.year === null ? null : x.year + span,
+  }));
+  all.push({ year, ...own, lastYear: year + span });
+  const kept = all.filter((x) => x.lastYear !== year && x.plans + x.dependency > 0);
+  const gone = all.filter((x) => x.lastYear === year);
+  return {
+    next: {
+      plans: round2(sumOf(kept.map((x) => x.plans))),
+      dependency: round2(sumOf(kept.map((x) => x.dependency))),
+    },
+    years: {
+      left: kept,
+      lost: {
+        plans: round2(sumOf(gone.map((x) => x.plans))),
+        dependency: round2(sumOf(gone.map((x) => x.dependency))),
+      },
+    },
+  };
+}
+
 /**
  * The pension plans and dependency insurance of one person (LIRPF arts. 51.5 and 52; Manual práctico
  * de Renta 2025, c13, «Límites y exceso de aportaciones» and its example, checked 22-10-2026). The
- * excess of the years before goes first and, like this year's, «con sujeción a los límites máximos»;
- * then the plans, then the dependency premiums (the Manual's choice, the better one). `room`: the 30 %
- * of the net work and activity income, and the base left.
+ * excess of the years before goes first and, like this year's, «con sujeción a los límites máximos»
+ * (RIRPF art. 51, BOE-A-2007-6820, checked 22-10-2026: «se entenderán reducidas, en primer lugar,
+ * las aportaciones correspondientes a años anteriores»), the oldest first, which are the first to
+ * run out; then the plans, then the dependency premiums (the Manual's choice, the better one). `room`:
+ * the 30 % of the net work and activity income, and the base left. `year`: the year of the return.
  */
 export function pensionOf(
   e: Pick<Earner, PensionPart | 'excess'>,
   room: number,
-  r: BaseReductions
-): { reduction: number; next: { plans: number; dependency: number } } {
+  r: BaseReductions,
+  year = 2025
+): {
+  reduction: number;
+  next: { plans: number; dependency: number };
+  years: NonNullable<RentaResult['pensionExcessYears']>;
+} {
   const table = employmentTableMax(e.pensionEmployer, e.gross, r.employmentTable);
   const inTable = Math.min(e.employmentOwn, table);
   const plansCap = r.pensionPlanLimit + r.pensionPlanEmployerLimit;
@@ -854,18 +952,49 @@ export function pensionOf(
     left -= used;
     return used;
   };
-  const oldPlans = take(e.excess.plans, plansCap);
-  const oldDependency = take(e.excess.dependency, r.dependencyLimit);
-  const newPlans = take(plans, plansCap - oldPlans);
-  const newDependency = take(dependency, r.dependencyLimit - oldDependency);
-  return {
-    reduction: round2(oldPlans + oldDependency + newPlans + newDependency),
-    // Only what the 30 % or the base left out carries (art. 52.2), not what passes the caps.
-    next: {
-      plans: round2(e.excess.plans - oldPlans + plans - newPlans),
-      dependency: round2(e.excess.dependency - oldDependency + dependency - newDependency),
-    },
+  const queue = excessQueue(e.excess, year, r.excessYears);
+  let plansRoom = plansCap;
+  let dependencyRoom = r.dependencyLimit;
+  const used = {
+    plans: queue.map((x) => {
+      const u = take(x.plans, plansRoom);
+      plansRoom -= u;
+      return u;
+    }),
+    dependency: queue.map((x) => {
+      const u = take(x.dependency, dependencyRoom);
+      dependencyRoom -= u;
+      return u;
+    }),
   };
+  const newPlans = take(plans, plansRoom);
+  const newDependency = take(dependency, dependencyRoom);
+  // Only what the 30 % or the base left out carries (art. 52.2), not what passes the caps.
+  const after = excessAfter(
+    queue,
+    used,
+    year,
+    {
+      plans: round2(plans - newPlans),
+      dependency: round2(dependency - newDependency),
+    },
+    r.excessYears
+  );
+  return {
+    reduction: round2(sumOf(used.plans) + sumOf(used.dependency) + newPlans + newDependency),
+    next: after.next,
+    years: after.years,
+  };
+}
+
+/** The reductions of arts. 53 and 54 of the person, in the base left after the pension plans. */
+function disabilityOf(input: RentaInput, room: number, plansUsed: number) {
+  const result = disabilityReductions(
+    input.disabilitySupport,
+    { room, plansUsed, disabled: input.family.disability >= 33, year: input.state.year },
+    input.state.baseReductions.disability
+  );
+  return { result, total: result?.total ?? 0 };
 }
 
 /** From the net pay to the general and savings bases: other income, the reductions of the base. */
@@ -923,7 +1052,12 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   let baseLeft = Math.max(0, afterJoint);
   const plans = earners.map((e, i) => {
     const own = work.each[i] + (i === 0 ? activityNet : 0);
-    const p = pensionOf(e, Math.min((Math.max(0, own) * r.percentLimit) / 100, baseLeft), r);
+    const p = pensionOf(
+      e,
+      Math.min((Math.max(0, own) * r.percentLimit) / 100, baseLeft),
+      r,
+      state.year
+    );
     baseLeft -= p.reduction;
     return p;
   });
@@ -931,16 +1065,20 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
   // The spouse's plan (art. 51.7) goes with the pension plans, before the compensatory pension.
   const leftAfterPlans = Math.max(0, afterJoint - pensionReduction);
   const spouse = Math.min(Math.min(positive(input.spousePlan), 1000), leftAfterPlans);
+  // Then the plans and the patrimony of a person with a disability (arts. 53 and 54).
+  const disability = disabilityOf(input, leftAfterPlans - spouse, plans[0].reduction);
+  const disabilityTotal = disability.total;
   const compensatory = positive(input.compensatoryPension);
-  const compensatoryGeneral = Math.min(compensatory, leftAfterPlans - spouse);
+  const compensatoryGeneral = Math.min(compensatory, leftAfterPlans - spouse - disabilityTotal);
   // What is left of the compensatory pension (art. 55) lowers the savings base, never below zero:
   // LIRPF art. 50.2 (BOE-A-2006-20764, consolidated text, checked 19-10-2026): "disminuir la base
   // imponible del ahorro en el remanente, si lo hubiera, de la reducción prevista en el artículo 55".
   const compensatorySavings = round2(
     Math.min(compensatory - compensatoryGeneral, savingsTotal - jointSavings)
   );
-  const otherReductions = round2(spouse + compensatoryGeneral);
+  const otherReductions = round2(spouse + disabilityTotal + compensatoryGeneral);
   return {
+    disability: disability.result,
     rentNet,
     imputed,
     capital,
@@ -949,6 +1087,7 @@ function basesOf(input: RentaInput, earners: Earner[], work: ReturnType<typeof w
     jointReduction: round2(jointGeneral + jointSavings),
     pensionReduction,
     pensionExcessNext: plans[0].next,
+    pensionExcessYears: plans[0].years,
     otherReductions,
     taxBase: round2(Math.max(0, afterJoint - pensionReduction - otherReductions)),
     savingsIncome: savingsTotal,
@@ -1157,7 +1296,9 @@ export function computeRenta(input: RentaInput): RentaResult {
     jointReduction,
     pensionReduction,
     pensionExcessNext,
+    pensionExcessYears,
     otherReductions,
+    disability,
     taxBase,
     savingsIncome,
     activities,
@@ -1271,7 +1412,9 @@ export function computeRenta(input: RentaInput): RentaResult {
     imputedIncome: imputed,
     pensionReduction,
     pensionExcessNext,
+    pensionExcessYears,
     otherReductions,
+    disability,
     savingsReduction,
     activities,
     generalCapital: capital,

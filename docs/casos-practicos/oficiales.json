@@ -1334,6 +1334,16 @@
      "casilla": null,
      "concepto": "Exceso pendiente padre",
      "importe": 476.19
+    },
+    {
+     "casilla": null,
+     "concepto": "Reducción patrimonio protegido (cada hermano)",
+     "importe": 4619.05
+    },
+    {
+     "casilla": null,
+     "concepto": "Exceso pendiente cada hermano",
+     "importe": 380.95
     }
    ],
    "reutilizable": "tal-cual",

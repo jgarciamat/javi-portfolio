@@ -5,11 +5,13 @@ import type {
   ChildIncome,
   DeductionChoice,
   Disability,
+  ExcessYear,
   Family,
   JointMember,
   RentaInput,
 } from './rentaCalc';
 import type { RentaCcaa, RentaState } from './rentaData';
+import type { DisabilitySupport } from './rentaDisability';
 import type { GeneralCapitalItem } from './rentaCapitalGeneral';
 import type { RentaProperty, RentaWorkExtras } from './rentaExtras';
 import type { SavingsDetail } from './rentaGains';
@@ -124,6 +126,14 @@ export interface RentaForm {
   /** What did not fit in the five years before (art. 52.2): plans and dependency insurance. */
   pensionExcess?: string;
   dependencyExcess?: string;
+  /** The same by the year it comes from (the five years before): the oldest are used first. */
+  pensionExcessYears?: Record<string, { plans?: string; dependency?: string }>;
+  /** The person has a disability: contributions to their own plan of art. 53. */
+  disabledOwnPlan?: string;
+  /** To the plan of a relative with a disability: mine, what that person put in, the others'. */
+  relativePlan?: { mine?: string; theirs?: string; others?: string };
+  /** To the protected patrimony of a relative: mine, the others', the excess by year before. */
+  patrimony?: { mine?: string; others?: string; pending?: Record<string, string> };
   spousePlan: string;
   compensatory: string;
   /** Maintenance paid to the children by a court decision (they do not live with the person). */
@@ -400,11 +410,54 @@ const tablesOf = (data: RentaData) =>
     ? { modules: modules2025, farm: farm2025 }
     : (data.activityTables ?? { modules: [], farm: [] });
 
+/** The excess of the pension plans typed by year, those with an amount. */
+const excessYearsOf = (form: RentaForm): ExcessYear[] =>
+  Object.entries(form.pensionExcessYears ?? {})
+    .map(([year, x]) => ({
+      year: Number(year),
+      plans: number(x.plans),
+      dependency: number(x.dependency),
+    }))
+    .filter((x) => x.plans + x.dependency > 0);
+
+/** The plans and patrimony of a person with a disability (rentaDisability.ts), if any was typed. */
+export function disabilitySupportOf(form: RentaForm): DisabilitySupport | undefined {
+  const own = number(form.disabledOwnPlan);
+  const rel = form.relativePlan;
+  const pat = form.patrimony;
+  const support: DisabilitySupport = {
+    ...(own > 0 ? { ownPlan: own } : {}),
+    ...(rel && number(rel.mine) > 0
+      ? {
+          relativePlan: {
+            mine: number(rel.mine),
+            theirs: number(rel.theirs),
+            others: number(rel.others),
+          },
+        }
+      : {}),
+  };
+  const pending = Object.entries(pat?.pending ?? {})
+    .map(([year, amount]) => ({ year: Number(year), amount: number(amount) }))
+    .filter((x) => x.amount > 0);
+  if (pat && (number(pat.mine) > 0 || pending.length > 0))
+    support.patrimony = { mine: number(pat.mine), others: number(pat.others), pending };
+  return Object.keys(support).length > 0 ? support : undefined;
+}
+
+/** The excess of the plans of the years before: a total of no year, and by year once asked. */
+const excessOf = (form: RentaForm): NonNullable<RentaInput['pensionExcess']> => ({
+  plans: number(form.pensionExcess),
+  dependency: number(form.dependencyExcess),
+  ...(form.pensionExcessYears ? { byYear: excessYearsOf(form) } : {}),
+});
+
 /** The calculation input for what is in the form. */
 export function toInput(form: RentaForm, data: RentaData): RentaInput {
   const rental = rentalOf(form, data.property, data.state.year);
   // The withholdings on the rent (box 0153) go with the rest to box 0609.
   const rentWithheld = rental?.items?.reduce((s, r) => s + r.withheld, 0) ?? 0;
+  const support = disabilitySupportOf(form);
   return {
     gross: number(form.gross),
     socialSecurity: socialSecurityOf(form),
@@ -417,8 +470,9 @@ export function toInput(form: RentaForm, data: RentaData): RentaInput {
     pensionPlanEmployer: number(form.pensionEmployer),
     pensionEmploymentOwn: number(form.pensionEmploymentOwn),
     dependencyPremiums: number(form.dependencyPremiums),
-    pensionExcess: { plans: number(form.pensionExcess), dependency: number(form.dependencyExcess) },
+    pensionExcess: excessOf(form),
     spousePlan: number(form.spousePlan),
+    ...(support ? { disabilitySupport: support } : {}),
     compensatoryPension: number(form.compensatory),
     childSupport: number(form.childSupport),
     pensionCapital2006: number(form.pensionCapital2006),

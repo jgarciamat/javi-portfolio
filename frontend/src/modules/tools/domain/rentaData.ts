@@ -1,5 +1,6 @@
 /** Data of the income tax return (IRPF) for Spain, by tax year, taken from the Tax Agency manual. */
 import type { Check } from './rentaRequirements';
+import type { DisabilityLimits } from './rentaDisability';
 
 /** A bracket of a progressive scale: the rate (%) applies from `from` euros up to the next bracket. */
 export interface TaxBracket {
@@ -248,6 +249,8 @@ export interface BaseReductions {
   percentLimit: number;
   /** Art. 52.2: years in which what did not fit can still be reduced. */
   excessYears: number;
+  /** Arts. 53 and 54 (a person with a disability); unset: the limits of 2025 (rentaDisability.ts). */
+  disability?: DisabilityLimits;
   notes: string;
 }
 

@@ -23,6 +23,7 @@ import {
 } from '@modules/tools/domain/rentaCalc';
 import type { Deduction, RentaCcaa } from '@modules/tools/domain/rentaData';
 import { donationResult } from '@modules/tools/domain/rentaDonations';
+import { patrimonyShare } from '@modules/tools/domain/rentaDisability';
 import { generalCapitalOf, relatedLoanSplit } from '@modules/tools/domain/rentaCapitalGeneral';
 import { agrarianModules } from '@modules/finances/domain/agrarianModules';
 import { artisticReduction } from '@modules/tools/domain/rentaActivity';
@@ -615,6 +616,45 @@ const CHECKS: Record<string, () => void> = {
       })
     );
     expect(r.pensionReduction).toBe(figure('renta-c13-01', 'Reducción plan de empleo'));
+    // The whole father: a net pay of 55,500 € (the Manual gives the net; 61,000 − 3,500 − 2,000),
+    // 4,250 € to his son's plan (the son put 20,000 €, which go first) and 6,250 € to the son's
+    // patrimony, where his four other children put 5,000 € each.
+    const father = computeRenta(
+      workReturn({
+        gross: '61000',
+        socialSecurity: '3500',
+        pension: '1500',
+        pensionEmployer: '2500',
+        relativePlan: { mine: '4250', theirs: '20000', others: '' },
+        patrimony: { mine: '6250', others: '20000' },
+      })
+    );
+    expect(father.netIncome).toBe(55500);
+    expect(father.pensionReduction).toBe(figure('renta-c13-01', 'Reducción plan de empleo'));
+    expect(father.disability?.relativePlan).toBe(figure('renta-c13-01', 'Reducción plan del hijo'));
+    expect(father.disability?.patrimony).toBe(
+      figure('renta-c13-01', 'Reducción patrimonio protegido')
+    );
+    expect(father.taxBase).toBe(figure('renta-c13-01', 'Base liquidable general padre'));
+    expect(father.disability?.patrimonyLeft).toEqual([
+      { year: 2025, amount: figure('renta-c13-01', 'Exceso pendiente padre'), lastYear: 2029 },
+    ]);
+    // The son (65 %, his income a pension of 32,000 €: a base of 30,000 €) puts 20,000 € in his plan.
+    const son = computeRenta(
+      workReturn({
+        gross: '32000',
+        socialSecurity: '0',
+        retired: true,
+        disability: 65,
+        disabledOwnPlan: '20000',
+      })
+    );
+    expect(son.disability?.ownPlan).toBe(20000);
+    expect(son.taxBase).toBe(figure('renta-c13-01', 'Base liquidable general hijo'));
+    // Each brother: 5,000 € of the 26,250 € given to the patrimony.
+    const brother = patrimonyShare(5000, 6250 + 3 * 5000);
+    expect(brother).toBe(figure('renta-c13-01', 'Reducción patrimonio protegido (cada hermano)'));
+    expect(round2(5000 - brother)).toBe(figure('renta-c13-01', 'Exceso pendiente cada hermano'));
   },
   'renta-c13-02': () => {
     // Pay of 35,000 € with 2,500 € of social security: 30,500 € net, the general base. Excesses of
@@ -644,6 +684,22 @@ const CHECKS: Record<string, () => void> = {
       plans: figure('renta-c13-02', 'Exceso pendiente aportaciones'),
       dependency: figure('renta-c13-02', 'Exceso pendiente dependencia'),
     });
+    // The same excesses typed as of 2024 (the Manual's year): the same figures, by year.
+    const byYear = computeRenta(
+      workReturn({
+        gross: '35000',
+        socialSecurity: '2500',
+        pension: '500',
+        pensionEmployer: '1400',
+        pensionEmploymentOwn: '2300',
+        dependencyPremiums: '1000',
+        pensionExcessYears: { '2024': { plans: '3500', dependency: '1500' } },
+      })
+    );
+    expect(byYear.pensionReduction).toBe(r.pensionReduction);
+    expect(byYear.taxBase).toBe(r.taxBase);
+    expect(byYear.pensionExcessNext).toEqual(r.pensionExcessNext);
+    expect(byYear.pensionExcessYears?.lost).toEqual({ plans: 0, dependency: 0 });
   },
   'renta-c14-01': () => {
     const children = [

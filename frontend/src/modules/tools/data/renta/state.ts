@@ -531,6 +531,9 @@ export const rentaState: RentaState = {
     dependencyLimit: 5000,
     percentLimit: 30,
     excessYears: 5,
+    // LIRPF arts. 53.1 and 54 (BOE-A-2006-20764, checked 22-10-2026): 10,000 € a relative, 24,250 €
+    // the person's own plan and everything given to one person or patrimony; 5 and 4 years.
+    disability: { perContributor: 10000, joint: 24250, planYears: 5, patrimonyYears: 4 },
     notes:
       'Límite conjunto por planes de pensiones, mutualidades, planes de previsión asegurados, planes de previsión social empresarial y seguros de dependencia: 1.500 euros, más hasta 8.500 si el aumento viene de contribuciones de la empresa o de aportaciones tuyas al mismo plan dentro de la tabla del art. 52. Los autónomos pueden sumar 4.250 por aportaciones propias, y entre ambos aumentos el tope es 8.500 (10.000 en total). Aparte, 5.000 por primas pagadas por la empresa a seguros colectivos de dependencia. Además no puede pasar del 30 % de los rendimientos netos del trabajo y de actividades (criterio del manual de la AEAT) ni dejar la base general negativa. Lo que sobre se puede reducir en los 5 años siguientes.',
   },

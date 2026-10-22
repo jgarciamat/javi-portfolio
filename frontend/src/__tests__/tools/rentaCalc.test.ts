@@ -484,6 +484,55 @@ describe('computeRenta', () => {
     expect(withActivity.reduction).toBe(10000);
   });
 
+  it('uses the excess of each year the oldest first and says when each one runs out', () => {
+    // 30 % of 28,000 = 8,400. Excess of 2020 (its last year is 2025), 2023 and 2022, typed out of
+    // order; 2019 is too old and 2025 is this year: both are left out.
+    const r = computeRenta(
+      input({
+        pensionPlan: 1500,
+        pensionExcess: {
+          plans: 0,
+          dependency: 0,
+          byYear: [
+            { year: 2023, plans: 6000, dependency: 0 },
+            { year: 2020, plans: 1000, dependency: 500 },
+            { year: 2022, plans: 2000, dependency: 0 },
+            { year: 2019, plans: 900, dependency: 0 },
+            { year: 2025, plans: 700, dependency: 0 },
+          ],
+        },
+      })
+    );
+    // 1,000 (2020) + 2,000 (2022) + 5,400 of 2023 = 8,400; then the 500 of dependency of 2020 has
+    // no room left and is lost, as 2025 was its last year.
+    expect(r.pensionReduction).toBe(8400);
+    expect(r.pensionExcessYears).toEqual({
+      left: [
+        { year: 2023, plans: 600, dependency: 0, lastYear: 2028 },
+        { year: 2025, plans: 1500, dependency: 0, lastYear: 2030 },
+      ],
+      lost: { plans: 0, dependency: 500 },
+    });
+    expect(r.pensionExcessNext).toEqual({ plans: 2100, dependency: 0 });
+  });
+
+  it('keeps an excess of no known year first, as before the years were asked', () => {
+    const r = computeRenta(
+      input({
+        pensionExcess: {
+          plans: 8000,
+          dependency: 0,
+          byYear: [{ year: 2021, plans: 1000, dependency: 0 }],
+        },
+      })
+    );
+    // The 8,000 of no year go first; 400 of 2021 fit in the 8,400 and 600 carry to 2026.
+    expect(r.pensionReduction).toBe(8400);
+    expect(r.pensionExcessYears?.left).toEqual([
+      { year: 2021, plans: 600, dependency: 0, lastYear: 2026 },
+    ]);
+  });
+
   it('allows more work expenses with a disability, a move and union fees', () => {
     expect(computeRenta(input({ family: { ...alone, disability: 33 } })).netIncome).toBe(
       32000 - 2000 - 2000 - 3500
