@@ -215,6 +215,27 @@ add('rentaCalculation', () => rentaApi.register());
 add('cryptoBuyMarket', () =>
   cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'market', amount: 1000 })
 );
+add('cryptoBuyWithExits', () =>
+  cryptoApi.placeOrder({
+    action: 'buy',
+    symbol: 'BTC',
+    type: 'market',
+    amount: 500,
+    takeProfit: 60000,
+    stopLoss: 45000,
+  })
+);
+add('cryptoShort', () =>
+  cryptoApi.placeOrder({
+    action: 'buy',
+    symbol: 'BTC',
+    direction: 'short',
+    type: 'market',
+    amount: 300,
+    takeProfit: 40000,
+    stopLoss: 55000,
+  })
+);
 add('cryptoBuyLimit', () =>
   cryptoApi.placeOrder({ action: 'buy', symbol: 'BTC', type: 'limit', amount: 250.5, price: 40000 })
 );

@@ -58,9 +58,12 @@ export function cryptoRoutes(c: Container, limiter: RateLimiterFactory): Router 
           ? {
               action: order.action,
               symbol: order.symbol,
+              direction: order.direction,
               type: order.type,
               amountCents: order.amount,
               price: order.price,
+              takeProfit: order.takeProfit,
+              stopLoss: order.stopLoss,
             }
           : order;
       res.status(201).json(await c.cryptoSim.place(req.userId, input));

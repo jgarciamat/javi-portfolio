@@ -1,31 +1,36 @@
-import { Suspense, useId, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import { storage } from '@shared/utils/storage';
-import { useCryptoMarket, type CryptoMarket } from '../application/useCryptoMarket';
+import { useCryptoMarket } from '../application/useCryptoMarket';
+import { useLayers } from '../application/useLayers';
 import { useSimulator, type Simulator } from '../application/useSimulator';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
-import { formatChange, formatPrice, tone } from '../domain/format';
-import type { CryptoCoin, CryptoInterval, SimFill, SimPortfolio } from '../domain/types';
-import { ChartTable } from './ChartTable';
-import { DataNotice, Glossary, Help, RiskBanner } from './Notices';
-import { OrderForm } from './OrderForm';
+import type { GuideSection } from '../domain/guide';
+import type { CryptoCoin, SimFill, SimPortfolio } from '../domain/types';
+import { Loading, MarketPanel, type View } from './MarketPanel';
+import {
+  MoneyProvider,
+  useDisplayCurrency,
+  useMoney,
+  type DisplayChoice,
+  type Money,
+} from './money';
+import { DataNotice, Glossary, RiskBanner } from './Notices';
+import { OrderBox } from './OrderBox';
 import { SimSettings, SimSummary } from './SimSummary';
-import { ClosedPanel, OpenPanel, PendingPanel } from './TradePanels';
+import { ClosedPanel, OpenPanel, PendingPanel, orderKind } from './TradePanels';
+
+type Translate = (key: string, vars?: Record<string, string | number>) => string;
 import type { ChartLine } from './useCandleChart';
 import '../../finances/ui/css/Sections.css';
 import './css/Crypto.css';
 
-// The chart library goes in its own chunk, downloaded only when a chart is shown.
-const PriceChart = lazyNamed(() => import('./PriceChart'), 'PriceChart');
+// The guide and its drawings are only downloaded when the person opens it.
+const GuideModal = lazyNamed(() => import('./GuideModal'), 'GuideModal');
 
 const VIEW_KEY = 'mm_crypto_view';
 const DEFAULT_SYMBOL = 'BTC';
-
-interface View {
-  symbol: string;
-  interval: CryptoInterval;
-}
 
 /** The coin and candle size last looked at, on this device (a convenience, nothing more). */
 export function savedView(): View {
@@ -42,17 +47,20 @@ export function savedView(): View {
   }
 }
 
-function Loading() {
-  const { t } = useI18n();
-  return (
-    <p className="empty-block" role="status">
-      {t('app.common.loading')}
-    </p>
-  );
+/** One sentence per order filled, expired or position closed since the last look. */
+export function fillText(f: SimFill, t: Translate, price: (euros: number) => string): string {
+  const vars = { coin: f.symbol, price: f.price === null ? '' : price(f.price) };
+  if (f.type === 'expired') return t('app.crypto.fills.expired', vars);
+  if (f.type === 'liquidation') return t('app.crypto.fills.liquidation', vars);
+  const opening = (f.side === 'buy') === (f.direction === 'long');
+  return opening
+    ? t(`app.crypto.fills.opened.${f.direction}`, vars)
+    : t(`app.crypto.fills.closed.${f.type}`, vars);
 }
 
 function FillsNotice({ fills }: { fills: SimFill[] }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
+  const money = useMoney();
   if (!fills.length) return null;
   return (
     <div className="cc-fills" role="status">
@@ -61,81 +69,19 @@ function FillsNotice({ fills }: { fills: SimFill[] }) {
       </p>
       <ul>
         {fills.map((f) => (
-          <li key={f.orderId}>
-            {f.type === 'expired'
-              ? t(`app.crypto.fills.expired.${f.side}`, { coin: f.symbol })
-              : t('app.crypto.fills.filled', {
-                  kind: t(`app.crypto.trades.kind.${f.side}.${f.type}`),
-                  coin: f.symbol,
-                  price: formatPrice(f.price!, locale),
-                })}
-          </li>
+          <li key={f.orderId}>{fillText(f, t, money.price)}</li>
         ))}
       </ul>
     </div>
   );
 }
 
-/** Price of the chosen coin and how it moved in 24 hours (facts, nothing more). */
-function Quote({ coin }: { coin: CryptoCoin | undefined }) {
-  const { t, locale } = useI18n();
-  return (
-    <div className="cc-quote">
-      <span className="cc-quote-price">
-        {coin?.price == null ? '—' : formatPrice(coin.price, locale)}
-      </span>
-      {coin?.changePercent24h != null && (
-        <span className={`cc-${tone(coin.changePercent24h)}`}>
-          {t('app.crypto.market.change24h', {
-            change: formatChange(coin.changePercent24h, locale),
-          })}
-        </span>
-      )}
-      {coin?.high24h != null && coin.low24h != null && (
-        <span className="cc-quote-range">
-          {t('app.crypto.market.range24h', {
-            low: formatPrice(coin.low24h, locale),
-            high: formatPrice(coin.high24h, locale),
-          })}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function Intervals({
-  value,
-  onChange,
-}: {
-  value: CryptoInterval;
-  onChange: (i: CryptoInterval) => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <fieldset className="cc-intervals">
-      <legend className="field-label">{t('app.crypto.market.interval')}</legend>
-      {CHART_INTERVALS.map((option) => (
-        <label key={option} className={`cc-interval${option === value ? ' cc-interval--on' : ''}`}>
-          <input
-            type="radio"
-            name="cc-interval"
-            value={option}
-            checked={option === value}
-            onChange={() => onChange(option)}
-          />
-          <span aria-hidden="true">{t(`app.crypto.intervals.short.${option}`)}</span>
-          <span className="sr-only">{t(`app.crypto.intervals.${option}`)}</span>
-        </label>
-      ))}
-    </fieldset>
-  );
-}
-
-/** Lines of the person's purchases and pending orders of the coin on the chart. */
+/** Lines of the person's purchases and pending orders of the coin, in the display currency. */
 export function chartLines(
   p: SimPortfolio | null,
   symbol: string,
-  t: (key: string) => string
+  t: Translate,
+  money: Pick<Money, 'toShown'>
 ): ChartLine[] {
   if (!p) return [];
   return [
@@ -143,108 +89,28 @@ export function chartLines(
       .filter((o) => o.symbol === symbol)
       .map((o) => ({
         id: o.id,
-        price: o.entryPrice,
+        price: money.toShown(o.entryPrice),
         kind: 'entry' as const,
-        title: t('app.crypto.chart.lineEntry'),
+        title: t(`app.crypto.chart.lineEntry.${o.direction}`),
       })),
     ...p.pending
       .filter((o) => o.symbol === symbol)
-      .map((o) => ({
-        id: o.id,
-        price: o.price,
-        kind: o.side,
-        title: t(`app.crypto.trades.kind.${o.side}.${o.type}`),
-      })),
+      .map((o) => {
+        const exit = o.positionId !== null;
+        const kind = exit ? (o.type === 'limit' ? 'takeProfit' : 'stopLoss') : 'order';
+        return {
+          id: o.id,
+          price: money.toShown(o.price),
+          kind: kind as ChartLine['kind'],
+          title: exit ? t(`app.crypto.chart.lines.${kind}`) : orderKind(o, t),
+        };
+      }),
   ];
 }
 
-function MarketPanel({
-  view,
-  market,
-  coin,
-  lines,
-  onChange,
-}: {
-  view: View;
-  market: CryptoMarket;
-  coin: CryptoCoin | undefined;
-  lines: ChartLine[];
-  onChange: (next: Partial<View>) => void;
-}) {
-  const { t } = useI18n();
-  const coinId = useId();
-  const coins = market.coins?.coins ?? [];
-  const label = t('app.crypto.chart.label', {
-    coin: coin?.name ?? view.symbol,
-    interval: t(`app.crypto.intervals.${view.interval}`),
-  });
-  return (
-    <section className="card cc-market" aria-labelledby="cc-market-title">
-      <h2 id="cc-market-title" className="section-title">
-        {t('app.crypto.market.title')}
-      </h2>
-      <div className="cc-market-head">
-        <div className="field">
-          <label className="field-label" htmlFor={coinId}>
-            {t('app.crypto.market.coin')}
-          </label>
-          <select
-            id={coinId}
-            value={view.symbol}
-            onChange={(e) => onChange({ symbol: e.target.value })}
-          >
-            {(coins.length ? coins : [{ symbol: view.symbol, name: view.symbol }]).map((c) => (
-              <option key={c.symbol} value={c.symbol}>
-                {c.name} ({c.symbol})
-              </option>
-            ))}
-          </select>
-        </div>
-        <Quote coin={coin} />
-      </div>
-      <Intervals value={view.interval} onChange={(interval) => onChange({ interval })} />
-      <p className="cc-helps">
-        <Help term="interval" label={t('app.crypto.help.interval')} />
-        <Help term="candle" label={t('app.crypto.help.candle')} />
-        <Help term="volume" label={t('app.crypto.help.volume')} />
-      </p>
-      {market.error && !market.candles && (
-        <p className="error-banner" role="alert">
-          {market.error}{' '}
-          <button type="button" className="btn-link" onClick={market.refresh}>
-            {t('app.crypto.market.retry')}
-          </button>
-        </p>
-      )}
-      {market.loading && <Loading />}
-      {market.candles && (
-        <>
-          <Suspense fallback={<Loading />}>
-            <PriceChart
-              candles={market.candles.candles}
-              viewKey={`${view.symbol}:${view.interval}`}
-              label={label}
-              lines={lines}
-            />
-          </Suspense>
-          <ChartTable candles={market.candles.candles} label={label} />
-        </>
-      )}
-    </section>
-  );
-}
-
-function SimulatorPanels({
-  sim,
-  symbol,
-  coin,
-}: {
-  sim: Simulator;
-  symbol: string;
-  coin: CryptoCoin | undefined;
-}) {
-  const { portfolio, action } = sim;
-  if (!portfolio) {
+/** Summary first, then (after the chart) the order box and the operations. */
+function SimulatorHead({ sim }: { sim: Simulator }) {
+  if (!sim.portfolio) {
     return sim.loadError ? (
       <p className="error-banner" role="alert">
         {sim.loadError}
@@ -256,58 +122,68 @@ function SimulatorPanels({
   return (
     <>
       <FillsNotice fills={sim.fills} />
-      {action.error && (
+      {sim.action.error && (
         <p className="error-banner" role="alert">
-          {action.error}
+          {sim.action.error}
         </p>
       )}
-      <SimSummary portfolio={portfolio} />
-      <OrderForm
+      <SimSummary portfolio={sim.portfolio} />
+    </>
+  );
+}
+
+function SimulatorBody({
+  portfolio,
+  sim,
+  symbol,
+  coin,
+}: {
+  portfolio: SimPortfolio;
+  sim: Simulator;
+  symbol: string;
+  coin: CryptoCoin | undefined;
+}) {
+  const busy = sim.action.pending;
+  return (
+    <>
+      <OrderBox
         symbol={symbol}
         coinName={coin?.name ?? symbol}
         price={coin?.price ?? null}
-        cash={portfolio.account.cash}
-        feeBps={portfolio.account.feeBps}
-        busy={action.pending}
+        portfolio={portfolio}
+        busy={busy}
         onPlace={sim.place}
       />
       <OpenPanel
         trades={portfolio.open}
         pending={portfolio.pending}
-        busy={action.pending}
+        busy={busy}
         onPlace={sim.place}
       />
       <PendingPanel
         orders={portfolio.pending}
-        busy={action.pending}
+        busy={busy}
         days={portfolio.limits.pendingDays}
         onCancel={sim.cancel}
       />
       <ClosedPanel trades={portfolio.closed} />
-      <SimSettings
-        portfolio={portfolio}
-        busy={action.pending}
-        onFee={sim.setFee}
-        onReset={sim.reset}
-      />
+      <SimSettings portfolio={portfolio} busy={busy} onFee={sim.setFee} onReset={sim.reset} />
     </>
   );
 }
 
-/**
- * «Consola crypto»: the chart of the main coins (candles, sizes, zoom) and a simulator with play
- * money to learn how buying and selling works and whether it would have gained or lost. Never
- * real money, no advice, no signals: neutral explanations only.
- */
-export function CryptoConsoleView() {
+function Console({ currency }: { currency: DisplayChoice }) {
   const { t } = useI18n();
+  const money = useMoney();
   const [view, setView] = useState(savedView);
+  const [guide, setGuide] = useState<GuideSection | null>(null);
+  const [layers, toggleLayer] = useLayers();
   const market = useCryptoMarket(view.symbol, view.interval, t('app.crypto.market.error'));
   const sim = useSimulator(t('app.crypto.sim.error'));
   const coin = market.coins?.coins.find((c) => c.symbol === view.symbol);
   const lines = useMemo(
-    () => chartLines(sim.portfolio, view.symbol, t),
-    [sim.portfolio, view.symbol, t]
+    () => chartLines(sim.portfolio, view.symbol, t, money),
+    [sim.portfolio, view.symbol, t, money]
   );
 
   const change = (next: Partial<View>) => {
@@ -320,9 +196,50 @@ export function CryptoConsoleView() {
     <div className="section-view cc">
       <RiskBanner />
       <DataNotice market={market.candles?.market ?? market.coins?.market ?? null} />
-      <MarketPanel view={view} market={market} coin={coin} lines={lines} onChange={change} />
-      <SimulatorPanels sim={sim} symbol={view.symbol} coin={coin} />
+      <p className="cc-data">
+        {currency.unavailable
+          ? t('app.crypto.currency.unavailable')
+          : money.display.currency === 'USD'
+            ? t('app.crypto.currency.note')
+            : null}
+      </p>
+      <SimulatorHead sim={sim} />
+      <MarketPanel
+        view={view}
+        market={market}
+        coin={coin}
+        lines={lines}
+        layers={layers}
+        currency={currency.chosen}
+        onChange={change}
+        onCurrency={currency.choose}
+        onToggleLayer={toggleLayer}
+        onGuide={setGuide}
+      />
+      {sim.portfolio && (
+        <SimulatorBody portfolio={sim.portfolio} sim={sim} symbol={view.symbol} coin={coin} />
+      )}
       <Glossary />
+      {guide && (
+        <Suspense fallback={null}>
+          <GuideModal section={guide} onClose={() => setGuide(null)} />
+        </Suspense>
+      )}
     </div>
+  );
+}
+
+/**
+ * «Consola crypto»: the chart of the main coins (candles, sizes, layers, zoom) and a simulator with
+ * play money to learn how buying and selling works and whether it would have gained or lost. Never
+ * real money, no advice, no signals: neutral explanations only. Amounts can be shown in euros or
+ * dollars; the simulator always works in euros.
+ */
+export function CryptoConsoleView() {
+  const choice = useDisplayCurrency();
+  return (
+    <MoneyProvider display={choice.display}>
+      <Console currency={choice} />
+    </MoneyProvider>
   );
 }

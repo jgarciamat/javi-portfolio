@@ -1269,6 +1269,35 @@
     }
   },
   {
+    "name": "cryptoBuyWithExits",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "type": "market",
+      "amount": 500,
+      "takeProfit": 60000,
+      "stopLoss": 45000
+    }
+  },
+  {
+    "name": "cryptoShort",
+    "method": "POST",
+    "path": "/crypto/sim/orders",
+    "auth": true,
+    "body": {
+      "action": "buy",
+      "symbol": "BTC",
+      "direction": "short",
+      "type": "market",
+      "amount": 300,
+      "takeProfit": 40000,
+      "stopLoss": 55000
+    }
+  },
+  {
     "name": "cryptoBuyLimit",
     "method": "POST",
     "path": "/crypto/sim/orders",

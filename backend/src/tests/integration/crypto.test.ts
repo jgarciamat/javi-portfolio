@@ -12,6 +12,7 @@ import {
   createTestApp,
   createUser,
 } from '../helpers/testApp';
+import { nextMonthStart, spanishMonth } from '@application/crypto/CryptoSimService';
 
 // Every price here is made up: the fake market answers what each test sets.
 const candle = (iso: string, open: number, high: number, low: number) => ({
@@ -77,6 +78,9 @@ describe('Crypto console', () => {
         changePercent24h: 1.5,
         high24h: 51_000,
         low24h: 48_500,
+        bid: 49_999,
+        ask: 50_001,
+        volume24h: 1_000_000,
       });
       expect(res.body.coins[2]).toMatchObject({ symbol: 'BNB', price: null });
       expect(res.body.market).toEqual({
@@ -250,6 +254,7 @@ describe('Crypto console', () => {
           orderId: order.id,
           symbol: 'BTC',
           side: 'buy',
+          direction: 'long',
           type: 'limit',
           price: 45_000,
           at: '2026-03-15T12:02:00.000Z',
@@ -377,6 +382,7 @@ describe('Crypto console', () => {
           id: `p${i}`,
           userId: user.id,
           symbol: 'BTC',
+          direction: 'long',
           quantity: 1,
           entryPrice: 1,
           amountCents: 100,
@@ -463,6 +469,186 @@ describe('Crypto console', () => {
       expect(foreign.body.code).toBe('CRYPTO_POSITION_NOT_FOUND');
       const theirs = await request(ctx.app).get('/api/crypto/sim').set(other.auth).expect(200);
       expect(theirs.body.open).toEqual([]);
+    });
+  });
+
+  describe('take profit and stop loss', () => {
+    it('leaves a limit and a stop sale with a market purchase', async () => {
+      const { body } = await buy({ takeProfit: 60_000, stopLoss: 45_000 }).expect(201);
+      const position = body.open[0].id;
+      expect(
+        body.pending.map((o: { type: string; price: number; positionId: string }) => [
+          o.type,
+          o.price,
+          o.positionId,
+        ])
+      ).toEqual(
+        expect.arrayContaining([
+          ['limit', 60_000, position],
+          ['stop', 45_000, position],
+        ])
+      );
+    });
+
+    it('checks that they are on the right side of the price', async () => {
+      expect((await buy({ takeProfit: 49_000 }).expect(400)).body.code).toBe(
+        'CRYPTO_TAKE_PROFIT_SIDE'
+      );
+      expect((await buy({ stopLoss: 51_000 }).expect(400)).body.code).toBe('CRYPTO_STOP_LOSS_SIDE');
+      expect((await buy({ stopLoss: 1 }).expect(400)).body.code).toBe('CRYPTO_PRICE_OUT_OF_RANGE');
+      await post('/crypto/sim/orders', {
+        action: 'sell',
+        positionId: '00000000-0000-4000-8000-000000000000',
+        type: 'market',
+        takeProfit: 1,
+      }).expect(400);
+      expect((await get('/crypto/sim').expect(200)).body.open).toEqual([]);
+    });
+
+    it('counts them among the pending orders', async () => {
+      for (let i = 0; i < MAX_PENDING_ORDERS - 1; i++) {
+        await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
+      }
+      const full = await buy({ amount: 10, takeProfit: 60_000, stopLoss: 45_000 }).expect(400);
+      expect(full.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
+      expect((await get('/crypto/sim').expect(200)).body.open).toEqual([]);
+    });
+
+    it('a pending purchase keeps them and leaves them once filled', async () => {
+      const placed = await buy({
+        type: 'limit',
+        price: 45_000,
+        takeProfit: 52_000,
+        stopLoss: 40_000,
+      }).expect(201);
+      expect(placed.body.pending[0]).toMatchObject({ takeProfit: 52_000, stopLoss: 40_000 });
+      expect(
+        (await buy({ type: 'limit', price: 45_000, takeProfit: 44_000 }).expect(400)).body.code
+      ).toBe('CRYPTO_TAKE_PROFIT_SIDE');
+      later(5 * 60_000);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T12:02:00Z', 46_000, 46_000, 44_000)]);
+      const { body } = await get('/crypto/sim').expect(200);
+      expect(body.open).toHaveLength(1);
+      expect(body.pending.map((o: { type: string }) => o.type).sort()).toEqual(['limit', 'stop']);
+      expect(body.pending[0]).toMatchObject({
+        side: 'sell',
+        createdAt: '2026-03-15T12:02:00.000Z',
+      });
+      // Only the take profit, or neither.
+      await buy({ type: 'stop', price: 52_000, takeProfit: 55_000 }).expect(201);
+      await buy({ type: 'stop', price: 53_000, stopLoss: 49_000 }).expect(201);
+    });
+  });
+
+  describe('short positions (1x, play money)', () => {
+    const short = (body: Record<string, unknown> = {}) => buy({ direction: 'short', ...body });
+
+    it('gains when the price falls and keeps the amount as its guarantee', async () => {
+      const opened = await short({ amount: 1000 }).expect(201);
+      expect(opened.body.account.cash).toBe(8999);
+      expect(opened.body.open[0]).toMatchObject({
+        direction: 'short',
+        quantity: 0.02,
+        entryPrice: 50_000,
+        liquidationPrice: 100_000,
+        value: 999,
+        pnl: -2,
+      });
+      ctx.market.prices.set('BTC', 45_000);
+      const now = (await get('/crypto/sim').expect(200)).body;
+      expect(now.open[0]).toMatchObject({ value: 1099.1, pnl: 98.1 });
+      const closed = await sell(now.open[0].id).expect(201);
+      expect(closed.body.closed[0]).toMatchObject({
+        direction: 'short',
+        exitPrice: 45_000,
+        proceeds: 1099.1,
+        pnl: 98.1,
+        closeType: 'market',
+      });
+      expect(closed.body.account.cash).toBe(10_098.1);
+    });
+
+    it('loses when the price rises, with take profit below and stop loss above', async () => {
+      expect((await short({ takeProfit: 55_000 }).expect(400)).body.code).toBe(
+        'CRYPTO_TAKE_PROFIT_SIDE'
+      );
+      expect((await short({ stopLoss: 45_000 }).expect(400)).body.code).toBe(
+        'CRYPTO_STOP_LOSS_SIDE'
+      );
+      const { body } = await short({ takeProfit: 40_000, stopLoss: 55_000 }).expect(201);
+      expect(
+        body.pending.map((o: { side: string; type: string; direction: string }) => [
+          o.side,
+          o.type,
+          o.direction,
+        ])
+      ).toEqual(
+        expect.arrayContaining([
+          ['buy', 'limit', 'short'],
+          ['buy', 'stop', 'short'],
+        ])
+      );
+      later(5 * 60_000);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T12:02:00Z', 50_000, 56_000, 49_000)]);
+      const after = (await get('/crypto/sim').expect(200)).body;
+      expect(after.closed[0]).toMatchObject({
+        direction: 'short',
+        exitPrice: 55_000,
+        closeType: 'stop',
+      });
+      expect(after.closed[0].pnl).toBeLessThan(0);
+      expect(after.fills[0]).toMatchObject({ side: 'buy', direction: 'short', type: 'stop' });
+    });
+
+    it('closes by itself when the price doubles, never losing more than the guarantee', async () => {
+      const opened = await short({ amount: 1000 }).expect(201);
+      later(5 * 60_000);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T12:02:00Z', 50_000, 120_000, 49_000)]);
+      const { body } = await get('/crypto/sim').expect(200);
+      expect(body.open).toEqual([]);
+      expect(body.closed[0]).toMatchObject({
+        exitPrice: 100_000,
+        closeType: 'liquidation',
+        proceeds: 0,
+        pnl: -1001,
+      });
+      expect(body.fills[0]).toMatchObject({
+        orderId: opened.body.open[0].id,
+        type: 'liquidation',
+      });
+      expect(body.account.cash).toBe(8999);
+    });
+
+    it('opens pending shorts with a limit above or a stop below the price', async () => {
+      expect((await short({ type: 'limit', price: 49_000 }).expect(400)).body.code).toBe(
+        'CRYPTO_ORDER_WOULD_FILL'
+      );
+      const placed = await short({ type: 'limit', price: 52_000, stopLoss: 60_000 }).expect(201);
+      expect(placed.body.pending[0]).toMatchObject({ side: 'sell', direction: 'short' });
+      await short({ type: 'stop', price: 48_000 }).expect(201);
+      later(5 * 60_000);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T12:02:00Z', 50_000, 53_000, 50_000)]);
+      const { body } = await get('/crypto/sim').expect(200);
+      expect(body.open[0]).toMatchObject({ direction: 'short', entryPrice: 52_000 });
+      expect(
+        body.pending.find((o: { positionId: string | null }) => o.positionId === body.open[0].id)
+      ).toMatchObject({ side: 'buy', type: 'stop', price: 60_000 });
+      const cover = await sell(body.open[0].id, { type: 'limit', price: 45_000 }).expect(201);
+      expect(
+        cover.body.pending.some(
+          (o: { side: string; type: string }) => o.side === 'buy' && o.type === 'limit'
+        )
+      ).toBe(true);
+      await short({ direction: 'sideways' }).expect(400);
+    });
+  });
+
+  describe('calendar months', () => {
+    it('counts months in Spanish time', () => {
+      expect(spanishMonth(new Date('2026-03-31T22:30:00Z'))).toBe('2026-04');
+      expect(spanishMonth(new Date('2026-03-31T21:30:00Z'))).toBe('2026-03');
+      expect(nextMonthStart('2026-12')).toBe('2027-01-01');
+      expect(nextMonthStart('2026-03')).toBe('2026-04-01');
     });
   });
 

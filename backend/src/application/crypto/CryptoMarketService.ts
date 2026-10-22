@@ -24,6 +24,9 @@ export interface CryptoCoinView {
   changePercent24h: number | null;
   high24h: number | null;
   low24h: number | null;
+  bid: number | null;
+  ask: number | null;
+  volume24h: number | null;
 }
 
 export interface CryptoCandlesView {
@@ -58,6 +61,9 @@ export class CryptoMarketService {
           changePercent24h: t?.changePercent24h ?? null,
           high24h: t?.high24h ?? null,
           low24h: t?.low24h ?? null,
+          bid: t?.bid ?? null,
+          ask: t?.ask ?? null,
+          volume24h: t?.volume24h ?? null,
         };
       }),
       market: feed

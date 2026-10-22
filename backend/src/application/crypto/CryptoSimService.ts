@@ -27,11 +27,16 @@ import {
   PENDING_DAYS,
   PENDING_MS,
   PendingType,
+  CloseType,
+  Direction,
   feeCents,
+  liquidationPrice,
+  sideOf,
   findFill,
   fillsNow,
   firstFill,
   performance,
+  PendingLike,
   resolutionFor,
   sale,
 } from '@domain/services/crypto-sim';
@@ -39,14 +44,28 @@ import { Cents, fromCents } from '@domain/shared/money';
 
 /** A purchase (euros to invest) or a sale; pending orders (limit, stop) always carry `price` (zod). */
 export type CryptoOrderInput =
-  | { action: 'buy'; symbol: CryptoSymbol; type: OrderType; amountCents: Cents; price?: number }
+  | {
+      action: 'buy';
+      symbol: CryptoSymbol;
+      /** Long (the default) or short, always 1x. */
+      direction?: Direction;
+      type: OrderType;
+      amountCents: Cents;
+      price?: number;
+      /** Sell if the price goes up to this (a linked limit sale). */
+      takeProfit?: number;
+      /** Sell if the price goes down to this (a linked stop sale). */
+      stopLoss?: number;
+    }
   | { action: 'sell'; positionId: string; type: OrderType; price?: number };
 
 export interface CryptoFillView {
+  /** The order, or the position closed because its guarantee ran out. */
   orderId: string;
   symbol: string;
   side: 'buy' | 'sell';
-  type: PendingType | 'expired';
+  direction: Direction;
+  type: PendingType | 'liquidation' | 'expired';
   price: number | null;
   at: string;
 }
@@ -56,8 +75,11 @@ type TradeType = 'market' | 'limit' | 'stop';
 export interface CryptoOpenView {
   id: string;
   symbol: string;
+  direction: Direction;
   quantity: number;
   entryPrice: number;
+  /** A short closes by itself here (its guarantee is used up); null for longs. */
+  liquidationPrice: number | null;
   invested: number;
   entryFee: number;
   openType: TradeType;
@@ -75,11 +97,15 @@ export interface CryptoPendingView {
   id: string;
   symbol: string;
   side: 'buy' | 'sell';
+  direction: Direction;
   type: PendingType;
   price: number;
   amount: number | null;
   reserved: number;
   positionId: string | null;
+  /** Take profit and stop loss that a pending purchase will leave once filled. */
+  takeProfit: number | null;
+  stopLoss: number | null;
   createdAt: string;
   expiresAt: string;
   currentPrice: number | null;
@@ -88,6 +114,7 @@ export interface CryptoPendingView {
 export interface CryptoClosedView {
   id: string;
   symbol: string;
+  direction: Direction;
   quantity: number;
   entryPrice: number;
   exitPrice: number;
@@ -97,13 +124,19 @@ export interface CryptoClosedView {
   pnl: number;
   pnlPercent: number;
   openType: TradeType;
-  closeType: TradeType;
+  closeType: TradeType | 'liquidation';
   openedAt: string;
   closedAt: string;
 }
 
 export interface CryptoSimView {
-  account: { initial: number; cash: number; reserved: number; feeBps: number; startedAt: string };
+  account: {
+    initial: number;
+    cash: number;
+    reserved: number;
+    feeBps: number;
+    startedAt: string;
+  };
   open: CryptoOpenView[];
   pending: CryptoPendingView[];
   closed: CryptoClosedView[];
@@ -183,7 +216,7 @@ export class CryptoSimService {
     return this.portfolio(userId);
   }
 
-  /** «Start again»: a new virtual balance, with no purchases or orders. */
+  /** «Start again»: a new virtual balance, with no positions or orders. */
   async reset(userId: string, initialCents: Cents, feeBps: number): Promise<CryptoSimView> {
     this.uow.run(() => {
       this.repo.clear(userId);
@@ -223,7 +256,7 @@ export class CryptoSimService {
     if (counts.open >= MAX_OPEN_POSITIONS) {
       throw new BusinessRuleError(
         'CRYPTO_TOO_MANY_OPEN',
-        `Puedes tener hasta ${MAX_OPEN_POSITIONS} compras abiertas a la vez.`
+        `Puedes tener hasta ${MAX_OPEN_POSITIONS} posiciones abiertas a la vez.`
       );
     }
     const fee = feeCents(input.amountCents, account.feeBps);
@@ -234,24 +267,41 @@ export class CryptoSimService {
         'No tienes saldo ficticio suficiente para esta compra (con la comisión).'
       );
     }
+    const direction = input.direction ?? 'long';
+    const entry = input.type === 'market' ? current : input.price!;
+    const exits = this.exitPrices(input, direction, entry, current);
     if (input.type === 'market') {
-      this.repo.insertPosition(
-        openPosition(userId, input.symbol, input.amountCents, fee, current, 'market', at)
+      this.checkPendingRoom(userId, this.repo.orders(userId).length, exits.length);
+      const position = openPosition(
+        userId,
+        input.symbol,
+        direction,
+        input.amountCents,
+        fee,
+        current,
+        'market',
+        at
       );
+      this.repo.insertPosition(position);
+      this.insertExits(position, exits, at);
     } else {
-      const price = this.pendingPrice('buy', input.type, input.price!, current);
+      const side = sideOf(direction, true);
+      const price = this.pendingPrice(side, input.type, input.price!, current);
       this.checkPendingRoom(userId);
       this.repo.insertOrder({
         id: randomUUID(),
         userId,
         symbol: input.symbol,
-        side: 'buy',
+        side,
+        direction,
         type: input.type,
         price,
         amountCents: input.amountCents,
         reservedCents: total,
         positionId: null,
         createdAt: at,
+        takeProfit: input.takeProfit ?? null,
+        stopLoss: input.stopLoss ?? null,
       });
     }
     this.repo.saveAccount({ ...account, cashCents: account.cashCents - total });
@@ -266,19 +316,20 @@ export class CryptoSimService {
     const { userId } = account;
     const position = this.repo.position(userId, input.positionId);
     if (!position || position.closedAt) {
-      throw new NotFoundError('Esa compra ya no está abierta', 'CRYPTO_POSITION_NOT_FOUND');
+      throw new NotFoundError('Esa posición ya no está abierta', 'CRYPTO_POSITION_NOT_FOUND');
     }
     const current = priceOf(prices, position.symbol);
     if (input.type === 'market') {
       this.close(account, position, current, 'market', at);
       return;
     }
-    const price = this.pendingPrice('sell', input.type, input.price!, current);
+    const side = sideOf(position.direction, false);
+    const price = this.pendingPrice(side, input.type, input.price!, current);
     const orders = this.repo.orders(userId);
     if (orders.some((o) => o.positionId === position.id && o.type === input.type)) {
       throw new BusinessRuleError(
         'CRYPTO_DUPLICATE_ORDER',
-        'Esta compra ya tiene una orden de ese tipo. Cancélala antes de poner otra.'
+        'Esta posición ya tiene una orden de ese tipo. Cancélala antes de poner otra.'
       );
     }
     this.checkPendingRoom(userId, orders.length);
@@ -286,14 +337,100 @@ export class CryptoSimService {
       id: randomUUID(),
       userId,
       symbol: position.symbol,
-      side: 'sell',
+      side,
+      direction: position.direction,
       type: input.type,
       price,
       amountCents: null,
       reservedCents: 0,
       positionId: position.id,
       createdAt: at,
+      takeProfit: null,
+      stopLoss: null,
     });
+  }
+
+  /**
+   * Take profit and stop loss of a new position. A long gains above its entry and loses below;
+   * a short the other way round. A market position's exits must not be reached already.
+   */
+  private exitPrices(
+    input: Extract<CryptoOrderInput, { action: 'buy' }>,
+    direction: Direction,
+    entry: number,
+    current: number
+  ): { type: PendingType; price: number }[] {
+    const long = direction === 'long';
+    const exits: { type: PendingType; price: number }[] = [];
+    if (input.takeProfit !== undefined) {
+      if (!(long ? input.takeProfit > entry : input.takeProfit < entry)) {
+        throw new BusinessRuleError(
+          'CRYPTO_TAKE_PROFIT_SIDE',
+          long
+            ? 'El precio objetivo (take profit) tiene que estar por encima del precio de entrada.'
+            : 'En un corto, el precio objetivo (take profit) tiene que estar por debajo del de entrada.'
+        );
+      }
+      exits.push({
+        type: 'limit',
+        price: this.exitPrice('limit', input, direction, input.takeProfit, current),
+      });
+    }
+    if (input.stopLoss !== undefined) {
+      if (!(long ? input.stopLoss < entry : input.stopLoss > entry)) {
+        throw new BusinessRuleError(
+          'CRYPTO_STOP_LOSS_SIDE',
+          long
+            ? 'El precio de protección (stop loss) tiene que estar por debajo del precio de entrada.'
+            : 'En un corto, el precio de protección (stop loss) tiene que estar por encima del de entrada.'
+        );
+      }
+      exits.push({
+        type: 'stop',
+        price: this.exitPrice('stop', input, direction, input.stopLoss, current),
+      });
+    }
+    return exits;
+  }
+
+  /** A market position's exits must not be reached now; a pending one's apply once filled. */
+  private exitPrice(
+    type: PendingType,
+    input: Extract<CryptoOrderInput, { action: 'buy' }>,
+    direction: Direction,
+    price: number,
+    current: number
+  ): number {
+    if (input.type === 'market') {
+      return this.pendingPrice(sideOf(direction, false), type, price, current);
+    }
+    this.checkRange(price, current);
+    return price;
+  }
+
+  /** The sale orders that go with a purchase (its take profit and stop loss). */
+  private insertExits(
+    position: CryptoSimPosition,
+    exits: { type: PendingType; price: number }[],
+    at: string
+  ): void {
+    for (const exit of exits) {
+      this.repo.insertOrder({
+        id: randomUUID(),
+        userId: position.userId,
+        symbol: position.symbol,
+        side: sideOf(position.direction, false),
+        direction: position.direction,
+        type: exit.type,
+        price: exit.price,
+        amountCents: null,
+        reservedCents: 0,
+        positionId: position.id,
+        createdAt: at,
+        takeProfit: null,
+        stopLoss: null,
+      });
+    }
   }
 
   private pendingPrice(
@@ -302,12 +439,7 @@ export class CryptoSimService {
     price: number,
     current: number
   ): number {
-    if (price < current / 100 || price > current * 100) {
-      throw new BusinessRuleError(
-        'CRYPTO_PRICE_OUT_OF_RANGE',
-        'Ese precio está demasiado lejos del precio actual.'
-      );
-    }
+    this.checkRange(price, current);
     if (fillsNow(side, type, price, current)) {
       throw new BusinessRuleError(
         'CRYPTO_ORDER_WOULD_FILL',
@@ -318,8 +450,21 @@ export class CryptoSimService {
     return price;
   }
 
-  private checkPendingRoom(userId: string, count = this.repo.orders(userId).length): void {
-    if (count >= MAX_PENDING_ORDERS) {
+  private checkRange(price: number, current: number): void {
+    if (price < current / 100 || price > current * 100) {
+      throw new BusinessRuleError(
+        'CRYPTO_PRICE_OUT_OF_RANGE',
+        'Ese precio está demasiado lejos del precio actual.'
+      );
+    }
+  }
+
+  private checkPendingRoom(
+    userId: string,
+    count = this.repo.orders(userId).length,
+    adding = 1
+  ): void {
+    if (adding > 0 && count + adding > MAX_PENDING_ORDERS) {
       throw new BusinessRuleError(
         'CRYPTO_TOO_MANY_PENDING',
         `Puedes tener hasta ${MAX_PENDING_ORDERS} órdenes pendientes a la vez.`
@@ -331,7 +476,7 @@ export class CryptoSimService {
     account: CryptoSimAccount,
     position: CryptoSimPosition,
     price: number,
-    type: OrderType,
+    type: CloseType,
     at: string
   ): void {
     const result = sale(position, price, account.feeBps);
@@ -366,18 +511,24 @@ export class CryptoSimService {
 
   private async resolve(userId: string, tickers: Tickers): Promise<CryptoFillView[]> {
     const orders = this.repo.orders(userId);
-    if (!orders.length) return [];
+    const shorts = this.repo
+      .positions(userId)
+      .filter((p) => !p.closedAt && p.direction === 'short');
+    if (!orders.length && !shorts.length) return [];
     const now = this.clock.now().getTime();
+    const since = new Map<string, number>();
+    const watch = (symbol: string, at: string): void => {
+      since.set(symbol, Math.min(since.get(symbol) ?? Infinity, Date.parse(at)));
+    };
+    orders.forEach((o) => watch(o.symbol, o.createdAt));
+    shorts.forEach((p) => watch(p.symbol, p.openedAt));
     const candles = new Map<string, MarketCandle[]>();
-    for (const symbol of new Set(orders.map((o) => o.symbol))) {
+    for (const [symbol, from] of since) {
       if (!isCryptoSymbol(symbol)) continue;
-      const since = Math.min(
-        ...orders.filter((o) => o.symbol === symbol).map((o) => Date.parse(o.createdAt))
-      );
       try {
         const feed = await this.market.candles(
           symbol,
-          resolutionFor(since, now, CANDLES_PER_SERIES)
+          resolutionFor(from, now, CANDLES_PER_SERIES)
         );
         candles.set(symbol, feed.data);
       } catch {
@@ -386,19 +537,20 @@ export class CryptoSimService {
     }
     const prices = tickers ? priceMap(tickers) : new Map<string, number>();
     const priceAt = tickers ? Date.parse(tickers.updatedAt) : now;
-    return this.uow.run(() => this.apply(userId, orders, candles, prices, priceAt, now));
+    return this.uow.run(() => this.apply(userId, orders, shorts, candles, prices, priceAt, now));
   }
 
   private apply(
     userId: string,
     orders: CryptoSimOrder[],
+    shorts: CryptoSimPosition[],
     candles: Map<string, MarketCandle[]>,
     prices: Prices,
     priceAt: number,
     now: number
   ): CryptoFillView[] {
     const events: CryptoFillView[] = [];
-    const fillOf = (o: CryptoSimOrder): Fill | null => {
+    const fillOf = (o: PendingLike & { symbol: string }): Fill | null => {
       const series = candles.get(o.symbol);
       const price = prices.get(o.symbol);
       if (!series && price === undefined) return null;
@@ -410,41 +562,72 @@ export class CryptoSimService {
     };
     const expired = (o: CryptoSimOrder): boolean => now - Date.parse(o.createdAt) > PENDING_MS;
 
-    const sells = new Map<string, { order: CryptoSimOrder; fill: Fill; type: PendingType }[]>();
+    type Exit = { order: CryptoSimOrder | null; fill: Fill; type: CloseType };
+    const exits = new Map<string, Exit[]>();
+    const addExit = (positionId: string, exit: Exit): void => {
+      exits.set(positionId, [...(exits.get(positionId) ?? []), exit]);
+    };
+
     for (const order of orders) {
       const fill = fillOf(order);
-      if (fill && order.side === 'buy') {
+      if (fill && order.positionId === null) {
         if (!this.repo.deleteOrder(userId, order.id)) continue;
-        const fee = order.reservedCents - order.amountCents!;
-        this.repo.insertPosition(
-          openPosition(
-            userId,
-            order.symbol,
-            order.amountCents!,
-            fee,
-            fill.price,
-            order.type,
-            fill.at
-          )
-        );
+        this.openFromOrder(userId, order, fill);
         events.push(event(order, order.type, fill.price, fill.at));
       } else if (fill) {
-        const list = sells.get(order.positionId!) ?? [];
-        list.push({ order, fill, type: order.type });
-        sells.set(order.positionId!, list);
+        addExit(order.positionId!, { order, fill, type: order.type });
       } else if (expired(order) && this.repo.deleteOrder(userId, order.id)) {
         this.refund(userId, order.reservedCents);
         events.push(event(order, 'expired', null, new Date(now).toISOString()));
       }
     }
-    for (const [positionId, list] of sells) {
-      // Orders go with their purchase when it closes, so the purchase is still open here.
+    // A short whose price doubled has used up its guarantee: it closes by itself.
+    for (const position of shorts) {
+      const fill = fillOf({
+        symbol: position.symbol,
+        side: 'buy',
+        type: 'stop',
+        price: liquidationPrice(position.entryPrice),
+        createdAt: position.openedAt,
+      });
+      if (fill) addExit(position.id, { order: null, fill, type: 'liquidation' });
+    }
+    for (const [positionId, list] of exits) {
+      // Orders go with their position when it closes, so the position is still open here.
       const position = this.repo.position(userId, positionId)!;
       const winner = firstFill(list)!;
       this.close(this.account(userId), position, winner.fill.price, winner.type, winner.fill.at);
-      events.push(event(winner.order, winner.type, winner.fill.price, winner.fill.at));
+      events.push({
+        orderId: winner.order?.id ?? position.id,
+        symbol: position.symbol,
+        side: sideOf(position.direction, false),
+        direction: position.direction,
+        type: winner.type as PendingType | 'liquidation',
+        price: winner.fill.price,
+        at: winner.fill.at,
+      });
     }
     return events;
+  }
+
+  /** A pending order reached by the price opens its position, with its take profit and stop loss. */
+  private openFromOrder(userId: string, order: CryptoSimOrder, fill: Fill): void {
+    const fee = order.reservedCents - order.amountCents!;
+    const position = openPosition(
+      userId,
+      order.symbol,
+      order.direction,
+      order.amountCents!,
+      fee,
+      fill.price,
+      order.type,
+      fill.at
+    );
+    this.repo.insertPosition(position);
+    const exits: { type: PendingType; price: number }[] = [];
+    if (order.takeProfit !== null) exits.push({ type: 'limit', price: order.takeProfit });
+    if (order.stopLoss !== null) exits.push({ type: 'stop', price: order.stopLoss });
+    this.insertExits(position, exits, fill.at);
   }
 
   // ─── View ────────────────────────────────────────────────────────────────
@@ -478,8 +661,10 @@ export class CryptoSimService {
         return {
           id: p.id,
           symbol: p.symbol,
+          direction: p.direction,
           quantity: p.quantity,
           entryPrice: p.entryPrice,
+          liquidationPrice: p.direction === 'short' ? liquidationPrice(p.entryPrice) : null,
           invested: fromCents(p.amountCents),
           entryFee: fromCents(p.entryFeeCents),
           openType: p.openType,
@@ -498,6 +683,7 @@ export class CryptoSimService {
       return {
         id: p.id,
         symbol: p.symbol,
+        direction: p.direction,
         quantity: p.quantity,
         entryPrice: p.entryPrice,
         exitPrice: p.exitPrice!,
@@ -532,11 +718,14 @@ export class CryptoSimService {
         id: o.id,
         symbol: o.symbol,
         side: o.side,
+        direction: o.direction,
         type: o.type,
         price: o.price,
         amount: o.amountCents === null ? null : fromCents(o.amountCents),
         reserved: fromCents(o.reservedCents),
         positionId: o.positionId,
+        takeProfit: o.takeProfit,
+        stopLoss: o.stopLoss,
         createdAt: o.createdAt,
         expiresAt: new Date(Date.parse(o.createdAt) + PENDING_MS).toISOString(),
         currentPrice: prices.get(o.symbol) ?? null,
@@ -570,6 +759,23 @@ export class CryptoSimService {
   }
 }
 
+/** Calendar month in Spain (YYYY-MM): monthly periods of the console start on the 1st there. */
+export function spanishMonth(now: Date): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Madrid',
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(now);
+  const part = (type: string): string => parts.find((p) => p.type === type)!.value;
+  return `${part('year')}-${part('month')}`;
+}
+
+/** First day of the month after `month` (YYYY-MM-DD). */
+export function nextMonthStart(month: string): string {
+  const [year, m] = month.split('-').map(Number);
+  return m === 12 ? `${year + 1}-01-01` : `${year}-${String(m + 1).padStart(2, '0')}-01`;
+}
+
 /** A last price older than this does not fill orders (only the candles do). */
 const PRICE_FRESH_MS = 2 * 60 * 1000;
 const stalePrice = (priceAt: number, now: number): boolean => now - priceAt > PRICE_FRESH_MS;
@@ -591,6 +797,7 @@ const priceMap = (tickers: MarketFeed<MarketTicker[]>): Prices =>
 function openPosition(
   userId: string,
   symbol: string,
+  direction: Direction,
   amountCents: Cents,
   entryFeeCents: Cents,
   price: number,
@@ -601,6 +808,7 @@ function openPosition(
     id: randomUUID(),
     userId,
     symbol,
+    direction,
     quantity: amountCents / 100 / price,
     entryPrice: price,
     amountCents,
@@ -625,6 +833,7 @@ const event = (
   orderId: order.id,
   symbol: order.symbol,
   side: order.side,
+  direction: order.direction,
   type,
   price,
   at,

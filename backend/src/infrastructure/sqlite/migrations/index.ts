@@ -35,6 +35,7 @@ import { funnelDaily } from './034-funnel-daily';
 import { trialNotices } from './035-trial-notices';
 import { creatorAffiliates } from './036-creator-affiliates';
 import { cryptoSimulator } from './037-crypto-simulator';
+import { cryptoShorts } from './038-crypto-shorts';
 import { gettingStartedSetting } from './013-getting-started-setting';
 
 /** Ordered list of schema migrations. Never edit an applied one: add a new file. */
@@ -76,4 +77,5 @@ export const migrations: Migration[] = [
   trialNotices,
   creatorAffiliates,
   cryptoSimulator,
+  cryptoShorts,
 ];

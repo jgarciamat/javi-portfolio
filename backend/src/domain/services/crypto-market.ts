@@ -71,6 +71,11 @@ export interface MarketTicker {
   changePercent24h: number;
   high24h: number;
   low24h: number;
+  /** Best buying and selling offers right now (null when the source does not give them). */
+  bid: number | null;
+  ask: number | null;
+  /** Euros traded in the last 24 hours. */
+  volume24h: number | null;
 }
 
 /** Where the numbers came from and how fresh they are. */

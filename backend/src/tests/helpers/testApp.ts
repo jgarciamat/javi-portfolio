@@ -156,6 +156,9 @@ export class FakeCryptoMarket implements CryptoMarketData {
         changePercent24h: 1.5,
         high24h: price * 1.02,
         low24h: price * 0.97,
+        bid: price - 1,
+        ask: price + 1,
+        volume24h: 1_000_000,
       }))
     );
   }

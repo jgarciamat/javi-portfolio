@@ -1,15 +1,18 @@
 import { useI18n } from '@core/i18n/I18nContext';
 import { ScrollRegion } from '@shared/components/ScrollRegion';
-import { formatChange, formatDateTime, formatPrice, formatVolume, tone } from '../domain/format';
+import { formatChange, formatDateTime, formatVolume, tone } from '../domain/format';
 import type { Candle } from '../domain/types';
+import { useMoney } from './money';
 
 /** Rows of the table that replaces the chart for screen readers and keyboards (newest first). */
 export const TABLE_ROWS = 30;
 
-/** The last candles of the chart as a table, for whoever cannot or prefers not to read the chart. */
+/** The last candles of the chart (in the display currency) as a table, for whoever cannot or prefers not to read the chart. */
 export function ChartTable({ candles, label }: { candles: Candle[]; label: string }) {
   const { t, locale } = useI18n();
+  const money = useMoney();
   const rows = candles.slice(-TABLE_ROWS).reverse();
+  if (!rows.length) return null;
   return (
     <details className="cc-table-details">
       <summary>{t('app.crypto.table.show', { count: rows.length })}</summary>
@@ -33,10 +36,10 @@ export function ChartTable({ candles, label }: { candles: Candle[]; label: strin
               return (
                 <tr key={c.time}>
                   <th scope="row">{formatDateTime(c.time, locale)}</th>
-                  <td>{formatPrice(c.open, locale)}</td>
-                  <td>{formatPrice(c.high, locale)}</td>
-                  <td>{formatPrice(c.low, locale)}</td>
-                  <td>{formatPrice(c.close, locale)}</td>
+                  <td>{money.shownPrice(c.open)}</td>
+                  <td>{money.shownPrice(c.high)}</td>
+                  <td>{money.shownPrice(c.low)}</td>
+                  <td>{money.shownPrice(c.close)}</td>
                   <td className={`cc-${tone(change)}`}>{formatChange(change, locale)}</td>
                   <td>{formatVolume(c.volume, locale)}</td>
                 </tr>

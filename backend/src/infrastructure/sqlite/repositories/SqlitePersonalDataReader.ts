@@ -125,7 +125,7 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
       initial: money(initial_cents),
       cash: money(cash_cents),
       operations: this.all(
-        `SELECT id, symbol, quantity, entry_price AS entryPrice, amount_cents, entry_fee_cents,
+        `SELECT id, symbol, direction, quantity, entry_price AS entryPrice, amount_cents, entry_fee_cents,
                 open_type AS openType, opened_at AS openedAt, exit_price AS exitPrice,
                 exit_fee_cents, proceeds_cents, pnl_cents, close_type AS closeType,
                 closed_at AS closedAt
@@ -142,8 +142,9 @@ export class SqlitePersonalDataReader implements PersonalDataReader {
         })
       ),
       pendingOrders: this.all(
-        `SELECT id, symbol, side, type, price, amount_cents, reserved_cents,
-                position_id AS positionId, created_at AS createdAt
+        `SELECT id, symbol, side, direction, type, price, amount_cents, reserved_cents,
+                position_id AS positionId, take_profit AS takeProfit, stop_loss AS stopLoss,
+                created_at AS createdAt
          FROM crypto_sim_orders WHERE user_id = ? ORDER BY created_at`,
         userId
       ).map(({ amount_cents, reserved_cents, ...o }) => ({

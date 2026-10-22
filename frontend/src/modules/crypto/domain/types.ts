@@ -6,6 +6,8 @@
 export type CryptoInterval = '1m' | '5m' | '15m' | '30m' | '1h' | '4h' | '1d' | '1w';
 export type TradeType = 'market' | 'limit' | 'stop';
 export type PendingType = Exclude<TradeType, 'market'>;
+/** `long`: bought, gains when the price rises; `short`: sold, gains when it falls (1x). */
+export type Direction = 'long' | 'short';
 
 export interface MarketStatus {
   available: boolean;
@@ -23,6 +25,11 @@ export interface CryptoCoin {
   changePercent24h: number | null;
   high24h: number | null;
   low24h: number | null;
+  /** Best offers to buy (bid) and to sell (ask) on the public market. */
+  bid: number | null;
+  ask: number | null;
+  /** Euros traded in the last 24 hours. */
+  volume24h: number | null;
 }
 
 export interface CryptoCoins {
@@ -50,8 +57,11 @@ export interface CryptoCandles {
 export interface OpenTrade {
   id: string;
   symbol: string;
+  direction: Direction;
   quantity: number;
   entryPrice: number;
+  /** A short closes by itself here (its guarantee is used up); null for longs. */
+  liquidationPrice: number | null;
   invested: number;
   entryFee: number;
   openType: TradeType;
@@ -68,11 +78,15 @@ export interface PendingOrder {
   id: string;
   symbol: string;
   side: 'buy' | 'sell';
+  direction: Direction;
   type: PendingType;
   price: number;
   amount: number | null;
   reserved: number;
   positionId: string | null;
+  /** Take profit and stop loss a pending purchase will leave once filled. */
+  takeProfit: number | null;
+  stopLoss: number | null;
   createdAt: string;
   expiresAt: string;
   currentPrice: number | null;
@@ -81,6 +95,7 @@ export interface PendingOrder {
 export interface ClosedTrade {
   id: string;
   symbol: string;
+  direction: Direction;
   quantity: number;
   entryPrice: number;
   exitPrice: number;
@@ -90,7 +105,7 @@ export interface ClosedTrade {
   pnl: number;
   pnlPercent: number;
   openType: TradeType;
-  closeType: TradeType;
+  closeType: TradeType | 'liquidation';
   openedAt: string;
   closedAt: string;
 }
@@ -99,13 +114,20 @@ export interface SimFill {
   orderId: string;
   symbol: string;
   side: 'buy' | 'sell';
-  type: PendingType | 'expired';
+  direction: Direction;
+  type: PendingType | 'liquidation' | 'expired';
   price: number | null;
   at: string;
 }
 
 export interface SimPortfolio {
-  account: { initial: number; cash: number; reserved: number; feeBps: number; startedAt: string };
+  account: {
+    initial: number;
+    cash: number;
+    reserved: number;
+    feeBps: number;
+    startedAt: string;
+  };
   open: OpenTrade[];
   pending: PendingOrder[];
   closed: ClosedTrade[];
@@ -126,5 +148,17 @@ export interface SimPortfolio {
 }
 
 export type OrderRequest =
-  | { action: 'buy'; symbol: string; type: TradeType; amount: number; price?: number }
+  | {
+      action: 'buy';
+      symbol: string;
+      /** Long (the default) or short, always 1x. */
+      direction?: Direction;
+      type: TradeType;
+      amount: number;
+      price?: number;
+      /** Sell if the price goes up to this (take profit). */
+      takeProfit?: number;
+      /** Sell if the price goes down to this (stop loss). */
+      stopLoss?: number;
+    }
   | { action: 'sell'; positionId: string; type: TradeType; price?: number };

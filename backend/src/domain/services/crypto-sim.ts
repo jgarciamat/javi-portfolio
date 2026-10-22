@@ -9,6 +9,20 @@ export type OrderSide = 'buy' | 'sell';
 /** `market`: now, at the last price. `limit`: at this price or better. `stop`: once the price passes it. */
 export type OrderType = 'market' | 'limit' | 'stop';
 export type PendingType = Exclude<OrderType, 'market'>;
+/** `long`: bought, gains when the price rises. `short`: sold, gains when it falls (1x, play money). */
+export type Direction = 'long' | 'short';
+/** How a position was closed; `liquidation`: a short whose guarantee ran out. */
+export type CloseType = OrderType | 'liquidation';
+
+/**
+ * A short is closed by itself when the price doubles: by then the loss equals the guarantee put
+ * in (1x, no leverage), so it can never lose more than that.
+ */
+export const liquidationPrice = (entry: number): number => entry * 2;
+
+/** The market side that opens (`buy` long, `sell` short) or closes a position of `direction`. */
+export const sideOf = (direction: Direction, opening: boolean): OrderSide =>
+  (direction === 'long') === opening ? 'buy' : 'sell';
 
 export const INITIAL_BALANCES_EUR = [1_000, 10_000, 100_000] as const;
 export const DEFAULT_INITIAL_CENTS = 1_000_000;
@@ -98,13 +112,16 @@ export function findFill(
   return null;
 }
 
-/** Of several fills for the same purchase the earliest wins; at the same time, the stop. */
-export function firstFill<T extends { fill: Fill; type: PendingType }>(fills: T[]): T | null {
+const PRIORITY: Record<CloseType, number> = { liquidation: 0, stop: 1, limit: 2, market: 3 };
+
+/**
+ * Of several ways a position closes the earliest wins; at the same time the most prudent: the
+ * exhausted guarantee, then the stop, then the limit.
+ */
+export function firstFill<T extends { fill: Fill; type: CloseType }>(fills: T[]): T | null {
   return (
     [...fills].sort(
-      (a, b) =>
-        Date.parse(a.fill.at) - Date.parse(b.fill.at) ||
-        (a.type === b.type ? 0 : a.type === 'stop' ? -1 : 1)
+      (a, b) => Date.parse(a.fill.at) - Date.parse(b.fill.at) || PRIORITY[a.type] - PRIORITY[b.type]
     )[0] ?? null
   );
 }
@@ -118,15 +135,29 @@ export interface SaleResult {
   pnlPercent: number;
 }
 
-/** What selling a purchase at `price` would give: commission, money received, gain or loss. */
+/**
+ * What closing a position at `price` would give back: commission, money received, gain or loss.
+ * A long is sold. A short gives back its guarantee plus what the price fell (minus what it rose),
+ * never less than nothing.
+ */
 export function sale(
-  position: { quantity: number; amountCents: number; entryFeeCents: number },
+  position: {
+    quantity: number;
+    amountCents: number;
+    entryFeeCents: number;
+    direction?: Direction;
+    entryPrice?: number;
+  },
   price: number,
   bps: number
 ): SaleResult {
   const grossCents = Math.round(position.quantity * price * 100);
   const fee = feeCents(grossCents, bps);
-  const proceedsCents = grossCents - fee;
+  const valueCents =
+    position.direction === 'short'
+      ? position.amountCents + Math.round((position.entryPrice! - price) * position.quantity * 100)
+      : grossCents;
+  const proceedsCents = Math.max(0, valueCents - fee);
   const paid = position.amountCents + position.entryFeeCents;
   const pnlCents = proceedsCents - paid;
   return {

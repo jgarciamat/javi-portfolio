@@ -1,15 +1,14 @@
 .cc-chart {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: 0.6rem;
 }
 
 .cc-chart-readout {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.9rem;
-  font-size: 0.9rem;
+  gap: 0.25rem 1rem;
+  font-size: 0.95rem;
   color: var(--slate-300);
   font-variant-numeric: tabular-nums;
   min-height: 1.5rem;
@@ -19,15 +18,37 @@
   color: var(--slate-100);
 }
 
-.cc-chart-period {
+.cc-legend {
+  list-style: none;
   margin: 0;
-  font-size: 0.95rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cc-legend li {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 10px;
+  background: var(--slate-800);
+  font-size: 0.9rem;
+  color: var(--slate-200);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-legend b {
+  color: var(--slate-100);
 }
 
 .cc-chart-canvas {
-  height: 380px;
+  height: 420px;
   width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--slate-700);
   touch-action: pan-y;
@@ -44,19 +65,73 @@
   gap: 0.5rem;
 }
 
-.cc-chart-tools button {
-  min-height: 48px;
-}
-
 .cc-chart-help,
 .cc-chart-credit {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--slate-300);
+  line-height: 1.45;
 }
 
 .cc-chart-credit a {
-  color: var(--accent-400);
+  color: var(--accent-300);
+}
+
+/* «Turn the phone»: a phone outline that tilts sideways, then rests. */
+.cc-rotate {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--accent-400);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent-600) 12%, var(--slate-900));
+}
+
+.cc-rotate p {
+  margin: 0;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.cc-rotate-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-rotate-actions button {
+  min-height: 48px;
+}
+
+.cc-rotate-phone {
+  width: 3rem;
+  height: 3rem;
+  color: var(--accent-300);
+  animation: cc-rotate 2.4s ease-in-out infinite;
+}
+
+@keyframes cc-rotate {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  50%,
+  80% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-rotate-phone {
+    animation: none;
+    transform: rotate(-90deg);
+  }
 }
 
 /* Full screen without the browser's API (which iPhone Safari lacks): the chart fills the view. */
@@ -65,23 +140,54 @@
   inset: 0;
   z-index: 1000;
   margin: 0;
-  padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem 0.75rem;
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+    max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   background: var(--slate-950);
   overflow-y: auto;
 }
 
 .cc-chart--expanded .cc-chart-canvas {
-  height: calc(100dvh - 12rem);
-  min-height: 260px;
+  height: calc(100dvh - 11rem);
+  min-height: 240px;
 }
 
-@media (max-width: 480px) {
+.cc-chart--expanded .cc-chart-help,
+.cc-chart--expanded .cc-rotate {
+  display: none;
+}
+
+@media (max-width: 719px) {
   .cc-chart-canvas {
-    height: 300px;
+    height: 340px;
+  }
+
+  .cc-chart-tools .cc-tool {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }
 
-html.wiz-contrast .cc-chart-canvas {
+/* A phone on its side: the chart takes nearly all the height. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-chart-canvas,
+  .cc-chart--expanded .cc-chart-canvas {
+    height: calc(100dvh - 6.5rem);
+    min-height: 200px;
+  }
+
+  .cc-chart-help,
+  .cc-legend {
+    display: none;
+  }
+
+  .cc-chart-tools {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+
+html.wiz-contrast .cc-chart-canvas,
+html.wiz-contrast .cc-legend li {
   border: 2px solid var(--slate-100);
 }
 

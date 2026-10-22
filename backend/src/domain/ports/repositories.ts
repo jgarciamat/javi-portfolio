@@ -628,6 +628,8 @@ export interface CryptoSimPosition {
   id: string;
   userId: string;
   symbol: string;
+  /** `long`: bought; `short`: sold, with the amount kept as its guarantee (1x). */
+  direction: 'long' | 'short';
   quantity: number;
   entryPrice: number;
   amountCents: Cents;
@@ -638,7 +640,7 @@ export interface CryptoSimPosition {
   exitFeeCents: Cents | null;
   proceedsCents: Cents | null;
   pnlCents: Cents | null;
-  closeType: 'market' | 'limit' | 'stop' | null;
+  closeType: 'market' | 'limit' | 'stop' | 'liquidation' | null;
   closedAt: string | null;
 }
 
@@ -648,12 +650,17 @@ export interface CryptoSimOrder {
   userId: string;
   symbol: string;
   side: 'buy' | 'sell';
+  /** Direction of the position it opens or closes. */
+  direction: 'long' | 'short';
   type: 'limit' | 'stop';
   price: number;
   amountCents: Cents | null;
   reservedCents: Cents;
   positionId: string | null;
   createdAt: string;
+  /** Take profit and stop loss to leave once a pending purchase is filled. */
+  takeProfit: number | null;
+  stopLoss: number | null;
 }
 
 export interface CryptoSimRepository {

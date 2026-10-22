@@ -58,6 +58,9 @@ export class FakeChart {
   applyOptions(options: Record<string, unknown>) {
     this.options = { ...this.options, ...options };
   }
+  removeSeries(series: FakeSeries) {
+    this.series = this.series.filter((s) => s !== series);
+  }
   subscribeCrosshairMove(fn: Listener<{ time?: number }>) {
     this.crosshair.push(fn);
   }
@@ -110,5 +113,6 @@ export function createChart(element: HTMLElement, options: Record<string, unknow
 
 export const CandlestickSeries = { type: 'Candlestick' };
 export const HistogramSeries = { type: 'Histogram' };
+export const LineSeries = { type: 'Line' };
 export const ColorType = { Solid: 'solid' };
 export const LineStyle = { Solid: 0, Dashed: 2 };

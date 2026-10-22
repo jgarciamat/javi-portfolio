@@ -62,7 +62,17 @@ export function parseTicker(item: unknown): MarketTicker | null {
   if (!isCryptoSymbol(symbol) || !price || !high24h || !low24h || !Number.isFinite(change)) {
     return null;
   }
-  return { symbol, price, changePercent24h: change, high24h, low24h };
+  const volume = typeof t.quoteVolume === 'string' ? Number(t.quoteVolume) : NaN;
+  return {
+    symbol,
+    price,
+    changePercent24h: change,
+    high24h,
+    low24h,
+    bid: positive(t.bidPrice),
+    ask: positive(t.askPrice),
+    volume24h: volume >= 0 ? volume : null,
+  };
 }
 
 /** Candles and prices in euros from Binance's public market data, through a shared cache. */

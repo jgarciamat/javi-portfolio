@@ -1,3 +1,4 @@
+import type { DisplayCurrency } from './currency';
 import type { Locale } from '@core/i18n/I18nContext';
 
 /** The Intl locale of the app language. */
@@ -12,25 +13,34 @@ export function priceDecimals(price: number): number {
   return Math.min(10, Math.ceil(-Math.log10(price)) + 3);
 }
 
-/** Euros with cents (amounts of the simulator). */
-export function formatEur(value: number, locale: Locale, signed = false): string {
+/** Money with cents (amounts of the simulator), in euros or the display currency. */
+export function formatEur(
+  value: number,
+  locale: Locale,
+  signed = false,
+  currency: DisplayCurrency = 'EUR'
+): string {
   return new Intl.NumberFormat(tag(locale), {
     ...GROUP,
     style: 'currency',
-    currency: 'EUR',
+    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
     signDisplay: signed ? 'exceptZero' : 'auto',
   }).format(value);
 }
 
-/** The price of a coin in euros, with as many decimals as it needs. */
-export function formatPrice(price: number, locale: Locale): string {
+/** The price of a coin, with as many decimals as it needs. */
+export function formatPrice(
+  price: number,
+  locale: Locale,
+  currency: DisplayCurrency = 'EUR'
+): string {
   const digits = priceDecimals(price);
   return new Intl.NumberFormat(tag(locale), {
     ...GROUP,
     style: 'currency',
-    currency: 'EUR',
+    currency,
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(price);

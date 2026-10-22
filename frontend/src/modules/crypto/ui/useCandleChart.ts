@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import {
   CandlestickSeries,
   ColorType,
   HistogramSeries,
+  LineSeries,
   LineStyle,
   createChart,
   type IChartApi,
@@ -16,6 +17,8 @@ import {
 import type { Locale } from '@core/i18n/I18nContext';
 import { RECENT_CANDLES } from '../domain/chart';
 import { formatDateTime, formatPlain, formatTick, intlTag } from '../domain/format';
+import { LAYER_COLORS } from '../domain/indicators';
+import type { LayerLevel, LayerLine } from '../domain/layers';
 import type { Candle } from '../domain/types';
 
 /** A horizontal line on the chart: a purchase's entry price or a pending order's price. */
@@ -23,7 +26,7 @@ export interface ChartLine {
   id: string;
   price: number;
   title: string;
-  kind: 'entry' | 'buy' | 'sell';
+  kind: 'entry' | 'takeProfit' | 'stopLoss' | 'order';
 }
 
 interface Palette {
@@ -33,8 +36,9 @@ interface Palette {
   up: string;
   down: string;
   entry: string;
-  buy: string;
-  sell: string;
+  takeProfit: string;
+  stopLoss: string;
+  order: string;
 }
 
 const token = (style: CSSStyleDeclaration, name: string, fallback: string) =>
@@ -50,8 +54,9 @@ function palette(): Palette {
     up: token(style, '--green-500', '#22c55e'),
     down: token(style, '--red-500', '#ef4444'),
     entry: token(style, '--blue-400', '#60a5fa'),
-    buy: token(style, '--amber-400', '#fbbf24'),
-    sell: token(style, '--violet-400', '#a78bfa'),
+    takeProfit: token(style, '--green-500', '#22c55e'),
+    stopLoss: token(style, '--red-500', '#ef4444'),
+    order: token(style, '--amber-400', '#fbbf24'),
   };
 }
 
@@ -133,11 +138,60 @@ function recolor({ chart, candles }: Engine): void {
   });
 }
 
+/** Lines and levels of the layers: drawn again whenever the candles or the layers change. */
+function useLayerDrawing(
+  current: () => Engine | null,
+  candles: Candle[],
+  layerLines: LayerLine[],
+  layerLevels: LayerLevel[],
+  locale: Locale
+): void {
+  useEffect(() => {
+    const { chart } = current()!;
+    const drawn = layerLines.map((line) => {
+      const series = chart.addSeries(LineSeries, {
+        color: LAYER_COLORS[line.layer],
+        lineWidth: 2,
+        lineStyle: line.dashed ? LineStyle.Dashed : LineStyle.Solid,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+      });
+      series.setData(
+        candles.map((c, i) => {
+          const value = line.values[i];
+          return value === null ? { time: toTime(c.time) } : { time: toTime(c.time), value };
+        })
+      );
+      return series;
+    });
+    return () => {
+      if (current()?.chart === chart) drawn.forEach((series) => chart.removeSeries(series));
+    };
+  }, [current, layerLines, candles, locale]);
+
+  // Levels of the layers, as labelled horizontal lines.
+  useEffect(() => {
+    const series = current()!.candles;
+    const drawn = layerLevels.map((level) =>
+      series.createPriceLine({
+        price: level.price,
+        color: LAYER_COLORS[level.layer],
+        lineWidth: 1,
+        lineStyle: level.dashed ? LineStyle.Dashed : LineStyle.Solid,
+        axisLabelVisible: true,
+        title: level.title,
+      })
+    );
+    return () => {
+      if (current()?.candles === series) drawn.forEach((line) => series.removePriceLine(line));
+    };
+  }, [current, layerLevels, locale]);
+}
+
 export interface CandleChart {
   /** The candle under the pointer, if any. */
   hovered: Candle | null;
-  /** Candles on screen (logical indexes), for the change of the visible period. */
-  range: LogicalRange | null;
   zoomIn: () => void;
   zoomOut: () => void;
   scroll: (bars: number) => void;
@@ -157,14 +211,29 @@ export function useCandleChart(
     viewKey,
     lines,
     locale,
-  }: { candles: Candle[]; viewKey: string; lines: ChartLine[]; locale: Locale }
+    layerLines,
+    layerLevels,
+    onRange,
+  }: {
+    candles: Candle[];
+    viewKey: string;
+    lines: ChartLine[];
+    locale: Locale;
+    /** Averages, bands and VWAP of the layers that are on. */
+    layerLines: LayerLine[];
+    /** Volume profile, supports and resistances and Fibonacci levels. */
+    layerLevels: LayerLevel[];
+    /** Candles on screen changed (logical indexes): a drag, a zoom or new data. */
+    onRange: (range: LogicalRange | null) => void;
+  }
 ): CandleChart {
   const engine = useRef<Engine | null>(null);
   const shownKey = useRef('');
   const data = useRef(candles);
   data.current = candles;
   const [hovered, setHovered] = useState<Candle | null>(null);
-  const [range, setRange] = useState<LogicalRange | null>(null);
+  const rangeListener = useRef(onRange);
+  rangeListener.current = onRange;
 
   useEffect(() => {
     const built = build(container.current!, locale);
@@ -173,6 +242,7 @@ export function useCandleChart(
       const time = param.time === undefined ? null : fromTime(param.time);
       setHovered(time === null ? null : (data.current.find((c) => c.time === time) ?? null));
     };
+    const setRange = (range: LogicalRange | null) => rangeListener.current(range);
     built.chart.subscribeCrosshairMove(onCrosshair);
     built.chart.timeScale().subscribeVisibleLogicalRangeChange(setRange);
     const observer = new MutationObserver(() => recolor(built));
@@ -245,6 +315,9 @@ export function useCandleChart(
     };
   }, [lines, locale]);
 
+  const currentEngine = useCallback(() => engine.current, []);
+  useLayerDrawing(currentEngine, candles, layerLines, layerLevels, locale);
+
   const zoom = (factor: number) => {
     const spacing = timeScale().options().barSpacing * factor;
     timeScale().applyOptions({ barSpacing: Math.min(MAX_SPACING, Math.max(MIN_SPACING, spacing)) });
@@ -252,7 +325,6 @@ export function useCandleChart(
 
   return {
     hovered,
-    range,
     zoomIn: () => zoom(ZOOM),
     zoomOut: () => zoom(1 / ZOOM),
     scroll: (bars) => timeScale().scrollToPosition(timeScale().scrollPosition() + bars, false),

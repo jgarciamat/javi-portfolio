@@ -1079,9 +1079,12 @@ export const cryptoOrderBody = z
       .object({
         action: z.literal('buy'),
         symbol: cryptoSymbol,
+        direction: z.enum(['long', 'short']).optional(),
         type: cryptoOrderType,
         amount: z.number().finite().min(1).max(10_000_000).transform(toCents),
         price: cryptoPrice.optional(),
+        takeProfit: cryptoPrice.optional(),
+        stopLoss: cryptoPrice.optional(),
       })
       .strict(),
     z

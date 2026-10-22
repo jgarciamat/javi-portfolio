@@ -100,6 +100,9 @@ export class DemoMarketData implements CryptoMarketData {
           changePercent24h: Math.round(((price - before) / before) * 10_000) / 100,
           high24h: Math.max(...day),
           low24h: Math.min(...day),
+          bid: price * 0.9995,
+          ask: price * 1.0005,
+          volume24h: Math.round(price * 1000),
         };
       })
     );

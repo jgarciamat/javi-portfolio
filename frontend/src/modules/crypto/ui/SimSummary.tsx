@@ -1,27 +1,36 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
 import { Modal } from '@shared/components/Modal';
 import type { PdfTable } from '@modules/finances/application/tablePdf';
 import { ExportButtons } from '@modules/finances/ui/components/ExportButtons';
-import {
-  formatChange,
-  formatDateTime,
-  formatEur,
-  formatNumber,
-  formatRate,
-  tone,
-} from '../domain/format';
+import { toDisplay, type Display } from '../domain/currency';
+import { formatChange, formatDateTime, formatNumber, formatRate, tone } from '../domain/format';
 import { FEE_OPTIONS_BPS, INITIAL_BALANCES } from '../domain/orders';
 import type { SimPortfolio } from '../domain/types';
+import { useMoney } from './money';
 import { Help } from './Notices';
 import '@shared/components/css/ConfirmDeleteModal.css';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 
-/** Every operation of the simulator as a table (open ones with their result if sold now). */
-export function historyTable(p: SimPortfolio, t: Translate, locale: Locale): PdfTable {
+const cents = (value: number) => Math.round(value * 100) / 100;
+
+/**
+ * Every operation of the simulator as a table (open ones with their result if sold now), in the
+ * currency the console is shown in.
+ */
+export function historyTable(
+  p: SimPortfolio,
+  t: Translate,
+  locale: Locale,
+  display: Display
+): PdfTable {
   const when = (iso: string) => formatDateTime(iso, locale);
   const type = (value: string) => t(`app.crypto.order.types.${value}`);
+  const money = (euros: number | null) =>
+    euros === null ? null : cents(toDisplay(euros, display));
+  const price = (euros: number | null) => (euros === null ? null : toDisplay(euros, display));
+  const symbol = display.currency === 'USD' ? '$' : '€';
   const columns = [
     'state',
     'coin',
@@ -38,36 +47,36 @@ export function historyTable(p: SimPortfolio, t: Translate, locale: Locale): Pdf
     'resultPercent',
   ];
   return {
-    head: columns.map((c) => t(`app.crypto.csv.${c}`)),
+    head: columns.map((c) => t(`app.crypto.csv.${c}`, { symbol })),
     rows: [
       ...p.open.map((o) => [
         t('app.crypto.csv.open'),
         o.symbol,
         o.quantity,
-        o.entryPrice,
+        price(o.entryPrice),
         when(o.openedAt),
         type(o.openType),
-        o.currentPrice,
+        price(o.currentPrice),
         '',
         '',
-        o.invested,
-        o.entryFee,
-        o.pnl,
+        money(o.invested),
+        money(o.entryFee),
+        money(o.pnl),
         o.pnlPercent,
       ]),
       ...p.closed.map((c) => [
         t('app.crypto.csv.closed'),
         c.symbol,
         c.quantity,
-        c.entryPrice,
+        price(c.entryPrice),
         when(c.openedAt),
         type(c.openType),
-        c.exitPrice,
+        price(c.exitPrice),
         when(c.closedAt),
         type(c.closeType),
-        c.invested,
-        c.fees,
-        c.pnl,
+        money(c.invested),
+        money(c.fees),
+        money(c.pnl),
         c.pnlPercent,
       ]),
     ],
@@ -77,9 +86,10 @@ export function historyTable(p: SimPortfolio, t: Translate, locale: Locale): Pdf
 /** How the play-money portfolio is doing: would it gain or lose, and the totals. */
 export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
   const { t, locale } = useI18n();
+  const money = useMoney();
   const { account, summary } = portfolio;
-  const money = (value: number | null, signed = false) =>
-    value === null ? '—' : formatEur(value, locale, signed);
+  const amount = (value: number | null, signed = false) =>
+    value === null ? '—' : money.amount(value, signed);
   const winRate =
     summary.winRate === null
       ? '—'
@@ -88,13 +98,11 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
           wins: summary.wins,
           losses: summary.losses,
         });
-  const figures: [string, string][] = [
-    ['equity', money(summary.equity)],
-    ['initial', money(account.initial)],
-    ['cash', money(account.cash)],
-    ['reserved', money(account.reserved)],
-    ['realized', money(summary.realized, true)],
-    ['unrealized', money(summary.unrealized, true)],
+  const figures: [string, string, string?][] = [
+    ['equity', amount(summary.equity)],
+    ['initial', amount(account.initial)],
+    ['realized', amount(summary.realized, true), `cc-${tone(summary.realized)}`],
+    ['unrealized', amount(summary.unrealized, true), `cc-${tone(summary.unrealized)}`],
     ['trades', String(summary.trades)],
     ['winRate', winRate],
   ];
@@ -110,32 +118,68 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
           : t(
               summary.total >= 0 ? 'app.crypto.summary.wouldGain' : 'app.crypto.summary.wouldLose',
               {
-                amount: formatEur(Math.abs(summary.total), locale),
+                amount: money.amount(Math.abs(summary.total)),
                 percent: formatChange(summary.totalPercent, locale),
               }
             )}
       </p>
       <dl className="cc-figures">
-        {figures.map(([key, value]) => (
+        {figures.map(([key, value, className]) => (
           <div key={key}>
             <dt>{t(`app.crypto.summary.${key}`)}</dt>
-            <dd>{value}</dd>
+            <dd className={className}>{value}</dd>
           </div>
         ))}
       </dl>
       <p className="cc-helps">
-        {(['realized', 'unrealized', 'winRate', 'reserved'] as const).map((term) => (
+        {(['realized', 'unrealized', 'winRate'] as const).map((term) => (
           <Help key={term} term={term} label={t(`app.crypto.help.${term}`)} />
         ))}
       </p>
-      <p className="section-hint">
+      <p className="cc-hint">
         {t('app.crypto.summary.since', { date: formatDateTime(account.startedAt, locale) })}
       </p>
     </section>
   );
 }
 
-/** The history to download, the commission and «Start again». */
+/** A row of buttons that behave as one choice (radio buttons with the look of chips). */
+function ChipChoice<T extends number>({
+  name,
+  legend,
+  options,
+  value,
+  label,
+  disabled,
+  onChange,
+}: {
+  name: string;
+  legend: string;
+  options: readonly T[];
+  value: number;
+  label: (option: T) => string;
+  disabled?: boolean;
+  onChange: (option: T) => void;
+}) {
+  return (
+    <fieldset className="cc-segmented cc-choice" disabled={disabled}>
+      <legend className="cc-label">{legend}</legend>
+      {options.map((option) => (
+        <label key={option} className={option === value ? 'is-on' : undefined}>
+          <input
+            type="radio"
+            name={name}
+            checked={option === value}
+            onChange={() => onChange(option)}
+          />
+          {label(option)}
+        </label>
+      ))}
+    </fieldset>
+  );
+}
+
+/** The history to download, the commission, the monthly top-up and «Start again» (Premium). */
 export function SimSettings({
   portfolio,
   busy,
@@ -148,11 +192,10 @@ export function SimSettings({
   onReset: (initial: number, bps: number) => Promise<boolean>;
 }) {
   const { t, locale } = useI18n();
+  const money = useMoney();
   const { account } = portfolio;
   const [confirming, setConfirming] = useState(false);
-  const [initial, setInitial] = useState(account.initial);
-  const feeId = useId();
-  const initialId = useId();
+  const [initial, setInitial] = useState<number>(account.initial);
   const close = () => setConfirming(false);
 
   return (
@@ -164,52 +207,38 @@ export function SimSettings({
         name="consola_crypto"
         what={t('app.crypto.csv.what')}
         count={portfolio.open.length + portfolio.closed.length}
-        table={() => historyTable(portfolio, t, locale)}
+        table={() => historyTable(portfolio, t, locale, money.display)}
       />
-      <div className="cc-settings">
-        <div className="field">
-          <label className="field-label" htmlFor={feeId}>
-            {t('app.crypto.settings.fee')}
-          </label>
-          <select
-            id={feeId}
-            value={account.feeBps}
-            disabled={busy}
-            onChange={(e) => void onFee(Number(e.target.value))}
-          >
-            {FEE_OPTIONS_BPS.map((bps) => (
-              <option key={bps} value={bps}>
-                {formatRate(bps, locale)}
-              </option>
-            ))}
-          </select>
-          <p className="section-hint">{t('app.crypto.settings.feeHint')}</p>
-        </div>
-        <div className="field">
-          <label className="field-label" htmlFor={initialId}>
-            {t('app.crypto.settings.initial')}
-          </label>
-          <select
-            id={initialId}
-            value={initial}
-            onChange={(e) => setInitial(Number(e.target.value))}
-          >
-            {INITIAL_BALANCES.map((value) => (
-              <option key={value} value={value}>
-                {formatEur(value, locale)}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            className="btn-danger"
-            disabled={busy}
-            onClick={() => setConfirming(true)}
-          >
-            {t('app.crypto.settings.reset')}
-          </button>
-        </div>
+      <ChipChoice
+        name="cc-fee"
+        legend={t('app.crypto.settings.fee')}
+        options={FEE_OPTIONS_BPS}
+        value={account.feeBps}
+        label={(bps) => formatRate(bps, locale)}
+        disabled={busy}
+        onChange={(bps) => void onFee(bps)}
+      />
+      <p className="cc-hint">{t('app.crypto.settings.feeHint')}</p>
+
+      <div className="cc-restart">
+        <ChipChoice
+          name="cc-initial"
+          legend={t('app.crypto.settings.initial')}
+          options={INITIAL_BALANCES}
+          value={initial}
+          label={(value) => money.amount(value)}
+          onChange={setInitial}
+        />
+        <button
+          type="button"
+          className="btn-danger"
+          disabled={busy}
+          onClick={() => setConfirming(true)}
+        >
+          {t('app.crypto.settings.reset')}
+        </button>
       </div>
+
       {confirming && (
         <Modal
           label={t('app.crypto.settings.confirmTitle')}
@@ -219,7 +248,7 @@ export function SimSettings({
         >
           <h2 className="confirm-delete-title">{t('app.crypto.settings.confirmTitle')}</h2>
           <p className="confirm-delete-message">
-            {t('app.crypto.settings.confirmBody', { amount: formatEur(initial, locale) })}
+            {t('app.crypto.settings.confirmBody', { amount: money.amount(initial) })}
           </p>
           <div className="confirm-delete-actions">
             <button type="button" className="btn-cancel" onClick={close} autoFocus>

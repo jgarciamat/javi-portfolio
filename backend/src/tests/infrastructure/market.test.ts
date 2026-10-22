@@ -25,6 +25,9 @@ const ticker = (symbol: string, last = '100.5') => ({
   priceChangePercent: '-2.5',
   highPrice: '110',
   lowPrice: '90',
+  bidPrice: '100.4',
+  askPrice: '100.6',
+  quoteVolume: '12345.5',
 });
 const reply = (body: unknown, ok = true, status = 200) => ({
   ok,
@@ -59,7 +62,13 @@ describe('parsing the public market data', () => {
       changePercent24h: -2.5,
       high24h: 110,
       low24h: 90,
+      bid: 100.4,
+      ask: 100.6,
+      volume24h: 12345.5,
     });
+    expect(
+      parseTicker({ ...ticker('BTCEUR'), bidPrice: '0', askPrice: 'x', quoteVolume: undefined })
+    ).toMatchObject({ bid: null, ask: null, volume24h: null });
     expect(parseTicker(null)).toBeNull();
     expect(parseTicker(ticker('FAKEEUR'))).toBeNull();
     expect(parseTicker({ ...ticker('BTCEUR'), symbol: 7 })).toBeNull();

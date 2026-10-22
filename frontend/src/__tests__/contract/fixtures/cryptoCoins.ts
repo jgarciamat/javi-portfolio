@@ -8,6 +8,9 @@ export const cryptoCoins = {
       changePercent24h: 1.5,
       high24h: 51000,
       low24h: 48500,
+      bid: 49999,
+      ask: 50001,
+      volume24h: 1000000,
     },
     {
       symbol: 'ETH',
@@ -16,6 +19,9 @@ export const cryptoCoins = {
       changePercent24h: 1.5,
       high24h: 2040,
       low24h: 1940,
+      bid: 1999,
+      ask: 2001,
+      volume24h: 1000000,
     },
     {
       symbol: 'BNB',
@@ -24,6 +30,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'XRP',
@@ -32,6 +41,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'SOL',
@@ -40,6 +52,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'ADA',
@@ -48,6 +63,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'DOGE',
@@ -56,6 +74,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'TRX',
@@ -64,6 +85,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'LINK',
@@ -72,6 +96,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'DOT',
@@ -80,6 +107,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'LTC',
@@ -88,6 +118,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'BCH',
@@ -96,6 +129,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'AVAX',
@@ -104,6 +140,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'XLM',
@@ -112,6 +151,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'SHIB',
@@ -120,6 +162,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'ATOM',
@@ -128,6 +173,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'NEAR',
@@ -136,6 +184,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'SUI',
@@ -144,6 +195,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'APT',
@@ -152,6 +206,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
     {
       symbol: 'POL',
@@ -160,6 +217,9 @@ export const cryptoCoins = {
       changePercent24h: null,
       high24h: null,
       low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
     },
   ],
   market: {

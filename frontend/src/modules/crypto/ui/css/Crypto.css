@@ -1,15 +1,42 @@
-/* ─── Consola crypto (simulator with play money) ─────────────────────────────
-   Big, calm text for older people; every colour comes from the theme tokens, so light, dark
-   and the wizard's contrast mode work without their own palette. */
+/* ─── Consola crypto ─────────────────────────────────────────────────────────
+   A calm trading desk for learning: cards with a clear header, large numbers with small labels
+   above them, chips and segmented controls instead of native selects, and every colour taken
+   from the theme tokens so light, dark and the wizard's contrast mode all work. Text is never
+   smaller than 0.875rem and never set in capitals. */
 
 .cc {
-  gap: 1rem;
+  --cc-radius: 14px;
+  --cc-gap: 1rem;
+  --cc-surface: var(--slate-900);
+  --cc-raised: var(--slate-800);
+  --cc-line: var(--slate-700);
+  --cc-soft: color-mix(in srgb, var(--accent-600) 12%, var(--slate-900));
+  gap: var(--cc-gap);
+  font-size: 1rem;
 }
 
 .cc .card {
   margin: 0;
+  border-radius: var(--cc-radius);
+  border-color: var(--cc-line);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 8px 24px -16px rgb(0 0 0 / 0.35);
+  padding: 1.25rem;
 }
 
+.cc .section-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.cc h3 {
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--slate-100);
+}
+
+/* Gain and loss: the dark-theme tokens are light, the light-theme ones dark (≥ 4.5:1). */
 .cc-up {
   color: var(--green-400);
 }
@@ -22,21 +49,38 @@
   color: var(--slate-300);
 }
 
-/* The risk notice is always there and cannot be closed. */
+.cc-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--slate-200);
+  margin-bottom: 0.4rem;
+  padding: 0;
+}
+
+.cc-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+  line-height: 1.45;
+}
+
+/* ─── Notices ─── */
+
 .cc-risk {
+  display: grid;
+  gap: 0.25rem;
   border: 2px solid var(--amber-500);
-  background: var(--slate-900);
-  border-radius: 12px;
-  padding: 0.9rem 1rem;
+  border-radius: var(--cc-radius);
+  background: color-mix(in srgb, var(--amber-500) 10%, var(--cc-surface));
+  padding: 0.9rem 1.1rem;
   color: var(--slate-100);
   line-height: 1.5;
 }
 
 .cc-risk strong {
-  display: block;
   color: var(--amber-400);
   font-size: 1.05rem;
-  margin-bottom: 0.25rem;
 }
 
 .cc-risk p {
@@ -45,9 +89,13 @@
 
 .cc-data {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--slate-300);
   line-height: 1.5;
+}
+
+.cc-data:empty {
+  display: none;
 }
 
 .cc-data--warn {
@@ -55,8 +103,8 @@
 }
 
 .cc-reminder {
-  margin: 0 0 0.75rem;
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.95rem;
   color: var(--amber-400);
 }
 
@@ -65,99 +113,155 @@
 }
 
 .cc-help-toggle {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   min-height: 44px;
 }
 
 .cc-help-text {
   display: block;
   margin: 0.25rem 0 0.5rem;
-  padding: 0.6rem 0.75rem;
-  border-left: 3px solid var(--accent-400);
-  background: var(--slate-800);
-  border-radius: 6px;
-  color: var(--slate-200);
+  padding: 0.65rem 0.85rem;
+  border-left: 4px solid var(--accent-400);
+  background: var(--cc-raised);
+  border-radius: 8px;
+  color: var(--slate-100);
   font-size: 0.95rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .cc-help-text[hidden] {
   display: none;
 }
 
-.cc-market-head {
+.cc-helps {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-end;
-  justify-content: space-between;
+  gap: 0 1.25rem;
+  margin: 0.25rem 0 0.5rem;
 }
 
-.cc-market-head .field {
-  flex: 1 1 14rem;
+.cc-helps .cc-help-text {
+  flex-basis: 100%;
 }
 
-.cc-market-head select {
-  width: 100%;
-  min-height: 48px;
-  font-size: 1.05rem;
-}
+/* ─── Chips and segmented controls ─── */
 
-.cc-quote {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  text-align: right;
-}
-
-.cc-quote-price {
-  font-size: 1.6rem;
-  font-weight: 700;
+.cc-chip,
+.cc-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 999px;
+  background: var(--cc-raised);
   color: var(--slate-100);
-  font-variant-numeric: tabular-nums;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
 }
 
-.cc-quote-range {
-  font-size: 0.9rem;
-  color: var(--slate-300);
+.cc-tool {
+  border-radius: 10px;
 }
 
-.cc-intervals,
-.cc-types {
-  border: 0;
-  padding: 0;
-  margin: 1rem 0 0.5rem;
-  display: flex;
+.cc-tool--strong {
+  border-color: var(--accent-400);
+  color: var(--accent-300);
+}
+
+.cc-chip:hover,
+.cc-tool:hover:not(:disabled) {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-600) 18%, var(--cc-raised));
+}
+
+.cc-chip:active,
+.cc-tool:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.cc-chip[aria-pressed='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+}
+
+.cc-tool:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cc button:focus-visible,
+.cc input:focus-visible,
+.cc a:focus-visible,
+.cc-segmented label:focus-within {
+  outline: 3px solid var(--accent-400);
+  outline-offset: 2px;
+}
+
+.cc-chip i,
+.cc-legend i {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex: 0 0 auto;
+}
+
+.cc-segmented {
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.25rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  background: var(--cc-raised);
+  min-width: 0;
 }
 
-.cc-intervals legend,
-.cc-types legend {
+.cc-segmented legend.cc-label {
+  float: left;
   width: 100%;
-  margin-bottom: 0.4rem;
+  margin: 0 0 0.4rem;
 }
 
-.cc-interval,
-.cc-type {
+.cc-segmented label {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 48px;
-  min-width: 48px;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--slate-600);
-  border-radius: 10px;
-  background: var(--slate-900);
-  color: var(--slate-200);
-  cursor: pointer;
-  font-weight: 600;
   justify-content: center;
+  min-height: 44px;
+  min-width: 48px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9px;
+  color: var(--slate-200);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
-.cc-interval input,
-.cc-type input {
+.cc-segmented label:hover {
+  background: color-mix(in srgb, var(--accent-600) 16%, transparent);
+}
+
+.cc-segmented label.is-on {
+  background: var(--accent-600);
+  color: #fff;
+  box-shadow: 0 2px 6px -2px rgb(0 0 0 / 0.4);
+}
+
+.cc-segmented input {
   position: absolute;
   opacity: 0;
   inset: 0;
@@ -165,93 +269,634 @@
   cursor: pointer;
 }
 
-.cc-interval:focus-within,
-.cc-type:focus-within {
+.cc-segmented[disabled] label {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cc-segmented--wide {
+  display: flex;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.cc-segmented--wide label {
+  flex: 1 1 0;
+  min-height: 52px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-raised);
+  font-size: 1.05rem;
+}
+
+.cc-direction label.is-on.cc-long {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.cc-direction label.is-on.cc-short {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* «▲ Long» and «▼ Short» badges: words and arrow first, colour as a support. */
+.cc-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  border: 1px solid currentColor;
+}
+
+.cc-dir--long {
+  color: var(--green-400);
+  background: color-mix(in srgb, var(--green-500) 12%, transparent);
+}
+
+.cc-dir--short {
+  color: var(--red-400);
+  background: color-mix(in srgb, var(--red-500) 12%, transparent);
+}
+
+.cc-choice {
+  display: flex;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.cc-choice label {
+  border: 1px solid var(--cc-line);
+  background: var(--cc-raised);
+  border-radius: 999px;
+}
+
+/* ─── Market ─── */
+
+.cc-market-grid {
+  display: grid;
+  grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.cc-market-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cc-coins {
+  border-right: 1px solid var(--cc-line);
+  padding-right: 1rem;
+  min-width: 0;
+}
+
+.cc-coins-title {
+  margin: 0 0 0.5rem;
+}
+
+.cc-coins-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cc-coin {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 56px;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--slate-100);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cc-coin:hover {
+  background: var(--cc-raised);
+}
+
+.cc-coin[aria-pressed='true'] {
+  background: var(--cc-soft);
+  border-color: var(--accent-400);
+}
+
+.cc-coin-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex: 0 0 auto;
+}
+
+.cc-coin-name,
+.cc-coin-price {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cc-coin-name b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cc-coin small,
+.cc-quote-name small {
+  color: var(--slate-300);
+  font-size: 0.875rem;
+}
+
+.cc-coin-price {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-coin-price b {
+  font-size: 0.95rem;
+}
+
+.cc-coins-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--slate-300);
+}
+
+.cc-market-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cc-market-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.cc-quote-main {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.cc-quote-main .cc-coin-icon {
+  width: 3rem;
+  height: 3rem;
+  font-size: 0.9rem;
+}
+
+.cc-quote-main p {
+  margin: 0;
+}
+
+.cc-quote-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.cc-quote-price {
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--slate-50);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-quote-changes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-size: 0.95rem;
+  color: var(--slate-300);
+}
+
+.cc-close b {
+  font-variant-numeric: tabular-nums;
+  color: var(--slate-100);
+}
+
+.cc-stats,
+.cc-strips,
+.cc-figures,
+.cc-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.cc-stats > div,
+.cc-strips > div,
+.cc-figures > div {
+  background: var(--cc-raised);
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  min-width: 0;
+}
+
+.cc-stats dt,
+.cc-strips dt,
+.cc-figures dt,
+.cc-facts dt,
+.cc-check dt,
+.cc-order-asset dt {
+  font-size: 0.875rem;
+  color: var(--slate-300);
+}
+
+.cc-stats dd,
+.cc-strips dd,
+.cc-figures dd,
+.cc-facts dd,
+.cc-check dd,
+.cc-order-asset dd {
+  margin: 0.15rem 0 0;
+  font-weight: 700;
+  color: var(--slate-100);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.cc-strips dd,
+.cc-figures dd {
+  font-size: 1.3rem;
+}
+
+.cc-stats dd {
+  font-size: 1.05rem;
+}
+
+/* ─── Layers ─── */
+
+.cc-layers {
+  border: 1px solid var(--cc-line);
+  border-radius: var(--cc-radius);
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--cc-raised) 55%, transparent);
+}
+
+.cc-layers-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cc-guide-open {
+  min-height: 48px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 2px solid var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cc-guide-open:hover {
+  background: var(--accent-700);
+}
+
+.cc-layers-note {
+  margin: 0.4rem 0 0.75rem;
+  color: var(--slate-300);
+  font-size: 0.95rem;
+}
+
+.cc-layer-groups {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cc-layer-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cc-layer-group-name {
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--slate-300);
+}
+
+.cc-layer {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cc-layer .cc-chip {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.cc-layer-help {
+  min-height: 44px;
+  min-width: 40px;
+  border: 1px solid var(--cc-line);
+  border-left: 0;
+  border-radius: 0 999px 999px 0;
+  background: var(--cc-raised);
+  color: var(--accent-300);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cc-layer-help:hover {
+  background: color-mix(in srgb, var(--accent-600) 18%, var(--cc-raised));
+}
+
+/* ─── Order box ─── */
+
+.cc-order {
+  border-top: 4px solid var(--accent-400) !important;
+}
+
+.cc-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.cc-order-asset {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+  text-align: right;
+}
+
+.cc-order-asset dd {
+  font-size: 1.15rem;
+}
+
+.cc-order-asset small {
+  color: var(--slate-300);
+  font-weight: 500;
+}
+
+.cc-strips {
+  margin-bottom: 1rem;
+}
+
+.cc-order-controls,
+.cc-order-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+.cc-exits {
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--cc-line);
+}
+
+.cc-field {
+  min-width: 0;
+}
+
+.cc-unit-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  background: var(--slate-950);
+  overflow: hidden;
+}
+
+.cc-unit-input:focus-within {
   outline: 3px solid var(--accent-400);
   outline-offset: 2px;
 }
 
-.cc-interval--on,
-.cc-type--on {
-  border-color: var(--accent-400);
-  background: var(--accent-600);
-  color: #fff;
+.cc-unit-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 52px;
+  border: 0;
+  background: transparent;
+  color: var(--slate-50);
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0 0.85rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.cc-type {
-  flex: 1 1 10rem;
-  justify-content: flex-start;
-  text-align: left;
+.cc-unit-input input:focus-visible {
+  outline: none;
 }
 
-.cc-type span {
+.cc-unit-input span {
+  padding: 0 0.9rem;
+  color: var(--slate-300);
+  font-weight: 700;
+}
+
+.cc-auto {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 0.85rem;
+  border: 1px dashed var(--cc-line);
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--slate-100);
 }
 
-.cc-type small {
-  font-weight: 400;
-  font-size: 0.85rem;
-}
-
-.cc-types--inline .cc-type {
-  flex: 0 1 auto;
-}
-
-.cc-order input,
-.cc-schedule input,
-.cc-settings select {
-  min-height: 48px;
-  font-size: 1.05rem;
-  width: 100%;
+.cc-auto small {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--cc-soft);
+  color: var(--accent-300);
 }
 
 .cc-quick {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.cc-quick button {
-  min-height: 44px;
+.cc-positions {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
-.cc-estimate,
-.cc-figures,
-.cc-facts {
+.cc-positions label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.cc-positions label.is-on {
+  border-color: var(--accent-400);
+  background: var(--cc-soft);
+}
+
+.cc-positions input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--accent-600);
+}
+
+.cc-check {
+  border: 1px solid var(--cc-line);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: var(--cc-raised);
+  margin: 0.75rem 0 1rem;
+}
+
+.cc-check h4 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  color: var(--slate-100);
+}
+
+.cc-check ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.cc-check li {
+  padding-left: 1.6rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.cc-check li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 800;
+}
+
+.cc-check-bad {
+  color: var(--amber-400);
+}
+
+.cc-check-bad::before {
+  content: '!';
+}
+
+.cc-check-good {
+  color: var(--green-400);
+}
+
+.cc-check-good::before {
+  content: '✓';
+}
+
+.cc-check dl {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   gap: 0.5rem 1rem;
-  margin: 1rem 0;
+  margin: 0.75rem 0 0;
 }
 
-.cc-estimate dt,
-.cc-figures dt,
-.cc-facts dt {
-  font-size: 0.85rem;
-  color: var(--slate-300);
+.cc-submit {
+  width: 100%;
+  min-height: 56px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.5);
 }
 
-.cc-estimate dd,
-.cc-figures dd,
-.cc-facts dd {
-  margin: 0;
-  font-weight: 600;
-  color: var(--slate-100);
-  font-variant-numeric: tabular-nums;
+.cc-submit--long {
+  background: #15803d;
 }
+
+.cc-submit--long:hover:not(:disabled) {
+  background: #166534;
+}
+
+.cc-submit--short {
+  background: #b91c1c;
+}
+
+.cc-submit--short:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.cc-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Panels of operations ─── */
 
 .cc-total {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0.25rem 0 0.85rem;
+  line-height: 1.35;
 }
 
 .cc-trades {
   list-style: none;
-  margin: 0;
+  margin: 0.5rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -259,26 +904,39 @@
 }
 
 .cc-trade {
-  border: 1px solid var(--slate-700);
-  border-radius: 12px;
-  padding: 0.75rem;
-  background: var(--slate-900);
+  border: 1px solid var(--cc-line);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: var(--cc-raised);
 }
 
 .cc-trade-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: 0.35rem 1rem;
   align-items: baseline;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
 }
 
 .cc-trade-head > :last-child {
   margin-left: auto;
 }
 
+.cc-facts {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  margin-bottom: 0.75rem;
+}
+
+.cc-scheduled {
+  margin: 0 0 0.75rem;
+  color: var(--slate-200);
+  font-size: 0.95rem;
+}
+
 .cc-trade .button-row {
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .cc-trade .button-row button {
@@ -287,15 +945,55 @@
 
 .cc-schedule {
   margin-top: 0.75rem;
-  border-top: 1px solid var(--slate-700);
+  border-top: 1px dashed var(--cc-line);
   padding-top: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.cc-schedule .cc-types {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-schedule .cc-type {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.cc-schedule .cc-type--on {
+  background: var(--accent-600);
+  border-color: var(--accent-400);
+  color: #fff;
+}
+
+.cc-schedule .cc-type input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+}
+
+.cc-schedule input:not([type='radio']) {
+  min-height: 48px;
+  font-size: 1.05rem;
 }
 
 .cc-fills {
   border: 2px solid var(--accent-400);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  background: var(--slate-900);
+  border-radius: var(--cc-radius);
+  padding: 0.85rem 1rem;
+  background: var(--cc-soft);
 }
 
 .cc-fills p {
@@ -307,31 +1005,20 @@
   padding-left: 1.2rem;
 }
 
-.cc-settings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-end;
-  margin-top: 1rem;
-  border-top: 1px solid var(--slate-700);
-  padding-top: 1rem;
+.cc-settings-card {
+  display: grid;
+  gap: 0.75rem;
 }
 
-.cc-settings .field {
-  flex: 1 1 12rem;
-}
-
-.cc-settings .btn-danger {
-  min-height: 48px;
-}
+/* ─── Table instead of the chart ─── */
 
 .cc-table-details summary {
   cursor: pointer;
   min-height: 44px;
   display: flex;
   align-items: center;
-  font-weight: 600;
-  color: var(--accent-400);
+  font-weight: 700;
+  color: var(--accent-300);
 }
 
 .cc-table-scroll {
@@ -347,8 +1034,8 @@
 
 .cc-table th,
 .cc-table td {
-  padding: 0.45rem 0.6rem;
-  border-bottom: 1px solid var(--slate-700);
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--cc-line);
   text-align: right;
   white-space: nowrap;
 }
@@ -361,7 +1048,7 @@
 .cc-glossary dl {
   margin: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .cc-glossary dt {
@@ -372,59 +1059,191 @@
 .cc-glossary dd {
   margin: 0.2rem 0 0;
   color: var(--slate-300);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-@media (max-width: 480px) {
-  .cc-quote {
+/* ─── Phones ─── */
+
+@media (max-width: 719px) {
+  .cc .card {
+    padding: 1rem;
+  }
+
+  .cc-market-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cc-coins {
+    border-right: 0;
+    padding-right: 0;
+  }
+
+  .cc-coins-list {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.4rem;
+  }
+
+  .cc-coins-list li {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+  }
+
+  .cc-coin {
+    width: auto;
+    min-width: 13.5rem;
+    border-color: var(--cc-line);
+  }
+
+  .cc-market-controls {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .cc-intervals {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cc-intervals label {
+    padding: 0.4rem 0.25rem;
+  }
+
+  .cc-currency {
+    align-self: flex-start;
+  }
+
+  .cc-order-asset {
     text-align: left;
   }
 
-  .cc-interval {
-    flex: 1 0 22%;
-    padding: 0.4rem 0.5rem;
-    white-space: nowrap;
+  .cc-strips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cc-strips > div:last-child {
+    grid-column: 1 / -1;
   }
 }
 
-/* High contrast (the wizard's switch): stronger borders and plain text colours. */
+/* A phone on its side: the chart gets the height, the rest becomes compact rows. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cc-market-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cc-coins {
+    border-right: 0;
+    padding-right: 0;
+  }
+
+  .cc-coins-title,
+  .cc-coins-pager {
+    display: none;
+  }
+
+  .cc-coins-list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .cc-coins-list li {
+    flex: 0 0 auto;
+  }
+
+  .cc-coin {
+    min-height: 44px;
+    min-width: 11rem;
+  }
+
+  .cc-stats {
+    display: none;
+  }
+
+  .cc-layer-groups {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+  }
+
+  .cc-layer-group {
+    flex-wrap: nowrap;
+  }
+
+  .cc-layer-group-name {
+    display: none;
+  }
+}
+
+/* ─── Contrast (the wizard's switch): stronger borders and plain text colours ─── */
+
+html.wiz-contrast .cc .card,
 html.wiz-contrast .cc-risk,
 html.wiz-contrast .cc-trade,
-html.wiz-contrast .cc-interval,
-html.wiz-contrast .cc-type {
+html.wiz-contrast .cc-chip,
+html.wiz-contrast .cc-tool,
+html.wiz-contrast .cc-segmented,
+html.wiz-contrast .cc-segmented--wide label,
+html.wiz-contrast .cc-stats > div,
+html.wiz-contrast .cc-strips > div,
+html.wiz-contrast .cc-figures > div,
+html.wiz-contrast .cc-check,
+html.wiz-contrast .cc-unit-input,
+html.wiz-contrast .cc-coin[aria-pressed='true'] {
   border-width: 2px;
   border-color: var(--slate-100);
 }
 
 html.wiz-contrast .cc-data,
-html.wiz-contrast .cc-estimate dt,
+html.wiz-contrast .cc-hint,
+html.wiz-contrast .cc-stats dt,
+html.wiz-contrast .cc-strips dt,
 html.wiz-contrast .cc-figures dt,
 html.wiz-contrast .cc-facts dt,
+html.wiz-contrast .cc-coin small,
+html.wiz-contrast .cc-layers-note,
 html.wiz-contrast .cc-glossary dd {
   color: var(--slate-100);
 }
 
-.cc-helps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1.25rem;
-  margin: 0.25rem 0 0.5rem;
+@media (prefers-reduced-motion: reduce) {
+  .cc-chip,
+  .cc-tool,
+  .cc-segmented label {
+    transition: none;
+  }
 }
 
-.cc-helps .cc-help {
-  flex: 0 1 auto;
+.cc-segmented label > span[aria-hidden='true'] {
+  margin-right: 0.35rem;
 }
 
-.cc-helps .cc-help-text {
-  flex-basis: 100%;
+.cc-trade.cc-trade--long {
+  border-left: 5px solid var(--green-500);
 }
 
-.cc-scheduled {
+.cc-trade.cc-trade--short {
+  border-left: 5px solid var(--red-500);
+}
+
+.cc-empty-cash {
   margin: 0 0 0.75rem;
-  color: var(--slate-200);
-  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--amber-500);
+  border-radius: 12px;
+  line-height: 1.5;
 }
 
-.cc-settings .btn-danger {
-  margin-top: 0.75rem;
+.cc-empty-cash strong {
+  color: var(--amber-400);
+}
+
+.cc-restart {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--cc-line);
 }

@@ -294,6 +294,8 @@ describe('API contract', () => {
     it('requests (the bodies the app sends are accepted by the routes)', async () => {
       const position = (await send('cryptoBuyMarket')).body.open[0].id as string;
       for (const name of [
+        'cryptoBuyWithExits',
+        'cryptoShort',
         'cryptoSellLimit',
         'cryptoSellMarket',
         'cryptoBuyLimit',

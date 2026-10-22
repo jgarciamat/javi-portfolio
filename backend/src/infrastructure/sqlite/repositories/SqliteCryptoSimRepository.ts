@@ -6,14 +6,15 @@ import {
 } from '@domain/ports/repositories';
 import { Db } from '../database';
 
-const POSITION = `id, user_id AS userId, symbol, quantity, entry_price AS entryPrice,
+const POSITION = `id, user_id AS userId, symbol, direction, quantity, entry_price AS entryPrice,
   amount_cents AS amountCents, entry_fee_cents AS entryFeeCents, open_type AS openType,
   opened_at AS openedAt, exit_price AS exitPrice, exit_fee_cents AS exitFeeCents,
   proceeds_cents AS proceedsCents, pnl_cents AS pnlCents, close_type AS closeType,
   closed_at AS closedAt`;
 
-const ORDER = `id, user_id AS userId, symbol, side, type, price, amount_cents AS amountCents,
-  reserved_cents AS reservedCents, position_id AS positionId, created_at AS createdAt`;
+const ORDER = `id, user_id AS userId, symbol, side, direction, type, price, amount_cents AS amountCents,
+  reserved_cents AS reservedCents, position_id AS positionId, created_at AS createdAt,
+  take_profit AS takeProfit, stop_loss AS stopLoss`;
 
 export class SqliteCryptoSimRepository implements CryptoSimRepository {
   constructor(private readonly db: Db) {}
@@ -71,14 +72,15 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
   insertPosition(p: CryptoSimPosition): void {
     this.db
       .prepare(
-        `INSERT INTO crypto_sim_positions (id, user_id, symbol, quantity, entry_price, amount_cents,
-           entry_fee_cents, open_type, opened_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO crypto_sim_positions (id, user_id, symbol, direction, quantity, entry_price,
+           amount_cents, entry_fee_cents, open_type, opened_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         p.id,
         p.userId,
         p.symbol,
+        p.direction,
         p.quantity,
         p.entryPrice,
         p.amountCents,
@@ -127,21 +129,24 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
   insertOrder(o: CryptoSimOrder): void {
     this.db
       .prepare(
-        `INSERT INTO crypto_sim_orders (id, user_id, symbol, side, type, price, amount_cents,
-           reserved_cents, position_id, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO crypto_sim_orders (id, user_id, symbol, side, direction, type, price,
+           amount_cents, reserved_cents, position_id, created_at, take_profit, stop_loss)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         o.id,
         o.userId,
         o.symbol,
         o.side,
+        o.direction,
         o.type,
         o.price,
         o.amountCents,
         o.reservedCents,
         o.positionId,
-        o.createdAt
+        o.createdAt,
+        o.takeProfit,
+        o.stopLoss
       );
   }
 
