@@ -11,6 +11,7 @@ const lines: ChartLine[] = [
   { id: 'o1', price: 95, title: 'Compra límite', kind: 'order' },
 ];
 const onVisibleChange = jest.fn();
+const onToggleLayer = jest.fn();
 
 function draw(props: Partial<Parameters<typeof PriceChart>[0]> = {}) {
   const view = renderWithI18n(
@@ -21,6 +22,7 @@ function draw(props: Partial<Parameters<typeof PriceChart>[0]> = {}) {
       interval="1h"
       lines={[]}
       layers={[]}
+      onToggleLayer={onToggleLayer}
       onVisibleChange={onVisibleChange}
       {...props}
     />
@@ -125,7 +127,7 @@ describe('PriceChart', () => {
     expect(screen.getByText(/La vela cierra en/)).toBeInTheDocument();
   });
 
-  it('draws the layers that are on with their legend, and removes them', () => {
+  it('draws the layers that are on with their values in the chips, and removes them', () => {
     const many = candleList(40);
     const { chart, rerender, unmount } = draw({
       candles: many,
@@ -134,9 +136,19 @@ describe('PriceChart', () => {
     expect(chart.series.filter((s) => s.kind === 'Line')).toHaveLength(5);
     expect(series(chart, 'Line').data[0]).toEqual({ time: many[0].time / 1000 });
     expect(series(chart, 'Line').data[30]).toHaveProperty('value');
-    const legend = screen.getByRole('list', { name: 'Valores de las capas encendidas' });
-    expect(legend).toHaveTextContent('EMA 20');
-    expect(legend).toHaveTextContent('sin datos');
+    const chip = (name: RegExp) => screen.getByRole('button', { name });
+    expect(chip(/^EMA 20 · \d/)).toHaveAttribute('aria-pressed', 'true');
+    expect(chip(/^EMA 20 · /)).toHaveAttribute('title', expect.stringMatching(/^EMA 20: Ahora /));
+    expect(chip(/^EMA 200 · —$/)).toHaveAttribute('aria-pressed', 'true');
+    expect(chip(/^Bollinger ?: Superior .+, Media .+, Inferior /)).toHaveAttribute(
+      'title',
+      expect.stringContaining('Bandas de Bollinger: Superior')
+    );
+    expect(chip(/^Sop\.\/Resist\. ?: sin datos/)).toHaveAttribute('aria-pressed', 'true');
+    expect(chip(/^EMA 50$/)).toHaveAttribute('aria-pressed', 'false');
+    expect(chip(/^EMA 50$/)).toHaveAttribute('title', 'EMA 50');
+    fireEvent.click(chip(/^EMA 50$/));
+    expect(onToggleLayer).toHaveBeenCalledWith('ema50');
     expect(series(chart, 'Candlestick').lines.map((l) => l.options.title)).toContain('POC');
     act(() => chart.show({ from: 5, to: 30 }));
     expect(
@@ -150,11 +162,12 @@ describe('PriceChart', () => {
         interval="1h"
         lines={[]}
         layers={[]}
+        onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
       />
     );
     expect(chart.series.filter((s) => s.kind === 'Line')).toHaveLength(0);
-    expect(screen.queryByRole('list', { name: 'Valores de las capas encendidas' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'EMA 20' })).toHaveAttribute('aria-pressed', 'false');
     rerender(
       <PriceChart
         candles={many}
@@ -163,6 +176,7 @@ describe('PriceChart', () => {
         interval="1h"
         lines={[]}
         layers={['vwap']}
+        onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
       />
     );
@@ -313,6 +327,7 @@ describe('PriceChart', () => {
         interval="1h"
         lines={[]}
         layers={[]}
+        onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
       />
     );
@@ -326,6 +341,7 @@ describe('PriceChart', () => {
         interval="1h"
         lines={[]}
         layers={[]}
+        onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
       />
     );
@@ -352,6 +368,7 @@ describe('PriceChart', () => {
         interval="1h"
         lines={[{ id: 'o2', price: 120, title: 'SL', kind: 'stopLoss' }]}
         layers={[]}
+        onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
       />
     );

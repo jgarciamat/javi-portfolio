@@ -1,16 +1,15 @@
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import type { CryptoMarket } from '../application/useCryptoMarket';
 import { CHART_INTERVALS } from '../domain/chart';
 import { DISPLAY_CURRENCIES, convertCandles, type DisplayCurrency } from '../domain/currency';
 import { formatChange, formatDateTime, tone } from '../domain/format';
-import type { GuideSection } from '../domain/guide';
 import type { LayerId } from '../domain/indicators';
 import type { Candle, CryptoCoin, CryptoInterval } from '../domain/types';
 import { ChartTable } from './ChartTable';
 import { CoinIcon, CoinList } from './CoinList';
-import { LayerBar } from './LayerBar';
+import { LearnButton, LearnPanel, type Guide } from './Learn';
 import { useMoney } from './money';
 import type { ChartLine } from './useCandleChart';
 
@@ -162,6 +161,8 @@ function ChartArea({
   interval,
   lines,
   layers,
+  onToggleLayer,
+  layerExtra,
   onVisibleChange,
 }: {
   market: CryptoMarket;
@@ -171,6 +172,8 @@ function ChartArea({
   interval: CryptoInterval;
   lines: ChartLine[];
   layers: LayerId[];
+  onToggleLayer: (layer: LayerId) => void;
+  layerExtra: ReactNode;
   onVisibleChange: (percent: number | null) => void;
 }) {
   const { t } = useI18n();
@@ -194,6 +197,8 @@ function ChartArea({
             interval={interval}
             lines={lines}
             layers={layers}
+            onToggleLayer={onToggleLayer}
+            layerExtra={layerExtra}
             onVisibleChange={onVisibleChange}
           />
         </Suspense>
@@ -203,10 +208,10 @@ function ChartArea({
 }
 
 /**
- * The market, compact like a trading desk: every coin in a column with its own scroll as tall as
- * the price and the chart, the price with the candle sizes and the currency on one row, the figures
- * of the day in one row of cells, the chart, and below it the layers and the table that stands in
- * for the chart.
+ * The market, compact like a trading desk: the coins in pages as tall as the price and the chart,
+ * the price with the candle sizes and the currency on one row, the figures of the day in one row
+ * of cells, the layer chips and «Learn before playing» just above the chart, the table that
+ * stands in for the chart at its foot and, below, the panel of the guide.
  */
 export function MarketPanel({
   view,
@@ -218,7 +223,8 @@ export function MarketPanel({
   onChange,
   onCurrency,
   onToggleLayer,
-  onGuide,
+  guide,
+  premium,
 }: {
   view: View;
   market: CryptoMarket;
@@ -229,7 +235,9 @@ export function MarketPanel({
   onChange: (next: Partial<View>) => void;
   onCurrency: (c: DisplayCurrency) => void;
   onToggleLayer: (layer: LayerId) => void;
-  onGuide: (section: GuideSection) => void;
+  guide: Guide;
+  /** Whether the person has Premium (for the «Free and Premium» tab of the guide). */
+  premium: boolean;
 }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -275,12 +283,14 @@ export function MarketPanel({
             interval={view.interval}
             lines={lines}
             layers={layers}
+            onToggleLayer={onToggleLayer}
+            layerExtra={<LearnButton guide={guide} />}
             onVisibleChange={setChange}
           />
+          <ChartTable candles={candles} label={label} />
         </div>
         <div className="cc-market-below">
-          <LayerBar active={layers} onToggle={onToggleLayer} onGuide={onGuide} />
-          <ChartTable candles={candles} label={label} />
+          <LearnPanel guide={guide} premium={premium} />
         </div>
       </div>
     </section>

@@ -36,10 +36,14 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 - Tipografía de la consola a 14 px de base; etiquetas a 12 px (mínimo), valores a 14 px; precio
   principal con `clamp()` (24 px en el móvil, 36 px en escritorio). Controles compactos con ratón
   (26-28 px) y de **32 px como mínimo** en el móvil o con pantalla táctil (`pointer: coarse`).
-- **Monedas**: todas las que da el backend, sin páginas. En escritorio, columna con su propio
-  scroll vertical tan alta como el precio y la gráfica (`contain: size` en la rejilla); filas de
-  ~40 px con icono pequeño, nombre, par, precio y variación. En el móvil y en horizontal, fila
-  deslizable. La moneda elegida se centra dentro de la lista sin mover la página.
+- **Monedas**: todas las que da el backend, en **páginas** en escritorio. La columna es tan alta
+  como el precio y la gráfica (`contain: size` en la rejilla) y **sin scroll interno**: se mide su
+  alto y el de una fila (44 px, con 6 px de aire entre filas) y cada página lleva solo las filas
+  **enteras** que caben (`rowsThatFit` en `ui/CoinList.tsx`; se vuelve a medir con
+  `ResizeObserver` y al cambiar el tamaño de la ventana; 8 filas hasta medir). Si hay más monedas
+  que filas aparecen «Ant.» y «Sig.» pequeños con «1 / 2» (mínimo 2 páginas); se abre en la página
+  de la moneda elegida. En el móvil y en horizontal, todas en una fila deslizable, con la elegida
+  centrada sin mover la página.
 - **Cabecera**: precio, cambio de 24 h y del periodo visible a la izquierda; temporalidades
   (5 min … 1 sem.) y «€ EUR | $ USD» como botoncitos en la misma fila a la derecha; debajo, **una
   fila** de celdas con bid, ask, máx./mín./volumen de 24 h y actualizado (3 por fila en el móvil).
@@ -48,9 +52,19 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 - **Zoom**: barra pequeña bajo la gráfica con iconos: «− Alejar», «+ Acercar», «Reciente» (rango
   lógico de las últimas 90 velas), «Todo» (`fitContent`) y «Pantalla completa»; cada botón lleva
   su atajo en `title` y `aria-keyshortcuts` (−, +, Fin, Inicio; Esc para salir).
-- **Capas**: chips pequeños en una barra que se ajusta a varias líneas, con la rayita del color de
-  la leyenda, texto en versalitas (solo aquí), `aria-pressed`; encendida, borde y fondo del color
-  de la capa; apagada, más tenue. «?» de cada capa y «¿Qué es cada cosa?» también pequeños.
+- **Capas**: chips pequeños (12 px, 24 px de alto con ratón) **justo encima de la gráfica**, en
+  el sitio de la antigua leyenda, uno junto a otro en una barra que se ajusta a varias líneas (en
+  horizontal, fila deslizable): rayita del color de la capa, nombre corto en versalitas
+  (EMA 20, EMA 50, EMA 200, Bollinger, VWAP, Perfil vol., Sop./Resist., Fibonacci) y
+  `aria-pressed`. Al pulsarlo la capa se dibuja y el chip queda marcado con borde y fondo de su
+  color; si la capa tiene un solo valor lo lleva dentro en pequeño («EMA 50 · 93,70 €») y si tiene
+  varios van en el `title` y en texto para lectores de pantalla. Sin etiquetas de grupo, sin «?»
+  en cada chip, sin leyenda aparte ni frase larga al lado. Al final de la barra, el botón de
+  acento pequeño **«Aprende antes de jugar»** (la frase «Son herramientas para aprender…» queda
+  en su `title` y como subtítulo del panel). La barra de capas grande de debajo de la gráfica
+  desaparece.
+- **Tabla de velas**: «Ver las últimas 30 velas en una tabla» es un enlace pequeño (12 px, sin
+  negrita) al pie del bloque de la gráfica, cerrado por defecto.
 - Resumen de cartera, caja de operar, paneles y tabla usan la misma escala (celdas de 12/16 px,
   campos de 40 px, botón de abrir de 44 px).
 
@@ -75,7 +89,7 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
   Sin cambio disponible se muestra en euros con un aviso.
 - Todo pasa por `frontend/src/modules/crypto/domain/currency.ts` y `format.ts`: precios, gráfica y
   capas (se convierten las velas), cabecera, bid/ask, volumen, monedas, caja de operar, cartera,
-  paneles e historial CSV (cabeceras con € o $). Lo tecleado en dólares se pasa a euros antes de
+  paneles e informe Premium de temporada (cabeceras con € o $). Lo tecleado en dólares se pasa a euros antes de
   enviarlo (importes al céntimo, precios sin redondear), con tests de ida y vuelta.
 - Preferencia por dispositivo en `mm_crypto_currency`; la primera vez, la moneda de la app.
 
@@ -85,24 +99,38 @@ Funciones puras (`domain/indicators.ts` y `domain/layers.ts`) sobre las velas ca
 50 y 200**, **Bandas de Bollinger (20, 2)**, **VWAP** (desde la primera vela cargada), **perfil de
 volumen** (POC, VAH y VAL de las velas en pantalla, zona de valor del 70 %), **soportes y
 resistencias** (giros con 3 velas a cada lado, agrupados al 0,5 %, hasta 3 de cada) y
-**Fibonacci** (0 a 100 % del último tramo alto-bajo visible). Cada capa: botón con
-`aria-pressed`, color, leyenda con su valor, «?» que abre la guía en su apartado y preferencia en
+**Fibonacci** (0 a 100 % del último tramo alto-bajo visible). Cada capa: chip con
+`aria-pressed`, su color, su valor (dentro del chip o en el `title`) y preferencia en
 `mm_crypto_layers`. Nada de flechas, señales ni proyecciones.
 
-## Guía «¿Qué es cada cosa?»
+## Panel «Aprende antes de jugar»
 
-Modal accesible (diálogo, foco atrapado, Esc, clic fuera, botón grande de cerrar, desplazable, a
-pantalla completa en el móvil), cargado aparte con sus dibujos SVG propios: velas y volumen;
-temporalidades; toros y osos, long y short (ejemplo con números inventados y la garantía del
-simulador); órdenes y comisiones; take profit y stop loss para largo y corto; apalancamiento (cómo
-funciona, por qué es peligroso y que Finanverso no lo ofrece); EMA; Bollinger; VWAP; perfil de
-volumen; soportes y resistencias; Fibonacci; y patrones (doji, martillo, estrella fugaz,
-envolventes, doble techo y suelo, hombro-cabeza-hombro, triángulo, bandera, cuña, rango y cruce de
-medias) con «Un patrón no garantiza lo que pasará después; es solo una forma de leer el gráfico»;
-y, al final, **«Palabras de la consola»**: el glosario completo (una sola fuente,
-`GLOSSARY_TERMS` en `domain/guide.ts` y las claves `app.crypto.glossary.*`) con buscador sin
-acentos ni mayúsculas. Ya no hay tarjeta de glosario en la pantalla: el botón «Aprende todas las
-palabras importantes» (bajo la caja de operar y al pie) abre la guía directamente en ese apartado.
+Ya no es un modal: es un **panel desplegable** bajo la gráfica (`ui/Learn.tsx`, `css/Learn.css`)
+con el título grande «Antes de empezar a jugar, aprende todo sobre el análisis de
+criptomonedas». Se abre y se cierra con el botón «Aprende antes de jugar» de la barra de capas
+(`aria-expanded`, `aria-controls="cc-learn"`), con su botón «Cerrar» o con **Esc** (el foco vuelve
+al botón). Al abrirse se desplaza a la vista y deja el foco en el título; cerrado es `inert` y se
+oculta al terminar de plegarse (animación de `grid-template-rows`, sin movimiento con «reducir
+movimiento»). Los botones «Aprende todas las palabras importantes» (bajo la caja de operar y al
+pie) lo abren en la pestaña de palabras.
+
+**Pestañas** (`GUIDE_TABS` en `domain/guide.ts`, patrón de pestañas accesible con flechas, Inicio
+y Fin; en el escritorio se reparten en varias líneas y en el móvil y en horizontal se deslizan):
+Velas y tiempo · Medias (EMA) · Bandas y precio medio · Niveles (soportes, Fibonacci, volumen) ·
+Patrones · Toros y osos, Long y Short · Órdenes (mercado, límite, stop, TP/SL) · Apalancamiento ·
+Palabras de la consola · Gratis y Premium. Cada pestaña muestra sus apartados de siempre (una sola
+fuente: las claves `app.crypto.guide.*` y `GUIDE_PARAGRAPHS`) en tarjetas con el dibujo SVG grande
+al lado del texto (encima en el móvil). El contenido de las pestañas y sus dibujos
+(`ui/GuidePanel.tsx`, `css/GuidePanel.css`) se descargan la primera vez que se abre. Las
+pestañas: velas y volumen; temporalidades; EMA; Bollinger y VWAP; soportes y resistencias,
+Fibonacci y perfil de volumen; patrones (doji, martillo, estrella fugaz, envolventes, doble techo
+y suelo, hombro-cabeza-hombro, triángulo, bandera, cuña, rango y cruce de medias) con «Un patrón
+no garantiza lo que pasará después; es solo una forma de leer el gráfico»; toros y osos, long y
+short (ejemplo con números inventados y la garantía del simulador); órdenes y comisiones con take
+profit y stop loss; apalancamiento (cómo funciona, por qué es peligroso y que Finanverso no lo
+ofrece); **«Palabras de la consola»**: el glosario completo (`GLOSSARY_TERMS` y las claves
+`app.crypto.glossary.*`) con buscador sin acentos ni mayúsculas; y la tarjeta «Gratis y Premium».
+La comisión fija del 0,10 % solo se menciona dentro de la guía.
 
 ## Simulador
 
@@ -116,7 +144,8 @@ palabras importantes» (bajo la caja de operar y al pie) abre la guía directame
 - **Órdenes** a mercado, límite o stop para abrir long o short; **take profit y stop loss**
   opcionales (largo: TP encima y SL debajo de la entrada; corto: al revés), guardados como órdenes
   de cierre vinculadas; una orden pendiente los deja al ejecutarse. Validación en vivo («Antes de
-  abrir», `aria-live`, que indica la comisión fija del 0,10 %) y en el servidor.
+  abrir», `aria-live`, con la comisión simulada en euros pero sin aviso del porcentaje) y en el
+  servidor.
 - **Ejecución determinista sin procesos en segundo plano**: al abrir o refrescar la consola (cada
   30 s a la vista) el servidor revisa órdenes y cortos con las velas desde su creación y con el
   último precio. Con hueco, al precio de apertura. Si en una vela se tocan varias salidas gana la
@@ -126,8 +155,11 @@ palabras importantes» (bajo la caja de operar y al pie) abre la guía directame
   usuario.
 - **Lo que se quitó de la interfaz** (decisión del dueño): el selector de comisión
   (0/0,1/0,25/0,5/1 %), el selector de saldo (1.000/10.000/100.000 €) y el botón «Empezar de
-  nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece; **«Exportar CSV»**
-  del historial (gratis) pasa al panel de **operaciones cerradas**. En el backend se elimina
+  nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece. Después se quitan
+  también el enlace «¿Qué es la comisión?», el aviso «Comisión fija…» de «Antes de abrir» y el
+  botón **«Exportar CSV»** gratis del historial (panel de cerradas): no hay CSV gratis en la
+  pantalla. Siguen el **informe Premium de temporada** en PDF y CSV y la exportación RGPD de la
+  cuenta (que incluye todo el simulador). En el backend se elimina
   `PATCH /crypto/sim/settings` y `POST /crypto/sim/reset` solo sirve para **carteras de
   prácticas**: acepta e ignora `initial` y `feeBps` que mandaban versiones anteriores de la app y,
   sin cartera de prácticas, responde `CRYPTO_SEASON_NO_RESET`.
@@ -213,8 +245,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   enviadas se borran a los 30 días. Sin Premium no se envían.
 - **Hasta 5 carteras de prácticas** y **100 órdenes pendientes** (20 en el gratuito).
 - **Informe de temporada** en PDF y CSV (`GET /crypto/seasons/:season/report`): todas las
-  operaciones cerradas, el resultado congelado y las estadísticas. El CSV básico del historial
-  sigue siendo gratis.
+  operaciones cerradas, el resultado congelado y las estadísticas.
 - **Insignia Premium** estética junto al alias en el ranking.
 
 ## Migración 039
@@ -238,18 +269,18 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 
 ## API
 
-| Método y ruta | Qué hace |
-| --- | --- |
-| `GET /crypto/sim?portfolio=<id>` | Cartera (la oficial si falta o ya no existe), temporada, plan, insignias, estadísticas (Premium) |
-| `POST /crypto/sim/orders` | Comprar o vender; `portfolioId` opcional (por defecto la oficial) |
-| `DELETE /crypto/sim/orders/:id` | Cancelar una orden pendiente |
-| `POST /crypto/sim/practice` | Nueva cartera de prácticas (1 gratis, 5 Premium) |
-| `POST /crypto/sim/reset` | Reiniciar una cartera de prácticas (`portfolioId`) |
-| `DELETE /crypto/sim/practice/:id` | Borrar una cartera de prácticas |
-| `GET /crypto/ranking` | Top 5 del mes, tu posición, reglas, ganadores del mes anterior |
-| `PUT /crypto/ranking/settings` | `{ optIn, alias? }` |
-| `GET /crypto/seasons/:season/report` | Informe de temporada (Premium) |
-| `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium) |
+| Método y ruta                                                            | Qué hace                                                                                         |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `GET /crypto/sim?portfolio=<id>`                                         | Cartera (la oficial si falta o ya no existe), temporada, plan, insignias, estadísticas (Premium) |
+| `POST /crypto/sim/orders`                                                | Comprar o vender; `portfolioId` opcional (por defecto la oficial)                                |
+| `DELETE /crypto/sim/orders/:id`                                          | Cancelar una orden pendiente                                                                     |
+| `POST /crypto/sim/practice`                                              | Nueva cartera de prácticas (1 gratis, 5 Premium)                                                 |
+| `POST /crypto/sim/reset`                                                 | Reiniciar una cartera de prácticas (`portfolioId`)                                               |
+| `DELETE /crypto/sim/practice/:id`                                        | Borrar una cartera de prácticas                                                                  |
+| `GET /crypto/ranking`                                                    | Top 5 del mes, tu posición, reglas, ganadores del mes anterior                                   |
+| `PUT /crypto/ranking/settings`                                           | `{ optIn, alias? }`                                                                              |
+| `GET /crypto/seasons/:season/report`                                     | Informe de temporada (Premium)                                                                   |
+| `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium)                                                                      |
 
 ## Interfaz
 
@@ -269,7 +300,7 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 ## Móvil y accesibilidad
 
 - 390 px sin desplazamiento lateral; en horizontal (844x390) la gráfica ocupa casi todo el alto y
-  monedas y capas pasan a filas deslizables.
+  monedas, capas y pestañas de la guía pasan a filas deslizables.
 - «Pantalla completa» usa la Fullscreen API y `screen.orientation.lock('landscape')` cuando el
   navegador lo deja; si no (iPhone Safari, algunos WebView) la gráfica ocupa la pantalla con CSS.
   Sin plugins nuevos de Capacitor.
@@ -277,8 +308,8 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   (respeta «reducir movimiento»), recordado en `mm_crypto_rotate_hint`.
 - Gráfica con nombre y resumen para lectores de pantalla, teclado, tabla de las últimas 30 velas,
   botones de 32 px como mínimo en pantallas táctiles, temas claro y oscuro y modo Contraste.
-- La librería de gráficos va en un chunk aparte fuera de la precaché offline; la guía y sus
-  dibujos también se cargan diferidos.
+- La librería de gráficos va en un chunk aparte fuera de la precaché offline; las pestañas de la
+  guía y sus dibujos también se cargan diferidos.
 
 ## Pruebas
 
@@ -286,7 +317,9 @@ Backend (dominio, mercado con `fetch` simulado, integración con mercado falso, 
 al 100 % (`src/__tests__/crypto/*`, con un doble de Lightweight Charts) y E2E
 (`frontend/e2e/crypto.spec.ts`, `CRYPTO_MARKET=demo`). Capturas de revisión en `/tmp/gf65-shots/`
 y, de la escala compacta, en `/tmp/gf66-shots/` (1440, 1920, 390 vertical y 844x390; claro, oscuro
-y Contraste).
+y Contraste). Chips de capas encima de la gráfica, monedas en páginas y panel «Aprende antes de
+jugar» (cerrado y abierto en dos pestañas) en `/tmp/gf67-shots/` (1440, 390 y 844x390; claro,
+oscuro y Contraste).
 
 Temporadas y ranking (datos inventados):
 

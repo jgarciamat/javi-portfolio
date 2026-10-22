@@ -2,7 +2,6 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { ApiError } from '@core/api/http';
 import { translate } from '@core/i18n/I18nContext';
 import { savedLayers } from '@modules/crypto/application/useLayers';
-import { EURO } from '@modules/crypto/domain/currency';
 import type {
   ClosedTrade,
   CryptoCandles,
@@ -18,10 +17,11 @@ import {
   fillText,
   savedView,
 } from '@modules/crypto/ui/CryptoConsoleView';
+import { FALLBACK_ROWS, rowsThatFit } from '@modules/crypto/ui/CoinList';
 import { makeMoney } from '@modules/crypto/ui/money';
-import { historyTable } from '@modules/crypto/ui/SimSummary';
 import * as fx from '@test-utils/crypto';
 import { createFakeApi, type FakeApi } from '@test-utils/fakeApi';
+import { mockMatchMedia } from '@test-utils/dom';
 import { renderWithProviders } from '@test-utils/render';
 import { charts } from '../../__mocks__/lightweightCharts';
 
@@ -88,6 +88,9 @@ const withPortfolio = (p: Partial<SimPortfolio>) => (api: FakeApi) =>
 const capital = () => screen.getByLabelText('Capital por operación');
 const openButton = () => screen.getByRole('button', { name: /Abrir (long|short)/ });
 const check = () => screen.getByRole('heading', { name: 'Antes de abrir' }).closest('div')!;
+const LEARN = 'Antes de empezar a jugar, aprende todo sobre el análisis de criptomonedas';
+const learn = () => screen.getByRole('region', { name: LEARN });
+const opener = () => screen.getByRole('button', { name: 'Aprende antes de jugar' });
 const ready = async () => {
   await screen.findByRole('img', { name: /Gráfica de/ });
   await screen.findByText('Abiertas (1)');
@@ -144,25 +147,97 @@ describe('Crypto console: market', () => {
     expect(savedView()).toEqual({ symbol: 'BTC', interval: '1h' });
   });
 
-  it('lists every coin, without pages, and keeps the chosen one in sight', async () => {
-    const many: CryptoCoins = {
-      ...fx.coins(),
-      coins: Array.from({ length: 30 }, (_, i) => ({
-        ...fx.coins().coins[0],
-        symbol: `C${String.fromCharCode(65 + (i % 26), 65 + Math.floor(i / 26))}X`,
-        name: `Coin ${i}`,
-      })),
-    };
+  const many: CryptoCoins = {
+    ...fx.coins(),
+    coins: Array.from({ length: 30 }, (_, i) => ({
+      ...fx.coins().coins[0],
+      symbol: `C${String.fromCharCode(65 + (i % 26), 65 + Math.floor(i / 26))}X`,
+      name: `Coin ${i}`,
+    })),
+  };
+  const coinNav = () => screen.getByRole('navigation', { name: 'Monedas' });
+  const shownCoins = () => within(within(coinNav()).getByRole('list')).getAllByRole('button');
+
+  it('pages the coins beside the chart, starting on the page of the chosen one', async () => {
     localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'CDBX', interval: '1h' }));
     setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
     expect(await screen.findByRole('button', { name: /Coin 29/ })).toHaveAttribute(
       'aria-pressed',
       'true'
     );
-    expect(screen.getByText('Coin 0')).toBeInTheDocument();
-    const list = within(screen.getByRole('navigation', { name: 'Monedas' })).getByRole('list');
-    expect(within(list).getAllByRole('button')).toHaveLength(30);
-    expect(screen.queryByRole('button', { name: 'Siguiente' })).toBeNull();
+    // Until the column is measured, pages of FALLBACK_ROWS rows: 30 coins, 4 pages.
+    expect(FALLBACK_ROWS).toBe(8);
+    expect(shownCoins()).toHaveLength(6);
+    expect(within(coinNav()).getByText('4 / 4')).toBeInTheDocument();
+    const prev = within(coinNav()).getByRole('button', { name: 'Ant. Página anterior de monedas' });
+    const next = within(coinNav()).getByRole('button', {
+      name: 'Sig. Página siguiente de monedas',
+    });
+    expect(next).toBeDisabled();
+    fireEvent.click(prev);
+    expect(within(coinNav()).getByText('3 / 4')).toBeInTheDocument();
+    expect(shownCoins()[0]).toHaveTextContent('Coin 16');
+    fireEvent.click(prev);
+    fireEvent.click(prev);
+    expect(prev).toBeDisabled();
+    expect(shownCoins()).toHaveLength(8);
+    fireEvent.click(next);
+    expect(shownCoins()[0]).toHaveTextContent('Coin 8');
+    fireEvent.click(screen.getByRole('button', { name: /Coin 9/ }));
+    expect(screen.getByRole('button', { name: /Coin 9/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(within(coinNav()).getByText('2 / 4')).toBeInTheDocument();
+  });
+
+  it('fits as many whole rows as the column holds, and measures again when it resizes', async () => {
+    const observers: (() => void)[] = [];
+    Object.assign(window, {
+      ResizeObserver: class {
+        constructor(callback: () => void) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    });
+    let height = 300;
+    const tall = jest
+      .spyOn(Element.prototype, 'clientHeight', 'get')
+      .mockImplementation(() => height);
+    const row = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(44);
+    const { unmount } = setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
+    await screen.findByRole('button', { name: /Coin 0/ });
+    expect(shownCoins()).toHaveLength(6);
+    const list = within(coinNav()).getByRole('list');
+    list.style.rowGap = '6px';
+    list.style.paddingTop = '4px';
+    height = 200;
+    act(() => observers.forEach((measure) => measure()));
+    expect(shownCoins()).toHaveLength(4);
+    height = 2_000;
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    expect(shownCoins()).toHaveLength(30);
+    expect(within(coinNav()).queryByRole('button', { name: /^Sig\./ })).toBeNull();
+    unmount();
+    tall.mockRestore();
+    row.mockRestore();
+    delete (window as { ResizeObserver?: unknown }).ResizeObserver;
+    expect(rowsThatFit(0, 44, 6)).toBe(FALLBACK_ROWS);
+    expect(rowsThatFit(30, 44, 6)).toBe(1);
+  });
+
+  it('on phones, every coin in a row that slides, keeping the chosen one in sight', async () => {
+    const restore = mockMatchMedia(true);
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'CDBX', interval: '1h' }));
+    setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
+    expect(await screen.findByRole('button', { name: /Coin 29/ })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(shownCoins()).toHaveLength(30);
+    expect(within(coinNav()).queryByRole('button', { name: /^Ant\./ })).toBeNull();
+    restore();
   });
 
   it('shows a coin without a price, and nothing while the prices load', async () => {
@@ -296,14 +371,21 @@ describe('Crypto console: layers, guide and currency', () => {
     setup();
     await ready();
     expect(screen.queryByRole('heading', { name: 'Palabras de la consola' })).toBeNull();
+    expect(learn()).toHaveAttribute('inert');
     const buttons = screen.getAllByRole('button', {
       name: 'Aprende todas las palabras importantes',
     });
     expect(buttons).toHaveLength(2);
     fireEvent.click(buttons[1]);
-    const dialog = await screen.findByRole('dialog', { name: '¿Qué es cada cosa?' });
-    expect(scroll).toHaveBeenCalledTimes(1);
-    const words = within(dialog).getByRole('region', { name: 'Palabras de la consola' });
+    const words = await screen.findByRole('region', { name: 'Palabras de la consola' });
+    expect(learn()).not.toHaveAttribute('inert');
+    expect(opener()).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('tab', { name: 'Palabras de la consola' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+    expect(scroll).toHaveBeenCalledWith({ block: 'start' });
+    expect(screen.getByRole('heading', { name: LEARN })).toHaveFocus();
     expect(within(words).getAllByRole('term')).toHaveLength(16);
     const search = within(words).getByRole('searchbox', { name: 'Buscar una palabra' });
     fireEvent.change(search, { target: { value: ' COMISIÓN ' } });
@@ -322,39 +404,95 @@ describe('Crypto console: layers, guide and currency', () => {
     expect(within(words).getByRole('status')).toHaveTextContent(
       'Ninguna palabra coincide con «zzz».'
     );
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Palabras de la consola' }));
-    expect(scroll).toHaveBeenCalledTimes(2);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Cerrar' }));
+    fireEvent.click(within(learn()).getByRole('button', { name: 'Cerrar' }));
+    expect(opener()).toHaveAttribute('aria-expanded', 'false');
+    expect(opener()).toHaveFocus();
     fireEvent.click(buttons[0]);
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(opener()).toHaveAttribute('aria-expanded', 'true');
+    expect(scroll).toHaveBeenCalledTimes(2);
     delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
   });
 
-  it('opens the guide from the big button and from each «?», and closes it', async () => {
-    const scroll = jest.fn();
-    Element.prototype.scrollIntoView = scroll;
+  it('opens the guide from its button above the chart, moves between tabs and closes it', async () => {
     setup();
     await ready();
-    fireEvent.click(screen.getByRole('button', { name: '¿Qué es cada cosa?' }));
-    const dialog = await screen.findByRole('dialog', { name: '¿Qué es cada cosa?' });
+    const button = opener();
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(button).toHaveAttribute('aria-controls', 'cc-learn');
+    expect(button).toHaveAttribute(
+      'title',
+      expect.stringMatching(/^Son herramientas para aprender/)
+    );
+    expect(screen.queryByText(/Son herramientas para aprender/)).toBeInTheDocument();
+    fireEvent.click(button);
+    const tabs = await screen.findAllByRole('tab');
+    expect(tabs.map((tab) => tab.textContent)).toEqual([
+      'Velas y tiempo',
+      'Medias (EMA)',
+      'Bandas y precio medio',
+      'Niveles (soportes, Fibonacci, volumen)',
+      'Patrones',
+      'Toros y osos, Long y Short',
+      'Órdenes (mercado, límite, stop, TP/SL)',
+      'Apalancamiento',
+      'Palabras de la consola',
+      'Gratis y Premium',
+    ]);
+    const panel = () => screen.getByRole('tabpanel');
+    expect(panel()).toHaveAccessibleName('Velas y tiempo');
+    expect(within(panel()).getByRole('heading', { name: 'Velas y volumen' })).toBeInTheDocument();
     expect(
-      within(dialog).getByRole('heading', { name: 'Toros y osos: long y short' })
+      within(panel()).getByRole('heading', { name: 'Temporalidades (tamaño de la vela)' })
+    ).toBeInTheDocument();
+    // Arrows go round, Home and End go to the ends; other keys do nothing.
+    fireEvent.keyDown(tabs[0], { key: 'ArrowLeft' });
+    expect(tabs[9]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[9]).toHaveFocus();
+    fireEvent.keyDown(tabs[9], { key: 'ArrowRight' });
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    fireEvent.keyDown(tabs[0], { key: 'End' });
+    fireEvent.keyDown(tabs[9], { key: 'Home' });
+    fireEvent.keyDown(tabs[0], { key: 'ArrowRight' });
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    fireEvent.keyDown(tabs[1], { key: 'ArrowLeft' });
+    fireEvent.keyDown(tabs[0], { key: 'a' });
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(tabs[2]);
+    expect(
+      within(panel()).getByRole('heading', { name: 'Bandas de Bollinger' })
     ).toBeInTheDocument();
     expect(
-      within(dialog).getAllByText(/Un patrón no garantiza lo que pasará después/)
+      within(panel()).getByRole('heading', { name: 'Precio medio con el volumen (VWAP)' })
+    ).toBeInTheDocument();
+    fireEvent.click(tabs[3]);
+    expect(
+      within(panel()).getByRole('heading', { name: 'Retrocesos de Fibonacci' })
+    ).toBeInTheDocument();
+    fireEvent.click(tabs[4]);
+    expect(
+      within(panel()).getAllByText(/Un patrón no garantiza lo que pasará después/)
     ).toHaveLength(2);
-    expect(within(dialog).getByText(/Finanverso no lo ofrece/)).toBeInTheDocument();
-    expect(scroll).not.toHaveBeenCalled();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Retrocesos de Fibonacci' }));
-    expect(scroll).toHaveBeenCalledTimes(1);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Cerrar' }));
-    expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: '¿Qué es Bandas de Bollinger?' }));
-    await screen.findByRole('dialog');
-    expect(scroll).toHaveBeenCalledTimes(2);
-    fireEvent.keyDown(document, { key: 'Escape' });
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    fireEvent.click(tabs[5]);
+    expect(
+      within(panel()).getByRole('heading', { name: 'Toros y osos: long y short' })
+    ).toBeInTheDocument();
+    fireEvent.click(tabs[6]);
+    expect(within(panel()).getByText(/la comisión es fija para todos/)).toBeInTheDocument();
+    fireEvent.click(tabs[7]);
+    expect(within(panel()).getByText(/Finanverso no lo ofrece/)).toBeInTheDocument();
+    // Esc closes it (unless something else already took the key); other keys do not.
+    fireEvent.keyDown(window, { key: 'a' });
+    const taken = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+    taken.preventDefault();
+    window.dispatchEvent(taken);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(button).toHaveFocus();
+    fireEvent.click(button);
+    expect(tabs[7]).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('shows everything in dollars with the ECB rate, and sends euros', async () => {
@@ -493,7 +631,9 @@ describe('Crypto console: opening positions', () => {
       stopLoss: 45_000,
     });
     expect(capital()).toHaveValue('');
-    const help = screen.getByRole('button', { name: '¿Qué es la comisión?' });
+    expect(box).toContain('Comisión simulada1,00 €');
+    expect(screen.queryByRole('button', { name: '¿Qué es la comisión?' })).toBeNull();
+    const help = screen.getByRole('button', { name: '¿Qué es una orden a mercado?' });
     fireEvent.click(help);
     expect(help).toHaveAttribute('aria-expanded', 'true');
   });
@@ -721,35 +861,18 @@ describe('Crypto console: open, pending and closed', () => {
 });
 
 describe('Crypto console: history', () => {
-  it('has no commission or balance settings: the commission is fixed', async () => {
+  it('has no commission or balance settings, and no notice about the commission', async () => {
     setup();
     await screen.findByText('Abiertas (1)');
     expect(screen.queryByText('Tu historial y ajustes')).toBeNull();
     expect(screen.queryByRole('radio', { name: /^0,25/ })).toBeNull();
-    expect(nb(check().textContent)).toContain(
-      'Comisión fija: 0,1 % al abrir y otro 0,1 % al cerrar'
-    );
+    expect(nb(check().textContent)).not.toContain('Comisión fija');
   });
 
-  it('downloads the history as CSV', async () => {
-    const createObjectURL = jest.fn((_blob: Blob) => 'blob:x');
-    Object.assign(URL, { createObjectURL, revokeObjectURL: jest.fn() });
-    const click = jest
-      .spyOn(HTMLAnchorElement.prototype, 'click')
-      .mockImplementation(() => undefined);
+  it('has no free CSV of the history on screen', async () => {
     setup(withPortfolio({ closed: [closed(1, 10)] }));
     await screen.findByText('Cerradas (1)');
-    fireEvent.click(screen.getByRole('button', { name: /Exportar CSV/ }));
-    await waitFor(() => expect(createObjectURL).toHaveBeenCalled());
-    const text = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.readAsText(createObjectURL.mock.calls[0][0]);
-    });
-    expect(text).toContain('"Estado";"Moneda"');
-    expect(text).toContain('"Precio de compra (€)"');
-    expect(text).toContain('"Cerrada";"ETH"');
-    click.mockRestore();
+    expect(screen.queryByRole('button', { name: /Exportar CSV/ })).toBeNull();
   });
 
   it('ignores answers that arrive after leaving the console', async () => {
@@ -770,34 +893,6 @@ describe('Crypto console: history', () => {
 });
 
 describe('Crypto console: helpers', () => {
-  it('builds the history table in the chosen currency', () => {
-    const p = fx.portfolio({ closed: [closed(1, 10)] });
-    const table = historyTable(p, t, 'es', { currency: 'USD', rate: 2 });
-    expect(table.head[3]).toBe('Precio de compra ($)');
-    expect(table.rows[0].slice(0, 4)).toEqual([
-      'Abierta (resultado si se vendiera ahora)',
-      'BTC',
-      0.02,
-      100_000,
-    ]);
-    expect(table.rows[1].slice(6, 12)).toEqual([
-      4040,
-      expect.stringContaining('2026'),
-      'Límite',
-      2000,
-      4,
-      20,
-    ]);
-    const noPrice = historyTable(
-      fx.portfolio({ open: [{ ...p.open[0], currentPrice: null, pnl: null }] }),
-      t,
-      'es',
-      EURO
-    );
-    expect(noPrice.rows[0][6]).toBeNull();
-    expect(noPrice.rows[0][11]).toBeNull();
-  });
-
   it('draws lines only for the chosen coin, converted', () => {
     const money = makeMoney({ currency: 'USD', rate: 2 }, 'es');
     expect(chartLines(null, 'BTC', t, money)).toEqual([]);

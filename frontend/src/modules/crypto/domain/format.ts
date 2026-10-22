@@ -114,11 +114,3 @@ export const tone = (value: number | null): 'up' | 'down' | 'flat' =>
 export function formatNumber(value: number, locale: Locale): string {
   return new Intl.NumberFormat(tag(locale), { maximumFractionDigits: 1 }).format(value);
 }
-
-/** A commission in basis points as a percentage: 10 → «0,1 %». */
-export function formatRate(bps: number, locale: Locale): string {
-  return new Intl.NumberFormat(tag(locale), {
-    style: 'percent',
-    maximumFractionDigits: 2,
-  }).format(bps / 10_000);
-}

@@ -18,7 +18,7 @@ import type {
   SimStats,
 } from '@modules/crypto/domain/types';
 import { CryptoConsoleView } from '@modules/crypto/ui/CryptoConsoleView';
-import { GuideModal } from '@modules/crypto/ui/GuideModal';
+import { GuidePanel } from '@modules/crypto/ui/GuidePanel';
 import { MoneyProvider } from '@modules/crypto/ui/money';
 import { EquityChart, PlansCard } from '@modules/crypto/ui/PremiumPanel';
 import * as fx from '@test-utils/crypto';
@@ -130,7 +130,8 @@ describe('Crypto console: the season', () => {
     expect(
       screen.getByText(/Informe de la temporada en PDF y CSV, con Premium/)
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Exportar CSV/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Exportar CSV/ })).toBeNull();
+    expect(screen.queryByText('Tu historial en CSV')).toBeNull();
   });
 
   it('warns in the last days, counts one day and says when it is the last', async () => {
@@ -586,29 +587,30 @@ describe('Crypto console: Premium comforts', () => {
   });
 
   it('explains Free and Premium in the guide too', async () => {
-    Element.prototype.scrollIntoView = jest.fn();
     setup();
     await ready();
     await act(async () => undefined);
-    fireEvent.click(screen.getAllByRole('button', { name: '¿Qué es cada cosa?' })[0]);
-    const dialog = await screen.findByRole('dialog', { name: '¿Qué es cada cosa?' });
-    expect(within(dialog).getByRole('button', { name: 'Gratis y Premium' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Aprende antes de jugar' }));
+    fireEvent.click(await screen.findByRole('tab', { name: 'Gratis y Premium' }));
     expect(
-      within(dialog).getByRole('heading', { level: 3, name: 'Gratis y Premium en la consola' })
+      within(screen.getByRole('tabpanel')).getByRole('heading', {
+        level: 3,
+        name: 'Gratis y Premium en la consola',
+      })
     ).toBeInTheDocument();
-    expect(within(dialog).getByText(/la comisión es fija para todos/)).toBeInTheDocument();
   });
 
   it('opens the guide before the portfolio arrives', async () => {
-    Element.prototype.scrollIntoView = jest.fn();
     setup((api) => api.cryptoApi.portfolio.mockReturnValue(new Promise(() => undefined)));
-    fireEvent.click((await screen.findAllByRole('button', { name: '¿Qué es cada cosa?' }))[0]);
-    const dialog = await screen.findByRole('dialog', { name: '¿Qué es cada cosa?' });
-    expect(within(dialog).getByRole('link', { name: /Ver Premium/ })).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('button', { name: 'Aprende antes de jugar' }));
+    fireEvent.click(await screen.findByRole('tab', { name: 'Gratis y Premium' }));
+    expect(
+      within(screen.getByRole('tabpanel')).getByRole('link', { name: /Ver Premium/ })
+    ).toBeInTheDocument();
   });
 
   it('renders the guide and the plans card on their own', () => {
-    renderWithProviders(<GuideModal section="plans" onClose={() => undefined} />);
+    renderWithProviders(<GuidePanel tab="plans" onTab={() => undefined} />);
     expect(screen.getAllByRole('link', { name: /Ver Premium/ }).length).toBeGreaterThan(0);
     renderWithProviders(<PlansCard premium />);
     expect(screen.getAllByText('Tienes Premium: todo esto ya está activo.')).toHaveLength(1);

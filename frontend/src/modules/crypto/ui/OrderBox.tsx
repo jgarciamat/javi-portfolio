@@ -1,7 +1,7 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
-import { formatChange, formatQuantity, formatRate, tone } from '../domain/format';
+import { formatChange, formatQuantity, tone } from '../domain/format';
 import { AMOUNT_SHARES, amountForShare, checkOpen, type OrderProblem } from '../domain/orders';
 import type { Direction, OrderRequest, SimPortfolio, TradeType } from '../domain/types';
 import { useMoney } from './money';
@@ -122,18 +122,15 @@ function BeforeOpening({
   problems,
   lines,
   direction,
-  bps,
 }: {
   problems: OrderProblem[];
   lines: Line[];
   direction: Direction;
-  bps: number;
 }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   return (
     <div className="cc-check" aria-live="polite">
       <h4>{t('app.crypto.order.check.title')}</h4>
-      <p className="cc-hint">{t('app.crypto.order.fixedFee', { rate: formatRate(bps, locale) })}</p>
       <ul>
         {problems.map((p) => (
           <li key={p} className="cc-check-bad">
@@ -257,7 +254,7 @@ function Strips({ portfolio }: { portfolio: SimPortfolio }) {
 }
 
 /** The estimate lines of «Before opening», in the display currency. */
-function useLines(check: ReturnType<typeof checkOpen>, symbol: string, bps: number): Line[] {
+function useLines(check: ReturnType<typeof checkOpen>, symbol: string): Line[] {
   const { t, locale } = useI18n();
   const money = useMoney();
   const lines: Line[] = [];
@@ -270,7 +267,7 @@ function useLines(check: ReturnType<typeof checkOpen>, symbol: string, bps: numb
         value: formatQuantity(check.estimate.quantity, locale),
       },
       {
-        label: t('app.crypto.order.fee', { rate: formatRate(bps, locale) }),
+        label: t('app.crypto.order.fee'),
         value: money.shownAmount(check.estimate.fee),
       },
       { label: t('app.crypto.order.total'), value: money.shownAmount(check.estimate.total) }
@@ -333,7 +330,7 @@ export function OrderBox(props: OrderBoxProps) {
     cash,
     bps,
   });
-  const lines = useLines(check, symbol, bps);
+  const lines = useLines(check, symbol);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -387,7 +384,6 @@ export function OrderBox(props: OrderBoxProps) {
         <p className="cc-hint">{t(`app.crypto.order.directionHint.${direction}`)}</p>
         <p className="cc-helps">
           <Help term={type} label={t(`app.crypto.help.${type}`)} />
-          <Help term="fee" label={t('app.crypto.help.fee')} />
           {direction === 'short' && <Help term="short" label={t('app.crypto.help.short')} />}
         </p>
 
@@ -438,7 +434,7 @@ export function OrderBox(props: OrderBoxProps) {
           onStopLoss={setStopLoss}
         />
 
-        <BeforeOpening problems={check.problems} lines={lines} direction={direction} bps={bps} />
+        <BeforeOpening problems={check.problems} lines={lines} direction={direction} />
 
         <button
           type="submit"

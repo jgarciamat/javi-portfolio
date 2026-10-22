@@ -1,6 +1,5 @@
 import { translate } from '@core/i18n/I18nContext';
-import { LAYER_SECTION } from '@modules/crypto/domain/guide';
-import { LAYERS } from '@modules/crypto/domain/indicators';
+import { GUIDE_SECTIONS, GUIDE_TABS } from '@modules/crypto/domain/guide';
 import { layerLevels, layerLines, legend } from '@modules/crypto/domain/layers';
 import type { Candle } from '@modules/crypto/domain/types';
 
@@ -75,7 +74,8 @@ describe('chart layers', () => {
     expect(items[3].values).toEqual([]);
   });
 
-  it('opens the guide where each layer is explained', () => {
-    expect(LAYERS.every((l) => typeof LAYER_SECTION[l] === 'string')).toBe(true);
+  it('puts every section of the guide in exactly one tab', () => {
+    const shown: string[] = GUIDE_TABS.flatMap((tab) => [...tab.sections]);
+    expect([...shown].sort()).toEqual([...GUIDE_SECTIONS].sort());
   });
 });

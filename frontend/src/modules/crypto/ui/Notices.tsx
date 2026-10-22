@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { useI18n, type Locale } from '@core/i18n/I18nContext';
 import { formatDateTime } from '../domain/format';
 import type { MarketStatus } from '../domain/types';
+import { BookIcon } from './Learn';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 
@@ -66,22 +67,7 @@ export function Help({ term, label }: { term: string; label: string }) {
   );
 }
 
-/** An open book, drawn with lines. */
-function BookIcon() {
-  return (
-    <svg className="cc-icon" viewBox="0 0 16 16" aria-hidden="true">
-      <path
-        d="M8 4.2C6.6 3 4.6 2.6 2 2.8v9.6c2.6-.2 4.6.2 6 1.4 1.4-1.2 3.4-1.6 6-1.4V2.8c-2.6-.2-4.6.2-6 1.4Zm0 0v9.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/** «Learn all the key words»: opens the guide on its words section. */
+/** «Learn all the key words»: opens the guide on its words tab. */
 export function GlossaryButton({ onOpen }: { onOpen: () => void }) {
   const { t } = useI18n();
   return (

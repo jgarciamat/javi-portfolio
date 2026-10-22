@@ -1,77 +1,62 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { LAYER_SECTION, type GuideSection } from '../domain/guide';
-import { LAYER_COLORS, type LayerId } from '../domain/indicators';
-
-const GROUPS: { id: string; layers: LayerId[] }[] = [
-  { id: 'averages', layers: ['ema20', 'ema50', 'ema200'] },
-  { id: 'bands', layers: ['bollinger', 'vwap'] },
-  { id: 'levels', layers: ['profile', 'levels', 'fibonacci'] },
-];
+import { LAYERS, LAYER_COLORS, type LayerId } from '../domain/indicators';
+import type { LegendItem } from '../domain/layers';
+import { useMoney } from './money';
 
 /**
- * Small chips in one bar that wraps, grouped, each with its colour and a «?» that opens the guide
- * where that layer is explained. Reading aids, never signals.
+ * Small chips just above the chart, one after the other in a bar that wraps: a colour mark and
+ * the short name. Pressed, the layer is drawn and the chip takes its colour; an average or the
+ * VWAP also shows its value now, and the rest give their values in the tooltip (and to screen
+ * readers). Reading aids, never signals. `children` goes at the end of the bar.
  */
 export function LayerBar({
   active,
+  legend,
   onToggle,
-  onGuide,
+  children,
 }: {
   active: LayerId[];
+  /** Values of the layers that are on. */
+  legend: LegendItem[];
   onToggle: (layer: LayerId) => void;
-  onGuide: (section: GuideSection) => void;
+  children?: ReactNode;
 }) {
   const { t } = useI18n();
+  const money = useMoney();
+  const price = (value: number | null) => (value === null ? '—' : money.shownPrice(value));
   return (
-    <div className="cc-layers">
-      <div className="cc-layers-bar">
-        <h3>{t('app.crypto.layers.title')}</h3>
-        {GROUPS.map((group) => (
-          <div
-            key={group.id}
-            className="cc-layer-group"
-            role="group"
-            aria-label={t(`app.crypto.layers.groups.${group.id}`)}
+    <div className="cc-layers" role="group" aria-label={t('app.crypto.layers.title')}>
+      {LAYERS.map((layer) => {
+        const values = legend.find((item) => item.layer === layer)?.values;
+        const name = t(`app.crypto.layers.names.${layer}`);
+        const detail = !values
+          ? null
+          : values.length
+            ? values.map((v) => `${v.label} ${price(v.price)}`).join(', ')
+            : t('app.crypto.layers.noData');
+        return (
+          <button
+            key={layer}
+            type="button"
+            className="cc-layer"
+            style={{ '--cc-layer': LAYER_COLORS[layer] } as CSSProperties}
+            aria-pressed={active.includes(layer)}
+            title={detail ? `${name}: ${detail}` : name}
+            onClick={() => onToggle(layer)}
           >
-            <span className="cc-layer-group-name" aria-hidden="true">
-              {t(`app.crypto.layers.groups.${group.id}`)}
-            </span>
-            {group.layers.map((layer) => {
-              const name = t(`app.crypto.layers.names.${layer}`);
-              return (
-                <span
-                  key={layer}
-                  className="cc-layer"
-                  style={{ '--cc-layer': LAYER_COLORS[layer] } as CSSProperties}
-                >
-                  <button
-                    type="button"
-                    className="cc-layer-chip"
-                    aria-pressed={active.includes(layer)}
-                    onClick={() => onToggle(layer)}
-                  >
-                    <i aria-hidden="true" />
-                    {name}
-                  </button>
-                  <button
-                    type="button"
-                    className="cc-layer-help"
-                    aria-label={t('app.crypto.layers.whatIs', { name })}
-                    onClick={() => onGuide(LAYER_SECTION[layer])}
-                  >
-                    ?
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        ))}
-        <button type="button" className="cc-guide-open" onClick={() => onGuide('candles')}>
-          {t('app.crypto.layers.guide')}
-        </button>
-      </div>
-      <p className="cc-layers-note">{t('app.crypto.layers.note')}</p>
+            <i aria-hidden="true" />
+            {t(`app.crypto.layers.short.${layer}`)}
+            {/* A single value fits in the chip; several go in the tooltip. */}
+            {values?.length === 1 ? (
+              <small> · {price(values[0].price)}</small>
+            ) : (
+              detail && <span className="sr-only">: {detail}</span>
+            )}
+          </button>
+        );
+      })}
+      {children}
     </div>
   );
 }

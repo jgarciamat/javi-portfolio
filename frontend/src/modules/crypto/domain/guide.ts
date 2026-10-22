@@ -1,6 +1,4 @@
-import type { LayerId } from './indicators';
-
-/** Sections of the guide «What is each thing?», in reading order. */
+/** Sections of the guide «Learn before playing», in reading order. */
 export const GUIDE_SECTIONS = [
   'candles',
   'intervals',
@@ -20,17 +18,23 @@ export const GUIDE_SECTIONS = [
 ] as const;
 export type GuideSection = (typeof GUIDE_SECTIONS)[number];
 
-/** Where the «?» of each layer opens the guide. */
-export const LAYER_SECTION: Record<LayerId, GuideSection> = {
-  ema20: 'ema',
-  ema50: 'ema',
-  ema200: 'ema',
-  bollinger: 'bollinger',
-  vwap: 'vwap',
-  profile: 'profile',
-  levels: 'levels',
-  fibonacci: 'fibonacci',
-};
+/**
+ * Tabs of the panel «Learn before playing», in reading order, each with the sections it shows
+ * one under the other.
+ */
+export const GUIDE_TABS = [
+  { id: 'candles', sections: ['candles', 'intervals'] },
+  { id: 'ema', sections: ['ema'] },
+  { id: 'bands', sections: ['bollinger', 'vwap'] },
+  { id: 'levels', sections: ['levels', 'fibonacci', 'profile'] },
+  { id: 'patterns', sections: ['patterns'] },
+  { id: 'directions', sections: ['directions'] },
+  { id: 'orders', sections: ['orders', 'exits'] },
+  { id: 'leverage', sections: ['leverage'] },
+  { id: 'glossary', sections: ['glossary'] },
+  { id: 'plans', sections: ['plans'] },
+] as const satisfies readonly { id: string; sections: readonly GuideSection[] }[];
+export type GuideTab = (typeof GUIDE_TABS)[number]['id'];
 
 /** Sections made of paragraphs (the patterns, the words and the plans have their own layout). */
 export type ParagraphSection = Exclude<GuideSection, 'patterns' | 'glossary' | 'plans'>;

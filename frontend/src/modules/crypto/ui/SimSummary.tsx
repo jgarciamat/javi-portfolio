@@ -1,83 +1,8 @@
-import { useI18n, type Locale } from '@core/i18n/I18nContext';
-import type { PdfTable } from '@modules/finances/application/tablePdf';
-import { ExportButtons } from '@modules/finances/ui/components/ExportButtons';
-import { toDisplay, type Display } from '../domain/currency';
+import { useI18n } from '@core/i18n/I18nContext';
 import { formatChange, formatDateTime, formatNumber, tone } from '../domain/format';
 import type { SimPortfolio } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
-
-type Translate = (key: string, vars?: Record<string, string | number>) => string;
-
-const cents = (value: number) => Math.round(value * 100) / 100;
-
-/**
- * Every operation of the simulator as a table (open ones with their result if sold now), in the
- * currency the console is shown in.
- */
-export function historyTable(
-  p: SimPortfolio,
-  t: Translate,
-  locale: Locale,
-  display: Display
-): PdfTable {
-  const when = (iso: string) => formatDateTime(iso, locale);
-  const type = (value: string) => t(`app.crypto.order.types.${value}`);
-  const money = (euros: number | null) =>
-    euros === null ? null : cents(toDisplay(euros, display));
-  const price = (euros: number | null) => (euros === null ? null : toDisplay(euros, display));
-  const symbol = display.currency === 'USD' ? '$' : '€';
-  const columns = [
-    'state',
-    'coin',
-    'quantity',
-    'buyPrice',
-    'buyDate',
-    'buyOrder',
-    'sellPrice',
-    'sellDate',
-    'sellOrder',
-    'invested',
-    'fees',
-    'result',
-    'resultPercent',
-  ];
-  return {
-    head: columns.map((c) => t(`app.crypto.csv.${c}`, { symbol })),
-    rows: [
-      ...p.open.map((o) => [
-        t('app.crypto.csv.open'),
-        o.symbol,
-        o.quantity,
-        price(o.entryPrice),
-        when(o.openedAt),
-        type(o.openType),
-        price(o.currentPrice),
-        '',
-        '',
-        money(o.invested),
-        money(o.entryFee),
-        money(o.pnl),
-        o.pnlPercent,
-      ]),
-      ...p.closed.map((c) => [
-        t('app.crypto.csv.closed'),
-        c.symbol,
-        c.quantity,
-        price(c.entryPrice),
-        when(c.openedAt),
-        type(c.openType),
-        price(c.exitPrice),
-        when(c.closedAt),
-        type(c.closeType),
-        money(c.invested),
-        money(c.fees),
-        money(c.pnl),
-        c.pnlPercent,
-      ]),
-    ],
-  };
-}
 
 /** How the play-money portfolio is doing: would it gain or lose, and the totals. */
 export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
@@ -136,19 +61,5 @@ export function SimSummary({ portfolio }: { portfolio: SimPortfolio }) {
         {t('app.crypto.summary.since', { date: formatDateTime(account.startedAt, locale) })}
       </p>
     </section>
-  );
-}
-
-/** The basic history as CSV (free on every plan), in the panel of closed operations. */
-export function HistoryExport({ portfolio }: { portfolio: SimPortfolio }) {
-  const { t, locale } = useI18n();
-  const money = useMoney();
-  return (
-    <ExportButtons
-      name="consola_crypto"
-      what={t('app.crypto.csv.what')}
-      count={portfolio.open.length + portfolio.closed.length}
-      table={() => historyTable(portfolio, t, locale, money.display)}
-    />
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Small drawings of the guide («What is each thing?»): candles, lines and levels drawn with the
+ * Drawings of the guide («Learn before playing»): candles, lines and levels drawn with the
  * theme's colours. They are decorative (the text next to them says the same), so screen readers
  * skip them.
  */
@@ -62,13 +62,39 @@ function Line({
   );
 }
 
-function Level({ v, className, label }: { v: number; className: string; label?: string }) {
+/**
+ * A dashed level with its name above the line, or (`side`) at its right end, for levels too close
+ * together to have their names above.
+ */
+function Level({
+  v,
+  className,
+  label,
+  side,
+}: {
+  v: number;
+  className: string;
+  label?: string;
+  side?: boolean;
+}) {
   const y = H - 8 - (v / 100) * (H - 16);
   return (
     <g className={className}>
-      <line x1="6" x2={W - 6} y1={y} y2={y} strokeWidth="1.5" strokeDasharray="4 3" />
+      <line
+        x1="6"
+        x2={side ? W - 36 : W - 6}
+        y1={y}
+        y2={y}
+        strokeWidth="1.5"
+        strokeDasharray="4 3"
+      />
       {label && (
-        <text x={W - 6} y={y - 3} textAnchor="end" className="cc-art-label">
+        <text
+          x={W - 4}
+          y={side ? y + 2.5 : y - 3}
+          textAnchor="end"
+          className={side ? 'cc-art-label cc-art-label--side' : 'cc-art-label'}
+        >
           {label}
         </text>
       )}
@@ -273,7 +299,7 @@ export function FibonacciArt({ labels }: { labels: string[] }) {
   return (
     <Frame>
       {heights.map((v, i) => (
-        <Level key={v} v={v} className="cc-art-fib" label={labels[i]} />
+        <Level key={v} v={v} className="cc-art-fib" label={labels[i]} side />
       ))}
       <Line
         points={[

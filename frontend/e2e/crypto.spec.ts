@@ -2,11 +2,13 @@ import { test, expect, openSection, signIn } from './fixtures';
 
 /**
  * «Consola crypto» with the server's invented prices (CRYPTO_MARKET=demo in the config): the
- * chart and its layers, a long opened and closed with play money, a pending short cancelled,
- * dollars, the guide, every coin in one list, the zoom bar, the words of the console in the guide
- * and the layout on phones; the monthly season, a practice portfolio, the voluntary ranking and
- * the Premium comforts.
+ * chart and its layer chips, a long opened and closed with play money, a pending short cancelled,
+ * dollars, the panel «Learn before playing» with its tabs, the coins in pages, the zoom bar, the
+ * words of the console in the guide and the layout on phones; the monthly season, a practice
+ * portfolio, the voluntary ranking and the Premium comforts.
  */
+const LEARN = 'Antes de empezar a jugar, aprende todo sobre el análisis de criptomonedas';
+
 test.beforeEach(async ({ page }) => {
   await signIn(page);
   await openSection(page, 'Consola crypto');
@@ -46,25 +48,44 @@ test('shows dollars, a layer and the guide', async ({ page }) => {
   await page.getByRole('radio', { name: '$ USD' }).check();
   await expect(page.getByText(/Conversión informativa al cambio del BCE de hoy/)).toBeVisible();
   await expect(page.locator('.cc-quote-price')).toContainText('US$');
-  const ema = page.getByRole('button', { name: 'EMA 20', exact: true });
+  const layers = page.getByRole('group', { name: 'Capas de la gráfica' });
+  const ema = layers.getByRole('button', { name: /^EMA 20( ·|$)/ });
   await ema.click();
   await expect(ema).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('list', { name: 'Valores de las capas encendidas' })).toContainText(
-    'EMA 20'
-  );
-  await page.getByRole('button', { name: '¿Qué es cada cosa?' }).click();
-  const guide = page.getByRole('dialog', { name: '¿Qué es cada cosa?' });
+  await expect(ema).toContainText(/EMA 20 · .*US\$/);
+  await expect(page.getByText('Medias móviles')).toHaveCount(0);
+
+  const open = page.getByRole('button', { name: 'Aprende antes de jugar' });
+  await open.click();
+  await expect(open).toHaveAttribute('aria-expanded', 'true');
+  const guide = page.getByRole('region', { name: LEARN });
+  await expect(guide.getByRole('heading', { name: LEARN })).toBeInViewport();
+  await guide.getByRole('tab', { name: 'Toros y osos, Long y Short' }).click();
   await expect(guide.getByRole('heading', { name: 'Toros y osos: long y short' })).toBeVisible();
+  await page.keyboard.press('ArrowRight');
+  await expect(guide.getByRole('tab', { name: /^Órdenes/ })).toHaveAttribute(
+    'aria-selected',
+    'true'
+  );
   await page.keyboard.press('Escape');
-  await expect(guide).toBeHidden();
+  await expect(open).toHaveAttribute('aria-expanded', 'false');
+  await expect(guide.getByRole('tablist')).toBeHidden();
 });
 
-test('lists every coin, zooms from the bar and opens the words of the console', async ({
-  page,
-}) => {
+test('pages the coins, zooms from the bar and opens the words of the console', async ({ page }) => {
+  // As many whole rows as fit beside the chart, in pages: no scroll inside, no row cut in half.
   const coins = page.getByRole('navigation', { name: 'Monedas' });
-  await expect(coins.getByRole('button')).toHaveCount(20);
-  await expect(page.getByRole('button', { name: 'Siguiente' })).toHaveCount(0);
+  const rows = coins.getByRole('listitem');
+  await expect(coins.getByText(/^1 \/ [2-9]$/)).toBeVisible();
+  const perPage = await rows.count();
+  expect(perPage).toBeGreaterThan(3);
+  expect(perPage).toBeLessThan(20);
+  const list = await coins.getByRole('list').boundingBox();
+  const last = await rows.last().boundingBox();
+  expect(last!.y + last!.height).toBeLessThanOrEqual(list!.y + list!.height + 1);
+  await coins.getByRole('button', { name: /^Sig\./ }).click();
+  await expect(coins.getByText(/^2 \/ [2-9]$/)).toBeVisible();
+  await coins.getByRole('button', { name: /^Ant\./ }).click();
   await coins.getByRole('button', { name: /Ethereum/ }).click();
   await expect(page.getByRole('img', { name: /Gráfica de Ethereum/ })).toBeVisible();
   await page.getByRole('button', { name: 'Acercar' }).click();
@@ -74,14 +95,13 @@ test('lists every coin, zooms from the bar and opens the words of the console', 
   await expect(page.getByText(/Velas a la vista: \d+/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Aprende todas las palabras importantes' }).last().click();
-  const guide = page.getByRole('dialog', { name: '¿Qué es cada cosa?' });
+  const guide = page.getByRole('region', { name: LEARN });
+  await expect(guide.getByRole('heading', { name: LEARN })).toBeInViewport();
   const words = guide.getByRole('region', { name: 'Palabras de la consola' });
-  await expect(words).toBeInViewport();
   await words.getByRole('searchbox', { name: 'Buscar una palabra' }).fill('comisión');
   await expect(words.getByRole('term').first()).toHaveText('Comisión');
   await page.keyboard.press('Escape');
-  await expect(guide).toBeHidden();
-  await expect(page.getByRole('heading', { name: 'Palabras de la consola' })).toHaveCount(0);
+  await expect(words).toBeHidden();
 });
 
 test('fits a phone upright and on its side without sideways scrolling', async ({ page }) => {
@@ -99,10 +119,14 @@ test('fits a phone upright and on its side without sideways scrolling', async ({
 });
 
 test('season, practice portfolio, ranking and Premium comforts', async ({ page, pageErrors }) => {
-  // The official season of this month, with its countdown and the fixed commission.
+  // The official season of this month, with its countdown; no commission notice and no free CSV.
   await expect(page.getByRole('heading', { name: /^Temporada de / })).toBeVisible();
   await expect(page.getByRole('timer').first()).toContainText(/Nueva temporada|último día/);
-  await expect(page.getByText(/Comisión fija: 0,1\s%/)).toBeVisible();
+  await expect(page.getByText(/Comisión fija/)).toHaveCount(0);
+  await expect(page.getByText('¿Qué es la comisión?')).toHaveCount(0);
+  await expect(page.locator('section.cc-panel').getByRole('button', { name: /CSV/ })).toHaveCount(
+    0
+  );
   await expect(page.getByText('Tu historial y ajustes')).toHaveCount(0);
 
   // A practice portfolio: separate, restarted with its own button and deleted.

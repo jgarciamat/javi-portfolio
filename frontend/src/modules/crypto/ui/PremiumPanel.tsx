@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useApi } from '@core/context/ApiContext';
 import { useI18n } from '@core/i18n/I18nContext';
@@ -46,6 +46,8 @@ export function PlansCard({
 }) {
   const { t } = useI18n();
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
+  // The card is also in a tab of the guide: each copy has its own title.
+  const titleId = useId();
   const column = (plan: 'free' | 'premium', icon: 'check' | 'star') => (
     <div className={`cc-plan cc-plan--${plan}`}>
       <h4>{t(`app.crypto.plans.${plan}Title`)}</h4>
@@ -59,8 +61,8 @@ export function PlansCard({
     </div>
   );
   return (
-    <section className="card cc-plans" aria-labelledby="cc-plans-title">
-      <Heading id="cc-plans-title" className="section-title">
+    <section className="card cc-plans" aria-labelledby={titleId}>
+      <Heading id={titleId} className="section-title">
         {t('app.crypto.plans.title')}
       </Heading>
       <div className="cc-plans-columns">

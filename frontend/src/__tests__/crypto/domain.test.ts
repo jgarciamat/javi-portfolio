@@ -20,7 +20,6 @@ import {
   formatPlain,
   formatPrice,
   formatQuantity,
-  formatRate,
   formatTick,
   formatVolume,
   priceDecimals,
@@ -59,8 +58,6 @@ describe('crypto formats', () => {
     expect(nbsp(formatChange(1.256, 'es'))).toBe('+1,26 %');
     expect(nbsp(formatChange(0, 'es'))).toBe('0,00 %');
     expect(formatQuantity(0.00772747, 'es')).toBe('0,00772747');
-    expect(nbsp(formatRate(10, 'es'))).toBe('0,1 %');
-    expect(nbsp(formatRate(0, 'en'))).toBe('0%');
     expect(formatVolume(1234, 'en')).toMatch(/^1\.2k$/i);
     expect(formatNumber(66.66, 'es')).toBe('66,7');
     expect(formatNumber(1234.5, 'en')).toBe('1,234.5');

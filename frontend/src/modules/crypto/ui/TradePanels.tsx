@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatDateTime, formatQuantity, tone } from '../domain/format';
@@ -333,7 +333,7 @@ export function PendingPanel({
   );
 }
 
-export function ClosedPanel({ trades, extra }: { trades: ClosedTrade[]; extra?: ReactNode }) {
+export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
   const { t, locale } = useI18n();
   const money = useMoney();
   const [shown, setShown] = useState(CLOSED_PAGE);
@@ -345,7 +345,6 @@ export function ClosedPanel({ trades, extra }: { trades: ClosedTrade[]; extra?: 
       <p className="cc-helps">
         <Help term="realized" label={t('app.crypto.help.realized')} />
       </p>
-      {extra}
       {trades.length === 0 ? (
         <p className="cc-hint">{t('app.crypto.trades.closedEmpty')}</p>
       ) : (

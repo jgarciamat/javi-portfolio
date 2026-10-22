@@ -209,13 +209,6 @@
   outline-offset: 2px;
 }
 
-.cc-legend i {
-  width: 3px;
-  height: 12px;
-  border-radius: 2px;
-  flex: 0 0 auto;
-}
-
 .cc-segmented {
   display: inline-flex;
   flex-wrap: wrap;
@@ -325,9 +318,9 @@
 
 /* ─── Market ─── */
 
-/* Coins at the side of the price and the chart; layers and the table below, full width. The
-   coin column takes no height of its own (contain: size) so its list scrolls inside the height of
-   the price and the chart, however many coins there are. */
+/* Coins at the side of the price and the chart; the panel of the guide below, full width. The
+   coin column takes no height of its own (contain: size): it is as tall as the price and the
+   chart, and shows as many whole rows as fit in that height, in pages. */
 .cc-market-grid {
   display: grid;
   grid-template-columns: minmax(13.5rem, 15rem) minmax(0, 1fr);
@@ -392,12 +385,10 @@
   padding: 0.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0.375rem;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
+  overflow: hidden;
 }
 
 .cc-coin {
@@ -406,8 +397,8 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.45rem;
-  min-height: 40px;
-  padding: 0.2rem 0.4rem;
+  min-height: 44px;
+  padding: 0.3rem 0.45rem;
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
@@ -467,6 +458,40 @@
 
 .cc-coin-price b {
   font-weight: 600;
+}
+
+/* «Ant.» 1 / 3 «Sig.»: small, at the foot of the column. */
+.cc-coins-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  border-top: 1px solid var(--cc-line);
+  font-size: 0.75rem;
+  color: var(--slate-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-coins-pager button {
+  min-height: 26px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--cc-line);
+  border-radius: 6px;
+  background: var(--cc-surface);
+  color: var(--slate-100);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cc-coins-pager button:hover:not(:disabled) {
+  border-color: var(--accent-400);
+}
+
+.cc-coins-pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Price on the left, candle sizes and currency on the right, on one row while it fits. */
@@ -611,30 +636,11 @@
 
 /* ─── Layers ─── */
 
-/* Small chips in one bar that wraps: a colour mark, the name in small capitals and a «?». On, the
-   chip takes the layer's colour as border and tint; off, it is quieter but still readable. */
+/* Small chips in one bar just above the chart that wraps: a colour mark and the short name in
+   small capitals. On, the chip takes the layer's colour as border and tint (and shows its value
+   when it has a single one); off, it is quieter but still readable. «Learn before playing» is the
+   accent button at the end. */
 .cc-layers {
-  display: grid;
-  gap: 0.3rem;
-}
-
-.cc-layers-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.75rem;
-}
-
-.cc .cc-layers-bar h3,
-.cc-layer-group-name {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--slate-300);
-}
-
-.cc-layer-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -643,42 +649,27 @@
 
 .cc-layer {
   display: inline-flex;
-  align-items: stretch;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 24px;
+  padding: 0 0.5rem 0 0.4rem;
   border: 1px solid var(--cc-line);
   border-radius: 6px;
   background: var(--cc-surface);
-  overflow: hidden;
-}
-
-.cc-layer:has([aria-pressed='true']) {
-  border-color: var(--cc-layer);
-  background: color-mix(in srgb, var(--cc-layer) 18%, var(--cc-surface));
-  box-shadow: inset 0 0 0 1px var(--cc-layer);
-}
-
-.cc-layer-chip,
-.cc-layer-help {
-  min-height: 26px;
-  border: 0;
-  background: transparent;
+  color: var(--slate-300);
   font: inherit;
   font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.cc-layer-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0 0.45rem 0 0.35rem;
-  color: var(--slate-300);
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
-.cc-layer-chip i {
+.cc-layer i {
   width: 3px;
   height: 12px;
   border-radius: 2px;
@@ -686,31 +677,37 @@
   opacity: 0.7;
 }
 
-.cc-layer-chip[aria-pressed='true'] {
+.cc-layer small {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-layer:hover {
+  border-color: var(--cc-layer);
+}
+
+.cc-layer[aria-pressed='true'] {
+  border-color: var(--cc-layer);
+  background: color-mix(in srgb, var(--cc-layer) 18%, var(--cc-surface));
+  box-shadow: inset 0 0 0 1px var(--cc-layer);
   color: var(--slate-50);
   font-weight: 800;
 }
 
-.cc-layer-chip[aria-pressed='true'] i {
+.cc-layer[aria-pressed='true'] i {
   opacity: 1;
 }
 
-.cc-layer-help {
-  min-width: 24px;
-  padding: 0 0.3rem;
-  border-left: 1px solid var(--cc-line);
-  color: var(--accent-300);
-  font-weight: 800;
-}
-
-.cc-layer-chip:hover,
-.cc-layer-help:hover {
-  background: color-mix(in srgb, var(--accent-600) 16%, transparent);
-}
-
-.cc-guide-open {
-  min-height: 26px;
-  padding: 0 0.7rem;
+.cc-learn-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  min-height: 24px;
+  padding: 0 0.65rem;
   border-radius: 6px;
   border: 1px solid var(--accent-400);
   background: var(--accent-600);
@@ -718,17 +715,21 @@
   font: inherit;
   font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.cc-guide-open:hover {
+.cc-learn-open:hover {
   background: var(--accent-700);
 }
 
-.cc-layers-note {
-  margin: 0;
-  color: var(--slate-300);
-  font-size: 0.75rem;
+.cc-learn-open[aria-expanded='true'] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-400) 45%, transparent);
+}
+
+/* The panel of the guide cannot be reached from a chart in full screen. */
+.cc-chart--expanded .cc-learn-open {
+  display: none;
 }
 
 /* «Learn all the key words»: opens the guide on its words. */
@@ -1124,14 +1125,22 @@
 
 /* ─── Table instead of the chart ─── */
 
+/* A small link at the foot of the chart, closed until it is asked for. */
+.cc-table-details {
+  margin-top: 0.35rem;
+}
+
 .cc-table-details summary {
   cursor: pointer;
-  min-height: 32px;
-  font-size: 0.8125rem;
+  width: fit-content;
+  min-height: 24px;
   display: flex;
   align-items: center;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--accent-300);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .cc-table-scroll {
@@ -1161,14 +1170,11 @@
 /* ─── Phones and touch screens: controls at least 32 px tall ─── */
 
 @media (max-width: 719px), (pointer: coarse) {
-  .cc-layer-chip,
-  .cc-layer-help,
-  .cc-guide-open {
+  .cc-layer,
+  .cc-learn-open,
+  .cc-coins-pager button,
+  .cc-table-details summary {
     min-height: 32px;
-  }
-
-  .cc-layer-help {
-    min-width: 32px;
   }
 }
 
@@ -1298,18 +1304,10 @@
     display: none;
   }
 
-  .cc-layers-bar {
+  .cc-layers {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 0.3rem;
-  }
-
-  .cc-layer-group {
-    flex-wrap: nowrap;
-  }
-
-  .cc-layer-group-name {
-    display: none;
   }
 }
 
@@ -1329,13 +1327,14 @@ html.wiz-contrast .cc-check,
 html.wiz-contrast .cc-unit-input,
 html.wiz-contrast .cc-coins,
 html.wiz-contrast .cc-layer,
+html.wiz-contrast .cc-coins-pager button,
 html.wiz-contrast .cc-glossary-open,
 html.wiz-contrast .cc-coin[aria-pressed='true'] {
   border-width: 2px;
   border-color: var(--slate-100);
 }
 
-html.wiz-contrast .cc-layer:has([aria-pressed='true']) {
+html.wiz-contrast .cc-layer[aria-pressed='true'] {
   border-color: var(--slate-50);
   box-shadow: inset 0 0 0 2px var(--cc-layer);
 }
@@ -1348,10 +1347,8 @@ html.wiz-contrast .cc-figures dt,
 html.wiz-contrast .cc-facts dt,
 html.wiz-contrast .cc-coin small,
 html.wiz-contrast .cc-coins-title,
-html.wiz-contrast .cc-layers-bar h3,
-html.wiz-contrast .cc-layer-group-name,
-html.wiz-contrast .cc-layer-chip,
-html.wiz-contrast .cc-layers-note,
+html.wiz-contrast .cc-coins-pager,
+html.wiz-contrast .cc-layer,
 html.wiz-contrast .cc-quote-changes {
   color: var(--slate-100);
 }
@@ -1359,6 +1356,7 @@ html.wiz-contrast .cc-quote-changes {
 @media (prefers-reduced-motion: reduce) {
   .cc-chip,
   .cc-tool,
+  .cc-layer,
   .cc-segmented label {
     transition: none;
   }

@@ -87,7 +87,7 @@ export const EXAMPLE_ALERTS: PriceAlert[] = [
 
 /** The ranking lines of the free plan and Premium (the «Free and Premium» card). */
 export const PLAN_LINES = {
-  free: ['season', 'ranking', 'practice', 'pending', 'csv', 'badges'],
+  free: ['season', 'ranking', 'practice', 'pending', 'badges'],
   premium: ['stats', 'chart', 'hold', 'alerts', 'practice', 'pending', 'report', 'badge'],
 } as const;
 

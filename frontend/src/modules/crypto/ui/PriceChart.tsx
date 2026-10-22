@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
   type RefObject,
 } from 'react';
 import type { LogicalRange } from 'lightweight-charts';
@@ -13,9 +14,10 @@ import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { storage } from '@shared/utils/storage';
 import { formatCountdown, summarize, untilClose } from '../domain/chart';
 import { formatChange, formatDateTime, formatVolume, tone } from '../domain/format';
-import { LAYER_COLORS, type LayerId } from '../domain/indicators';
-import { layerLevels, layerLines, legend, type LegendItem } from '../domain/layers';
+import type { LayerId } from '../domain/indicators';
+import { layerLevels, layerLines, legend } from '../domain/layers';
 import type { Candle, CryptoInterval } from '../domain/types';
+import { LayerBar } from './LayerBar';
 import { useMoney } from './money';
 import { useCandleChart, type CandleChart, type ChartLine } from './useCandleChart';
 import './css/PriceChart.css';
@@ -34,6 +36,9 @@ interface PriceChartProps {
   lines: ChartLine[];
   /** Visual layers that are on (averages, bands, levels…). */
   layers: LayerId[];
+  onToggleLayer: (layer: LayerId) => void;
+  /** What goes at the end of the layer chips (the button of the guide). */
+  layerExtra?: ReactNode;
   /** Change (%) of the candles on screen, for the header; null when there are none. */
   onVisibleChange: (percent: number | null) => void;
 }
@@ -231,31 +236,6 @@ function RotateHint({ onFull }: { onFull: () => void }) {
   );
 }
 
-function Legend({ items }: { items: LegendItem[] }) {
-  const { t } = useI18n();
-  const money = useMoney();
-  if (!items.length) return null;
-  return (
-    <ul className="cc-legend" aria-label={t('app.crypto.layers.legendLabel')}>
-      {items.map((item) => (
-        <li key={item.layer}>
-          <i style={{ background: LAYER_COLORS[item.layer] }} aria-hidden="true" />
-          <b>{t(`app.crypto.layers.names.${item.layer}`)}</b>
-          {item.values.length === 0 ? (
-            <span>{t('app.crypto.layers.noData')}</span>
-          ) : (
-            item.values.map((v) => (
-              <span key={v.label}>
-                {v.label} {v.price === null ? '—' : money.shownPrice(v.price)}
-              </span>
-            ))
-          )}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 /** Candles on screen out of `total`: all of them until the chart says which ones it shows. */
 const inView = (total: number, shown: { from: number; to: number } | null): number =>
   shown ? Math.max(0, Math.min(total - 1, shown.to) - Math.max(0, shown.from) + 1) : total;
@@ -314,7 +294,7 @@ function useFullScreen(root: RefObject<HTMLDivElement | null>) {
 /**
  * Candle chart of a coin, as in the original console: candles and volume, drag to move, wheel or
  * pinch to zoom, the prices of the candle under the pointer and the lines of the person's
- * purchases and pending orders, plus the visual layers that are on with their legend. Buttons
+ * purchases and pending orders, plus the chips of the visual layers with their values. Buttons
  * and keys do the same as the mouse, and a text summary is read out instead of the drawing.
  */
 export function PriceChart({
@@ -324,6 +304,8 @@ export function PriceChart({
   interval,
   lines,
   layers,
+  onToggleLayer,
+  layerExtra,
   onVisibleChange,
 }: PriceChartProps) {
   const { t, locale } = useI18n();
@@ -390,7 +372,13 @@ export function PriceChart({
           />
         )}
       </div>
-      <Legend items={legend(lineData, levelData, layers, t)} />
+      <LayerBar
+        active={layers}
+        legend={legend(lineData, levelData, layers, t)}
+        onToggle={onToggleLayer}
+      >
+        {layerExtra}
+      </LayerBar>
       <div
         ref={container}
         className="cc-chart-canvas"

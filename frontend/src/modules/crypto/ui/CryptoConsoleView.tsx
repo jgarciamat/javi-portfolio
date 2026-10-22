@@ -1,6 +1,5 @@
-import { Suspense, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { lazyNamed } from '@shared/utils/lazyNamed';
 import { storage } from '@shared/utils/storage';
 import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
@@ -8,7 +7,6 @@ import { useAlerts, useRanking } from '../application/useRanking';
 import { useSimulator, type Simulator } from '../application/useSimulator';
 import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
-import type { GuideSection } from '../domain/guide';
 import type { CryptoCoin, SimFill, SimPortfolio } from '../domain/types';
 import { Loading, MarketPanel, type View } from './MarketPanel';
 import {
@@ -23,16 +21,14 @@ import { OrderBox } from './OrderBox';
 import { AlertsCard, PlansCard, StatsCard } from './PremiumPanel';
 import { RankingCard } from './RankingCard';
 import { BadgesCard, PracticeOffer, SeasonPanel } from './SeasonPanel';
-import { HistoryExport, SimSummary } from './SimSummary';
+import { useGuide } from './Learn';
+import { SimSummary } from './SimSummary';
 import { ClosedPanel, OpenPanel, PendingPanel, orderKind } from './TradePanels';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 import type { ChartLine } from './useCandleChart';
 import '../../finances/ui/css/Sections.css';
 import './css/Crypto.css';
-
-// The guide and its drawings are only downloaded when the person opens it.
-const GuideModal = lazyNamed(() => import('./GuideModal'), 'GuideModal');
 
 const VIEW_KEY = 'mm_crypto_view';
 const DEFAULT_SYMBOL = 'BTC';
@@ -177,7 +173,7 @@ function SimulatorBody({
         days={portfolio.limits.pendingDays}
         onCancel={sim.cancel}
       />
-      <ClosedPanel trades={portfolio.closed} extra={<HistoryExport portfolio={portfolio} />} />
+      <ClosedPanel trades={portfolio.closed} />
       <StatsCard portfolio={portfolio} />
     </>
   );
@@ -224,7 +220,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
   const { t } = useI18n();
   const money = useMoney();
   const [view, setView] = useState(savedView);
-  const [guide, setGuide] = useState<GuideSection | null>(null);
+  const guide = useGuide();
   const [layers, toggleLayer] = useLayers();
   const market = useCryptoMarket(view.symbol, view.interval, t('app.crypto.market.error'));
   const sim = useSimulator(t('app.crypto.sim.error'));
@@ -258,7 +254,8 @@ function Console({ currency }: { currency: DisplayChoice }) {
         onChange={change}
         onCurrency={currency.choose}
         onToggleLayer={toggleLayer}
-        onGuide={setGuide}
+        guide={guide}
+        premium={premium}
       />
       {sim.portfolio && (
         <>
@@ -267,17 +264,12 @@ function Console({ currency }: { currency: DisplayChoice }) {
             sim={sim}
             symbol={view.symbol}
             coin={coin}
-            onGlossary={() => setGuide('glossary')}
+            onGlossary={() => guide.show('glossary')}
           />
           <SeasonExtras portfolio={sim.portfolio} coins={market.coins?.coins ?? []} />
         </>
       )}
-      <GlossaryButton onOpen={() => setGuide('glossary')} />
-      {guide && (
-        <Suspense fallback={null}>
-          <GuideModal section={guide} premium={premium} onClose={() => setGuide(null)} />
-        </Suspense>
-      )}
+      <GlossaryButton onOpen={() => guide.show('glossary')} />
     </div>
   );
 }
