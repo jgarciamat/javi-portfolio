@@ -85,8 +85,12 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 
 - Control «€ EUR | $ USD» junto a las temporalidades. El simulador **sigue en euros**; los dólares
   son una **conversión de visualización** con el cambio del BCE del día (el `/api/rates` que ya usa
-  la app), con el aviso «Conversión informativa al cambio del BCE de hoy; el simulador usa euros».
-  Sin cambio disponible se muestra en euros con un aviso.
+  la app). Binance cotiza pares reales con euro (`BTCEUR`), así que en euros no hay conversión; en
+  dólares son esos precios en euros convertidos. Un **único aviso discreto** (`DataNotice`) reúne
+  retraso, fuente, frescura y, en USD, «Los importes en dólares son una conversión informativa al
+  cambio de referencia del BCE de hoy (1 € = X US$); el simulador guarda y calcula en euros».
+  `/api/rates` no devuelve fecha, por eso se dice «de hoy». Sin cambio disponible se muestra en
+  euros y el mismo aviso lo dice.
 - Todo pasa por `frontend/src/modules/crypto/domain/currency.ts` y `format.ts`: precios, gráfica y
   capas (se convierten las velas), cabecera, bid/ask, volumen, monedas, caja de operar, cartera,
   paneles e informe Premium de temporada (cabeceras con € o $). Lo tecleado en dólares se pasa a euros antes de
@@ -137,7 +141,10 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
 - **Carteras**: cada persona tiene la **cartera oficial de la temporada** (una por mes natural,
   `YYYY-MM` en hora de Madrid) y, si quiere, **carteras de prácticas** separadas. Todas empiezan
   con **10.000 € virtuales** y una **comisión fija del 0,10 %** al comprar y al vender. Ya no se
-  eligen ni el saldo ni la comisión.
+  eligen ni el saldo ni la comisión. Con **una sola cartera** se ve una etiqueta informativa
+  («Temporada de X · cartera oficial», sin aspecto de botón) y el botón «Cartera de prácticas»
+  con su frase (o el motivo si hoy no se puede crear); con **varias**, pestañas
+  (`role=tablist/tab`, `aria-selected`).
 - **Long y short a 1x**. Un short guarda su importe como **garantía**: gana si el precio baja y
   pierde si sube; si llega al **doble** de la entrada se cierra solo («garantía agotada»,
   `closeType: liquidation`). Nunca se pierde más de lo puesto.

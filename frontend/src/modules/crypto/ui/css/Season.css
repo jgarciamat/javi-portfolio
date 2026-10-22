@@ -13,8 +13,35 @@
   margin-right: 0.3rem;
 }
 
-.cc-portfolio-new {
-  border-style: dashed;
+.cc-portfolio-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cc-portfolio[aria-selected='true'] {
+  border-color: var(--accent-400);
+  background: var(--accent-600);
+  color: #fff;
+  cursor: default;
+}
+
+/* Only one portfolio: an informative label, not a button. */
+.cc-portfolio-single {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--cc-muted, inherit);
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.cc-portfolio-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8125rem;
+  opacity: 0.8;
 }
 
 .cc-season .section-title .icon,

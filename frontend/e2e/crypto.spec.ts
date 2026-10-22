@@ -117,7 +117,9 @@ test('keeps a pending short until it is cancelled', async ({ page }) => {
 
 test('shows dollars, a layer and the guide', async ({ page }) => {
   await page.getByRole('radio', { name: '$ USD' }).check();
-  await expect(page.getByText(/Conversión informativa al cambio del BCE de hoy/)).toBeVisible();
+  await expect(
+    page.getByText(/conversión informativa al cambio de referencia del BCE de hoy \(1 € = /)
+  ).toBeVisible();
   await expect(page.locator('.cc-quote-price')).toContainText('US$');
   const layers = page.getByRole('group', { name: 'Capas de la gráfica' });
   const ema = layers.getByRole('button', { name: /^EMA 20( ·|$)/ });
@@ -209,7 +211,7 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await expect(page.getByText('Tu historial y ajustes')).toHaveCount(0);
 
   // A practice portfolio: separate, restarted with its own button and deleted.
-  await page.getByRole('button', { name: /Nueva cartera de prácticas/ }).click();
+  await page.getByRole('button', { name: /^Cartera de prácticas$/ }).click();
   await expect(page.getByRole('heading', { name: 'Cartera de prácticas' })).toBeVisible();
   await page.getByLabel('Capital por operación').fill('100');
   await page.getByRole('button', { name: 'Abrir long' }).click();

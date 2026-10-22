@@ -98,12 +98,13 @@ describe('Crypto console: the season', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('Nueva temporada en 16 días');
     expect(screen.queryByText(/Quedan pocos días/)).toBeNull();
     expect(screen.getByText(/todos empiezan el día 1 con 10.000 € virtuales/)).toBeInTheDocument();
-    const nav = screen.getByRole('navigation', { name: 'Tus carteras' });
-    expect(within(nav).getByRole('button', { name: /Temporada de marzo/ })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
-    expect(within(nav).getByRole('button', { name: /Nueva cartera de prácticas/ })).toBeEnabled();
+    const bar = screen.getByRole('group', { name: 'Tus carteras' });
+    // Only the official portfolio: a plain label (not a button) and one clear action.
+    expect(within(bar).queryByRole('button', { name: /Temporada de marzo/ })).toBeNull();
+    expect(within(bar).queryByRole('tab')).toBeNull();
+    expect(bar).toHaveTextContent('Temporada de marzo · cartera oficial');
+    expect(within(bar).getByRole('button', { name: /^Cartera de prácticas$/ })).toBeEnabled();
+    expect(bar).toHaveTextContent('Practica con otros 10.000 € virtuales sin afectar al ranking.');
     const badges = screen.getByRole('heading', { name: 'Tus insignias' }).closest('section')!;
     expect(within(badges).getByText('Conseguida')).toBeInTheDocument();
     expect(within(badges).getByText('Cierra 10 operaciones.')).toBeInTheDocument();
@@ -209,14 +210,14 @@ describe('Crypto console: practice portfolios', () => {
   it('creates one, trades in it, starts it again and deletes it', async () => {
     const { api } = setup();
     await ready();
-    fireEvent.click(screen.getByRole('button', { name: /Nueva cartera de prácticas/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Cartera de prácticas$/ }));
     await screen.findByRole('heading', { name: 'Cartera de prácticas' });
     expect(api.cryptoApi.createPractice).toHaveBeenCalled();
     expect(localStorage.getItem('mm_crypto_portfolio')).toBe(fx.PRACTICE_REF.id);
     expect(screen.getByText(/no cuenta para el ranking/)).toBeInTheDocument();
     expect(screen.getByText(/5 veces más/)).toBeInTheDocument();
     // No room for another one on the free plan.
-    expect(screen.queryByRole('button', { name: /Nueva cartera de prácticas/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Cartera de prácticas$/ })).toBeNull();
 
     api.cryptoApi.portfolio.mockResolvedValue(practiceOn());
     api.cryptoApi.placeOrder.mockResolvedValue(practiceOn());
@@ -251,7 +252,11 @@ describe('Crypto console: practice portfolios', () => {
       );
     });
     expect(await screen.findByText(/1 vez más/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Temporada de marzo/ }));
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+    expect(tabs[1]).toHaveTextContent('Prácticas 1');
+    fireEvent.click(screen.getByRole('tab', { name: /Temporada de marzo/ }));
     await waitFor(() => expect(api.cryptoApi.portfolio).toHaveBeenLastCalledWith(fx.SEASON_REF.id));
     unmount();
     setup(
@@ -264,7 +269,16 @@ describe('Crypto console: practice portfolios', () => {
     expect(
       await screen.findByRole('button', { name: 'Empezar de nuevo con 10.000 €' })
     ).toBeDisabled();
-    expect(screen.queryByRole('button', { name: /Nueva cartera de prácticas/ })).toBeNull();
+    const make = screen.getByRole('button', { name: /^Cartera de prácticas$/ });
+    expect(make).toBeDisabled();
+    expect(make).toHaveAccessibleDescription(/Hoy ya no puedes crear ni reiniciar/);
+  });
+
+  it('labels a lone practice portfolio, without the official tag', async () => {
+    setup(withPortfolio({ portfolio: fx.PRACTICE_REF, portfolios: [fx.PRACTICE_REF] }));
+    const bar = await screen.findByRole('group', { name: 'Tus carteras' });
+    expect(bar).toHaveTextContent('Prácticas 1');
+    expect(bar).not.toHaveTextContent('cartera oficial');
   });
 
   it('offers practice when the season ran out of money', async () => {

@@ -223,21 +223,6 @@ function SeasonExtras({
 const statusOf = (market: ReturnType<typeof useCryptoMarket>) =>
   market.candles?.market ?? market.coins?.market ?? null;
 
-/** Dollars are only a conversion of what the simulator does in euros. */
-function CurrencyNote({ unavailable }: { unavailable: boolean }) {
-  const { t } = useI18n();
-  const money = useMoney();
-  return (
-    <p className="cc-data">
-      {unavailable
-        ? t('app.crypto.currency.unavailable')
-        : money.display.currency === 'USD'
-          ? t('app.crypto.currency.note')
-          : null}
-    </p>
-  );
-}
-
 function Console({ currency }: { currency: DisplayChoice }) {
   const { t } = useI18n();
   const money = useMoney();
@@ -264,8 +249,7 @@ function Console({ currency }: { currency: DisplayChoice }) {
   return (
     <div className="section-view cc">
       <RiskBanner />
-      <DataNotice market={statusOf(market)} />
-      <CurrencyNote unavailable={currency.unavailable} />
+      <DataNotice market={statusOf(market)} unavailable={currency.unavailable} />
       <RankingIntro ranking={ranking.ranking} />
       {sim.portfolio && <SeasonPanel portfolio={sim.portfolio} sim={sim} />}
       <SimulatorHead sim={sim} />

@@ -3,6 +3,7 @@ import { useI18n, type Locale } from '@core/i18n/I18nContext';
 import { formatDateTime } from '../domain/format';
 import type { MarketStatus } from '../domain/types';
 import { BookIcon } from './Learn';
+import { useMoney } from './money';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 
@@ -29,17 +30,35 @@ function freshness(market: MarketStatus | null, t: Translate, locale: Locale) {
   return { text: t('app.crypto.data.fresh', { when }), warn: false };
 }
 
-/** Where the prices come from and how fresh they are (they are orientative and delayed). */
-export function DataNotice({ market }: { market: MarketStatus | null }) {
+/**
+ * One discreet note: where the prices come from, how fresh they are and, in dollars, that they are
+ * a conversion. Binance quotes real euro pairs, so euros are never converted; dollars are the
+ * euro price at the European Central Bank's rate of the day.
+ */
+export function DataNotice({
+  market,
+  unavailable,
+}: {
+  market: MarketStatus | null;
+  unavailable: boolean;
+}) {
   const { t, locale } = useI18n();
+  const { display } = useMoney();
   const { text, warn } = freshness(market, t, locale);
+  const usd = display.currency === 'USD';
+  const source =
+    market?.source === 'demo'
+      ? t('app.crypto.data.demo')
+      : t(usd ? 'app.crypto.data.sourceUsd' : 'app.crypto.data.source');
+  const rate = display.rate.toLocaleString(locale, {
+    maximumFractionDigits: 4,
+  });
   return (
-    <p className={`cc-data${warn ? ' cc-data--warn' : ''}`}>
-      <span>{t('app.crypto.data.delayed')}</span>{' '}
-      <span>
-        {market?.source === 'demo' ? t('app.crypto.data.demo') : t('app.crypto.data.source')}
-      </span>{' '}
+    <p className={`cc-data${warn || unavailable ? ' cc-data--warn' : ''}`}>
+      <span>{t('app.crypto.data.delayed')}</span> <span>{source}</span>{' '}
       <span role="status">{text}</span>
+      {usd && <> {t('app.crypto.currency.note', { rate })}</>}
+      {unavailable && <> {t('app.crypto.currency.unavailable')}</>}
     </p>
   );
 }

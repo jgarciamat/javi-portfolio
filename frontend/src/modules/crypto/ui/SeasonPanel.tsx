@@ -57,45 +57,81 @@ function Confirm({
   );
 }
 
+/** «+ Practice portfolio» and why, or why it is off (no room, no actions left today). */
+function PracticeAction({ portfolio, sim }: { portfolio: SimPortfolio; sim: Simulator }) {
+  const { t } = useI18n();
+  const practices = portfolio.portfolios.filter((p) => p.kind === 'practice').length;
+  const hasRoom = practices < portfolio.plan.practiceMax;
+  const noActions = portfolio.plan.practiceActionsLeft <= 0;
+  if (!hasRoom) return null;
+  return (
+    <>
+      <button
+        type="button"
+        className="cc-tool cc-tool--strong cc-portfolio-new"
+        disabled={sim.action.pending || noActions}
+        aria-describedby="cc-portfolio-hint"
+        onClick={() => void sim.createPractice()}
+      >
+        <Icon name="plus" /> {t('app.crypto.portfolios.new')}
+      </button>
+      <p id="cc-portfolio-hint" className="cc-portfolio-hint">
+        {t(noActions ? 'app.crypto.portfolios.noActions' : 'app.crypto.portfolios.newHint')}
+      </p>
+    </>
+  );
+}
+
 /** Which portfolio is on screen: the official season or a practice one, and a new practice. */
 export function PortfolioBar({ portfolio, sim }: { portfolio: SimPortfolio; sim: Simulator }) {
   const { t, locale } = useI18n();
-  const practices = portfolio.portfolios.filter((p) => p.kind === 'practice');
-  const canCreate =
-    practices.length < portfolio.plan.practiceMax && portfolio.plan.practiceActionsLeft > 0;
   let practiceNumber = 0;
+  const labelOf = (p: SimPortfolio['portfolios'][number]) =>
+    p.kind === 'season'
+      ? t('app.crypto.portfolios.season', { month: monthName(p.season!, locale) })
+      : t('app.crypto.portfolios.practice', { n: ++practiceNumber });
+  const iconOf = (p: SimPortfolio['portfolios'][number]) => (
+    <Icon name={p.kind === 'season' ? 'flag' : 'wrench'} />
+  );
+  const create = <PracticeAction portfolio={portfolio} sim={sim} />;
+  if (portfolio.portfolios.length === 1) {
+    const only = portfolio.portfolios[0];
+    return (
+      <div className="cc-portfolios" aria-label={t('app.crypto.portfolios.label')} role="group">
+        <span className="cc-portfolio-single">
+          {iconOf(only)} {labelOf(only)}
+          {only.kind === 'season' ? ` · ${t('app.crypto.portfolios.official')}` : ''}
+        </span>
+        {create}
+      </div>
+    );
+  }
   return (
-    <nav className="cc-portfolios" aria-label={t('app.crypto.portfolios.label')}>
-      {portfolio.portfolios.map((p) => {
-        const label =
-          p.kind === 'season'
-            ? t('app.crypto.portfolios.season', { month: monthName(p.season!, locale) })
-            : t('app.crypto.portfolios.practice', { n: ++practiceNumber });
-        const on = p.id === portfolio.portfolio.id;
-        return (
-          <button
-            key={p.id}
-            type="button"
-            className={`cc-chip cc-portfolio${on ? ' is-on' : ''}`}
-            aria-pressed={on}
-            disabled={sim.action.pending}
-            onClick={() => void sim.select(p.id)}
-          >
-            <Icon name={p.kind === 'season' ? 'flag' : 'wrench'} /> {label}
-          </button>
-        );
-      })}
-      {canCreate && (
-        <button
-          type="button"
-          className="cc-chip cc-portfolio-new"
-          disabled={sim.action.pending}
-          onClick={() => void sim.createPractice()}
-        >
-          <Icon name="plus" /> {t('app.crypto.portfolios.new')}
-        </button>
-      )}
-    </nav>
+    <div className="cc-portfolios">
+      <div
+        role="tablist"
+        className="cc-portfolio-tabs"
+        aria-label={t('app.crypto.portfolios.label')}
+      >
+        {portfolio.portfolios.map((p) => {
+          const on = p.id === portfolio.portfolio.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              role="tab"
+              className={`cc-chip cc-portfolio${on ? ' is-on' : ''}`}
+              aria-selected={on}
+              disabled={sim.action.pending}
+              onClick={() => void sim.select(p.id)}
+            >
+              {iconOf(p)} {labelOf(p)}
+            </button>
+          );
+        })}
+      </div>
+      {create}
+    </div>
   );
 }
 

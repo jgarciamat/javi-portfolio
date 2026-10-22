@@ -557,8 +557,12 @@ describe('Crypto console: layers, guide and currency', () => {
     await ready();
     fireEvent.click(screen.getByRole('radio', { name: '$ USD' }));
     expect(
-      await screen.findByText(/Conversión informativa al cambio del BCE de hoy/)
+      await screen.findByText(
+        /conversión informativa al cambio de referencia del BCE de hoy \(1 € = 1,1 US\$\)/
+      )
     ).toBeInTheDocument();
+    expect(screen.getByText(/Precios públicos de Binance en dólares/)).toBeInTheDocument();
+    expect(document.querySelectorAll('.cc-data')).toHaveLength(1);
     expect(api.ratesApi.get).toHaveBeenCalledWith('EUR', 'USD');
     expect(nb(document.querySelector('.cc-quote-price')!.textContent)).toBe('55.000,00 US$');
     fireEvent.change(capital(), { target: { value: '110' } });
@@ -575,6 +579,8 @@ describe('Crypto console: layers, guide and currency', () => {
     expect(localStorage.getItem('mm_crypto_currency')).toBe('USD');
     fireEvent.click(screen.getByRole('radio', { name: '€ EUR' }));
     expect(nb(document.querySelector('.cc-quote-price')!.textContent)).toBe('50.000,00 €');
+    expect(screen.getByText(/Precios públicos de Binance en euros/)).toBeInTheDocument();
+    expect(screen.queryByText(/conversión informativa/)).toBeNull();
   });
 
   it('keeps euros and says so when the dollar rate is not available', async () => {
