@@ -236,6 +236,42 @@ function RotateHint({ onFull }: { onFull: () => void }) {
   );
 }
 
+/**
+ * The lines of the person's operations in words, top to bottom (the drawing cannot be read out),
+ * and a key of how #1 and #2 are drawn: solid and dashed for the first, long dashes and dots in a
+ * lighter tone for the second.
+ */
+function LinesKey({ id, lines }: { id: string; lines: ChartLine[] }) {
+  const { t } = useI18n();
+  const money = useMoney();
+  const slots = [...new Set(lines.map((l) => l.slot ?? 0))]
+    .filter((n) => n > 0)
+    .sort((a, b) => a - b);
+  const words = [...lines]
+    .sort((a, b) => b.price - a.price)
+    .map((l) => `${l.title}: ${money.shownPrice(l.price)}`);
+  return (
+    <>
+      <p id={id} className="sr-only">
+        {words.length ? t('app.crypto.chart.linesSummary', { lines: words.join('; ') }) : ''}
+      </p>
+      {slots.length > 0 && (
+        <p className="cc-chart-slots" aria-hidden="true">
+          <span>{t('app.crypto.chart.slotsKey')}</span>
+          {slots.map((slot) => (
+            <span
+              key={slot}
+              className={`cc-chart-slot cc-chart-slot--${slot % 2 ? 'odd' : 'even'}`}
+            >
+              <i /> #{slot}
+            </span>
+          ))}
+        </p>
+      )}
+    </>
+  );
+}
+
 /** Candles on screen out of `total`: all of them until the chart says which ones it shows. */
 const inView = (total: number, shown: { from: number; to: number } | null): number =>
   shown ? Math.max(0, Math.min(total - 1, shown.to) - Math.max(0, shown.from) + 1) : total;
@@ -333,6 +369,7 @@ export function PriceChart({
   const full = useFullScreen(root);
   const helpId = useId();
   const summaryId = useId();
+  const linesId = useId();
 
   const visible = shown ? summarize(candles, shown.from, shown.to) : null;
   const change = visible ? visible.changePercent : null;
@@ -385,7 +422,7 @@ export function PriceChart({
         role="img"
         aria-roledescription={t('app.crypto.chart.role')}
         aria-label={label}
-        aria-describedby={`${summaryId} ${helpId}`}
+        aria-describedby={`${summaryId} ${linesId} ${helpId}`}
         onKeyDown={onKeyDown}
       />
       <p id={summaryId} className="sr-only">
@@ -401,6 +438,7 @@ export function PriceChart({
             })
           : t('app.crypto.chart.empty')}
       </p>
+      <LinesKey id={linesId} lines={lines} />
       <Tools chart={chart} expanded={full.expanded} onExpand={full.toggle} />
       <p id={helpId} className="cc-chart-help">
         {t('app.crypto.chart.help')}

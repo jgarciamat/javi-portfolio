@@ -228,12 +228,12 @@ add('cryptoBuyWithExits', () =>
 add('cryptoShort', () =>
   cryptoApi.placeOrder({
     action: 'buy',
-    symbol: 'BTC',
+    symbol: 'ETH',
     direction: 'short',
     type: 'market',
     amount: 300,
-    takeProfit: 40000,
-    stopLoss: 55000,
+    takeProfit: 1500,
+    stopLoss: 2500,
   })
 );
 add('cryptoBuyLimit', () =>

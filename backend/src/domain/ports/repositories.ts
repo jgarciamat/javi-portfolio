@@ -651,6 +651,8 @@ export interface CryptoSimPosition {
   /** `season`: closed at the last price when its season ended. */
   closeType: 'market' | 'limit' | 'stop' | 'liquidation' | 'season' | null;
   closedAt: string | null;
+  /** Its number among the operations of the coin (#1, #2); null on the oldest closed ones. */
+  slot: number | null;
 }
 
 /** An order waiting for a price: a purchase (`amountCents`) or the sale of `positionId`. */
@@ -671,6 +673,8 @@ export interface CryptoSimOrder {
   /** Take profit and stop loss to leave once a pending purchase is filled. */
   takeProfit: number | null;
   stopLoss: number | null;
+  /** Number of a pending purchase among the operations of the coin; null on take profit and stop loss. */
+  slot: number | null;
 }
 
 /** The ranking alias (null until the person changes it) and the daily practice restarts. */

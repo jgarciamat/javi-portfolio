@@ -651,6 +651,7 @@ describe('Crypto console: season report table', () => {
       {
         id: 'c1',
         symbol: 'ETH',
+        slot: null,
         direction: 'short',
         quantity: 0.5,
         entryPrice: 2_000,

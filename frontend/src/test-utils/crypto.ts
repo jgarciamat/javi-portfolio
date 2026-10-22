@@ -170,6 +170,7 @@ export function portfolio(overrides: Partial<SimPortfolio> = {}): SimPortfolio {
       {
         id: 'p1',
         symbol: 'BTC',
+        slot: 1,
         direction: 'long',
         quantity: 0.02,
         entryPrice: 50_000,
@@ -200,7 +201,7 @@ export function portfolio(overrides: Partial<SimPortfolio> = {}): SimPortfolio {
     },
     market: MARKET,
     fills: [],
-    limits: { pending: 20, open: 50, operations: 1000, pendingDays: 30 },
+    limits: { pending: 20, open: 50, operations: 1000, pendingDays: 30, perCoin: 2 },
     ...overrides,
   };
 }

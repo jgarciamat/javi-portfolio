@@ -32,10 +32,26 @@ export const DEFAULT_FEE_BPS = 10;
 
 export const MAX_PENDING_ORDERS = 20;
 export const MAX_OPEN_POSITIONS = 50;
+/**
+ * Operations of one coin at once in a portfolio (open positions and pending orders that open
+ * one; their take profit and stop loss do not count), numbered #1 and #2 on the cards and chart.
+ */
+export const MAX_PER_COIN = 2;
 /** Operations kept per user (open and closed); past it, «Start again» or export the history. */
 export const MAX_POSITIONS = 1000;
 export const PENDING_DAYS = 30;
 export const PENDING_MS = PENDING_DAYS * 24 * 60 * 60 * 1000;
+
+/**
+ * The number of a new operation of a coin: the lowest one not in use (#1, then #2). It stays with
+ * the operation while it lives (a pending order passes it to its position) and is free again once
+ * the operation closes or is cancelled.
+ */
+export function freeSlot(used: (number | null)[]): number {
+  let slot = 1;
+  while (used.includes(slot)) slot += 1;
+  return slot;
+}
 
 /** Commission in cents of an amount, rounded to the cent. */
 export function feeCents(amountCents: number, bps: number): number {

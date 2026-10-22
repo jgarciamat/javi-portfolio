@@ -29,6 +29,7 @@ import {
   amountForShare,
   buyEstimate,
   checkOpen,
+  coinSlots,
   feeOf,
   fillsNow,
   liquidationPrice,
@@ -36,8 +37,9 @@ import {
   openBreakdown,
   exitResult,
   saleEstimate,
+  withSlot,
 } from '@modules/crypto/domain/orders';
-import { candleList } from '@test-utils/crypto';
+import { candleList, portfolio } from '@test-utils/crypto';
 
 const nbsp = (text: string) => text.replace(/\u00a0|\u202f/g, ' ');
 
@@ -269,3 +271,49 @@ describe('result of an open long and short (invented numbers)', () => {
     expect(needsRise('short', 'stopLoss')).toBe(true);
   });
 });
+
+describe('two operations per coin', () => {
+  const p = portfolio();
+  const entry = { ...p.open[0], symbol: 'BTC' };
+
+  it('writes the number after the word, or the word alone without one', () => {
+    expect(withSlot('SOL', 2)).toBe('SOL #2');
+    expect(withSlot('TP', null)).toBe('TP');
+  });
+
+  it('counts the open ones and the pending purchases of the coin, not their exits', () => {
+    expect(coinSlots({ ...p, open: [] }, 'BTC')).toEqual({ used: 0, max: 2, next: 1, full: false });
+    const pending = [
+      { ...exitOf('p1'), slot: 1 },
+      { ...exitOf(null), symbol: 'BTC', slot: 2 },
+      { ...exitOf(null), symbol: 'ETH', slot: 1 },
+    ];
+    expect(coinSlots({ ...p, open: [entry], pending }, 'BTC')).toEqual({
+      used: 2,
+      max: 2,
+      next: 3,
+      full: true,
+    });
+    expect(coinSlots({ ...p, open: [{ ...entry, slot: 2 }] }, 'BTC').next).toBe(1);
+  });
+});
+
+function exitOf(positionId: string | null) {
+  return {
+    id: `o-${positionId}`,
+    symbol: 'BTC',
+    slot: null,
+    side: 'buy' as const,
+    direction: 'long' as const,
+    type: 'limit' as const,
+    price: 1,
+    amount: null,
+    reserved: 0,
+    positionId,
+    takeProfit: null,
+    stopLoss: null,
+    createdAt: '',
+    expiresAt: '',
+    currentPrice: null,
+  };
+}

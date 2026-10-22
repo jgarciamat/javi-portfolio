@@ -6,6 +6,7 @@ import {
   fillsNow,
   findFill,
   firstFill,
+  freeSlot,
   performance,
   resolutionFor,
   sale,
@@ -26,6 +27,15 @@ describe('crypto coins', () => {
     expect(isCryptoSymbol('BTC')).toBe(true);
     expect(isCryptoSymbol('FAKE')).toBe(false);
     expect(coinName('ETH')).toBe('Ethereum');
+  });
+});
+
+describe('number of an operation of a coin', () => {
+  it('takes the lowest one not in use', () => {
+    expect(freeSlot([])).toBe(1);
+    expect(freeSlot([1])).toBe(2);
+    expect(freeSlot([2])).toBe(1);
+    expect(freeSlot([1, 3, null])).toBe(2);
   });
 });
 

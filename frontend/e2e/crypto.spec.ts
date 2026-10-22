@@ -94,7 +94,7 @@ test('opens a long with take profit and stop loss, changes them and closes it at
   // «Close trade» asks once more on the same button, then closes at the market price.
   await open.getByRole('button', { name: /^Cerrar operación/ }).click();
   await open.getByRole('button', { name: /^¿Seguro\? Sí, cerrar/ }).click();
-  await expect(page.getByText(/Operación de BTC cerrada al precio de mercado/)).toBeVisible();
+  await expect(page.getByText(/Operación de BTC #1 cerrada al precio de mercado/)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Cerradas (1)' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Abiertas (0)' })).toBeVisible();
 });
@@ -111,7 +111,7 @@ test('keeps a pending short until it is cancelled', async ({ page }) => {
     panel(page, 'Pendientes').getByText('Abrir short (límite)', { exact: true })
   ).toBeVisible();
   await expect(panel(page, 'Pendientes').getByText(/pasan a «Abiertas»/)).toBeVisible();
-  await page.getByRole('button', { name: 'Cancelar Abrir short (límite) BTC' }).click();
+  await page.getByRole('button', { name: 'Cancelar Abrir short (límite) BTC #1' }).click();
   await expect(page.getByRole('heading', { name: 'Pendientes (0)' })).toBeVisible();
 });
 
@@ -248,18 +248,96 @@ test('season, practice portfolio, ranking and Premium comforts', async ({ page, 
   await expect(alerts.getByText('Todavía no tienes avisos.')).toBeVisible();
 });
 
+test('numbers two operations per coin on rows and chart lines, and refuses a third', async ({
+  page,
+  request,
+}) => {
+  await page.evaluate(() =>
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'SOL', interval: '1h' }))
+  );
+  await page.reload();
+  await openSection(page, 'Consola crypto');
+  await expect(page.getByRole('img', { name: /Gráfica de Solana/ })).toBeVisible();
+  const open = panel(page, 'Abiertas');
+  const who = open.locator('.cc-who');
+  const note = page.locator('.cc-slot-note');
+  /** What a screen reader hears about the chart: its lines with their numbers. */
+  const spoken = () =>
+    page.locator('.cc-chart-canvas').evaluate((el) =>
+      el
+        .getAttribute('aria-describedby')!
+        .split(' ')
+        .map((id) => document.getElementById(id)!.textContent)
+        .join(' ')
+    );
+
+  await page.getByLabel('Capital por operación').fill('100');
+  await page.getByRole('button', { name: 'Abrir long' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
+  await expect(who).toHaveText(['▲ LongSOL#1(operación 1)']);
+  await expect(note).toHaveText('Ya tienes 1 de 2 operaciones de SOL; esta será la #2.');
+
+  await page.getByRole('radio', { name: /Osos · Short/ }).check();
+  await page.getByLabel('Capital por operación').fill('100');
+  await page.getByRole('button', { name: 'Abrir short' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (2)' })).toBeVisible();
+  await expect(who).toHaveText(['▼ ShortSOL#2(operación 2)', '▲ LongSOL#1(operación 1)']);
+  await expect.poll(spoken).toContain('Entrada long #1');
+  expect(await spoken()).toContain('Entrada short #2');
+  await expect(page.locator('.cc-chart-slots')).toHaveText('Tus operaciones: #1 #2');
+
+  // Two of two: the button is off with its reason, and the server refuses a third anyway.
+  await page.getByLabel('Capital por operación').fill('100');
+  const submit = page.getByRole('button', { name: 'Abrir short' });
+  await expect(submit).toBeDisabled();
+  await expect(submit).toHaveAccessibleDescription(
+    'Ya tienes 2 de 2 operaciones de SOL: cierra o cancela una para abrir otra.'
+  );
+  const login = await request.post(`${API_URL}/auth/login`, { data: DEMO_USER });
+  const { accessToken } = await login.json();
+  const third = await request.post(`${API_URL}/crypto/sim/orders`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    data: { action: 'buy', symbol: 'SOL', type: 'limit', price: 1, amount: 10 },
+  });
+  expect(third.status()).toBe(409);
+  expect((await third.json()).code).toBe('CRYPTO_COIN_FULL');
+
+  // Closing #1 frees its number: the next one is #1 again and the short keeps #2.
+  await open.getByRole('button', { name: 'Cerrar operación (Long de SOL #1)' }).click();
+  await open.getByRole('button', { name: '¿Seguro? Sí, cerrar (Long de SOL #1)' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
+  await expect(note).toHaveText('Ya tienes 1 de 2 operaciones de SOL; esta será la #1.');
+  await page.getByRole('radio', { name: /Toros · Long/ }).check();
+  await page.getByLabel('Capital por operación').fill('100');
+  await page.getByRole('button', { name: 'Abrir long' }).click();
+  await expect(page.getByRole('heading', { name: 'Abiertas (2)' })).toBeVisible();
+  await expect(who).toHaveText(['▲ LongSOL#1(operación 1)', '▼ ShortSOL#2(operación 2)']);
+  await expect(panel(page, 'Cerradas').locator('.cc-who').first()).toHaveText(
+    '▲ LongSOL#1(operación 1)'
+  );
+
+  // Both closed again, so the next tests start from an empty panel.
+  for (const name of ['Long de SOL #1', 'Short de SOL #2']) {
+    await open.getByRole('button', { name: `Cerrar operación (${name})` }).click();
+    await open.getByRole('button', { name: `¿Seguro? Sí, cerrar (${name})` }).click();
+  }
+  await expect(page.getByRole('heading', { name: 'Abiertas (0)' })).toBeVisible();
+});
+
 test('pages the open trades ten at a time and goes back a page when the last row goes', async ({
   page,
   request,
 }) => {
-  // Eleven small purchases through the API, then the console shows them in pages.
+  // Eleven small purchases through the API (two per coin at most), then the console shows them
+  // in pages.
   const login = await request.post(`${API_URL}/auth/login`, { data: DEMO_USER });
   const { accessToken } = await login.json();
   const headers = { Authorization: `Bearer ${accessToken}` };
+  const coins = ['ETH', 'BNB', 'XRP', 'ADA', 'DOGE', 'TRX'];
   for (let i = 0; i < 11; i++) {
     const bought = await request.post(`${API_URL}/crypto/sim/orders`, {
       headers,
-      data: { action: 'buy', symbol: 'ETH', type: 'market', amount: 10 },
+      data: { action: 'buy', symbol: coins[i >> 1], type: 'market', amount: 10 },
     });
     expect(bought.ok()).toBe(true);
   }

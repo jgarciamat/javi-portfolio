@@ -467,6 +467,42 @@
   background: color-mix(in srgb, var(--red-500) 12%, transparent);
 }
 
+/* «#1» / «#2» beside the coin: the number of the operation, as on its chart lines (solid for
+   the first, dashed and lighter for the second). */
+.cc-slot {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.4rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue-300);
+  border: 1px solid var(--blue-400);
+}
+
+.cc-slot--even {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--blue-400) 12%, transparent);
+}
+
+/* Below the open button: which number the new one takes, or why the button is off. */
+.cc-slot-note {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--cc-text-2);
+  line-height: 1.45;
+}
+
+.cc-slot-note:empty {
+  display: none;
+}
+
+.cc-slot-note.is-full {
+  color: var(--amber-400);
+  font-weight: 600;
+}
+
 /* ─── Market ─── */
 
 /* Coins at the side of the price and the chart; the panel of the guide below, full width. The
@@ -1952,6 +1988,19 @@ html.wiz-contrast .cc-glossary-open,
 html.wiz-contrast .cc-coin[aria-pressed='true'] {
   border-width: 2px;
   border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-slot {
+  border-width: 2px;
+  color: var(--slate-50);
+}
+
+html.wiz-contrast .cc-slot-note {
+  color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-slot-note.is-full {
+  color: var(--amber-300);
 }
 
 html.wiz-contrast .cc-layer[aria-pressed='true'] {

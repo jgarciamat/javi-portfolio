@@ -2,7 +2,13 @@ import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatQuantity, pnl } from '../domain/format';
-import { AMOUNT_SHARES, amountForShare, checkOpen, type OrderProblem } from '../domain/orders';
+import {
+  AMOUNT_SHARES,
+  amountForShare,
+  checkOpen,
+  coinSlots,
+  type OrderProblem,
+} from '../domain/orders';
 import type { Direction, OrderRequest, SimPortfolio, TradeType } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
@@ -301,6 +307,34 @@ function useLines(check: ReturnType<typeof checkOpen>, symbol: string): Line[] {
 }
 
 /**
+ * Below the button, once the coin has operations under way: which number the new one will take
+ * («esta será la #2»), or why the button is off (two of two). Read out with the button.
+ */
+function SlotNote({
+  id,
+  symbol,
+  slots,
+}: {
+  id: string;
+  symbol: string;
+  slots: ReturnType<typeof coinSlots>;
+}) {
+  const { t } = useI18n();
+  return (
+    <p id={id} className={`cc-slot-note${slots.full ? ' is-full' : ''}`} aria-live="polite">
+      {slots.used === 0
+        ? null
+        : t(`app.crypto.order.slots.${slots.full ? 'full' : 'next'}`, {
+            used: slots.used,
+            max: slots.max,
+            symbol,
+            next: slots.next,
+          })}
+    </p>
+  );
+}
+
+/**
  * Opening positions with play money: long (bought, gains if the price rises) or short (sold,
  * gains if it falls), always 1x; now (market), at a limit or at a stop, with an optional take
  * profit and stop loss. Every amount is typed and shown in the chosen currency and sent in euros.
@@ -317,7 +351,10 @@ export function OrderBox(props: OrderBoxProps) {
   const [takeProfit, setTakeProfit] = useState('');
   const [stopLoss, setStopLoss] = useState('');
   const [done, setDone] = useState<string | null>(null);
+  const noteId = useId();
   const { account } = portfolio;
+  // Two operations of a coin at once at most, numbered #1 and #2 (the server checks it again).
+  const slots = coinSlots(portfolio, symbol);
   const bps = account.feeBps;
   const cash = money.toShown(account.cash);
   const pending = type !== 'market';
@@ -445,10 +482,12 @@ export function OrderBox(props: OrderBoxProps) {
         <button
           type="submit"
           className={`cc-submit cc-submit--${direction}`}
-          disabled={busy || check.problems.length > 0}
+          disabled={busy || check.problems.length > 0 || slots.full}
+          aria-describedby={slots.used > 0 ? noteId : undefined}
         >
           {t(`app.crypto.order.submit.${direction}`)}
         </button>
+        <SlotNote id={noteId} symbol={symbol} slots={slots} />
         {done && (
           <p className="section-success" role="status">
             {done}

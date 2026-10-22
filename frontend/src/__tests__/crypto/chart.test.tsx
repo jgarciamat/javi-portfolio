@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { PriceChart } from '@modules/crypto/ui/PriceChart';
 import type { ChartLine } from '@modules/crypto/ui/useCandleChart';
 import { candleList } from '@test-utils/crypto';
@@ -7,8 +7,8 @@ import { charts, type FakeChart } from '../../__mocks__/lightweightCharts';
 
 const candles = candleList(5);
 const lines: ChartLine[] = [
-  { id: 'p1', price: 101, title: 'Tu compra', kind: 'entry' },
-  { id: 'o1', price: 95, title: 'Compra límite', kind: 'order' },
+  { id: 'p1', price: 101, title: 'Tu compra', kind: 'entry', slot: 1 },
+  { id: 'o1', price: 95, title: 'Compra límite', kind: 'order', slot: null },
 ];
 const onVisibleChange = jest.fn();
 const onToggleLayer = jest.fn();
@@ -30,6 +30,16 @@ function draw(props: Partial<Parameters<typeof PriceChart>[0]> = {}) {
   const chart = charts[charts.length - 1];
   return { ...view, chart };
 }
+
+/** What a screen reader says about the chart (its description), with plain spaces. */
+const described = () =>
+  screen
+    .getByRole('img', { name: /^Gráfica/ })
+    .getAttribute('aria-describedby')!
+    .split(' ')
+    .map((id) => document.getElementById(id)!.textContent)
+    .join(' ')
+    .replace(/\u00a0|\u202f/g, ' ');
 
 const series = (chart: FakeChart, kind: string) => chart.series.find((s) => s.kind === kind)!;
 
@@ -366,7 +376,7 @@ describe('PriceChart', () => {
         viewKey="BTC:1h"
         label="Gráfica"
         interval="1h"
-        lines={[{ id: 'o2', price: 120, title: 'SL', kind: 'stopLoss' }]}
+        lines={[{ id: 'o2', price: 120, title: 'SL', kind: 'stopLoss', slot: 1 }]}
         layers={[]}
         onToggleLayer={onToggleLayer}
         onVisibleChange={onVisibleChange}
@@ -390,6 +400,63 @@ describe('PriceChart', () => {
       expect(chart.options.layout).toMatchObject({ background: { color: '#000000' } })
     );
     expect(series(chart, 'Candlestick').options).toMatchObject({ upColor: '#00ff00' });
+  });
+
+  it('draws #2 apart from #1, reads the lines out and shows how each is drawn', async () => {
+    const two: ChartLine[] = [
+      { id: 'e1', price: 101, title: 'Entrada short #1', kind: 'entry', slot: 1 },
+      { id: 't1', price: 99, title: 'TP #1', kind: 'takeProfit', slot: 1 },
+      { id: 'e2', price: 102, title: 'Entrada long #2', kind: 'entry', slot: 2 },
+      { id: 't2', price: 104, title: 'TP #2', kind: 'takeProfit', slot: 2 },
+      { id: 's2', price: 100, title: 'SL #2', kind: 'stopLoss', slot: 2 },
+      { id: 'o2', price: 98, title: 'Pendiente long #2', kind: 'order', slot: 2 },
+    ];
+    const { chart } = draw({ lines: two });
+    // Solid and dashed for #1; long dashes and dots, in a lighter tone, for #2 (still green, red).
+    const looks = series(chart, 'Candlestick').lines.map((l) => [
+      l.options.title,
+      l.options.lineStyle,
+      l.options.color,
+    ]);
+    expect(looks).toEqual([
+      ['Entrada short #1', 0, '#60a5fa'],
+      ['TP #1', 2, '#22c55e'],
+      ['Entrada long #2', 3, '#93c5fd'],
+      ['TP #2', 1, '#86efac'],
+      ['SL #2', 1, '#fca5a5'],
+      ['Pendiente long #2', 1, '#fcd34d'],
+    ]);
+    // Close labels move apart on the price scale instead of covering each other.
+    expect(chart.options.rightPriceScale).toMatchObject({ alignLabels: true });
+    expect(described()).toContain(
+      'Tus líneas en la gráfica, de arriba abajo: TP #2: 104,00 €; Entrada long #2: 102,00 €; ' +
+        'Entrada short #1: 101,00 €; SL #2: 100,00 €; TP #1: 99,00 €; Pendiente long #2: 98,00 €.'
+    );
+    const key = document.querySelector('.cc-chart-slots')!;
+    expect(key).toHaveAttribute('aria-hidden', 'true');
+    expect(key.textContent).toBe('Tus operaciones: #1 #2');
+    expect(key.querySelector('.cc-chart-slot--even')).not.toBeNull();
+
+    // A new theme draws the lines again in its colours.
+    document.documentElement.style.setProperty('--blue-300', '#123456');
+    document.documentElement.setAttribute('data-theme', 'light');
+    await waitFor(() =>
+      expect(
+        series(chart, 'Candlestick').lines.filter(
+          (l) => !l.removed && l.options.color === '#123456'
+        )
+      ).toHaveLength(1)
+    );
+  });
+
+  it('has no key nor spoken lines without operations, and no number on lines without one', () => {
+    draw({ lines: [{ id: 'x', price: 95, title: 'Compra', kind: 'order', slot: null }] });
+    expect(document.querySelector('.cc-chart-slots')).toBeNull();
+    expect(series(charts[0], 'Candlestick').lines[0].options).toMatchObject({ lineStyle: 2 });
+    expect(described()).toContain('Tus líneas');
+    cleanup();
+    draw();
+    expect(described()).not.toContain('Tus líneas');
   });
 
   it('says so when there are no candles', () => {

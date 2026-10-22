@@ -91,4 +91,5 @@ export const GLOSSARY_TERMS = [
   'realized',
   'winRate',
   'pending',
+  'slot',
 ] as const;

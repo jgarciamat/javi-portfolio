@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import {
   BusinessRuleError,
+  ConflictError,
   NotFoundError,
   PaymentRequiredError,
   UnavailableError,
@@ -28,6 +29,7 @@ import {
   DEFAULT_FEE_BPS,
   Fill,
   MAX_OPEN_POSITIONS,
+  MAX_PER_COIN,
   MAX_POSITIONS,
   OrderType,
   PENDING_DAYS,
@@ -36,6 +38,7 @@ import {
   CloseType,
   Direction,
   feeCents,
+  freeSlot,
   liquidationPrice,
   sideOf,
   findFill,
@@ -103,6 +106,8 @@ export interface CryptoFillView {
   type: PendingType | 'liquidation' | 'expired';
   price: number | null;
   at: string;
+  /** Number of the operation among those of its coin (#1, #2). */
+  slot: number | null;
 }
 
 type TradeType = 'market' | 'limit' | 'stop';
@@ -110,6 +115,8 @@ type TradeType = 'market' | 'limit' | 'stop';
 export interface CryptoOpenView {
   id: string;
   symbol: string;
+  /** Its number among the operations of the coin (#1, #2), the same on the chart. */
+  slot: number | null;
   direction: Direction;
   quantity: number;
   entryPrice: number;
@@ -131,6 +138,8 @@ export interface CryptoOpenView {
 export interface CryptoPendingView {
   id: string;
   symbol: string;
+  /** A pending purchase's number, or that of the position a take profit or stop loss goes with. */
+  slot: number | null;
   side: 'buy' | 'sell';
   direction: Direction;
   type: PendingType;
@@ -149,6 +158,8 @@ export interface CryptoPendingView {
 export interface CryptoClosedView {
   id: string;
   symbol: string;
+  /** The number it had while open; null on the oldest ones. */
+  slot: number | null;
   direction: Direction;
   quantity: number;
   entryPrice: number;
@@ -264,7 +275,14 @@ export interface CryptoSimView {
   };
   /** Pending orders filled (or expired) while answering this request. */
   fills: CryptoFillView[];
-  limits: { pending: number; open: number; operations: number; pendingDays: number };
+  limits: {
+    pending: number;
+    open: number;
+    operations: number;
+    pendingDays: number;
+    /** Operations of one coin at once (open and pending to open). */
+    perCoin: number;
+  };
 }
 
 export interface CryptoSeasonReportView {
@@ -684,6 +702,7 @@ export class CryptoSimService {
         `Puedes tener hasta ${MAX_OPEN_POSITIONS} posiciones abiertas a la vez.`
       );
     }
+    const slot = this.coinSlot(portfolio.id, input.symbol);
     const fee = feeCents(input.amountCents, portfolio.feeBps);
     const total = input.amountCents + fee;
     if (total > portfolio.cashCents) {
@@ -707,7 +726,8 @@ export class CryptoSimService {
         fee,
         current,
         'market',
-        at
+        at,
+        slot
       );
       this.repo.insertPosition(position);
       this.insertExits(position, exits, at);
@@ -730,6 +750,7 @@ export class CryptoSimService {
         createdAt: at,
         takeProfit: input.takeProfit ?? null,
         stopLoss: input.stopLoss ?? null,
+        slot,
       });
     }
     this.repo.savePortfolio({ ...portfolio, cashCents: portfolio.cashCents - total });
@@ -774,6 +795,7 @@ export class CryptoSimService {
       createdAt: at,
       takeProfit: null,
       stopLoss: null,
+      slot: null,
     });
   }
 
@@ -857,6 +879,7 @@ export class CryptoSimService {
         createdAt: at,
         takeProfit: null,
         stopLoss: null,
+        slot: null,
       });
     }
   }
@@ -907,6 +930,36 @@ export class CryptoSimService {
         'Ese precio está demasiado lejos del precio actual.'
       );
     }
+  }
+
+  /** Numbers in use by the operations of a coin under way: open positions and pending purchases. */
+  private usedSlots(portfolioId: string, symbol: string): (number | null)[] {
+    return [
+      ...this.repo
+        .positions(portfolioId)
+        .filter((p) => !p.closedAt && p.symbol === symbol)
+        .map((p) => p.slot),
+      ...this.repo
+        .orders(portfolioId)
+        .filter((o) => o.positionId === null && o.symbol === symbol)
+        .map((o) => o.slot),
+    ];
+  }
+
+  /**
+   * The number of a new operation of a coin, or a refusal when it already has two under way
+   * (portfolios that had more before keep them, but open no more until they are under two).
+   */
+  private coinSlot(portfolioId: string, symbol: string): number {
+    const used = this.usedSlots(portfolioId, symbol);
+    if (used.length >= MAX_PER_COIN) {
+      throw new ConflictError(
+        `Ya tienes ${MAX_PER_COIN} operaciones de ${symbol}: cierra o cancela una para abrir otra.`,
+        'CRYPTO_COIN_FULL',
+        { symbol, limit: MAX_PER_COIN }
+      );
+    }
+    return freeSlot(used);
   }
 
   private pendingMax(userId: string): number {
@@ -1085,6 +1138,7 @@ export class CryptoSimService {
         type: winner.type as PendingType | 'liquidation',
         price: winner.fill.price,
         at: winner.fill.at,
+        slot: position.slot,
       });
     }
     return events;
@@ -1101,7 +1155,9 @@ export class CryptoSimService {
       fee,
       fill.price,
       order.type,
-      fill.at
+      fill.at,
+      // The order is gone already, so its number is free for its position.
+      order.slot ?? freeSlot(this.usedSlots(portfolio.id, order.symbol))
     );
     this.repo.insertPosition(position);
     const exits: { type: PendingType; price: number }[] = [];
@@ -1229,6 +1285,7 @@ export class CryptoSimService {
         return {
           id: p.id,
           symbol: p.symbol,
+          slot: p.slot,
           direction: p.direction,
           quantity: p.quantity,
           entryPrice: p.entryPrice,
@@ -1245,6 +1302,7 @@ export class CryptoSimService {
           _cents: sold,
         };
       });
+    const slots = new Map(all.map((p) => [p.id, p.slot]));
     const closedRows = all.filter((p) => p.closedAt);
     const closed = closedRows.map(closedView);
     const perf = performance(closedRows.map((p) => ({ pnlCents: p.pnlCents! })));
@@ -1272,6 +1330,7 @@ export class CryptoSimService {
       pending: orders.map((o) => ({
         id: o.id,
         symbol: o.symbol,
+        slot: o.positionId === null ? o.slot : (slots.get(o.positionId) ?? null),
         side: o.side,
         direction: o.direction,
         type: o.type,
@@ -1326,6 +1385,7 @@ export class CryptoSimService {
         open: MAX_OPEN_POSITIONS,
         operations: MAX_POSITIONS,
         pendingDays: PENDING_DAYS,
+        perCoin: MAX_PER_COIN,
       },
     };
   }
@@ -1411,6 +1471,7 @@ export function closedView(p: CryptoSimPosition): CryptoClosedView {
   return {
     id: p.id,
     symbol: p.symbol,
+    slot: p.slot,
     direction: p.direction,
     quantity: p.quantity,
     entryPrice: p.entryPrice,
@@ -1471,7 +1532,8 @@ function openPosition(
   entryFeeCents: Cents,
   price: number,
   openType: OrderType,
-  openedAt: string
+  openedAt: string,
+  slot: number
 ): CryptoSimPosition {
   return {
     id: randomUUID(),
@@ -1491,6 +1553,7 @@ function openPosition(
     pnlCents: null,
     closeType: null,
     closedAt: null,
+    slot,
   };
 }
 
@@ -1507,4 +1570,5 @@ const event = (
   type,
   price,
   at,
+  slot: order.slot,
 });

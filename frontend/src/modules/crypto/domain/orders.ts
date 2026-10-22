@@ -1,4 +1,4 @@
-import type { Direction, OpenTrade, PendingType, TradeType } from './types';
+import type { Direction, OpenTrade, PendingType, SimPortfolio, Slot, TradeType } from './types';
 
 /** The commission is fixed: 0,10 % when opening and again when closing (10 basis points). */
 export const FIXED_FEE_BPS = 10;
@@ -24,6 +24,24 @@ export function fillsNow(
 ): boolean {
   const buysLow = (side === 'buy') === (type === 'limit');
   return buysLow ? current <= price : current >= price;
+}
+
+/** «SOL #1», «TP #2»: a word and the number of its operation (the word alone without one). */
+export const withSlot = (text: string, slot: Slot): string => (slot ? `${text} #${slot}` : text);
+
+/**
+ * The operations of a coin under way (open positions and pending purchases; their take profit
+ * and stop loss do not count), the number the next one would take (the lowest free) and whether
+ * there is room for it: the same rule as the API.
+ */
+export function coinSlots(p: Pick<SimPortfolio, 'open' | 'pending' | 'limits'>, symbol: string) {
+  const used = [
+    ...p.open.filter((o) => o.symbol === symbol).map((o) => o.slot),
+    ...p.pending.filter((o) => o.positionId === null && o.symbol === symbol).map((o) => o.slot),
+  ];
+  let next = 1;
+  while (used.includes(next)) next += 1;
+  return { used: used.length, max: p.limits.perCoin, next, full: used.length >= p.limits.perCoin };
 }
 
 /** Percentages of the available money offered as shortcuts for the amount. */

@@ -1,6 +1,9 @@
+import { randomUUID } from 'crypto';
 import request from 'supertest';
 import { loadConfig } from '@config/env';
+import { CRYPTO_SYMBOLS } from '@domain/services/crypto-market';
 import { MAX_PENDING_ORDERS, PENDING_MS } from '@domain/services/crypto-sim';
+import { CryptoSimPosition } from '@domain/ports/repositories';
 import { buildContainer } from '@infrastructure/container';
 import { openDatabase } from '@infrastructure/sqlite/database';
 import { migrate } from '@infrastructure/sqlite/migrator';
@@ -23,6 +26,33 @@ const candle = (iso: string, open: number, high: number, low: number) => ({
   low,
   close: open,
   volume: 1,
+});
+
+/** An open long kept from before a rule (written straight to the repository). */
+const openRow = (
+  userId: string,
+  portfolioId: string,
+  symbol: string,
+  slot: number | null
+): CryptoSimPosition => ({
+  id: randomUUID(),
+  userId,
+  portfolioId,
+  symbol,
+  direction: 'long',
+  quantity: 0.01,
+  entryPrice: 1000,
+  amountCents: 1000,
+  entryFeeCents: 1,
+  openType: 'market',
+  openedAt: '2026-03-15T11:00:00.000Z',
+  exitPrice: null,
+  exitFeeCents: null,
+  proceedsCents: null,
+  pnlCents: null,
+  closeType: null,
+  closedAt: null,
+  slot,
 });
 
 describe('Crypto console', () => {
@@ -149,7 +179,13 @@ describe('Crypto console', () => {
         winRate: null,
       });
       // The 14-day trial is Premium: 100 pending orders; the free plan, 20.
-      expect(body.limits).toEqual({ pending: 100, open: 50, operations: 1000, pendingDays: 30 });
+      expect(body.limits).toEqual({
+        pending: 100,
+        open: 50,
+        operations: 1000,
+        pendingDays: 30,
+        perCoin: 2,
+      });
       expect(body.portfolio).toMatchObject({ kind: 'season', season: '2026-03' });
       expect(body.season).toMatchObject({
         month: '2026-03',
@@ -268,6 +304,7 @@ describe('Crypto console', () => {
           type: 'limit',
           price: 45_000,
           at: '2026-03-15T12:02:00.000Z',
+          slot: 1,
         },
       ]);
       expect(body.open[0]).toMatchObject({
@@ -373,18 +410,34 @@ describe('Crypto console', () => {
 
     it('limits the pending orders (20 on the free plan) and the open purchases', async () => {
       expireTrial(ctx, user);
+      // Two operations per coin at most: twenty pending orders take ten coins.
+      const coins = CRYPTO_SYMBOLS.slice(0, 11);
+      coins.forEach((symbol) => ctx.market.prices.set(symbol, 50_000));
       for (let i = 0; i < MAX_PENDING_ORDERS; i++) {
-        await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
+        await buy({ symbol: coins[i >> 1], type: 'limit', price: 40_000 - i, amount: 10 }).expect(
+          201
+        );
       }
-      const full = await buy({ type: 'limit', price: 30_000, amount: 10 }).expect(400);
+      const full = await buy({
+        symbol: coins[10],
+        type: 'limit',
+        price: 30_000,
+        amount: 10,
+      }).expect(400);
       expect(full.body.code).toBe('CRYPTO_TOO_MANY_PENDING');
       expect(full.body.error).toContain('con Premium, hasta 100');
       // A take profit or stop loss goes with its position: it is not a pending order.
-      const position = (await buy({ amount: 10, takeProfit: 60_000 }).expect(201)).body.open[0];
+      const position = (
+        await buy({ symbol: coins[10], amount: 10, takeProfit: 60_000 }).expect(201)
+      ).body.open[0];
       await sell(position.id, { type: 'stop', price: 45_000 }).expect(201);
 
-      for (let i = 0; i < 49; i++) await buy({ amount: 10 }).expect(201);
-      expect((await buy({ amount: 10 }).expect(400)).body.code).toBe('CRYPTO_TOO_MANY_OPEN');
+      // Fifty open at once at most (only reachable with operations kept from before the rule).
+      const repo = ctx.container.repos.cryptoSim;
+      const portfolioId = (await get('/crypto/sim').expect(200)).body.portfolio.id as string;
+      for (let i = 1; i < 50; i++) repo.insertPosition(openRow(user.id, portfolioId, 'POL', i));
+      const tooMany = await buy({ symbol: 'ETH', amount: 10 }).expect(400);
+      expect(tooMany.body.code).toBe('CRYPTO_TOO_MANY_OPEN');
     });
 
     it('stops at 1.000 operations in a month', async () => {
@@ -409,6 +462,7 @@ describe('Crypto console', () => {
           pnlCents: null,
           closeType: null,
           closedAt: null,
+          slot: null,
         });
       }
       const full = await buy({ amount: 10 }).expect(400);
@@ -515,8 +569,13 @@ describe('Crypto console', () => {
 
     it('does not count them among the pending orders, and they do not expire', async () => {
       expireTrial(ctx, user);
+      // Two per coin: the twenty pending orders take ten coins other than Bitcoin.
+      const coins = CRYPTO_SYMBOLS.slice(1, 11);
+      coins.forEach((symbol) => ctx.market.prices.set(symbol, 50_000));
       for (let i = 0; i < MAX_PENDING_ORDERS; i++) {
-        await buy({ type: 'limit', price: 40_000 - i, amount: 10 }).expect(201);
+        await buy({ symbol: coins[i >> 1], type: 'limit', price: 40_000 - i, amount: 10 }).expect(
+          201
+        );
       }
       await buy({ amount: 10, takeProfit: 60_000, stopLoss: 45_000 }).expect(201);
       // A practice portfolio does not end with the month: 40 days later they are still there.
@@ -650,7 +709,7 @@ describe('Crypto console', () => {
       });
       // Only the take profit, or neither.
       await buy({ type: 'stop', price: 52_000, takeProfit: 55_000 }).expect(201);
-      await buy({ type: 'stop', price: 53_000, stopLoss: 49_000 }).expect(201);
+      await buy({ symbol: 'ETH', type: 'stop', price: 2_100, stopLoss: 1_900 }).expect(201);
     });
   });
 
@@ -779,6 +838,137 @@ describe('Crypto console', () => {
         )
       ).toBe(true);
       await short({ direction: 'sideways' }).expect(400);
+    });
+  });
+
+  describe('two operations per coin, numbered', () => {
+    const slots = (rows: { symbol: string; slot: number | null }[]) =>
+      rows.map((r) => `${r.symbol}#${r.slot}`);
+
+    it('numbers them #1 and #2, refuses a third and gives the freed number to the next', async () => {
+      const first = (await buy({ amount: 100, takeProfit: 60_000, stopLoss: 40_000 }).expect(201))
+        .body;
+      expect(slots(first.open)).toEqual(['BTC#1']);
+      // Its take profit and stop loss carry the number of their position and do not count.
+      expect(slots(first.pending)).toEqual(['BTC#1', 'BTC#1']);
+      expect(first.limits.perCoin).toBe(2);
+      const second = (await buy({ type: 'limit', price: 45_000, amount: 100 }).expect(201)).body;
+      expect(second.pending.find((o: { positionId: null }) => o.positionId === null).slot).toBe(2);
+
+      const third = await buy({ direction: 'short', amount: 100 }).expect(409);
+      expect(third.body).toMatchObject({
+        code: 'CRYPTO_COIN_FULL',
+        error: 'Ya tienes 2 operaciones de BTC: cierra o cancela una para abrir otra.',
+        details: { symbol: 'BTC', limit: 2 },
+      });
+      await buy({ type: 'stop', price: 52_000, amount: 100 }).expect(409);
+      // Another coin has its own two.
+      expect(slots((await buy({ symbol: 'ETH', amount: 100 }).expect(201)).body.open)).toContain(
+        'ETH#1'
+      );
+
+      // Closing #1 frees it: the next one is #1 again and the pending #2 keeps its number.
+      const closed = (await sell(first.open[0].id).expect(201)).body;
+      expect(slots(closed.closed)).toEqual(['BTC#1']);
+      const again = (await buy({ direction: 'short', amount: 100 }).expect(201)).body;
+      expect(slots(again.open.filter((p: { symbol: string }) => p.symbol === 'BTC'))).toEqual([
+        'BTC#1',
+      ]);
+      expect(slots(again.pending)).toEqual(['BTC#2']);
+    });
+
+    it('keeps the number of a pending order once it is filled, and frees it when cancelled', async () => {
+      await buy({ amount: 100 }).expect(201);
+      const placed = (await buy({ type: 'limit', price: 45_000, amount: 100 }).expect(201)).body;
+      const order = placed.pending[0];
+      expect(order.slot).toBe(2);
+      later(5 * 60_000);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T12:02:00Z', 46_000, 46_000, 44_000)]);
+      const filled = (await get('/crypto/sim').expect(200)).body;
+      expect(filled.fills).toEqual([expect.objectContaining({ orderId: order.id, slot: 2 })]);
+      expect(slots(filled.open).sort()).toEqual(['BTC#1', 'BTC#2']);
+
+      // A cancelled pending order frees its number too.
+      const sold = (
+        await sell(filled.open.find((p: { slot: number }) => p.slot === 1).id).expect(201)
+      ).body;
+      expect(slots(sold.open)).toEqual(['BTC#2']);
+      const pending = (await buy({ type: 'limit', price: 40_000, amount: 100 }).expect(201)).body;
+      expect(pending.pending[0].slot).toBe(1);
+      await request(ctx.app)
+        .delete(`/api/crypto/sim/orders/${pending.pending[0].id}`)
+        .set(user.auth)
+        .expect(200);
+      expect(
+        (await buy({ amount: 100 }).expect(201)).body.open
+          .map((p: { slot: number }) => p.slot)
+          .sort()
+      ).toEqual([1, 2]);
+    });
+
+    it('counts each portfolio apart (the season and a practice one)', async () => {
+      await buy({ amount: 100 }).expect(201);
+      await buy({ amount: 100 }).expect(201);
+      const practice = (await post('/crypto/sim/practice', {}).expect(201)).body.portfolio.id;
+      const res = await buy({ portfolioId: practice, amount: 100 }).expect(201);
+      expect(slots(res.body.open)).toEqual(['BTC#1']);
+    });
+
+    it('keeps more than two of a coin from before the rule, opening no more until under two', async () => {
+      const repo = ctx.container.repos.cryptoSim;
+      const portfolioId = (await get('/crypto/sim').expect(200)).body.portfolio.id as string;
+      const old = [1, 2, 3].map((slot) => openRow(user.id, portfolioId, 'BTC', slot));
+      old.forEach((row) => repo.insertPosition(row));
+      expect(slots((await get('/crypto/sim').expect(200)).body.open)).toHaveLength(3);
+      await buy({ amount: 100 }).expect(409);
+      await sell(old[0].id).expect(201);
+      await buy({ amount: 100 }).expect(409);
+      await sell(old[1].id).expect(201);
+      const next = (await buy({ amount: 100 }).expect(201)).body.open;
+      expect(slots(next).sort()).toEqual(['BTC#1', 'BTC#3']);
+    });
+  });
+
+  describe('migration 040', () => {
+    it('numbers the operations under way of each coin in the order they started', () => {
+      const db = openDatabase(':memory:');
+      migrate(
+        db,
+        migrations.filter((m) => m.version < 40)
+      );
+      db.exec(`
+        INSERT INTO users (id, email, name, password_hash, created_at, email_verified)
+          VALUES ('u1', 'u1@example.com', 'Uno', 'x', '2026-01-01T00:00:00Z', 1);
+        INSERT INTO crypto_sim_portfolios (id, user_id, kind, season, initial_cents, cash_cents,
+          fee_bps, started_at) VALUES ('f1', 'u1', 'season', '2026-10', 1000000, 900000, 10,
+          '2026-10-01T00:00:00Z');
+        INSERT INTO crypto_sim_positions (id, user_id, portfolio_id, symbol, quantity, entry_price,
+          amount_cents, entry_fee_cents, open_type, opened_at, closed_at, exit_price,
+          exit_fee_cents, proceeds_cents, pnl_cents, close_type)
+          VALUES
+          ('done', 'u1', 'f1', 'BTC', 0.1, 50000, 500000, 500, 'market', '2026-10-01T09:00:00Z',
+            '2026-10-01T10:00:00Z', 50000, 500, 499500, -1000, 'market'),
+          ('b', 'u1', 'f1', 'BTC', 0.1, 50000, 500000, 500, 'market', '2026-10-03T10:00:00Z',
+            NULL, NULL, NULL, NULL, NULL, NULL),
+          ('e', 'u1', 'f1', 'ETH', 0.1, 2000, 20000, 20, 'market', '2026-10-04T10:00:00Z',
+            NULL, NULL, NULL, NULL, NULL, NULL),
+          ('c', 'u1', 'f1', 'BTC', 0.1, 50000, 500000, 500, 'market', '2026-10-05T10:00:00Z',
+            NULL, NULL, NULL, NULL, NULL, NULL);
+        INSERT INTO crypto_sim_orders (id, user_id, portfolio_id, symbol, side, type, price,
+          amount_cents, reserved_cents, position_id, created_at)
+          VALUES
+          ('a', 'u1', 'f1', 'BTC', 'buy', 'limit', 40000, 1000, 1001, NULL, '2026-10-02T10:00:00Z'),
+          ('tp', 'u1', 'f1', 'BTC', 'sell', 'limit', 60000, NULL, 0, 'b', '2026-10-03T10:00:00Z');
+      `);
+      migrate(db, migrations);
+      const of = (table: string) =>
+        Object.fromEntries(
+          (db.prepare(`SELECT id, slot FROM ${table}`).all() as { id: string; slot: number }[]).map(
+            (r) => [r.id, r.slot]
+          )
+        );
+      expect(of('crypto_sim_positions')).toEqual({ done: null, b: 2, e: 1, c: 3 });
+      expect(of('crypto_sim_orders')).toEqual({ a: 1, tp: null });
     });
   });
 

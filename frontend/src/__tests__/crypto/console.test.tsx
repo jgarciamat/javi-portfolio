@@ -41,6 +41,7 @@ function setup(change?: (api: FakeApi) => void) {
 const order = (o: Partial<PendingOrder>): PendingOrder => ({
   id: 'o1',
   symbol: 'BTC',
+  slot: 2,
   side: 'buy',
   direction: 'long',
   type: 'limit',
@@ -59,6 +60,7 @@ const order = (o: Partial<PendingOrder>): PendingOrder => ({
 const short: OpenTrade = {
   ...fx.portfolio().open[0],
   id: 's1',
+  slot: 2,
   direction: 'short',
   liquidationPrice: 100_000,
   pnl: -97.9,
@@ -68,6 +70,7 @@ const short: OpenTrade = {
 const closed = (i: number, pnl: number, extra: Partial<ClosedTrade> = {}): ClosedTrade => ({
   id: `c${i}`,
   symbol: 'ETH',
+  slot: 1,
   direction: 'long',
   quantity: 0.5,
   entryPrice: 2_000,
@@ -388,7 +391,7 @@ describe('Crypto console: layers, guide and currency', () => {
     );
     expect(scroll).toHaveBeenCalledWith({ block: 'start' });
     expect(screen.getByRole('heading', { name: LEARN })).toHaveFocus();
-    expect(within(words).getAllByRole('term')).toHaveLength(16);
+    expect(within(words).getAllByRole('term')).toHaveLength(17);
     const search = within(words).getByRole('searchbox', { name: 'Buscar una palabra' });
     fireEvent.change(search, { target: { value: ' COMISIÓN ' } });
     const found = within(words)
@@ -765,7 +768,7 @@ describe('Crypto console: opening positions', () => {
 
 describe('Crypto console: open, pending and closed', () => {
   const exit = (o: Partial<PendingOrder>) =>
-    order({ side: 'sell', amount: null, reserved: 0, positionId: 'p1', ...o });
+    order({ side: 'sell', amount: null, reserved: 0, positionId: 'p1', slot: 1, ...o });
   const withExits = [
     exit({ id: 'tp', price: 60_000 }),
     exit({ id: 'sl', type: 'stop', price: 45_000 }),
@@ -782,7 +785,7 @@ describe('Crypto console: open, pending and closed', () => {
     setup(withPortfolio(both));
     await screen.findByText('Abiertas (2)');
     expect(screen.getAllByText('Long', { selector: '.cc-dir' })).toHaveLength(1);
-    const long = card(/^Cerrar operación \(Long de BTC\)/);
+    const long = card(/^Cerrar operación \(Long de BTC #1\)/);
     // One row: the cells in order, each with its label for screen readers.
     expect(Array.from(long.querySelectorAll(':scope > .cc-cell')).map((c) => c.className)).toEqual([
       'cc-cell cc-cell--who',
@@ -804,7 +807,7 @@ describe('Crypto console: open, pending and closed', () => {
     expect(heads).toHaveLength(1);
     expect(heads[0]).toHaveAttribute('aria-hidden', 'true');
     expect(text(heads[0])).toBe('OperaciónPreciosImporteTP / SLResultado');
-    const other = card(/^Cerrar operación \(Short de BTC\)/);
+    const other = card(/^Cerrar operación \(Short de BTC #2\)/);
     expect(text(other.querySelector('.cc-exit-lines'))).toBe('TPTake profit—SLStop loss—');
     // They are not pending orders: «Pendientes» only has the orders that open a trade.
     expect(screen.getByText('Pendientes (0)')).toBeInTheDocument();
@@ -817,9 +820,9 @@ describe('Crypto console: open, pending and closed', () => {
     const both = fx.portfolio({ open: [fx.portfolio().open[0], short], pending: withExits });
     setup(withPortfolio(both));
     await screen.findByText('Abiertas (2)');
-    const long = card(/^Cerrar operación \(Long de BTC\)/);
+    const long = card(/^Cerrar operación \(Long de BTC #1\)/);
     expect(long.querySelector('.cc-detail')).toBeNull();
-    const toggle = within(long).getByRole('button', { name: 'Detalles (Long de BTC)' });
+    const toggle = within(long).getByRole('button', { name: 'Detalles (Long de BTC #1)' });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -838,7 +841,7 @@ describe('Crypto console: open, pending and closed', () => {
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(long.querySelector('.cc-detail')).toBeNull();
-    const other = card(/^Cerrar operación \(Short de BTC\)/);
+    const other = card(/^Cerrar operación \(Short de BTC #2\)/);
     open(other);
     expect(nb(within(other).getByText('Se cerraría sola a').nextSibling!.textContent)).toBe(
       '100.000,00 €'
@@ -862,7 +865,7 @@ describe('Crypto console: open, pending and closed', () => {
     };
     setup(withPortfolio({ open: [winning] }));
     await screen.findByText('Abiertas (1)');
-    const li = card(/^Cerrar operación \(Short de BTC\)/);
+    const li = card(/^Cerrar operación \(Short de BTC #2\)/);
     // Headline: the net, big and red, its percent below and, small, price and commissions.
     const end = li.querySelector('.cc-cell--end')!;
     expect(text(end)).toBe('Resultado−2,73 €−0,05 %Precio: +7,26 € · Comisiones: −9,99 €');
@@ -924,7 +927,7 @@ describe('Crypto console: open, pending and closed', () => {
   it('edits the take profit and stop loss with live checks, sending only what changed', async () => {
     const { api } = setup(withPortfolio({ pending: withExits }));
     await screen.findByText('Abiertas (1)');
-    const edit = screen.getByRole('button', { name: 'Editar TP/SL (Long de BTC)' });
+    const edit = screen.getByRole('button', { name: 'Editar TP/SL (Long de BTC #1)' });
     fireEvent.click(edit);
     expect(edit).toHaveAttribute('aria-expanded', 'true');
     const tp = screen.getByLabelText('Take profit (€)');
@@ -1015,16 +1018,16 @@ describe('Crypto console: open, pending and closed', () => {
     });
     await screen.findByText('Abiertas (1)');
     jest.useFakeTimers();
-    const close = screen.getByRole('button', { name: 'Cerrar operación (Long de BTC)' });
+    const close = screen.getByRole('button', { name: 'Cerrar operación (Long de BTC #1)' });
     expect(close).toHaveAttribute('title', expect.stringContaining('al último precio'));
     fireEvent.click(close);
-    expect(close).toHaveAccessibleName('¿Seguro? Sí, cerrar (Long de BTC)');
+    expect(close).toHaveAccessibleName('¿Seguro? Sí, cerrar (Long de BTC #1)');
     expect(close).toHaveClass('cc-close--armed');
     expect(
       screen.getByText('Pulsa otra vez en 4 segundos para cerrarla al precio de ahora.')
     ).toBeInTheDocument();
     act(() => jest.advanceTimersByTime(CONFIRM_MS));
-    expect(close).toHaveAccessibleName('Cerrar operación (Long de BTC)');
+    expect(close).toHaveAccessibleName('Cerrar operación (Long de BTC #1)');
     expect(api.cryptoApi.placeOrder).not.toHaveBeenCalled();
     fireEvent.click(close);
     fireEvent.click(close);
@@ -1038,7 +1041,7 @@ describe('Crypto console: open, pending and closed', () => {
     );
     expect(
       await screen.findByText(
-        'Operación de BTC cerrada al precio de mercado. La ves en «Cerradas».'
+        'Operación de BTC #1 cerrada al precio de mercado. La ves en «Cerradas».'
       )
     ).toHaveAttribute('role', 'status');
     expect(screen.getByText('Abiertas (0)')).toBeInTheDocument();
@@ -1087,13 +1090,13 @@ describe('Crypto console: open, pending and closed', () => {
     const candleSeries = charts[charts.length - 1].series.find((s) => s.kind === 'Candlestick')!;
     await waitFor(() =>
       expect(candleSeries.lines.filter((l) => !l.removed).map((l) => l.options.title)).toEqual([
-        'Entrada long',
-        'Abrir long (límite)',
-        'SL',
-        'TP',
+        'Entrada long #1',
+        'Pendiente long #2',
+        'SL #1',
+        'TP #1',
       ])
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Cancelar Abrir long (límite) BTC' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar Abrir long (límite) BTC #2' }));
     await waitFor(() => expect(api.cryptoApi.cancelOrder).toHaveBeenCalledWith('o1'));
   });
 
@@ -1136,7 +1139,9 @@ describe('Crypto console: open, pending and closed', () => {
 
     // The data refreshes: same pages. Then rows go: back to the last page that exists.
     api.cryptoApi.cancelOrder.mockResolvedValueOnce(fx.portfolio({ ...full }));
-    fireEvent.click(screen.getAllByRole('button', { name: 'Cancelar Abrir long (límite) BTC' })[0]);
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Cancelar Abrir long (límite) BTC #2' })[0]
+    );
     await waitFor(() => expect(api.cryptoApi.cancelOrder).toHaveBeenCalledTimes(1));
     expect(rows('Abiertas (12)')).toHaveLength(2);
     expect(within(pager('Cerradas (23)')).getByText('Página 2 de 3')).toBeInTheDocument();
@@ -1147,7 +1152,9 @@ describe('Crypto console: open, pending and closed', () => {
         closed: many.slice(0, 12),
       })
     );
-    fireEvent.click(screen.getAllByRole('button', { name: 'Cancelar Abrir long (límite) BTC' })[0]);
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Cancelar Abrir long (límite) BTC #2' })[0]
+    );
     expect(await screen.findByText('Abiertas (4)')).toBeInTheDocument();
     expect(rows('Abiertas (4)')).toHaveLength(4);
     expect(within(panel('Abiertas (4)')).queryByRole('navigation')).toBeNull();
@@ -1177,10 +1184,11 @@ describe('Crypto console: open, pending and closed', () => {
       type: 'limit',
       price: 45_000,
       at: 'x',
+      slot: null,
       ...f,
     });
     const fills = [
-      fill({ orderId: 'a' }),
+      fill({ orderId: 'a', slot: 2 }),
       fill({ orderId: 'b', side: 'sell', type: 'stop' }),
       fill({ orderId: 'c', direction: 'short', type: 'liquidation', price: 100_000 }),
       fill({ orderId: 'd', type: 'expired', price: null }),
@@ -1189,7 +1197,7 @@ describe('Crypto console: open, pending and closed', () => {
     const box = await screen.findByText('Novedades de tus órdenes');
     const items = [...box.closest('div')!.querySelectorAll('li')].map((li) => nb(li.textContent));
     expect(items).toEqual([
-      'Se ha abierto tu long de BTC a 45.000,00 €.',
+      'Se ha abierto tu long de BTC #2 a 45.000,00 €.',
       'El stop loss de tu posición de BTC se ha ejecutado a 45.000,00 €.',
       'Tu short de BTC se ha cerrado solo a 100.000,00 €: el precio llegó al doble y su garantía se agotó.',
       'Una orden de BTC ha caducado. Si reservaba dinero, ha vuelto a tu saldo.',
@@ -1199,6 +1207,69 @@ describe('Crypto console: open, pending and closed', () => {
     fireEvent.click(close);
     fireEvent.click(close);
     await waitFor(() => expect(screen.queryByText('Novedades de tus órdenes')).toBeNull());
+  });
+});
+
+describe('Crypto console: two operations per coin, numbered', () => {
+  const note = () => document.querySelector('.cc-slot-note')!;
+  const submit = () => screen.getByRole('button', { name: 'Abrir long' });
+
+  it('says which number the next one takes, and turns the button off at two of two', async () => {
+    const { api } = setup();
+    await ready();
+    fireEvent.change(capital(), { target: { value: '100' } });
+    expect(nb(note().textContent)).toBe('Ya tienes 1 de 2 operaciones de BTC; esta será la #2.');
+    expect(submit()).toBeEnabled();
+    expect(submit()).toHaveAccessibleDescription(
+      'Ya tienes 1 de 2 operaciones de BTC; esta será la #2.'
+    );
+    // A pending purchase counts too (its take profit and stop loss do not).
+    api.cryptoApi.placeOrder.mockResolvedValue(
+      fx.portfolio({ pending: [order({ id: 'o9', slot: 2 })] })
+    );
+    fireEvent.click(submit());
+    await waitFor(() =>
+      expect(nb(note().textContent)).toBe(
+        'Ya tienes 2 de 2 operaciones de BTC: cierra o cancela una para abrir otra.'
+      )
+    );
+    expect(note()).toHaveClass('is-full');
+    fireEvent.change(capital(), { target: { value: '100' } });
+    expect(submit()).toBeDisabled();
+    // Another coin has its own two: nothing to say there.
+    fireEvent.click(screen.getByRole('button', { name: /Ethereum/ }));
+    await screen.findByRole('img', { name: /Gráfica de Ethereum/ });
+    expect(note().textContent).toBe('');
+    expect(submit()).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('takes the free number: #1 again once the first one is gone', async () => {
+    setup(withPortfolio({ open: [{ ...fx.portfolio().open[0], slot: 2 }] }));
+    await ready();
+    expect(nb(note().textContent)).toContain('esta será la #1');
+  });
+
+  it('puts the number beside the coin in every panel, read out in words', async () => {
+    setup(
+      withPortfolio({
+        open: [fx.portfolio().open[0], short],
+        pending: [order({ id: 'o5', symbol: 'ETH', slot: 1 })],
+        closed: [closed(1, 10, { slot: 2 }), closed(2, -5, { slot: null })],
+      })
+    );
+    await screen.findByText('Abiertas (2)');
+    const who = (title: string) =>
+      [...screen.getByText(title).closest('section')!.querySelectorAll('.cc-who')].map((el) =>
+        nb(el.textContent)
+      );
+    expect(who('Abiertas (2)')).toEqual(['▲ LongBTC#1(operación 1)', '▼ ShortBTC#2(operación 2)']);
+    expect(who('Pendientes (1)')).toEqual(['▲ LongETH#1(operación 1)']);
+    // The oldest closed ones have no number.
+    expect(who('Cerradas (2)')).toEqual(['▲ LongETH#2(operación 2)', '▲ LongETH']);
+    expect(document.querySelectorAll('.cc-slot--even')).toHaveLength(2);
+    expect(
+      screen.getByRole('button', { name: 'Cancelar Abrir long (límite) ETH #1' })
+    ).toBeVisible();
   });
 });
 
@@ -1256,6 +1327,7 @@ describe('Crypto console: helpers', () => {
       type: 'limit',
       price: 1,
       at: '',
+      slot: null,
     };
     expect(fillText(take, t, money.price)).toMatch(/take profit/);
   });

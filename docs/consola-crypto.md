@@ -155,6 +155,18 @@ La comisión fija del 0,10 % solo se menciona dentro de la guía.
   cuentan las de entrada; el TP y el SL van con su posición, como mucho 2 por cada una de las 50),
   50 posiciones abiertas y 1.000 operaciones; las pendientes de entrada caducan a los 30 días; rate
   limit por usuario.
+- **Dos operaciones por moneda, numeradas** (`MAX_PER_COIN = 2`, `freeSlot` en
+  `domain/services/crypto-sim.ts`; `CryptoSimService.coinSlot`). Por cartera y moneda caben como
+  mucho **2 operaciones a la vez**, sumando las posiciones abiertas y las órdenes pendientes de
+  entrada (su TP y su SL no cuentan). La tercera se rechaza con **409 `CRYPTO_COIN_FULL`**
+  («Ya tienes 2 operaciones de SOL: cierra o cancela una para abrir otra.», con `symbol` y
+  `limit` en `details`, traducido en `app.apiError.CRYPTO_COIN_FULL`). Cada operación guarda su
+  **número** (`slot`, #1 o #2): el **hueco libre más bajo** al abrirla; una pendiente se lo pasa
+  a su posición al ejecutarse; al cerrarse o cancelarse el número queda libre (las cerradas lo
+  conservan para el historial). La API lo devuelve en `open`, `pending` (el TP y el SL llevan el
+  de su posición), `closed` y `fills`, y el límite en `limits.perCoin`. Los límites globales (50
+  abiertas, 20/100 pendientes) siguen igual. Una cartera que ya tenía más de 2 de una moneda las
+  conserva (como #3 y siguientes), pero no abre más de esa moneda hasta bajar de 2.
 
 ## Paneles de operaciones (Abiertas, Pendientes, Cerradas)
 
@@ -348,6 +360,12 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
   `crypto_sim_season_results`, `crypto_sim_season_closes`, `crypto_sim_badges`,
   `crypto_sim_equity_days` y `crypto_sim_alerts`. `close_type` admite `season`.
 
+## Migración 040
+
+- `slot INTEGER` (nulo o mayor que 0) en `crypto_sim_positions` y `crypto_sim_orders`. Las
+  operaciones en curso (posiciones abiertas y pendientes de entrada) se numeran por cartera y
+  moneda en el orden en que empezaron; las cerradas y el TP/SL vinculados quedan en `NULL`.
+
 ## Persistencia y datos personales
 
 - Todo con `ON DELETE CASCADE`: se borra con la cuenta.
@@ -374,6 +392,20 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 
 ## Interfaz
 
+- **Número de cada operación** (`SlotBadge` en `TradePanels.tsx`, `withSlot` y `coinSlots` en
+  `domain/orders.ts`): insignia «#1» / «#2» junto a la moneda en Abiertas, Pendientes y Cerradas
+  (la #2 con borde discontinuo; el lector de pantalla oye «(operación 2)»), y el número en los
+  botones para lector de pantalla («Cerrar operación (Short de SOL #2)») y en los avisos de
+  órdenes ejecutadas. En la **gráfica** (`chartLines`, `useCandleChart`) las líneas llevan el
+  número en la etiqueta («Entrada short #1», «TP #1», «SL #1», «Pendiente long #2»); las de la #1
+  son continua (entrada) y discontinuas (TP, SL, pendiente), y las de la #2 de rayas largas y
+  puntos en un tono más claro (verde para el TP y rojo para el SL siempre). Las etiquetas de
+  precios cercanos se separan solas (`alignLabels` de la escala de precios: la librería desplaza
+  la etiqueta y su título). Debajo, la leyenda «Tus operaciones: ━ #1 ┅ #2» y, para el lector de
+  pantalla, la lista de líneas de arriba abajo con su precio en la descripción de la gráfica.
+  Las líneas se vuelven a dibujar al cambiar de tema. En la **caja de operar**, bajo el botón,
+  «Ya tienes 1 de 2 operaciones de SOL; esta será la #2» y, con 2 de 2, el botón desactivado con
+  el motivo (`aria-describedby`). Término del glosario «Operación #1 y #2».
 - **Selector de carteras**: temporada oficial del mes y carteras de prácticas, con «Nueva
   cartera de prácticas»; cada cartera de prácticas tiene su botón para reiniciar y para borrar.
 - **Cuenta atrás** «Nueva temporada en X días», **aviso 3 días antes** y **resumen de tu
@@ -412,6 +444,8 @@ jugar» (cerrado y abierto en dos pestañas) en `/tmp/gf67-shots/` (1440, 390 y 
 oscuro y Contraste). Paneles con TP/SL en la tarjeta, formulario de edición y «¿Seguro? Sí,
 cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste). Filas compactas (una por
 operación, con y sin Detalles) en `/tmp/gf70-shots/` (1440 y 390; claro, oscuro y Contraste).
+Operaciones numeradas (#1 y #2 en filas, líneas de la gráfica con precios cercanos y aviso de la
+caja de operar con 2 de 2) en `/tmp/gf71-shots/` (1440 y 390; claro, oscuro y Contraste).
 
 Temporadas y ranking (datos inventados):
 

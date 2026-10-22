@@ -16,11 +16,11 @@ const POSITION = `id, user_id AS userId, portfolio_id AS portfolioId, symbol, di
   entry_price AS entryPrice, amount_cents AS amountCents, entry_fee_cents AS entryFeeCents,
   open_type AS openType, opened_at AS openedAt, exit_price AS exitPrice,
   exit_fee_cents AS exitFeeCents, proceeds_cents AS proceedsCents, pnl_cents AS pnlCents,
-  close_type AS closeType, closed_at AS closedAt`;
+  close_type AS closeType, closed_at AS closedAt, slot`;
 
 const ORDER = `id, user_id AS userId, portfolio_id AS portfolioId, symbol, side, direction, type,
   price, amount_cents AS amountCents, reserved_cents AS reservedCents, position_id AS positionId,
-  created_at AS createdAt, take_profit AS takeProfit, stop_loss AS stopLoss`;
+  created_at AS createdAt, take_profit AS takeProfit, stop_loss AS stopLoss, slot`;
 
 const RESULT = `user_id AS userId, season, initial_cents AS initialCents, final_cents AS finalCents,
   trades, wins, active_days AS activeDays, reached_at AS reachedAt, ranked, alias, premium, place,
@@ -169,8 +169,8 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
     this.db
       .prepare(
         `INSERT INTO crypto_sim_positions (id, user_id, portfolio_id, symbol, direction, quantity,
-           entry_price, amount_cents, entry_fee_cents, open_type, opened_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+           entry_price, amount_cents, entry_fee_cents, open_type, opened_at, slot)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         p.id,
@@ -183,7 +183,8 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
         p.amountCents,
         p.entryFeeCents,
         p.openType,
-        p.openedAt
+        p.openedAt,
+        p.slot
       );
   }
 
@@ -236,8 +237,9 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
     this.db
       .prepare(
         `INSERT INTO crypto_sim_orders (id, user_id, portfolio_id, symbol, side, direction, type,
-           price, amount_cents, reserved_cents, position_id, created_at, take_profit, stop_loss)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+           price, amount_cents, reserved_cents, position_id, created_at, take_profit, stop_loss,
+           slot)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         o.id,
@@ -253,7 +255,8 @@ export class SqliteCryptoSimRepository implements CryptoSimRepository {
         o.positionId,
         o.createdAt,
         o.takeProfit,
-        o.stopLoss
+        o.stopLoss,
+        o.slot
       );
   }
 

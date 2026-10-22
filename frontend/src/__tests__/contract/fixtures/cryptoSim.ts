@@ -25,6 +25,7 @@ export const cryptoSim = {
     {
       id: '00000000-0000-4000-8000-000000000002',
       symbol: 'BTC',
+      slot: 1,
       direction: 'long',
       quantity: 0.02,
       entryPrice: 50000,
@@ -44,6 +45,7 @@ export const cryptoSim = {
     {
       id: '00000000-0000-4000-8000-000000000003',
       symbol: 'BTC',
+      slot: 2,
       side: 'buy',
       direction: 'long',
       type: 'limit',
@@ -60,6 +62,7 @@ export const cryptoSim = {
     {
       id: '00000000-0000-4000-8000-000000000004',
       symbol: 'BTC',
+      slot: 1,
       side: 'sell',
       direction: 'long',
       type: 'limit',
@@ -78,6 +81,7 @@ export const cryptoSim = {
     {
       id: '00000000-0000-4000-8000-000000000005',
       symbol: 'BTC',
+      slot: 2,
       direction: 'long',
       quantity: 0.02,
       entryPrice: 50000,
@@ -144,5 +148,5 @@ export const cryptoSim = {
     source: 'binance',
   },
   fills: [],
-  limits: { pending: 100, open: 50, operations: 1000, pendingDays: 30 },
+  limits: { pending: 100, open: 50, operations: 1000, pendingDays: 30, perCoin: 2 },
 } as const;

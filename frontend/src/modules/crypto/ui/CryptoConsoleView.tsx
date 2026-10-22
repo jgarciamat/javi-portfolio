@@ -5,6 +5,7 @@ import { useCryptoMarket } from '../application/useCryptoMarket';
 import { useLayers } from '../application/useLayers';
 import { useAlerts, useRanking, type Ranking } from '../application/useRanking';
 import { useSimulator, type Simulator } from '../application/useSimulator';
+import { withSlot } from '../domain/orders';
 import { outOfBalance } from '../domain/season';
 import { CHART_INTERVALS, DEFAULT_INTERVAL } from '../domain/chart';
 import type { CryptoCoin, SimFill, SimPortfolio } from '../domain/types';
@@ -23,7 +24,7 @@ import { RankingCard, RankingIntro } from './RankingCard';
 import { BadgesCard, PracticeOffer, SeasonPanel } from './SeasonPanel';
 import { useGuide } from './Learn';
 import { SimSummary } from './SimSummary';
-import { ClosedPanel, OpenPanel, PendingPanel, orderKind } from './TradePanels';
+import { ClosedPanel, OpenPanel, PendingPanel } from './TradePanels';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 import type { ChartLine } from './useCandleChart';
@@ -50,7 +51,7 @@ export function savedView(): View {
 
 /** One sentence per order filled, expired or position closed since the last look. */
 export function fillText(f: SimFill, t: Translate, price: (euros: number) => string): string {
-  const vars = { coin: f.symbol, price: f.price === null ? '' : price(f.price) };
+  const vars = { coin: withSlot(f.symbol, f.slot), price: f.price === null ? '' : price(f.price) };
   if (f.type === 'expired') return t('app.crypto.fills.expired', vars);
   if (f.type === 'liquidation') return t('app.crypto.fills.liquidation', vars);
   const opening = (f.side === 'buy') === (f.direction === 'long');
@@ -77,7 +78,10 @@ function FillsNotice({ fills }: { fills: SimFill[] }) {
   );
 }
 
-/** Lines of the person's purchases and pending orders of the coin, in the display currency. */
+/**
+ * Lines of the person's purchases and pending orders of the coin, in the display currency, each
+ * with the number of its operation («Entrada short #1», «TP #1», «Pendiente long #2»).
+ */
 export function chartLines(
   p: SimPortfolio | null,
   symbol: string,
@@ -92,7 +96,8 @@ export function chartLines(
         id: o.id,
         price: money.toShown(o.entryPrice),
         kind: 'entry' as const,
-        title: t(`app.crypto.chart.lineEntry.${o.direction}`),
+        slot: o.slot,
+        title: withSlot(t(`app.crypto.chart.lineEntry.${o.direction}`), o.slot),
       })),
     ...p.pending
       .filter((o) => o.symbol === symbol)
@@ -103,7 +108,15 @@ export function chartLines(
           id: o.id,
           price: money.toShown(o.price),
           kind: kind as ChartLine['kind'],
-          title: exit ? t(`app.crypto.chart.lines.${kind}`) : orderKind(o, t),
+          slot: o.slot,
+          title: withSlot(
+            t(
+              exit
+                ? `app.crypto.chart.lines.${kind}`
+                : `app.crypto.chart.lines.order.${o.direction}`
+            ),
+            o.slot
+          ),
         };
       }),
   ];

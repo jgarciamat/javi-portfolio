@@ -118,6 +118,35 @@
   color: var(--accent-300);
 }
 
+/* How the lines of each operation are drawn: #1 solid, #2 dashed and lighter. */
+.cc-chart-slots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.85rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cc-text-2);
+}
+
+.cc-chart-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: var(--blue-300);
+}
+
+.cc-chart-slot i {
+  width: 1.75rem;
+  border-top: 2px solid var(--blue-400);
+}
+
+.cc-chart-slot--even i {
+  border-top-style: dashed;
+  border-top-color: var(--blue-300);
+}
+
 /* «Turn the phone»: a phone outline that tilts sideways, then rests. */
 .cc-rotate {
   display: grid;
@@ -250,6 +279,7 @@ html.wiz-contrast .cc-zoom {
 }
 
 html.wiz-contrast .cc-chart-readout,
+html.wiz-contrast .cc-chart-slots,
 html.wiz-contrast .cc-chart-pill,
 html.wiz-contrast .cc-chart-help,
 html.wiz-contrast .cc-chart-credit {

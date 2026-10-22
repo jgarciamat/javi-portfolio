@@ -8,6 +8,7 @@ export const cryptoReport = {
     {
       id: '00000000-0000-4000-8000-000000000001',
       symbol: 'BTC',
+      slot: 2,
       direction: 'long',
       quantity: 0.02,
       entryPrice: 50000,

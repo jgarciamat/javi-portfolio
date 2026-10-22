@@ -2,7 +2,14 @@ import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'reac
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatDateTime, formatQuantity, pnl } from '../domain/format';
-import { exitProblem, exitResult, needsRise, openBreakdown, type ExitKind } from '../domain/orders';
+import {
+  exitProblem,
+  exitResult,
+  needsRise,
+  openBreakdown,
+  withSlot,
+  type ExitKind,
+} from '../domain/orders';
 import type {
   ClosedTrade,
   Direction,
@@ -10,6 +17,7 @@ import type {
   OpenTrade,
   OrderRequest,
   PendingOrder,
+  Slot,
 } from '../domain/types';
 import { useMoney } from './money';
 import { Help } from './Notices';
@@ -30,6 +38,22 @@ export function DirectionBadge({ direction }: { direction: Direction }) {
     <span className={`cc-dir cc-dir--${direction}`}>
       <span aria-hidden="true">{direction === 'long' ? '▲' : '▼'}</span>{' '}
       {t(`app.crypto.order.directionShort.${direction}`)}
+    </span>
+  );
+}
+
+/**
+ * «#1» / «#2» beside the coin: the number of the operation, the same one its lines carry on the
+ * chart. The second one is drawn apart (dashed, like its lines), and the number is read out in
+ * words.
+ */
+export function SlotBadge({ slot }: { slot: Slot }) {
+  const { t } = useI18n();
+  if (!slot) return null;
+  return (
+    <span className={`cc-slot cc-slot--${slot % 2 ? 'odd' : 'even'}`}>
+      <span aria-hidden="true">#{slot}</span>
+      <span className="sr-only">{t('app.crypto.slot.label', { n: slot })}</span>
     </span>
   );
 }
@@ -392,7 +416,7 @@ function CloseTrade({
     return () => clearTimeout(timer);
   }, [armed]);
   const which = t('app.crypto.trades.close.which', {
-    coin: trade.symbol,
+    coin: withSlot(trade.symbol, trade.slot),
     direction: t(`app.crypto.order.directionShort.${trade.direction}`),
   });
   return (
@@ -492,7 +516,7 @@ function OpenCard({
   }
   const breakdown = openBreakdown(trade);
   const which = t('app.crypto.trades.close.which', {
-    coin: trade.symbol,
+    coin: withSlot(trade.symbol, trade.slot),
     direction: t(`app.crypto.order.directionShort.${trade.direction}`),
   });
   return (
@@ -501,6 +525,7 @@ function OpenCard({
         <span className="cc-who">
           <DirectionBadge direction={trade.direction} />
           <b>{trade.symbol}</b>
+          <SlotBadge slot={trade.slot} />
         </span>
         <small className="cc-sub">
           {formatQuantity(trade.quantity, locale)} · {formatDateTime(trade.openedAt, locale)}
@@ -605,7 +630,7 @@ export function OpenPanel({
   const close = async (trade: OpenTrade) => {
     setDone(null);
     if (await onPlace({ action: 'sell', positionId: trade.id, type: 'market' })) {
-      setDone(t('app.crypto.trades.close.done', { coin: trade.symbol }));
+      setDone(t('app.crypto.trades.close.done', { coin: withSlot(trade.symbol, trade.slot) }));
     }
   };
   return (
@@ -697,6 +722,7 @@ export function PendingPanel({
                     <span className="cc-who">
                       <DirectionBadge direction={order.direction} />
                       <b>{order.symbol}</b>
+                      <SlotBadge slot={order.slot} />
                     </span>
                     <small className="cc-sub">{kind}</small>
                   </Cell>
@@ -732,7 +758,7 @@ export function PendingPanel({
                       {t('app.crypto.trades.cancel')}
                       <span className="sr-only">
                         {' '}
-                        {kind} {order.symbol}
+                        {kind} {withSlot(order.symbol, order.slot)}
                       </span>
                     </button>
                   </div>
@@ -779,6 +805,7 @@ export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
                   <span className="cc-who">
                     <DirectionBadge direction={trade.direction} />
                     <b>{trade.symbol}</b>
+                    <SlotBadge slot={trade.slot} />
                   </span>
                   <small className="cc-sub">
                     {formatQuantity(trade.quantity, locale)} ·{' '}

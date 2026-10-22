@@ -19,15 +19,19 @@ import { RECENT_CANDLES } from '../domain/chart';
 import { formatDateTime, formatPlain, formatTick, intlTag } from '../domain/format';
 import { LAYER_COLORS } from '../domain/indicators';
 import type { LayerLevel, LayerLine } from '../domain/layers';
-import type { Candle } from '../domain/types';
+import type { Candle, Slot } from '../domain/types';
 
 /** A horizontal line on the chart: a purchase's entry price or a pending order's price. */
 export interface ChartLine {
   id: string;
   price: number;
   title: string;
-  kind: 'entry' | 'takeProfit' | 'stopLoss' | 'order';
+  kind: LineKind;
+  /** Number of its operation (#1, #2): the second one is drawn apart. */
+  slot: Slot;
 }
+
+type LineKind = 'entry' | 'takeProfit' | 'stopLoss' | 'order';
 
 interface Palette {
   background: string;
@@ -35,10 +39,9 @@ interface Palette {
   grid: string;
   up: string;
   down: string;
-  entry: string;
-  takeProfit: string;
-  stopLoss: string;
-  order: string;
+  /** Lines of the first operation of a coin, and (`second`) a lighter tone for the second one. */
+  lines: Record<LineKind, string>;
+  second: Record<LineKind, string>;
 }
 
 const token = (style: CSSStyleDeclaration, name: string, fallback: string) =>
@@ -53,10 +56,35 @@ function palette(): Palette {
     grid: token(style, '--slate-800', '#1e293b'),
     up: token(style, '--green-500', '#22c55e'),
     down: token(style, '--red-500', '#ef4444'),
-    entry: token(style, '--blue-400', '#60a5fa'),
-    takeProfit: token(style, '--green-500', '#22c55e'),
-    stopLoss: token(style, '--red-500', '#ef4444'),
-    order: token(style, '--amber-400', '#fbbf24'),
+    lines: {
+      entry: token(style, '--blue-400', '#60a5fa'),
+      takeProfit: token(style, '--green-500', '#22c55e'),
+      stopLoss: token(style, '--red-500', '#ef4444'),
+      order: token(style, '--amber-400', '#fbbf24'),
+    },
+    // Green is still a take profit and red a stop loss: only the tone changes.
+    second: {
+      entry: token(style, '--blue-300', '#93c5fd'),
+      takeProfit: token(style, '--green-300', '#86efac'),
+      stopLoss: token(style, '--red-300', '#fca5a5'),
+      order: token(style, '--amber-300', '#fcd34d'),
+    },
+  };
+}
+
+/**
+ * How a line is drawn: the entry solid and the rest dashed for the first operation of a coin; long
+ * dashes and dots, in a lighter tone, for the second one, so #1 and #2 never look alike.
+ */
+function lineLook(line: ChartLine, colors: Palette) {
+  const second = !!line.slot && line.slot % 2 === 0;
+  // [entry, take profit / stop loss / pending order]
+  const styles = second
+    ? [LineStyle.LargeDashed, LineStyle.Dotted]
+    : [LineStyle.Solid, LineStyle.Dashed];
+  return {
+    color: (second ? colors.second : colors.lines)[line.kind],
+    lineStyle: styles[line.kind === 'entry' ? 0 : 1],
   };
 }
 
@@ -84,7 +112,12 @@ function build(element: HTMLElement, locale: Locale): Engine {
       attributionLogo: true,
     },
     grid: { vertLines: { color: colors.grid }, horzLines: { color: colors.grid } },
-    rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.1, bottom: 0.25 } },
+    // Labels of lines whose prices are close move apart instead of covering each other.
+    rightPriceScale: {
+      borderVisible: false,
+      alignLabels: true,
+      scaleMargins: { top: 0.1, bottom: 0.25 },
+    },
     timeScale: {
       borderVisible: false,
       timeVisible: true,
@@ -232,6 +265,8 @@ export function useCandleChart(
   const data = useRef(candles);
   data.current = candles;
   const [hovered, setHovered] = useState<Candle | null>(null);
+  // Bumped when the theme changes: the lines are drawn again in its colours.
+  const [look, setLook] = useState(0);
   const rangeListener = useRef(onRange);
   rangeListener.current = onRange;
 
@@ -245,7 +280,10 @@ export function useCandleChart(
     const setRange = (range: LogicalRange | null) => rangeListener.current(range);
     built.chart.subscribeCrosshairMove(onCrosshair);
     built.chart.timeScale().subscribeVisibleLogicalRangeChange(setRange);
-    const observer = new MutationObserver(() => recolor(built));
+    const observer = new MutationObserver(() => {
+      recolor(built);
+      setLook((n) => n + 1);
+    });
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class', 'data-theme'],
@@ -302,9 +340,8 @@ export function useCandleChart(
     const drawn: IPriceLine[] = lines.map((line) =>
       series.createPriceLine({
         price: line.price,
-        color: colors[line.kind],
+        ...lineLook(line, colors),
         lineWidth: 2,
-        lineStyle: line.kind === 'entry' ? LineStyle.Solid : LineStyle.Dashed,
         axisLabelVisible: true,
         title: line.title,
       })
@@ -313,7 +350,7 @@ export function useCandleChart(
       // The chart may be gone already (language change): then its lines went with it.
       if (engine.current?.candles === series) drawn.forEach((line) => series.removePriceLine(line));
     };
-  }, [lines, locale]);
+  }, [lines, locale, look]);
 
   const currentEngine = useCallback(() => engine.current, []);
   useLayerDrawing(currentEngine, candles, layerLines, layerLevels, locale);

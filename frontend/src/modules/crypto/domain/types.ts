@@ -54,9 +54,17 @@ export interface CryptoCandles {
   market: MarketStatus;
 }
 
+/**
+ * Number of an operation among those of its coin (#1, #2: two at most at once), the same on its
+ * card and on the chart; it stays while the operation lives and is free again once it ends. Null
+ * on the oldest closed ones.
+ */
+export type Slot = number | null;
+
 export interface OpenTrade {
   id: string;
   symbol: string;
+  slot: Slot;
   direction: Direction;
   quantity: number;
   entryPrice: number;
@@ -77,6 +85,8 @@ export interface OpenTrade {
 export interface PendingOrder {
   id: string;
   symbol: string;
+  /** A pending purchase's number, or that of the position a take profit or stop loss goes with. */
+  slot: Slot;
   side: 'buy' | 'sell';
   direction: Direction;
   type: PendingType;
@@ -95,6 +105,7 @@ export interface PendingOrder {
 export interface ClosedTrade {
   id: string;
   symbol: string;
+  slot: Slot;
   direction: Direction;
   quantity: number;
   entryPrice: number;
@@ -119,6 +130,7 @@ export interface SimFill {
   type: PendingType | 'liquidation' | 'expired';
   price: number | null;
   at: string;
+  slot: Slot;
 }
 
 /** A play-money portfolio: the official one of a monthly season, or a practice one. */
@@ -205,7 +217,14 @@ export interface SimPortfolio {
   };
   market: MarketStatus;
   fills: SimFill[];
-  limits: { pending: number; open: number; operations: number; pendingDays: number };
+  limits: {
+    pending: number;
+    open: number;
+    operations: number;
+    pendingDays: number;
+    /** Operations of one coin at once (open and pending to open). */
+    perCoin: number;
+  };
 }
 
 export type OrderRequest =

@@ -115,4 +115,4 @@ export const CandlestickSeries = { type: 'Candlestick' };
 export const HistogramSeries = { type: 'Histogram' };
 export const LineSeries = { type: 'Line' };
 export const ColorType = { Solid: 'solid' };
-export const LineStyle = { Solid: 0, Dashed: 2 };
+export const LineStyle = { Solid: 0, Dotted: 1, Dashed: 2, LargeDashed: 3 };
