@@ -71,7 +71,9 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 ## Datos de mercado
 
 - **Fuente**: datos públicos de Binance, sin clave ni cuenta (`data-api.binance.vision` y, si
-  falla, `api.binance.com`). Las 20 monedas tienen **par real en EUR**: no hay conversión.
+  falla, `api.binance.com`). 22 monedas (las 20 primeras más PEPE y BONK). Cada una sale de **un
+  solo par**, fijado por versión (ver «Fuente por moneda»): BTC y ETH de su par en euros; el resto
+  de su par en **USDT convertido a euros** al cambio de referencia del BCE.
 - **Proxy en el backend** (`/api/crypto/coins` y `/api/crypto/candles`, con sesión): el navegador
   nunca llama a terceros (la CSP no cambia). Caché compartida de 15 s a 10 min según el marco, una
   sola petición aunque muchas pantallas pidan a la vez; 1.000 velas por serie, 500 a la gráfica.
@@ -81,12 +83,115 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 - `CRYPTO_MARKET=demo` inventa precios suaves y deterministas para desarrollo y E2E (sin
   Internet). En producción se fuerza la fuente real.
 
+### Fuente por moneda (versión 2, octubre de 2026)
+
+**Problema.** Los pares en euros de casi todas las monedas apenas tienen operaciones: muchas velas
+salían planas (apertura = máximo = mínimo = cierre, sin volumen) y otras sueltas con saltos. Es
+lo que hay en Binance, no un fallo de la gráfica.
+
+**Medición** (API pública de Binance, 23-10-2026, % de velas vacías: sin volumen o con un único
+precio; volumen de 24 h del par en euros):
+
+| Moneda | Vol. 24 h en EUR | EUR 5 min | EUR 15 min | EUR 1 h | USDT 15 min |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BTC | 7,6 M€ | 0 % | 0 % | 0 % | 0 % |
+| ETH | 4,0 M€ | 0,3 % | 0 % | 0 % | 0 % |
+| SOL | 1,0 M€ | 1,5 % | 0 % | 0 % | 0 % |
+| XRP | 1,1 M€ | 16 % | 1 % | 0 % | 0 % |
+| DOGE | 140 k€ | 30 % | 7 % | 0,5 % | 0 % |
+| TRX | 50 k€ | 62 % | 8-14 % | 0 % | 0 % |
+| BNB | 173 k€ | 55 % | 17 % | 2 % | 0 % |
+| ADA | 161 k€ | 68 % | 35 % | 2,5 % | 0 % |
+| LINK | 50 k€ | — | 69 % | 21,5 % | 0 % |
+| DOT | 15 k€ | — | 68,5 % | 12 % | 0 % |
+| LTC | 32 k€ | — | 82 % | 27,5 % | 0 % |
+| BCH | 2 k€ | — | 88,5 % | 56 % | 0 % |
+| AVAX | 60 k€ | — | 39,5 % | 39,5 % | 0 % |
+| XLM | 10 k€ | — | 79,5 % | 44,5 % | 0 % |
+| SHIB | 7 k€ | — | 89 % | 47 % | 0 % |
+| ATOM | 7 k€ | — | 94,5 % | 82 % | 0 % |
+| NEAR | 22 k€ | — | 59,5 % | 23,5 % | 0,5 % |
+| SUI | 39 k€ | — | 64,5 % | 20,5 % | 0 % |
+| APT | 8 k€ | — | 90,5 % | 46 % | 0 % |
+| POL | 15 k€ | — | 85 % | 59 % | 0,5 % |
+| PEPE | 36 k€ | — | 85 % | 28 % | 0 % |
+| BONK | sin par en EUR | — | — | — | 0,5 % |
+
+(5 min sobre 1.000 velas; 15 min y 1 h sobre 200.) Los pares en USDT mueven de cientos de miles a
+miles de millones de dólares al día y no tienen velas vacías en ninguna temporalidad.
+
+**Criterio.** Se queda en euros solo la moneda cuyo par en euros tiene menos de un 1 % de velas
+vacías a 5 min (la temporalidad más corta de la gráfica) y millones de euros al día: **BTC y ETH**.
+SOL pasa por poco (1,5 %) pero se ve peor que en USDT; se puede volver a euros sin tocar código.
+El resto, **USDT**. Configurable con `CRYPTO_EURO_PAIRS` (`BTC,ETH` por defecto, `none` para
+todas en USDT; una moneda desconocida impide arrancar). El plan está en
+`backend/src/domain/services/crypto-market.ts` (`EURO_PAIRS`, `MARKET_SOURCE_VERSION = 2`).
+
+**Por qué fijo y no decidido sobre la marcha.** Una decisión automática (por volumen o velas
+vacías) cambiaría de par al reiniciar el servidor (Render reinicia a menudo) o entre peticiones:
+el precio saltaría ~0,2-0,5 % (el par en euros y el USDT al cambio del BCE no coinciden del todo)
+y podría disparar TP/SL que el mercado no alcanzó. Por eso el par de cada moneda es fijo durante
+la vida del proceso y solo cambia con una nueva versión del plan. Sí hay vigilancia: si una moneda
+en euros mueve menos de 250.000 € en 24 h, el servidor lo anota en el log una vez al día
+(«consider quoting it in USDT»), sin cambiar nada.
+
+**Conversión (una sola función de precio).** `BinanceMarketData` guarda en caché los números del
+par (USDT) y los convierte **al leer** con `toEuros(usdt, usdPerEur) = usdt / tasa` (redondeo a
+10 cifras significativas, que mantiene máximo ≥ apertura/cierre ≥ mínimo). Lo usan igual las
+velas, el precio, bid/ask y el volumen de 24 h, y de ahí beben la gráfica, la lista de monedas,
+las órdenes a mercado, límite y stop, los TP/SL, la resolución de pendientes con velas, las
+alertas, el cierre de temporada y el ranking: todos ven los mismos euros en el mismo momento. El
+volumen de cada vela sigue en monedas; el % de 24 h es el del par (con una tasa fija coincide).
+
+- **Tasa**: el cambio de referencia del BCE de hoy (dólares por euro) del mismo `FrankfurterRates`
+  que sirve `/api/rates` (una sola instancia en el contenedor, caché de 12 h). Se toma **1 USDT =
+  1 US$** y se dice en la nota. Si el servicio de tasas falla se usa la última tasa obtenida
+  hasta 7 días (el BCE no publica en fin de semana); sin ninguna, las monedas en USDT salen **sin
+  precio** y sus velas dan 503 `MARKET_UNAVAILABLE`: nunca se inventa un precio ni se cambia de
+  par.
+- **Dólares sin doble conversión**: `/api/crypto/coins` y `/api/crypto/candles` devuelven
+  `market.usdPerEur` (la tasa usada) y cada moneda o serie su `quote` (`EUR` o `USDT`). El
+  frontend usa esa misma tasa para mostrar dólares (`DisplayChoice.adopt`), así que en USD una
+  moneda en USDT muestra exactamente su precio en USDT (euros × la misma tasa).
+- **Huecos**: no se rellenan. Si a la fuente le falta una vela, falta en la gráfica.
+- **Límite conocido**: la conversión usa la tasa de hoy también para las velas antiguas (en 1 d y
+  1 sem. el euro frente al dólar ha variado hasta ~10 % en años). Para aprender es suficiente y lo
+  dice la nota; convertir cada vela con la tasa de su día es posible (serie histórica del BCE) si
+  el dueño lo pide.
+- **Cambio de tasa diario**: cuando el BCE publica la tasa nueva (~16:00), todas las velas en
+  USDT se mueven a la vez lo que se mueva el euro (normalmente < 0,5 %). Equivale a un movimiento
+  real para quien mide en euros; puede ejecutar un TP/SL que estuviera a esa distancia.
+- **Datos existentes**: la consola aún no está en producción (no hay operaciones reales de
+  usuarios). En bases de desarrollo, las posiciones y órdenes guardadas siguen en euros; al pasar
+  una moneda a USDT, sus pendientes se resuelven en la siguiente lectura con la serie nueva
+  convertida (la caché va por par, así que nunca se mezclan series), y el precio puede moverse una
+  vez ~0,2-0,5 %.
+
+**Nota de datos (por moneda).** Con la moneda de la gráfica en USDT, el aviso dice en euros
+«SHIB: precio convertido desde USDT al cambio de referencia del BCE de hoy (1 € = X US$; tomamos
+1 USDT = 1 US$), porque en euros apenas tiene operaciones o no cotiza» y en dólares «precio en USDT
+mostrado en dólares sin más conversión (…); el simulador lo guarda en euros, convertido desde
+USDT al cambio de referencia del BCE de hoy». Con los datos de ejemplo (`demo`) no se habla de
+USDT: son inventados en euros.
+
+**Aviso de poco volumen.** Si más del 30 % de las velas a la vista (mínimo 10) están vacías, bajo
+la gráfica (también a pantalla completa) aparece «Poco volumen en esta moneda: prueba una
+temporalidad mayor (1 h o 4 h)» (las dos siguientes de 1 h o más; en 1 sem., «muchas velas de
+este tramo no tienen operaciones»). Con USDT casi nunca saldrá.
+
+PUNTO PARA ABOGADO: uso de los datos públicos de Binance (precios de pares en USDT) convertidos a
+euros con la tasa del BCE y mostrados a usuarios en una app con plan de pago. Ya se usaban los
+pares en euros; la novedad es mostrar precios derivados (conversión propia). Revisar las
+condiciones de uso de la API pública de Binance y la atribución, y que el texto «convertido desde
+USDT … tomamos 1 USDT = 1 US$» basta como aviso.
+
 ## Moneda de visualización (EUR / USD)
 
 - Control «€ EUR | $ USD» junto a las temporalidades. El simulador **sigue en euros**; los dólares
-  son una **conversión de visualización** con el cambio del BCE del día (el `/api/rates` que ya usa
-  la app). Binance cotiza pares reales con euro (`BTCEUR`), así que en euros no hay conversión; en
-  dólares son esos precios en euros convertidos. Un **único aviso discreto** (`DataNotice`) reúne
+  son una **conversión de visualización** con el cambio del BCE del día (la tasa con la que el
+  servidor convirtió los precios en USDT, o el `/api/rates` que ya usa la app). BTC y ETH vienen de
+  su par en euros y en dólares se convierten; las monedas en USDT se guardan en euros y en dólares
+  vuelven a su precio en USDT (ver «Fuente por moneda»). Un **único aviso discreto** (`DataNotice`) reúne
   retraso, fuente, frescura y, en USD, «Los importes en dólares son una conversión informativa al
   cambio de referencia del BCE de hoy (1 € = X US$); el simulador guarda y calcula en euros».
   `/api/rates` no devuelve fecha, por eso se dice «de hoy». Sin cambio disponible se muestra en
@@ -463,6 +568,17 @@ cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste). Filas co
 operación, con y sin Detalles) en `/tmp/gf70-shots/` (1440 y 390; claro, oscuro y Contraste).
 Operaciones numeradas (#1 y #2 en filas, líneas de la gráfica con precios cercanos y aviso de la
 caja de operar con 2 de 2) en `/tmp/gf71-shots/` (1440 y 390; claro, oscuro y Contraste).
+
+Fuente por moneda (USDT convertido): `backend/src/tests/infrastructure/market.test.ts` (plan de
+pares, conversión y redondeo, caché por par convertida al leer, tasa de reserva de 7 días, sin
+tasa no hay precio en USDT, plan configurable, aviso en el log), `integration/crypto-usdt.test.ts`
+(adaptador real con HTTP simulado: precio de la lista, compra, gráfica y stop loss resuelto con
+las velas convertidas, todo con los mismos euros), `adapters.test.ts` (`CRYPTO_EURO_PAIRS`),
+contrato con `quote` y `market.usdPerEur`; en el frontend, nota por moneda (EUR, USD, sin tasa,
+demo), tasa del servidor para los dólares y aviso de poco volumen (`chart.test.tsx`,
+`domain.test.ts`), y E2E con una moneda en USDT y velas vacías. Capturas con la API real de
+Binance, antes (todas en euros) y después, en `/tmp/gf74-shots/` (`before-*` y `after-*`: NEAR,
+PEPE, BONK y SOL en 15 min y 1 h, DOGE y TRX en 5 min; EUR y USD).
 
 Temporadas y ranking (datos inventados):
 
