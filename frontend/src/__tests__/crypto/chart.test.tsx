@@ -325,6 +325,41 @@ describe('PriceChart', () => {
     expect(container.querySelector('.cc-chart--expanded')).toBeNull();
   });
 
+  it('shows the bar of the full screen only there, keeps focus inside and gives it back', () => {
+    const { container } = draw({ fullBar: <button type="button">Barra</button> });
+    expect(screen.queryByRole('button', { name: 'Barra' })).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const opener = screen.getByRole('button', { name: 'Pantalla completa' });
+    opener.focus();
+    fireEvent.click(opener);
+    const dialog = screen.getByRole('dialog', { name: 'Gráfica en pantalla completa' });
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(screen.getByRole('button', { name: 'Barra' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /^Gráfica/ })).toHaveFocus();
+    // Tab from the last control goes to the first one, Shift+Tab the other way round.
+    const first = screen.getByRole('button', { name: 'Barra' });
+    const last = screen.getByRole('link', { name: /TradingView/ });
+    last.focus();
+    fireEvent.keyDown(window, { key: 'Tab' });
+    expect(first).toHaveFocus();
+    fireEvent.keyDown(window, { key: 'Tab', shiftKey: true });
+    expect(last).toHaveFocus();
+    // Tab in the middle is left to the browser.
+    screen.getByRole('button', { name: 'Alejar' }).focus();
+    fireEvent.keyDown(window, { key: 'Tab' });
+    expect(screen.getByRole('button', { name: 'Alejar' })).toHaveFocus();
+    // Focus that got out of the chart comes back to it.
+    (document.activeElement as HTMLElement).blur();
+    fireEvent.keyDown(window, { key: 'Tab' });
+    expect(first).toHaveFocus();
+    (document.activeElement as HTMLElement).blur();
+    fireEvent.keyDown(window, { key: 'Tab', shiftKey: true });
+    expect(last).toHaveFocus();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(container.querySelector('.cc-chart--expanded')).toBeNull();
+    expect(opener).toHaveFocus();
+  });
+
   it('keeps the view on new candles of the same coin and goes back to recent on another', () => {
     const { chart, rerender } = draw();
     chart.visibleRange = { from: 1, to: 2 };

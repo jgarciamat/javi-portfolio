@@ -204,26 +204,107 @@
   }
 }
 
-/* Full screen without the browser's API (which iPhone Safari lacks): the chart fills the view. */
+/*
+ * Full screen (the browser's own or, without it, the page layout filling the view): a compact
+ * bar on top (coin, price, candle sizes, currency), the layer chips, the chart taking what is
+ * left and the zoom bar at the foot, so nothing covers the drawing.
+ */
 .cc-chart--expanded {
   position: fixed;
   inset: 0;
   z-index: 1000;
   margin: 0;
-  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
-    max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  gap: 0.3rem;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+    max(0.5rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   background: var(--slate-950);
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .cc-chart--expanded .cc-chart-canvas {
-  height: calc(100dvh - 11rem);
-  min-height: 240px;
+  flex: 1 1 0;
+  height: auto;
+  min-height: 140px;
 }
 
 .cc-chart--expanded .cc-chart-help,
+.cc-chart--expanded .cc-chart-slots,
 .cc-chart--expanded .cc-rotate {
   display: none;
+}
+
+.cc-chart--expanded .cc-chart-credit {
+  margin: 0;
+  font-size: 0.625rem;
+}
+
+.cc-chart--expanded .cc-chart-tools {
+  flex: 0 0 auto;
+}
+
+.cc-full-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.6rem;
+}
+
+.cc-full-bar .cc-quote-main {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.1rem 0.5rem;
+}
+
+.cc-full-bar .cc-quote-main .cc-coin-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.5625rem;
+}
+
+.cc-full-bar .cc-quote-line {
+  grid-column: auto;
+  gap: 0 0.6rem;
+}
+
+.cc-full-bar .cc-quote-price {
+  font-size: 1.0625rem;
+}
+
+.cc-full-bar .cc-quote-changes {
+  font-size: 0.75rem;
+}
+
+.cc-full-coin select {
+  min-height: 32px;
+  max-width: 11rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--cc-line, var(--slate-700));
+  border-radius: 6px;
+  background: var(--cc-raised, var(--slate-800));
+  color: var(--cc-strong, var(--slate-50));
+  font: inherit;
+  font-size: 0.8125rem;
+}
+
+.cc-full-bar .cc-intervals {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.cc-full-bar .cc-segmented label {
+  min-width: 0;
+  min-height: 30px;
+  padding: 0.1rem 0.5rem;
+}
+
+/* The way out, the clearest button of the bar. */
+.cc-chart--expanded .cc-zoom--full {
+  border-color: var(--accent-400);
+  color: var(--cc-strong, var(--slate-50));
+  font-weight: 600;
 }
 
 @media (max-width: 719px), (pointer: coarse) {
@@ -243,6 +324,37 @@
     height: 320px;
   }
 
+  /* Full screen on a phone held upright: three short rows on top, the chips in one row. */
+  .cc-chart--expanded .cc-chart-head,
+  .cc-chart--expanded .cc-full-bar .cc-quote-changes span + span {
+    display: none;
+  }
+
+  .cc-chart--expanded .cc-layers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    flex: 0 0 auto;
+  }
+
+  .cc-full-bar .cc-intervals {
+    order: 1;
+  }
+
+  .cc-full-coin {
+    flex: 1 1 0;
+    min-width: 0;
+    order: 2;
+  }
+
+  .cc-full-coin select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .cc-full-bar .cc-currency {
+    order: 2;
+  }
+
   .cc-zoom {
     flex: 1 1 auto;
     justify-content: center;
@@ -256,10 +368,54 @@
 
 /* A phone on its side: the chart takes nearly all the height. */
 @media (orientation: landscape) and (max-height: 500px) {
-  .cc-chart-canvas,
-  .cc-chart--expanded .cc-chart-canvas {
+  .cc-chart-canvas {
     height: calc(100dvh - 6.5rem);
     min-height: 200px;
+  }
+
+  .cc-chart--expanded .cc-chart-head {
+    display: none;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-main {
+    flex: 0 1 auto;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-name small,
+  .cc-chart--expanded .cc-full-bar .cc-quote-changes span + span {
+    display: none;
+  }
+
+  .cc-full-bar {
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-quote-main {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .cc-chart--expanded .cc-full-bar .cc-coin-icon {
+    display: none;
+  }
+
+  .cc-full-bar .cc-segmented {
+    flex-wrap: nowrap;
+  }
+
+  .cc-full-coin select {
+    max-width: 8.5rem;
+  }
+
+  .cc-full-bar .cc-segmented label {
+    padding: 0.1rem 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  .cc-chart--expanded .cc-layers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
 
   .cc-chart-help {

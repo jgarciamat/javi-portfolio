@@ -185,6 +185,58 @@ test('pages the coins, zooms from the bar and opens the words of the console', a
   await expect(words).toBeHidden();
 });
 
+test('keeps candle sizes, currency, coin and zoom in the full screen chart', async ({ page }) => {
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+    { width: 844, height: 390 },
+  ]) {
+    await page.setViewportSize(size);
+    await page.locator('.cc-zoom--full').click();
+    const full = page.getByRole('dialog', { name: 'Gráfica en pantalla completa' });
+    await expect(full).toBeVisible();
+    const canvas = full.getByRole('img', { name: /Gráfica de/ });
+    // Everything is in reach and nothing covers the drawing.
+    for (const control of [
+      full.getByRole('radio', { name: '5 minutos', exact: true }),
+      full.getByRole('radio', { name: '1 semana', exact: true }),
+      full.getByRole('radio', { name: '$ USD' }),
+      full.getByRole('combobox', { name: 'Cambiar de moneda' }),
+      full.getByRole('button', { name: 'Acercar' }),
+      full.getByRole('button', { name: 'Lo más reciente' }),
+      full.getByRole('button', { name: 'Ver todo' }),
+      full.getByRole('button', { name: 'Salir de pantalla completa' }),
+    ]) {
+      await expect(control).toBeVisible();
+      await expect(control).toBeInViewport();
+    }
+    await expect(full.getByRole('button', { name: /Antes de empezar/ })).toHaveCount(0);
+    const box = await canvas.boundingBox();
+    expect(box!.height).toBeGreaterThan(size.height * 0.45);
+    await full.getByRole('radio', { name: '1 día' }).check();
+    await full.getByRole('combobox', { name: 'Cambiar de moneda' }).selectOption('ETH');
+    await expect(
+      full.getByRole('img', { name: 'Gráfica de Ethereum, velas de 1 día' })
+    ).toBeVisible();
+    await full.getByRole('radio', { name: '$ USD' }).check();
+    await full.getByRole('button', { name: 'Acercar' }).click();
+    await page.keyboard.press('Escape');
+    await expect(full).toBeHidden();
+    // What was chosen up there stays chosen down here.
+    await expect(page.getByRole('radio', { name: '1 día' })).toBeChecked();
+    await expect(page.getByRole('radio', { name: '$ USD' })).toBeChecked();
+    await expect(page.getByRole('img', { name: /Gráfica de Ethereum/ })).toBeVisible();
+    // Back to the starting point for the next size.
+    await page.evaluate(() => localStorage.removeItem('mm_crypto_view'));
+    await page.evaluate(() => localStorage.removeItem('mm_crypto_currency'));
+    await page.reload();
+    await openSection(page, 'Consola crypto');
+    await expect(
+      page.getByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 hora' })
+    ).toBeVisible();
+  }
+});
+
 test('fits a phone upright and on its side without sideways scrolling', async ({ page }) => {
   for (const size of [
     { width: 390, height: 844 },

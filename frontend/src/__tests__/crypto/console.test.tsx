@@ -152,6 +152,36 @@ describe('Crypto console: market', () => {
     expect(savedView()).toEqual({ symbol: 'BTC', interval: '1h' });
   });
 
+  it('keeps candle size, coin, currency and layers in the full screen bar and after leaving it', async () => {
+    const { api } = setup((a) =>
+      a.ratesApi.get.mockResolvedValue({ from: 'EUR', to: 'USD', rate: 1.1 })
+    );
+    await ready();
+    fireEvent.click(screen.getByRole('button', { name: 'Pantalla completa' }));
+    const dialog = screen.getByRole('dialog', { name: 'Gráfica en pantalla completa' });
+    const bar = within(dialog);
+    expect(dialog.querySelector('.cc-full-bar')).not.toBeNull();
+    expect(bar.queryByRole('button', { name: /Antes de empezar/ })).toBeNull();
+    fireEvent.click(bar.getByRole('radio', { name: '1 día' }));
+    await screen.findByRole('img', { name: 'Gráfica de Bitcoin, velas de 1 día' });
+    expect(api.cryptoApi.candles).toHaveBeenLastCalledWith('BTC', '1d');
+    fireEvent.change(bar.getByRole('combobox', { name: 'Cambiar de moneda' }), {
+      target: { value: 'ETH' },
+    });
+    await screen.findByRole('img', { name: 'Gráfica de Ethereum, velas de 1 día' });
+    fireEvent.click(bar.getByRole('radio', { name: '$ USD' }));
+    await screen.findByText(/conversión informativa/);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(bar.getByRole('button', { name: /^Salir de pantalla completa/ }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('radio', { name: '1 día', checked: true })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '$ USD', checked: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ethereum/ })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+  });
+
   const many: CryptoCoins = {
     ...fx.coins(),
     coins: Array.from({ length: 30 }, (_, i) => ({

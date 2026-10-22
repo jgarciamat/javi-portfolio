@@ -430,6 +430,16 @@ empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
 
 - 390 px sin desplazamiento lateral; en horizontal (844x390) la gráfica ocupa casi todo el alto y
   monedas, capas y pestañas de la guía pasan a filas deslizables.
+- **Pantalla completa**: diálogo (`role="dialog"`, `aria-modal`, foco atrapado con Tab/Mayús+Tab,
+  Esc sale y el foco vuelve al botón que la abrió). Barra superior compacta con moneda, precio y
+  variación, desplegable «Cambiar de moneda», temporalidades (5 min … 1 sem.) y «€ EUR | $ USD»;
+  debajo, los chips de capas; la gráfica ocupa el resto; y abajo la barra de zoom (Alejar, Acercar,
+  Reciente, Todo) con el botón destacado «Salir de pantalla completa». En móvil vertical la barra
+  pasa a tres filas cortas y los chips a una fila deslizable; en horizontal (844x390) la barra va
+  en una fila y se oculta la línea de la vela señalada. «Aprende antes de jugar» queda oculto. La
+  elección de temporalidad, moneda, moneda del mercado y capas es la misma de fuera, así que se
+  conserva al salir; la gráfica sigue montada (vacía) mientras llegan las velas nuevas para no
+  salir de pantalla completa al cambiar. Las líneas y etiquetas de operaciones (#1/#2) no cambian.
 - «Pantalla completa» usa la Fullscreen API y `screen.orientation.lock('landscape')` cuando el
   navegador lo deja; si no (iPhone Safari, algunos WebView) la gráfica ocupa la pantalla con CSS.
   Sin plugins nuevos de Capacitor.

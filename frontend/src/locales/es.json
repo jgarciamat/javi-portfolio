@@ -5174,6 +5174,8 @@
   "app.crypto.chart.allShort": "Todo",
   "app.crypto.chart.full": "Pantalla completa",
   "app.crypto.chart.exitFull": "Salir de pantalla completa",
+  "app.crypto.chart.fullDialog": "Gráfica en pantalla completa",
+  "app.crypto.chart.pickCoin": "Cambiar de moneda",
   "app.crypto.chart.help": "Arrastra para moverte y usa la rueda o dos dedos para ampliar. Con el teclado: flechas para moverte, + y − para ampliar, Inicio para ver todo y Fin para lo más reciente.",
   "app.crypto.chart.credit": "Gráfica dibujada con",
   "app.crypto.chart.lineEntry": "Tu compra",

@@ -979,11 +979,6 @@
   }
 }
 
-/* The panel of the guide cannot be reached from a chart in full screen. */
-.cc-chart--expanded .cc-learn-open {
-  display: none;
-}
-
 /* «Learn all the key words»: opens the guide on its words. */
 .cc-glossary-open {
   align-self: flex-start;

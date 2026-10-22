@@ -33,9 +33,12 @@ export function Loading() {
 function Intervals({
   value,
   onChange,
+  name = 'cc-interval',
 }: {
   value: CryptoInterval;
   onChange: (i: CryptoInterval) => void;
+  /** Radio group name: apart in the full screen bar, so the two copies never share a choice. */
+  name?: string;
 }) {
   const { t } = useI18n();
   return (
@@ -45,7 +48,7 @@ function Intervals({
         <label key={option} className={option === value ? 'is-on' : undefined}>
           <input
             type="radio"
-            name="cc-interval"
+            name={name}
             value={option}
             checked={option === value}
             onChange={() => onChange(option)}
@@ -62,9 +65,11 @@ function Intervals({
 export function CurrencySwitch({
   value,
   onChange,
+  name = 'cc-currency',
 }: {
   value: DisplayCurrency;
   onChange: (c: DisplayCurrency) => void;
+  name?: string;
 }) {
   const { t } = useI18n();
   return (
@@ -74,7 +79,7 @@ export function CurrencySwitch({
         <label key={option} className={option === value ? 'is-on' : undefined}>
           <input
             type="radio"
-            name="cc-currency"
+            name={name}
             value={option}
             checked={option === value}
             onChange={() => onChange(option)}
@@ -150,7 +155,62 @@ function Stats({ coin, updatedAt }: { coin: CryptoCoin | undefined; updatedAt: s
   );
 }
 
+/**
+ * What stays in reach with the chart in full screen: the coin (with a small selector to change
+ * it), its price and changes, the candle sizes and the currency, in one compact bar.
+ */
+function FullBar({
+  coins,
+  view,
+  coin,
+  change,
+  currency,
+  onChange,
+  onCurrency,
+}: {
+  coins: CryptoCoin[];
+  view: View;
+  coin: CryptoCoin | undefined;
+  change: number | null;
+  currency: DisplayCurrency;
+  onChange: (next: Partial<View>) => void;
+  onCurrency: (c: DisplayCurrency) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="cc-full-bar">
+      <QuoteHead coin={coin} symbol={view.symbol} change={change} />
+      <label className="cc-full-coin">
+        <span className="sr-only">{t('app.crypto.chart.pickCoin')}</span>
+        <select value={view.symbol} onChange={(e) => onChange({ symbol: e.target.value })}>
+          {coins.map((c) => (
+            <option key={c.symbol} value={c.symbol}>
+              {c.name} ({c.symbol})
+            </option>
+          ))}
+        </select>
+      </label>
+      <Intervals
+        name="cc-full-interval"
+        value={view.interval}
+        onChange={(interval) => onChange({ interval })}
+      />
+      <CurrencySwitch name="cc-full-currency" value={currency} onChange={onCurrency} />
+    </div>
+  );
+}
+
 const coinName = (coin: CryptoCoin | undefined, symbol: string): string => coin?.name ?? symbol;
+
+/**
+ * Once drawn, the chart stays mounted (empty) while other candles load, so a chart in full screen
+ * survives a change of coin, candle size or currency.
+ */
+function useWaiting(market: CryptoMarket): boolean {
+  const [drawn, setDrawn] = useState(false);
+  if (market.candles && !drawn) setDrawn(true);
+  return !market.candles && drawn && !market.error;
+}
 
 /** The chart (or why it is missing) for the candles in the display currency. */
 function ChartArea({
@@ -163,6 +223,7 @@ function ChartArea({
   layers,
   onToggleLayer,
   layerExtra,
+  fullBar,
   onVisibleChange,
 }: {
   market: CryptoMarket;
@@ -174,9 +235,11 @@ function ChartArea({
   layers: LayerId[];
   onToggleLayer: (layer: LayerId) => void;
   layerExtra: ReactNode;
+  fullBar: ReactNode;
   onVisibleChange: (percent: number | null) => void;
 }) {
   const { t } = useI18n();
+  const waiting = useWaiting(market);
   return (
     <>
       {market.error && !market.candles && (
@@ -188,17 +251,18 @@ function ChartArea({
         </p>
       )}
       {market.loading && <Loading />}
-      {market.candles && (
+      {(market.candles || waiting) && (
         <Suspense fallback={<Loading />}>
           <PriceChart
-            candles={candles}
-            viewKey={viewKey}
+            candles={waiting ? [] : candles}
+            viewKey={waiting ? `${viewKey}:loading` : viewKey}
             label={label}
             interval={interval}
             lines={lines}
             layers={layers}
             onToggleLayer={onToggleLayer}
             layerExtra={layerExtra}
+            fullBar={fullBar}
             onVisibleChange={onVisibleChange}
           />
         </Suspense>
@@ -285,6 +349,17 @@ export function MarketPanel({
             layers={layers}
             onToggleLayer={onToggleLayer}
             layerExtra={<LearnButton guide={guide} />}
+            fullBar={
+              <FullBar
+                coins={coins}
+                view={view}
+                coin={coin}
+                change={market.candles ? change : null}
+                currency={currency}
+                onChange={onChange}
+                onCurrency={onCurrency}
+              />
+            }
             onVisibleChange={setChange}
           />
           <ChartTable candles={candles} label={label} />

@@ -5174,6 +5174,8 @@
   "app.crypto.chart.allShort": "All",
   "app.crypto.chart.full": "Full screen",
   "app.crypto.chart.exitFull": "Leave full screen",
+  "app.crypto.chart.fullDialog": "Chart in full screen",
+  "app.crypto.chart.pickCoin": "Change coin",
   "app.crypto.chart.help": "Drag to move and use the wheel or two fingers to zoom. With the keyboard: arrows to move, + and − to zoom, Home to see everything and End for the most recent.",
   "app.crypto.chart.credit": "Chart drawn with",
   "app.crypto.chart.lineEntry": "Your purchase",

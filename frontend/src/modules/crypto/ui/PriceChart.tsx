@@ -39,6 +39,8 @@ interface PriceChartProps {
   onToggleLayer: (layer: LayerId) => void;
   /** What goes just below the layer chips (the bar of the guide). */
   layerExtra?: ReactNode;
+  /** The coin, candle sizes and currency, on top of the chart while it is in full screen. */
+  fullBar?: ReactNode;
   /** Change (%) of the candles on screen, for the header; null when there are none. */
   onVisibleChange: (percent: number | null) => void;
 }
@@ -276,6 +278,46 @@ function LinesKey({ id, lines }: { id: string; lines: ChartLine[] }) {
 const inView = (total: number, shown: { from: number; to: number } | null): number =>
   shown ? Math.max(0, Math.min(total - 1, shown.to) - Math.max(0, shown.from) + 1) : total;
 
+const FOCUSABLE =
+  'button:not(:disabled), select:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]';
+
+/** Tab and Shift+Tab go round the full screen chart instead of reaching the page behind it. */
+function trapFocus(event: globalThis.KeyboardEvent, box: HTMLElement) {
+  const items = [...box.querySelectorAll<HTMLElement>(FOCUSABLE)];
+  const first = items[0];
+  const last = items[items.length - 1];
+  const inside = box.contains(document.activeElement);
+  if (event.shiftKey && (document.activeElement === first || !inside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+/** The compact bar of the full screen, or the hint to turn the phone otherwise. */
+function ChartTop({
+  expanded,
+  fullBar,
+  onFull,
+}: {
+  expanded: boolean;
+  fullBar: ReactNode;
+  onFull: () => void;
+}) {
+  return expanded ? fullBar : <RotateHint onFull={onFull} />;
+}
+
+/** What has no place in the full screen (the panel of the guide cannot be reached from there). */
+function Unless({ hide, children }: { hide: boolean; children: ReactNode }) {
+  return hide ? null : children;
+}
+
+/** In full screen the chart is a dialog that holds the focus. */
+const dialogProps = (expanded: boolean, name: string) =>
+  expanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': name } : {};
+
 /** Full screen: the browser's own when it allows it, turned sideways on phones that let us. */
 function useFullScreen(root: RefObject<HTMLDivElement | null>) {
   const [expanded, setExpanded] = useState(false);
@@ -283,8 +325,11 @@ function useFullScreen(root: RefObject<HTMLDivElement | null>) {
 
   useEffect(() => {
     if (!expanded) return;
+    const opener = document.activeElement as HTMLElement | null;
+    root.current?.querySelector<HTMLElement>('.cc-chart-canvas')?.focus();
     const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') setExpanded(false);
+      if (event.key === 'Tab') trapFocus(event, root.current!);
     };
     const onChange = () => {
       if (native.current && !document.fullscreenElement) {
@@ -297,8 +342,9 @@ function useFullScreen(root: RefObject<HTMLDivElement | null>) {
     return () => {
       window.removeEventListener('keydown', onKey);
       document.removeEventListener('fullscreenchange', onChange);
+      opener?.focus();
     };
-  }, [expanded]);
+  }, [expanded, root]);
 
   const enter = () => {
     setExpanded(true);
@@ -342,6 +388,7 @@ export function PriceChart({
   layers,
   onToggleLayer,
   layerExtra,
+  fullBar,
   onVisibleChange,
 }: PriceChartProps) {
   const { t, locale } = useI18n();
@@ -367,6 +414,7 @@ export function PriceChart({
     onRange: setRange,
   });
   const full = useFullScreen(root);
+  const dialog = dialogProps(full.expanded, t('app.crypto.chart.fullDialog'));
   const helpId = useId();
   const summaryId = useId();
   const linesId = useId();
@@ -397,8 +445,8 @@ export function PriceChart({
   const last = candles[candles.length - 1];
 
   return (
-    <div ref={root} className={`cc-chart${full.expanded ? ' cc-chart--expanded' : ''}`}>
-      <RotateHint onFull={full.enter} />
+    <div ref={root} className={`cc-chart${full.expanded ? ' cc-chart--expanded' : ''}`} {...dialog}>
+      <ChartTop expanded={full.expanded} fullBar={fullBar} onFull={full.enter} />
       <div className="cc-chart-head">
         <Readout candle={chart.hovered ?? last ?? null} />
         {last && (
@@ -414,7 +462,7 @@ export function PriceChart({
         legend={legend(lineData, levelData, layers, t)}
         onToggle={onToggleLayer}
       />
-      {layerExtra}
+      <Unless hide={full.expanded}>{layerExtra}</Unless>
       <div
         ref={container}
         className="cc-chart-canvas"
