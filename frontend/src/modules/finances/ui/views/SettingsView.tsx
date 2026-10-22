@@ -36,6 +36,7 @@ import { offersEnabled } from '../navigation';
 import '../css/Sections.css';
 import { Icon } from '@shared/components/Icon';
 import { TwoFactorSection } from '@modules/auth/ui/TwoFactorSection';
+import { InstallGuideCard } from '@shared/components/InstallGuide';
 
 const CURRENCIES: Currency[] = ['EUR', 'USD', 'GBP', 'MXN', 'ARS', 'COP', 'CLP', 'CHF'];
 const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
@@ -406,6 +407,7 @@ export function SettingsView({ onOpenProfile, onStartTour }: SettingsViewProps) 
       <CaptureCard />
       <HouseholdCard />
       <TourCard settings={settings} saving={action.pending} save={save} onStartTour={onStartTour} />
+      <InstallGuideCard />
       <AppLockCard />
       <DataCard onError={action.setError} />
       <SecurityCard onOpenProfile={onOpenProfile} onError={action.setError} />

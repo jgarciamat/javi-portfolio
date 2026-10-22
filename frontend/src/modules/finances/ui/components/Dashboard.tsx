@@ -35,6 +35,7 @@ import { MonthlyView, MonthNavCard } from './MonthlyView';
 import { monthAlertMessage } from './monthAlertMessage';
 import { BrandLogo } from '@shared/components/BrandLogo';
 import { SocialIcons } from '@shared/components/SocialLinks';
+import { IosInstallHint } from '@shared/components/IosInstallHint';
 import '../css/Dashboard.css';
 import '../css/Sections.css';
 
@@ -62,6 +63,36 @@ const CustomAlertsTab = lazyNamed(() => import('./CustomAlertsTab'), 'CustomAler
 const CategoryManager = lazyNamed(() => import('./CategoryManager'), 'CategoryManager');
 const ImportModal = lazyNamed(() => import('./ImportModal'), 'ImportModal');
 const ProfilePage = lazyNamed(() => import('@modules/auth/ui/ProfilePage'), 'ProfilePage');
+
+/**
+ * The tour, its offer and the install notice, one at a time. The terms dialog cannot be
+ * dismissed: they all wait until the terms are accepted.
+ */
+function TourAndNotices({
+  tour,
+  onShowTab,
+  termsPending,
+}: {
+  tour: ReturnType<typeof useWelcomeTour>;
+  onShowTab: (tab: DashboardTab) => void;
+  termsPending: boolean;
+}) {
+  if (termsPending) return null;
+  return (
+    <>
+      {tour.offer && <TourOffer onAnswer={tour.answerOffer} />}
+      {tour.open && (
+        <GuidedTour
+          steps={tour.steps}
+          onShowTab={onShowTab}
+          onClose={tour.close}
+          initialDontShowAgain={tour.dontShowAgain}
+        />
+      )}
+      {!tour.offer && !tour.open && <IosInstallHint />}
+    </>
+  );
+}
 
 /** Sections that need nothing from the dashboard. */
 const SIMPLE_VIEWS: Partial<
@@ -358,16 +389,11 @@ export function Dashboard() {
       <Suspense fallback={null}>
         <DashboardModals dash={dash} />
       </Suspense>
-      {/* The terms dialog cannot be dismissed: the tour waits until they are accepted. */}
-      {tour.offer && !plan?.overview?.terms.mustAccept && <TourOffer onAnswer={tour.answerOffer} />}
-      {tour.open && !plan?.overview?.terms.mustAccept && (
-        <GuidedTour
-          steps={tour.steps}
-          onShowTab={dash.setTab}
-          onClose={tour.close}
-          initialDontShowAgain={tour.dontShowAgain}
-        />
-      )}
+      <TourAndNotices
+        tour={tour}
+        onShowTab={dash.setTab}
+        termsPending={!!plan?.overview?.terms.mustAccept}
+      />
     </div>
   );
 }
