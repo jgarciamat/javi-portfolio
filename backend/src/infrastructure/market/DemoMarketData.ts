@@ -7,6 +7,7 @@ import {
   INTERVAL_MS,
   MarketCandle,
   MarketFeed,
+  MarketQuote,
   MarketTicker,
 } from '@domain/services/crypto-market';
 
@@ -32,6 +33,8 @@ const BASE: Record<CryptoSymbol, number> = {
   SUI: 2,
   APT: 7,
   POL: 0.3,
+  PEPE: 0.000008,
+  BONK: 0.00002,
 };
 
 const HOUR = 3_600_000;
@@ -55,12 +58,17 @@ export function demoPrice(symbol: CryptoSymbol, at: number): number {
 
 /**
  * Market data invented on the server, for local development and the end-to-end tests (no
- * Internet). Never used in production: the configuration forces the real source there.
+ * Internet). Never used in production: the configuration forces the real source there. The
+ * prices are invented in euros, so nothing is converted.
  */
 export class DemoMarketData implements CryptoMarketData {
   readonly source = 'demo' as const;
 
   constructor(private readonly now: () => number = Date.now) {}
+
+  quoteOf(): MarketQuote {
+    return 'EUR';
+  }
 
   async candles(
     symbol: CryptoSymbol,
@@ -103,6 +111,7 @@ export class DemoMarketData implements CryptoMarketData {
           bid: price * 0.9995,
           ask: price * 1.0005,
           volume24h: Math.round(price * 1000),
+          quote: 'EUR' as const,
         };
       })
     );

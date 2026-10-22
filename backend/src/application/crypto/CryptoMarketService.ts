@@ -4,6 +4,7 @@ import {
   CryptoInterval,
   CryptoSymbol,
   MarketCandle,
+  MarketQuote,
   MarketStamp,
 } from '@domain/services/crypto-market';
 
@@ -15,6 +16,8 @@ export interface MarketStatusView {
   source: 'binance' | 'demo';
   updatedAt: string | null;
   stale: boolean;
+  /** Dollars per euro (ECB) used to convert the USDT prices of this answer; null when none were. */
+  usdPerEur: number | null;
 }
 
 export interface CryptoCoinView {
@@ -27,20 +30,24 @@ export interface CryptoCoinView {
   bid: number | null;
   ask: number | null;
   volume24h: number | null;
+  /** Market the prices come from: the euro pair, or the USDT pair converted to euros. */
+  quote: MarketQuote;
 }
 
 export interface CryptoCandlesView {
   symbol: CryptoSymbol;
   interval: CryptoInterval;
+  quote: MarketQuote;
   candles: MarketCandle[];
   market: MarketStatusView;
 }
 
-const stamp = ({ source, updatedAt, stale }: MarketStamp): MarketStatusView => ({
+const stamp = ({ source, updatedAt, stale, usdPerEur }: MarketStamp): MarketStatusView => ({
   available: true,
   source,
   updatedAt,
   stale,
+  usdPerEur: usdPerEur ?? null,
 });
 
 /** What the «Consola crypto» shows of the market: the coin list with prices, and candles. */
@@ -64,11 +71,18 @@ export class CryptoMarketService {
           bid: t?.bid ?? null,
           ask: t?.ask ?? null,
           volume24h: t?.volume24h ?? null,
+          quote: this.market.quoteOf(symbol),
         };
       }),
       market: feed
         ? stamp(feed)
-        : { available: false, source: this.market.source, updatedAt: null, stale: false },
+        : {
+            available: false,
+            source: this.market.source,
+            updatedAt: null,
+            stale: false,
+            usdPerEur: null,
+          },
     };
   }
 
@@ -77,6 +91,7 @@ export class CryptoMarketService {
     return {
       symbol,
       interval,
+      quote: this.market.quoteOf(symbol),
       candles: feed.data.slice(-CHART_CANDLES),
       market: stamp(feed),
     };

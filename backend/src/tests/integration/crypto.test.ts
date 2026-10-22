@@ -101,7 +101,7 @@ describe('Crypto console', () => {
     it('lists every coin, with prices when the source answers', async () => {
       const res = await get('/crypto/coins').expect(200);
       expect(res.headers['cache-control']).toBe('private, max-age=15');
-      expect(res.body.coins).toHaveLength(20);
+      expect(res.body.coins).toHaveLength(22);
       expect(res.body.coins[0]).toEqual({
         symbol: 'BTC',
         name: 'Bitcoin',
@@ -112,18 +112,41 @@ describe('Crypto console', () => {
         bid: 49_999,
         ask: 50_001,
         volume24h: 1_000_000,
+        quote: 'EUR',
       });
-      expect(res.body.coins[2]).toMatchObject({ symbol: 'BNB', price: null });
+      expect(res.body.coins[2]).toMatchObject({ symbol: 'BNB', price: null, quote: 'USDT' });
+      expect(res.body.coins.map((c: { symbol: string }) => c.symbol).slice(-2)).toEqual([
+        'PEPE',
+        'BONK',
+      ]);
       expect(res.body.market).toEqual({
         available: true,
         source: 'binance',
         updatedAt: '2026-03-15T12:00:00.000Z',
         stale: false,
+        usdPerEur: null,
       });
       ctx.market.down = true;
       const down = await get('/crypto/coins').expect(200);
       expect(down.body.market).toMatchObject({ available: false, updatedAt: null });
       expect(down.body.coins[0].price).toBeNull();
+      expect(down.body.market.usdPerEur).toBeNull();
+    });
+
+    it('says which coins come from USDT and the ECB rate used to convert them', async () => {
+      ctx.market.prices.set('NEAR', 4);
+      ctx.market.setCandles('NEAR', [candle('2026-03-15T11:00:00Z', 4, 4.2, 3.9)]);
+      ctx.market.setCandles('BTC', [candle('2026-03-15T11:00:00Z', 50_000, 50_100, 49_900)]);
+      const coins = await get('/crypto/coins').expect(200);
+      expect(coins.body.market.usdPerEur).toBe(1.1);
+      expect(coins.body.coins.find((c: { symbol: string }) => c.symbol === 'NEAR')).toMatchObject({
+        price: 4,
+        quote: 'USDT',
+      });
+      const near = await get('/crypto/candles?symbol=NEAR&interval=15m').expect(200);
+      expect(near.body).toMatchObject({ quote: 'USDT', market: { usdPerEur: 1.1 } });
+      const btc = await get('/crypto/candles?symbol=BTC&interval=15m');
+      expect(btc.body).toMatchObject({ quote: 'EUR', market: { usdPerEur: null } });
     });
 
     it('gives the last 500 candles of a coin and size, and 503 when there are none', async () => {

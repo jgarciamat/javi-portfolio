@@ -350,11 +350,16 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     }
   };
 
+  // One rates service for /api/rates and the console's conversions: the same ECB rate in both.
+  const rates = overrides.rates ?? new FrankfurterRates();
   const market =
     overrides.market ??
     (config.cryptoMarket === 'demo'
       ? new DemoMarketData(() => clock.now().getTime())
-      : new BinanceMarketData());
+      : new BinanceMarketData(fetch, undefined, undefined, undefined, {
+          rates,
+          euroPairs: config.cryptoEuroPairs,
+        }));
   const cryptoSim = new CryptoSimService(repos.cryptoSim, market, uow, clock, entitlements);
 
   return {
@@ -363,7 +368,7 @@ export function buildContainer(db: Db, config: AppConfig, overrides: ContainerOv
     clock,
     repos,
     email,
-    rates: overrides.rates ?? new FrankfurterRates(),
+    rates,
     cryptoMarket: new CryptoMarketService(market),
     cryptoSim,
     cryptoRanking: new CryptoRankingService(

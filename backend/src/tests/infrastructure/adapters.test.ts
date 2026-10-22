@@ -68,6 +68,20 @@ describe('config', () => {
     expect(loadConfig({ NODE_ENV: 'development' }).cryptoMarket).toBe('binance');
   });
 
+  it('keeps the measured euro pairs unless configured otherwise, and refuses unknown coins', () => {
+    const dev = { NODE_ENV: 'development' };
+    expect(loadConfig(dev).cryptoEuroPairs).toEqual(['BTC', 'ETH']);
+    expect(loadConfig({ ...dev, CRYPTO_EURO_PAIRS: ' ' }).cryptoEuroPairs).toEqual(['BTC', 'ETH']);
+    expect(loadConfig({ ...dev, CRYPTO_EURO_PAIRS: 'none' }).cryptoEuroPairs).toEqual([]);
+    expect(loadConfig({ ...dev, CRYPTO_EURO_PAIRS: 'btc, sol,BTC' }).cryptoEuroPairs).toEqual([
+      'BTC',
+      'SOL',
+    ]);
+    expect(() => loadConfig({ ...dev, CRYPTO_EURO_PAIRS: 'BTC,FAKE' })).toThrow(
+      /unknown coin in CRYPTO_EURO_PAIRS/
+    );
+  });
+
   it('encrypts the 2FA secrets with their own key, or one derived from the JWT secret', () => {
     const base = { NODE_ENV: 'development', JWT_SECRET: 'j'.repeat(40) };
     expect(loadConfig(base).twoFactor.encryptionKey).toBe('j'.repeat(40));

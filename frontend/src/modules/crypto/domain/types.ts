@@ -1,6 +1,7 @@
 /**
- * Answers of the «Consola crypto» API (backend/src/application/crypto). Prices in euros; the
- * simulator uses play money only. The contract test checks these against real answers.
+ * Answers of the «Consola crypto» API (backend/src/application/crypto). Prices in euros (those of
+ * coins quoted in USDT already converted by the server); the simulator uses play money only.
+ * The contract test checks these against real answers.
  */
 
 export type CryptoInterval = '1m' | '5m' | '15m' | '30m' | '1h' | '4h' | '1d' | '1w';
@@ -8,6 +9,8 @@ export type TradeType = 'market' | 'limit' | 'stop';
 export type PendingType = Exclude<TradeType, 'market'>;
 /** `long`: bought, gains when the price rises; `short`: sold, gains when it falls (1x). */
 export type Direction = 'long' | 'short';
+/** The market a coin's prices come from: its euro pair, or its USDT pair converted to euros. */
+export type Quote = 'EUR' | 'USDT';
 
 export interface MarketStatus {
   available: boolean;
@@ -16,6 +19,11 @@ export interface MarketStatus {
   updatedAt: string | null;
   /** The source is down and an older copy is shown. */
   stale: boolean;
+  /**
+   * Dollars per euro (ECB reference rate of the day) the server used to convert USDT prices to
+   * euros; null when it converted none. Only on the market answers (coins and candles).
+   */
+  usdPerEur?: number | null;
 }
 
 export interface CryptoCoin {
@@ -30,6 +38,7 @@ export interface CryptoCoin {
   ask: number | null;
   /** Euros traded in the last 24 hours. */
   volume24h: number | null;
+  quote: Quote;
 }
 
 export interface CryptoCoins {
@@ -50,6 +59,7 @@ export interface Candle {
 export interface CryptoCandles {
   symbol: string;
   interval: CryptoInterval;
+  quote: Quote;
   candles: Candle[];
   market: MarketStatus;
 }

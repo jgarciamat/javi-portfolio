@@ -275,7 +275,10 @@ describe('API contract', () => {
 
     it('answers (compared with the fixtures the app type-checks)', async () => {
       ctx.market.setCandles('ETH', candles);
+      // A coin quoted in USDT (already converted by the source double).
+      ctx.market.prices.set('NEAR', 4);
       contract('cryptoCoins', (await get('/crypto/coins')).body);
+      ctx.market.prices.delete('NEAR');
       contract('cryptoCandles', (await get('/crypto/candles?symbol=ETH&interval=1h')).body);
       const position = (await send('cryptoBuyMarket')).body.open[0].id as string;
       await send('cryptoSellLimit', { position });

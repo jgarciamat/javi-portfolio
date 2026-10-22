@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { CreatorProgramConfig } from '@application/creators/CreatorProgram';
+import { CRYPTO_SYMBOLS, CryptoSymbol, EURO_PAIRS } from '@domain/services/crypto-market';
 
 const booleanish = z
   .enum(['true', 'false', '1', '0', ''])
@@ -9,6 +10,27 @@ const booleanish = z
 const cents = (euros: number): number => Math.round(euros * 100);
 
 const PRODUCTION_URL = 'https://finanverso.app';
+
+/**
+ * Coins of the crypto console kept on their euro pair: «BTC,ETH», «none» for none (all in
+ * USDT) or empty for the measured default (EURO_PAIRS). An unknown coin is an error.
+ */
+const euroPairs = z
+  .string()
+  .optional()
+  .transform((value, ctx): readonly CryptoSymbol[] => {
+    const text = value?.trim().toUpperCase() ?? '';
+    if (!text) return EURO_PAIRS;
+    if (text === 'NONE') return [];
+    const list = [...new Set(text.split(',').map((s) => s.trim()))];
+    const known = list.filter((s): s is CryptoSymbol =>
+      (CRYPTO_SYMBOLS as readonly string[]).includes(s)
+    );
+    if (known.length !== list.length) {
+      ctx.addIssue({ code: 'custom', message: `unknown coin in CRYPTO_EURO_PAIRS: ${text}` });
+    }
+    return known;
+  });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -85,6 +107,7 @@ const envSchema = z.object({
   RATE_LIMIT_DISABLED: booleanish,
   /** Market data of the crypto console: the public source, or invented data (never in production). */
   CRYPTO_MARKET: z.enum(['binance', 'demo']).default('binance'),
+  CRYPTO_EURO_PAIRS: euroPairs,
   SEED_DEMO_USER: booleanish,
   SEED_DEMO_EMAIL: z.string().email().default('demo@moneymanager.local'),
   SEED_DEMO_PASSWORD: z.string().optional(),
@@ -145,6 +168,8 @@ export interface AppConfig {
   rateLimitDisabled: boolean;
   /** Where the crypto console gets its prices: always the real source in production. */
   cryptoMarket: 'binance' | 'demo';
+  /** Coins whose prices come from their euro pair (the rest: USDT converted at the ECB rate). */
+  cryptoEuroPairs: readonly CryptoSymbol[];
   demoSeed: { enabled: boolean; email: string; password: string | null };
 }
 
@@ -305,6 +330,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     },
     rateLimitDisabled: raw.RATE_LIMIT_DISABLED,
     cryptoMarket: raw.NODE_ENV === 'production' ? 'binance' : raw.CRYPTO_MARKET,
+    cryptoEuroPairs: raw.CRYPTO_EURO_PAIRS,
     demoSeed: {
       enabled: raw.SEED_DEMO_USER && raw.NODE_ENV !== 'production',
       email: raw.SEED_DEMO_EMAIL,

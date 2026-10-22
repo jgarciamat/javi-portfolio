@@ -29,6 +29,7 @@ export function coins(): CryptoCoins {
         bid: 49_990,
         ask: 50_010,
         volume24h: 12_345_678,
+        quote: 'EUR',
       },
       {
         symbol: 'ETH',
@@ -40,6 +41,7 @@ export function coins(): CryptoCoins {
         bid: null,
         ask: null,
         volume24h: null,
+        quote: 'EUR',
       },
       {
         symbol: 'SHIB',
@@ -51,9 +53,11 @@ export function coins(): CryptoCoins {
         bid: null,
         ask: null,
         volume24h: null,
+        quote: 'USDT',
       },
     ],
-    market: MARKET,
+    // SHIB is quoted in USDT; without a reference rate the server leaves it without a price.
+    market: { ...MARKET, usdPerEur: null },
   };
 }
 
@@ -69,7 +73,13 @@ export function candleList(count = 5, start = Date.parse('2026-03-15T08:00:00Z')
 }
 
 export function candles(symbol = 'BTC', interval: CryptoInterval = '1h', count = 5): CryptoCandles {
-  return { symbol, interval, candles: candleList(count), market: MARKET };
+  return {
+    symbol,
+    interval,
+    quote: symbol === 'BTC' || symbol === 'ETH' ? 'EUR' : 'USDT',
+    candles: candleList(count),
+    market: { ...MARKET, usdPerEur: symbol === 'BTC' || symbol === 'ETH' ? null : 1.1 },
+  };
 }
 
 /** The official portfolio of March 2026 (made-up ids). */

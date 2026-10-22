@@ -11,6 +11,7 @@ export const cryptoCoins = {
       bid: 49999,
       ask: 50001,
       volume24h: 1000000,
+      quote: 'EUR',
     },
     {
       symbol: 'ETH',
@@ -22,6 +23,7 @@ export const cryptoCoins = {
       bid: 1999,
       ask: 2001,
       volume24h: 1000000,
+      quote: 'EUR',
     },
     {
       symbol: 'BNB',
@@ -33,6 +35,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'XRP',
@@ -44,6 +47,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'SOL',
@@ -55,6 +59,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'ADA',
@@ -66,6 +71,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'DOGE',
@@ -77,6 +83,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'TRX',
@@ -88,6 +95,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'LINK',
@@ -99,6 +107,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'DOT',
@@ -110,6 +119,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'LTC',
@@ -121,6 +131,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'BCH',
@@ -132,6 +143,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'AVAX',
@@ -143,6 +155,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'XLM',
@@ -154,6 +167,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'SHIB',
@@ -165,6 +179,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'ATOM',
@@ -176,17 +191,19 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'NEAR',
       name: 'NEAR Protocol',
-      price: null,
-      changePercent24h: null,
-      high24h: null,
-      low24h: null,
-      bid: null,
-      ask: null,
-      volume24h: null,
+      price: 4,
+      changePercent24h: 1.5,
+      high24h: 4.08,
+      low24h: 3.88,
+      bid: 3,
+      ask: 5,
+      volume24h: 1000000,
+      quote: 'USDT',
     },
     {
       symbol: 'SUI',
@@ -198,6 +215,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'APT',
@@ -209,6 +227,7 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
     },
     {
       symbol: 'POL',
@@ -220,6 +239,31 @@ export const cryptoCoins = {
       bid: null,
       ask: null,
       volume24h: null,
+      quote: 'USDT',
+    },
+    {
+      symbol: 'PEPE',
+      name: 'Pepe',
+      price: null,
+      changePercent24h: null,
+      high24h: null,
+      low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
+      quote: 'USDT',
+    },
+    {
+      symbol: 'BONK',
+      name: 'Bonk',
+      price: null,
+      changePercent24h: null,
+      high24h: null,
+      low24h: null,
+      bid: null,
+      ask: null,
+      volume24h: null,
+      quote: 'USDT',
     },
   ],
   market: {
@@ -227,5 +271,6 @@ export const cryptoCoins = {
     source: 'binance',
     updatedAt: '2026-03-15T12:00:00.000Z',
     stale: false,
+    usdPerEur: 1.1,
   },
 } as const;

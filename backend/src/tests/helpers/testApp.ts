@@ -20,9 +20,12 @@ import { UnauthorizedError, UnavailableError, ValidationError } from '@domain/er
 import {
   CryptoInterval,
   CryptoSymbol,
+  EURO_PAIRS,
   MarketCandle,
   MarketFeed,
+  MarketQuote,
   MarketTicker,
+  quoteOf,
 } from '@domain/services/crypto-market';
 import { BcryptPasswordHasher } from '@infrastructure/auth/JwtTokenService';
 import { buildContainer, Container } from '@infrastructure/container';
@@ -117,7 +120,8 @@ export class FakePushSender implements PushSender {
 }
 
 /**
- * Crypto market double (no Internet): prices and candles set by the test, made-up numbers.
+ * Crypto market double (no Internet): prices and candles set by the test, made-up numbers in
+ * euros (those of the coins quoted in USDT pass for already converted at `usdPerEur`).
  * `down` makes every call fail like a source that does not answer.
  */
 export class FakeCryptoMarket implements CryptoMarketData {
@@ -130,8 +134,13 @@ export class FakeCryptoMarket implements CryptoMarketData {
   stale = false;
   down = false;
   candleCalls: string[] = [];
+  usdPerEur = 1.1;
 
   constructor(private readonly clock: Clock) {}
+
+  quoteOf(symbol: CryptoSymbol): MarketQuote {
+    return quoteOf(symbol, EURO_PAIRS);
+  }
 
   /** Candles of a coin for every size the simulator may ask for. */
   setCandles(symbol: CryptoSymbol, candles: MarketCandle[]): void {
@@ -144,7 +153,7 @@ export class FakeCryptoMarket implements CryptoMarketData {
   ): Promise<MarketFeed<MarketCandle[]>> {
     this.candleCalls.push(`${symbol}:${interval}`);
     if (this.down) throw new UnavailableError('down', 'MARKET_UNAVAILABLE');
-    return this.feed(this.series.get(symbol) ?? []);
+    return this.feed(this.series.get(symbol) ?? [], this.quoteOf(symbol) === 'USDT');
   }
 
   async tickers(): Promise<MarketFeed<MarketTicker[]>> {
@@ -159,16 +168,19 @@ export class FakeCryptoMarket implements CryptoMarketData {
         bid: price - 1,
         ask: price + 1,
         volume24h: 1_000_000,
-      }))
+        quote: this.quoteOf(symbol),
+      })),
+      [...this.prices.keys()].some((symbol) => this.quoteOf(symbol) === 'USDT')
     );
   }
 
-  private feed<T>(data: T): MarketFeed<T> {
+  private feed<T>(data: T, converted: boolean): MarketFeed<T> {
     return {
       data,
       source: 'binance',
       updatedAt: this.clock.now().toISOString(),
       stale: this.stale,
+      ...(converted ? { usdPerEur: this.usdPerEur } : {}),
     };
   }
 }
@@ -183,6 +195,8 @@ export function createTestApp(
     offers?: OfferCatalog;
     rates?: ExchangeRates;
     market?: FakeCryptoMarket;
+    /** A real market adapter (with a fake HTTP) in place of the double, which stays unused. */
+    marketData?: (clock: Clock) => CryptoMarketData;
     pushEnabled?: boolean;
     env?: Record<string, string>;
   } = {}
@@ -211,7 +225,7 @@ export function createTestApp(
     rates: options.rates ?? {
       rate: async (from, to) => (from === 'USD' && to === 'EUR' ? 0.9 : 2),
     },
-    market,
+    market: options.marketData?.(clock) ?? market,
   });
   return { app: createApp(container), container, clock, email, google, payments, push, market };
 }
