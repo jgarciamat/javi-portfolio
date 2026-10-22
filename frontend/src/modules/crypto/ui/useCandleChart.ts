@@ -123,6 +123,8 @@ function build(element: HTMLElement, locale: Locale): Engine {
       timeVisible: true,
       secondsVisible: false,
       rightOffset: 4,
+      // Wider candles by default (the library has no candle-width option; it scales with this).
+      barSpacing: 10,
       tickMarkFormatter: (time: Time, kind: number) => formatTick(fromTime(time), kind, locale),
     },
     localization: {

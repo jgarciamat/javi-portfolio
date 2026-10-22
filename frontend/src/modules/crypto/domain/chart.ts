@@ -4,7 +4,7 @@ import type { Candle, CryptoInterval } from './types';
 export const CHART_INTERVALS: CryptoInterval[] = ['5m', '15m', '30m', '1h', '4h', '1d', '1w'];
 export const DEFAULT_INTERVAL: CryptoInterval = '1h';
 /** Candles shown when a coin or size is opened (the rest is a scroll or a zoom away). */
-export const RECENT_CANDLES = 90;
+export const RECENT_CANDLES = 70;
 
 export interface CandleSummary {
   first: Candle;

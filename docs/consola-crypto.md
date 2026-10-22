@@ -50,7 +50,7 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 - **Vela**: «Ap. / Máx. / Mín. / Cie. / Vol.» en una línea pequeña (nombre completo al pasar el
   ratón, `<abbr>`) y una pastilla con la cuenta atrás del cierre y las **velas a la vista**.
 - **Zoom**: barra pequeña bajo la gráfica con iconos: «− Alejar», «+ Acercar», «Reciente» (rango
-  lógico de las últimas 90 velas), «Todo» (`fitContent`) y «Pantalla completa»; cada botón lleva
+  lógico de las últimas 70 velas), «Todo» (`fitContent`) y «Pantalla completa»; cada botón lleva
   su atajo en `title` y `aria-keyshortcuts` (−, +, Fin, Inicio; Esc para salir).
 - **Capas**: chips pequeños (12 px, 24 px de alto con ratón) **justo encima de la gráfica**, en
   el sitio de la antigua leyenda, uno junto a otro en una barra que se ajusta a varias líneas (en
