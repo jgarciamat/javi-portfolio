@@ -25,7 +25,9 @@ export interface Reconciliation390 {
 export type Warning390 =
   | { code: 'filedDiffers'; quarter: number; difference: number }
   | { code: 'identity'; expected: number; got: number }
-  | { code: 'exonerated' };
+  | { code: 'exonerated' }
+  /** 2023 or 2024: temporary rates (5 %, 2 %, 7.5 %) the summary does not work out. */
+  | { code: 'temporaryRates' };
 
 export interface Draft390 {
   sections: Section390[];
@@ -380,6 +382,8 @@ export function draft390(vat: VatYear, options: VatOptions): Draft390 {
   if (expected !== t86)
     warnings.push({ code: 'identity', expected: euros(expected), got: euros(t86) });
   if (options.regime === 'simplified') warnings.push({ code: 'exonerated' });
+  if (vat.quarters.some((q) => q.draft.warnings.includes('temporaryRates')))
+    warnings.push({ code: 'temporaryRates' });
 
   return {
     sections: [

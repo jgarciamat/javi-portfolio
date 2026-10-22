@@ -1063,6 +1063,7 @@ describe('Modelo 390', () => {
         { code: 'exonerated' },
         { code: 'filedDiffers' },
         { code: 'identity' },
+        { code: 'temporaryRates' },
       ],
     };
     const later = autonomoDraft({ year: 2026, quarter: 4, m390: warned });
@@ -1080,6 +1081,7 @@ describe('Modelo 390', () => {
       'exonerated390',
       'filed390',
       'identity390',
+      'temporaryRates390',
     ]);
     expect(built.checks[4].values).toEqual({ quarter: 2, difference: 72 });
     expect(built.checks[7].values).toEqual({ quarter: 0, difference: 0 });

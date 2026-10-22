@@ -253,6 +253,12 @@ describe('quarterFrom303 and rateOfRatio', () => {
     expect(found.income).toEqual({ r21: 100, r10: 0, r4: 0, r0: 0 });
     expect(found.expenses).toEqual([]);
     expect(found.ignored).toEqual(['44', '62', '74']);
+    // A 303 of 2023-2024 with the temporary rates (5 %, 2 %) and the surcharges of 16-18.
+    expect(quarterFrom303({ '153': 100, '165': 50, '16': 20 }).ignored).toEqual([
+      '153',
+      '165',
+      '16',
+    ]);
     expect(found.result).toBeNull();
   });
 

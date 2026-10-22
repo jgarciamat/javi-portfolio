@@ -580,7 +580,9 @@ export function quarterFrom303(boxes: Record<string, number>): Quarter303 {
     const amount = r2(b(base) - lessBase);
     if (amount > 0) expenses.push(lineOf(amount, r2(b(vat) - lessVat), op, investment));
   }
-  const ignored = ['44', '62', '74'].filter((id) => b(id) !== 0);
+  // 153, 165 and 16: the temporary rates of 2023-2024 (5 %, 2 %, 7.5 %) and the surcharges that go
+  // with them (16-18 also took the 0.5 % one up to 3T 2024): the quarter does not model them.
+  const ignored = ['44', '62', '74', '153', '165', '16'].filter((id) => b(id) !== 0);
   return {
     income: { r21: b('07'), r10: b('04'), r4: b('01'), r0: b('150') },
     expenses,

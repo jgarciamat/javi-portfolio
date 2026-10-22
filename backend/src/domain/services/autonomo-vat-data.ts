@@ -116,6 +116,55 @@ export const RE_RATES: { vat: 21 | 10 | 4; rate: number; boxes: [string, string,
 /** Tobacco: 1.75 % (art. 161.4.º LIVA), boxes 156-158. */
 export const RE_TOBACCO = 1.75;
 
+/**
+ * The temporary rates of 2023 and 2024 (food and energy), as the BOE gives them (consolidated texts,
+ * checked 22-10-2026), with their surcharge and the boxes of the 303 of each period:
+ * - RDL 20/2022 (BOE-A-2022-22685), art. 72 as worded by RDL 8/2023 (BOE-A-2023-26452) art. 20:
+ *   from 1-1-2023 to 30-6-2024, 0 % for bread, flour, milk, cheese, eggs, fruit, vegetables, pulses,
+ *   tubers and cereals (surcharge 0 %), 5 % for olive and seed oils and pasta (surcharge 0.62 %, set
+ *   by RDL 1/2023, DA 16.ª). Art. 1: 5 % for natural gas, briquettes, pellets and firewood in 2023
+ *   (surcharge 0.62 %). RDL 11/2022 art. 18 as worded by RDL 20/2022: 5 % for electricity
+ *   (≤ 10 kW, market above 45 €/MWh, or vulnerable) from 1-7-2022 to 31-12-2023.
+ * - RDL 8/2023, art. 21: 10 % in 2024 for electricity (same conditions), for natural gas until
+ *   31-3-2024 and for briquettes, pellets and firewood until 30-6-2024 (10 % has its own boxes).
+ * - RDL 4/2024 (BOE-A-2024-12944), art. 1: from 1-7-2024 to 30-9-2024, 0 % for the basic food and
+ *   olive oil (surcharge 0 %), 5 % for seed oils and pasta (0.62 %); from 1-10-2024 to 31-12-2024,
+ *   2 % for the basic food and olive oil (0.26 %) and 7.5 % for seed oils and pasta (1 %). Art. 2:
+ *   olive oil at 4 % from 2025.
+ * - Boxes: AEAT, «Instrucciones para 09 a 12 y 3T de 2024» and «Instrucciones para el 4T de 2024»
+ *   of the 303 (5 % → 153-155 and surcharges 0 %, 0.5 % and 0.62 % → 16-18 up to 3T; 2 % → 165-167,
+ *   7.5 % → 153-155, 0.26 % and 0.5 % → 168-170, 1 % → 16-18 in 4T), and the AEAT note «nuevos tipos
+ *   de recargo de equivalencia» of January 2023 (0 % and 0.62 % in 16-18 with the 0.5 % all 2023).
+ *   The 303 of 2023 to 2T 2024 (Orden HFP/1124/2022, BOE-A-2022-19290, anexo II) has no 165-170.
+ * The draft does not work these rates out (no invoice or form field takes them): it warns instead.
+ */
+export const TEMPORARY_VAT: {
+  from: string;
+  to: string;
+  vat: number;
+  re: number;
+  boxes: string;
+}[] = [
+  { from: '2023-01-01', to: '2024-06-30', vat: 5, re: 0.62, boxes: '153-155 / 16-18' },
+  { from: '2024-07-01', to: '2024-09-30', vat: 5, re: 0.62, boxes: '153-155 / 16-18' },
+  { from: '2024-10-01', to: '2024-12-31', vat: 2, re: 0.26, boxes: '165-167 / 168-170' },
+  { from: '2024-10-01', to: '2024-12-31', vat: 7.5, re: 1, boxes: '153-155 / 16-18' },
+];
+
+/** The rates of `TEMPORARY_VAT` in force some day of a quarter (0-3) of a year. */
+export function temporaryRatesIn(year: number, q: number): typeof TEMPORARY_VAT {
+  const start = `${year}-${String(q * 3 + 1).padStart(2, '0')}-01`;
+  const end = `${year}-${String(q * 3 + 3).padStart(2, '0')}-31`;
+  return TEMPORARY_VAT.filter((t) => t.from <= end && t.to >= start);
+}
+
+/**
+ * The boxes of the 0.5 % surcharge: 16-18 up to the third quarter of 2024 (with the 0 % and the
+ * 0.62 % ones), 168-170 from the fourth (Orden HAC/819/2024 and its instructions) [see above].
+ */
+export const reHalfBoxes = (year: number, q: number): [string, string, string] =>
+  year < 2024 || (year === 2024 && q < 3) ? ['16', '17', '18'] : ['168', '169', '170'];
+
 /** Investment goods: worth at least 500,000 pesetas (art. 108.Dos.5.º LIVA). */
 export const INVESTMENT_MIN = 3005.06;
 /** Regularised over 4 years after the purchase, 9 for land and buildings (art. 107 LIVA)… */

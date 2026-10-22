@@ -225,6 +225,12 @@ describe('Which boxes are shown', () => {
     expect(
       splitBoxes([b('22', 1), b('23', 5.2), b('65', 100), b('66', 5)]).shown.map((x) => x.box)
     ).toEqual(['22', '23', '65', '66']);
+    // Up to 3T 2024 the 0.5 % surcharge goes in 16-18: its rate shows with its base.
+    expect(splitBoxes([b('16', 500), b('17', 0.5), b('18', 2.5)]).shown.map((x) => x.box)).toEqual([
+      '16',
+      '17',
+      '18',
+    ]);
   });
 });
 

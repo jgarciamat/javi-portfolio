@@ -525,6 +525,7 @@ const warnings390 = (m390: Draft390): Check[] =>
       return warn('filed390', { quarter: w.quarter ?? 0, difference: w.difference ?? 0 });
     if (w.code === 'identity')
       return warn('identity390', { expected: w.expected ?? 0, got: w.got ?? 0 });
+    if (w.code === 'temporaryRates') return warn('temporaryRates390');
     return warn('exonerated390');
   });
 
