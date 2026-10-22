@@ -296,11 +296,68 @@ El dueño autoriza adaptar los textos de la consola por ser contenido didáctico
     inventados, sin recomendar operar ni enlazar a plataformas, sigue siendo contenido educativo
     y no publicidad de productos apalancados (CNMV); revisar la redacción del aviso fijo.
 
-## Pendiente para la próxima entrega (no implementado todavía)
+# Cambios del 22/10/2026 (tercera tanda): temporadas, ranking voluntario y carteras de prácticas
 
-45. **Temporadas, ranking mensual y cartera de prácticas** (ver `docs/consola-crypto.md`,
-    «Pendiente»). Antes de publicarlos hacen falta: tratamiento del **alias** del ranking
-    (participación voluntaria, base 6.1.a, conservación del histórico de temporadas), **bases del
-    ranking** (concurso de habilidad sin coste, premio de 1 mes de Premium no canjeable por dinero,
-    sin dinero real, descalificación por abuso, fechas en hora de Madrid) y revisión del **premio
-    promocional** por un abogado.
+**Propuesta, pendiente de revisión legal; no se han cambiado los textos publicados.** El dueño
+autoriza adaptar los textos de la consola (contenido didáctico). Detalle técnico y **bases del
+ranking** en `docs/consola-crypto.md`.
+
+45. **Qué cambia**: la consola pasa a tener temporadas mensuales (del día 1 al último día, hora
+    peninsular española) con 10.000 € virtuales para todos, carteras de prácticas separadas y un
+    **ranking mensual voluntario** (top 5) cuyo ganador recibe 1 mes de Premium. La comisión
+    simulada es fija (0,10 %) y ya no se elige el saldo.
+46. **Datos nuevos** (todo con dinero virtual, ninguno es patrimonio real):
+    - **alias** del ranking y la preferencia **«Aparecer en el ranking»** (desactivada por
+      defecto);
+    - **resultado de cada temporada**: saldo inicial y final, operaciones cerradas, operaciones
+      ganadas, días con actividad, si participaba, el alias de ese momento, si tenía Premium, el
+      puesto (1-5) y los días de Premium ganados;
+    - **insignias** (primera operación, primer take profit, 10 operaciones, mes en positivo) con
+      su fecha;
+    - **patrimonio de cada día** de cada cartera (para la gráfica de Premium);
+    - **alertas de precio** (moneda, por encima o por debajo, precio, fecha y cuándo se envió);
+    - **contador diario** de carteras de prácticas creadas o reiniciadas (anti-abuso).
+47. **Finalidad**: mostrar tu evolución y tu historial de temporadas, calcular y publicar el
+    ranking mensual, dar el premio al ganador, enviar las alertas de precio que pidas y evitar
+    abusos.
+48. **Base jurídica propuesta**:
+    - simulación, temporadas, insignias, historial, alertas y contador anti-abuso: ejecución del
+      servicio (art. 6.1.b);
+    - aparecer en el ranking con tu alias: **acción voluntaria / consentimiento** (art. 6.1.a), que
+      se da al activar el interruptor y se retira desactivándolo;
+    - el premio: ejecución de las bases del ranking (art. 6.1.b).
+49. **Quién ve qué**: los demás usuarios solo ven, de quien se apunta, el **alias**, la
+    **rentabilidad**, el **número de operaciones** y una **insignia Premium** si la tiene. Nunca el
+    correo, el nombre completo ni identificadores. Tu posición y tus cifras solo las ves tú. Quien
+    no se apunta no aparece.
+50. **Conservación**:
+    - operaciones de cada temporada: **12 meses** después de terminar, luego se borran;
+    - resultados de temporada, insignias y top 5 histórico: **mientras exista la cuenta**;
+    - alertas de precio ya enviadas: **30 días**;
+    - carteras de prácticas: hasta que la persona la borre o la reinicie, o elimine la cuenta.
+51. **Borrado y exportación**: todo se borra al eliminar la cuenta (borrado en cascada), también
+    su alias y sus puestos en los top 5 anteriores. La exportación JSON (`cryptoSimulator`)
+    incluye `portfolios` (operaciones, órdenes pendientes y patrimonio diario), `ranking`
+    (participación y alias), `seasonResults`, `badges` y `priceAlerts`.
+52. **Textos propuestos** (sin editar todavía):
+    - **s2**: «Si usas la Consola crypto guardamos tus carteras con dinero ficticio (la oficial de
+      cada mes y las de prácticas), el resultado de cada temporada, tus insignias, el valor de cada
+      día de tus carteras y las alertas de precio que crees. Si activas "Aparecer en el ranking",
+      guardamos también tu alias.»
+    - **s3**: añadir el ranking como acción voluntaria/consentimiento, retirable desactivándolo.
+    - **s5**: añadir los plazos del punto 50.
+    - **s7**: mencionar las nuevas secciones de la exportación.
+    - **Condiciones**: enlazar las bases del ranking.
+53. **A REVISAR POR UN ABOGADO**:
+    - **Premio promocional**: si el ranking con premio de 1 mes de Premium es un concurso o sorteo
+      promocional con requisitos propios (bases, comunicación, territorialidad) y la fiscalidad de
+      un premio en especie para el ganador y para Finanverso.
+    - **Edad mínima** para participar y recibir el premio (las cuentas se admiten desde 14 años).
+    - **Alias por defecto con el nombre de pila**: es un dato personal que se hace visible si la
+      persona activa el ranking; valorar proponer un alias neutro en su lugar.
+    - **Insignia Premium junto al alias**: revela públicamente que esa persona paga Premium;
+      valorar quitarla o hacerla opcional.
+    - **Retención** de resultados y del top 5 histórico mientras exista la cuenta.
+    - **Territorialidad** del concurso (España, UE o todos los usuarios).
+    - Que las alertas de precio, con el texto «Es solo un aviso, no una recomendación», sigan
+      siendo un aviso de servicio y no publicidad de criptoactivos.

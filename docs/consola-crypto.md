@@ -106,23 +106,165 @@ palabras importantes» (bajo la caja de operar y al pie) abre la guía directame
 
 ## Simulador
 
-- **Cartera por usuario**, 10.000 € ficticios al empezar; «Empezar de nuevo» con 1.000, 10.000 o
-  100.000 €, gratis.
+- **Carteras**: cada persona tiene la **cartera oficial de la temporada** (una por mes natural,
+  `YYYY-MM` en hora de Madrid) y, si quiere, **carteras de prácticas** separadas. Todas empiezan
+  con **10.000 € virtuales** y una **comisión fija del 0,10 %** al comprar y al vender. Ya no se
+  eligen ni el saldo ni la comisión.
 - **Long y short a 1x**. Un short guarda su importe como **garantía**: gana si el precio baja y
   pierde si sube; si llega al **doble** de la entrada se cierra solo («garantía agotada»,
   `closeType: liquidation`). Nunca se pierde más de lo puesto.
 - **Órdenes** a mercado, límite o stop para abrir long o short; **take profit y stop loss**
   opcionales (largo: TP encima y SL debajo de la entrada; corto: al revés), guardados como órdenes
   de cierre vinculadas; una orden pendiente los deja al ejecutarse. Validación en vivo («Antes de
-  abrir», `aria-live`) y en el servidor.
+  abrir», `aria-live`, que indica la comisión fija del 0,10 %) y en el servidor.
 - **Ejecución determinista sin procesos en segundo plano**: al abrir o refrescar la consola (cada
   30 s a la vista) el servidor revisa órdenes y cortos con las velas desde su creación y con el
   último precio. Con hueco, al precio de apertura. Si en una vela se tocan varias salidas gana la
   más prudente: garantía agotada, stop y después límite.
-- Comisión 0-1 %; límites de 20 pendientes, 50 abiertas y 1.000 operaciones; pendientes caducan a
-  los 30 días; rate limit por usuario.
-- **Persistencia**: migraciones `037` y `038` (dirección, TP/SL de las pendientes,
-  `liquidation`), con `ON DELETE CASCADE` y en la exportación RGPD (`cryptoSimulator`).
+- Límites por cartera: **20 órdenes pendientes en el plan gratuito y 100 con Premium**, 50
+  posiciones abiertas y 1.000 operaciones; las pendientes caducan a los 30 días; rate limit por
+  usuario.
+- **Lo que se quitó de la interfaz** (decisión del dueño): el selector de comisión
+  (0/0,1/0,25/0,5/1 %), el selector de saldo (1.000/10.000/100.000 €) y el botón «Empezar de
+  nuevo» de la cartera oficial. La tarjeta «Tu historial y ajustes» desaparece; **«Exportar CSV»**
+  del historial (gratis) pasa al panel de **operaciones cerradas**. En el backend se elimina
+  `PATCH /crypto/sim/settings` y `POST /crypto/sim/reset` solo sirve para **carteras de
+  prácticas**: acepta e ignora `initial` y `feeBps` que mandaban versiones anteriores de la app y,
+  sin cartera de prácticas, responde `CRYPTO_SEASON_NO_RESET`.
+
+## Temporada mensual
+
+- Código: `backend/src/domain/services/crypto-season.ts` (reglas puras), `CryptoSimService`
+  (carteras, órdenes y cierre de temporada) y `CryptoRankingService.run()` (job horario de
+  `main.ts`).
+- Cada temporada va del **día 1 a las 00:00** al **último día a las 23:59:59** (hora peninsular
+  española, con los cambios de horario). Todo se calcula con `Europe/Madrid`, sea cual sea la zona
+  horaria del servidor o de CI.
+- **Cierre idempotente** de dos formas: **perezoso** (la primera vez que la persona abre la
+  consola en el mes nuevo) y con el **job horario**, que cierra también a quien no vuelve. Repetir
+  el job o leer a la vez no duplica nada (`UNIQUE(user_id, season)` y comprobación de
+  `closed_at` dentro de la transacción).
+- Al cerrar: las órdenes alcanzadas **antes de medianoche** se ejecutan solo con las velas
+  anteriores al fin; el resto se **cancela** y el dinero reservado vuelve; las posiciones abiertas
+  se cierran (`closeType: 'season'`, hora 23:59:59 del último día) al **cierre de la última vela
+  horaria antes de medianoche** (el mismo precio para todos), si no al último precio y, si no hay
+  ningún precio, se **espera hasta 24 h**; pasado ese plazo se usa el precio de entrada (solo
+  pierde las comisiones).
+- Se congela el **resultado** (patrimonio final, operaciones, aciertos, días con actividad,
+  si participaba en el ranking, alias en ese momento, insignia Premium). Una cartera sin ninguna
+  operación se cierra sin generar resultado.
+- La temporada oficial **nunca se recarga a mitad de mes**: quien se queda sin saldo puede seguir
+  en una cartera de prácticas hasta el día 1.
+- Avisos: «Nueva temporada en X días» siempre, aviso destacado los **3 últimos días**
+  (`endingSoon`) y, al empezar el mes, el **resumen de tu temporada anterior** (`season.history`,
+  hasta 12 temporadas).
+- **Retención**: las operaciones de una temporada terminada se guardan **12 meses** y después el
+  job las borra; los resultados congelados (y el top 5) se guardan mientras exista la cuenta.
+
+## Cartera de prácticas
+
+- **1 a la vez en el plan gratuito** (402 `PLAN_LIMIT` si se pide otra) y **hasta 5 con
+  Premium**. Siempre 10.000 € y comisión del 0,10 %.
+- Separada de la temporada: **no puntúa** en el ranking ni da resultado de temporada, y sigue
+  igual cuando cambia el mes.
+- Se reinicia con su propio botón, dentro de su tarjeta (siempre 10.000 €). Límite anti-abuso:
+  **5 creaciones o reinicios al día** por persona (día de Madrid, `CRYPTO_PRACTICE_DAILY`).
+  Se puede borrar.
+- Si se pide una cartera que ya no existe, la lectura muestra la oficial y las escrituras
+  responden `CRYPTO_PORTFOLIO_NOT_FOUND`.
+
+## Ranking mensual (voluntario)
+
+- **Desactivado por defecto**. Se activa con «Aparecer en el ranking»; el alias se puede editar
+  y por defecto se propone el **nombre de pila** del perfil. Validación: 3 a 20 caracteres,
+  letras, números, espacios, puntos y guiones; sin correos, enlaces, teléfonos ni palabras
+  ofensivas básicas (`CRYPTO_ALIAS_INVALID`).
+- La API del ranking solo devuelve **alias, rentabilidad, nº de operaciones e insignia Premium**:
+  nunca correo, nombre ni identificadores. Tu posición y tus cifras solo te las devuelve a ti.
+- **Métrica**: rentabilidad = patrimonio final / saldo inicial − 1 (10.000 €; las posiciones
+  abiertas se valoran a mercado).
+- **Mínimos para puntuar**: 5 operaciones cerradas (sin contar las cerradas por el fin de la
+  temporada) y 3 días distintos con actividad (abrir o cerrar).
+- **Desempates**: más operaciones; después, quien cerró antes su última operación (llegó antes a
+  ese resultado); por último, una clave estable interna (nunca se muestra).
+- La tabla en vivo del mes se calcula con los precios actuales y se guarda en caché **60 s**
+  (activar o desactivar la participación la borra).
+- **Cierre el día 1**: cuando todas las carteras oficiales de ese mes están cerradas, se congela
+  el **top 5** (una sola vez, tabla `crypto_sim_season_closes`) y el ganador recibe **30 días de
+  Premium** con el mecanismo de regalo existente (`grantDays` con `afterPaidPeriod`: se suma
+  después de la prueba o del periodo ya pagado; quien tiene Premium de por vida no recibe nada
+  más). Se le avisa con una notificación push de servicio «Has ganado 1 mes de Premium» y en el
+  resumen de su temporada.
+- **Insignias** sencillas que se conservan entre temporadas: primera operación (`firstTrade`),
+  primer take profit alcanzado (`firstTakeProfit`), 10 operaciones (`tenTrades`) y mes en
+  positivo (`positiveMonth`).
+
+## Premium en la consola (comodidades, sin ventaja en el ranking)
+
+Función de plan `cryptoPro`, comprobada en el servidor como las demás funciones Premium. Todos
+empiezan cada mes con lo mismo y la métrica del ranking no cambia con el plan.
+
+- **Estadísticas avanzadas** de la cartera: % de operaciones ganadas, mejor y peor operación,
+  ganancia y pérdida media, **evolución diaria del patrimonio** (se guarda cada hora y al mirar) y
+  **comparación con mantener** la moneda más usada desde el inicio (sin comisiones). El % de
+  operaciones ganadas sigue visible gratis en el resumen, porque ya lo era.
+- **Alertas de precio** por push de servicio: hasta 10 a la vez, revisadas cada 5 minutos, cada
+  una se envía una vez con un texto neutro («Es solo un aviso, no una recomendación»); las
+  enviadas se borran a los 30 días. Sin Premium no se envían.
+- **Hasta 5 carteras de prácticas** y **100 órdenes pendientes** (20 en el gratuito).
+- **Informe de temporada** en PDF y CSV (`GET /crypto/seasons/:season/report`): todas las
+  operaciones cerradas, el resultado congelado y las estadísticas. El CSV básico del historial
+  sigue siendo gratis.
+- **Insignia Premium** estética junto al alias en el ranking.
+
+## Migración 039
+
+- De una cuenta por usuario a **carteras** (`crypto_sim_portfolios`). Cada cuenta existente pasa
+  a ser la **cartera oficial del mes en curso** (calculado en hora de Madrid al migrar), con sus
+  operaciones y órdenes pendientes (`portfolio_id`).
+- La comisión se **normaliza al 0,10 %** para lo que venga (las operaciones pasadas conservan la
+  suya). El saldo inicial existente (por ejemplo 100.000 €) se conserva hasta el día 1 y la
+  rentabilidad del ranking se mide sobre él; desde el mes siguiente todos empiezan con 10.000 €.
+- Tablas nuevas: `crypto_sim_profiles` (participación y alias, contador diario de prácticas),
+  `crypto_sim_season_results`, `crypto_sim_season_closes`, `crypto_sim_badges`,
+  `crypto_sim_equity_days` y `crypto_sim_alerts`. `close_type` admite `season`.
+
+## Persistencia y datos personales
+
+- Todo con `ON DELETE CASCADE`: se borra con la cuenta.
+- La exportación RGPD (`cryptoSimulator`) incluye `portfolios` (con operaciones, órdenes
+  pendientes y patrimonio diario), `ranking` (participación y alias), `seasonResults`, `badges` y
+  `priceAlerts`.
+
+## API
+
+| Método y ruta | Qué hace |
+| --- | --- |
+| `GET /crypto/sim?portfolio=<id>` | Cartera (la oficial si falta o ya no existe), temporada, plan, insignias, estadísticas (Premium) |
+| `POST /crypto/sim/orders` | Comprar o vender; `portfolioId` opcional (por defecto la oficial) |
+| `DELETE /crypto/sim/orders/:id` | Cancelar una orden pendiente |
+| `POST /crypto/sim/practice` | Nueva cartera de prácticas (1 gratis, 5 Premium) |
+| `POST /crypto/sim/reset` | Reiniciar una cartera de prácticas (`portfolioId`) |
+| `DELETE /crypto/sim/practice/:id` | Borrar una cartera de prácticas |
+| `GET /crypto/ranking` | Top 5 del mes, tu posición, reglas, ganadores del mes anterior |
+| `PUT /crypto/ranking/settings` | `{ optIn, alias? }` |
+| `GET /crypto/seasons/:season/report` | Informe de temporada (Premium) |
+| `GET /crypto/alerts`, `POST /crypto/alerts`, `DELETE /crypto/alerts/:id` | Alertas de precio (Premium) |
+
+## Interfaz
+
+- **Selector de carteras**: temporada oficial del mes y carteras de prácticas, con «Nueva
+  cartera de prácticas»; cada cartera de prácticas tiene su botón para reiniciar y para borrar.
+- **Cuenta atrás** «Nueva temporada en X días», **aviso 3 días antes** y **resumen de tu
+  temporada anterior** al empezar la siguiente (con el aviso del premio si se ganó).
+- Aviso **«Te has quedado sin saldo»** en la temporada, que ofrece la cartera de prácticas.
+- Tarjeta **«Ranking del mes»**: podio del top 5 (medallas, alias, %, nº de operaciones),
+  tu posición solo visible para ti, cuenta atrás, premio explicado, ganadores del mes anterior,
+  interruptor «Aparecer en el ranking» y alias.
+- Tarjeta **«Gratis y Premium en la consola»** (dos columnas, iconos, frases cortas, por qué el
+  ranking es justo y botón a Premium), accesible desde la consola y desde la guía.
+- Cada función Premium bloqueada muestra una **maqueta con datos de ejemplo** y qué desbloquea,
+  sin presión ni lenguaje de apuesta.
 
 ## Móvil y accesibilidad
 
@@ -146,19 +288,69 @@ al 100 % (`src/__tests__/crypto/*`, con un doble de Lightweight Charts) y E2E
 y, de la escala compacta, en `/tmp/gf66-shots/` (1440, 1920, 390 vertical y 844x390; claro, oscuro
 y Contraste).
 
-## Pendiente (aprobado por el dueño, para la siguiente entrega)
+Temporadas y ranking (datos inventados):
 
-1. **Temporada mensual**: el día 1 (hora de Madrid, job horario idempotente de `main.ts`) se
-   congela el resultado, se cierran posiciones a último precio, se cancelan pendientes y todos
-   vuelven a 10.000 €; historial marcado con su mes; avisos «Nueva temporada en X días», aviso 3
-   días antes y resumen de la temporada anterior. La temporada oficial no se recarga nunca.
-2. **Ranking mensual** voluntario (alias editable, nunca el correo), rentabilidad sobre 10.000 €,
-   mínimos (≥5 operaciones cerradas, ≥3 días con actividad), desempates, top 5 en histórico y 1 mes
-   de Premium al ganador (aviso in-app y push de servicio); insignias ligeras; bases del ranking.
-3. **Cartera de prácticas** gratuita (separada, no puntúa, reiniciable con límites) para quien se
-   quede sin saldo.
-4. **Premium sin ventaja en el ranking**: estadísticas avanzadas, alertas de precio (push), hasta 5
-   carteras de prácticas, 100 órdenes pendientes, informe de temporada en PDF/CSV completo,
-   insignia estética; tarjeta «Gratis y Premium en la consola» con vistas previas.
+- `backend/src/tests/domain/crypto-season.test.ts`: inicio y fin de mes en Madrid en invierno y
+  en verano (31 de octubre a las 23:00 UTC ya es noviembre), días que faltan, rentabilidad,
+  mínimos, orden y desempates (rentabilidad, operaciones, quien llegó antes, clave estable),
+  actividad por días de Madrid y alias (longitud, correos, enlaces, teléfonos, palabras).
+- `backend/src/tests/integration/crypto-seasons.test.ts`: cierre del mes al cierre de la última
+  vela horaria, pendientes canceladas con reembolso y las alcanzadas antes de medianoche
+  ejecutadas, idempotencia (job varias veces y lecturas a la vez), cambio a las 00:00 de Madrid
+  con el reloj del servidor en UTC, espera de precios y precio de entrada tras 24 h, carteras
+  vacías, retención de 12 meses, patrimonio diario, prácticas (límites gratis/Premium, 5 al día,
+  aislamiento), ranking en vivo (solo alias, sin correos ni ids), congelación del top 5, premio
+  una sola vez (también tras un periodo de pago y nada extra para quien tiene Premium de por vida),
+  push al ganador, Premium (estadísticas, informe, alertas) y exportación/borrado RGPD, y la
+  migración 039 con datos de la 038.
+- Los tests del frontend se ejecutan con `TZ=UTC` como en CI (`src/__tests__/crypto/domain.test.ts`
+  depende de la zona horaria local).
 
-La recarga Premium a mitad de mes que se llegó a programar se **retiró** al cambiar la decisión.
+## BASES DEL RANKING (propuesta pendiente de revisión legal)
+
+Texto en lenguaje claro para mostrar en la app cuando un abogado lo revise. Los puntos marcados
+«A REVISAR POR UN ABOGADO» necesitan su opinión antes de publicar.
+
+1. **Organizador**: Finanverso (datos del titular y contacto: support@finanverso.app).
+2. **Qué es**: un concurso **gratuito de habilidad** dentro de la Consola crypto, un simulador
+   educativo. No hace falta comprar nada ni pagar para participar. Se usa **solo dinero
+   virtual**: no se invierte, no se gana ni se pierde dinero real.
+3. **Participación voluntaria**: solo participa quien activa «Aparecer en el ranking». Los demás
+   ven el ranking pero no aparecen. Se puede dejar de participar en cualquier momento.
+4. **Alias**: los demás solo ven tu alias, tu rentabilidad, tu número de operaciones y, si
+   tienes Premium, una pequeña insignia. Nunca tu correo ni tu nombre completo. El alias no puede
+   llevar correos, enlaces, teléfonos ni palabras ofensivas.
+   A REVISAR POR UN ABOGADO: el alias que se propone por defecto es tu nombre de pila (es un dato
+   personal que se vuelve visible si activas el ranking); y la insignia Premium junto al alias
+   revela que pagas Premium.
+5. **Quién puede participar**: personas con una cuenta registrada en Finanverso.
+   A REVISAR POR UN ABOGADO: edad mínima para participar y recibir el premio (la app admite
+   cuentas desde 14 años) y territorialidad (si se limita a residentes en España o en la UE).
+6. **Fechas**: cada mes es una temporada, del día 1 a las 00:00 al último día a las 23:59:59,
+   hora peninsular española. El día 1 todas las carteras oficiales vuelven a 10.000 € virtuales,
+   en el plan gratuito y en Premium.
+7. **Cómo se mide**: rentabilidad = patrimonio final / 10.000 € − 1. Lo que siga abierto al final
+   del mes se cierra al último precio de la última hora del mes, el mismo para todos. Las
+   carteras de prácticas no cuentan.
+8. **Mínimos**: para aparecer hay que cerrar al menos 5 operaciones y operar al menos 3 días
+   distintos en el mes.
+9. **Empates**: gana quien hizo más operaciones; si sigue el empate, quien cerró antes su última
+   operación.
+10. **Premio**: quien queda primero recibe **1 mes de Premium**. No se puede cambiar por dinero
+    ni por otra cosa, ni pasar a otra persona. Se suma al Premium que ya tenga (después de su
+    prueba o del periodo ya pagado). Quien tiene Premium de por vida no recibe nada adicional.
+    A REVISAR POR UN ABOGADO: naturaleza del premio promocional (si encaja como concurso o
+    sorteo promocional, requisitos de bases, depósito o comunicación) y su fiscalidad como premio
+    en especie.
+11. **Aviso al ganador**: el día 1 se avisa en la propia app (resumen de la temporada) y con una
+    notificación, si la tiene activada.
+12. **Descalificación por abuso**: se puede excluir a quien use varias cuentas, programas o
+    automatismos, alias ofensivos o que suplanten a otros, o aproveche fallos del simulador.
+13. **Historial**: el top 5 de cada mes y tu resultado se guardan mientras tengas la cuenta; las
+    operaciones de cada temporada, 12 meses. Todo se borra al eliminar la cuenta y va en la
+    exportación de tus datos.
+    A REVISAR POR UN ABOGADO: plazos de retención de resultados y del top 5 histórico.
+14. **Cambios**: Finanverso puede cambiar o terminar el ranking avisando en la app; los cambios no
+    afectan a una temporada ya empezada salvo por abuso o fallo técnico.
+15. **Recuerda**: es un simulador educativo. Los resultados con dinero virtual no garantizan
+    nada en el mercado real y no son una recomendación de inversión.
