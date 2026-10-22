@@ -43,23 +43,36 @@ test('opens a long with take profit and stop loss, changes them and closes it at
   await page.getByRole('button', { name: 'Abrir long' }).click();
   await expect(page.getByRole('heading', { name: 'Abiertas (1)' })).toBeVisible();
 
-  // On the card, green and red; not among the pending orders.
+  // One row, with its take profit in green and its stop loss in red; not among the pending orders.
   const open = panel(page, 'Abiertas');
-  const takeProfit = open.locator('.cc-exit--takeProfit');
-  const stopLoss = open.locator('.cc-exit--stopLoss');
+  const row = open.locator('.cc-trades > li');
+  await expect(row).toHaveCount(1);
+  const takeProfit = open.locator('.cc-exit-lines .cc-exit--takeProfit');
+  const stopLoss = open.locator('.cc-exit-lines .cc-exit--stopLoss');
   await expect(takeProfit).toContainText('100.000,00 €');
-  await expect(takeProfit).toContainText(/\+\d+,\d\d\s*% del precio actual/);
-  await expect(takeProfit.locator('.pnl-pos')).toBeVisible();
-  await expect(takeProfit).toContainText('(el precio debe subir)');
-  await expect(stopLoss).toContainText('(el precio debe bajar)');
-  // The result is explained: price, commissions (entry + estimated exit) and net.
-  const breakdown = open.locator('.cc-breakdown');
-  await expect(breakdown).toContainText('Resultado del precio');
-  await expect(breakdown).toContainText('Comisiones (entrada + salida estimada)');
-  await expect(breakdown).toContainText('Resultado neto');
-  await expect(open.locator('.cc-price-result')).toContainText(/^Precio: [+−]?\d/);
+  await expect(takeProfit).toContainText(/\+\d+,\d\d\s*%/);
+  await expect(takeProfit.locator('.cc-exit-price')).toBeVisible();
   await expect(stopLoss).toContainText('30.000,00 €');
-  await expect(stopLoss.locator('.pnl-neg')).toBeVisible();
+  await expect(open.locator('.cc-big')).toBeVisible();
+  await expect(open.locator('.cc-cell--end .cc-sub')).toContainText(
+    /^Precio: [+−]?\d.*Comisiones: /
+  );
+  const rowBox = await row.boundingBox();
+  expect(rowBox!.height).toBeLessThan(110);
+  // The rest opens in a second line: what it gives, the distances and the breakdown of the result.
+  const details = open.getByRole('button', { name: /^Detalles/ });
+  await expect(details).toHaveAttribute('aria-expanded', 'false');
+  await details.click();
+  await expect(details).toHaveAttribute('aria-expanded', 'true');
+  const detail = open.locator('.cc-detail');
+  await expect(detail).toContainText('Si cerraras ahora recibirías');
+  await expect(detail.locator('.cc-exit--takeProfit')).toContainText('(el precio debe subir)');
+  await expect(detail.locator('.cc-exit--takeProfit .pnl-pos')).toBeVisible();
+  await expect(detail.locator('.cc-exit--stopLoss')).toContainText('(el precio debe bajar)');
+  await expect(detail.locator('.cc-exit--stopLoss .pnl-neg')).toBeVisible();
+  await expect(detail).toContainText('Resultado del precio');
+  await expect(detail).toContainText('Comisiones (entrada + salida estimada)');
+  await expect(detail).toContainText('Resultado neto');
   const colour = (part: typeof takeProfit) =>
     part.locator('dt').evaluate((el) => getComputedStyle(el).color);
   expect(await colour(takeProfit)).not.toEqual(await colour(stopLoss));
@@ -74,7 +87,8 @@ test('opens a long with take profit and stop loss, changes them and closes it at
   await open.getByLabel('Stop loss (€)').fill('');
   await open.getByRole('button', { name: 'Guardar TP/SL' }).click();
   await expect(takeProfit).toContainText('110.000,00 €');
-  await expect(stopLoss).toHaveText(/^Stop loss\s*—$/);
+  await expect(stopLoss).toContainText('—');
+  await expect(stopLoss).not.toContainText('30.000');
   await expect(page.getByRole('heading', { name: 'Pendientes (0)' })).toBeVisible();
 
   // «Close trade» asks once more on the same button, then closes at the market price.

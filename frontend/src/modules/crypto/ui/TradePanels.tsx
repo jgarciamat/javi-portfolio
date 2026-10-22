@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type FormEvent } from 'react';
+import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { parseDecimal } from '@shared/utils/numbers';
 import { formatChange, formatDateTime, formatQuantity, pnl } from '../domain/format';
@@ -82,14 +82,133 @@ function Pager({
   );
 }
 
-function Result({ pnl: value, percent }: { pnl: number | null; percent: number | null }) {
+function Result({ pnl: value, percent }: { pnl: number; percent: number }) {
   const { locale } = useI18n();
   const money = useMoney();
-  if (value === null || percent === null) return <b className={pnl(null)}>—</b>;
   return (
     <b className={pnl(value)}>
       {money.amount(value, true)} ({formatChange(percent, locale)})
     </b>
+  );
+}
+
+/** The result as a headline: the amount big, its percent below (the colour says up or down). */
+function BigResult({ pnl: value, percent }: { pnl: number | null; percent: number | null }) {
+  const { locale } = useI18n();
+  const money = useMoney();
+  if (value === null || percent === null) return <b className={`cc-big ${pnl(null)}`}>—</b>;
+  return (
+    <>
+      <b className={`cc-big ${pnl(value)}`}>{money.amount(value, true)}</b>
+      <span className={`cc-sub-pct ${pnl(value)}`}>{formatChange(percent, locale)}</span>
+    </>
+  );
+}
+
+type Role = 'who' | 'prices' | 'amount' | 'middle' | 'end' | 'actions';
+
+/**
+ * A cell of a row. Its label shows above it on narrow screens and is read aloud always; on wide
+ * ones the column headers (once, over the list) say it.
+ */
+function Cell({ role, label, children }: { role: Role; label?: string; children: ReactNode }) {
+  return (
+    <div className={`cc-cell cc-cell--${role}`}>
+      {label && <span className="cc-cell-label">{label}</span>}
+      {children}
+    </div>
+  );
+}
+
+/** A small label and its value on one line: «Entrada 64.207,24 €». */
+function Mini({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <span className="cc-mini">
+      <small>{label}</small> <span>{children}</span>
+    </span>
+  );
+}
+
+/**
+ * The column headers, once over the list (decorative: every cell carries its own label for
+ * screen readers). Hidden on narrow screens, where each cell shows its label instead.
+ */
+function ColumnHeads({ kind, keys }: { kind: 'open' | 'pending' | 'closed'; keys: string[] }) {
+  const { t } = useI18n();
+  return (
+    <div className={`cc-trade-cols cc-trade-cols--${kind}`} aria-hidden="true">
+      {keys.map((key) => (
+        <span key={key}>{key && t(`app.crypto.trades.cols.${key}`)}</span>
+      ))}
+    </div>
+  );
+}
+
+/** «▾ Details» (needs its own id): opens the second line of a row. */
+function DetailsToggle({
+  open,
+  controls,
+  which,
+  onToggle,
+}: {
+  open: boolean;
+  controls: string;
+  which: string;
+  onToggle: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <button
+      type="button"
+      className="cc-tool cc-details-toggle"
+      title={t('app.crypto.trades.details.label')}
+      aria-expanded={open}
+      aria-controls={controls}
+      onClick={onToggle}
+    >
+      <span aria-hidden="true" className="cc-chevron">
+        {open ? '▴' : '▾'}
+      </span>
+      <span className="cc-details-text">{t('app.crypto.trades.details.label')}</span>
+      <span className="sr-only"> {which}</span>
+    </button>
+  );
+}
+
+/** The take profit (green) and the stop loss (red) as two short lines: price and distance. */
+function ExitLines({
+  exits,
+  current,
+}: {
+  exits: Partial<Record<ExitKind, number>>;
+  current: number | null | undefined;
+}) {
+  const { t, locale } = useI18n();
+  const money = useMoney();
+  return (
+    <dl className="cc-exit-lines">
+      {EXITS.map(({ kind }) => {
+        const price = exits[kind];
+        return (
+          <div key={kind} className={`cc-exit cc-exit--${kind}`}>
+            <dt>
+              <span aria-hidden="true">{t(`app.crypto.trades.facts.${kind}Short`)}</span>
+              <span className="sr-only">{t(`app.crypto.trades.facts.${kind}`)}</span>
+            </dt>
+            {price === undefined ? (
+              <dd>—</dd>
+            ) : (
+              <dd>
+                <b className="cc-exit-price">{money.price(price)}</b>
+                {current != null && (
+                  <small>{formatChange(((price - current) / current) * 100, locale)}</small>
+                )}
+              </dd>
+            )}
+          </div>
+        );
+      })}
+    </dl>
   );
 }
 
@@ -102,10 +221,10 @@ const EXITS: { kind: ExitKind; type: PendingOrder['type'] }[] = [
 const inputValue = (shown: number) => String(Number(shown.toPrecision(10)));
 
 /**
- * The take profit (green) and the stop loss (red) of an open position: its price, how far it is
- * from the current price and what closing there would give. «—» when there is none.
+ * What closing at the take profit or the stop loss would give: how far each is from the current
+ * price, which way the price must go and the result if reached. Only the ones that are set.
  */
-function ExitFacts({
+function ExitDetails({
   trade,
   exits,
   bps,
@@ -115,47 +234,40 @@ function ExitFacts({
   bps: number;
 }) {
   const { t, locale } = useI18n();
-  const money = useMoney();
   return (
-    <dl className="cc-exits">
+    <>
       {EXITS.map(({ kind }) => {
         const price = exits[kind];
-        const result = price === undefined ? null : exitResult(trade, price, bps);
+        if (price === undefined) return null;
+        const result = exitResult(trade, price, bps);
         const rise = needsRise(trade.direction, kind);
         return (
           <div key={kind} className={`cc-exit cc-exit--${kind}`}>
             <dt>{t(`app.crypto.trades.facts.${kind}`)}</dt>
-            {result === null ? (
-              <dd>—</dd>
-            ) : (
-              <dd>
-                <b className="cc-exit-price">{money.price(price!)}</b>
-                <span>
-                  {trade.currentPrice === null
-                    ? '—'
-                    : t('app.crypto.trades.exits.distance', {
-                        percent: formatChange(
-                          ((price! - trade.currentPrice) / trade.currentPrice) * 100,
-                          locale
-                        ),
-                      })}{' '}
-                  <small
-                    className="cc-exit-way"
-                    title={t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}.title`)}
-                  >
-                    {t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}`)}
-                  </small>
-                </span>
-                <span>
-                  {t('app.crypto.trades.exits.ifReached')}{' '}
-                  <Result pnl={result.pnl} percent={result.percent} />
-                </span>
-              </dd>
-            )}
+            <dd>
+              {trade.currentPrice === null
+                ? '—'
+                : t('app.crypto.trades.exits.distance', {
+                    percent: formatChange(
+                      ((price - trade.currentPrice) / trade.currentPrice) * 100,
+                      locale
+                    ),
+                  })}{' '}
+              <small
+                className="cc-exit-way"
+                title={t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}.title`)}
+              >
+                {t(`app.crypto.trades.exits.way.${rise ? 'rise' : 'fall'}`)}
+              </small>
+              <span>
+                {t('app.crypto.trades.exits.ifReached')}{' '}
+                <Result pnl={result.pnl} percent={result.percent} />
+              </span>
+            </dd>
           </div>
         );
       })}
-    </dl>
+    </>
   );
 }
 
@@ -295,8 +407,12 @@ function CloseTrade({
           if (armed) onClose();
         }}
       >
-        {t(armed ? 'app.crypto.trades.close.confirm' : 'app.crypto.trades.close.label')}
-        <span className="sr-only"> {which}</span>
+        <span aria-hidden="true">
+          {t(armed ? 'app.crypto.trades.close.confirm' : 'app.crypto.trades.close.short')}
+        </span>
+        <span className="sr-only">
+          {t(armed ? 'app.crypto.trades.close.confirm' : 'app.crypto.trades.close.label')} {which}
+        </span>
       </button>
       <span className="sr-only" aria-live="polite">
         {armed ? t('app.crypto.trades.close.armed', { seconds: CONFIRM_MS / 1000 }) : ''}
@@ -306,9 +422,9 @@ function CloseTrade({
 }
 
 /**
- * Why the result is what it is: what the price gives, the commissions and the net result (the
- * headline of the card). When the price already favours the person but the commissions are not
- * covered yet, a short sentence says so instead of leaving a red number unexplained.
+ * Why the result is what it is (second line of a row): what the price gives, the commissions and
+ * the net result. When the price already favours the person but the commissions are not covered
+ * yet, a short sentence says so instead of leaving a red number unexplained.
  */
 function Breakdown({ trade }: { trade: OpenTrade }) {
   const { t, locale } = useI18n();
@@ -325,22 +441,30 @@ function Breakdown({ trade }: { trade: OpenTrade }) {
     ],
   ];
   return (
-    <div className="cc-breakdown">
-      <dl className="cc-facts">
-        {rows.map(([key, text, tone]) => (
-          <div key={key}>
-            <dt>{t(`app.crypto.trades.breakdown.${key}`)}</dt>
-            <dd className={tone || undefined}>{text}</dd>
-          </div>
-        ))}
-      </dl>
+    <>
+      {rows.map(([key, text, tone]) => (
+        <div key={key} className="cc-breakdown-row">
+          <dt>{t(`app.crypto.trades.breakdown.${key}`)}</dt>
+          <dd className={tone || undefined}>{text}</dd>
+        </div>
+      ))}
       {parts.price > 0 && parts.net < 0 && (
-        <p className="cc-hint">{t('app.crypto.trades.breakdown.feesNotCovered')}</p>
+        <p className="cc-hint cc-detail-note">{t('app.crypto.trades.breakdown.feesNotCovered')}</p>
       )}
-    </div>
+    </>
   );
 }
 
+const OPEN_COLS = ['position', 'prices', 'amount', 'exits', 'result', ''];
+const PENDING_COLS = ['position', 'prices', 'reserved', 'exits', 'dates', ''];
+const CLOSED_COLS = ['position', 'prices', 'amount', 'closing', 'result'];
+
+/**
+ * One open trade, in one row: direction, coin, quantity and date · entry and now · amount · take
+ * profit and stop loss · net result · buttons. What is secondary (what closing would give, the
+ * price that closes it alone, the breakdown of the result) opens in a second line, like the
+ * take profit and stop loss form.
+ */
 function OpenCard({
   trade,
   orders,
@@ -358,53 +482,62 @@ function OpenCard({
 }) {
   const { t, locale } = useI18n();
   const money = useMoney();
+  const id = useId();
   const [editing, setEditing] = useState(false);
+  const [details, setDetails] = useState(false);
   const exits: Partial<Record<ExitKind, number>> = {};
   for (const { kind, type } of EXITS) {
     const order = orders.find((o) => o.type === type);
     if (order) exits[kind] = order.price;
   }
   const breakdown = openBreakdown(trade);
-  const facts: [string, string][] = [
-    ['entry', `${money.price(trade.entryPrice)} · ${formatDateTime(trade.openedAt, locale)}`],
-    [
-      'invested',
-      `${money.amount(trade.invested)} + ${money.amount(trade.entryFee)} ${t('app.crypto.trades.feeWord')}`,
-    ],
-    ['now', trade.currentPrice === null ? '—' : money.price(trade.currentPrice)],
-    ['ifClosed', trade.value === null ? '—' : money.amount(trade.value)],
-  ];
-  if (trade.liquidationPrice !== null) {
-    facts.push(['liquidation', money.price(trade.liquidationPrice)]);
-  }
+  const which = t('app.crypto.trades.close.which', {
+    coin: trade.symbol,
+    direction: t(`app.crypto.order.directionShort.${trade.direction}`),
+  });
   return (
-    <li className={`cc-trade cc-trade--${trade.direction}`}>
-      <div className="cc-trade-head">
-        <DirectionBadge direction={trade.direction} />
-        <b>{trade.symbol}</b>
-        <span>{formatQuantity(trade.quantity, locale)}</span>
-        <span className="cc-trade-result">
-          <Result pnl={trade.pnl} percent={trade.pnlPercent} />
-          {breakdown && (
-            <small className={`cc-price-result ${pnl(breakdown.price)}`}>
+    <li className={`cc-trade cc-trade--open cc-trade--${trade.direction}`}>
+      <Cell role="who" label={t('app.crypto.trades.cols.position')}>
+        <span className="cc-who">
+          <DirectionBadge direction={trade.direction} />
+          <b>{trade.symbol}</b>
+        </span>
+        <small className="cc-sub">
+          {formatQuantity(trade.quantity, locale)} · {formatDateTime(trade.openedAt, locale)}
+        </small>
+      </Cell>
+      <Cell role="prices" label={t('app.crypto.trades.cols.prices')}>
+        <Mini label={t('app.crypto.trades.facts.entry')}>{money.price(trade.entryPrice)}</Mini>
+        <Mini label={t('app.crypto.trades.facts.nowShort')}>
+          {trade.currentPrice === null ? '—' : money.price(trade.currentPrice)}
+        </Mini>
+      </Cell>
+      <Cell role="amount" label={t('app.crypto.trades.cols.amount')}>
+        <span>{money.amount(trade.invested)}</span>
+        <small className="cc-sub">
+          +{money.amount(trade.entryFee)} {t('app.crypto.trades.feeWord')}
+        </small>
+      </Cell>
+      <Cell role="middle" label={t('app.crypto.trades.cols.exits')}>
+        <ExitLines exits={exits} current={trade.currentPrice} />
+      </Cell>
+      <Cell role="end" label={t('app.crypto.trades.cols.result')}>
+        <BigResult pnl={trade.pnl} percent={trade.pnlPercent} />
+        {breakdown && (
+          <small className="cc-sub">
+            <span className={pnl(breakdown.price)}>
               {t('app.crypto.trades.breakdown.priceShort', {
                 amount: money.amount(breakdown.price, true),
               })}
-            </small>
-          )}
-        </span>
-      </div>
-      <dl className="cc-facts">
-        {facts.map(([key, text]) => (
-          <div key={key}>
-            <dt>{t(`app.crypto.trades.facts.${key}`)}</dt>
-            <dd>{text}</dd>
-          </div>
-        ))}
-      </dl>
-      <Breakdown trade={trade} />
-      <ExitFacts trade={trade} exits={exits} bps={bps} />
-      <div className="button-row">
+            </span>
+            {' · '}
+            {t('app.crypto.trades.breakdown.feesShort', {
+              amount: money.amount(-breakdown.fees, true),
+            })}
+          </small>
+        )}
+      </Cell>
+      <div className="cc-cell cc-cell--actions">
         <CloseTrade trade={trade} busy={busy} onClose={onClose} />
         <button
           type="button"
@@ -413,15 +546,31 @@ function OpenCard({
           onClick={() => setEditing((v) => !v)}
         >
           {t('app.crypto.trades.exits.edit')}
-          <span className="sr-only">
-            {' '}
-            {t('app.crypto.trades.close.which', {
-              coin: trade.symbol,
-              direction: t(`app.crypto.order.directionShort.${trade.direction}`),
-            })}
-          </span>
+          <span className="sr-only"> {which}</span>
         </button>
+        <DetailsToggle
+          open={details}
+          controls={`${id}-details`}
+          which={which}
+          onToggle={() => setDetails((v) => !v)}
+        />
       </div>
+      {details && (
+        <dl id={`${id}-details`} className="cc-detail">
+          <div>
+            <dt>{t('app.crypto.trades.facts.ifClosed')}</dt>
+            <dd>{trade.value === null ? '—' : money.amount(trade.value)}</dd>
+          </div>
+          {trade.liquidationPrice !== null && (
+            <div>
+              <dt>{t('app.crypto.trades.facts.liquidation')}</dt>
+              <dd>{money.price(trade.liquidationPrice)}</dd>
+            </div>
+          )}
+          <ExitDetails trade={trade} exits={exits} bps={bps} />
+          <Breakdown trade={trade} />
+        </dl>
+      )}
       {editing && (
         <ExitsForm
           trade={trade}
@@ -475,19 +624,22 @@ export function OpenPanel({
       {trades.length === 0 ? (
         <p className="cc-hint">{t('app.crypto.trades.openEmpty')}</p>
       ) : (
-        <ul className="cc-trades">
-          {page.rows.map((trade) => (
-            <OpenCard
-              key={trade.id}
-              trade={trade}
-              orders={pending.filter((o) => o.positionId === trade.id)}
-              bps={bps}
-              busy={busy}
-              onClose={() => void close(trade)}
-              onSetExits={onSetExits}
-            />
-          ))}
-        </ul>
+        <div className="cc-table">
+          <ColumnHeads kind="open" keys={OPEN_COLS} />
+          <ul className="cc-trades">
+            {page.rows.map((trade) => (
+              <OpenCard
+                key={trade.id}
+                trade={trade}
+                orders={pending.filter((o) => o.positionId === trade.id)}
+                bps={bps}
+                busy={busy}
+                onClose={() => void close(trade)}
+                onSetExits={onSetExits}
+              />
+            ))}
+          </ul>
+        </div>
       )}
       <Pager
         label={t('app.crypto.trades.pager.open')}
@@ -528,51 +680,67 @@ export function PendingPanel({
       {entries.length === 0 ? (
         <p className="cc-hint">{t('app.crypto.trades.pendingEmpty')}</p>
       ) : (
-        <ul className="cc-trades">
-          {page.rows.map((order) => {
-            const facts: [string, string][] = [['reserved', money.amount(order.reserved)]];
-            facts.push([
-              'now',
-              order.currentPrice === null ? '—' : money.price(order.currentPrice),
-            ]);
-            if (order.takeProfit !== null)
-              facts.push(['takeProfit', money.price(order.takeProfit)]);
-            if (order.stopLoss !== null) facts.push(['stopLoss', money.price(order.stopLoss)]);
-            facts.push(['created', formatDateTime(order.createdAt, locale)]);
-            facts.push(['expires', formatDateTime(order.expiresAt, locale)]);
-            const kind = orderKind(order, t);
-            return (
-              <li key={order.id} className={`cc-trade cc-trade--${order.direction}`}>
-                <div className="cc-trade-head">
-                  <DirectionBadge direction={order.direction} />
-                  <b>{order.symbol}</b>
-                  <span>{kind}</span>
-                  <b>{money.price(order.price)}</b>
-                </div>
-                <dl className="cc-facts">
-                  {facts.map(([key, text]) => (
-                    <div key={key}>
-                      <dt>{t(`app.crypto.trades.facts.${key}`)}</dt>
-                      <dd>{text}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <button
-                  type="button"
-                  className="cc-tool"
-                  disabled={busy}
-                  onClick={() => void onCancel(order.id)}
+        <div className="cc-table">
+          <ColumnHeads kind="pending" keys={PENDING_COLS} />
+          <ul className="cc-trades">
+            {page.rows.map((order) => {
+              const kind = orderKind(order, t);
+              const exits: Partial<Record<ExitKind, number>> = {};
+              if (order.takeProfit !== null) exits.takeProfit = order.takeProfit;
+              if (order.stopLoss !== null) exits.stopLoss = order.stopLoss;
+              return (
+                <li
+                  key={order.id}
+                  className={`cc-trade cc-trade--pending cc-trade--${order.direction}`}
                 >
-                  {t('app.crypto.trades.cancel')}
-                  <span className="sr-only">
-                    {' '}
-                    {kind} {order.symbol}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                  <Cell role="who" label={t('app.crypto.trades.cols.position')}>
+                    <span className="cc-who">
+                      <DirectionBadge direction={order.direction} />
+                      <b>{order.symbol}</b>
+                    </span>
+                    <small className="cc-sub">{kind}</small>
+                  </Cell>
+                  <Cell role="prices" label={t('app.crypto.trades.cols.prices')}>
+                    <Mini label={t('app.crypto.trades.facts.order')}>
+                      <b>{money.price(order.price)}</b>
+                    </Mini>
+                    <Mini label={t('app.crypto.trades.facts.nowShort')}>
+                      {order.currentPrice === null ? '—' : money.price(order.currentPrice)}
+                    </Mini>
+                  </Cell>
+                  <Cell role="amount" label={t('app.crypto.trades.cols.reserved')}>
+                    <span>{money.amount(order.reserved)}</span>
+                  </Cell>
+                  <Cell role="middle" label={t('app.crypto.trades.cols.exits')}>
+                    <ExitLines exits={exits} current={undefined} />
+                  </Cell>
+                  <Cell role="end" label={t('app.crypto.trades.cols.dates')}>
+                    <Mini label={t('app.crypto.trades.facts.created')}>
+                      {formatDateTime(order.createdAt, locale)}
+                    </Mini>
+                    <Mini label={t('app.crypto.trades.facts.expires')}>
+                      {formatDateTime(order.expiresAt, locale)}
+                    </Mini>
+                  </Cell>
+                  <div className="cc-cell cc-cell--actions">
+                    <button
+                      type="button"
+                      className="cc-tool"
+                      disabled={busy}
+                      onClick={() => void onCancel(order.id)}
+                    >
+                      {t('app.crypto.trades.cancel')}
+                      <span className="sr-only">
+                        {' '}
+                        {kind} {order.symbol}
+                      </span>
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
       <Pager
         label={t('app.crypto.trades.pager.pending')}
@@ -599,41 +767,51 @@ export function ClosedPanel({ trades }: { trades: ClosedTrade[] }) {
       {trades.length === 0 ? (
         <p className="cc-hint">{t('app.crypto.trades.closedEmpty')}</p>
       ) : (
-        <ul className="cc-trades">
-          {page.rows.map((trade) => (
-            <li key={trade.id} className={`cc-trade cc-trade--${trade.direction}`}>
-              <div className="cc-trade-head">
-                <DirectionBadge direction={trade.direction} />
-                <b>{trade.symbol}</b>
-                <span>{formatQuantity(trade.quantity, locale)}</span>
-                <Result pnl={trade.pnl} percent={trade.pnlPercent} />
-              </div>
-              <dl className="cc-facts">
-                <div>
-                  <dt>{t('app.crypto.trades.facts.entry')}</dt>
-                  <dd>
-                    {money.price(trade.entryPrice)} · {formatDateTime(trade.openedAt, locale)}
-                  </dd>
-                </div>
-                <div>
-                  <dt>{t('app.crypto.trades.facts.exit')}</dt>
-                  <dd>
-                    {money.price(trade.exitPrice)} · {formatDateTime(trade.closedAt, locale)} ·{' '}
-                    {t(`app.crypto.trades.closeTypes.${trade.closeType}`)}
-                  </dd>
-                </div>
-                <div>
-                  <dt>{t('app.crypto.trades.facts.invested')}</dt>
-                  <dd>{money.amount(trade.invested)}</dd>
-                </div>
-                <div>
-                  <dt>{t('app.crypto.trades.fees')}</dt>
-                  <dd>{money.amount(trade.fees)}</dd>
-                </div>
-              </dl>
-            </li>
-          ))}
-        </ul>
+        <div className="cc-table">
+          <ColumnHeads kind="closed" keys={CLOSED_COLS} />
+          <ul className="cc-trades">
+            {page.rows.map((trade) => (
+              <li
+                key={trade.id}
+                className={`cc-trade cc-trade--closed cc-trade--${trade.direction}`}
+              >
+                <Cell role="who" label={t('app.crypto.trades.cols.position')}>
+                  <span className="cc-who">
+                    <DirectionBadge direction={trade.direction} />
+                    <b>{trade.symbol}</b>
+                  </span>
+                  <small className="cc-sub">
+                    {formatQuantity(trade.quantity, locale)} ·{' '}
+                    {formatDateTime(trade.openedAt, locale)}
+                  </small>
+                </Cell>
+                <Cell role="prices" label={t('app.crypto.trades.cols.prices')}>
+                  <Mini label={t('app.crypto.trades.facts.entry')}>
+                    {money.price(trade.entryPrice)}
+                  </Mini>
+                  <Mini label={t('app.crypto.trades.facts.exit')}>
+                    {money.price(trade.exitPrice)}
+                  </Mini>
+                </Cell>
+                <Cell role="amount" label={t('app.crypto.trades.cols.amount')}>
+                  <span>{money.amount(trade.invested)}</span>
+                  <small className="cc-sub">
+                    {t('app.crypto.trades.breakdown.feesShort', {
+                      amount: money.amount(trade.fees),
+                    })}
+                  </small>
+                </Cell>
+                <Cell role="middle" label={t('app.crypto.trades.cols.closing')}>
+                  <span>{t(`app.crypto.trades.closeTypes.${trade.closeType}`)}</span>
+                  <small className="cc-sub">{formatDateTime(trade.closedAt, locale)}</small>
+                </Cell>
+                <Cell role="end" label={t('app.crypto.trades.cols.result')}>
+                  <BigResult pnl={trade.pnl} percent={trade.pnlPercent} />
+                </Cell>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       <Pager
         label={t('app.crypto.trades.pager.closed')}

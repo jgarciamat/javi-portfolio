@@ -1232,35 +1232,166 @@
   gap: 0.5rem;
 }
 
+/* ─── One row per operation ───
+   Column headers once over the list; each row is a grid (a table row for the eye, a list item
+   for a screen reader). Narrow panels (container query: the panel, not the window) stack the
+   cells in two or three short lines and show each cell's own label instead of the headers. */
+.cc-table {
+  container-type: inline-size;
+  margin-top: 0.5rem;
+}
+
 .cc-trade {
+  display: grid;
+  grid-template-columns: var(--cc-cols);
+  align-items: center;
+  gap: 0.35rem 0.85rem;
   border: 1px solid var(--cc-line);
   border-radius: 8px;
-  padding: 0.6rem 0.8rem;
+  padding: 0.5rem 0.8rem;
   background: var(--cc-raised);
+  font-size: 0.8125rem;
 }
 
-.cc-trade-head {
+.cc-trade-cols {
+  display: grid;
+  grid-template-columns: var(--cc-cols);
+  gap: 0 0.85rem;
+  /* Same inset as a row: its border (1px + 5px on the side) and its padding. */
+  padding: 0 calc(0.8rem + 1px) 0.15rem calc(0.8rem + 6px);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-text-2);
+}
+
+/* Open and pending: six columns; closed: five (no buttons). */
+.cc-trade,
+.cc-trade-cols {
+  --cc-cols: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1.2fr) minmax(0, 1.6fr)
+    14rem;
+}
+
+.cc-trade--closed,
+.cc-trade-cols--closed {
+  --cc-cols: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1.2fr) minmax(0, 1.6fr);
+}
+
+.cc-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  color: var(--cc-text);
+}
+
+.cc-cell:not(.cc-cell--actions) > :not(.cc-cell-label) {
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Read aloud always; shown only where there are no column headers. */
+.cc-cell-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cc-who {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem 0.85rem;
   align-items: baseline;
-  font-size: 0.9375rem;
-  margin-bottom: 0.4rem;
+  gap: 0.15rem 0.5rem;
   color: var(--cc-strong);
+  font-size: 0.875rem;
 }
 
-.cc-trade-head > .cc-trade-result {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.1rem 0.5rem;
-  align-items: baseline;
-  justify-content: flex-end;
-}
-
-.cc-price-result {
-  font-size: 0.75rem;
+.cc-sub,
+.cc-mini small,
+.cc-exit small {
+  font-size: 0.6875rem;
   font-weight: 400;
+  color: var(--cc-text-2);
+}
+
+.cc-sub {
+  white-space: nowrap;
+}
+
+.cc-cell--end > .cc-sub,
+.cc-cell--who > .cc-sub {
+  white-space: normal;
+}
+
+.cc-sub .pnl-pos {
+  color: var(--pnl-pos);
+}
+
+.cc-sub .pnl-neg {
+  color: var(--pnl-neg);
+}
+
+/* Only the headline carries the arrow: the small figures keep the colour and the sign. */
+.cc-sub .pnl-pos::before,
+.cc-sub .pnl-neg::before,
+.cc-sub-pct::before {
+  content: none;
+}
+
+.cc-mini {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.cc-cell--end {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.cc-trade--pending .cc-cell--end {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cc-big {
+  font-size: 1.125rem;
+  line-height: 1.15;
+}
+
+.cc-sub-pct {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cc-cell--actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.cc-details-toggle .cc-details-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.cc-trade .cc-cell--actions button {
+  min-height: 28px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.75rem;
 }
 
 .cc-exit-way {
@@ -1268,60 +1399,34 @@
   font-size: 0.75rem;
 }
 
-.cc-breakdown {
-  margin-bottom: 0.5rem;
-}
-
-.cc-facts {
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  margin-bottom: 0.5rem;
-}
-
-/* ─── Take profit and stop loss of an open trade ───
-   Green take profit and red stop loss with the result colours (the words say which is which):
-   price, distance to the current price and what closing there would give, «—» when there is none. */
-.cc-exits {
+/* Take profit (green) and stop loss (red) as two short lines. The words (TP/SL) say which is
+   which; the colour only backs them up. */
+.cc-exit-lines {
   display: grid;
-  gap: 0.3rem;
-  margin: 0 0 0.5rem;
+  gap: 0.1rem;
+  margin: 0;
 }
 
-.cc-exit {
+.cc-exit-lines .cc-exit {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.15rem 0.85rem;
-  padding: 0.3rem 0.6rem;
-  border-left: 3px solid var(--cc-line);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--cc-surface) 55%, transparent);
+  gap: 0.4rem;
 }
 
-.cc-exit dt {
-  min-width: 6.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+.cc-exit-lines dt {
+  min-width: 1.5rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .cc-exit dd {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: baseline;
-  gap: 0.15rem 0.85rem;
+  gap: 0 0.4rem;
   margin: 0;
-  font-family: var(--cc-num);
-  font-variant-numeric: tabular-nums;
-  color: var(--cc-text);
-}
-
-.cc-exit--takeProfit {
-  border-left-color: var(--pnl-pos);
-}
-
-.cc-exit--stopLoss {
-  border-left-color: var(--pnl-neg);
 }
 
 .cc-exit--takeProfit dt,
@@ -1336,13 +1441,184 @@
   color: var(--pnl-neg);
 }
 
-.cc-trade .button-row {
-  flex-wrap: wrap;
-  gap: 0.4rem;
+/* The second line of a row: what is secondary. */
+.cc-detail {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.3rem 1rem;
+  margin: 0;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--cc-line);
+  font-family: var(--cc-num);
+  font-variant-numeric: tabular-nums;
 }
 
-.cc-trade .button-row button {
-  min-height: 36px;
+.cc-detail > div,
+.cc-detail .cc-exit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.cc-detail dt {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cc-text-2);
+}
+
+.cc-detail dd {
+  margin: 0;
+  color: var(--cc-text);
+}
+
+.cc-detail .cc-exit dd {
+  display: block;
+}
+
+.cc-detail .cc-exit dd small,
+.cc-detail .cc-exit dd > span {
+  display: block;
+}
+
+.cc-detail .cc-exit--takeProfit dt {
+  color: var(--pnl-pos);
+}
+
+.cc-detail .cc-exit--stopLoss dt {
+  color: var(--pnl-neg);
+}
+
+.cc-detail-note {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.cc-trade > .cc-exits-form {
+  grid-column: 1 / -1;
+  margin-top: 0.1rem;
+}
+
+@container (max-width: 1100px) {
+  .cc-trade-cols {
+    display: none;
+  }
+
+  /* Two columns, three short lines (open: who | result, prices | amount, TP/SL | buttons). */
+  .cc-trade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'who end'
+      'prices amount'
+      'middle middle'
+      'actions actions';
+    gap: 0.45rem 0.7rem;
+  }
+
+  .cc-trade--open .cc-exit-lines {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 0.7rem;
+  }
+
+  .cc-trade--open .cc-exit-lines .cc-exit {
+    flex-wrap: wrap;
+  }
+
+  .cc-trade--pending {
+    grid-template-areas:
+      'who actions'
+      'prices amount'
+      'middle end';
+  }
+
+  .cc-trade--closed {
+    grid-template-areas:
+      'who end'
+      'prices amount'
+      'middle middle';
+  }
+
+  .cc-cell--who {
+    grid-area: who;
+  }
+
+  .cc-cell--prices {
+    grid-area: prices;
+  }
+
+  .cc-cell--amount {
+    grid-area: amount;
+  }
+
+  .cc-cell--middle {
+    grid-area: middle;
+  }
+
+  .cc-cell--end {
+    grid-area: end;
+  }
+
+  .cc-cell--actions {
+    grid-area: actions;
+    justify-content: flex-start;
+  }
+
+  .cc-trade--pending .cc-cell--end {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .cc-trade--pending .cc-cell--actions {
+    justify-content: flex-end;
+  }
+
+  /* The small subline of the result is in the details; its label shows only where a figure has
+     no words of its own (the amount, the dates, the closing). */
+  .cc-cell--end > .cc-sub {
+    display: none;
+  }
+
+  .cc-cell--amount > .cc-cell-label,
+  .cc-cell--middle > .cc-cell-label,
+  .cc-trade--pending .cc-cell--end > .cc-cell-label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cc-text-2);
+  }
+
+  .cc-trade--open .cc-cell--middle > .cc-cell-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .cc-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-details-toggle .cc-details-text {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+  }
 }
 
 /* «Close trade»: a quiet button that turns red while it waits for the confirming press. */

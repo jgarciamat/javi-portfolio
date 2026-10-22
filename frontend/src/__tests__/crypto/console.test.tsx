@@ -644,7 +644,9 @@ describe('Crypto console: opening positions', () => {
       await screen.findByText('Sin precios ahora no podemos calcular el resultado.')
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Cerrar operación/ })).toBeDisabled();
-    expect(nb(document.querySelector('.cc-exit--takeProfit')!.textContent)).toBe('Take profit—');
+    expect(nb(document.querySelector('.cc-exit-lines')!.textContent)).toBe(
+      'TPTake profit—SLStop loss—'
+    );
     expect(screen.getByText('Te has quedado sin dinero ficticio.')).toBeInTheDocument();
   });
 
@@ -772,30 +774,77 @@ describe('Crypto console: open, pending and closed', () => {
     screen.getByRole('button', { name: symbol }).closest('li')! as HTMLElement;
   const text = (el: Element | null) => nb(el!.textContent);
 
-  it('shows the take profit in green and the stop loss in red on each open trade', async () => {
+  const open = (el: HTMLElement) =>
+    fireEvent.click(within(el).getByRole('button', { name: /^Detalles/ }));
+
+  it('puts each open trade in one row: green take profit, red stop loss, details apart', async () => {
     const both = fx.portfolio({ open: [fx.portfolio().open[0], short], pending: withExits });
     setup(withPortfolio(both));
     await screen.findByText('Abiertas (2)');
     expect(screen.getAllByText('Long', { selector: '.cc-dir' })).toHaveLength(1);
-    expect(nb(screen.getByText('Se cerraría sola a').nextSibling!.textContent)).toBe(
-      '100.000,00 €'
-    );
     const long = card(/^Cerrar operación \(Long de BTC\)/);
+    // One row: the cells in order, each with its label for screen readers.
+    expect(Array.from(long.querySelectorAll(':scope > .cc-cell')).map((c) => c.className)).toEqual([
+      'cc-cell cc-cell--who',
+      'cc-cell cc-cell--prices',
+      'cc-cell cc-cell--amount',
+      'cc-cell cc-cell--middle',
+      'cc-cell cc-cell--end',
+      'cc-cell cc-cell--actions',
+    ]);
+    expect(text(long.querySelector('.cc-cell--prices'))).toContain('Entrada');
+    expect(text(long.querySelector('.cc-cell--amount'))).toContain('de comisión');
     expect(text(long.querySelector('.cc-exit--takeProfit'))).toBe(
-      'Take profit60.000,00 €+9,09 % del precio actual (el precio debe subir)Si llega: +197,80 € (+19,76 %)'
+      'TPTake profit60.000,00 €+9,09 %'
     );
-    expect(text(long.querySelector('.cc-exit--stopLoss'))).toBe(
-      'Stop loss45.000,00 €−18,18 % del precio actual (el precio debe bajar)Si llega: −101,90 € (−10,18 %)'
-    );
-    expect(long.querySelector('.cc-exit--takeProfit .pnl-pos')).not.toBeNull();
-    expect(long.querySelector('.cc-exit--stopLoss .pnl-neg')).not.toBeNull();
+    expect(text(long.querySelector('.cc-exit--stopLoss'))).toBe('SLStop loss45.000,00 €−18,18 %');
+    expect(long.querySelector('.cc-exit--takeProfit .cc-exit-price')).not.toBeNull();
+    // The headers go once above the list, hidden from screen readers.
+    const heads = document.querySelectorAll('.cc-trade-cols--open');
+    expect(heads).toHaveLength(1);
+    expect(heads[0]).toHaveAttribute('aria-hidden', 'true');
+    expect(text(heads[0])).toBe('OperaciónPreciosImporteTP / SLResultado');
     const other = card(/^Cerrar operación \(Short de BTC\)/);
-    expect(text(other.querySelector('.cc-exits'))).toBe('Take profit—Stop loss—');
+    expect(text(other.querySelector('.cc-exit-lines'))).toBe('TPTake profit—SLStop loss—');
     // They are not pending orders: «Pendientes» only has the orders that open a trade.
     expect(screen.getByText('Pendientes (0)')).toBeInTheDocument();
     expect(screen.queryByText(/Cierres programados/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '¿Qué es el take profit?' }));
     expect(screen.getByText(/lo ves en verde en su tarjeta/)).toBeVisible();
+  });
+
+  it('opens the details of a row: what it would give, where it closes alone, the exits', async () => {
+    const both = fx.portfolio({ open: [fx.portfolio().open[0], short], pending: withExits });
+    setup(withPortfolio(both));
+    await screen.findByText('Abiertas (2)');
+    const long = card(/^Cerrar operación \(Long de BTC\)/);
+    expect(long.querySelector('.cc-detail')).toBeNull();
+    const toggle = within(long).getByRole('button', { name: 'Detalles (Long de BTC)' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const detail = long.querySelector('.cc-detail')!;
+    expect(toggle).toHaveAttribute('aria-controls', detail.id);
+    expect(text(detail.querySelector('.cc-exit--takeProfit'))).toBe(
+      'Take profit+9,09 % del precio actual (el precio debe subir)Si llega: +197,80 € (+19,76 %)'
+    );
+    expect(text(detail.querySelector('.cc-exit--stopLoss'))).toBe(
+      'Stop loss−18,18 % del precio actual (el precio debe bajar)Si llega: −101,90 € (−10,18 %)'
+    );
+    expect(detail.querySelector('.cc-exit--takeProfit .pnl-pos')).not.toBeNull();
+    expect(detail.querySelector('.cc-exit--stopLoss .pnl-neg')).not.toBeNull();
+    expect(text(detail)).toContain('Si cerraras ahora recibirías');
+    expect(text(detail)).not.toContain('Se cerraría sola a');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(long.querySelector('.cc-detail')).toBeNull();
+    const other = card(/^Cerrar operación \(Short de BTC\)/);
+    open(other);
+    expect(nb(within(other).getByText('Se cerraría sola a').nextSibling!.textContent)).toBe(
+      '100.000,00 €'
+    );
+    // No take profit or stop loss: nothing about them in the details.
+    expect(other.querySelector('.cc-detail .cc-exit')).toBeNull();
   });
 
   it('explains a red short whose price already goes its way: price, commissions and net', async () => {
@@ -814,13 +863,18 @@ describe('Crypto console: open, pending and closed', () => {
     setup(withPortfolio({ open: [winning] }));
     await screen.findByText('Abiertas (1)');
     const li = card(/^Cerrar operación \(Short de BTC\)/);
-    // Headline: the net, red, with the price result small and green beside it.
-    expect(text(li.querySelector('.cc-trade-head'))).toContain('−2,73 € (−0,05 %)Precio: +7,26 €');
-    expect(li.querySelector('.cc-trade-head .pnl-neg')).not.toBeNull();
-    expect(li.querySelector('.cc-price-result.pnl-pos')).not.toBeNull();
-    const rows = li.querySelector('.cc-breakdown')!;
+    // Headline: the net, big and red, its percent below and, small, price and commissions.
+    const end = li.querySelector('.cc-cell--end')!;
+    expect(text(end)).toBe('Resultado−2,73 €−0,05 %Precio: +7,26 € · Comisiones: −9,99 €');
+    expect(end.querySelector('.cc-big.pnl-neg')).not.toBeNull();
+    expect(end.querySelector('.cc-sub .pnl-pos')).not.toBeNull();
+    expect(li.querySelector('.cc-detail')).toBeNull();
+    open(li);
+    const rows = li.querySelector('.cc-detail')!;
     expect(text(rows)).toBe(
-      'Resultado del precio+7,26 €Comisiones (entrada + salida estimada)−9,99 €' +
+      'Si cerraras ahora recibirías5.002,27 €Se cerraría sola a' +
+        text(within(li).getByText('Se cerraría sola a').nextSibling as Element) +
+        'Resultado del precio+7,26 €Comisiones (entrada + salida estimada)−9,99 €' +
         'Resultado neto−2,73 € (−0,05 %)El precio ya juega a tu favor, pero las comisiones aún no están cubiertas.'
     );
     expect(rows.querySelector('.pnl-pos')).not.toBeNull();
@@ -830,9 +884,11 @@ describe('Crypto console: open, pending and closed', () => {
   it('does not add the sentence when the net is green or the price goes against', async () => {
     setup(withPortfolio({ open: [fx.portfolio().open[0], { ...short, id: 's2' }] }));
     await screen.findByText('Abiertas (2)');
+    for (const button of screen.getAllByRole('button', { name: /^Detalles/ })) {
+      fireEvent.click(button);
+    }
     expect(screen.queryByText(/comisiones aún no están cubiertas/)).toBeNull();
-    expect(document.querySelectorAll('.cc-breakdown')).toHaveLength(2);
-    expect(document.querySelectorAll('.cc-breakdown .pnl-pos')).toHaveLength(2);
+    expect(document.querySelectorAll('.cc-detail .cc-breakdown-row')).toHaveLength(6);
   });
 
   it('shows no breakdown without a price', async () => {
@@ -844,8 +900,11 @@ describe('Crypto console: open, pending and closed', () => {
       })
     );
     await screen.findByText('Abiertas (1)');
-    expect(document.querySelector('.cc-breakdown')).toBeNull();
-    expect(document.querySelector('.cc-price-result')).toBeNull();
+    open(card(/^Cerrar operación/));
+    expect(document.querySelector('.cc-breakdown-row')).toBeNull();
+    expect(text(document.querySelector('.cc-cell--end'))).toBe('Resultado—');
+    expect(text(document.querySelector('.cc-cell--prices'))).toContain('Ahora —');
+    expect(text(document.querySelector('.cc-detail'))).toContain('Si cerraras ahora recibirías—');
   });
 
   it("shows the distance as «—» without a price, and a short's result if reached", async () => {
@@ -854,9 +913,11 @@ describe('Crypto console: open, pending and closed', () => {
     ];
     setup(withPortfolio({ open: [{ ...short, currentPrice: null }], pending }));
     await screen.findByText('Abiertas (1)');
+    expect(text(document.querySelector('.cc-exit--takeProfit'))).toBe('TPTake profit40.000,00 €');
+    open(card(/^Cerrar operación/));
     // Guarantee 1.000 € + (50.000 − 40.000) × 0,02 = 1.200 €, minus 0,80 € of commission.
-    expect(text(document.querySelector('.cc-exit--takeProfit'))).toBe(
-      'Take profit40.000,00 €— (el precio debe bajar)Si llega: +198,20 € (+19,80 %)'
+    expect(text(document.querySelector('.cc-detail .cc-exit--takeProfit'))).toBe(
+      'Take profit— (el precio debe bajar)Si llega: +198,20 € (+19,80 %)'
     );
   });
 
@@ -1010,9 +1071,12 @@ describe('Crypto console: open, pending and closed', () => {
     const { api } = setup(withPortfolio({ pending }));
     expect(await screen.findByText('Pendientes (2)')).toBeInTheDocument();
     const pendingPanel = screen.getByText('Pendientes (2)').closest('section')!;
-    expect(within(pendingPanel).getAllByText('Reservado')).toHaveLength(2);
-    expect(within(pendingPanel).queryByText('Stop loss', { selector: 'span' })).toBeNull();
-    expect(nb(pendingPanel.textContent)).toContain('Take profit52.000,00 €');
+    expect(pendingPanel.querySelectorAll('.cc-cell--amount')).toHaveLength(2);
+    expect(text(pendingPanel.querySelector('.cc-exit--takeProfit'))).toBe(
+      'TPTake profit52.000,00 €'
+    );
+    expect(text(pendingPanel.querySelector('.cc-exit--stopLoss'))).toBe('SLStop loss40.000,00 €');
+    expect(pendingPanel.querySelectorAll('.cc-trade-cols--pending')).toHaveLength(1);
     expect(screen.getByText('Abrir short (límite)')).toBeInTheDocument();
     expect(nb(pendingPanel.textContent)).toContain('pasan a «Abiertas»');
     fireEvent.click(

@@ -167,14 +167,28 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
   backend los sigue guardando como órdenes vinculadas (y la API los sigue devolviendo en
   `pending`, para las apps antiguas), pero el frontend los muestra en la tarjeta de su operación.
   El texto del panel y los «¿Qué es…?» (orden pendiente, take profit, stop loss) lo explican.
-- **Tarjeta de cada operación abierta**: debajo de sus datos, el **take profit en verde** y el
-  **stop loss en rojo** (tokens `--pnl-pos` / `--pnl-neg`, con borde del mismo color), cada uno con
-  su precio, la **distancia en %** respecto al precio actual y el **resultado estimado si se
-  alcanza** (mismas cuentas que el servidor, comisión incluida, en verde o rojo con `.pnl-pos` /
-  `.pnl-neg`); «—» si no hay.
-- **Desglose del resultado** (tarjeta de «Abiertas», `Breakdown` y `openBreakdown` en
-  `domain/orders.ts`): el titular sigue siendo el **resultado neto** con su color, y al lado, en
-  pequeño, el **resultado del precio** («Precio: +7,26 €», verde o rojo). Debajo, tres filas:
+- **Una fila por operación** (Abiertas, Pendientes y Cerradas; `TradePanels.tsx`, estilos
+  `.cc-table`, `.cc-trade`, `.cc-cell--*` en `Crypto.css`): rejilla con las **cabeceras de columna
+  una sola vez** sobre la lista (decorativas, `aria-hidden`; cada celda lleva su propia etiqueta
+  para el lector de pantalla). Abiertas: **Operación** (▲Long / ▼Short + moneda; debajo, cantidad ·
+  fecha de entrada) · **Precios** (Entrada / Ahora apilados) · **Importe** (con la comisión de
+  entrada pequeña) · **TP / SL** (TP en verde y SL en rojo apilados, con su distancia % en pequeño;
+  «—» si no hay) · **Resultado** (neto grande en verde/rojo con su % debajo y, pequeño, «Precio ±X ·
+  Comisiones −Y») · botones **Cerrar**, **Editar TP/SL** y ▾ **Detalles**. Pendientes: operación y
+  tipo · Orden / Ahora · Reservado · TP / SL · Creada / Caduca · Cancelar. Cerradas: operación ·
+  Entrada / Salida · Importe y comisiones · Cierre (tipo y fecha) · Resultado.
+- **Detalles** (botón ▾, `aria-expanded` + `aria-controls`): abre una **segunda línea** de la fila
+  con lo secundario: «Si cerraras ahora recibirías», «Se cerraría sola a» (shorts), para el TP y el
+  SL puestos su distancia en palabras («(el precio debe subir/bajar)», con tooltip) y el
+  **resultado si llega** (mismas cuentas que el servidor, comisión incluida, `.pnl-pos` /
+  `.pnl-neg`), y el desglose del resultado. El formulario de **Editar TP/SL** también sale en una
+  segunda línea. **Cerrar** mantiene la confirmación de 2 pasos («¿Seguro? Sí, cerrar», 4 s).
+- **Responsive por contenedor**: con el panel de 1.100 px o menos la fila pasa a 3-4 líneas
+  compactas en dos columnas (operación | resultado, precios | importe, TP/SL, botones; sin scroll
+  lateral) y las etiquetas de las celdas se ven encima de cada dato.
+- **Desglose del resultado** (`Breakdown` y `openBreakdown` en `domain/orders.ts`): el titular es
+  el **resultado neto** con su color y, pequeño, el **resultado del precio** («Precio: +7,26 €»,
+  verde o rojo) y las comisiones. En Detalles, tres filas:
   _Resultado del precio_ (lo que da solo el movimiento del precio: un long gana si sube, un short
   si baja) · _Comisiones (entrada + salida estimada)_ · _Resultado neto_ (con el %, siempre sobre
   lo pagado: importe + comisión de entrada). Siempre: neto = precio − comisión de entrada −
@@ -185,8 +199,8 @@ Código: `frontend/src/modules/crypto/ui/TradePanels.tsx` y `domain/orders.ts` (
   short con el precio a favor puede verse en rojo hasta cubrirlas. Revisión de cuentas (tests con
   números inventados en `crypto-sim.test.ts`, `crypto.test.ts` y `domain.test.ts`): longs y
   shorts dan el mismo resultado en espejo; no había error de cálculo, solo de presentación.
-- **Distancia del TP y del SL**: «+9,09 % del precio actual» seguido, en gris, de «(el precio debe
-  subir)» o «(el precio debe bajar)» (con tooltip): TP de un long y SL de un short, subir; TP de un
+- **Distancia del TP y del SL**: en la fila, «+9,09 %»; en Detalles, «+9,09 % del precio actual»
+  seguido, en gris, de «(el precio debe subir)» o «(el precio debe bajar)» (con tooltip): TP de un long y SL de un short, subir; TP de un
   short y SL de un long, bajar (`needsRise`).
 - **«Editar TP/SL»** abre un formulario con las dos casillas rellenas: cambiar el precio lo mueve
   y dejarla vacía lo quita. Se comprueba en vivo contra el **precio actual** (long: TP por encima
@@ -396,7 +410,8 @@ y, de la escala compacta, en `/tmp/gf66-shots/` (1440, 1920, 390 vertical y 844x
 y Contraste). Chips de capas encima de la gráfica, monedas en páginas y panel «Aprende antes de
 jugar» (cerrado y abierto en dos pestañas) en `/tmp/gf67-shots/` (1440, 390 y 844x390; claro,
 oscuro y Contraste). Paneles con TP/SL en la tarjeta, formulario de edición y «¿Seguro? Sí,
-cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste).
+cerrar» en `/tmp/gf69-shots/` (1280 y 390; claro, oscuro y Contraste). Filas compactas (una por
+operación, con y sin Detalles) en `/tmp/gf70-shots/` (1440 y 390; claro, oscuro y Contraste).
 
 Temporadas y ranking (datos inventados):
 
