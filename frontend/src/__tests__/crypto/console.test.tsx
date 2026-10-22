@@ -224,7 +224,7 @@ describe('Crypto console: market', () => {
     expect(within(coinNav()).getByText('2 / 4')).toBeInTheDocument();
   });
 
-  it('fits as many whole rows as the column holds, and measures again when it resizes', async () => {
+  it('fits as many whole rows as the column holds, and measures again when it resizes, keeping the page', async () => {
     const observers: (() => void)[] = [];
     Object.assign(window, {
       ResizeObserver: class {
@@ -243,12 +243,17 @@ describe('Crypto console: market', () => {
     const { unmount } = setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
     await screen.findByRole('button', { name: /Coin 0/ });
     expect(shownCoins()).toHaveLength(6);
+    // The page turned to stays when the pages change size (the chart arriving late, a resize).
+    fireEvent.click(within(coinNav()).getByRole('button', { name: /^Sig\./ }));
+    expect(shownCoins()[0]).toHaveTextContent('Coin 6');
     const list = within(coinNav()).getByRole('list');
     list.style.rowGap = '6px';
     list.style.paddingTop = '4px';
     height = 200;
     act(() => observers.forEach((measure) => measure()));
     expect(shownCoins()).toHaveLength(4);
+    expect(within(coinNav()).getByText('2 / 8')).toBeInTheDocument();
+    expect(shownCoins()[0]).toHaveTextContent('Coin 4');
     height = 2_000;
     act(() => {
       window.dispatchEvent(new Event('resize'));

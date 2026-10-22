@@ -206,8 +206,15 @@ test('says when a coin comes from USDT, shows its dollars as they are and warns 
 
 test('pages the coins, zooms from the bar and opens the words of the console', async ({ page }) => {
   // As many whole rows as fit beside the chart, in pages: no scroll inside, no row cut in half.
+  // Measured once the chart is drawn: until its code arrives the column is shorter (fewer rows).
   const coins = page.getByRole('navigation', { name: 'Monedas' });
   const rows = coins.getByRole('listitem');
+  await expect(
+    page
+      .getByRole('img', { name: /Gráfica de Bitcoin/ })
+      .locator('canvas')
+      .first()
+  ).toBeVisible();
   await expect(coins.getByText(/^1 \/ [2-9]$/)).toBeVisible();
   const perPage = await rows.count();
   expect(perPage).toBeGreaterThan(3);
@@ -218,6 +225,7 @@ test('pages the coins, zooms from the bar and opens the words of the console', a
   await coins.getByRole('button', { name: /^Sig\./ }).click();
   await expect(coins.getByText(/^2 \/ [2-9]$/)).toBeVisible();
   await coins.getByRole('button', { name: /^Ant\./ }).click();
+  await expect(coins.getByText(/^1 \/ [2-9]$/)).toBeVisible();
   await coins.getByRole('button', { name: /Ethereum/ }).click();
   await expect(page.getByRole('img', { name: /Gráfica de Ethereum/ })).toBeVisible();
   await page.getByRole('button', { name: 'Acercar' }).click();

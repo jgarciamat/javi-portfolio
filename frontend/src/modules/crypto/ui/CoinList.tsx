@@ -111,13 +111,13 @@ export function CoinList({
   const rows = useRowsPerPage(list, paged, coins.length > 0);
   const pages = Math.max(1, Math.ceil(coins.length / rows));
   const index = coins.findIndex((c) => c.symbol === selected);
-  const [page, setPage] = useState(0);
-
-  // The page of the chosen coin, when it changes or the size of the pages does.
+  // The page turned to by hand, kept when the size of the pages changes (the chart arriving late
+  // makes the column taller); until then, and again once another coin is chosen, the chosen one's.
+  const [turned, setTurned] = useState<number | null>(null);
   useEffect(() => {
-    setPage(Math.max(0, Math.floor(index / rows)));
-  }, [index, rows]);
-  const current = Math.min(page, pages - 1);
+    setTurned(null);
+  }, [selected]);
+  const current = Math.min(turned ?? Math.max(0, Math.floor(index / rows)), pages - 1);
   const shown = paged ? coins.slice(current * rows, (current + 1) * rows) : coins;
 
   // On phones the chosen coin stays in sight inside the row, without moving the page.
@@ -159,7 +159,7 @@ export function CoinList({
           </li>
         ))}
       </ul>
-      {paged && pages > 1 && <Pager page={current} pages={pages} onPage={setPage} />}
+      {paged && pages > 1 && <Pager page={current} pages={pages} onPage={setTurned} />}
     </nav>
   );
 }
