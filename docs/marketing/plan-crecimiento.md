@@ -92,7 +92,7 @@ Hechos [M]: 20 vídeos largos y un plan de playlists y descripciones (`seo-plan.
 | Contenido para buscadores | 6/10 | 9 guías nuevas bien dirigidas, pero con muro y sin autoridad ni enlaces |
 | Medición | **2/10** | Sin Search Console, sin embudo, sin cohortes; el informe del 14-10 no encontró datos en producción |
 | Conversión a Premium | 4/10 | Prueba de 14 días y Stripe/RevenueCat en marcha; sin recuperación de la prueba ni embudo medido |
-| Producto para el nicho | 7/10 | Renta y autónomos muy completos; **riesgo de confianza**: ningún fichero probado en la sede y 59 de 62 casos del catálogo reproducidos como tests (55 de los 57 oficiales, 3 de ellos solo en parte; 22-10-2026, ver docs/fiscalidad/auditoria-calculos.md) |
+| Producto para el nicho | 7/10 | Renta y autónomos muy completos; **riesgo de confianza**: ningún fichero probado en la sede y 61 de 62 casos del catálogo reproducidos como tests (los 57 oficiales, 3 de ellos solo en parte; 22-10-2026, ver docs/fiscalidad/auditoria-calculos.md) |
 
 **Conclusión:** buen camino, pero a ciegas. Arreglar la medición cuesta poco y cambia todo lo demás.
 
@@ -216,7 +216,7 @@ Contexto del calendario [F: `plan-operacion-y-cumplimiento.md`, 20-10-2026]: ele
 | Creador de contenido | No sabe si es autónomo (DAC7, habitualidad) | «Creador y Hacienda sin sustos» | Guía, 130/303 | Vídeos cortos (hueco de poca competencia, §3.3 del informe de TikTok) |
 | Persona que huye de TaxDown por el precio | Precio de presentar [F: TaxDown muestra planes de autónomo «desde 49 €/año» en su web, y una reseña de 30-09-2026 cita 29,90 y 59,90 €/mes; las fuentes no coinciden] | «Hazlo tú con guía, por 10 € el pase de la Renta» | Pase de la Renta | Comparativa honesta (sin atacar marcas) |
 
-**Pruebas de confianza** que sí podemos enseñar: fuentes oficiales con fecha en cada guía, exportar o borrar tus datos, cálculo en el dispositivo, sin anuncios. Las que **no** podemos enseñar todavía: «probado en la sede de la AEAT» (cero ficheros probados) y «casos oficiales verificados» (59 de 62 reproducidos en tests el 22-10-2026, 3 solo en parte; falta la revisión de un profesional colegiado). Hasta que cambie, la promesa es *borrador orientativo*.
+**Pruebas de confianza** que sí podemos enseñar: fuentes oficiales con fecha en cada guía, exportar o borrar tus datos, cálculo en el dispositivo, sin anuncios. Las que **no** podemos enseñar todavía: «probado en la sede de la AEAT» (cero ficheros probados) y «casos oficiales verificados» (61 de 62 reproducidos en tests el 22-10-2026, 3 solo en parte; falta la revisión de un profesional colegiado). Hasta que cambie, la promesa es *borrador orientativo*.
 
 ---
 

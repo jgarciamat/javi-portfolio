@@ -111,7 +111,7 @@ Ficheros para la sede: 303, 130, 111, 115, 349, 390, 190, 180 y 347. Vistas prev
 | Renta contra el motor (96 personas) | **2.978 coinciden**, 0 discrepancias, 16 pendientes |
 | Autónomos 130 y 303 contra el servidor (3 personas, 4 trimestres) | **320 coinciden**, 0 discrepancias, 0 sin calcular |
 | Casos oficiales catalogados | 62: 37 del Manual de Renta 2025 y 25 de autónomos |
-| Casos oficiales reproducidos por el motor | **59 de 62 el 22-10-2026** (51 el 21-10-2026; [auditoria-calculos.md](auditoria-calculos.md)). El 19-10-2026 eran **17**: 9 de Renta y 8 de IVA (303-01 a 303-04, 390-01, 390-02, 349-01 y 349-02). Además, el caso práctico del capítulo 7 del Manual (estimación directa) se reproduce en `annualActivity.test.ts`, fuera del banco |
+| Casos oficiales reproducidos por el motor | **61 de 62 el 22-10-2026** (51 el 21-10-2026 y 59 a mitad del 22-10-2026; [auditoria-calculos.md](auditoria-calculos.md)). El 19-10-2026 eran **17**: 9 de Renta y 8 de IVA (303-01 a 303-04, 390-01, 390-02, 349-01 y 349-02). Además, el caso práctico del capítulo 7 del Manual (estimación directa) se reproduce en `annualActivity.test.ts`, fuera del banco |
 | Pruebas del banco | 3.250 superadas, 400 pendientes, 0 fallos |
 
 **Los 16 pendientes de la Renta** son, sobre todo, rentas exentas que no se integran (becas, indemnizaciones, ayudas de la DA 5.ª) y deducciones autonómicas sin caso oficial: dos de Castilla y León, Murcia y Canarias. Otros dos:
