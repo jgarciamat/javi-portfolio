@@ -1,8 +1,8 @@
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { lazyNamed } from '@shared/utils/lazyNamed';
 import type { CryptoMarket } from '../application/useCryptoMarket';
-import { CHART_INTERVALS, formatCountdown, untilClose } from '../domain/chart';
+import { CHART_INTERVALS } from '../domain/chart';
 import { DISPLAY_CURRENCIES, convertCandles, type DisplayCurrency } from '../domain/currency';
 import { formatChange, formatDateTime, tone } from '../domain/format';
 import type { GuideSection } from '../domain/guide';
@@ -28,22 +28,6 @@ export function Loading() {
     <p className="empty-block" role="status">
       {t('app.common.loading')}
     </p>
-  );
-}
-
-/** Time left until the last candle closes, ticking every second. */
-function CandleClose({ opened, interval }: { opened: number; interval: CryptoInterval }) {
-  const { t } = useI18n();
-  const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return (
-    <span className="cc-close">
-      {t('app.crypto.market.candleClose')}{' '}
-      <b>{formatCountdown(untilClose(opened, interval, now))}</b>
-    </span>
   );
 }
 
@@ -103,19 +87,15 @@ export function CurrencySwitch({
   );
 }
 
-/** Coin, price, its 24-hour change, the change of what is on screen and the candle countdown. */
+/** Coin, price, its 24-hour change and the change of what is on screen. */
 function QuoteHead({
   coin,
   symbol,
   change,
-  opened,
-  interval,
 }: {
   coin: CryptoCoin | undefined;
   symbol: string;
   change: number | null;
-  opened: number | null;
-  interval: CryptoInterval;
 }) {
   const { t, locale } = useI18n();
   const money = useMoney();
@@ -123,10 +103,10 @@ function QuoteHead({
   return (
     <div className="cc-quote-main">
       <CoinIcon symbol={symbol} />
-      <div>
-        <p className="cc-quote-name">
-          {coin?.name ?? symbol} <small>{`${symbol} / ${money.display.currency}`}</small>
-        </p>
+      <p className="cc-quote-name">
+        {coin?.name ?? symbol} <small>{`${symbol} / ${money.display.currency}`}</small>
+      </p>
+      <div className="cc-quote-line">
         <p className="cc-quote-price">{coin?.price == null ? '—' : money.price(coin.price)}</p>
         <p className="cc-quote-changes">
           {day !== null && (
@@ -140,14 +120,13 @@ function QuoteHead({
               <b className={`cc-${tone(change)}`}>{formatChange(change, locale)}</b>
             </span>
           )}
-          {opened !== null && <CandleClose opened={opened} interval={interval} />}
         </p>
       </div>
     </div>
   );
 }
 
-/** Best offers, the 24-hour range and volume, and when the prices arrived. */
+/** Best offers, the 24-hour range and volume, and when the prices arrived: one row of cells. */
 function Stats({ coin, updatedAt }: { coin: CryptoCoin | undefined; updatedAt: string | null }) {
   const { t, locale } = useI18n();
   const money = useMoney();
@@ -180,6 +159,7 @@ function ChartArea({
   candles,
   viewKey,
   label,
+  interval,
   lines,
   layers,
   onVisibleChange,
@@ -188,6 +168,7 @@ function ChartArea({
   candles: Candle[];
   viewKey: string;
   label: string;
+  interval: CryptoInterval;
   lines: ChartLine[];
   layers: LayerId[];
   onVisibleChange: (percent: number | null) => void;
@@ -210,6 +191,7 @@ function ChartArea({
             candles={candles}
             viewKey={viewKey}
             label={label}
+            interval={interval}
             lines={lines}
             layers={layers}
             onVisibleChange={onVisibleChange}
@@ -221,8 +203,10 @@ function ChartArea({
 }
 
 /**
- * The market: the coins at the side, the price and the candle sizes on top, the chart with its
- * layers below, and the table that stands in for the chart.
+ * The market, compact like a trading desk: every coin in a column with its own scroll as tall as
+ * the price and the chart, the price with the candle sizes and the currency on one row, the figures
+ * of the day in one row of cells, the chart, and below it the layers and the table that stands in
+ * for the chart.
  */
 export function MarketPanel({
   view,
@@ -260,7 +244,6 @@ export function MarketPanel({
     () => (raw ? convertCandles(raw, money.display) : []),
     [raw, money.display]
   );
-  const last = candles[candles.length - 1];
 
   return (
     <section className="card cc-market" aria-labelledby="cc-market-title">
@@ -273,30 +256,29 @@ export function MarketPanel({
           selected={view.symbol}
           onSelect={(symbol) => onChange({ symbol })}
         />
-        <div className="cc-market-main">
-          <div className="cc-market-top">
-            <QuoteHead
-              coin={coin}
-              symbol={view.symbol}
-              change={market.candles ? change : null}
-              opened={last ? last.time : null}
-              interval={view.interval}
-            />
+        <div className="cc-market-top">
+          <div className="cc-market-head">
+            <QuoteHead coin={coin} symbol={view.symbol} change={market.candles ? change : null} />
             <div className="cc-market-controls">
               <Intervals value={view.interval} onChange={(interval) => onChange({ interval })} />
               <CurrencySwitch value={currency} onChange={onCurrency} />
             </div>
           </div>
           <Stats coin={coin} updatedAt={market.candles?.market.updatedAt ?? null} />
+        </div>
+        <div className="cc-market-chart">
           <ChartArea
             market={market}
             candles={candles}
             viewKey={`${view.symbol}:${view.interval}:${money.display.currency}`}
             label={label}
+            interval={view.interval}
             lines={lines}
             layers={layers}
             onVisibleChange={setChange}
           />
+        </div>
+        <div className="cc-market-below">
           <LayerBar active={layers} onToggle={onToggleLayer} onGuide={onGuide} />
           <ChartTable candles={candles} label={label} />
         </div>

@@ -18,6 +18,7 @@ function draw(props: Partial<Parameters<typeof PriceChart>[0]> = {}) {
       candles={candles}
       viewKey="BTC:1h"
       label="Gráfica de Bitcoin"
+      interval="1h"
       lines={[]}
       layers={[]}
       onVisibleChange={onVisibleChange}
@@ -101,13 +102,27 @@ describe('PriceChart', () => {
     expect(screen.getByText('106,00 €')).toBeInTheDocument();
   });
 
-  it('tells the header the change of the candles on screen', () => {
+  it('tells the header the change of the candles on screen, and counts them', () => {
     const { chart } = draw();
+    const count = () => screen.getByText(/Velas a la vista/).textContent;
     expect(onVisibleChange).toHaveBeenLastCalledWith(null);
+    expect(count()).toBe('Velas a la vista: 5');
     act(() => chart.show({ from: 0, to: 1 }));
     expect(onVisibleChange.mock.calls.at(-1)![0]).toBeCloseTo(0.5);
+    expect(count()).toBe('Velas a la vista: 2');
+    act(() => chart.show({ from: -3, to: 9 }));
+    expect(count()).toBe('Velas a la vista: 5');
     act(() => chart.show({ from: 3.2, to: 3.8 }));
     expect(onVisibleChange).toHaveBeenLastCalledWith(null);
+    expect(count()).toBe('Velas a la vista: 0');
+  });
+
+  it('shows the candle under the pointer in one short line with the full names on hover', () => {
+    draw();
+    const open = screen.getByTitle('Apertura');
+    expect(open).toHaveTextContent('Ap.');
+    expect(open.closest('p')).toHaveTextContent(/Vol\. 14/);
+    expect(screen.getByText(/La vela cierra en/)).toBeInTheDocument();
   });
 
   it('draws the layers that are on with their legend, and removes them', () => {
@@ -132,6 +147,7 @@ describe('PriceChart', () => {
         candles={many}
         viewKey="BTC:1h"
         label="Gráfica"
+        interval="1h"
         lines={[]}
         layers={[]}
         onVisibleChange={onVisibleChange}
@@ -144,6 +160,7 @@ describe('PriceChart', () => {
         candles={many}
         viewKey="BTC:1h"
         label="Gráfica"
+        interval="1h"
         lines={[]}
         layers={['vwap']}
         onVisibleChange={onVisibleChange}
@@ -235,11 +252,17 @@ describe('PriceChart', () => {
     expect(chart.barSpacing).toBe(2);
     for (let i = 0; i < 20; i++) fireEvent.click(screen.getByRole('button', { name: 'Acercar' }));
     expect(chart.barSpacing).toBe(60);
-    fireEvent.click(screen.getByRole('button', { name: 'Ver todo' }));
+    const all = screen.getByRole('button', { name: 'Ver todo' });
+    expect(all).toHaveTextContent('Todo');
+    expect(all).toHaveAttribute('aria-keyshortcuts', 'Home');
+    expect(all).toHaveAttribute('title', 'Ver todo (Home)');
+    fireEvent.click(all);
     expect(chart.fitted).toBe(1);
     chart.visibleRange = null;
     fireEvent.click(screen.getByRole('button', { name: 'Lo más reciente' }));
     expect(chart.visibleRange).toEqual({ from: 0, to: 8 });
+    expect(screen.getByRole('button', { name: 'Alejar' })).toHaveAttribute('title', 'Alejar (−)');
+    expect(screen.getByRole('button', { name: 'Acercar' })).toHaveAttribute('title', 'Acercar (+)');
 
     const canvas = screen.getByRole('img', { name: 'Gráfica de Bitcoin' });
     fireEvent.keyDown(canvas, { key: 'ArrowLeft' });
@@ -287,6 +310,7 @@ describe('PriceChart', () => {
         candles={more}
         viewKey="BTC:1h"
         label="Gráfica"
+        interval="1h"
         lines={[]}
         layers={[]}
         onVisibleChange={onVisibleChange}
@@ -299,6 +323,7 @@ describe('PriceChart', () => {
         candles={more}
         viewKey="ETH:1h"
         label="Gráfica"
+        interval="1h"
         lines={[]}
         layers={[]}
         onVisibleChange={onVisibleChange}
@@ -324,6 +349,7 @@ describe('PriceChart', () => {
         candles={candles}
         viewKey="BTC:1h"
         label="Gráfica"
+        interval="1h"
         lines={[{ id: 'o2', price: 120, title: 'SL', kind: 'stopLoss' }]}
         layers={[]}
         onVisibleChange={onVisibleChange}

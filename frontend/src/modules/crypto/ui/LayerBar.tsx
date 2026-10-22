@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { LAYER_SECTION, type GuideSection } from '../domain/guide';
 import { LAYER_COLORS, type LayerId } from '../domain/indicators';
@@ -9,8 +10,8 @@ const GROUPS: { id: string; layers: LayerId[] }[] = [
 ];
 
 /**
- * Buttons that turn on the visual layers of the chart, grouped, with their colour and a «?» that
- * opens the guide where that layer is explained. Reading aids, never signals.
+ * Small chips in one bar that wraps, grouped, each with its colour and a «?» that opens the guide
+ * where that layer is explained. Reading aids, never signals.
  */
 export function LayerBar({
   active,
@@ -24,14 +25,8 @@ export function LayerBar({
   const { t } = useI18n();
   return (
     <div className="cc-layers">
-      <div className="cc-layers-head">
+      <div className="cc-layers-bar">
         <h3>{t('app.crypto.layers.title')}</h3>
-        <button type="button" className="cc-guide-open" onClick={() => onGuide('candles')}>
-          {t('app.crypto.layers.guide')}
-        </button>
-      </div>
-      <p className="cc-layers-note">{t('app.crypto.layers.note')}</p>
-      <div className="cc-layer-groups">
         {GROUPS.map((group) => (
           <div
             key={group.id}
@@ -39,18 +34,24 @@ export function LayerBar({
             role="group"
             aria-label={t(`app.crypto.layers.groups.${group.id}`)}
           >
-            <span className="cc-layer-group-name">{t(`app.crypto.layers.groups.${group.id}`)}</span>
+            <span className="cc-layer-group-name" aria-hidden="true">
+              {t(`app.crypto.layers.groups.${group.id}`)}
+            </span>
             {group.layers.map((layer) => {
               const name = t(`app.crypto.layers.names.${layer}`);
               return (
-                <span key={layer} className="cc-layer">
+                <span
+                  key={layer}
+                  className="cc-layer"
+                  style={{ '--cc-layer': LAYER_COLORS[layer] } as CSSProperties}
+                >
                   <button
                     type="button"
-                    className="cc-chip"
+                    className="cc-layer-chip"
                     aria-pressed={active.includes(layer)}
                     onClick={() => onToggle(layer)}
                   >
-                    <i style={{ background: LAYER_COLORS[layer] }} aria-hidden="true" />
+                    <i aria-hidden="true" />
                     {name}
                   </button>
                   <button
@@ -66,7 +67,11 @@ export function LayerBar({
             })}
           </div>
         ))}
+        <button type="button" className="cc-guide-open" onClick={() => onGuide('candles')}>
+          {t('app.crypto.layers.guide')}
+        </button>
       </div>
+      <p className="cc-layers-note">{t('app.crypto.layers.note')}</p>
     </div>
   );
 }

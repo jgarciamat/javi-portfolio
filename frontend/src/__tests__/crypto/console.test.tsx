@@ -93,17 +93,6 @@ const ready = async () => {
   await screen.findByText('Abiertas (1)');
 };
 
-const phone = (matches: boolean) =>
-  Object.defineProperty(window, 'matchMedia', {
-    configurable: true,
-    value: (query: string) => ({
-      matches: matches && query.includes('max-width: 719px') && !query.includes('orientation'),
-      media: query,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-    }),
-  });
-
 beforeEach(() => {
   localStorage.clear();
   charts.length = 0;
@@ -137,7 +126,6 @@ describe('Crypto console: market', () => {
     expect(screen.getByRole('button', { name: /Bitcoin/ })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(screen.getByText('Ver las últimas 5 velas en una tabla'));
     expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(6);
-    expect(screen.getByRole('heading', { name: 'Palabras de la consola' })).toBeInTheDocument();
   });
 
   it('changes coin and candle size, and remembers them on this device', async () => {
@@ -156,35 +144,24 @@ describe('Crypto console: market', () => {
     expect(savedView()).toEqual({ symbol: 'BTC', interval: '1h' });
   });
 
-  it('pages the coins on wide screens and slides them all on phones', async () => {
+  it('lists every coin, without pages, and keeps the chosen one in sight', async () => {
     const many: CryptoCoins = {
       ...fx.coins(),
-      coins: Array.from({ length: 10 }, (_, i) => ({
+      coins: Array.from({ length: 30 }, (_, i) => ({
         ...fx.coins().coins[0],
-        symbol: `C${String.fromCharCode(65 + i)}X`,
+        symbol: `C${String.fromCharCode(65 + (i % 26), 65 + Math.floor(i / 26))}X`,
         name: `Coin ${i}`,
       })),
     };
-    const { unmount } = setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
-    await screen.findByText('Coin 0');
-    expect(screen.queryByText('Coin 9')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
-    fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
-    expect(screen.getByText('Coin 9')).toBeInTheDocument();
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Anterior' }));
-    expect(screen.getByText('Coin 0')).toBeInTheDocument();
-    unmount();
-    // The page with the chosen coin opens first.
-    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'CJX', interval: '1h' }));
-    const chosen = setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
-    expect(await screen.findByRole('button', { name: /Coin 9/ })).toBeInTheDocument();
-    chosen.unmount();
-    localStorage.clear();
-    phone(true);
+    localStorage.setItem('mm_crypto_view', JSON.stringify({ symbol: 'CDBX', interval: '1h' }));
     setup((api) => api.cryptoApi.coins.mockResolvedValue(many));
-    await screen.findByText('Coin 9');
+    expect(await screen.findByRole('button', { name: /Coin 29/ })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
     expect(screen.getByText('Coin 0')).toBeInTheDocument();
+    const list = within(screen.getByRole('navigation', { name: 'Monedas' })).getByRole('list');
+    expect(within(list).getAllByRole('button')).toHaveLength(30);
     expect(screen.queryByRole('button', { name: 'Siguiente' })).toBeNull();
   });
 
@@ -311,6 +288,46 @@ describe('Crypto console: layers, guide and currency', () => {
     expect(savedLayers()).toEqual([]);
     localStorage.setItem('mm_crypto_layers', '["vwap","nope"]');
     expect(savedLayers()).toEqual(['vwap']);
+  });
+
+  it('opens the words of the console in the guide, from the foot and from the order box', async () => {
+    const scroll = jest.fn();
+    Element.prototype.scrollIntoView = scroll;
+    setup();
+    await ready();
+    expect(screen.queryByRole('heading', { name: 'Palabras de la consola' })).toBeNull();
+    const buttons = screen.getAllByRole('button', {
+      name: 'Aprende todas las palabras importantes',
+    });
+    expect(buttons).toHaveLength(2);
+    fireEvent.click(buttons[1]);
+    const dialog = await screen.findByRole('dialog', { name: '¿Qué es cada cosa?' });
+    expect(scroll).toHaveBeenCalledTimes(1);
+    const words = within(dialog).getByRole('region', { name: 'Palabras de la consola' });
+    expect(within(words).getAllByRole('term')).toHaveLength(16);
+    const search = within(words).getByRole('searchbox', { name: 'Buscar una palabra' });
+    fireEvent.change(search, { target: { value: ' COMISIÓN ' } });
+    const found = within(words)
+      .getAllByRole('term')
+      .map((d) => d.textContent);
+    expect(found).toContain('Comisión');
+    expect(found).not.toContain('Vela');
+    fireEvent.change(search, { target: { value: 'garantia' } });
+    expect(
+      within(words)
+        .getAllByRole('term')
+        .map((d) => d.textContent)
+    ).toContain('Short (osos)');
+    fireEvent.change(search, { target: { value: 'zzz' } });
+    expect(within(words).getByRole('status')).toHaveTextContent(
+      'Ninguna palabra coincide con «zzz».'
+    );
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Palabras de la consola' }));
+    expect(scroll).toHaveBeenCalledTimes(2);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cerrar' }));
+    fireEvent.click(buttons[0]);
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
   });
 
   it('opens the guide from the big button and from each «?», and closes it', async () => {

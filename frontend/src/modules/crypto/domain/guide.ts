@@ -15,6 +15,7 @@ export const GUIDE_SECTIONS = [
   'levels',
   'fibonacci',
   'patterns',
+  'glossary',
 ] as const;
 export type GuideSection = (typeof GUIDE_SECTIONS)[number];
 
@@ -30,8 +31,11 @@ export const LAYER_SECTION: Record<LayerId, GuideSection> = {
   fibonacci: 'fibonacci',
 };
 
+/** Sections made of paragraphs (the patterns and the words have their own layout). */
+export type ParagraphSection = Exclude<GuideSection, 'patterns' | 'glossary'>;
+
 /** Paragraphs of each section (`app.crypto.guide.<section>.p1` …). */
-export const GUIDE_PARAGRAPHS: Record<Exclude<GuideSection, 'patterns'>, number> = {
+export const GUIDE_PARAGRAPHS: Record<ParagraphSection, number> = {
   candles: 4,
   intervals: 2,
   directions: 5,
@@ -62,4 +66,24 @@ export const CHART_PATTERNS = [
   'wedge',
   'range',
   'maCross',
+] as const;
+
+/** Words of the console (`app.crypto.glossary.<term>.term` and `.text`), in the guide's last section. */
+export const GLOSSARY_TERMS = [
+  'candle',
+  'interval',
+  'volume',
+  'long',
+  'short',
+  'market',
+  'limit',
+  'stop',
+  'takeProfit',
+  'stopLoss',
+  'fee',
+  'reserved',
+  'unrealized',
+  'realized',
+  'winRate',
+  'pending',
 ] as const;

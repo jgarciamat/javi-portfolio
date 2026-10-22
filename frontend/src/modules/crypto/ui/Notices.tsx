@@ -66,41 +66,28 @@ export function Help({ term, label }: { term: string; label: string }) {
   );
 }
 
-export const GLOSSARY_TERMS = [
-  'candle',
-  'interval',
-  'volume',
-  'long',
-  'short',
-  'market',
-  'limit',
-  'stop',
-  'takeProfit',
-  'stopLoss',
-  'fee',
-  'reserved',
-  'unrealized',
-  'realized',
-  'winRate',
-  'pending',
-] as const;
+/** An open book, drawn with lines. */
+function BookIcon() {
+  return (
+    <svg className="cc-icon" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M8 4.2C6.6 3 4.6 2.6 2 2.8v9.6c2.6-.2 4.6.2 6 1.4 1.4-1.2 3.4-1.6 6-1.4V2.8c-2.6-.2-4.6.2-6 1.4Zm0 0v9.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
-/** Every word of the console explained, for whoever wants to read them all at once. */
-export function Glossary() {
+/** «Learn all the key words»: opens the guide on its words section. */
+export function GlossaryButton({ onOpen }: { onOpen: () => void }) {
   const { t } = useI18n();
   return (
-    <section className="card cc-glossary" aria-labelledby="cc-glossary-title">
-      <h2 id="cc-glossary-title" className="section-title">
-        {t('app.crypto.glossary.title')}
-      </h2>
-      <dl>
-        {GLOSSARY_TERMS.map((term) => (
-          <div key={term}>
-            <dt>{t(`app.crypto.glossary.${term}.term`)}</dt>
-            <dd>{t(`app.crypto.glossary.${term}.text`)}</dd>
-          </div>
-        ))}
-      </dl>
-    </section>
+    <button type="button" className="cc-glossary-open" onClick={onOpen}>
+      <BookIcon />
+      {t('app.crypto.glossary.open')}
+    </button>
   );
 }

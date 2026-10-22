@@ -16,7 +16,7 @@ import {
   type DisplayChoice,
   type Money,
 } from './money';
-import { DataNotice, Glossary, RiskBanner } from './Notices';
+import { DataNotice, GlossaryButton, RiskBanner } from './Notices';
 import { OrderBox } from './OrderBox';
 import { SimSettings, SimSummary } from './SimSummary';
 import { ClosedPanel, OpenPanel, PendingPanel, orderKind } from './TradePanels';
@@ -137,11 +137,13 @@ function SimulatorBody({
   sim,
   symbol,
   coin,
+  onGlossary,
 }: {
   portfolio: SimPortfolio;
   sim: Simulator;
   symbol: string;
   coin: CryptoCoin | undefined;
+  onGlossary: () => void;
 }) {
   const busy = sim.action.pending;
   return (
@@ -154,6 +156,7 @@ function SimulatorBody({
         busy={busy}
         onPlace={sim.place}
       />
+      <GlossaryButton onOpen={onGlossary} />
       <OpenPanel
         trades={portfolio.open}
         pending={portfolio.pending}
@@ -217,9 +220,15 @@ function Console({ currency }: { currency: DisplayChoice }) {
         onGuide={setGuide}
       />
       {sim.portfolio && (
-        <SimulatorBody portfolio={sim.portfolio} sim={sim} symbol={view.symbol} coin={coin} />
+        <SimulatorBody
+          portfolio={sim.portfolio}
+          sim={sim}
+          symbol={view.symbol}
+          coin={coin}
+          onGlossary={() => setGuide('glossary')}
+        />
       )}
-      <Glossary />
+      <GlossaryButton onOpen={() => setGuide('glossary')} />
       {guide && (
         <Suspense fallback={null}>
           <GuideModal section={guide} onClose={() => setGuide(null)} />

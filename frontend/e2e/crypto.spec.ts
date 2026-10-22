@@ -3,7 +3,8 @@ import { test, expect, openSection, signIn } from './fixtures';
 /**
  * «Consola crypto» with the server's invented prices (CRYPTO_MARKET=demo in the config): the
  * chart and its layers, a long opened and closed with play money, a pending short cancelled,
- * dollars, the guide and the layout on phones.
+ * dollars, the guide, every coin in one list, the zoom bar, the words of the console in the guide
+ * and the layout on phones.
  */
 test.beforeEach(async ({ page }) => {
   await signIn(page);
@@ -55,6 +56,31 @@ test('shows dollars, a layer and the guide', async ({ page }) => {
   await expect(guide.getByRole('heading', { name: 'Toros y osos: long y short' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(guide).toBeHidden();
+});
+
+test('lists every coin, zooms from the bar and opens the words of the console', async ({
+  page,
+}) => {
+  const coins = page.getByRole('navigation', { name: 'Monedas' });
+  await expect(coins.getByRole('button')).toHaveCount(20);
+  await expect(page.getByRole('button', { name: 'Siguiente' })).toHaveCount(0);
+  await coins.getByRole('button', { name: /Ethereum/ }).click();
+  await expect(page.getByRole('img', { name: /Gráfica de Ethereum/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Acercar' }).click();
+  await page.getByRole('button', { name: 'Alejar' }).click();
+  await page.getByRole('button', { name: 'Ver todo' }).click();
+  await page.getByRole('button', { name: 'Lo más reciente' }).click();
+  await expect(page.getByText(/Velas a la vista: \d+/)).toBeVisible();
+
+  await page.getByRole('button', { name: 'Aprende todas las palabras importantes' }).last().click();
+  const guide = page.getByRole('dialog', { name: '¿Qué es cada cosa?' });
+  const words = guide.getByRole('region', { name: 'Palabras de la consola' });
+  await expect(words).toBeInViewport();
+  await words.getByRole('searchbox', { name: 'Buscar una palabra' }).fill('comisión');
+  await expect(words.getByRole('term').first()).toHaveText('Comisión');
+  await page.keyboard.press('Escape');
+  await expect(guide).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Palabras de la consola' })).toHaveCount(0);
 });
 
 test('fits a phone upright and on its side without sideways scrolling', async ({ page }) => {

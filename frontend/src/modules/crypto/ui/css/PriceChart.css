@@ -1,21 +1,55 @@
 .cc-chart {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.4rem;
+}
+
+/* The candle under the pointer in one small line, and the countdown pill at its right. */
+.cc-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.75rem;
+  min-height: 1.5rem;
 }
 
 .cc-chart-readout {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  font-size: 0.95rem;
+  gap: 0.1rem 0.75rem;
+  margin: 0;
+  font-size: 0.75rem;
   color: var(--slate-300);
   font-variant-numeric: tabular-nums;
-  min-height: 1.5rem;
+}
+
+.cc-chart-readout abbr {
+  text-decoration: none;
+  cursor: help;
 }
 
 .cc-chart-readout b {
   color: var(--slate-100);
+}
+
+.cc-chart-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 0.6rem;
+  margin: 0;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 999px;
+  background: var(--slate-800);
+  font-size: 0.75rem;
+  color: var(--slate-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-chart-pill > span + span {
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--slate-700);
 }
 
 .cc-legend {
@@ -24,19 +58,19 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 
 .cc-legend li {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.25rem 0.6rem;
-  padding: 0.35rem 0.7rem;
+  gap: 0.1rem 0.45rem;
+  padding: 0.1rem 0.5rem;
   border: 1px solid var(--slate-700);
-  border-radius: 10px;
+  border-radius: 6px;
   background: var(--slate-800);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--slate-200);
   font-variant-numeric: tabular-nums;
 }
@@ -48,7 +82,7 @@
 .cc-chart-canvas {
   height: 420px;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--slate-700);
   touch-action: pan-y;
@@ -59,18 +93,51 @@
   outline-offset: 2px;
 }
 
+/* «− Alejar», «+ Acercar», «Reciente», «Todo» and full screen: a small bar below the chart. */
 .cc-chart-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.3rem;
+}
+
+.cc-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 28px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--slate-700);
+  border-radius: 6px;
+  background: var(--slate-800);
+  color: var(--slate-100);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cc-zoom:hover {
+  border-color: var(--accent-400);
+  background: color-mix(in srgb, var(--accent-600) 18%, var(--slate-800));
+}
+
+.cc-zoom--full {
+  margin-left: auto;
+  border-color: var(--accent-400);
+  color: var(--accent-300);
+}
+
+.cc-zoom[aria-pressed='true'] {
+  background: var(--accent-600);
+  color: #fff;
 }
 
 .cc-chart-help,
 .cc-chart-credit {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--slate-300);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .cc-chart-credit a {
@@ -156,14 +223,31 @@
   display: none;
 }
 
+@media (max-width: 719px), (pointer: coarse) {
+  .cc-zoom {
+    min-height: 32px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .cc-chart-canvas {
+    height: 480px;
+  }
+}
+
 @media (max-width: 719px) {
   .cc-chart-canvas {
-    height: 340px;
+    height: 320px;
   }
 
-  .cc-chart-tools .cc-tool {
+  .cc-zoom {
     flex: 1 1 auto;
     justify-content: center;
+    padding: 0 0.4rem;
+  }
+
+  .cc-zoom--full {
+    margin-left: 0;
   }
 }
 
@@ -187,11 +271,14 @@
 }
 
 html.wiz-contrast .cc-chart-canvas,
+html.wiz-contrast .cc-chart-pill,
+html.wiz-contrast .cc-zoom,
 html.wiz-contrast .cc-legend li {
   border: 2px solid var(--slate-100);
 }
 
 html.wiz-contrast .cc-chart-readout,
+html.wiz-contrast .cc-chart-pill,
 html.wiz-contrast .cc-chart-help,
 html.wiz-contrast .cc-chart-credit {
   color: var(--slate-100);

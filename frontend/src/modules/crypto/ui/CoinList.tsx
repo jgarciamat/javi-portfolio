@@ -1,12 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
-import { useMediaQuery } from '@shared/hooks/useMediaQuery';
 import { formatChange, tone } from '../domain/format';
 import type { CryptoCoin } from '../domain/types';
 import { useMoney } from './money';
-
-export const COINS_PER_PAGE = 8;
-export const PHONE = '(max-width: 719px)';
 
 /** A round badge with the coin's letters, in a colour of its own (no outside images). */
 export function CoinIcon({ symbol }: { symbol: string }) {
@@ -19,8 +15,8 @@ export function CoinIcon({ symbol }: { symbol: string }) {
 }
 
 /**
- * The coins of the console: a column with pages on wide screens, a row that slides sideways on
- * phones. Each one shows its pair, price and 24-hour change.
+ * The coins of the console, all of them: a column with its own scroll beside the chart on wide
+ * screens, a row that slides sideways on phones. Each one shows its pair, price and 24-hour change.
  */
 export function CoinList({
   coins,
@@ -33,26 +29,22 @@ export function CoinList({
 }) {
   const { t, locale } = useI18n();
   const money = useMoney();
-  const phone = useMediaQuery(PHONE);
-  const pages = Math.max(1, Math.ceil(coins.length / COINS_PER_PAGE));
-  // Until the person turns the page, the one with the chosen coin is shown.
-  const [page, setPage] = useState<number | null>(null);
-  const chosenPage = Math.floor(
-    Math.max(
-      0,
-      coins.findIndex((c) => c.symbol === selected)
-    ) / COINS_PER_PAGE
-  );
-  const current = Math.min(page ?? chosenPage, pages - 1);
-  const shown = phone
-    ? coins
-    : coins.slice(current * COINS_PER_PAGE, (current + 1) * COINS_PER_PAGE);
+  const list = useRef<HTMLUListElement>(null);
+
+  // The chosen coin stays in sight inside the list, without moving the page.
+  useEffect(() => {
+    const box = list.current!;
+    const item = box.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!item) return;
+    box.scrollTop = item.offsetTop - (box.clientHeight - item.offsetHeight) / 2;
+    box.scrollLeft = item.offsetLeft - (box.clientWidth - item.offsetWidth) / 2;
+  }, [selected, coins.length]);
 
   return (
     <nav className="cc-coins" aria-label={t('app.crypto.coins.title')}>
       <h3 className="cc-coins-title">{t('app.crypto.coins.title')}</h3>
-      <ul className="cc-coins-list">
-        {shown.map((coin) => (
+      <ul ref={list} className="cc-coins-list">
+        {coins.map((coin) => (
           <li key={coin.symbol}>
             <button
               type="button"
@@ -79,29 +71,6 @@ export function CoinList({
           </li>
         ))}
       </ul>
-      {!phone && pages > 1 && (
-        <div className="cc-coins-pager">
-          <button
-            type="button"
-            className="cc-tool"
-            disabled={current === 0}
-            aria-label={t('app.crypto.coins.previous')}
-            onClick={() => setPage(current - 1)}
-          >
-            {t('app.crypto.coins.previousShort')}
-          </button>
-          <span>{t('app.crypto.coins.page', { page: current + 1, pages })}</span>
-          <button
-            type="button"
-            className="cc-tool"
-            disabled={current === pages - 1}
-            aria-label={t('app.crypto.coins.next')}
-            onClick={() => setPage(current + 1)}
-          >
-            {t('app.crypto.coins.nextShort')}
-          </button>
-        </div>
-      )}
     </nav>
   );
 }

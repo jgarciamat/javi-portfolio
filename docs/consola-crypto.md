@@ -12,10 +12,10 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
 - La gráfica de velas con **TradingView Lightweight Charts** (misma librería, v5.2.1): velas y
   volumen, marcos de 5 min a 1 semana, arrastrar, rueda o pellizco para ampliar, «Lo más reciente»,
   «Ver todo», pantalla completa, lectura de la vela señalada y líneas de precio de las posiciones.
-- La disposición: columna de monedas con icono, nombre, par y páginas «Ant./Sig.»; cabecera con la
-  moneda y el precio grande, cambio del periodo visible, caja con mejor oferta de compra y venta
-  (bid/ask), volumen de 24 h y hora de actualización; temporalidades arriba; cuenta atrás del
-  cierre de la vela; botones-chip para las capas.
+- La disposición: columna de monedas con icono, nombre, par y variación; cabecera con la moneda y
+  el precio, cambio del periodo visible, caja con mejor oferta de compra y venta (bid/ask), volumen
+  de 24 h y hora de actualización; temporalidades arriba; cuenta atrás del cierre de la vela;
+  botones-chip para las capas.
 - La caja de operar: franjas de capital inicial, disponible, reservado, resultado no realizado y
   patrimonio; dirección **Toros · Long / Osos · Short**; tipo de orden; capital por operación con
   atajos de 25/50/75/100 %; precio de entrada automático a mercado; take profit y stop loss;
@@ -30,6 +30,29 @@ Del frontend del proyecto privado se tomaron **ideas de interfaz**, no código d
   desde el navegador, claves, `.env`, datos y configuración privada.
 - **Apalancamiento**: no se implementa. Solo se explica en la guía (qué es, por qué multiplica
   ganancias y pérdidas, liquidación) y se dice que Finanverso no lo ofrece. Siempre **1x**.
+
+## Escala compacta (estilo terminal)
+
+- Tipografía de la consola a 14 px de base; etiquetas a 12 px (mínimo), valores a 14 px; precio
+  principal con `clamp()` (24 px en el móvil, 36 px en escritorio). Controles compactos con ratón
+  (26-28 px) y de **32 px como mínimo** en el móvil o con pantalla táctil (`pointer: coarse`).
+- **Monedas**: todas las que da el backend, sin páginas. En escritorio, columna con su propio
+  scroll vertical tan alta como el precio y la gráfica (`contain: size` en la rejilla); filas de
+  ~40 px con icono pequeño, nombre, par, precio y variación. En el móvil y en horizontal, fila
+  deslizable. La moneda elegida se centra dentro de la lista sin mover la página.
+- **Cabecera**: precio, cambio de 24 h y del periodo visible a la izquierda; temporalidades
+  (5 min … 1 sem.) y «€ EUR | $ USD» como botoncitos en la misma fila a la derecha; debajo, **una
+  fila** de celdas con bid, ask, máx./mín./volumen de 24 h y actualizado (3 por fila en el móvil).
+- **Vela**: «Ap. / Máx. / Mín. / Cie. / Vol.» en una línea pequeña (nombre completo al pasar el
+  ratón, `<abbr>`) y una pastilla con la cuenta atrás del cierre y las **velas a la vista**.
+- **Zoom**: barra pequeña bajo la gráfica con iconos: «− Alejar», «+ Acercar», «Reciente» (rango
+  lógico de las últimas 90 velas), «Todo» (`fitContent`) y «Pantalla completa»; cada botón lleva
+  su atajo en `title` y `aria-keyshortcuts` (−, +, Fin, Inicio; Esc para salir).
+- **Capas**: chips pequeños en una barra que se ajusta a varias líneas, con la rayita del color de
+  la leyenda, texto en versalitas (solo aquí), `aria-pressed`; encendida, borde y fondo del color
+  de la capa; apagada, más tenue. «?» de cada capa y «¿Qué es cada cosa?» también pequeños.
+- Resumen de cartera, caja de operar, paneles y tabla usan la misma escala (celdas de 12/16 px,
+  campos de 40 px, botón de abrir de 44 px).
 
 ## Datos de mercado
 
@@ -75,7 +98,11 @@ simulador); órdenes y comisiones; take profit y stop loss para largo y corto; a
 funciona, por qué es peligroso y que Finanverso no lo ofrece); EMA; Bollinger; VWAP; perfil de
 volumen; soportes y resistencias; Fibonacci; y patrones (doji, martillo, estrella fugaz,
 envolventes, doble techo y suelo, hombro-cabeza-hombro, triángulo, bandera, cuña, rango y cruce de
-medias) con «Un patrón no garantiza lo que pasará después; es solo una forma de leer el gráfico».
+medias) con «Un patrón no garantiza lo que pasará después; es solo una forma de leer el gráfico»;
+y, al final, **«Palabras de la consola»**: el glosario completo (una sola fuente,
+`GLOSSARY_TERMS` en `domain/guide.ts` y las claves `app.crypto.glossary.*`) con buscador sin
+acentos ni mayúsculas. Ya no hay tarjeta de glosario en la pantalla: el botón «Aprende todas las
+palabras importantes» (bajo la caja de operar y al pie) abre la guía directamente en ese apartado.
 
 ## Simulador
 
@@ -107,7 +134,7 @@ medias) con «Un patrón no garantiza lo que pasará después; es solo una forma
 - Aviso único y descartable «Gira el móvil para ver mejor la gráfica» con un móvil que gira
   (respeta «reducir movimiento»), recordado en `mm_crypto_rotate_hint`.
 - Gráfica con nombre y resumen para lectores de pantalla, teclado, tabla de las últimas 30 velas,
-  botones de 44-56 px, temas claro y oscuro y modo Contraste.
+  botones de 32 px como mínimo en pantallas táctiles, temas claro y oscuro y modo Contraste.
 - La librería de gráficos va en un chunk aparte fuera de la precaché offline; la guía y sus
   dibujos también se cargan diferidos.
 
@@ -115,7 +142,9 @@ medias) con «Un patrón no garantiza lo que pasará después; es solo una forma
 
 Backend (dominio, mercado con `fetch` simulado, integración con mercado falso, contrato), frontend
 al 100 % (`src/__tests__/crypto/*`, con un doble de Lightweight Charts) y E2E
-(`frontend/e2e/crypto.spec.ts`, `CRYPTO_MARKET=demo`). Capturas de revisión en `/tmp/gf65-shots/`.
+(`frontend/e2e/crypto.spec.ts`, `CRYPTO_MARKET=demo`). Capturas de revisión en `/tmp/gf65-shots/`
+y, de la escala compacta, en `/tmp/gf66-shots/` (1440, 1920, 390 vertical y 844x390; claro, oscuro
+y Contraste).
 
 ## Pendiente (aprobado por el dueño, para la siguiente entrega)
 

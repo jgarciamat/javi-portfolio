@@ -235,6 +235,62 @@
   font-size: 0.95rem;
 }
 
+/* «Words of the console»: a box to find a word and the terms in two compact columns. */
+.cc-glossary-search {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 22rem;
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--slate-200);
+}
+
+.cc-glossary-search input {
+  min-height: 40px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--slate-600);
+  border-radius: 8px;
+  background: var(--slate-950);
+  color: var(--slate-50);
+  font: inherit;
+  font-weight: 400;
+}
+
+.cc-glossary-search input:focus-visible {
+  outline: 3px solid var(--accent-300);
+  outline-offset: 2px;
+}
+
+.cc-glossary {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.cc-glossary > div {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--slate-700);
+  border-left: 3px solid var(--accent-400);
+  border-radius: 8px;
+  background: var(--slate-800);
+}
+
+.cc-glossary dt {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.cc-glossary dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--slate-200);
+}
+
 @media (max-width: 719px) {
   .cc-guide-overlay {
     padding: 0;
@@ -256,6 +312,8 @@
 
 html.wiz-contrast .cc-guide,
 html.wiz-contrast .cc-pattern,
+html.wiz-contrast .cc-glossary > div,
+html.wiz-contrast .cc-glossary-search input,
 html.wiz-contrast .cc-art {
   border: 2px solid var(--slate-100);
 }

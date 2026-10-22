@@ -1,18 +1,19 @@
 /* ─── Consola crypto ─────────────────────────────────────────────────────────
-   A calm trading desk for learning: cards with a clear header, large numbers with small labels
-   above them, chips and segmented controls instead of native selects, and every colour taken
-   from the theme tokens so light, dark and the wizard's contrast mode all work. Text is never
-   smaller than 0.875rem and never set in capitals. */
+   A compact trading desk for learning: small labels over clear numbers, rows of small buttons
+   and segmented controls instead of native selects, and every colour taken from the theme tokens
+   so light, dark and the wizard's contrast mode all work. Text is never smaller than 0.75rem
+   (12 px) and only the layer chips are set in capitals. Controls are compact with a mouse and at
+   least 32 px tall on phones and touch screens. */
 
 .cc {
-  --cc-radius: 14px;
-  --cc-gap: 1rem;
+  --cc-radius: 10px;
+  --cc-gap: 0.75rem;
   --cc-surface: var(--slate-900);
   --cc-raised: var(--slate-800);
   --cc-line: var(--slate-700);
   --cc-soft: color-mix(in srgb, var(--accent-600) 12%, var(--slate-900));
   gap: var(--cc-gap);
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .cc .card {
@@ -22,16 +23,16 @@
   box-shadow:
     0 1px 2px rgb(0 0 0 / 0.12),
     0 8px 24px -16px rgb(0 0 0 / 0.35);
-  padding: 1.25rem;
+  padding: 0.85rem 1rem;
 }
 
 .cc .section-title {
-  font-size: 1.25rem;
+  font-size: 1rem;
   margin-bottom: 0.25rem;
 }
 
 .cc h3 {
-  font-size: 1.05rem;
+  font-size: 0.875rem;
   margin: 0;
   color: var(--slate-100);
 }
@@ -51,16 +52,16 @@
 
 .cc-label {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--slate-200);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
   padding: 0;
 }
 
 .cc-hint {
-  margin: 0.35rem 0 0;
-  font-size: 0.9rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
   color: var(--slate-300);
   line-height: 1.45;
 }
@@ -73,14 +74,15 @@
   border: 2px solid var(--amber-500);
   border-radius: var(--cc-radius);
   background: color-mix(in srgb, var(--amber-500) 10%, var(--cc-surface));
-  padding: 0.9rem 1.1rem;
+  padding: 0.55rem 0.85rem;
   color: var(--slate-100);
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .cc-risk strong {
   color: var(--amber-400);
-  font-size: 1.05rem;
+  font-size: 0.875rem;
 }
 
 .cc-risk p {
@@ -89,7 +91,7 @@
 
 .cc-data {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
   color: var(--slate-300);
   line-height: 1.5;
 }
@@ -104,7 +106,7 @@
 
 .cc-reminder {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
   color: var(--amber-400);
 }
 
@@ -113,21 +115,21 @@
 }
 
 .cc-help-toggle {
-  font-size: 0.95rem;
-  min-height: 44px;
+  font-size: 0.8125rem;
+  min-height: 32px;
 }
 
 .cc-help-text {
   display: block;
-  margin: 0.25rem 0 0.5rem;
-  padding: 0.65rem 0.85rem;
-  border-left: 4px solid var(--accent-400);
+  margin: 0.2rem 0 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--accent-400);
   background: var(--cc-raised);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--slate-100);
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .cc-help-text[hidden] {
@@ -151,15 +153,15 @@
 .cc-tool {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  min-height: 44px;
-  padding: 0.45rem 0.9rem;
+  gap: 0.35rem;
+  min-height: 32px;
+  padding: 0.25rem 0.7rem;
   border: 1px solid var(--cc-line);
   border-radius: 999px;
   background: var(--cc-raised);
   color: var(--slate-100);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -169,7 +171,7 @@
 }
 
 .cc-tool {
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .cc-tool--strong {
@@ -207,22 +209,21 @@
   outline-offset: 2px;
 }
 
-.cc-chip i,
 .cc-legend i {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
   flex: 0 0 auto;
 }
 
 .cc-segmented {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 2px;
   margin: 0;
-  padding: 0.25rem;
+  padding: 2px;
   border: 1px solid var(--cc-line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--cc-raised);
   min-width: 0;
 }
@@ -230,7 +231,7 @@
 .cc-segmented legend.cc-label {
   float: left;
   width: 100%;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.3rem;
 }
 
 .cc-segmented label {
@@ -238,11 +239,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  min-width: 48px;
-  padding: 0.4rem 0.85rem;
-  border-radius: 9px;
+  min-height: 32px;
+  min-width: 2.5rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
   color: var(--slate-200);
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -283,10 +285,10 @@
 
 .cc-segmented--wide label {
   flex: 1 1 0;
-  min-height: 52px;
+  min-height: 40px;
   border: 1px solid var(--cc-line);
   background: var(--cc-raised);
-  font-size: 1.05rem;
+  font-size: 0.9375rem;
 }
 
 .cc-direction label.is-on.cc-long {
@@ -304,9 +306,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.15rem 0.6rem;
+  padding: 0.05rem 0.5rem;
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 800;
   border: 1px solid currentColor;
 }
@@ -337,37 +339,79 @@
 
 /* ─── Market ─── */
 
+/* Coins at the side of the price and the chart; layers and the table below, full width. The
+   coin column takes no height of its own (contain: size) so its list scrolls inside the height of
+   the price and the chart, however many coins there are. */
 .cc-market-grid {
   display: grid;
-  grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
-  gap: 1.25rem;
-  margin-top: 0.75rem;
+  grid-template-columns: minmax(13.5rem, 15rem) minmax(0, 1fr);
+  grid-template-areas:
+    'coins top'
+    'coins chart'
+    'below below';
+  gap: 0.6rem 0.85rem;
+  margin-top: 0.4rem;
 }
 
-.cc-market-main {
+.cc-market > .section-title {
+  font-size: 0.875rem;
+  color: var(--slate-300);
+  margin: 0;
+}
+
+.cc-market-top {
+  grid-area: top;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cc-market-chart {
+  grid-area: chart;
+  min-width: 0;
+}
+
+.cc-market-below {
+  grid-area: below;
+  min-width: 0;
+  display: grid;
+  gap: 0.5rem;
 }
 
 .cc-coins {
-  border-right: 1px solid var(--cc-line);
-  padding-right: 1rem;
+  grid-area: coins;
+  contain: size;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--cc-line);
+  border-radius: var(--cc-radius);
+  background: color-mix(in srgb, var(--cc-raised) 45%, transparent);
+  overflow: hidden;
 }
 
-.cc-coins-title {
-  margin: 0 0 0.5rem;
+.cc .cc-coins-title {
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--cc-line);
+  font-size: 0.75rem;
+  color: var(--slate-300);
 }
 
 .cc-coins-list {
+  position: relative;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .cc-coin {
@@ -375,14 +419,16 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.6rem;
-  min-height: 56px;
-  padding: 0.5rem 0.6rem;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.2rem 0.4rem;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: 6px;
   background: transparent;
   color: var(--slate-100);
   font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.2;
   text-align: left;
   cursor: pointer;
 }
@@ -399,13 +445,13 @@
 .cc-coin-icon {
   display: inline-grid;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.5625rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   flex: 0 0 auto;
 }
 
@@ -425,7 +471,7 @@
 .cc-coin small,
 .cc-quote-name small {
   color: var(--slate-300);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .cc-coin-price {
@@ -434,45 +480,39 @@
 }
 
 .cc-coin-price b {
-  font-size: 0.95rem;
+  font-weight: 600;
 }
 
-.cc-coins-pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: 0.6rem;
-  font-size: 0.9rem;
-  color: var(--slate-300);
-}
-
-.cc-market-top {
+/* Price on the left, candle sizes and currency on the right, on one row while it fits. */
+.cc-market-head {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
 }
 
 .cc-market-controls {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .cc-quote-main {
-  display: flex;
-  gap: 0.85rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  flex: 1 1 18rem;
+  column-gap: 0.55rem;
+  flex: 1 1 16rem;
   min-width: 0;
 }
 
 .cc-quote-main .cc-coin-icon {
-  width: 3rem;
-  height: 3rem;
-  font-size: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.6875rem;
 }
 
 .cc-quote-main p {
@@ -480,15 +520,23 @@
 }
 
 .cc-quote-name {
-  font-size: 1.1rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--slate-100);
 }
 
+.cc-quote-line {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.85rem;
+}
+
 .cc-quote-price {
-  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.15;
   color: var(--slate-50);
   font-variant-numeric: tabular-nums;
 }
@@ -496,8 +544,8 @@
 .cc-quote-changes {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  font-size: 0.95rem;
+  gap: 0.15rem 0.75rem;
+  font-size: 0.8125rem;
   color: var(--slate-300);
 }
 
@@ -506,23 +554,40 @@
   color: var(--slate-100);
 }
 
-.cc-stats,
+/* The figures of the day: one row of small cells that wraps only when it must. */
+.cc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  background: var(--cc-line);
+  gap: 1px;
+  overflow: hidden;
+}
+
+.cc-stats > div {
+  flex: 1 1 7.5rem;
+  min-width: 0;
+  padding: 0.25rem 0.55rem;
+  background: var(--cc-raised);
+}
+
 .cc-strips,
 .cc-figures,
 .cc-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.4rem;
   margin: 0;
 }
 
-.cc-stats > div,
 .cc-strips > div,
 .cc-figures > div {
   background: var(--cc-raised);
   border: 1px solid var(--cc-line);
-  border-radius: 12px;
-  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
   min-width: 0;
 }
 
@@ -532,7 +597,7 @@
 .cc-facts dt,
 .cc-check dt,
 .cc-order-asset dt {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--slate-300);
 }
 
@@ -542,7 +607,7 @@
 .cc-facts dd,
 .cc-check dd,
 .cc-order-asset dd {
-  margin: 0.15rem 0 0;
+  margin: 0.1rem 0 0;
   font-weight: 700;
   color: var(--slate-100);
   font-variant-numeric: tabular-nums;
@@ -551,38 +616,121 @@
 
 .cc-strips dd,
 .cc-figures dd {
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 
 .cc-stats dd {
-  font-size: 1.05rem;
+  font-size: 0.875rem;
 }
 
 /* ─── Layers ─── */
 
+/* Small chips in one bar that wraps: a colour mark, the name in small capitals and a «?». On, the
+   chip takes the layer's colour as border and tint; off, it is quieter but still readable. */
 .cc-layers {
-  border: 1px solid var(--cc-line);
-  border-radius: var(--cc-radius);
-  padding: 0.9rem 1rem;
-  background: color-mix(in srgb, var(--cc-raised) 55%, transparent);
+  display: grid;
+  gap: 0.3rem;
 }
 
-.cc-layers-head {
+.cc-layers-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.35rem 0.75rem;
+}
+
+.cc .cc-layers-bar h3,
+.cc-layer-group-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--slate-300);
+}
+
+.cc-layer-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cc-layer {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--cc-line);
+  border-radius: 6px;
+  background: var(--cc-surface);
+  overflow: hidden;
+}
+
+.cc-layer:has([aria-pressed='true']) {
+  border-color: var(--cc-layer);
+  background: color-mix(in srgb, var(--cc-layer) 18%, var(--cc-surface));
+  box-shadow: inset 0 0 0 1px var(--cc-layer);
+}
+
+.cc-layer-chip,
+.cc-layer-help {
+  min-height: 26px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.cc-layer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.45rem 0 0.35rem;
+  color: var(--slate-300);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cc-layer-chip i {
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--cc-layer);
+  opacity: 0.7;
+}
+
+.cc-layer-chip[aria-pressed='true'] {
+  color: var(--slate-50);
+  font-weight: 800;
+}
+
+.cc-layer-chip[aria-pressed='true'] i {
+  opacity: 1;
+}
+
+.cc-layer-help {
+  min-width: 24px;
+  padding: 0 0.3rem;
+  border-left: 1px solid var(--cc-line);
+  color: var(--accent-300);
+  font-weight: 800;
+}
+
+.cc-layer-chip:hover,
+.cc-layer-help:hover {
+  background: color-mix(in srgb, var(--accent-600) 16%, transparent);
 }
 
 .cc-guide-open {
-  min-height: 48px;
-  padding: 0.5rem 1.1rem;
-  border-radius: 999px;
-  border: 2px solid var(--accent-400);
+  min-height: 26px;
+  padding: 0 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent-400);
   background: var(--accent-600);
   color: #fff;
   font: inherit;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -592,55 +740,37 @@
 }
 
 .cc-layers-note {
-  margin: 0.4rem 0 0.75rem;
+  margin: 0;
   color: var(--slate-300);
-  font-size: 0.95rem;
+  font-size: 0.75rem;
 }
 
-.cc-layer-groups {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.cc-layer-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.cc-layer-group-name {
-  width: 100%;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--slate-300);
-}
-
-.cc-layer {
+/* «Learn all the key words»: opens the guide on its words. */
+.cc-glossary-open {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-}
-
-.cc-layer .cc-chip {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.cc-layer-help {
-  min-height: 44px;
-  min-width: 40px;
-  border: 1px solid var(--cc-line);
-  border-left: 0;
-  border-radius: 0 999px 999px 0;
-  background: var(--cc-raised);
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--accent-400);
+  border-radius: 999px;
+  background: var(--cc-soft);
   color: var(--accent-300);
   font: inherit;
-  font-weight: 800;
+  font-size: 0.8125rem;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.cc-layer-help:hover {
-  background: color-mix(in srgb, var(--accent-600) 18%, var(--cc-raised));
+.cc-glossary-open:hover {
+  background: color-mix(in srgb, var(--accent-600) 24%, var(--cc-surface));
+}
+
+.cc-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
 }
 
 /* ─── Order box ─── */
@@ -653,19 +783,19 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.9rem;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 
 .cc-order-asset {
   display: flex;
-  gap: 1.25rem;
+  gap: 1rem;
   margin: 0;
   text-align: right;
 }
 
 .cc-order-asset dd {
-  font-size: 1.15rem;
+  font-size: 0.9375rem;
 }
 
 .cc-order-asset small {
@@ -674,19 +804,19 @@
 }
 
 .cc-strips {
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
 .cc-order-controls,
 .cc-order-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 1rem;
-  margin: 0.75rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.6rem 0.85rem;
+  margin: 0.5rem 0;
 }
 
 .cc-exits {
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
   border-top: 1px dashed var(--cc-line);
 }
 
@@ -698,7 +828,7 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--cc-line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--slate-950);
   overflow: hidden;
 }
@@ -711,13 +841,13 @@
 .cc-unit-input input {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 52px;
+  min-height: 40px;
   border: 0;
   background: transparent;
   color: var(--slate-50);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 0 0.85rem;
+  padding: 0 0.7rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -726,7 +856,7 @@
 }
 
 .cc-unit-input span {
-  padding: 0 0.9rem;
+  padding: 0 0.7rem;
   color: var(--slate-300);
   font-weight: 700;
 }
@@ -734,21 +864,21 @@
 .cc-auto {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-height: 52px;
+  gap: 0.5rem;
+  min-height: 40px;
   margin: 0;
-  padding: 0 0.85rem;
+  padding: 0 0.7rem;
   border: 1px dashed var(--cc-line);
-  border-radius: 12px;
-  font-size: 1.2rem;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--slate-100);
 }
 
 .cc-auto small {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.15rem 0.55rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 999px;
   background: var(--cc-soft);
   color: var(--accent-300);
@@ -757,8 +887,8 @@
 .cc-quick {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
 }
 
 .cc-positions {
@@ -766,18 +896,18 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.4rem;
+  gap: 0.3rem;
   min-width: 0;
 }
 
 .cc-positions label {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  min-height: 48px;
-  padding: 0.4rem 0.75rem;
+  gap: 0.5rem;
+  min-height: 36px;
+  padding: 0.25rem 0.6rem;
   border: 1px solid var(--cc-line);
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
@@ -787,22 +917,22 @@
 }
 
 .cc-positions input {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1rem;
+  height: 1rem;
   accent-color: var(--accent-600);
 }
 
 .cc-check {
   border: 1px solid var(--cc-line);
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
   background: var(--cc-raised);
-  margin: 0.75rem 0 1rem;
+  margin: 0.5rem 0 0.75rem;
 }
 
 .cc-check h4 {
-  margin: 0 0 0.4rem;
-  font-size: 1rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.875rem;
   color: var(--slate-100);
 }
 
@@ -811,13 +941,13 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.2rem;
 }
 
 .cc-check li {
-  padding-left: 1.6rem;
+  padding-left: 1.3rem;
   position: relative;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .cc-check li::before {
@@ -844,18 +974,18 @@
 
 .cc-check dl {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.5rem 1rem;
-  margin: 0.75rem 0 0;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.35rem 0.85rem;
+  margin: 0.5rem 0 0;
 }
 
 .cc-submit {
   width: 100%;
-  min-height: 56px;
+  min-height: 44px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 10px;
   font: inherit;
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -888,9 +1018,9 @@
 /* ─── Panels of operations ─── */
 
 .cc-total {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 800;
-  margin: 0.25rem 0 0.85rem;
+  margin: 0.2rem 0 0.6rem;
   line-height: 1.35;
 }
 
@@ -900,23 +1030,23 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .cc-trade {
   border: 1px solid var(--cc-line);
-  border-radius: 14px;
-  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
   background: var(--cc-raised);
 }
 
 .cc-trade-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 1rem;
+  gap: 0.3rem 0.85rem;
   align-items: baseline;
-  font-size: 1.1rem;
-  margin-bottom: 0.6rem;
+  font-size: 0.9375rem;
+  margin-bottom: 0.4rem;
 }
 
 .cc-trade-head > :last-child {
@@ -924,31 +1054,31 @@
 }
 
 .cc-facts {
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  margin-bottom: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin-bottom: 0.5rem;
 }
 
 .cc-scheduled {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   color: var(--slate-200);
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
 }
 
 .cc-trade .button-row {
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .cc-trade .button-row button {
-  min-height: 48px;
+  min-height: 36px;
 }
 
 .cc-schedule {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   border-top: 1px dashed var(--cc-line);
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.45rem;
   justify-items: start;
 }
 
@@ -958,15 +1088,15 @@
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .cc-schedule .cc-type {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0.4rem 0.9rem;
+  min-height: 32px;
+  padding: 0.2rem 0.7rem;
   border: 1px solid var(--cc-line);
   border-radius: 999px;
   cursor: pointer;
@@ -985,14 +1115,15 @@
 }
 
 .cc-schedule input:not([type='radio']) {
-  min-height: 48px;
-  font-size: 1.05rem;
+  min-height: 36px;
+  font-size: 0.9375rem;
 }
 
 .cc-fills {
   border: 2px solid var(--accent-400);
   border-radius: var(--cc-radius);
-  padding: 0.85rem 1rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.8125rem;
   background: var(--cc-soft);
 }
 
@@ -1007,14 +1138,15 @@
 
 .cc-settings-card {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 /* ─── Table instead of the chart ─── */
 
 .cc-table-details summary {
   cursor: pointer;
-  min-height: 44px;
+  min-height: 32px;
+  font-size: 0.8125rem;
   display: flex;
   align-items: center;
   font-weight: 700;
@@ -1029,12 +1161,12 @@
   width: 100%;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
-  font-size: 0.95rem;
+  font-size: 0.8125rem;
 }
 
 .cc-table th,
 .cc-table td {
-  padding: 0.5rem 0.65rem;
+  padding: 0.3rem 0.5rem;
   border-bottom: 1px solid var(--cc-line);
   text-align: right;
   white-space: nowrap;
@@ -1045,44 +1177,52 @@
   text-align: left;
 }
 
-.cc-glossary dl {
-  margin: 0;
-  display: grid;
-  gap: 0.85rem;
-}
+/* ─── Phones and touch screens: controls at least 32 px tall ─── */
 
-.cc-glossary dt {
-  font-weight: 700;
-  color: var(--slate-100);
-}
+@media (max-width: 719px), (pointer: coarse) {
+  .cc-layer-chip,
+  .cc-layer-help,
+  .cc-guide-open {
+    min-height: 32px;
+  }
 
-.cc-glossary dd {
-  margin: 0.2rem 0 0;
-  color: var(--slate-300);
-  line-height: 1.55;
+  .cc-layer-help {
+    min-width: 32px;
+  }
 }
-
-/* ─── Phones ─── */
 
 @media (max-width: 719px) {
   .cc .card {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .cc-market-grid {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'coins'
+      'top'
+      'chart'
+      'below';
   }
 
   .cc-coins {
-    border-right: 0;
-    padding-right: 0;
+    contain: none;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .cc-coins-title {
+    display: none;
   }
 
   .cc-coins-list {
     flex-direction: row;
+    gap: 0.3rem;
+    padding: 0 0 0.3rem;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.4rem;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
   }
 
   .cc-coins-list li {
@@ -1092,26 +1232,33 @@
 
   .cc-coin {
     width: auto;
-    min-width: 13.5rem;
+    min-width: 10.5rem;
     border-color: var(--cc-line);
   }
 
   .cc-market-controls {
-    align-items: stretch;
+    justify-content: flex-start;
     width: 100%;
   }
 
   .cc-intervals {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    flex: 1 1 100%;
   }
 
   .cc-intervals label {
-    padding: 0.4rem 0.25rem;
+    min-width: 0;
+    padding: 0.2rem 0.1rem;
   }
 
-  .cc-currency {
-    align-self: flex-start;
+  .cc-stats > div {
+    flex-basis: 30%;
+    padding: 0.25rem 0.4rem;
+  }
+
+  .cc-stats dd {
+    font-size: 0.8125rem;
   }
 
   .cc-order-asset {
@@ -1131,21 +1278,30 @@
 @media (orientation: landscape) and (max-height: 500px) {
   .cc-market-grid {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'coins'
+      'top'
+      'chart'
+      'below';
   }
 
   .cc-coins {
-    border-right: 0;
-    padding-right: 0;
+    contain: none;
+    border: 0;
+    background: transparent;
+    overflow: visible;
   }
 
-  .cc-coins-title,
-  .cc-coins-pager {
+  .cc-coins-title {
     display: none;
   }
 
   .cc-coins-list {
     flex-direction: row;
+    gap: 0.3rem;
+    padding: 0 0 0.3rem;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .cc-coins-list li {
@@ -1153,19 +1309,18 @@
   }
 
   .cc-coin {
-    min-height: 44px;
-    min-width: 11rem;
+    min-width: 10rem;
+    border-color: var(--cc-line);
   }
 
   .cc-stats {
     display: none;
   }
 
-  .cc-layer-groups {
-    display: flex;
+  .cc-layers-bar {
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding-bottom: 0.4rem;
+    padding-bottom: 0.3rem;
   }
 
   .cc-layer-group {
@@ -1186,14 +1341,22 @@ html.wiz-contrast .cc-chip,
 html.wiz-contrast .cc-tool,
 html.wiz-contrast .cc-segmented,
 html.wiz-contrast .cc-segmented--wide label,
-html.wiz-contrast .cc-stats > div,
+html.wiz-contrast .cc-stats,
 html.wiz-contrast .cc-strips > div,
 html.wiz-contrast .cc-figures > div,
 html.wiz-contrast .cc-check,
 html.wiz-contrast .cc-unit-input,
+html.wiz-contrast .cc-coins,
+html.wiz-contrast .cc-layer,
+html.wiz-contrast .cc-glossary-open,
 html.wiz-contrast .cc-coin[aria-pressed='true'] {
   border-width: 2px;
   border-color: var(--slate-100);
+}
+
+html.wiz-contrast .cc-layer:has([aria-pressed='true']) {
+  border-color: var(--slate-50);
+  box-shadow: inset 0 0 0 2px var(--cc-layer);
 }
 
 html.wiz-contrast .cc-data,
@@ -1203,8 +1366,12 @@ html.wiz-contrast .cc-strips dt,
 html.wiz-contrast .cc-figures dt,
 html.wiz-contrast .cc-facts dt,
 html.wiz-contrast .cc-coin small,
+html.wiz-contrast .cc-coins-title,
+html.wiz-contrast .cc-layers-bar h3,
+html.wiz-contrast .cc-layer-group-name,
+html.wiz-contrast .cc-layer-chip,
 html.wiz-contrast .cc-layers-note,
-html.wiz-contrast .cc-glossary dd {
+html.wiz-contrast .cc-quote-changes {
   color: var(--slate-100);
 }
 
@@ -1216,7 +1383,7 @@ html.wiz-contrast .cc-glossary dd {
   }
 }
 
-.cc-segmented label > span[aria-hidden='true'] {
+.cc-segmented--wide label > span[aria-hidden='true'] {
   margin-right: 0.35rem;
 }
 

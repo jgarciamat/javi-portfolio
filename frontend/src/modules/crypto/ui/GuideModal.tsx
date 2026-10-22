@@ -1,4 +1,4 @@
-import { useEffect, type ReactElement } from 'react';
+import { useEffect, useId, useState, type ReactElement } from 'react';
 import { useI18n } from '@core/i18n/I18nContext';
 import { Modal } from '@shared/components/Modal';
 import { intlTag } from '../domain/format';
@@ -6,9 +6,11 @@ import { FIB_RATIOS } from '../domain/indicators';
 import {
   CANDLE_PATTERNS,
   CHART_PATTERNS,
+  GLOSSARY_TERMS,
   GUIDE_PARAGRAPHS,
   GUIDE_SECTIONS,
   type GuideSection,
+  type ParagraphSection,
 } from '../domain/guide';
 import {
   BollingerArt,
@@ -40,7 +42,7 @@ function Section({
   art,
   extra,
 }: {
-  id: Exclude<GuideSection, 'patterns'>;
+  id: ParagraphSection;
   art: ReactElement;
   extra?: ReactElement;
 }) {
@@ -90,9 +92,60 @@ function Patterns() {
   );
 }
 
+/** Text compared without capitals or accents, so «stop» finds «Stop loss» and «vela» finds «Vela». */
+const plain = (text: string) =>
+  text
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+
+/** «Words of the console»: every term with its short explanation, and a box to find one. */
+function Glossary() {
+  const { t } = useI18n();
+  const [query, setQuery] = useState('');
+  const searchId = useId();
+  const id = anchor('glossary');
+  const terms = GLOSSARY_TERMS.map((term) => ({
+    term,
+    name: t(`app.crypto.glossary.${term}.term`),
+    text: t(`app.crypto.glossary.${term}.text`),
+  }));
+  const wanted = plain(query.trim());
+  const shown = terms.filter((g) => plain(`${g.name} ${g.text}`).includes(wanted));
+  return (
+    <section id={id} className="cc-guide-section" aria-labelledby={`${id}-title`}>
+      <h3 id={`${id}-title`}>{t('app.crypto.guide.glossary.title')}</h3>
+      <p>{t('app.crypto.guide.glossary.intro')}</p>
+      <label className="cc-glossary-search" htmlFor={searchId}>
+        <span>{t('app.crypto.guide.glossary.search')}</span>
+        <input
+          id={searchId}
+          type="search"
+          value={query}
+          autoComplete="off"
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
+      {shown.length ? (
+        <dl className="cc-glossary">
+          {shown.map((g) => (
+            <div key={g.term}>
+              <dt>{g.name}</dt>
+              <dd>{g.text}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p role="status">{t('app.crypto.guide.glossary.none', { query: query.trim() })}</p>
+      )}
+    </section>
+  );
+}
+
 /**
  * «What is each thing?»: how to read candles, sizes and every layer of the chart, and the best
- * known patterns, with small drawings. Plain explanations for learning, never advice.
+ * known patterns, with small drawings, and every word of the console at the end. Plain
+ * explanations for learning, never advice.
  */
 export function GuideModal({ section, onClose }: { section: GuideSection; onClose: () => void }) {
   const { t, locale } = useI18n();
@@ -154,6 +207,7 @@ export function GuideModal({ section, onClose }: { section: GuideSection; onClos
         <Section id="levels" art={<LevelsArt labels={[layer('resistance'), layer('support')]} />} />
         <Section id="fibonacci" art={<FibonacciArt labels={FIB_RATIOS.map(percent)} />} />
         <Patterns />
+        <Glossary />
       </div>
     </Modal>
   );
